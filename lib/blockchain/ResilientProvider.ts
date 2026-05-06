@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { getGbAllRpc, getGbAllWss } from './getblock-registry';
 
 // ── GLOBAL RESILIENCE HACK ──────────────────────────────────────────────────
 // NodeJS `ws` library (used under the hood by ethers.WebSocketProvider) 
@@ -60,80 +61,106 @@ const parseMultiplexKeys = (envVal: string | undefined): string[] => {
   return envVal.split(',').map(s => s.trim()).filter(Boolean);
 };
 
-// Endpoints públicos de fallback (Sexta línea de defensa e inyección web3 masiva)
+// ── FALLBACKS — construido desde getblock-registry + públicos ────────────────
+// GetBlock siempre en primera posición. Nunca hardcodear URLs aquí.
 const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string[] }> = {
   1: {
     rpc: [
-      process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
-      ...parseMultiplexKeys(process.env.GETBLOCK_ETH_RPCS),
+      ...getGbAllRpc('eth'),                                          // GB slots 1+2 (archive)
       ...parseMultiplexKeys(process.env.ALCHEMY_ETH_RPCS),
       `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
       'https://rpc.ankr.com/eth',
       'https://1rpc.io/eth',
       'https://eth.llamarpc.com',
-      'https://cloudflare-eth.com'
+      'https://cloudflare-eth.com',
     ].filter(Boolean),
     wss: [
-      'wss://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
-      ...parseMultiplexKeys(process.env.GETBLOCK_ETH_WSS),
+      ...getGbAllWss('eth'),                                          // GB WSS slots 1+2+3
       'wss://ethereum-rpc.publicnode.com',
-      'wss://eth.llamarpc.com'
-    ].filter(Boolean)
+      'wss://eth.llamarpc.com',
+    ].filter(Boolean),
   },
   56: {
     rpc: [
-      process.env.BNB_RPC_URL || 'https://go.getblock.us/8405bc34194e4343a10cdc7a76360793',
-      ...parseMultiplexKeys(process.env.GETBLOCK_BSC_RPCS),
-      'https://bsc.llamarpc.com',          // FIX: binance.llamarpc.com is ENOTFOUND — correct host
+      ...getGbAllRpc('bsc'),                                          // GB slot 6
+      'https://bsc.llamarpc.com',
       'https://1rpc.io/bnb',
       'https://bsc-dataseed1.binance.org',
       'https://bsc-dataseed2.binance.org',
-      'https://bsc.meowrpc.com',
       'https://rpc.ankr.com/bsc',
-      'https://bsc.publicnode.com'
+      'https://bsc.publicnode.com',
     ].filter(Boolean),
     wss: [
-      'wss://go.getblock.us/8405bc34194e4343a10cdc7a76360793',
-      ...parseMultiplexKeys(process.env.GETBLOCK_BSC_WSS),
+      ...getGbAllWss('bsc'),                                          // GB slot 7
       'wss://bsc-rpc.publicnode.com',
-      'wss://binance.llamarpc.com'
-    ].filter(Boolean)
+    ].filter(Boolean),
   },
   137: {
     rpc: [
-      ...parseMultiplexKeys(process.env.GETBLOCK_POLYGON_RPCS),
+      ...getGbAllRpc('polygon'),                                      // GB slot 5 (archive)
       'https://polygon.llamarpc.com',
       'https://1rpc.io/matic',
       'https://rpc.ankr.com/polygon',
-      'https://polygon.meowrpc.com',
-      'https://polygon-rpc.com'
+      'https://polygon-rpc.com',
     ].filter(Boolean),
     wss: [
-      ...parseMultiplexKeys(process.env.GETBLOCK_POLYGON_WSS),
-      'wss://polygon-bor-rpc.publicnode.com'
-    ].filter(Boolean)
+      ...getGbAllWss('polygon'),                                      // GB slot 9
+      'wss://polygon-bor-rpc.publicnode.com',
+    ].filter(Boolean),
   },
   8453: {
     rpc: [
-      process.env.GETBLOCK_BASE_RPC || '',
-      ...parseMultiplexKeys(process.env.GETBLOCK_BASE_RPCS),
+      ...getGbAllRpc('base'),                                         // GB slot 7 (archive)
       'https://base.llamarpc.com',
       'https://1rpc.io/base',
       'https://mainnet.base.org',
-      'https://base.meowrpc.com',
-      'https://rpc.ankr.com/base'
+      'https://rpc.ankr.com/base',
     ].filter(Boolean),
     wss: [
-      ...parseMultiplexKeys(process.env.GETBLOCK_BASE_WSS),
+      ...getGbAllWss('base'),                                         // GB slot 8
       'wss://base-rpc.publicnode.com',
-      'wss://base.llamarpc.com'
+      'wss://base.llamarpc.com',
     ].filter(Boolean),
     archive: [
-      `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
-      'https://rpc.ankr.com/eth',
-      'https://cloudflare-eth.com'
-    ].filter(Boolean)
-  }
+      ...getGbAllRpc('base'),
+      `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
+      'https://rpc.ankr.com/base',
+    ].filter(Boolean),
+  },
+  10: {
+    rpc: [
+      ...getGbAllRpc('op'),                                           // GB slot 10
+      `https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
+      'https://mainnet.optimism.io',
+      'https://rpc.ankr.com/optimism',
+    ].filter(Boolean),
+    wss: [
+      'wss://optimism-rpc.publicnode.com',
+    ].filter(Boolean),
+  },
+  42161: {
+    rpc: [
+      ...getGbAllRpc('arb'),                                          // GB slot 8 (archive)
+      `https://arb-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
+      'https://arb1.arbitrum.io/rpc',
+      'https://rpc.ankr.com/arbitrum',
+    ].filter(Boolean),
+    wss: [
+      ...getGbAllWss('arb'),                                          // GB slot 14
+      'wss://arbitrum-one-rpc.publicnode.com',
+    ].filter(Boolean),
+  },
+  43114: {
+    rpc: [
+      ...getGbAllRpc('avax'),                                         // GB slot 13
+      `https://avalanche-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
+      'https://api.avax.network/ext/bc/C/rpc',
+      'https://rpc.ankr.com/avalanche',
+    ].filter(Boolean),
+    wss: [
+      'wss://avalanche-c-chain-rpc.publicnode.com',
+    ].filter(Boolean),
+  },
 };
 
 const EXHAUSTION_COOLDOWN_MS = 60 * 1000; // REDUCED EXHAUSTION COOLDOWN TO 60 SECONDS! (Max Agility)

@@ -107,74 +107,75 @@ export default function SwapModal({ isOpen, onClose }: SwapModalProps) {
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none p-4"
                     >
-                        <div className="w-full max-w-md bg-[#EAEADF] border border-[#1F1F1F]/10 rounded-[40px] shadow-2xl overflow-hidden pointer-events-auto relative">
+                        <div className="w-full max-w-md bg-[#050505] border border-white/10 rounded-[40px] shadow-[0_0_80px_-20px_rgba(var(--aztec-orchid-rgb),0.3)] overflow-hidden pointer-events-auto relative backdrop-blur-2xl">
                             
                             {/* Header */}
-                            <div className="flex items-center justify-between p-6 pb-2">
+                            <div className="flex items-center justify-between p-6 pb-2 border-b border-white/5 bg-white/[0.02]">
                                 <div>
-                                    <h2 className="text-2xl font-black text-[#1F1F1F] tracking-tight">Smart Swap</h2>
-                                    <p className="text-xs font-bold text-[#1F1F1F]/50 uppercase tracking-widest">Invisible Bridging Enabled</p>
+                                    <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                                        <Zap size={20} className="text-[var(--aztec-orchid)]" />
+                                        Smart Swap
+                                    </h2>
+                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mt-1">Invisible Bridging Active</p>
                                 </div>
-                                <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full transition-colors">
-                                    <X className="w-6 h-6 text-[#1F1F1F]" />
+                                <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                                    <X className="w-5 h-5 text-white/60" />
                                 </button>
                             </div>
 
-                            <div className="p-6 space-y-2">
+                            <div className="p-6 space-y-2 bg-[#050505]">
                                 {/* PAY INPUT */}
-                                <div className="bg-white p-5 rounded-[32px] shadow-sm border border-transparent hover:border-[#1F1F1F]/5 transition-all group">
-                                    <div className="flex justify-between text-xs font-bold text-[#1F1F1F]/40 mb-2 uppercase tracking-wide">
+                                <div className="bg-white/[0.02] p-5 rounded-[32px] border border-white/5 hover:border-[var(--aztec-orchid)]/50 transition-all group relative overflow-hidden">
+                                    <div className="flex justify-between text-[10px] font-black text-white/40 mb-3 uppercase tracking-[0.15em]">
                                         <span>You Pay</span>
-                                        <span>Balance: 2.45</span>
+                                        <span className="font-mono">Balance: 2.45 ETH</span>
                                     </div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4 relative z-10">
                                         <input 
                                             type="number" 
                                             value={payAmount}
                                             onChange={(e) => setPayAmount(e.target.value)}
-                                            placeholder="0" 
-                                            className="w-full bg-transparent text-4xl font-black text-[#1F1F1F] focus:outline-none placeholder:text-[#1F1F1F]/10"
+                                            placeholder="0.00" 
+                                            className="w-full bg-transparent text-4xl font-black font-mono text-white focus:outline-none placeholder:text-white/10"
                                         />
-                                        <button className="flex items-center gap-2 bg-[#1F1F1F] text-[#EAEADF] px-4 py-2 rounded-full hover:scale-105 transition-transform">
-                                            <span className="font-bold">{payToken.symbol}</span>
+                                        <button className="flex items-center gap-2 bg-white/10 text-white px-4 py-2.5 rounded-full hover:bg-white/20 transition-all border border-white/10 shrink-0">
+                                            <span className="font-black text-xs uppercase tracking-wider">{payToken.symbol}</span>
                                         </button>
                                     </div>
-                                    <div className="mt-2 text-xs font-medium text-[#1F1F1F]/40">
-                                        on {payToken.chain}
+                                    <div className="mt-3 text-[9px] font-black uppercase tracking-widest text-white/30 flex items-center gap-1.5">
+                                        <Route size={10} /> Route via {payToken.chain}
                                     </div>
                                 </div>
 
                                 {/* SWITCHER */}
-                                <div className="relative h-4 z-10">
-                                    <div className="absolute left-1/2 -translate-x-1/2 -top-5">
-                                        <div className="bg-[#EAEADF] p-2 rounded-xl border-4 border-[#EAEADF]">
-                                            <div className="bg-white p-2 rounded-lg shadow-sm text-[#1F1F1F]">
-                                                <ArrowDown size={20} />
-                                            </div>
+                                <div className="relative h-4 z-10 flex justify-center">
+                                    <div className="absolute -top-4 bg-[#050505] p-1.5 rounded-2xl border border-white/5 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                                        <div className="bg-white/5 p-2 rounded-xl text-[var(--aztec-orchid)] hover:text-white hover:bg-[var(--aztec-orchid)] transition-all cursor-pointer">
+                                            <ArrowDown size={18} />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* RECEIVE INPUT */}
-                                <div className="bg-white p-5 rounded-[32px] shadow-sm border border-transparent hover:border-[#1F1F1F]/5 transition-all">
-                                    <div className="flex justify-between text-xs font-bold text-[#1F1F1F]/40 mb-2 uppercase tracking-wide">
+                                <div className="bg-white/[0.02] p-5 rounded-[32px] border border-white/5 hover:border-[var(--aztec-orchid)]/50 transition-all group relative overflow-hidden">
+                                    <div className="flex justify-between text-[10px] font-black text-white/40 mb-3 uppercase tracking-[0.15em]">
                                         <span>You Receive</span>
-                                        {swapStatus === 'quoting' && <span className="flex items-center gap-1 text-purple-600"><Loader2 size={10} className="animate-spin"/> Finding Best Route...</span>}
+                                        {swapStatus === 'quoting' && <span className="flex items-center gap-1.5 text-[var(--aztec-orchid)]"><Loader2 size={10} className="animate-spin"/> Routing...</span>}
                                     </div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4 relative z-10">
                                         <input 
                                             type="text" 
                                             value={receiveAmount}
                                             readOnly
-                                            placeholder="0" 
-                                            className={`w-full bg-transparent text-4xl font-black text-[#1F1F1F] focus:outline-none placeholder:text-[#1F1F1F]/10 transition-opacity ${swapStatus === 'quoting' ? 'opacity-50' : 'opacity-100'}`}
+                                            placeholder="0.00" 
+                                            className={`w-full bg-transparent text-4xl font-black font-mono text-white focus:outline-none placeholder:text-white/10 transition-opacity ${swapStatus === 'quoting' ? 'opacity-30' : 'opacity-100'}`}
                                         />
-                                        <button className="flex items-center gap-2 bg-[#1F1F1F] text-[#EAEADF] px-4 py-2 rounded-full hover:scale-105 transition-transform shadow-lg">
-                                            <span className="font-bold">{receiveToken.symbol}</span>
+                                        <button className="flex items-center gap-2 bg-white/10 text-white px-4 py-2.5 rounded-full hover:bg-white/20 transition-all border border-white/10 shrink-0">
+                                            <span className="font-black text-xs uppercase tracking-wider">{receiveToken.symbol}</span>
                                         </button>
                                     </div>
-                                    <div className="mt-2 text-xs font-medium text-[#1F1F1F]/40">
-                                        on {receiveToken.chain}
+                                    <div className="mt-3 text-[9px] font-black uppercase tracking-widest text-white/30 flex items-center gap-1.5">
+                                        <Route size={10} /> Route via {receiveToken.chain}
                                     </div>
                                 </div>
 
@@ -182,21 +183,23 @@ export default function SwapModal({ isOpen, onClose }: SwapModalProps) {
                                 <AnimatePresence>
                                     {route && (
                                         <motion.div 
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            className="bg-[#1F1F1F] text-[#EAEADF] p-4 rounded-3xl mt-4 flex items-center justify-between"
+                                            initial={{ opacity: 0, height: 0, y: -10 }}
+                                            animate={{ opacity: 1, height: 'auto', y: 0 }}
+                                            className="bg-white/[0.03] border border-white/5 p-4 rounded-3xl mt-4 flex items-center justify-between overflow-hidden relative"
                                         >
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-purple-500/20 rounded-full text-purple-300">
-                                                    <Sparkles size={18} />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-[var(--aztec-orchid)]/5 to-transparent pointer-events-none" />
+                                            <div className="flex items-center gap-3 relative z-10">
+                                                <div className="p-2 bg-[var(--aztec-orchid)]/10 rounded-full text-[var(--aztec-orchid)]">
+                                                    <Sparkles size={14} />
                                                 </div>
                                                 <div>
-                                                    <div className="text-xs font-bold text-[#EAEADF]/60 uppercase tracking-widest">AI Solver Route</div>
-                                                    <div className="font-bold text-sm">{route}</div>
+                                                    <div className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Flashbots Solver Route</div>
+                                                    <div className="font-mono text-xs font-black text-white/90 mt-0.5">{route}</div>
                                                 </div>
                                             </div>
-                                            <div className="text-green-400 font-bold text-xs bg-green-900/30 px-2 py-1 rounded-lg">
-                                                Fastest
+                                            <div className="text-green-400 font-black text-[9px] uppercase tracking-widest bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-lg relative z-10 flex items-center gap-1.5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                                0-Conf
                                             </div>
                                         </motion.div>
                                     )}
@@ -206,15 +209,15 @@ export default function SwapModal({ isOpen, onClose }: SwapModalProps) {
                                 <button 
                                     disabled={!payAmount || swapLoading || swapStatus === 'quoting'}
                                     onClick={handleSwap}
-                                    className="w-full py-5 mt-4 bg-[#1F1F1F] text-white rounded-[24px] font-black text-xl shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+                                    className="w-full py-5 mt-4 bg-[var(--aztec-orchid)] text-black rounded-[24px] font-black text-sm uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(var(--aztec-orchid-rgb),0.3)] hover:brightness-110 active:scale-95 disabled:opacity-30 disabled:scale-100 disabled:shadow-none transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                                     {swapStatus === 'quoting' ? (
-                                        <>Searching...</>
+                                        <>Awaiting Route Matrix...</>
                                     ) : (
                                         <>
-                                            <Zap fill="currentColor" className="text-yellow-400" />
-                                            {swapStatus === 'signing' ? 'PLEASE SIGN...' : 'EXECUTE SWAP'}
+                                            <Zap fill="currentColor" size={16} />
+                                            {swapStatus === 'signing' ? 'AWAITING WALLET SIGNATURE' : 'EXECUTE TACTICAL SWAP'}
                                         </>
                                     )}
                                 </button>

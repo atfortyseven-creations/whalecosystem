@@ -56,7 +56,7 @@ export const SovereignMessenger = () => {
                     sender,
                     content: input,
                     address,
-                    signature: 'SIG_ECIES_' + Math.random().toString(16).slice(2, 24)
+                    signature: 'SIG_ECIES_' + Array.from(window.crypto.getRandomValues(new Uint8Array(11))).map(b => b.toString(16).padStart(2, '0')).join('')
                 })
             });
 

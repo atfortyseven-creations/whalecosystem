@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { safeRedisGet, safeRedisSet } from '../redis/client';
+import { getGbAllRpc } from '../blockchain/getblock-registry';
 
 /**
  * 🌌 WHALE INTELLIGENCE MATRIX V8.0 — ZERO SYNTHETIC DATA
@@ -59,13 +60,18 @@ const DEX_ROUTERS_BNB = new Set([
     '0x1111111254eeb25477b68fb85ed929f73a960582', // 1inch v5 BSC
 ]);
 
+// RPC_CONFIG — construido desde el registry (GetBlock primero, públicos de emergencia)
 const RPC_CONFIG = {
     ETH: [
-        process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
-    ],
+        ...getGbAllRpc('eth'),                                      // GB slots 1+2 (archive)
+        'https://cloudflare-eth.com',
+        'https://rpc.ankr.com/eth',
+    ].filter(Boolean),
     BNB: [
-        process.env.BNB_RPC_URL || 'https://go.getblock.us/8405bc34194e4343a10cdc7a76360793',
-    ]
+        ...getGbAllRpc('bsc'),                                      // GB slot 6
+        'https://bsc-dataseed1.binance.org',
+        'https://rpc.ankr.com/bsc',
+    ].filter(Boolean),
 };
 
 const BINANCE_24_TOKENS: Record<string, Record<string, { symbol: string; decimals: number }>> = {
@@ -277,8 +283,8 @@ class WhaleDataService {
 
             // Scan ETH and BNB in parallel — real data only
             const [ethMovements, bnbMovements] = await Promise.all([
-                this.processRecentBlocks('ETH', 5),
-                this.processRecentBlocks('BNB', 5),
+                this.processRecentBlocks('ETH', 3),   // 3 bloques (~36s) — balance entre frescura y CU
+                this.processRecentBlocks('BNB', 3),
             ]);
 
             let allMovements = [...ethMovements, ...bnbMovements];
@@ -295,8 +301,8 @@ class WhaleDataService {
 
             allMovements = allMovements.sort((a, b) => b.ts - a.ts).slice(0, limit);
 
-            // Cache 15s — real data refreshes frequently enough
-            await safeRedisSet(cacheKey, JSON.stringify(allMovements), 'EX', '15');
+            // Cache 120s — reduce getLogs calls de ~5760/día a ~720/día (-87% CU)
+            await safeRedisSet(cacheKey, JSON.stringify(allMovements), 'EX', '120');
             return allMovements;
         } catch (error) {
             console.error('[WhaleService V8] Fatal error — returning empty:', error);
