@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { safeRedisGet, safeRedisSet } from '../redis/client';
-import { getGbAllRpc } from '../blockchain/getblock-registry';
+import { getGbAllRpc } from '@/lib/blockchain/getblock-registry';
 
 /**
  * 🌌 WHALE INTELLIGENCE MATRIX V8.0 — ZERO SYNTHETIC DATA

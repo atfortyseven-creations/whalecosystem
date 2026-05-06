@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
-import { getGbRpc, getGbWss } from '../blockchain/getblock-registry';
+import { getGbRpc, getGbWss } from '@/lib/blockchain/getblock-registry';
 
 // 100M-User Scalability & Enterprise Matrix Configuration
 export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche';
@@ -26,7 +26,7 @@ export const NETWORKS: Record<NetworkId, { name: string; currency: string; rpc: 
   },
   optimism: {
     name: 'Optimism', currency: 'ETH', color: '#FF0420',
-    rpc: getGbRpc('op')  || 'https://mainnet.optimism.io',
+    rpc: 'https://mainnet.optimism.io',
     wss: 'wss://optimism-rpc.publicnode.com',
   },
   base: {
@@ -36,7 +36,7 @@ export const NETWORKS: Record<NetworkId, { name: string; currency: string; rpc: 
   },
   avalanche: {
     name: 'Avalanche', currency: 'AVAX', color: '#E84142',
-    rpc: getGbRpc('avax') || 'https://api.avax.network/ext/bc/C/rpc',
+    rpc: 'https://api.avax.network/ext/bc/C/rpc',
     wss: 'wss://avalanche-c-chain-rpc.publicnode.com',
   },
 };

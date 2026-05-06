@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { redisClient } from './redis/client';
-import { getGbAllRpc, getGbRpc } from '../blockchain/getblock-registry';
+import { getGbAllRpc, getGbRpc } from '@/lib/blockchain/getblock-registry';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -33,10 +33,10 @@ function safeParseRPC(envValue: string | undefined, fallback: string): string {
  */
 const RPC_POOL: Record<string, RPCEndpoint[]> = {
     SOLANA: [
-        { url: safeParseRPC(process.env.GB_SOL_RPC_1, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: safeParseRPC(process.env.GB_SOL_RPC_2 ?? process.env.SOLANA_RPC_2, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://api.mainnet-beta.solana.com', chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://ssc-dao.genesysgo.net',       chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        { url: safeParseRPC(process.env.GB_SOL_RPC_1, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: safeParseRPC(process.env.GB_SOL_RPC_2 ?? process.env.SOLANA_RPC_2, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://api.mainnet-beta.solana.com', chain: 'SOLANA' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://ssc-dao.genesysgo.net',       chain: 'SOLANA' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ].filter((ep, idx, arr) => arr.findIndex(e => e.url === ep.url) === idx), // deduplica
 
     ETHEREUM: [
@@ -45,44 +45,43 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
             url, chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
         })),
         // Públicos de emergencia
-        { url: 'https://cloudflare-eth.com', chain: 'ETHEREUM', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://rpc.ankr.com/eth',   chain: 'ETHEREUM', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://eth.llamarpc.com',   chain: 'ETHEREUM', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        { url: 'https://cloudflare-eth.com', chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/eth',   chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://eth.llamarpc.com',   chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
     BSC: [
-        ...( getGbRpc('bsc') ? [{ url: getGbRpc('bsc'), chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
-        { url: 'https://bsc-dataseed1.binance.org', chain: 'BSC', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://bsc-dataseed2.binance.org', chain: 'BSC', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://rpc.ankr.com/bsc',          chain: 'BSC', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        ...( getGbRpc('bsc') ? [{ url: getGbRpc('bsc') as string, chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
+        { url: 'https://bsc-dataseed1.binance.org', chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://bsc-dataseed2.binance.org', chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/bsc',          chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
     POLYGON: [
-        ...( getGbRpc('polygon') ? [{ url: getGbRpc('polygon'), chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
-        { url: 'https://polygon-rpc.com',           chain: 'POLYGON', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://rpc.ankr.com/polygon',      chain: 'POLYGON', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://polygon.llamarpc.com',       chain: 'POLYGON', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        ...( getGbRpc('polygon') ? [{ url: getGbRpc('polygon') as string, chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
+        { url: 'https://polygon-rpc.com',           chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/polygon',      chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://polygon.llamarpc.com',       chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
     BASE: [
-        ...( getGbRpc('base') ? [{ url: getGbRpc('base'), chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
-        { url: 'https://mainnet.base.org',          chain: 'BASE', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://rpc.ankr.com/base',         chain: 'BASE', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://base.llamarpc.com',          chain: 'BASE', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        ...( getGbRpc('base') ? [{ url: getGbRpc('base') as string, chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
+        { url: 'https://mainnet.base.org',          chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/base',         chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://base.llamarpc.com',          chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
     ARB: [
         ...getGbAllRpc('arb').map(url => ({
             url, chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
         })),
-        { url: 'https://arb1.arbitrum.io/rpc',      chain: 'ARB', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://rpc.ankr.com/arbitrum',     chain: 'ARB', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        { url: 'https://arb1.arbitrum.io/rpc',      chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/arbitrum',     chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
     OP: [
-        ...( getGbRpc('op') ? [{ url: getGbRpc('op'), chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
-        { url: 'https://mainnet.optimism.io',        chain: 'OP', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: 'https://rpc.ankr.com/optimism',      chain: 'OP', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        { url: 'https://mainnet.optimism.io',        chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/optimism',      chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 };
 
