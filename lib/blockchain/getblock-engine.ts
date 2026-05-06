@@ -1,17 +1,14 @@
 /**
- * GetBlock Engine — Dedicated Ethereum Node
+ * GetBlock Engine — Multi-Endpoint Failover (vía getblock-registry)
  *
- * Utilizamos nuestro Interstellar Node dedicado para Ethereum
- * para resolver consultas de balances de manera confiable.
- *
- * EP1: https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b
+ * Fuente única: getblock-registry.ts
+ * No hardcodear URLs aquí. Para añadir endpoints, editar .env + registry.
  */
 
-// ── DYNAMIC ENDPOINT LOADING ────────────────────────────────────────────────
-const ALL_ENDPOINTS = [
-  process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
-  process.env.GETBLOCK_ETH_RPC_1,
-].filter(Boolean) as string[];
+import { getGbAllRpc, getActiveCount, getCoveredChains, markCuExhausted } from './getblock-registry';
+
+// ── FALLBACK PÚBLICO DE EMERGENCIA ───────────────────────────────────────────
+const PUBLIC_ETH_FALLBACK = 'https://eth.llamarpc.com';
 
 // ── Estado de salud por endpoint ─────────────────────────────────────────────
 interface EndpointHealth {
@@ -21,50 +18,60 @@ interface EndpointHealth {
   errorCount: number;
 }
 
-const endpointHealth: EndpointHealth[] = ALL_ENDPOINTS.map(url => ({
-  url,
-  exhausted: false,
-  errorCount: 0,
-}));
-
 // Cooldown de 10 min para 402/429
 const EXHAUSTION_COOLDOWN_MS = 10 * 60 * 1000;
 
-function getActiveEndpoints(): EndpointHealth[] {
-  const now = Date.now();
-  for (const ep of endpointHealth) {
-    if (ep.exhausted && ep.exhaustedAt && now - ep.exhaustedAt > EXHAUSTION_COOLDOWN_MS) {
-      ep.exhausted = false;
-      ep.errorCount = 0;
-    }
+// Mapa de salud por URL (singleton en memoria del proceso)
+const healthMap = new Map<string, EndpointHealth>();
+
+function getOrCreateHealth(url: string): EndpointHealth {
+  if (!healthMap.has(url)) {
+    healthMap.set(url, { url, exhausted: false, errorCount: 0 });
   }
-  return endpointHealth.filter(ep => !ep.exhausted);
+  return healthMap.get(url)!;
+}
+
+function getActiveUrls(urls: string[]): string[] {
+  const now = Date.now();
+  return urls.filter(url => {
+    const h = getOrCreateHealth(url);
+    if (h.exhausted && h.exhaustedAt && now - h.exhaustedAt > EXHAUSTION_COOLDOWN_MS) {
+      h.exhausted = false;
+      h.errorCount = 0;
+    }
+    return !h.exhausted;
+  });
 }
 
 function markExhausted(url: string, reason: string) {
-  const ep = endpointHealth.find(e => e.url === url);
-  if (!ep) return;
-  ep.exhausted = true;
-  ep.exhaustedAt = Date.now();
-  console.warn(`[GetBlock-Engine] 💀 BLACKLISTED (${reason}): ${url.slice(0, 40)}...`);
+  const h = getOrCreateHealth(url);
+  h.exhausted = true;
+  h.exhaustedAt = Date.now();
+  h.errorCount++;
+  console.warn(`[GetBlock-Engine] 💀 BLACKLISTED (${reason}): ${url.slice(0, 48)}...`);
 }
 
-// ── JSON-RPC core con failover automático ────────────────────────────────────
+// ── JSON-RPC core con failover automático desde el registry ──────────────────
 async function rpcWithFailover(method: string, params: unknown[], id = 1): Promise<string> {
-  const active = getActiveEndpoints();
+  // Obtener todos los HTTP endpoints ETH activos desde el registry centralizado
+  const registryUrls = getGbAllRpc('eth');
+  const activeUrls = getActiveUrls(registryUrls.length > 0 ? registryUrls : [PUBLIC_ETH_FALLBACK]);
 
-  if (active.length === 0) {
-    // Si todo GetBlock falló, intentar fallback público de emergencia por fetch
-    return fetch('https://eth.llamarpc.com', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', method, params, id })
-    }).then(r => r.json()).then(j => j.result as string).catch(() => '0x0');
+  if (activeUrls.length === 0) {
+    // Todos los GetBlock exhausted → emergency public fallback
+    return fetch(PUBLIC_ETH_FALLBACK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', method, params, id }),
+    })
+      .then(r => r.json())
+      .then((j: any) => j.result as string)
+      .catch(() => '0x0');
   }
 
-  for (const ep of active) {
+  for (const url of activeUrls) {
     try {
-      const res = await fetch(ep.url, {
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jsonrpc: '2.0', method, params, id }),
@@ -72,7 +79,8 @@ async function rpcWithFailover(method: string, params: unknown[], id = 1): Promi
       });
 
       if (res.status === 402 || res.status === 429 || res.status === 401) {
-        markExhausted(ep.url, `HTTP_${res.status}`);
+        markCuExhausted(url);   // Circuit Breaker — bloquea hasta 00:00 UTC
+        markExhausted(url, `HTTP_${res.status}`);
         continue;
       }
 
@@ -80,19 +88,21 @@ async function rpcWithFailover(method: string, params: unknown[], id = 1): Promi
 
       const json = await res.json() as { result?: string; error?: any };
       if (json.error) {
-          const msg = JSON.stringify(json.error);
-          if (msg.includes('quota') || msg.includes('limit') || msg.includes('unauthorized')) {
-              markExhausted(ep.url, 'RPC_LIMIT');
-              continue;
-          }
-          throw new Error(msg);
+        const msg = JSON.stringify(json.error);
+        if (msg.includes('quota') || msg.includes('limit') || msg.includes('unauthorized') || msg.includes('exceeded')) {
+          markCuExhausted(url);   // Circuit Breaker — bloquea hasta 00:00 UTC
+          markExhausted(url, 'RPC_LIMIT');
+          continue;
+        }
+        throw new Error(msg);
       }
 
       return json.result as string;
-    } catch (err: any) {
-        continue;
+    } catch {
+      continue;
     }
   }
+
   return '0x0'; // Fallback de silencio absoluto
 }
 
@@ -106,7 +116,7 @@ const SIG_BALANCE_OF = '0x70a08231'; // balanceOf(address)
 const SIG_SLOT0      = '0x3850c7bd'; // slot0() Uniswap V3
 
 // ────────────────────────────────────────────────────────────────────────────
-// Portfolio: eth_getBalance + batched balanceOf — usa failover en cada call
+// Portfolio: eth_getBalance + batched balanceOf
 // ────────────────────────────────────────────────────────────────────────────
 
 const KNOWN_ERC20: { symbol: string; address: string; decimals: number }[] = [
@@ -135,7 +145,7 @@ export interface PortfolioToken {
   chain:    string;
 }
 
-/** Fetch ETH + top ERC-20 balances con failover automático entre los 6 endpoints */
+/** Fetch ETH + top ERC-20 balances con failover automático via registry */
 export async function getUserPortfolio(walletAddress: string): Promise<{
   ethBalance: number;
   tokens: PortfolioToken[];
@@ -164,7 +174,7 @@ export async function getUserPortfolio(walletAddress: string): Promise<{
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Market Intel: UniswapV3 slot0() on-chain prices con failover
+// Market Intel: UniswapV3 slot0() on-chain prices
 // ────────────────────────────────────────────────────────────────────────────
 
 const TOP_POOLS_V3: { symbol: string; pool: string; token0Decimals: number; token1Decimals: number }[] = [
@@ -207,10 +217,19 @@ export async function getPoolPrices(): Promise<PoolPrice[]> {
 
 /** Exponer estado de salud de endpoints para debug / monitoring */
 export function getEndpointStatus() {
-  return endpointHealth.map(ep => ({
-    url: ep.url.slice(0, 55) + '...',
-    exhausted: ep.exhausted,
-    errorCount: ep.errorCount,
-    exhaustedAt: ep.exhaustedAt ? new Date(ep.exhaustedAt).toISOString() : null,
+  return Array.from(healthMap.values()).map(h => ({
+    url: h.url.slice(0, 55) + '...',
+    exhausted: h.exhausted,
+    errorCount: h.errorCount,
+    exhaustedAt: h.exhaustedAt ? new Date(h.exhaustedAt).toISOString() : null,
   }));
+}
+
+/** Resumen del registry para logging de startup */
+export function getRegistrySummary() {
+  return {
+    activeEndpoints: getActiveCount(),
+    coveredChains: getCoveredChains(),
+    ethEndpointsLoaded: getGbAllRpc('eth').length,
+  };
 }

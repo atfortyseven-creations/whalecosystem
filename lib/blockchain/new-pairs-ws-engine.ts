@@ -1,17 +1,19 @@
 /**
- * GetBlock WebSocket New Pairs Engine — EP3
+ * GetBlock WebSocket New Pairs Engine — Registry-backed
  * Subscribes to UniswapV3 PoolCreated events in real time.
  * Factory: 0x1F98431c8aD98523631AE4a59f267346ea31F984
- * Event:   PoolCreated(address,address,uint24,int24,address)
- * Uses: wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a
+ * WSS pool: getblock-registry.ts (GB_ETH_WSS_1/2/3)
  */
 
 import WebSocket from 'ws';
+import { getGbAllWss } from './getblock-registry';
 
-const WS_ENDPOINTS = [
-    process.env.GETBLOCK_WS_EP1 || 'wss://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
-    process.env.NEXT_PUBLIC_WS_RPC_URL || 'wss://ethereum-rpc.publicnode.com'
-];
+// WSS pool desde el registry — obtiene los WSS dinámicamente para respetar el CU Circuit Breaker
+const getActiveWssUrls = (): string[] => {
+    const gb = getGbAllWss('eth');
+    return gb.length > 0 ? gb : ['wss://ethereum-rpc.publicnode.com'];
+};
+
 let currentWsIndex = 0;
 let backoff = 5000;
 
@@ -43,7 +45,8 @@ class NewPairsWebSocketEngine {
     connect() {
         if (this.ws?.readyState === WebSocket.OPEN || this.ws?.readyState === WebSocket.CONNECTING) return;
 
-        const currentUrl = WS_ENDPOINTS[currentWsIndex];
+        const activeUrls = getActiveWssUrls();
+        const currentUrl = activeUrls[currentWsIndex % activeUrls.length];
         const socket = new WebSocket(currentUrl);
         this.ws = socket;
 
@@ -139,7 +142,8 @@ class NewPairsWebSocketEngine {
 
     private scheduleReconnect() {
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
-        currentWsIndex = (currentWsIndex + 1) % WS_ENDPOINTS.length;
+        const activeUrls = getActiveWssUrls();
+        currentWsIndex = (currentWsIndex + 1) % activeUrls.length;
         this.reconnectTimer = setTimeout(() => {
             backoff = Math.min(backoff * 1.5, 30000); // Max 30s
             this.connect();

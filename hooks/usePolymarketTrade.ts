@@ -105,7 +105,9 @@ export function usePolymarketTrade() {
             setStatus("SIGNING");
 
             // 2. Create Order Object
-            const salt = Math.floor(Math.random() * 1000000);
+            const saltArray = new Uint32Array(1);
+            window.crypto.getRandomValues(saltArray);
+            const salt = saltArray[0];
             const makerAmount = amountBigInt;
             const takerAmount = parseUnits((parseFloat(amount) / price).toFixed(6), 6); 
 
