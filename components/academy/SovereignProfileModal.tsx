@@ -91,10 +91,31 @@ export function SovereignProfileModal({
                       </div>
                    </div>
                    
-                   <div className="p-6 bg-black text-white text-center opacity-50">
-                       <span className="font-mono text-[10px] uppercase tracking-widest">
-                           Módulo de Interfaz de Progreso Total en Construcción.
-                       </span>
+                   <div className="border border-black/10 bg-white p-6">
+                       <h4 className="text-[10px] font-mono font-bold uppercase tracking-widest text-black/40 mb-6">Cryptographic Mastery Heuristics</h4>
+                       <div className="space-y-4">
+                           {[
+                               { label: 'Blockchain Architecture', score: 85 },
+                               { label: 'Smart Contract Security', score: 42 },
+                               { label: 'Zero-Knowledge Proofs', score: 15 },
+                               { label: 'On-Chain Forensics', score: 92 }
+                           ].map((skill) => (
+                               <div key={skill.label} className="flex items-center gap-4">
+                                   <div className="w-1/3 text-[9px] font-mono font-bold uppercase tracking-widest text-black/60 truncate">
+                                       {skill.label}
+                                   </div>
+                                   <div className="flex-1 h-1.5 bg-black/5 overflow-hidden">
+                                       <div 
+                                           className={`h-full ${skill.score > 80 ? 'bg-emerald-500' : skill.score > 40 ? 'bg-amber-500' : 'bg-black/20'}`} 
+                                           style={{ width: `${skill.score}%` }}
+                                       />
+                                   </div>
+                                   <div className="w-8 text-right text-[10px] font-mono font-bold">
+                                       {skill.score}%
+                                   </div>
+                               </div>
+                           ))}
+                       </div>
                    </div>
                 </div>
              )}

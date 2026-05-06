@@ -115,7 +115,7 @@ const FAQS = [
   },
   {
     question: "Do I need to connect a wallet?",
-    answer: "Yes. Sovereign Intelligence uses your wallet as your primary login and billing identity. It only takes a few seconds to connect — no password needed."
+    answer: "Yes. The platform uses your wallet as your primary login and billing identity. It only takes a few seconds to connect — no password needed."
   },
   {
     question: "How are invoices sent?",
@@ -341,11 +341,6 @@ function PricingContent() {
 
         {/* ── Hero ── */}
         <header className="flex flex-col items-center text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C076]/10 border border-[#00C076]/20 mb-6 shadow-sm">
-            <Shield size={14} className="text-[#00C076]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">100% On-Chain Billing</span>
-          </div>
-          
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-[#050505] mb-8 max-w-5xl leading-[1.1]">
             The right plan for<br className="hidden md:block" />
             <span className="text-[#050505]/30">every trader.</span>
