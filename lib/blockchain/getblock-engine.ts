@@ -7,8 +7,17 @@
 
 import { getGbAllRpc, getActiveCount, getCoveredChains, markCuExhausted } from './getblock-registry';
 
-// ── FALLBACK PÚBLICO DE EMERGENCIA ───────────────────────────────────────────
-const PUBLIC_ETH_FALLBACK = 'https://eth.llamarpc.com';
+// ── FALLBACK PÚBLICOS DE EMERGENCIA ──────────────────────────────────────────
+const PUBLIC_ETH_FALLBACKS = [
+  'https://eth.llamarpc.com',
+  'https://cloudflare-eth.com',
+  'https://rpc.ankr.com/eth',
+  'https://eth.drpc.org',
+  'https://1rpc.io/eth',
+  'https://ethereum-rpc.publicnode.com',
+];
+
+const PUBLIC_ETH_FALLBACK = PUBLIC_ETH_FALLBACKS[0];
 
 // ── Estado de salud por endpoint ─────────────────────────────────────────────
 interface EndpointHealth {
@@ -53,21 +62,9 @@ function markExhausted(url: string, reason: string) {
 
 // ── JSON-RPC core con failover automático desde el registry ──────────────────
 async function rpcWithFailover(method: string, params: unknown[], id = 1): Promise<string> {
-  // Obtener todos los HTTP endpoints ETH activos desde el registry centralizado
+  // ETAPA 1: Intentar endpoints GetBlock activos del registry
   const registryUrls = getGbAllRpc('eth');
-  const activeUrls = getActiveUrls(registryUrls.length > 0 ? registryUrls : [PUBLIC_ETH_FALLBACK]);
-
-  if (activeUrls.length === 0) {
-    // Todos los GetBlock exhausted → emergency public fallback
-    return fetch(PUBLIC_ETH_FALLBACK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', method, params, id }),
-    })
-      .then(r => r.json())
-      .then((j: any) => j.result as string)
-      .catch(() => '0x0');
-  }
+  const activeUrls = getActiveUrls(registryUrls);
 
   for (const url of activeUrls) {
     try {
@@ -79,7 +76,7 @@ async function rpcWithFailover(method: string, params: unknown[], id = 1): Promi
       });
 
       if (res.status === 402 || res.status === 429 || res.status === 401) {
-        markCuExhausted(url);   // Circuit Breaker — bloquea hasta 00:00 UTC
+        markCuExhausted(url);
         markExhausted(url, `HTTP_${res.status}`);
         continue;
       }
@@ -90,7 +87,7 @@ async function rpcWithFailover(method: string, params: unknown[], id = 1): Promi
       if (json.error) {
         const msg = JSON.stringify(json.error);
         if (msg.includes('quota') || msg.includes('limit') || msg.includes('unauthorized') || msg.includes('exceeded')) {
-          markCuExhausted(url);   // Circuit Breaker — bloquea hasta 00:00 UTC
+          markCuExhausted(url);
           markExhausted(url, 'RPC_LIMIT');
           continue;
         }
@@ -103,7 +100,23 @@ async function rpcWithFailover(method: string, params: unknown[], id = 1): Promi
     }
   }
 
-  return '0x0'; // Fallback de silencio absoluto
+  // ETAPA 2: GetBlock vacío o agotado → iterar fallbacks públicos en orden
+  for (const fallbackUrl of PUBLIC_ETH_FALLBACKS) {
+    try {
+      const r = await fetch(fallbackUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method, params, id }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!r.ok) continue;
+      const j = await r.json() as { result?: string; error?: any };
+      if (j.error || !j.result) continue;
+      return j.result as string;
+    } catch { continue; }
+  }
+
+  return '0x0'; // Silencio absoluto
 }
 
 // ── Pad address to 32-byte ABI encoding ─────────────────────────────────────
@@ -202,17 +215,75 @@ export async function getPoolPrices(): Promise<PoolPrice[]> {
     )
   );
 
-  return TOP_POOLS_V3.map((p, i) => {
+  const prices: PoolPrice[] = [];
+
+  for (let i = 0; i < TOP_POOLS_V3.length; i++) {
+    const p = TOP_POOLS_V3[i];
     const raw = results[i];
-    if (!raw || raw === '0x') return { ...p, sqrtPriceX96: '0', tick: 0, price: 0 };
-    const sqrtPriceX96 = BigInt('0x' + raw.slice(2, 66));
-    const tick = parseInt(raw.slice(66, 72), 16);
-    const price = Number(
-      (sqrtPriceX96 * sqrtPriceX96 * BigInt(Math.pow(10, p.token0Decimals))) /
-      (BigInt(2) ** BigInt(192) * BigInt(Math.pow(10, p.token1Decimals)))
-    );
-    return { symbol: p.symbol, pool: p.pool, sqrtPriceX96: sqrtPriceX96.toString(), tick, price };
-  });
+
+    // Validate: must be a hex string of at least 64 chars (32 bytes for sqrtPriceX96)
+    if (!raw || raw === '0x' || raw === '0x0' || raw.length < 66) {
+      console.warn(`[API] RPC ${getGbAllRpc('eth')[0] || 'public'} returns empty slot0 results.`);
+      prices.push({ ...p, sqrtPriceX96: '0', tick: 0, price: 0 });
+      continue;
+    }
+
+    try {
+      const sqrtPriceX96 = BigInt('0x' + raw.slice(2, 66));
+      if (sqrtPriceX96 === 0n) {
+        prices.push({ ...p, sqrtPriceX96: '0', tick: 0, price: 0 });
+        continue;
+      }
+      const tickHex = raw.slice(66, 74);
+      const tick = parseInt(tickHex, 16);
+      const price = Number(
+        (sqrtPriceX96 * sqrtPriceX96 * BigInt(Math.pow(10, p.token0Decimals))) /
+        (BigInt(2) ** BigInt(192) * BigInt(Math.pow(10, p.token1Decimals)))
+      );
+      prices.push({ symbol: p.symbol, pool: p.pool, sqrtPriceX96: sqrtPriceX96.toString(), tick, price });
+    } catch {
+      prices.push({ ...p, sqrtPriceX96: '0', tick: 0, price: 0 });
+    }
+  }
+
+  // If all prices failed (all-zero), try CoinGecko as fallback
+  const hasValidPrice = prices.some(p => p.price > 0);
+  if (!hasValidPrice) {
+    try {
+      const cgRes = await fetch(
+        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin,chainlink,uniswap,wrapped-bitcoin&vs_currencies=usd',
+        { signal: AbortSignal.timeout(5000) }
+      );
+      if (cgRes.ok) {
+        const cg = await cgRes.json();
+        // Map CoinGecko data to pool prices for display
+        return prices.map(p => {
+          if (p.symbol === 'ETH/USDC' || p.symbol === 'ETH/USDT') {
+            const ethUsd = cg?.ethereum?.usd ?? 0;
+            return { ...p, price: ethUsd, sqrtPriceX96: '1', tick: 0 };
+          }
+          if (p.symbol === 'WBTC/ETH') {
+            const btcUsd = cg?.bitcoin?.usd ?? 0;
+            const ethUsd = cg?.ethereum?.usd ?? 1;
+            return { ...p, price: btcUsd / ethUsd, sqrtPriceX96: '1', tick: 0 };
+          }
+          if (p.symbol === 'LINK/ETH') {
+            const linkUsd = cg?.chainlink?.usd ?? 0;
+            const ethUsd = cg?.ethereum?.usd ?? 1;
+            return { ...p, price: linkUsd / ethUsd, sqrtPriceX96: '1', tick: 0 };
+          }
+          if (p.symbol === 'UNI/ETH') {
+            const uniUsd = cg?.uniswap?.usd ?? 0;
+            const ethUsd = cg?.ethereum?.usd ?? 1;
+            return { ...p, price: uniUsd / ethUsd, sqrtPriceX96: '1', tick: 0 };
+          }
+          return p;
+        });
+      }
+    } catch { /* silencio — CoinGecko también falló */ }
+  }
+
+  return prices;
 }
 
 /** Exponer estado de salud de endpoints para debug / monitoring */
