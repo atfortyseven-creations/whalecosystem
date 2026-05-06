@@ -30,7 +30,7 @@ import { PlanDashboard }           from '@/components/dashboard/PlanDashboard';
 
 // ── Hidden panels (commented out — re-enable with sidebar items) ───────────────
 // import { PremiumMatrixStack }   from '@/components/premium/PremiumMatrixStack';
-// import { WatchlistTable }       from '@/components/dashboard/WatchlistTable';
+import { WatchlistTable }       from '@/components/dashboard/WatchlistTable';
 // import { WhalePortfolio }       from '@/components/dashboard/WhalePortfolio';
 // import { ZKShieldStation }      from '@/components/dashboard/ZKShieldStation';
 // import SovereignIntelTab        from '@/components/dashboard/SovereignIntelTab';
@@ -237,8 +237,7 @@ export default function WhaleDashboard() {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'market-data':
-                return <UnderDevelopmentPanel title="Market Overview" subtitle="Comprehensive real-time global market data" icon={Globe} accent="#0052FF" />;
-
+                return <><PanelHeader icon={Globe} title="Market Overview" description="Comprehensive real-time global market data and asset tracking." accent="#0052FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`market-data-${refreshKey}`}><WatchlistTable /></DashboardErrorBoundary></div></>;
 
 
             case 'dashboard':
@@ -267,13 +266,11 @@ export default function WhaleDashboard() {
                 return <><PanelHeader icon={Ticket} title="Access Pass" description="Mint your institutional clearance pass to unlock advanced analytics, private data feeds, and exclusive platform features." accent="#D4AF37" /><div className="flex-1 min-h-[950px] shrink-0"><DashboardErrorBoundary key={`gold-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div></>;
 
             case 'markets':
-                return <UnderDevelopmentPanel title="Top Markets" subtitle="Price performance, volume and capitalisation across leading assets" icon={Globe} accent="#0052FF" />;
-
+                return <><PanelHeader icon={Globe} title="Top Markets" description="Price performance, volume and capitalisation across leading assets." accent="#0052FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`markets-${refreshKey}`}><GainersLosersPanel /></DashboardErrorBoundary></div></>;
 
 
             case 'newpairs':
-                return <UnderDevelopmentPanel title="New Listings" subtitle="Tokens recently listed on decentralised exchanges" icon={Flame} accent="#FF6B35" />;
-
+                return <><PanelHeader icon={Flame} title="New Listings" description="Tokens recently listed on decentralised exchanges." accent="#FF6B35" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`newpairs-${refreshKey}`}><NewPairsTable /></DashboardErrorBoundary></div></>;
 
 
             case 'omniexplorer':
@@ -289,8 +286,7 @@ export default function WhaleDashboard() {
                 return <><PanelHeader icon={Network} title="Mass Transfers" description="Coordinated or unusually large token movements across multiple wallets. Spot potential market-moving events early." accent="#9945FF" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key={`mass-transfer-${refreshKey}`}><MassTransferIntel /></DashboardErrorBoundary></div></>;
 
             case 'graph':
-                return <UnderDevelopmentPanel title="Entity Graph" subtitle="Interactive network map of wallet relationships and capital flows" icon={Compass} accent="#9945FF" />;
-
+                return <><PanelHeader icon={Compass} title="Entity Graph" description="Interactive network map of wallet relationships and capital flows." accent="#9945FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`graph-${refreshKey}`}><EntityGraphVis /></DashboardErrorBoundary></div></>;
 
 
             case 'defi':
