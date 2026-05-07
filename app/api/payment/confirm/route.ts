@@ -15,7 +15,10 @@ const TIER_NAMES: Record<string, string> = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { txHash, planId, billingCycle, priceEth, email, walletAddress } = body;
+    const { txHash, planId, billingCycle, priceEth, email, walletAddress: rawWalletAddress } = body;
+    const walletAddress = (rawWalletAddress && rawWalletAddress !== 'manual_tron_user') 
+      ? rawWalletAddress 
+      : (email ? `tron_${email.replace(/[^a-zA-Z0-9]/g, '')}` : `tron_${txHash.slice(0, 10)}`);
 
     if (!txHash || !planId || !walletAddress || !billingCycle || !priceEth) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -96,7 +99,6 @@ export async function POST(request: NextRequest) {
         type: 'SUBSCRIPTION_PAYMENT',
         amount: parseFloat(priceEth),
         token: 'USDT',
-        network: 'TRON_TRC20',
         fromAddress: walletAddress.toLowerCase(),
         toAddress: process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
         authUserId: user.id,
@@ -105,6 +107,7 @@ export async function POST(request: NextRequest) {
           billingCycle,
           email,
           usdValue: priceEth,
+          network: 'TRON_TRC20',
           expiresAt: expiresAt.toISOString()
         }
       }
