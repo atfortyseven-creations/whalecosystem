@@ -6,11 +6,11 @@ import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-const POINT_COUNT  = 120000;
+const POINT_COUNT  = 40000; // Drastically reduced for optimization
 const GLOBE_RADIUS = 1.0;
-const DOT_SIZE     = 3.5; // pixel size
-const DOT_COLOR    = new THREE.Color("#B0B0B0"); // Light grey for the continents
-const BG_COLOR     = "#FAF9F6";
+const DOT_SIZE     = 2.5; // Adjusted for new point count
+const DOT_COLOR    = new THREE.Color("#A0A0A0"); // Sleek grey
+const BG_COLOR     = "transparent";
 
 // ─── ERROR BOUNDARY ──────────────────────────────────────────────────────────
 class GlobeErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
@@ -34,26 +34,22 @@ class GlobeErrorBoundary extends React.Component<{children: React.ReactNode}, {h
 
 // ─── VISITOR MARKERS ─────────────────────────────────────────────────────────
 const VISITOR_COUNTRIES = [
-  // Europe
   { lat: 40.4,  lon: -3.7,   scale: 2.1 }, // Spain
   { lat: 52.4,  lon: 4.9,    scale: 1.4 }, // Netherlands
   { lat: 51.2,  lon: 10.4,   scale: 1.6 }, // Germany
   { lat: 46.2,  lon: 2.2,    scale: 1.5 }, // France
   { lat: 51.5,  lon: -0.1,   scale: 1.7 }, // UK
   { lat: 41.9,  lon: 12.5,   scale: 1.2 }, // Italy
-  // Americas
-  { lat: 37.1,  lon: -95.7,  scale: 2.5 }, // United States
-  { lat: 40.7,  lon: -74.0,  scale: 1.8 }, // New York
-  { lat: 37.8,  lon: -122.4, scale: 1.4 }, // San Francisco
+  { lat: 37.1,  lon: -95.7,  scale: 2.5 }, // US
+  { lat: 40.7,  lon: -74.0,  scale: 1.8 }, // NY
+  { lat: 37.8,  lon: -122.4, scale: 1.4 }, // SF
   { lat: -14.2, lon: -51.9,  scale: 1.8 }, // Brazil
-  // Asia-Pacific
   { lat: 35.7,  lon: 139.7,  scale: 1.9 }, // Tokyo
   { lat: 35.9,  lon: 104.2,  scale: 2.2 }, // China
   { lat: 1.3,   lon: 103.8,  scale: 1.3 }, // Singapore
-  { lat: 22.3,  lon: 114.2,  scale: 1.2 }, // Hong Kong
-  // Middle East & Africa
+  { lat: 22.3,  lon: 114.2,  scale: 1.2 }, // HK
   { lat: 25.2,  lon: 55.3,   scale: 1.0 }, // Dubai
-  { lat: -30.6, lon: 22.9,   scale: 1.0 }, // South Africa
+  { lat: -30.6, lon: 22.9,   scale: 1.0 }, // SA
 ];
 
 // ─── SHADERS ──────────────────────────────────────────────────────────────────
@@ -110,63 +106,50 @@ const fragmentShader = `
 
 // ─── CONTINENTAL DOT MESH ────────────────────────────────────────────────────
 function HighFidelityPointGlobe() {
-  const [mapTexture, setMapTexture] = useState<THREE.Texture | null>(null);
+  const [mapState, setMapState] = useState<{ texture: THREE.Texture | null, failed: boolean }>({ texture: null, failed: false });
 
   useEffect(() => {
     let isMounted = true;
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
+    
+    // Using a highly reliable raw github url instead of unpkg to avoid CORS/rate-limiting
     loader.load(
-      'https://unpkg.com/three-globe/example/img/earth-water.png',
+      'https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/earth-water.png',
       (texture) => {
         if (!isMounted) return;
         texture.colorSpace = THREE.SRGBColorSpace;
-        setMapTexture(texture);
+        setMapState({ texture, failed: false });
       },
       undefined,
       (err) => {
         if (!isMounted) return;
-        console.warn('Failed to load globe water mask texture, using fallback', err);
-        // Fallback: render everything as land
-        const canvas = document.createElement('canvas');
-        canvas.width = 2;
-        canvas.height = 2;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.fillStyle = 'black';
-          ctx.fillRect(0, 0, 2, 2);
-        }
-        const fallbackTex = new THREE.CanvasTexture(canvas);
-        fallbackTex.colorSpace = THREE.SRGBColorSpace;
-        setMapTexture(fallbackTex);
+        console.warn('Failed to load globe water mask texture. Falling back to wireframe.', err);
+        setMapState({ texture: null, failed: true });
       }
     );
     return () => { isMounted = false; };
   }, []);
 
-  const { geometry, material } = useMemo(() => {
-    if (!mapTexture) return { geometry: null, material: null };
-
+  const { pointsGeometry, pointsMaterial, wireGeometry } = useMemo(() => {
+    // 1. Point Cloud Geometry
     const geo = new THREE.BufferGeometry();
     const positions = new Float32Array(POINT_COUNT * 3);
-    
     const PHI = Math.PI * (3 - Math.sqrt(5));
     
     for (let i = 0; i < POINT_COUNT; i++) {
       const y = 1 - (i / (POINT_COUNT - 1)) * 2;
       const r = Math.sqrt(Math.max(0, 1 - y * y));
       const theta = PHI * i;
-      
       positions[i * 3 + 0] = Math.cos(theta) * r * GLOBE_RADIUS;
       positions[i * 3 + 1] = y * GLOBE_RADIUS;
       positions[i * 3 + 2] = Math.sin(theta) * r * GLOBE_RADIUS;
     }
-    
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     
     const mat = new THREE.ShaderMaterial({
       uniforms: {
-        uMap: { value: mapTexture },
+        uMap: { value: mapState.texture },
         uSize: { value: DOT_SIZE },
         uColor: { value: DOT_COLOR }
       },
@@ -175,13 +158,27 @@ function HighFidelityPointGlobe() {
       transparent: true,
       depthWrite: false
     });
-    
-    return { geometry: geo, material: mat };
-  }, [mapTexture]);
 
-  if (!geometry || !material) return null;
+    // 2. Wireframe Fallback Geometry
+    const wGeo = new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(GLOBE_RADIUS, 12));
 
-  return <points geometry={geometry} material={material} />;
+    return { pointsGeometry: geo, pointsMaterial: mat, wireGeometry: wGeo };
+  }, [mapState.texture]);
+
+  // If loading, show nothing
+  if (!mapState.texture && !mapState.failed) return null;
+
+  // If failed, gracefully degrade to a beautiful wireframe globe
+  if (mapState.failed) {
+    return (
+      <lineSegments geometry={wireGeometry}>
+        <lineBasicMaterial color="#CCCCCC" transparent opacity={0.3} />
+      </lineSegments>
+    );
+  }
+
+  // Normal optimal point rendering
+  return <points geometry={pointsGeometry} material={pointsMaterial} />;
 }
 
 // ─── VISITOR MARKERS ────────────────────────────────────────────────────────
@@ -237,7 +234,7 @@ function SolidCore() {
   return (
     <mesh>
       <sphereGeometry args={[GLOBE_RADIUS * 0.99, 64, 64]} />
-      <meshBasicMaterial color="#FFFFFF" transparent opacity={1} />
+      <meshBasicMaterial color="#F5F5F5" transparent opacity={1} />
     </mesh>
   );
 }
@@ -288,3 +285,4 @@ export function SovereignGlobe3D() {
     </div>
   );
 }
+
