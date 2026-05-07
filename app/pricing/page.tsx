@@ -17,9 +17,9 @@ const TIER_HIERARCHY: Record<string, number> = {
 };
 
 const TIER_PRICES: Record<string, { monthly: string, annual: string }> = {
-  'STARTER': { monthly: '0.005', annual: '0.05' }, 
-  'PRO': { monthly: '0.015', annual: '0.15' },
-  'ELITE': { monthly: '0.05', annual: '0.5' }
+  'STARTER': { monthly: '130', annual: '1300' }, 
+  'PRO': { monthly: '350', annual: '3500' },
+  'ELITE': { monthly: '950', annual: '9500' }
 };
 
 const PRICING_TIERS = [
@@ -141,6 +141,7 @@ function PricingContent() {
   // Email Modal State
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [emailInput, setEmailInput] = useState('');
+  const [txIdInput, setTxIdInput] = useState('');
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   // Wagmi hooks for on-chain transaction
@@ -204,71 +205,61 @@ function PricingContent() {
     setIsEmailModalOpen(true);
   };
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailInput || !emailInput.includes('@')) {
       toast.error('Invalid Email', { description: 'Please enter a valid email address.' });
       return;
     }
+    if (!txIdInput || txIdInput.length < 32) {
+      toast.error('Invalid Transaction ID', { description: 'Please enter the Tron TXID after sending the USDT.' });
+      return;
+    }
     if (!selectedPlanId) return;
 
-    const priceEth = TIER_PRICES[selectedPlanId][billingCycle];
-    if (!priceEth) return;
-
+    const priceUsdt = TIER_PRICES[selectedPlanId][billingCycle];
     setLoadingTier(selectedPlanId);
-    toast.loading('Please confirm the transaction in your wallet...', { id: 'tx-toast' });
+    setIsConfirmingBackend(true);
+    toast.loading('Verifying your Tron transaction...', { id: 'tx-toast' });
     
-    // Process on-chain transaction
-    sendTransaction({
-      to: (process.env.NEXT_PUBLIC_TREASURY_WALLET || '0x000000000000000000000000000000000000dEaD') as `0x${string}`,
-      value: parseEther(priceEth),
-    }, {
-      onError: (error) => {
-        toast.error('Transaction Failed', { id: 'tx-toast', description: error.message || 'User rejected the request' });
-        setLoadingTier(null);
-        setIsEmailModalOpen(false);
-      },
-      onSuccess: async (hash) => {
-        setIsConfirmingBackend(true);
-        toast.loading('Transaction submitted, confirming access...', { id: 'tx-toast' });
-        
-        try {
-          const res = await fetch('/api/payment/confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              txHash: hash,
-              planId: selectedPlanId,
-              billingCycle,
-              priceEth,
-              email: emailInput,
-              walletAddress: address
-            })
-          });
-          
-          if (res.ok) {
-            toast.success('Access Granted!', {
-              id: 'tx-toast',
-              description: 'Your payment was submitted and access granted. Redirecting...',
-            });
-            setTimeout(() => {
-              router.push('/dashboard?tab=billing');
-            }, 2000);
-          } else {
-            throw new Error('Backend failed to confirm payment');
-          }
-        } catch (error) {
-          toast.error('Verification Error', {
-            id: 'tx-toast',
-            description: 'Transaction submitted but verification failed. Please contact support.'
-          });
-        } finally {
-          setLoadingTier(null);
-          setIsEmailModalOpen(false);
-          setIsConfirmingBackend(false);
-        }
+    try {
+      const res = await fetch('/api/payment/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          txHash: txIdInput,
+          planId: selectedPlanId,
+          billingCycle,
+          priceEth: priceUsdt, // Keeping param name for backward compat or updating it later
+          email: emailInput,
+          walletAddress: address || 'manual_tron_user',
+          network: 'TRON_TRC20',
+          token: 'USDT'
+        })
+      });
+      
+      if (res.ok) {
+        toast.success('Access Granted!', {
+          id: 'tx-toast',
+          description: 'Payment confirmed. Redirecting to your terminal...',
+        });
+        setTimeout(() => {
+          router.push('/dashboard?tab=billing');
+        }, 2000);
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Verification failed');
       }
-    });
+    } catch (error: any) {
+      toast.error('Verification Error', {
+        id: 'tx-toast',
+        description: error.message || 'Verification failed. Please contact support.'
+      });
+    } finally {
+      setLoadingTier(null);
+      setIsEmailModalOpen(false);
+      setIsConfirmingBackend(false);
+    }
   };
 
   return (
@@ -282,7 +273,7 @@ function PricingContent() {
         {/* Email Invoice Modal */}
         {isEmailModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-black/10 relative">
+            <div className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl border border-black/10 relative overflow-y-auto max-h-[90vh]">
               <button 
                 onClick={() => { setIsEmailModalOpen(false); setLoadingTier(null); }}
                 className="absolute top-4 right-4 text-black/40 hover:text-black"
@@ -291,49 +282,87 @@ function PricingContent() {
               </button>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-[#00C076]/10 text-[#00C076] rounded-2xl flex items-center justify-center">
-                  <Mail size={24} />
+                  <Shield size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold">Billing Invoice</h3>
-                  <p className="text-sm text-black/50">Where should we send your receipt?</p>
+                  <h3 className="text-xl font-bold">Institutional Checkout</h3>
+                  <p className="text-sm text-black/50">Tether USDT (Tron TRC-20 Network)</p>
                 </div>
               </div>
+
+              <div className="mb-6 p-5 bg-black/[0.02] border border-black/5 rounded-2xl">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-xs font-black uppercase tracking-widest text-black/40">Send Payment To</span>
+                  <span className="text-[10px] bg-[#00C076]/10 text-[#00C076] px-2 py-0.5 rounded font-black">TRC-20 ONLY</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white border border-black/10 p-3 rounded-xl mb-4">
+                  <code className="text-xs font-mono font-bold truncate flex-1">
+                    {process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'}
+                  </code>
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+                      toast.success('Address copied');
+                    }}
+                    className="p-2 hover:bg-black/5 rounded-lg transition-colors"
+                  >
+                    <Database size={14} className="text-black/40" />
+                  </button>
+                </div>
+                <p className="text-[10px] text-center font-bold text-black/30 uppercase tracking-widest leading-relaxed">
+                  Verify the address carefully. Any assets sent via other networks (ETH, BSC) will be permanently lost.
+                </p>
+              </div>
+
               <form onSubmit={handleEmailSubmit}>
-                <div className="mb-6">
-                  <label className="block text-xs font-black uppercase tracking-widest text-black/40 mb-2">Email Address</label>
-                  <input 
-                    type="email"
-                    required
-                    value={emailInput}
-                    onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder="Enter your Gmail..."
-                    className="w-full px-4 py-3 bg-black/5 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C076] font-medium"
-                  />
+                <div className="grid grid-cols-1 gap-4 mb-6">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-black/40 mb-2">Receipt Email</label>
+                    <input 
+                      type="email"
+                      required
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                      placeholder="Where should we send your invoice?"
+                      className="w-full px-4 py-3 bg-black/5 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C076] font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-widest text-black/40 mb-2">Transaction ID (TXID)</label>
+                    <input 
+                      type="text"
+                      required
+                      value={txIdInput}
+                      onChange={(e) => setTxIdInput(e.target.value)}
+                      placeholder="Paste your Tron TXID here..."
+                      className="w-full px-4 py-3 bg-black/5 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C076] font-medium"
+                    />
+                  </div>
                 </div>
                 
-                <div className="mb-6 bg-black/5 p-4 rounded-xl border border-black/10">
+                <div className="mb-6 bg-[#050505] p-5 rounded-2xl border border-white/5">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-bold text-black/60">Selected Plan:</span>
-                    <span className="text-sm font-black uppercase tracking-widest text-black">{selectedPlanId} ({billingCycle})</span>
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Selected Tier</span>
+                    <span className="text-sm font-black uppercase tracking-widest text-white">{selectedPlanId} ({billingCycle})</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-bold text-black/60">Total Cost:</span>
-                    <span className="text-lg font-black text-[#00C076]">{selectedPlanId ? TIER_PRICES[selectedPlanId][billingCycle] : ''} ETH</span>
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Total Amount</span>
+                    <span className="text-2xl font-black text-[#00C076]">{selectedPlanId ? TIER_PRICES[selectedPlanId][billingCycle] : ''} <span className="text-sm">USDT</span></span>
                   </div>
                 </div>
 
                 <button 
                   type="submit"
-                  disabled={isTxPending || isConfirmingBackend}
+                  disabled={isConfirmingBackend}
                   className="w-full py-4 bg-[#050505] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black/80 transition-all disabled:opacity-70"
                 >
-                  {(isTxPending || isConfirmingBackend) ? (
-                    <><Loader2 className="animate-spin" size={18} /> Processing On-Chain...</>
+                  {isConfirmingBackend ? (
+                    <><Loader2 className="animate-spin" size={18} /> Validating Ledger...</>
                   ) : (
-                    <>Sign & Pay <ArrowRight size={18} /></>
+                    <>Confirm Payment <ArrowRight size={18} /></>
                   )}
                 </button>
-                <p className="text-center text-xs text-black/40 mt-4 font-medium">Fully decentralized payment. No intermediaries.</p>
+                <p className="text-center text-[10px] text-black/30 mt-4 font-black uppercase tracking-[0.2em]">Institutional Grade Security • Zero Counterparty Risk</p>
               </form>
             </div>
           </div>
@@ -382,7 +411,7 @@ function PricingContent() {
           <div className="rounded-[2rem] border border-[#050505]/10 bg-white p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
               <div className="text-sm font-black uppercase tracking-[0.2em] text-black/40 mb-1">Free</div>
-              <div className="text-3xl font-bold tracking-tight text-[#050505] mb-1">0 ETH <span className="text-base font-medium text-black/30">/ forever</span></div>
+              <div className="text-3xl font-bold tracking-tight text-[#050505] mb-1">0 USDT <span className="text-base font-medium text-black/30">/ forever</span></div>
               <p className="text-sm text-black/50 font-medium">Browse market data, read the forum, and explore the platform at no cost.</p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -431,7 +460,7 @@ function PricingContent() {
                       {price}
                     </span>
                     <span className={`text-sm font-bold uppercase tracking-widest ${tier.highlight ? 'text-[#00C076]' : 'text-black/40'}`}>
-                      ETH <br/><span className="text-[10px]">/ {billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
+                      USDT <br/><span className="text-[10px]">/ {billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
                     </span>
                   </div>
                   <p className={`text-sm font-semibold mb-2 ${tier.highlight ? 'text-[#00C076]' : 'text-[#050505]'}`}>

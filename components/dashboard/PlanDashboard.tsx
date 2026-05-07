@@ -134,7 +134,7 @@ export function PlanDashboard() {
                 onClick={() => router.push('/pricing')}
                 className="mt-4 md:mt-0 px-6 py-3 bg-[#00C076] text-black font-black text-xs uppercase tracking-widest rounded-xl hover:bg-emerald-400 transition-all shadow-[0_0_20px_rgba(0,192,118,0.4)]"
               >
-                {isExpired ? 'Renew Subscription' : 'Upgrade to Pro'}
+                {isExpired ? 'Renew Subscription' : 'Upgrade Plan'}
               </button>
             ) : (
               <div className="mt-4 md:mt-0 px-4 py-2 bg-white/5 border border-white/10 text-white/50 font-black uppercase tracking-widest text-xs rounded-xl flex items-center gap-2">
@@ -235,7 +235,7 @@ export function PlanDashboard() {
                     <td className="py-4 px-4 font-mono text-xs text-white/60">{tx.amount} {tx.token}</td>
                     <td className="py-4 pl-4 flex flex-col gap-1">
                       <a 
-                        href={`https://etherscan.io/tx/${tx.txHash}`}
+                        href={`https://tronscan.org/#/transaction/${tx.txHash}`}
                         target="_blank"
                         rel="noreferrer"
                         className="text-[11px] font-mono font-black text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"

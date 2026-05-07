@@ -195,7 +195,7 @@ const UnderDevelopmentPanel = ({
 
 export default function WhaleDashboard() {
     const searchParams = useSearchParams();
-    const initialTab = searchParams.get('tab') || 'news';
+    const initialTab = searchParams.get('tab') || 'market-data';
     const [activeTab, setActiveTab] = useState<string>(initialTab);
 
     React.useEffect(() => {
@@ -314,8 +314,8 @@ export default function WhaleDashboard() {
                 return <><PanelHeader icon={MessageSquare} title="Support" description="Contact the team directly, report a problem, or ask a question. We respond as quickly as possible to every request." accent="#050505" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key={`support-${refreshKey}`}><WhaleSupport /></DashboardErrorBoundary></div></>;
 
             default:
-                // Fallback: news panel so users never see a blank screen
-                return <><PanelHeader icon={Newspaper} title="News" description="The latest news and market analysis curated from key sources in crypto and global finance." accent="#050505" /><div className="h-[750px] shrink-0"><DashboardErrorBoundary key={`news-default-${refreshKey}`}><NewsOfToday /></DashboardErrorBoundary></div></>;
+                // Fallback: market-data panel so users never see a blank screen
+                return <><PanelHeader icon={Globe} title="Market Overview" description="Comprehensive real-time global market data and asset tracking." accent="#0052FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`market-data-default-${refreshKey}`}><WatchlistTable /></DashboardErrorBoundary></div></>;
         }
     };
 

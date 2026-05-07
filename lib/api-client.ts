@@ -70,12 +70,18 @@ const fetchSovereign = async (url: string, requiresAuth: boolean = false) => {
 // ============================================================================
 
 export function useMarketData(endpointKey: keyof typeof REGISTRY.MARKET_DATA) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['market', endpointKey],
     // Force auth for watchlist since it's sharing the vault endpoint
     queryFn: () => fetchSovereign(REGISTRY.MARKET_DATA[endpointKey], endpointKey === 'watchlist'),
-    refetchInterval: 60000, 
+    refetchInterval: 60_000,
+    staleTime: 55_000,          // prevents duplicate fetches within 55s
+    retry: 2,
   });
+  return {
+    ...query,
+    refetch: query.refetch,     // explicitly expose refetch for manual refresh buttons
+  };
 }
 
 // Highly secured intelligence fetches

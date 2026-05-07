@@ -634,9 +634,10 @@ export class PortfolioService {
       chainsToQuery.map(async (id) => {
           const fetchPromise = this.getFullPortfolio(id, address, forceRefresh, netWorthData);
           
-          // 8.5s timeout per chain to ensure snappy login but allow for RPC fallbacks
+          // 5s timeout per chain — Moralis should always respond within 3s.
+          // If RPC fallback is triggered, 5s is still enough for public nodes.
           const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 8500)
+              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 5000)
           );
 
           try {

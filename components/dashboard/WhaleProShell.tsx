@@ -6,7 +6,7 @@ import {
     LayoutDashboard,
     Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
-    Globe, Cpu, Shield, Newspaper,
+    Globe, Cpu, Shield,
     Network, Ticket, Flame, Menu,
     BookOpen, Database, MessageSquare,
     Landmark, Compass,
@@ -48,8 +48,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'omniexplorer', label: 'Block Explorer',    icon: <Search size={17}/> },
     { id: 'defi',         label: 'DeFi Yields',       icon: <Landmark size={17}/> },
 
-    { id: 'news',         label: 'News',              icon: <Newspaper size={17}/>, dividerBefore: 'News Feed' },
-    { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/> },
+    { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/>,   dividerBefore: 'ZK Layer' },
 
     { id: 'vault',        label: 'Sovereign Vault',   icon: <Lock size={17}/>,      dividerBefore: 'Execution' },
     { id: 'logs',         label: 'Session Logs',      icon: <Database size={17}/>,  dividerBefore: 'System' },
@@ -317,7 +316,7 @@ export function WhaleProShell({
     useEffect(() => {
         if (RESTRICTED_TABS.includes(activeTab)) {
             if (!isWalletConnected) {
-                onTabChange('news');
+                onTabChange('market-data');
                 toast.error("Session Lost", { description: "You have been disconnected." });
             }
         }
@@ -506,10 +505,10 @@ export function WhaleProShell({
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
                 <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} h-16 border-t border-black/10 bg-white items-center justify-around px-2 shrink-0 z-50`} style={{ minHeight: '64px', maxHeight: '64px' }}>
                     {[
-                        { id: 'news', icon: <Newspaper size={20} />, label: 'News' },
-                        { id: 'markets', icon: <Globe size={20} />, label: 'Markets' },
-                        { id: 'vault', icon: <Lock size={20} />, label: 'Vault' },
-                        { id: 'menu', icon: <Menu size={20} />, label: 'Menu' },
+                        { id: 'market-data', icon: <Globe size={20} />, label: 'Markets' },
+                        { id: 'markets',     icon: <LayoutDashboard size={20} />, label: 'Top' },
+                        { id: 'portfolio',   icon: <Wallet size={20} />, label: 'Portfolio' },
+                        { id: 'menu',        icon: <Menu size={20} />, label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
                         return (

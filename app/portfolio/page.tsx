@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet, RefreshCw, ArrowUpRight, ArrowDownRight,
@@ -42,9 +42,33 @@ const SUPPORTED_CHAINS = [
   { caipId: "eip155:480",   name: "World Chain", color: "#000000", symbol: "WLD",  id: 480 },
 ];
 
-function formatUSD(val: number) {
-  if (!val || isNaN(val)) return "$0.00";
-  return `$${safeToLocaleString(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+/** Fetch EUR/USD rate (cached in module scope so it refreshes every 5 min) */
+let _eurRate: number = 0.93; // sensible default
+let _eurFetched = 0;
+async function fetchEURRate() {
+  if (Date.now() - _eurFetched < 5 * 60_000) return _eurRate;
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD', { cache: 'no-store' });
+    const d = await r.json();
+    if (d?.rates?.EUR) { _eurRate = d.rates.EUR; _eurFetched = Date.now(); }
+  } catch { /* keep cached */ }
+  return _eurRate;
+}
+
+function formatEUR(val: number, rate: number) {
+  if (!val || isNaN(val)) return "€0,00";
+  const eur = val * rate;
+  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(eur);
+}
+
+function useEURRate() {
+  const [rate, setRate] = useState(_eurRate || 0.93);
+  useEffect(() => {
+    fetchEURRate().then(setRate);
+    const t = setInterval(() => fetchEURRate().then(setRate), 5 * 60_000);
+    return () => clearInterval(t);
+  }, []);
+  return rate;
 }
 
 function formatAddr(addr: string | null | undefined) {
@@ -53,9 +77,10 @@ function formatAddr(addr: string | null | undefined) {
 }
 
 // ── Asset Row ────────────────────────────────────────────────────────────────
-function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boolean }) {
+function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hidden: boolean; eurRate: number }) {
   const isPos = (asset.change24h ?? 0) >= 0;
   const chainColor = CHAIN_COLORS[asset.network] ?? "#888";
+  const valueEUR = formatEUR(asset.value ?? 0, eurRate);
 
   return (
     <motion.div
@@ -99,10 +124,10 @@ function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boo
         </div>
       </div>
 
-      {/* USD value */}
+      {/* EUR value */}
       <div className="text-right w-28 shrink-0">
         <div className="font-black font-mono text-sm" style={{ color: INK }}>
-          {hidden ? "••••••" : formatUSD(asset.value ?? 0)}
+          {hidden ? "••••••" : valueEUR}
         </div>
       </div>
     </motion.div>
@@ -139,6 +164,8 @@ function WalletAction({
 
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function PortfolioPage() {
+  const eurRate = useEURRate();
+  const fmt = useCallback((v: number) => formatEUR(v, eurRate), [eurRate]);
   const [hidden, setHidden] = useState(false);
   const [search, setSearch] = useState("");
   const [isTransferOpen, setIsTransferOpen] = useState(false);
@@ -297,7 +324,7 @@ export default function PortfolioPage() {
           <div className="p-8">
             <div className="flex items-start justify-between mb-6">
               <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em]" style={{ color: MUTED }}>
-                Total Portfolio Value
+                Total Portfolio Value · EUR
               </span>
               <button
                 onClick={() => setHidden(h => !h)}
@@ -311,7 +338,7 @@ export default function PortfolioPage() {
             {/* Big number */}
             <div className="flex items-end gap-5 flex-wrap mb-8">
               <div className="text-6xl md:text-7xl font-black tracking-tighter font-mono" style={{ color: INK }}>
-                {hidden ? <span style={{ color: MUTED }}>••••••••</span> : formatUSD(Number(totalPnl) ?? 0)}
+                {hidden ? <span style={{ color: MUTED }}>••••••••</span> : fmt(Number(totalPnl) ?? 0)}
               </div>
 
               {/* 24h pill */}
@@ -321,7 +348,7 @@ export default function PortfolioPage() {
                 }`}
               >
                 {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                {hidden ? "••••" : `${isPositive ? "+" : ""}${formatUSD(Number(change24hUSD) ?? 0)}`}
+                {hidden ? "••••" : `${isPositive ? "+" : ""}${fmt(Number(change24hUSD) ?? 0)}`}
                 <span className="opacity-60 text-xs">
                   ({hidden ? "••" : `${safeToFixed(Number(change24hPercent) ?? 0, 2)}%`})
                 </span>
@@ -557,7 +584,7 @@ export default function PortfolioPage() {
             <div className="flex-1 text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>Asset</div>
             <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-widest hidden sm:block" style={{ color: MUTED }}>Balance</div>
             <div className="w-20 text-right text-[9px] font-mono font-black uppercase tracking-widest hidden md:block" style={{ color: MUTED }}>24H</div>
-            <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>Value</div>
+            <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>Value (EUR)</div>
           </div>
 
           {/* Rows */}
@@ -586,7 +613,7 @@ export default function PortfolioPage() {
               </div>
             ) : (
               filteredAssets.map((asset: any, i: number) => (
-                <AssetRow key={`${asset.symbol}-${asset.network}-${i}`} asset={asset} idx={i} hidden={hidden} />
+                <AssetRow key={`${asset.symbol}-${asset.network}-${i}`} asset={asset} idx={i} hidden={hidden} eurRate={eurRate} />
               ))
             )}
           </div>
@@ -629,7 +656,7 @@ export default function PortfolioPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-mono" style={{ color: MUTED }}>{safeToFixed(pct, 1)}%</span>
-                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "••••" : formatUSD(asset.value ?? 0)}</span>
+                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "••••" : formatEUR(asset.value ?? 0, eurRate)}</span>
                       </div>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(5,5,5,0.07)" }}>
