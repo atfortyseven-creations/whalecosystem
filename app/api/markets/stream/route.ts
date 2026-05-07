@@ -107,7 +107,7 @@ async function fetchCexMarkets(): Promise<any[] | null> {
     // 2. Try MEXC API (Globally accessible, no strict geographic blocks)
     try {
         const controllerMexc = new AbortController();
-        const idMexc = setTimeout(() => controllerMexc.abort(), 6000); // 6s timeout for MEXC
+        const idMexc = setTimeout(() => controllerMexc.abort(), 6000);
         
         const res = await fetch('https://api.mexc.com/api/v3/ticker/24hr', {
             cache: 'no-store',
@@ -121,7 +121,8 @@ async function fetchCexMarkets(): Promise<any[] | null> {
         if (res.ok) {
             const raw = await res.json();
             if (Array.isArray(raw) && raw.length > 0) {
-                return raw.map(t => ({
+                // MEXC returns priceChangePercent as a decimal (e.g. "0.0056" = 0.56%), so we must multiply by 100
+                return raw.map((t: any) => ({
                     ...t,
                     priceChangePercent: t.priceChangePercent ? (parseFloat(t.priceChangePercent) * 100).toFixed(3) : "0.000"
                 }));
@@ -153,6 +154,43 @@ async function fetchCexMarkets(): Promise<any[] | null> {
         console.warn('[API] Binance fetch failed', e);
     }
     
+    // 4. Final fallback: CoinGecko (free tier, globally accessible, no IP blocks)
+    try {
+        const cgIds = 'bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin,shiba-inu,polkadot,avalanche-2,chainlink,matic-network,uniswap,arbitrum,optimism,aptos,injective-protocol,pepe,dogwifcoin,bonk,floki,fetch-ai,near,lido-dao,worldcoin-wld,starknet,jupiter,pyth-network,celestia,blur,gmx,sui,sei-network,toncoin';
+        const controllerCg = new AbortController();
+        const idCg = setTimeout(() => controllerCg.abort(), 8000);
+        const resCg = await fetch(
+            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${cgIds}&order=market_cap_desc&per_page=100&page=1&price_change_percentage=24h`,
+            { cache: 'no-store', signal: controllerCg.signal, headers: { 'Accept': 'application/json' } }
+        ).finally(() => clearTimeout(idCg));
+        if (resCg.ok) {
+            const cgData = await resCg.json();
+            if (Array.isArray(cgData) && cgData.length > 0) {
+                const CG_SYMBOL_MAP: Record<string, string> = {
+                    'bitcoin':'BTCUSDT','ethereum':'ETHUSDT','binancecoin':'BNBUSDT','solana':'SOLUSDT',
+                    'ripple':'XRPUSDT','cardano':'ADAUSDT','dogecoin':'DOGEUSDT','shiba-inu':'SHIBUSDT',
+                    'polkadot':'DOTUSDT','avalanche-2':'AVAXUSDT','chainlink':'LINKUSDT','matic-network':'MATICUSDT',
+                    'uniswap':'UNIUSDT','arbitrum':'ARBUSDT','optimism':'OPUSDT','aptos':'APTUSDT',
+                    'injective-protocol':'INJUSDT','pepe':'PEPEUSDT','dogwifcoin':'WIFUSDT','bonk':'BONKUSDT',
+                    'floki':'FLOKIUSDT','fetch-ai':'FETUSDT','near':'NEARUSDT','lido-dao':'LDOUSDT',
+                    'worldcoin-wld':'WLDUSDT','starknet':'STRKUSDT','jupiter':'JUPUSDT','pyth-network':'PYTHUSDT',
+                    'celestia':'TIAUSDT','blur':'BLURUSDT','gmx':'GMXUSDT','sui':'SUIUSDT',
+                    'sei-network':'SEIUSDT','toncoin':'TONUSDT',
+                };
+                console.log('[API] Using CoinGecko fallback, got', cgData.length, 'assets');
+                return cgData.map((c: any) => ({
+                    symbol: CG_SYMBOL_MAP[c.id] || (c.symbol.toUpperCase() + 'USDT'),
+                    lastPrice: c.current_price?.toString() || '0',
+                    priceChangePercent: c.price_change_percentage_24h?.toFixed(3) || '0.000',
+                    quoteVolume: c.total_volume?.toString() || '0',
+                    source: 'coingecko',
+                }));
+            }
+        }
+    } catch (e) {
+        console.warn('[API] CoinGecko fetch failed', e);
+    }
+
     return null;
 }
 
