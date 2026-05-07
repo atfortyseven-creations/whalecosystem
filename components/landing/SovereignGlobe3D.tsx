@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useMemo, useEffect } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import React, { useRef, useMemo, useEffect, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -11,6 +11,26 @@ const GLOBE_RADIUS = 1.0;
 const DOT_SIZE     = 3.5; // pixel size
 const DOT_COLOR    = new THREE.Color("#B0B0B0"); // Light grey for the continents
 const BG_COLOR     = "#FAF9F6";
+
+// ─── ERROR BOUNDARY ──────────────────────────────────────────────────────────
+class GlobeErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error("Globe Rendering Error:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return null;
+    }
+    return this.props.children;
+  }
+}
 
 // ─── VISITOR MARKERS ─────────────────────────────────────────────────────────
 const VISITOR_COUNTRIES = [
@@ -90,11 +110,43 @@ const fragmentShader = `
 
 // ─── CONTINENTAL DOT MESH ────────────────────────────────────────────────────
 function HighFidelityPointGlobe() {
-  // Load the earth-water mask (black for land, white for water)
-  const mapTexture = useLoader(THREE.TextureLoader, 'https://unpkg.com/three-globe/example/img/earth-water.png');
-  mapTexture.colorSpace = THREE.SRGBColorSpace;
-  
+  const [mapTexture, setMapTexture] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin("anonymous");
+    loader.load(
+      'https://unpkg.com/three-globe/example/img/earth-water.png',
+      (texture) => {
+        if (!isMounted) return;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        setMapTexture(texture);
+      },
+      undefined,
+      (err) => {
+        if (!isMounted) return;
+        console.warn('Failed to load globe water mask texture, using fallback', err);
+        // Fallback: render everything as land
+        const canvas = document.createElement('canvas');
+        canvas.width = 2;
+        canvas.height = 2;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = 'black';
+          ctx.fillRect(0, 0, 2, 2);
+        }
+        const fallbackTex = new THREE.CanvasTexture(canvas);
+        fallbackTex.colorSpace = THREE.SRGBColorSpace;
+        setMapTexture(fallbackTex);
+      }
+    );
+    return () => { isMounted = false; };
+  }, []);
+
   const { geometry, material } = useMemo(() => {
+    if (!mapTexture) return { geometry: null, material: null };
+
     const geo = new THREE.BufferGeometry();
     const positions = new Float32Array(POINT_COUNT * 3);
     
@@ -126,6 +178,8 @@ function HighFidelityPointGlobe() {
     
     return { geometry: geo, material: mat };
   }, [mapTexture]);
+
+  if (!geometry || !material) return null;
 
   return <points geometry={geometry} material={material} />;
 }
@@ -207,28 +261,30 @@ function RotatingGlobeGroup() {
 export function SovereignGlobe3D() {
   return (
     <div className="w-full h-full absolute inset-0 z-0 bg-transparent overflow-hidden flex items-center justify-center">
-      <Canvas
-        camera={{ position: [0, 0, 2.5], fov: 45, near: 0.01, far: 10 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
-        style={{ background: "transparent", cursor: "grab" }}
-      >
-        <group rotation={[0.2, -0.5, 0]}>
-          <React.Suspense fallback={null}>
-            <RotatingGlobeGroup />
-          </React.Suspense>
-        </group>
+      <GlobeErrorBoundary>
+        <Canvas
+          camera={{ position: [0, 0, 2.5], fov: 45, near: 0.01, far: 10 }}
+          dpr={[1, 2]}
+          gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
+          style={{ background: "transparent", cursor: "grab" }}
+        >
+          <group rotation={[0.2, -0.5, 0]}>
+            <React.Suspense fallback={null}>
+              <RotatingGlobeGroup />
+            </React.Suspense>
+          </group>
 
-        <OrbitControls
-          enablePan={false}
-          enableZoom={false}
-          minPolarAngle={Math.PI * 0.3}
-          maxPolarAngle={Math.PI * 0.7}
-          autoRotate={false}
-          enableDamping
-          dampingFactor={0.05}
-        />
-      </Canvas>
+          <OrbitControls
+            enablePan={false}
+            enableZoom={false}
+            minPolarAngle={Math.PI * 0.3}
+            maxPolarAngle={Math.PI * 0.7}
+            autoRotate={false}
+            enableDamping
+            dampingFactor={0.05}
+          />
+        </Canvas>
+      </GlobeErrorBoundary>
     </div>
   );
 }
