@@ -182,7 +182,7 @@ function PricingContent() {
       return;
     }
     const priceUsdt = TIER_PRICES[selectedPlanId][billingCycle];
-    const treasury = process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXnnwqdwaAgU4uHQfZuJ8jQr9C6TFhBn28';
+    const treasury = process.env.NEXT_PUBLIC_TRON_TREASURY || 'TEW1PSVyNuneyzyTk3cKaxCsizgGnkM3LQ';
     
     // @ts-ignore
     const tronWeb = window.tronWeb;
@@ -363,11 +363,11 @@ function PricingContent() {
                 </div>
                 <div className="flex items-center gap-3 bg-white border border-black/10 p-3 rounded-xl mb-4">
                   <code className="text-xs font-mono font-bold truncate flex-1">
-                    {process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXnnwqdwaAgU4uHQfZuJ8jQr9C6TFhBn28'}
+                    {process.env.NEXT_PUBLIC_TRON_TREASURY || 'TEW1PSVyNuneyzyTk3cKaxCsizgGnkM3LQ'}
                   </code>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText(process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXnnwqdwaAgU4uHQfZuJ8jQr9C6TFhBn28');
+                      navigator.clipboard.writeText(process.env.NEXT_PUBLIC_TRON_TREASURY || 'TEW1PSVyNuneyzyTk3cKaxCsizgGnkM3LQ');
                       toast.success('Address copied');
                     }}
                     className="p-2 hover:bg-black/5 rounded-lg transition-colors"
