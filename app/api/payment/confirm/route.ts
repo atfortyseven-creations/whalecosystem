@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         amount: parseFloat(priceEth),
         token: 'USDT',
         fromAddress: walletAddress.toLowerCase(),
-        toAddress: process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXnnwqdwaAgU4uHQfZuJ8jQr9C6TFhBn28',
+        toAddress: process.env.NEXT_PUBLIC_TRON_TREASURY || 'TEW1PSVyNuneyzyTk3cKaxCsizgGnkM3LQ',
         authUserId: user.id,
         metadata: {
           planId,
