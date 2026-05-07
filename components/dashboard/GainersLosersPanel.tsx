@@ -46,7 +46,7 @@ function stripUSDT(binanceSymbol: string): string {
 }
 
 // ── Row Component ─────────────────────────────────────────────────────────────
-function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, onClick }: {
+function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, onClick }: {
     rank: number;
     symbol: string;
     data: any;
