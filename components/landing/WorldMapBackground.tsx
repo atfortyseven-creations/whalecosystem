@@ -22,11 +22,11 @@ export function BtcTransferLegend() {
   }, []);
 
   const routes = [
-    { from: "New York",      to: "London",      btc: (124.5  + Math.random() * 40.2).toFixed(2), latency: "12ms", conf: "6/6",         type: "OTC Desk" },
-    { from: "Tokyo",         to: "Hong Kong",   btc: (89.2   + Math.random() * 20.6).toFixed(2), latency: "8ms",  conf: "Unconfirmed", type: "Exchange" },
-    { from: "San Francisco", to: "Paris",       btc: (45.8   + Math.random() * 15.3).toFixed(2), latency: "14ms", conf: "2/6",         type: "Whale Wallet" },
-    { from: "London",        to: "Dubai",       btc: (210.1  + Math.random() * 55.0).toFixed(2), latency: "11ms", conf: "6/6",         type: "Institutional" },
-    { from: "Hong Kong",     to: "Singapore",   btc: (67.9   + Math.random() * 12.5).toFixed(2), latency: "6ms",  conf: "1/6",         type: "Dark Pool" },
+    { from: "New York",      to: "London",      btc: "145.28", latency: "12ms", conf: "6/6",         type: "OTC Desk" },
+    { from: "Tokyo",         to: "Hong Kong",   btc: "101.55", latency: "8ms",  conf: "Unconfirmed", type: "Exchange" },
+    { from: "San Francisco", to: "Paris",       btc: "53.21",  latency: "14ms", conf: "2/6",         type: "Whale Wallet" },
+    { from: "London",        to: "Dubai",       btc: "241.16", latency: "11ms", conf: "6/6",         type: "Institutional" },
+    { from: "Hong Kong",     to: "Singapore",   btc: "72.44",  latency: "6ms",  conf: "1/6",         type: "Dark Pool" },
   ];
 
   return (
