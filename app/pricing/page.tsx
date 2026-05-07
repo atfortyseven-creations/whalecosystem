@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock, Globe, Building2, BarChart3, HelpCircle, Settings, Mail } from 'lucide-react';
+import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock, Globe, Building2, BarChart3, HelpCircle, Settings, Mail, Wallet } from 'lucide-react';
 import { useSendTransaction } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { parseEther } from 'viem';
@@ -175,6 +175,72 @@ function PricingContent() {
     router.push('/dashboard?tab=billing');
   };
 
+  const handleDirectPay = async () => {
+    if (!selectedPlanId) return;
+    if (!emailInput || !emailInput.includes('@')) {
+      toast.error('Email Required', { description: 'Please enter your email to receive the invoice before paying.' });
+      return;
+    }
+    const priceUsdt = TIER_PRICES[selectedPlanId][billingCycle];
+    const treasury = process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXnnwqdwaAgU4uHQfZuJ8jQr9C6TFhBn28';
+    
+    // @ts-ignore
+    const tronWeb = window.tronWeb;
+    if (!tronWeb || !tronWeb.ready) {
+      toast.error('TronLink Not Found', { description: 'Please install or unlock TronLink to pay automatically.' });
+      return;
+    }
+
+    try {
+      setIsConfirmingBackend(true);
+      toast.loading('Initializing USDT Transfer...', { id: 'tron-pay' });
+      
+      // USDT Contract on Tron Mainnet
+      const contract = await tronWeb.contract().at("TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t");
+      
+      // USDT has 6 decimals on Tron
+      const amount = (parseFloat(priceUsdt) * 1000000).toString();
+      
+      const result = await contract.transfer(treasury, amount).send();
+      
+      if (result) {
+        setTxIdInput(result); // Set the TXID automatically
+        toast.success('Transfer Sent!', { id: 'tron-pay', description: 'Transaction broadcasted. Verifying now...' });
+        
+        // Auto-submit to backend
+        const confirmRes = await fetch('/api/payment/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            txHash: result,
+            planId: selectedPlanId,
+            billingCycle,
+            priceEth: priceUsdt,
+            email: emailInput,
+            walletAddress: address || tronWeb.defaultAddress.base58 || 'tron_user',
+            network: 'TRON_TRC20',
+            token: 'USDT'
+          })
+        });
+
+        if (confirmRes.ok) {
+          toast.success('Access Granted!', { id: 'tron-pay' });
+          setTimeout(() => router.push('/dashboard?tab=billing'), 2000);
+        } else {
+          throw new Error('Backend confirmation failed. Please save your TXID.');
+        }
+      }
+    } catch (error: any) {
+      console.error('Tron Payment Error:', error);
+      toast.error('Payment Error', { 
+        id: 'tron-pay', 
+        description: error.message || 'The transaction failed or was rejected.' 
+      });
+    } finally {
+      setIsConfirmingBackend(false);
+    }
+  };
+
   const handleSubscribeClick = (planId: string) => {
     if (!isConnected && !address) {
       toast.error('Connect your wallet to subscribe', {
@@ -297,11 +363,11 @@ function PricingContent() {
                 </div>
                 <div className="flex items-center gap-3 bg-white border border-black/10 p-3 rounded-xl mb-4">
                   <code className="text-xs font-mono font-bold truncate flex-1">
-                    {process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'}
+                    {process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXnnwqdwaAgU4uHQfZuJ8jQr9C6TFhBn28'}
                   </code>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText(process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+                      navigator.clipboard.writeText(process.env.NEXT_PUBLIC_TRON_TREASURY || 'TXnnwqdwaAgU4uHQfZuJ8jQr9C6TFhBn28');
                       toast.success('Address copied');
                     }}
                     className="p-2 hover:bg-black/5 rounded-lg transition-colors"
@@ -351,17 +417,27 @@ function PricingContent() {
                   </div>
                 </div>
 
-                <button 
-                  type="submit"
-                  disabled={isConfirmingBackend}
-                  className="w-full py-4 bg-[#050505] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black/80 transition-all disabled:opacity-70"
-                >
-                  {isConfirmingBackend ? (
-                    <><Loader2 className="animate-spin" size={18} /> Validating Ledger...</>
-                  ) : (
-                    <>Confirm Payment <ArrowRight size={18} /></>
-                  )}
-                </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                  <button 
+                    type="button"
+                    onClick={handleDirectPay}
+                    disabled={isConfirmingBackend}
+                    className="py-4 bg-[#00C076] text-black rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all disabled:opacity-70"
+                  >
+                    <Wallet size={18} /> Pay via Wallet
+                  </button>
+                  <button 
+                    type="submit"
+                    disabled={isConfirmingBackend}
+                    className="py-4 bg-[#050505] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black/80 transition-all disabled:opacity-70"
+                  >
+                    {isConfirmingBackend ? (
+                      <><Loader2 className="animate-spin" size={18} /> Verifying...</>
+                    ) : (
+                      <>Manual Confirmation <ArrowRight size={18} /></>
+                    )}
+                  </button>
+                </div>
                 <p className="text-center text-[10px] text-black/30 mt-4 font-black uppercase tracking-[0.2em]">Institutional Grade Security • Zero Counterparty Risk</p>
               </form>
             </div>
