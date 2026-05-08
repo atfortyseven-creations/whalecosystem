@@ -108,9 +108,9 @@ export default function ForumSettingsPage() {
     if (!profile) return;
     setSaving(true);
     const r = await apiForum('update_profile', {
-      displayName: profile.displayName,
-      bio: profile.bio,
-      avatarUrl: profile.avatarUrl,
+      displayName: profile.displayName || null,
+      bio: profile.bio || null,
+      avatarUrl: profile.avatarUrl?.trim() || null, // null if empty — field is optional
       notifyOnReply: profile.notifyOnReply,
       notifyOnMention: profile.notifyOnMention,
     });

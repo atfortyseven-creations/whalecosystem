@@ -7,9 +7,9 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
 
 // Note: Prices should ideally be matched with the frontend
 const TIER_NAMES: Record<string, string> = {
-  STARTER: 'Explorer',
-  PRO: 'Professional',
-  ELITE: 'Enterprise'
+  STARTER: 'Starter',
+  PRO: 'Pro',
+  ELITE: 'Elite'
 };
 
 export async function POST(request: NextRequest) {

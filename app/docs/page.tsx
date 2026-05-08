@@ -1,196 +1,159 @@
 "use client";
 
 import React from 'react';
-import { Book, Code, Terminal, Database, Server, Hexagon, Layers, Activity, Lock, Globe } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Terminal, Code, Server, Shield, Zap, Book, Scale } from 'lucide-react';
+
+const CARDS = [
+  {
+    tab: 'docs',
+    icon: <Book size={18} />,
+    title: 'Documentation',
+    desc: 'Platform architecture, SIWE authentication, Neo4j Akashic Ledger, smart contracts, and node deployment.',
+    href: '/docs/intro',
+    cta: 'Read docs',
+    links: [
+      { label: 'Core Concepts', href: '/docs/intro' },
+      { label: 'Architecture', href: '/docs/platform/architecture' },
+      { label: 'Authentication', href: '/docs/platform/auth' },
+    ],
+  },
+  {
+    tab: 'developer',
+    icon: <Code size={18} />,
+    title: 'Developer',
+    desc: 'REST API, WebSocket streams, TypeScript & Python SDKs, webhooks, and rate limits per plan.',
+    href: '/docs/developer/overview',
+    cta: 'API reference',
+    links: [
+      { label: 'REST API', href: '/docs/developer/api/overview' },
+      { label: 'WebSocket API', href: '/docs/developer/ws/connection' },
+      { label: 'TypeScript SDK', href: '/docs/developer/sdk/typescript' },
+    ],
+  },
+  {
+    tab: 'operator',
+    icon: <Server size={18} />,
+    title: 'Operator',
+    desc: 'Run full nodes, sequencers, and provers. Hardware requirements, keystore management, and monitoring.',
+    href: '/docs/operator/overview',
+    cta: 'Run a node',
+    links: [
+      { label: 'Prerequisites', href: '/docs/operator/prerequisites' },
+      { label: 'Running a Node', href: '/docs/operator/setup/node' },
+      { label: 'Monitoring', href: '/docs/operator/monitoring' },
+    ],
+  },
+  {
+    tab: 'legal',
+    icon: <Scale size={18} />,
+    title: 'Legal',
+    desc: 'Terms of service, privacy policy, cookie policy, risk disclosure, and the Whale Code of conduct.',
+    href: '/docs/terms-of-service',
+    cta: 'View legal',
+    links: [
+      { label: 'Terms of Service', href: '/docs/terms-of-service' },
+      { label: 'Privacy Policy', href: '/docs/privacy-policy' },
+      { label: 'Risk Disclosure', href: '/docs/risk-disclosure' },
+    ],
+  },
+];
+
+const QUICK = [
+  { label: 'Quickstart (5 min)', href: '/docs/quickstart', badge: 'START HERE', icon: <Zap size={13} /> },
+  { label: 'Authentication guide', href: '/docs/platform/auth', icon: <Shield size={13} /> },
+  { label: 'API reference', href: '/docs/developer/api/overview', icon: <Code size={13} /> },
+  { label: 'Run a full node', href: '/docs/operator/setup/node', icon: <Terminal size={13} /> },
+];
 
 export default function DocsPage() {
-    return (
-        <div className="w-full overflow-x-hidden font-sans selection:bg-[#1a1a1a] selection:text-[#FAF9F6]" style={{ backgroundColor: "#FAF9F6", color: "#0A0A0A", minHeight: "100vh" }}>
-            <div className="w-full max-w-[1200px] mx-auto pt-32 pb-40 px-6 lg:px-12 flex flex-col items-start">
-                
-                {/* ── TOPOGRAPHY ── */}
-                <div style={{ color: "#0044CC" }} className="font-mono text-[10px] font-bold tracking-[0.4em] uppercase mb-8 flex items-center gap-3">
-                    <Book size={14} /> Master Node Documentation • Section D-1
-                </div>
-                
-                <h1 style={{ fontFamily: "'Georgia', serif" }} className="text-5xl md:text-7xl font-normal tracking-tight leading-[1.05] mb-6 text-[#0A0A0A]">
-                    Sovereign Technical Compendium
-                </h1>
-                
-                <p className="font-mono text-sm mb-24 uppercase tracking-widest font-bold text-black/40">
-                    Version 6.2.0 • Institutional Build
-                </p>
+  return (
+    <div className="doc-content">
 
-                {/* ── CARDS ── */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-32">
-                    <div className="bg-white border border-black/10 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow">
-                        <Terminal className="mb-6 text-black" size={24} strokeWidth={1.5} />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight text-black">Core Architecture</h3>
-                        <p className="text-xs font-mono leading-relaxed uppercase tracking-wide text-black/50">
-                            Understanding the Next.js Edge Runtime, Neo4j AuraDB integration, and the proprietary Wagmi/Viem transaction dispatchers.
-                        </p>
-                    </div>
-                    <div className="bg-white border border-black/10 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow">
-                        <Hexagon className="mb-6 text-black" size={24} strokeWidth={1.5} />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight text-black">Smart Contracts</h3>
-                        <p className="text-xs font-mono leading-relaxed uppercase tracking-wide text-black/50">
-                            ABIs, deployed addresses, and functional specifications for the Golden Ticket NFT and the Akashic Ledger system.
-                        </p>
-                    </div>
-                    <div className="bg-white border border-black/10 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow">
-                        <Code className="mb-6 text-black" size={24} strokeWidth={1.5} />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight text-black">API Integration</h3>
-                        <p className="text-xs font-mono leading-relaxed uppercase tracking-wide text-black/50">
-                            Interfacing with the Sovereign WebSocket endpoints, rate limits, and securing your REST payloads via cryptographic nonces.
-                        </p>
-                    </div>
-                    <div className="bg-white border border-black/10 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow">
-                        <Layers className="mb-6 text-black" size={24} strokeWidth={1.5} />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight text-black">Node Operations</h3>
-                        <p className="text-xs font-mono leading-relaxed uppercase tracking-wide text-black/50">
-                            Hardware requirements, Docker orchestration, and PM2 process management for deploying your own Master Node instance.
-                        </p>
-                    </div>
-                </div>
+      {/* Hero */}
+      <div className="mb-16">
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-25 mb-4">
+          Whale Alert · Documentation v2.0
+        </p>
+        <h1 className="text-[2.5rem] md:text-[3.5rem] font-black tracking-tighter uppercase leading-none mb-6">
+          Documentation
+        </h1>
+        <p className="text-[1rem] leading-relaxed opacity-60 max-w-xl">
+          Everything you need to integrate, operate, and build on top of the Whale Alert Network —
+          the institutional on-chain intelligence platform.
+        </p>
+      </div>
 
-                {/* ── SECTIONS ── */}
-                <div className="flex flex-col gap-24 w-full max-w-[900px] mx-auto font-serif">
-                    
-                    {/* SECTION 1 */}
-                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
-                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">01</div>
-                        <div>
-                            <h2 className="text-3xl font-normal mb-8 text-black">System Architecture Overview</h2>
-                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
-                                <p>
-                                    The Sovereign Master Node is a full-stack, decentralized intelligence and execution platform. It transcends traditional dApp architectures by fusing an aggressive Next.js App Router (running strictly on Edge and Node.js primitives) with a deeply integrated Neo4j Graph Database for high-velocity data modeling.
-                                </p>
-                                <p>
-                                    The client-side infrastructure leverages React Server Components to pre-render heavy cryptographic logic securely on the server, drastically reducing the JavaScript payload delivered to the client. Real-time DOM updates are handled by Framer Motion, ensuring mathematical fluidity at 60 frames per second, whilst global state is synchronized via Zustand combined with Wagmi's reactive hooks.
-                                </p>
-                                <p>
-                                    This hybrid topology—where heavy computation occurs in the Vercel/Railway backend, and only deterministic rendering commands are dispatched to the client—ensures that the Terminal remains impenetrable, highly performant, and resistant to client-side memory exhaustion when processing millions of localized graph nodes.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* SECTION 2 */}
-                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
-                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">02</div>
-                        <div>
-                            <h2 className="text-3xl font-normal mb-8 text-black">The Neo4j Akashic Ledger</h2>
-                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
-                                <p>
-                                    The intelligence capabilities of the Terminal are powered entirely by Neo4j AuraDB. Traditional relational databases (SQL) and document stores (NoSQL) fail catastrophically when attempting to model complex, multi-hop decentralized exchange routing, institutional wallet clustering, and recursive MEV extraction patterns.
-                                </p>
-                                <p>
-                                    By utilizing Cypher query language over a native property graph, we can execute 5-hop pathfinding algorithms across millions of Ethereum addresses in single-digit milliseconds. The graph schema consists of `(:Wallet)`, `(:SmartContract)`, `(:Transaction)`, and `(:Token)` nodes connected by strongly typed edges such as `[:TRANSFERRED]`, `[:SWAPPED]`, and `[:VOTED]`.
-                                </p>
-                                <div className="p-6 my-8 bg-black/5 border border-black/10 rounded-sm">
-                                    <p className="font-mono text-[13px] text-black/70">
-                                        MATCH (w:Wallet)-[t:TRANSFERRED]-&gt;(sc:SmartContract)<br/>
-                                        WHERE w.classification = 'WHALE' AND sc.protocol = 'UNISWAP_V3'<br/>
-                                        RETURN w, t, sc LIMIT 100;
-                                    </p>
-                                </div>
-                                <p>
-                                    This infrastructure allows the Sovereign Master Node to visualize institutional liquidity flows in real-time, effectively creating a "Dark Forest Radar" for the mempool.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* SECTION 3 */}
-                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
-                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">03</div>
-                        <div>
-                            <h2 className="text-3xl font-normal mb-8 text-black">Cryptographic Authentication (SIWE)</h2>
-                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
-                                <p>
-                                    The Terminal rejects traditional username/password paradigms. All authentication is exclusively managed through EIP-4361: Sign-In with Ethereum (SIWE). When an operator initiates a connection, the server generates a cryptographically secure nonce. The local wallet signs a standardized message containing this nonce, the URI, and a timestamp.
-                                </p>
-                                <p>
-                                    Upon validation by the backend (using `viem/utils` to recover the signer's address from the ECSDA signature), an HttpOnly JSON Web Token (JWT) is minted. This token is bound to the specific Ethereum address and cannot be hijacked via cross-site scripting (XSS).
-                                </p>
-                                <p>
-                                    This guarantees that interactions within the Terminal—such as deploying smart contracts, interacting with the Forum, or accessing Premium intelligence tiers—are irrevocably tethered to a verifiable on-chain identity without compromising absolute anonymity.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* SECTION 4 */}
-                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
-                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">04</div>
-                        <div>
-                            <h2 className="text-3xl font-normal mb-8 text-black">Golden Ticket & Sovereign Identity Contracts</h2>
-                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
-                                <p>
-                                    The protocol relies on several foundational smart contracts deployed on Base network (an Ethereum L2). The primary access-control mechanism is the <strong>Golden Ticket ERC-721 Contract</strong>. This non-fungible token grants perpetual, uncensorable access to the Premium Intelligence tiers of the Terminal.
-                                </p>
-                                <p>
-                                    The smart contract implements a deterministic bonding curve for minting, meaning early institutional adopters secure access at a lower capital requirement. The contract also integrates ERC-2981 for on-chain royalty enforcement and leverages custom ReentrancyGuard modules to prevent vector attacks during minting phases.
-                                </p>
-                                <p>
-                                    All contract ABIs (Application Binary Interfaces) and TypeChain bindings are stored locally in the `contracts/` directory, ensuring that the Terminal interacts with the blockchain using perfectly typed TypeScript interfaces, eliminating runtime decoding errors.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* SECTION 5 */}
-                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
-                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">05</div>
-                        <div>
-                            <h2 className="text-3xl font-normal mb-8 text-black">Node Deployment & Self-Hosting</h2>
-                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
-                                <p>
-                                    For institutional actors desiring absolute sovereignty, the Terminal can be deployed on proprietary bare-metal servers. The system is fully containerized using Docker, allowing for rapid orchestration via Docker Compose or Kubernetes.
-                                </p>
-                                <p>
-                                    <strong>Hardware Prerequisites:</strong><br/>
-                                    • Processing: Dedicated 8-Core CPU (Minimum)<br/>
-                                    • Memory: 32GB ECC RAM (Required for local Neo4j instances)<br/>
-                                    • Storage: 2TB NVMe SSD (For synchronized RPC nodes and graph persistence)<br/>
-                                    • Network: 1Gbps Dedicated Uplink
-                                </p>
-                                <p>
-                                    To deploy, administrators must configure the `.env` file with their specific Alchemy/Infura RPC endpoints, WalletConnect Cloud IDs, and Neo4j authentication credentials. Once configured, running the `start.sh` or `SovereignVault_RUN.bat` scripts will initialize the PM2 daemon or Docker containers, spinning up the Next.js runtime, the Redis cache, and the WebSocket servers concurrently.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    {/* SECTION 6 */}
-                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
-                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">06</div>
-                        <div>
-                            <h2 className="text-3xl font-normal mb-8 text-black">API Limitations & WebSockets</h2>
-                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
-                                <p>
-                                    The Terminal provides a robust internal API for data fetching, but external access is strictly throttled by the Web Application Firewall (WAF) outlined in the middleware. 
-                                </p>
-                                <p>
-                                    Live market data and orderbook streams are delivered exclusively via secure WebSockets (WSS). Clients must initiate a handshake using an authorized session token. The WebSocket server (managed via custom Next.js route handlers and Socket.io) broadcasts incremental delta updates rather than full state objects, drastically reducing bandwidth consumption and ensuring ultra-low latency execution feedback.
-                                </p>
-                                <p>
-                                    Unrecognized socket connections or connections failing the cryptographic heartbeat challenge are abruptly terminated without response.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                </div>
-
-                {/* ── FOOTER MARK ── */}
-                <div className="w-full flex flex-col items-center justify-center mt-40 pt-16 border-t border-black/10">
-                    <Globe className="mb-6 text-black/20" size={48} />
-                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold text-center text-black/40">
-                        Sovereign Master Node · Technical Documentation D-1
-                    </p>
-                </div>
-            </div>
+      {/* Quick links */}
+      <div className="mb-16">
+        <p className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-25 mb-4">Quick access</p>
+        <div className="flex flex-col gap-px border border-black/8 dark:border-white/8">
+          {QUICK.map((q, i) => (
+            <Link key={i} href={q.href}
+              className="flex items-center justify-between px-5 py-3.5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
+              <div className="flex items-center gap-3">
+                <span className="opacity-35 group-hover:opacity-70 transition-opacity">{q.icon}</span>
+                <span className="font-mono text-[12px] tracking-tight">{q.label}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                {q.badge && (
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-[#00C076] font-black">{q.badge}</span>
+                )}
+                <ArrowRight size={12} className="opacity-20 group-hover:opacity-60 group-hover:translate-x-0.5 transition-all" />
+              </div>
+            </Link>
+          ))}
         </div>
-    );
+      </div>
+
+      {/* Section cards */}
+      <div className="mb-16">
+        <p className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-25 mb-4">Sections</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px border border-black/8 dark:border-white/8">
+          {CARDS.map((card, i) => (
+            <div key={i} className="p-7 hover:bg-black/[0.025] dark:hover:bg-white/[0.025] transition-colors flex flex-col gap-4 border-b border-r border-black/8 dark:border-white/8 last:border-b-0">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="opacity-40">{card.icon}</span>
+                  <span className="font-mono text-[11px] font-black uppercase tracking-[0.2em]">{card.title}</span>
+                </div>
+                <span className="font-mono text-[9px] uppercase tracking-widest opacity-20 border border-current px-2 py-0.5">
+                  {card.tab}
+                </span>
+              </div>
+              <p className="text-[13px] leading-relaxed opacity-55">{card.desc}</p>
+              <div className="flex flex-col gap-1 mt-1">
+                {card.links.map((lnk, j) => (
+                  <Link key={j} href={lnk.href}
+                    className="flex items-center gap-2 font-mono text-[11px] opacity-40 hover:opacity-100 hover:text-[#00C076] transition-all group">
+                    <span className="opacity-30 group-hover:opacity-100">→</span>
+                    {lnk.label}
+                  </Link>
+                ))}
+              </div>
+              <Link href={card.href}
+                className="mt-2 self-start flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-2 border border-current opacity-30 hover:opacity-100 transition-all group">
+                {card.cta} <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Platform info */}
+      <div className="border-t border-black/8 dark:border-white/8 pt-12 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+        {[
+          { value: '12', label: 'Chains indexed' },
+          { value: 'v2.0', label: 'Current version' },
+          { value: 'TRC-20', label: 'Payment network' },
+        ].map((s, i) => (
+          <div key={i}>
+            <div className="font-black text-[2rem] tracking-tighter">{s.value}</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest opacity-30 mt-1">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
 }

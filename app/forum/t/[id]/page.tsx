@@ -64,20 +64,21 @@ export default function TopicPage() {
       // the signature request, we post without a signature rather than blocking.
       let finalContent = replyContent;
       try {
-        if (!isSovereignHandshake) {
-            const signature = await signMessageAsync({ message: replyContent });
-            finalContent = `${replyContent}\n\n[SIGNATURE:${signature}]`;
-        } else {
-            finalContent = `${replyContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
-        }
+        // Always attempt real cryptographic signature first (works on iOS and Android)
+        const signature = await signMessageAsync({ message: replyContent });
+        finalContent = `${replyContent}\n\n[SIGNATURE:${signature}]`;
       } catch (e: any) {
-        console.warn('Signature failed, falling back to sovereign session:', e);
+        // Signature rejected or wallet not available — fallback to session auth
+        console.warn('Signature skipped, using session address:', e);
         if (sessionAddress) {
-            finalContent = `${replyContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
+          // Use the wallet address as proof of session identity
+          finalContent = `${replyContent}\n\n[SIGNATURE:SESSION:${sessionAddress}]`;
+        } else if (isSovereignHandshake) {
+          finalContent = `${replyContent}\n\n[SIGNATURE:SESSION:AUTHENTICATED]`;
         } else {
-            setReplyError('CRYPTOGRAPHIC SIGNATURE REQUIRED');
-            setSubmitting(false);
-            return;
+          setReplyError('CRYPTOGRAPHIC SIGNATURE REQUIRED');
+          setSubmitting(false);
+          return;
         }
       }
 
@@ -319,8 +320,8 @@ function RenderContent({ content }: { content: string }) {
   }
   text = text.replace(docRegex, '').trim();
   
-  // Check for the new token format
-  const tokenMatch = text.match(/\[SIGNATURE:(0x[a-fA-F0-9]+|SOVEREIGN_HANDSHAKE_VERIFIED)\]/i);
+  // Check for the new token format — hex signature OR session fallback
+  const tokenMatch = text.match(/\[SIGNATURE:(0x[a-fA-F0-9]+|SESSION:[a-zA-Z0-9x:]+)\]/i);
   if (tokenMatch) {
     signature = tokenMatch[1];
     text = text.replace(tokenMatch[0], '').trim();
@@ -370,7 +371,7 @@ function RenderContent({ content }: { content: string }) {
             Signature Verified
           </span>
           <div className="font-mono text-[10px] break-all text-[#00C076]/60">
-            {signature === 'SOVEREIGN_HANDSHAKE_VERIFIED' ? 'Linked Sovereign Device' : signature}
+            {signature.startsWith('SESSION:') ? signature.replace('SESSION:', '') : signature}
           </div>
         </div>
       )}
