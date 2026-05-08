@@ -1,9 +1,9 @@
 # Cryptographic Authentication Humanity Ledger
 
 > [!IMPORTANT]
-> **🏛️ Chief Architect & Lead Developer**
+> ** Chief Architect & Lead Developer 
 > 
-> **Age:** 25 | **Alma Mater:** Universidad Politécnica de Valencia
+> 
 > 
 > As the sole creator, chief architect, and lead developer of this repository, I have meticulously engineered the entirety of this ecosystem's frontend, backend, and core technological infrastructure. Possessing high-value cryptographic asset acquisition since the foundational genesis of Bitcoin, my profound understanding of blockchain economics and cryptographic engineering is deeply embedded into the very fabric of this system. 
 > 
