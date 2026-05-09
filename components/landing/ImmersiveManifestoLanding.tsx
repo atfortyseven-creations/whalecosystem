@@ -14,17 +14,14 @@ const STATS = [
 
 const FEATURES = [
   {
-    icon: <Zap size={20} />,
     title: "Real-time whale detection",
     desc: "Intercept institutional capital from the mempool — before block confirmation, before price impact.",
   },
   {
-    icon: <Shield size={20} />,
     title: "Cryptographic identity",
     desc: "Zero passwords. Your wallet is your key. Every forum post carries an ECDSA signature. Every session is mathematically verifiable.",
   },
   {
-    icon: <BarChart3 size={20} />,
     title: "On-chain forensics",
     desc: "12 chains. Unlimited history. De-obfuscate mixer outputs, trace multi-hop routes, and map entity clusters in real time.",
   },
@@ -129,9 +126,6 @@ export function ImmersiveManifestoLanding({
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-px bg-black/8">
           {FEATURES.map((f, i) => (
             <div key={i} className="bg-[#FDFCF8] p-10 flex flex-col gap-6 group hover:bg-[#F5F4EF] transition-colors">
-              <div className="w-11 h-11 flex items-center justify-center border border-black/10 text-[#00C076] group-hover:bg-black group-hover:text-white group-hover:border-black transition-all duration-300">
-                {f.icon}
-              </div>
               <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] font-black">{f.title}</h3>
               <p className="font-serif text-[13px] text-[#444] leading-relaxed">{f.desc}</p>
             </div>
