@@ -220,6 +220,9 @@ export function WhaleProShell({
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [isSessionLocked, setIsSessionLocked] = useState(false);
+    const [tier, setTier] = useState<string | null>(null);
+    const [subStatus, setSubStatus] = useState<string | null>(null);
+    const [isTierLoaded, setIsTierLoaded] = useState(false);
     const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // ── True Desktop Detection ────────────────────────────────────────────────
@@ -247,6 +250,24 @@ export function WhaleProShell({
 
     const { latency, isConnected: streamConnected, mode } = useMarketStream();
     const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
+
+    useEffect(() => {
+        fetch('/api/auth/session', { cache: 'no-store' })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data?.user?.tier) {
+                    setTier(data.user.tier.split('_')[0].toUpperCase());
+                } else {
+                    setTier('FREE');
+                }
+                setSubStatus(data?.user?.subscription?.status || null);
+            })
+            .catch(() => {
+                setTier('FREE');
+                setSubStatus(null);
+            })
+            .finally(() => setIsTierLoaded(true));
+    }, [isWalletConnected, isSovereignHandshake]);
 
     // ── Inactivity Session Lock — driven by autoDisconnectTimer from settings ──
     useEffect(() => {
@@ -308,6 +329,14 @@ export function WhaleProShell({
                 router.push('/connect');
                 return;
             }
+            if (tier === 'FREE') {
+                toast.error("Upgrade Required", {
+                    description: "This module requires an active subscription.",
+                    duration: 4000
+                });
+                router.push('/pricing');
+                return;
+            }
         }
         onTabChange(id);
     };
@@ -355,6 +384,41 @@ export function WhaleProShell({
                         <Shield size={13} className="inline mr-2 mb-0.5" />
                         Resume Session
                     </button>
+                </motion.div>
+            )}
+
+            {isTierLoaded && tier === 'FREE' && activeTab !== 'billing' && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="fixed inset-0 z-[9998] flex flex-col items-center justify-center text-center"
+                    style={{ background: 'rgba(250,249,246,0.97)', backdropFilter: 'blur(24px)' }}
+                >
+                    <Lock size={48} className={`mb-6 ${subStatus === 'PENDING_SEPA' ? 'text-amber-500' : 'text-[#00C076]'}`} strokeWidth={1} />
+                    <h2 className="text-2xl font-black uppercase tracking-[0.2em] text-[#050505] mb-2">
+                        {subStatus === 'PENDING_SEPA' ? 'Awaiting Transfer' : 'Access Denied'}
+                    </h2>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/40 mb-8 max-w-sm">
+                        {subStatus === 'PENDING_SEPA' 
+                            ? 'Your invoice has been generated. Please complete the SEPA transfer to activate your account and unlock the terminal.'
+                            : 'You are currently on a free plan. The Whale Alert Network terminal requires an active subscription to view live telemetry and market intelligence.'}
+                    </p>
+                    <div className="flex gap-4">
+                        {subStatus !== 'PENDING_SEPA' && (
+                            <button
+                                onClick={() => router.push('/pricing')}
+                                className="px-8 py-3.5 bg-[#00C076] text-black text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-400 transition-all active:scale-[0.98] shadow-lg"
+                            >
+                                View Plans
+                            </button>
+                        )}
+                        <button
+                            onClick={() => onTabChange('billing')}
+                            className="px-8 py-3.5 bg-black text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-all active:scale-[0.98]"
+                        >
+                            My Billing
+                        </button>
+                    </div>
                 </motion.div>
             )}
         </AnimatePresence>

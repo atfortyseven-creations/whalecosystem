@@ -34,6 +34,20 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Billing SEPA] Processing transfer ref ${reference} for ${email} (Plan: ${planId})`);
 
+    // 0. Anti-Spam / Rate Limiting Check
+    const recentInvoices = await prisma.transaction.count({
+      where: {
+        fromAddress: email,
+        type: 'SUBSCRIPTION_PAYMENT',
+        timestamp: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+      }
+    });
+
+    if (recentInvoices > 3) {
+      console.warn(`[Billing SEPA] Rate limit exceeded for ${email}`);
+      return NextResponse.json({ error: 'Too many invoice requests. Please complete your existing pending transfers.' }, { status: 429 });
+    }
+
     // 1. Calculate Expiration Date (Immediate optimistic access)
     const existingSub = await prisma.subscription.findUnique({
       where: { userId: walletAddress.toLowerCase() }
@@ -52,18 +66,18 @@ export async function POST(request: NextRequest) {
       expiresAt.setMonth(baseDate.getMonth() + 1);
     }
 
-    // 2. Update Database (User Tier & Email)
+    // 2. Update Database (User Email)
+    // IMPORTANT SECURITY FIX: Do not immediately upgrade user.tier. They remain FREE until SEPA is confirmed.
     let user;
     try {
       user = await prisma.user.upsert({
         where: { walletAddress: walletAddress.toLowerCase() },
         update: {
-          tier: planId,
           email: email
         },
         create: {
           walletAddress: walletAddress.toLowerCase(),
-          tier: planId,
+          tier: 'FREE',
           email: email
         }
       });
@@ -71,25 +85,25 @@ export async function POST(request: NextRequest) {
       if (e.code === 'P2002') {
         user = await prisma.user.upsert({
           where: { walletAddress: walletAddress.toLowerCase() },
-          update: { tier: planId },
-          create: { walletAddress: walletAddress.toLowerCase(), tier: planId }
+          update: { email: email },
+          create: { walletAddress: walletAddress.toLowerCase(), tier: 'FREE', email: email }
         });
       } else {
         throw e;
       }
     }
 
-    // 3. Update or Create Subscription Record
+    // 3. Update or Create Subscription Record as PENDING
     await prisma.subscription.upsert({
       where: { userId: walletAddress.toLowerCase() },
       update: {
-        status: 'ACTIVE',
+        status: 'PENDING_SEPA',
         tier: `${planId}_${billingCycle.toUpperCase()}`,
         expiresAt: expiresAt,
       },
       create: {
         userId: walletAddress.toLowerCase(),
-        status: 'ACTIVE',
+        status: 'PENDING_SEPA',
         tier: `${planId}_${billingCycle.toUpperCase()}`,
         expiresAt: expiresAt,
       }
@@ -99,7 +113,7 @@ export async function POST(request: NextRequest) {
     await prisma.transaction.create({
       data: {
         txHash: reference, // Using the bank transfer reference instead of crypto txHash
-        status: 'PROCESSING', // SEPA takes 1-2 days, but we give access now
+        status: 'PENDING', // SEPA takes 1-2 days. Will be ACTIVE when confirmed.
         type: 'SUBSCRIPTION_PAYMENT',
         amount: parseFloat(priceEur),
         token: 'EUR',
@@ -136,7 +150,7 @@ export async function POST(request: NextRequest) {
             <div style="padding: 40px;">
               <p style="margin: 0 0 24px 0; font-size: 16px; color: #374151; line-height: 1.5;">
                 Hello,<br><br>
-                Thank you for upgrading to the <strong>${TIER_NAMES[planId] || planId} Plan</strong>. Your account access has been provisionally granted. To finalize the activation, please complete the SEPA Bank Transfer within the next 48 hours using the details below.
+                Thank you for requesting an upgrade to the <strong>${TIER_NAMES[planId] || planId} Plan</strong>. To activate your account access, please complete the SEPA Bank Transfer within the next 48 hours using the details below. Once the transfer is received, your account will automatically switch to ACTIVE.
               </p>
 
               <!-- Payment Details Box -->
@@ -201,7 +215,7 @@ export async function POST(request: NextRequest) {
       // We do not fail the request if the email fails, but we log heavily.
     }
 
-    return NextResponse.json({ success: true, tier: planId, expiresAt });
+    return NextResponse.json({ success: true, status: 'PENDING_SEPA', tier: planId, expiresAt });
   } catch (error) {
     console.error('[Billing SEPA] Error confirming payment:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
