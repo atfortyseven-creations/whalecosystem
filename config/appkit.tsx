@@ -196,11 +196,13 @@ try {
             ],
             features: {
                 analytics: false, // ⚡ INSTANT BOOT: Disable telemetry to avoid blocking network requests
-                email: false,
-                socials: [],
-                emailShowWallets: false,
-                swaps: false,
-                onramp: false,
+                email: true, // Habilitado para facilitar onboarding
+                socials: ['google', 'x', 'apple', 'discord'],
+                emailShowWallets: true,
+                swaps: true,
+                onramp: true,
+                send: true,
+                receive: true,
                 reownAuthentication: false,
             },
             themeMode: 'dark',

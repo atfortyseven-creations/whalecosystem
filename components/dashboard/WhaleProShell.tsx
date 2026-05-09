@@ -57,8 +57,8 @@ const SIDEBAR_ITEMS: NavItem[] = [
 ];
 
 const RESTRICTED_TABS = [
-    'firehose', 'sov-intel', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
-    'portfolio', 'live-port', 'whale-port', 'vault', 'zk', 'logs'
+    'firehose', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
+    'live-port', 'whale-port', 'vault', 'zk', 'logs'
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {

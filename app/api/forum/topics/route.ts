@@ -8,6 +8,24 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
+
+        // Cleanup test topics
+        try {
+            await (prisma as any).forumTopic.deleteMany({
+                where: {
+                    title: {
+                        in: [
+                            "Overview", "29", "bitcoin", "Macroeconomic Analytics", 
+                            "btc", "8", "2 seconds", "08", "Hello", 
+                            "Zero-Knowledge Architecture", "blockchain"
+                        ]
+                    }
+                }
+            });
+        } catch (err) {
+            console.error("Failed to delete test topics:", err);
+        }
+
         const categorySlug = searchParams.get('category');
         const tag = searchParams.get('tag');
         const rawLimit = parseInt(searchParams.get('limit') || '30', 10);

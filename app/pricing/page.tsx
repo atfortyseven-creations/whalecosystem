@@ -203,7 +203,7 @@ function PricingContent() {
                     ))}
                   </ul>
 
-                  {isDowngrade ? (
+                  {isDowngrade && currentTierLevel > 0 ? (
                     <div className={`w-full py-4 rounded-xl text-center text-xs font-black uppercase tracking-[0.2em] opacity-40 ${
                       tier.highlight ? 'bg-white/10 text-white' : 'bg-black/5 text-black'
                     }`}>
