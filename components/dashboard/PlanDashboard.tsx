@@ -74,8 +74,12 @@ export function PlanDashboard() {
   let cycle = 'Lifetime';
   let expiresString = 'Never';
   let isExpired = false;
+  let isPending = false;
 
   if (sub) {
+    if (sub.status === 'PENDING_SEPA') {
+        isPending = true;
+    }
     const parts = sub.tier.split('_');
     formattedTier = parts[0] || userData.tier;
     cycle = parts[1] ? (parts[1].toLowerCase() === 'annual' ? 'Annually' : 'Monthly') : 'N/A';
@@ -118,7 +122,12 @@ export function PlanDashboard() {
                 </div>
               </div>
               <div className="text-right">
-                {isFree || isExpired ? (
+                {isPending ? (
+                  <div className="px-4 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-500 font-bold text-xs rounded-xl flex items-center gap-2">
+                    <Loader2 size={16} className="animate-spin" />
+                    Awaiting SEPA Transfer
+                  </div>
+                ) : isFree || isExpired ? (
                   <button 
                     onClick={() => router.push('/pricing')}
                     className="px-5 py-2.5 bg-white text-black font-bold text-sm rounded-xl hover:bg-white/90 transition-all shadow-sm"
@@ -134,13 +143,19 @@ export function PlanDashboard() {
               </div>
             </div>
 
-            {!isFree && (
+            {!isFree && !isPending && (
               <p className="text-sm text-white/50 flex items-center gap-2 font-medium">
                 <CalendarClock size={16} className="text-white/30" />
                 Your plan {isExpired ? 'expired on' : 'will automatically renew on'} <span className="text-white font-semibold">{expiresString}</span>
               </p>
             )}
-            {isFree && (
+            {isPending && (
+              <p className="text-sm text-amber-500/70 font-medium max-w-md mt-2 flex items-center gap-2">
+                <AlertCircle size={16} />
+                Your plan upgrade is pending manual bank confirmation. It will activate automatically once the transfer is received.
+              </p>
+            )}
+            {isFree && !isPending && (
               <p className="text-sm text-white/50 font-medium max-w-md">
                 You are currently on the Free tier. Upgrade to unlock full on-chain intelligence, predictive models, and infinite API access.
               </p>
@@ -218,13 +233,13 @@ export function PlanDashboard() {
                       </td>
                       <td className="py-4 px-4">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] rounded-md border ${
-                          tx.status === 'PROCESSING' 
-                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
-                            : tx.status === 'CONFIRMED'
+                          tx.status === 'PROCESSING' || tx.status === 'PENDING'
+                            ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' 
+                            : tx.status === 'CONFIRMED' || tx.status === 'ACTIVE'
                             ? 'bg-[#00C076]/10 text-[#00C076] border-[#00C076]/20'
                             : 'bg-white/10 text-white/60 border-white/10'
                         }`}>
-                          {tx.status === 'PROCESSING' && <Loader2 size={10} className="animate-spin" />}
+                          {(tx.status === 'PROCESSING' || tx.status === 'PENDING') && <Loader2 size={10} className="animate-spin" />}
                           {tx.status}
                         </span>
                       </td>

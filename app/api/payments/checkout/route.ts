@@ -34,11 +34,12 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Plan configuration not found' }, { status: 400 });
         }
 
+        const normalizedUserId = userId.toLowerCase();
         // SIWE-native: userId is always a walletAddress
         const user = await prisma.user.upsert({
-            where: { walletAddress: userId },
+            where: { walletAddress: normalizedUserId },
             update: {},
-            create: { walletAddress: userId, tier: 'FREE' }
+            create: { walletAddress: normalizedUserId, tier: 'FREE' }
         });
 
         if (!user) {
@@ -51,9 +52,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Stripe price ID not configured for this plan. Please contact support.' }, { status: 503 });
         }
 
-        // Create Stripe Checkout Session
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card', 'sepa_debit'],
+        // Create Stripe Checkout Session payload
+        const sessionPayload: any = {
+            payment_method_types: ['card'],
             payment_method_options: {
                 card: {
                     request_three_d_secure: 'automatic',
@@ -66,12 +67,10 @@ export async function POST(req: NextRequest) {
                 },
             ],
             mode: 'subscription',
-            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api-marketplace/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/product/pricing`,
-            // user.email may not exist on the User schema — use optional cast for forward-compatibility
-            customer_email: (user as any).email || undefined,
+            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
             metadata: {
-                userId: userId,
+                userId: normalizedUserId,
                 tier: tier,
                 env: process.env.NODE_ENV ?? 'production',
                 billingCycle: billingCycle,
@@ -89,7 +88,7 @@ export async function POST(req: NextRequest) {
             },
             subscription_data: {
                 metadata: {
-                    sovereign_user_id: userId,
+                    sovereign_user_id: normalizedUserId,
                     tier: tier,
                     billingCycle: billingCycle,
                     maxTokens: planConfig.limits.maxTokens.toString(),
@@ -97,7 +96,15 @@ export async function POST(req: NextRequest) {
                     ft_darkPool: planConfig.features.darkPoolDetection ? 'yes' : 'no'
                 }
             }
-        });
+        };
+
+        if (user.stripeCustomerId) {
+            sessionPayload.customer = user.stripeCustomerId;
+        } else {
+            sessionPayload.customer_email = user.email || undefined;
+        }
+
+        const session = await stripe.checkout.sessions.create(sessionPayload);
 
         return NextResponse.json({ url: session.url });
 

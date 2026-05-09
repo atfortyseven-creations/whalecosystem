@@ -25,24 +25,43 @@ export async function verifyPremiumAccess(userId: string): Promise<{
   expiresAt?: Date;
 }> {
   try {
+    const normalizedUserId = userId.toLowerCase();
+
     // 1. Native DB TIER check (One-time payments and Sovereign tier)
-    const user = await prisma.user.findUnique({
-      where: { walletAddress: userId },
+    let user = await prisma.user.findUnique({
+      where: { walletAddress: normalizedUserId },
       select: { tier: true }
     });
+
+    if (!user) {
+      user = await prisma.user.findFirst({
+        where: { walletAddress: { equals: normalizedUserId, mode: 'insensitive' } },
+        select: { tier: true }
+      });
+    }
 
     if (user?.tier === 'SOVEREIGN' || user?.tier === 'HUMAN') {
        return { valid: true, tier: 'SOVEREIGN' };
     }
 
-    // 2. Subscription check from native DB
-    const subscription = await prisma.subscription.findFirst({
+    // 2. Subscription check from native DB (case insensitive fallback)
+    let subscription = await prisma.subscription.findFirst({
       where: {
-        userId,
+        userId: normalizedUserId,
         status: 'ACTIVE',
         expiresAt: { gte: new Date() },
       },
     });
+
+    if (!subscription) {
+      subscription = await prisma.subscription.findFirst({
+        where: {
+          userId: { equals: normalizedUserId, mode: 'insensitive' },
+          status: 'ACTIVE',
+          expiresAt: { gte: new Date() },
+        },
+      });
+    }
     
     if (!subscription) return { valid: false, tier: 'FREE' };
     return { valid: true, tier: 'PREMIUM', expiresAt: subscription.expiresAt };

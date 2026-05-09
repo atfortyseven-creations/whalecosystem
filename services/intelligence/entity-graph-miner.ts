@@ -77,6 +77,15 @@ export class EntityGraphMiner {
             size: Math.max(1, (e.totalVolumeUSD || 0) / 1_000_000)
         }));
 
+        if (nodes.length === 0) {
+            nodes.push({
+                id: '0xGENESIS_000000000000000000000000000000',
+                group: 0,
+                label: 'GENESIS NODE (AWAITING DATA)',
+                size: 5
+            });
+        }
+
         // ZERO-SIMULATION MANDATE: No fabricated links.
         // Links are only populated from real on-chain data via Neo4j (mineRealNetworkGraph).
         return {
@@ -98,9 +107,11 @@ export class EntityGraphMiner {
                 WITH e, r, t
                 ORDER BY e.volumeUSD DESC
                 LIMIT 50
-                RETURN
-                    collect(DISTINCT e) AS nodes,
-                    collect(DISTINCT {source: e.address, target: t.address, value: r.amountUSD}) AS links
+                WITH collect(DISTINCT e) + collect(DISTINCT t) AS all_nodes, collect(DISTINCT {source: e.address, target: t.address, value: r.amountUSD}) AS links
+                UNWIND all_nodes AS n
+                WITH DISTINCT n AS node, links
+                WHERE node IS NOT NULL
+                RETURN collect(node) AS nodes, links
             `;
             const result = await session.run(query);
             if (!result.records.length) {
@@ -126,12 +137,25 @@ export class EntityGraphMiner {
                     value: Math.max(1, (l.value || 0) / 100_000)
                 }));
 
+            // Double-check to prevent D3 "missing id" crashes
+            const nodeIds = new Set(nodes.map(n => n.id));
+            const safeLinks = links.filter(l => nodeIds.has(l.source) && nodeIds.has(l.target));
+
+            if (nodes.length === 0) {
+                nodes.push({
+                    id: '0xGENESIS_000000000000000000000000000000',
+                    group: 0,
+                    label: 'GENESIS NODE (AWAITING DATA)',
+                    size: 5
+                });
+            }
+
             return {
                 nodes,
-                links,
+                links: safeLinks,
                 status: 'LIVE_NEO4J' as GraphStatus,
                 nodeCount: nodes.length,
-                linkCount: links.length,
+                linkCount: safeLinks.length,
             };
         } finally {
             await session.close();
