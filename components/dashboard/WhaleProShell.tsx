@@ -38,10 +38,10 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'portfolio',     label: 'Main Portfolio',    icon: <Wallet size={17}/> },
     { id: 'billing',       label: 'Billing & Plan',    icon: <CreditCard size={17}/> },
 
-    { id: 'market-data',  label: 'Market Data',       icon: <Globe size={17}/>,     dividerBefore: 'Intelligence' },
-    { id: 'markets',      label: 'Top Markets',       icon: <LayoutDashboard size={17}/> },
+    // { id: 'market-data',  label: 'Market Data',       icon: <Globe size={17}/>,     dividerBefore: 'Intelligence' },
+    { id: 'markets',      label: 'Top Markets',       icon: <LayoutDashboard size={17}/>, dividerBefore: 'Intelligence' },
     { id: 'newpairs',     label: 'New Listings',      icon: <Search size={17}/> },
-    { id: 'graph',        label: 'Entity Graph',      icon: <Compass size={17}/> },
+    // { id: 'graph',        label: 'Entity Graph',      icon: <Compass size={17}/> },
 
     { id: 'inst-ledger',  label: 'Whale Ledger',      icon: <Book size={17}/>,      dividerBefore: 'On-Chain Intel' },
     { id: 'mass-transfer',label: 'Mass Transfers',    icon: <Network size={17}/> },
@@ -569,8 +569,8 @@ export function WhaleProShell({
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
                 <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} h-16 border-t border-black/10 bg-white items-center justify-around px-2 shrink-0 z-50`} style={{ minHeight: '64px', maxHeight: '64px' }}>
                     {[
-                        { id: 'market-data', icon: <Globe size={20} />, label: 'Markets' },
-                        { id: 'markets',     icon: <LayoutDashboard size={20} />, label: 'Top' },
+                        { id: 'markets',     icon: <LayoutDashboard size={20} />, label: 'Markets' },
+                        { id: 'newpairs',    icon: <Search size={20} />, label: 'Listings' },
                         { id: 'portfolio',   icon: <Wallet size={20} />, label: 'Portfolio' },
                         { id: 'menu',        icon: <Menu size={20} />, label: 'Menu' },
                     ].map(tab => {

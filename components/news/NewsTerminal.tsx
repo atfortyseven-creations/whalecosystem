@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Download, Mail, X, Calendar, ChevronLeft, ArrowRight, Clock, BookOpen, ExternalLink, Globe } from 'lucide-react';
+import { Download, Mail, X, Calendar, ChevronLeft, ArrowRight, Clock, BookOpen, ExternalLink, Globe, Activity } from 'lucide-react';
 import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
 import { useAccount } from 'wagmi';
 import { CryptoCheckoutModal } from './CryptoCheckoutModal';
@@ -51,8 +51,7 @@ export function NewsTerminal() {
   const { address } = useAccount();
   const router = useRouter();
 
-  const hasAccess = true;
-
+  const [tier,         setTier]         = useState<string>('FREE');
   const [articles,     setArticles]     = useState<NewsArticle[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [selected,     setSelected]     = useState<NewsArticle | null>(null);
@@ -89,6 +88,13 @@ export function NewsTerminal() {
   // ── Load data ──────────────────────────────────────────────────────────────
   useEffect(() => {
     fetchEthEur().then(setEthEur);
+
+    fetch('/api/auth/session', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.user?.tier) setTier(data.user.tier.split('_')[0].toUpperCase());
+      })
+      .catch(console.error);
 
     fetch('/api/news', { cache: 'no-store' })
       .then(r => r.json())
@@ -143,6 +149,8 @@ export function NewsTerminal() {
     if (!selected) return;
     router.push(`/whalepost/full-report?id=${encodeURIComponent(selected.id)}`);
   };
+
+  const hasAccess = tier === 'PRO' || tier === 'ELITE';
 
   const BG      = '#FAF9F6';
   const TEXT    = '#0A0A0A';
@@ -299,6 +307,24 @@ export function NewsTerminal() {
                       <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/50">
                         <Clock size={12} /> {estimateReadTime(selected.description ?? '')} min read
                       </div>
+                      {(() => {
+                         const positiveWords = ['surge', 'growth', 'gain', 'bull', 'rally', 'adopt', 'high', 'up', 'approve', 'soar', 'breakout'];
+                         const negativeWords = ['drop', 'fall', 'bear', 'hack', 'loss', 'crash', 'down', 'reject', 'ban', 'plunge', 'scam'];
+                         const textBody = (selected.title + ' ' + (selected.description ?? '')).toLowerCase();
+                         let posCount = 0; let negCount = 0;
+                         positiveWords.forEach(w => { posCount += (textBody.match(new RegExp('\\b'+w+'\\b', 'g')) || []).length; });
+                         negativeWords.forEach(w => { negCount += (textBody.match(new RegExp('\\b'+w+'\\b', 'g')) || []).length; });
+                         let sentiment = 'NEUTRAL';
+                         let sentColor = 'text-black/50 border-black/10';
+                         if (posCount > negCount) { sentiment = 'BULLISH'; sentColor = 'text-emerald-600 border-emerald-600/30'; }
+                         else if (negCount > posCount) { sentiment = 'BEARISH'; sentColor = 'text-rose-600 border-rose-600/30'; }
+                         
+                         return (
+                           <div className={`flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-sm border ${sentColor}`}>
+                             <Activity size={12} /> Semantic Sentiment: {sentiment}
+                           </div>
+                         );
+                      })()}
                     </div>
                   </div>
 

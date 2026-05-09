@@ -36,26 +36,18 @@ const StaggeredText = ({ text, className }: { text: string; className?: string }
 
 // 1. Builder Announcements
 const BuilderAnnouncements = () => {
-  const announcements = [
-    {
-      date: "System Update",
-      title: "Edge-Optimized Cryptography",
-      desc: "We have finalized our migration to Ed25519 (EdDSA) asymmetric cryptography. Verification now operates globally in sub-5 milliseconds, ensuring session integrity without secret exposure to intermediate edge nodes.",
-      action: "Review Architecture",
-    },
-    {
-      date: "Security Protocol",
-      title: "Zero-Trust Handshakes",
-      desc: "We have eliminated Man-in-the-Middle vectors. The new QR handshake uses ephemeral X25519 key exchanges and AES-256-GCM encryption, routing signatures directly from mobile devices to desktop terminals.",
-      action: "Inspect Telemetry",
-    },
-    {
-      date: "Regulatory Framework",
-      title: "Automated Compliance Toolkit",
-      desc: "Built-in compliance automation. The system executes programmatic entity wiping and SHA-256 hashing to fulfill European GDPR and MiCA requirements by default.",
-      action: "Read Documentation",
-    }
-  ];
+  const [commits, setCommits] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    fetch('https://api.github.com/repos/ethereum/go-ethereum/commits?per_page=3')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setCommits(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto py-32 px-6">
@@ -67,31 +59,46 @@ const BuilderAnnouncements = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {announcements.map((a, i) => (
-          <motion.div 
-             key={i}
-             initial={{ opacity: 0, y: 30 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-             transition={{ duration: 0.6, delay: i * 0.1 }}
-             className="group relative bg-white p-8 md:p-12 border border-black/10 hover:border-[#0044CC]/30 transition-all cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,68,204,0.08)] rounded-sm min-h-[480px] flex flex-col justify-between"
-          >
-             <div className="relative z-10">
-               <div className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-black/40 mb-8 flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-[#0044CC] animate-pulse" /> {a.date}
+        {loading ? (
+           <div className="col-span-3 text-center py-20 font-mono text-[10px] uppercase tracking-widest text-black/40">
+             Synchronizing core repository state...
+           </div>
+        ) : commits.map((c, i) => {
+          const dateStr = new Date(c.commit.author.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const sha = c.sha.slice(0, 7);
+          const fullMsg = c.commit.message as string;
+          const title = fullMsg.split('\n')[0];
+          const desc = fullMsg.split('\n').slice(1).join(' ').trim() || "Core protocol architectural update and optimization.";
+
+          return (
+            <motion.div 
+               key={i}
+               initial={{ opacity: 0, y: 30 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ duration: 0.6, delay: i * 0.1 }}
+               className="group relative bg-white p-8 md:p-12 border border-black/10 hover:border-[#0044CC]/30 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,68,204,0.08)] rounded-sm min-h-[480px] flex flex-col justify-between"
+            >
+               <div className="relative z-10">
+                 <div className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-black/40 mb-8 flex items-center justify-between gap-2">
+                   <div className="flex items-center gap-2">
+                     <div className="w-1.5 h-1.5 rounded-full bg-[#0044CC] animate-pulse" /> {dateStr}
+                   </div>
+                   <span className="text-[#0044CC] bg-[#0044CC]/5 px-2 py-0.5 rounded-sm">SHA: {sha}</span>
+                 </div>
+                 <h3 className="font-serif text-2xl lg:text-[24px] font-normal text-[#0A0A0A] mb-6 leading-[1.3] group-hover:text-[#0044CC] transition-colors line-clamp-3">
+                    {title}
+                 </h3>
+                 <p className="font-sans text-[#1a1a1a] text-[13px] leading-[1.8] tracking-[0.01em] mb-8 line-clamp-4">
+                    {desc}
+                 </p>
                </div>
-               <h3 className="font-serif text-2xl lg:text-[28px] font-normal text-[#0A0A0A] mb-6 leading-[1.3] group-hover:text-[#0044CC] transition-colors">
-                  {a.title}
-               </h3>
-               <p className="font-sans text-[#1a1a1a] text-[15px] leading-[1.8] tracking-[0.01em] mb-8">
-                  {a.desc}
-               </p>
-             </div>
-             <div className="relative z-10 font-mono text-[10px] font-bold uppercase tracking-widest text-[#0044CC] flex items-center gap-4 hover:gap-6 transition-all">
-                {a.action} <ArrowRight size={14} />
-             </div>
-          </motion.div>
-        ))}
+               <a href={c.html_url} target="_blank" rel="noopener noreferrer" className="relative z-10 font-mono text-[10px] font-bold uppercase tracking-widest text-[#0044CC] flex items-center gap-4 hover:gap-6 transition-all cursor-pointer">
+                  Inspect Diff <ArrowRight size={14} />
+               </a>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

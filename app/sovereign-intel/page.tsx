@@ -134,14 +134,48 @@ export default function ExplorerPage() {
                         key={address}
                         className="border border-black/10 bg-white shadow-sm rounded-3xl p-6 md:p-10 mb-8"
                     >
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-8 border-b border-black/5 gap-4">
-                            <div>
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-8 border-b border-black/5 gap-8">
+                            <div className="flex-1">
                                 <h3 className="font-mono text-[10px] uppercase tracking-widest text-black/40 mb-2">Target Address</h3>
-                                <div className="text-lg font-mono font-bold">{address}</div>
+                                <div className="text-lg font-mono font-bold break-all">{address}</div>
                             </div>
-                            <div className="text-right">
-                                 <h3 className="font-mono text-[10px] uppercase tracking-widest text-black/40 mb-2">Records Found</h3>
-                                 <div className="text-3xl font-black">{transactions.length}</div>
+                            
+                            <div className="grid grid-cols-3 gap-8 md:gap-12 shrink-0">
+                                <div className="text-right">
+                                    <h3 className="font-mono text-[10px] uppercase tracking-widest text-black/40 mb-2">Records</h3>
+                                    <div className="text-2xl font-black">{transactions.length}</div>
+                                </div>
+                                
+                                {(() => {
+                                    const totalVolume = transactions.reduce((sum, tx) => sum + (parseFloat(tx.fromAmount) || 0), 0);
+                                    
+                                    const tokenCounts: Record<string, number> = {};
+                                    let maxToken = "N/A";
+                                    let maxCount = 0;
+                                    
+                                    transactions.forEach(tx => {
+                                        if (tx.fromToken) {
+                                            tokenCounts[tx.fromToken] = (tokenCounts[tx.fromToken] || 0) + 1;
+                                            if (tokenCounts[tx.fromToken] > maxCount) {
+                                                maxCount = tokenCounts[tx.fromToken];
+                                                maxToken = tx.fromToken;
+                                            }
+                                        }
+                                    });
+
+                                    return (
+                                        <>
+                                            <div className="text-right">
+                                                <h3 className="font-mono text-[10px] uppercase tracking-widest text-black/40 mb-2">Volume</h3>
+                                                <div className="text-2xl font-black">{totalVolume > 0 ? totalVolume.toFixed(2) : "0.00"}</div>
+                                            </div>
+                                            <div className="text-right">
+                                                <h3 className="font-mono text-[10px] uppercase tracking-widest text-black/40 mb-2">Dominant Asset</h3>
+                                                <div className="text-2xl font-black">{maxToken}</div>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
                             </div>
                         </div>
 

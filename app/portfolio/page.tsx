@@ -6,7 +6,7 @@ import {
   Wallet, RefreshCw, ArrowUpRight, ArrowDownRight,
   Eye, EyeOff, PieChart, Globe, Copy, Search,
   ArrowDownLeft, Repeat, CreditCard, Plus, ChevronDown,
-  Check, Loader2, ShieldCheck, ExternalLink
+  Check, Loader2, ShieldCheck, ExternalLink, Activity, ShieldAlert
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { useAccount, useSwitchChain, useConnect } from 'wagmi';
@@ -192,7 +192,7 @@ export default function PortfolioPage() {
       a.symbol?.toLowerCase().includes(search.toLowerCase()) ||
       a.network?.toLowerCase().includes(search.toLowerCase())
     )
-    .sort((a: any, b: any) => (b.value ?? 0) - (a.value ?? 0));
+    .sort((a: any, b: any) => (b.valueUSD ?? 0) - (a.valueUSD ?? 0));
 
   const openMode = (m: "send" | "swap" | "bridge" | "buy") => {
     setTransferMode(m);
@@ -656,7 +656,7 @@ export default function PortfolioPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-mono" style={{ color: MUTED }}>{safeToFixed(pct, 1)}%</span>
-                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "••••" : formatEUR(asset.value ?? 0, eurRate)}</span>
+                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "••••" : formatEUR(asset.valueUSD ?? 0, eurRate)}</span>
                       </div>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(5,5,5,0.07)" }}>
@@ -671,6 +671,71 @@ export default function PortfolioPage() {
                   </div>
                 );
               })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── RISK PROFILE & EXPOSURE ── */}
+        {filteredAssets.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.24 }}
+            className="rounded-3xl border overflow-hidden"
+            style={{ borderColor: BORDER, background: CARD }}
+          >
+            <div className="px-6 py-5 border-b flex items-center gap-3" style={{ borderColor: BORDER }}>
+              <div className="w-1 h-5 rounded-full" style={{ background: INK }} />
+              <h2 className="font-black uppercase tracking-tight text-sm" style={{ color: INK }}>Exposure Profile</h2>
+            </div>
+            
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+               {(() => {
+                  const total = Number(totalPnl) || 1; // avoid division by zero
+                  const sorted = [...filteredAssets].sort((a, b) => (b.valueUSD ?? 0) - (a.valueUSD ?? 0));
+                  const topAsset = sorted[0];
+                  const topPct = topAsset ? ((topAsset.valueUSD ?? 0) / total) * 100 : 0;
+                  
+                  const stablecoins = ['USDC', 'USDT', 'DAI', 'USDe', 'FRAX', 'FDUSD'];
+                  const stableValue = filteredAssets.filter(a => stablecoins.includes(a.symbol?.toUpperCase())).reduce((sum, a) => sum + (a.valueUSD ?? 0), 0);
+                  const stablePct = (stableValue / total) * 100;
+
+                  let riskClass = "MODERATE";
+                  let riskColor = "text-amber-500";
+                  if (stablePct > 50) { riskClass = "CONSERVATIVE"; riskColor = "text-emerald-500"; }
+                  else if (topPct > 60) { riskClass = "AGGRESSIVE"; riskColor = "text-rose-500"; }
+
+                  return (
+                    <>
+                      <div className="space-y-2 border-r border-black/5 last:border-0 pr-4">
+                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
+                           <Activity size={12} /> Dominance
+                        </div>
+                        <div className="text-xl font-black font-mono text-black">
+                           {safeToFixed(topPct, 1)}% <span className="text-[11px] uppercase ml-1 opacity-50">{topAsset?.symbol || 'N/A'}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 border-r border-black/5 last:border-0 pr-4">
+                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
+                           <ShieldCheck size={12} /> Stablecoin Hedge
+                        </div>
+                        <div className="text-xl font-black font-mono text-black">
+                           {safeToFixed(stablePct, 1)}%
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
+                           <ShieldAlert size={12} /> Risk Classification
+                        </div>
+                        <div className={`text-xl font-black font-mono ${riskColor}`}>
+                           {riskClass}
+                        </div>
+                      </div>
+                    </>
+                  );
+               })()}
             </div>
           </motion.div>
         )}

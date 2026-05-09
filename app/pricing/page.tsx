@@ -130,18 +130,6 @@ function PricingContent() {
   const currentTierLevel = TIER_HIERARCHY[currentTier] || 0;
 
   const handleSubscribeClick = (planId: string) => {
-    if (!isConnected && !address) {
-      toast.error('Wallet required', { description: 'Connect your wallet to subscribe.' });
-      open();
-      return;
-    }
-    if (isSovereignHandshake) {
-      toast.info('Connect wallet to this browser', {
-        description: 'You are synced via mobile. Please connect your wallet directly in this browser to pay.',
-      });
-      open();
-      return;
-    }
     if (currentTierLevel >= (TIER_HIERARCHY[planId] || 0)) {
       toast.info('Already on this plan or higher'); return;
     }
@@ -158,11 +146,15 @@ function PricingContent() {
 
   const handleConfirmTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailInput.includes('@')) { toast.error('Invalid email format'); return; }
+    if (!emailInput || !emailInput.includes('@')) {
+      toast.error('Email inválido', { description: 'Introduce una dirección de email válida.' });
+      return;
+    }
     if (!selectedPlanId) return;
+    if (!generatedRef) return;
     
     setIsConfirming(true);
-    toast.loading('Generating invoice & unlocking access...', { id: 'tx' });
+    toast.loading('Generando factura...', { id: 'invoice-tx' });
     
     try {
       const r = await fetch('/api/payment/confirm', {
@@ -177,19 +169,21 @@ function PricingContent() {
           walletAddress: address || 'manual_sepa_user',
         }),
       });
+
+      const d = await r.json();
+
       if (r.ok) {
-        toast.success('Access granted!', { id: 'tx', description: 'Invoice sent to your email.' });
+        toast.success('¡Acceso desbloqueado!', { id: 'invoice-tx', description: 'Factura enviada a tu email.' });
         setCheckoutStep('success');
         setTimeout(() => {
-            setIsModalOpen(false);
-            router.push('/dashboard?tab=billing');
+          setIsModalOpen(false);
+          router.push('/dashboard?tab=billing');
         }, 4000);
       } else {
-        const d = await r.json();
-        throw new Error(d.error || 'Verification failed');
+        throw new Error(d.error || 'Error al procesar la solicitud');
       }
-    } catch (e: any) {
-      toast.error('Error', { id: 'tx', description: e.message });
+    } catch (err: any) {
+      toast.error('Error al generar factura', { id: 'invoice-tx', description: err.message });
     } finally {
       setIsConfirming(false);
       setLoadingTier(null);

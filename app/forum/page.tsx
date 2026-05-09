@@ -31,7 +31,7 @@ function ForumHomeContent() {
   }, [filter]);
 
   return (
-    <div className="w-full min-h-screen bg-[#FFFDF8] dark:bg-[#050505] text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
+    <div className="w-full min-h-screen bg-[#FFFDF8] dark:bg-[#050505] text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative transition-colors duration-300">
       {/* Background Volumetric Lighting */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#00C076]/10 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
       
@@ -47,7 +47,14 @@ function ForumHomeContent() {
             <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-5 transition-all duration-300 ease-in-out px-4 rounded-xl sm:-mx-4 hover:bg-black/5 dark:hover:bg-white/[0.02] border border-transparent hover:border-black/10 dark:hover:border-white/5 border-b-black/5 dark:border-b-white/5 mb-2 hover:shadow-md dark:hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]" style={{ transformStyle: 'preserve-3d' }}>
               <div className="w-1.5 h-1.5 rounded-full mr-4 mt-2 shadow-[0_0_10px_currentColor]" style={{ backgroundColor: cat.color || '#00C076', color: cat.color || '#00C076' }}></div>
               <div className="flex flex-col">
-                <span className="text-[16px] font-black tracking-tight transition-colors text-black dark:text-white group-hover:text-[#00C076]">{cat.name}</span>
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-[16px] font-black tracking-tight transition-colors text-black dark:text-white group-hover:text-[#00C076]">{cat.name}</span>
+                  {cat._count?.topics !== undefined && (
+                    <span className="text-[10px] font-mono font-bold text-black/40 dark:text-white/40 bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-md">
+                      {cat._count.topics} {cat._count.topics === 1 ? 'TOPIC' : 'TOPICS'}
+                    </span>
+                  )}
+                </div>
                 <span className="text-[12px] mt-1.5 leading-relaxed line-clamp-2 text-[#888888]">{cat.description || "Topics related to " + cat.name}</span>
               </div>
             </Link>
@@ -88,40 +95,42 @@ function ForumHomeContent() {
                 <Link
                   key={topic.id}
                   href={`/forum/t/${topic.id}`}
-                  className="flex items-start py-5 px-5 rounded-2xl group transition-all duration-300 bg-black/[0.02] dark:bg-white/[0.01] border border-black/10 dark:border-white/5 hover:bg-white dark:hover:bg-white/[0.03] hover:border-[#00C076]/30 hover:shadow-lg dark:hover:shadow-[0_10px_30px_rgba(0,192,118,0.1)] relative overflow-hidden"
+                  className="flex flex-col sm:flex-row items-start py-5 px-5 rounded-2xl group transition-all duration-300 bg-black/[0.02] dark:bg-white/[0.01] border border-black/10 dark:border-white/5 hover:bg-white dark:hover:bg-white/[0.03] hover:border-[#00C076]/30 hover:shadow-lg dark:hover:shadow-[0_10px_30px_rgba(0,192,118,0.1)] relative overflow-hidden"
                 >
                   {/* Hover Glow Effect */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-[#00C076]/5 to-transparent pointer-events-none" />
 
-                  {/* Avatar */}
-                  <div className="w-[50px] shrink-0 pt-1 relative z-10">
-                    <div className="w-[40px] h-[40px] rounded-xl flex items-center justify-center text-[12px] font-black text-black/50 dark:text-[#555] bg-black/5 dark:bg-black border border-black/10 dark:border-white/10 group-hover:border-[#00C076]/50 transition-colors">
-                      {topic.author?.walletAddress?.slice(2, 4).toUpperCase() || 'ID'}
+                  <div className="flex w-full sm:w-auto items-start flex-1 min-w-0">
+                    {/* Avatar */}
+                    <div className="w-[50px] shrink-0 pt-1 relative z-10">
+                      <div className="w-[40px] h-[40px] rounded-xl flex items-center justify-center text-[12px] font-black text-black/50 dark:text-[#555] bg-black/5 dark:bg-black border border-black/10 dark:border-white/10 group-hover:border-[#00C076]/50 transition-colors">
+                        {topic.author?.walletAddress?.slice(2, 4).toUpperCase() || 'ID'}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Title & Badges */}
-                  <div className="flex-1 flex flex-col pr-4 min-w-0 relative z-10">
-                    <span className="font-bold text-[18px] leading-[1.3] text-black dark:text-white group-hover:text-[#00C076] transition-colors line-clamp-2">
-                      {topic.title}
-                    </span>
-                    <div className="flex items-center gap-2 mt-3 flex-wrap">
-                      {topic.category && (
-                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white dark:bg-black border border-black/10 dark:border-white/10 group-hover:border-[#00C076]/30 transition-colors">
-                          <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: topic.category.color || '#00C076', color: topic.category.color || '#00C076' }} />
-                          <span className="text-[9px] font-black tracking-widest uppercase text-black dark:text-white">{topic.category.name}</span>
-                        </div>
-                      )}
-                      {topic.tags?.map((t: any) => (
-                        <span key={t.id} className="text-[9px] font-bold tracking-widest uppercase bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 px-2 py-0.5 rounded-md text-black/60 dark:text-[#888888]">
-                          {t.name}
-                        </span>
-                      ))}
+                    {/* Title & Badges */}
+                    <div className="flex-1 flex flex-col pr-0 sm:pr-4 min-w-0 relative z-10">
+                      <span className="font-bold text-[18px] leading-[1.3] text-black dark:text-white group-hover:text-[#00C076] transition-colors line-clamp-2">
+                        {topic.title}
+                      </span>
+                      <div className="flex items-center gap-2 mt-3 flex-wrap">
+                        {topic.category && (
+                          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white dark:bg-black border border-black/10 dark:border-white/10 group-hover:border-[#00C076]/30 transition-colors">
+                            <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: topic.category.color || '#00C076', color: topic.category.color || '#00C076' }} />
+                            <span className="text-[9px] font-black tracking-widest uppercase text-black dark:text-white">{topic.category.name}</span>
+                          </div>
+                        )}
+                        {topic.tags?.map((t: any) => (
+                          <span key={t.id} className="text-[9px] font-bold tracking-widest uppercase bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 px-2 py-0.5 rounded-md text-black/60 dark:text-[#888888]">
+                            {t.name}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
                   {/* Stats */}
-                  <div className="w-[70px] flex flex-col items-end shrink-0 gap-1 pt-1 relative z-10">
+                  <div className="w-full sm:w-[70px] flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start shrink-0 gap-1 pt-4 sm:pt-1 mt-4 sm:mt-0 border-t sm:border-t-0 border-black/5 dark:border-white/5 relative z-10">
                     <div className="flex items-center gap-1.5 text-black/40 dark:text-[#555]">
                         <span className="text-[12px] font-black">{topic._count?.posts || 0}</span>
                         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>

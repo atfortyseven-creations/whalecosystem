@@ -153,7 +153,7 @@ export default function CareersPage() {
               Active Operational Mandates
             </h2>
             <div className="px-3 py-1 rounded-full bg-black/5 text-[#050505] text-[10px] font-black font-mono uppercase tracking-[0.2em]">
-              1 Open Role
+              2 Open Roles
             </div>
           </div>
           
@@ -170,6 +170,31 @@ export default function CareersPage() {
                    <span className="text-[#050505]/80 font-bold">Content Architecture</span>
                    <span className="w-1 h-1 rounded-full bg-black/20" />
                    <span>Remote (Global)</span>
+                   <span className="w-1 h-1 rounded-full bg-black/20" />
+                   <span>Full-Time</span>
+                 </div>
+               </div>
+               
+               <div className="mt-6 sm:mt-0 flex items-center gap-4">
+                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-black/10 bg-white group-hover:border-[#00C076]/30 transition-colors">
+                   <span className="text-[10px] font-black uppercase tracking-widest text-[#050505]">View Mandate</span>
+                   <ChevronRight size={14} className="text-[#050505]/40 group-hover:text-[#00C076] transition-colors" />
+                 </div>
+               </div>
+            </Link>
+
+            <Link 
+              href="/careers/protocol-security-researcher" 
+              className="group flex flex-col sm:flex-row sm:items-center justify-between py-6 px-4 -mx-4 rounded-2xl hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:border-black/5 border border-transparent transition-all duration-300"
+            >
+               <div className="flex flex-col gap-2.5">
+                 <h3 className="text-[18px] font-black tracking-tight text-[#050505] group-hover:text-[#00C076] transition-colors">
+                   Protocol Security Researcher (Zero-Knowledge)
+                 </h3>
+                 <div className="flex items-center gap-3 font-mono text-[10px] text-[#050505]/50 uppercase tracking-[0.2em]">
+                   <span className="text-[#050505]/80 font-bold">Cryptography</span>
+                   <span className="w-1 h-1 rounded-full bg-black/20" />
+                   <span>Remote (EU/US)</span>
                    <span className="w-1 h-1 rounded-full bg-black/20" />
                    <span>Full-Time</span>
                  </div>

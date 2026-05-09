@@ -1,16 +1,46 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { SovereignGlobe3D } from "./SovereignGlobe3D";
 import Link from "next/link";
-import { ArrowRight, Scan, Zap, Shield, BarChart3, MessageSquare, ChevronRight } from "lucide-react";
+import { ArrowRight, Scan, MessageSquare, ChevronRight } from "lucide-react";
+import { usePublicClient } from 'wagmi';
 
-const STATS = [
-  { label: "Tracked today", value: "$2.4B", unit: "USD on-chain" },
-  { label: "Whale movements", value: "847", unit: "last 24h" },
-  { label: "Chains indexed", value: "12", unit: "L1 + L2" },
-  { label: "Active analysts", value: "2,400+", unit: "verified wallets" },
-];
+// Lottie cargado dinámicamente para evitar SSR issues
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+
+// Componente auxiliar: carga el JSON desde /public/ en runtime y pasa animationData
+function LottieFromUrl({
+  url,
+  className,
+  style,
+}: {
+  url: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const [animData, setAnimData] = useState<object | null>(null);
+
+  useEffect(() => {
+    fetch(url)
+      .then((r) => r.json())
+      .then(setAnimData)
+      .catch(() => {});
+  }, [url]);
+
+  if (!animData) return null;
+  return (
+    <Lottie
+      animationData={animData}
+      loop
+      autoplay
+      className={className}
+      style={style ?? { width: "100%", height: "auto" }}
+      aria-hidden="true"
+    />
+  );
+}
 
 const FEATURES = [
   {
@@ -33,12 +63,6 @@ const PLANS = [
   { id: "ELITE",   name: "Elite",   price: "950", note: "Institutional grade" },
 ];
 
-const FORUM_POSTS = [
-  { sig: "0x4a3f...d219", time: "2m ago",  msg: "Whale alert: 12,500 ETH moved to Binance cold wallet." },
-  { sig: "0x8c71...a44f", time: "7m ago",  msg: "BTC mining difficulty +3.2%. Next halving in 248 days." },
-  { sig: "0x2e19...b3c0", time: "14m ago", msg: "USDT TRC-20 anomaly: $42M bridge transfer detected on TRON." },
-];
-
 const KEY_EVENTS = [
   { date: "Jan 2009", code: "BTC-000", text: "Bitcoin Block 0 — Satoshi's direct answer to the TARP bailout: immutable, trustless, sovereign." },
   { date: "Feb 2014", code: "MTGOX",   text: "850,000 BTC stolen — centralized custody proven irreconcilable with cryptographic sovereignty." },
@@ -55,6 +79,61 @@ export function ImmersiveManifestoLanding({
   onOpenScanner?: () => void;
   hideMap?: boolean;
 }) {
+  const [stats, setStats] = useState<any[]>([
+    { label: "Network State", value: "SYNCING...", unit: "Ethereum Mainnet" },
+    { label: "Base Fee", value: "---", unit: "Gwei" },
+    { label: "Active Tokens", value: "---", unit: "Global Markets" },
+    { label: "Total Cap", value: "---", unit: "Trillion USD" },
+  ]);
+  const [liveTopics, setLiveTopics] = useState<any[]>([]);
+  const publicClient = usePublicClient({ chainId: 1 });
+
+  useEffect(() => {
+    fetch('https://api.coingecko.com/api/v3/global')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.data) {
+           setStats(prev => {
+             const newStats = [...prev];
+             newStats[2] = { label: "Active Tokens", value: data.data.active_cryptocurrencies.toLocaleString(), unit: "Global Markets" };
+             newStats[3] = { label: "Total Cap", value: "$" + (data.data.total_market_cap.usd / 1e12).toFixed(2), unit: "Trillion USD" };
+             return newStats;
+           });
+        }
+      }).catch(()=>{});
+
+    fetch('/api/forum/topics?limit=3&filter=latest')
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) setLiveTopics(data);
+      }).catch(()=>{});
+  }, []);
+
+  useEffect(() => {
+     if (!publicClient) return;
+     const updateBlock = async () => {
+        try {
+           const block = await publicClient.getBlock();
+           setStats(prev => {
+             const newStats = [...prev];
+             newStats[0] = { label: "Network State", value: "#" + block.number.toString(), unit: "Ethereum Mainnet" };
+             newStats[1] = { label: "Base Fee", value: block.baseFeePerGas ? (Number(block.baseFeePerGas) / 1e9).toFixed(2) : "0", unit: "Gwei" };
+             return newStats;
+           });
+        } catch (e) {}
+     };
+     updateBlock();
+     const unwatch = publicClient.watchBlocks({ onBlock: block => {
+        setStats(prev => {
+          const newStats = [...prev];
+          newStats[0] = { label: "Network State", value: "#" + block.number.toString(), unit: "Ethereum Mainnet" };
+          newStats[1] = { label: "Base Fee", value: block.baseFeePerGas ? (Number(block.baseFeePerGas) / 1e9).toFixed(2) : "0", unit: "Gwei" };
+          return newStats;
+        });
+     }});
+     return () => unwatch();
+  }, [publicClient]);
+
   return (
     <div className="relative bg-[#FDFCF8] text-[#050505] font-sans antialiased overflow-x-hidden">
 
@@ -111,10 +190,10 @@ export function ImmersiveManifestoLanding({
       {/* ── STATS ── */}
       <section className="w-full border-b border-black/8">
         <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-black/8">
-          {STATS.map((s, i) => (
+          {stats.map((s, i) => (
             <div key={i} className="flex flex-col gap-1.5 p-8 hover:bg-black/[0.02] transition-colors">
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/30">{s.label}</span>
-              <span className="font-black text-[36px] tracking-tighter text-black leading-none">{s.value}</span>
+              <span className="font-black text-[30px] sm:text-[36px] tracking-tighter text-black leading-none">{s.value}</span>
               <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#00C076]">{s.unit}</span>
             </div>
           ))}
@@ -182,6 +261,14 @@ export function ImmersiveManifestoLanding({
             <h2 className="text-[30px] sm:text-[42px] font-black tracking-tighter uppercase leading-tight mb-5">
               Every post.<br /><span className="text-[#00C076]">Cryptographically</span><br />signed.
             </h2>
+
+            {/* Lottie — DeeWork About Blockchain: alineado con el párrafo sobre ECDSA */}
+            <div className="my-6 w-full max-w-[240px]">
+              <LottieFromUrl
+                url="/lotties/DeeWork About Blockchain.json"
+              />
+            </div>
+
             <p className="font-serif text-[13px] text-[#444] leading-relaxed mb-8 max-w-md">
               The only forum where every message carries an ECDSA wallet signature. No anonymous posts. No repudiation. Identity is your key.
             </p>
@@ -192,15 +279,21 @@ export function ImmersiveManifestoLanding({
             </Link>
           </div>
           <div className="flex flex-col gap-px bg-black/8">
-            {FORUM_POSTS.map((p, i) => (
-              <div key={i} className="bg-[#FDFCF8] p-5 flex flex-col gap-2 hover:bg-[#F5F4EF] transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[9px] text-[#00C076] tracking-widest">✓ {p.sig}</span>
-                  <span className="font-mono text-[9px] text-black/30 uppercase tracking-widest">{p.time}</span>
+            {liveTopics.length === 0 ? (
+               <div className="bg-[#FDFCF8] p-10 text-center font-mono text-[10px] uppercase tracking-widest text-black/40">Loading Live Matrix...</div>
+            ) : liveTopics.map((p, i) => {
+              const sig = p.author?.walletAddress ? `${p.author.walletAddress.slice(0, 6)}...${p.author.walletAddress.slice(-4)}` : '0xUNKNOWN';
+              const dateStr = new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+              return (
+                <div key={i} className="bg-[#FDFCF8] p-5 flex flex-col gap-2 hover:bg-[#F5F4EF] transition-colors">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[9px] text-[#00C076] tracking-widest">✓ {sig}</span>
+                    <span className="font-mono text-[9px] text-black/30 uppercase tracking-widest">{dateStr}</span>
+                  </div>
+                  <p className="font-serif text-[13px] text-[#333] leading-snug">{p.title}</p>
                 </div>
-                <p className="font-serif text-[13px] text-[#333] leading-snug">{p.msg}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
