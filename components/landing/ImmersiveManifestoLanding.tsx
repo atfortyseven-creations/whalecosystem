@@ -66,10 +66,7 @@ export function ImmersiveManifestoLanding({
 
         {/* Left */}
         <div className="relative z-10 flex flex-col justify-center px-8 sm:px-14 lg:px-20 pt-32 pb-16 lg:py-0 w-full lg:w-1/2">
-          <div className="flex items-center gap-2 mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-black/40">Live · 12 chains indexed</span>
-          </div>
+
 
           <h1 className="text-[44px] sm:text-[62px] lg:text-[72px] font-black tracking-tighter leading-[0.93] uppercase text-black mb-6">
             WHALE<br />ALERT<br /><span className="text-[#00C076]">NETWORK</span>
