@@ -15,7 +15,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized: Authentication required to initialize checkout.' }, { status: 401 });
         }
 
-        const { tier, isAnnual } = await req.json();
+        const body = await req.json();
+        const tier = (body.tier as string)?.toUpperCase();
+        const isAnnual = body.isAnnual;
         const userId = validation.userId;
 
         if (!tier || !PRICE_IDS[tier]) {

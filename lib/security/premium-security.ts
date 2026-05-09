@@ -140,7 +140,8 @@ export async function logAuditEvent(log: {
 
 export async function validateSecureRequest(
   req: NextRequest,
-  requiredTier: 'FREE' | 'PREMIUM' = 'FREE'
+  requiredTier: 'FREE' | 'PREMIUM' = 'FREE',
+  options: { requireCsrf?: boolean } = {}
 ): Promise<{
   valid: boolean;
   userId?: string;
@@ -170,14 +171,16 @@ export async function validateSecureRequest(
     const access = await verifyPremiumAccess(userId);
     if (!access.valid) return { valid: false, error: 'Premium required' };
   }
-  
-  if (req.method !== 'GET') {
+
+  // CSRF is opt-in — only enforced for sensitive mutations that explicitly require it.
+  // Payment checkout and session-based flows do NOT send this header and must not be blocked.
+  if (options.requireCsrf && req.method !== 'GET') {
     const csrfToken = req.headers.get('x-csrf-token');
     if (!csrfToken || !verifyCSRFToken(csrfToken, userId)) {
-        return { valid: false, error: 'Invalid CSRF' };
+      return { valid: false, error: 'Invalid CSRF' };
     }
   }
-  
+
   return { valid: true, userId };
 }
 
