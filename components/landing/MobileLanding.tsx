@@ -1010,7 +1010,18 @@ export function MobileLanding() {
     try {
       Object.keys(localStorage).forEach(k => {
         const lower = k.toLowerCase();
-        if (lower.includes('walletconnect') || lower.includes('wagmi') || lower.includes('wc@2')) {
+        if (
+          lower.includes('walletconnect') || 
+          lower.includes('wagmi') || 
+          lower.includes('wc@2') ||
+          lower.includes('appkit') ||
+          lower.includes('reown') ||
+          lower.includes('w3m') ||
+          lower.includes('rainbow') ||
+          lower.includes('metamask') ||
+          lower.includes('coinbase') ||
+          lower.includes('session')
+        ) {
           localStorage.removeItem(k);
         }
       });
