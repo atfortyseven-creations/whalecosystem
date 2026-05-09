@@ -24,19 +24,19 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const checkMobile = () => {
+            // Absolute hardware guard: If physical screen is >= 1024px, it is NEVER mobile.
+            // This prevents false positives on large touch screens or UA spoofing.
+            if (window.screen && window.screen.width >= 1024) {
+                setIsMobile(false);
+                return;
+            }
+
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
             // UA-based detection — works for standard mobile browsers
             const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-            // Physical device detection — survives "Desktop site" UA spoofing in Chrome.
-            // When a user enables "Request Desktop Site", Chrome changes the UA string
-            // to remove mobile markers. But maxTouchPoints and screen.width reflect
-            // the actual hardware and cannot be faked by this setting.
             const isTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
             const isSmallScreen  = window.screen.width < 768;
-            // Mobile = UA says mobile OR (touch device AND small screen).
-            // Using touch || screen alone causes false positives on touch laptops (Surface Pro etc.).
-            // The AND condition for physical checks ensures only real phones/tablets are routed
-            // to MobileLanding, consistent with SmartLandingRouter logic.
+            
             setIsMobile(isUaMobile || (isTouchScreen && isSmallScreen));
         };
 

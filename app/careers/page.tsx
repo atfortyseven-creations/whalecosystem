@@ -53,15 +53,15 @@ export default function CareersPage() {
         <header className="flex flex-col items-center text-center gap-8 max-w-3xl mx-auto">
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm shadow-sm">
             <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/70">Global Recruitment Active</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/70">We are hiring</span>
           </div>
           
           <h1 className="text-[44px] md:text-[56px] font-black tracking-tighter leading-[1.05] text-[#050505]">
-            Architect the Infrastructure <br className="hidden md:block"/> of Financial Truth.
+            Build Something <br className="hidden md:block"/> That Matters.
           </h1>
           
           <p className="font-serif text-[17px] md:text-[19px] text-[#050505]/60 leading-[1.6] max-w-2xl">
-            Whale Alert Network is the premier intelligence layer for the blockchain ecosystem. We are recruiting elite operators to build systems that analyze billions in capital flow for the world's leading institutions.
+            We track the largest crypto movements in the world, in real time. Come help us build the tools that make it happen. We are looking for strong engineers who love crypto, data, and building impactful products.
           </p>
         </header>
 
@@ -70,26 +70,50 @@ export default function CareersPage() {
            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-black/10 to-transparent" />
            <div className="pl-8 sm:pl-12 flex flex-col gap-12">
               <div className="flex flex-col gap-2">
-                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40">The Mandate</span>
-                 <h2 className="text-[28px] font-bold tracking-tight text-[#050505]">An environment engineered for extreme competence.</h2>
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40">Why join us?</span>
+                 <h2 className="text-[28px] font-bold tracking-tight text-[#050505]">An environment built for your best work.</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                {CULTURE_PILLARS.map((pillar) => (
-                  <div key={pillar.id} className="flex flex-col gap-4 group">
+                  <div className="flex flex-col gap-4 group">
                     <div className="w-10 h-10 rounded-xl bg-white border border-black/10 flex items-center justify-center shadow-sm group-hover:border-[#00C076]/40 group-hover:bg-[#00C076]/5 transition-all duration-300">
-                       {pillar.icon}
+                       <Shield size={18} className="text-[#050505]" />
                     </div>
                     <div className="flex flex-col gap-2">
                       <h3 className="text-[15px] font-bold tracking-tight text-[#050505]">
-                        {pillar.title}
+                        We value results, not résumés
                       </h3>
                       <p className="font-serif text-[14px] text-[#050505]/60 leading-[1.7]">
-                        {pillar.text}
+                        We don't care where you went to school. We care about what you can build. We value transparency, ownership, and shipping high-quality code.
                       </p>
                     </div>
                   </div>
-                ))}
+                  <div className="flex flex-col gap-4 group">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-black/10 flex items-center justify-center shadow-sm group-hover:border-[#00C076]/40 group-hover:bg-[#00C076]/5 transition-all duration-300">
+                       <Cpu size={18} className="text-[#050505]" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <h3 className="text-[15px] font-bold tracking-tight text-[#050505]">
+                        We move fast and ship real things
+                      </h3>
+                      <p className="font-serif text-[14px] text-[#050505]/60 leading-[1.7]">
+                        Small, autonomous teams. No bureaucratic friction. We trust our engineers to make decisions and deploy features rapidly to users.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4 group">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-black/10 flex items-center justify-center shadow-sm group-hover:border-[#00C076]/40 group-hover:bg-[#00C076]/5 transition-all duration-300">
+                       <Globe size={18} className="text-[#050505]" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <h3 className="text-[15px] font-bold tracking-tight text-[#050505]">
+                        Full remote freedom, world-class pay
+                      </h3>
+                      <p className="font-serif text-[14px] text-[#050505]/60 leading-[1.7]">
+                        Work asynchronously from anywhere. We compensate competitively, offering top-tier salaries and flexible hours to respect your life outside of work.
+                      </p>
+                    </div>
+                  </div>
               </div>
            </div>
         </section>
@@ -166,12 +190,14 @@ export default function CareersPage() {
                  <h3 className="text-[18px] font-black tracking-tight text-[#050505] group-hover:text-[#00C076] transition-colors">
                    Senior Web3 Educator & Content Strategist
                  </h3>
-                 <div className="flex items-center gap-3 font-mono text-[10px] text-[#050505]/50 uppercase tracking-[0.2em]">
+                 <div className="flex items-center gap-3 font-mono text-[10px] text-[#050505]/50 uppercase tracking-[0.2em] flex-wrap">
                    <span className="text-[#050505]/80 font-bold">Content Architecture</span>
-                   <span className="w-1 h-1 rounded-full bg-black/20" />
+                   <span className="hidden sm:block w-1 h-1 rounded-full bg-black/20" />
                    <span>Remote (Global)</span>
-                   <span className="w-1 h-1 rounded-full bg-black/20" />
+                   <span className="hidden sm:block w-1 h-1 rounded-full bg-black/20" />
                    <span>Full-Time</span>
+                   <span className="hidden sm:block w-1 h-1 rounded-full bg-black/20" />
+                   <span className="text-[#00C076]">$80k - $120k</span>
                  </div>
                </div>
                
@@ -191,12 +217,14 @@ export default function CareersPage() {
                  <h3 className="text-[18px] font-black tracking-tight text-[#050505] group-hover:text-[#00C076] transition-colors">
                    Protocol Security Researcher (Zero-Knowledge)
                  </h3>
-                 <div className="flex items-center gap-3 font-mono text-[10px] text-[#050505]/50 uppercase tracking-[0.2em]">
+                 <div className="flex items-center gap-3 font-mono text-[10px] text-[#050505]/50 uppercase tracking-[0.2em] flex-wrap">
                    <span className="text-[#050505]/80 font-bold">Cryptography</span>
-                   <span className="w-1 h-1 rounded-full bg-black/20" />
+                   <span className="hidden sm:block w-1 h-1 rounded-full bg-black/20" />
                    <span>Remote (EU/US)</span>
-                   <span className="w-1 h-1 rounded-full bg-black/20" />
+                   <span className="hidden sm:block w-1 h-1 rounded-full bg-black/20" />
                    <span>Full-Time</span>
+                   <span className="hidden sm:block w-1 h-1 rounded-full bg-black/20" />
+                   <span className="text-[#00C076]">$120k - $180k</span>
                  </div>
                </div>
                

@@ -20,6 +20,8 @@ import { useMarketStream } from '@/context/MarketStreamContext';
 import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useEthMetrics } from '@/hooks/useEthMetrics';
+import { getTierById } from '@/lib/config/pricing-tiers';
 import { toast } from 'sonner';
 import { useDisconnect } from 'wagmi';
 
@@ -38,10 +40,9 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'portfolio',     label: 'Main Portfolio',    icon: <Wallet size={17}/> },
     { id: 'billing',       label: 'Billing & Plan',    icon: <CreditCard size={17}/> },
 
-    // { id: 'market-data',  label: 'Market Data',       icon: <Globe size={17}/>,     dividerBefore: 'Intelligence' },
     { id: 'markets',      label: 'Top Markets',       icon: <LayoutDashboard size={17}/>, dividerBefore: 'Intelligence' },
     { id: 'newpairs',     label: 'New Listings',      icon: <Search size={17}/> },
-    // { id: 'graph',        label: 'Entity Graph',      icon: <Compass size={17}/> },
+    { id: 'graph',        label: 'Entity Graph',      icon: <Compass size={17}/>,  badge: 'LIVE', badgeColor: '#9945FF' },
 
     { id: 'inst-ledger',  label: 'Whale Ledger',      icon: <Book size={17}/>,      dividerBefore: 'On-Chain Intel' },
     { id: 'mass-transfer',label: 'Mass Transfers',    icon: <Network size={17}/> },
@@ -193,7 +194,13 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavI
                 )}
 
                 {!isCollapsed && item.badge && (
-                    <span className={`ml-2 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[4px] border shrink-0 transition-colors ${isActive ? 'bg-[#00C076]/20 text-[#00C076] border-[#00C076]/30 shadow-[0_0_10px_rgba(0,192,118,0.2)]' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
+                    <span
+                        className={`ml-2 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[4px] border shrink-0 transition-colors`}
+                        style={isActive
+                            ? { background: 'rgba(0,192,118,0.15)', color: '#00C076', borderColor: 'rgba(0,192,118,0.3)' }
+                            : { background: `${item.badgeColor ?? '#00C076'}15`, color: item.badgeColor ?? '#00C076', borderColor: `${item.badgeColor ?? '#00C076'}30` }
+                        }
+                    >
                         {item.badge}
                     </span>
                 )}
@@ -250,6 +257,28 @@ export function WhaleProShell({
 
     const { latency, isConnected: streamConnected, mode } = useMarketStream();
     const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
+
+    // ── UX-18: Live ETH metrics (shared hook, DRY with landing) ─────────────
+    const { blockNumber, baseFeeGwei, utcTime, syncing: ethSyncing } = useEthMetrics();
+
+    // ── UX-19: Real node health — polled every 60s ──────────────────────────
+    const [nodeStatus, setNodeStatus] = useState<'OPERATIONAL' | 'DEGRADED' | 'OFFLINE'>('OPERATIONAL');
+    useEffect(() => {
+        const checkHealth = async () => {
+            try {
+                const res  = await fetch('/api/network/getblock-health', { cache: 'no-store' });
+                const data = await res.json();
+                if (!res.ok || data?.status === 'offline')  setNodeStatus('OFFLINE');
+                else if (data?.status === 'degraded')        setNodeStatus('DEGRADED');
+                else                                         setNodeStatus('OPERATIONAL');
+            } catch {
+                setNodeStatus('DEGRADED');
+            }
+        };
+        checkHealth();
+        const id = setInterval(checkHealth, 60_000);
+        return () => clearInterval(id);
+    }, []);
 
     useEffect(() => {
         fetch('/api/auth/session', { cache: 'no-store' })
@@ -481,6 +510,45 @@ export function WhaleProShell({
                     )}
                 </div>
 
+                {/* UX-17: Tier badge at sidebar bottom */}
+                {!isCollapsed && isTierLoaded && (
+                    <div className="px-3 pb-2 shrink-0">
+                        {(() => {
+                            const tierCfg = getTierById(tier ?? 'FREE');
+                            const isPaid  = tier !== 'FREE' && tier !== null;
+                            return (
+                                <div
+                                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border"
+                                    style={{
+                                        background:   isPaid ? `${tierCfg?.accentColor}10` : 'rgba(0,0,0,0.03)',
+                                        borderColor:  isPaid ? `${tierCfg?.accentColor}30` : 'rgba(0,0,0,0.08)',
+                                    }}
+                                >
+                                    <div className="flex flex-col leading-none">
+                                        <span
+                                            className="text-[8px] font-black uppercase tracking-widest"
+                                            style={{ color: isPaid ? tierCfg?.accentColor : 'rgba(0,0,0,0.3)' }}
+                                        >
+                                            {tierCfg?.name ?? 'Free'}
+                                        </span>
+                                        <span className="text-[7px] text-black/30 font-mono uppercase tracking-widest mt-0.5">
+                                            {isPaid ? 'Active plan' : 'Free tier'}
+                                        </span>
+                                    </div>
+                                    {!isPaid && (
+                                        <button
+                                            onClick={() => router.push('/pricing')}
+                                            className="text-[7px] font-black uppercase tracking-widest px-2 py-1 bg-black text-white rounded-lg hover:bg-black/80 transition-colors"
+                                        >
+                                            Upgrade
+                                        </button>
+                                    )}
+                                </div>
+                            );
+                        })()}
+                    </div>
+                )}
+
                 <div className="px-2 pb-3 pt-1 shrink-0">
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -507,8 +575,18 @@ export function WhaleProShell({
                         </span>
                     </button>
 
+                    {/* UX-18: Live ETH metrics replacing the empty LiveMarketBand slot */}
                     <div className="hidden lg:flex items-center gap-0 divide-x divide-black/10 flex-1 mx-6 overflow-hidden">
-                        {/* Removed LiveMarketBand */}
+                        {[
+                            { label: 'ETH Block', value: ethSyncing ? '...' : (blockNumber ?? '---') },
+                            { label: 'Base Fee',  value: baseFeeGwei ? `${baseFeeGwei} Gwei` : '---' },
+                            { label: 'UTC',       value: utcTime ?? '---' },
+                        ].map((m) => (
+                            <div key={m.label} className="flex flex-col items-start px-4 py-1 min-w-[100px]">
+                                <span className="font-mono text-[7px] uppercase tracking-[0.25em] text-black/30">{m.label}</span>
+                                <span className="font-mono text-[10px] font-black text-[#050505] tabular-nums leading-tight">{m.value}</span>
+                            </div>
+                        ))}
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -570,9 +648,9 @@ export function WhaleProShell({
                 <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} h-16 border-t border-black/10 bg-white items-center justify-around px-2 shrink-0 z-50`} style={{ minHeight: '64px', maxHeight: '64px' }}>
                     {[
                         { id: 'markets',     icon: <LayoutDashboard size={20} />, label: 'Markets' },
-                        { id: 'newpairs',    icon: <Search size={20} />, label: 'Listings' },
-                        { id: 'portfolio',   icon: <Wallet size={20} />, label: 'Portfolio' },
-                        { id: 'menu',        icon: <Menu size={20} />, label: 'Menu' },
+                        { id: 'newpairs',    icon: <Search size={20} />,          label: 'Listings' },
+                        { id: 'portfolio',   icon: <Wallet size={20} />,          label: 'Portfolio' },
+                        { id: 'menu',        icon: <Menu size={20} />,            label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
                         return (
@@ -580,12 +658,18 @@ export function WhaleProShell({
                                 key={tab.id}
                                 onClick={() => tab.id === 'menu' ? setIsPaletteOpen(true) : handleTabChange(tab.id)}
                                 style={{ minHeight: 0, minWidth: 0 }}
-                                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
+                                className={`relative flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
                                     isActive ? 'text-black' : 'text-[#888888] hover:text-black'
                                 }`}
                             >
-                                {tab.icon}
-                                <span className={`text-[10px] font-bold ${isActive ? 'opacity-100' : 'opacity-60'}`}>{tab.label}</span>
+                                {/* PERF-20: Active indicator pill — WCAG AA contrast */}
+                                {isActive && (
+                                    <span className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#050505]" />
+                                )}
+                                <span className={isActive ? 'scale-110 transition-transform' : 'transition-transform'}>
+                                    {tab.icon}
+                                </span>
+                                <span className={`text-[10px] font-bold ${isActive ? 'opacity-100 font-black' : 'opacity-60'}`}>{tab.label}</span>
                             </button>
                         );
                     })}
@@ -594,18 +678,28 @@ export function WhaleProShell({
                 {/* ─── Status Bar ─── */}
                 <footer className="hidden md:flex h-7 border-t border-black/10 bg-white items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                    <span className="flex items-center gap-1.5 min-w-[120px]">
-                            <Globe size={11} /> Global Latency: 
+                        <span className="flex items-center gap-1.5 min-w-[120px]">
+                            <Globe size={11} /> Global Latency:
                             <span className={latency > 150 ? 'text-[#FF3B30]' : latency > 0 ? 'text-[#00FF55]' : 'text-[#888888]'}>
                                 {latency > 0 ? `${latency}ms` : 'SYNCING'}
                             </span>
                         </span>
+                        {/* UX-19: Real node status from /api/network/getblock-health */}
                         <span className="flex items-center gap-1.5">
-                            <Cpu size={11} /> Nodes: 
-                            <span className="text-[#00FF55]">
-                                OPERATIONAL
+                            <Cpu size={11} /> Nodes:
+                            <span className={
+                                nodeStatus === 'OPERATIONAL' ? 'text-[#00FF55]' :
+                                nodeStatus === 'DEGRADED'    ? 'text-[#FFB800]' : 'text-[#FF3B30]'
+                            }>
+                                {nodeStatus}
                             </span>
                         </span>
+                        {/* ETH block in status bar */}
+                        {blockNumber && (
+                            <span className="flex items-center gap-1.5">
+                                <Globe size={11} /> ETH: <span className="text-[#050505]">{blockNumber}</span>
+                            </span>
+                        )}
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Shield size={11} /> Protocol: Live</span>

@@ -6,86 +6,25 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader2, Settings, CheckCircle2 } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
+import { PRICING_TIERS, TIER_RANK } from '@/lib/config/pricing-tiers';
 
-const TIER_HIERARCHY: Record<string, number> = {
-  'FREE': 0,
-  'STARTER': 1,
-  'PRO': 2,
-  'ELITE': 3
-};
-
-const TIER_PRICES: Record<string, { monthly: string; annual: string }> = {
-  'STARTER': { monthly: '130', annual: '1300' },
-  'PRO':     { monthly: '350', annual: '3500' },
-  'ELITE':   { monthly: '950', annual: '9500' },
-};
-
-const PRICING_TIERS = [
-  {
-    id: 'STARTER',
-    name: 'Starter',
-    tagline: 'Track the market',
-    features: [
-      'Full trading terminal',
-      '1-minute data refresh',
-      '3 custom whale alerts',
-      'Forum & community access',
-      'On-chain identity profile',
-      '1,000 API calls / day',
-    ],
-    buttonText: 'Get started',
-  },
-  {
-    id: 'PRO',
-    name: 'Pro',
-    tagline: 'Trade with precision',
-    highlight: true,
-    features: [
-      'Zero-delay data streaming',
-      'Advanced on-chain analytics',
-      'Full read & write API access',
-      'Priority support — 24/7',
-      'Security analytics & alerts',
-      '15 custom alerts',
-      'Predictive market models',
-      '10,000 API calls / day',
-    ],
-    buttonText: 'Go Pro',
-  },
-  {
-    id: 'ELITE',
-    name: 'Elite',
-    tagline: 'Institutional grade',
-    features: [
-      'Unlimited data firehose',
-      'No query limits or rate caps',
-      'Dedicated account manager',
-      'Full API & Webhook integration',
-      'Unlimited custom alerts',
-      '99.99% SLA uptime guarantee',
-      'Custom smart contract indexing',
-      'Private node infrastructure',
-    ],
-    buttonText: 'Contact sales',
-  },
-];
 
 const FAQS = [
   {
     question: 'How does billing work?',
-    answer: 'Payments are processed securely via Stripe. You can pay using major credit cards or SEPA Direct Debit. Your account tier is upgraded automatically upon successful payment.',
+    answer: 'Payments are processed securely via Stripe. You can pay using major credit cards or SEPA Direct Debit. Your account upgrades automatically once payment goes through.',
   },
   {
     question: 'Do I need a crypto wallet?',
-    answer: 'Yes. Your wallet acts as your secure, passwordless login to the platform, but payments are processed in traditional Fiat (Euros) to ensure institutional compliance.',
+    answer: 'Yes! Your wallet acts as your secure login to the platform. We don\'t use passwords. Payments, however, are made in standard Fiat (Euros) for simplicity.',
   },
   {
-    question: 'How are invoices sent?',
-    answer: 'A professional invoice is automatically emailed to you the moment your payment is confirmed. You can also manage your billing history in your dashboard.',
+    question: 'How do I get my invoice?',
+    answer: 'We automatically email a professional invoice to you the moment your payment is confirmed. You can also download past invoices anytime from your dashboard.',
   },
   {
-    question: 'Is there a refund policy?',
-    answer: 'Because premium plans grant immediate, unlimited access to proprietary on-chain intelligence feeds, we do not offer refunds on active billing cycles.',
+    question: 'Can I cancel anytime?',
+    answer: 'Absolutely. You can cancel your subscription from your dashboard at any point. You\'ll retain access to your premium features until the end of your current billing cycle.',
   },
 ];
 
@@ -111,10 +50,10 @@ function PricingContent() {
       .finally(() => setIsTierLoaded(true));
   }, [isConnected, isSovereignHandshake]);
 
-  const currentTierLevel = TIER_HIERARCHY[currentTier] || 0;
+  const currentTierLevel = TIER_RANK[currentTier as keyof typeof TIER_RANK] ?? 0;
 
   const handleSubscribeClick = async (planId: string) => {
-    if (currentTierLevel >= (TIER_HIERARCHY[planId] || 0)) {
+    if (currentTierLevel >= (TIER_RANK[planId as keyof typeof TIER_RANK] ?? 0)) {
       toast.info('Already on this plan or higher'); return;
     }
     
@@ -160,18 +99,24 @@ function PricingContent() {
 
         {/* Hero */}
         <header className="text-center mb-20">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-black/30 mb-5">Pricing</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#00C076] mb-5">Subscription Plans</p>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-black mb-5 leading-[1.1]">
-            Institutional access,<br/>transparent billing
+            The Right Plan for Every Trader
           </h1>
-          <p className="text-lg text-black/50 max-w-lg mx-auto leading-relaxed">
-            Start free. Upgrade when you're ready. All payments are processed securely via Stripe in Euros.
+          <p className="text-lg text-black/60 max-w-2xl mx-auto leading-relaxed mb-8">
+            Join 2,000+ traders and analysts already using Whale Alert Network to track the biggest crypto movements on-chain. Start free, scale as you grow.
           </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] font-bold uppercase tracking-widest text-black/40">
+             <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-[#00C076]"/> 7-Day Money-Back Guarantee</span>
+             <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-[#00C076]"/> Secured by Stripe</span>
+             <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-[#00C076]"/> Powered by Ethereum</span>
+          </div>
 
           {currentTierLevel > 0 && (
             <button
               onClick={() => router.push('/dashboard?tab=billing')}
-              className="mt-8 inline-flex items-center gap-2 px-5 py-2.5 bg-[#050505] text-white rounded-full text-xs font-bold uppercase tracking-[0.12em] hover:bg-black/80 transition shadow-lg"
+              className="mt-10 inline-flex items-center gap-2 px-5 py-2.5 bg-[#050505] text-white rounded-full text-xs font-bold uppercase tracking-[0.12em] hover:bg-black/80 transition shadow-lg"
             >
               <Settings size={13} /> Manage subscription
             </button>
@@ -197,10 +142,12 @@ function PricingContent() {
         </header>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-32">
           {PRICING_TIERS.map(tier => {
-            const isDowngrade = currentTierLevel >= (TIER_HIERARCHY[tier.id] || 0);
-            const price = TIER_PRICES[tier.id][billingCycle];
+            const isDowngrade = currentTierLevel >= (TIER_RANK[tier.id as keyof typeof TIER_RANK] ?? 0);
+            // Use priceMonthly/priceAnnual from SSOT
+            const price = billingCycle === 'monthly' ? tier.priceMonthly : tier.priceAnnual;
+            const isFree = tier.id === 'FREE';
             return (
               <div
                 key={tier.id}
@@ -238,11 +185,19 @@ function PricingContent() {
                   <ul className="flex flex-col gap-4 flex-1 mb-10">
                     {tier.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-3">
-                        <span className={`mt-0.5 shrink-0 ${tier.highlight ? 'text-[#00C076]' : 'text-black/20'}`}>
+                        <span className={`mt-0.5 shrink-0 ${
+                          f.highlight
+                            ? (tier.highlight ? 'text-[#00C076]' : 'text-[#050505]')
+                            : (tier.highlight ? 'text-[#00C076]' : 'text-black/20')
+                        }`}>
                           <CheckCircle2 size={16} />
                         </span>
-                        <span className={`text-[14px] font-medium leading-snug ${tier.highlight ? 'text-white/80' : 'text-black/70'}`}>
-                          {f}
+                        <span className={`text-[14px] font-medium leading-snug ${
+                          f.highlight
+                            ? (tier.highlight ? 'text-white font-bold' : 'text-[#050505] font-bold')
+                            : (tier.highlight ? 'text-white/80' : 'text-black/70')
+                        }`}>
+                          {f.text}
                         </span>
                       </li>
                     ))}

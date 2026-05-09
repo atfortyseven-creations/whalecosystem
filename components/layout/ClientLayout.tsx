@@ -252,6 +252,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname === '/support' ||
     pathname === '/academy' ||
     pathname === '/vip' ||
+    pathname === '/news' ||
+    pathname === '/pricing' ||
+    pathname === '/careers' ||
+    pathname.startsWith('/forum') ||
     pathname === '/';
 
   return (

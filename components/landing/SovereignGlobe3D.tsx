@@ -1,9 +1,36 @@
 "use client";
 
-import React, { useRef, useMemo, useEffect, useState } from "react";
+import React, { useRef, useMemo, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+
+// ─── BATTERY-AWARE DPR HOOK ─────────────────────────────────────────────────
+// Returns the optimal Device Pixel Ratio based on battery state.
+// On battery-constrained devices (< 20% or discharging), caps at 1.
+// On plugged-in / high-power devices, allows up to 1.5 (never 2 — WebGL cost).
+function useBatteryAwareDpr(): [number, number] {
+  const [dpr, setDpr] = useState<[number, number]>([1, 1.5]);
+
+  useEffect(() => {
+    const nav = navigator as any;
+    if (!nav.getBattery) return; // Desktop without Battery API — keep default
+
+    nav.getBattery().then((battery: any) => {
+      const update = () => {
+        const isLow     = battery.level < 0.20;
+        const isCharging = battery.charging;
+        // Aggressive: discharge + low → 1x. Plugged in → 1.5x.
+        setDpr(isCharging ? [1, 1.5] : isLow ? [1, 1] : [1, 1.2]);
+      };
+      update();
+      battery.addEventListener('chargingchange', update);
+      battery.addEventListener('levelchange',   update);
+    }).catch(() => {/* Battery API failed silently */});
+  }, []);
+
+  return dpr;
+}
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const POINT_COUNT  = 40000; // Drastically reduced for optimization
@@ -112,22 +139,37 @@ function HighFidelityPointGlobe() {
     let isMounted = true;
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
-    
-    // Using a highly reliable raw github url instead of unpkg to avoid CORS/rate-limiting
-    loader.load(
-      'https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/earth-water.png',
-      (texture) => {
-        if (!isMounted) return;
-        texture.colorSpace = THREE.SRGBColorSpace;
-        setMapState({ texture, failed: false });
-      },
-      undefined,
-      (err) => {
-        if (!isMounted) return;
-        console.warn('Failed to load globe water mask texture. Falling back to wireframe.', err);
-        setMapState({ texture: null, failed: true });
-      }
-    );
+
+    // PERF-22: Local-first texture strategy.
+    // /public/textures/earth-water.png is served by Next.js static assets — zero CDN dependency.
+    // CDN fallback is only used if the local file is missing (should not happen in production).
+    const LOCAL_URL  = '/textures/earth-water.png';
+    const REMOTE_URL = 'https://raw.githubusercontent.com/vasturiano/three-globe/master/example/img/earth-water.png';
+
+    const loadTexture = (url: string, isFallback = false) => {
+      loader.load(
+        url,
+        (texture) => {
+          if (!isMounted) return;
+          texture.colorSpace = THREE.SRGBColorSpace;
+          setMapState({ texture, failed: false });
+        },
+        undefined,
+        (err) => {
+          if (!isMounted) return;
+          if (!isFallback) {
+            // Local load failed — try remote CDN as last resort
+            console.warn('[Globe] Local texture missing, falling back to CDN.');
+            loadTexture(REMOTE_URL, true);
+          } else {
+            console.warn('[Globe] All texture sources failed. Using wireframe fallback.', err);
+            setMapState({ texture: null, failed: true });
+          }
+        }
+      );
+    };
+
+    loadTexture(LOCAL_URL);
     return () => { isMounted = false; };
   }, []);
 
@@ -256,12 +298,13 @@ function RotatingGlobeGroup() {
 
 // ─── MAIN EXPORT ─────────────────────────────────────────────────────────────
 export function SovereignGlobe3D() {
+  const dpr = useBatteryAwareDpr();
   return (
     <div className="w-full h-full absolute inset-0 z-0 bg-transparent overflow-hidden flex items-center justify-center">
       <GlobeErrorBoundary>
         <Canvas
           camera={{ position: [0, 0, 2.5], fov: 45, near: 0.01, far: 10 }}
-          dpr={[1, 2]}
+          dpr={dpr}
           gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
           style={{ background: "transparent", cursor: "grab" }}
         >

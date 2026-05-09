@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PRICE_IDS } from '@/lib/payments/stripe';
 import { prisma } from '@/lib/prisma';
 import { validateSecureRequest } from '@/lib/security/premium-security';
+import { SAAS_PLANS, PlanTier } from '@/lib/saas/plans';
 
 /**
  * Elite Checkout Tunnel
@@ -16,12 +17,18 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const tier = (body.tier as string)?.toUpperCase();
-        const isAnnual = body.isAnnual;
+        const tier = (body.tier as string)?.toUpperCase() as PlanTier;
+        const isAnnual = body.isAnnual === true;
         const userId = validation.userId;
+        const billingCycle = isAnnual ? 'ANNUAL' : 'MONTHLY';
 
-        if (!tier || !PRICE_IDS[tier]) {
+        if (!tier || !PRICE_IDS[billingCycle][tier]) {
             return NextResponse.json({ error: 'Invalid plan tier or missing user context' }, { status: 400 });
+        }
+
+        const planConfig = SAAS_PLANS[tier];
+        if (!planConfig) {
+            return NextResponse.json({ error: 'Plan configuration not found' }, { status: 400 });
         }
 
         // SIWE-native: userId is always a walletAddress
@@ -43,7 +50,7 @@ export async function POST(req: NextRequest) {
             },
             line_items: [
                 {
-                    price: PRICE_IDS[tier],
+                    price: PRICE_IDS[billingCycle][tier],
                     quantity: 1,
                 },
             ],
@@ -53,14 +60,30 @@ export async function POST(req: NextRequest) {
             // user.email may not exist on the User schema — use optional cast for forward-compatibility
             customer_email: (user as any).email || undefined,
             metadata: {
-                userId:  userId,
-                tier:    tier,
-                env:     process.env.NODE_ENV ?? 'production',
+                userId: userId,
+                tier: tier,
+                env: process.env.NODE_ENV ?? 'production',
+                billingCycle: billingCycle,
+                // Trillion Parameters Articulation:
+                requestsPerDay: planConfig.limits.requestsPerDay.toString(),
+                maxApiKeys: planConfig.limits.maxApiKeys.toString(),
+                maxTokens: planConfig.limits.maxTokens.toString(),
+                dataWindowHours: planConfig.limits.dataWindowHours.toString(),
+                ft_webSockets: planConfig.features.webSockets ? 'yes' : 'no',
+                ft_fixProtocol: planConfig.features.fixProtocol ? 'yes' : 'no',
+                ft_hmacRequired: planConfig.features.hmacRequired ? 'yes' : 'no',
+                ft_ipWhitelist: planConfig.features.ipWhitelist ? 'yes' : 'no',
+                ft_darkPool: planConfig.features.darkPoolDetection ? 'yes' : 'no',
+                ft_csvExport: planConfig.features.csvExport ? 'yes' : 'no'
             },
             subscription_data: {
                 metadata: {
                     sovereign_user_id: userId,
-                    tier:              tier,
+                    tier: tier,
+                    billingCycle: billingCycle,
+                    maxTokens: planConfig.limits.maxTokens.toString(),
+                    requestsPerDay: planConfig.limits.requestsPerDay.toString(),
+                    ft_darkPool: planConfig.features.darkPoolDetection ? 'yes' : 'no'
                 }
             }
         });
