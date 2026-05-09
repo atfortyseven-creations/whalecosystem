@@ -472,6 +472,7 @@ function ConnectedScreen({
         {/* ── Disconnect session button ── */}
         {onDisconnect && (
           <motion.button
+            id="sovereign-disconnect-btn"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.27, duration: 0.5 }}
@@ -988,39 +989,49 @@ export function MobileLanding() {
 
 
   // ── handleDisconnect: clears session and resets all state ───────────────
-  const handleDisconnect = useCallback(() => {
+  const handleDisconnect = useCallback(async () => {
     // Visual feedback of the nuclear purge
     const btn = document.getElementById('sovereign-disconnect-btn');
     if (btn) {
-        btn.innerHTML = '<span class="animate-pulse">NUKING KERNEL STATE...</span>';
-        btn.style.backgroundColor = '#FF0000';
+        btn.innerHTML = '<span class="animate-pulse">NUKING SESSION...</span>';
+        btn.style.backgroundColor = '#dc2626';
         btn.style.color = '#FFFFFF';
         btn.style.pointerEvents = 'none';
     }
 
-    setTimeout(() => {
-        // 1. Expire the sovereign_handshake cookie
-        document.cookie = 'sovereign_handshake=; path=/; max-age=0; SameSite=Lax';
-        
-        // 2. Nuke all WalletConnect and Wagmi persistent state to fix Rainbow/Trust bugs
-        try {
-          Object.keys(localStorage).forEach(k => {
-            const lower = k.toLowerCase();
-            if (lower.includes('walletconnect') || lower.includes('wagmi') || lower.includes('wc@2')) {
-              localStorage.removeItem(k);
-            }
-          });
-          sessionStorage.clear();
-        } catch {}
+    // 1. Expire the sovereign_handshake cookie immediately
+    document.cookie = 'sovereign_handshake=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    
+    // 2. Clear state locally so UI updates instantly
+    setIsLinked(false);
+    setLinkedAddress(null);
 
-        // 3. Disconnect wagmi
-        try { disconnect(); } catch {}
-        
-        // 4. Force a clean window reload to guarantee a pristine state for the next wallet
-        if (typeof window !== 'undefined') {
-          window.location.href = window.location.pathname;
+    // 3. Nuke all WalletConnect and Wagmi persistent state to fix Rainbow/Trust bugs
+    try {
+      Object.keys(localStorage).forEach(k => {
+        const lower = k.toLowerCase();
+        if (lower.includes('walletconnect') || lower.includes('wagmi') || lower.includes('wc@2')) {
+          localStorage.removeItem(k);
         }
-    }, 400); // 400ms delay to let the user see the system purge
+      });
+      sessionStorage.clear();
+    } catch {}
+
+    // 4. Disconnect wagmi async
+    try { 
+      if (disconnect) {
+        disconnect(); 
+      }
+    } catch (err) {
+      console.warn("Wagmi disconnect error", err);
+    }
+    
+    // 5. Force a clean window reload to guarantee a pristine state for the next wallet
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.location.href = window.location.pathname;
+      }
+    }, 800);
   }, [disconnect]);
 
   if (!mounted) return null;

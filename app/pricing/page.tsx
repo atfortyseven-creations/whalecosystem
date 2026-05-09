@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, ArrowRight, Settings, Wallet } from 'lucide-react';
+import { Loader2, Settings, Building2, CheckCircle2, Copy } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 
 const TIER_HIERARCHY: Record<string, number> = {
@@ -73,21 +73,28 @@ const PRICING_TIERS = [
 const FAQS = [
   {
     question: 'How does billing work?',
-    answer: 'Payments are processed on-chain via USDT on Tron (TRC-20). Once the transaction is confirmed, your account tier is updated instantly and an invoice is emailed to you.',
+    answer: 'Payments are processed securely via SEPA Bank Transfer in Euros (€). Once you request an upgrade, you will receive an invoice with the transfer instructions. Your account tier is upgraded immediately while the transfer settles.',
   },
   {
-    question: 'Do I need a wallet?',
-    answer: 'Yes. Your wallet is your login and billing identity. Connect in seconds — no password needed.',
+    question: 'Do I need a crypto wallet?',
+    answer: 'Yes. Your wallet acts as your secure, passwordless login to the platform, but payments are processed in traditional Fiat (Euros) to ensure institutional compliance.',
   },
   {
     question: 'How are invoices sent?',
-    answer: 'Enter your email at checkout. A receipt is emailed automatically after your payment is confirmed.',
+    answer: 'A highly detailed HTML invoice is automatically emailed to you the moment you initiate the upgrade. It contains the required Bank Details (IBAN/BIC) and your unique Transfer Reference.',
   },
   {
     question: 'Is there a refund policy?',
-    answer: 'Plans give immediate access to live on-chain data. We do not offer refunds on past billing cycles.',
+    answer: 'Because premium plans grant immediate, unlimited access to proprietary on-chain intelligence feeds, we do not offer refunds on active billing cycles.',
   },
 ];
+
+const BANK_DETAILS = {
+  beneficiary: 'STEFAN-ANTONIO CIRISANU',
+  iban: 'ES52 1583 0001 1090 8640 3529',
+  bic: 'REVOESM2',
+  bank: 'Revolut Bank UAB, Madrid, Spain'
+};
 
 function PricingContent() {
   const { isConnected, isSovereignHandshake, address } = useSovereignAccount();
@@ -96,11 +103,15 @@ function PricingContent() {
   const [currentTier, setCurrentTier] = useState<string>('FREE');
   const [isTierLoaded, setIsTierLoaded] = useState<boolean>(false);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  
+  // Checkout Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [emailInput, setEmailInput] = useState('');
-  const [txIdInput, setTxIdInput] = useState('');
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [generatedRef, setGeneratedRef] = useState('');
+  const [checkoutStep, setCheckoutStep] = useState<'input' | 'success'>('input');
+  
   const { open } = useAppKit();
 
   useEffect(() => {
@@ -118,92 +129,6 @@ function PricingContent() {
 
   const currentTierLevel = TIER_HIERARCHY[currentTier] || 0;
 
-  const handleDirectPay = async () => {
-    if (!selectedPlanId) return;
-    if (!emailInput || !emailInput.includes('@')) {
-      toast.error('Email required', { description: 'Enter your email before paying.' });
-      return;
-    }
-    const priceUsdt = TIER_PRICES[selectedPlanId][billingCycle];
-    const treasury = process.env.NEXT_PUBLIC_TRON_TREASURY || 'TEW1PSVyNuneyzyTk3cKaxCsizgGnkM3LQ';
-    // @ts-ignore
-    const tronWeb = window.tronWeb;
-    if (!tronWeb || !tronWeb.ready) {
-      toast.error('TronLink not found', { description: 'Install or unlock TronLink to pay automatically.' });
-      return;
-    }
-    try {
-      setIsConfirming(true);
-      toast.loading('Sending USDT...', { id: 'tron-pay' });
-      const contract = await tronWeb.contract().at('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t');
-      const amount = (parseFloat(priceUsdt) * 1_000_000).toString();
-      const txHash = await contract.transfer(treasury, amount).send();
-      if (txHash) {
-        setTxIdInput(txHash);
-        toast.success('Sent!', { id: 'tron-pay', description: 'Confirming on-chain...' });
-        const r = await fetch('/api/payment/confirm', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            txHash,
-            planId: selectedPlanId,
-            billingCycle,
-            priceEth: priceUsdt,
-            email: emailInput,
-            walletAddress: address || tronWeb.defaultAddress.base58 || 'tron_user',
-          }),
-        });
-        if (r.ok) {
-          toast.success('Access granted!', { id: 'tron-pay' });
-          setTimeout(() => router.push('/dashboard?tab=billing'), 1800);
-        } else {
-          throw new Error('Confirmation failed. Save your TXID.');
-        }
-      }
-    } catch (e: any) {
-      toast.error('Payment error', { id: 'tron-pay', description: e.message });
-    } finally {
-      setIsConfirming(false);
-    }
-  };
-
-  const handleManualConfirm = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!emailInput.includes('@')) { toast.error('Invalid email'); return; }
-    if (!txIdInput || txIdInput.length < 32) { toast.error('Invalid TXID'); return; }
-    if (!selectedPlanId) return;
-    setIsConfirming(true);
-    setLoadingTier(selectedPlanId);
-    toast.loading('Verifying...', { id: 'tx' });
-    try {
-      const r = await fetch('/api/payment/confirm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          txHash: txIdInput,
-          planId: selectedPlanId,
-          billingCycle,
-          priceEth: TIER_PRICES[selectedPlanId][billingCycle],
-          email: emailInput,
-          walletAddress: address || 'manual_tron_user',
-        }),
-      });
-      if (r.ok) {
-        toast.success('Access granted!', { id: 'tx', description: 'Redirecting...' });
-        setTimeout(() => router.push('/dashboard?tab=billing'), 1800);
-      } else {
-        const d = await r.json();
-        throw new Error(d.error || 'Verification failed');
-      }
-    } catch (e: any) {
-      toast.error('Error', { id: 'tx', description: e.message });
-    } finally {
-      setIsConfirming(false);
-      setLoadingTier(null);
-      setIsModalOpen(false);
-    }
-  };
-
   const handleSubscribeClick = (planId: string) => {
     if (!isConnected && !address) {
       toast.error('Wallet required', { description: 'Connect your wallet to subscribe.' });
@@ -220,11 +145,61 @@ function PricingContent() {
     if (currentTierLevel >= (TIER_HIERARCHY[planId] || 0)) {
       toast.info('Already on this plan or higher'); return;
     }
+    
+    // Generate a secure, professional transfer reference
+    const timestamp = Date.now().toString().slice(-4);
+    const randomHex = Math.random().toString(16).slice(2, 6).toUpperCase();
+    setGeneratedRef(`INV-${planId}-${timestamp}-${randomHex}`);
+    
     setSelectedPlanId(planId);
+    setCheckoutStep('input');
     setIsModalOpen(true);
   };
 
-  const TREASURY = process.env.NEXT_PUBLIC_TRON_TREASURY || 'TEW1PSVyNuneyzyTk3cKaxCsizgGnkM3LQ';
+  const handleConfirmTransfer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailInput.includes('@')) { toast.error('Invalid email format'); return; }
+    if (!selectedPlanId) return;
+    
+    setIsConfirming(true);
+    toast.loading('Generating invoice & unlocking access...', { id: 'tx' });
+    
+    try {
+      const r = await fetch('/api/payment/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reference: generatedRef,
+          planId: selectedPlanId,
+          billingCycle,
+          priceEur: TIER_PRICES[selectedPlanId][billingCycle],
+          email: emailInput,
+          walletAddress: address || 'manual_sepa_user',
+        }),
+      });
+      if (r.ok) {
+        toast.success('Access granted!', { id: 'tx', description: 'Invoice sent to your email.' });
+        setCheckoutStep('success');
+        setTimeout(() => {
+            setIsModalOpen(false);
+            router.push('/dashboard?tab=billing');
+        }, 4000);
+      } else {
+        const d = await r.json();
+        throw new Error(d.error || 'Verification failed');
+      }
+    } catch (e: any) {
+      toast.error('Error', { id: 'tx', description: e.message });
+    } finally {
+      setIsConfirming(false);
+      setLoadingTier(null);
+    }
+  };
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied to clipboard`);
+  };
 
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-[#111] font-sans">
@@ -232,69 +207,85 @@ function PricingContent() {
 
       <main className="w-full max-w-5xl mx-auto px-6 py-16 md:py-28">
 
-        {/* Payment Modal */}
+        {/* SEPA Checkout Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl border border-black/8 relative">
-              <button
-                onClick={() => { setIsModalOpen(false); setLoadingTier(null); }}
-                className="absolute top-5 right-5 text-black/30 hover:text-black text-xl leading-none"
-              >✕</button>
-
-              <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-black/30 mb-1">Payment</p>
-              <h3 className="text-2xl font-bold tracking-tight mb-1">
-                {selectedPlanId ? PRICING_TIERS.find(t => t.id === selectedPlanId)?.name : ''}
-              </h3>
-              <p className="text-sm text-black/40 mb-6">
-                {selectedPlanId ? TIER_PRICES[selectedPlanId][billingCycle] : ''} USDT · Tron TRC-20
-              </p>
-
-              <div className="mb-5 p-4 bg-black/[0.03] rounded-xl border border-black/5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-black/30 mb-2">Send to</p>
-                <div className="flex items-center gap-2">
-                  <code className="text-xs font-mono font-semibold flex-1 truncate">{TREASURY}</code>
-                  <button
-                    onClick={() => { navigator.clipboard.writeText(TREASURY); toast.success('Copied'); }}
-                    className="text-[11px] font-bold text-black/40 hover:text-black px-2 py-1 rounded-lg hover:bg-black/5 transition"
-                  >Copy</button>
-                </div>
-                <p className="text-[10px] text-black/30 mt-2">TRC-20 network only. Other networks will result in permanent loss.</p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+            <div className="bg-white rounded-2xl max-w-[500px] w-full shadow-2xl border border-black/10 relative overflow-hidden flex flex-col">
+              
+              <div className="bg-[#050505] text-white px-8 py-6 relative">
+                  {!isConfirming && checkoutStep !== 'success' && (
+                    <button
+                        onClick={() => { setIsModalOpen(false); setLoadingTier(null); }}
+                        className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors text-xl leading-none"
+                    >✕</button>
+                  )}
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-1 flex items-center gap-2">
+                    <Building2 size={12} /> Institutional Checkout
+                  </p>
+                  <h3 className="text-2xl font-bold tracking-tight">
+                    {selectedPlanId ? PRICING_TIERS.find(t => t.id === selectedPlanId)?.name : ''} Plan
+                  </h3>
               </div>
 
-              <form onSubmit={handleManualConfirm} className="flex flex-col gap-4">
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-black/30 mb-1.5">Email for receipt</label>
-                  <input
-                    type="email" required value={emailInput}
-                    onChange={e => setEmailInput(e.target.value)}
-                    placeholder="you@email.com"
-                    className="w-full px-4 py-3 text-sm bg-black/[0.03] border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/20 transition"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-black/30 mb-1.5">Transaction ID (TXID)</label>
-                  <input
-                    type="text" required value={txIdInput}
-                    onChange={e => setTxIdInput(e.target.value)}
-                    placeholder="Paste Tron TXID after sending..."
-                    className="w-full px-4 py-3 text-sm bg-black/[0.03] border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/20 transition font-mono"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <button
-                    type="button" onClick={handleDirectPay} disabled={isConfirming}
-                    className="py-3 bg-[#00C076] text-black rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-emerald-400 transition disabled:opacity-60"
-                  >
-                    <Wallet size={14} /> Pay via wallet
-                  </button>
-                  <button
-                    type="submit" disabled={isConfirming}
-                    className="py-3 bg-black text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-black/80 transition disabled:opacity-60"
-                  >
-                    {isConfirming ? <Loader2 className="animate-spin" size={14} /> : <>Confirm <ArrowRight size={14} /></>}
-                  </button>
-                </div>
-              </form>
+              <div className="p-8">
+                  {checkoutStep === 'input' ? (
+                      <form onSubmit={handleConfirmTransfer} className="flex flex-col gap-6">
+                        
+                        <div className="flex items-center justify-between border-b border-black/10 pb-6">
+                            <div>
+                                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-black/40">Amount Due</p>
+                                <p className="text-3xl font-black mt-1">€{selectedPlanId ? TIER_PRICES[selectedPlanId][billingCycle] : ''} <span className="text-sm font-medium text-black/40">EUR</span></p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-black/40">Billing Cycle</p>
+                                <p className="text-sm font-bold mt-1 capitalize">{billingCycle}</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-xl">
+                            <p className="text-sm font-semibold text-blue-900 mb-1">Guaranteed Access Policy</p>
+                            <p className="text-xs text-blue-800/70 leading-relaxed">
+                                Enter your email below to instantly unlock the platform. We will email you the official invoice with the bank details (IBAN). You have 48 hours to complete the SEPA transfer.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-black/60 mb-2">Billing Email Address</label>
+                            <input
+                                type="email" required value={emailInput}
+                                onChange={e => setEmailInput(e.target.value)}
+                                placeholder="institution@example.com"
+                                className="w-full px-4 py-3.5 text-sm bg-black/[0.02] border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C076]/40 focus:border-[#00C076] transition-all font-medium"
+                            />
+                        </div>
+
+                        <button
+                            type="submit" disabled={isConfirming || !emailInput}
+                            className="w-full py-4 mt-2 bg-[#050505] text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-black/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                        >
+                            {isConfirming ? <Loader2 className="animate-spin" size={16} /> : 'Generate Invoice & Unlock Access'}
+                        </button>
+                      </form>
+                  ) : (
+                      <div className="flex flex-col items-center text-center py-6">
+                          <div className="w-16 h-16 bg-[#00C076]/10 text-[#00C076] rounded-full flex items-center justify-center mb-6">
+                              <CheckCircle2 size={32} />
+                          </div>
+                          <h4 className="text-xl font-bold mb-2">Access Granted</h4>
+                          <p className="text-sm text-black/50 leading-relaxed mb-8">
+                              Your cryptographic profile is now unlocked. We've sent the official invoice and SEPA transfer instructions to <strong>{emailInput}</strong>.
+                          </p>
+                          <div className="w-full text-left bg-black/[0.03] border border-black/5 p-5 rounded-xl mb-6">
+                              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/40 mb-1">Transfer Concept / Reference</p>
+                              <div className="flex items-center justify-between">
+                                <code className="text-sm font-bold bg-yellow-100 px-2 py-1 rounded text-black">{generatedRef}</code>
+                                <button onClick={() => copyToClipboard(generatedRef, 'Reference')} className="text-black/40 hover:text-black transition-colors"><Copy size={16}/></button>
+                              </div>
+                          </div>
+                          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#00C076] animate-pulse">Redirecting to Dashboard...</p>
+                      </div>
+                  )}
+              </div>
             </div>
           </div>
         )}
@@ -303,90 +294,86 @@ function PricingContent() {
         <header className="text-center mb-20">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-black/30 mb-5">Pricing</p>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-black mb-5 leading-[1.1]">
-            Simple, transparent pricing
+            Institutional access,<br/>transparent billing
           </h1>
           <p className="text-lg text-black/50 max-w-lg mx-auto leading-relaxed">
-            Start free. Upgrade when you're ready. Every plan activates instantly with no setup fees.
+            Start free. Upgrade when you're ready. All payments are processed securely via SEPA Bank Transfer in Euros.
           </p>
 
           {currentTierLevel > 0 && (
             <button
               onClick={() => router.push('/dashboard?tab=billing')}
-              className="mt-8 inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-[0.12em] hover:bg-black/80 transition"
+              className="mt-8 inline-flex items-center gap-2 px-5 py-2.5 bg-[#050505] text-white rounded-full text-xs font-bold uppercase tracking-[0.12em] hover:bg-black/80 transition shadow-lg"
             >
               <Settings size={13} /> Manage subscription
             </button>
           )}
 
           {/* Billing Toggle */}
-          <div className="mt-10 inline-flex items-center bg-black/5 p-1 rounded-full">
+          <div className="mt-10 inline-flex items-center bg-black/[0.03] p-1.5 rounded-full border border-black/5">
             <button
               onClick={() => setBillingCycle('monthly')}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-                billingCycle === 'monthly' ? 'bg-white shadow-sm text-black' : 'text-black/40 hover:text-black'
+              className={`px-8 py-2.5 rounded-full text-sm font-bold transition-all ${
+                billingCycle === 'monthly' ? 'bg-white shadow-sm text-black border border-black/5' : 'text-black/40 hover:text-black'
               }`}
             >Monthly</button>
             <button
               onClick={() => setBillingCycle('annual')}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
-                billingCycle === 'annual' ? 'bg-white shadow-sm text-black' : 'text-black/40 hover:text-black'
+              className={`px-8 py-2.5 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${
+                billingCycle === 'annual' ? 'bg-white shadow-sm text-black border border-black/5' : 'text-black/40 hover:text-black'
               }`}
             >
-              Annual <span className="text-[10px] font-bold text-[#00C076]">–16%</span>
+              Annual <span className="text-[10px] font-black text-[#00C076] px-2 py-0.5 bg-[#00C076]/10 rounded-full">–16%</span>
             </button>
           </div>
         </header>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-32">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-32">
           {PRICING_TIERS.map(tier => {
             const isDowngrade = currentTierLevel >= (TIER_HIERARCHY[tier.id] || 0);
             const price = TIER_PRICES[tier.id][billingCycle];
             return (
               <div
                 key={tier.id}
-                className={`relative flex flex-col rounded-2xl transition-all duration-300 ${
+                className={`relative flex flex-col rounded-3xl transition-all duration-300 ${
                   tier.highlight
-                    ? 'bg-black text-white shadow-2xl'
-                    : 'bg-white border border-black/8 hover:border-black/20'
+                    ? 'bg-[#050505] text-white shadow-[0_20px_40px_rgba(0,0,0,0.15)] ring-1 ring-white/10'
+                    : 'bg-white border border-black/10 hover:border-black/20 hover:shadow-lg'
                 }`}
               >
                 {tier.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00C076] text-black text-[10px] font-bold uppercase tracking-[0.15em] px-4 py-1 rounded-full">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#00C076] text-black text-[10px] font-black uppercase tracking-[0.2em] px-5 py-1.5 rounded-full shadow-sm">
                     Recommended
                   </div>
                 )}
 
-                <div className={`p-8 border-b ${tier.highlight ? 'border-white/8' : 'border-black/5'}`}>
-                  <p className={`text-[11px] font-bold uppercase tracking-[0.2em] mb-4 ${
+                <div className={`p-8 border-b ${tier.highlight ? 'border-white/10' : 'border-black/5'}`}>
+                  <p className={`text-[11px] font-black uppercase tracking-[0.2em] mb-4 ${
                     tier.highlight ? 'text-white/40' : 'text-black/30'
                   }`}>{tier.name}</p>
-                  <div className="flex items-baseline gap-1.5 mb-2">
-                    <span className={`text-5xl font-bold tracking-tight ${tier.highlight ? 'text-white' : 'text-black'}`}>
+                  <div className="flex items-baseline gap-1.5 mb-1">
+                    <span className={`text-[28px] font-bold ${tier.highlight ? 'text-[#00C076]' : 'text-black/40'}`}>€</span>
+                    <span className={`text-6xl font-black tracking-tighter ${tier.highlight ? 'text-white' : 'text-[#050505]'}`}>
                       {price}
                     </span>
-                    <span className={`text-sm font-semibold ${tier.highlight ? 'text-[#00C076]' : 'text-black/30'}`}>
-                      USDT
-                    </span>
                   </div>
-                  <p className={`text-[13px] ${tier.highlight ? 'text-white/30' : 'text-black/30'}`}>
-                    per {billingCycle === 'monthly' ? 'month' : 'year'}
+                  <p className={`text-sm font-semibold tracking-wide ${tier.highlight ? 'text-white/40' : 'text-black/40'} mb-5`}>
+                    EUR / {billingCycle === 'monthly' ? 'month' : 'year'}
                   </p>
-                  <p className={`text-sm mt-4 font-medium ${tier.highlight ? 'text-white/60' : 'text-black/50'}`}>
+                  <p className={`text-sm font-medium ${tier.highlight ? 'text-white/70' : 'text-black/60'}`}>
                     {tier.tagline}
                   </p>
                 </div>
 
                 <div className="p-8 flex-1 flex flex-col">
-                  <ul className="flex flex-col gap-3.5 flex-1 mb-8">
+                  <ul className="flex flex-col gap-4 flex-1 mb-10">
                     {tier.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <span className={`mt-0.5 shrink-0 ${tier.highlight ? 'text-[#00C076]' : 'text-black/20'}`}>
-                          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
+                          <CheckCircle2 size={16} />
                         </span>
-                        <span className={`text-[14px] leading-snug ${tier.highlight ? 'text-white/70' : 'text-black/55'}`}>
+                        <span className={`text-[14px] font-medium leading-snug ${tier.highlight ? 'text-white/80' : 'text-black/70'}`}>
                           {f}
                         </span>
                       </li>
@@ -394,7 +381,7 @@ function PricingContent() {
                   </ul>
 
                   {isDowngrade ? (
-                    <div className={`w-full py-3 rounded-xl text-center text-xs font-bold uppercase tracking-[0.12em] opacity-40 ${
+                    <div className={`w-full py-4 rounded-xl text-center text-xs font-black uppercase tracking-[0.2em] opacity-40 ${
                       tier.highlight ? 'bg-white/10 text-white' : 'bg-black/5 text-black'
                     }`}>
                       {currentTier === tier.id ? 'Current plan' : 'Included'}
@@ -403,10 +390,10 @@ function PricingContent() {
                     <button
                       onClick={() => handleSubscribeClick(tier.id)}
                       disabled={!isTierLoaded || loadingTier === tier.id}
-                      className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${
+                      className={`w-full py-4 rounded-xl text-sm font-black transition-all ${
                         tier.highlight
-                          ? 'bg-[#00C076] text-black hover:bg-emerald-400 disabled:opacity-60'
-                          : 'bg-black text-white hover:bg-black/80 disabled:opacity-60'
+                          ? 'bg-[#00C076] text-black hover:bg-emerald-400 disabled:opacity-60 shadow-lg shadow-emerald-500/20'
+                          : 'bg-[#050505] text-white hover:bg-black/80 disabled:opacity-60 shadow-md'
                       }`}
                     >
                       {loadingTier === tier.id || !isTierLoaded
@@ -422,13 +409,13 @@ function PricingContent() {
         </div>
 
         {/* FAQ */}
-        <section className="border-t border-black/8 pt-20 pb-10">
-          <h2 className="text-2xl font-bold tracking-tight mb-10">Common questions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 max-w-4xl">
+        <section className="border-t border-black/10 pt-20 pb-10">
+          <h2 className="text-3xl font-bold tracking-tight mb-12">Common questions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-10 max-w-4xl">
             {FAQS.map((faq, i) => (
               <div key={i}>
-                <h4 className="text-[15px] font-semibold mb-2">{faq.question}</h4>
-                <p className="text-sm text-black/50 leading-relaxed">{faq.answer}</p>
+                <h4 className="text-base font-bold mb-3">{faq.question}</h4>
+                <p className="text-[15px] font-medium text-black/60 leading-relaxed">{faq.answer}</p>
               </div>
             ))}
           </div>

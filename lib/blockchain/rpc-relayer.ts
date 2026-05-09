@@ -5,19 +5,17 @@
  * Distribuye requests entre todos los endpoints GetBlock del registry
  * usando Round-Robin con cooldown automático en caso de 429/500.
  *
- * Clusters soportados (20 slots):
- *   ETH_RPC, ETH_WSS, ETH_MEV
- *   SOL_RPC, SOL_WSS
- *   BASE_RPC, BASE_WSS
- *   POL_RPC, POL_WSS
- *   BSC_RPC, BSC_WSS
- *   ARB_RPC, ARB_WSS
- *   OP_RPC
- *   WORLD_RPC
- *   BTC_RPC
- *   AVAX_RPC
- *   HYPEREVM_RPC
- *   BERA_RPC
+ * Clusters soportados:
+ *   ETH_RPC (6 endpoints), ETH_WSS (4), ETH_MEV
+ *   SOL_RPC (4 endpoints), SOL_WSS (2)
+ *   BASE_RPC (2 endpoints), BASE_WSS (2)
+ *   POL_RPC (4 endpoints), POL_WSS (2)
+ *   BSC_RPC (4 endpoints), BSC_WSS (2)
+ *   ARB_RPC (2 endpoints), ARB_WSS (2)
+ *   OP_RPC, WORLD_RPC, BTC_RPC, AVAX_RPC, HYPEREVM_RPC, BERA_RPC
+ *
+ * ANTI-BAN: Los backups solo entran en juego cuando el primario falla.
+ * El cooldown es de 5 min para 429/500 antes de reintentar.
  */
 
 export type NetworkTag =
@@ -76,55 +74,112 @@ export class RpcRelayerManager {
   }
 
   private static initialize() {
-    // ── ETH ──────────────────────────────────────────────────────────────────
+    // ── ETH ────────────────────────────────────────────────────────────────────────
+    // Primarios (cuentas 1-3) → Backup (cuentas 12-14). RR natural.
     this.loadCluster('ETH_RPC', [
       process.env.GB_ETH_RPC_1,
       process.env.GB_ETH_RPC_2,
       process.env.RPC_CLUSTER_ETH_RPC,  // legacy comma-separated
+      // — backups (cuentas 12–14) — solo entran si primarios en cooldown
+      process.env.GB_ETH_RPC_B1,
+      process.env.GB_ETH_RPC_B2,
+      process.env.GB_ETH_RPC_B3,
+      process.env.GB_ETH_RPC_B4,
     ]);
     this.loadCluster('ETH_WSS', [
       process.env.GB_ETH_WSS_1,
+      process.env.GB_ETH_WSS_2,
       process.env.RPC_CLUSTER_ETH_WSS,  // legacy comma-separated
+      // — backups —
+      process.env.GB_ETH_WSS_B1,
+      process.env.GB_ETH_WSS_B2,
     ]);
     this.loadCluster('ETH_MEV', [process.env.GB_ETH_MEV_RPC]);
 
-    // ── SOLANA ────────────────────────────────────────────────────────────────
+    // ── SOLANA ───────────────────────────────────────────────────────────────────────
+    // Primarios (cuentas 4-5) → Backup (cuentas 15-16). RR natural.
     this.loadCluster('SOL_RPC', [
       process.env.GB_SOL_RPC_1,
+      process.env.GB_SOL_RPC_EXTRA,
+      process.env.GB_SOL_RPC_2,
+      process.env.GB_SOL_RPC_3,
       process.env.RPC_CLUSTER_SOL_RPC,  // legacy comma-separated
+      // — backups (cuentas 15–16) —
+      process.env.GB_SOL_RPC_B1,
+      process.env.GB_SOL_RPC_B2,
+      process.env.GB_SOL_RPC_B3,
     ]);
-    this.loadCluster('SOL_WSS', [process.env.GB_SOL_WSS_1]);
+    this.loadCluster('SOL_WSS', [
+      process.env.GB_SOL_WSS_1,
+      // — backup —
+      process.env.GB_SOL_WSS_B1,
+    ]);
 
-    // ── BASE ──────────────────────────────────────────────────────────────────
-    this.loadCluster('BASE_RPC', [process.env.GB_BASE_RPC_1]);
-    this.loadCluster('BASE_WSS', [process.env.GB_BASE_WSS_1]);
+    // ── BASE ────────────────────────────────────────────────────────────────────────
+    // Primario (cuenta 11) → Backup (cuenta 22). RR natural.
+    this.loadCluster('BASE_RPC', [
+      process.env.GB_BASE_RPC_1,
+      // — backup (cuenta 22) —
+      process.env.GB_BASE_RPC_B1,
+    ]);
+    this.loadCluster('BASE_WSS', [
+      process.env.GB_BASE_WSS_1,
+      // — backup —
+      process.env.GB_BASE_WSS_B1,
+    ]);
 
-    // ── POLYGON ───────────────────────────────────────────────────────────────
+    // ── POLYGON ──────────────────────────────────────────────────────────────────────
+    // Primarios (cuentas 6-7) → Backup (cuentas 17-18). RR natural.
     this.loadCluster('POL_RPC', [
       process.env.GB_POL_RPC_1,
+      process.env.GB_POL_RPC_EXTRA,
+      process.env.GB_POL_RPC_2,
+      process.env.GB_POL_RPC_3,
       process.env.RPC_CLUSTER_POLYGON_RPC,
+      // — backups (cuentas 17–18) —
+      process.env.GB_POL_RPC_B1,
+      process.env.GB_POL_RPC_B2,
+      process.env.GB_POL_RPC_B3,
     ]);
     this.loadCluster('POL_WSS', [
       process.env.GB_POL_WSS_1,
       process.env.RPC_CLUSTER_POLYGON_WSS,
+      // — backup —
+      process.env.GB_POL_WSS_B1,
     ]);
 
-    // ── BSC ───────────────────────────────────────────────────────────────────
+    // ── BSC ─────────────────────────────────────────────────────────────────────────
+    // Primarios (cuentas 8-9) → Backup (cuentas 19-20). RR natural.
     this.loadCluster('BSC_RPC', [
       process.env.GB_BSC_RPC_1,
+      process.env.GB_BSC_RPC_2,
+      process.env.GB_BSC_RPC_3,
       process.env.RPC_CLUSTER_BSC_RPC,
+      // — backups (cuentas 19–20) —
+      process.env.GB_BSC_RPC_B1,
+      process.env.GB_BSC_RPC_B2,
+      process.env.GB_BSC_RPC_B3,
     ]);
     this.loadCluster('BSC_WSS', [
       process.env.GB_BSC_WSS_1,
       process.env.RPC_CLUSTER_BSC_WSS,
+      // — backup —
+      process.env.GB_BSC_WSS_B1,
     ]);
 
-    // ── ARBITRUM ──────────────────────────────────────────────────────────────
+    // ── ARBITRUM ──────────────────────────────────────────────────────────────────────
+    // Primario (cuenta 10) → Backup (cuenta 21). RR natural.
     this.loadCluster('ARB_RPC', [
       process.env.GB_ARB_RPC_1,
       process.env.RPC_CLUSTER_ARB_RPC,  // legacy comma-separated (2 URLs)
+      // — backup (cuenta 21) —
+      process.env.GB_ARB_RPC_B1,
     ]);
-    this.loadCluster('ARB_WSS', [process.env.GB_ARB_WSS_1]);
+    this.loadCluster('ARB_WSS', [
+      process.env.GB_ARB_WSS_1,
+      // — backup —
+      process.env.GB_ARB_WSS_B1,
+    ]);
 
     // ── OPTIMISM ──────────────────────────────────────────────────────────────
     this.loadCluster('OP_RPC', [process.env.GB_OP_RPC_1]);

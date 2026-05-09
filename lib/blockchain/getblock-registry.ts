@@ -1,13 +1,15 @@
 /**
- * ╔══════════════════════════════════════════════════════════════════════════╗
- * ║   GETBLOCK REGISTRY — 22 ENDPOINTS | 11 CUENTAS FREE                  ║
- * ║   Budget: 11 × 550,000 CU/día = 6,050,000 CU/día total               ║
- * ║                                                                        ║
- * ║   ANTI-BAN — CU Circuit Breaker:                                       ║
- * ║   Si GetBlock responde 402/429 → ese endpoint se bloquea               ║
- * ║   automáticamente hasta el reset diario (00:00 UTC).                   ║
- * ║   Si TODOS los endpoints de una chain se agotan → fallback público.    ║
- * ╚══════════════════════════════════════════════════════════════════════════╝
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║   GETBLOCK REGISTRY — 46 ENDPOINTS | 22 CUENTAS FREE                 ║
+ * ║   Budget: 22 × 550,000 CU/día = 12,100,000 CU/día total            ║
+ * ║                                                                       ║
+ * ║   ANTI-BAN — CU Circuit Breaker:                                      ║
+ * ║   Si GetBlock responde 402/429 → ese endpoint se bloquea              ║
+ * ║   automáticamente hasta el reset diario (00:00 UTC).                  ║
+ * ║   Los backups (cuentas 12–22) solo entran cuando los primarios        ║
+ * ║   están agotados. Así evitamos doble-consumo innecesario.            ║
+ * ║   Si TODOS los endpoints de una chain se agotan → fallback público.  ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
  */
 
 export type GbChain = 'eth' | 'sol' | 'polygon' | 'bsc' | 'arb' | 'base' | 'op' | 'world' | 'avax' | 'hyperevm' | 'bera';
@@ -86,21 +88,81 @@ export const GB_REGISTRY: GbEndpoint[] = [
   ep(23, 11, 'base', 'rpc', 'GB_BASE_RPC_1'),
   ep(24, 11, 'base', 'wss', 'GB_BASE_WSS_1'),
 
-  // CUENTA 12 — OPTIMISM
-  ep(25, 12, 'op', 'rpc', 'GB_OP_RPC_1'),
+  // ─── CUENTAS ÚNICAS (una sola cuenta por chain) ───────────────────────────
+  // Estas NO tienen backup en la segunda batería: la chain se degrada al
+  // fallback público si su único slot GetBlock se agota.
 
-  // CUENTA 13 — AVALANCHE
-  ep(26, 13, 'avax', 'rpc', 'GB_AVAX_RPC_1'),
+  // CUENTA ÚNICA — OPTIMISM
+  ep(25, 101, 'op',       'rpc', 'GB_OP_RPC_1'),
 
-  // CUENTA 14 — WORLDCHAIN
-  ep(27, 14, 'world', 'rpc', 'GB_WORLD_RPC_1'),
+  // CUENTA ÚNICA — AVALANCHE
+  ep(26, 102, 'avax',     'rpc', 'GB_AVAX_RPC_1'),
 
-  // CUENTA 15 — HYPEREVM
-  ep(28, 15, 'hyperevm', 'rpc', 'GB_HYPEREVM_RPC_1'),
+  // CUENTA ÚNICA — WORLDCHAIN
+  ep(27, 103, 'world',    'rpc', 'GB_WORLD_RPC_1'),
 
-  // CUENTA 16 — BERACHAIN
-  ep(29, 16, 'bera', 'rpc', 'GB_BERA_RPC_1'),
+  // CUENTA ÚNICA — HYPEREVM
+  ep(28, 104, 'hyperevm', 'rpc', 'GB_HYPEREVM_RPC_1'),
+
+  // CUENTA ÚNICA — BERACHAIN
+  ep(29, 105, 'bera',     'rpc', 'GB_BERA_RPC_1'),
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SEGUNDA BATERÍA — CUENTAS 12–22 (BACKUP)
+  // Registradas al final de cada chain → el CB las activa solo cuando
+  // las primarias están en 402/429. Sin consumo extra en condiciones normales.
+  // ═══════════════════════════════════════════════════════════════════
+
+  // CUENTA 12 — ETH backup primario (RPC + WSS)
+  ep(30, 12, 'eth', 'rpc', 'GB_ETH_RPC_B1'),
+  ep(31, 12, 'eth', 'wss', 'GB_ETH_WSS_B1'),
+
+  // CUENTA 13 — ETH backup secundario (RPC + WSS)
+  ep(32, 13, 'eth', 'rpc', 'GB_ETH_RPC_B2'),
+  ep(33, 13, 'eth', 'wss', 'GB_ETH_WSS_B2'),
+
+  // CUENTA 14 — ETH backup terciario (2x RPC)
+  ep(34, 14, 'eth', 'rpc', 'GB_ETH_RPC_B3'),
+  ep(35, 14, 'eth', 'rpc', 'GB_ETH_RPC_B4'),
+
+  // CUENTA 15 — SOL backup (RPC + WSS)
+  ep(36, 15, 'sol', 'rpc', 'GB_SOL_RPC_B1'),
+  ep(37, 15, 'sol', 'wss', 'GB_SOL_WSS_B1'),
+
+  // CUENTA 16 — SOL backup redundancia (2x RPC)
+  ep(38, 16, 'sol', 'rpc', 'GB_SOL_RPC_B2'),
+  ep(39, 16, 'sol', 'rpc', 'GB_SOL_RPC_B3'),
+
+  // CUENTA 17 — POLYGON backup (RPC + WSS)
+  ep(40, 17, 'polygon', 'rpc', 'GB_POL_RPC_B1'),
+  ep(41, 17, 'polygon', 'wss', 'GB_POL_WSS_B1'),
+
+  // CUENTA 18 — POLYGON backup redundancia (2x RPC)
+  ep(42, 18, 'polygon', 'rpc', 'GB_POL_RPC_B2'),
+  ep(43, 18, 'polygon', 'rpc', 'GB_POL_RPC_B3'),
+
+  // CUENTA 19 — BSC backup (RPC + WSS)
+  ep(44, 19, 'bsc', 'rpc', 'GB_BSC_RPC_B1'),
+  ep(45, 19, 'bsc', 'wss', 'GB_BSC_WSS_B1'),
+
+  // CUENTA 20 — BSC backup redundancia (2x RPC)
+  ep(46, 20, 'bsc', 'rpc', 'GB_BSC_RPC_B2'),
+  ep(47, 20, 'bsc', 'rpc', 'GB_BSC_RPC_B3'),
+
+  // CUENTA 21 — ARBITRUM backup (RPC + WSS)
+  ep(48, 21, 'arb', 'rpc', 'GB_ARB_RPC_B1'),
+  ep(49, 21, 'arb', 'wss', 'GB_ARB_WSS_B1'),
+
+  // CUENTA 22 — BASE backup (RPC + WSS)
+  ep(50, 22, 'base', 'rpc', 'GB_BASE_RPC_B1'),
+  ep(51, 22, 'base', 'wss', 'GB_BASE_WSS_B1'),
 ];
+
+// ─── Conjuntos de slots por tier para monitoreo separado ────────────────────
+/** Slots primarios — cuentas 1–11 + cuentas únicas 101–105 */
+export const GB_PRIMARY_SLOTS = GB_REGISTRY.filter(e => e.account <= 11 || (e.account >= 101 && e.account <= 105));
+/** Slots de backup — cuentas 12–22 (segunda batería) */
+export const GB_BACKUP_SLOTS  = GB_REGISTRY.filter(e => e.account >= 12 && e.account <= 99);
 
 // ─── CU CIRCUIT BREAKER — Anti-Ban ───────────────────────────────────────────
 /**
@@ -239,12 +301,12 @@ export function getCoveredChains(): GbChain[] {
 }
 
 export const CU_BUDGET: Record<GbChain, number> = {
-  eth:      3 * 550_000,
-  sol:      2 * 550_000,
-  polygon:  2 * 550_000,
-  bsc:      2 * 550_000,
-  arb:      1 * 550_000,
-  base:     1 * 550_000,
+  eth:      6 * 550_000,   // 3 primarias + 3 backup = 6 cuentas
+  sol:      4 * 550_000,   // 2 primarias + 2 backup = 4 cuentas
+  polygon:  4 * 550_000,   // 2 primarias + 2 backup = 4 cuentas
+  bsc:      4 * 550_000,   // 2 primarias + 2 backup = 4 cuentas
+  arb:      2 * 550_000,   // 1 primaria  + 1 backup = 2 cuentas
+  base:     2 * 550_000,   // 1 primaria  + 1 backup = 2 cuentas
   op:       1 * 550_000,
   avax:     1 * 550_000,
   world:    1 * 550_000,
@@ -253,17 +315,22 @@ export const CU_BUDGET: Record<GbChain, number> = {
 };
 
 export function getTotalCuBudget(): number {
-  return 11 * 550_000;
+  return 22 * 550_000;  // 22 cuentas × 550,000 CU = 12,100,000 CU/día
 }
 
 // ─── Startup log ─────────────────────────────────────────────────────────────
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'test') {
-  const active = getActiveCount();
-  const chains = getCoveredChains();
-  const missing = GB_REGISTRY.filter(e => !e.isActive).map(e => e.envKey);
+  const active    = getActiveCount();
+  const primary   = GB_PRIMARY_SLOTS.filter(e => e.isActive).length;
+  const backup    = GB_BACKUP_SLOTS.filter(e  => e.isActive).length;
+  const chains    = getCoveredChains();
+  const missing   = GB_REGISTRY.filter(e => !e.isActive).map(e => e.envKey);
 
-  console.log(`[GetBlock] ✅ ${active}/${GB_REGISTRY.length} slots activos | Chains: ${chains.join(', ')}`);
+  console.log(
+    `[GetBlock] ✅ ${active}/${GB_REGISTRY.length} slots activos ` +
+    `(${primary} primarios + ${backup} backup) | Chains: ${chains.join(', ')}`
+  );
   if (missing.length > 0) {
     console.log(`[GetBlock] ⚠️  Slots pendientes (${missing.length}): ${missing.join(', ')}`);
   }
