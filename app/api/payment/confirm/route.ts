@@ -2,31 +2,39 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Resend } from 'resend';
 
-// Ensure you set RESEND_API_KEY in your env, but gracefully fallback for dev.
+// Resend instance — fallback for dev but required for prod
 const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
 
-// Note: Prices should ideally be matched with the frontend
 const TIER_NAMES: Record<string, string> = {
   STARTER: 'Starter',
   PRO: 'Pro',
   ELITE: 'Elite'
 };
 
+const BANK_DETAILS = {
+  beneficiary: 'STEFAN-ANTONIO CIRISANU',
+  iban: 'ES52 1583 0001 1090 8640 3529',
+  bic: 'REVOESM2',
+  bank: 'Revolut Bank UAB, Calle Príncipe de Vergara 132, 4 planta, 28002, Madrid, Spain'
+};
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { txHash, planId, billingCycle, priceEth, email, walletAddress: rawWalletAddress } = body;
-    const walletAddress = (rawWalletAddress && rawWalletAddress !== 'manual_tron_user') 
+    const { reference, planId, billingCycle, priceEur, email, walletAddress: rawWalletAddress } = body;
+    
+    // Identity resolution: we require email for billing now.
+    const walletAddress = (rawWalletAddress && rawWalletAddress !== 'manual_sepa_user') 
       ? rawWalletAddress 
-      : (email ? `tron_${email.replace(/[^a-zA-Z0-9]/g, '')}` : `tron_${txHash.slice(0, 10)}`);
+      : `sepa_${email.replace(/[^a-zA-Z0-9]/g, '')}`;
 
-    if (!txHash || !planId || !walletAddress || !billingCycle || !priceEth) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!reference || !planId || !walletAddress || !billingCycle || !priceEur || !email) {
+      return NextResponse.json({ error: 'Missing required billing fields (email, reference, etc.)' }, { status: 400 });
     }
 
-    console.log(`[Payment] Verifying tx ${txHash} for wallet ${walletAddress} (Plan: ${planId}, Cycle: ${billingCycle})`);
+    console.log(`[Billing SEPA] Processing transfer ref ${reference} for ${email} (Plan: ${planId})`);
 
-    // 1. Calculate Expiration Date
+    // 1. Calculate Expiration Date (Immediate optimistic access)
     const existingSub = await prisma.subscription.findUnique({
       where: { userId: walletAddress.toLowerCase() }
     });
@@ -51,24 +59,20 @@ export async function POST(request: NextRequest) {
         where: { walletAddress: walletAddress.toLowerCase() },
         update: {
           tier: planId,
-          ...(email && { email: email }) // Update email if provided
+          email: email
         },
         create: {
           walletAddress: walletAddress.toLowerCase(),
           tier: planId,
-          ...(email && { email: email })
+          email: email
         }
       });
     } catch (e: any) {
       if (e.code === 'P2002') {
-        // Unique constraint failed, likely on email. Fallback without email.
         user = await prisma.user.upsert({
           where: { walletAddress: walletAddress.toLowerCase() },
           update: { tier: planId },
-          create: {
-            walletAddress: walletAddress.toLowerCase(),
-            tier: planId
-          }
+          create: { walletAddress: walletAddress.toLowerCase(), tier: planId }
         });
       } else {
         throw e;
@@ -91,74 +95,115 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // 4. Record the Transaction
+    // 4. Record the SEPA Transaction
     await prisma.transaction.create({
       data: {
-        txHash: txHash,
-        status: 'CONFIRMED',
+        txHash: reference, // Using the bank transfer reference instead of crypto txHash
+        status: 'PROCESSING', // SEPA takes 1-2 days, but we give access now
         type: 'SUBSCRIPTION_PAYMENT',
-        amount: parseFloat(priceEth),
-        token: 'USDT',
-        fromAddress: walletAddress.toLowerCase(),
-        toAddress: process.env.NEXT_PUBLIC_TRON_TREASURY || 'TEW1PSVyNuneyzyTk3cKaxCsizgGnkM3LQ',
+        amount: parseFloat(priceEur),
+        token: 'EUR',
+        fromAddress: email,
+        toAddress: BANK_DETAILS.iban,
         authUserId: user.id,
         metadata: {
           planId,
           billingCycle,
           email,
-          usdValue: priceEth,
-          network: 'TRON_TRC20',
-          expiresAt: expiresAt.toISOString()
+          eurValue: priceEur,
+          network: 'SEPA_TRANSFER',
+          expiresAt: expiresAt.toISOString(),
+          bankBeneficiary: BANK_DETAILS.beneficiary
         }
       }
     });
 
-    // 5. Send Email Invoice using Resend
-    if (email) {
-      try {
-        const invoiceHtml = `
-          <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #050505; color: #ffffff; border-radius: 16px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #00C076; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">Sovereign Intelligence</h1>
-              <p style="color: #888888; font-size: 14px;">On-Chain Payment Receipt (TRON NETWORK)</p>
-            </div>
+    // 5. Send Professional Email Invoice (Railway / Stripe Style)
+    try {
+      const invoiceHtml = `
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 40px 20px;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
             
-            <div style="background: #111111; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #222;">
-              <h2 style="font-size: 18px; margin-top: 0; color: #ffffff;">Invoice Details</h2>
-              <table style="width: 100%; color: #bbbbbb; font-size: 14px;">
-                <tr><td style="padding: 8px 0;">Plan Acquired:</td><td style="text-align: right; color: #fff; font-weight: bold;">${TIER_NAMES[planId] || planId} (${billingCycle.toUpperCase()})</td></tr>
-                <tr><td style="padding: 8px 0;">Amount Paid:</td><td style="text-align: right; color: #00C076; font-weight: bold;">${priceEth} USDT</td></tr>
-                <tr><td style="padding: 8px 0;">Valid Until:</td><td style="text-align: right; color: #fff;">${expiresAt.toLocaleDateString()}</td></tr>
-                <tr><td style="padding: 8px 0;">Network:</td><td style="text-align: right; color: #fff;">TRON (TRC-20)</td></tr>
-                <tr><td style="padding: 8px 0;">TXID:</td><td style="text-align: right; font-family: monospace;">
-                  <a href="https://tronscan.org/#/transaction/${txHash}" style="color: #00C076; text-decoration: none;">${txHash.slice(0,6)}...${txHash.slice(-4)}</a>
-                </td></tr>
-              </table>
+            <!-- Header -->
+            <div style="background-color: #050505; padding: 32px 40px; text-align: left;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Sovereign</h1>
+              <p style="margin: 4px 0 0 0; color: #a1a1aa; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Invoice & Payment Instructions</p>
             </div>
 
-            <p style="text-align: center; color: #666666; font-size: 12px; margin-top: 30px;">
-              Your cryptographic access has been granted.<br/>
-              Return to the terminal to begin operations.
-            </p>
-          </div>
-        `;
+            <!-- Body -->
+            <div style="padding: 40px;">
+              <p style="margin: 0 0 24px 0; font-size: 16px; color: #374151; line-height: 1.5;">
+                Hello,<br><br>
+                Thank you for upgrading to the <strong>${TIER_NAMES[planId] || planId} Plan</strong>. Your account access has been provisionally granted. To finalize the activation, please complete the SEPA Bank Transfer within the next 48 hours using the details below.
+              </p>
 
-        const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-        await resend.emails.send({
-          from: `Sovereign Billing <${fromEmail}>`,
-          to: email,
-          subject: `Invoice: ${TIER_NAMES[planId] || planId} Plan Payment Confirmed`,
-          html: invoiceHtml,
-        });
-        console.log(`[Payment] Invoice sent to ${email}`);
-      } catch (emailError: any) {
-        console.error(`[Payment] Failed to send email via Resend:`, emailError.message);
-      }
+              <!-- Payment Details Box -->
+              <div style="background-color: #f3f4f6; border-radius: 8px; padding: 24px; margin-bottom: 32px;">
+                <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Amount Due</p>
+                <p style="margin: 0 0 24px 0; font-size: 36px; font-weight: 800; color: #111827; line-height: 1;">€${priceEur}</p>
+
+                <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Bank Transfer Details (SEPA)</p>
+                <table style="width: 100%; font-size: 14px; color: #374151; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e5e7eb; color: #6b7280;">Beneficiary</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600; text-align: right; color: #111827;">${BANK_DETAILS.beneficiary}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e5e7eb; color: #6b7280;">IBAN</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600; text-align: right; font-family: monospace; font-size: 15px; color: #111827;">${BANK_DETAILS.iban}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e5e7eb; color: #6b7280;">BIC/SWIFT</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600; text-align: right; font-family: monospace; color: #111827;">${BANK_DETAILS.bic}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e5e7eb; color: #6b7280;">Bank Name</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600; text-align: right; color: #111827;">${BANK_DETAILS.bank}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6b7280;">Transfer Concept/Reference</td>
+                    <td style="padding: 10px 0; font-weight: 600; text-align: right; font-family: monospace; color: #000000; background-color: #fef08a; padding-right: 4px;">${reference}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <p style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5;">
+                <strong>Note:</strong> Make sure to include the exact Transfer Concept/Reference (<code>${reference}</code>) in your bank's transfer description so we can automatically match your payment.
+              </p>
+            </div>
+
+            <!-- Footer -->
+            <div style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb; text-align: center;">
+              <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                Sovereign Intelligence · Madrid, Spain<br>
+                Receipt generated on ${new Date().toLocaleDateString()}
+              </p>
+            </div>
+
+          </div>
+        </body>
+        </html>
+      `;
+
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'billing@sovereign-intelligence.com';
+      const emailResponse = await resend.emails.send({
+        from: `Sovereign Billing <${fromEmail}>`,
+        to: email,
+        subject: `Invoice & Transfer Instructions: ${TIER_NAMES[planId] || planId} Plan`,
+        html: invoiceHtml,
+      });
+
+      console.log(`[Billing SEPA] Invoice successfully sent to ${email}. ID: ${emailResponse.data?.id}`);
+    } catch (emailError: any) {
+      console.error(`[Billing SEPA] CRITICAL: Failed to send invoice via Resend:`, emailError.message);
+      // We do not fail the request if the email fails, but we log heavily.
     }
 
     return NextResponse.json({ success: true, tier: planId, expiresAt });
   } catch (error) {
-    console.error('[Payment] Error confirming payment:', error);
+    console.error('[Billing SEPA] Error confirming payment:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
