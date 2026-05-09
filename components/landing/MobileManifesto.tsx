@@ -476,7 +476,57 @@ export function MobileManifesto() {
         </div>
       </section>
 
+
+      {/* ── 5.5 529-AXIOM SYSTEM (MOBILE) ───────────────────────────────────── */}
+      <section className="bg-black text-white border-b border-white/8">
+        <div className="px-6 pt-14 pb-6">
+          <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/30 block mb-4">
+            Architecture v1.0 Complete
+          </span>
+          <h2 className="font-black text-[28px] tracking-tighter uppercase leading-tight">
+            529 Axioms.<br />
+            <span className="text-white/25">Zero gaps.</span>
+          </h2>
+          <p className="font-serif text-[13px] text-white/40 leading-relaxed mt-3 mb-8">
+            29 original axioms + 500 extended elements. Every edge case covered. Production-ready.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-px bg-white/8">
+          {[
+            { range: "01–50",  label: "TitaniumGate & Auth",      color: "#00C076", desc: "X25519 · EdDSA JWT · Redis zero-race · ZK 2FA · 100% passwordless" },
+            { range: "51–100", label: "Intelligence Engine",       color: "#4A9EFF", desc: "Mempool capture · 7-hop Neo4j · MEV detection · |Z|≥3 alerts" },
+            { range: "101–150",label: "Governance & Forum",        color: "#4A9EFF", desc: "Signed polls · IPFS media · SSE push · ECDSA moderation" },
+            { range: "151–229",label: "Billing & Compliance",      color: "#FF6B35", desc: "Atomic upgrade · SEPA · KYC ZK-proof · MiCA Art 72 · GDPR" },
+            { range: "230–349",label: "Infra & DevOps",            color: "#FF6B35", desc: "Blue-green · SLSA L4 · Chaos engineering · SLA 99.999%" },
+            { range: "350–449",label: "Analytics & Growth",        color: "#B44FFF", desc: "Churn prediction · LTV · K-factor · Network effects graph" },
+            { range: "450–529",label: "Security & Sovereignty",    color: "#B44FFF", desc: "CSP L3 · Signed PWA · SBOM · CVE scanner · On-chain insurance" },
+          ].map((p) => (
+            <div key={p.range} className="bg-[#0A0A0A] px-6 py-5 flex items-start gap-4">
+              <span
+                className="shrink-0 w-1.5 h-1.5 rounded-full mt-1.5"
+                style={{ backgroundColor: p.color }}
+              />
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-[8px] uppercase tracking-widest text-white/25">{p.range}</span>
+                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.12em] text-white">{p.label}</span>
+                </div>
+                <p className="font-serif text-[11px] text-white/35 leading-snug">{p.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="px-6 py-6 border-t border-white/8">
+          <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">
+            Axiom 529 — Singleton WebSocket Reference Counting ✓
+          </span>
+        </div>
+      </section>
+
       {/* ── 6. CLOSING CTA ────────────────────────────────────────────────────── */}
+
       {/* BUG-10: Authenticated users go to /dashboard, others to /connect */}
       <section
         className="px-6 py-16"

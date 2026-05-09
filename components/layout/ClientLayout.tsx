@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
+// Axioma 452 — SW registered here (non-blocking)
+// Axioma 350 — Funnel tracking per navigation
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -73,14 +75,51 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     fetchSettings();
   }, [fetchSettings]);
 
-  // Log page navigation
+  // ── Axioma 452: PWA Service Worker registration ─────────────────────────────
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js', { scope: '/' })
+        .then((reg) => {
+          console.info('[SW] Registered:', reg.scope);
+          // Check for waiting updates
+          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          reg.addEventListener('updatefound', () => {
+            const newSW = reg.installing;
+            if (!newSW) return;
+            newSW.addEventListener('statechange', () => {
+              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                console.info('[SW] Update available — will apply on next visit.');
+              }
+            });
+          });
+        })
+        .catch((err) => console.warn('[SW] Registration failed:', err));
+    }
+  }, []);
+
+  // ── Axioma 350: Funnel tracking per navigation (non-blocking) ───────────────
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Session log (existing)
       fetch('/api/session-logs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: `NAVIGATED_TO: ${pathname || '/'}` })
       }).catch(() => {});
+      // Funnel step tracking
+      const step = pathname === '/' ? 'LANDING'
+        : pathname.startsWith('/connect') ? 'WALLET_CONNECT'
+        : pathname.startsWith('/dashboard') ? 'DASHBOARD'
+        : pathname.startsWith('/pricing') ? 'PLAN_VIEW'
+        : null;
+      if (step) {
+        fetch('/api/analytics/funnel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step, ts: Date.now() }),
+        }).catch(() => {});
+      }
     }
   }, [pathname]);
 

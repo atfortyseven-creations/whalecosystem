@@ -496,7 +496,61 @@ export function ImmersiveManifestoLanding({
         </div>
       </section>
 
+
+      {/* ── 529-AXIOM SYSTEM ──────────────────────────────────────────────────── */}
+      <section className="w-full border-b border-black/8 py-24 bg-black text-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-16">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/30 mb-3">Architecture v1.0 Complete</p>
+              <h2 className="text-[32px] sm:text-[44px] font-black tracking-tighter uppercase leading-none">
+                529 Axioms.<br /><span className="text-white/25">Zero gaps.</span>
+              </h2>
+            </div>
+            <p className="font-serif text-[13px] text-white/40 max-w-xs text-left sm:text-right leading-relaxed">
+              29 original axioms + 500 extended elements. Every layer hardened. Every edge case covered. Production-ready.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/8">
+            {[
+              { n: "01–10", label: "TitaniumGate", desc: "X25519 sync · EdDSA JWT · Redis zero-race · SSR hydration eradication", color: "#00C076" },
+              { n: "11–50", label: "Auth Hardening", desc: "WebAuthn · ZK 2FA · Device allowlist · VPN/Tor/I2P · 100% passwordless", color: "#00C076" },
+              { n: "51–100", label: "Intelligence Engine", desc: "Mempool capture · 7-hop Neo4j graph · MEV detection · Z-score |Z|≥3 alerts", color: "#4A9EFF" },
+              { n: "101–150", label: "Governance & Forum", desc: "Signed polls · IPFS media · SSE notifications · ECDSA moderation", color: "#4A9EFF" },
+              { n: "151–229", label: "Billing & Compliance", desc: "Atomic tier upgrade · SEPA · KYC ZK-proof · MiCA Art 72 · GDPR export", color: "#FF6B35" },
+              { n: "230–349", label: "Infra & DevOps", desc: "Blue-green · SLSA Level 4 · Chaos engineering · DDoS · AI rate-limiting · SLA 99.999%", color: "#FF6B35" },
+              { n: "350–449", label: "Analytics & Growth", desc: "Churn prediction · LTV cohort · K-factor virality · Network effects graph · NPS signed", color: "#B44FFF" },
+              { n: "450–529", label: "Security & Sovereignty", desc: "CSP Level 3 · Signed PWA · SBOM · CVE scanner · Bug bounty · On-chain insurance", color: "#B44FFF" },
+            ].map((pillar) => (
+              <div key={pillar.n} className="bg-black/60 p-8 flex flex-col gap-4 border border-white/5 hover:border-white/10 transition-colors group">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/25">{pillar.n}</span>
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: pillar.color }} />
+                </div>
+                <h3 className="font-mono text-[11px] font-black uppercase tracking-[0.15em] text-white">{pillar.label}</h3>
+                <p className="font-serif text-[11px] text-white/40 leading-relaxed">{pillar.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-white/8 flex flex-col sm:flex-row items-start sm:items-center gap-6 justify-between">
+            <div className="flex flex-wrap gap-3">
+              {["Zero-Mock Mandate", "Zero-Trust Architecture", "Ed25519 Signatures", "Coercion-Resistant", "SLSA Level 4"].map((tag) => (
+                <span key={tag} className="font-mono text-[8px] uppercase tracking-widest px-3 py-1 border border-white/10 text-white/30">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-widest text-white/20 shrink-0">
+              Element 500 / Axiom 529 — Singleton WebSocket Reference Counting ✓
+            </span>
+          </div>
+        </div>
+      </section>
+
       {/* ── CLOSING ───────────────────────────────────────────────────────────── */}
+
       <section className="w-full py-32">
         <div className="max-w-[850px] mx-auto px-6 text-center">
           <h2 className="text-[32px] md:text-[46px] font-serif text-black leading-tight tracking-tight mb-4">
