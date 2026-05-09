@@ -31,7 +31,13 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
         setMounted(true);
         if (typeof window === 'undefined') return;
         
-        const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+        const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL;
+        // If no gateway URL is configured, skip WebSocket connection silently.
+        if (!GATEWAY_URL) {
+            setLogs([{ id: -1, timestamp: 'SYSCALL', type: 'info', message: 'Sovereign telemetry stream initializing...' }]);
+            return;
+        }
+
         const socket = io(GATEWAY_URL, { 
             path: '/api/socket/io',
             transports: ['websocket', 'polling'],
@@ -42,7 +48,7 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
 
         setLogs([
             { id: -2, timestamp: 'SYSCALL', type: 'info', message: 'Initializing Institutional WebSocket Topology...' },
-            { id: -1, timestamp: 'GATEWAY', type: 'info', message: <span className="text-[#888888]">Establishing handshake with {GATEWAY_URL}...</span> }
+            { id: -1, timestamp: 'GATEWAY', type: 'info', message: <span className="text-[#888888]">Establishing sovereign connection...</span> }
         ]);
 
         socket.on('connect', () => {

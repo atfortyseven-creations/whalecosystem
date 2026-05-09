@@ -22,8 +22,11 @@ export async function POST(req: NextRequest) {
         const userId = validation.userId;
         const billingCycle = isAnnual ? 'ANNUAL' : 'MONTHLY';
 
-        if (!tier || !PRICE_IDS[billingCycle][tier]) {
-            return NextResponse.json({ error: 'Invalid plan tier or missing user context' }, { status: 400 });
+        if (!tier) {
+            return NextResponse.json({ error: 'Invalid plan tier' }, { status: 400 });
+        }
+        if (!PRICE_IDS[billingCycle]?.[tier]) {
+            return NextResponse.json({ error: 'Stripe price not configured for this plan. Contact support.' }, { status: 503 });
         }
 
         const planConfig = SAAS_PLANS[tier];
@@ -43,9 +46,9 @@ export async function POST(req: NextRequest) {
         }
 
         const priceId = PRICE_IDS[billingCycle][tier];
-        if (priceId.includes('PLACEHOLDER')) {
-            // Development fallback for unconfigured Stripe prices. Avoids throwing 400 errors.
-            return NextResponse.json({ url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?tab=billing` });
+        if (!priceId) {
+            // Stripe price not configured for this tier/cycle combination.
+            return NextResponse.json({ error: 'Stripe price ID not configured for this plan. Please contact support.' }, { status: 503 });
         }
 
         // Create Stripe Checkout Session

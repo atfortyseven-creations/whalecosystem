@@ -98,8 +98,8 @@ export async function createCheckoutSession(planId: string) {
       },
       submit: { message: 'Adquirir Licencia Institucional' },
     },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing?canceled=true`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://humanidfi.com'}/pricing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://humanidfi.com'}/pricing?canceled=true`,
     metadata: {
       plan_id: normalizedPlanId,
       sovereign_user_id: userId,
@@ -144,7 +144,7 @@ export async function createCustomerPortalSession() {
 
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: dbUser.stripeCustomerId,
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing`,
+    return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://humanidfi.com'}/pricing`,
   });
 
   return { url: portalSession.url };

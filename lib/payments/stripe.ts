@@ -16,18 +16,19 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'mock_key', {
  * Mapping of internal PlanTier to Stripe Price IDs.
  * Note: These should ideally be moved to environment variables or fetched from Stripe API.
  */
+// Monthly price IDs — maps STRIPE_PRICE_* env vars (existing) + STRIPE_*_PRICE_ID_MO (canonical)
 export const PRICE_IDS: Record<string, Record<string, string>> = {
   MONTHLY: {
-    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_MO || 'ST_PLAN_STANDARD_MO_PLACEHOLDER',
-    STARTER: process.env.STRIPE_STARTER_PRICE_ID_MO || 'ST_PLAN_STARTER_MO_PLACEHOLDER',
-    PRO: process.env.STRIPE_PRO_PRICE_ID_MO || 'ST_PLAN_PRO_MO_PLACEHOLDER',
-    ELITE: process.env.STRIPE_ELITE_PRICE_ID_MO || 'ST_PLAN_ELITE_MO_PLACEHOLDER',
+    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_MO || process.env.STRIPE_PRICE_STANDARD || '',
+    STARTER:  process.env.STRIPE_STARTER_PRICE_ID_MO  || process.env.STRIPE_PRICE_STARTER  || '',
+    PRO:      process.env.STRIPE_PRO_PRICE_ID_MO      || process.env.STRIPE_PRICE_PRO       || '',
+    ELITE:    process.env.STRIPE_ELITE_PRICE_ID_MO    || process.env.STRIPE_PRICE_INSTITUTIONAL || '',
   },
   ANNUAL: {
-    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_YR || 'ST_PLAN_STANDARD_YR_PLACEHOLDER',
-    STARTER: process.env.STRIPE_STARTER_PRICE_ID_YR || 'ST_PLAN_STARTER_YR_PLACEHOLDER',
-    PRO: process.env.STRIPE_PRO_PRICE_ID_YR || 'ST_PLAN_PRO_YR_PLACEHOLDER',
-    ELITE: process.env.STRIPE_ELITE_PRICE_ID_YR || 'ST_PLAN_ELITE_YR_PLACEHOLDER',
+    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_YR || process.env.STRIPE_PRICE_STANDARD || '',
+    STARTER:  process.env.STRIPE_STARTER_PRICE_ID_YR  || process.env.STRIPE_PRICE_STARTER  || '',
+    PRO:      process.env.STRIPE_PRO_PRICE_ID_YR      || process.env.STRIPE_PRICE_PRO       || '',
+    ELITE:    process.env.STRIPE_ELITE_PRICE_ID_YR    || process.env.STRIPE_PRICE_INSTITUTIONAL || '',
   }
 };
 

@@ -5,20 +5,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import * as d3 from 'd3';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Network, Zap, Loader2, WifiOff, Search, Info, Maximize2, XCircle } from 'lucide-react';
+import { Network, Loader2, WifiOff, XCircle, ZoomIn, ZoomOut, Maximize2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import { OmniExplorer } from './OmniExplorer';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
+// ── Color palette ─────────────────────────────────────────────────────────────
+const NODE_COLORS: Record<number, { fill: string; glow: string; label: string }> = {
+    0: { fill: '#050505', glow: '#ffffff',  label: 'Genesis Node' },
+    1: { fill: '#FF3B30', glow: '#FF3B30',  label: 'High Risk' },
+    2: { fill: '#00C076', glow: '#00C076',  label: 'Institutional' },
+    3: { fill: '#0052FF', glow: '#0052FF',  label: 'Wallet' },
+};
+const getNodeColor = (group: number) => NODE_COLORS[group] ?? NODE_COLORS[3];
+
 export function EntityGraphVis() {
-    const svgRef = useRef<SVGSVGElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const svgRef        = useRef<SVGSVGElement>(null);
+    const containerRef  = useRef<HTMLDivElement>(null);
+    const zoomRef       = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
     const [selectedNode, setSelectedNode] = useState<any>(null);
-    const [isHeuristic, setIsHeuristic] = useState(false);
-    // mountKey increments on every mount, forcing SWR to bypass the stale cache
-    // and do a fresh network fetch each time the user opens the Entity Graph tab.
-    const [mountKey, setMountKey] = useState(0);
+    const [mountKey, setMountKey]         = useState(0);
+    const [zoomLevel, setZoomLevel]       = useState(1);
 
     const { data: matrixData, isLoading, mutate } = useSWR(
         `/api/intelligence/graph?t=${mountKey}`,
@@ -26,7 +33,6 @@ export function EntityGraphVis() {
         { refreshInterval: 0, revalidateOnFocus: false }
     );
 
-    // Force a fresh fetch every time this component mounts (tab activation)
     useEffect(() => {
         setMountKey(Date.now());
         mutate();
@@ -35,6 +41,7 @@ export function EntityGraphVis() {
 
     const isOffline = !matrixData?.graph?.nodes?.length || matrixData?.degraded;
 
+    // ── D3 render ────────────────────────────────────────────────────────────
     useEffect(() => {
         let nodes: any[] = [];
         let links: any[] = [];
@@ -46,11 +53,6 @@ export function EntityGraphVis() {
 
         if (!svgRef.current || !nodes.length) return;
 
-        // ── ResizeObserver guard ────────────────────────────────────────────────
-        // When this tab is first activated, the SVG parent container may not yet
-        // have been laid out by the browser (clientWidth = 0). We observe the
-        // container with ResizeObserver and only start the D3 simulation once we
-        // get real non-zero dimensions, preventing the invisible-graph bug.
         const parent = svgRef.current.parentElement;
         if (!parent) return;
 
@@ -61,99 +63,178 @@ export function EntityGraphVis() {
             if (hasRun || !svgRef.current) return;
             hasRun = true;
 
-        const d3Nodes = nodes.map(d => ({ ...d }));
-        const d3Links = links.map(d => ({ ...d }));
+            const d3Nodes = nodes.map(d => ({ ...d }));
+            const d3Links = links.map(d => ({ ...d }));
 
-        const svg = d3.select(svgRef.current);
-        svg.selectAll('*').remove();
+            const svg = d3.select(svgRef.current);
+            svg.selectAll('*').remove();
 
-        const g = svg.append("g");
-
-        // Zoom capability for institutional-grade inspection
-        const zoom = d3.zoom()
-            .scaleExtent([0.1, 4])
-            .on("zoom", (event) => g.attr("transform", event.transform));
-
-        svg.call(zoom as any);
-
-        const simulation = d3.forceSimulation(d3Nodes as any)
-            .force("link", d3.forceLink(d3Links).id((d: any) => d.id).distance(120))
-            .force("charge", d3.forceManyBody().strength(-400))
-            .force("center", d3.forceCenter(width / 2, height / 2))
-            .force("collide", d3.forceCollide().radius((d: any) => (d.size * 6) + 10));
-
-        const link = g.append("g")
-            .selectAll("line")
-            .data(d3Links)
-            .join("line")
-            .attr("stroke", "#ffffff10")
-            .attr("stroke-width", (d: any) => Math.sqrt(d.value) * 0.5);
-
-        const node = g.append("g")
-            .selectAll("circle")
-            .data(d3Nodes)
-            .join("circle")
-            .attr("r", (d: any) => d.size * 3)
-            .attr("fill", (d: any) => {
-                if (d.group === 0) return '#050505'; // Genesis
-                if (d.group === 1) return '#FF3B30'; // High Risk
-                if (d.group === 2) return '#00C076'; // Institutional
-                return '#0052FF'; // Regular
-            })
-            .attr("stroke", "#000000")
-            .attr("stroke-width", 2)
-            .style("cursor", "pointer")
-            .on("click", (event, d) => {
-                setSelectedNode(d);
-                toast.success(`ENTITY_ANALYSIS: ${d.label}`);
+            // ── Defs: glows ──────────────────────────────────────────────────
+            const defs = svg.append('defs');
+            Object.entries(NODE_COLORS).forEach(([group, colors]) => {
+                const filter = defs.append('filter')
+                    .attr('id', `glow-${group}`)
+                    .attr('x', '-50%').attr('y', '-50%')
+                    .attr('width', '200%').attr('height', '200%');
+                filter.append('feGaussianBlur')
+                    .attr('stdDeviation', '4')
+                    .attr('result', 'blur');
+                const feMerge = filter.append('feMerge');
+                feMerge.append('feMergeNode').attr('in', 'blur');
+                feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
             });
 
-        const label = g.append("g")
-            .selectAll("text")
-            .data(d3Nodes)
-            .join("text")
-            .text((d: any) => d.label)
-            .attr("font-size", "7px")
-            .attr("dx", 12)
-            .attr("dy", 3)
-            .attr("fill", "#ffffff20")
-            .attr("pointer-events", "none")
-            .style("font-family", "monospace")
-            .style("text-transform", "uppercase");
+            // ── Background & grid ────────────────────────────────────────────
+            svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('fill', '#0A0A0A');
 
-            simulation.on("tick", () => {
-                link.attr("x1", (d: any) => (d.source as any).x)
-                    .attr("y1", (d: any) => (d.source as any).y)
-                    .attr("x2", (d: any) => (d.target as any).x)
-                    .attr("y2", (d: any) => (d.target as any).y);
-
-                node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
-                label.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y);
-            });
-
-            // Memory/CPU Leak Prevention via Page Visibility API
-            const handleVisibilityChange = () => {
-                if (document.hidden) {
-                    simulation.stop();
-                } else {
-                    simulation.alpha(0.3).restart();
+            // Dot grid
+            const gridSpacing = 32;
+            const dotsG = svg.append('g').attr('class', 'grid-dots');
+            for (let x = 0; x < width; x += gridSpacing) {
+                for (let y = 0; y < height; y += gridSpacing) {
+                    dotsG.append('circle')
+                        .attr('cx', x).attr('cy', y)
+                        .attr('r', 0.8)
+                        .attr('fill', 'rgba(255,255,255,0.06)');
                 }
+            }
+
+            const g = svg.append('g');
+
+            // ── Zoom ─────────────────────────────────────────────────────────
+            const zoom = d3.zoom<SVGSVGElement, unknown>()
+                .scaleExtent([0.08, 5])
+                .on('zoom', (event) => {
+                    g.attr('transform', event.transform);
+                    setZoomLevel(Math.round(event.transform.k * 100) / 100);
+                });
+
+            svg.call(zoom);
+            zoomRef.current = zoom;
+
+            // ── Force simulation ─────────────────────────────────────────────
+            const simulation = d3.forceSimulation(d3Nodes as any)
+                .force('link',    d3.forceLink(d3Links).id((d: any) => d.id).distance(140))
+                .force('charge',  d3.forceManyBody().strength(-500))
+                .force('center',  d3.forceCenter(width / 2, height / 2))
+                .force('collide', d3.forceCollide().radius((d: any) => (d.size * 6) + 18));
+
+            // ── Links ────────────────────────────────────────────────────────
+            const link = g.append('g')
+                .selectAll('line')
+                .data(d3Links)
+                .join('line')
+                .attr('stroke', (d: any) => {
+                    // color based on source node's group
+                    const srcGroup = nodes.find(n => n.id === (typeof d.source === 'object' ? d.source.id : d.source))?.group ?? 3;
+                    return getNodeColor(srcGroup).glow + '40';
+                })
+                .attr('stroke-width', (d: any) => Math.max(0.5, Math.sqrt(d.value ?? 1) * 0.8));
+
+            // ── Nodes ────────────────────────────────────────────────────────
+            const node = g.append('g')
+                .selectAll('circle')
+                .data(d3Nodes)
+                .join('circle')
+                .attr('r', (d: any) => (d.size ?? 4) * 3 + 4)
+                .attr('fill', (d: any) => getNodeColor(d.group).fill)
+                .attr('stroke', (d: any) => getNodeColor(d.group).glow)
+                .attr('stroke-width', 1.5)
+                .attr('filter', (d: any) => `url(#glow-${d.group})`)
+                .style('cursor', 'pointer')
+                .on('click', (_event, d: any) => {
+                    setSelectedNode(d);
+                    toast.success(`ENTITY: ${d.label}`, { duration: 2500 });
+                })
+                .on('mouseover', function(_event, d: any) {
+                    d3.select(this)
+                        .transition().duration(200)
+                        .attr('r', (d.size ?? 4) * 3 + 8)
+                        .attr('stroke-width', 3);
+                    linkEl.attr('stroke', (l: any) => {
+                        const srcId = typeof l.source === 'object' ? l.source.id : l.source;
+                        const tgtId = typeof l.target === 'object' ? l.target.id : l.target;
+                        if (srcId === d.id || tgtId === d.id) {
+                            return getNodeColor(d.group).glow + 'CC';
+                        }
+                        return getNodeColor(nodes.find(n => n.id === srcId)?.group ?? 3).glow + '20';
+                    });
+                })
+                .on('mouseout', function(_event, d: any) {
+                    d3.select(this)
+                        .transition().duration(200)
+                        .attr('r', (d.size ?? 4) * 3 + 4)
+                        .attr('stroke-width', 1.5);
+                    linkEl.attr('stroke', (l: any) => {
+                        const srcId = typeof l.source === 'object' ? l.source.id : l.source;
+                        return getNodeColor(nodes.find(n => n.id === srcId)?.group ?? 3).glow + '40';
+                    });
+                });
+
+            // ── Labels ───────────────────────────────────────────────────────
+            const label = g.append('g')
+                .selectAll('text')
+                .data(d3Nodes)
+                .join('text')
+                .text((d: any) => d.label)
+                .attr('font-size', '8px')
+                .attr('dx', (d: any) => (d.size ?? 4) * 3 + 10)
+                .attr('dy', 3)
+                .attr('fill', (d: any) => getNodeColor(d.group).glow + 'CC')
+                .attr('pointer-events', 'none')
+                .style('font-family', 'monospace')
+                .style('text-transform', 'uppercase')
+                .style('letter-spacing', '0.08em');
+
+            // Keep reference for hover
+            const linkEl = link;
+
+            // ── Drag ─────────────────────────────────────────────────────────
+            node.call(
+                d3.drag<SVGCircleElement, any>()
+                    .on('start', (event, d: any) => {
+                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                        d.fx = d.x; d.fy = d.y;
+                    })
+                    .on('drag', (event, d: any) => { d.fx = event.x; d.fy = event.y; })
+                    .on('end', (event, d: any) => {
+                        if (!event.active) simulation.alphaTarget(0);
+                        d.fx = null; d.fy = null;
+                    }) as any
+            );
+
+            // ── Tick ─────────────────────────────────────────────────────────
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', (d: any) => d.source.x)
+                    .attr('y1', (d: any) => d.source.y)
+                    .attr('x2', (d: any) => d.target.x)
+                    .attr('y2', (d: any) => d.target.y);
+                node.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y);
+                label.attr('x', (d: any) => d.x).attr('y', (d: any) => d.y);
+            });
+
+            // Pause/resume on page visibility change
+            const handleVisibility = () => {
+                if (document.hidden) simulation.stop();
+                else simulation.alpha(0.3).restart();
             };
-            document.addEventListener('visibilitychange', handleVisibilityChange);
+            document.addEventListener('visibilitychange', handleVisibility);
 
             cleanupFn = () => {
-                document.removeEventListener('visibilitychange', handleVisibilityChange);
+                document.removeEventListener('visibilitychange', handleVisibility);
                 simulation.stop();
             };
         };
 
-        // Try immediately with current dimensions
         const immediateW = parent.clientWidth || 0;
         const immediateH = parent.clientHeight || 0;
         if (immediateW > 0 && immediateH > 0) {
             runD3(immediateW, immediateH);
         } else {
-            // Dimensions not ready — wait for layout via ResizeObserver
             const ro = new ResizeObserver((entries) => {
                 for (const entry of entries) {
                     const { width, height } = entry.contentRect;
@@ -165,124 +246,202 @@ export function EntityGraphVis() {
                 }
             });
             ro.observe(parent);
-            cleanupFn = () => { ro.disconnect(); };
+            cleanupFn = () => ro.disconnect();
         }
 
         return () => { if (cleanupFn) cleanupFn(); };
     }, [matrixData, isOffline]);
 
+    // ── Zoom helpers ─────────────────────────────────────────────────────────
+    const handleZoomIn = () => {
+        if (!svgRef.current || !zoomRef.current) return;
+        d3.select(svgRef.current).transition().duration(300).call(zoomRef.current.scaleBy, 1.4);
+    };
+    const handleZoomOut = () => {
+        if (!svgRef.current || !zoomRef.current) return;
+        d3.select(svgRef.current).transition().duration(300).call(zoomRef.current.scaleBy, 0.7);
+    };
+    const handleResetZoom = () => {
+        if (!svgRef.current || !zoomRef.current) return;
+        d3.select(svgRef.current).transition().duration(400).call(zoomRef.current.transform, d3.zoomIdentity);
+    };
+
     return (
-        <div className="w-full h-full min-h-0 flex flex-col lg:flex-row gap-4 overflow-hidden p-2">
-        {/* GRAPH PANEL */}
-        <div className="flex-1 w-full flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-2xl font-mono overflow-hidden shadow-sm shrink-0 min-h-0 relative z-10">
-            {/* ── HEADER ── */}
-            <div className="px-8 py-6 border-b border-[#E5E5E5] flex items-center justify-between shrink-0 bg-[#FAF9F6]">
-                <div className="flex items-center gap-4">
-                    <Network size={18} className="text-[#050505]" />
+        <div className="w-full h-full min-h-0 flex flex-col overflow-hidden" style={{ minHeight: 600 }}>
+
+            {/* ── HEADER ────────────────────────────────────────────────────── */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0A0A0A] shrink-0">
+                <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,192,118,0.1)', border: '1px solid rgba(0,192,118,0.25)' }}>
+                        <Network size={14} className="text-[#00C076]" />
+                    </div>
                     <div>
-                        <h2 className="text-[10px] font-bold uppercase tracking-[0.2em]">ENTITY GRAPH</h2>
-                        <span className="text-[8px] text-[#A0A0A0] uppercase tracking-widest mt-1">Multi-Entity Mapping</span>
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.25em] text-white">Entity Graph</h2>
+                        <span className="text-[8px] text-white/30 uppercase tracking-widest">Multi-Entity Capital Topology</span>
                     </div>
                 </div>
-                <div className="flex items-center gap-6">
-                    {isHeuristic && (
-                        <div className="flex items-center gap-2 text-[8px] text-[#FF3B30] border border-[#FF3B30]/30 px-3 py-1 bg-[#FF3B30]/5">
-                            <WifiOff size={10} />
-                            <span>HEURISTICS ACTIVE</span>
-                        </div>
-                    )}
-                    <div className="text-[8px] text-[#888888] font-bold uppercase tracking-[0.2em] border border-[#E5E5E5] px-3 py-1">
-                        STATE: {isOffline ? 'DEGRADED' : 'LIVE'}
+
+                <div className="flex items-center gap-2">
+                    {/* Zoom controls */}
+                    <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1 border border-white/5">
+                        <button onClick={handleZoomOut} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white transition-colors">
+                            <ZoomOut size={12} />
+                        </button>
+                        <span className="text-[9px] font-black font-mono text-white/30 px-2 tabular-nums min-w-[40px] text-center">
+                            {Math.round(zoomLevel * 100)}%
+                        </span>
+                        <button onClick={handleZoomIn} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white transition-colors">
+                            <ZoomIn size={12} />
+                        </button>
+                        <button onClick={handleResetZoom} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white transition-colors">
+                            <Maximize2 size={12} />
+                        </button>
+                    </div>
+
+                    <button
+                        onClick={() => { setMountKey(Date.now()); mutate(); }}
+                        className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors border border-white/5"
+                        title="Refresh graph"
+                    >
+                        <RefreshCw size={13} />
+                    </button>
+
+                    {/* Status pill */}
+                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[8px] font-black uppercase tracking-widest ${
+                        isOffline
+                            ? 'bg-[#FF3B30]/5 border-[#FF3B30]/20 text-[#FF3B30]'
+                            : 'bg-[#00C076]/5 border-[#00C076]/20 text-[#00C076]'
+                    }`}>
+                        {isOffline ? <WifiOff size={9} /> : <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse inline-block" />}
+                        {isOffline ? 'Degraded' : 'Live'}
                     </div>
                 </div>
             </div>
 
-            {/* ── GRAPH CANVAS ── */}
-            <div className="flex-1 relative bg-[#FFFFFF]">
+            {/* ── CANVAS ────────────────────────────────────────────────────── */}
+            <div ref={containerRef} className="flex-1 relative" style={{ background: '#0A0A0A', minHeight: 0 }}>
+
+                {/* Loading overlay */}
                 {isLoading && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-50 bg-white/50 backdrop-blur-sm">
-                        <Loader2 className="animate-spin text-[#050505]" size={32} />
-                        <span className="text-[10px] font-bold tracking-[0.2em] text-[#050505]">INDEXING ENTITIES...</span>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-50" style={{ background: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(4px)' }}>
+                        <Loader2 className="animate-spin text-[#00C076]" size={28} />
+                        <span className="text-[9px] font-black tracking-[0.25em] text-[#00C076] uppercase">Indexing Entities...</span>
                     </div>
                 )}
-                
-                <svg ref={svgRef} className="w-full h-full" />
 
-                {/* HUD Overlay */}
-                <div className="absolute bottom-8 left-8 flex flex-col gap-4 pointer-events-none">
-                    <div className="p-4 bg-white/80 border border-[#E5E5E5] backdrop-blur-md rounded">
-                        <div className="text-[8px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em] mb-2">GRAPH METRICS</div>
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                            <span className="text-[7px] text-[#A0A0A0] uppercase">TOTAL NODES:</span>
-                            <span className="text-[8px] text-[#050505] font-bold">{matrixData?.graph?.nodes?.length || 0}</span>
-                            <span className="text-[7px] text-[#A0A0A0] uppercase">TOTAL EDGES:</span>
-                            <span className="text-[8px] text-[#050505] font-bold">{matrixData?.graph?.links?.length || 0}</span>
-                        </div>
+                {/* Empty state */}
+                {!isLoading && isOffline && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-40">
+                        <WifiOff size={32} className="text-white/10" />
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white/20">Graph Unavailable</p>
+                        <p className="text-[9px] text-white/10">The entity intelligence layer is offline</p>
                     </div>
+                )}
 
-                    {/* Node Legend */}
-                    <div className="p-4 bg-white/80 border border-[#E5E5E5] backdrop-blur-md rounded flex flex-col gap-2 mt-2">
-                        <div className="text-[8px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em] mb-1">NODE LEGEND</div>
-                        <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#050505]"></div> Genesis Node</div>
-                        <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#00C076]"></div> Institutional Hub</div>
-                        <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#0052FF]"></div> Regular Wallet</div>
-                        <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#FF3B30]"></div> High Risk Entity</div>
+                <svg ref={svgRef} className="w-full h-full" style={{ display: 'block' }} />
+
+                {/* ── Legend ────────────────────────────────────────────────── */}
+                <div className="absolute bottom-5 left-5 flex flex-col gap-2 pointer-events-none">
+                    <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)' }}>
+                        <div className="px-4 py-2.5 border-b border-white/5">
+                            <span className="text-[8px] font-black uppercase tracking-widest text-white/30">Node Legend</span>
+                        </div>
+                        <div className="px-4 py-3 flex flex-col gap-2">
+                            {Object.entries(NODE_COLORS).map(([group, colors]) => (
+                                <div key={group} className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: colors.fill, boxShadow: `0 0 6px ${colors.glow}` }} />
+                                    <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: colors.glow + 'BB' }}>
+                                        {colors.label}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Selection details */}
+                {/* ── Stats HUD ─────────────────────────────────────────────── */}
+                <div className="absolute bottom-5 right-5 pointer-events-none">
+                    <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)' }}>
+                        <div className="px-4 py-2.5 border-b border-white/5">
+                            <span className="text-[8px] font-black uppercase tracking-widest text-white/30">Graph Metrics</span>
+                        </div>
+                        <div className="px-4 py-3 grid grid-cols-2 gap-x-8 gap-y-2">
+                            <span className="text-[7px] uppercase tracking-wider text-white/20">Nodes</span>
+                            <span className="text-[9px] font-black font-mono text-white">{matrixData?.graph?.nodes?.length ?? 0}</span>
+                            <span className="text-[7px] uppercase tracking-wider text-white/20">Edges</span>
+                            <span className="text-[9px] font-black font-mono text-white">{matrixData?.graph?.links?.length ?? 0}</span>
+                            <span className="text-[7px] uppercase tracking-wider text-white/20">Zoom</span>
+                            <span className="text-[9px] font-black font-mono text-[#00C076]">{Math.round(zoomLevel * 100)}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Selected Node Panel ───────────────────────────────────── */}
                 <AnimatePresence>
                     {selectedNode && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="absolute top-8 right-8 w-64 bg-white/95 border border-[#E5E5E5] rounded p-6 backdrop-blur-md pointer-events-auto shadow-sm"
+                            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                            className="absolute top-5 right-5 w-64 rounded-xl border border-white/10 overflow-hidden pointer-events-auto"
+                            style={{ background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(16px)' }}
                         >
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="text-[7px] text-[#A0A0A0] font-bold uppercase tracking-[0.1em]">ENTITY DATA</div>
-                                <XCircle size={12} className="cursor-pointer text-[#A0A0A0] hover:text-[#050505]" onClick={() => setSelectedNode(null)} />
+                            {/* Panel header */}
+                            <div
+                                className="flex items-center justify-between px-5 py-3 border-b border-white/5"
+                                style={{ background: getNodeColor(selectedNode.group).glow + '08' }}
+                            >
+                                <span className="text-[8px] font-black uppercase tracking-[0.2em]" style={{ color: getNodeColor(selectedNode.group).glow }}>
+                                    Entity Analysis
+                                </span>
+                                <button onClick={() => setSelectedNode(null)} className="p-0.5 hover:opacity-70 transition-opacity">
+                                    <XCircle size={13} className="text-white/30" />
+                                </button>
                             </div>
-                            
-                            <h3 className="text-xs font-bold text-[#050505] uppercase tracking-[0.1em] mb-4 truncate">{selectedNode.label}</h3>
-                            
-                            <div className="space-y-4">
-                                <div className="border-l-2 border-[#050505] pl-3">
-                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">LAYER TYPE</div>
-                                    <div className="text-[9px] font-bold uppercase text-[#050505]">
-                                        {selectedNode.group === 0 ? 'GENESIS ORIGIN' : 
-                                         selectedNode.group === 1 ? 'FLAGGED HIGH-RISK RECIPIENT' : 
-                                         selectedNode.group === 2 ? 'INSTITUTIONAL LIQUIDITY HUB' : 
-                                         'STANDARD PARTICIPANT WALLET'}
+
+                            <div className="px-5 py-4 flex flex-col gap-4">
+                                {/* Node name with glow dot */}
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: getNodeColor(selectedNode.group).fill, boxShadow: `0 0 8px ${getNodeColor(selectedNode.group).glow}` }} />
+                                    <h3 className="text-[11px] font-black text-white uppercase tracking-wide truncate">{selectedNode.label}</h3>
+                                </div>
+
+                                {[
+                                    { label: 'Layer Type', value: selectedNode.group === 0 ? 'Genesis Origin' : selectedNode.group === 1 ? 'Flagged High-Risk' : selectedNode.group === 2 ? 'Institutional Hub' : 'Standard Wallet', color: getNodeColor(selectedNode.group).glow },
+                                    { label: 'Wallet Address', value: selectedNode.address || '—', color: 'rgba(255,255,255,0.4)' },
+                                    { label: 'Network Weight', value: String(selectedNode.weight ?? selectedNode.size ?? '—'), color: '#00C076' },
+                                    { label: 'Connections', value: String(selectedNode.connections ?? '—'), color: 'rgba(255,255,255,0.4)' },
+                                ].map(({ label, value, color }) => (
+                                    <div key={label} className="flex flex-col gap-0.5">
+                                        <span className="text-[7px] uppercase tracking-[0.2em] text-white/20 font-black">{label}</span>
+                                        <span className="text-[10px] font-bold font-mono break-all" style={{ color }}>{value}</span>
                                     </div>
-                                </div>
-                                <div className="border-l-2 border-[#0052FF] pl-3">
-                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">WALLET ADDRESS</div>
-                                    <div className="text-[9px] font-mono text-[#050505] break-all">{selectedNode.address || '—'}</div>
-                                </div>
-                                <div className="border-l-2 border-[#00C076] pl-3">
-                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">NETWORK WEIGHT</div>
-                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{selectedNode.weight ?? selectedNode.size ?? '—'}</div>
-                                </div>
-                                <div className="border-l-2 border-[#FF3B30] pl-3">
-                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">CONNECTIONS</div>
-                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{selectedNode.connections ?? '—'}</div>
-                                </div>
+                                ))}
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {/* Tip */}
+                <div className="absolute top-5 left-5 pointer-events-none">
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-white/15">
+                        Scroll to zoom · drag nodes · click to inspect
+                    </span>
+                </div>
             </div>
 
-            {/* ── FOOTER ── */}
-            <div className="px-8 py-3 border-t border-[#E5E5E5] bg-[#FAF9F6] flex justify-between items-center text-[8px] font-bold text-[#A0A0A0] uppercase tracking-[0.2em] shrink-0">
+            {/* ── FOOTER ────────────────────────────────────────────────────── */}
+            <div className="px-6 py-3 border-t border-white/5 bg-[#0A0A0A] flex justify-between items-center text-[7px] font-bold uppercase tracking-[0.2em] text-white/20 shrink-0">
                 <div className="flex items-center gap-4">
-                    <span>RENDER LAYER: D3</span>
-                    <span>DATABASE: NEO4J CLUSTER</span>
+                    <span>Render: D3 Force Graph</span>
+                    <span>Database: Neo4j Cluster</span>
                 </div>
-                <span>GRAPH VERIFIED</span>
+                <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
+                    Entity Intelligence v2.0
+                </span>
             </div>
-        </div>
         </div>
     );
 }
