@@ -203,29 +203,20 @@ export const useWalletStore = create<WalletState>()(
       },
 
       updateBalance: async () => {
-        const { address, activeNetwork, activeProtocol, isUpdatingBalance } = get();
+        const { address, activeNetwork, isUpdatingBalance } = get();
         if (!address || isUpdatingBalance) return;
         
         set({ isUpdatingBalance: true });
 
         try {
           const networkData = NETWORKS[activeNetwork];
-          const provider = activeProtocol === 'WSS' 
-            ? new ethers.WebSocketProvider(networkData.wss)
-            : new ethers.JsonRpcProvider(networkData.rpc);
+          // [INSTITUTIONAL OPTIMIZATION]
+          // Never use WebSockets for one-off stateless requests like getBalance.
+          // WSS Handshakes are extremely heavy. We force JsonRpcProvider for all state-reads
+          // to ensure instantaneous UI rendering and zero connection drops.
+          const provider = new ethers.JsonRpcProvider(networkData.rpc);
 
-          let rawBalance;
-          try {
-             rawBalance = await provider.getBalance(address);
-          } catch (failoverError) {
-             if (activeProtocol === 'WSS') {
-                console.warn("[Auto-Heal] WSS terminated unexpectedly. Routing via RPC rescue node.");
-                const fallbackNode = new ethers.JsonRpcProvider(networkData.rpc);
-                rawBalance = await fallbackNode.getBalance(address);
-             } else {
-                 throw failoverError;
-             }
-          }
+          let rawBalance = await provider.getBalance(address);
 
           const oldBalanceValue = parseFloat(get().balance || "0");
           let numericBalance = parseFloat(ethers.formatEther(rawBalance));
@@ -241,9 +232,6 @@ export const useWalletStore = create<WalletState>()(
           const displayBalance = numericBalance === 0 ? "0.0" : numericBalance < 0.0001 ? "<0.0001" : numericBalance.toFixed(4);
           set({ balance: displayBalance });
 
-          if (activeProtocol === 'WSS' && 'destroy' in provider) {
-             (provider as any).destroy();
-          }
         } catch (error) {
           console.error("Failed to sync balance:", error);
         } finally {

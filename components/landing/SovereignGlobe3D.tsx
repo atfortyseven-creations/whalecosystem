@@ -207,6 +207,17 @@ function HighFidelityPointGlobe() {
     return { pointsGeometry: geo, pointsMaterial: mat, wireGeometry: wGeo };
   }, [mapState.texture]);
 
+  // [INSTITUTIONAL OPTIMIZATION]: Prevent WebGL VRAM leaks
+  // React Three Fiber does not auto-dispose manually created objects.
+  useEffect(() => {
+    return () => {
+      pointsGeometry.dispose();
+      pointsMaterial.dispose();
+      wireGeometry.dispose();
+      if (mapState.texture) mapState.texture.dispose();
+    };
+  }, [pointsGeometry, pointsMaterial, wireGeometry, mapState.texture]);
+
   // If loading, show nothing
   if (!mapState.texture && !mapState.failed) return null;
 

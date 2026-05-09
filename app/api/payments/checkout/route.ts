@@ -32,12 +32,20 @@ export async function POST(req: NextRequest) {
         }
 
         // SIWE-native: userId is always a walletAddress
-        const user = await prisma.user.findUnique({
-            where: { walletAddress: userId }
+        const user = await prisma.user.upsert({
+            where: { walletAddress: userId },
+            update: {},
+            create: { walletAddress: userId, tier: 'FREE' }
         });
 
         if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+            return NextResponse.json({ error: 'Failed to resolve user' }, { status: 404 });
+        }
+
+        const priceId = PRICE_IDS[billingCycle][tier];
+        if (priceId.includes('PLACEHOLDER')) {
+            // Development fallback for unconfigured Stripe prices. Avoids throwing 400 errors.
+            return NextResponse.json({ url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?tab=billing` });
         }
 
         // Create Stripe Checkout Session
@@ -50,7 +58,7 @@ export async function POST(req: NextRequest) {
             },
             line_items: [
                 {
-                    price: PRICE_IDS[billingCycle][tier],
+                    price: priceId,
                     quantity: 1,
                 },
             ],

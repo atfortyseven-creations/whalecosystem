@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect, useBalance, useEnsName } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
@@ -455,18 +456,21 @@ function ConnectedScreen({
         </motion.button>
 
         {/* ── Forum CTA ── */}
-        <motion.a
-          href="/forum"
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.6 }}
-          whileTap={{ scale: 0.97 }}
-          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black uppercase tracking-widest border border-black/10 bg-white hover:bg-[#FAF9F6] active:bg-[#F5F4EF] transition-colors"
-          style={{ fontSize: "12px", color: "#050505" }}
+          className="w-full"
         >
-          <MessageSquare size={16} />
-          Access Sovereign Forum
-        </motion.a>
+          <Link
+            href="/forum"
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black uppercase tracking-widest border border-black/10 bg-white hover:bg-[#FAF9F6] active:bg-[#F5F4EF] active:scale-[0.97] transition-all duration-200"
+            style={{ fontSize: "12px", color: "#050505" }}
+          >
+            <MessageSquare size={16} />
+            Access Sovereign Forum
+          </Link>
+        </motion.div>
 
 
         {/* ── Disconnect session button ── */}

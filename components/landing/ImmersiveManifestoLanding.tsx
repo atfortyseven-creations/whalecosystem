@@ -270,6 +270,40 @@ export function ImmersiveManifestoLanding({
         )}
       </section>
 
+      {/* ── THE MEMPOOL SPACE (ABSOLUTELY INHUMAN PERFECTION) ───────────────── */}
+      <section className="w-full border-b border-black/8 bg-[#FDFCF8] overflow-hidden relative">
+        <div className="w-full border-b border-black/8 px-6 md:px-12 py-16 flex flex-col md:flex-row justify-between items-end gap-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/30 mb-3">Layer 1 Omniscience</p>
+            <h2 className="text-[32px] sm:text-[44px] font-black tracking-tighter uppercase leading-none">
+              The Mempool.<br /><span className="text-black/25">Absolute truth.</span>
+            </h2>
+          </div>
+          <p className="font-serif text-[14px] text-black/50 max-w-sm text-left md:text-right leading-relaxed">
+            Real-time visualization of unconfirmed transactions and block execution. Every byte of institutional capital flows through here.
+          </p>
+        </div>
+        
+        <div className="w-full h-[850px] relative bg-[#FDFCF8]">
+          {/* 
+            Inhuman styling: 
+            invert(1) -> makes dark background white
+            grayscale(1) -> strips noisy colors for pure monochrome brutalism
+            contrast(1.1) brightness(1.15) -> matches the #FDFCF8 background perfectly 
+          */}
+          <iframe 
+            src="https://mempool.space" 
+            title="Mempool Explorer"
+            className="w-full h-[120%] -mt-[5%] border-none mix-blend-multiply"
+            style={{ 
+              filter: "invert(1) grayscale(1) contrast(1.1) brightness(1.15)"
+            }}
+          />
+          {/* Gradient fade to seamlessly blend the bottom edge */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#FDFCF8] to-transparent pointer-events-none" />
+        </div>
+      </section>
+
       {/* ── FEATURES ──────────────────────────────────────────────────────────── */}
       <section className="w-full border-b border-black/8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-px bg-black/8">

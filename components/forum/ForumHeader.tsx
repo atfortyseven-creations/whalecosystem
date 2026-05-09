@@ -60,17 +60,20 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
             Categories
           </Link>
           <Link href="/forum?filter=latest" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            Latest Posts
+            Latest
           </Link>
           <Link href="/forum?filter=new" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            New Posts
-          </Link>
-          <Link href="/forum?filter=unread" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            Unread
+            New
           </Link>
           <Link href="/forum?filter=top" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            Top Posts
+            Top
           </Link>
+          <div className="w-px h-4 bg-black/10 dark:bg-white/10 shrink-0 mx-2" />
+          {navLinks.slice(1).map(n => (
+            <Link key={n.href} href={n.href} className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
+              {n.label}
+            </Link>
+          ))}
         </div>
       </div>
     </>

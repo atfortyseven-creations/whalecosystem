@@ -14,8 +14,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 where: { id: topicId },
                 data: { views: { increment: 1 } }
             });
-        } catch (e) {
-            console.warn('[API] Failed to increment views (likely schema mismatch)', e);
+        } catch (e: any) {
+            // Silently ignore P2025 (Record to update not found) to maintain absolute log purity
+            if (e.code !== 'P2025') {
+                console.warn('[API] Non-critical error incrementing views:', e.message);
+            }
         }
 
         const topic = await (prisma as any).forumTopic.findUnique({

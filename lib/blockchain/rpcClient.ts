@@ -61,8 +61,13 @@ export const getPolWsClient = () => {
     return _polClient;
 };
 
+// ETH HTTP: GetBlock Registry primero, Alchemy segundo, público de emergencia
+const ETH_HTTP_URL = 
+    process.env.NEXT_PUBLIC_ETH_RPC_URL || 
+    (ALCHEMY_KEY ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}` : 'https://cloudflare-eth.com');
+
 // ── HTTP client para fetching de bloques/receipts cuando WS pushea un hash ──
 export const ethHttpClient = createPublicClient({
     chain: mainnet,
-    transport: http(),
+    transport: http(ETH_HTTP_URL),
 });

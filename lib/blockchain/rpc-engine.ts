@@ -50,6 +50,16 @@ async function hashRequest(body: string): Promise<string> {
 
 const CACHEABLE_METHODS = ['eth_call', 'eth_chainId', 'eth_blockNumber', 'eth_gasPrice'];
 
+// Limpieza automática (Garbage Collection) para evitar fugas de memoria OOM en el contenedor
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of rpcCache.entries()) {
+    if (value.expiry <= now) {
+      rpcCache.delete(key);
+    }
+  }
+}, 60000); // Limpia cada minuto
+
 const memoizedFetch = (url: string) => {
   return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     if (init?.method === 'POST' && typeof init.body === 'string') {
@@ -62,12 +72,14 @@ const memoizedFetch = (url: string) => {
         if (isReadMethod) {
           const cacheKey = `${url}_${await hashRequest(init.body)}`;
           const cached = rpcCache.get(cacheKey);
+          
           if (cached && cached.expiry > Date.now()) {
             return new Response(JSON.stringify(cached.data), {
               status: 200,
               headers: { 'Content-Type': 'application/json' },
             });
           }
+          
           const response = await fetch(input, init);
           if (response.ok) {
             const clone = response.clone();

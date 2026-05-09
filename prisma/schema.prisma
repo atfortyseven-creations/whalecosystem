@@ -699,6 +699,8 @@ model Transaction {
   metadata    Json?   @default("{}")
 
   @@index([authUserId])
+  // [INSTITUTIONAL OPTIMIZATION] - Previene ataque DDoS (Sequential Scan) en el endpoint /api/payment/confirm
+  @@index([fromAddress, type, timestamp(sort: Desc)])
 }
 
 model SocialRecovery {

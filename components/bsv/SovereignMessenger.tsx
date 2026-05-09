@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Shield, User, Zap, MessageSquare, Activity, Globe } from 'lucide-react';
 import { useCWI } from '@/lib/bsv/CWIContext';
 import { toast } from 'sonner';
+import useSWR from 'swr';
 
 /**
  * SOVEREIGN MESSENGER (Pillar 3 - Phase 2)
@@ -19,21 +20,25 @@ export const SovereignMessenger = () => {
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const loadMessages = async () => {
-        try {
-            const res = await fetch('/api/chat/sync');
-            const data = await res.json();
-            setMessages(data.messages.reverse());
-        } catch (e) {
-            console.error('Messenger Load Error', e);
+    const { data: syncData, mutate } = useSWR(
+        '/api/chat/sync',
+        async (url) => {
+            const res = await fetch(url);
+            return res.json();
+        },
+        { 
+            refreshInterval: 5000,
+            revalidateOnFocus: true,
+            // Detiene el polling si el usuario cambia de pestaña, ahorrando batería y ancho de banda
+            isPaused: () => typeof document !== 'undefined' && document.hidden 
         }
-    };
+    );
 
     useEffect(() => {
-        loadMessages();
-        const i = setInterval(loadMessages, 5000);
-        return () => clearInterval(i);
-    }, []);
+        if (syncData?.messages) {
+            setMessages([...syncData.messages].reverse());
+        }
+    }, [syncData]);
 
     useEffect(() => {
         if (scrollRef.current) {
