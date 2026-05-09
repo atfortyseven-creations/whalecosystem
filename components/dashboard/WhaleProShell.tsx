@@ -416,7 +416,7 @@ export function WhaleProShell({
                 </motion.div>
             )}
 
-            {isTierLoaded && tier === 'FREE' && activeTab !== 'billing' && (
+            {isTierLoaded && tier === 'FREE' && RESTRICTED_TABS.includes(activeTab) && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

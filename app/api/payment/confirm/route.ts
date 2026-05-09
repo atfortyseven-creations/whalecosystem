@@ -23,10 +23,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { reference, planId, billingCycle, priceEur, email, walletAddress: rawWalletAddress } = body;
     
-    // Identity resolution: we require email for billing now.
-    const walletAddress = (rawWalletAddress && rawWalletAddress !== 'manual_sepa_user') 
-      ? rawWalletAddress 
-      : `sepa_${email.replace(/[^a-zA-Z0-9]/g, '')}`;
+    // ── STRICT IDENTITY ENFORCEMENT ──
+    // Zero-Trust policy: A connected Web3 wallet is strictly required to bind the institutional license.
+    if (!rawWalletAddress || rawWalletAddress === 'manual_sepa_user') {
+      return NextResponse.json({ error: 'A connected Web3 Wallet is strictly required to issue an Institutional License. Please connect your wallet first.' }, { status: 401 });
+    }
+
+    const walletAddress = rawWalletAddress.toLowerCase();
 
     if (!reference || !planId || !walletAddress || !billingCycle || !priceEur || !email) {
       return NextResponse.json({ error: 'Missing required billing fields (email, reference, etc.)' }, { status: 400 });
@@ -93,21 +96,27 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Update or Create Subscription Record as PENDING
-    await prisma.subscription.upsert({
-      where: { userId: walletAddress.toLowerCase() },
-      update: {
-        status: 'PENDING_SEPA',
-        tier: `${planId}_${billingCycle.toUpperCase()}`,
-        expiresAt: expiresAt,
-      },
-      create: {
-        userId: walletAddress.toLowerCase(),
-        status: 'PENDING_SEPA',
-        tier: `${planId}_${billingCycle.toUpperCase()}`,
-        expiresAt: expiresAt,
-      }
-    });
+    const isCurrentlyActive = existingSub && existingSub.status === 'ACTIVE' && existingSub.expiresAt > now;
+
+    // 3. Update or Create Subscription Record as PENDING (Only if they don't already have an active pass)
+    // IMPORTANT: If they have an ACTIVE plan, we do NOT overwrite it to PENDING_SEPA, 
+    // otherwise they lose access to their current tier while waiting for the bank transfer!
+    if (!isCurrentlyActive) {
+      await prisma.subscription.upsert({
+        where: { userId: walletAddress.toLowerCase() },
+        update: {
+          status: 'PENDING_SEPA',
+          tier: `${planId}_${billingCycle.toUpperCase()}`,
+          expiresAt: expiresAt,
+        },
+        create: {
+          userId: walletAddress.toLowerCase(),
+          status: 'PENDING_SEPA',
+          tier: `${planId}_${billingCycle.toUpperCase()}`,
+          expiresAt: expiresAt,
+        }
+      });
+    }
 
     // 4. Record the SEPA Transaction
     await prisma.transaction.create({

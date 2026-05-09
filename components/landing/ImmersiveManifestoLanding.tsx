@@ -24,6 +24,7 @@ import Link from "next/link";
 import { ArrowRight, Scan, MessageSquare, ChevronRight, Shield, Zap, Globe2 } from "lucide-react";
 import { useEthMetrics } from "@/hooks/useEthMetrics";
 import { PRICING_TIERS } from "@/lib/config/pricing-tiers";
+import { StackableCarousel } from "@/components/ui/StackableCarousel";
 
 // Lottie loaded dynamically — no SSR (uses DOM APIs)
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
@@ -284,23 +285,26 @@ export function ImmersiveManifestoLanding({
           </p>
         </div>
         
-        <div className="w-full h-[850px] relative bg-[#FDFCF8]">
-          {/* 
-            Inhuman styling: 
-            invert(1) -> makes dark background white
-            grayscale(1) -> strips noisy colors for pure monochrome brutalism
-            contrast(1.1) brightness(1.15) -> matches the #FDFCF8 background perfectly 
-          */}
-          <iframe 
-            src="https://mempool.space" 
-            title="Mempool Explorer"
-            className="w-full h-[120%] -mt-[5%] border-none mix-blend-multiply"
-            style={{ 
-              filter: "invert(1) grayscale(1) contrast(1.1) brightness(1.15)"
-            }}
-          />
-          {/* Gradient fade to seamlessly blend the bottom edge */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#FDFCF8] to-transparent pointer-events-none" />
+        <div className="w-full relative bg-[#FDFCF8] py-12">
+          <StackableCarousel className="w-full" itemClassName="w-[85vw] md:w-[800px] hover:scale-[1.02] transition-transform duration-500 cursor-grab active:cursor-grabbing">
+            {[
+              "/system-shots/Captura de pantalla 2026-05-07 012904.png",
+              "/system-shots/Captura de pantalla 2026-05-07 032204.png",
+              "/system-shots/Captura de pantalla 2026-05-10 002811.png",
+              "/system-shots/Captura de pantalla 2026-05-10 002900.png",
+              "/system-shots/Captura de pantalla 2026-05-10 002953.png"
+            ].map((src, idx) => (
+              <img 
+                key={idx}
+                src={src} 
+                className="w-full h-auto rounded-xl shadow-2xl border border-black/10 object-cover" 
+                alt={`Platform screenshot ${idx + 1}`} 
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect width="800" height="500" fill="%23f5f4ef"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="14" fill="%23aaa">Image synced via Sovereign API. Refreshing cache...</text></svg>'
+                }}
+              />
+            ))}
+          </StackableCarousel>
         </div>
       </section>
 

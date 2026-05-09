@@ -20,6 +20,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
 import { PRICING_TIERS } from "@/lib/config/pricing-tiers";
+import { StackableCarousel } from "@/components/ui/StackableCarousel";
 
 // ─── Live whale flow fetcher ───────────────────────────────────────────────────
 interface Flow {
@@ -283,6 +284,39 @@ export function MobileManifesto() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── 3.5 THE PLATFORM ─────────────────────────────────────────────────── */}
+      <section className="py-14 border-b border-black/8 bg-[#FDFCF8]">
+        <div className="px-6 mb-8">
+          <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/30 block mb-3">
+            Interface
+          </span>
+          <h2 className="font-black text-[26px] tracking-tighter uppercase leading-tight">
+            Terminal.<br />
+            <span className="text-black/20">Absolute truth.</span>
+          </h2>
+        </div>
+
+        <StackableCarousel className="w-full" itemClassName="w-[85vw]">
+          {[
+            "/system-shots/Captura de pantalla 2026-05-07 012904.png",
+            "/system-shots/Captura de pantalla 2026-05-07 032204.png",
+            "/system-shots/Captura de pantalla 2026-05-10 002811.png",
+            "/system-shots/Captura de pantalla 2026-05-10 002900.png",
+            "/system-shots/Captura de pantalla 2026-05-10 002953.png"
+          ].map((src, idx) => (
+            <img 
+              key={idx}
+              src={src} 
+              className="w-full h-auto rounded-xl shadow-lg border border-black/10 object-cover" 
+              alt={`Platform screenshot ${idx + 1}`} 
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f5f4ef"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="12" fill="%23aaa">Image synced via Sovereign API.</text></svg>'
+              }}
+            />
+          ))}
+        </StackableCarousel>
       </section>
 
       {/* ── 4. LIVE FLOWS ─────────────────────────────────────────────────────── */}

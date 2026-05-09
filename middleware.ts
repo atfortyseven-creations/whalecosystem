@@ -348,8 +348,8 @@ export default async function middleware(request: NextRequest) {
       'Permissions-Policy': 'camera=(self), microphone=(), geolocation=(), payment=(self)',
       'Expect-CT': 'enforce, max-age=86400',
       'X-Permitted-Cross-Domain-Policies': 'none',
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups', // Relaxed to allow WalletConnect popups
+      // 'Cross-Origin-Embedder-Policy' removed to allow Stripe, MoonPay, and external images to load without strict CORP requirements
     };
 
     const isInternalRoute = matchesPattern(pathname, PROTECTED_PATTERNS) || pathname.startsWith('/api');
