@@ -20,6 +20,6 @@ export const PRICE_IDS: Record<string, string> = {
   STANDARD: process.env.STRIPE_STANDARD_PRICE_ID || process.env.STRIPE_PRICE_STANDARD || 'ST_PLAN_STANDARD_PLACEHOLDER',
   STARTER: process.env.STRIPE_STARTER_PRICE_ID || process.env.STRIPE_PRICE_STARTER || 'ST_PLAN_STARTER_PLACEHOLDER',
   PRO: process.env.STRIPE_PRO_PRICE_ID || process.env.STRIPE_PRICE_PRO || 'ST_PLAN_PRO_PLACEHOLDER',
-  Elite: process.env.STRIPE_Elite_PRICE_ID || process.env.STRIPE_PRICE_Elite || 'ST_PLAN_Elite_PLACEHOLDER',
+  ELITE: process.env.STRIPE_ELITE_PRICE_ID || process.env.STRIPE_PRICE_ELITE || 'ST_PLAN_ELITE_PLACEHOLDER',
 };
 

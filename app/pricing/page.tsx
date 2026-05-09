@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, Settings, Building2, CheckCircle2, Copy } from 'lucide-react';
+import { Loader2, Settings, CheckCircle2 } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 
 const TIER_HIERARCHY: Record<string, number> = {
@@ -73,7 +73,7 @@ const PRICING_TIERS = [
 const FAQS = [
   {
     question: 'How does billing work?',
-    answer: 'Payments are processed securely via SEPA Bank Transfer in Euros (€). Once you request an upgrade, you will receive an invoice with the transfer instructions. Your account tier is upgraded immediately while the transfer settles.',
+    answer: 'Payments are processed securely via Stripe. You can pay using major credit cards or SEPA Direct Debit. Your account tier is upgraded automatically upon successful payment.',
   },
   {
     question: 'Do I need a crypto wallet?',
@@ -81,20 +81,13 @@ const FAQS = [
   },
   {
     question: 'How are invoices sent?',
-    answer: 'A highly detailed HTML invoice is automatically emailed to you the moment you initiate the upgrade. It contains the required Bank Details (IBAN/BIC) and your unique Transfer Reference.',
+    answer: 'A professional invoice is automatically emailed to you the moment your payment is confirmed. You can also manage your billing history in your dashboard.',
   },
   {
     question: 'Is there a refund policy?',
     answer: 'Because premium plans grant immediate, unlimited access to proprietary on-chain intelligence feeds, we do not offer refunds on active billing cycles.',
   },
 ];
-
-const BANK_DETAILS = {
-  beneficiary: 'STEFAN-ANTONIO CIRISANU',
-  iban: 'ES52 1583 0001 1090 8640 3529',
-  bic: 'REVOESM2',
-  bank: 'Revolut Bank UAB, Madrid, Spain'
-};
 
 function PricingContent() {
   const { isConnected, isSovereignHandshake, address } = useSovereignAccount();
@@ -104,14 +97,6 @@ function PricingContent() {
   const [isTierLoaded, setIsTierLoaded] = useState<boolean>(false);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   
-  // Checkout Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [emailInput, setEmailInput] = useState('');
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [generatedRef, setGeneratedRef] = useState('');
-  const [checkoutStep, setCheckoutStep] = useState<'input' | 'success'>('input');
-  
   const { open } = useAppKit();
 
   useEffect(() => {
@@ -120,7 +105,6 @@ function PricingContent() {
       .then(data => {
         if (data?.user?.tier) {
           setCurrentTier(data.user.tier.split('_')[0].toUpperCase());
-          if (data.user.email) setEmailInput(data.user.email);
         }
       })
       .catch(() => {})
@@ -129,70 +113,41 @@ function PricingContent() {
 
   const currentTierLevel = TIER_HIERARCHY[currentTier] || 0;
 
-  const handleSubscribeClick = (planId: string) => {
+  const handleSubscribeClick = async (planId: string) => {
     if (currentTierLevel >= (TIER_HIERARCHY[planId] || 0)) {
       toast.info('Already on this plan or higher'); return;
     }
     
-    // Generate a secure, professional transfer reference
-    const timestamp = Date.now().toString().slice(-4);
-    const randomHex = Math.random().toString(16).slice(2, 6).toUpperCase();
-    setGeneratedRef(`INV-${planId}-${timestamp}-${randomHex}`);
-    
-    setSelectedPlanId(planId);
-    setCheckoutStep('input');
-    setIsModalOpen(true);
-  };
-
-  const handleConfirmTransfer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!emailInput || !emailInput.includes('@')) {
-      toast.error('Email inválido', { description: 'Introduce una dirección de email válida.' });
+    if (!isConnected || !address) {
+      toast.info('Please connect your wallet first');
+      open({ view: 'Connect' });
       return;
     }
-    if (!selectedPlanId) return;
-    if (!generatedRef) return;
     
-    setIsConfirming(true);
-    toast.loading('Generando factura...', { id: 'invoice-tx' });
+    setLoadingTier(planId);
     
     try {
-      const r = await fetch('/api/payment/confirm', {
+      const r = await fetch('/api/payments/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          reference: generatedRef,
-          planId: selectedPlanId,
-          billingCycle,
-          priceEur: TIER_PRICES[selectedPlanId][billingCycle],
-          email: emailInput,
-          walletAddress: address || 'manual_sepa_user',
+          tier: planId,
+          isAnnual: billingCycle === 'annual',
         }),
       });
 
-      const d = await r.json();
+      const data = await r.json();
 
-      if (r.ok) {
-        toast.success('¡Acceso desbloqueado!', { id: 'invoice-tx', description: 'Factura enviada a tu email.' });
-        setCheckoutStep('success');
-        setTimeout(() => {
-          setIsModalOpen(false);
-          router.push('/dashboard?tab=billing');
-        }, 4000);
+      if (r.ok && data.url) {
+        window.location.href = data.url;
       } else {
-        throw new Error(d.error || 'Error al procesar la solicitud');
+        throw new Error(data.error || 'Failed to initialize checkout');
       }
     } catch (err: any) {
-      toast.error('Error al generar factura', { id: 'invoice-tx', description: err.message });
+      toast.error('Checkout error', { description: err.message });
     } finally {
-      setIsConfirming(false);
       setLoadingTier(null);
     }
-  };
-
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard`);
   };
 
   return (
@@ -201,88 +156,7 @@ function PricingContent() {
 
       <main className="w-full max-w-5xl mx-auto px-6 py-16 md:py-28">
 
-        {/* SEPA Checkout Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-            <div className="bg-white rounded-2xl max-w-[500px] w-full shadow-2xl border border-black/10 relative overflow-hidden flex flex-col">
-              
-              <div className="bg-[#050505] text-white px-8 py-6 relative">
-                  {!isConfirming && checkoutStep !== 'success' && (
-                    <button
-                        onClick={() => { setIsModalOpen(false); setLoadingTier(null); }}
-                        className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors text-xl leading-none"
-                    >✕</button>
-                  )}
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-1 flex items-center gap-2">
-                    <Building2 size={12} /> Institutional Checkout
-                  </p>
-                  <h3 className="text-2xl font-bold tracking-tight">
-                    {selectedPlanId ? PRICING_TIERS.find(t => t.id === selectedPlanId)?.name : ''} Plan
-                  </h3>
-              </div>
 
-              <div className="p-8">
-                  {checkoutStep === 'input' ? (
-                      <form onSubmit={handleConfirmTransfer} className="flex flex-col gap-6">
-                        
-                        <div className="flex items-center justify-between border-b border-black/10 pb-6">
-                            <div>
-                                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-black/40">Amount Due</p>
-                                <p className="text-3xl font-black mt-1">€{selectedPlanId ? TIER_PRICES[selectedPlanId][billingCycle] : ''} <span className="text-sm font-medium text-black/40">EUR</span></p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-black/40">Billing Cycle</p>
-                                <p className="text-sm font-bold mt-1 capitalize">{billingCycle}</p>
-                            </div>
-                        </div>
-
-                        <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-xl">
-                            <p className="text-sm font-semibold text-blue-900 mb-1">Guaranteed Access Policy</p>
-                            <p className="text-xs text-blue-800/70 leading-relaxed">
-                                Enter your email below to instantly unlock the platform. We will email you the official invoice with the bank details (IBAN). You have 48 hours to complete the SEPA transfer.
-                            </p>
-                        </div>
-
-                        <div>
-                            <label className="block text-[11px] font-bold uppercase tracking-[0.15em] text-black/60 mb-2">Billing Email Address</label>
-                            <input
-                                type="email" required value={emailInput}
-                                onChange={e => setEmailInput(e.target.value)}
-                                placeholder="institution@example.com"
-                                className="w-full px-4 py-3.5 text-sm bg-black/[0.02] border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C076]/40 focus:border-[#00C076] transition-all font-medium"
-                            />
-                        </div>
-
-                        <button
-                            type="submit" disabled={isConfirming || !emailInput}
-                            className="w-full py-4 mt-2 bg-[#050505] text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-black/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                        >
-                            {isConfirming ? <Loader2 className="animate-spin" size={16} /> : 'Generate Invoice & Unlock Access'}
-                        </button>
-                      </form>
-                  ) : (
-                      <div className="flex flex-col items-center text-center py-6">
-                          <div className="w-16 h-16 bg-[#00C076]/10 text-[#00C076] rounded-full flex items-center justify-center mb-6">
-                              <CheckCircle2 size={32} />
-                          </div>
-                          <h4 className="text-xl font-bold mb-2">Access Granted</h4>
-                          <p className="text-sm text-black/50 leading-relaxed mb-8">
-                              Your cryptographic profile is now unlocked. We've sent the official invoice and SEPA transfer instructions to <strong>{emailInput}</strong>.
-                          </p>
-                          <div className="w-full text-left bg-black/[0.03] border border-black/5 p-5 rounded-xl mb-6">
-                              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/40 mb-1">Transfer Concept / Reference</p>
-                              <div className="flex items-center justify-between">
-                                <code className="text-sm font-bold bg-yellow-100 px-2 py-1 rounded text-black">{generatedRef}</code>
-                                <button onClick={() => copyToClipboard(generatedRef, 'Reference')} className="text-black/40 hover:text-black transition-colors"><Copy size={16}/></button>
-                              </div>
-                          </div>
-                          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#00C076] animate-pulse">Redirecting to Dashboard...</p>
-                      </div>
-                  )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Hero */}
         <header className="text-center mb-20">
@@ -291,7 +165,7 @@ function PricingContent() {
             Institutional access,<br/>transparent billing
           </h1>
           <p className="text-lg text-black/50 max-w-lg mx-auto leading-relaxed">
-            Start free. Upgrade when you're ready. All payments are processed securely via SEPA Bank Transfer in Euros.
+            Start free. Upgrade when you're ready. All payments are processed securely via Stripe in Euros.
           </p>
 
           {currentTierLevel > 0 && (

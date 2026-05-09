@@ -24,10 +24,16 @@ const stripeWorker = new Worker('stripe-webhook', async (job) => {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     
+    // 100000% Payment Verification Rule
+    if (session.payment_status !== 'paid') {
+      console.warn(`[WAC] Webhook checkout complete but payment_status is ${session.payment_status}. Skipping upgrade until payment is processed.`);
+      return { processed: true, status: session.payment_status };
+    }
+
     // Check if it's a subscription mode checkout
     if (session.mode === 'subscription') {
-      const walletAddress = session.metadata?.sovereign_user_id;
-      const planId = session.metadata?.plan_id;
+      const walletAddress = session.metadata?.userId || session.metadata?.sovereign_user_id || session.subscription_data?.metadata?.sovereign_user_id;
+      const planId = session.metadata?.tier || session.metadata?.plan_id;
       const customerId = session.customer;
       const subscriptionId = session.subscription;
 

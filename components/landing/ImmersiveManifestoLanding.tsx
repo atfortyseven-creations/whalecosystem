@@ -89,7 +89,7 @@ export function ImmersiveManifestoLanding({
   const publicClient = usePublicClient({ chainId: 1 });
 
   useEffect(() => {
-    fetch('https://api.coingecko.com/api/v3/global')
+    fetch('/api/market/global')
       .then(r => r.json())
       .then(data => {
         if (data?.data) {
@@ -141,7 +141,7 @@ export function ImmersiveManifestoLanding({
       <section className="relative w-full min-h-[100dvh] flex flex-col lg:flex-row items-center border-b border-black/8 overflow-hidden">
 
         {/* Left */}
-        <div className="relative z-10 flex flex-col justify-center px-8 sm:px-14 lg:px-20 pt-32 pb-16 lg:py-0 w-full lg:w-1/2">
+        <div className="relative z-10 flex flex-col justify-center flex-1 px-8 sm:px-14 lg:px-20 pt-24 pb-28 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0">
 
 
           <h1 className="text-[44px] sm:text-[62px] lg:text-[72px] font-black tracking-tighter leading-[0.93] uppercase text-black mb-6">
@@ -171,7 +171,7 @@ export function ImmersiveManifestoLanding({
         </div>
 
         {/* Globe */}
-        <div className="relative w-full lg:w-1/2 h-[50vh] lg:h-screen lg:absolute lg:right-0 lg:top-0 lg:bottom-0">
+        <div className="absolute inset-0 w-full h-[100dvh] opacity-25 pointer-events-none lg:relative lg:w-1/2 lg:h-screen lg:opacity-100 lg:pointer-events-auto lg:right-0 lg:top-0 lg:bottom-0">
           {!hideMap && <SovereignGlobe3D />}
         </div>
 
