@@ -74,13 +74,12 @@ export async function POST(req: NextRequest) {
                 // [CRITICAL BUGFIX] - Update User Entity
                 // The JWT minter (wallet/sync) reads from User.tier, NOT Subscription.tier
                 // If we don't update User.tier, the user remains FREE after paying.
-                // We also save the Stripe Customer and Subscription IDs so the Customer Portal works.
+                // We also save the Stripe Customer ID so the Customer Portal works.
                 await prisma.user.update({
                     where: { walletAddress: finalUserId },
                     data: { 
                         tier: tier,
-                        stripeCustomerId: stripeCustomerId || undefined,
-                        stripeSubscriptionId: stripeSubscriptionId || undefined
+                        stripeCustomerId: stripeCustomerId || undefined
                     }
                 });
 
@@ -102,10 +101,10 @@ export async function POST(req: NextRequest) {
             const subscription = event.data.object as any;
             let subUserId = subscription.metadata?.userId || subscription.metadata?.sovereign_user_id;
 
-            // Fallback: Automated cancellations might strip metadata. Lookup by Subscription ID.
-            if (!subUserId) {
-                const userBySub = await prisma.user.findUnique({
-                    where: { stripeSubscriptionId: subscription.id },
+            // Fallback: Automated cancellations might strip metadata. Lookup by Customer ID.
+            if (!subUserId && subscription.customer) {
+                const userBySub = await prisma.user.findFirst({
+                    where: { stripeCustomerId: subscription.customer as string },
                     select: { walletAddress: true }
                 });
                 subUserId = userBySub?.walletAddress;
@@ -136,10 +135,10 @@ export async function POST(req: NextRequest) {
             let updatedUserId = updatedSub.metadata?.userId || updatedSub.metadata?.sovereign_user_id;
             const updatedTier = updatedSub.metadata?.tier || updatedSub.metadata?.plan_id;
 
-            // Fallback: Automated updates might strip metadata. Lookup by Subscription ID.
-            if (!updatedUserId) {
-                const userBySub = await prisma.user.findUnique({
-                    where: { stripeSubscriptionId: updatedSub.id },
+            // Fallback: Automated updates might strip metadata. Lookup by Customer ID.
+            if (!updatedUserId && updatedSub.customer) {
+                const userBySub = await prisma.user.findFirst({
+                    where: { stripeCustomerId: updatedSub.customer as string },
                     select: { walletAddress: true }
                 });
                 updatedUserId = userBySub?.walletAddress;
@@ -181,7 +180,7 @@ export async function POST(req: NextRequest) {
                     const tier = subscription.metadata?.tier || subscription.metadata?.plan_id;
 
                     if (subUserId && tier) {
-                        const newExpiresAt = new Date(subscription.current_period_end * 1000);
+                        const newExpiresAt = new Date((subscription as any).current_period_end * 1000);
                         
                         console.log(`[INVOICE_SUCCESS] Extending ${tier} for User: ${subUserId} until ${newExpiresAt}`);
                         
