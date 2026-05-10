@@ -99,10 +99,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
           className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-32 pb-24 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
         >
-          <motion.div variants={FADE_UP} className="flex items-center gap-3 mb-8">
-            <span className="w-2 h-2 rounded-full bg-[#0a0a0a] animate-pulse" />
-            <span className="font-mono text-[10px] sm:text-[11px] font-black uppercase tracking-[0.25em] text-slate-500">Sovereign Telemetry</span>
-          </motion.div>
+
 
           <motion.h1 variants={FADE_UP} className="text-[48px] sm:text-[64px] md:text-[80px] xl:text-[96px] font-black tracking-tighter leading-[0.9] uppercase text-[#0a0a0a] mb-8 drop-shadow-sm">
             Whale<br />Alert<br /><span className="text-black/30">Network</span>

@@ -72,6 +72,14 @@ const MempoolForensicsPanel = dynamic(
   () => import('@/components/dashboard/MempoolForensicsPanel').then(m => m.MempoolForensicsPanel),
   { ssr: false }
 );
+const ReputationDashboard = dynamic(
+  () => import('@/components/dashboard/ReputationDashboard').then(m => m.ReputationDashboard),
+  { ssr: false }
+);
+const MorphoYieldDashboard = dynamic(
+  () => import('@/components/dashboard/MorphoYieldDashboard').then(m => m.MorphoYieldDashboard),
+  { ssr: false }
+);
 
 import "@/app/dashboard/dashboard.css";
 
@@ -335,7 +343,10 @@ export default function WhaleDashboard() {
                 return <><PanelHeader icon={Radar} title="Mempool Forensics" description="AI heuristic engine scanning the Ethereum and Optimism mempools in real-time for drainer contracts, MEV sandwiches, and phishing attacks." accent="#FF1744" /><div className="flex-1 min-h-[900px] shrink-0"><DashboardErrorBoundary key={`forensics-${refreshKey}`}><MempoolForensicsPanel /></DashboardErrorBoundary></div></>;
 
             case 'reputation':
-                return <><PanelHeader icon={Award} title="Reputation SBT" description="Your on-chain Soulbound Token passport. A non-transferable proof of your journey, milestones, and contribution to the Sovereign ecosystem." accent="#D4AF37" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`reputation-${refreshKey}`}><div className="flex flex-col items-center justify-center min-h-[520px] gap-5"><div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center"><Award size={28} strokeWidth={1.4} style={{ color: '#D4AF37' }} /></div><div className="flex flex-col items-center gap-2 text-center"><h3 className="text-[16px] font-black text-[#050505]">Reputation SBT Dashboard</h3><p className="text-[12px] text-black/40 max-w-[340px] leading-relaxed">Your Soulbound Token is deployed on Optimism. Connect your wallet to view your tier, milestones, and on-chain reputation score.</p></div></div></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Award} title="Reputation SBT" description="Your on-chain Soulbound Token passport. A non-transferable proof of your journey, milestones, and contribution to the Sovereign ecosystem." accent="#D4AF37" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`reputation-${refreshKey}`}><ReputationDashboard /></DashboardErrorBoundary></div></>;
+
+            case 'morpho':
+                return <><PanelHeader icon={Database} title="Morpho Base Yields" description="Real-time TVL and APY analytics for Morpho Blue liquidity pools on the Base network." accent="#0052FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`morpho-${refreshKey}`}><MorphoYieldDashboard /></DashboardErrorBoundary></div></>;
 
             default:
                 // Fallback: Ticket Mint panel so users always land on the Access Pass

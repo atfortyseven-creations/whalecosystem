@@ -49,6 +49,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'mass-transfer',label: 'Mass Transfers',    icon: <Network size={17}/> },
     { id: 'omniexplorer', label: 'Block Explorer',    icon: <Search size={17}/> },
     { id: 'defi',         label: 'DeFi Yields',       icon: <Landmark size={17}/> },
+    { id: 'morpho',       label: 'Morpho Base',       icon: <Database size={17}/>, badge: 'NEW', badgeColor: '#0052FF' },
 
     { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/>,   dividerBefore: 'ZK Layer' },
 

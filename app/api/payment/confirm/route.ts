@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
         type: 'SUBSCRIPTION_PAYMENT',
         amount: parseFloat(priceEur),
         token: 'EUR',
-        fromAddress: email,
+        fromAddress: walletAddress.toLowerCase(),
         toAddress: BANK_DETAILS.iban,
         authUserId: user.id,
         metadata: {

@@ -64,14 +64,14 @@ function scoreThreat(tx: any): { level: ThreatLevel; type: string; reason: strin
   }
 
   // 2. Gas price anomaly (potential frontrun / MEV sandwich)
-  const gasGwei = parseFloat(tx.gasPrice ?? '0') / 1e9;
+  const gasGwei = parseFloat(tx.gasPrice ?? '0');
   if (gasGwei > 200) {
     score += 40;
     flags.push(`Abnormal gas price: ${gasGwei.toFixed(1)} Gwei — possible MEV priority bribe`);
   }
 
   // 3. Zero-value transaction with input data (typical of approval phishing)
-  const valueEth = parseFloat(tx.value ?? '0') / 1e18;
+  const valueEth = parseFloat(tx.value ?? '0');
   if (valueEth === 0 && inputData !== '0x' && inputData.length > 10) {
     score += 20;
     flags.push('Zero ETH value with contract call — typical of token approval phishing');
@@ -154,8 +154,8 @@ export function MempoolForensicsPanel() {
           txHash: tx.hash ?? '0x000…',
           from: tx.from ?? '0x000…',
           to: tx.to ?? '0x000…',
-          value: ((parseFloat(tx.value ?? '0') / 1e18).toFixed(4)),
-          gasPrice: ((parseFloat(tx.gasPrice ?? '0') / 1e9).toFixed(2)),
+          value: ((parseFloat(tx.value ?? '0')).toFixed(4)),
+          gasPrice: ((parseFloat(tx.gasPrice ?? '0')).toFixed(2)),
           threatLevel: level,
           threatType: type,
           reason,
