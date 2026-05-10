@@ -46,7 +46,7 @@ export async function canReceiveMessages(
   address: string,
 ): Promise<boolean> {
   try {
-    const res = await Client.canMessage([address], { env: XMTP_ENV }) as any;
+    const res = await Client.canMessage([address as any], { env: XMTP_ENV }) as any;
     return res.get(address.toLowerCase()) ?? res.get(address) ?? false;
   } catch {
     return false;

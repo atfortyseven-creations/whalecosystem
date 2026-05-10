@@ -101,7 +101,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         >
           <motion.div variants={FADE_UP} className="flex items-center gap-3 mb-8">
             <span className="w-2 h-2 rounded-full bg-[#0a0a0a] animate-pulse" />
-            <span className="font-mono text-[10px] sm:text-[11px] font-black uppercase tracking-[0.25em] text-slate-500">Live Global Tracking</span>
+            <span className="font-mono text-[10px] sm:text-[11px] font-black uppercase tracking-[0.25em] text-slate-500">Sovereign Telemetry</span>
           </motion.div>
 
           <motion.h1 variants={FADE_UP} className="text-[48px] sm:text-[64px] md:text-[80px] xl:text-[96px] font-black tracking-tighter leading-[0.9] uppercase text-[#0a0a0a] mb-8 drop-shadow-sm">

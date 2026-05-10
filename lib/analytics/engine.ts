@@ -10,6 +10,25 @@
 import { prisma } from '@/lib/prisma';
 import { redisClient as redis } from '@/lib/redis/client';
 
+async function getRedisValue<T>(key: string): Promise<T | null> {
+  const val = await redis.get(key);
+  if (!val) return null;
+  try { return typeof val === 'string' ? JSON.parse(val) as T : val as T; } catch { return val as unknown as T; }
+}
+async function getRedisNumber(key: string): Promise<number | null> {
+  const val = await redis.get(key);
+  if (!val) return null;
+  return Number(val);
+}
+async function setRedisValue(key: string, value: any, ttlSeconds?: number): Promise<void> {
+  const val = typeof value === 'string' ? value : JSON.stringify(value);
+  if (ttlSeconds) {
+    await redis.set(key, val, 'EX', ttlSeconds);
+  } else {
+    await redis.set(key, val);
+  }
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface ChurnScore {
   walletAddress: string;
@@ -50,7 +69,7 @@ export interface ViralityMetrics {
  */
 export async function computeChurnScore(walletAddress: string): Promise<ChurnScore> {
   const cacheKey = `churn:${walletAddress}`;
-  const cached = await redis.get<ChurnScore>(cacheKey);
+  const cached = await getRedisValue<ChurnScore>(cacheKey);
   if (cached) return cached;
 
   const wallet = walletAddress.toLowerCase();
@@ -89,7 +108,7 @@ export async function computeChurnScore(walletAddress: string): Promise<ChurnSco
     const predictedDays = Math.round(30 * (1 - score));
 
     const result: ChurnScore = { walletAddress, score, predictedDays, signals, computedAt: new Date().toISOString() };
-    await redis.set(cacheKey, result, { ex: 3600 }); // 1hr cache
+    await setRedisValue(cacheKey, result, 3600); // 1hr cache
     return result;
 
   } catch {
@@ -100,7 +119,7 @@ export async function computeChurnScore(walletAddress: string): Promise<ChurnSco
 // ── COHORT ANALYSIS (Axioma 352) ──────────────────────────────────────────────
 export async function computeWeeklyCohorts(): Promise<CohortData[]> {
   const cacheKey = 'analytics:cohorts';
-  const cached = await redis.get<CohortData[]>(cacheKey);
+  const cached = await getRedisValue<CohortData[]>(cacheKey);
   if (cached) return cached;
 
   try {
@@ -146,7 +165,7 @@ export async function computeWeeklyCohorts(): Promise<CohortData[]> {
       },
     }));
 
-    await redis.set(cacheKey, cohorts, { ex: 3600 });
+    await setRedisValue(cacheKey, cohorts, 3600);
     return cohorts;
 
   } catch {
@@ -169,7 +188,7 @@ export async function getFunnelMetrics(days = 7): Promise<Record<string, number>
     let total = 0;
     for (let d = 0; d < days; d++) {
       const date = new Date(Date.now() - d * 86_400_000).toISOString().slice(0, 10);
-      const count = await redis.get<number>(`funnel:${step}:${date}`);
+      const count = await getRedisNumber(`funnel:${step}:${date}`);
       total += count ?? 0;
     }
     metrics[step] = total;
@@ -180,13 +199,13 @@ export async function getFunnelMetrics(days = 7): Promise<Record<string, number>
 // ── VIRALITY COEFFICIENT (Axioma 353) ─────────────────────────────────────────
 export async function computeViralityMetrics(): Promise<ViralityMetrics> {
   const cacheKey = 'analytics:virality';
-  const cached = await redis.get<ViralityMetrics>(cacheKey);
+  const cached = await getRedisValue<ViralityMetrics>(cacheKey);
   if (cached) return cached;
 
   try {
     const [totalReferrals, convertedRef] = await Promise.all([
-      redis.get<number>('referrals:total') ?? Promise.resolve(0),
-      redis.get<number>('referrals:converted') ?? Promise.resolve(0),
+      getRedisNumber('referrals:total') ?? Promise.resolve(0),
+      getRedisNumber('referrals:converted') ?? Promise.resolve(0),
     ]);
 
     const totalUsers = await prisma.user.count();
@@ -204,7 +223,7 @@ export async function computeViralityMetrics(): Promise<ViralityMetrics> {
       computedAt: new Date().toISOString(),
     };
 
-    await redis.set(cacheKey, result, { ex: 3600 });
+    await setRedisValue(cacheKey, result, 3600);
     return result;
 
   } catch {
@@ -223,7 +242,7 @@ export interface NPSEntry {
 
 export async function submitNPS(entry: NPSEntry): Promise<void> {
   const key = `nps:${entry.walletAddress}:${new Date().toISOString().slice(0, 7)}`; // Monthly
-  await redis.set(key, entry, { ex: 86_400 * 35 }); // 35-day TTL
+  await setRedisValue(key, entry, 86_400 * 35); // 35-day TTL
 
   // Increment NPS bucket counter
   const bucket = entry.score >= 9 ? 'promoter' : entry.score >= 7 ? 'passive' : 'detractor';
@@ -233,9 +252,9 @@ export async function submitNPS(entry: NPSEntry): Promise<void> {
 export async function getNPSSummary(yearMonth?: string): Promise<{ promoters: number; passives: number; detractors: number; nps: number }> {
   const ym = yearMonth ?? new Date().toISOString().slice(0, 7);
   const [p, pa, d] = await Promise.all([
-    redis.get<number>(`nps:count:promoter:${ym}`),
-    redis.get<number>(`nps:count:passive:${ym}`),
-    redis.get<number>(`nps:count:detractor:${ym}`),
+    getRedisNumber(`nps:count:promoter:${ym}`),
+    getRedisNumber(`nps:count:passive:${ym}`),
+    getRedisNumber(`nps:count:detractor:${ym}`),
   ]);
   const promoters  = p  ?? 0;
   const passives   = pa ?? 0;

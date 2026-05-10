@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 /**
  * Sovereign Telemetry Engine (Zero-Third-Party / GDPR Compliant)
@@ -6,9 +6,6 @@ import { PrismaClient } from '@prisma/client';
  * Aggregates performance metrics (Latency, Uptime) in-memory and flushes 
  * to PostgreSQL securely. No PII, IP addresses, or wallet addresses are logged.
  */
-
-// We don't import the global prisma instance to keep this module portable and strictly scoped
-const prisma = new PrismaClient();
 
 type MetricType = 'HANDSHAKE_LATENCY' | 'WHALE_DETECTION_LATENCY' | 'WS_UPTIME';
 
