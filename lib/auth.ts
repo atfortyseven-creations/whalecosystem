@@ -124,3 +124,15 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
+
+export async function verifyAdminSession(req: any): Promise<boolean> {
+  try {
+    const { getSession } = await import('@/lib/session');
+    const session = await getSession();
+    if (!session || !session.userId) return false;
+    const adminAddresses = ['0x...']; // Replace with actual logic or env var
+    return adminAddresses.includes(session.userId.toLowerCase());
+  } catch {
+    return false;
+  }
+}

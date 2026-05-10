@@ -279,8 +279,8 @@ export default RateLimiter
 // The in-memory RateLimiter above handles server-side API routes only.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
+// import { Ratelimit } from '@upstash/ratelimit';
+// import { Redis } from '@upstash/redis';
 
 export type RateLimitTier = 'FREE' | 'STANDARD' | 'STARTER' | 'PRO' | 'ELITE';
 
@@ -292,31 +292,15 @@ const TIER_CONFIG: Record<RateLimitTier, { requests: number; window: `${number}s
   ELITE:    { requests: 500, window: '10s' },
 };
 
-let _upstashRedis: Redis | null = null;
-const _limiters = new Map<RateLimitTier, Ratelimit>();
+let _upstashRedis: any | null = null;
+const _limiters = new Map<RateLimitTier, any>();
 
-function getUpstashRedis(): Redis | null {
-  if (_upstashRedis) return _upstashRedis;
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
-  _upstashRedis = new Redis({ url, token });
-  return _upstashRedis;
+function getUpstashRedis(): any | null {
+  return null; // Disabled Upstash for edge build stability
 }
 
-function getDistributedLimiter(tier: RateLimitTier): Ratelimit | null {
-  const client = getUpstashRedis();
-  if (!client) return null;
-  if (_limiters.has(tier)) return _limiters.get(tier)!;
-  const { requests, window } = TIER_CONFIG[tier];
-  const limiter = new Ratelimit({
-    redis: client,
-    limiter: Ratelimit.slidingWindow(requests, window),
-    analytics: false,
-    prefix: `sovereign_rl_${tier.toLowerCase()}`,
-  });
-  _limiters.set(tier, limiter);
-  return limiter;
+function getDistributedLimiter(tier: RateLimitTier): any | null {
+  return null;
 }
 
 export interface DistributedRateLimitResult {
