@@ -7,13 +7,14 @@ import { Loader2 } from 'lucide-react';
 import { GraphData, GraphNode, GraphLink } from '@/utils/graphData';
 
 // Dynamically import generic 3D Graph to avoid SSR issues
+// @ts-ignore
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), {
     ssr: false,
     loading: () => <div className="flex items-center justify-center h-full text-zinc-500"><Loader2 className="animate-spin mr-2" /> Loading Star Chart...</div>
-});
+}) as any;
 
 export function Constellation() {
-    const { address } = useAccount();
+    const { address } = (useAccount as any)();
     const graphRef = useRef<any>();
     const [data, setData] = useState<GraphData | null>(null);
     const [isLoading, setIsLoading] = useState(false);

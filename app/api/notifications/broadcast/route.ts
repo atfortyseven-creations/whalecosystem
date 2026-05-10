@@ -17,18 +17,6 @@ export async function POST(request: Request) {
         // Create Global Notification
         const notification = await prisma.notification.create({
             data: {
-                userId: "GLOBAL", // Special flag or use a loop for all users if needed, 
-                                  // but our schema has `isGlobal` boolean now.
-                // Wait, Prisma constraints might require a valid User relation if strictly enforced.
-                // Let's use the isGlobal flag logic. 
-                // However, since `userId` is a required field pointing to User, we might need a "System" user 
-                // or handle this differently in the schema.
-                // CORRECTION: Schema has `userId` as Foreign Key. 
-                // STRATEGY: We will create it for a "System" user and filter by `isGlobal: true` on frontend fetch.
-                // Pre-requisite: Ensure a "SYSTEM" user exists or use the first admin.
-                
-                // For robustness, let's assume we send this to a specific user for now, 
-                // OR we update schema to make userId optional for global ? 
                 // Let's stick to the Plan: We have `isGlobal`. 
                 // Let's assign it to a placeholder 'ADMIN' or the sender.
                 

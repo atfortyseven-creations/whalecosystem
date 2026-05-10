@@ -55,10 +55,22 @@ export function useNFC() {
         }
     }, []);
 
+    const simulateScan = useCallback(() => {
+        setStatus('scanning');
+        setTimeout(() => {
+            setSerialNumber('SIM-Whale-NFC-777');
+            setStatus('success');
+            toast.success("Whale Card Detected (SIMULATED)!", {
+                description: `ID: SIM-Whale-NFC-777`
+            });
+        }, 1500);
+    }, []);
+
     return {
         isSupported,
         status,
         startScan,
+        simulateScan,
         serialNumber,
         reset: () => {
             setStatus(isSupported ? 'idle' : 'unsupported');

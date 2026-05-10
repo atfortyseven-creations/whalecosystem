@@ -1,5 +1,11 @@
-```typescript
 // Feature Cards Data - 40+ Categories
+import {
+  Shield, Key, Users, Heart, Eye, Fingerprint, Clock, Smartphone, Cloud, Lock,
+  TrendingUp, BarChart, Zap, Sprout, Droplet, Repeat, SlidersHorizontal, RefreshCcw, Radar, Activity,
+  Layers, Bell, Fuel, FileText, Compass, GitBranch, Search, Image, Send, MessageSquare,
+  Cable, ArrowLeftRight, DollarSign, Layers2, Rocket, Server, Monitor, Grid, Bot, Gift,
+  Vote, Sparkles, Badge, Star, Vault, Calculator
+} from 'lucide-react';
 
 export interface FeatureCard {
   id: number;
@@ -773,5 +779,3 @@ export const FEATURE_CARDS: FeatureCard[] = [
     gradient: "from-green-500 to-emerald-600"
   }
 ];
-```
-
