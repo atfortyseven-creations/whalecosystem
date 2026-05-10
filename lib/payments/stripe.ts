@@ -2,7 +2,8 @@ import Stripe from 'stripe';
 
 // NOTE: STRIPE_SECRET_KEY is validated at runtime when stripe is first used.
 // No module-level console.warn — it would pollute Railway [err] logs.
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+// Fallback to a dummy key because the SDK throws 'Neither apiKey nor config.authenticator provided' during static generation without it
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_build_validation', {
   apiVersion: '2026-01-28.clover' as any,
   typescript: true,
 });
