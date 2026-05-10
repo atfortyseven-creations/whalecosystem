@@ -86,25 +86,7 @@ export class EntityGraphMiner {
             });
         }
 
-        // Generar enlaces determinísticos basados en las direcciones para que el grafo se vea vivo
-        // y cumpla con la expectativa de alta fidelidad visual "on-chain"
         const links: GraphLink[] = [];
-        if (nodes.length > 1) {
-            for (let i = 0; i < nodes.length; i++) {
-                // Connect to 2-4 other nodes deterministically based on hex chars
-                const numConnections = (nodes[i].id.charCodeAt(5) % 3) + 2;
-                for (let c = 1; c <= numConnections; c++) {
-                    const targetIdx = (i + c * 3) % nodes.length;
-                    if (i !== targetIdx) {
-                        links.push({
-                            source: nodes[i].id,
-                            target: nodes[targetIdx].id,
-                            value: ((nodes[i].id.charCodeAt(6) * nodes[targetIdx].id.charCodeAt(7)) % 100) + 5
-                        });
-                    }
-                }
-            }
-        }
 
         return {
             nodes,
