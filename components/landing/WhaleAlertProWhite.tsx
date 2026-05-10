@@ -217,8 +217,32 @@ function LiveTicker() {
 
 const STATS_DATA = [
   { value: 48, suffix: "M+", label: "Whale events detected" },
-  { value: 24, suffix: "", label: "ERC-20 tokens scanned" },
-  { value: 12, suffix: "s", label: "Average latency from chain" },
+  { value: 24, suffix: "", label: "ERC-20 tokens monitored" },
+  { value: 12, suffix: "s", label: "Block-to-API latency" },
+];
+
+const PLATFORM_SCREENSHOTS = [
+  {
+    src: '/system-shots/Captura de pantalla 2026-05-10 002811.png',
+    title: 'Ticket Mint — Genesis Access',
+    desc: 'The WGT-GENESIS credential portal. Cryptographically allocates permanent access passes on Optimism L2. Only 200 Genesis tickets exist globally.',
+    badge: 'ZK Identity Layer',
+    badgeColor: '#8b5cf6',
+  },
+  {
+    src: '/system-shots/Captura de pantalla 2026-05-10 002900.png',
+    title: 'Capital Ledger — Mass Transfers',
+    desc: 'Real-time forensic feed of ERC-20 mass transfer events. Every transaction is ECDSA-verified, classified, and delivered in under 10ms. Shown: $599K aggregate across 80 verified operations.',
+    badge: 'Live Intelligence Feed',
+    badgeColor: '#06b6d4',
+  },
+  {
+    src: '/system-shots/Captura de pantalla 2026-05-10 002953.png',
+    title: 'Aztec Pipeline — ZK Block Sequencer',
+    desc: 'Live view of Aztec Network rollup blocks progressing through proving, sequencing, and settlement on Ethereum. Our sovereign ZK layer for privacy-preserving forensic proofs.',
+    badge: 'Aztec ZK Layer',
+    badgeColor: '#10b981',
+  },
 ];
 
 const API_CAPABILITIES = [
@@ -679,6 +703,100 @@ export function WhaleAlertProWhite() {
                 <p className="text-slate-500 font-medium leading-relaxed text-sm uppercase tracking-wide">{cap.desc}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          PLATFORM IN ACTION — SCREENSHOTS
+          ───────────────────────────────────────────────────────────── */}
+      <section className="py-40 px-6 md:px-12 bg-slate-50/80 border-t border-slate-100 relative overflow-hidden" aria-label="Platform Preview">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="text-center space-y-8 mb-24">
+            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white border border-slate-100 rounded-full shadow-md">
+              <div className="w-2 h-2 rounded-full bg-violet-500 animate-ping" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Terminal Preview</span>
+            </div>
+            <h2 className="text-[7vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
+              The Platform<br /><span className="text-slate-300">In Action</span>
+            </h2>
+            <p className="text-xl font-medium text-slate-500 max-w-3xl mx-auto leading-relaxed">
+              Every module shown is live, real-data, and production-grade. This is what institutional intelligence looks like.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {PLATFORM_SCREENSHOTS.map((shot, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.15 }}
+                viewport={{ once: true }}
+                className="group flex flex-col bg-white rounded-[3rem] border border-slate-200 overflow-hidden hover:border-slate-300 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500"
+              >
+                {/* Screenshot */}
+                <div className="relative overflow-hidden rounded-t-[3rem] bg-slate-100" style={{ aspectRatio: '16/10' }}>
+                  <Image
+                    src={shot.src}
+                    alt={shot.title}
+                    fill
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent" />
+                  <div
+                    className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-lg"
+                    style={{ backgroundColor: shot.badgeColor }}
+                  >
+                    {shot.badge}
+                  </div>
+                </div>
+                {/* Text */}
+                <div className="p-8 flex flex-col gap-4 flex-1">
+                  <h3 className="text-xl font-black text-slate-950 uppercase italic tracking-tight">{shot.title}</h3>
+                  <p className="text-slate-500 font-medium leading-relaxed text-sm flex-1">{shot.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Blockchain illustration images */}
+          <div className="mt-20 flex flex-col md:flex-row items-center gap-12 bg-white rounded-[3rem] border border-slate-200 p-12 shadow-xl shadow-slate-200/40">
+            <div className="flex items-center gap-8 shrink-0">
+              <div className="relative w-32 h-32 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/system-shots/istockphoto-865597192-612x612.jpg"
+                  alt="Blockchain network topology"
+                  fill
+                  className="object-cover opacity-80 mix-blend-multiply"
+                />
+              </div>
+              <div className="relative w-32 h-32 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/system-shots/pngtree-blockchain-network-illustration-with-cubes-vector-png-image_18614224.jpg"
+                  alt="Distributed ledger architecture"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+            <div className="space-y-4 max-w-2xl">
+              <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-cyan-50 border border-cyan-100 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-[0.35em] text-cyan-600">Decentralised Architecture</span>
+              </div>
+              <h3 className="text-3xl font-black text-slate-950 uppercase italic tracking-tight leading-tight">
+                Sovereign<br />Node Network
+              </h3>
+              <p className="text-slate-500 font-medium leading-relaxed">
+                Our intelligence infrastructure runs across a globally distributed node mesh with no single point of failure. Each node independently validates on-chain events before they reach the API layer — guaranteeing data integrity through consensus, not trust.
+              </p>
+              <div className="flex flex-wrap gap-3 pt-2">
+                {['99.99% Uptime SLA', 'Multi-region deployment', 'Zero mock data policy', 'ECDSA verification'].map(tag => (
+                  <span key={tag} className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-slate-500">{tag}</span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
