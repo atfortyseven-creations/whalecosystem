@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
           data: { 
               requests: { increment: 1 },
               lastUsedAt: new Date()
-          }
+          } as any
       }).catch(err => console.error('Failed to update stats', err));
 
       // [LOGIC] Fetch Real Whale Data

@@ -226,6 +226,7 @@ export const translations = {
 } as const;
 
 export type TranslationKey = keyof typeof translations['en'];
-export type Language = 'en';
+export type Language = 'en' | 'es';
 
-
+// Add Spanish as a supported language (falls back to English for missing keys)
+(translations as any)['es'] = translations['en'];
