@@ -183,11 +183,19 @@ export async function POST(req: NextRequest) {
         }
 
         // ── Ensure User row exists ────────────────────────────────────────────
-        await (prisma as any).user.upsert({
+        const user = await (prisma as any).user.upsert({
             where: { walletAddress: address },
             update: {},
             create: { walletAddress: address }
         });
+
+        // ── Validation: Prevent unpaid ticket minting (Firmas sin pagar) ──────
+        if (user.tier === 'FREE' && !user.isPro) {
+            console.warn(JSON.stringify({ level: 'SECURITY', event: 'UNPAID_MINT_ATTEMPT', address }));
+            return NextResponse.json({
+                error: 'Pago requerido. Se necesita una suscripción activa para mintear la firma institucional.'
+            }, { status: 402 });
+        }
 
         // ── Create ticket using standard Prisma methods ───────────────────────
         const tempSerial = `PENDING-${address}-${Date.now()}`;
