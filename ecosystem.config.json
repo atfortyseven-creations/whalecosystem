@@ -2,8 +2,7 @@
   "apps": [
     {
       "name": "sovereign-web",
-      "script": "node_modules/next/dist/bin/next",
-      "args": "start .",
+      "script": "server.js",
       "cwd": "/app",
       "interpreter": "node",
       "instances": "max",
