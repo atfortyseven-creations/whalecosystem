@@ -6,7 +6,7 @@ import {
   Ticket, Flame, Search, Layers, LineChart, Book,
   Network, Compass, Landmark, BarChart3, FlaskConical,
   Wallet, Shield, Database, MessageSquare,
-  LayoutDashboard, ShieldAlert
+  LayoutDashboard, ShieldAlert, MessageCircle, TrendingUp, Award, Radar
 } from 'lucide-react';
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
@@ -58,6 +58,18 @@ const BRCExplorerShell = dynamic(
 );
 const CosmicForgePanel = dynamic(
   () => import('@/components/forge/CosmicForgePanel').then(m => m.CosmicForgePanel),
+  { ssr: false }
+);
+const SovereignChat = dynamic(
+  () => import('@/components/dashboard/SovereignChat').then(m => m.SovereignChat),
+  { ssr: false }
+);
+const HyperliquidExecutionPanel = dynamic(
+  () => import('@/components/dashboard/HyperliquidExecutionPanel').then(m => m.HyperliquidExecutionPanel),
+  { ssr: false }
+);
+const MempoolForensicsPanel = dynamic(
+  () => import('@/components/dashboard/MempoolForensicsPanel').then(m => m.MempoolForensicsPanel),
   { ssr: false }
 );
 
@@ -312,6 +324,18 @@ export default function WhaleDashboard() {
 
             case 'support':
                 return <><PanelHeader icon={MessageSquare} title="Support" description="Contact the team directly, report a problem, or ask a question. We respond as quickly as possible to every request." accent="#050505" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key={`support-${refreshKey}`}><WhaleSupport /></DashboardErrorBoundary></div></>;
+
+            case 'chat':
+                return <><PanelHeader icon={MessageCircle} title="Sovereign Chat" description="End-to-End encrypted messaging via the XMTP protocol. No server can read your messages. Ever." accent="#9945FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`chat-${refreshKey}`}><SovereignChat /></DashboardErrorBoundary></div></>;
+
+            case 'trade':
+                return <><PanelHeader icon={TrendingUp} title="Trading Terminal" description="Execute perpetual futures positions directly on Hyperliquid L1 without leaving the dashboard. Zero-gas institutional execution." accent="#00C076" /><div className="flex-1 min-h-[900px] shrink-0"><DashboardErrorBoundary key={`trade-${refreshKey}`}><HyperliquidExecutionPanel /></DashboardErrorBoundary></div></>;
+
+            case 'forensics':
+                return <><PanelHeader icon={Radar} title="Mempool Forensics" description="AI heuristic engine scanning the Ethereum and Optimism mempools in real-time for drainer contracts, MEV sandwiches, and phishing attacks." accent="#FF1744" /><div className="flex-1 min-h-[900px] shrink-0"><DashboardErrorBoundary key={`forensics-${refreshKey}`}><MempoolForensicsPanel /></DashboardErrorBoundary></div></>;
+
+            case 'reputation':
+                return <><PanelHeader icon={Award} title="Reputation SBT" description="Your on-chain Soulbound Token passport. A non-transferable proof of your journey, milestones, and contribution to the Sovereign ecosystem." accent="#D4AF37" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`reputation-${refreshKey}`}><div className="flex flex-col items-center justify-center min-h-[520px] gap-5"><div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center"><Award size={28} strokeWidth={1.4} style={{ color: '#D4AF37' }} /></div><div className="flex flex-col items-center gap-2 text-center"><h3 className="text-[16px] font-black text-[#050505]">Reputation SBT Dashboard</h3><p className="text-[12px] text-black/40 max-w-[340px] leading-relaxed">Your Soulbound Token is deployed on Optimism. Connect your wallet to view your tier, milestones, and on-chain reputation score.</p></div></div></DashboardErrorBoundary></div></>;
 
             default:
                 // Fallback: Ticket Mint panel so users always land on the Access Pass

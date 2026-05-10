@@ -10,7 +10,8 @@ import {
     Network, Ticket, Flame, Menu,
     BookOpen, Database, MessageSquare,
     Landmark, Compass,
-    LineChart, Lock, Book, Info, X, ArrowUpRight, CreditCard
+    LineChart, Lock, Book, Info, X, ArrowUpRight, CreditCard,
+    MessageCircle, TrendingUp, Award, Radar
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -52,13 +53,18 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/>,   dividerBefore: 'ZK Layer' },
 
     { id: 'vault',        label: 'Sovereign Vault',   icon: <Lock size={17}/>,      dividerBefore: 'Execution' },
+    { id: 'trade',        label: 'Trading Terminal',  icon: <TrendingUp size={17}/>, badge: 'LIVE', badgeColor: '#00C076' },
+    { id: 'forensics',    label: 'Mempool Forensics', icon: <Radar size={17}/>,      badge: 'AI', badgeColor: '#FF1744' },
+    { id: 'chat',         label: 'Sovereign Chat',    icon: <MessageCircle size={17}/>, badge: 'E2E', badgeColor: '#9945FF' },
+    { id: 'reputation',   label: 'Reputation SBT',   icon: <Award size={17}/> },
     { id: 'logs',         label: 'Session Logs',      icon: <Database size={17}/>,  dividerBefore: 'System' },
     { id: 'support',      label: 'Support',           icon: <MessageSquare size={17}/> },
 ];
 
 const RESTRICTED_TABS = [
     'firehose', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
-    'live-port', 'whale-port', 'vault', 'zk', 'logs'
+    'live-port', 'whale-port', 'vault', 'zk', 'logs',
+    'trade', 'forensics', 'chat', 'reputation'
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
