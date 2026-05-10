@@ -48,14 +48,17 @@ class SovereignMempoolStreamer {
           const type = valueEth > 5 ? 'whale' : 'dust';
 
           // Only index events with actual economic transfer
-          if (valueEth > 0.05) {
+          if (valueEth > 0.05 || (tx.input && tx.input !== '0x')) {
             const eventData = {
               hash: tx.hash,
               timestamp,
               network: 'Ethereum',
-              value: valueEth,
-              gasPrice: gasPriceGwei,
+              value: valueEth.toString(), // Store as string for parseFloat later
+              gasPrice: gasPriceGwei.toString(),
               type,
+              from: tx.from,
+              to: tx.to,
+              input: tx.input || tx.data || '0x',
             };
 
             this.recentTiers.push(eventData);
