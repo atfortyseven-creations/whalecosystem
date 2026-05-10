@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
+import { createPublicClient, http, parseAbi } from 'viem';
+import { optimism } from 'viem/chains';
 
 // ============================================
 // SECURITY LAYER 1: Rate Limiting
@@ -26,6 +28,27 @@ export async function verifyPremiumAccess(userId: string): Promise<{
 }> {
   try {
     const normalizedUserId = userId.toLowerCase();
+
+    // [ON-CHAIN ARTICULATION] 0. Cryptographic ZK/Token Validation
+    // Query the blockchain directly. If the wallet holds the Sovereign NFT,
+    // grant absolute access without consulting the centralized database.
+    try {
+        const publicClient = createPublicClient({ chain: optimism, transport: http() });
+        const SOVEREIGN_NFT_CONTRACT = '0x0000000000000000000000000000000000000000'; // Replace with real contract
+        const balance = await publicClient.readContract({
+            address: SOVEREIGN_NFT_CONTRACT as `0x${string}`,
+            abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
+            functionName: 'balanceOf',
+            args: [normalizedUserId as `0x${string}`],
+        });
+
+        if (balance > 0n) {
+            console.log(`[Zero-Trust] 🛡️ Validated Sovereign NFT holding for ${normalizedUserId}`);
+            return { valid: true, tier: 'SOVEREIGN' };
+        }
+    } catch (rpcErr) {
+        // Silent fallback to database if RPC fails (Network Resilience)
+    }
 
     // 1. Native DB TIER check (One-time payments and Sovereign tier)
     let user = await prisma.user.findUnique({

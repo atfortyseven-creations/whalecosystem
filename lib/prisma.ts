@@ -124,14 +124,14 @@ function getProductionUrl(): string | undefined {
         if (urlObj.protocol === 'postgresql:' || urlObj.protocol === 'postgres:') {
             // Force PgBouncer
             urlObj.searchParams.set('pgbouncer', 'true');
-            // Safe Institutional limit: 10 connections per instance prevents starvation
-            urlObj.searchParams.set('connection_limit', process.env.DATABASE_CONNECTION_LIMIT || '10');
+            // Railway Cluster Configuration: 20 connections per PM2 instance
+            urlObj.searchParams.set('connection_limit', process.env.DATABASE_CONNECTION_LIMIT || '20');
             // Aggressive TCP timeout
             urlObj.searchParams.set('connect_timeout', '10');
             // Max time a connection can be held in the pool
-            urlObj.searchParams.set('pool_timeout', '15');
-            // Kill queries taking longer than 8s to prevent total DB lockup
-            urlObj.searchParams.set('statement_timeout', '8000');
+            urlObj.searchParams.set('pool_timeout', '10');
+            // Kill queries taking longer than 5s to prevent total DB lockup during high traffic
+            urlObj.searchParams.set('statement_timeout', '5000');
         }
         return urlObj.toString();
     } catch {

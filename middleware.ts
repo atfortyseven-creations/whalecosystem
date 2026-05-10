@@ -147,17 +147,8 @@ export default async function middleware(request: NextRequest) {
     if (!isBypassIP && pathname.startsWith('/api')) {
       try {
         let tier = 'FREE';
-        const address = request.cookies.get('sovereign_handshake')?.value;
-        if (address && typeof address === 'string' && address.startsWith('0x')) {
-           const { safeRedisGet } = await import('./lib/redis/client');
-           const cached = await safeRedisGet(`tier:${address.toLowerCase()}`);
-           if (cached) {
-               try {
-                   const data = JSON.parse(cached);
-                   if (data.tier) tier = data.tier;
-               } catch(e) {}
-           }
-        }
+        // Rate limiting for edge middleware defaults to FREE tier limits to prevent Edge Runtime dynamic evaluation errors.
+        // Node.js routes handle strict tier checks internally.
 
          const VALID_TIERS = ['FREE', 'STANDARD', 'STARTER', 'PRO', 'ELITE'] as const;
          type ValidTier = typeof VALID_TIERS[number];
