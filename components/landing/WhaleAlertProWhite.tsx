@@ -708,6 +708,101 @@ export function WhaleAlertProWhite() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
+          CRYPTOGRAPHIC FORENSICS & DARK POOL RADAR (NEW MODULES)
+          ───────────────────────────────────────────────────────────── */}
+      <section className="py-40 px-6 md:px-12 bg-white relative overflow-hidden" aria-label="Cryptographic Forensics">
+        <div className="max-w-[1400px] mx-auto space-y-32">
+          
+          {/* Feature 1: Dark Pool Radar */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="order-2 lg:order-1 relative h-[600px] w-full rounded-[3rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-2xl group">
+              <Image 
+                src={LANDING_ASSETS.spheres} 
+                alt="Dark Pool Radar Spheres" 
+                fill 
+                className="object-cover group-hover:scale-105 transition-transform duration-1000" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent" />
+              <div className="absolute bottom-10 left-10 right-10">
+                 <div className="px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl w-fit mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                   Module Active
+                 </div>
+                 <h3 className="text-3xl font-black text-white uppercase italic tracking-tight">Dark Pool <br/> Radar Matrix</h3>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2 space-y-8">
+              <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-200 rounded-full shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 italic">Off-Chain Detection</span>
+              </div>
+              <h2 className="text-[5vw] lg:text-7xl font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
+                Illuminate The <br /><span className="text-slate-300">Unseen</span>
+              </h2>
+              <p className="text-xl font-medium text-slate-500 leading-relaxed">
+                Standard order books only show what they want you to see. Our Dark Pool Radar aggregates OTC block trades and hidden liquidity movements across 14 major venues, bringing invisible institutional volume into the light.
+              </p>
+              <ul className="space-y-4 pt-4">
+                {[
+                  "OTC Block Trade Detection",
+                  "Cross-Chain Liquidity Routing",
+                  "Hidden Accumulation Heatmaps"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-4 text-sm font-black text-slate-700 uppercase tracking-widest">
+                    <CheckCircle2 size={18} className="text-rose-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Feature 2: Ecosystem Metaverse */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="space-y-8">
+              <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-200 rounded-full shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 italic">3D Topology</span>
+              </div>
+              <h2 className="text-[5vw] lg:text-7xl font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
+                Ecosystem <br /><span className="text-slate-300">Metaverse</span>
+              </h2>
+              <p className="text-xl font-medium text-slate-500 leading-relaxed">
+                Navigate the blockchain like never before. Our 3D topological maps visualize complex wallet interactions, identifying hidden relationships between entities, protocols, and smart contracts instantly.
+              </p>
+              <ul className="space-y-4 pt-4">
+                {[
+                  "Interactive 3D Wallet Graphs",
+                  "Protocol Exposure Visualizations",
+                  "Sybil Cluster Identification"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-4 text-sm font-black text-slate-700 uppercase tracking-widest">
+                    <CheckCircle2 size={18} className="text-cyan-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="relative h-[600px] w-full rounded-[3rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-2xl group">
+              <Image 
+                src={LANDING_ASSETS.metaverse} 
+                alt="Ecosystem Metaverse 3D" 
+                fill 
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-1000 mix-blend-luminosity opacity-90" 
+              />
+              <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
+              <div className="absolute bottom-10 left-10 right-10">
+                 <div className="px-4 py-2 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl w-fit mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                   Engine Online
+                 </div>
+                 <h3 className="text-3xl font-black text-slate-900 uppercase italic tracking-tight drop-shadow-xl">Topological <br/> Graph Engine</h3>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
           PLATFORM IN ACTION — SCREENSHOTS
           ───────────────────────────────────────────────────────────── */}
       <section className="py-40 px-6 md:px-12 bg-slate-50/80 border-t border-slate-100 relative overflow-hidden" aria-label="Platform Preview">

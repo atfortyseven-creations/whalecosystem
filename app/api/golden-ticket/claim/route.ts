@@ -183,55 +183,33 @@ export async function POST(req: NextRequest) {
         }
 
         // ── Ensure User row exists ────────────────────────────────────────────
-        // NOTE: Using $executeRaw instead of prisma.user.upsert() to avoid
-        // Prisma injecting schema-level defaults (e.g. hiddenAssets[]) for
-        // columns that may not yet exist in the live DB (schema drift).
-        // This raw INSERT is safe: only writes walletAddress, ignores conflicts.
-        await (prisma as any).$executeRaw`
-            INSERT INTO "User" ("id", "walletAddress", "createdAt", "updatedAt")
-            VALUES (gen_random_uuid()::text, ${address}, now(), now())
-            ON CONFLICT ("walletAddress") DO NOTHING
-        `;
+        await (prisma as any).user.upsert({
+            where: { walletAddress: address },
+            update: {},
+            create: { walletAddress: address }
+        });
 
-        // ── Create ticket (raw SQL — bypasses Prisma @updatedAt injection) ────
-        // goldenTicket.create() and .update() both crash with "column updatedAt
-        // does not exist" because Prisma auto-injects @updatedAt fields.
-        // This raw CTE: INSERTs the row, captures the autoincrement ticketNumber,
-        // immediately finalizes the serialCode, and returns the full row — atomic.
+        // ── Create ticket using standard Prisma methods ───────────────────────
         const tempSerial = `PENDING-${address}-${Date.now()}`;
-        const rows = await (prisma as any).$queryRaw`
-            WITH inserted AS (
-                INSERT INTO "GoldenTicket"
-                    ("id", "userAddress", "serialCode", "tier", "badgeColor",
-                     "networkLaunchEligible", "twitterHandle", "signatureData",
-                     "isActive", "claimedAt")
-                VALUES (
-                    gen_random_uuid()::text, ${address}, ${tempSerial},
-                    'GENESIS', 'GOLD', true,
-                    ${safeHandle}, ${safeSignatureData},
-                    true, now()
-                )
-                RETURNING id, "ticketNumber", "userAddress", "serialCode",
-                          "tier", "badgeColor", "networkLaunchEligible",
-                          "twitterHandle", "signatureData", "isActive", "claimedAt"
-            )
-            UPDATE "GoldenTicket" gt
-            SET    "serialCode" = 'WGT-GENESIS-' || LPAD(i."ticketNumber"::text, 4, '0')
-            FROM   inserted i
-            WHERE  gt.id = i.id
-            RETURNING gt.id, gt."ticketNumber", gt."userAddress", gt."serialCode",
-                      gt."tier", gt."badgeColor", gt."networkLaunchEligible",
-                      gt."twitterHandle", gt."signatureData", gt."isActive", gt."claimedAt"
-        `;
-        let finalTicket = Array.isArray(rows) ? rows[0] : rows;
+        const initialTicket = await (prisma as any).goldenTicket.create({
+            data: {
+                userAddress: address,
+                serialCode: tempSerial,
+                tier: 'GENESIS',
+                badgeColor: 'GOLD',
+                networkLaunchEligible: true,
+                twitterHandle: safeHandle,
+                signatureData: safeSignatureData,
+                isActive: true
+            }
+        });
 
-        if (!finalTicket || !finalTicket.ticketNumber) {
-            // Fallback: If Prisma didn't return the CTE RETURNING rows, fetch it explicitly
-            finalTicket = await (prisma as any).goldenTicket.findUnique({
-                where: { userAddress: address }
-            });
-            if (!finalTicket) throw new Error('Ticket insert failed completely');
-        }
+        // Update with final formatted serial code based on the generated ticketNumber
+        const finalSerial = `WGT-GENESIS-${String(initialTicket.ticketNumber).padStart(4, '0')}`;
+        let finalTicket = await (prisma as any).goldenTicket.update({
+            where: { id: initialTicket.id },
+            data: { serialCode: finalSerial }
+        });
 
         // ── Absolute Atomic Supply Check (Anti-TOCTOU) ────────────────────────
         if (finalTicket.ticketNumber > MAX_SUPPLY) {
