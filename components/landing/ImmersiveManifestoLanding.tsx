@@ -66,7 +66,7 @@ const ARCHITECTURE = [
   { id: "SYS-8", label: "Security", desc: "Comprehensive protection layers safeguarding all user data.", color: "#888", icon: Shield },
 ];
 
-const FADE_UP = {
+const FADE_UP: any = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
 };
@@ -203,7 +203,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
             {FEATURES.map((f, i) => (
-              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.8, ease: "easeOut" } } }} className="group bg-white p-10 md:p-12 rounded-3xl border border-black/5 hover:border-black/15 hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 flex flex-col gap-8">
+              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.8, ease: "easeOut" as any } } }} className="group bg-white p-10 md:p-12 rounded-3xl border border-black/5 hover:border-black/15 hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 flex flex-col gap-8">
                 <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-black/5 flex items-center justify-center group-hover:bg-[#0a0a0a] transition-colors duration-500">
                   <f.icon size={24} strokeWidth={1.5} className="text-[#0a0a0a] group-hover:text-white transition-colors duration-500" />
                 </div>

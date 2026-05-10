@@ -67,9 +67,9 @@ function useSecondsAgo(date: Date | null): string {
   return label;
 }
 
-const FADE_UP = {
+const FADE_UP: any = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as any } }
 };
 
 export function MobileManifesto() {
