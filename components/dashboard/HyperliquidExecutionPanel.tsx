@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useWalletClient } from 'wagmi';
 import { TrendingUp, TrendingDown, Zap, RefreshCw, AlertTriangle, Target } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -35,6 +35,7 @@ const TOP_MARKETS = ['BTC', 'ETH', 'SOL', 'ARB', 'OP', 'AVAX', 'LINK', 'UNI'];
 
 export function HyperliquidExecutionPanel() {
   const { address, isConnected } = useAccount();
+  const { data: walletClient } = useWalletClient();
 
   const [markets, setMarkets] = useState<MarketData[]>([]);
   const [positions, setPositions] = useState<PositionData[]>([]);
@@ -74,22 +75,14 @@ export function HyperliquidExecutionPanel() {
         })
         .filter((m: MarketData) => TOP_MARKETS.includes(m.coin));
 
-      setMarkets(enriched.length ? enriched : getFallbackMarkets());
+      setMarkets(enriched);
     } catch (err) {
       console.error('[Hyperliquid] Market fetch failed:', err);
-      // Fallback data to guarantee 100% UI uptime for "funcionamiento correcto"
-      setMarkets(getFallbackMarkets());
+      setMarkets([]); // Explicit empty state on failure (Zero-Mock)
     } finally {
       setIsLoadingMarkets(false);
     }
   }, []);
-
-  const getFallbackMarkets = () => [
-    { coin: 'BTC', markPx: '64532.10', fundingRate: '0.0012', openInterest: '1240500000', volume24h: '3500000000', priceChange24h: 2.4 },
-    { coin: 'ETH', markPx: '3452.45', fundingRate: '0.0015', openInterest: '840500000', volume24h: '1500000000', priceChange24h: 1.8 },
-    { coin: 'SOL', markPx: '145.20', fundingRate: '0.0042', openInterest: '240500000', volume24h: '900000000', priceChange24h: -1.2 },
-    { coin: 'ARB', markPx: '1.12', fundingRate: '0.0021', openInterest: '40500000', volume24h: '150000000', priceChange24h: 4.5 },
-  ];
 
   // Fetch open positions for connected wallet
   const fetchPositions = useCallback(async () => {
@@ -113,18 +106,10 @@ export function HyperliquidExecutionPanel() {
           leverage: p.position.leverage?.value?.toString() ?? '1',
         }));
         
-      let mergedPos = openPos;
-      try {
-        const stored = localStorage.getItem('hl_local_positions');
-        if (stored) {
-           const localData = JSON.parse(stored) as PositionData[];
-           mergedPos = [...localData, ...openPos];
-        }
-      } catch (e) {}
-
-      setPositions(mergedPos);
+      setPositions(openPos);
     } catch (err) {
       console.error('[Hyperliquid] Position fetch failed:', err);
+      setPositions([]);
     } finally {
       setIsLoadingPositions(false);
     }
@@ -140,13 +125,10 @@ export function HyperliquidExecutionPanel() {
     if (isConnected) fetchPositions();
   }, [isConnected, fetchPositions, activeTab]);
 
-  // ── Place a market order via Hyperliquid API ─────────────────────────────
-  // NOTE: In production, real Hyperliquid orders require signing with the
-  // user's private key via the Hyperliquid SDK (@nktkas/hyperliquid).
-  // This function demonstrates the full order submission architecture
-  // and will request a wallet signature as the order payload.
+  // ── Place a market order via Backend Relay ─────────────────────────────
+  // Real orders require an L1 signature.
   const placeOrder = useCallback(async () => {
-    if (!isConnected || !address) {
+    if (!isConnected || !address || !walletClient) {
       toast.error('Connect your wallet to trade');
       return;
     }
@@ -159,41 +141,37 @@ export function HyperliquidExecutionPanel() {
     const toastId = toast.loading(`Signing ${side.toUpperCase()} ${size} ${selectedCoin} @ ${leverage}x…`);
 
     try {
-      // ── SIMULATION MODE ──────────────────────────────────────────────────────
-      // To ensure perfectly pristine UI/UX without actual L1 mainnet exposure
-      // (which requires @nktkas/hyperliquid SDK and user's private key signature),
-      // we robustly simulate the execution pipeline and merge state locally.
-      
       const isBuy = side === 'long';
       const selectedMarket = markets.find((m) => m.coin === selectedCoin);
-      const markPrice = parseFloat(selectedMarket?.markPx ?? '0');
-      
-      if (markPrice === 0) throw new Error('Market data unavailable');
+      if (!selectedMarket) throw new Error('Market data unavailable');
 
-      // Slippage-adjusted fill price
-      const slippageFactor = isBuy ? 1.002 : 0.998;
-      const fillPx = (markPrice * slippageFactor).toFixed(4);
+      // Request actual signature from user's wallet
+      const messageToSign = `Approve ${isBuy ? 'LONG' : 'SHORT'} order for ${size} USD of ${selectedCoin} at ${leverage}x leverage on Hyperliquid.`;
+      const signature = await walletClient.signMessage({ 
+        message: messageToSign,
+        account: address as any
+      });
 
-      // Simulate network & L1 signing latency
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Send the signature and payload to the real backend execution API
+      const res = await fetch('/api/hyperliquid/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          address,
+          signature,
+          coin: selectedCoin,
+          isBuy,
+          sz: parseFloat(size),
+          leverage
+        })
+      });
 
-      // Append to local simulated positions
-      const newPos: PositionData = {
-        coin: selectedCoin,
-        szi: isBuy ? (parseFloat(size) / markPrice).toString() : (-(parseFloat(size) / markPrice)).toString(),
-        entryPx: fillPx,
-        unrealizedPnl: '0.00',
-        leverage: leverage.toString(),
-      };
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Execution failed with status ${res.status}`);
+      }
 
-      try {
-        const stored = localStorage.getItem('hl_local_positions');
-        const existing = stored ? JSON.parse(stored) : [];
-        const merged = [newPos, ...existing];
-        localStorage.setItem('hl_local_positions', JSON.stringify(merged));
-      } catch (e) {}
-
-      toast.success(`${side.toUpperCase()} ${size} ${selectedCoin} at ${leverage}x executed successfully`, { id: toastId, style: { background: '#050505', color: '#00C076', border: '1px solid #00C07640' } });
+      toast.success(`${side.toUpperCase()} ${size} ${selectedCoin} executed successfully on L1`, { id: toastId, style: { background: '#050505', color: '#00C076', border: '1px solid #00C07640' } });
       setSize('');
       setActiveTab('positions');
       fetchPositions();
@@ -203,7 +181,7 @@ export function HyperliquidExecutionPanel() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [isConnected, address, side, size, selectedCoin, leverage, markets, fetchPositions]);
+  }, [isConnected, address, side, size, selectedCoin, leverage, markets, fetchPositions, walletClient]);
 
   const selectedMarket = markets.find((m) => m.coin === selectedCoin);
 

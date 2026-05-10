@@ -1,15 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useWalletClient } from 'wagmi';
 import { Lock, Send, RefreshCw, MessageCircle, ChevronLeft, Zap, Shield } from 'lucide-react';
 import { toast } from 'sonner';
-
-// ── Simulated XMTP SDK for Universal Uptime ───────────────────────────────
-// Replaces fragile browser-sdk with robust local storage simulation to guarantee
-// "miles de trillones de parametros" level UX without actual network failure points.
-
-const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+import { getXMTPClient, listConversations, getMessages, sendMessage, streamMessages } from '@/lib/xmtp/client';
+import type { Client, Conversation, DecodedMessage } from '@xmtp/browser-sdk';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -19,8 +15,9 @@ interface Message {
   sent: Date;
 }
 
-interface Conversation {
+interface ChatConvo {
   peerAddress: string;
+  conversation: Conversation;
   messages: Message[];
   lastMessage?: Message;
 }
@@ -32,9 +29,11 @@ const fmtTime = (d: Date) =>
 
 export function SovereignChat() {
   const { address, isConnected } = useAccount();
+  const { data: walletClient } = useWalletClient();
 
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConvo, setActiveConvo] = useState<Conversation | null>(null);
+  const [xmtpClient, setXmtpClient] = useState<Client | null>(null);
+  const [conversations, setConversations] = useState<ChatConvo[]>([]);
+  const [activeConvo, setActiveConvo] = useState<ChatConvo | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMsg, setInputMsg] = useState('');
   const [isInitializing, setIsInitializing] = useState(false);
@@ -51,49 +50,50 @@ export function SovereignChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Load convos from local storage
-  const loadConvos = useCallback(() => {
-    if (!address) return;
-    const key = `sov_chat_${address.toLowerCase()}`;
-    const stored = localStorage.getItem(key);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        const enriched = Object.keys(parsed).map(peer => {
-          const msgs = parsed[peer].map((m: any) => ({ ...m, sent: new Date(m.sent) }));
-          return {
-            peerAddress: peer,
-            messages: msgs,
-            lastMessage: msgs[msgs.length - 1]
-          };
-        });
-        setConversations(enriched);
-        return parsed;
-      } catch (e) {}
+  // Load convos from real network
+  const loadConvos = useCallback(async (client: Client) => {
+    try {
+      const convos = await listConversations(client);
+      const enriched = await Promise.all(convos.map(async (c) => {
+        const rawMsgs = await c.messages();
+        const parsedMsgs = rawMsgs.map(m => ({
+          id: m.id,
+          senderAddress: m.senderAddress,
+          content: m.content as string,
+          sent: m.sent
+        }));
+        return {
+          peerAddress: c.peerAddress,
+          conversation: c,
+          messages: parsedMsgs,
+          lastMessage: parsedMsgs[parsedMsgs.length - 1]
+        };
+      }));
+      setConversations(enriched);
+    } catch (err: any) {
+      console.error("Failed to load XMTP convos", err);
     }
-    return {};
-  }, [address]);
+  }, []);
 
-  const saveMessage = (peer: string, msg: Message) => {
-    if (!address) return;
-    const key = `sov_chat_${address.toLowerCase()}`;
-    const all = loadConvos() || {};
-    if (!all[peer]) all[peer] = [];
-    all[peer].push(msg);
-    localStorage.setItem(key, JSON.stringify(all));
-    loadConvos();
-  };
-
-  // ── Initialize XMTP client (Simulated) ───────────────────────────────────
+  // ── Initialize XMTP client ───────────────────────────────────
   const initClient = useCallback(async () => {
-    if (!isConnected || !address) {
+    if (!isConnected || !address || !walletClient) {
       toast.error('Connect your wallet to access Sovereign Chat');
       return;
     }
     setIsInitializing(true);
     try {
-      await delay(1200); // Simulate key generation and network sync
-      loadConvos();
+      // Create adapter for wagmi wallet client to match XMTP expectation
+      const signer = {
+        getAddress: async () => address,
+        signMessage: async (message: string) => {
+          return walletClient.signMessage({ message, account: address as any });
+        }
+      };
+
+      const client = await getXMTPClient(signer);
+      setXmtpClient(client);
+      await loadConvos(client);
       setIsReady(true);
       toast.success('Sovereign Channel Established — All messages are E2E Encrypted');
     } catch (err: any) {
@@ -101,44 +101,93 @@ export function SovereignChat() {
     } finally {
       setIsInitializing(false);
     }
-  }, [isConnected, address, loadConvos]);
+  }, [isConnected, address, walletClient, loadConvos]);
+
+  // ── Stream incoming messages ───────────────────────────────────────────────
+  useEffect(() => {
+    let isStreaming = true;
+    if (!xmtpClient) return;
+
+    const startStream = async () => {
+      try {
+        setStreamActive(true);
+        for await (const message of await streamMessages(xmtpClient)) {
+          if (!isStreaming) break;
+          // Handle new message - append to active convo if matched
+          const parsed = {
+            id: message.id,
+            senderAddress: message.senderAddress,
+            content: message.content as string,
+            sent: message.sent
+          };
+          
+          if (activeConvo && activeConvo.peerAddress.toLowerCase() === message.conversation.peerAddress.toLowerCase()) {
+             setMessages(prev => {
+                if (prev.find(p => p.id === parsed.id)) return prev;
+                return [...prev, parsed];
+             });
+          }
+          // Reload convos to update list
+          loadConvos(xmtpClient);
+        }
+      } catch (e) {
+        console.error("Stream failed", e);
+      } finally {
+        setStreamActive(false);
+      }
+    };
+    startStream();
+    return () => { isStreaming = false; };
+  }, [xmtpClient, activeConvo, loadConvos]);
 
   // ── Open a conversation ──────────────────────────────────────────────────
   const openConversation = useCallback(
     async (peerAddress: string) => {
-      if (!isReady) return;
-      setStreamActive(true);
-      await delay(400); // simulate decrypting history
-      const all = loadConvos() || {};
-      const msgs = all[peerAddress] || [];
-      setMessages(msgs);
-      setActiveConvo({ peerAddress, messages: msgs });
-      setStreamActive(false);
+      if (!isReady || !xmtpClient) return;
+      try {
+        const rawMsgs = await getMessages(xmtpClient, peerAddress);
+        const parsedMsgs = rawMsgs.map(m => ({
+          id: m.id,
+          senderAddress: m.senderAddress,
+          content: m.content as string,
+          sent: m.sent
+        }));
+        
+        setMessages(parsedMsgs);
+        setActiveConvo({ 
+            peerAddress, 
+            conversation: null as any, // Not strictly needed for active display if we send via client
+            messages: parsedMsgs 
+        });
+      } catch (err: any) {
+        toast.error("Failed to open conversation: " + err.message);
+      }
     },
-    [isReady, loadConvos]
+    [isReady, xmtpClient]
   );
 
   // ── Send message ─────────────────────────────────────────────────────────
-  const sendMessage = useCallback(async () => {
-    if (!isReady || !activeConvo || !inputMsg.trim() || !address) return;
+  const handleSendMessage = useCallback(async () => {
+    if (!isReady || !activeConvo || !inputMsg.trim() || !address || !xmtpClient) return;
     setIsSending(true);
     try {
-      await delay(300); // Simulate encryption
+      await sendMessage(xmtpClient, activeConvo.peerAddress, inputMsg.trim());
+      // The stream might catch it, but we can optimistically add it or wait for reload
       const newMsg: Message = {
-        id: Math.random().toString(36).slice(2),
+        id: Math.random().toString(36).slice(2), // temp id
         senderAddress: address,
         content: inputMsg.trim(),
         sent: new Date()
       };
-      saveMessage(activeConvo.peerAddress, newMsg);
       setMessages(prev => [...prev, newMsg]);
       setInputMsg('');
+      loadConvos(xmtpClient);
     } catch (err: any) {
       toast.error(`Send failed: ${err.message}`);
     } finally {
       setIsSending(false);
     }
-  }, [isReady, activeConvo, inputMsg, address]);
+  }, [isReady, activeConvo, inputMsg, address, xmtpClient, loadConvos]);
 
   // ── Start a new conversation ─────────────────────────────────────────────
   const startNewConvo = useCallback(async () => {
@@ -156,7 +205,7 @@ export function SovereignChat() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      handleSendMessage();
     }
   };
 
@@ -339,7 +388,7 @@ export function SovereignChat() {
                 style={{ lineHeight: '1.5' }}
               />
               <button
-                onClick={sendMessage}
+                onClick={handleSendMessage}
                 disabled={isSending || !inputMsg.trim()}
                 className="shrink-0 w-10 h-10 rounded-xl bg-[#050505] flex items-center justify-center text-white transition-all hover:bg-[#1a1a1a] disabled:opacity-40 disabled:cursor-not-allowed"
               >
