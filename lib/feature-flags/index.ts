@@ -11,7 +11,7 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-import { redis } from '@/lib/redis/client';
+import { redisClient as redis } from '@/lib/redis/client';
 
 export type FlagTier = 'ALL' | 'STARTER' | 'PRO' | 'ELITE';
 

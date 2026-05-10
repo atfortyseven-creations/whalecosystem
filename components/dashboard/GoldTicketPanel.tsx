@@ -6,7 +6,9 @@ import { toast } from 'sonner';
 import {
   useConnect, useSignMessage,
   useReadContract, useSwitchChain, useAccount,
+  useSendTransaction
 } from 'wagmi';
+import { parseEther } from 'viem';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { injected } from 'wagmi/connectors';
 import {
@@ -16,34 +18,10 @@ import {
 import { WhaleLogo } from '@/components/shared/WhaleLogo';
 import { useRouter } from 'next/navigation';
 
-// ── Contract ──────────────────────────────────────────────────────────────────
-const CONTRACT = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
+// ── Treasury ──────────────────────────────────────────────────────────────────
+const TREASURY_WALLET = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
 const OPTIMISM_CHAIN_ID = 10;
 const MAX_SUPPLY = 200;
-
-const ABI = [
-  { inputs: [], name: 'mint', outputs: [], stateMutability: 'payable', type: 'function' },
-  {
-    inputs: [{ internalType: 'address', name: 'account', type: 'address' }, { internalType: 'uint256', name: 'id', type: 'uint256' }],
-    name: 'balanceOf', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view', type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'id', type: 'uint256' }],
-    name: 'totalSupply', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view', type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'id', type: 'uint256' }],
-    name: 'maxSupply', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view', type: 'function',
-  },
-  {
-    inputs: [], name: 'mintPrice',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view', type: 'function',
-  },
-] as const;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const truncAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -289,9 +267,11 @@ export function GoldTicketPanel() {
   const router = useRouter();
   const { switchChain } = useSwitchChain();
   const { signMessage, isPending: isSigning } = useSignMessage();
+  const { sendTransactionAsync } = useSendTransaction();
   const [dbStats, setDbStats] = useState<any>(null);
   const [signatureData, setSignatureData] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
+  const MINT_FEE_ETH = "0.00111"; // Highly addictive micro-transaction fee
 
   const fetchStats = useCallback(async () => {
     try {
@@ -363,23 +343,43 @@ export function GoldTicketPanel() {
     if (isSovereignHandshake && !isWagmiConnected) {
       performClaim(); // Bypass Wagmi signMessage, backend will auth via session cookie
     } else {
-      const toastId = toast.loading('Awaiting wallet signature...');
-      signMessage(
-        { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
-        {
-          onSuccess: async (cryptoSignature: string) => {
-            toast.dismiss(toastId);
-            await performClaim(cryptoSignature);
-          },
-          onError: (err: any) => {
-            toast.dismiss(toastId);
-            toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
-            setIsMinting(false);
-          }
+      try {
+        if (chainId !== OPTIMISM_CHAIN_ID) {
+            toast.info('Switching to Optimism Network...');
+            await switchChain({ chainId: OPTIMISM_CHAIN_ID });
         }
-      );
+
+        const txToast = toast.loading(`Initiating Sovereign Mint Protocol (${MINT_FEE_ETH} ETH)...`);
+        
+        const txHash = await sendTransactionAsync({
+            to: TREASURY_WALLET,
+            value: parseEther(MINT_FEE_ETH)
+        });
+        
+        toast.dismiss(txToast);
+        toast.success(`Transaction sent: ${txHash.slice(0,10)}... Please sign the ledger entry.`);
+
+        const signToastId = toast.loading('Awaiting cryptographic signature...');
+        signMessage(
+          { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
+          {
+            onSuccess: async (cryptoSignature: string) => {
+              toast.dismiss(signToastId);
+              await performClaim(cryptoSignature);
+            },
+            onError: (err: any) => {
+              toast.dismiss(signToastId);
+              toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
+              setIsMinting(false);
+            }
+          }
+        );
+      } catch (error: any) {
+        toast.error(`Mint execution failed: ${error?.shortMessage || error?.message || 'Transaction rejected'}`);
+        setIsMinting(false);
+      }
     }
-  }, [isConnected, isWagmiConnected, isSovereignHandshake, signatureData, isMinting, isSigning, address, signMessage, router, fetchStats]);
+  }, [isConnected, isWagmiConnected, isSovereignHandshake, signatureData, isMinting, isSigning, address, signMessage, sendTransactionAsync, switchChain, chainId, router, fetchStats]);
 
   const hasTicket = dbStats?.ticket || false;
 
@@ -416,7 +416,7 @@ export function GoldTicketPanel() {
                       onMint={handleMint}
                       mintLabel={
                         isMinting || isSigning ? 'SIGNING...' :
-                        !isConnected || !isWagmiConnected ? 'CONNECT WALLET' : 'AUTHORIZE MINT'
+                        !isConnected || !isWagmiConnected ? 'CONNECT WALLET' : `MINT FOR ${MINT_FEE_ETH} ETH`
                       }
                     />
                  </div>

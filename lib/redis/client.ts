@@ -95,7 +95,8 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
 
     console.log(`[Redis:${config.name || 'Factory'}] 🚀 Initializing legendary connection...`);
 
-    const Redis = require('ioredis');
+    const ioredisPkg = 'ioredis';
+    const Redis = eval('require')(ioredisPkg);
     const client = new Redis(REDIS_URL, {
         family: 4, // [IPv4-FIX] Ensure Railway proxy connectivity avoids IPv6 blackholes
         keepAlive: 10000, // [STABILITY] Keep-Alive to prevent proxy timeout
