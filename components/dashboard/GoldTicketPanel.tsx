@@ -291,10 +291,10 @@ export function GoldTicketPanel() {
   const handleMint = useCallback(async () => {
     if (!isConnected) { router.push('/connect'); return; }
 
-    // If user has only a cookie/QR session, they have no wagmi connector → cannot sign
-    if (!isWagmiConnected && !isSovereignHandshake) {
-      toast.error('Wallet connection required for signing', {
-        description: 'Your current session cannot sign transactions. Click to connect a Web3 wallet (MetaMask, WalletConnect, or Google Auth).',
+    // If user is not Wagmi connected, they cannot pay the required fee
+    if (!isWagmiConnected) {
+      toast.error('Wallet connection required for minting', {
+        description: 'A connected Web3 wallet is required to process the mint transaction fee.',
         duration: 6000,
       });
       router.push('/connect');
@@ -340,44 +340,40 @@ export function GoldTicketPanel() {
       }
     };
 
-    if (isSovereignHandshake && !isWagmiConnected) {
-      performClaim(); // Bypass Wagmi signMessage, backend will auth via session cookie
-    } else {
-      try {
-        if (chainId !== OPTIMISM_CHAIN_ID) {
-            toast.info('Switching to Optimism Network...');
-            await switchChain({ chainId: OPTIMISM_CHAIN_ID });
-        }
-
-        const txToast = toast.loading(`Initiating Sovereign Mint Protocol (${MINT_FEE_ETH} ETH)...`);
-        
-        const txHash = await sendTransactionAsync({
-            to: TREASURY_WALLET,
-            value: parseEther(MINT_FEE_ETH)
-        });
-        
-        toast.dismiss(txToast);
-        toast.success(`Transaction sent: ${txHash.slice(0,10)}... Please sign the ledger entry.`);
-
-        const signToastId = toast.loading('Awaiting cryptographic signature...');
-        signMessage(
-          { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
-          {
-            onSuccess: async (cryptoSignature: string) => {
-              toast.dismiss(signToastId);
-              await performClaim(cryptoSignature);
-            },
-            onError: (err: any) => {
-              toast.dismiss(signToastId);
-              toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
-              setIsMinting(false);
-            }
-          }
-        );
-      } catch (error: any) {
-        toast.error(`Mint execution failed: ${error?.shortMessage || error?.message || 'Transaction rejected'}`);
-        setIsMinting(false);
+    try {
+      if (chainId !== OPTIMISM_CHAIN_ID) {
+          toast.info('Switching to Optimism Network...');
+          await switchChain({ chainId: OPTIMISM_CHAIN_ID });
       }
+
+      const txToast = toast.loading(`Initiating Sovereign Mint Protocol (${MINT_FEE_ETH} ETH)...`);
+      
+      const txHash = await sendTransactionAsync({
+          to: TREASURY_WALLET,
+          value: parseEther(MINT_FEE_ETH)
+      });
+      
+      toast.dismiss(txToast);
+      toast.success(`Transaction sent: ${txHash.slice(0,10)}... Please sign the ledger entry.`);
+
+      const signToastId = toast.loading('Awaiting cryptographic signature...');
+      signMessage(
+        { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
+        {
+          onSuccess: async (cryptoSignature: string) => {
+            toast.dismiss(signToastId);
+            await performClaim(cryptoSignature);
+          },
+          onError: (err: any) => {
+            toast.dismiss(signToastId);
+            toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
+            setIsMinting(false);
+          }
+        }
+      );
+    } catch (error: any) {
+      toast.error(`Mint execution failed: ${error?.shortMessage || error?.message || 'Transaction rejected'}`);
+      setIsMinting(false);
     }
   }, [isConnected, isWagmiConnected, isSovereignHandshake, signatureData, isMinting, isSigning, address, signMessage, sendTransactionAsync, switchChain, chainId, router, fetchStats]);
 

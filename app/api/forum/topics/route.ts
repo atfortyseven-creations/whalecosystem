@@ -92,7 +92,8 @@ export async function POST(req: NextRequest) {
         const { title, content, categoryId, tags, cryptoSignature } = body;
 
         if (!title || !content || !categoryId || !cryptoSignature) {
-            return NextResponse.json({ error: 'Missing required fields or cryptographic signature' }, { status: 400 });
+            console.error('[Forum] Missing fields validation failed:', { title: !!title, content: !!content, categoryId: !!categoryId, cryptoSignature: !!cryptoSignature });
+            return NextResponse.json({ error: `Missing required fields or cryptographic signature. Received: title=${!!title}, content=${!!content}, category=${!!categoryId}, sig=${!!cryptoSignature}` }, { status: 400 });
         }
 
         // [ON-CHAIN ARTICULATION] Cryptographic Non-Repudiation Check

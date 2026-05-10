@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { useConnect, useSignMessage, useReadContract, useSwitchChain, useAccount } from 'wagmi';
+import { useConnect, useSignMessage, useReadContract, useSwitchChain, useAccount, useSendTransaction } from 'wagmi';
+import { parseEther } from 'viem';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { injected } from 'wagmi/connectors';
 import {
@@ -345,9 +346,15 @@ export function VossSupremacyPanel() {
   const { isConnected: isWagmiConnected } = useAccount();
   const router = useRouter();
   const { signMessage, isPending: isSigning } = useSignMessage();
+  const { sendTransactionAsync } = useSendTransaction();
+  const { switchChain } = useSwitchChain();
+  const chainId = useAccount().chainId;
   const [dbStats, setDbStats] = useState<any>(null);
   const [signatureData, setSignatureData] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
+  const OPTIMISM_CHAIN_ID = 10;
+  const TREASURY_WALLET = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
+  const MINT_FEE_ETH = "0.00111";
 
   const fetchStats = useCallback(async (signal?: AbortSignal) => {
     try {
@@ -387,50 +394,69 @@ export function VossSupremacyPanel() {
 
     if (isMinting || isSigning) return;
     setIsMinting(true);
-    const toastId = toast.loading('Awaiting external wallet verification...', { style: { background: '#050505', color: '#D4AF37', border: '1px solid #D4AF3740' } });
 
-    signMessage(
-      { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
-      {
-        onSuccess: async (cryptoSignature: string) => {
-          toast.dismiss(toastId);
-          const t2 = toast.loading('Processing ticket allocation...', { style: { background: '#050505', color: '#D4AF37', border: '1px solid #D4AF3740' } });
-          try {
-            const res = await fetch('/api/golden-ticket/claim', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                walletAddress: address,
-                cryptoSignature,
-                signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() })
-              })
-            });
-            toast.dismiss(t2);
-            const json = await res.json();
-            if (res.ok) {
-              toast.success('AUTHORIZATION GRANTED.', { description: 'Ticket allocation successful.', style: { background: '#050505', color: '#00C076', border: '1px solid #00C07640' } });
-              fetchStats();
-            } else if (res.status === 409) {
-              toast.info('Request obsolete: Wallet already owns an allocated ticket.');
-              fetchStats();
-            } else {
-              toast.error(`Allocation failure: ${json.error || 'Server rejected context'}`);
+    try {
+      if (chainId !== OPTIMISM_CHAIN_ID) {
+          toast.info('Switching to Optimism Network...');
+          await switchChain({ chainId: OPTIMISM_CHAIN_ID });
+      }
+
+      const txToast = toast.loading(`Initiating Sovereign Mint Protocol (${MINT_FEE_ETH} ETH)...`, { style: { background: '#050505', color: '#D4AF37', border: '1px solid #D4AF3740' } });
+      const txHash = await sendTransactionAsync({
+          to: TREASURY_WALLET,
+          value: parseEther(MINT_FEE_ETH)
+      });
+      toast.dismiss(txToast);
+      toast.success(`Transaction verified. Awaiting external wallet verification...`, { style: { background: '#050505', color: '#00C076', border: '1px solid #00C07640' } });
+
+      const toastId = toast.loading('Awaiting external wallet verification...', { style: { background: '#050505', color: '#D4AF37', border: '1px solid #D4AF3740' } });
+
+      signMessage(
+        { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
+        {
+          onSuccess: async (cryptoSignature: string) => {
+            toast.dismiss(toastId);
+            const t2 = toast.loading('Processing ticket allocation...', { style: { background: '#050505', color: '#D4AF37', border: '1px solid #D4AF3740' } });
+            try {
+              const res = await fetch('/api/golden-ticket/claim', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  walletAddress: address,
+                  cryptoSignature,
+                  signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() })
+                })
+              });
+              toast.dismiss(t2);
+              const json = await res.json();
+              if (res.ok) {
+                toast.success('AUTHORIZATION GRANTED.', { description: 'Ticket allocation successful.', style: { background: '#050505', color: '#00C076', border: '1px solid #00C07640' } });
+                fetchStats();
+              } else if (res.status === 409) {
+                toast.info('Request obsolete: Wallet already owns an allocated ticket.');
+                fetchStats();
+              } else {
+                toast.error(`Allocation failure: ${json.error || 'Server rejected context'}`);
+              }
+            } catch (e) {
+              toast.dismiss(t2);
+              toast.error('Server sync failed. Please review your connection.');
+            } finally {
+              setIsMinting(false);
             }
-          } catch (e) {
-            toast.dismiss(t2);
-            toast.error('Server sync failed. Please review your connection.');
-          } finally {
+          },
+          onError: (err: any) => {
+            toast.dismiss(toastId);
+            toast.error(`Verification aborted: ${err?.shortMessage || err?.message}`);
             setIsMinting(false);
           }
-        },
-        onError: (err: any) => {
-          toast.dismiss(toastId);
-          toast.error(`Verification aborted: ${err?.shortMessage || err?.message}`);
-          setIsMinting(false);
         }
-      }
-    );
-  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, router, fetchStats, isWagmiConnected]);
+      );
+    } catch (error: any) {
+      toast.error(`Mint execution failed: ${error?.shortMessage || error?.message || 'Transaction rejected'}`);
+      setIsMinting(false);
+    }
+  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, router, fetchStats, isWagmiConnected, sendTransactionAsync, switchChain, chainId]);
 
   const hasTicket = dbStats?.ticket || false;
 
