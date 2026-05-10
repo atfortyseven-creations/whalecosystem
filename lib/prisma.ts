@@ -124,14 +124,9 @@ function getProductionUrl(): string | undefined {
         if (urlObj.protocol === 'postgresql:' || urlObj.protocol === 'postgres:') {
             // Force PgBouncer
             urlObj.searchParams.set('pgbouncer', 'true');
-            // Railway Cluster Configuration: 20 connections per PM2 instance
-            urlObj.searchParams.set('connection_limit', process.env.DATABASE_CONNECTION_LIMIT || '20');
-            // Aggressive TCP timeout
-            urlObj.searchParams.set('connect_timeout', '10');
-            // Max time a connection can be held in the pool
-            urlObj.searchParams.set('pool_timeout', '10');
-            // Kill queries taking longer than 5s to prevent total DB lockup during high traffic
-            urlObj.searchParams.set('statement_timeout', '5000');
+            // Removed connect_timeout, pool_timeout, and statement_timeout as they cause Prisma to throw
+            // "PANIC: timer has gone away" in serverless/edge environments and occasionally Node instances
+            // when the Tokio runtime drops its internal timer handles.
         }
         return urlObj.toString();
     } catch {
