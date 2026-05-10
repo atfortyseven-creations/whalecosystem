@@ -11,6 +11,7 @@ if (!process.env.JWT_SECRET) {
 // Force deployment trigger [INSTITUTIONAL SYNC]: 2026-04-21T04:15:00Z
 const nextConfig = {
     ...(process.env.IPFS_BUILD === 'true' ? { output: 'export' } : {}),
+    outputFileTracingRoot: __dirname,
     transpilePackages: [
         'three',
         '@react-three/fiber',

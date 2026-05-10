@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAccount, useSignMessage } from 'wagmi';
 import { Lock, Send, RefreshCw, MessageCircle, ChevronLeft, Zap, Shield } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 // ── XMTP SDK (browser-safe) ──────────────────────────────────────────────────
 // We use dynamic import to avoid SSR issues with the XMTP browser SDK

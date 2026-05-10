@@ -98,7 +98,7 @@ export async function getFlag(flagKey: string): Promise<FeatureFlag | null> {
   if (cached) return cached;
 
   try {
-    const raw = await redis.get<FeatureFlag>(`${FLAG_PREFIX}${flagKey}`);
+    const raw = await redis.get(`${FLAG_PREFIX}${flagKey}`);
     if (!raw) return null;
     toCache(flagKey, raw);
     return raw;

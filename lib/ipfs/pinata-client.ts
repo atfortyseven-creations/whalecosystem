@@ -57,7 +57,7 @@ export async function pinFileToIPFS(
   }
 
   const formData = new FormData();
-  const blob = file instanceof Buffer ? new Blob([file], { type: mimeType }) : file;
+  const blob = file instanceof Buffer ? new Blob([new Uint8Array(file)], { type: mimeType }) : file;
   formData.append('file', blob, filename);
 
   // Pinata metadata with signed attribution
