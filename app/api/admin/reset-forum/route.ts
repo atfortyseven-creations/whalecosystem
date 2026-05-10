@@ -2,8 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { isAdmin } from '@/lib/admin';
+import { requireAdmin } from '@/lib/admin-guard';
 
-export async function GET(req: Request) {
+export async function POST(req: Request) {
+  const deny = requireAdmin(req);
+  if (deny) return deny;
+
   try {
     const cookieStore = await cookies();
     const address = cookieStore.get('sovereign_handshake')?.value;

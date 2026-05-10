@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Pause, Play, Download, Copy, AlertTriangle, RefreshCw, Server, Wallet, Code, Bot } from 'lucide-react';
-import { NodeType } from './CanvasEngine';
+import { NodeType } from './canvas-types';
 
 interface ContextMenuProps {
     x: number;

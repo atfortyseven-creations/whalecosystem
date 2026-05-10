@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { isAdmin } from '@/lib/admin';
+import { requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +11,10 @@ export const dynamic = 'force-dynamic';
  * Deletes ALL forum posts and topics from the database.
  * Admin-only. Single-use cleanup endpoint.
  */
-export async function POST() {
+export async function POST(req: Request) {
+    const deny = requireAdmin(req);
+    if (deny) return deny;
+
     try {
         const cookieStore = await cookies();
         const address = cookieStore.get('sovereign_handshake')?.value;

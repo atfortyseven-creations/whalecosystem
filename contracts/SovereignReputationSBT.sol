@@ -32,6 +32,8 @@ contract SovereignReputationSBT is ERC1155, Ownable {
     mapping(address => uint256) public forumPostCount;     // on-chain post count (relayed)
     mapping(address => bool) public isGenesisMember;       // genesis ticket holder
     mapping(address => bytes32[]) public milestoneHashes;  // immutable milestone record
+    /// @dev Prevents the same milestone hash from being recorded twice for the same holder.
+    mapping(address => mapping(bytes32 => bool)) public milestoneRecorded;
 
     uint256 public constant MAX_TIER = 3;
     string private _baseMetadataUri;
@@ -109,6 +111,12 @@ contract SovereignReputationSBT is ERC1155, Ownable {
         string calldata milestone
     ) external onlyOwner {
         require(hasSBT[holder], "SBT: Wallet has no SBT");
+        // Deduplication guard: each milestone hash can only be recorded once per holder.
+        // Without this, a malicious or compromised relayer could call recordMilestone
+        // repeatedly with the same hash to artificially inflate forumPostCount and
+        // allow a holder to satisfy tier-upgrade thresholds fraudulently.
+        require(!milestoneRecorded[holder][milestoneHash], "SBT: Milestone already recorded");
+        milestoneRecorded[holder][milestoneHash] = true;
         milestoneHashes[holder].push(milestoneHash);
         forumPostCount[holder]++;
         emit MilestoneRecorded(holder, milestone, block.timestamp);

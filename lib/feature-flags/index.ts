@@ -100,8 +100,11 @@ export async function getFlag(flagKey: string): Promise<FeatureFlag | null> {
   try {
     const raw = await redis.get(`${FLAG_PREFIX}${flagKey}`);
     if (!raw) return null;
-    toCache(flagKey, raw);
-    return raw;
+    // ioredis returns a raw string; Upstash Redis returns an already-parsed object.
+    // Handle both to remain compatible with both clients.
+    const flag: FeatureFlag = typeof raw === 'string' ? JSON.parse(raw) : raw as FeatureFlag;
+    toCache(flagKey, flag);
+    return flag;
   } catch {
     return null;
   }
@@ -109,9 +112,11 @@ export async function getFlag(flagKey: string): Promise<FeatureFlag | null> {
 
 export async function setFlag(flag: FeatureFlag): Promise<void> {
   const redisKey = `${FLAG_PREFIX}${flag.key}`;
-  await redis.set(redisKey, { ...flag, updatedAt: new Date().toISOString() });
+  const payload = { ...flag, updatedAt: new Date().toISOString() };
+  // Serialize to JSON string to be compatible with both ioredis and Upstash
+  await redis.set(redisKey, JSON.stringify(payload));
   await redis.sadd(FLAGS_INDEX, flag.key);
-  memCache.delete(flag.key); // Invalidate cache immediately
+  memCache.delete(flag.key); // Invalidate in-memory cache immediately
 }
 
 export async function deleteFlag(flagKey: string): Promise<void> {

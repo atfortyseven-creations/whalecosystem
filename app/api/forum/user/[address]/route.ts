@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 
-export async function GET(req: Request, { params }: { params: { address: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ address: string }> }) {
     try {
         const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
-        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const authAddress = cookieStore.get('sovereign_handshake')?.value;
+        if (!authAddress) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const userAddress = params.address.toLowerCase();
+        const { address } = await params;
+        const userAddress = address.toLowerCase();
 
         const user = await (prisma as any).user.findUnique({
             where: { walletAddress: userAddress },

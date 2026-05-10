@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Wallet, Bot, Cpu, Link as LinkIcon, Activity } from 'lucide-react';
-import { NodeData } from './CanvasEngine';
+import { NodeData } from './canvas-types';
 
 interface CanvasNodeProps {
     data: NodeData;

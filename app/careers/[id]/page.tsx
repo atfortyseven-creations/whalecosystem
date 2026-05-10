@@ -6,8 +6,9 @@ import { ArrowLeft, MapPin, Clock, DollarSign, ChevronRight } from 'lucide-react
 import { OPEN_ROLES } from '../data';
 import type { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const role = OPEN_ROLES.find(r => r.id === params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const role = OPEN_ROLES.find(r => r.id === id);
   if (!role) return { title: 'Not Found | Whale Alert Network' };
 
   return {
@@ -16,8 +17,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default function CareerDetailPage({ params }: { params: { id: string } }) {
-  const role = OPEN_ROLES.find(r => r.id === params.id);
+export default async function CareerDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const role = OPEN_ROLES.find(r => r.id === id);
 
   if (!role) {
     notFound();

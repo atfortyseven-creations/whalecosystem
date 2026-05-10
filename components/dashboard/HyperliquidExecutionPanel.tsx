@@ -167,8 +167,8 @@ export function HyperliquidExecutionPanel() {
       const slippageFactor = isBuy ? 1.002 : 0.998;
       const fillPx = (markPrice * slippageFactor).toFixed(4);
 
-      // Simulate institutional execution latency
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // NOTE: Direct on-chain execution via Hyperliquid EIP-712 signing is pending
+      // wallet-client integration. Orders are staged locally until signing flow is wired.
 
       const newPos: PositionData = {
         coin: selectedCoin,

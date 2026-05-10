@@ -84,7 +84,7 @@ export function ConnectWalletModal() {
             const pair = await generateX25519KeyPair();
             const sessId = typeof crypto !== 'undefined' && crypto.randomUUID 
                 ? crypto.randomUUID() 
-                : (Math.random().toString(36).substring(2, 15) + Date.now().toString(36));
+                : Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('') + '-' + Date.now().toString(36);
             
             const payload = JSON.stringify({ 
                 uuid: sessId, 

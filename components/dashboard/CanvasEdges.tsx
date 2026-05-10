@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { EdgeData, NodeData } from './CanvasEngine';
+import { EdgeData, NodeData } from './canvas-types';
 
 interface CanvasEdgesProps {
     edges: EdgeData[];

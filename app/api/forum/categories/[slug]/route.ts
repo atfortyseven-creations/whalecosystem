@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 
-export async function GET(req: Request, { params }: { params: { slug: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const cookieStore = await cookies();
         const address = cookieStore.get('sovereign_handshake')?.value;
         if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const slug = params.slug;
+        const { slug } = await params;
 
         const category = await (prisma as any).forumCategory.findUnique({
             where: { slug },

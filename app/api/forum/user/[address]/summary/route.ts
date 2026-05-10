@@ -76,9 +76,10 @@ async function fetchUserSafe(walletAddress: string) {
     } catch { return null; }
 }
 
-export async function GET(req: Request, { params }: { params: { address: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ address: string }> }) {
     try {
-        const userAddress = params.address.toLowerCase();
+        const { address } = await params;
+        const userAddress = address.toLowerCase();
         const user = await fetchUserSafe(userAddress);
         if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 

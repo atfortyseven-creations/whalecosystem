@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as framer from 'framer-motion';
 import { Terminal, ChevronsDown, Loader, Activity, RadioTower } from 'lucide-react';
-import { NodeData } from './CanvasEngine';
+import { NodeData } from './canvas-types';
 import { io, Socket } from 'socket.io-client';
 
 interface TelemetryTerminalProps {
