@@ -41,14 +41,14 @@ export async function addToAddressBook(data: CreateAddressBookEntry): Promise<Ad
     ensName = await reverseResolveENS(data.address) || undefined;
   }
 
-  return prisma.addressBookEntry.create({
+  return (prisma as any).addressBookEntry.create({
     data: {
       authUserId: data.authUserId,
       name: data.name,
       address: data.address.toLowerCase(),
       ensName,
       label: data.label,
-      note: data.note,
+      notes: data.note,
       isFavorite: data.isFavorite || false,
       chainId: data.chainId,
     },

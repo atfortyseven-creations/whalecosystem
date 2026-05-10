@@ -87,7 +87,7 @@ export async function verifyPremiumAccess(userId: string): Promise<{
     }
     
     if (!subscription) return { valid: false, tier: 'FREE' };
-    return { valid: true, tier: 'PREMIUM', expiresAt: subscription.expiresAt };
+    return { valid: true, tier: 'PREMIUM', expiresAt: subscription.expiresAt ?? undefined };
   } catch (error) {
     return { valid: false, tier: 'FREE' };
   }

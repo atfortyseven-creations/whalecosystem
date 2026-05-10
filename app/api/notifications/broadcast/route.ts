@@ -14,13 +14,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Title and Message required' }, { status: 400 });
         }
 
-        // Create Global Notification
+        // Create Global Notification (isGlobal = true, userId optional for global broadcasts)
         const notification = await prisma.notification.create({
             data: {
-                // Let's stick to the Plan: We have `isGlobal`. 
-                // Let's assign it to a placeholder 'ADMIN' or the sender.
-                
-                user: { connect: { walletAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e" } }, // Temporary: Connect to Demo User as sender
                 title,
                 message,
                 type: type || 'system',
