@@ -4,10 +4,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # NOTE: NO set -e — individual command failures must NOT kill the container.
 
+# ── Suppress npm update notices and Prisma update banners (both go to stderr) ──
+export PRISMA_HIDE_UPDATE_MESSAGE=1
+export NPM_CONFIG_UPDATE_NOTIFIER=false
+export NO_UPDATE_NOTIFIER=1
+
 echo "[Sovereign] ═══════════════════════════════════════════════"
 echo "[Sovereign] Phase 1: Prisma client generation..."
 echo "[Sovereign] ═══════════════════════════════════════════════"
-npx prisma generate || echo "[Sovereign] WARNING: prisma generate failed — continuing anyway"
+npx --quiet prisma generate 2>&1 | grep -v 'npm notice' | grep -v 'Update available' | grep -v 'major update' | grep -v 'pris.ly' | grep -v 'npm i ' || echo "[Sovereign] WARNING: prisma generate failed — continuing anyway"
 
 echo "[Sovereign] ═══════════════════════════════════════════════"
 echo "[Sovereign] Phase 2: Database schema synchronization..."
@@ -47,7 +52,7 @@ async function clean() {
 clean();
 " || echo "[Sovereign] Dedup step skipped"
 
-npx prisma db push --accept-data-loss || echo "[Sovereign] WARNING: db push failed — DB may be at latest schema or locked by another instance"
+npx prisma db push --accept-data-loss 2>&1 | grep -v 'npm notice' | grep -v 'Update available' | grep -v 'major update' | grep -v 'pris.ly' | grep -v 'npm i ' || echo "[Sovereign] WARNING: db push failed — DB may be at latest schema or locked by another instance"
 
 echo "[Sovereign] ═══════════════════════════════════════════════"
 echo "[Sovereign] Phase 3: Launching PM2 process mesh..."

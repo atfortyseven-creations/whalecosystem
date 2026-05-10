@@ -223,7 +223,7 @@ export async function getPoolPrices(): Promise<PoolPrice[]> {
 
     // Validate: must be a hex string of at least 64 chars (32 bytes for sqrtPriceX96)
     if (!raw || raw === '0x' || raw === '0x0' || raw.length < 66) {
-      console.warn(`[API] RPC ${getGbAllRpc('eth')[0] || 'public'} returns empty slot0 results.`);
+      // slot0 empty — RPC degraded, CoinGecko fallback will handle it below
       prices.push({ ...p, sqrtPriceX96: '0', tick: 0, price: 0 });
       continue;
     }

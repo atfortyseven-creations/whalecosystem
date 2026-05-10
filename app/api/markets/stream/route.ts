@@ -61,11 +61,11 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
             );
             // If we got at least one price, the endpoint is healthy
             if (Object.keys(prices).length > 0) break;
-            else {
-                console.warn(`[API] RPC ${ep} returns empty slot0 results.`);
-            }
+            // slot0 returned empty — RPC degraded, CEX fallback covers this
+
         } catch (e) {
-            console.error('[API] Provider exception:', e);
+            console.log('[API] RPC provider exception — degrading to CEX data:', (e as Error).message);
+
             RpcRelayerManager.reportFailure('ETH', 'RPC', ep);
             continue;
         }
@@ -101,7 +101,8 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             }
         }
     } catch (e) {
-        console.warn('[API] KuCoin fetch failed, falling back to MEXC', e);
+        console.log('[API] KuCoin unavailable — falling back to MEXC');
+
     }
 
     // 2. Try MEXC API (Globally accessible, no strict geographic blocks)
@@ -129,7 +130,8 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             }
         }
     } catch (e) {
-        console.warn('[API] MEXC fetch failed, falling back to Binance', e);
+        console.log('[API] MEXC unavailable — falling back to Binance');
+
     }
 
     // 2. Fallback to Binance
@@ -151,7 +153,8 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             if (Array.isArray(rawBinance) && rawBinance.length > 0) return rawBinance;
         }
     } catch (e) {
-        console.warn('[API] Binance fetch failed', e);
+        console.log('[API] Binance unavailable — trying CoinGecko');
+
     }
     
     // 4. Final fallback: CoinGecko (free tier, globally accessible, no IP blocks)
@@ -188,7 +191,8 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             }
         }
     } catch (e) {
-        console.warn('[API] CoinGecko fetch failed', e);
+        console.log('[API] CoinGecko unavailable — returning null (all sources exhausted)');
+
     }
 
     return null;

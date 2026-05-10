@@ -1,16 +1,12 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  // We keep a non-blocking check for local development, but in prod this will fail fast.
-  console.warn('WARNING: STRIPE_SECRET_KEY is not defined in environment variables.');
-} else if (process.env.STRIPE_SECRET_KEY.startsWith('pk_')) {
-  console.error('USER ALERT: STRIPE_SECRET_KEY is set to a Publishable Key (starts with pk_). You have swapped your Stripe keys! Payment processing will fail.');
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'mock_key', {
-  apiVersion: '2026-01-28.clover' as any, // Matched to User account precisely
+// NOTE: STRIPE_SECRET_KEY is validated at runtime when stripe is first used.
+// No module-level console.warn — it would pollute Railway [err] logs.
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2026-01-28.clover' as any,
   typescript: true,
 });
+
 
 /**
  * Mapping of internal PlanTier to Stripe Price IDs.

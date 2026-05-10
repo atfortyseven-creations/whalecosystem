@@ -139,7 +139,7 @@ async function scanChain(chain: ChainConfig): Promise<any[]> {
   }
 
   if (!provider) {
-    console.warn(`[EVM Scan] No working RPC for ${chain.label}`);
+    console.log(`[EVM Scan] No active RPC for ${chain.label} — degrading gracefully`);
     return [];
   }
 

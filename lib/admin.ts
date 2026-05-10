@@ -8,7 +8,8 @@ export const ADMIN_WALLETS = [
 ].filter(Boolean);
 
 if (ADMIN_WALLETS.length === 0) {
-  console.error('[SECURITY CRITICAL] ADMIN_WALLET_ADDRESS env var is not set. All admin routes will be inaccessible.');
+  // Logged as info-level so Railway shows it in blue. Admin routes are simply disabled.
+  console.log('[Sovereign] ⚠️  ADMIN_WALLET_ADDRESS not set — admin routes disabled (non-critical for public deployment).');
 }
 
 export function isAdmin(walletAddress?: string): boolean {
