@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morpho Blue Yields on Base</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1>Morpho Blue Analytics</h1>
+            <p>Real-time Yields & TVL on Base Network</p>
+        </header>
+        <main>
+            <div id="loading" class="loading-state">
+                <div class="spinner"></div>
+                <p>Fetching data from DefiLlama...</p>
+            </div>
+            <div id="error" class="error-state" style="display: none;">
+                <p>Failed to load data. Please try again later.</p>
+            </div>
+            <div class="chart-container" style="display: none;">
+                <canvas id="yieldChart"></canvas>
+            </div>
+            <div class="stats-grid" style="display: none;">
+                <!-- Dynamically populated stats -->
+            </div>
+        </main>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
