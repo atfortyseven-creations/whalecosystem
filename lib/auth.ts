@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
+import { NextAuthOptions } from "next-auth";
 
 /**
  * SOVEREIGN AUTH UTILITIES

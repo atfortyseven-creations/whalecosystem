@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAccount, useSendTransaction, useBalance } from 'wagmi';
 import { parseEther, formatUnits } from 'viem';
 import { TrendingUp, TrendingDown, Zap, RefreshCw, AlertTriangle, Target } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 // ── Hyperliquid API constants ────────────────────────────────────────────────
 const HL_INFO_URL = 'https://api.hyperliquid.xyz/info';

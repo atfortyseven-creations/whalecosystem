@@ -30,7 +30,7 @@ export async function getXMTPClient(signer: {
     return clientRegistry.get(address)!;
   }
 
-  const client = await Client.create(signer, { env: XMTP_ENV });
+  const client = await Client.create(signer as any, { env: XMTP_ENV });
   clientRegistry.set(address, client);
   return client;
 }
@@ -46,7 +46,8 @@ export async function canReceiveMessages(
   address: string,
 ): Promise<boolean> {
   try {
-    return await Client.canMessage(address, { env: XMTP_ENV });
+    const res = await Client.canMessage([address], { env: XMTP_ENV }) as any;
+    return res.get(address.toLowerCase()) ?? res.get(address) ?? false;
   } catch {
     return false;
   }
@@ -58,7 +59,7 @@ export async function sendMessage(
   toAddress:      string,
   content:        string,
 ): Promise<void> {
-  const conversation = await client.conversations.newConversation(toAddress);
+  const conversation = await (client.conversations as any).newConversation(toAddress);
   await conversation.send(content);
 }
 
@@ -76,6 +77,6 @@ export async function* streamMessages(client: Client) {
 
 /** Get messages from a specific conversation */
 export async function getMessages(client: Client, peerAddress: string) {
-  const conversation = await client.conversations.newConversation(peerAddress);
+  const conversation = await (client.conversations as any).newConversation(peerAddress);
   return conversation.messages();
 }

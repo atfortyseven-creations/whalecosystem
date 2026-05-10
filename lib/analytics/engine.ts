@@ -8,7 +8,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { redis } from '@/lib/redis/client';
+import { redisClient as redis } from '@/lib/redis/client';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface ChurnScore {

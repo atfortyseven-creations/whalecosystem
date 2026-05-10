@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Chaos Engineering Test Suite — Axioma 282
  * ═══════════════════════════════════════════════════════════════
