@@ -66,6 +66,7 @@ export function SovereignChat() {
     if (!address) return null;
     return {
       getAddress: async () => address,
+      getIdentifier: async () => address,
       signMessage: async (message: string) => {
         const sig = await signMessageAsync({ message });
         return sig;

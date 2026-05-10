@@ -73,7 +73,7 @@ export default function CategoryPage() {
           ) : category.topics.map((topic: any) => {
             const lastActivity = topic.updatedAt || topic.createdAt;
             const activityText = formatDistanceToNowStrict(new Date(lastActivity), { addSuffix: false });
-            const avatarColor = `#${topic.author?.walletAddress.slice(2, 8)}`;
+            const avatarColor = `#${topic.author?.walletAddress?.slice(2, 8) || '000000'}`;
 
             return (
               <Link 
@@ -95,7 +95,7 @@ export default function CategoryPage() {
                      className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold"
                      style={{ backgroundColor: avatarColor }}
                    >
-                     {topic.author?.walletAddress.slice(2,3).toUpperCase()}
+                     {topic.author?.walletAddress?.slice(2,3).toUpperCase() || '?'}
                    </div>
                 </div>
 

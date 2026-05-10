@@ -85,6 +85,7 @@ function NewTopicContent() {
     setSubmitting(true);
     try {
       let finalContent = content;
+      let finalSignature = '';
       
       // Inject Secure Documents into payload
       documents.forEach(doc => {
@@ -95,14 +96,16 @@ function NewTopicContent() {
 
       try {
         if (!isSovereignHandshake) {
-            const signature = await signMessageAsync({ message: title + '\n' + finalContent });
-            finalContent = `${finalContent}\n\n[SIGNATURE:${signature}]`;
+            finalSignature = await signMessageAsync({ message: title + '\n' + finalContent });
+            finalContent = `${finalContent}\n\n[SIGNATURE:${finalSignature}]`;
         } else {
+            finalSignature = 'SOVEREIGN_HANDSHAKE_VERIFIED';
             finalContent = `${finalContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
         }
       } catch (e: any) {
         console.warn('Signature failed, falling back to sovereign session:', e);
         if (address) {
+            finalSignature = 'SOVEREIGN_HANDSHAKE_VERIFIED';
             finalContent = `${finalContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
         } else {
             setError('Signing failed. Please try again.');
@@ -142,6 +145,7 @@ function NewTopicContent() {
           content: finalContent,
           categoryId,
           tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+          cryptoSignature: finalSignature,
         }),
       });
       if (res.ok) {

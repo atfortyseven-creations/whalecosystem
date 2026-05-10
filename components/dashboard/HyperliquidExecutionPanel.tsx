@@ -59,7 +59,6 @@ export function HyperliquidExecutionPanel() {
       const [meta, assetCtxs] = await res.json();
 
       const enriched: MarketData[] = meta.universe
-        .filter((_: any, i: number) => TOP_MARKETS.includes(meta.universe[i]?.name))
         .map((asset: any, i: number) => {
           const ctx = assetCtxs[i];
           const markPx = parseFloat(ctx?.markPx ?? '0');
