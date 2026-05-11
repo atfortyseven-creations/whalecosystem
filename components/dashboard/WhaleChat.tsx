@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera } from 'lucide-react';
+import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
-// viem toHex removed — raw Uint8Array is passed directly to wagmi signMessageAsync
-import { getXMTPClient, canReceiveMessages, sendMessage, listConversations, getMessages, destroyXMTPClient } from '@/lib/xmtp/client';
+import { getXMTPClient, canReceiveMessages, sendMessage, listConversations, getMessages, destroyXMTPClient, getDmId, nsToDate } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
-import type { Client, DecodedMessage } from '@xmtp/browser-sdk';
+import type { Client } from '@xmtp/browser-sdk';
 
 interface ConversationMeta {
   peerAddress: string;
@@ -29,7 +28,7 @@ function Avatar({ address }: { address: string }) {
 }
 
 export function WhaleChat() {
-  const { address, isConnected } = useSovereignAccount();
+  const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
   const { signMessageAsync } = useSignMessage();
 
   const [client, setClient] = useState<Client | null>(null);
@@ -50,10 +49,19 @@ export function WhaleChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<boolean>(false);
   const activePeerRef = useRef<string | null>(null);
+  const activePeerDmIdRef = useRef<string | null>(null);
+  const peerToConvId = useRef<Map<string, string>>(new Map());
+  const convIdToPeer = useRef<Map<string, string>>(new Map());
 
-  // Keep ref in sync with activePeer
+  // Keep refs in sync with activePeer
   useEffect(() => {
     activePeerRef.current = activePeer;
+    if (activePeer) {
+      const dmId = peerToConvId.current.get(activePeer.toLowerCase());
+      if (dmId) activePeerDmIdRef.current = dmId;
+    } else {
+      activePeerDmIdRef.current = null;
+    }
   }, [activePeer]);
 
   // Scroll to bottom
@@ -172,6 +180,11 @@ export function WhaleChat() {
   // Initialize XMTP
   const initClient = async () => {
     if (!address) return;
+    // QR Handshake sessions cannot sign via wagmi — requires direct wallet connection
+    if (isSovereignHandshake) {
+      setInitError('Para usar Whale Chat, conecta tu cartera directamente (MetaMask / WalletConnect) en lugar del puente QR.');
+      return;
+    }
     setIsInitializing(true);
     setInitError('');
     try {
@@ -212,22 +225,36 @@ export function WhaleChat() {
   const loadConversations = async (xmtp: Client) => {
     const convos = await listConversations(xmtp);
     const metaList: ConversationMeta[] = [];
-    
-    // Sort by most recent message (XMTP SDK usually handles this, but we'll fetch latest)
+
     for (const c of (convos as any[])) {
       try {
-        const msgs = await c.messages({ limit: 1 });
+        // v5.3.0: DMs have peerInboxId() async method, no peerAddress property
+        const peerInboxId: string = typeof c.peerInboxId === 'function'
+          ? await c.peerInboxId()
+          : (c.id || 'unknown');
+
+        // Use cached wallet address if we have it, otherwise show truncated inboxId
+        const peerKey = convIdToPeer.current.get(c.id) || peerInboxId;
+
+        // Store bidirectional mapping
+        peerToConvId.current.set(peerKey.toLowerCase(), c.id);
+        convIdToPeer.current.set(c.id, peerKey);
+
+        // v5.3.0: use lastMessage() method
+        const lastMsg = typeof c.lastMessage === 'function' ? await c.lastMessage() : null;
+
         metaList.push({
-          peerAddress: c.peerAddress || c.topic || "Unknown",
-          lastMessage: msgs.length > 0 ? (typeof msgs[0].content === 'string' ? msgs[0].content : "Encrypted Data") : undefined,
-          lastAt: msgs.length > 0 ? (msgs[0].sent || msgs[0].sentAt) : undefined,
+          peerAddress: peerKey,
+          lastMessage: lastMsg
+            ? (typeof lastMsg.content === 'string' ? lastMsg.content : 'Encrypted Data')
+            : undefined,
+          lastAt: lastMsg ? nsToDate(lastMsg.sentAtNs) : undefined,
         });
       } catch (e) {
-        console.warn("Failed to load messages for conversation", e);
+        console.warn('Failed to load conversation', e);
       }
     }
-    
-    // Sort descending by date
+
     metaList.sort((a, b) => (b.lastAt?.getTime() ?? 0) - (a.lastAt?.getTime() ?? 0));
     setConversations(metaList);
   };
@@ -238,33 +265,31 @@ export function WhaleChat() {
     try {
       const stream = await xmtp.conversations.streamAllMessages();
       for await (const message of stream as any) {
-        const msgPeer = message.conversation?.peerAddress || message.senderAddress || "Unknown";
-        const msgContent = typeof message.content === 'string' ? message.content : "Encrypted Data";
-        const msgSent = message.sent || message.sentAt || new Date();
+        // v5.3.0: messages have conversationId, senderInboxId, sentAtNs, content (decoded)
+        const convId = message.conversationId;
+        const msgContent = typeof message.content === 'string' ? message.content : (message.fallback || 'Encrypted Data');
+        const msgSent = nsToDate(message.sentAtNs);
 
-        // If message is for active conversation, append it
-        const currentPeer = activePeerRef.current;
-        if (currentPeer && msgPeer.toLowerCase() === currentPeer.toLowerCase()) {
+        // Resolve peer wallet address from conversation ID mapping
+        const msgPeer = convIdToPeer.current.get(convId) || convId;
+
+        // Append to active chat if it matches the current conversation
+        if (activePeerDmIdRef.current && convId === activePeerDmIdRef.current) {
           setMessages(prev => {
-            // Deduplicate by exact ID
             if (prev.find(m => m.id === message.id)) return prev;
-            // Remove optimistic messages with identical content
             const filtered = prev.filter(m => !(String(m.id).startsWith('opt_') && m.content === msgContent));
             return [...filtered, message];
           });
         }
 
-        // Update conversation list with new message
+        // Update conversation list preview
         setConversations(prev => {
-          const existing = prev.filter(c => c.peerAddress.toLowerCase() !== msgPeer.toLowerCase());
-          return [
-            { peerAddress: msgPeer, lastMessage: msgContent, lastAt: msgSent },
-            ...existing
-          ];
+          const existing = prev.filter(c => peerToConvId.current.get(c.peerAddress.toLowerCase()) !== convId);
+          return [{ peerAddress: msgPeer, lastMessage: msgContent, lastAt: msgSent }, ...existing];
         });
       }
     } catch (e) {
-      console.error("[XMTP] Stream error:", e);
+      console.error('[XMTP] Stream error:', e);
       streamRef.current = false;
     }
   };
@@ -273,17 +298,23 @@ export function WhaleChat() {
   useEffect(() => {
     if (!client || !activePeer) return;
     let isMounted = true;
-    
+
     const loadChat = async () => {
       setMessages([]);
       try {
+        // v5.3.0: get/create DM and store conversation ID mapping
+        const dmId = await getDmId(client, activePeer);
+        activePeerDmIdRef.current = dmId;
+        peerToConvId.current.set(activePeer.toLowerCase(), dmId);
+        convIdToPeer.current.set(dmId, activePeer);
+
         const msgs = await getMessages(client, activePeer);
         if (isMounted) setMessages(msgs);
       } catch (e) {
-        console.error("Failed to load messages", e);
+        console.error('Failed to load messages', e);
       }
     };
-    
+
     loadChat();
     return () => { isMounted = false; };
   }, [client, activePeer]);
@@ -295,15 +326,21 @@ export function WhaleChat() {
       const peer = peerInput.trim();
       const canMsg = await canReceiveMessages(client, peer);
       if (!canMsg) {
-        alert("This address has not activated XMTP yet. They must log in to an XMTP client first.");
+        alert('This address has not activated XMTP yet. They must log in to an XMTP client first.');
         setSending(false);
         return;
       }
+      // v5.3.0: pre-create DM and store mapping before switching view
+      const dmId = await getDmId(client, peer);
+      peerToConvId.current.set(peer.toLowerCase(), dmId);
+      convIdToPeer.current.set(dmId, peer);
+      activePeerDmIdRef.current = dmId;
+
       setActivePeer(peer);
       setShowList(false);
       setPeerInput('');
     } catch {
-      alert("Invalid address.");
+      alert('Invalid address.');
     } finally {
       setSending(false);
     }
@@ -323,12 +360,12 @@ export function WhaleChat() {
 
     try {
       await sendMessage(client, activePeer, content);
-      // Optimistic update for better UX
+      // Optimistic update — use inboxId so isMe check works
       const newMsg = {
         id: `opt_${Date.now()}`,
-        senderAddress: address,
+        senderInboxId: client?.inboxId,
         content: content,
-        sent: new Date()
+        sentAtNs: BigInt(Date.now()) * 1_000_000n,
       };
       setMessages(prev => [...prev, newMsg]);
     } catch (err) {
@@ -571,9 +608,12 @@ export function WhaleChat() {
                 </div>
               ) : (
                 messages.map(msg => {
-                  const isMe = (msg.senderAddress || "").toLowerCase() === address?.toLowerCase();
-                  const content = typeof msg.content === 'string' ? msg.content : "Encrypted Data";
-                  const sentTime = msg.sent || msg.sentAt || new Date();
+                  // v5.3.0: senderInboxId (not senderAddress), sentAtNs (BigInt ns), content (decoded)
+                  const isMe = msg.senderInboxId
+                    ? msg.senderInboxId === client?.inboxId
+                    : (msg.senderAddress || '').toLowerCase() === address?.toLowerCase();
+                  const content = typeof msg.content === 'string' ? msg.content : (msg.fallback || 'Encrypted Data');
+                  const sentTime = msg.sentAtNs != null ? nsToDate(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
                   
                   return (
                     <div key={msg.id} className={`flex flex-col max-w-[78%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`}>
@@ -624,25 +664,39 @@ export function WhaleChat() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center p-8 bg-[#FAFAFA]">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-[#9945FF]/10 blur-xl scale-150" />
-              <div className="relative w-16 h-16 rounded-2xl bg-white border border-black/10 flex items-center justify-center shadow-sm">
-                <Shield size={28} className="text-[#9945FF]/60" />
+          <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-[#0D0D0D] to-[#050505]">
+            {/* Ambient glow */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-80 h-80 rounded-full bg-[#00C076]/6 blur-[100px]" />
+            </div>
+            {/* Subtle grid */}
+            <div className="absolute inset-0 opacity-[0.04]" style={{
+              backgroundImage: 'linear-gradient(rgba(0,192,118,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(0,192,118,0.8) 1px, transparent 1px)',
+              backgroundSize: '48px 48px'
+            }} />
+            <div className="relative z-10 flex flex-col items-center gap-5 p-8 max-w-xs text-center">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-2xl bg-[#00C076]/25 blur-xl scale-150 animate-pulse" />
+                <div className="relative w-14 h-14 rounded-2xl bg-white/5 border border-[#00C076]/20 flex items-center justify-center backdrop-blur-sm">
+                  <Zap size={24} className="text-[#00C076]" />
+                </div>
               </div>
-            </div>
-            <div className="max-w-sm">
-              <h3 className="text-[11px] font-black uppercase tracking-widest text-[#050505] mb-2">Select a Conversation</h3>
-              <p className="text-[10px] text-black/40 leading-relaxed font-mono">
-                Enter an Ethereum address above to initiate a cryptographic channel,
-                or select an existing conversation from the list. All communications
-                are encrypted end-to-end using the XMTP double-ratchet protocol.
-                No message content is accessible to any server or intermediary.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 text-[9px] font-black uppercase tracking-widest text-black/25">
-              <span className="flex items-center justify-center gap-1.5"><Lock size={9} /> Zero-Knowledge E2EE Active</span>
-              <span className="flex items-center justify-center gap-1.5"><Activity size={9} /> XMTP Network Online</span>
+              <div>
+                <h3 className="text-[12px] font-black uppercase tracking-[0.22em] text-white mb-2">Select a Channel</h3>
+                <p className="text-[10px] text-white/30 leading-relaxed font-mono">
+                  Enter an Ethereum address to open a zero-knowledge encrypted channel. Only you and your peer can read these messages.
+                </p>
+              </div>
+              <div className="flex flex-col gap-1.5 w-full">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.07]">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse shrink-0" />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#00C076]">XMTP Protocol Active</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.07]">
+                  <Lock size={9} className="text-white/30 shrink-0" />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Zero-Knowledge E2EE</span>
+                </div>
+              </div>
             </div>
           </div>
         )}

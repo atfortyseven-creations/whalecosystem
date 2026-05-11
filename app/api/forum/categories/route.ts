@@ -4,17 +4,26 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 const DEFAULT_CATEGORIES = [
-    { name: 'Announcements',   slug: 'announcements', description: 'Official network updates and protocol changes.', color: '#2D0A59', orderIndex: 1 },
-    { name: 'Governance',      slug: 'governance',    description: 'Proposals, voting discussions, and treasury allocations.', color: '#D4AF37', orderIndex: 2 },
-    { name: 'Research & Alpha',slug: 'research',      description: 'High-level macro analysis, on-chain data, and institutional insights.', color: '#0066FF', orderIndex: 3 },
-    { name: 'Technical Support',slug: 'support',      description: 'Smart contract debugging, SDK assistance, and bug reports.', color: '#E11D48', orderIndex: 4 },
+    { name: 'General',    slug: 'general',    description: 'General discussion, announcements, and community updates.', color: '#00C076', orderIndex: 1 },
+    { name: 'Developer',  slug: 'developer',  description: 'Technical discussions, smart contracts, bugs, and development topics.', color: '#9945FF', orderIndex: 2 },
+    { name: 'Partnering', slug: 'partnering', description: 'Partnership proposals, collaboration opportunities, and integrations.', color: '#D4AF37', orderIndex: 3 },
 ];
 
 async function ensureDefaultCategories() {
-    const count = await (prisma as any).forumCategory.count();
-    if (count === 0) {
-        await (prisma as any).forumCategory.createMany({ data: DEFAULT_CATEGORIES });
+    // Upsert canonical categories (safe for existing data)
+    for (const cat of DEFAULT_CATEGORIES) {
+        await (prisma as any).forumCategory.upsert({
+            where: { slug: cat.slug },
+            update: { name: cat.name, description: cat.description, color: cat.color, orderIndex: cat.orderIndex },
+            create: cat,
+        });
     }
+    // Remove any legacy categories not in our canonical set
+    try {
+        await (prisma as any).forumCategory.deleteMany({
+            where: { slug: { notIn: DEFAULT_CATEGORIES.map(c => c.slug) } },
+        });
+    } catch { /* silently ignore if topics reference old categories */ }
 }
 
 export async function GET() {

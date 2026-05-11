@@ -1,17 +1,19 @@
 /**
  * XMTP E2E Encrypted Chat Client
  * ═══════════════════════════════════════════════════════════════════════════════
- * Wraps @xmtp/browser-sdk v5 for sovereign wallet-to-wallet encrypted messaging.
+ * Wraps @xmtp/browser-sdk v5.3.0 for sovereign wallet-to-wallet encrypted messaging.
  *
- * @xmtp/browser-sdk v5 Signer contract (mandatory shape):
+ * v5.3.0 Signer interface (mandatory):
  *   type          : "EOA" | "SCW"
- *   getIdentifier : () => Promise<Identifier>
- *                   where Identifier = { identifier: string; identifierKind: IdentifierKind }
- *                   and   IdentifierKind = "Ethereum" (string literal union)
- *   signMessage   : (msg: string | Uint8Array) => Promise<Uint8Array>
+ *   getIdentifier : () => Promise<{ identifier: string; identifierKind: "Ethereum" }>
+ *   signMessage   : (message: string) => Promise<Uint8Array>   ← string ONLY
  *
- * Critical: identifierKind MUST be the exact string "Ethereum" (not a variable
- * that happens to hold it), as the SDK performs strict equality checks internally.
+ * v5.3.0 Key API changes vs v5.2:
+ *   - conversations.newDm(inboxId)            ← takes inboxId string
+ *   - conversations.newDmWithIdentifier(id)   ← takes Identifier object  ✓ USE THIS
+ *   - DecodedMessage: senderInboxId, sentAtNs (BigInt ns), content (decoded)
+ *   - Dm.peerInboxId()                        ← async, returns inboxId string
+ *   - conversations.sync() required before list/stream
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
@@ -25,9 +27,9 @@ if (typeof window !== 'undefined' && !window.Buffer) {
 
 import { Client, type XmtpEnv } from '@xmtp/browser-sdk';
 
-// ── Type definitions matching browser-sdk v5.2 exactly ───────────────────────
+// ── Type definitions matching browser-sdk v5.3.0 exactly ─────────────────────
 type IdentifierKind = 'Ethereum';
-interface XmtpIdentifier {
+export interface XmtpIdentifier {
   identifier: string;
   identifierKind: IdentifierKind;
 }
@@ -49,13 +51,22 @@ function hexToBytes(hex: string): Uint8Array {
   return bytes;
 }
 
+// ── BigInt nanoseconds → Date ─────────────────────────────────────────────────
+export function nsToDate(ns: bigint | undefined | null): Date {
+  if (ns == null) return new Date();
+  try {
+    return new Date(Number(BigInt(String(ns)) / 1_000_000n));
+  } catch {
+    return new Date();
+  }
+}
+
 /**
- * Build an XMTP v5-compatible signer from a wagmi/viem EOA wallet client.
+ * Build an XMTP v5.3.0-compatible signer from a wagmi/viem EOA wallet client.
  *
- * The returned object satisfies the browser-sdk v5 Signer interface exactly:
- *  - `type`          → "EOA" literal
- *  - `getIdentifier` → returns { identifier: checksumAddress, identifierKind: "Ethereum" }
- *  - `signMessage`   → accepts string | Uint8Array, returns raw Uint8Array (not hex)
+ * CRITICAL v5.3.0 changes:
+ *  - signMessage receives string ONLY (no Uint8Array) and must return Uint8Array
+ *  - getIdentifier returns { identifier: checksumAddress, identifierKind: "Ethereum" }
  */
 function buildXmtpSigner(wagmiSigner: {
   getAddress: () => Promise<string>;
@@ -64,7 +75,7 @@ function buildXmtpSigner(wagmiSigner: {
   return {
     type: 'EOA' as const,
 
-    // ── CRITICAL: getIdentifier must be a function returning the exact shape ──
+    // getIdentifier: async function returning the exact Identifier shape
     getIdentifier: async (): Promise<XmtpIdentifier> => {
       const address = await wagmiSigner.getAddress();
       return {
@@ -73,8 +84,8 @@ function buildXmtpSigner(wagmiSigner: {
       };
     },
 
-    // ── signMessage receives string | Uint8Array; must return Uint8Array ──────
-    signMessage: async (message: string | Uint8Array): Promise<Uint8Array> => {
+    // v5.3.0: signMessage receives string only, must return Uint8Array
+    signMessage: async (message: string): Promise<Uint8Array> => {
       const hexSig = await wagmiSigner.signMessage(message);
       return hexToBytes(hexSig);
     },
@@ -83,7 +94,7 @@ function buildXmtpSigner(wagmiSigner: {
 
 /**
  * Initialize or retrieve a cached XMTP client for a wallet address.
- * If a client for this address already exists in the registry (IndexedDB-backed),
+ * If a client already exists in the registry (IndexedDB-backed),
  * it is returned immediately without re-prompting the user to sign.
  */
 export async function getXMTPClient(wagmiSigner: {
@@ -98,7 +109,7 @@ export async function getXMTPClient(wagmiSigner: {
 
   const signer = buildXmtpSigner(wagmiSigner);
 
-  // Client.create accepts the signer directly; env is passed as a ClientOptions field
+  // Client.create(signer, options) — v5.3.0 signature
   const client = await Client.create(signer, { env: XMTP_ENV });
 
   clientRegistry.set(address, client);
@@ -112,7 +123,7 @@ export function destroyXMTPClient(address: string): void {
 
 /**
  * Check if a given Ethereum address has an active XMTP identity.
- * Uses the static Client.canMessage() method which requires no client instance.
+ * v5.3.0: Client.canMessage returns Map<string, boolean>.
  */
 export async function canReceiveMessages(
   _client: Client,
@@ -124,18 +135,16 @@ export async function canReceiveMessages(
       identifierKind: 'Ethereum',
     };
 
-    // canMessage returns Map<string, boolean> keyed by lowercase address
-    const result = await (Client as any).canMessage([identifier], XMTP_ENV);
+    const result = await Client.canMessage([identifier], XMTP_ENV);
 
     if (result instanceof Map) {
       return result.get(address.toLowerCase()) ?? result.get(address) ?? false;
     }
 
-    // Fallback: plain object response
     if (result && typeof result === 'object') {
       return (
-        result[address.toLowerCase()] ??
-        result[address] ??
+        (result as any)[address.toLowerCase()] ??
+        (result as any)[address] ??
         false
       );
     }
@@ -148,8 +157,21 @@ export async function canReceiveMessages(
 }
 
 /**
+ * Get or create a DM with a peer and return its conversation ID.
+ * v5.3.0 FIX: use newDmWithIdentifier() — newDm() takes inboxId, NOT Identifier.
+ */
+export async function getDmId(client: Client, peerAddress: string): Promise<string> {
+  const identifier: XmtpIdentifier = {
+    identifier: peerAddress,
+    identifierKind: 'Ethereum',
+  };
+  const dm = await client.conversations.newDmWithIdentifier(identifier);
+  return dm.id;
+}
+
+/**
  * Send an end-to-end encrypted message to a wallet address.
- * Uses newDm() (v5 API) with fallback to newConversation() for edge builds.
+ * v5.3.0 FIX: use newDmWithIdentifier() which accepts an Identifier object.
  */
 export async function sendMessage(
   client: Client,
@@ -160,39 +182,38 @@ export async function sendMessage(
     identifier: toAddress,
     identifierKind: 'Ethereum',
   };
-  const convos = client.conversations as any;
-  const dm =
-    typeof convos.newDm === 'function'
-      ? await convos.newDm(identifier)
-      : await convos.newConversation(toAddress);
+  // v5.3.0: newDmWithIdentifier takes an Identifier object
+  const dm = await client.conversations.newDmWithIdentifier(identifier);
   await dm.send(content);
 }
 
-/** List all conversations for the current identity */
-export async function listConversations(client: Client) {
-  return client.conversations.list();
-}
-
-/** Async generator streaming all incoming messages in real time */
-export async function* streamMessages(client: Client) {
-  for await (const message of await client.conversations.streamAllMessages()) {
-    yield message;
-  }
+/**
+ * List all DM conversations.
+ * v5.3.0: Must sync() first, then listDms().
+ */
+export async function listConversations(client: Client): Promise<any[]> {
+  await client.conversations.sync();
+  return client.conversations.listDms();
 }
 
 /**
- * Retrieve the message history for a specific peer conversation.
- * Creates the DM if it does not yet exist (XMTP DMs are idempotent).
+ * Retrieve message history for a specific peer conversation.
+ * v5.3.0 FIX: use newDmWithIdentifier(), sync(), then messages().
  */
-export async function getMessages(client: Client, peerAddress: string) {
+export async function getMessages(client: Client, peerAddress: string): Promise<any[]> {
   const identifier: XmtpIdentifier = {
     identifier: peerAddress,
     identifierKind: 'Ethereum',
   };
-  const convos = client.conversations as any;
-  const dm =
-    typeof convos.newDm === 'function'
-      ? await convos.newDm(identifier)
-      : await convos.newConversation(peerAddress);
+  const dm = await client.conversations.newDmWithIdentifier(identifier);
+  await dm.sync();
   return dm.messages();
+}
+
+/** Async generator streaming all incoming messages in real time */
+export async function* streamMessages(client: Client) {
+  const stream = await client.conversations.streamAllMessages();
+  for await (const message of stream as any) {
+    yield message;
+  }
 }
