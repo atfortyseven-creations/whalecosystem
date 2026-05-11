@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
+import { toHex } from 'viem';
 import { getXMTPClient, canReceiveMessages, sendMessage, listConversations, getMessages, destroyXMTPClient } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
 import type { Client, DecodedMessage } from '@xmtp/browser-sdk';
@@ -166,10 +167,16 @@ export function WhaleChat() {
       const signer = {
         getAddress: async () => address,
         signMessage: async (msg: string | Uint8Array) => {
-          if (typeof msg === 'string') {
-            return await signMessageAsync({ message: msg });
-          } else {
-            return await signMessageAsync({ message: { raw: msg } });
+          try {
+            if (typeof msg === 'string') {
+              return await signMessageAsync({ message: msg, account: address as `0x${string}` });
+            } else {
+              const hexString = toHex(msg);
+              return await signMessageAsync({ message: { raw: hexString }, account: address as `0x${string}` });
+            }
+          } catch (err: any) {
+            console.error("[XMTP] Signature Error:", err);
+            throw err;
           }
         },
       };

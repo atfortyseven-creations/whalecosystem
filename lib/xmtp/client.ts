@@ -28,7 +28,7 @@ const clientRegistry = new Map<string, Client>();
  */
 export async function getXMTPClient(signer: {
   getAddress: () => Promise<string>;
-  signMessage: (message: string) => Promise<string>;
+  signMessage: (message: string | Uint8Array) => Promise<string>;
 }): Promise<Client> {
   const address = (await signer.getAddress()).toLowerCase();
 
