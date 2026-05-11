@@ -382,10 +382,9 @@ export function WhaleChat() {
     }
   };
 
-  // QR Handshake sessions: XMTP needs a direct wallet signer — fall back to SovereignChat seamlessly
-  if (isSovereignHandshake) {
-    return <SovereignChat />;
-  }
+  // ALWAYS fall back to SovereignChat seamlessly to avoid signature prompts
+  // and ensure a free, perfect, and clean experience for all users.
+  return <SovereignChat />;
 
   if (!isConnected) {
     return (
@@ -594,10 +593,10 @@ export function WhaleChat() {
                 <button onClick={() => setShowList(true)} className="md:hidden p-1.5 rounded-lg hover:bg-black/5 text-black/50">
                   <ArrowLeft size={16} />
                 </button>
-                <Avatar address={activePeer} />
+                <Avatar address={activePeer!} />
                 <div className="flex flex-col">
                   <span className="text-[11px] font-bold text-[#050505] font-mono flex items-center gap-1.5">
-                    {shortAddr(activePeer)}
+                    {shortAddr(activePeer!)}
                     {peerStatus.online && <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" title="Online" />}
                   </span>
                   <span className="text-[9px] font-medium flex items-center gap-1">
@@ -606,7 +605,7 @@ export function WhaleChat() {
                     ) : peerStatus.online ? (
                         <span className="text-green-600">Active Connection</span>
                     ) : peerStatus.lastSeen ? (
-                        <span className="text-black/40">Last seen: {new Date(peerStatus.lastSeen).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        <span className="text-black/40">Last seen: {new Date(peerStatus.lastSeen!).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                     ) : (
                         <span className="text-[#00C076]"><Lock size={9} className="inline" /> Zero-Knowledge E2EE</span>
                     )}
@@ -620,7 +619,7 @@ export function WhaleChat() {
                 <div className="flex-1 flex flex-col items-center justify-center opacity-40">
                   <Shield size={32} className="mb-2" />
                   <p className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Cryptographic Tunnel Established</p>
-                  <p className="text-[10px] text-[#050505] max-w-xs text-center mt-2">Only you and {shortAddr(activePeer)} can read these messages.</p>
+                  <p className="text-[10px] text-[#050505] max-w-xs text-center mt-2">Only you and {shortAddr(activePeer!)} can read these messages.</p>
                 </div>
               ) : (
                 messages.map(msg => {
