@@ -210,6 +210,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/academy',
             '/support',
             '/status',
+            '/dashboard',
         ];
         const isDirectAccessRoute = DIRECT_ACCESS_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
 
