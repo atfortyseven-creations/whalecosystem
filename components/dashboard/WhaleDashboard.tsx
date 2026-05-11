@@ -267,6 +267,11 @@ export default function WhaleDashboard() {
             case 'sov-intel':
             case 'live-port':
             case 'whale-port':
+            case 'graph':
+            case 'vault':
+            case 'trade':
+            case 'forensics':
+            case 'reputation':
                 return (
                     <div className="flex flex-col items-center justify-center h-[400px] gap-4 text-black/20">
                         <span className="text-[11px] font-black uppercase tracking-[0.3em]">Module Temporarily Disabled</span>
@@ -306,8 +311,7 @@ export default function WhaleDashboard() {
             case 'mass-transfer':
                 return <><PanelHeader icon={Network} title="Mass Transfers" description="Coordinated or unusually large token movements across multiple wallets. Spot potential market-moving events early." accent="#9945FF" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key={`mass-transfer-${refreshKey}`}><MassTransferIntel /></DashboardErrorBoundary></div></>;
 
-            case 'graph':
-                return <><PanelHeader icon={Compass} title="Entity Graph" description="Interactive network map of wallet relationships and capital flows." accent="#9945FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`graph-${refreshKey}`}><EntityGraphVis /></DashboardErrorBoundary></div></>;
+
 
 
             case 'defi':
@@ -322,8 +326,7 @@ export default function WhaleDashboard() {
             case 'portfolio':
                 return <><PanelHeader icon={Wallet} title="My Portfolio" description="The complete balance and value of all tokens in your connected wallet across every supported blockchain." accent="#00C076" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`human-port-${refreshKey}`}><PortfolioDashboard /></DashboardErrorBoundary></div></>;
 
-            case 'vault':
-                return <><PanelHeader icon={Lock} title="Secure Vault" description="Store sensitive data and private notes in an encrypted environment. Only your wallet signature can unlock what you save here." accent="#D4AF37" /><div className="h-[650px] shrink-0"><DashboardErrorBoundary key={`sov-vault-${refreshKey}`}><SovereignVault /></DashboardErrorBoundary></div></>;
+
 
             case 'logs':
                 return <><PanelHeader icon={Database} title="Activity Log" description="A complete history of all actions taken during your session. Useful for auditing and reviewing your on-chain interactions." accent="#0052FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`session-logs-${refreshKey}`}><SessionLogsPanel /></DashboardErrorBoundary></div></>;
@@ -340,14 +343,7 @@ export default function WhaleDashboard() {
             case 'chat':
                 return <><PanelHeader icon={MessageCircle} title="Whale Chat" description="Real-time end-to-end encrypted messaging between wallet addresses. Messages stream instantly across all connected clients." accent="#9945FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`chat-${refreshKey}`}><WhaleChat /></DashboardErrorBoundary></div></>;
 
-            case 'trade':
-                return <><PanelHeader icon={TrendingUp} title="Trading Terminal" description="Execute perpetual futures positions directly on Hyperliquid L1 without leaving the dashboard. Zero-gas institutional execution." accent="#00C076" /><div className="flex-1 min-h-[900px] shrink-0"><DashboardErrorBoundary key={`trade-${refreshKey}`}><HyperliquidExecutionPanel /></DashboardErrorBoundary></div></>;
 
-            case 'forensics':
-                return <><PanelHeader icon={Radar} title="Mempool Forensics" description="AI heuristic engine scanning the Ethereum and Optimism mempools in real-time for drainer contracts, MEV sandwiches, and phishing attacks." accent="#FF1744" /><div className="flex-1 min-h-[900px] shrink-0"><DashboardErrorBoundary key={`forensics-${refreshKey}`}><MempoolForensicsPanel /></DashboardErrorBoundary></div></>;
-
-            case 'reputation':
-                return <><PanelHeader icon={Award} title="Reputation SBT" description="Your on-chain Soulbound Token passport. A non-transferable proof of your journey, milestones, and contribution to the Sovereign ecosystem." accent="#D4AF37" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`reputation-${refreshKey}`}><ReputationDashboard /></DashboardErrorBoundary></div></>;
 
             case 'morpho':
                 return <><PanelHeader icon={Database} title="Morpho Base Yields" description="Real-time TVL and APY analytics for Morpho Blue liquidity pools on the Base network." accent="#0052FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`morpho-${refreshKey}`}><MorphoYieldDashboard /></DashboardErrorBoundary></div></>;
