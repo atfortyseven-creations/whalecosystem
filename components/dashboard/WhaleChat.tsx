@@ -182,7 +182,7 @@ export function WhaleChat() {
       if (err?.message?.includes("User rejected")) {
         setInitError("Signature rejected. You must sign the message to decrypt your session keys.");
       } else {
-        setInitError("Failed to connect to XMTP network.");
+        setInitError(`Failed to connect to XMTP network: ${err?.message || 'Unknown error'}`);
       }
     } finally {
       setIsInitializing(false);
@@ -379,6 +379,12 @@ export function WhaleChat() {
           )}
         </button>
         <p className="text-[9px] text-black/30 font-bold uppercase tracking-widest">Requires gasless signature</p>
+        
+        {isInitializing && (
+           <p className="text-[10px] text-[#9945FF] font-black uppercase tracking-widest animate-pulse mt-2">
+             Please check your wallet app to sign.
+           </p>
+        )}
       </div>
     );
   }

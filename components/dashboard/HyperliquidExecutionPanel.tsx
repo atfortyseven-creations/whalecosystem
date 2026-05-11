@@ -93,7 +93,10 @@ export function HyperliquidExecutionPanel() {
   // Fetch open positions for connected wallet, merging local deterministic state
   const fetchPositions = useCallback(async () => {
     if (!address) return;
-    setIsLoadingPositions(true);
+    setPositions((prev) => {
+        if (prev.length === 0) setIsLoadingPositions(true);
+        return prev;
+    });
     try {
       const res = await fetch(HL_INFO_URL, {
         method: 'POST',
@@ -421,7 +424,19 @@ export function HyperliquidExecutionPanel() {
                     </thead>
                     <tbody>
                       {positions.map((pos, i) => {
-                        const pnl = parseFloat(pos.unrealizedPnl);
+                        let pnl = parseFloat(pos.unrealizedPnl);
+                        
+                        // Compute real-time PnL for local mock orders
+                        if (pos.unrealizedPnl === '0.00' || pnl === 0) {
+                           const currentMarket = markets.find(m => m.coin === pos.coin);
+                           if (currentMarket) {
+                               const markPx = parseFloat(currentMarket.markPx);
+                               const entryPx = parseFloat(pos.entryPx);
+                               const szi = parseFloat(pos.szi);
+                               pnl = (markPx - entryPx) * szi;
+                           }
+                        }
+
                         const isLong = parseFloat(pos.szi) > 0;
                         return (
                           <tr key={`${pos.coin}-${i}`} className="border-b border-black/[0.03] hover:bg-black/[0.01] transition-colors">
