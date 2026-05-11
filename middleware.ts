@@ -17,6 +17,9 @@ enum PlanTier {
 // Scoped to each Edge container instance; sufficient for single-instance deployments.
 // [SECURITY FIX]: Switched from Set + setTimeout (Memory Leak in Edge) to Map + Lazy Eviction
 const replayMap = new Map<string, number>(); // <nonce, expirationTimestamp>
+// Deterministic GC counter — increments on every POST, triggers cleanup every 100 requests.
+// Replaces Math.random() to avoid non-determinism in security-critical middleware.
+let replayGcCounter = 0;
 
 function logAuditSafe(req: NextRequest, action: string, actor: string, ip: string, metadata: any) {
   const url = new URL('/api/internal/audit', req.url);
@@ -199,8 +202,11 @@ export default async function middleware(request: NextRequest) {
             
             replayMap.set(signatureNonce, now + 60000); // Set expiration to 60s from now
 
-            // Lazy garbage collection: Every ~100 requests, clean up expired map entries to prevent memory leak
-            if (Math.random() < 0.01) {
+            // Deterministic lazy GC: every 100 POST requests, purge expired nonces.
+            // Counter-based approach replaces Math.random() for deterministic, testable behaviour.
+            replayGcCounter++;
+            if (replayGcCounter >= 100) {
+              replayGcCounter = 0;
               for (const [key, exp] of replayMap.entries()) {
                 if (now >= exp) replayMap.delete(key);
               }

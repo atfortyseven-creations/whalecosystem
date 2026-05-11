@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
-import { toHex } from 'viem';
+// viem toHex removed — raw Uint8Array is passed directly to wagmi signMessageAsync
 import { getXMTPClient, canReceiveMessages, sendMessage, listConversations, getMessages, destroyXMTPClient } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
 import type { Client, DecodedMessage } from '@xmtp/browser-sdk';
@@ -177,16 +177,18 @@ export function WhaleChat() {
     try {
       const signer = {
         getAddress: async () => address,
-        signMessage: async (msg: string | Uint8Array) => {
+        // signMessage must return a hex string; XMTP client.ts converts it to Uint8Array
+        signMessage: async (msg: string | Uint8Array): Promise<string> => {
           try {
             if (typeof msg === 'string') {
+              // Plain text message (first-time key generation)
               return await signMessageAsync({ message: msg, account: address as `0x${string}` });
             } else {
-              const hexString = toHex(msg);
-              return await signMessageAsync({ message: { raw: hexString }, account: address as `0x${string}` });
+              // Raw bytes — wrap as typed data array for wagmi
+              return await signMessageAsync({ message: { raw: msg as Uint8Array }, account: address as `0x${string}` });
             }
           } catch (err: any) {
-            console.error("[XMTP] Signature Error:", err);
+            console.error('[XMTP] Signature Error:', err);
             throw err;
           }
         },
@@ -196,11 +198,11 @@ export function WhaleChat() {
       await loadConversations(xmtp);
       startMessageStream(xmtp);
     } catch (err: any) {
-      console.error("[XMTP] Init Error:", err);
-      if (err?.message?.includes("User rejected")) {
-        setInitError("Signature rejected. You must sign the message to decrypt your session keys.");
+      console.error('[XMTP] Init Error:', err);
+      if (err?.message?.includes('User rejected') || err?.message?.includes('denied')) {
+        setInitError('Authentication declined. A gasless cryptographic signature is required to derive your XMTP session keys. No transaction is submitted to the network.');
       } else {
-        setInitError(`Failed to connect to XMTP network: ${err?.message || 'Unknown error'}`);
+        setInitError(`Connection failure: ${err?.message || 'Unknown error'}. Please verify your wallet connection and retry.`);
       }
     } finally {
       setIsInitializing(false);
@@ -366,56 +368,94 @@ export function WhaleChat() {
     );
   }
 
-  // ── Loading / Auto-init state ─────────────────────────────────────────────
-  // Shown while XMTP initializes automatically after wallet connection.
-  // On return visits (keys already in IndexedDB) this lasts < 1 second.
-  // On first visit, this transitions into a wallet signature prompt.
+  // ── Loading / Auto-init state ────────────────────────────────────────────────
+  // Displayed while the XMTP client initialises automatically post-connection.
+  // On returning sessions, encryption keys are retrieved from IndexedDB instantly.
+  // On first-time sessions, a single gasless wallet signature derives the keys.
   if (!client) {
     return (
-      <div className="flex flex-col items-center justify-center h-full min-h-[500px] gap-5 bg-white rounded-2xl border border-black/5 shadow-sm p-8 text-center">
-        <div className="relative">
-          <Shield size={40} strokeWidth={1} className="text-[#9945FF] mb-2" />
-          <Lock size={16} className="absolute bottom-1 right-[-4px] text-[#050505] bg-white rounded-full p-0.5" />
+      <div className="flex flex-col h-full min-h-[500px] bg-white rounded-2xl border border-black/5 shadow-sm overflow-y-auto">
+        {/* Protocol Header */}
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-black/6 shrink-0">
+          <div className="relative">
+            <Shield size={22} strokeWidth={1.5} className="text-[#9945FF]" />
+            <Lock size={10} className="absolute -bottom-0.5 -right-1 text-[#050505] bg-white rounded-full p-[1px]" />
+          </div>
+          <div>
+            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#050505]">Whale Chat — Decentralised E2EE Protocol</h3>
+            <p className="text-[9px] text-black/40 font-mono uppercase tracking-widest mt-0.5">XMTP Network · Zero-Trust Architecture</p>
+          </div>
         </div>
 
-        {initError ? (
-          // ── Error: show retry ────────────────────────────────────────────
-          <>
-            <h3 className="text-base font-black uppercase tracking-widest text-[#050505]">Connection Failed</h3>
-            <div className="bg-red-50 text-red-600 text-[10px] font-mono p-3 rounded-lg border border-red-100 max-w-xs w-full">
-              {initError}
-            </div>
-            <button
-              onClick={initClient}
-              disabled={isInitializing}
-              className="mt-2 px-8 py-3.5 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_20px_rgba(153,69,255,0.4)] transition-all flex items-center justify-center gap-2 active:scale-95"
-            >
-              {isInitializing ? (
-                <><Activity size={14} className="animate-spin" /> Connecting...</>
-              ) : (
-                <><Lock size={14} /> Retry Connection</>
-              )}
-            </button>
-            <p className="text-[9px] text-black/30 font-bold uppercase tracking-widest">Requires gasless signature</p>
-          </>
-        ) : (
-          // ── Auto-initializing silently ───────────────────────────────────
-          <>
-            <h3 className="text-base font-black uppercase tracking-widest text-[#050505]">Securing Channel</h3>
-            <p className="text-[11px] font-mono text-black/50 max-w-sm leading-relaxed">
-              Establishing your encrypted XMTP session...
+        {/* Academic Protocol Explanation */}
+        <div className="flex-1 px-6 py-5 flex flex-col gap-5">
+          <div className="prose-xs text-[12px] text-black/70 leading-relaxed font-sans space-y-3 max-w-2xl">
+            <p>
+              <strong className="text-[#050505] font-black">Whale Chat</strong> is a decentralised, peer-to-peer encrypted messaging module built upon the{' '}
+              <span className="font-black text-[#9945FF]">XMTP (Extensible Message Transport Protocol)</span> network.
+              Unlike conventional messaging architectures that route communications through centralised intermediaries,
+              Whale Chat establishes direct cryptographic channels between Ethereum wallet identities, ensuring that
+              message content is mathematically inaccessible to any third party — including the platform itself.
             </p>
-            <div className="flex items-center gap-3 mt-2">
-              <Activity size={18} className="text-[#9945FF] animate-spin" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#9945FF] animate-pulse">
-                Loading keys…
-              </span>
-            </div>
-            <p className="text-[9px] text-black/30 font-bold uppercase tracking-widest mt-1">
-              First time? You may need to sign once in your wallet.
+            <p>
+              Each participant&apos;s messaging identity is derived deterministically from their Ethereum private key
+              via a <strong className="text-[#050505]">gasless ECDSA signature</strong>. This operation generates
+              a set of session encryption keys that are stored exclusively in your browser&apos;s IndexedDB, never
+              transmitted to any server. All messages are encrypted with <strong className="text-[#050505]">double-ratchet
+              forward secrecy</strong> before leaving your device and can only be decrypted by the recipient&apos;s
+              private key material.
             </p>
-          </>
-        )}
+            <p>
+              Upon your first activation, a single wallet signature is requested to derive these keys.
+              Subsequent sessions are fully automatic — no further signatures are required, as the keys
+              persist securely in your local browser storage.
+            </p>
+          </div>
+
+          {/* Key properties */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { label: 'No Server Storage', desc: 'Messages are never stored on any centralised server. The network is peer-to-peer.' },
+              { label: 'Forward Secrecy', desc: 'Each session uses ephemeral key derivation. Compromise of one key cannot expose historical messages.' },
+              { label: 'Gasless Identity', desc: 'Your messaging identity is derived via a costless signature — no gas fee, no on-chain transaction.' },
+            ].map((item) => (
+              <div key={item.label} className="p-3 rounded-xl border border-black/8 bg-black/[0.02]">
+                <p className="text-[9px] font-black uppercase tracking-widest text-[#9945FF] mb-1">{item.label}</p>
+                <p className="text-[10px] text-black/50 leading-relaxed font-mono">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Status / Action */}
+          <div className="mt-auto pt-4">
+            {initError ? (
+              <div className="flex flex-col gap-3">
+                <div className="bg-red-50 text-red-700 text-[11px] font-mono p-4 rounded-xl border border-red-100 leading-relaxed">
+                  {initError}
+                </div>
+                <button
+                  onClick={initClient}
+                  disabled={isInitializing}
+                  className="self-start px-8 py-3.5 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_20px_rgba(153,69,255,0.4)] transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                >
+                  {isInitializing ? (
+                    <><Activity size={14} className="animate-spin" /> Initialising...</>
+                  ) : (
+                    <><Lock size={14} /> Retry Authentication</>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-[#9945FF]/5 border border-[#9945FF]/15">
+                <Activity size={18} className="text-[#9945FF] animate-spin shrink-0" />
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-[#9945FF]">Establishing Secure Channel</p>
+                  <p className="text-[9px] text-black/40 font-mono mt-0.5">Retrieving session keys from local storage. If this is your first session, approve the signature prompt in your wallet.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
@@ -584,15 +624,25 @@ export function WhaleChat() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center p-8 bg-[#FAFAFA]">
-            <div className="w-16 h-16 rounded-2xl bg-[#050505]/5 border border-black/10 flex items-center justify-center">
-              <Shield size={28} className="text-[#050505]/40" />
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center p-8 bg-[#FAFAFA]">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-[#9945FF]/10 blur-xl scale-150" />
+              <div className="relative w-16 h-16 rounded-2xl bg-white border border-black/10 flex items-center justify-center shadow-sm">
+                <Shield size={28} className="text-[#9945FF]/60" />
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-black uppercase tracking-widest text-[#050505]/80">Maximum Security</h3>
-              <p className="text-[11px] text-black/40 mt-2 max-w-xs leading-relaxed font-mono">
-                Decentralized protocol active. No server can intercept these messages.
+            <div className="max-w-sm">
+              <h3 className="text-[11px] font-black uppercase tracking-widest text-[#050505] mb-2">Select a Conversation</h3>
+              <p className="text-[10px] text-black/40 leading-relaxed font-mono">
+                Enter an Ethereum address above to initiate a cryptographic channel,
+                or select an existing conversation from the list. All communications
+                are encrypted end-to-end using the XMTP double-ratchet protocol.
+                No message content is accessible to any server or intermediary.
               </p>
+            </div>
+            <div className="flex flex-col gap-2 text-[9px] font-black uppercase tracking-widest text-black/25">
+              <span className="flex items-center justify-center gap-1.5"><Lock size={9} /> Zero-Knowledge E2EE Active</span>
+              <span className="flex items-center justify-center gap-1.5"><Activity size={9} /> XMTP Network Online</span>
             </div>
           </div>
         )}

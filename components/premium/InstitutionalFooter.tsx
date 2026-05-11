@@ -43,11 +43,11 @@ export default function InstitutionalFooter() {
                 Downhead
               </a>
             </li>
-            <li>
-              <a href="/vip" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
+              <li>
+              <Link href="/dashboard" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
                 <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
-                VIP Terminal
-              </a>
+                Dashboard Terminal
+              </Link>
             </li>
             <li>
               <Link href="/academy" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">

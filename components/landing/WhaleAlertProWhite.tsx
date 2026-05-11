@@ -471,7 +471,7 @@ export function WhaleAlertProWhite() {
                 { href: '/ledger', icon: Anchor, label: 'Whale Ledger', color: 'text-cyan-600' },
                 { href: '/portfolio', icon: TrendingUp, label: 'Whale Profile', color: 'text-indigo-600' },
                 { href: '/support', icon: LifeBuoy, label: 'Support', color: 'text-rose-600' },
-                { href: '/vip', icon: LayoutDashboard, label: 'Terminal', color: 'text-slate-950' },
+                { href: '/dashboard', icon: LayoutDashboard, label: 'Terminal', color: 'text-slate-950' },
               ].map((link) => (
                 <Link 
                   key={link.href}
