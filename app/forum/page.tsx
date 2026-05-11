@@ -45,7 +45,7 @@ function ForumHomeContent() {
              <div className="py-4 text-[13px] text-black/40 dark:text-white/30 font-sans">Loading matrix...</div>
           ) : categories.map(cat => (
             <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-5 transition-all duration-300 ease-in-out px-4 rounded-xl sm:-mx-4 hover:bg-black/5 dark:hover:bg-white/[0.02] border border-transparent hover:border-black/10 dark:hover:border-white/5 border-b-black/5 dark:border-b-white/5 mb-2 hover:shadow-md dark:hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]" style={{ transformStyle: 'preserve-3d' }}>
-              <div className="w-1.5 h-1.5 rounded-full mr-4 mt-2 shadow-[0_0_10px_currentColor]" style={{ backgroundColor: cat.color || '#00C076', color: cat.color || '#00C076' }}></div>
+
               <div className="flex flex-col">
                 <div className="flex items-center justify-between w-full">
                   <span className="text-[16px] font-black tracking-tight transition-colors text-black dark:text-white group-hover:text-[#00C076]">{cat.name}</span>

@@ -14,16 +14,37 @@ async function ensureDefaultCategories() {
     for (const cat of DEFAULT_CATEGORIES) {
         await (prisma as any).forumCategory.upsert({
             where: { slug: cat.slug },
-            update: { name: cat.name, description: cat.description, color: cat.color, orderIndex: cat.orderIndex },
-            create: cat,
+            update: { name: cat.name, description: cat.description, orderIndex: cat.orderIndex },
+            create: { ...cat },
         });
     }
-    // Remove any legacy categories not in our canonical set
+
+    // Cascade-delete topics/posts of non-canonical categories before removing them
     try {
-        await (prisma as any).forumCategory.deleteMany({
+        const legacyCategories = await (prisma as any).forumCategory.findMany({
             where: { slug: { notIn: DEFAULT_CATEGORIES.map(c => c.slug) } },
+            select: { id: true },
         });
-    } catch { /* silently ignore if topics reference old categories */ }
+        if (legacyCategories.length > 0) {
+            const legacyIds = legacyCategories.map((c: any) => c.id);
+            // Find topics in legacy categories
+            const legacyTopics = await (prisma as any).forumTopic.findMany({
+                where: { categoryId: { in: legacyIds } },
+                select: { id: true },
+            });
+            const legacyTopicIds = legacyTopics.map((t: any) => t.id);
+            if (legacyTopicIds.length > 0) {
+                // Delete dependent records first (FK order matters)
+                await (prisma as any).forumNotification.deleteMany({ where: { topicId: { in: legacyTopicIds } } });
+                await (prisma as any).forumLike.deleteMany({ where: { topicId: { in: legacyTopicIds } } });
+                await (prisma as any).forumPost.deleteMany({ where: { topicId: { in: legacyTopicIds } } });
+                await (prisma as any).forumTopic.deleteMany({ where: { id: { in: legacyTopicIds } } });
+            }
+            await (prisma as any).forumCategory.deleteMany({ where: { id: { in: legacyIds } } });
+        }
+    } catch (e) {
+        console.warn('[Forum] Legacy category cleanup error (non-fatal):', e);
+    }
 }
 
 export async function GET() {
