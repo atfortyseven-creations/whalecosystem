@@ -11,7 +11,7 @@ import {
     BookOpen, Database, MessageSquare,
     Landmark, Compass,
     LineChart, Lock, Book, Info, X, ArrowUpRight, CreditCard,
-    MessageCircle, TrendingUp, Award, Radar
+    MessageCircle, TrendingUp, Award, Radar, Camera
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -51,12 +51,13 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'defi',         label: 'DeFi Yields',       icon: <Landmark size={17}/> },
     { id: 'morpho',       label: 'Morpho Base',       icon: <Database size={17}/>, badge: 'NEW', badgeColor: '#0052FF' },
 
-    { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/>,   dividerBefore: 'ZK Layer' },
+    { id: 'scanner',      label: 'QR Scanner',        icon: <Camera size={17}/>,    dividerBefore: 'ZK Layer' },
+    { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/> },
 
     { id: 'vault',        label: 'Sovereign Vault',   icon: <Lock size={17}/>,      dividerBefore: 'Execution' },
     { id: 'trade',        label: 'Trading Terminal',  icon: <TrendingUp size={17}/>, badge: 'LIVE', badgeColor: '#00C076' },
     { id: 'forensics',    label: 'Mempool Forensics', icon: <Radar size={17}/>,      badge: 'AI', badgeColor: '#FF1744' },
-    { id: 'chat',         label: 'Sovereign Chat',    icon: <MessageCircle size={17}/>, badge: 'E2E', badgeColor: '#9945FF' },
+    { id: 'chat',         label: 'Whale Chat',       icon: <MessageCircle size={17}/>, badge: 'E2E', badgeColor: '#9945FF' },
     { id: 'reputation',   label: 'Reputation SBT',   icon: <Award size={17}/> },
     { id: 'logs',         label: 'Session Logs',      icon: <Database size={17}/>,  dividerBefore: 'System' },
     { id: 'support',      label: 'Support',           icon: <MessageSquare size={17}/> },
@@ -652,11 +653,12 @@ export function WhaleProShell({
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
                 {/* Only renders on real mobile hardware (screen.width < 1024).  */}
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
-                <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} h-16 border-t border-black/10 bg-white items-center justify-around px-2 shrink-0 z-50`} style={{ minHeight: '64px', maxHeight: '64px' }}>
+                <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} h-16 border-t border-black/10 bg-white items-center justify-around px-1 shrink-0 z-50`} style={{ minHeight: '64px', maxHeight: '64px' }}>
                     {[
                         { id: 'markets',     icon: <LayoutDashboard size={20} />, label: 'Markets' },
                         { id: 'newpairs',    icon: <Search size={20} />,          label: 'Listings' },
                         { id: 'portfolio',   icon: <Wallet size={20} />,          label: 'Portfolio' },
+                        { id: 'scanner',     icon: <Camera size={20} />,          label: 'Scanner' },
                         { id: 'menu',        icon: <Menu size={20} />,            label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
@@ -665,7 +667,7 @@ export function WhaleProShell({
                                 key={tab.id}
                                 onClick={() => tab.id === 'menu' ? setIsPaletteOpen(true) : handleTabChange(tab.id)}
                                 style={{ minHeight: 0, minWidth: 0 }}
-                                className={`relative flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
+                                className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors ${
                                     isActive ? 'text-black' : 'text-[#888888] hover:text-black'
                                 }`}
                             >
