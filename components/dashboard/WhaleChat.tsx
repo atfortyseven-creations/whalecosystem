@@ -48,6 +48,12 @@ export function WhaleChat() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<boolean>(false);
+  const activePeerRef = useRef<string | null>(null);
+
+  // Keep ref in sync with activePeer
+  useEffect(() => {
+    activePeerRef.current = activePeer;
+  }, [activePeer]);
 
   // Scroll to bottom
   useEffect(() => {
@@ -62,6 +68,7 @@ export function WhaleChat() {
       setConversations([]);
       setActivePeer(null);
       setMessages([]);
+      streamRef.current = false;
     }
   }, [isConnected, address, client]);
 
@@ -103,7 +110,7 @@ export function WhaleChat() {
 
       pollPeer();
       const interval = setInterval(pollPeer, 3000);
-      return () => clearInterval(interval);
+      return () => { isMounted = false; clearInterval(interval); };
   }, [activePeer, address]);
 
   // Extreme Security: Draft Persistence & Typing Telemetry
@@ -216,16 +223,16 @@ export function WhaleChat() {
         const msgSent = message.sent || message.sentAt || new Date();
 
         // If message is for active conversation, append it
-        setActivePeer((currentPeer) => {
-          if (currentPeer && msgPeer.toLowerCase() === currentPeer.toLowerCase()) {
-            setMessages(prev => {
-              // Avoid duplicates
-              if (prev.find(m => m.id === message.id)) return prev;
-              return [...prev, message];
-            });
-          }
-          return currentPeer;
-        });
+        const currentPeer = activePeerRef.current;
+        if (currentPeer && msgPeer.toLowerCase() === currentPeer.toLowerCase()) {
+          setMessages(prev => {
+            // Deduplicate by exact ID
+            if (prev.find(m => m.id === message.id)) return prev;
+            // Remove optimistic messages with identical content
+            const filtered = prev.filter(m => !(String(m.id).startsWith('opt_') && m.content === msgContent));
+            return [...filtered, message];
+          });
+        }
 
         // Update conversation list with new message
         setConversations(prev => {
@@ -298,15 +305,12 @@ export function WhaleChat() {
       await sendMessage(client, activePeer, content);
       // Optimistic update for better UX
       const newMsg = {
-        id: Date.now().toString(),
+        id: `opt_${Date.now()}`,
         senderAddress: address,
         content: content,
         sent: new Date()
       };
-      setMessages(prev => {
-        if (prev.find(m => m.id === newMsg.id)) return prev;
-        return [...prev, newMsg];
-      });
+      setMessages(prev => [...prev, newMsg]);
     } catch (err) {
       console.error("Failed to send", err);
       alert("Failed to send message.");

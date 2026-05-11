@@ -189,10 +189,7 @@ export async function safeRedisSet(key: string, value: string, ...args: any[]): 
 export async function safeRedisSAdd(key: string, member: string): Promise<void> {
     try {
         if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
-            const current = memoryStore.get(key) || [];
-            if (!current.includes(member)) {
-                memoryStore.set(key, [...current, member]);
-            }
+            await (redisClient as any).sadd(key, member);
             return;
         }
         await Promise.race([
@@ -205,7 +202,7 @@ export async function safeRedisSAdd(key: string, member: string): Promise<void> 
 export async function safeRedisSMembers(key: string): Promise<string[]> {
     try {
         if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
-            return memoryStore.get(key) || [];
+            return await (redisClient as any).smembers(key);
         }
         const members = await Promise.race([
             redisClient.smembers(key),

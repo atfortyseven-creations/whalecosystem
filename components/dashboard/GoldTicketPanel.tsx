@@ -273,19 +273,23 @@ export function GoldTicketPanel() {
   const [isMinting, setIsMinting] = useState(false);
   const MINT_FEE_ETH = "0.00111"; // Highly addictive micro-transaction fee
 
-  const fetchStats = useCallback(async () => {
+  const fetchStats = useCallback(async (isMounted: boolean = true) => {
     try {
       const q = address ? `?address=${address}` : '';
       const res = await fetch(`/api/golden-ticket/claim${q}`);
       const json = await res.json();
-      setDbStats(json);
+      if (isMounted) setDbStats(json);
     } catch {}
   }, [address]);
 
   useEffect(() => {
-    fetchStats();
-    const id = setInterval(fetchStats, 5000);
-    return () => clearInterval(id);
+    let isMounted = true;
+    fetchStats(isMounted);
+    const id = setInterval(() => fetchStats(isMounted), 5000);
+    return () => {
+      isMounted = false;
+      clearInterval(id);
+    };
   }, [fetchStats]);
 
   const handleMint = useCallback(async () => {

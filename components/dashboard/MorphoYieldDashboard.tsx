@@ -4,35 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Database, Waves, Activity, ArrowUpRight, TrendingUp, Anchor, AlertTriangle } from 'lucide-react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  LineController,
-  BarController,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  LineController,
-  BarController,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+import 'chart.js/auto';
+import { Chart } from 'react-chartjs-2';
 
 interface MorphoPool {
   id: string;
@@ -196,7 +169,7 @@ export function MorphoYieldDashboard() {
           </div>
         </div>
         <div className="h-[280px] w-full">
-          <Bar data={chartData} options={chartOptions as any} />
+          <Chart type="bar" data={chartData} options={chartOptions as any} />
         </div>
       </div>
 
