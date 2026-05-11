@@ -11,7 +11,7 @@ export function SiteNavigationPill() {
     const navLinks = [
         { href: '/#pricing', label: 'Pricing', icon: Tag, active: false },
         { href: '/#faq', label: 'FAQ', icon: HelpCircle, active: false },
-        { href: '/network', label: 'Network', icon: Globe, active: pathname.startsWith('/network') },
+        { href: '/ledger', label: 'Ledger', icon: Globe, active: pathname.startsWith('/ledger') },
         { href: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, active: pathname.startsWith('/portfolio') },
     ];
 

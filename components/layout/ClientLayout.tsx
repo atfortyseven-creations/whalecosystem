@@ -41,9 +41,9 @@ const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/news', '/c
 // Routes that must NOT get the legacy black Downhead footer
 // ─────────────────────────────────────────────────────────────────────────────
 const NO_DOWNHEAD_PREFIXES = [
-  '/dashboard', '/portfolio', '/academy', '/support', '/network',
+  '/dashboard', '/portfolio', '/academy', '/support',
   '/docs', '/privacy', '/terms', '/ticket', '/news', '/connect',
-  '/voss-supremacy', '/sovereign-intel', '/predictions', '/ledger',
+  '/voss-supremacy', '/predictions', '/ledger',
   '/gold-registry', '/infrastructure', '/directory', '/company',
   '/vip', '/faq', '/api-marketplace', '/clearance', '/settings',
   '/login', '/sign-up', '/legal', '/admin', '/developer', '/forum',
@@ -56,8 +56,8 @@ const NO_DOWNHEAD_PREFIXES = [
 // WhaleProShell with its own fixed-inset shell) should be fully contained.
 // ─────────────────────────────────────────────────────────────────────────────
 const BOUNDED_PREFIXES = [
-  '/portfolio', '/academy', '/support', '/news', '/network',
-  '/predictions', '/ledger', '/sovereign-intel', '/voss-supremacy',
+  '/portfolio', '/academy', '/support', '/news',
+  '/predictions', '/ledger', '/voss-supremacy',
   '/gold-registry', '/vip', '/developer', '/developers', '/faq',
   '/ticket', '/settings', '/docs', '/privacy', '/terms', '/legal',
   '/connect', '/sign-up', '/login', '/admin', '/clearance',
@@ -286,7 +286,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     !NO_DOWNHEAD_PREFIXES.some(p => pathname.startsWith(p));
 
   const showInstitutionalHeader =
-    pathname === '/network' ||
+    pathname === '/ledger' ||
     pathname === '/portfolio' ||
     pathname === '/support' ||
     pathname === '/academy' ||
