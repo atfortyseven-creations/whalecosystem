@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect, useBalance, useEnsName } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
+import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare, MessageCircle } from "lucide-react";
 
 // ── Reown AppKit + WagmiAdapter localStorage key patterns ─────────────────
 // These are ALL the keys that Reown AppKit v1/v2 and its WagmiAdapter write
