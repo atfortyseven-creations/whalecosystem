@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity } from 'lucide-react';
+import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
 import { getXMTPClient, canReceiveMessages, sendMessage, listConversations, getMessages, destroyXMTPClient } from '@/lib/xmtp/client';
+import { QrScanner } from '@/components/dashboard/QrScanner';
 import type { Client, DecodedMessage } from '@xmtp/browser-sdk';
 
 interface ConversationMeta {
@@ -42,6 +43,7 @@ export function WhaleChat() {
   const [peerInput, setPeerInput] = useState('');
   const [sending, setSending] = useState(false);
   const [showList, setShowList] = useState(true);
+  const [showScanner, setShowScanner] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<boolean>(false);
@@ -212,6 +214,20 @@ export function WhaleChat() {
     );
   }
 
+  if (showScanner) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-white rounded-2xl border border-black/8 overflow-y-auto">
+         <div className="w-full max-w-sm">
+             <div className="flex justify-between items-center mb-6 px-2">
+                 <h3 className="font-mono font-bold uppercase tracking-widest text-lg">Scan PC Session</h3>
+                 <button onClick={() => setShowScanner(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X size={20}/></button>
+             </div>
+             <QrScanner mode="scan" />
+         </div>
+      </div>
+    );
+  }
+
   // Not initialized yet -> Prompt for signature
   if (!client) {
     return (
@@ -260,6 +276,13 @@ export function WhaleChat() {
               <Shield size={14} className="text-[#9945FF]" />
               <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">E2EE Secured</span>
             </div>
+            <button
+                onClick={() => setShowScanner(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 text-[9px] font-bold uppercase tracking-widest text-black/60 transition-colors"
+                title="Scan PC QR to link session"
+            >
+                <Camera size={12} /> Link PC
+            </button>
           </div>
           <div className="flex gap-2">
             <input

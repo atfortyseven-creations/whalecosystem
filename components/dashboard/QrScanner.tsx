@@ -5,13 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Camera, Loader, RefreshCcw } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 
+import { QRCodeSVG } from 'qrcode.react';
+
 type ScanState = 'idle' | 'requesting' | 'scanning' | 'validating' | 'success' | 'error';
 
 interface QrScannerProps {
     className?: string;
+    mode?: 'project' | 'scan';
 }
 
-export function QrScanner({ className }: QrScannerProps) {
+export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
     const [state, setState] = useState<ScanState>('idle');
     const [message, setMessage] = useState('');
     const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -112,6 +115,63 @@ export function QrScanner({ className }: QrScannerProps) {
         setState('idle'); 
         setMessage(''); 
     };
+
+    const [projectData, setProjectData] = useState<{ token: string, linkUrl: string } | null>(null);
+    const [projectLoading, setProjectLoading] = useState(false);
+
+    const generateQr = useCallback(async () => {
+        setProjectLoading(true);
+        try {
+            const res = await fetch('/api/bridge/generate', { method: 'POST' });
+            const data = await res.json();
+            if (data.token) {
+                setProjectData(data);
+            }
+        } catch (e) {
+            console.error("Failed to generate QR", e);
+        } finally {
+            setProjectLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (mode === 'project') {
+            generateQr();
+        }
+    }, [mode, generateQr]);
+
+    if (mode === 'project') {
+        return (
+            <div className={`w-full flex flex-col items-center gap-6 ${className ?? ''}`}>
+                <div className="flex flex-col items-center gap-4 text-center">
+                    <h3 className="font-mono text-xl font-bold tracking-tight text-[#050505] dark:text-white">Link Device</h3>
+                    <p className="text-xs text-black/50 dark:text-white/50 max-w-xs leading-relaxed">
+                        Scan this QR code from the Whale Chat mobile app to securely link your session.
+                    </p>
+                </div>
+                
+                {projectLoading ? (
+                    <div className="w-64 h-64 flex items-center justify-center border border-black/10 dark:border-white/10 rounded-3xl bg-black/5 dark:bg-white/5">
+                        <Loader size={36} className="animate-spin text-[#9945FF]" />
+                    </div>
+                ) : projectData ? (
+                    <div className="p-6 bg-white rounded-3xl border border-black/10 shadow-xl">
+                        <QRCodeSVG value={projectData.linkUrl} size={220} level="H" includeMargin={false} />
+                    </div>
+                ) : (
+                    <button onClick={generateQr} className="px-6 py-3 bg-[#9945FF] text-white font-bold rounded-xl active:scale-95 transition-all">
+                        Generate Link QR
+                    </button>
+                )}
+                
+                {projectData && (
+                    <button onClick={generateQr} className="text-[10px] font-mono uppercase tracking-widest text-[#9945FF] hover:opacity-80 transition-opacity flex items-center gap-2">
+                        <RefreshCcw size={12} /> Refresh QR Code
+                    </button>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className={`w-full flex flex-col items-center gap-6 ${className ?? ''}`}>
