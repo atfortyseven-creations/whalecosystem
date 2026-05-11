@@ -4,8 +4,33 @@ import React, { useState, useEffect } from 'react';
 import { Database, Waves, Activity, ArrowUpRight, TrendingUp, Anchor, AlertTriangle } from 'lucide-react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
-import 'chart.js/auto';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  LineController,
+  BarController
+} from 'chart.js';
 import { Chart } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  LineController,
+  BarController
+);
 
 interface MorphoPool {
   id: string;

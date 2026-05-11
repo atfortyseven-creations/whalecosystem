@@ -9,8 +9,10 @@
 
 'use client';
 
+import { Buffer } from 'buffer';
+
 if (typeof window !== 'undefined' && !window.Buffer) {
-  window.Buffer = require('buffer').Buffer;
+  window.Buffer = Buffer;
 }
 
 import { Client, type XmtpEnv } from '@xmtp/browser-sdk';
