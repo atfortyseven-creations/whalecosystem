@@ -6,6 +6,7 @@ import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera
 import { useSignMessage } from 'wagmi';
 import { getXMTPClient, canReceiveMessages, sendMessage, listConversations, getMessages, destroyXMTPClient, getDmId, nsToDate } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
+import { SovereignChat } from '@/components/dashboard/SovereignChat';
 import type { Client } from '@xmtp/browser-sdk';
 
 interface ConversationMeta {
@@ -44,6 +45,7 @@ export function WhaleChat() {
   const [sending, setSending] = useState(false);
   const [showList, setShowList] = useState(true);
   const [showScanner, setShowScanner] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [peerStatus, setPeerStatus] = useState<{ online: boolean, lastSeen: number | null, isTyping: boolean }>({ online: false, lastSeen: null, isTyping: false });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -52,6 +54,12 @@ export function WhaleChat() {
   const activePeerDmIdRef = useRef<string | null>(null);
   const peerToConvId = useRef<Map<string, string>>(new Map());
   const convIdToPeer = useRef<Map<string, string>>(new Map());
+
+  // Detect physical device type (touch + narrow screen = mobile)
+  useEffect(() => {
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    setIsMobile(isTouchDevice && window.screen.width < 768);
+  }, []);
 
   // Keep refs in sync with activePeer
   useEffect(() => {
@@ -180,11 +188,8 @@ export function WhaleChat() {
   // Initialize XMTP
   const initClient = async () => {
     if (!address) return;
-    // QR Handshake sessions cannot sign via wagmi — requires direct wallet connection
-    if (isSovereignHandshake) {
-      setInitError('Para usar Whale Chat, conecta tu cartera directamente (MetaMask / WalletConnect) en lugar del puente QR.');
-      return;
-    }
+    // QR Handshake sessions: wagmi signMessageAsync unavailable — skip, SovereignChat handles this
+    if (isSovereignHandshake) return;
     setIsInitializing(true);
     setInitError('');
     try {
@@ -377,6 +382,11 @@ export function WhaleChat() {
     }
   };
 
+  // QR Handshake sessions: XMTP needs a direct wallet signer — fall back to SovereignChat seamlessly
+  if (isSovereignHandshake) {
+    return <SovereignChat />;
+  }
+
   if (!isConnected) {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[500px] gap-4">
@@ -389,17 +399,23 @@ export function WhaleChat() {
     );
   }
 
-  // ── QR Scanner overlay (accessible at any time when connected) ───────────
+  // QR overlay — PC shows QR generator, mobile shows QR scanner
   if (showScanner) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-white rounded-2xl border border-black/8 overflow-y-auto">
          <div className="w-full max-w-sm">
              <div className="flex justify-between items-center mb-6 px-2">
-                 <h3 className="font-mono font-bold uppercase tracking-widest text-lg">Scan PC Session</h3>
+                 <h3 className="font-mono font-bold uppercase tracking-widest text-lg">
+                   {isMobile ? 'Scan PC Session' : 'Link Mobile Device'}
+                 </h3>
                  <button onClick={() => setShowScanner(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X size={20}/></button>
              </div>
-             <p className="text-[11px] text-black/50 text-center mb-4 px-4 font-mono">Scan the QR code displayed on your desktop dashboard to link your secure E2EE chat session.</p>
-             <QrScanner mode="scan" />
+             <p className="text-[11px] text-black/50 text-center mb-4 px-4 font-mono">
+               {isMobile
+                 ? 'Scan the QR code displayed on your desktop dashboard to link your secure E2EE chat session.'
+                 : 'Scan this QR code from your mobile device to link your Whale Chat session securely.'}
+             </p>
+             <QrScanner mode={isMobile ? 'scan' : 'project'} />
          </div>
       </div>
     );
@@ -512,9 +528,9 @@ export function WhaleChat() {
             <button
                 onClick={() => setShowScanner(true)}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 text-[9px] font-bold uppercase tracking-widest text-black/60 transition-colors"
-                title="Scan PC QR to link session"
+                title={isMobile ? 'Scan PC QR to link session' : 'Show QR to link mobile device'}
             >
-                <Camera size={12} /> Link PC
+                <Camera size={12} /> {isMobile ? 'Scan QR' : 'Link Mobile'}
             </button>
           </div>
           <div className="flex gap-2">

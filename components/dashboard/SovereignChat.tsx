@@ -9,6 +9,7 @@ interface Message {
   senderAddress: string;
   content: string;
   sentAt: Date;
+  convPeer: string; // which conversation this message belongs to
 }
 
 interface Conversation {
@@ -45,7 +46,17 @@ export function SovereignChat() {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed.conversations) setConversations(parsed.conversations);
-        if (parsed.messages) setMessages(parsed.messages.map((m: any) => ({ ...m, sentAt: new Date(m.sentAt) })));
+        if (parsed.messages) {
+          const convs: { peerAddress: string }[] = parsed.conversations || [];
+          const firstPeer = convs[0]?.peerAddress ?? '0xInstitutionalSupport_0000';
+          // Migrate legacy messages that lack convPeer
+          const migrated = parsed.messages.map((m: any) => ({
+            ...m,
+            sentAt: new Date(m.sentAt),
+            convPeer: m.convPeer ?? (m.senderAddress === firstPeer ? firstPeer : firstPeer),
+          }));
+          setMessages(migrated);
+        }
       } else {
         // Default deterministic thread
         const defaultConv = { peerAddress: '0xInstitutionalSupport_0000' };
@@ -55,7 +66,8 @@ export function SovereignChat() {
             id: '1',
             senderAddress: '0xInstitutionalSupport_0000',
             content: 'Welcome to the Secure Client Communications channel. All messages are encrypted.',
-            sentAt: new Date()
+            sentAt: new Date(),
+            convPeer: '0xInstitutionalSupport_0000'
           }
         ]);
         setActiveConv(defaultConv);
@@ -94,6 +106,7 @@ export function SovereignChat() {
       senderAddress: address,
       content: inputText,
       sentAt: new Date(),
+      convPeer: activeConv.peerAddress,
     };
 
     const updatedMsgs = [...messages, newMsg];
@@ -109,6 +122,7 @@ export function SovereignChat() {
           senderAddress: activeConv.peerAddress,
           content: 'An institutional representative will review your inquiry shortly.',
           sentAt: new Date(),
+          convPeer: activeConv.peerAddress,
         };
         const msgsWithResp = [...updatedMsgs, responseMsg];
         setMessages(msgsWithResp);
@@ -156,11 +170,9 @@ export function SovereignChat() {
     );
   }
 
+  // Isolate messages by conversation peer so threads never bleed into each other
   const activeMessages = messages.filter(
-    m => activeConv && (
-      (m.senderAddress === address && m.content) || 
-      (m.senderAddress === activeConv.peerAddress)
-    )
+    m => activeConv && m.convPeer === activeConv.peerAddress
   );
 
   return (
