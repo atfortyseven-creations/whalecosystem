@@ -42,7 +42,7 @@ export function ScannerZone() {
                     </div>
                 ) : (
                     <div className="w-full max-w-sm pt-8">
-                        <QrScanner />
+                        <QrScanner mode="project" />
                     </div>
                 )}
             </div>
