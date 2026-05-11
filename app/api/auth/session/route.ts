@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyJWT } from '@/lib/jwt';
 
+// Helper to handle BigInt serialization from Prisma
+function serializeData(data: any) {
+  return JSON.parse(
+    JSON.stringify(data, (_, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    )
+  );
+}
 export async function GET(request: NextRequest) {
   try {
     // ── Priority 1: Sovereign JWT session (human_session cookie) ────────────
@@ -21,7 +29,7 @@ export async function GET(request: NextRequest) {
             where: { fromAddress: walletAddress.toLowerCase(), type: 'SUBSCRIPTION_PAYMENT' },
             orderBy: { timestamp: 'desc' }
           });
-          return NextResponse.json({
+          return NextResponse.json(serializeData({
             authenticated: true,
             user: {
               id: walletAddress,
@@ -32,7 +40,7 @@ export async function GET(request: NextRequest) {
               subscription: subscription || null,
               transactions: userTransactions || [],
             },
-          });
+          }));
         }
       } catch {
         // JWT expired or invalid — fall through
@@ -52,12 +60,12 @@ export async function GET(request: NextRequest) {
         where: { fromAddress: handshake.toLowerCase(), type: 'SUBSCRIPTION_PAYMENT' },
         orderBy: { timestamp: 'desc' }
       });
-      return NextResponse.json({
+      return NextResponse.json(serializeData({
         authenticated: !!user,
         user: user
           ? { id: handshake, email: user.email || '', tier: user.tier, humanityScore: user.humanityScore, walletAddress: user.walletAddress, subscription: subscription, transactions: userTransactions }
           : null,
-      });
+      }));
     }
 
     return NextResponse.json({ authenticated: false, user: null });

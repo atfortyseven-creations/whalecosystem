@@ -6,7 +6,7 @@ import {
   Ticket, Flame, Search, Layers, LineChart, Book,
   Network, Compass, Landmark, BarChart3, FlaskConical,
   Wallet, Shield, Database, MessageSquare,
-  LayoutDashboard, ShieldAlert, MessageCircle, TrendingUp, Award, Radar
+  LayoutDashboard, ShieldAlert, MessageCircle, TrendingUp, Award, Radar, Camera
 } from 'lucide-react';
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
@@ -15,6 +15,7 @@ import { useSearchParams } from 'next/navigation';
 
 // ── Active panels (visible to users) ──────────────────────────────────────────
 import { NewPairsTable }           from '@/components/dashboard/NewPairsTable';
+import { ScannerZone }              from '@/components/dashboard/ScannerZone';
 import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPanel';
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
 import { OmniExplorer }            from '@/components/dashboard/OmniExplorer';
@@ -60,8 +61,8 @@ const CosmicForgePanel = dynamic(
   () => import('@/components/forge/CosmicForgePanel').then(m => m.CosmicForgePanel),
   { ssr: false }
 );
-const SovereignChat = dynamic(
-  () => import('@/components/dashboard/SovereignChat').then(m => m.SovereignChat),
+const WhaleChat = dynamic(
+  () => import('@/components/dashboard/WhaleChat').then(m => m.WhaleChat),
   { ssr: false }
 );
 const HyperliquidExecutionPanel = dynamic(
@@ -333,8 +334,11 @@ export default function WhaleDashboard() {
             case 'support':
                 return <><PanelHeader icon={MessageSquare} title="Support" description="Contact the team directly, report a problem, or ask a question. We respond as quickly as possible to every request." accent="#050505" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key={`support-${refreshKey}`}><WhaleSupport /></DashboardErrorBoundary></div></>;
 
+            case 'scanner':
+                return <><PanelHeader icon={Camera} title="Scanner Zone" description="Scan a QR code to link a mobile device, or enter Whale Chat to message securely." accent="#9945FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`scanner-${refreshKey}`}><ScannerZone /></DashboardErrorBoundary></div></>;
+
             case 'chat':
-                return <><PanelHeader icon={MessageCircle} title="Sovereign Chat" description="End-to-End encrypted messaging via the XMTP protocol. No server can read your messages. Ever." accent="#9945FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`chat-${refreshKey}`}><SovereignChat /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={MessageCircle} title="Whale Chat" description="Real-time end-to-end encrypted messaging between wallet addresses. Messages stream instantly across all connected clients." accent="#9945FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`chat-${refreshKey}`}><WhaleChat /></DashboardErrorBoundary></div></>;
 
             case 'trade':
                 return <><PanelHeader icon={TrendingUp} title="Trading Terminal" description="Execute perpetual futures positions directly on Hyperliquid L1 without leaving the dashboard. Zero-gas institutional execution." accent="#00C076" /><div className="flex-1 min-h-[900px] shrink-0"><DashboardErrorBoundary key={`trade-${refreshKey}`}><HyperliquidExecutionPanel /></DashboardErrorBoundary></div></>;
