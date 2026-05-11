@@ -472,6 +472,22 @@ function ConnectedScreen({
           </Link>
         </motion.div>
 
+        {/* ── Whale Chat CTA ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.26, duration: 0.6 }}
+          className="w-full"
+        >
+          <Link
+            href="/dashboard?tab=chat"
+            className="w-full flex items-center justify-center gap-3 py-4 mt-4 rounded-2xl font-black uppercase tracking-widest border border-[#9945FF]/20 bg-[#9945FF]/5 hover:bg-[#9945FF]/10 active:scale-[0.97] transition-all duration-200"
+            style={{ fontSize: "12px", color: "#9945FF" }}
+          >
+            <MessageCircle size={16} />
+            Enter Whale Chat Encrypted
+          </Link>
+        </motion.div>
 
         {/* ── Disconnect session button ── */}
         {onDisconnect && (

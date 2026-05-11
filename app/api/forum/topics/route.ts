@@ -98,7 +98,11 @@ export async function POST(req: NextRequest) {
 
         // [ON-CHAIN ARTICULATION] Cryptographic Non-Repudiation Check
         // The user must sign the exact content payload to prove authenticity.
-        const messageToVerify = `${title}\n${content}`;
+        let signedContent = content;
+        if (content.includes('\n\n[SIGNATURE:')) {
+            signedContent = content.substring(0, content.lastIndexOf('\n\n[SIGNATURE:'));
+        }
+        const messageToVerify = `${title}\n${signedContent}`;
         try {
             if (cryptoSignature !== 'SOVEREIGN_HANDSHAKE_VERIFIED') {
                 const isValidSig = await verifyMessage({

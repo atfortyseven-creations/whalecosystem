@@ -55,22 +55,22 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
       {/* Secondary Discourse Sub-Nav */}
       <div className="w-full shadow-sm bg-white dark:bg-[#050505] border-b border-black/10 dark:border-white/5 transition-colors duration-300">
-        <div className="max-w-[1110px] mx-auto px-4 flex items-center h-[54px] gap-8 overflow-x-auto custom-scrollbar">
-          <Link href="/forum" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black dark:text-white border-b-2 border-[#00C076] whitespace-nowrap">
+        <div className="max-w-[1110px] mx-auto px-4 flex items-center h-[54px] gap-4 md:gap-8 overflow-x-auto custom-scrollbar">
+          <Link href="/forum" className="shrink-0 text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black dark:text-white border-b-2 border-[#00C076] whitespace-nowrap">
             Categories
           </Link>
-          <Link href="/forum?filter=latest" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
+          <Link href="/forum?filter=latest" className="shrink-0 text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
             Latest
           </Link>
-          <Link href="/forum?filter=new" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
+          <Link href="/forum?filter=new" className="shrink-0 text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
             New
           </Link>
-          <Link href="/forum?filter=top" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
+          <Link href="/forum?filter=top" className="shrink-0 text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
             Top
           </Link>
           <div className="w-px h-4 bg-black/10 dark:bg-white/10 shrink-0 mx-2" />
           {navLinks.slice(1).map(n => (
-            <Link key={n.href} href={n.href} className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
+            <Link key={n.href} href={n.href} className="shrink-0 text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
               {n.label}
             </Link>
           ))}
