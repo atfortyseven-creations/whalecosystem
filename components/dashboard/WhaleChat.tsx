@@ -73,6 +73,17 @@ export function WhaleChat() {
     }
   }, [isConnected, address, client]);
 
+  // ── AUTO-INITIALIZE: When wallet is connected and XMTP not yet started, ──────
+  // auto-call initClient so the user doesn't have to tap a button.
+  // XMTP v3 stores session keys in IndexedDB — after the first sign,
+  // subsequent loads are silent (no wallet prompt needed).
+  useEffect(() => {
+    if (isConnected && address && !client && !isInitializing) {
+      initClient();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, address]);
+
   // Telemetry: Heartbeat Loop
   useEffect(() => {
       if (!address || !client) return;
@@ -339,6 +350,7 @@ export function WhaleChat() {
     );
   }
 
+  // ── QR Scanner overlay (accessible at any time when connected) ───────────
   if (showScanner) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-white rounded-2xl border border-black/8 overflow-y-auto">
@@ -354,7 +366,10 @@ export function WhaleChat() {
     );
   }
 
-  // Not initialized yet -> Prompt for signature
+  // ── Loading / Auto-init state ─────────────────────────────────────────────
+  // Shown while XMTP initializes automatically after wallet connection.
+  // On return visits (keys already in IndexedDB) this lasts < 1 second.
+  // On first visit, this transitions into a wallet signature prompt.
   if (!client) {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[500px] gap-5 bg-white rounded-2xl border border-black/5 shadow-sm p-8 text-center">
@@ -362,35 +377,44 @@ export function WhaleChat() {
           <Shield size={40} strokeWidth={1} className="text-[#9945FF] mb-2" />
           <Lock size={16} className="absolute bottom-1 right-[-4px] text-[#050505] bg-white rounded-full p-0.5" />
         </div>
-        <h3 className="text-lg font-black uppercase tracking-widest text-[#050505]">Encrypted Channel Offline</h3>
-        <p className="text-[11px] font-mono text-black/50 max-w-sm leading-relaxed">
-          Whale Chat uses the XMTP protocol for military-grade End-to-End Encryption.
-          Your private keys never leave your device.
-        </p>
-        
-        {initError && (
-          <div className="bg-red-50 text-red-600 text-[10px] font-mono p-3 rounded-lg border border-red-100 max-w-xs w-full">
-            {initError}
-          </div>
-        )}
 
-        <button
-          onClick={initClient}
-          disabled={isInitializing}
-          className="mt-2 px-8 py-3.5 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_20px_rgba(153,69,255,0.4)] transition-all flex items-center justify-center gap-2 active:scale-95"
-        >
-          {isInitializing ? (
-            <><Activity size={14} className="animate-spin" /> Generating Keys...</>
-          ) : (
-            <><Lock size={14} /> Authorize Session</>
-          )}
-        </button>
-        <p className="text-[9px] text-black/30 font-bold uppercase tracking-widest">Requires gasless signature</p>
-        
-        {isInitializing && (
-           <p className="text-[10px] text-[#9945FF] font-black uppercase tracking-widest animate-pulse mt-2">
-             Please check your wallet app to sign.
-           </p>
+        {initError ? (
+          // ── Error: show retry ────────────────────────────────────────────
+          <>
+            <h3 className="text-base font-black uppercase tracking-widest text-[#050505]">Connection Failed</h3>
+            <div className="bg-red-50 text-red-600 text-[10px] font-mono p-3 rounded-lg border border-red-100 max-w-xs w-full">
+              {initError}
+            </div>
+            <button
+              onClick={initClient}
+              disabled={isInitializing}
+              className="mt-2 px-8 py-3.5 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_20px_rgba(153,69,255,0.4)] transition-all flex items-center justify-center gap-2 active:scale-95"
+            >
+              {isInitializing ? (
+                <><Activity size={14} className="animate-spin" /> Connecting...</>
+              ) : (
+                <><Lock size={14} /> Retry Connection</>
+              )}
+            </button>
+            <p className="text-[9px] text-black/30 font-bold uppercase tracking-widest">Requires gasless signature</p>
+          </>
+        ) : (
+          // ── Auto-initializing silently ───────────────────────────────────
+          <>
+            <h3 className="text-base font-black uppercase tracking-widest text-[#050505]">Securing Channel</h3>
+            <p className="text-[11px] font-mono text-black/50 max-w-sm leading-relaxed">
+              Establishing your encrypted XMTP session...
+            </p>
+            <div className="flex items-center gap-3 mt-2">
+              <Activity size={18} className="text-[#9945FF] animate-spin" />
+              <span className="text-[11px] font-black uppercase tracking-widest text-[#9945FF] animate-pulse">
+                Loading keys…
+              </span>
+            </div>
+            <p className="text-[9px] text-black/30 font-bold uppercase tracking-widest mt-1">
+              First time? You may need to sign once in your wallet.
+            </p>
+          </>
         )}
       </div>
     );

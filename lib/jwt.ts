@@ -14,9 +14,19 @@ async function getEdDSAKeys() {
   if (cachedPrivateKey && cachedPublicKey) return { privateKey: cachedPrivateKey, publicKey: cachedPublicKey };
   
   if (process.env.JWT_EDDSA_PRIVATE_JWK && process.env.JWT_EDDSA_PUBLIC_JWK) {
-     cachedPrivateKey = await importJWK(JSON.parse(process.env.JWT_EDDSA_PRIVATE_JWK), 'EdDSA');
-     cachedPublicKey = await importJWK(JSON.parse(process.env.JWT_EDDSA_PUBLIC_JWK), 'EdDSA');
-     return { privateKey: cachedPrivateKey, publicKey: cachedPublicKey };
+    try {
+      const privJwk = JSON.parse(process.env.JWT_EDDSA_PRIVATE_JWK);
+      const pubJwk  = JSON.parse(process.env.JWT_EDDSA_PUBLIC_JWK);
+      cachedPrivateKey = await importJWK(privJwk, 'EdDSA');
+      cachedPublicKey  = await importJWK(pubJwk,  'EdDSA');
+      return { privateKey: cachedPrivateKey, publicKey: cachedPublicKey };
+    } catch (parseErr) {
+      // Malformed JWK env var — fall back to HS256 silently
+      console.warn('[JWT] JWT_EDDSA_*_JWK env var is malformed or invalid JSON. Falling back to HS256.', parseErr instanceof SyntaxError ? parseErr.message : '');
+      cachedPrivateKey = null;
+      cachedPublicKey  = null;
+      return null;
+    }
   }
   return null;
 }
