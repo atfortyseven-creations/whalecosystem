@@ -10,8 +10,8 @@ import { SplashContainer } from '@/components/shared/SplashContainer';
 
 const MENU_ITEMS = [
   { label: "Home", href: "/" },
-  { label: "Blockchain", href: "#", subItems: [{ label: "Network Blocks", description: "Real-time block stream.", href: "/network" }, { label: "Ledger", description: "Global ledger history.", href: "/ledger" }] },
-  { label: "Intelligence", href: "#", subItems: [{ label: "Data & Charts", description: "On-chain analytics.", href: "/sovereign-intel" }, { label: "Assets", description: "Secure storage.", href: "/portfolio" }] },
+  { label: "Blockchain", href: "#", subItems: [{ label: "Ledger", description: "Global ledger history.", href: "/ledger" }, { label: "Predictions", description: "Market predictions.", href: "/predictions" }] },
+  { label: "Intelligence", href: "#", subItems: [{ label: "Portfolio", description: "Manage assets.", href: "/portfolio" }, { label: "VIP", description: "Exclusive whale data.", href: "/vip" }] },
   { label: "Forum", href: "/forum" },
   { label: "Ecosystem", href: "#", subItems: [{ label: "News", description: "Global intel.", href: "/news" }, { label: "Academy", description: "Learn.", href: "/academy" }, { label: "Careers", description: "Join us.", href: "/careers" }] },
   { label: "Pricing", href: "/pricing" }

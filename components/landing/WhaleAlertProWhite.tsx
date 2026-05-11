@@ -411,9 +411,9 @@ export function WhaleAlertProWhite() {
 
           {/* Desktop Center Navigation */}
           <div className="hidden lg:flex items-center gap-6">
-            <Link href="/network" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
+            <Link href="/ledger" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
               <Anchor size={16} className="text-slate-400 group-hover:text-cyan-600" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-950">Whale Tracker</span>
+              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-950">Whale Ledger</span>
             </Link>
             <Link href="/portfolio" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
               <TrendingUp size={16} className="text-slate-400 group-hover:text-indigo-600" />
@@ -468,7 +468,7 @@ export function WhaleAlertProWhite() {
               className="w-full max-w-[1400px] mt-4 bg-white/95 backdrop-blur-3xl border border-slate-200 rounded-[2.5rem] p-8 flex flex-col gap-4 lg:hidden shadow-2xl z-[110]"
             >
               {[
-                { href: '/network', icon: Anchor, label: 'Whale Tracker', color: 'text-cyan-600' },
+                { href: '/ledger', icon: Anchor, label: 'Whale Ledger', color: 'text-cyan-600' },
                 { href: '/portfolio', icon: TrendingUp, label: 'Whale Profile', color: 'text-indigo-600' },
                 { href: '/support', icon: LifeBuoy, label: 'Support', color: 'text-rose-600' },
                 { href: '/vip', icon: LayoutDashboard, label: 'Terminal', color: 'text-slate-950' },
