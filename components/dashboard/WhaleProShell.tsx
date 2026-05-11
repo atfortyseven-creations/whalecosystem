@@ -366,14 +366,6 @@ export function WhaleProShell({
                 router.push('/connect');
                 return;
             }
-            if (tier === 'FREE') {
-                toast.error("Upgrade Required", {
-                    description: "This module requires an active subscription.",
-                    duration: 4000
-                });
-                router.push('/pricing');
-                return;
-            }
         }
         onTabChange(id);
     };
@@ -424,40 +416,7 @@ export function WhaleProShell({
                 </motion.div>
             )}
 
-            {isTierLoaded && tier === 'FREE' && RESTRICTED_TABS.includes(activeTab) && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="fixed inset-0 z-[9998] flex flex-col items-center justify-center text-center"
-                    style={{ background: 'rgba(250,249,246,0.97)', backdropFilter: 'blur(24px)' }}
-                >
-                    <Lock size={48} className={`mb-6 ${subStatus === 'PENDING_SEPA' ? 'text-amber-500' : 'text-[#00C076]'}`} strokeWidth={1} />
-                    <h2 className="text-2xl font-black uppercase tracking-[0.2em] text-[#050505] mb-2">
-                        {subStatus === 'PENDING_SEPA' ? 'Awaiting Transfer' : 'Access Denied'}
-                    </h2>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/40 mb-8 max-w-sm">
-                        {subStatus === 'PENDING_SEPA' 
-                            ? 'Your invoice has been generated. Please complete the SEPA transfer to activate your account and unlock the terminal.'
-                            : 'You are currently on a free plan. The Whale Alert Network terminal requires an active subscription to view live telemetry and market intelligence.'}
-                    </p>
-                    <div className="flex gap-4">
-                        {subStatus !== 'PENDING_SEPA' && (
-                            <button
-                                onClick={() => router.push('/pricing')}
-                                className="px-8 py-3.5 bg-[#00C076] text-black text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-400 transition-all active:scale-[0.98] shadow-lg"
-                            >
-                                View Plans
-                            </button>
-                        )}
-                        <button
-                            onClick={() => onTabChange('billing')}
-                            className="px-8 py-3.5 bg-black text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-all active:scale-[0.98]"
-                        >
-                            My Billing
-                        </button>
-                    </div>
-                </motion.div>
-            )}
+
         </AnimatePresence>
 
         <div className={`flex fixed inset-0 bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''}`}>

@@ -118,7 +118,7 @@ export function GlobalSettingsModal() {
                                             <div className="space-y-4">
                                                 {/* 1 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] mb-2 rounded-xl">
-                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">1. Theme System (Locked)</label>
+                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">Theme System (Locked)</label>
                                                     <div className="flex items-center gap-2 px-3 py-2 bg-[#FAF9F6] border border-[#E5E5E5] rounded-lg">
                                                         <Shield size={12} className="text-black/40" />
                                                         <span className="text-[11px] font-bold uppercase tracking-wider text-black opacity-50">Sovereign Ivory Mode Only</span>
@@ -127,7 +127,7 @@ export function GlobalSettingsModal() {
                                                 <div className="flex gap-4">
                                                     {/* 2 */}
                                                     <div className="flex-1 p-4 bg-white border border-[#E5E5E5] rounded-xl">
-                                                        <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">2. Base Currency</label>
+                                                        <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">Base Currency</label>
                                                          <SelectBox value={currency} onChange={(e) => set(setCurrency, 'Currency')(e.target.value as any)}>
                                                             <option value="USD">USD — US Dollar</option>
                                                             <option value="EUR">EUR — Euro</option>
@@ -141,7 +141,7 @@ export function GlobalSettingsModal() {
                                                     <div className="flex items-center gap-3">
                                                        <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><ActivitySquare size={14}/></div>
                                                        <div>
-                                                         <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">4. UI Density</span>
+                                                         <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">UI Density</span>
                                                          <span className="text-[10px] text-[#888888] block mt-1">Component spacing</span>
                                                        </div>
                                                     </div>
@@ -162,7 +162,7 @@ export function GlobalSettingsModal() {
                                                 {/* 5 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div>
-                                                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">5. Testnet Analytics <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span>
+                                                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">Testnet Analytics <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span>
                                                         <span className="text-[10px] text-[#888888] block mt-1">Index Sepolia/Goerli</span>
                                                     </div>
                                                     <Toggle enabled={testnetMode} setEnabled={(v) => { setTestnetMode(v); toast.success(`Testnet mode ${v ? 'enabled' : 'disabled'} — reload to apply`, { duration: 3000, position: 'bottom-right' }); }} />
@@ -180,7 +180,7 @@ export function GlobalSettingsModal() {
                                                     <div className="flex items-center gap-3">
                                                        <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Volume2 size={14}/></div>
                                                        <div>
-                                                           <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">8. Radar Audio Alerts</span>
+                                                           <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Radar Audio Alerts</span>
                                                            <span className="text-[10px] text-[#888888] block mt-1">Play beep on trigger</span>
                                                        </div>
                                                     </div>
@@ -198,7 +198,7 @@ export function GlobalSettingsModal() {
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <div className="p-2 bg-black rounded"><EyeOff size={14} className="text-white" /></div>
-                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">11. Stealth Mode</span><span className="text-[10px] text-[#888888] block mt-1">Blur all balance values (hover to reveal)</span></div>
+                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Stealth Mode</span><span className="text-[10px] text-[#888888] block mt-1">Blur all balance values (hover to reveal)</span></div>
                                                     </div>
                                                     <Toggle enabled={stealthMode} setEnabled={(v) => { setStealthMode(v); toast.success(`Stealth mode ${v ? 'on — balances blurred' : 'off'}`, { duration: 2000, position: 'bottom-right' }); }} />
                                                 </div>
@@ -206,7 +206,7 @@ export function GlobalSettingsModal() {
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <div className="p-2 border border-[#E5E5E5] rounded"><LogOut size={14} className="text-black" /></div>
-                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">12. Show Balances</span><span className="text-[10px] text-[#888888] block mt-1">Display balances on load</span></div>
+                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Show Balances</span><span className="text-[10px] text-[#888888] block mt-1">Display balances on load</span></div>
                                                     </div>
                                                     <Toggle enabled={showBalances} setEnabled={(v) => { setShowBalances(v); toast.success(`Balances ${v ? 'visible' : 'hidden'}`, { duration: 1800, position: 'bottom-right' }); }} />
                                                 </div>
@@ -214,14 +214,14 @@ export function GlobalSettingsModal() {
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <div className="p-2 border border-[#E5E5E5] rounded"><Shield size={14} className="text-black" /></div>
-                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">13. Analytics Sharing</span><span className="text-[10px] text-[#888888] block mt-1">Send diagnostic errors</span></div>
+                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Analytics Sharing</span><span className="text-[10px] text-[#888888] block mt-1">Send diagnostic errors</span></div>
                                                     </div>
-                                                    <Toggle enabled={allowAnalytics} setEnabled={setAllowAnalytics} />
+                                                    <Toggle enabled={allowAnalytics} setEnabled={(v) => { setAllowAnalytics(v); toast.success(`Analytics ${v ? 'enabled' : 'disabled'}`, { duration: 1800, position: 'bottom-right' }); }} />
                                                 </div>
                                                 {/* 14 (Action) */}
                                                 <div className="pt-4 border-t border-[#E5E5E5]">
                                                     <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
-                                                       <div className="flex items-center gap-3"><div className="p-2 border border-[#E5E5E5] rounded bg-[#FAF9F6]"><HardDrive size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">14. Clear Terminal Cache</span><span className="text-[10px] text-[#888888] block mt-1">Purge graph queries & cache</span></div></div>
+                                                       <div className="flex items-center gap-3"><div className="p-2 border border-[#E5E5E5] rounded bg-[#FAF9F6]"><HardDrive size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Clear Terminal Cache</span><span className="text-[10px] text-[#888888] block mt-1">Purge graph queries & cache</span></div></div>
                                                        <button onClick={() => { if(confirm("Purge application cache?")) clearAppData(); }} className="px-4 py-2 border border-[#FF3B30] text-[#FF3B30] text-[9px] font-black uppercase rounded-lg hover:bg-[#FF3B30] hover:text-white transition-all">Purge</button>
                                                     </div>
                                                 </div>
@@ -235,7 +235,7 @@ export function GlobalSettingsModal() {
                                             <div className="space-y-4">
                                                  {/* 16 */}
                                                  <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl">
-                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">16. Auto-Disconnect Security</label>
+                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">Auto-Disconnect Security</label>
                                                     <div className="flex bg-[#FAF9F6] border border-[#E5E5E5] rounded-lg p-1 w-full text-center">
                                                         {(['15m', '1h', '24h', 'never'] as const).map(d => (
                                                             <button key={d} onClick={() => { setAutoDisconnectTimer(d); toast.success(`Auto-lock: ${d}`, { duration: 1800, position: 'bottom-right' }); }} className={`flex-1 py-2 rounded text-[10px] font-black uppercase transition-all ${autoDisconnectTimer === d ? 'bg-black text-white shadow' : 'text-[#888888] hover:text-black'}`}>{d}</button>
@@ -254,9 +254,9 @@ export function GlobalSettingsModal() {
                                                 {/* 17 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
-                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Monitor size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">17. Hardware Acceleration</span><span className="text-[10px] text-[#888888] block mt-1">Allow WebGL / GPU graph</span></div>
+                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Monitor size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Hardware Acceleration</span><span className="text-[10px] text-[#888888] block mt-1">Allow WebGL / GPU graph</span></div>
                                                     </div>
-                                                    <Toggle enabled={hardwareAcceleration} setEnabled={setHardwareAcceleration} />
+                                                    <Toggle enabled={hardwareAcceleration} setEnabled={(v) => { setHardwareAcceleration(v); toast.success(`Hardware accel ${v ? 'enabled' : 'disabled'}`, { duration: 1800, position: 'bottom-right' }); }} />
                                                 </div>
 
                                                  {/* Action Disconnect moved to Bottom of Display or separate */}

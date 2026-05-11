@@ -51,7 +51,12 @@ export function SovereignChat() {
       const stored = localStorage.getItem('secure_comm_history');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed.conversations) setConversations(parsed.conversations);
+        if (parsed.conversations) {
+          setConversations(parsed.conversations);
+          if (parsed.conversations.length > 0) {
+            setActiveConv(parsed.conversations[0]);
+          }
+        }
         if (parsed.messages) {
           const convs: { peerAddress: string }[] = parsed.conversations || [];
           const firstPeer = convs[0]?.peerAddress ?? '0xInstitutionalSupport_0000';
@@ -130,9 +135,11 @@ export function SovereignChat() {
           sentAt: new Date(),
           convPeer: activeConv.peerAddress,
         };
-        const msgsWithResp = [...updatedMsgs, responseMsg];
-        setMessages(msgsWithResp);
-        persistToLocal(conversations, msgsWithResp);
+        setMessages(prev => {
+          const msgsWithResp = [...prev, responseMsg];
+          persistToLocal(conversations, msgsWithResp);
+          return msgsWithResp;
+        });
       }, 1200);
     }
   };
