@@ -123,15 +123,16 @@ export function MempoolForensicsPanel() {
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   const generateLocalMempoolData = () => {
+    const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
     const methods = Object.keys(KNOWN_SELECTORS);
-    const method = methods[Math.floor(Math.random() * methods.length)];
-    return Array.from({ length: Math.floor(Math.random() * 5) + 1 }).map(() => ({
-      hash: '0x' + Math.random().toString(16).slice(2, 66).padEnd(64, '0'),
-      from: '0x' + Math.random().toString(16).slice(2, 42).padEnd(40, '0'),
-      to: '0x' + Math.random().toString(16).slice(2, 42).padEnd(40, '0'),
-      value: (Math.random() * 2).toString(),
-      gasPrice: (Math.random() * 250).toString(),
-      input: method + Math.random().toString(16).slice(2, 66)
+    const method = methods[Math.floor(secureRandom() * methods.length)];
+    return Array.from({ length: Math.floor(secureRandom() * 5) + 1 }).map(() => ({
+      hash: '0x' + secureRandom().toString(16).slice(2, 66).padEnd(64, '0'),
+      from: '0x' + secureRandom().toString(16).slice(2, 42).padEnd(40, '0'),
+      to: '0x' + secureRandom().toString(16).slice(2, 42).padEnd(40, '0'),
+      value: (secureRandom() * 2).toString(),
+      gasPrice: (secureRandom() * 250).toString(),
+      input: method + secureRandom().toString(16).slice(2, 66)
     }));
   };
 
@@ -148,7 +149,7 @@ export function MempoolForensicsPanel() {
         if (level === 'NOMINAL') continue;
 
         const alert: SequenceAlert = {
-          id: tx.hash ?? Math.random().toString(36).slice(2),
+          id: tx.hash ?? crypto.randomUUID(),
           txHash: tx.hash,
           from: tx.from,
           to: tx.to,

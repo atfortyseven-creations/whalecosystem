@@ -29,8 +29,9 @@ export const HeuristicEntropySim = () => {
     const [points, setPoints] = useState<number[]>([]);
     
     useEffect(() => {
+        const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
         const interval = setInterval(() => {
-            setPoints(prev => [...prev.slice(-19), Math.random() * 100]);
+            setPoints(prev => [...prev.slice(-19), secureRandom() * 100]);
         }, 1500);
         return () => clearInterval(interval);
     }, []);
@@ -53,12 +54,15 @@ export const HeuristicEntropySim = () => {
                     Notice: Volatility delta exceeded 0.82. Rebalancing operations detected.
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                    {[1,2,3,4].map(i => (
+                    {[1,2,3,4].map(i => {
+                        const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+                        return (
                         <div key={i} className="p-4 border border-[#E5E5E5] bg-[#FAF9F6] rounded shadow-sm">
                             <div className="text-[8px] text-[#A0A0A0] mb-1">NODE_0x0{i}</div>
-                            <div className="text-xl font-bold tracking-tighter text-[#050505]">{(Math.random() * 10).toFixed(2)}σ</div>
+                            <div className="text-xl font-bold tracking-tighter text-[#050505]">{(secureRandom() * 10).toFixed(2)}σ</div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>

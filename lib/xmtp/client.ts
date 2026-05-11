@@ -9,6 +9,10 @@
 
 'use client';
 
+if (typeof window !== 'undefined' && !window.Buffer) {
+  window.Buffer = require('buffer').Buffer;
+}
+
 import { Client, type XmtpEnv } from '@xmtp/browser-sdk';
 
 const XMTP_ENV: XmtpEnv = (process.env.NEXT_PUBLIC_XMTP_ENV as XmtpEnv) ?? 'production';

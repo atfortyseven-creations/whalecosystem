@@ -158,7 +158,13 @@ export function WhaleChat() {
     try {
       const signer = {
         getAddress: async () => address,
-        signMessage: async (msg: string) => await signMessageAsync({ message: msg }),
+        signMessage: async (msg: string | Uint8Array) => {
+          if (typeof msg === 'string') {
+            return await signMessageAsync({ message: msg });
+          } else {
+            return await signMessageAsync({ message: { raw: msg } });
+          }
+        },
       };
       const xmtp = await getXMTPClient(signer);
       setClient(xmtp);
@@ -290,7 +296,17 @@ export function WhaleChat() {
 
     try {
       await sendMessage(client, activePeer, content);
-      // We don't need to manually append to messages array because streamAllMessages will catch it and update state!
+      // Optimistic update for better UX
+      const newMsg = {
+        id: Date.now().toString(),
+        senderAddress: address,
+        content: content,
+        sent: new Date()
+      };
+      setMessages(prev => {
+        if (prev.find(m => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
     } catch (err) {
       console.error("Failed to send", err);
       alert("Failed to send message.");
@@ -320,6 +336,7 @@ export function WhaleChat() {
                  <h3 className="font-mono font-bold uppercase tracking-widest text-lg">Scan PC Session</h3>
                  <button onClick={() => setShowScanner(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X size={20}/></button>
              </div>
+             <p className="text-[11px] text-black/50 text-center mb-4 px-4 font-mono">Scan the QR code displayed on your desktop dashboard to link your secure E2EE chat session.</p>
              <QrScanner mode="scan" />
          </div>
       </div>
