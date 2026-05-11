@@ -34,11 +34,17 @@ export function SovereignChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Auto-initialize network to bypass signature prompts and enter directly
+  useEffect(() => {
+    if (isConnected && address && !isConnectedToNetwork && !isInitializing) {
+      initClient();
+    }
+  }, [isConnected, address, isConnectedToNetwork, isInitializing]);
+
   const initClient = async () => {
     if (!address) return;
     setIsInitializing(true);
-    // Simulate secure initialization sequence
-    await new Promise(r => setTimeout(r, 1500));
+    // Instant initialization (no artificial lag)
     
     // Load local storage deterministic data
     try {
