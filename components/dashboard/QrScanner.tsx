@@ -14,11 +14,14 @@ interface QrScannerProps {
     mode?: 'project' | 'scan';
 }
 
+// Module-level constant — QrScanner is never mounted more than once simultaneously,
+// so a fixed DOM ID for html5-qrcode's internal container is safe and allocation-free.
+const QR_CONTAINER_ID = 'qr-reader-container';
+
 export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
     const [state, setState] = useState<ScanState>('idle');
     const [message, setMessage] = useState('');
     const scannerRef = useRef<Html5Qrcode | null>(null);
-    const containerId = "qr-reader-container";
 
     // Stop all camera resources
     const stopCamera = useCallback(async () => {
@@ -74,7 +77,7 @@ export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
         await stopCamera();
 
         try {
-            const scanner = new Html5Qrcode(containerId);
+            const scanner = new Html5Qrcode(QR_CONTAINER_ID);
             scannerRef.current = scanner;
 
             const config = {
@@ -176,7 +179,7 @@ export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
     return (
         <div className={`w-full flex flex-col items-center gap-6 ${className ?? ''}`}>
             {/* Hidden/Placeholder container for Html5Qrcode */}
-            <div id={containerId} className="hidden pointer-events-none opacity-0 w-0 h-0" />
+            <div id={QR_CONTAINER_ID} className="hidden pointer-events-none opacity-0 w-0 h-0" />
 
             <AnimatePresence mode="wait">
                 {/* IDLE */}
@@ -227,7 +230,7 @@ export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
                             <div id="scanner-viewfinder" className="w-full h-full [&>video]:w-full [&>video]:h-full [&>video]:object-cover" />
                             
                             {/* Inject the video into the viewfinder */}
-                            <VideoReparenter sourceId={containerId} targetId="scanner-viewfinder" />
+                            <VideoReparenter sourceId={QR_CONTAINER_ID} targetId="scanner-viewfinder" />
 
                             {/* Scan overlay */}
                             <div className="absolute inset-0 pointer-events-none">

@@ -10,8 +10,7 @@ import { SplashContainer } from '@/components/shared/SplashContainer';
 
 const MENU_ITEMS = [
   { label: "Home", href: "/" },
-  { label: "Blockchain", href: "#", subItems: [{ label: "Ledger", description: "Global ledger history.", href: "/ledger" }, { label: "Predictions", description: "Market predictions.", href: "/predictions" }] },
-  { label: "Intelligence", href: "#", subItems: [{ label: "Portfolio", description: "Manage assets.", href: "/portfolio" }, { label: "VIP", description: "Exclusive whale data.", href: "/vip" }] },
+  { label: "Blockchain", href: "#", subItems: [{ label: "Portfolio", description: "Track and manage your on-chain assets.", href: "/portfolio" }] },
   { label: "Forum", href: "/forum" },
   { label: "Ecosystem", href: "#", subItems: [{ label: "News", description: "Global intel.", href: "/news" }, { label: "Academy", description: "Learn.", href: "/academy" }, { label: "Careers", description: "Join us.", href: "/careers" }] },
   { label: "Pricing", href: "/pricing" }

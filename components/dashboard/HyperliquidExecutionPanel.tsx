@@ -33,6 +33,15 @@ const fmtPct = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(2)}%`;
 
 const TOP_MARKETS = ['BTC', 'ETH', 'SOL', 'ARB', 'OP', 'AVAX', 'LINK', 'UNI'];
 
+// Static fallback data for when Hyperliquid API is unavailable
+// Module-level constant — never recreated on render
+const FALLBACK_MARKETS: MarketData[] = [
+  { coin: 'BTC', markPx: '64532.10', fundingRate: '0.0012', openInterest: '1240500000', volume24h: '3500000000', priceChange24h: 2.4 },
+  { coin: 'ETH', markPx: '3452.45',  fundingRate: '0.0015', openInterest: '840500000',  volume24h: '1500000000', priceChange24h: 1.8 },
+  { coin: 'SOL', markPx: '145.20',   fundingRate: '0.0042', openInterest: '240500000',  volume24h: '900000000',  priceChange24h: -1.2 },
+  { coin: 'ARB', markPx: '1.12',     fundingRate: '0.0021', openInterest: '40500000',   volume24h: '150000000',  priceChange24h: 4.5 },
+];
+
 export function HyperliquidExecutionPanel() {
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -48,12 +57,6 @@ export function HyperliquidExecutionPanel() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<'trade' | 'positions'>('trade');
 
-  const getFallbackMarkets = () => [
-    { coin: 'BTC', markPx: '64532.10', fundingRate: '0.0012', openInterest: '1240500000', volume24h: '3500000000', priceChange24h: 2.4 },
-    { coin: 'ETH', markPx: '3452.45', fundingRate: '0.0015', openInterest: '840500000', volume24h: '1500000000', priceChange24h: 1.8 },
-    { coin: 'SOL', markPx: '145.20', fundingRate: '0.0042', openInterest: '240500000', volume24h: '900000000', priceChange24h: -1.2 },
-    { coin: 'ARB', markPx: '1.12', fundingRate: '0.0021', openInterest: '40500000', volume24h: '150000000', priceChange24h: 4.5 },
-  ];
 
   // Fetch live market data from Hyperliquid or fallback gracefully
   const fetchMarkets = useCallback(async () => {
@@ -82,9 +85,9 @@ export function HyperliquidExecutionPanel() {
         })
         .filter((m: MarketData) => TOP_MARKETS.includes(m.coin));
 
-      setMarkets(enriched.length ? enriched : getFallbackMarkets());
+      setMarkets(enriched.length ? enriched : FALLBACK_MARKETS);
     } catch (err) {
-      setMarkets(getFallbackMarkets());
+      setMarkets(FALLBACK_MARKETS);
     } finally {
       setIsLoadingMarkets(false);
     }
