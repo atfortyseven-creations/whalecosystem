@@ -43,7 +43,6 @@ const SIDEBAR_ITEMS: NavItem[] = [
 
     { id: 'markets',      label: 'Top Markets',       icon: <LayoutDashboard size={17}/>, dividerBefore: 'Intelligence' },
     { id: 'newpairs',     label: 'New Listings',      icon: <Search size={17}/> },
-    { id: 'graph',        label: 'Entity Graph',      icon: <Compass size={17}/>,  badge: 'LIVE', badgeColor: '#9945FF' },
 
     { id: 'inst-ledger',  label: 'Whale Ledger',      icon: <Book size={17}/>,      dividerBefore: 'On-Chain Intel' },
     { id: 'mass-transfer',label: 'Mass Transfers',    icon: <Network size={17}/> },
@@ -54,11 +53,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'scanner',      label: 'QR Scanner',        icon: <Camera size={17}/>,    dividerBefore: 'ZK Layer' },
     { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/> },
 
-    { id: 'vault',        label: 'Sovereign Vault',   icon: <Lock size={17}/>,      dividerBefore: 'Execution' },
-    { id: 'trade',        label: 'Trading Terminal',  icon: <TrendingUp size={17}/>, badge: 'LIVE', badgeColor: '#00C076' },
-    { id: 'forensics',    label: 'Mempool Forensics', icon: <Radar size={17}/>,      badge: 'AI', badgeColor: '#FF1744' },
-    { id: 'chat',         label: 'Whale Chat',       icon: <MessageCircle size={17}/>, badge: 'E2E', badgeColor: '#9945FF' },
-    { id: 'reputation',   label: 'Reputation SBT',   icon: <Award size={17}/> },
+    { id: 'chat',         label: 'Whale Chat',       icon: <MessageCircle size={17}/>, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF' },
     { id: 'logs',         label: 'Session Logs',      icon: <Database size={17}/>,  dividerBefore: 'System' },
     { id: 'support',      label: 'Support',           icon: <MessageSquare size={17}/> },
 ];

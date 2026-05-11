@@ -20,8 +20,6 @@ const PAGES = [
   { id: "market-data",   label: "Market Data",     group: "Intelligence",   icon: <Globe size={15} /> },
   { id: "markets",       label: "Top Markets",     group: "Intelligence",   icon: <LayoutDashboard size={15} /> },
   { id: "newpairs",      label: "New Listings",    group: "Intelligence",   icon: <Search size={15} /> },
-  { id: "graph",         label: "Entity Graph",    group: "Intelligence",   icon: <Compass size={15} /> },
-
   // ── Blockchain Data ──
   { id: "inst-ledger",   label: "Institutional Ledger",    group: "Blockchain Data", icon: <Book size={15} /> },
   { id: "mass-transfer", label: "Mass Transfers",  group: "Blockchain Data", icon: <Network size={15} /> },
@@ -33,15 +31,12 @@ const PAGES = [
   { id: "sov-intel",     label: "Research Reports", group: "Premium Insights", icon: <BookOpen size={15} />,  external: true },
   { id: "zk",            label: "Privacy Network",  group: "Premium Insights", icon: <Shield size={15} /> },
 
-  // ── Execution ──
-  { id: "vault",         label: "Secure Vault", group: "Execution",      icon: <Lock size={15} /> },
-
   // ── System ──
   { id: "logs",          label: "Activity Logs",    group: "System",         icon: <Database size={15} /> },
   { id: "support",       label: "Support",         group: "System",         icon: <MessageSquare size={15} /> },
 ];
 
-const GROUPS = ["Overview", "Intelligence", "Blockchain Data", "Premium Insights", "Execution", "System"];
+const GROUPS = ["Overview", "Intelligence", "Blockchain Data", "Premium Insights", "System"];
 
 export function GlobalCommandPalette({
   isOpen,

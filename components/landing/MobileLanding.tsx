@@ -244,10 +244,8 @@ function ConnectedScreen({
   signMessageAsync?: any;
 }) {
   const now = useLiveClock();
-  const [connectedAt] = useState(() => new Date());
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [userAgentInfo, setUserAgentInfo] = useState('');
-  const [screenRes, setScreenRes] = useState('');
   const [sessionHistory, setSessionHistory] = useState<any[]>([]);
 
   // ── Real on-chain data ────────────────────────────────────────────────────
@@ -274,7 +272,6 @@ function ConnectedScreen({
        if (ua.indexOf("like Mac") != -1) os = "iOS";
        const detectedOs = `${os} (${navigator.vendor || "Browser"})`;
        setUserAgentInfo(detectedOs);
-       setScreenRes(`${window.screen.width}x${window.screen.height}`);
        
        if (address) {
          const key = `sovereign_history_${address}`;
@@ -286,7 +283,6 @@ function ConnectedScreen({
                  if (Array.isArray(parsed)) existing = parsed;
              }
          } catch (e) {
-             console.warn("[Sovereign] LocalStorage parse error, resetting history array.");
              existing = [];
          }
 
@@ -301,12 +297,10 @@ function ConnectedScreen({
          let updated = existing;
          
          if (!isDuplicate) {
-           updated = [currentSession, ...existing].slice(0, 50); // Hard limit to 50 entries to prevent QuotaExceededError
+           updated = [currentSession, ...existing].slice(0, 50);
            try {
                localStorage.setItem(key, JSON.stringify(updated));
-           } catch (e) {
-               console.warn("[Sovereign] LocalStorage write error (quota exceeded).");
-           }
+           } catch (e) {}
          }
          setSessionHistory(updated);
        }
@@ -315,160 +309,122 @@ function ConnectedScreen({
 
   const fmtTime   = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const fmtDate   = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-  const fmtStamp  = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
-      {/* Backgrounds */}
-      <div className="fixed inset-0 z-0 bg-[#FAF9F6]" />
-      <div className="fixed top-0 inset-x-0 h-28 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,1) 0%, transparent 100%)" }} />
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-white text-black">
+      {/* Black and White Spinning World Background */}
+      <div className="fixed inset-0 z-0 flex items-center justify-center overflow-hidden bg-[#fafafa]">
+        <motion.img 
+           src="/rectangle_large_type_2_a9c6cc1e1738c43864683c13c43314d9.jpg"
+           alt="Rotating World"
+           className="absolute min-w-[150vw] min-h-[150vh] object-cover opacity-15"
+           style={{ filter: "grayscale(100%) contrast(150%)" }}
+           animate={{ rotate: 360 }}
+           transition={{ duration: 180, ease: "linear", repeat: Infinity }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/80 to-white/95 backdrop-blur-[2px]" />
+      </div>
 
-      {/* Fixed Header */}
-      <motion.header
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between px-5 py-3 rounded-full"
-        style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: `1px solid ${FAINT}`, boxShadow: "0 4px 24px rgba(5,5,5,0.07)" }}
-      >
-        <div className="flex items-center gap-2">
-          {onBack && (
-            <button
-              onClick={onBack}
-              title="Back to Landing Page"
-              className="p-1.5 -ml-2 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors mr-1 cursor-pointer flex items-center gap-1"
-            >
-               <ArrowRight size={15} className="rotate-180" />
-               <span className="text-[8px] font-mono uppercase tracking-widest text-black/40">Home</span>
-            </button>
-          )}
-          <WhaleLogo className="w-5 h-5 shrink-0" />
-          <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
-        </div>
-        <button 
-           onClick={() => setShowInfoModal(true)}
-           className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 transition-colors"
+      <main className="relative z-10 flex-1 flex flex-col items-center px-6 py-10 gap-5 max-w-[480px] w-full mx-auto">
+        
+        {/* Header & Logo */}
+        <motion.div 
+           initial={{ opacity: 0, y: -10 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.6 }}
+           className="w-full flex flex-col items-center justify-center gap-5 mb-4 mt-2"
         >
-          <Info size={14} />
-        </button>
-      </motion.header>
-
-      <main className="relative z-10 flex-1 flex flex-col items-center px-4 pt-28 pb-[calc(2rem+env(safe-area-inset-bottom))] gap-5 max-w-[440px] w-full mx-auto">
+           <img src="/logo-landingpage.png" alt="Whale Logo" className="h-20 w-auto object-contain drop-shadow-sm" style={{ filter: "grayscale(100%)" }} />
+           <div className="flex flex-col items-center text-center">
+             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">Whale Alert</h1>
+             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Institutional Terminal</p>
+           </div>
+        </motion.div>
 
         {/* ── Sovereign Identity Card ── */}
         <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ delay: 0.05, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-           className="w-full bg-white rounded-[24px] border border-[#E5E5E5] shadow-xl overflow-hidden flex flex-col"
+           initial={{ opacity: 0, scale: 0.98 }}
+           animate={{ opacity: 1, scale: 1 }}
+           transition={{ delay: 0.1, duration: 0.6 }}
+           className="w-full bg-white rounded-[32px] border-[3px] border-black shadow-[0_12px_40px_rgb(0,0,0,0.12)] overflow-hidden flex flex-col"
         >
-          {/* Purple header — live clock + verified badge */}
-            <div className="bg-gradient-to-br from-[#2D0A59] to-[#1E073B] px-6 py-6 flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 mb-1">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Active Session · ECDSA Verified</p>
-                <div className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">Connected</span>
-                </div>
-              </div>
-              <p className="text-[38px] font-black tracking-tighter text-white leading-none tabular-nums">
-                {fmtTime(now)}
-              </p>
-              <p className="text-[10px] font-medium text-white/50 capitalize mt-1">{fmtDate(now)}</p>
+          {/* Header */}
+          <div className="bg-black px-6 py-8 flex flex-col items-center text-center gap-4">
+            <div className="px-4 py-1.5 rounded-full border border-white/30 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white">Active Session · Verified</span>
             </div>
-            <div className="flex flex-col items-end gap-2 shrink-0">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-                <CheckCircle2 size={24} className="text-emerald-400" />
-              </div>
-            </div>
+            <p className="text-[44px] font-black tracking-tighter text-white leading-none tabular-nums mt-2">
+              {fmtTime(now)}
+            </p>
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/50">{fmtDate(now)}</p>
           </div>
 
           {/* On-chain data row */}
-          <div className="grid grid-cols-2 gap-px bg-[#F0F0F0]">
-            <div className="bg-white px-5 py-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Network</p>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-violet-500" />
-                <p className="text-[11px] font-black text-[#050505] truncate">{chainName(chainId)}</p>
-              </div>
+          <div className="grid grid-cols-2 gap-px bg-black">
+            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Network</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-black truncate">{chainName(chainId)}</p>
             </div>
-            <div className="bg-white px-5 py-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Balance On-Chain</p>
-              <p className="text-[11px] font-black font-mono text-[#050505] truncate">
-                {fmtBalance() ?? <span className="text-[#050505]/30 animate-pulse">Loading…</span>}
+            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Balance</p>
+              <p className="text-[13px] font-black font-mono tracking-wider text-black truncate">
+                {fmtBalance() ?? <span className="text-black/30 animate-pulse">Loading…</span>}
               </p>
             </div>
           </div>
 
           {/* Wallet / identity row */}
-          <div className="grid grid-cols-2 gap-px bg-[#F0F0F0] border-t border-[#F0F0F0]">
-            <div className="bg-white px-5 py-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Wallet Provider</p>
-              <p className="text-[11px] font-black text-[#050505] truncate">{connectorName || 'Secure Wallet'}</p>
+          <div className="grid grid-cols-2 gap-px bg-black border-t border-black">
+            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Provider</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-black truncate">{connectorName || 'Secure Wallet'}</p>
             </div>
-            <div className="bg-white px-5 py-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Identity (ENS)</p>
-              <p className="text-[11px] font-black text-violet-700 truncate">{ensName ?? checksumAddr(address)}</p>
+            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Identity</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-black truncate">{ensName ?? checksumAddr(address)}</p>
             </div>
           </div>
 
           {/* Full address */}
-          <div className="px-5 py-4 bg-[#FAF9F6] border-t border-[#F0F0F0]">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-2">Wallet Address · On-Chain Verified</p>
-            <div className="flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-xl px-3 py-2.5">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-              <p className="text-[11px] font-mono text-[#050505] tracking-tight break-all leading-relaxed flex-1">
+          <div className="px-6 py-6 bg-white border-t border-black flex flex-col items-center text-center">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-3">Verified On-Chain Address</p>
+            <div className="flex items-center justify-center gap-2 bg-[#f4f4f4] border border-black/10 rounded-2xl px-5 py-4 w-full">
+              <p className="text-[12px] font-mono text-black font-bold tracking-tight break-all leading-relaxed">
                 {address}
               </p>
             </div>
           </div>
         </motion.div>
 
-        {/* ── Permission Badge ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.6 }}
-          className="w-full flex items-center gap-3 px-5 py-4 rounded-2xl bg-white border border-[#E5E5E5]"
-        >
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
-            <CheckCircle2 size={18} className="text-emerald-500" />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#050505]">Scanner unlocked</p>
-            <p className="text-[9px] text-[#050505]/40 font-medium">You can use the scanner to link the desktop terminal.</p>
-          </div>
-        </motion.div>
-
         {/* ── Primary CTA ── */}
         <motion.button
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22, duration: 0.6 }}
-          whileTap={{ scale: 0.97 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          whileTap={{ scale: 0.98 }}
           onClick={onScan}
-          className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white shadow-xl"
-          style={{ background: "#2D0A59", fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(45,10,89,0.45)" }}
+          className="w-full flex items-center justify-center gap-4 py-6 rounded-[24px] font-black uppercase tracking-[0.15em] text-white bg-black border-[3px] border-black hover:bg-black/90 shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all mt-2"
+          style={{ fontSize: "12px" }}
         >
-          <Scan size={18} />
-          Open QR Scanner · Sync Desktop
+          <Scan size={20} strokeWidth={2.5} />
+          Open QR Scanner · Sync
         </motion.button>
 
         {/* ── Forum CTA ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.6 }}
+          transition={{ delay: 0.25, duration: 0.5 }}
           className="w-full"
         >
           <Link
             href="/forum"
-            className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black uppercase tracking-widest border border-black/10 bg-white hover:bg-[#FAF9F6] active:bg-[#F5F4EF] active:scale-[0.97] transition-all duration-200"
-            style={{ fontSize: "12px", color: "#050505" }}
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[3px] border-black bg-white hover:bg-black hover:text-white transition-all group"
+            style={{ fontSize: "11px", color: "black" }}
           >
-            <MessageSquare size={16} />
-            Access Sovereign Forum
+            <MessageSquare size={18} className="group-hover:text-white transition-colors" />
+            Sovereign Forum
           </Link>
         </motion.div>
 
@@ -476,16 +432,16 @@ function ConnectedScreen({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.26, duration: 0.6 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
           className="w-full"
         >
           <Link
             href="/dashboard?tab=chat"
-            className="w-full flex items-center justify-center gap-3 py-4 mt-4 rounded-2xl font-black uppercase tracking-widest border border-[#9945FF]/20 bg-[#9945FF]/5 hover:bg-[#9945FF]/10 active:scale-[0.97] transition-all duration-200"
-            style={{ fontSize: "12px", color: "#9945FF" }}
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[3px] border-black/20 bg-white hover:border-black transition-all text-black"
+            style={{ fontSize: "11px" }}
           >
-            <MessageCircle size={16} />
-            Enter Whale Chat Encrypted
+            <MessageCircle size={18} />
+            Encrypted Chat
           </Link>
         </motion.div>
 
@@ -493,71 +449,48 @@ function ConnectedScreen({
         {onDisconnect && (
           <motion.button
             id="sovereign-disconnect-btn"
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.27, duration: 0.5 }}
-            whileTap={{ scale: 0.97 }}
+            transition={{ delay: 0.35, duration: 0.5 }}
+            whileTap={{ scale: 0.98 }}
             onClick={onDisconnect}
-            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-black uppercase tracking-widest border border-red-200/80 bg-red-50/60 hover:bg-red-100/80 active:bg-red-100 transition-colors"
-            style={{ fontSize: "11px", color: "#dc2626" }}
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-black/5 transition-all mt-4 text-black/50 hover:text-black"
+            style={{ fontSize: "10px" }}
           >
-            <LogOut size={15} />
-            Disconnect Session · Change Wallet
+            <LogOut size={16} />
+            Disconnect Wallet
           </motion.button>
         )}
 
-        {/* ── Instruction card ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="w-full flex items-start gap-3 p-4 rounded-2xl bg-white/60 border border-[#E5E5E5]"
-        >
-          <Fingerprint size={14} className="text-[#050505]/25 mt-0.5 shrink-0" />
-          <p className="text-[9px] text-[#050505]/40 font-medium leading-relaxed">
-            On the Desktop Terminal, click <strong className="text-[#2D0A59]/80 font-black">Direct QR Handshake</strong>, then scan the code with this button to sync your institutional session.
-          </p>
-        </motion.div>
-
         {/* ── Session History Panel ── */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.6 }}
-          className="w-full bg-white rounded-[24px] border border-[#E5E5E5] overflow-hidden flex flex-col shadow-sm mt-4"
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="w-full bg-white rounded-[24px] border-[3px] border-black overflow-hidden flex flex-col mt-6 shadow-[0_8px_24px_rgb(0,0,0,0.06)]"
         >
-          <div className="bg-[#1E073B] px-5 py-4 flex items-center justify-between">
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-white/90">Session History</h3>
-            <div className="px-2 py-1 bg-white/10 rounded-full text-[9px] font-black text-white/90">{sessionHistory.length} Records</div>
+          <div className="bg-black px-6 py-5 flex items-center justify-between">
+            <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Session Log</h3>
+            <div className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-black text-white">{sessionHistory.length}</div>
           </div>
           <div className="flex flex-col max-h-[280px] overflow-y-auto">
              {sessionHistory.length === 0 ? (
-               <div className="p-6 text-center text-[11px] font-medium text-black/40">No previous records.</div>
+               <div className="p-8 text-center text-[10px] font-black uppercase tracking-widest text-black/40">No records.</div>
              ) : (
                sessionHistory.map((s, i) => (
-                 <div key={i} className={`px-5 py-4 flex flex-col gap-1.5 ${i !== sessionHistory.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}>
+                 <div key={i} className={`px-6 py-5 flex flex-col gap-2.5 ${i !== sessionHistory.length - 1 ? 'border-b-2 border-black/5' : ''}`}>
                     <div className="flex items-center justify-between">
-                       <span className="text-[11px] font-black text-[#050505] capitalize">{s.date}</span>
-                       <span className="text-[10px] font-mono text-[#050505]/50">{s.time}</span>
+                       <span className="text-[10px] font-black uppercase tracking-widest text-black">{s.date}</span>
+                       <span className="text-[11px] font-mono font-bold text-black/60">{s.time}</span>
                     </div>
-                    <div className="flex items-center justify-between mt-1">
-                       <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/40">{s.provider}</span>
-                       <span className="text-[9px] font-black uppercase tracking-widest text-[#2D0A59]">{s.os}</span>
+                    <div className="flex items-center justify-between">
+                       <span className="text-[9px] font-black uppercase tracking-[0.15em] text-black/40">{s.provider}</span>
+                       <span className="text-[9px] font-black uppercase tracking-[0.15em] text-black/60">{s.os}</span>
                     </div>
                  </div>
                ))
              )}
           </div>
-        </motion.div>
-
-        {/* ─── Live Ecosystem Intel ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="w-full flex flex-col pt-8 pb-4"
-        >
-          <WhalecosystemTweetFeed />
         </motion.div>
       </main>
 
@@ -566,84 +499,13 @@ function ConnectedScreen({
         onClose={onCloseScanner}
         address={address}
         onScan={(_result: string) => {
-          // The /api/auth/qr-session handshake is completed
-          // atomically inside QRScannerModal.handleSuccess before this fires.
           const toast = document.createElement('div');
-          toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-          toast.textContent = '✓ Desktop Terminal Unlocked';
+          toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[11px] border border-white/20 font-black uppercase tracking-[0.2em] px-6 py-5 rounded-[20px] shadow-2xl text-center';
+          toast.textContent = 'SESSION SYNCHRONIZED';
           document.body.appendChild(toast);
           setTimeout(() => toast.remove(), 3000);
         }}
       />
-
-      {/* INFO MODAL */}
-      <AnimatePresence>
-        {showInfoModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-5"
-          >
-            <motion.div 
-               initial={{ scale: 0.95, opacity: 0, y: 10 }}
-               animate={{ scale: 1, opacity: 1, y: 0 }}
-               exit={{ scale: 0.95, opacity: 0, y: 10 }}
-               className="w-full max-w-sm bg-white rounded-[24px] shadow-2xl border border-black/10 overflow-hidden flex flex-col"
-            >
-               <div className="flex items-center justify-between px-6 py-5 border-b border-[#F0F0F0]">
-                 <div className="flex items-center gap-2.5">
-                   <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
-                     <Info size={16} />
-                   </div>
-                    <h3 className="text-[14px] font-black uppercase tracking-tight text-[#050505]">Session Panel Info</h3>
-                 </div>
-                 <button onClick={() => setShowInfoModal(false)} className="p-2 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-black/40 hover:text-black">
-                   <X size={16} />
-                 </button>
-               </div>
-               
-               <div className="px-6 py-6 flex flex-col gap-5">
-                  <div className="bg-blue-50/50 p-4 border border-blue-100 rounded-xl">
-                    <p className="text-[11px] text-blue-900 leading-relaxed font-medium">
-                      You are viewing the sovereign control panel on your mobile device. Your session is fully verified and cryptographically secured with the data shown on screen.
-                    </p>
-                  </div>
-
-                  <div>
-                     <p className="text-[10px] font-black uppercase tracking-widest text-[#050505]/40 mb-3">Steps to link the PC Terminal</p>
-                     
-                     <div className="flex flex-col gap-3">
-                       <div className="flex items-start gap-3">
-                         <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">1</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Open the Whale Alert Network platform in your desktop browser.</p>
-                       </div>
-                       <div className="flex items-start gap-3">
-                         <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">2</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Select the <strong className="font-black text-[#2D0A59]">Direct QR Handshake</strong> option on the PC home screen.</p>
-                       </div>
-                       <div className="flex items-start gap-3">
-                         <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">3</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Tap the <strong className="font-black text-[#2D0A59]">OPEN QR SCANNER</strong> button on this mobile screen.</p>
-                       </div>
-                       <div className="flex items-start gap-3">
-                         <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">4</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Point your camera at the QR code on your monitor to instantly transfer your secure session.</p>
-                       </div>
-                     </div>
-                  </div>
-               </div>
-               
-               <div className="p-4 border-t border-[#F0F0F0] bg-[#FAF9F6]">
-                  <button onClick={() => setShowInfoModal(false)} className="w-full py-3.5 rounded-xl bg-[#2D0A59] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#1E073B] transition-colors shadow-lg active:scale-95 duration-200">
-                    Understood
-                  </button>
-               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
     </div>
   );
 }
