@@ -37,13 +37,14 @@ export function WhaleChat() {
 
   const [conversations, setConversations] = useState<ConversationMeta[]>([]);
   const [activePeer, setActivePeer] = useState<string | null>(null);
-  const [messages, setMessages] = useState<DecodedMessage[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   
   const [inputText, setInputText] = useState('');
   const [peerInput, setPeerInput] = useState('');
   const [sending, setSending] = useState(false);
   const [showList, setShowList] = useState(true);
   const [showScanner, setShowScanner] = useState(false);
+  const [peerStatus, setPeerStatus] = useState<{ online: boolean, lastSeen: number | null, isTyping: boolean }>({ online: false, lastSeen: null, isTyping: false });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<boolean>(false);
@@ -63,6 +64,91 @@ export function WhaleChat() {
       setMessages([]);
     }
   }, [isConnected, address, client]);
+
+  // Telemetry: Heartbeat Loop
+  useEffect(() => {
+      if (!address || !client) return;
+      
+      const sendHeartbeat = async () => {
+          if (document.visibilityState !== 'visible') return; // Extreme privacy: pause heartbeat when hidden
+          try {
+              await fetch('/api/chat/telemetry', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ address, type: 'heartbeat' })
+              });
+          } catch {}
+      };
+
+      sendHeartbeat();
+      const interval = setInterval(sendHeartbeat, 15000);
+      return () => clearInterval(interval);
+  }, [address, client]);
+
+  // Telemetry: Peer Polling Loop
+  useEffect(() => {
+      if (!activePeer || !address) {
+          setPeerStatus({ online: false, lastSeen: null, isTyping: false });
+          return;
+      }
+      let isMounted = true;
+      const pollPeer = async () => {
+          try {
+              const res = await fetch(`/api/chat/telemetry?peer=${activePeer}&self=${address}`);
+              if (!res.ok) return;
+              const data = await res.json();
+              if (isMounted) setPeerStatus(data);
+          } catch {}
+      };
+
+      pollPeer();
+      const interval = setInterval(pollPeer, 3000);
+      return () => clearInterval(interval);
+  }, [activePeer, address]);
+
+  // Extreme Security: Draft Persistence & Typing Telemetry
+  useEffect(() => {
+    if (!activePeer || !address) return;
+    const draftKey = `whale_draft_${address.toLowerCase()}_${activePeer.toLowerCase()}`;
+    
+    if (inputText.trim()) {
+      localStorage.setItem(draftKey, btoa(encodeURIComponent(inputText))); // Basic obfuscation for local drafts
+    } else {
+      localStorage.removeItem(draftKey);
+    }
+
+    // Typing telemetry (debounced)
+    const sendTyping = async () => {
+        if (!inputText.trim()) return;
+        try {
+            await fetch('/api/chat/telemetry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address, type: 'typing', peer: activePeer })
+            });
+        } catch {}
+    };
+
+    const timeoutId = setTimeout(sendTyping, 500); 
+    return () => clearTimeout(timeoutId);
+  }, [inputText, activePeer, address]);
+
+  // Draft Loading on Peer Switch
+  useEffect(() => {
+    if (activePeer && address) {
+      const draftKey = `whale_draft_${address.toLowerCase()}_${activePeer.toLowerCase()}`;
+      const saved = localStorage.getItem(draftKey);
+      if (saved) {
+          try {
+              setInputText(decodeURIComponent(atob(saved)));
+          } catch {
+              setInputText('');
+          }
+      } else {
+          setInputText('');
+      }
+    }
+  }, [activePeer, address]);
 
   // Initialize XMTP
   const initClient = async () => {
@@ -95,13 +181,17 @@ export function WhaleChat() {
     const metaList: ConversationMeta[] = [];
     
     // Sort by most recent message (XMTP SDK usually handles this, but we'll fetch latest)
-    for (const c of convos) {
-      const msgs = await c.messages({ limit: 1 });
-      metaList.push({
-        peerAddress: c.peerAddress,
-        lastMessage: msgs.length > 0 ? msgs[0].content : undefined,
-        lastAt: msgs.length > 0 ? msgs[0].sent : undefined,
-      });
+    for (const c of (convos as any[])) {
+      try {
+        const msgs = await c.messages({ limit: 1 });
+        metaList.push({
+          peerAddress: c.peerAddress || c.topic || "Unknown",
+          lastMessage: msgs.length > 0 ? (typeof msgs[0].content === 'string' ? msgs[0].content : "Encrypted Data") : undefined,
+          lastAt: msgs.length > 0 ? (msgs[0].sent || msgs[0].sentAt) : undefined,
+        });
+      } catch (e) {
+        console.warn("Failed to load messages for conversation", e);
+      }
     }
     
     // Sort descending by date
@@ -114,10 +204,14 @@ export function WhaleChat() {
     streamRef.current = true;
     try {
       const stream = await xmtp.conversations.streamAllMessages();
-      for await (const message of stream) {
+      for await (const message of stream as any) {
+        const msgPeer = message.conversation?.peerAddress || message.senderAddress || "Unknown";
+        const msgContent = typeof message.content === 'string' ? message.content : "Encrypted Data";
+        const msgSent = message.sent || message.sentAt || new Date();
+
         // If message is for active conversation, append it
         setActivePeer((currentPeer) => {
-          if (currentPeer && message.conversation.peerAddress.toLowerCase() === currentPeer.toLowerCase()) {
+          if (currentPeer && msgPeer.toLowerCase() === currentPeer.toLowerCase()) {
             setMessages(prev => {
               // Avoid duplicates
               if (prev.find(m => m.id === message.id)) return prev;
@@ -129,10 +223,9 @@ export function WhaleChat() {
 
         // Update conversation list with new message
         setConversations(prev => {
-          const peer = message.conversation.peerAddress;
-          const existing = prev.filter(c => c.peerAddress.toLowerCase() !== peer.toLowerCase());
+          const existing = prev.filter(c => c.peerAddress.toLowerCase() !== msgPeer.toLowerCase());
           return [
-            { peerAddress: peer, lastMessage: message.content, lastAt: message.sent },
+            { peerAddress: msgPeer, lastMessage: msgContent, lastAt: msgSent },
             ...existing
           ];
         });
@@ -189,6 +282,11 @@ export function WhaleChat() {
     setSending(true);
     const content = inputText.trim();
     setInputText(''); // Optimistic clear
+    
+    // Clear draft explicitly
+    if (address) {
+        localStorage.removeItem(`whale_draft_${address.toLowerCase()}_${activePeer.toLowerCase()}`);
+    }
 
     try {
       await sendMessage(client, activePeer, content);
@@ -347,9 +445,20 @@ export function WhaleChat() {
                 </button>
                 <Avatar address={activePeer} />
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-[#050505] font-mono">{shortAddr(activePeer)}</span>
-                  <span className="text-[9px] text-[#00C076] font-medium flex items-center gap-1">
-                    <Lock size={9} /> Zero-Knowledge E2EE
+                  <span className="text-[11px] font-bold text-[#050505] font-mono flex items-center gap-1.5">
+                    {shortAddr(activePeer)}
+                    {peerStatus.online && <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" title="Online" />}
+                  </span>
+                  <span className="text-[9px] font-medium flex items-center gap-1">
+                    {peerStatus.isTyping ? (
+                        <span className="text-[#9945FF] font-black tracking-widest uppercase animate-pulse">Decrypting Keystrokes...</span>
+                    ) : peerStatus.online ? (
+                        <span className="text-green-600">Active Connection</span>
+                    ) : peerStatus.lastSeen ? (
+                        <span className="text-black/40">Last seen: {new Date(peerStatus.lastSeen).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    ) : (
+                        <span className="text-[#00C076]"><Lock size={9} className="inline" /> Zero-Knowledge E2EE</span>
+                    )}
                   </span>
                 </div>
               </div>
@@ -364,7 +473,10 @@ export function WhaleChat() {
                 </div>
               ) : (
                 messages.map(msg => {
-                  const isMe = msg.senderAddress.toLowerCase() === address?.toLowerCase();
+                  const isMe = (msg.senderAddress || "").toLowerCase() === address?.toLowerCase();
+                  const content = typeof msg.content === 'string' ? msg.content : "Encrypted Data";
+                  const sentTime = msg.sent || msg.sentAt || new Date();
+                  
                   return (
                     <div key={msg.id} className={`flex flex-col max-w-[78%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`}>
                       <div className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed break-words ${
@@ -372,14 +484,23 @@ export function WhaleChat() {
                           ? 'bg-[#050505] text-white rounded-br-sm'
                           : 'bg-white text-[#050505] rounded-bl-sm border border-black/8 shadow-sm'
                       }`}>
-                        {msg.content}
+                        {content}
                       </div>
                       <span className="text-[9px] text-black/25 mt-1 px-1 font-mono">
-                        {msg.sent.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(sentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   );
                 })
+              )}
+              {peerStatus.isTyping && (
+                  <div className="flex self-start items-start max-w-[78%]">
+                      <div className="px-3.5 py-2 rounded-2xl bg-white border border-[#9945FF]/20 shadow-sm flex items-center gap-1.5 rounded-bl-sm">
+                          <span className="w-1 h-1 rounded-full bg-[#9945FF] animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-1 h-1 rounded-full bg-[#9945FF] animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-1 h-1 rounded-full bg-[#9945FF] animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                  </div>
               )}
               <div ref={messagesEndRef} />
             </div>
