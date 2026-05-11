@@ -124,15 +124,20 @@ export function MempoolForensicsPanel() {
 
   const generateLocalMempoolData = () => {
     const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+    const generateHex = (bytes: number) => {
+        const arr = new Uint8Array(bytes);
+        crypto.getRandomValues(arr);
+        return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+    };
     const methods = Object.keys(KNOWN_SELECTORS);
     const method = methods[Math.floor(secureRandom() * methods.length)];
     return Array.from({ length: Math.floor(secureRandom() * 5) + 1 }).map(() => ({
-      hash: '0x' + secureRandom().toString(16).slice(2, 66).padEnd(64, '0'),
-      from: '0x' + secureRandom().toString(16).slice(2, 42).padEnd(40, '0'),
-      to: '0x' + secureRandom().toString(16).slice(2, 42).padEnd(40, '0'),
+      hash: '0x' + generateHex(32),
+      from: '0x' + generateHex(20),
+      to: '0x' + generateHex(20),
       value: (secureRandom() * 2).toString(),
       gasPrice: (secureRandom() * 250).toString(),
-      input: method + secureRandom().toString(16).slice(2, 66)
+      input: method + generateHex(32)
     }));
   };
 

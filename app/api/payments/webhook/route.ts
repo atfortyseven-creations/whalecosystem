@@ -211,10 +211,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
 }
 
-// Ensure the body is not parsed as JSON by Next.js automatically
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
 
