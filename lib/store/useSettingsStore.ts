@@ -27,6 +27,9 @@ export interface SovereignSettings {
 
     // 9. Visualization & Hardware
     hardwareAcceleration: boolean;
+
+    // 10. Assets
+    hiddenAssets?: string; // JSON array of symbols/addresses
 }
 
 export interface SettingsState extends SovereignSettings {
@@ -50,6 +53,7 @@ export interface SettingsState extends SovereignSettings {
     setAllowAnalytics: (allow: boolean) => void;
     setAutoDisconnectTimer: (timer: SettingsState['autoDisconnectTimer']) => void;
     setHardwareAcceleration: (val: boolean) => void;
+    setHiddenAssets: (val: string) => void;
     setSettingsOpen: (open: boolean) => void;
     clearAppData: () => void;
 }
@@ -117,6 +121,7 @@ export const useSettingsStore = create<SettingsState>()(
             allowAnalytics: false,
             autoDisconnectTimer: '1h',
             hardwareAcceleration: true,
+            hiddenAssets: '[]',
 
             settings: null,
             isSettingsOpen: false,
@@ -168,6 +173,7 @@ export const useSettingsStore = create<SettingsState>()(
             setAllowAnalytics: (val) => get().updateSetting('allowAnalytics', val),
             setAutoDisconnectTimer: (val) => get().updateSetting('autoDisconnectTimer', val),
             setHardwareAcceleration: (val) => get().updateSetting('hardwareAcceleration', val),
+            setHiddenAssets: (val) => get().updateSetting('hiddenAssets', val),
 
             setSettingsOpen: (isSettingsOpen) => set({ isSettingsOpen }),
             clearAppData: () => {
@@ -191,7 +197,8 @@ export const useSettingsStore = create<SettingsState>()(
                 showBalances: state.showBalances,
                 allowAnalytics: state.allowAnalytics,
                 autoDisconnectTimer: state.autoDisconnectTimer,
-                hardwareAcceleration: state.hardwareAcceleration
+                hardwareAcceleration: state.hardwareAcceleration,
+                hiddenAssets: state.hiddenAssets
             })
         }
     )

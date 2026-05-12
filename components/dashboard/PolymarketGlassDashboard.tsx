@@ -96,7 +96,13 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
             ? (orderBook.asks[0]?.price || 0.5)
             : (1 - (orderBook.bids[0]?.price || 0.5));
 
-        trade("BUY", amount, bestPrice, activeTokenIdToTrade);
+        const sanitizedAmount = amount.trim();
+        if (!sanitizedAmount || isNaN(parseFloat(sanitizedAmount))) {
+            toast.error("Invalid amount.");
+            return;
+        }
+
+        trade("BUY", sanitizedAmount, bestPrice, activeTokenIdToTrade);
     };
 
     return (

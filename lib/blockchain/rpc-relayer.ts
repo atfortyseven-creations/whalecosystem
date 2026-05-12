@@ -41,25 +41,61 @@ interface Endpoint {
 }
 
 // Fallbacks públicos por red, usados si el cluster GetBlock está vacío
-const PUBLIC_FALLBACKS: Partial<Record<string, string>> = {
-  ETH_RPC:      'https://eth.llamarpc.com',
-  ETH_WSS:      'wss://ethereum-rpc.publicnode.com',
-  SOL_RPC:      'https://api.mainnet-beta.solana.com',
-  SOL_WSS:      'wss://api.mainnet-beta.solana.com',
-  BASE_RPC:     'https://mainnet.base.org',
-  BASE_WSS:     'wss://base-rpc.publicnode.com',
-  POL_RPC:      'https://polygon-rpc.com',
-  POL_WSS:      'wss://polygon-bor-rpc.publicnode.com',
-  BSC_RPC:      'https://bsc-dataseed1.binance.org',
-  BSC_WSS:      'wss://bsc-rpc.publicnode.com',
-  ARB_RPC:      'https://arb1.arbitrum.io/rpc',
-  ARB_WSS:      'wss://arbitrum-one-rpc.publicnode.com',
-  OP_RPC:       'https://mainnet.optimism.io',
-  WORLD_RPC:    'https://worldchain-mainnet.g.alchemy.com/public',
-  BTC_RPC:      'https://mempool.space/api',
-  AVAX_RPC:     'https://api.avax.network/ext/bc/C/rpc',
-  HYPEREVM_RPC: 'https://rpc.hyperliquid.xyz/evm',
-  BERA_RPC:     'https://rpc.berachain.com',
+const PUBLIC_FALLBACKS: Partial<Record<string, string[]>> = {
+  ETH_RPC: [
+    'https://eth.llamarpc.com',
+    'https://cloudflare-eth.com',
+    'https://ethereum-rpc.publicnode.com',
+    'https://eth-mainnet.public.blastapi.io'
+  ],
+  ETH_WSS: [
+    'wss://ethereum-rpc.publicnode.com',
+    'wss://eth.llamarpc.com'
+  ],
+  SOL_RPC: [
+    'https://api.mainnet-beta.solana.com',
+    'https://solana-mainnet.public.blastapi.io'
+  ],
+  SOL_WSS: [
+    'wss://api.mainnet-beta.solana.com'
+  ],
+  BASE_RPC: [
+    'https://mainnet.base.org',
+    'https://base-rpc.publicnode.com',
+    'https://base.llamarpc.com'
+  ],
+  BASE_WSS: [
+    'wss://base-rpc.publicnode.com'
+  ],
+  POL_RPC: [
+    'https://polygon-rpc.com',
+    'https://polygon.llamarpc.com',
+    'https://polygon-bor-rpc.publicnode.com'
+  ],
+  POL_WSS: [
+    'wss://polygon-bor-rpc.publicnode.com'
+  ],
+  BSC_RPC: [
+    'https://bsc-dataseed1.binance.org',
+    'https://bsc-dataseed2.binance.org',
+    'https://bsc.publicnode.com'
+  ],
+  BSC_WSS: [
+    'wss://bsc-rpc.publicnode.com'
+  ],
+  ARB_RPC: [
+    'https://arb1.arbitrum.io/rpc',
+    'https://arbitrum.llamarpc.com'
+  ],
+  ARB_WSS: [
+    'wss://arbitrum-one-rpc.publicnode.com'
+  ],
+  OP_RPC:       ['https://mainnet.optimism.io'],
+  WORLD_RPC:    ['https://worldchain-mainnet.g.alchemy.com/public'],
+  BTC_RPC:      ['https://mempool.space/api'],
+  AVAX_RPC:     ['https://api.avax.network/ext/bc/C/rpc'],
+  HYPEREVM_RPC: ['https://rpc.hyperliquid.xyz/evm'],
+  BERA_RPC:     ['https://rpc.berachain.com'],
 };
 
 export class RpcRelayerManager {
@@ -241,11 +277,16 @@ export class RpcRelayerManager {
   static getRpcUrl(network: NetworkTag, protocol: ProtocolType = 'RPC'): string {
     const key = `${network}_${protocol}`;
     const cluster = this.endpoints[key];
-    const fallback = PUBLIC_FALLBACKS[key] ?? '';
+    const fallbacks = PUBLIC_FALLBACKS[key] ?? [];
 
     if (!cluster || cluster.length === 0) {
-      console.warn(`[RpcRelayer] No endpoints for ${key} — using public fallback.`);
-      return fallback;
+      if (fallbacks.length > 0) {
+        // Round-robin through fallbacks if cluster is empty
+        const fIdx = (this.indices[key] || 0) % fallbacks.length;
+        this.indices[key] = (fIdx + 1) % fallbacks.length;
+        return fallbacks[fIdx];
+      }
+      return '';
     }
 
     const now = Date.now();
@@ -270,7 +311,13 @@ export class RpcRelayerManager {
       return ep.url;
     }
 
-    // Todos en cooldown — intentar con el primero de todos modos
+    // Todos en cooldown — intentar con el primero de todos modos o saltar a fallbacks
+    if (fallbacks.length > 0) {
+      const fIdx = (this.indices[key] || 0) % fallbacks.length;
+      this.indices[key] = (fIdx + 1) % fallbacks.length;
+      return fallbacks[fIdx];
+    }
+
     console.error(`[RpcRelayer] ⚠️ ALL nodes cooling down for ${key} — forcing primary.`);
     return cluster[0].url;
   }

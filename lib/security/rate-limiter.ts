@@ -333,7 +333,7 @@ export async function checkRateLimit(
     const limiter = getDistributedLimiter(tier);
     if (!limiter) {
       if (!_upstashWarned) {
-        console.warn('[RateLimiter] Upstash not configured — failing open. Set UPSTASH_REDIS_REST_URL + TOKEN. (This warning will only be logged once to prevent log spam)');
+        console.log('[RateLimiter] Upstash not configured — failing open. Set UPSTASH_REDIS_REST_URL + TOKEN.');
         _upstashWarned = true;
       }
       return allow;
