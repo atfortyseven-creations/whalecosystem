@@ -262,10 +262,6 @@ export default function WhaleDashboard() {
 
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'market-data':
-                return <><PanelHeader icon={Globe} title="Market Overview" description="Comprehensive real-time global market data and asset tracking." accent="#0052FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`market-data-${refreshKey}`}><WatchlistTable /></DashboardErrorBoundary></div></>;
-
-
             // All other legacy/removed tabs — fall to default (Access Pass)
             case 'dashboard':
             case 'watchlist':
