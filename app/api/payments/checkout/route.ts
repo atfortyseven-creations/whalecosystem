@@ -46,10 +46,22 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Failed to resolve user' }, { status: 404 });
         }
 
-        const priceId = PRICE_IDS[billingCycle][tier];
+        let priceId = PRICE_IDS[billingCycle][tier];
         if (!priceId) {
             // Stripe price not configured for this tier/cycle combination.
             return NextResponse.json({ error: 'Stripe price ID not configured for this plan. Please contact support.' }, { status: 503 });
+        }
+
+        // Auto-resolve prod_ IDs to their default price_ IDs (Intelligent Routing)
+        if (priceId.startsWith('prod_')) {
+            try {
+                const product = await stripe.products.retrieve(priceId);
+                if (!product.default_price) throw new Error('Product has no default price');
+                priceId = typeof product.default_price === 'string' ? product.default_price : product.default_price.id;
+            } catch (err) {
+                console.error('[STRIPE_PRODUCT_RESOLVER]', err);
+                return NextResponse.json({ error: 'Failed to resolve pricing configuration.' }, { status: 500 });
+            }
         }
 
         // Create Stripe Checkout Session payload

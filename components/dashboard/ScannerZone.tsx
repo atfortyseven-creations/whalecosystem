@@ -9,7 +9,7 @@ export function ScannerZone() {
     const [mode, setMode] = useState<'chat' | 'project'>('chat');
 
     return (
-        <div className="flex flex-col w-full h-full max-w-6xl mx-auto px-2 md:px-0 relative">
+        <div className="flex flex-col w-full h-full mx-auto px-2 md:px-0 relative">
             {/* Toggle Header */}
             <div className="flex bg-black/5 p-1 rounded-xl w-full max-w-[320px] mx-auto mb-5 shrink-0 z-10 border border-black/5">
                 <button

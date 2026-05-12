@@ -4,32 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, Settings, CheckCircle2 } from 'lucide-react';
+import { Loader2, Settings, CheckCircle2, Shield, Zap } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { PRICING_TIERS, TIER_RANK } from '@/lib/config/pricing-tiers';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { motion } from 'framer-motion';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
-
-const FAQS = [
-  {
-    question: 'How does billing work?',
-    answer: 'Payments are processed securely via Stripe. You can pay using major credit cards or SEPA Direct Debit. Your account upgrades automatically once payment goes through.',
-  },
-  {
-    question: 'Do I need a crypto wallet?',
-    answer: 'Yes! Your wallet acts as your secure login to the platform. We don\'t use passwords. Payments, however, are made in standard Fiat (Euros) for simplicity.',
-  },
-  {
-    question: 'How do I get my invoice?',
-    answer: 'We automatically email a professional invoice to you the moment your payment is confirmed. You can also download past invoices anytime from your dashboard.',
-  },
-  {
-    question: 'Can I cancel anytime?',
-    answer: 'Absolutely. You can cancel your subscription from your dashboard at any point. You\'ll retain access to your premium features until the end of your current billing cycle.',
-  },
-];
-
-function PricingContent() {
+export default function PricingPage() {
   const { isConnected, isSovereignHandshake, address } = useSovereignAccount();
   const router = useRouter();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
@@ -55,7 +37,9 @@ function PricingContent() {
 
   const handleSubscribeClick = async (planId: string) => {
     if (currentTierLevel >= (TIER_RANK[planId as keyof typeof TIER_RANK] ?? 0)) {
-      toast.info('Already on this plan or higher'); return;
+      toast.info('Access Level Already Granted'); 
+      router.push('/dashboard');
+      return;
     }
     
     if (!isConnected || !address) {
@@ -91,174 +75,116 @@ function PricingContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] text-[#111] font-sans">
-      <div className="h-24 w-full" />
+    <div className="min-h-screen bg-[#FAFAF8] text-[#0A0A0A] font-sans overflow-x-hidden selection:bg-[#0044CC]/20">
+      
+      <main className="w-full max-w-[1400px] mx-auto pt-32 pb-24 px-6 lg:px-12">
+        
+        {/* ── HEADER ── */}
+        <div className="text-center mb-20">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm mb-6">
+            <Settings size={14} className="text-[#0044CC]" />
+            <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Access Tiers</span>
+          </motion.div>
+          
+          <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-[48px] md:text-[64px] font-black uppercase tracking-tighter leading-[0.95] mb-6">
+            Institutional <br className="hidden md:block" />
+            <span className="text-[#0044CC]">Infrastructure.</span>
+          </motion.h1>
+          
+          <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-[16px] md:text-[18px] text-slate-500 font-serif max-w-2xl mx-auto leading-relaxed">
+            Unrestricted forensic capacity or core network access. Choose the analytical layer that matches your operational requirements.
+          </motion.p>
+        </div>
 
-      <main className="w-full max-w-5xl mx-auto px-6 py-16 md:py-28">
-
-
-
-        {/* Hero */}
-        <header className="text-center mb-20">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#00C076] mb-5">Subscription Plans</p>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-black mb-5 leading-[1.1]">
-            The Right Plan for Every Trader
-          </h1>
-          <p className="text-lg text-black/60 max-w-2xl mx-auto leading-relaxed mb-8">
-            Join 2,000+ traders and analysts already using Whale Alert Network to track the biggest crypto movements on-chain. Start free, scale as you grow.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] font-bold uppercase tracking-widest text-black/40">
-             <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-[#00C076]"/> 7-Day Money-Back Guarantee</span>
-             <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-[#00C076]"/> Secured by Stripe</span>
-             <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-[#00C076]"/> Powered by Ethereum</span>
-          </div>
-
-          {currentTierLevel > 0 && (
-            <button
-              onClick={() => router.push('/dashboard?tab=billing')}
-              className="mt-10 inline-flex items-center gap-2 px-5 py-2.5 bg-[#050505] text-white rounded-full text-xs font-bold uppercase tracking-[0.12em] hover:bg-black/80 transition shadow-lg"
-            >
-              <Settings size={13} /> Manage subscription
-            </button>
-          )}
-
-          {/* Billing Toggle */}
-          <div className="mt-10 inline-flex items-center bg-black/[0.03] p-1.5 rounded-full border border-black/5">
-            <button
-              onClick={() => setBillingCycle('monthly')}
-              className={`px-8 py-2.5 rounded-full text-sm font-bold transition-all ${
-                billingCycle === 'monthly' ? 'bg-white shadow-sm text-black border border-black/5' : 'text-black/40 hover:text-black'
-              }`}
-            >Monthly</button>
-            <button
-              onClick={() => setBillingCycle('annual')}
-              className={`px-8 py-2.5 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${
-                billingCycle === 'annual' ? 'bg-white shadow-sm text-black border border-black/5' : 'text-black/40 hover:text-black'
-              }`}
-            >
-              Annual <span className="text-[10px] font-black text-[#00C076] px-2 py-0.5 bg-[#00C076]/10 rounded-full">–16%</span>
-            </button>
-          </div>
-        </header>
-
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-32">
-          {PRICING_TIERS.map(tier => {
-            const isDowngrade = currentTierLevel >= (TIER_RANK[tier.id as keyof typeof TIER_RANK] ?? 0);
-            // Use priceMonthly/priceAnnual from SSOT
-            const price = billingCycle === 'monthly' ? tier.priceMonthly : tier.priceAnnual;
-            const isFree = tier.id === 'FREE';
+        {/* ── PRICING BENTO GRID ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 max-w-6xl mx-auto">
+          {PRICING_TIERS.map((tier, index) => {
+            const isStandard = tier.id === 'STANDARD';
             return (
-              <div
+              <motion.div 
                 key={tier.id}
-                className={`relative flex flex-col rounded-3xl transition-all duration-300 ${
-                  tier.highlight
-                    ? 'bg-[#050505] text-white shadow-[0_20px_40px_rgba(0,0,0,0.15)] ring-1 ring-white/10'
-                    : 'bg-white border border-black/10 hover:border-black/20 hover:shadow-lg'
-                }`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
+                className={`relative flex flex-col bg-white rounded-[3rem] border shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-black/5 ${isStandard ? 'border-[#0044CC]/20' : 'border-black/5'}`}
               >
-                {tier.highlight && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#00C076] text-black text-[10px] font-black uppercase tracking-[0.2em] px-5 py-1.5 rounded-full shadow-sm">
-                    Recommended
-                  </div>
-                )}
+                {/* Accent Glow */}
+                <div 
+                  className="absolute -right-20 -top-20 w-64 h-64 rounded-full blur-[80px] opacity-[0.15] pointer-events-none" 
+                  style={{ background: tier.accentColor }} 
+                />
 
-                <div className={`p-8 border-b ${tier.highlight ? 'border-white/10' : 'border-black/5'}`}>
-                  <p className={`text-[11px] font-black uppercase tracking-[0.2em] mb-4 ${
-                    tier.highlight ? 'text-white/40' : 'text-black/30'
-                  }`}>{tier.name}</p>
-                  <div className="flex items-baseline gap-1.5 mb-1">
-                    <span className={`text-[28px] font-bold ${tier.highlight ? 'text-[#00C076]' : 'text-black/40'}`}>€</span>
-                    <span className={`text-6xl font-black tracking-tighter ${tier.highlight ? 'text-white' : 'text-[#050505]'}`}>
-                      {price}
-                    </span>
-                  </div>
-                  <p className={`text-sm font-semibold tracking-wide ${tier.highlight ? 'text-white/40' : 'text-black/40'} mb-5`}>
-                    EUR / {billingCycle === 'monthly' ? 'month' : 'year'}
-                  </p>
-                  <p className={`text-sm font-medium ${tier.highlight ? 'text-white/70' : 'text-black/60'}`}>
-                    {tier.tagline}
-                  </p>
+                {/* Massive Lottie Header */}
+                <div className="w-full aspect-[16/9] bg-[#FAFAF8] relative flex items-center justify-center p-8 border-b border-black/5">
+                   <RemoteLottie path={tier.lottie || 'Safe Box.json'} className={`w-full h-full object-contain ${isStandard ? 'scale-125' : 'scale-110'}`} />
+                   {tier.badge && (
+                     <div className="absolute top-6 left-6 px-4 py-2 bg-[#0044CC] text-white rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-lg">
+                       {tier.badge}
+                     </div>
+                   )}
                 </div>
 
-                <div className="p-8 flex-1 flex flex-col">
-                  <ul className="flex flex-col gap-4 flex-1 mb-10">
-                    {tier.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <span className={`mt-0.5 shrink-0 ${
-                          f.highlight
-                            ? (tier.highlight ? 'text-[#00C076]' : 'text-[#050505]')
-                            : (tier.highlight ? 'text-[#00C076]' : 'text-black/20')
-                        }`}>
-                          <CheckCircle2 size={16} />
-                        </span>
-                        <span className={`text-[14px] font-medium leading-snug ${
-                          f.highlight
-                            ? (tier.highlight ? 'text-white font-bold' : 'text-[#050505] font-bold')
-                            : (tier.highlight ? 'text-white/80' : 'text-black/70')
-                        }`}>
-                          {f.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="p-8 md:p-12 flex-1 flex flex-col relative z-10">
+                  <div className="mb-8">
+                    <h2 className="text-[32px] md:text-[40px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-none mb-2">
+                      {tier.name}
+                    </h2>
+                    <p className="font-mono text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                      {tier.tagline}
+                    </p>
+                  </div>
 
-                  {isDowngrade && currentTierLevel > 0 ? (
-                    <div className={`w-full py-4 rounded-xl text-center text-xs font-black uppercase tracking-[0.2em] opacity-40 ${
-                      tier.highlight ? 'bg-white/10 text-white' : 'bg-black/5 text-black'
-                    }`}>
-                      {currentTier === tier.id ? 'Current plan' : 'Included'}
+                  <div className="mb-10">
+                    <div className="flex items-end gap-2">
+                      <span className="text-[56px] font-black tracking-tighter leading-[0.85] text-[#0A0A0A]">
+                        {tier.priceMonthly}€
+                      </span>
+                      <span className="text-[12px] font-bold uppercase tracking-widest text-slate-400 pb-1">
+                        / month
+                      </span>
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => handleSubscribeClick(tier.id)}
-                      disabled={!isTierLoaded || loadingTier === tier.id}
-                      className={`w-full py-4 rounded-xl text-sm font-black transition-all ${
-                        tier.highlight
-                          ? 'bg-[#00C076] text-black hover:bg-emerald-400 disabled:opacity-60 shadow-lg shadow-emerald-500/20'
-                          : 'bg-[#050505] text-white hover:bg-black/80 disabled:opacity-60 shadow-md'
-                      }`}
-                    >
-                      {loadingTier === tier.id || !isTierLoaded
-                        ? <Loader2 size={16} className="animate-spin mx-auto" />
-                        : tier.buttonText
-                      }
-                    </button>
-                  )}
+                  </div>
+
+                  {/* Feature List */}
+                  <div className="flex-1 space-y-4 mb-10">
+                    {tier.features.map((feature, fIdx) => (
+                      <div key={fIdx} className="flex items-start gap-4">
+                        <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${feature.highlight ? 'bg-[#0044CC]/10 text-[#0044CC]' : 'bg-black/5 text-[#0A0A0A]'}`}>
+                          <CheckCircle2 size={12} strokeWidth={3} />
+                        </div>
+                        <span className={`text-[13px] md:text-[14px] leading-relaxed font-medium ${feature.highlight ? 'text-[#0044CC] font-bold' : 'text-slate-600'}`}>
+                          {feature.text}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA */}
+                  <button
+                    onClick={() => handleSubscribeClick(tier.id)}
+                    disabled={loadingTier === tier.id || (!isTierLoaded && isConnected)}
+                    className={`w-full py-5 rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg ${
+                      isStandard 
+                        ? 'bg-[#0044CC] text-white hover:bg-[#003399]' 
+                        : 'bg-[#0A0A0A] text-white hover:bg-black/80'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {loadingTier === tier.id ? (
+                      <><Loader2 size={16} className="animate-spin" /> Authorizing...</>
+                    ) : currentTierLevel >= (TIER_RANK[tier.id as keyof typeof TIER_RANK] ?? 0) ? (
+                      <><Shield size={16} /> Access Granted</>
+                    ) : (
+                      <><Zap size={16} /> {tier.buttonText}</>
+                    )}
+                  </button>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
-
-        {/* FAQ */}
-        <section className="border-t border-black/10 pt-20 pb-10">
-          <h2 className="text-3xl font-bold tracking-tight mb-12">Common questions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-10 max-w-4xl">
-            {FAQS.map((faq, i) => (
-              <div key={i}>
-                <h4 className="text-base font-bold mb-3">{faq.question}</h4>
-                <p className="text-[15px] font-medium text-black/60 leading-relaxed">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
       </main>
+
       <SovereignFooter />
     </div>
-  );
-}
-
-export default function PricingPage() {
-  return (
-    <React.Suspense fallback={
-      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
-        <Loader2 className="animate-spin text-black/30" size={28} />
-      </div>
-    }>
-      <PricingContent />
-    </React.Suspense>
   );
 }

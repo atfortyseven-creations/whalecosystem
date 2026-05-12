@@ -146,7 +146,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
             )}
 
             <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-2">
+            <div className="w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-2">
 
                 {/* B. PORTFOLIO & DYNAMIC MARKETS AREA */}
                 <motion.div variants={itemVariants} className="lg:col-span-8 space-y-6">

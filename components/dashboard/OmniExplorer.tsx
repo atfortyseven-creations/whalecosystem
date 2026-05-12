@@ -186,7 +186,7 @@ export function OmniExplorer() {
                 </div>
 
                 {/* Data Grids */}
-                <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 pb-20">
+                <div className="w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 pb-20">
                     
                     {/* BLOCKS PANEL */}
                     <div className="border border-[#E5E5E5] bg-white rounded overflow-hidden shadow-sm">

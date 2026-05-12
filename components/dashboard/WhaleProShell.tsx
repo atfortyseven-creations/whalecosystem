@@ -58,8 +58,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
 ];
 
 const RESTRICTED_TABS = [
-    'firehose', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
-    'live-port', 'whale-port', 'vault', 'zk', 'logs', 'chat'
+    'mass-transfer', 'defi'
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
@@ -233,6 +232,21 @@ export function WhaleProShell({
     const [isTierLoaded, setIsTierLoaded] = useState(false);
     const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    // Load Tier for access control
+    useEffect(() => {
+        fetch('/api/auth/session', { cache: 'no-store' })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (data?.user?.tier) {
+                    setTier(data.user.tier.split('_')[0].toUpperCase());
+                } else {
+                    setTier('FREE');
+                }
+                setIsTierLoaded(true);
+            })
+            .catch(() => setIsTierLoaded(true));
+    }, []);
+
     // ── True Desktop Detection ────────────────────────────────────────────────
     // Uses hardware screen.width (not viewport) so narrowing the browser window
     // on a PC does NOT trigger the mobile nav. Only real mobile devices (screen
@@ -359,6 +373,14 @@ export function WhaleProShell({
                 router.push('/connect');
                 return;
             }
+            if (isTierLoaded && tier !== 'STANDARD' && tier !== 'PRO' && tier !== 'ELITE') {
+                toast.error("Standard Plan Required", {
+                    description: "This module requires the Institutional Standard tier.",
+                    duration: 4000
+                });
+                router.push('/pricing');
+                return;
+            }
         }
         onTabChange(id);
     };
@@ -369,10 +391,13 @@ export function WhaleProShell({
             if (!isWalletConnected) {
                 onTabChange('gold');
                 toast.error("Session Lost", { description: "You have been disconnected." });
+            } else if (isTierLoaded && tier !== 'STANDARD' && tier !== 'PRO' && tier !== 'ELITE') {
+                onTabChange('gold');
+                toast.error("Standard Plan Required", { description: "You do not have clearance for this module." });
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isWalletConnected, activeTab]);
+    }, [isWalletConnected, activeTab, isTierLoaded, tier]);
 
 
 

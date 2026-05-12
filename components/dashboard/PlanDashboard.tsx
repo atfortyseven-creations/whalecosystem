@@ -92,7 +92,7 @@ export function PlanDashboard() {
   }
 
   return (
-    <div className="flex flex-col gap-8 w-full max-w-6xl mx-auto p-4 md:p-10 font-sans">
+    <div className="flex flex-col gap-8 w-full mx-auto p-4 md:p-10 font-sans">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-8">

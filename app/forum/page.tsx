@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { motion } from 'framer-motion';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { Activity } from 'lucide-react';
 
 function ForumHomeContent() {
   const [topics, setTopics] = useState<any[]>([]);
@@ -32,11 +35,38 @@ function ForumHomeContent() {
   }, [filter]);
 
   return (
-    <div className="w-full min-h-screen bg-[#FFFDF8] dark:bg-[#050505] text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative transition-colors duration-300">
-      {/* Background Volumetric Lighting */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#00C076]/10 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
+    <div className="w-full min-h-screen bg-[#FAFAF8] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#FAFAF8] selection:bg-[#0044CC]/20 py-20 px-6 font-sans relative transition-colors duration-300 overflow-x-hidden">
       
-      <div className="max-w-[1110px] mx-auto">
+      <div className="max-w-[1200px] mx-auto mb-20">
+        {/* ── ACADEMIC WELCOME HERO ── */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white dark:bg-[#111] rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-6 md:p-16 flex flex-col lg:flex-row items-center gap-10 md:gap-16 overflow-hidden relative">
+            
+            {/* Ambient background Lottie (Lottie 1) */}
+            <div className="absolute opacity-[0.03] dark:opacity-[0.05] pointer-events-none -left-20 -top-20 z-0">
+               <RemoteLottie path="isometric-cube.json" className="w-[500px] h-[500px]" />
+            </div>
+
+            <div className="w-full lg:w-1/2 relative z-10 space-y-6 md:space-y-8 text-center lg:text-left">
+                <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#FAFAF8] dark:bg-[#0A0A0A] border border-black/5 dark:border-white/5 rounded-full shadow-sm mx-auto lg:mx-0">
+                    <Activity size={14} className="text-[#0044CC] dark:text-[#4d88ff]" />
+                    <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Cryptographic Perimeter</span>
+                </div>
+                <h2 className="text-[36px] md:text-[56px] lg:text-[64px] font-black uppercase text-[#0A0A0A] dark:text-white leading-[1.05] md:leading-[0.95] tracking-tighter">
+                    Sovereign <br className="hidden md:block" /><span className="text-[#0044CC] dark:text-[#4d88ff]">Dialogue.</span>
+                </h2>
+                <p className="font-serif text-[15px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                    A secure perimeter for institutional discourse. All interactions are cryptographically signed, ensuring absolute authenticity. This eliminates the noise of public networks and fosters a highly focused, academic environment strictly for authenticated participants.
+                </p>
+            </div>
+            
+            {/* Primary Display Lottie (Lottie 2) */}
+            <div className="w-full lg:w-1/2 relative z-10 aspect-square md:aspect-video flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[1.5rem] md:rounded-[2rem] border border-black/5 dark:border-white/5 shadow-sm p-4 md:p-8 overflow-hidden">
+                <RemoteLottie path="social.json" className="scale-[1.5] md:scale-[1.8] w-full" />
+            </div>
+        </motion.div>
+      </div>
+      
+      <div className="max-w-[1200px] mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-[60px]">
         
         {/* Left Column: Categories (35% -> col-span-4) */}

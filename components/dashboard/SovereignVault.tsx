@@ -295,7 +295,7 @@ export function SovereignVault() {
 
     return (
         <div className="w-full h-full min-h-0 overflow-y-auto msv-hide-scrollbar flex flex-col items-center bg-[#FFFFFF] text-[#050505] font-sans p-4 md:p-8">
-            <div className="w-full max-w-5xl mx-auto flex flex-col items-start pt-4 gap-8 shrink-0 pb-10">
+            <div className="w-full mx-auto flex flex-col items-start pt-4 gap-8 shrink-0 pb-10">
 
                 <div className="shrink-0 pt-2 pb-6 border-b border-[#E5E5E5] w-full bg-white flex flex-col gap-0.5 mb-2">
                     <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.1em] text-[#050505]">

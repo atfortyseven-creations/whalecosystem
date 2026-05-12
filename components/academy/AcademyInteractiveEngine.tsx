@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Server, CheckCircle2, ChevronDown, GraduationCap, Folder, Upload, Send, Lock, BookOpen, Shield } from "lucide-react";
 import { syncAcademySyllabusToDB, getUserProgressAndSubmissions, toggleLessonProgress, submitProofOfWork } from "@/app/actions/academy-actions";
 import { SovereignProfileModal } from "./SovereignProfileModal";
+import { RemoteLottie } from "@/components/ui/RemoteLottie";
 
 type Lesson = { id: string; title: string; description: string; duration: string; level: string; orderIndex: number };
 type Course = { id: string; slug: string; title: string; description: string; lessons: Lesson[] };
@@ -131,40 +132,52 @@ export function AcademyInteractiveEngine({
     return (
         <div className="pt-32 pb-48 px-4 sm:px-6 max-w-5xl mx-auto w-full relative z-10 transition-all">
             
-            {/* Header */}
-            <header className="mb-16 flex flex-col md:flex-row justify-between items-start gap-8 border-b border-black/10 pb-8">
-                <div>
-                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-black/15 text-[10px] font-mono uppercase tracking-[0.2em] font-semibold text-black/50 mb-6 bg-white/70">
-                        <GraduationCap size={14} /> Sistema Moodle Institucional
+            {/* ── NESTR HERO ── */}
+            <header className="mb-16 w-full bg-white rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
+                <div className="w-full lg:w-1/2 relative z-10 space-y-6 lg:space-y-8 text-center lg:text-left">
+                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#FAFAF8] border border-black/5 rounded-full shadow-sm mx-auto lg:mx-0">
+                        <GraduationCap size={14} className="text-[#0044CC]" />
+                        <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Quantitative Institute</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-serif text-black leading-tight tracking-tight mb-4">
-                        Sovereign <span className="font-light italic opacity-60">Curriculum</span>
+                    
+                    <h1 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-[0.95]">
+                        Sovereign <br /><span className="text-[#0044CC]">Curriculum.</span>
                     </h1>
-                    <p className="font-serif text-[14px] text-[#444] max-w-xl leading-relaxed">
-                        Infraestructura pedagógica con auditoría determinística. Cada módulo interactivo transmite telemetría hacia las tablas inmutables de su perfil académico.
+                    
+                    <p className="font-serif text-[16px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                        Institutional pedagogy with deterministic auditing. Every interactive module transmits telemetry towards the immutable tables of your academic profile. Proof of Work required.
                     </p>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-4">
+                        {/* Admin Mode Badge */}
+                        {isAdmin && (
+                            <div className="px-6 py-3 bg-black text-white rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg cursor-default w-full sm:w-auto justify-center">
+                                <Server size={14}/> Teacher Root Access
+                            </div>
+                        )}
+                        {/* User Profile Hook */}
+                        {!isAdmin && address && (
+                            <button 
+                                onClick={() => setIsProfileOpen(true)}
+                                className="px-6 py-3 bg-[#0044CC] text-white rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#003399] transition-colors flex items-center gap-3 w-full sm:w-auto justify-center shadow-lg"
+                            >
+                               <Shield size={14}/> Student Profile
+                            </button>
+                        )}
+                    </div>
+                    {/* Stats */}
+                    <div className="flex items-center gap-6 justify-center lg:justify-start font-mono text-[10px] uppercase tracking-widest text-black/40 font-bold pt-4">
+                        {isAdmin ? (
+                            <span>DB Rows Active: {dbCourses.length}</span>
+                        ) : address ? (
+                            <span>{completedLessons.size} Módulos Conquistados</span>
+                        ) : null}
+                    </div>
                 </div>
-                {/* Admin Mode Badge */}
-                {isAdmin && (
-                    <div className="flex flex-col items-end gap-3 text-right">
-                        <div className="px-4 py-2 bg-black text-white rounded-lg text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-2 shadow-xl cursor-default">
-                            <Server size={12}/> Teacher Root Access
-                        </div>
-                        <span className="font-mono text-[9px] text-black/40">DB Rows Active: {dbCourses.length}</span>
-                    </div>
-                )}
-                {/* User Profile Hook */}
-                {!isAdmin && address && (
-                    <div className="flex flex-col items-end gap-3 text-right">
-                        <button 
-                            onClick={() => setIsProfileOpen(true)}
-                            className="px-6 py-3 bg-black text-white rounded-lg text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors flex items-center gap-2"
-                        >
-                           <Shield size={14}/> Student Profile
-                        </button>
-                        <span className="font-mono text-[9px] text-black/40">{completedLessons.size} Módulos Conquistados</span>
-                    </div>
-                )}
+
+                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 shadow-sm p-6 overflow-hidden">
+                    <RemoteLottie path="Ball playing.json" className="scale-125 w-full h-full object-contain" />
+                </div>
             </header>
 
             {!selectedCourseSlug ? (
