@@ -88,9 +88,7 @@ export default function MobileChatPage() {
 
       {/* ── Chat Panel (fills remaining height, no overflow) ── */}
       <div className="flex-1 min-h-0 overflow-hidden">
-        {/* forceAutoInit disabled: prevents automatic initialization failures on mobile.
-            Users can read the protocol explanation and activate manually. */}
-        <WhaleChat />
+        <WhaleChat forceAutoInit={true} />
       </div>
     </div>
   );

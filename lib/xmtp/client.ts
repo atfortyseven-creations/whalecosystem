@@ -96,24 +96,74 @@ function buildXmtpSigner(wagmiSigner: {
  * Initialize or retrieve a cached XMTP client for a wallet address.
  * If a client already exists in the registry (IndexedDB-backed),
  * it is returned immediately without re-prompting the user to sign.
+ *
+ * OPTIMIZATION: If a deterministic seed is provided, a StaticSigner is used
+ * which handles all signatures internally, requiring ZERO wallet interaction.
  */
-export async function getXMTPClient(wagmiSigner: {
-  getAddress: () => Promise<string>;
-  signMessage: (message: string | Uint8Array) => Promise<string>;
-}): Promise<Client> {
+export async function getXMTPClient(
+  wagmiSigner: {
+    getAddress: () => Promise<string>;
+    signMessage: (message: string | Uint8Array) => Promise<string>;
+  },
+  seed?: string
+): Promise<Client> {
   const address = (await wagmiSigner.getAddress()).toLowerCase();
 
   if (clientRegistry.has(address)) {
     return clientRegistry.get(address)!;
   }
 
-  const signer = buildXmtpSigner(wagmiSigner);
+  let signer;
+  if (seed) {
+    // ── Use Deterministic Static Signer ──────────────────────────────────────
+    // This signer uses a derived private key to sign XMTP requests silently.
+    signer = buildDeterministicSigner(address, seed);
+  } else {
+    // ── Use Standard Wallet Signer ───────────────────────────────────────────
+    signer = buildXmtpSigner(wagmiSigner);
+  }
 
   // Client.create(signer, options) — v5.3.0 signature
   const client = await Client.create(signer, { env: XMTP_ENV });
 
   clientRegistry.set(address, client);
   return client;
+}
+
+/**
+ * Build a deterministic XMTP signer from a seed (hex string).
+ * Allows silent re-authentication without wallet prompts.
+ */
+function buildDeterministicSigner(address: string, seed: string) {
+  // We use the seed directly as a private key for the XMTP identity.
+  // Note: We use a dynamic import for 'ethers' or 'viem' to keep the bundle lean if possible.
+  // Since we already have viem-like logic in the project, we'll use a simple implementation.
+  return {
+    type: 'EOA' as const,
+    getIdentifier: async (): Promise<XmtpIdentifier> => ({
+      identifier: address,
+      identifierKind: 'Ethereum',
+    }),
+    signMessage: async (message: string): Promise<Uint8Array> => {
+      // In a real implementation, we would use the private key to sign.
+      // For now, we'll implement a simple signer using the provided seed.
+      // Since XMTP v3 is highly specific about its signatures, we'll use 
+      // the wagmiSigner for the VERY FIRST TIME to get the seed, then
+      // we need a way to sign without it.
+      
+      // IMPLEMENTATION DETAIL: To sign without a wallet, we need a library.
+      // We'll use the 'viem' account if available.
+      try {
+        const { privateKeyToAccount } = await import('viem/accounts');
+        const account = privateKeyToAccount(seed as `0x${string}`);
+        const sig = await account.signMessage({ message });
+        return hexToBytes(sig);
+      } catch (e) {
+        console.error('[XMTP] Deterministic sign failed:', e);
+        throw e;
+      }
+    },
+  };
 }
 
 /** Remove a client from the registry (call on wallet disconnect) */
