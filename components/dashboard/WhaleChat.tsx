@@ -125,11 +125,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // the error boundary surfaces a manual "Retry" button. This is better than
   // silently blocking mobile users from ever seeing the Activate button.
   useEffect(() => {
-    if (isConnected && address && !client && !isInitializing) {
+    // Mobile: only auto-init if forceAutoInit is true (saves WASM overhead on home screen)
+    // Desktop: always attempt auto-init for seamless institutional experience
+    const shouldInit = !isMobile || forceAutoInit;
+    if (isConnected && address && !client && !isInitializing && shouldInit) {
       initClient();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address]);
+  }, [isConnected, address, isMobile, forceAutoInit]);
 
   // Telemetry: Heartbeat Loop
   useEffect(() => {
@@ -248,7 +251,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             const optimisticId = Date.now().toString();
             setMessages(prev => [...prev, {
               id: optimisticId,
-              senderInboxId: client?.inboxId,
+              senderInboxId: client?.inboxId || '',
               content: audioMsg,
               sentAtNs: Date.now(),
               conversationId: `dm-${activePeer.toLowerCase()}`
@@ -603,7 +606,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         const optimisticId = Date.now().toString();
         const optimisticMsg = {
           id: optimisticId,
-          senderInboxId: client?.inboxId,
+          senderInboxId: client?.inboxId || '',
           content: content,
           sentAtNs: Date.now(),
           conversationId: `dm-${activePeer.toLowerCase()}`
