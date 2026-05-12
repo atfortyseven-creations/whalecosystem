@@ -307,6 +307,7 @@ export default function ConnectPage() {
   }, [qrSession, ephemeral, qrData, syncStatus]);
 
 
+  // ── Redirect enforcement: multiple layers to prevent stuck screen ──────────
   useEffect(() => {
     if (!mounted || !isConnected) return;
     try {
@@ -316,37 +317,50 @@ export default function ConnectPage() {
       }
     } catch {}
 
-    // ─── HARD REDIRECT: use window.location.replace, NOT router.replace ────
-    // router.replace is a client-side navigation — the server never sees the
-    // new sovereign_handshake cookie we just set. window.location.replace
-    // forces a full HTTP round-trip so SSR can read the cookie and serve the
-    // correct authenticated layout immediately.
     const doHardRedirect = () => {
       setPendingId(null);
-      router.replace("/");
+      // Force full page navigation — client router won't flush cookies
+      window.location.replace("/dashboard");
     };
 
-    const enforceRedirect = () => {
-      if (isLinked) {
+    // Layer 1: redirect immediately if already linked
+    if (isLinked) {
+      doHardRedirect();
+      return;
+    }
+
+    // Layer 2: auto-redirect after 3s even if isLinked never fired
+    // Covers race condition where LinkedGate sets cookie but store update lags
+    const timer3s = setTimeout(() => {
+      doHardRedirect();
+    }, 3000);
+
+    // Layer 3: absolute fallback after 8s — wallet is connected, just go
+    const timer8s = setTimeout(() => {
+      doHardRedirect();
+    }, 8000);
+
+    // Visibility change (iOS background suspension)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
         doHardRedirect();
       }
     };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // iOS/Android Chrome Background Suspension Fix
-    if (typeof document !== "undefined" && document.visibilityState === "hidden") {
-      const handleVisibilityChange = () => {
-        if (document.visibilityState === "visible") {
-          enforceRedirect();
-          document.removeEventListener("visibilitychange", handleVisibilityChange);
-        }
-      };
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-      setTimeout(enforceRedirect, 2000);
-      return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-    } else {
-      enforceRedirect();
+    return () => {
+      clearTimeout(timer3s);
+      clearTimeout(timer8s);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isConnected, mounted, isLinked]);
+
+  // Separate effect: isLinked flips → redirect instantly
+  useEffect(() => {
+    if (isLinked && mounted && isConnected) {
+      window.location.replace("/dashboard");
     }
-  }, [isConnected, mounted, isLinked, router]);
+  }, [isLinked, mounted, isConnected]);
 
   // ── Mobile Redirect ───────────────────────────────────────────────────────
   // Mobile users have their own standalone UI on the landing page (MobileLanding.tsx).
@@ -582,17 +596,20 @@ export default function ConnectPage() {
                   <div className="flex flex-col items-center gap-3 mt-4">
                     <Loader2 size={24} className="animate-spin text-[#050505]/30" />
                     <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/50 animate-pulse">
-                      Redirecting to Terminal...
+                      Entering Humanity Ledger™...
                     </span>
                   </div>
 
-                  <div className="mt-8">
+                  <div className="mt-8 flex flex-col items-center gap-2">
                     <button
-                      className="text-[9px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-[#050505] underline decoration-dotted underline-offset-4 transition-colors"
-                      onClick={(e) => { e.preventDefault(); router.replace("/"); }}
+                      className="text-[11px] font-black uppercase tracking-widest text-white bg-black px-6 py-3 rounded-2xl hover:bg-black/80 transition-colors"
+                      onClick={() => { window.location.href = '/dashboard'; }}
                     >
-                      Click here if not redirected automatically
+                      Enter Dashboard →
                     </button>
+                    <span className="text-[9px] font-mono text-[#050505]/30 mt-1">
+                      Auto-redirecting in 3s...
+                    </span>
                   </div>
                 </motion.div>
 

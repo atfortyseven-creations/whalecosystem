@@ -337,7 +337,7 @@ function ConnectedScreen({
            <img src="/logo-landingpage.png" alt="Whale Logo" className="h-20 w-auto object-contain drop-shadow-sm" style={{ filter: "grayscale(100%)" }} />
            <div className="flex flex-col items-center text-center">
              <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">Whale Alert</h1>
-             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Institutional Terminal</p>
+             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Humanity Ledger™</p>
            </div>
         </motion.div>
 
@@ -397,19 +397,7 @@ function ConnectedScreen({
           </div>
         </motion.div>
 
-        {/* ── Primary CTA ── */}
-        <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onScan}
-          className="w-full flex items-center justify-center gap-4 py-6 rounded-[24px] font-black uppercase tracking-[0.15em] text-white bg-black border-[3px] border-black hover:bg-black/90 shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all mt-2"
-          style={{ fontSize: "12px" }}
-        >
-          <Scan size={20} strokeWidth={2.5} />
-          Open QR Scanner · Sync
-        </motion.button>
+
 
         {/* ── Forum CTA ── */}
         <motion.div

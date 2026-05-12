@@ -12,13 +12,17 @@ type ScanState = 'idle' | 'requesting' | 'scanning' | 'validating' | 'success' |
 interface QrScannerProps {
     className?: string;
     mode?: 'project' | 'scan';
+    onScanSuccess?: (decodedText: string) => void;
+    projectValue?: string;
+    projectTitle?: string;
+    projectDescription?: string;
 }
 
 // Module-level constant — QrScanner is never mounted more than once simultaneously,
 // so a fixed DOM ID for html5-qrcode's internal container is safe and allocation-free.
 const QR_CONTAINER_ID = 'qr-reader-container';
 
-export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
+export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValue, projectTitle, projectDescription }: QrScannerProps) {
     const [state, setState] = useState<ScanState>('idle');
     const [message, setMessage] = useState('');
     const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -41,6 +45,12 @@ export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
     }, [stopCamera]);
 
     const handleDecode = async (decodedText: string) => {
+        if (onScanSuccess) {
+            await stopCamera();
+            onScanSuccess(decodedText);
+            return;
+        }
+        
         setState('validating');
         await stopCamera();
         
@@ -123,6 +133,10 @@ export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
     const [projectLoading, setProjectLoading] = useState(false);
 
     const generateQr = useCallback(async () => {
+        if (projectValue) {
+            setProjectData({ token: projectValue, linkUrl: projectValue });
+            return;
+        }
         setProjectLoading(true);
         try {
             const res = await fetch('/api/bridge/generate', { method: 'POST' });
@@ -135,7 +149,7 @@ export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
         } finally {
             setProjectLoading(false);
         }
-    }, []);
+    }, [projectValue]);
 
     useEffect(() => {
         if (mode === 'project') {
@@ -147,9 +161,9 @@ export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
         return (
             <div className={`w-full flex flex-col items-center gap-6 ${className ?? ''}`}>
                 <div className="flex flex-col items-center gap-4 text-center">
-                    <h3 className="font-mono text-xl font-bold tracking-tight text-[#050505] dark:text-white">Link Device</h3>
+                    <h3 className="font-mono text-xl font-bold tracking-tight text-[#050505] dark:text-white">{projectTitle || 'Link Device'}</h3>
                     <p className="text-xs text-black/50 dark:text-white/50 max-w-xs leading-relaxed">
-                        Scan this QR code from the Whale Chat mobile app to securely link your session.
+                        {projectDescription || 'Scan this QR code from the Whale Chat mobile app to securely link your session.'}
                     </p>
                 </div>
                 
@@ -167,7 +181,7 @@ export function QrScanner({ className, mode = 'scan' }: QrScannerProps) {
                     </button>
                 )}
                 
-                {projectData && (
+                {projectData && !projectValue && (
                     <button onClick={generateQr} className="text-[10px] font-mono uppercase tracking-widest text-[#9945FF] hover:opacity-80 transition-opacity flex items-center gap-2">
                         <RefreshCcw size={12} /> Refresh QR Code
                     </button>

@@ -1,12 +1,12 @@
 "use client";
-
+// WhaleDashboard v2 — Camera & ScannerZone removed, Morpho restored
 import React, { useState } from 'react';
 import { 
   Globe, Lock, BookOpen, Star, Newspaper, 
   Ticket, Flame, Search, Layers, LineChart, Book,
   Network, Compass, Landmark, BarChart3, FlaskConical,
   Wallet, Shield, Database, MessageSquare,
-  LayoutDashboard, ShieldAlert, MessageCircle, TrendingUp, Award, Radar, Camera
+  LayoutDashboard, MessageCircle, Camera
 } from 'lucide-react';
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
@@ -14,13 +14,13 @@ import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBo
 import { useSearchParams } from 'next/navigation';
 
 // ── Active panels (visible to users) ──────────────────────────────────────────
+import { ScannerZone }             from '@/components/dashboard/ScannerZone';
 import { NewPairsTable }           from '@/components/dashboard/NewPairsTable';
-import { ScannerZone }              from '@/components/dashboard/ScannerZone';
 import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPanel';
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
 import { OmniExplorer }            from '@/components/dashboard/OmniExplorer';
 import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
-import { VossSupremacyPanel }    from '@/components/dashboard/VossSupremacyPanel';
+import { VossSupremacyPanel }      from '@/components/dashboard/VossSupremacyPanel';
 import { EntityGraphVis }          from '@/components/dashboard/EntityGraphVis';
 import { SovereignVault }          from '@/components/dashboard/SovereignVault';
 import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
@@ -63,18 +63,6 @@ const CosmicForgePanel = dynamic(
 );
 const WhaleChat = dynamic(
   () => import('@/components/dashboard/WhaleChat').then(m => m.WhaleChat),
-  { ssr: false }
-);
-const HyperliquidExecutionPanel = dynamic(
-  () => import('@/components/dashboard/HyperliquidExecutionPanel').then(m => m.HyperliquidExecutionPanel),
-  { ssr: false }
-);
-const MempoolForensicsPanel = dynamic(
-  () => import('@/components/dashboard/MempoolForensicsPanel').then(m => m.MempoolForensicsPanel),
-  { ssr: false }
-);
-const ReputationDashboard = dynamic(
-  () => import('@/components/dashboard/ReputationDashboard').then(m => m.ReputationDashboard),
   { ssr: false }
 );
 const MorphoYieldDashboard = dynamic(
@@ -261,6 +249,7 @@ export default function WhaleDashboard() {
                 return <><PanelHeader icon={Globe} title="Market Overview" description="Comprehensive real-time global market data and asset tracking." accent="#0052FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`market-data-${refreshKey}`}><WatchlistTable /></DashboardErrorBoundary></div></>;
 
 
+            // All other legacy/removed tabs — fall to default (Access Pass)
             case 'dashboard':
             case 'watchlist':
             case 'firehose':
@@ -272,12 +261,12 @@ export default function WhaleDashboard() {
             case 'trade':
             case 'forensics':
             case 'reputation':
-                return (
-                    <div className="flex flex-col items-center justify-center h-[400px] gap-4 text-black/20">
-                        <span className="text-[11px] font-black uppercase tracking-[0.3em]">Module Temporarily Disabled</span>
-                        <span className="text-[9px] font-mono">Contact administrator to re-enable this section</span>
-                    </div>
-                );
+            case 'scanner':
+                // Removed modules — redirect to Access Pass
+                if (typeof window !== 'undefined' && activeTab !== 'gold') {
+                    setActiveTab('gold');
+                }
+                return <><PanelHeader icon={Ticket} title="Access Pass" description="Mint your institutional clearance pass to unlock advanced analytics, private data feeds, and exclusive platform features." accent="#D4AF37" /><div className="flex-1 min-h-[950px] shrink-0"><DashboardErrorBoundary key={`gold-redirect-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div></>;
 
             case 'billing':
                 return <><PanelHeader icon={LayoutDashboard} title="Billing & Plan" description="Manage your on-chain plan and view cryptographic invoices." accent="#00C076" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`billing-${refreshKey}`}><PlanDashboard /></DashboardErrorBoundary></div></>;
@@ -337,11 +326,10 @@ export default function WhaleDashboard() {
             case 'support':
                 return <><PanelHeader icon={MessageSquare} title="Support" description="Contact the team directly, report a problem, or ask a question. We respond as quickly as possible to every request." accent="#050505" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key={`support-${refreshKey}`}><WhaleSupport /></DashboardErrorBoundary></div></>;
 
-            case 'scanner':
-                return <><PanelHeader icon={Camera} title="Scanner Zone" description="Scan a QR code to link a mobile device, or enter Whale Chat to message securely." accent="#9945FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`scanner-${refreshKey}`}><ScannerZone /></DashboardErrorBoundary></div></>;
 
             case 'chat':
                 return <><PanelHeader icon={MessageCircle} title="Whale Chat" description="Real-time end-to-end encrypted messaging between wallet addresses. Messages stream instantly across all connected clients." accent="#9945FF" /><div className="flex-1 min-h-[700px] shrink-0"><DashboardErrorBoundary key={`chat-${refreshKey}`}><WhaleChat /></DashboardErrorBoundary></div></>;
+
 
 
 

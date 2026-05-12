@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Ticket, Wallet,
-  Globe, LayoutDashboard, Compass,
-  Book, Network, BookOpen, Landmark,
-  Newspaper, Shield, Lock, Database, MessageSquare,
+  Globe, LayoutDashboard,
+  Book, Network, Landmark,
+  Shield, Database, MessageSquare,
   Command
 } from "lucide-react";
 
@@ -20,23 +20,26 @@ const PAGES = [
   { id: "market-data",   label: "Market Data",     group: "Intelligence",   icon: <Globe size={15} /> },
   { id: "markets",       label: "Top Markets",     group: "Intelligence",   icon: <LayoutDashboard size={15} /> },
   { id: "newpairs",      label: "New Listings",    group: "Intelligence",   icon: <Search size={15} /> },
-  // ── Blockchain Data ──
-  { id: "inst-ledger",   label: "Institutional Ledger",    group: "Blockchain Data", icon: <Book size={15} /> },
-  { id: "mass-transfer", label: "Mass Transfers",  group: "Blockchain Data", icon: <Network size={15} /> },
-  { id: "omniexplorer",  label: "Block Explorer",  group: "Blockchain Data", icon: <Search size={15} /> },
-  { id: "defi",          label: "DeFi Yields",     group: "Blockchain Data", icon: <Landmark size={15} /> },
 
-  // ── Premium Insights ──
-  { id: "news",          label: "News",            group: "Premium Insights", icon: <Newspaper size={15} />, external: true },
-  { id: "sov-intel",     label: "Research Reports", group: "Premium Insights", icon: <BookOpen size={15} />,  external: true },
-  { id: "zk",            label: "Privacy Network",  group: "Premium Insights", icon: <Shield size={15} /> },
+  // ── On-Chain Intel ──
+  { id: "inst-ledger",   label: "Whale Ledger",    group: "On-Chain Intel", icon: <Book size={15} /> },
+  { id: "mass-transfer", label: "Mass Transfers",  group: "On-Chain Intel", icon: <Network size={15} /> },
+  { id: "omniexplorer",  label: "Block Explorer",  group: "On-Chain Intel", icon: <Search size={15} /> },
+  { id: "defi",          label: "DeFi Yields",     group: "On-Chain Intel", icon: <Landmark size={15} /> },
+  { id: "morpho",        label: "Morpho Base",     group: "On-Chain Intel", icon: <Database size={15} /> },
+
+  // ── ZK Layer ──
+  { id: "zk",            label: "Aztec Pipeline",  group: "ZK Layer",       icon: <Shield size={15} /> },
+
+  // ── Communications ──
+  { id: "chat",          label: "Whale Chat",      group: "Communications", icon: <MessageSquare size={15} /> },
 
   // ── System ──
-  { id: "logs",          label: "Activity Logs",    group: "System",         icon: <Database size={15} /> },
+  { id: "logs",          label: "Activity Logs",   group: "System",         icon: <Database size={15} /> },
   { id: "support",       label: "Support",         group: "System",         icon: <MessageSquare size={15} /> },
 ];
 
-const GROUPS = ["Overview", "Intelligence", "Blockchain Data", "Premium Insights", "System"];
+const GROUPS = ["Overview", "Intelligence", "On-Chain Intel", "ZK Layer", "Communications", "System"];
 
 export function GlobalCommandPalette({
   isOpen,

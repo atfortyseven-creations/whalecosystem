@@ -11,7 +11,7 @@ import {
     BookOpen, Database, MessageSquare,
     Landmark, Compass,
     LineChart, Lock, Book, Info, X, ArrowUpRight, CreditCard,
-    MessageCircle, TrendingUp, Award, Radar, Camera
+    MessageCircle
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -48,10 +48,9 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'mass-transfer',label: 'Mass Transfers',    icon: <Network size={17}/> },
     { id: 'omniexplorer', label: 'Block Explorer',    icon: <Search size={17}/> },
     { id: 'defi',         label: 'DeFi Yields',       icon: <Landmark size={17}/> },
-    { id: 'morpho',       label: 'Morpho Base',       icon: <Database size={17}/>, badge: 'NEW', badgeColor: '#0052FF' },
+    { id: 'morpho',       label: 'Morpho Base',       icon: <Database size={17}/>, badge: 'LIVE', badgeColor: '#0052FF' },
 
-    { id: 'scanner',      label: 'QR Scanner',        icon: <Camera size={17}/>,    dividerBefore: 'ZK Layer' },
-    { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/> },
+    { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/>,    dividerBefore: 'ZK Layer' },
 
     { id: 'chat',         label: 'Whale Chat',       icon: <MessageCircle size={17}/>, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF' },
     { id: 'logs',         label: 'Session Logs',      icon: <Database size={17}/>,  dividerBefore: 'System' },
@@ -60,8 +59,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
 
 const RESTRICTED_TABS = [
     'firehose', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
-    'live-port', 'whale-port', 'vault', 'zk', 'logs',
-    'trade', 'forensics', 'chat', 'reputation'
+    'live-port', 'whale-port', 'vault', 'zk', 'logs', 'chat'
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
@@ -612,7 +610,7 @@ export function WhaleProShell({
                         { id: 'markets',     icon: <LayoutDashboard size={20} />, label: 'Markets' },
                         { id: 'newpairs',    icon: <Search size={20} />,          label: 'Listings' },
                         { id: 'portfolio',   icon: <Wallet size={20} />,          label: 'Portfolio' },
-                        { id: 'scanner',     icon: <Camera size={20} />,          label: 'Scanner' },
+                        { id: 'chat',        icon: <MessageCircle size={20} />,    label: 'Chat' },
                         { id: 'menu',        icon: <Menu size={20} />,            label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;

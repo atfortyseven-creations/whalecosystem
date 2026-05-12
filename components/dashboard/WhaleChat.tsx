@@ -45,6 +45,7 @@ export function WhaleChat() {
   const [sending, setSending] = useState(false);
   const [showList, setShowList] = useState(true);
   const [showScanner, setShowScanner] = useState(false);
+  const [showMyQR, setShowMyQR] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [peerStatus, setPeerStatus] = useState<{ online: boolean, lastSeen: number | null, isTyping: boolean }>({ online: false, lastSeen: null, isTyping: false });
 
@@ -238,35 +239,38 @@ export function WhaleChat() {
     convIdToPeer.current.set(activePeerDmIdRef.current, activePeer);
   }, [client, activePeer]);
 
-  const handleStartConversation = async () => {
-    if (!client || !peerInput.trim() || sending) return;
-    setSending(true);
-    try {
-      const peer = peerInput.trim();
-      const newConv = { peerAddress: peer, lastMessage: '', lastAt: new Date() };
+  const handleStartConversationWithPeer = async (peerAddr: string) => {
+      if (!client || !peerAddr || sending) return;
+      setSending(true);
+      try {
+        const peer = peerAddr.trim();
+        const newConv = { peerAddress: peer, lastMessage: '', lastAt: new Date() };
 
-      setConversations(prev => {
-          const exists = prev.find(c => c.peerAddress.toLowerCase() === peer.toLowerCase());
-          if (exists) return prev;
-          const updated = [newConv, ...prev];
-          persistToLocal(updated, messages);
-          return updated;
-      });
+        setConversations(prev => {
+            const exists = prev.find(c => c.peerAddress.toLowerCase() === peer.toLowerCase());
+            if (exists) return prev;
+            const updated = [newConv, ...prev];
+            persistToLocal(updated, messages);
+            return updated;
+        });
 
-      const dmId = `dm-${peer.toLowerCase()}`;
-      peerToConvId.current.set(peer.toLowerCase(), dmId);
-      convIdToPeer.current.set(dmId, peer);
-      activePeerDmIdRef.current = dmId;
+        const dmId = `dm-${peer.toLowerCase()}`;
+        peerToConvId.current.set(peer.toLowerCase(), dmId);
+        convIdToPeer.current.set(dmId, peer);
+        activePeerDmIdRef.current = dmId;
 
-      setActivePeer(peer);
-      setShowList(false);
-      setPeerInput('');
-    } catch {
-      alert('Invalid address.');
-    } finally {
-      setSending(false);
-    }
+        setActivePeer(peer);
+        setShowList(false);
+        setPeerInput('');
+        setShowScanner(false);
+      } catch {
+        alert('Invalid address.');
+      } finally {
+        setSending(false);
+      }
   };
+
+  const handleStartConversation = async () => handleStartConversationWithPeer(peerInput);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,6 +303,33 @@ export function WhaleChat() {
           persistToLocal(mapped, messages);
           return mapped;
       });
+
+      // Synchronize to the peer's local storage (P2P simulation)
+      if (activePeer !== '0xInstitutionalSupport_0000') {
+          const peerKey = `whale_chat_history_${activePeer}`;
+          const peerStored = localStorage.getItem(peerKey);
+          let peerConvs: any[] = [];
+          let peerMsgs: any[] = [];
+          if (peerStored) {
+              try {
+                  const p = JSON.parse(peerStored);
+                  if (p.conversations) peerConvs = p.conversations;
+                  if (p.messages) peerMsgs = p.messages;
+              } catch (e) {}
+          }
+          
+          // Add or update conversation in peer's state
+          if (!peerConvs.find(c => c.peerAddress.toLowerCase() === address.toLowerCase())) {
+              peerConvs = [{ peerAddress: address, lastMessage: content, lastAt: new Date() }, ...peerConvs];
+          } else {
+              peerConvs = peerConvs.map(c => c.peerAddress.toLowerCase() === address.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c);
+          }
+          
+          const peerMsg = { ...newMsg, conversationId: `dm-${address.toLowerCase()}` };
+          peerMsgs = [...peerMsgs, peerMsg];
+          
+          localStorage.setItem(peerKey, JSON.stringify({ conversations: peerConvs, messages: peerMsgs }));
+      }
 
       // Mock response for Institutional Support
       if (activePeer === '0xInstitutionalSupport_0000') {
@@ -350,16 +381,35 @@ export function WhaleChat() {
          <div className="w-full max-w-sm">
              <div className="flex justify-between items-center mb-6 px-2">
                  <h3 className="font-mono font-bold uppercase tracking-widest text-lg">
-                   {isMobile ? 'Scan PC Session' : 'Link Mobile Device'}
+                   Scan Peer QR
                  </h3>
                  <button onClick={() => setShowScanner(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X size={20}/></button>
              </div>
              <p className="text-[11px] text-black/50 text-center mb-4 px-4 font-mono">
-               {isMobile
-                 ? 'Scan the QR code displayed on your desktop dashboard to link your secure E2EE chat session.'
-                 : 'Scan this QR code from your mobile device to link your Whale Chat session securely.'}
+               Scan a peer's Sovereign QR Code to instantly establish a zero-knowledge E2EE communication channel.
              </p>
-             <QrScanner mode={isMobile ? 'scan' : 'project'} />
+             <QrScanner mode="scan" onScanSuccess={(addr) => handleStartConversationWithPeer(addr)} />
+         </div>
+      </div>
+    );
+  }
+
+  if (showMyQR) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-white rounded-2xl border border-black/8 overflow-y-auto">
+         <div className="w-full max-w-sm">
+             <div className="flex justify-between items-center mb-6 px-2">
+                 <h3 className="font-mono font-bold uppercase tracking-widest text-lg">
+                   My Sovereign QR
+                 </h3>
+                 <button onClick={() => setShowMyQR(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X size={20}/></button>
+             </div>
+             <QrScanner 
+                 mode="project" 
+                 projectValue={address} 
+                 projectTitle="My Sovereign Identity" 
+                 projectDescription="Have a peer scan this QR code to instantly open a secure encrypted chat channel with your address." 
+             />
          </div>
       </div>
     );
@@ -469,13 +519,22 @@ export function WhaleChat() {
               <Shield size={14} className="text-[#9945FF]" />
               <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">E2EE Secured</span>
             </div>
-            <button
-                onClick={() => setShowScanner(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 text-[9px] font-bold uppercase tracking-widest text-black/60 transition-colors"
-                title={isMobile ? 'Scan PC QR to link session' : 'Show QR to link mobile device'}
-            >
-                <Camera size={12} /> {isMobile ? 'Scan QR' : 'Link Mobile'}
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                  onClick={() => setShowScanner(true)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 text-[9px] font-bold uppercase tracking-widest text-black/60 transition-colors"
+                  title="Scan Peer QR"
+              >
+                  <Camera size={12} /> Scan
+              </button>
+              <button
+                  onClick={() => setShowMyQR(true)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 text-[9px] font-bold uppercase tracking-widest text-black/60 transition-colors"
+                  title="Show My QR"
+              >
+                  My QR
+              </button>
+            </div>
           </div>
           <div className="flex gap-2">
             <input
