@@ -606,6 +606,9 @@ export function MobileLanding() {
   // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
+  const [isActuallySigning, setIsActuallySigning] = useState(false);
+  const [signingError, setSigningError] = useState<string | null>(null);
+
   // Start with connect overlay visible — like Scroll.io, users see wallet buttons immediately
   // The ImmersiveManifesto is moved to a secondary "Learn More" link below the buttons.
   const [showConnectOverlay, setShowConnectOverlay] = useState(true);
@@ -631,36 +634,62 @@ export function MobileLanding() {
   }, []);
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // SINGLE SOURCE OF TRUTH: if AppKit SIWE verifies session, cookie is set
+  // SECURE HANDSHAKE: Verifies wallet ownership via cryptographic proof
   // ─────────────────────────────────────────────────────────────────────────────
   const establishSession = useCallback(async (addr: string) => {
-    if (isLinked) return;
+    if (isLinked || isActuallySigning) return;
 
     const norm = addr.toLowerCase();
 
-    // ── Write the handshake cookie directly from the wagmi address ──────────
-    // Previously this function waited for the SIWE backend to set the cookie.
-    // However, Reown Cloud's "ReownAuthentication" dashboard setting silently
-    // overrides any siweConfig passed to createAppKit, so the SIWE flow never
-    // completes and the cookie is never written — leaving the UI frozen.
-    //
-    // Fix: we trust the WalletConnect handshake (wagmi address) as sufficient
-    // proof of key ownership. Write the cookie client-side immediately.
-    // The SIWE API routes remain for optional server-side verification elsewhere.
+    // 1. First, check if we already have a valid server session
     try {
-      if (!document.cookie.includes('sovereign_handshake=')) {
-        document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+      const checkRes = await fetch('/api/auth/verify-session');
+      if (checkRes.ok) {
+        const data = await checkRes.json();
+        if (data.authenticated) {
+           console.log('[Auth] Existing session valid for:', norm);
+           setLinkedAddress(norm);
+           setIsLinked(true);
+           return;
+        }
       }
-    } catch {}
+    } catch (e) {
+      console.warn('[Auth] Session check failed, proceeding to sign');
+    }
 
-    setLinkedAddress(norm);
-    setIsLinked(true);
-    setConnecting(null);
-    setShowFallbackBtn(false);
-    try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
-    try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
-    setShowManualReconnectRaw(false);
-  }, [isLinked]);
+    // 2. No session? We MUST sign.
+    setIsActuallySigning(true);
+    setSigningError(null);
+
+    try {
+      const message = buildSovereignMessage(norm);
+      const signature = await signMessageAsync({ message });
+
+      const verifyRes = await fetch('/api/auth/sovereign-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: norm, signature, message })
+      });
+
+      if (!verifyRes.ok) {
+        throw new Error('Verification rejected by Sovereign Node');
+      }
+
+      console.log('[Auth] Handshake successful for:', norm);
+      setLinkedAddress(norm);
+      setIsLinked(true);
+      setConnecting(null);
+      setShowFallbackBtn(false);
+      try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
+      try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
+      setShowManualReconnectRaw(false);
+    } catch (err: any) {
+      console.error('[Auth] Handshake failed:', err);
+      setSigningError(err.message || 'Verification failed');
+    } finally {
+      setIsActuallySigning(false);
+    }
+  }, [isLinked, isActuallySigning, signMessageAsync]);
 
   // ── onFocusRecheck — stable useCallback so multiple effects can reference it —
   const onFocusRecheck = useCallback(() => {
@@ -993,36 +1022,18 @@ export function MobileLanding() {
   // ── Render: Wallet connected, session being written (brief) ─────────────────
   // This render is typically invisible — the useEffect above fires setIsLinked
   // in the same React batch. Shown only for a fraction of a second max.
-  if (isConnected && address && !isLinked) {
+  if ((isConnected && address && !isLinked) || isActuallySigning) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex flex-col items-center justify-center p-8 text-center space-y-6">
-        <Loader2 size={32} className="animate-spin text-[#050505]/30" />
-        <h3 className="font-serif text-2xl font-bold tracking-tight text-[#050505]">Awaiting Cryptographic Signature</h3>
-        <p className="text-[12px] text-[#050505]/60 font-medium">
-          Your wallet is connected, but the secure handshake is pending.<br/>
-          Please check your wallet to sign the verification message.
-        </p>
-        <div className="flex flex-col items-center gap-3 mt-8">
-          <button 
-             onClick={() => {
-               // Zero-Block UX Fallback: If wallet SIWE hangs (Simulation Unavailable), force the handshake
-               console.warn('[MobileLanding] User manually triggered optimistic verification bypass.');
-               const norm = address.toLowerCase();
-               document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-               sessionStorage.setItem(`sovereign_signed_${norm}`, 'true');
-               window.location.reload();
-             }}
-             className="font-mono text-[10px] uppercase tracking-widest text-emerald-600 font-bold border border-emerald-500/20 bg-emerald-500/5 px-6 py-3 rounded-full hover:bg-emerald-500/10 transition-colors"
-          >
-            Bypass Signature (Wallet Hung)
-          </button>
-          <button 
-             onClick={() => disconnect()}
-             className="font-mono text-[10px] uppercase tracking-widest text-[#ef4444] font-bold border border-red-500/20 bg-red-500/5 px-6 py-3 rounded-full hover:bg-red-500/10 transition-colors"
-          >
-            Cancel & Disconnect
-          </button>
-        </div>
+      <div className="w-full h-full">
+        <SigningOverlay 
+          address={address || effectiveAddress || '0x...'}
+          isSigning={isActuallySigning}
+          error={signingError}
+          onSigned={() => {}}
+          onRetry={() => {
+            if (address) establishSession(address);
+          }}
+        />
       </div>
     );
   }

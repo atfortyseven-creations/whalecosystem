@@ -299,11 +299,6 @@ export function MassTransferIntel() {
             <h1 className="text-2xl font-bold uppercase tracking-tighter text-[#050505]">
               CAPITAL LEDGER
             </h1>
-            {/* Live indicator */}
-            <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-[#00C076]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
-              LIVE
-            </span>
           </div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#A0A0A0] ml-9">
             FLOW TOPOGRAPHY · {'<10ms'} · {events.length} EVENTS
@@ -410,8 +405,7 @@ export function MassTransferIntel() {
                     <span className="text-[#050505] font-black">{chainFilter}</span>
                   )}
                   <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-[#00C076] rounded-full animate-pulse" />
-                    LIVE
+                    Verified Stream
                   </span>
                 </div>
               </div>

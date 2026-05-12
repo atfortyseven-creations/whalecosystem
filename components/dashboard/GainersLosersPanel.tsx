@@ -246,7 +246,7 @@ export function GainersLosersPanel() {
                 <div className="bg-white/70 backdrop-blur-3xl border border-black/[0.05] rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
                     <div className="flex items-center justify-between mb-5 pb-3 border-b border-black/[0.04]">
                         <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.15em] flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse"/> 24H GAINERS
+                            24H GAINERS
                         </span>
                         <div className="flex items-center gap-1.5 opacity-50"><TrendingUp size={14} className="text-[#00C076]"/></div>
                     </div>
@@ -282,7 +282,7 @@ export function GainersLosersPanel() {
                 <div className="bg-white/70 backdrop-blur-3xl border border-black/[0.05] rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
                     <div className="flex items-center justify-between mb-5 pb-3 border-b border-black/[0.04]">
                         <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.15em] flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#FF3B30] animate-pulse"/> 24H LOSERS
+                            24H LOSERS
                         </span>
                         <div className="flex items-center gap-1.5 opacity-50"><TrendingDown size={14} className="text-[#FF3B30]"/></div>
                     </div>
@@ -370,11 +370,8 @@ export function GainersLosersPanel() {
                         </div>
                         {/* Stream status */}
                         <div className="flex items-center gap-2 border-l border-black/10 pl-3">
-                            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#00C076] shadow-[0_0_8px_#00C076] animate-pulse' : 'bg-[#FF3B30] animate-pulse'}`} />
                             <span className="text-[10px] font-mono font-black text-[#A0A0A0] uppercase tracking-widest">
-                                {lastUpdate instanceof Date && !isNaN(lastUpdate.getTime())
-                                    ? lastUpdate.toTimeString().slice(0, 8)
-                                    : '—'}
+                                Data Stream
                             </span>
                         </div>
                     </div>

@@ -77,13 +77,6 @@ export default function MobileChatPage() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <Shield size={16} strokeWidth={1.5} className="text-[#9945FF]" />
-            <Lock
-              size={8}
-              className="absolute -bottom-0.5 -right-1 text-[#050505] bg-white rounded-full p-[1px]"
-            />
-          </div>
           <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">
             Whale Chat
           </span>

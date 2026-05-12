@@ -244,13 +244,29 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         if (audioChunksRef.current.length === 0) return;
 
         const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        if (blob.size < 1000) {
+            console.warn('[Voice] Recording too short, ignoring.');
+            setIsRecording(false);
+            setRecordingSeconds(0);
+            return;
+        }
+
         const reader = new FileReader();
         reader.onloadend = async () => {
           const dataUrl = reader.result as string;
-          // Send as special prefix so receiver knows it's audio
+          
+          // XMTP Limit Check: Typical message limit is 1MB. 
+          // Base64 overhead is ~33%. A 750KB blob is roughly the safe limit.
+          if (dataUrl.length > 1024 * 1024) {
+              setInitError('Voice message is too long for the secure P2P network. Please record a shorter message (under 30s).');
+              setIsRecording(false);
+              setRecordingSeconds(0);
+              return;
+          }
+
           const audioMsg = `__AUDIO__${dataUrl}`;
-          if (client && activePeer && activePeer.toLowerCase() !== '0xinstitutionalsupport_0000') {
-            const optimisticId = Date.now().toString();
+          if (client && activePeer) {
+            const optimisticId = `optimistic-${Date.now()}`;
             setMessages(prev => [...prev, {
               id: optimisticId,
               senderInboxId: client?.inboxId || '',
@@ -258,7 +274,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               sentAtNs: Date.now(),
               conversationId: `dm-${activePeer.toLowerCase()}`
             }]);
-            try { await sendMessage(client, activePeer, audioMsg); } catch {}
+            try { 
+                await sendMessage(client, activePeer, audioMsg); 
+                console.log('[Voice] P2P Audio transmission successful.');
+            } catch (sendErr: any) {
+                console.error('[Voice] P2P Send Failed:', sendErr?.message);
+                setMessages(prev => prev.filter(m => m.id !== optimisticId));
+                setInitError('Failed to transmit secure voice message. Check your connection.');
+            }
           }
         };
         reader.readAsDataURL(blob);
@@ -373,8 +396,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         const parsed = JSON.parse(stored);
         if (parsed.conversations) setConversations(parsed.conversations);
       } else {
-        const defaultConv = { peerAddress: '0xInstitutionalSupport_0000', lastMessage: 'Secure channel initialized.', lastAt: new Date() };
-        setConversations([defaultConv]);
+        setConversations([]);
       }
     } catch (e) {}
   };
@@ -541,13 +563,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             peer = peer.substring(9).split('@')[0];
         }
         
-        if (!/^0x[a-fA-F0-9]{40}$/.test(peer) && peer.toLowerCase() !== '0xinstitutionalsupport_0000') {
+        if (!/^0x[a-fA-F0-9]{40}$/.test(peer)) {
             alert('Invalid Ethereum address format.');
             setSending(false);
             return;
         }
 
-        if (peer.toLowerCase() !== '0xinstitutionalsupport_0000') {
+        if (peer) {
             // Use cached result — avoids ~500ms static network lookup on repeated opens
             let canMsg = canReceiveCache.current.get(peer.toLowerCase());
             if (canMsg === undefined) {
@@ -664,31 +686,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         return updated;
       });
 
-      // ── 3. AUTO-REPLY BOT (LOCAL MOCK ONLY) ──────────────────────────────────────────────
-      if (activePeer.toLowerCase() === '0xinstitutionalsupport_0000') {
-        const now = Date.now();
-        const myConvId = `dm-${activePeer.toLowerCase()}`;
-        const newMsg = {
-          id: now.toString(),
-          senderInboxId: client?.inboxId,
-          content: content,
-          sentAtNs: now,         
-          conversationId: myConvId
-        };
-        setMessages(prev => [...prev, newMsg]);
-
-        setTimeout(() => {
-          const replyId = (Date.now() + 1).toString();
-          const replyMsg = {
-            id: replyId,
-            senderInboxId: activePeer,
-            content: 'An institutional representative will review your inquiry shortly.',
-            sentAtNs: Date.now() + 1000,
-            conversationId: myConvId
-          };
-          setMessages(prev => [...prev, replyMsg]);
-        }, 1400);
-      }
 
     } catch (err) {
       console.error('[Chat] handleSend failed:', err);
@@ -721,12 +718,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         {/* Protocol Header */}
         <div className="flex items-center gap-3 px-6 py-4 border-b border-black/6 shrink-0">
           <div className="relative">
-            <Shield size={22} strokeWidth={1.5} className="text-[#9945FF]" />
-            <Lock size={10} className="absolute -bottom-0.5 -right-1 text-[#050505] bg-white rounded-full p-[1px]" />
           </div>
           <div>
-            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#050505]">Whale Chat — Decentralised E2EE Protocol</h3>
-            <p className="text-[9px] text-black/40 font-mono uppercase tracking-widest mt-0.5">XMTP Network · Zero-Trust Architecture</p>
+            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#050505]">Whale Chat</h3>
+            <p className="text-[9px] text-black/40 font-mono uppercase tracking-widest mt-0.5">XMTP Network</p>
           </div>
         </div>
 
@@ -799,9 +794,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             ) : isSovereignHandshake ? (
               <div className="flex flex-col gap-3">
                 <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
-                  <p className="font-black uppercase tracking-widest mb-1 flex items-center gap-2 text-amber-950">
-                    <Shield size={14} /> Limited Handshake Session
-                  </p>
+                    Limited Handshake Session
                   You are connected via a QR link. Whale Chat requires a direct wallet connection to sign and derive encryption keys. Please connect your wallet directly to this device to enable messaging.
                 </div>
                 <button
@@ -841,8 +834,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         <div className="p-4 border-b border-black/6">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Shield size={14} className="text-[#9945FF]" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">E2EE Secured</span>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -936,7 +927,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                     ) : peerStatus.lastSeen ? (
                         <span className="text-black/40">Last seen: {new Date(peerStatus.lastSeen!).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                     ) : (
-                        <span className="text-[#00C076]"><Lock size={9} className="inline" /> Zero-Knowledge E2EE</span>
+                        <span className="text-black/40">Secured Channel</span>
                     )}
                   </span>
                 </div>
@@ -955,9 +946,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   <div className="flex-1 flex flex-col items-center justify-center">
                     <div className="flex flex-col items-center max-w-[280px] text-center gap-6">
                       <div className="flex flex-col items-center opacity-40">
-                        <Shield size={32} className="mb-2" />
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Túnel Criptográfico Establecido</p>
-                        <p className="text-[10px] text-[#050505] mt-2">Solo tú y {shortAddr(activePeer!)} pueden leer estos mensajes.</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Túnel Establecido</p>
                       </div>
 
                       <div className="w-full bg-black/[0.02] border border-black/[0.05] rounded-xl p-5 text-left">
@@ -1058,6 +1047,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                       ? 'bg-red-500 text-white shadow-[0_0_12px_rgba(239,68,68,0.4)]'
                       : 'bg-black/[0.05] text-black/50 hover:bg-black/10'
                   }`}
+                  style={{ touchAction: 'none' }}
                   title={isRecording ? 'Release to send audio' : 'Hold to record voice'}
                 >
                   {isRecording ? <MicOff size={15} /> : <Mic size={15} />}
@@ -1099,10 +1089,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <div className="relative mb-2">
                   <div className="bg-black/[0.04] border border-black/[0.07] rounded-2xl rounded-bl-none px-4 py-3 text-left">
                     <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#050505]/70 whitespace-nowrap">Whale Chat</p>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
-                      <span className="text-[9px] text-[#00C076] font-mono font-bold uppercase tracking-widest">E2EE Secure</span>
-                    </div>
+                    <span className="text-[#00C076] font-mono font-bold uppercase tracking-widest text-[9px]">Connected</span>
                   </div>
                   {/* Bubble tail */}
                   <div className="absolute -bottom-2 left-0 w-3 h-3 bg-black/[0.04] border-l border-b border-black/[0.07]"
@@ -1149,7 +1136,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               {/* Single minimal status row */}
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/20" />
-                <span className="text-[9px] font-mono uppercase tracking-widest text-black/30">Zero-Knowledge · End-to-End Encrypted</span>
+                <span className="text-[9px] font-mono uppercase tracking-widest text-black/30">Whale Alert Network</span>
                 <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/20" />
               </div>
 

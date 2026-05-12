@@ -60,10 +60,10 @@ export async function POST(req: NextRequest) {
         });
 
         // 4. Update User Role / Access Level
-        if (kycStatus === 'VERIFIED') {
+        if (kycStatus === 'APPROVED') {
             await prisma.user.update({
-                where: { walletAddress: externalUserId }, // Ensure this mapping is correct
-                data: { tier: 'VERIFIED' as any } // KYC-verified tier upgrade
+                where: { walletAddress: externalUserId.toLowerCase() },
+                data: { tier: 'VERIFIED' as any } 
             });
         }
 

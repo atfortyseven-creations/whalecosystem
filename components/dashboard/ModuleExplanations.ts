@@ -40,7 +40,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'markets': {
-        title: 'TOP MARKETS: MICROSTRUCTURAL PANOPTICON',
+        title: 'MARKET OVERVIEW: MICROSTRUCTURAL PANOPTICON',
         subtitle: 'FORENSIC ANALYSIS OF BOOK DEPTH & LIQUIDITY',
         overview: 'The Top Markets viewer executes continuous analytical modeling on the most dominant trading pairs in the crypto world. Operating as a microstructural scanner, it dives into the Order Book to empirically discern between real liquidity, book manipulation ("Spoofing"), or "Wash Trading".\n\nIt volumetrically decomposes the architecture and resistance of buying and selling postures. This reveals concentrations of "Smart Money", real support and resistance levels (Bid/Ask Walls), and identifies with surgical clarity the geographical vectors towards which financial dominance flows.',
         features: [
@@ -50,7 +50,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'newpairs': {
-        title: 'NEW LISTINGS: GENESIS CONTRACT ANALYSIS',
+        title: 'NEW TOKENS: GENESIS CONTRACT ANALYSIS',
         subtitle: 'SYNCHRONOUS AUDIT OF RECENTLY ISSUED ASSETS',
         overview: 'The testing ground where protocols emerge onto the mainnet. This system acts as a hypersensitive periscope interconnected to the EVM mempool, intercepting the creation of smart contracts (Contract Creation Events) and tracking initial liquidity provision in Automated Market Makers (AMMs).\n\nThrough an algorithmic risk evaluation, it examines fundamental token health metrics: master key renunciations, liquidity burns, and deceptive taxes ("Honeypot Diagnostics"), serving as the definitive analytical shield against fraud during primal periods of high volatility.',
         features: [
@@ -60,7 +60,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'omniexplorer': {
-        title: 'OMNI EXPLORER: MULTI-CHAIN FORENSIC ENGINE',
+        title: 'BLOCK EXPLORER: MULTI-CHAIN FORENSIC ENGINE',
         subtitle: 'UNIVERSAL CRYPTOGRAPHIC CARTOGRAPHY & DECODING',
         overview: 'The Omni Explorer replaces the fragmentation and inefficiency of conventional block browsers. It constitutes an agnostic ecosystem capable of interpreting architectures from the Ethereum network (EVM), Bitcoin (UTXO), and other L1s, grouped under an interface purified of visual noise and distractions.\n\nIt provides analytical firms with advanced capabilities to destructure any referenced metric (Transaction Hashes, Blocks, Contract Addresses), transforming raw machine code (Hex/Opcodes) into a logical, transparent diagram suitable for investigations or audits.',
         features: [
@@ -110,7 +110,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'mass-transfer': {
-        title: 'MASS TRANSFERS: RESERVE DISTRIBUTION MAPPING',
+        title: 'TRANSFER HUB: RESERVE DISTRIBUTION MAPPING',
         subtitle: 'ANALYSIS OF MIGRATIONS TOWARDS CENTRALIZED EXCHANGES',
         overview: 'A macro module exhaustively focused on tracking and notifying imminent redistributions of large global reserves (Hot/Cold Wallets). The system monitors deposit transitions to and from Centralized Exchanges, identifying the general climate and decisively anticipating disruptions in circulating inventory ("Supply Shocks").\n\nIt interprets large outflows or influx spikes with relentless heuristic logic: identifying whether hundreds of millions have aggressively entered Binance or OKX (selling pressure) or if they have been extracted to Self-Custody Wallets (imminent scarcity).',
         features: [
