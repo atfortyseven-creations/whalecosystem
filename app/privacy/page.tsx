@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Shield, EyeOff, Server, Lock, Database, Globe, Network, Cpu, Fingerprint, Activity } from 'lucide-react';
+import { SovereignFooter } from '@/components/landing/SovereignFooter';
 
 export default function PrivacyPage() {
     return (
@@ -159,14 +160,9 @@ export default function PrivacyPage() {
 
                 </div>
 
-                {/* ── FOOTER MARK ── */}
-                <div className="w-full flex flex-col items-center justify-center mt-40 pt-16 border-t border-black/10">
-                    <Globe className="mb-6 text-black/20" size={48} />
-                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold text-center text-black/40">
-                        Sovereign Master Node · Cryptographic Privacy Doctrine
-                    </p>
                 </div>
             </div>
+            <SovereignFooter />
         </div>
     );
 }

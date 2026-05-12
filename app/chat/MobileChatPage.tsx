@@ -24,28 +24,40 @@ const WhaleChat = dynamic(
 );
 
 export default function MobileChatPage() {
-  // ── visualViewport keyboard fix ──────────────────────────────────────────
-  // On iOS Safari, 100dvh does NOT shrink when the software keyboard opens.
-  // The keyboard overlaps the input bar from below. Fix: track the real
-  // visible height via window.visualViewport and apply it as an inline style.
-  // This prevents the layout from reflowing / scrolling erratically.
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+  const [viewportOffset, setViewportOffset] = useState<number>(0);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.visualViewport) return;
+    if (typeof window === "undefined") return;
+
+    // ── Body Scroll Lock ───────────────────────────────────────────────────
+    // Prevent the entire page from bouncing or scrolling on mobile
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    document.body.style.overscrollBehavior = 'none';
+
+    if (!window.visualViewport) return;
 
     const vv = window.visualViewport!;
 
     const update = () => {
-      // Cancel any pending RAF to batch updates
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => {
         setViewportHeight(vv.height);
+        setViewportOffset(vv.offsetTop);
+        
+        // CRITICAL: Force window scroll to 0 to prevent browser from 
+        // "helping" us by pushing the layout up when keyboard opens.
+        if (vv.offsetTop > 0) {
+            window.scrollTo(0, 0);
+        }
       });
     };
 
-    update(); // initial
+    update();
     vv.addEventListener("resize", update);
     vv.addEventListener("scroll", update);
 
@@ -53,41 +65,52 @@ export default function MobileChatPage() {
       vv.removeEventListener("resize", update);
       vv.removeEventListener("scroll", update);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      
+      // Cleanup body styles
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+      document.body.style.overscrollBehavior = '';
     };
   }, []);
 
-  const containerStyle: React.CSSProperties = viewportHeight
-    ? { height: `${viewportHeight}px`, overflow: "hidden" }
-    : { height: "100dvh", overflow: "hidden" };
+  // Use fixed positioning to occupy exactly the visual viewport space.
+  // This is the "Master" solution for mobile messaging apps in the browser.
+  const containerStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: `${viewportOffset}px`,
+    left: 0,
+    right: 0,
+    height: viewportHeight ? `${viewportHeight}px` : '100dvh',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    backgroundColor: '#FAFAFA',
+    zIndex: 1000,
+  };
 
   return (
-    <div
-      className="flex flex-col bg-[#FAFAFA] text-[#050505]"
-      style={containerStyle}
-    >
+    <div style={containerStyle} className="text-[#050505]">
       {/* ── Top Navigation Bar ── */}
       <header className="shrink-0 h-14 flex items-center justify-between px-4 bg-white border-b border-black/8 z-10">
         <Link
           href="/"
-          className="flex items-center gap-2 text-black/50 hover:text-black transition-colors"
+          className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 text-black/40 transition-colors"
           aria-label="Back to home"
         >
-          <ArrowLeft size={18} />
-          <span className="text-[11px] font-bold uppercase tracking-widest">Back</span>
+          <ArrowLeft size={20} />
         </Link>
 
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">
-            Whale Chat
-          </span>
+          {/* Central brand symbol could go here, or remain empty for maximum minimalism */}
         </div>
 
-        {/* Spacer to keep title centered */}
-        <div className="w-[60px]" />
+        <div className="w-10" />
       </header>
 
-      {/* ── Chat Panel (fills remaining height, no overflow) ── */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      {/* ── Chat Panel ── */}
+      <div className="flex-1 min-h-0 overflow-hidden relative">
         <WhaleChat forceAutoInit={true} />
       </div>
     </div>

@@ -26,7 +26,7 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
     // Dynamic presence guard for iOS/Safari
     const { AnimatePresence, motion } = framer;
 
-    // Reemplazar simulación con streams WebSockets reales del motor de Node.js
+    // Replace simulation with real WebSocket streams from the Node.js engine
     useEffect(() => {
         setMounted(true);
         if (typeof window === 'undefined') return;
@@ -68,7 +68,7 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
                 id: ++logCounter,
                 timestamp: timeStr,
                 type: 'warning',
-                message: <span><span className="text-[#E5E5E5]">[{data.chain?.toUpperCase() || 'ETH'}]</span> ALERTA WHALE: {data.type || 'Transfer'} detectado por <span className="text-[#FF9500] font-black">${(data.usdValue || data.amountUsd || 0).toLocaleString()}</span> USD.</span>
+                message: <span><span className="text-[#E5E5E5]">[{data.chain?.toUpperCase() || 'ETH'}]</span> WHALE ALERT: {data.type || 'Transfer'} detected for <span className="text-[#FF9500] font-black">${(data.usdValue || data.amountUsd || 0).toLocaleString()}</span> USD.</span>
             }]);
         });
 
@@ -90,13 +90,13 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
             const now = new Date();
             const timeStr = now.toLocaleTimeString();
             setLogs(prev => {
-                // Generate high-fidelity synthetic telemetry if real source is offline
+                // Generate high-fidelity synthetic telemetry if real source is degraded
                 if (prev.length > 5 && prev[prev.length-1].type === 'error') return prev; 
                 return [...prev.slice(-49), {
                     id: ++logCounter,
                     timestamp: timeStr,
                     type: 'error',
-                    message: <span className="text-red-400">SOVEREIGN_OFFLINE // Local diagnostics initiated. Tracking local node entropy...</span>
+                    message: <span className="text-red-400">SOVEREIGN_DIAGNOSTICS // Tracking local node entropy...</span>
                 }];
             });
         });

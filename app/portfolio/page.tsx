@@ -17,6 +17,7 @@ import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransac
 import { DepositModal } from '@/components/rainbow/DepositModal';
 import { toast } from 'sonner';
 import { ChainActivityPanel } from '@/components/portfolio/ChainActivityPanel';
+import { SovereignFooter } from '@/components/landing/SovereignFooter';
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 const BG   = "#FAF9F6";
@@ -765,6 +766,7 @@ export default function PortfolioPage() {
         onClose={() => setIsDepositOpen(false)}
         address={userAddress ?? ""}
       />
+      <SovereignFooter />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Search } from '@/components/docs/Search';
 import { ThemeToggle } from '@/components/docs/ThemeToggle';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { SovereignFooter } from '@/components/landing/SovereignFooter';
 
 const TOP_TABS = [
   { id: 'docs',      label: 'Docs',      href: '/docs' },
@@ -105,10 +106,11 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <Sidebar theme={theme} currentPath={pathname || ''} />
 
         {/* Main content */}
-        <main className={`flex-1 min-w-0 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar`}>
-          <div className="max-w-[780px] mx-auto py-16 px-6 lg:px-12">
+        <main className={`flex-1 min-w-0 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar flex flex-col`}>
+          <div className="max-w-[780px] mx-auto py-16 px-6 lg:px-12 flex-1">
             {children}
           </div>
+          <SovereignFooter />
         </main>
       </div>
 

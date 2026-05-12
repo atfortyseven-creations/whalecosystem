@@ -1,422 +1,230 @@
 "use client";
 
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence, useInView } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ArrowRight, Shield, Activity, Globe, Zap, 
+  Menu, X, ChevronRight, Lock, Eye, 
+  Database, Cpu, MessageSquare, BarChart3,
+  TrendingUp, Layers, LifeBuoy, LogIn, CheckCircle2
+} from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { useUIStore } from '@/lib/store/ui-store';
-import { 
-  Shield, Zap, Globe, Cpu, ArrowRight, Landmark, Activity, 
-  TrendingUp, TrendingDown, Clock, Building2, Code2, Layers,
-  CheckCircle2, Star, ChevronDown, ExternalLink, Info, Lock, Key, AlertTriangle, Users, Mail, Send, LayoutDashboard,
-  BarChart2, Webhook, Filter, Anchor, LifeBuoy, Menu, X, LogIn
-} from 'lucide-react';
-import { InmersiveConstellations } from '@/components/shared/InmersiveConstellations';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
-const LANDING_ASSETS = {
-  hero: '/models/update/17863656.jpg', // Massive 7MB High-Fidelity Asset
-  detection: '/models/update/3d-render-abstract-techno-background-with-flowing-cyber-particles.jpg',
-  processing: '/models/update/light-prisms-colorful-effect.jpg',
-  metaverse: '/models/update/metaverse.png',
-  nfts: '/models/update/nft_art.jpg',
-  prisms: '/models/update/light-prisms-colorful-effect.jpg',
-  global: '/models/update/921.jpg',
-  diamond: '/models/update/gradient-pink-diamond-balls-assortment (2).png',
-  spheres: '/models/update/3d-shape-glowing-with-bright-holographic-colors.jpg',
-  intelligence: '/models/update/11469812.png'
-};
-
-// ─── Whale event card ─────────────────────────────────────────────────────────
-function WhaleEventCard({ token, amount, direction, wallet, time, delay }: {
-  token: string; amount: string; direction: string;
-  wallet: string; time: string; delay?: number;
-}) {
-  const isBuy = direction.toUpperCase().includes("BUY") || direction.toUpperCase().includes("OUTFLOW");
-  const isSell = direction.toUpperCase().includes("SELL") || direction.toUpperCase().includes("INFLOW");
-  const color = isBuy ? "#06b6d4" : isSell ? "#8b5cf6" : "#cbd5e1";
-  const Icon = isBuy ? TrendingUp : isSell ? TrendingDown : ArrowRight;
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: (delay || 0) * 0.1 }}
-      viewport={{ once: true }}
-      className="flex items-center gap-6 py-5 px-8 border-b border-slate-50 hover:bg-slate-50/50 transition-all group"
-    >
-      <div className="w-1.5 h-12 rounded-full flex-shrink-0" style={{ backgroundColor: color, boxShadow: `0 0 15px ${color}30` }} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3">
-          <span className="font-black text-slate-950 text-sm tracking-tight">{token}</span>
-          <span
-            className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border"
-            style={{ color, borderColor: `${color}30`, background: `${color}05` }}
-          >
-            {direction}
-          </span>
-        </div>
-        <div className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-tighter truncate">{wallet}</div>
-      </div>
-      <div className="text-right">
-        <div className="font-black text-slate-950 font-mono text-sm">{amount}</div>
-        <div className="text-[9px] text-slate-400 uppercase font-black tracking-widest mt-1">{time}</div>
-      </div>
-    </motion.div>
-  );
+// ── Types ───────────────────────────────────────────────────────────────────
+interface PricingTier {
+  id: string;
+  name: string;
+  priceMonthly: number;
+  tagline: string;
+  accentColor: string;
+  badge?: string;
+  highlight?: boolean;
+  features: { text: string; included: boolean }[];
 }
 
-// ─── Pricing Card ────────────────────────────────────────────────────────────
-function PricingCard({ tier, price, period, desc, features, cta, ctaLink, highlighted, badge }: any) {
+const PRICING_TIERS: PricingTier[] = [
+  {
+    id: 'STARTER',
+    name: 'Whale Starter',
+    priceMonthly: 0,
+    tagline: 'Basic on-chain visibility.',
+    accentColor: '#888888',
+    features: [
+      { text: 'Real-time Whale Alerts', included: true },
+      { text: 'Basic Market Analytics', included: true },
+      { text: 'Community Chat Access', included: true },
+      { text: 'Priority Node Access', included: false }
+    ]
+  },
+  {
+    id: 'PRO',
+    name: 'Whale Pro',
+    priceMonthly: 49,
+    tagline: 'Professional tracking suite.',
+    accentColor: '#00C076',
+    badge: 'Popular',
+    highlight: true,
+    features: [
+      { text: 'All Starter Features', included: true },
+      { text: 'MEV Detection & Alerts', included: true },
+      { text: 'Advanced Portfolio Tracking', included: true },
+      { text: '0.1s Telemetry Latency', included: true }
+    ]
+  },
+  {
+    id: 'INSTITUTIONAL',
+    name: 'Institutional',
+    priceMonthly: 299,
+    tagline: 'The ultimate firm-wide edge.',
+    accentColor: '#9945FF',
+    features: [
+      { text: 'All Pro Features', included: true },
+      { text: 'API Access & Webhooks', included: true },
+      { text: 'Custom Forensic Reporting', included: true },
+      { text: 'Dedicated Account Manager', included: true }
+    ]
+  },
+  {
+    id: 'LEGENDARY',
+    name: 'Legendary',
+    priceMonthly: 999,
+    tagline: 'Zero-latency execution.',
+    accentColor: '#FF9500',
+    features: [
+      { text: 'All Institutional Features', included: true },
+      { text: 'Co-located Node Hosting', included: true },
+      { text: 'Direct Market Execution', included: true },
+      { text: '24/7 Forensic Concierge', included: true }
+    ]
+  }
+];
+
+const API_CAPABILITIES = [
+  { icon: Zap, title: '0.1s Latency', desc: 'Real-time mempool streaming with millisecond precision.' },
+  { icon: Shield, title: 'ZK Privacy', desc: 'Sovereign authentication with zero-knowledge verification.' },
+  { icon: Cpu, title: 'GPU Mesh', desc: 'Distributed node network for high-concurrency analysis.' },
+  { icon: Database, title: '10PB History', desc: 'Complete archival state of all major EVM networks.' }
+];
+
+const LANDING_ASSETS = {
+  spheres: '/system-shots/istockphoto-1406830588-612x612.jpg',
+  metaverse: '/system-shots/istockphoto-1413811800-612x612.jpg',
+  nfts: '/system-shots/istockphoto-1365440263-612x612.jpg',
+  prisms: '/system-shots/istockphoto-1400262450-612x612.jpg',
+  global: '/system-shots/istockphoto-1153216843-612x612.jpg',
+  diamond: '/system-shots/istockphoto-1412534575-612x612.jpg'
+};
+
+// ── Components ──────────────────────────────────────────────────────────────
+
+function PricingCard(tier: PricingTier) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className={`relative flex flex-col rounded-[3rem] border p-10 h-full transition-all duration-500 ${
-        highlighted
-          ? "bg-white border-cyan-500 shadow-[0_40px_80px_-15px_rgba(6,182,212,0.1)] ring-1 ring-cyan-500/20"
-          : "bg-white/60 border-slate-100 hover:border-slate-300 shadow-xl shadow-slate-200/50"
+      className={`group relative flex flex-col p-10 rounded-[3.5rem] border transition-all duration-500 hover:shadow-2xl hover:scale-[1.02] ${
+        tier.highlight ? 'bg-slate-950 text-white border-slate-800 shadow-2xl' : 'bg-white border-slate-100 hover:border-slate-300'
       }`}
     >
-      {badge && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-600 text-white text-[10px] font-black uppercase tracking-[0.3em] px-6 py-2 rounded-full shadow-lg">
-          {badge}
+      {tier.badge && (
+        <div className="absolute top-8 right-8 px-4 py-1.5 bg-cyan-500 text-white rounded-full font-mono text-[9px] font-black uppercase tracking-widest shadow-lg animate-pulse">
+          {tier.badge}
         </div>
       )}
-      <div className="mb-8">
-        <div className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-2">{tier}</div>
-        <div className="flex items-end gap-2">
-          <span className="text-5xl font-black text-slate-950 tracking-tighter italic">{price}</span>
-          <span className="text-slate-400 pb-2 font-black text-[10px] uppercase tracking-widest">/{period}</span>
-        </div>
-        <p className="text-slate-500 text-sm mt-4 font-medium leading-relaxed">{desc}</p>
+      
+      <span className="font-mono text-[11px] font-black uppercase tracking-[0.3em] mb-8 opacity-40 italic">{tier.id}</span>
+      <h3 className="text-4xl font-black uppercase italic tracking-tighter mb-4">{tier.name}</h3>
+      <div className="flex items-baseline gap-2 mb-2">
+        <span className="text-6xl font-black tracking-tighter">€{tier.priceMonthly}</span>
+        <span className="text-xs font-mono font-bold uppercase tracking-widest opacity-40">/month</span>
       </div>
-      <ul className="space-y-4 flex-1 mb-10">
-        {features.map((f: string, i: number) => (
-          <li key={i} className="flex items-start gap-3 text-xs font-black text-slate-600 uppercase tracking-tight">
-            <CheckCircle2 size={14} className="text-cyan-600 mt-0.5 flex-shrink-0" />
-            {f}
-          </li>
+      <p className="font-medium text-slate-500 mb-10 leading-relaxed text-sm">{tier.tagline}</p>
+      
+      <div className="space-y-4 mb-12 flex-1">
+        {tier.features.map((f, i) => (
+          <div key={i} className="flex items-center gap-4">
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${
+              f.included ? (tier.highlight ? 'bg-cyan-500 border-cyan-400' : 'bg-slate-950 border-slate-800') : 'opacity-20'
+            }`}>
+              {f.included && <CheckCircle2 size={12} className="text-white" />}
+            </div>
+            <span className={`text-[11px] font-black uppercase tracking-widest ${f.included ? 'opacity-100' : 'opacity-20'}`}>
+              {f.text}
+            </span>
+          </div>
         ))}
-      </ul>
-      <Link href={ctaLink} className="block group">
-        <button className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] transition-all flex items-center justify-center gap-3 ${
-          highlighted ? "bg-slate-950 text-white hover:bg-black" : "bg-slate-100 text-slate-900 group-hover:bg-slate-200"
-        }`}>
-          {cta} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-        </button>
+      </div>
+      
+      <Link 
+        href="/connect" 
+        className={`w-full py-5 rounded-[2rem] font-mono text-[11px] font-black uppercase tracking-[0.4em] text-center transition-all ${
+          tier.highlight ? 'bg-white text-slate-950 hover:bg-slate-100 shadow-xl' : 'bg-slate-950 text-white hover:bg-black'
+        }`}
+      >
+        Select Tier
       </Link>
     </motion.div>
   );
 }
 
-// ─── FAQ item ─────────────────────────────────────────────────────────────────
-function FAQItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = React.useState(false);
+function WhaleEventCard({ type, amount, chain, time }: { type: string, amount: string, chain: string, time: string }) {
   return (
-    <div className="border-b border-slate-100 last:border-0 overflow-hidden">
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-8 text-left group">
-        <span className="text-base font-black text-slate-950 uppercase italic tracking-tight group-hover:text-cyan-600 transition-colors pr-6">{q}</span>
-        <div className={`w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center transition-all ${open ? 'bg-slate-950 border-slate-950 text-white rotate-180' : 'text-slate-400'}`}>
-          <ChevronDown size={14} />
+    <div className="flex items-center justify-between py-6 px-12 group hover:bg-slate-50 transition-colors duration-300">
+      <div className="flex items-center gap-8">
+        <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+        <div className="flex flex-col">
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic mb-1">Alert Matrix</span>
+          <span className="text-xl font-black text-slate-950 uppercase italic tracking-tighter">{type}</span>
         </div>
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <p className="pb-8 text-sm text-slate-500 font-medium leading-relaxed uppercase tracking-wider max-w-2xl">{a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
+      <div className="flex items-center gap-16">
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic mb-1">{chain}</span>
+          <span className="text-xl font-mono font-black text-slate-950">€{amount}</span>
+        </div>
+        <span className="text-[10px] font-black font-mono text-slate-300 uppercase tracking-widest">{time}</span>
+      </div>
     </div>
   );
 }
 
-// ─── Live stat counter ────────────────────────────────────────────────────────
-function Counter({ target, suffix = "", duration = 2 }: { target: number; suffix?: string; duration?: number }) {
-  const [count, setCount] = React.useState(0);
-  const ref = React.useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
-
-  React.useEffect(() => {
-    if (!inView) return;
-    let start = 0;
-    const step = target / (duration * 60);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= target) { setCount(target); clearInterval(timer); }
-      else setCount(Math.floor(start));
-    }, 1000 / 60);
-    return () => clearInterval(timer);
-  }, [inView, target, duration]);
-
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
-}
-
-// ─── Token price ticker ───────────────────────────────────────────────────────
-const TICKER_TOKENS = ["BTC", "ETH", "BNB", "SOL", "XRP", "LINK", "UNI", "AAVE", "ARB", "OP", "PEPE", "MATIC"];
-
-function LiveTicker() {
-  const [prices, setPrices] = React.useState<Record<string, { price: number; change: number }>>({});
-
-  React.useEffect(() => {
-    const fetchPrices = async () => {
-      try {
-        const res = await fetch('/api/market/ticker');
-        const data = await res.json();
-        const formatted: Record<string, { price: number; change: number }> = {};
-        TICKER_TOKENS.forEach(t => {
-          if (data[t]) formatted[t] = data[t];
-          else formatted[t] = { price: 0, change: 0 };
-        });
-        setPrices(formatted);
-      } catch (e) {
-        console.error("Ticker fetch error:", e);
-      }
-    };
-    fetchPrices();
-    const interval = setInterval(fetchPrices, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="w-full overflow-hidden border-y border-slate-100 bg-white/80 backdrop-blur-md py-4 relative z-50">
-      <motion.div
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-        className="flex items-center gap-16 w-max [will-change:transform]"
-      >
-        {[...TICKER_TOKENS, ...TICKER_TOKENS].map((token, i) => {
-          const p = prices[token];
-          return (
-            <div key={i} className="flex items-center gap-4 font-mono text-[11px] whitespace-nowrap group">
-              <span className="font-black text-slate-950 px-2 py-0.5 bg-slate-100 rounded group-hover:bg-cyan-500 group-hover:text-white transition-colors">{token}</span>
-              <span className="text-slate-500 font-bold">
-                ${p ? (p.price < 0.01 ? p.price.toFixed(8) : p.price.toLocaleString(undefined, { maximumFractionDigits: 2 })) : "..."}
-              </span>
-              {p && (
-                <span className={`font-black ${p.change >= 0 ? "text-cyan-600" : "text-rose-600"}`}>
-                  {p.change >= 0 ? "▲" : "▼"} {Math.abs(p.change).toFixed(1)}%
-                </span>
-              )}
-              <span className="text-slate-200">/</span>
-            </div>
-          );
-        })}
-      </motion.div>
-    </div>
-  );
-}
-
-const STATS_DATA = [
-  { value: 48, suffix: "M+", label: "Whale events detected" },
-  { value: 24, suffix: "", label: "ERC-20 tokens monitored" },
-  { value: 12, suffix: "s", label: "Block-to-API latency" },
-];
-
-const PLATFORM_SCREENSHOTS = [
-  {
-    src: '/system-shots/Captura de pantalla 2026-05-10 002811.png',
-    title: 'Ticket Mint — Genesis Access',
-    desc: 'The WGT-GENESIS credential portal. Cryptographically allocates permanent access passes on Optimism L2. Only 200 Genesis tickets exist globally.',
-    badge: 'ZK Identity Layer',
-    badgeColor: '#8b5cf6',
-  },
-  {
-    src: '/system-shots/Captura de pantalla 2026-05-10 002900.png',
-    title: 'Capital Ledger — Mass Transfers',
-    desc: 'Real-time forensic feed of ERC-20 mass transfer events. Every transaction is ECDSA-verified, classified, and delivered in under 10ms. Shown: $599K aggregate across 80 verified operations.',
-    badge: 'Live Intelligence Feed',
-    badgeColor: '#06b6d4',
-  },
-  {
-    src: '/system-shots/Captura de pantalla 2026-05-10 002953.png',
-    title: 'Aztec Pipeline — ZK Block Sequencer',
-    desc: 'Live view of Aztec Network rollup blocks progressing through proving, sequencing, and settlement on Ethereum. Our sovereign ZK layer for privacy-preserving forensic proofs.',
-    badge: 'Aztec ZK Layer',
-    badgeColor: '#10b981',
-  },
-];
-
-const API_CAPABILITIES = [
-  { icon: Activity, title: "Whale Events Stream", desc: "Every transfer ≥ $100K across 24 tokens. Buy/Sell/Transfer classified. Full metadata: hash, block, gas, addresses." },
-  { icon: BarChart2, title: "Heikin-Ashi Signals", desc: "On-chain data combined with HA candles to generate algorithmic LONG/SHORT signals per token." },
-  { icon: Globe, title: "Multi-Chain Coverage", desc: "Ethereum, Base, Arbitrum, Optimism, Polygon. Unified API — one key, all chains." },
-  { icon: Building2, title: "Elite Profile", desc: "Identify Binance, Coinbase, Kraken, OKX, Bitfinex wallet movements classified in real time." },
-  { icon: AlertTriangle, title: "Anomaly Detection", desc: "Algorithmic anomaly scoring. Detect coordinated wash trading, flash loan attacks, and liquidation cascades." },
-  { icon: Webhook, title: "Webhook Delivery", desc: "Push events to your endpoint as they happen. Retry logic, signature verification, delivery receipts." },
-  { icon: Filter, title: "Dark Pool Radar", desc: "Detect OTC block trades and off-exchange movements that don't appear in standard order books." },
-  { icon: Shield, title: "Risk Scoring", desc: "Every address gets a risk score 0–100 based on on-chain behavior, defi exposure, and historical patterns." },
-];
-
-const PRICING_TIERS = [
-  {
-    tier: "Standard",
-    price: "$14.99",
-    period: "month",
-    desc: "Ideal for novice traders. Essential data for the top 3 cryptos (BTC, ETH, BNB).",
-    features: [
-      "5,000 API requests / day",
-      "3 major tokens (BTC, ETH, BNB)",
-      "1 API key",
-      "REST API access",
-      "12h Event Window",
-      "≥ $1.00M threshold",
-      "Dedicated Slack channel",
-      "Sovereign Architecture Access",
-    ],
-    cta: "Get Started Now",
-    ctaLink: "/api-marketplace?tier=standard",
-  },
-  {
-    tier: "Starter",
-    price: "$49",
-    period: "month",
-    desc: "For independent traders. Access to real-time whale data on major tokens.",
-    features: [
-      "10,000 API requests / day",
-      "5 tokens (BTC, ETH, BNB, SOL, XRP)",
-      "1 API key",
-      "REST API access",
-      "24h sliding window",
-      "≥ $500K threshold",
-    ],
-    cta: "Start Monitoring",
-    ctaLink: "/api-marketplace?tier=starter",
-  },
-  {
-    tier: "Pro",
-    price: "$299",
-    period: "month",
-    desc: "For professional trading desks. Every token. Webhooks. Priority delivery.",
-    features: [
-      "500,000 API requests / day",
-      "All 24 tracked tokens",
-      "3 API keys",
-      "REST + WebSocket + Webhooks",
-      "30-day historical access",
-      "≥ $100K threshold",
-      "Heikin-Ashi signal feed",
-      "Priority Telegram support",
-    ],
-    cta: "Go Pro",
-    ctaLink: "/api-marketplace?tier=pro",
-    highlighted: true,
-    badge: "Most Popular",
-  },
-  {
-    tier: "Elite",
-    price: "$1,999",
-    period: "month",
-    desc: "For hedge funds and market makers. Unlimited access, dedicated infrastructure.",
-    features: [
-      "Unlimited API requests",
-      "All tokens + custom requests",
-      "10 API keys + sub-accounts",
-      "REST + WebSocket + FIX protocol",
-      "12-month full history",
-      "≥ $50K threshold",
-      "99.99% SLA + dedicated infra",
-    ],
-    cta: "Contact Sales",
-    ctaLink: "/api-marketplace?tier=elite",
-  },
-];
-
-const FAQS_DATA = [
-  {
-    q: "How does the data work? Is it real or simulated?",
-    a: "100% real. Our system directly scans Ethereum's ERC-20 contracts using Alchemy RPC, extracts transfer logs block-by-block, and serves them via API. Zero simulated data."
-  },
-  {
-    q: "How fast do I receive the data?",
-    a: "Events appear in the API within one Ethereum block. With webhooks, latency is less than 500ms from detection. WebSocket users receive live event streaming."
-  },
-  {
-    q: "Can I cancel at any time?",
-    a: "Yes, you can cancel from the customer portal at any time. Cancellation is effective at the end of the current billing period."
-  },
-  {
-    q: "What blockchain chains do you cover?",
-    a: "We currently scan Ethereum Mainnet with 24 ERC-20 contracts. We are adding Base, Arbitrum, Optimism, and Polygon for and Elite users shortly."
-  },
-];
-
-export function WhaleAlertProWhite() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [currentTime, setCurrentTime] = React.useState("");
-  const [previewEvents, setPreviewEvents] = React.useState<any[]>([]);
-  const [mounted, setMounted] = React.useState(false);
-
-  // Wallet integration
+export default function WhaleAlertProWhite() {
+  const [mounted, setMounted] = useState(false);
+  const [currentTime, setCurrentTime] = useState('');
   const router = useRouter();
   const { isConnected } = useAccount();
 
-  React.useEffect(() => { setMounted(true); }, []);
-
-  // Smart CTA: routes to dashboard if connected, otherwise opens connect modal
-  const handleEnterTerminal = React.useCallback(() => {
-    if (isConnected) {
-      router.push('/dashboard');
-    } else {
-      router.push('/connect');
-    }
-  }, [isConnected, router]);
-
-  React.useEffect(() => {
-    const update = () => setCurrentTime(new Date().toISOString().slice(11, 19) + " UTC");
+  useEffect(() => {
+    setMounted(true);
+    const update = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    };
     update();
-    const t = setInterval(update, 1000);
-    
-    // Preview events for the landing page
-    setPreviewEvents([
-      { token: "ETH", amount: "$14,285,120", direction: "OUTFLOW", wallet: "Coinbase Prime", time: "2m ago", delay: 0 },
-      { token: "BTC", amount: "$82,100,000", direction: "INFLOW", wallet: "Binance Hot Wallet", time: "5m ago", delay: 1 },
-      { token: "LINK", amount: "$2,400,000", direction: "BUY", wallet: "Institutional Whale 0x71", time: "12m ago", delay: 2 },
-      { token: "SOL", amount: "$5,120,500", direction: "TRANSFER", wallet: "Unknown Elite Wallet", time: "18m ago", delay: 3 },
-      { token: "PEPE", amount: "$1,850,000", direction: "SELL", wallet: "Early Accumulator", time: "24m ago", delay: 4 }
-    ]);
-
-    return () => clearInterval(t);
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
   }, []);
 
-  return (
-    <div ref={containerRef} className="relative bg-white text-slate-900 selection:bg-cyan-100 selection:text-cyan-900 overflow-x-hidden wave-surface wave-surface-strong">
-      <InmersiveConstellations />
-      {/* ─────────────────────────────────────────────────────────────
-          HEADER
-          ───────────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 w-full z-[100] px-6 py-6 flex flex-col items-center gap-4 transition-all">
-        <div className="w-full max-w-[1400px] flex justify-between items-center bg-white/40 backdrop-blur-3xl border border-white/20 px-8 py-4 rounded-[2.5rem] shadow-2xl shadow-slate-200/50">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-slate-950 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-              <Landmark size={20} className="text-white" />
-            </div>
-            <span className="text-lg font-black tracking-tighter uppercase italic text-slate-950 underline decoration-cyan-400 decoration-4 underline-offset-4">Whale Alert Network Pro</span>
-          </Link>
+  const handleEnterTerminal = () => {
+    if (isConnected) router.push('/dashboard');
+    else router.push('/connect');
+  };
 
-          {/* Desktop Center Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
-            <Link href="/ledger" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
-              <Anchor size={16} className="text-slate-400 group-hover:text-cyan-600" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-950">Whale Ledger</span>
+  const previewEvents = [
+    { type: 'Institutional Buy', amount: '12,450,000', chain: 'Ethereum Mainnet', time: '02:44:12' },
+    { type: 'Liquidity Injection', amount: '4,800,000', chain: 'Base Network', time: '02:45:01' },
+    { type: 'Cross-Chain Bridge', amount: '2,900,000', chain: 'Arbitrum One', time: '02:46:55' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#FAF9F6] text-slate-950 selection:bg-cyan-500/20 font-sans overflow-x-hidden">
+      
+      {/* ─── NAVIGATION ─── */}
+      <nav className="fixed top-0 w-full z-[100] px-6 md:px-12 py-8 flex items-center justify-between pointer-events-none">
+        <div className="flex items-center gap-8 pointer-events-auto">
+          <Link href="/" className="group flex items-center gap-4 bg-white/70 backdrop-blur-xl border border-slate-100 px-6 py-2 rounded-full hover:border-slate-300 transition-all shadow-xl shadow-slate-200/50">
+            <div className="relative w-8 h-8">
+              <Image src="/official-whale-monochrome.png" alt="Sovereign Whale" fill className="object-contain" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[11px] font-black uppercase tracking-tighter leading-none">Whale Alert</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Network</span>
+            </div>
+          </Link>
+          
+          <div className="hidden lg:flex items-center gap-2 bg-white/70 backdrop-blur-xl border border-slate-100 px-4 py-2 rounded-full shadow-xl shadow-slate-200/50">
+            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
+              <Activity size={16} className="text-slate-400 group-hover:text-cyan-500" />
+              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-950">Terminal</span>
             </Link>
             <Link href="/portfolio" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
-              <TrendingUp size={16} className="text-slate-400 group-hover:text-indigo-600" />
+              <Layers size={16} className="text-slate-400 group-hover:text-indigo-600" />
               <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-950">Whale Profile</span>
             </Link>
             <Link href="/support" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
@@ -424,230 +232,95 @@ export function WhaleAlertProWhite() {
               <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-950">Support</span>
             </Link>
           </div>
-
-          <div className="flex items-center gap-4 sm:gap-8">
-            <div className="hidden md:flex items-center gap-8">
-              {[
-                { label: 'Fase 01', href: '#infrastructure' },
-                { label: 'Mercado', href: '#market' },
-                { label: 'Pricing', href: '#pricing' },
-                { label: 'FAQ', href: '#faq' },
-              ].map(item => (
-                <a key={item.label} href={item.href} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-950 transition-colors">{item.label}</a>
-              ))}
-            </div>
-            {/* Smart CTA: connected → dashboard, disconnected → connect modal */}
-            <button
-              onClick={handleEnterTerminal}
-              className="flex items-center gap-2 px-6 sm:px-8 py-3 bg-slate-950 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-black transition-all shadow-xl shadow-slate-200"
-            >
-              {mounted && isConnected ? (
-                <><span>Enter Dashboard</span><div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" /></>
-              ) : (
-                <><LogIn size={12} /><span>Enter Terminal</span></>
-              )}
-            </button>
-            
-            {/* Mobile Menu Toggle */}
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-3 text-slate-950 hover:bg-slate-100 rounded-xl transition-all"
-            >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
         </div>
 
-        {/* Mobile Navigation Overlay */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="w-full max-w-[1400px] mt-4 bg-white/95 backdrop-blur-3xl border border-slate-200 rounded-[2.5rem] p-8 flex flex-col gap-4 lg:hidden shadow-2xl z-[110]"
-            >
-              {[
-                { href: '/ledger', icon: Anchor, label: 'Whale Ledger', color: 'text-cyan-600' },
-                { href: '/portfolio', icon: TrendingUp, label: 'Whale Profile', color: 'text-indigo-600' },
-                { href: '/support', icon: LifeBuoy, label: 'Support', color: 'text-rose-600' },
-                { href: '/dashboard', icon: LayoutDashboard, label: 'Terminal', color: 'text-slate-950' },
-              ].map((link) => (
-                <Link 
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:border-slate-300 transition-all group"
-                >
-                  <link.icon size={20} className={`${link.color} group-hover:scale-110 transition-transform`} />
-                  <span className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-950">{link.label}</span>
-                </Link>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Global Intelligence Pill - SUB-NAV POSITIONING TO PREVENT STACKING */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          className="inline-flex items-center gap-3 px-6 py-2 bg-white border border-slate-100 rounded-full shadow-lg shadow-slate-200/30"
-        >
-          <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
-          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-600">Global Institutional Intelligence v6.12.0</span>
-        </motion.div>
+        <div className="flex items-center gap-4 sm:gap-8 pointer-events-auto">
+          <div className="hidden md:flex items-center gap-8">
+            {[
+              { label: 'Phase 01', href: '#infrastructure' },
+              { label: 'Market', href: '#market' },
+              { label: 'Pricing', href: '#pricing' },
+              { label: 'FAQ', href: '#faq' },
+            ].map(item => (
+              <a key={item.label} href={item.href} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-950 transition-colors">{item.label}</a>
+            ))}
+          </div>
+          <button
+            onClick={handleEnterTerminal}
+            className="flex items-center gap-2 px-6 sm:px-8 py-3 bg-slate-950 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-black transition-all shadow-xl shadow-slate-200"
+          >
+            {mounted && isConnected ? (
+              <><span>Enter Dashboard</span><div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" /></>
+            ) : (
+              <><LogIn size={12} /><span>Enter Terminal</span></>
+            )}
+          </button>
+        </div>
       </nav>
 
-      {/* ─────────────────────────────────────────────────────────────
-          HERO SECTION (PHASE 0)
-          ───────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[110vh] flex items-center justify-center overflow-hidden pt-40 pb-20">
-        <div className="absolute inset-0 z-0">
-          <Image src={LANDING_ASSETS.hero} alt="Cosmic White" fill className="object-cover opacity-70 mix-blend-multiply transition-all duration-1000 scale-105" priority />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/60 to-white" />
-          {/* Stratospheric Glows */}
-          <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] bg-cyan-200/20 blur-[150px] rounded-full mix-blend-screen animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-[50vw] h-[50vw] bg-indigo-200/20 blur-[150px] rounded-full mix-blend-screen animate-pulse animation-delay-3000" />
-        </div>
-        
-        <div className="relative z-10 text-center space-y-12 max-w-[1600px] px-6">
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.95 }} 
-            animate={{ opacity: 1, scale: 1 }} 
-            transition={{ duration: 1, ease: [0, 0, 0.2, 1] }} 
-            className="text-[13vw] font-black leading-[0.75] tracking-tighter uppercase italic text-slate-950 px-4 drop-shadow-2xl"
-          >
-            Superior <br /> 
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-indigo-600 to-violet-600 saturate-[1.5]">Forensics</span>
-          </motion.h1>
-          
-          <div className="space-y-12">
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-xl md:text-3xl font-medium text-slate-500 max-w-5xl mx-auto leading-relaxed underline decoration-slate-100 decoration-8 underline-offset-12">
-              Observing institutional flows across the top 24 Binance tokens with zero friction, sub-millisecond precision, and absolute 3D immersion.
-            </motion.p>
-            
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="flex flex-col md:flex-row items-center justify-center gap-12 pt-8">
-               <div className="grid grid-cols-3 gap-20 text-center md:px-12">
-                  {STATS_DATA.map((s, i) => (
-                    <div key={i} className="group relative">
-                      <div className="text-6xl font-black text-slate-950 italic tracking-tighter group-hover:scale-110 transition-transform">
-                        <Counter target={s.value} suffix={s.suffix} />
-                      </div>
-                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-4 px-6 py-2 bg-white/50 backdrop-blur-md rounded-full border border-slate-100 group-hover:bg-cyan-50 group-hover:text-cyan-600 transition-all shadow-sm">{s.label}</div>
-                    </div>
-                  ))}
-               </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <LiveTicker />
-
-      {/* ─────────────────────────────────────────────────────────────
-          SCROLLYTELLING: DETECTION (PHASE 01)
-          ───────────────────────────────────────────────────────────── */}
-      <section id="infrastructure" className="relative h-[250vh]">
-        <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-          <motion.div 
-            style={{ 
-              scale: useTransform(smoothProgress, [0.1, 0.4], [1.3, 1]),
-              opacity: useTransform(smoothProgress, [0.1, 0.2, 0.4], [0, 1, 0.8]),
-              filter: useTransform(smoothProgress, [0.1, 0.2], ["blur(20px) saturate(0.5)", "blur(0px) saturate(1.5)"])
-            }}
-            className="absolute inset-0 z-0"
-          >
-            <Image src={LANDING_ASSETS.detection} alt="Detection" fill className="object-cover mix-blend-multiply opacity-50" />
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent" />
-            <div className="absolute inset-0 bg-cyan-500/5 mix-blend-overlay" />
-          </motion.div>
-
-          <div className="relative z-10 px-24 max-w-6xl">
-            <motion.div style={{ opacity: useTransform(smoothProgress, [0.15, 0.25], [0, 1]), x: useTransform(smoothProgress, [0.15, 0.25], [-100, 0]) }} className="space-y-12">
-              <div className="inline-flex items-center gap-4 px-6 py-2 bg-cyan-50 border border-cyan-100 rounded-full shadow-lg shadow-cyan-100/50">
-                <div className="w-2 h-2 rounded-full bg-cyan-600 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-600">Phase 01 — Latency Floor Extraction</span>
-              </div>
-              <h2 className="text-9xl font-black text-slate-950 uppercase italic tracking-tighter leading-[0.8] drop-shadow-sm">Scanning the <br /> <span className="text-slate-300">Deep Mempool</span></h2>
-              <p className="text-2xl text-slate-500 font-medium leading-relaxed max-w-3xl">
-                Our proprietary inspection engine extracts sub-millisecond latent data directly from global validator nodes. Every institutional order is captured before block confirmation.
-              </p>
-              <div className="flex gap-20 pt-10">
-                <div className="relative">
-                  <div className="text-7xl font-black italic text-cyan-600 tracking-tighter drop-shadow-xl">0.08ms</div>
-                  <div className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 mt-4 border-l-2 border-cyan-200 pl-4">Node Latency Floor</div>
-                </div>
-                <div className="relative">
-                  <div className="text-7xl font-black italic text-indigo-600 tracking-tighter drop-shadow-xl">14.2B</div>
-                  <div className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 mt-4 border-l-2 border-indigo-200 pl-4">Daily Signals Synthetic</div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          SCROLLYTELLING: PROCESSING (PHASE 02)
-          ───────────────────────────────────────────────────────────── */}
-      <section className="relative h-[250vh]">
-        <div className="sticky top-0 h-screen flex items-center justify-end overflow-hidden">
-          <motion.div 
-            style={{ 
-              scale: useTransform(smoothProgress, [0.4, 0.7], [1.4, 1]),
-              opacity: useTransform(smoothProgress, [0.4, 0.5, 0.7], [0, 1, 0.9]),
-              filter: useTransform(smoothProgress, [0.4, 0.5], ["blur(30px) saturate(0)", "blur(0px) saturate(1.8)"])
-            }}
-            className="absolute inset-0 z-0"
-          >
-            <Image src={LANDING_ASSETS.processing} alt="Processing" fill className="object-cover mix-blend-multiply opacity-40" />
-            <div className="absolute inset-0 bg-gradient-to-l from-white via-white/80 to-transparent" />
-            <div className="absolute inset-0 bg-indigo-500/5 mix-blend-overlay" />
-          </motion.div>
-
-          <div className="relative z-10 px-24 max-w-6xl text-right">
-            <motion.div style={{ opacity: useTransform(smoothProgress, [0.45, 0.55], [0, 1]), x: useTransform(smoothProgress, [0.45, 0.55], [100, 0]) }} className="space-y-12">
-              <div className="inline-flex items-center gap-4 px-6 py-2 bg-indigo-50 border border-indigo-100 rounded-full shadow-lg shadow-indigo-100/50 ml-auto">
-                <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-600">Phase 02 — Neural Forensic Synthesis</span>
-              </div>
-              <h2 className="text-9xl font-black text-slate-950 uppercase italic tracking-tighter leading-[0.8] drop-shadow-sm">Forensic <br /> <span className="text-slate-300">Tactical Gravity</span></h2>
-              <p className="text-2xl text-slate-500 font-medium leading-relaxed max-w-3xl ml-auto">
-                Raw data is processed through our sovereign neural network. We differentiate institutional accumulation from retail noise with 99.4% forensic accuracy.
-              </p>
-              <div className="flex gap-20 pt-10 justify-end">
-                <div className="relative">
-                  <div className="text-7xl font-black italic text-indigo-600 tracking-tighter drop-shadow-xl">99.4%</div>
-                  <div className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 mt-4 border-r-2 border-indigo-200 pr-4">Deduction Accuracy</div>
-                </div>
-                <div className="relative">
-                  <div className="text-7xl font-black italic text-cyan-600 tracking-tighter drop-shadow-xl">GPU+</div>
-                  <div className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 mt-4 border-r-2 border-cyan-200 pr-4">Neural compute clusters</div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          WHALE EVENTS PREVIEW (MARKET)
-          ───────────────────────────────────────────────────────────── */}
-      <section id="market" className="py-56 px-12 bg-slate-50 relative overflow-hidden wave-surface" aria-label="Live Institutional Matrix">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-        <div className="max-w-7xl mx-auto space-y-32">
-          <div className="text-center space-y-10">
-            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white border border-slate-100 rounded-full shadow-md">
-              <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Sub-Millisecond Pulse Stream</span>
+      {/* ─── HERO SECTION ─── */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-40 px-6">
+        {/* Lottie Background Overlay */}
+        <div className="absolute inset-0 z-0 opacity-[0.1] pointer-events-none flex items-center justify-center">
+            <div className="w-full max-w-[1200px] aspect-square">
+                <RemoteLottie path="Connected world.json" />
             </div>
-            <h2 className="text-[8vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">Live Institutional <br /> <span className="text-slate-300">Tactical Matrix</span></h2>
-            <p className="text-2xl font-medium text-slate-500 max-w-4xl mx-auto leading-relaxed uppercase tracking-widest">
-              Every event below captures a multi-million dollar institutional rotation, processed and delivered in real-time.
-            </p>
+        </div>
+
+        <div className="max-w-[1400px] w-full mx-auto relative z-10 text-center space-y-16">
+          <div className="space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-4 px-8 py-3 bg-white border border-slate-100 rounded-full shadow-2xl shadow-slate-200/50"
+            >
+              <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500 italic">Sovereign Intelligence v3.0</span>
+            </motion.div>
+            
+            <h1 className="text-[15vw] lg:text-[13vw] font-black text-slate-950 uppercase italic leading-[0.75] tracking-tighter text-balance">
+              Whale <br /> <span className="text-slate-300">Architecture</span>
+            </h1>
           </div>
 
-          <div className="bg-white rounded-[4rem] border border-slate-200 shadow-[0_80px_150px_-30px_rgba(0,0,0,0.08)] overflow-hidden wave-surface wave-surface-light">
+          <p className="text-2xl md:text-3xl font-medium text-slate-500 max-w-4xl mx-auto leading-relaxed text-balance">
+            The world&apos;s most advanced cryptographic forensic engine. Real-time institutional telemetry, dark pool monitoring, and cross-chain liquidation radar.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-8">
+            <button
+              onClick={handleEnterTerminal}
+              className="group relative flex items-center gap-6 px-16 py-8 bg-slate-950 text-white rounded-[2.5rem] shadow-2xl shadow-slate-400/30 hover:bg-black hover:scale-105 transition-all duration-500 overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative z-10 text-[13px] font-black uppercase tracking-[0.6em]">Initialize Session</span>
+              <ArrowRight size={20} className="relative z-10 group-hover:translate-x-2 transition-transform" />
+            </button>
+            
+            <div className="flex items-center gap-4 bg-white border border-slate-100 px-8 py-4 rounded-full shadow-lg">
+              <div className="flex -space-x-4">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden relative shadow-sm">
+                    <Image src={`/system-shots/istockphoto-1153216843-612x612.jpg`} alt="User" fill className="object-cover" />
+                  </div>
+                ))}
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Used by 400+ Firms</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-30">
+          <span className="text-[9px] font-black uppercase tracking-[0.4em] rotate-90 mb-4">Scroll to explore</span>
+          <div className="w-px h-24 bg-gradient-to-b from-slate-950 to-transparent" />
+        </div>
+      </section>
+
+      {/* ─── LIVE DATA STRIP ─── */}
+      <section className="py-20 px-6 md:px-12 relative overflow-hidden" id="market">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="bg-white rounded-[4rem] border border-slate-200 shadow-[0_80px_150px_-30px_rgba(0,0,0,0.08)] overflow-hidden">
             <div className="flex items-center justify-between px-16 py-10 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-6">
                 <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse" />
@@ -657,13 +330,14 @@ export function WhaleAlertProWhite() {
                 {[1, 2, 3].map(i => <div key={i} className="w-2 h-2 rounded-full bg-slate-200" />)}
               </div>
             </div>
+
             <div className="divide-y divide-slate-100 overflow-hidden">
               {previewEvents.map((ev, i) => (
                 <WhaleEventCard key={i} {...ev} />
               ))}
             </div>
             <div className="p-12 text-center bg-slate-50/30">
-               <Link href="/vip" className="inline-flex items-center gap-4 px-12 py-5 bg-slate-950 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.5em] hover:bg-black hover:scale-105 transition-all shadow-xl shadow-slate-200">
+               <Link href="/connect" className="inline-flex items-center gap-4 px-12 py-5 bg-slate-950 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.5em] hover:bg-black hover:scale-105 transition-all shadow-xl shadow-slate-200">
                   Connect to Forensic Hub <ArrowRight size={16} />
                </Link>
             </div>
@@ -671,9 +345,7 @@ export function WhaleAlertProWhite() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          TECHNICAL CAPABILITIES GRID
-          ───────────────────────────────────────────────────────────── */}
+      {/* ─── TECHNICAL CAPABILITIES GRID ─── */}
       <section id="capabilities" className="py-40 px-12 relative" aria-label="Ultimate Infrastructure">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-col md:flex-row items-end justify-between mb-32 gap-12">
@@ -704,262 +376,144 @@ export function WhaleAlertProWhite() {
               </motion.div>
             ))}
           </div>
+
+          <div className="mt-40 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white rounded-[4rem] border border-slate-100 p-16 shadow-2xl shadow-slate-200/30 overflow-hidden relative">
+            {/* Background Accent */}
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50/50 -skew-x-12 translate-x-20 z-0" />
+            
+            <div className="relative z-10 space-y-12">
+                <div className="space-y-6">
+                    <div className="inline-flex items-center gap-4 px-6 py-2 bg-indigo-50 border border-indigo-100 rounded-full">
+                        <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-600">Forensic Analysis</span>
+                    </div>
+                    <h3 className="text-7xl font-black text-slate-950 uppercase italic leading-[0.85] tracking-tighter">Big Data <br/> <span className="text-slate-300">Analytics</span></h3>
+                    <p className="text-xl font-medium text-slate-500 leading-relaxed max-w-lg">
+                        Our intelligence engine processes over 12TB of raw on-chain data daily, identifying hidden whale clusters and front-running attempts before they hit the public mempool.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8">
+                    {[
+                        { label: 'Latency', val: '0.1s' },
+                        { label: 'Integrity', val: '100%' },
+                        { label: 'Uptime', val: '99.9%' },
+                        { label: 'Security', val: 'AES-256' }
+                    ].map(s => (
+                        <div key={s.label} className="space-y-2">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{s.label}</span>
+                            <div className="text-3xl font-black text-slate-950 font-mono tracking-tighter">{s.val}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="relative z-10 aspect-square max-w-[600px] w-full mx-auto">
+                <RemoteLottie path="Big Data Analytics.json" />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          CRYPTOGRAPHIC FORENSICS & DARK POOL RADAR (NEW MODULES)
-          ───────────────────────────────────────────────────────────── */}
-      <section className="py-40 px-6 md:px-12 bg-white relative overflow-hidden" aria-label="Cryptographic Forensics">
-        <div className="max-w-[1400px] mx-auto space-y-32">
+      {/* ─── DARK POOL & METAVERSE ─── */}
+      <section className="py-40 px-12 bg-white relative overflow-hidden">
+        <div className="max-w-[1400px] mx-auto space-y-40">
           
-          {/* Feature 1: Dark Pool Radar */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div className="order-2 lg:order-1 relative h-[600px] w-full rounded-[3rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-2xl group">
-              <Image 
-                src={LANDING_ASSETS.spheres} 
-                alt="Dark Pool Radar Spheres" 
-                fill 
-                className="object-cover group-hover:scale-105 transition-transform duration-1000" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent" />
-              <div className="absolute bottom-10 left-10 right-10">
-                 <div className="px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl w-fit mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                   Module Active
-                 </div>
-                 <h3 className="text-3xl font-black text-white uppercase italic tracking-tight">Dark Pool <br/> Radar Matrix</h3>
-              </div>
-            </div>
-            <div className="order-1 lg:order-2 space-y-8">
-              <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-200 rounded-full shadow-sm">
-                <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 italic">Off-Chain Detection</span>
-              </div>
-              <h2 className="text-[5vw] lg:text-7xl font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
-                Illuminate The <br /><span className="text-slate-300">Unseen</span>
-              </h2>
-              <p className="text-xl font-medium text-slate-500 leading-relaxed">
-                Standard order books only show what they want you to see. Our Dark Pool Radar aggregates OTC block trades and hidden liquidity movements across 14 major venues, bringing invisible institutional volume into the light.
-              </p>
-              <ul className="space-y-4 pt-4">
-                {[
-                  "OTC Block Trade Detection",
-                  "Cross-Chain Liquidity Routing",
-                  "Hidden Accumulation Heatmaps"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-4 text-sm font-black text-slate-700 uppercase tracking-widest">
-                    <CheckCircle2 size={18} className="text-rose-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Dark Pool Radar */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+             <div className="relative aspect-[4/3] rounded-[4rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-2xl group">
+                <Image src={LANDING_ASSETS.spheres} alt="Dark Pool" fill className="object-cover group-hover:scale-105 transition-transform duration-1000" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+                <div className="absolute bottom-10 left-10 flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center">
+                        <Activity size={24} className="text-white" />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/70 italic">Module: DPR-01</span>
+                        <span className="text-2xl font-black text-white uppercase italic tracking-tighter">Dark Pool Radar</span>
+                    </div>
+                </div>
+             </div>
+             <div className="space-y-8">
+                <h2 className="text-8xl font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
+                    Illuminate <br /><span className="text-slate-300">The Unseen</span>
+                </h2>
+                <p className="text-xl font-medium text-slate-500 leading-relaxed">
+                    Standard order books only show what they want you to see. Our Dark Pool Radar aggregates OTC block trades and hidden liquidity movements across 14 major venues.
+                </p>
+                <ul className="space-y-4">
+                    {["OTC Block Detection", "Cross-Chain Liquidity", "Hidden Accumulation"].map(t => (
+                        <li key={t} className="flex items-center gap-4 text-sm font-black text-slate-700 uppercase tracking-widest">
+                            <CheckCircle2 size={18} className="text-cyan-500" /> {t}
+                        </li>
+                    ))}
+                </ul>
+             </div>
           </div>
 
-          {/* Feature 2: Ecosystem Metaverse */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-200 rounded-full shadow-sm">
-                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 italic">3D Topology</span>
-              </div>
-              <h2 className="text-[5vw] lg:text-7xl font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
-                Ecosystem <br /><span className="text-slate-300">Metaverse</span>
-              </h2>
-              <p className="text-xl font-medium text-slate-500 leading-relaxed">
-                Navigate the blockchain like never before. Our 3D topological maps visualize complex wallet interactions, identifying hidden relationships between entities, protocols, and smart contracts instantly.
-              </p>
-              <ul className="space-y-4 pt-4">
-                {[
-                  "Interactive 3D Wallet Graphs",
-                  "Protocol Exposure Visualizations",
-                  "Sybil Cluster Identification"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-4 text-sm font-black text-slate-700 uppercase tracking-widest">
-                    <CheckCircle2 size={18} className="text-cyan-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="relative h-[600px] w-full rounded-[3rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-2xl group">
-              <Image 
-                src={LANDING_ASSETS.metaverse} 
-                alt="Ecosystem Metaverse 3D" 
-                fill 
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-1000 mix-blend-luminosity opacity-90" 
-              />
-              <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
-              <div className="absolute bottom-10 left-10 right-10">
-                 <div className="px-4 py-2 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl w-fit mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                   Engine Online
-                 </div>
-                 <h3 className="text-3xl font-black text-slate-900 uppercase italic tracking-tight drop-shadow-xl">Topological <br/> Graph Engine</h3>
-              </div>
-            </div>
+          {/* Ecosystem Metaverse */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+             <div className="order-2 lg:order-1 space-y-8">
+                <h2 className="text-8xl font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter text-right">
+                    Ecosystem <br /><span className="text-slate-300">Metaverse</span>
+                </h2>
+                <p className="text-xl font-medium text-slate-500 leading-relaxed text-right">
+                    Navigate the blockchain in 3D. Our topological graph engine visualizes wallet interactions and entity clusters with unparalleled depth.
+                </p>
+                <div className="flex justify-end gap-4 pt-4">
+                    {["3D Wallet Graphs", "Sybil Identification"].map(t => (
+                        <span key={t} className="px-6 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500">{t}</span>
+                    ))}
+                </div>
+             </div>
+             <div className="order-1 lg:order-2 relative aspect-square rounded-[4rem] overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl flex items-center justify-center p-12">
+                <div className="absolute inset-0 opacity-40">
+                   <Image src={LANDING_ASSETS.metaverse} alt="Metaverse" fill className="object-cover mix-blend-luminosity" />
+                </div>
+                <div className="relative w-full h-full">
+                    <RemoteLottie path="Metaverse animations.json" className="scale-110" />
+                </div>
+             </div>
           </div>
-
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          PLATFORM IN ACTION — SCREENSHOTS
-          ───────────────────────────────────────────────────────────── */}
-      <section className="py-40 px-6 md:px-12 bg-slate-50/80 border-t border-slate-100 relative overflow-hidden" aria-label="Platform Preview">
+      {/* ─── NODE NETWORK ─── */}
+      <section id="infrastructure" className="py-40 px-12 bg-slate-50/50 border-t border-slate-100">
         <div className="max-w-[1400px] mx-auto">
-          <div className="text-center space-y-8 mb-24">
-            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white border border-slate-100 rounded-full shadow-md">
-              <div className="w-2 h-2 rounded-full bg-violet-500 animate-ping" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Terminal Preview</span>
-            </div>
-            <h2 className="text-[7vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
-              The Platform<br /><span className="text-slate-300">In Action</span>
-            </h2>
-            <p className="text-xl font-medium text-slate-500 max-w-3xl mx-auto leading-relaxed">
-              Every module shown is live, real-data, and production-grade. This is what institutional intelligence looks like.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {PLATFORM_SCREENSHOTS.map((shot, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.15 }}
-                viewport={{ once: true }}
-                className="group flex flex-col bg-white rounded-[3rem] border border-slate-200 overflow-hidden hover:border-slate-300 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500"
-              >
-                {/* Screenshot */}
-                <div className="relative overflow-hidden rounded-t-[3rem] bg-slate-100" style={{ aspectRatio: '16/10' }}>
-                  <Image
-                    src={shot.src}
-                    alt={shot.title}
-                    fill
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent" />
-                  <div
-                    className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-lg"
-                    style={{ backgroundColor: shot.badgeColor }}
-                  >
-                    {shot.badge}
-                  </div>
+            <div className="mt-20 flex flex-col md:flex-row items-center gap-20 bg-white rounded-[4rem] border border-slate-200 p-20 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+                <div className="relative w-full max-w-[500px] aspect-square shrink-0">
+                    <div className="absolute inset-0 bg-cyan-100/30 blur-[100px] rounded-full" />
+                    <RemoteLottie path="DeeWork About Blockchain.json" className="relative z-10" />
                 </div>
-                {/* Text */}
-                <div className="p-8 flex flex-col gap-4 flex-1">
-                  <h3 className="text-xl font-black text-slate-950 uppercase italic tracking-tight">{shot.title}</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed text-sm flex-1">{shot.desc}</p>
+                <div className="space-y-8 flex-1">
+                    <div className="inline-flex items-center gap-4 px-6 py-2 bg-emerald-50 border border-emerald-100 rounded-full">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-600">Sovereign Protocol</span>
+                    </div>
+                    <h3 className="text-8xl font-black uppercase italic tracking-tighter text-slate-950 leading-[0.8]">Global Node <br/> <span className="text-slate-300">Network</span></h3>
+                    <p className="text-xl font-medium text-slate-500 leading-relaxed text-justify">
+                        Our intelligence infrastructure runs across a globally distributed node mesh with no single point of failure. Each node independently validates on-chain events before they reach the API layer.
+                    </p>
+                    <div className="flex flex-wrap gap-4 pt-4">
+                        {['99.99% Uptime SLA', 'Multi-region deployment', 'Zero mock data policy'].map(tag => (
+                        <span key={tag} className="text-[10px] font-black uppercase tracking-widest px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-slate-500">{tag}</span>
+                        ))}
+                    </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Blockchain illustration images */}
-          <div className="mt-20 flex flex-col md:flex-row items-center gap-12 bg-white rounded-[3rem] border border-slate-200 p-12 shadow-xl shadow-slate-200/40">
-            <div className="flex items-center gap-8 shrink-0">
-              <div className="relative w-32 h-32 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden">
-                <Image
-                  src="/system-shots/istockphoto-865597192-612x612.jpg"
-                  alt="Blockchain network topology"
-                  fill
-                  className="object-cover opacity-80 mix-blend-multiply"
-                />
-              </div>
-              <div className="relative w-32 h-32 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden">
-                <Image
-                  src="/system-shots/pngtree-blockchain-network-illustration-with-cubes-vector-png-image_18614224.jpg"
-                  alt="Distributed ledger architecture"
-                  fill
-                  className="object-cover"
-                />
-              </div>
             </div>
-            <div className="space-y-4 max-w-2xl">
-              <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-cyan-50 border border-cyan-100 rounded-full">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                <span className="text-[9px] font-black uppercase tracking-[0.35em] text-cyan-600">Decentralised Architecture</span>
-              </div>
-              <h3 className="text-3xl font-black text-slate-950 uppercase italic tracking-tight leading-tight">
-                Sovereign<br />Node Network
-              </h3>
-              <p className="text-slate-500 font-medium leading-relaxed">
-                Our intelligence infrastructure runs across a globally distributed node mesh with no single point of failure. Each node independently validates on-chain events before they reach the API layer — guaranteeing data integrity through consensus, not trust.
-              </p>
-              <div className="flex flex-wrap gap-3 pt-2">
-                {['99.99% Uptime SLA', 'Multi-region deployment', 'Zero mock data policy', 'ECDSA verification'].map(tag => (
-                  <span key={tag} className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-slate-500">{tag}</span>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          VISION GRID: WEB3 ECOSYSTEM
-          ───────────────────────────────────────────────────────────── */}
-      <section className="py-32 px-12 border-t border-slate-100">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-12">
-            <div className="space-y-4 max-w-2xl">
-              <div className="inline-flex items-center gap-4 px-6 py-2 bg-cyan-50 border border-cyan-100 rounded-full">
-                <div className="w-2 h-2 rounded-full bg-cyan-600 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-600">Expansion Horizon</span>
-              </div>
-              <h2 className="text-[7vw] font-black text-slate-950 uppercase italic leading-[0.85] tracking-tighter">The Visionary <br /> <span className="text-slate-300">Architecture</span></h2>
-            </div>
-            <p className="text-lg font-medium text-slate-500 max-w-md leading-relaxed">
-              Beyond monitoring. We are building a unified ecosystem for the next generation of sovereign financial participation.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: 'Metaverse Nexus', img: LANDING_ASSETS.metaverse, desc: 'Spatial monitoring of virtual economies and cross-metaverse liquidity flows.' },
-              { title: 'NFT Forensic Lab', img: LANDING_ASSETS.nfts, desc: 'Deep-dive wash trading detection and high-rarity accumulation alerts.' },
-              { title: 'Prism Network', img: LANDING_ASSETS.prisms, desc: 'Cross-chain bridging protocols with institutional liquidation protection.' },
-              { title: 'Global Settlement', img: LANDING_ASSETS.global, desc: 'Real-time validation of cross-border institutional settlements.' },
-              { title: 'Diamond Hand Protocol', img: LANDING_ASSETS.diamond, desc: 'Advanced analytics for long-term vaulting and supply shock prediction.' },
-              { title: 'Market Spheres', img: LANDING_ASSETS.spheres, desc: 'GPU-rendered clusters of market dominance and liquidity depth.' }
-            ].map((card, i) => (
-              <motion.div 
-                key={card.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="group p-1 bg-white rounded-[3rem] border border-slate-200 overflow-hidden hover:border-cyan-500 transition-all duration-500 shadow-xl shadow-slate-200/50"
-              >
-                <div className="relative h-96 rounded-[2.8rem] overflow-hidden mb-8">
-                  <Image src={card.img} alt={card.title} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
-                </div>
-                <div className="p-8 space-y-4">
-                  <h3 className="text-3xl font-black text-slate-950 uppercase italic tracking-tighter">{card.title}</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">{card.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          PRICING SECTION
-          ───────────────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-40 px-12 bg-slate-50 relative overflow-hidden" aria-label="Pricing Tiers">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      {/* ─── PRICING SECTION ─── */}
+      <section id="pricing" className="py-40 px-12 bg-white relative overflow-hidden" aria-label="Pricing Tiers">
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-8 mb-24">
-            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white border border-slate-100 rounded-full shadow-md">
+            <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-100 rounded-full shadow-md">
               <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Sovereign Access Tiers</span>
             </div>
-            <h2 className="text-[7vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">Select Your <br /><span className="text-slate-300">Protocol</span></h2>
-            <p className="text-xl font-medium text-slate-500 max-w-3xl mx-auto leading-relaxed">
-              From independent traders to hedge funds — every tier delivers sovereign-grade intelligence.
-            </p>
+            <h2 className="text-[10vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter text-center">Select Your <br /><span className="text-slate-300">Protocol</span></h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {PRICING_TIERS.map((tier, i) => (
@@ -969,130 +523,52 @@ export function WhaleAlertProWhite() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────
-          FAQ SECTION
-          ───────────────────────────────────────────────────────────── */}
-      <section id="faq" className="py-40 px-12 relative" aria-label="Frequently Asked Questions">
+      {/* ─── FAQ SECTION ─── */}
+      <section id="faq" className="py-40 px-12 bg-slate-50 border-t border-slate-100">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center space-y-8 mb-24">
-            <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-100 rounded-full shadow-md">
-              <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Forensic Intelligence FAQ</span>
+            <div className="text-center mb-24 space-y-6">
+                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-slate-400 italic">Operational Protocol</span>
+                <h2 className="text-7xl font-black text-slate-950 uppercase italic tracking-tighter">System FAQ</h2>
             </div>
-            <h2 className="text-[7vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">Sovereign <br /><span className="text-slate-300">Answers</span></h2>
-          </div>
-          <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden p-12">
-            {FAQS_DATA.map((item, i) => (
-              <FAQItem key={i} q={item.q} a={item.a} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          FINAL ACTION
-          ───────────────────────────────────────────────────────────── */}
-      <section id="access" className="min-h-screen flex items-center justify-center relative bg-white overflow-hidden py-32 wave-surface wave-surface-strong">
-        <div className="absolute inset-0 opacity-20 transition-all duration-1000">
-          <Image src={LANDING_ASSETS.intelligence} alt="Intelligence" fill className="object-cover saturate-0 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/40 to-white" />
-        </div>
-        
-        <div className="relative z-10 text-center space-y-20 max-w-6xl px-6">
-          <motion.h2 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            className="text-[10vw] font-black leading-[0.8] tracking-tighter uppercase italic text-slate-950 px-4"
-          >
-            Execute Your <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-indigo-600">Dominance</span>
-          </motion.h2>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 pt-10">
-            {/* Primary CTA: smart-routed */}
-            <button
-              onClick={handleEnterTerminal}
-              className="group px-16 py-8 bg-slate-950 text-white rounded-[2rem] text-xl font-black uppercase tracking-[0.4em] hover:bg-black hover:scale-105 transition-all shadow-2xl shadow-slate-300 flex items-center gap-8"
-            >
-              {mounted && isConnected ? (
-                <>
-                  Enter Dashboard
-                  <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
-                </>
-              ) : (
-                <>
-                  Initialize Terminal
-                  <ArrowRight className="group-hover:translate-x-4 transition-transform" />
-                </>
-              )}
-            </button>
-            <a href="#pricing" className="px-12 py-6 border-2 border-slate-200 text-slate-500 rounded-[2rem] text-sm font-black uppercase tracking-[0.3em] hover:border-slate-400 hover:text-slate-950 transition-all">
-              View Pricing
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          FOOTER
-          ───────────────────────────────────────────────────────────── */}
-      <footer className="relative py-32 px-12 border-t border-slate-100 bg-white overflow-hidden wave-surface">
-        <div className="max-w-7xl mx-auto space-y-24 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-20">
-            <div className="space-y-8 max-w-sm">
-               <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 bg-slate-950 rounded-xl flex items-center justify-center">
-                   <Landmark size={16} className="text-white" />
-                 </div>
-                 <span className="text-xl font-black tracking-tighter uppercase italic text-slate-950">Whale Alert Network Pro</span>
-               </div>
-               <p className="text-sm font-medium text-slate-400 leading-relaxed uppercase tracking-wider">
-                 Empowering institutional traders with sub-millisecond on-chain intelligence and sovereign forensic depth.
-               </p>
-               <div className="flex gap-4">
-                  {['Twitter', 'Discord', 'Telegram'].map(social => (
-                    <div key={social} className="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-950 hover:text-white transition-all cursor-pointer">
-                      <Globe size={16} />
+            
+            <div className="space-y-4">
+                {[
+                    { q: "Is the data really live?", a: "Our proprietary node network streams mempool data with a latency of under 100ms, ensuring you see institutional moves before they are confirmed on-chain." },
+                    { q: "How is my privacy protected?", a: "We use E2EE and ZK-privacy layers. We never store your wallet's private keys, and all session data is cryptographically ephemeral." },
+                    { q: "Can I cancel my tier at any time?", a: "Yes. All subscriptions are handled via smart contracts (or SEPA), and can be modified or terminated instantly through your dashboard." }
+                ].map((item, i) => (
+                    <div key={i} className="bg-white border border-slate-100 rounded-[2.5rem] p-10 hover:border-slate-300 transition-all">
+                        <h3 className="text-xl font-black uppercase italic tracking-tighter mb-4">{item.q}</h3>
+                        <p className="text-slate-500 font-medium leading-relaxed">{item.a}</p>
                     </div>
-                  ))}
-               </div>
+                ))}
             </div>
+        </div>
+      </section>
 
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-20">
-              <div className="space-y-6">
-                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-900 italic">Infrastructure</h4>
-                 <div className="flex flex-col gap-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                    <Link href="/developers" className="hover:text-cyan-600">API Documentation</Link>
-                    <Link href="/status" className="hover:text-cyan-600">Network Status</Link>
-                    <Link href="/security" className="hover:text-cyan-600">Forensic Audits</Link>
-                 </div>
-              </div>
-              <div className="space-y-6">
-                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-900 italic">Participation</h4>
-                 <div className="flex flex-col gap-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                    <Link href="/vip" className="hover:text-cyan-600">Execution Terminal</Link>
-                    <Link href="/portfolio" className="hover:text-cyan-600">Fusion Portfolio</Link>
-                    <Link href="/governance" className="hover:text-cyan-600">DAO Governance</Link>
-                 </div>
-              </div>
-              <div className="space-y-6">
-                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-900 italic">Legal Identity</h4>
-                 <div className="flex flex-col gap-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                    <Link href="/terms" className="hover:text-cyan-600">Service Terms</Link>
-                    <Link href="/privacy" className="hover:text-cyan-600">Privacy Protocol</Link>
-                    <Link href="/support" className="hover:text-cyan-600">Forensic Support</Link>
-                 </div>
-              </div>
+      {/* ─── FOOTER BAR ─── */}
+      <footer className="py-20 px-12 border-t border-slate-100 bg-white">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="flex items-center gap-6">
+                <div className="relative w-10 h-10">
+                    <Image src="/official-whale-monochrome.png" alt="Sovereign Whale" fill className="object-contain" />
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-sm font-black uppercase tracking-tighter">Whale Alert Network</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Sovereign Submission Final</span>
+                </div>
             </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row justify-between items-center pt-20 border-t border-slate-50 text-[10px] font-black uppercase tracking-[0.5em] text-slate-300">
-            <div>© 2026 Whale Alert Network Pro — Sovereign Institutional Vanguard</div>
-            <div className="flex gap-10 mt-10 md:mt-0">
-               <span>Optimal Performance (240Hz)</span>
-               <span className="text-cyan-600">Lanzadera Submission Final</span>
+            
+            <div className="flex items-center gap-12">
+                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">© 2026 atfortyseven-creations</span>
+                <div className="flex items-center gap-6">
+                    <a href="#" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-950 transition-colors">Telegram</a>
+                    <a href="#" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-950 transition-colors">Twitter</a>
+                </div>
             </div>
-          </div>
         </div>
       </footer>
+
     </div>
   );
 }

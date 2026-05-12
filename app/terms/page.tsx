@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Gavel, Globe, Zap, AlertTriangle, Scale, ShieldCheck, Database, Network, Key, Terminal, FileText, Cpu, Server, Fingerprint, Lock } from 'lucide-react';
+import { SovereignFooter } from '@/components/landing/SovereignFooter';
 
 export default function TermsPage() {
     return (
@@ -213,14 +214,9 @@ export default function TermsPage() {
 
                 </div>
 
-                {/* ── FOOTER MARK ── */}
-                <div className="w-full flex flex-col items-center justify-center mt-40 pt-16 border-t border-black/10">
-                    <Globe className="mb-6 text-black/20" size={48} />
-                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold text-center text-black/40">
-                        Sovereign Master Node · Legal Compendium L-1 · Absolute Finality
-                    </p>
                 </div>
             </div>
+            <SovereignFooter />
         </div>
     );
 }

@@ -267,7 +267,7 @@ export function NewsTerminal() {
                         <ChevronLeft size={18} />
                       </button>
                       <div className="font-mono text-[9px] uppercase tracking-[0.2em] font-semibold text-black/40">
-                        Global Intelligence Network
+                        {/* Global Intelligence Network - Removed for minimalism */}
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -288,9 +288,6 @@ export function NewsTerminal() {
                   {/* Header */}
                   <div className="px-6 md:px-12 pt-16 pb-12 max-w-4xl mx-auto">
                     <div className="flex items-center gap-3 mb-6">
-                      <span className="px-2 py-1 border border-[#0044CC]/20 text-[#0044CC] font-mono text-[10px] uppercase tracking-widest font-bold rounded-sm">
-                        Executive Brief
-                      </span>
                       <span className="font-mono text-[10px] uppercase tracking-widest text-black/40 flex items-center gap-1.5">
                         <Globe size={11} /> {selected.source}
                       </span>
@@ -307,24 +304,6 @@ export function NewsTerminal() {
                       <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/50">
                         <Clock size={12} /> {estimateReadTime(selected.description ?? '')} min read
                       </div>
-                      {(() => {
-                         const positiveWords = ['surge', 'growth', 'gain', 'bull', 'rally', 'adopt', 'high', 'up', 'approve', 'soar', 'breakout'];
-                         const negativeWords = ['drop', 'fall', 'bear', 'hack', 'loss', 'crash', 'down', 'reject', 'ban', 'plunge', 'scam'];
-                         const textBody = (selected.title + ' ' + (selected.description ?? '')).toLowerCase();
-                         let posCount = 0; let negCount = 0;
-                         positiveWords.forEach(w => { posCount += (textBody.match(new RegExp('\\b'+w+'\\b', 'g')) || []).length; });
-                         negativeWords.forEach(w => { negCount += (textBody.match(new RegExp('\\b'+w+'\\b', 'g')) || []).length; });
-                         let sentiment = 'NEUTRAL';
-                         let sentColor = 'text-black/50 border-black/10';
-                         if (posCount > negCount) { sentiment = 'BULLISH'; sentColor = 'text-emerald-600 border-emerald-600/30'; }
-                         else if (negCount > posCount) { sentiment = 'BEARISH'; sentColor = 'text-rose-600 border-rose-600/30'; }
-                         
-                         return (
-                           <div className={`flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-sm border ${sentColor}`}>
-                             <Activity size={12} /> Semantic Sentiment: {sentiment}
-                           </div>
-                         );
-                      })()}
                     </div>
                   </div>
 

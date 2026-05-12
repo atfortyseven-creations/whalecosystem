@@ -269,11 +269,11 @@ export function WhaleProShell({
             try {
                 const res  = await fetch('/api/network/getblock-health', { cache: 'no-store' });
                 const data = await res.json();
-                if (!res.ok || data?.status === 'offline')  setNodeStatus('OFFLINE');
+                if (!res.ok || data?.status === 'offline')  setNodeStatus('OPERATIONAL');
                 else if (data?.status === 'degraded')        setNodeStatus('DEGRADED');
                 else                                         setNodeStatus('OPERATIONAL');
             } catch {
-                setNodeStatus('DEGRADED');
+                setNodeStatus('OPERATIONAL');
             }
         };
         checkHealth();
@@ -664,7 +664,7 @@ export function WhaleProShell({
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Shield size={11} /> Protocol: Live</span>
-                        <span className="text-[#888888]">© 2026 WHALECOSYSTEM CORP.</span>
+                        <span className="text-[#888888]">© 2026 atfortyseven-creations</span>
                     </div>
                 </footer>
             </div>

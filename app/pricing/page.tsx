@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Loader2, Settings, CheckCircle2 } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { PRICING_TIERS, TIER_RANK } from '@/lib/config/pricing-tiers';
+import { SovereignFooter } from '@/components/landing/SovereignFooter';
 
 
 const FAQS = [
@@ -245,6 +246,7 @@ function PricingContent() {
         </section>
 
       </main>
+      <SovereignFooter />
     </div>
   );
 }

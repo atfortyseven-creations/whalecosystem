@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle, ChevronDown, Activity, Globe, Shield, Zap } fr
 import { PRICING_TIERS } from "@/lib/config/pricing-tiers";
 import { StackableCarousel } from "@/components/ui/StackableCarousel";
 import { motion, AnimatePresence } from "framer-motion";
+import { RemoteLottie } from "@/components/ui/RemoteLottie";
 
 interface Flow {
   txid: string;
@@ -89,14 +90,13 @@ export function MobileManifesto() {
     <div className="relative bg-[#FAFAF8] text-[#0a0a0a] font-sans antialiased overflow-x-hidden min-h-screen selection:bg-black/10">
 
       {/* ── 1. HERO ───────────────────────────────────────────────────────────── */}
-      <section className="px-6 pb-16 pt-safe border-b border-black/5 bg-white" style={{ paddingTop: "max(6rem, env(safe-area-inset-top, 6rem))" }}>
-        <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}>
-          <motion.div variants={FADE_UP} className="flex items-center gap-3 mb-8">
-            <span className="w-2 h-2 rounded-full bg-[#0a0a0a] animate-pulse" />
-            <span className="font-mono text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-              Live Network
-            </span>
-          </motion.div>
+      <section className="px-6 pb-16 pt-safe border-b border-black/5 bg-white relative overflow-hidden" style={{ paddingTop: "max(6rem, env(safe-area-inset-top, 6rem))" }}>
+        {/* Mobile Hero Lottie */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] opacity-[0.04] pointer-events-none">
+            <RemoteLottie path="Earth globe rotating with Seamless loop animation.json" />
+        </div>
+
+        <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }} className="relative z-10">
 
           <motion.h1 variants={FADE_UP} className="text-[48px] sm:text-[56px] font-black tracking-tighter leading-[0.9] uppercase mb-6 text-[#0a0a0a]">
             Whale<br />Alert<br /><span className="text-black/30">Network</span>
@@ -130,9 +130,6 @@ export function MobileManifesto() {
       {/* ── 2. CREATOR'S NOTE ─────────────────────────────────────────────────── */}
       <section className="px-6 py-20 border-b border-black/5 bg-[#FAFAF8]">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP}>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400 block mb-6">
-            Architect's Note
-          </span>
           <div className="space-y-5 font-serif text-[16px] text-[#0a0a0a] leading-[1.8] font-medium">
             <p>
               I built this alone. Not at a fund, not at a startup — from my desk, watching whale wallets move nine figures while retail read the news twenty minutes later. That gap is structural.
@@ -165,10 +162,10 @@ export function MobileManifesto() {
       {/* ── 3. HOW IT WORKS ───────────────────────────────────────────────────── */}
       <section className="px-6 py-20 border-b border-black/5 bg-white">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP}>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400 block mb-8">
-            Engine Mechanics
-          </span>
           <div className="flex flex-col gap-6">
+            <div className="relative w-full aspect-video bg-[#FAFAF8] rounded-3xl border border-black/5 overflow-hidden flex items-center justify-center p-8 mb-4">
+                <RemoteLottie path="Trade.json" className="scale-125" />
+            </div>
             {[
               { n: "01", icon: Zap, title: "Mempool Capture", body: "GetBlock nodes stream pending transaction logs before any block confirmation. Whale-sized transfers get flagged instantly." },
               { n: "02", icon: Activity, title: "Entity Resolution", body: "Known exchange wallets are matched against a curated registry. Unknown wallets are clustered by behavioural footprint." },
@@ -193,7 +190,6 @@ export function MobileManifesto() {
       <section className="py-20 border-b border-black/5 bg-[#FAFAF8] overflow-hidden">
         <div className="px-6 mb-8 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">Network Telemetry</span>
             {!loading && lastUpdated && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-black/5 shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0a0a0a] animate-pulse" />
@@ -235,81 +231,11 @@ export function MobileManifesto() {
         </div>
       </section>
 
-      {/* ── 5. PLANS ──────────────────────────────────────────────────────────── */}
-      <section className="py-20 border-b border-black/5 bg-white">
-        <div className="px-6 mb-12">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400 block mb-4">Access Tiers</span>
-          <h2 className="font-black text-[32px] tracking-tighter uppercase leading-[0.95]">
-            The Right Tier.<br /><span className="text-black/20">For every firm.</span>
-          </h2>
-        </div>
-
-        <div className="px-6 flex flex-col gap-6">
-          {PRICING_TIERS.filter((t) => ["STARTER", "PRO"].includes(t.id)).map((tier) => (
-            <Link key={tier.id} href="/pricing" className={`group relative flex flex-col p-8 rounded-3xl transition-transform active:scale-[0.98] border ${tier.highlight ? "bg-[#0a0a0a] text-white border-black shadow-2xl" : "bg-[#FAFAF8] border-black/5"}`}>
-              {tier.highlight && (
-                <div className="absolute -top-3 right-6 px-4 py-1.5 bg-white text-[#0a0a0a] rounded-full font-mono text-[9px] font-black uppercase tracking-widest shadow-lg">
-                  {tier.badge || "Most Popular"}
-                </div>
-              )}
-              <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] mb-6 opacity-50">{tier.id}</span>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="font-black text-[48px] tracking-tighter leading-none">€{tier.priceMonthly}</span>
-              </div>
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest opacity-40 mb-8 block">EUR / month</span>
-              <p className="font-serif text-[15px] opacity-70 leading-relaxed font-medium mb-8">{tier.tagline}</p>
-              
-              <div className="flex flex-col gap-3">
-                {tier.features.slice(0, 3).map((f) => (
-                  <div key={f.text} className="flex items-start gap-3">
-                    <CheckCircle size={16} className={`mt-0.5 shrink-0 ${tier.highlight ? "text-white" : "text-[#0a0a0a]"}`} />
-                    <span className="font-mono text-[11px] font-bold uppercase tracking-wide opacity-80">{f.text}</span>
-                  </div>
-                ))}
-              </div>
-            </Link>
-          ))}
-          <Link href="/pricing" className="flex items-center justify-center gap-3 w-full h-[56px] mt-4 bg-slate-50 border border-black/5 text-[#0a0a0a] rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] active:bg-slate-100 transition-colors">
-            View All Pricing Details <ArrowRight size={14} />
-          </Link>
-        </div>
-      </section>
-
-      {/* ── 5.5 529-AXIOM SYSTEM (MOBILE) ───────────────────────────────────── */}
-      <section className="bg-[#0a0a0a] text-white">
-        <div className="px-6 py-20">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-white/40 block mb-6">System Architecture</span>
-          <h2 className="font-black text-[32px] tracking-tighter uppercase leading-[0.95] mb-6">
-            529 Axioms.<br /><span className="text-white/30">Zero gaps.</span>
-          </h2>
-          <p className="font-serif text-[16px] text-white/50 leading-relaxed mb-12">
-            29 original axioms + 500 extended elements. Every edge case covered. Production-ready institutional grade infrastructure.
-          </p>
-
-          <div className="flex flex-col gap-4">
-            {[
-              { range: "01–50", label: "TitaniumGate Auth", desc: "X25519 · EdDSA JWT · Redis zero-race · ZK 2FA" },
-              { range: "51–100", label: "Intelligence Engine", desc: "Mempool capture · 7-hop Neo4j · MEV detection" },
-              { range: "151–229", label: "Billing & Compliance", desc: "Atomic upgrade · SEPA · KYC ZK-proof" },
-              { range: "350–449", label: "Analytics & Growth", desc: "Churn prediction · LTV · K-factor mapping" },
-            ].map((p, i) => (
-              <motion.div key={p.range} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { delay: i * 0.1 } } }} className="bg-[#141414] p-6 rounded-2xl border border-white/5 flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                  <span className="font-mono text-[11px] font-black uppercase tracking-[0.15em] text-white">{p.label}</span>
-                </div>
-                <p className="font-serif text-[13px] text-white/40 leading-relaxed pl-4 border-l border-white/5 ml-[3px]">{p.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── 6. CLOSING CTA ────────────────────────────────────────────────────── */}
       <section className="px-6 pt-20 pb-safe" style={{ paddingBottom: "max(5rem, env(safe-area-inset-bottom, 5rem))" }}>
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-full bg-white border border-black/5 shadow-sm flex items-center justify-center mb-8">
-            <Shield size={20} className="text-[#0a0a0a]" />
+          <div className="w-48 h-48 mb-8 opacity-20">
+            <RemoteLottie path="Crypto coins.json" />
           </div>
           <h2 className="text-[28px] font-serif text-[#0a0a0a] leading-tight tracking-tight mb-6">
             The chain never lies. <br /><span className="italic font-light text-slate-500">Read it before the market.</span>
@@ -326,7 +252,6 @@ export function MobileManifesto() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { ArrowRight, Shield, Globe, Cpu, CheckCircle2, Clock, MapPin, DollarSign, Zap, Users, ChevronRight, Mail } from 'lucide-react';
+import { SovereignFooter } from '@/components/landing/SovereignFooter';
 
 export const metadata: Metadata = {
   title: 'Careers | Whale Alert Network',
@@ -214,8 +215,8 @@ export default function CareersPage() {
             <p className="mt-6 text-[11px] text-slate-400 font-bold uppercase tracking-widest">careers@humanidfi.com</p>
           </div>
         </section>
-
       </main>
+      <SovereignFooter />
     </div>
   );
 }

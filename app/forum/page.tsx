@@ -4,6 +4,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
+import { SovereignFooter } from '@/components/landing/SovereignFooter';
 
 function ForumHomeContent() {
   const [topics, setTopics] = useState<any[]>([]);
@@ -145,6 +146,7 @@ function ForumHomeContent() {
         </div>
       </div>
       </div>
+      <SovereignFooter />
     </div>
   );
 }

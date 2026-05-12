@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap, Mic, MicOff, Play, Pause, Wallet } from 'lucide-react';
+import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap, Mic, MicOff, Play, Pause, Wallet, QrCode } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate, discoverNewPeers } from '@/lib/xmtp/client';
@@ -102,10 +102,33 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     }
   }, [activePeer]);
 
-  // Scroll to bottom
+  // Auto-scroll to bottom on new messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
+
+  // MASTER-FIX: Auto-scroll on resize (keyboard open/close) to maintain stability
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isMobile) return;
+    const handleResize = () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    // Also track visualViewport if available for more precision
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+    }
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+      }
+    };
+  }, [isMobile]);
 
   // Handle wallet disconnect
   useEffect(() => {
@@ -438,18 +461,22 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       setClient(realClient);
       await loadConversations();
     } catch (err: any) {
-      console.error('Init Error:', err);
-      if (err?.name === 'ChunkLoadError' || err?.message?.includes('Loading chunk')) {
-        setInitError('XMTP module failed to load. Please reload the page and try again.');
-        setTimeout(() => { try { window.location.reload(); } catch {} }, 3000);
-      } else if (err?.code === 4001 || err?.message?.toLowerCase().includes('reject')) {
-        setInitError('Signature rejected. You must sign the authorization to establish the secure channel.');
-      } else if (err?.message === 'QR_SESSION_RESTRICTION') {
-        setInitError('Whale Chat requires a direct wallet connection for end-to-end encryption. QR-linked sessions are restricted to read-only dashboard access.');
-      } else if (err?.message?.includes('No active wallet')) {
-        setInitError('No live wallet detected. Please connect your wallet directly (not via QR session) to activate Whale Chat.');
+      console.error('[WhaleChat] Init Error:', err);
+      
+      const errorMsg = err?.message || '';
+      
+      if (err?.name === 'ChunkLoadError' || errorMsg.includes('Loading chunk')) {
+        setInitError('Secure messaging module failed to load. Please check your network connection and reload the terminal.');
+      } else if (err?.code === 4001 || errorMsg.toLowerCase().includes('reject')) {
+        setInitError('Identity authorization rejected. You must approve the secure channel signature to proceed.');
+      } else if (errorMsg === 'QR_SESSION_RESTRICTION') {
+        setInitError('Whale Chat requires a direct wallet connection for end-to-end encryption. Mobile QR-linked sessions are restricted to read-only dashboard access.');
+      } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector')) {
+        setInitError('Active wallet connection lost. Please ensure your wallet app is open and synchronized with this device.');
+      } else if (errorMsg.includes('WASM') || errorMsg.includes('wasm')) {
+        setInitError('Cryptographic WASM engine failure. This is often caused by browser security extensions. Please try in a clean session.');
       } else {
-        setInitError('Failed to initialize secure communications channel.');
+        setInitError(`Sovereign tunnel failure: ${errorMsg.slice(0, 50) || 'Unknown Protocol Error'}. Please retry or check network status.`);
       }
     } finally {
       setIsInitializing(false);
@@ -780,57 +807,52 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   if (!client) {
     return (
       <div className="flex flex-col h-full min-h-[500px] bg-white rounded-2xl border border-black/5 shadow-sm overflow-y-auto">
-        {/* Protocol Header */}
-        <div className="flex items-center gap-3 px-6 py-4 border-b border-black/6 shrink-0">
-          <div className="relative">
-          </div>
-          <div>
-            <h3 className="text-[11px] font-black uppercase tracking-widest text-[#050505]">Whale Chat</h3>
-            <p className="text-[9px] text-black/40 font-mono uppercase tracking-widest mt-0.5">XMTP Network</p>
+        {/* Minimalist Protocol Header */}
+        <div className="flex items-center justify-center px-6 py-8 shrink-0">
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-1 h-1 rounded-full bg-[#9945FF] animate-pulse" />
           </div>
         </div>
 
-        {/* Academic Protocol Explanation */}
-        <div className="flex-1 px-6 py-5 flex flex-col gap-5">
-          <div className="prose-xs text-[12px] text-black/70 leading-relaxed font-sans space-y-3 max-w-2xl">
-            <p>
-              <strong className="text-[#050505] font-black">Whale Chat</strong> is a decentralised, peer-to-peer encrypted messaging module built upon the{' '}
-              <span className="font-black text-[#9945FF]">XMTP (Extensible Message Transport Protocol)</span> network.
-              Unlike conventional messaging architectures that route communications through centralised intermediaries,
-              Whale Chat establishes direct cryptographic channels between Ethereum wallet identities, ensuring that
-              message content is mathematically inaccessible to any third party — including the platform itself.
+        {/* Hero Marketing Section */}
+        <div className="flex-1 px-8 py-10 flex flex-col items-center justify-center text-center gap-8">
+          <div className="relative group">
+            {/* Ambient glow around the whale */}
+            <div className="absolute inset-0 bg-[#9945FF]/20 blur-[60px] rounded-full scale-150 animate-pulse" />
+            <img 
+              src="/official-whale.png" 
+              alt="Sovereign Whale" 
+              className="relative w-48 h-48 md:w-56 md:h-56 object-contain filter drop-shadow-[0_0_30px_rgba(153,69,255,0.3)] group-hover:scale-105 transition-transform duration-700 ease-out" 
+            />
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-[#050505] text-[14px] font-medium tracking-tight">
+              "¡ Your Whale Chat is ready !"
             </p>
-            <p>
-              Each participant&apos;s messaging identity is derived deterministically from their Ethereum private key
-              via a <strong className="text-[#050505]">gasless ECDSA signature</strong>. This operation generates
-              a set of session encryption keys that are stored exclusively in your browser&apos;s IndexedDB, never
-              transmitted to any server. All messages are encrypted with <strong className="text-[#050505]">double-ratchet
-              forward secrecy</strong> before leaving your device and can only be decrypted by the recipient&apos;s
-              private key material.
-            </p>
-            <p>
-              Upon your first activation, a single wallet signature is requested to derive these keys.
-              Subsequent sessions are fully automatic — no further signatures are required, as the keys
-              persist securely in your local browser storage.
+            <p className="text-black/30 text-[10px] font-mono uppercase tracking-[0.3em]">
+              Point-to-Point Encryption
             </p>
           </div>
 
-          {/* Key properties */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        </div>
+
+          {/* Key properties - P2P Marketing Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 px-6 pb-8">
             {[
-              { label: 'No Server Storage', desc: 'Messages are never stored on any centralised server. The network is peer-to-peer.' },
-              { label: 'Forward Secrecy', desc: 'Each session uses ephemeral key derivation. Compromise of one key cannot expose historical messages.' },
-              { label: 'Gasless Identity', desc: 'Your messaging identity is derived via a costless signature — no gas fee, no on-chain transaction.' },
+              { label: '0 Server Storage', desc: 'Messages stored only on your device. Real P2P.' },
+              { label: 'Forward Secrecy', desc: 'Each session is unique. Total mathematical privacy.' },
+              { label: 'Gasless Auth', desc: 'Free cryptographic identity. No network fees.' },
             ].map((item) => (
-              <div key={item.label} className="p-3 rounded-xl border border-black/8 bg-black/[0.02]">
-                <p className="text-[9px] font-black uppercase tracking-widest text-[#9945FF] mb-1">{item.label}</p>
-                <p className="text-[10px] text-black/50 leading-relaxed font-mono">{item.desc}</p>
+              <div key={item.label} className="p-4 rounded-2xl border border-black/5 bg-black/[0.01] hover:bg-black/[0.02] transition-colors">
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#9945FF] mb-1.5">{item.label}</p>
+                <p className="text-[10px] text-black/40 leading-snug font-mono uppercase tracking-wider">{item.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Status / Action */}
-          <div className="mt-auto pt-4">
+          <div className="mt-auto pt-6 px-6 pb-6">
             {initError ? (
               <div className="flex flex-col gap-3">
                 <div className="bg-red-50 text-red-700 text-[11px] font-mono p-4 rounded-xl border border-red-100 leading-relaxed">
@@ -839,7 +861,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <button
                   onClick={initClient}
                   disabled={isInitializing}
-                  className="self-start px-8 py-3.5 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_20px_rgba(153,69,255,0.4)] transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                  className="w-full px-8 py-4 rounded-2xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_25px_rgba(153,69,255,0.4)] transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
                 >
                   {isInitializing ? (
                     <><Activity size={14} className="animate-spin" /> Initialising...</>
@@ -849,44 +871,24 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 </button>
               </div>
             ) : isInitializing ? (
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-[#9945FF]/5 border border-[#9945FF]/15">
-                <Activity size={18} className="text-[#9945FF] animate-spin shrink-0" />
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-[#9945FF]">Establishing Secure Channel</p>
-                  <p className="text-[9px] text-black/40 font-mono mt-0.5">Retrieving session keys from local storage. If this is your first session, approve the signature prompt in your wallet.</p>
-                </div>
-              </div>
-            ) : isSovereignHandshake ? (
-              <div className="flex flex-col gap-3">
-                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
-                    Limited Handshake Session
-                  You are connected via a QR link. Whale Chat requires a direct wallet connection to sign and derive encryption keys. Please connect your wallet directly to this device to enable messaging.
-                </div>
-                <button
-                  onClick={() => openAppKit()}
-                  className="w-full px-8 py-4 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95"
-                >
-                  <Wallet size={14} /> Connect Wallet Directly
-                </button>
-                <p className="text-[9px] text-black/30 font-mono text-center uppercase tracking-widest">
-                  Establishes a direct cryptographic link for E2EE
-                </p>
+              <div className="flex flex-col items-center gap-4">
+                <Activity size={18} className="text-[#9945FF] animate-spin" />
+                <p className="text-[10px] text-black/30 font-mono uppercase tracking-widest">Establishing Connection...</p>
               </div>
             ) : (
-              // Mobile: auto-init is skipped — show a prominent manual trigger button
               <button
                 onClick={initClient}
                 disabled={isInitializing}
-                className="w-full px-8 py-4 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_20px_rgba(153,69,255,0.4)] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                className="group relative px-12 py-4 rounded-full bg-white border border-black/10 text-[#050505] text-[11px] font-bold uppercase tracking-widest hover:border-[#9945FF] hover:text-[#9945FF] transition-all active:scale-95 disabled:opacity-50"
               >
-                <Zap size={14} /> Activate Secure Channel
+                Access Channel
+                <div className="absolute inset-0 rounded-full bg-[#9945FF]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             )}
           </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
   const shortAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
@@ -897,30 +899,29 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       {/* ── Sidebar: Conversation List ── */}
       <div className={`${showList ? 'flex' : 'hidden md:flex'} w-full md:w-72 flex-col border-r border-black/6 bg-[#FAFAFA]`}>
         <div className="p-4 border-b border-black/6">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-            </div>
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <button
-                  onClick={() => setShowScanner(true)}
-                  className={`flex items-center gap-1.5 rounded-lg bg-black/5 hover:bg-black/10 font-bold uppercase tracking-widest text-black/60 transition-colors ${isMobile ? 'px-4 py-2.5 text-[11px]' : 'px-2.5 py-1.5 text-[9px]'}`}
-                  title="Scan Peer QR"
+                onClick={() => setShowScanner(true)}
+                className="p-2.5 rounded-xl bg-black/[0.03] text-black/40 hover:bg-black/5 transition-all"
+                title="Scan Peer QR"
               >
-                  <Camera size={isMobile ? 14 : 12} /> Scan
+                <Camera size={18} />
               </button>
               <button
-                  onClick={() => setShowMyQR(true)}
-                  className={`flex items-center gap-1.5 rounded-lg bg-black/5 hover:bg-black/10 font-bold uppercase tracking-widest text-black/60 transition-colors ${isMobile ? 'px-4 py-2.5 text-[11px]' : 'px-2.5 py-1.5 text-[9px]'}`}
-                  title="Show My QR"
+                onClick={() => setShowMyQR(true)}
+                className="p-2.5 rounded-xl bg-black/[0.03] text-black/40 hover:bg-black/5 transition-all"
+                title="Show My QR"
               >
-                  My QR
+                <QrCode size={18} />
               </button>
             </div>
           </div>
+
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="0x... or .eth"
+              placeholder="Address or .eth"
               value={peerInput}
               onChange={e => setPeerInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleStartConversation()}
@@ -982,19 +983,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <div className="flex flex-col">
                   <span className="text-[11px] font-bold text-[#050505] font-mono flex items-center gap-1.5">
                     {shortAddr(activePeer!)}
-                    {peerStatus.online && <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" title="Online" />}
+                    {peerStatus.online && <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />}
                   </span>
-                  <span className="text-[9px] font-medium flex items-center gap-1">
-                    {peerStatus.isTyping ? (
-                        <span className="text-[#9945FF] font-black tracking-widest uppercase animate-pulse">Decrypting Keystrokes...</span>
-                    ) : peerStatus.online ? (
-                        <span className="text-green-600">Active Connection</span>
-                    ) : peerStatus.lastSeen ? (
-                        <span className="text-black/40">Last seen: {new Date(peerStatus.lastSeen!).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                    ) : (
-                        <span className="text-black/40">Secured Channel</span>
-                    )}
-                  </span>
+                  {peerStatus.isTyping && (
+                    <span className="text-[9px] text-[#9945FF] font-black tracking-widest uppercase animate-pulse">Decrypting...</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1011,21 +1004,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   <div className="flex-1 flex flex-col items-center justify-center">
                     <div className="flex flex-col items-center max-w-[280px] text-center gap-6">
                       <div className="flex flex-col items-center opacity-40">
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Túnel Establecido</p>
-                      </div>
-
-                      <div className="w-full bg-black/[0.02] border border-black/[0.05] rounded-xl p-5 text-left">
-                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505] mb-4 border-b border-black/5 pb-2">Sync Requirement</p>
-                        <div className="space-y-4">
-                          <div className="flex gap-3">
-                            <span className="text-[9px] font-bold text-black/20 mt-0.5">01</span>
-                            <p className="text-[10px] text-black/40 leading-relaxed uppercase tracking-wider">Make sure the other person has also added your address.</p>
-                          </div>
-                          <div className="flex gap-3">
-                            <span className="text-[9px] font-bold text-black/20 mt-0.5">02</span>
-                            <p className="text-[10px] text-black/40 leading-relaxed uppercase tracking-wider">Send a message to make the chat appear for the other person.</p>
-                          </div>
-                        </div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#050505]">Tunnel Established</p>
                       </div>
                     </div>
                   </div>
@@ -1124,7 +1103,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   inputMode="text"
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
-                  placeholder="Draft encrypted message..."
+                  placeholder="Encrypted message..."
                   className="flex-1 bg-black/[0.03] border border-black/8 rounded-xl px-4 py-3 text-[#050505] focus:outline-none focus:border-[#9945FF]/30 placeholder:text-black/30"
                   style={{ WebkitAppearance: 'none', fontSize: '16px', lineHeight: '1.4' }}
                 />
@@ -1143,66 +1122,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             <div className="flex flex-col items-center gap-8 p-8 max-w-sm text-center select-none">
 
               {/* Logo + Bubble row */}
-              <div className="flex items-end gap-3">
-                {/* Official Logo */}
-                <img
-                  src="/official-whale.png"
-                  alt="Whale Alert Network"
-                  className="w-24 h-24 object-contain"
-                />
-                {/* Speech Bubble */}
-                <div className="relative mb-2">
-                  <div className="bg-black/[0.04] border border-black/[0.07] rounded-2xl rounded-bl-none px-4 py-3 text-left">
-                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#050505]/70 whitespace-nowrap">Whale Chat</p>
-                    <span className="text-[#00C076] font-mono font-bold uppercase tracking-widest text-[9px]">Connected</span>
-                  </div>
-                  {/* Bubble tail */}
-                  <div className="absolute -bottom-2 left-0 w-3 h-3 bg-black/[0.04] border-l border-b border-black/[0.07]"
-                    style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
-                </div>
-              </div>
-
-              {/* Welcome text */}
-              <div className="flex flex-col items-center gap-2">
-                <h2
-                  className="text-[30px] font-black text-[#050505] leading-[1.1] tracking-tight"
-                  style={{ fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}
-                >
-                  Welcome to<br />Whale Chat!
-                </h2>
-                <p className="text-[11px] text-black/35 leading-relaxed max-w-[240px]">
-                  Enter a wallet address to open a secure encrypted channel.
-                </p>
-              </div>
-
-              {/* Protocol Steps */}
-              <div className="w-full max-w-[280px] bg-black/[0.02] border border-black/[0.05] rounded-xl p-5 text-left">
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505] mb-4 border-b border-black/5 pb-2">How to Chat</p>
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <span className="text-[9px] font-bold text-black/20 mt-0.5">01</span>
-                    <p className="text-[10px] text-black/50 leading-relaxed uppercase tracking-wider">Both people must click activate and sign the request in their wallet.</p>
-                  </div>
-                  <div className="flex gap-3">
-                    <span className="text-[9px] font-bold text-black/20 mt-0.5">02</span>
-                    <p className="text-[10px] text-black/50 leading-relaxed uppercase tracking-wider">Add the other person&apos;s address or scan their QR code.</p>
-                  </div>
-                  <div className="flex gap-3">
-                    <span className="text-[9px] font-bold text-black/20 mt-0.5">03</span>
-                    <p className="text-[10px] text-black/50 leading-relaxed uppercase tracking-wider">Both people must send a message to start the conversation.</p>
-                  </div>
-                  <div className="flex gap-3">
-                    <span className="text-[9px] font-bold text-black/20 mt-0.5">04</span>
-                    <p className="text-[10px] text-black/50 leading-relaxed uppercase tracking-wider">Once both have sent a message, the chat will work in real time.</p>
-                  </div>
-                </div>
-              </div>
-
               {/* Single minimal status row */}
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/20" />
-                <span className="text-[9px] font-mono uppercase tracking-widest text-black/30">Whale Alert Network</span>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/20" />
+              <div className="flex flex-col items-center gap-6">
+                <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/20">Sovereign Communication</p>
               </div>
 
             </div>

@@ -2,6 +2,7 @@ import React from "react";
 import { getAcademyData } from "@/app/actions/academy-actions";
 import { AcademyInteractiveEngine } from "@/components/academy/AcademyInteractiveEngine";
 import { TOPIC_CATEGORIES } from "@/lib/data/academy-curriculum";
+import { SovereignFooter } from "@/components/landing/SovereignFooter";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export default async function AcademyPage() {
                 isSeeded={isDatabaseSeeded}
                 expectedCategories={TOPIC_CATEGORIES.length} 
             />
+            <SovereignFooter />
         </div>
     );
 }

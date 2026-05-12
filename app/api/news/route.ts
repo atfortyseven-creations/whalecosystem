@@ -78,6 +78,15 @@ function generateBtcSentiment(title: string) {
   };
 }
 
+function cleanAnalysis(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/Executive Brief|Global Intelligence Network|WAN Intelligence Node|Semantic Sentiment:\s*\w+|Executive Assessment Frame|Systemic Weight|Market Trajectory|Domain Vector|Macro-Institutional/gi, "")
+    .replace(/\d+\s*\/100/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 /**
  * Institutional Analysis Generator (Expert Rotation) - Extended Length
  */
@@ -157,7 +166,7 @@ async function fetchRSSFeed(url: string, sourceName: string): Promise<UINewsArti
       articles.push({
         id:          `rss-${Buffer.from(link).toString('base64').slice(0, 16)}`,
         title:       cleanTitle,
-        description: generateDeepAnalysis(cleanTitle, sourceName),
+        description: cleanAnalysis(generateDeepAnalysis(cleanTitle, sourceName)),
         date:        pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
         url:         link,
         source:      sourceName,
@@ -209,10 +218,10 @@ function padTo300(articles: UINewsArticle[]) {
       {
         id: 'custom-1',
         title: 'Structural Decoupling in Layer 1 Nodes and MEV Extraction Vectors',
-        description: 'An exhaustive quantitative analysis of network topology across Ethereum reveals a statistically significant divergence in Maximal Extractable Value (MEV) extraction rates. Over the past quarter, our proprietary telemetry has observed that elite institutional entities and quantitative hedge funds have systematically routed their capital flows through private RPC endpoints and decentralized dark pools (such as Flashbots Protect and its analogues). This strategic routing has effectively isolated over $430 million in cross-border transactions from the public mempool.\n\n## The Silent Migration\n\nThis behavior is not serendipitous; rather, it represents a structural paradigm shift in blockchain market microstructure. Historically, the execution of large capital blocks was inherently subject to statistical arbitrage and "sandwich" attacks orchestrated by algorithmic searchers. However, the massive migration toward asynchronous settlement channels conclusively indicates that institutional-grade capital now prioritizes slippage mitigation and trade obfuscation over immediate inclusion in the subsequent block.\n\n> "The transition from public mempool execution to private order flow directly undermines the foundational assumption of transparent liquidity on Layer 1, demanding entirely new heuristic models for volume analysis."\n\n## Economic Repercussions\n\nThe economic impact of this decoupling is fundamentally bidirectional. First, it erodes the aggregate profitability of public, good-faith validators who rely substantially on MEV-derived tips to sustain operational margins in an environment of diminishing staking yields. Second, it generates a severe information asymmetry: competing pricing models that base their analytics exclusively on the public mempool are losing visibility over true macroeconomic accumulation and distribution flows.\n\nFor the corporate operator, the conclusion is unequivocal. Hidden capital flows are masking the true volume of structural support and resistance in major digital assets. We imperatively recommend that treasuries adjust their market impact models and incorporate a heuristic discount coefficient for all on-chain volume metrics that do not formally account for private block flows. Furthermore, algorithmic trading systems must be recalibrated to recognize phantom liquidity spikes that evaporate milliseconds before execution, a hallmark of advanced MEV spoofing tactics now prevalent in the public domain.',
+        description: cleanAnalysis('An exhaustive quantitative analysis of network topology across Ethereum reveals a statistically significant divergence in Maximal Extractable Value (MEV) extraction rates. Over the past quarter, our proprietary telemetry has observed that elite institutional entities and quantitative hedge funds have systematically routed their capital flows through private RPC endpoints and decentralized dark pools (such as Flashbots Protect and its analogues). This strategic routing has effectively isolated over $430 million in cross-border transactions from the public mempool.\n\n## The Silent Migration\n\nThis behavior is not serendipitous; rather, it represents a structural paradigm shift in blockchain market microstructure. Historically, the execution of large capital blocks was inherently subject to statistical arbitrage and "sandwich" attacks orchestrated by algorithmic searchers. However, the massive migration toward asynchronous settlement channels conclusively indicates that institutional-grade capital now prioritizes slippage mitigation and trade obfuscation over immediate inclusion in the subsequent block.\n\n> "The transition from public mempool execution to private order flow directly undermines the foundational assumption of transparent liquidity on Layer 1, demanding entirely new heuristic models for volume analysis."\n\n## Economic Repercussions\n\nThe economic impact of this decoupling is fundamentally bidirectional. First, it erodes the aggregate profitability of public, good-faith validators who rely substantially on MEV-derived tips to sustain operational margins in an environment of diminishing staking yields. Second, it generates a severe information asymmetry: competing pricing models that base their analytics exclusively on the public mempool are losing visibility over true macroeconomic accumulation and distribution flows.\n\nFor the corporate operator, the conclusion is unequivocal. Hidden capital flows are masking the true volume of structural support and resistance in major digital assets. We imperatively recommend that treasuries adjust their market impact models and incorporate a heuristic discount coefficient for all on-chain volume metrics that do not formally account for private block flows. Furthermore, algorithmic trading systems must be recalibrated to recognize phantom liquidity spikes that evaporate milliseconds before execution, a hallmark of advanced MEV spoofing tactics now prevalent in the public domain.'),
         date: d,
         url: 'https://whalealert.network/news/mev-extraction-anomaly',
-        source: 'WAN Intelligence Node',
+        source: 'Sovereign Node',
         sentiment: 'bearish',
         btcBullish: 34,
         btcBearish: 66
@@ -220,10 +229,10 @@ function padTo300(articles: UINewsArticle[]) {
       {
         id: 'custom-2',
         title: 'Institutional Integration of ZK-Rollup Consensus and Capital Obfuscation',
-        description: 'The rapid maturation of Zero-Knowledge (ZK) infrastructure is facilitating a massive, silent transition of tier-1 capital toward Layer 2 (L2) networks. Our rigorous cross-chain analysis certifies that protocols based on ZK-Rollup technology are processing corporate settlement volumes at a rate 3.4 times higher than the historical year-over-year average. This parabolic adoption is not primarily driven by the well-documented compression of gas fees, but rather by the unbreakable mathematical capacity to obfuscate critical transactional metadata prior to final consolidation on the mainnet.\n\nFrom an analytical perspective grounded in corporate game theory, the ability to execute massive portfolio rebalancing strategies without revealing specific asset weightings to forensic analysis firms provides a competitive advantage of colossal magnitude. Cryptographic validity proofs (SNARKs and STARKs) allow hedge funds and decentralized market makers, for the first time, to mathematically demonstrate the solvency of their audited reserves without exposing the tactical directionality of their active operations on the limit order book.\n\nOur intelligence projects that this emerging dynamic will irreversibly fragment the crystalline transparency for which Layer 1 (L1) has historically been characterized. As protocols such as Account Abstraction (ERC-4337) and ZK proof aggregation become standardized across the industry, the traditional heuristics employed for whale tracking will suffer an estimated 40% degradation in precision over the next 18 months.\n\nTherefore, it is fundamental that financial institutions and risk analysts proactively adapt their surveillance and monitoring infrastructures. The new market standard will demand analytical systems capable of basing their conclusions on aggregated cryptographic proofs, gradually discarding deterministic heuristics linked to basic address clustering. Quantitative models must evolve to interpret zero-knowledge state transitions as primary indicators of macroeconomic capital flows.',
+        description: cleanAnalysis('The rapid maturation of Zero-Knowledge (ZK) infrastructure is facilitating a massive, silent transition of tier-1 capital toward Layer 2 (L2) networks. Our rigorous cross-chain analysis certifies that protocols based on ZK-Rollup technology are processing corporate settlement volumes at a rate 3.4 times higher than the historical year-over-year average. This parabolic adoption is not primarily driven by the well-documented compression of gas fees, but rather by the unbreakable mathematical capacity to obfuscate critical transactional metadata prior to final consolidation on the mainnet.\n\nFrom an analytical perspective grounded in corporate game theory, the ability to execute massive portfolio rebalancing strategies without revealing specific asset weightings to forensic analysis firms provides a competitive advantage of colossal magnitude. Cryptographic validity proofs (SNARKs and STARKs) allow hedge funds and decentralized market makers, for the first time, to mathematically demonstrate the solvency of their audited reserves without exposing the tactical directionality of their active operations on the limit order book.\n\nOur intelligence projects that this emerging dynamic will irreversibly fragment the crystalline transparency for which Layer 1 (L1) has historically been characterized. As protocols such as Account Abstraction (ERC-4337) and ZK proof aggregation become standardized across the industry, the traditional heuristics employed for whale tracking will suffer an estimated 40% degradation in precision over the next 18 months.\n\nTherefore, it is fundamental that financial institutions and risk analysts proactively adapt their surveillance and monitoring infrastructures. The new market standard will demand analytical systems capable of basing their conclusions on aggregated cryptographic proofs, gradually discarding deterministic heuristics linked to basic address clustering. Quantitative models must evolve to interpret zero-knowledge state transitions as primary indicators of macroeconomic capital flows.'),
         date: new Date(Date.now() - 3600000).toISOString(),
         url: 'https://whalealert.network/news/zk-obfuscation',
-        source: 'WAN Base Layer',
+        source: 'Sovereign Layer',
         sentiment: 'bullish',
         btcBullish: 82,
         btcBearish: 18
@@ -292,7 +301,7 @@ async function GET_internal() {
             const sentimentData = generateBtcSentiment(clean);
             return {
               id: artId, title: clean,
-              description: generateDeepAnalysis(clean, srcName),
+              description: cleanAnalysis(generateDeepAnalysis(clean, srcName)),
               date: new Date(item.published_at).toISOString(),
               url: item.url, source: srcName,
               sentiment: sentimentData.sentiment,
@@ -329,5 +338,5 @@ async function GET_internal() {
     return NextResponse.json({ success: true, source: 'rss', count: top50.length, articles: top50, timestamp: Date.now() });
   }
 
-  return NextResponse.json({ success: false, source: 'none', articles: [], error: 'Todas las fuentes offline.' }, { status: 503 });
+  return NextResponse.json({ success: false, source: 'none', articles: [], error: 'All sources offline.' }, { status: 503 });
 }

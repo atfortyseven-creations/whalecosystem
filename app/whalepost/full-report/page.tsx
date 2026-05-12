@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
 import Link from 'next/link';
+import { SovereignFooter } from '@/components/landing/SovereignFooter';
 
 function formatFullDate(iso: string): string {
   const d = new Date(iso);
@@ -163,17 +164,13 @@ function FullReportContent() {
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/60 group-hover:text-black transition-colors">Return</span>
         </Link>
         <div className="flex items-center gap-2 text-black/40">
-          <Lock size={12} />
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em]">Verified Secure End-to-End</span>
+          {/* Verified Secure End-to-End - Removed for minimalism */}
         </div>
       </nav>
 
       {/* Hero Header Area (No Image) */}
       <header className="max-w-[900px] mx-auto px-6 md:px-12 pt-20 pb-12">
         <div className="flex items-center gap-4 mb-8">
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 border border-[#0044CC]/20 bg-[#0044CC]/5 text-[#0044CC] font-mono text-[10px] uppercase tracking-widest font-bold rounded-sm">
-            <Activity size={12} /> Institutional Dossier
-          </span>
           <span className="font-mono text-[10px] uppercase tracking-widest text-black/40 flex items-center gap-1.5">
             <Globe size={11} /> {article.source}
           </span>
@@ -201,41 +198,7 @@ function FullReportContent() {
         </div>
       </header>
 
-      {/* Executive Intelligence Brief */}
-      <section className="max-w-[900px] mx-auto px-6 md:px-12 mb-16">
-        <div className="bg-white border border-black/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-sm p-8 md:p-10">
-          <div className="flex items-center gap-3 mb-8 pb-4 border-b border-black/5">
-            <ShieldCheck size={18} className="text-[#0044CC]" />
-            <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest">Executive Assessment Frame</h2>
-          </div>
-          
-          {(() => {
-            const brief = getIntelligenceBrief(article.id);
-            return (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/40 mb-2 flex items-center gap-2">
-                    <BarChart3 size={10} /> Systemic Weight
-                  </p>
-                  <p className="font-sans text-2xl font-bold tracking-tight text-[#0044CC]">{brief.impact} <span className="text-sm font-medium text-black/40">/100</span></p>
-                </div>
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/40 mb-2 flex items-center gap-2">
-                    <Activity size={10} /> Market Trajectory
-                  </p>
-                  <p className="font-sans text-xl font-bold tracking-tight text-[#0A0A0A]">{brief.sentiment}</p>
-                </div>
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/40 mb-2 flex items-center gap-2">
-                    <Fingerprint size={10} /> Domain Vector
-                  </p>
-                  <p className="font-sans text-xl font-bold tracking-tight text-[#0A0A0A]">{brief.relevance}</p>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-      </section>
+      {/* Executive Intelligence Brief - Removed for minimalism */}
 
       {/* Main Content Body */}
       <main className="max-w-[800px] mx-auto px-6 md:px-12 font-serif text-[#111]">
@@ -247,7 +210,7 @@ function FullReportContent() {
         <div className="border-t border-black/10 pt-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/40 flex items-center gap-2">
-              <Lock size={12} /> Officially Sanitized Intelligence
+              {/* Officially Sanitized Intelligence - Removed for minimalism */}
             </div>
             <div className="font-mono text-[9px] uppercase tracking-widest text-black/30">
               ID: {article.id.substring(0, 16)}
@@ -275,7 +238,7 @@ function FullReportContent() {
           </div>
         </section>
       )}
-
+      <SovereignFooter />
     </article>
   );
 }
