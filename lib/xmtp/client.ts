@@ -235,7 +235,7 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
 
     for (const dm of dms) {
       try {
-        const members: any[] = dm.members ?? [];
+        const members: any[] = typeof dm.members === 'function' ? await dm.members() : (dm.members ?? []);
         const hasPeer = members.some((m: any) => {
           const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
           return addrs.some((a: string) => a.toLowerCase() === normalizedPeer);
@@ -263,10 +263,9 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
 
     for (const dm of dms) {
       try {
-        const peerInboxId: string =
-          typeof dm.peerInboxId === 'function'
-            ? await dm.peerInboxId()
-            : (dm.peerInboxId ?? '');
+        const peerInboxId: string = await (typeof dm.peerInboxId === 'function'
+          ? dm.peerInboxId()
+          : (dm.peerInboxId ?? ''));
 
         if (!peerInboxId) continue;
 
@@ -275,13 +274,19 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
           identifier: peerAddress,
           identifierKind: 'Ethereum',
         };
-        const result = await Client.canMessage([identifier], XMTP_ENV);
+        // v5.3.0: Use getInboxIdForAddress for reliable resolution
         let resolvedInboxId: string | null = null;
-
-        if (result instanceof Map) {
-          resolvedInboxId = result.get(normalizedPeer) ?? result.get(peerAddress) ?? null;
-        } else if (result && typeof result === 'object') {
-          resolvedInboxId = (result as any)[normalizedPeer] ?? (result as any)[peerAddress] ?? null;
+        try {
+          resolvedInboxId = await client.getInboxIdForAddress(peerAddress);
+        } catch {
+          // Fallback to canMessage check if getInboxIdForAddress fails
+          const result = await Client.canMessage([identifier], XMTP_ENV);
+          if (result instanceof Map) {
+            const entry = Array.from(result.entries()).find(([k]) => k.toLowerCase() === normalizedPeer);
+            // If canMessage returns a boolean, we can't use it as an inboxId.
+            // But if it returns the inboxId in some versions, we handle it.
+            if (entry && typeof entry[1] === 'string') resolvedInboxId = entry[1];
+          }
         }
 
         if (resolvedInboxId && peerInboxId.toLowerCase() === resolvedInboxId.toLowerCase()) {
@@ -328,7 +333,7 @@ export async function discoverNewPeers(
 
     for (const dm of dms) {
       try {
-        const members: any[] = dm.members ?? [];
+        const members: any[] = typeof dm.members === 'function' ? await dm.members() : (dm.members ?? []);
         for (const m of members) {
           const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
           for (const addr of addrs) {
