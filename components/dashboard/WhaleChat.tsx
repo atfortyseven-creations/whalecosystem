@@ -860,10 +860,28 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   m.conversationId === `dm-${activePeer!.toLowerCase()}`
                 );
                 if (filteredMsgs.length === 0) return (
-                  <div className="flex-1 flex flex-col items-center justify-center opacity-40">
-                    <Shield size={32} className="mb-2" />
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Cryptographic Tunnel Established</p>
-                    <p className="text-[10px] text-[#050505] max-w-xs text-center mt-2">Only you and {shortAddr(activePeer!)} can read these messages.</p>
+                  <div className="flex-1 flex flex-col items-center justify-center">
+                    <div className="flex flex-col items-center max-w-[280px] text-center gap-6">
+                      <div className="flex flex-col items-center opacity-40">
+                        <Shield size={32} className="mb-2" />
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Túnel Criptográfico Establecido</p>
+                        <p className="text-[10px] text-[#050505] mt-2">Solo tú y {shortAddr(activePeer!)} pueden leer estos mensajes.</p>
+                      </div>
+
+                      <div className="w-full bg-black/[0.02] border border-black/[0.05] rounded-xl p-5 text-left">
+                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505] mb-4 border-b border-black/5 pb-2">Sync Requirement</p>
+                        <div className="space-y-4">
+                          <div className="flex gap-3">
+                            <span className="text-[9px] font-bold text-black/20 mt-0.5">01</span>
+                            <p className="text-[10px] text-black/40 leading-relaxed uppercase tracking-wider">Make sure the other person has also added your address.</p>
+                          </div>
+                          <div className="flex gap-3">
+                            <span className="text-[9px] font-bold text-black/20 mt-0.5">02</span>
+                            <p className="text-[10px] text-black/40 leading-relaxed uppercase tracking-wider">Send a message to make the chat appear for the other person.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 );
                 return filteredMsgs.map(msg => {
@@ -959,6 +977,29 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <p className="text-[11px] text-black/35 leading-relaxed max-w-[240px]">
                   Enter a wallet address to open a secure encrypted channel.
                 </p>
+              </div>
+
+              {/* Protocol Steps */}
+              <div className="w-full max-w-[280px] bg-black/[0.02] border border-black/[0.05] rounded-xl p-5 text-left">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505] mb-4 border-b border-black/5 pb-2">How to Chat</p>
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <span className="text-[9px] font-bold text-black/20 mt-0.5">01</span>
+                    <p className="text-[10px] text-black/50 leading-relaxed uppercase tracking-wider">Both people must click activate and sign the request in their wallet.</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="text-[9px] font-bold text-black/20 mt-0.5">02</span>
+                    <p className="text-[10px] text-black/50 leading-relaxed uppercase tracking-wider">Add the other person&apos;s address or scan their QR code.</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="text-[9px] font-bold text-black/20 mt-0.5">03</span>
+                    <p className="text-[10px] text-black/50 leading-relaxed uppercase tracking-wider">Both people must send a message to start the conversation.</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="text-[9px] font-bold text-black/20 mt-0.5">04</span>
+                    <p className="text-[10px] text-black/50 leading-relaxed uppercase tracking-wider">Once both have sent a message, the chat will work in real time.</p>
+                  </div>
+                </div>
               </div>
 
               {/* Single minimal status row */}
