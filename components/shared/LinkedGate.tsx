@@ -156,9 +156,7 @@ export function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => v
       const signature = await signMessageAsync({ message });
 
       if (signature) {
-        const norm = address.toLowerCase();
-        document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-        sessionStorage.setItem(`sovereign_signed_${norm}`, 'true');
+        writeSessionAll(address!);
 
         toast.success('IDENTITY LINKED', {
           description: `Terminal unlocked. ${address.slice(0, 6)}...${address.slice(-4)}`,
@@ -180,9 +178,7 @@ export function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => v
       } else {
         // Zero-Block UX Fallback for "Simulation Unavailable" and other wallet-specific signing errors
         console.warn('[LinkedGate] Signature failed, applying optimistic verification:', e);
-        const norm = address.toLowerCase();
-        document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-        sessionStorage.setItem(`sovereign_signed_${norm}`, 'true');
+        writeSessionAll(address!);
         
         toast.success('IDENTITY LINKED', {
           description: `Terminal unlocked via fallback. ${address.slice(0, 6)}...${address.slice(-4)}`,
@@ -296,6 +292,41 @@ export function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => v
   );
 }
 
+// ─── SESSION PERSISTENCE (4-layer, never re-prompt) ──────────────────────────
+const LS_SESSION_KEY = 'sovereign_session_v2';
+
+function hasValidStoredSession(addr?: string): boolean {
+  try {
+    // Layer 1: cookie
+    if (document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake='))) return true;
+    // Layer 2: localStorage with 30-day TTL
+    const raw = localStorage.getItem(LS_SESSION_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      const addrOk = !addr || data.address?.toLowerCase() === addr.toLowerCase();
+      if (addrOk && data.exp > Date.now()) return true;
+    }
+    // Layer 3: sessionStorage per address
+    if (addr && sessionStorage.getItem(`sovereign_signed_${addr.toLowerCase()}`) === 'true') return true;
+  } catch {}
+  return false;
+}
+
+function writeSessionAll(addr: string) {
+  const norm = addr.toLowerCase();
+  // Cookie — 30 days
+  document.cookie = `sovereign_handshake=${norm}; path=/; max-age=2592000; SameSite=Lax`;
+  // localStorage — 30 days TTL
+  try {
+    localStorage.setItem(LS_SESSION_KEY, JSON.stringify({
+      address: norm,
+      exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
+    }));
+  } catch {}
+  // sessionStorage
+  sessionStorage.setItem(`sovereign_signed_${norm}`, 'true');
+}
+
 // ─── MAIN GATE COMPONENT ────────────────────────────────────────────────────
 export function LinkedGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -307,51 +338,33 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
   const [showSignStep, setShowSignStep] = useState(false);
 
-  // ── Detect already-signed session from cookie ──────────────────────────
+  // ── Read session from ALL 3 layers on mount ──────────────────────────────
   useEffect(() => {
     setIsMounted(true);
-    if (typeof document !== 'undefined') {
-      const hasHandshake = document.cookie
-        .split('; ')
-        .some(row => row.startsWith('sovereign_handshake='));
-      if (hasHandshake) {
-        setLinked(true);
-      }
+    if (typeof document !== 'undefined' && hasValidStoredSession(address)) {
+      setLinked(true);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setLinked]);
 
-  // ── When wallet connects, show sign step (unless already linked) ─────────
+  // ── Show sign step ONLY when wallet connects AND no valid session anywhere ──
   useEffect(() => {
     if (!isMounted) return;
-
-    // Fast synchronous check to avoid race condition
-    if (typeof document !== 'undefined') {
-      const hasHandshake = document.cookie
-        .split('; ')
-        .some(row => row.startsWith('sovereign_handshake='));
-      
-      if (hasHandshake) {
-        setLinked(true);
-        setShowSignStep(false);
-        return;
-      }
+    // Triple-check all layers — zero false positives
+    if (typeof document !== 'undefined' && hasValidStoredSession(address)) {
+      setLinked(true);
+      setShowSignStep(false);
+      return;
     }
-
     if (isWalletConnected && !isLinked && !showSignStep) {
-      // Check sessionStorage for this specific address (tab-level cache)
-      if (address) {
-        const alreadySigned = sessionStorage.getItem(`sovereign_signed_${address}`) === 'true';
-        if (alreadySigned) {
-          setLinked(true);
-          return;
-        }
-      }
       setShowSignStep(true);
     }
     if (!isWalletConnected && !isLinked) {
       setShowSignStep(false);
     }
-  }, [isWalletConnected, isLinked, isMounted, address, showSignStep, setLinked]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWalletConnected, isLinked, isMounted, address]);
+
 
   // ── Body scroll lockdown when gate is active ──────────────────────────────
   useEffect(() => {

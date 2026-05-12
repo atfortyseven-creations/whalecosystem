@@ -59,7 +59,7 @@ export function WhaleChat() {
   // Detect physical device type (touch + narrow screen = mobile)
   useEffect(() => {
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    setIsMobile(isTouchDevice && window.screen.width < 768);
+    setIsMobile(isTouchDevice && window.innerWidth < 768);
   }, []);
 
   // Keep refs in sync with activePeer
@@ -202,10 +202,19 @@ export function WhaleChat() {
     }
   };
 
+  // ── Safe serialization helper (BigInt → number) ──────────────────────────
+  const safeMsg = (msg: any) => ({
+    ...msg,
+    sentAtNs: typeof msg.sentAtNs === 'bigint' ? Number(msg.sentAtNs / 1000000n) : msg.sentAtNs,
+  });
+
   const persistToLocal = (convs: ConversationMeta[], msgs: any[]) => {
     try {
-      localStorage.setItem(`whale_chat_history_${address}`, JSON.stringify({ conversations: convs, messages: msgs }));
-    } catch (e) {}
+      localStorage.setItem(
+        `whale_chat_history_${address}`,
+        JSON.stringify({ conversations: convs, messages: msgs.map(safeMsg) })
+      );
+    } catch (e) { console.warn('[Chat] persist failed', e); }
   };
 
   const loadConversations = async () => {
@@ -222,8 +231,8 @@ export function WhaleChat() {
           id: '1',
           senderInboxId: '0xInstitutionalSupport_0000',
           content: 'Welcome to the Secure Client Communications channel. All messages are zero-knowledge encrypted end-to-end.',
-          sentAtNs: BigInt(Date.now()) * 1000000n,
-          conversationId: 'dm-0xInstitutionalSupport_0000'
+          sentAtNs: Date.now(),
+          conversationId: 'dm-0xinstitutionalsupport_0000'
         }]);
       }
     } catch (e) {}
@@ -238,6 +247,28 @@ export function WhaleChat() {
     peerToConvId.current.set(activePeer.toLowerCase(), activePeerDmIdRef.current);
     convIdToPeer.current.set(activePeerDmIdRef.current, activePeer);
   }, [client, activePeer]);
+
+  // ── Real-time incoming message polling (localStorage P2P) ────────────────
+  // Every 2 seconds, check if the peer has written new messages to our storage.
+  useEffect(() => {
+    if (!client || !activePeer || !address) return;
+    let lastCount = 0;
+    const poll = setInterval(() => {
+      try {
+        const stored = localStorage.getItem(`whale_chat_history_${address}`);
+        if (!stored) return;
+        const parsed = JSON.parse(stored);
+        const msgs: any[] = parsed.messages || [];
+        if (msgs.length !== lastCount) {
+          lastCount = msgs.length;
+          setMessages(msgs);
+          const convs: ConversationMeta[] = parsed.conversations || [];
+          setConversations(convs);
+        }
+      } catch {}
+    }, 2000);
+    return () => clearInterval(poll);
+  }, [client, activePeer, address]);
 
   const handleStartConversationWithPeer = async (peerAddr: string) => {
       if (!client || !peerAddr || sending) return;
@@ -284,79 +315,69 @@ export function WhaleChat() {
     }
 
     try {
+      const now = Date.now();
+      const myConvId = `dm-${activePeer.toLowerCase()}`;
       const newMsg = {
-        id: Date.now().toString(),
+        id: now.toString(),
         senderInboxId: client?.inboxId,
         content: content,
-        sentAtNs: BigInt(Date.now()) * 1000000n,
-        conversationId: activePeerDmIdRef.current
+        sentAtNs: now,         // plain number — JSON-safe
+        conversationId: myConvId
       };
-      
-      setMessages(prev => {
-          const msgs = [...prev, newMsg];
-          persistToLocal(conversations, msgs);
-          return msgs;
-      });
 
-      setConversations(prev => {
-          const mapped = prev.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c);
-          persistToLocal(mapped, messages);
-          return mapped;
-      });
+      // ── Update sender's own storage ──────────────────────────────────────
+      const selfKey = `whale_chat_history_${address}`;
+      let selfConvs: ConversationMeta[] = [];
+      let selfMsgs: any[] = [];
+      try {
+        const raw = localStorage.getItem(selfKey);
+        if (raw) { const p = JSON.parse(raw); selfConvs = p.conversations || []; selfMsgs = p.messages || []; }
+      } catch {}
 
-      // Synchronize to the peer's local storage (P2P simulation)
-      if (activePeer !== '0xInstitutionalSupport_0000') {
-          const peerKey = `whale_chat_history_${activePeer}`;
-          const peerStored = localStorage.getItem(peerKey);
-          let peerConvs: any[] = [];
-          let peerMsgs: any[] = [];
-          if (peerStored) {
-              try {
-                  const p = JSON.parse(peerStored);
-                  if (p.conversations) peerConvs = p.conversations;
-                  if (p.messages) peerMsgs = p.messages;
-              } catch (e) {}
-          }
-          
-          // Add or update conversation in peer's state
-          if (!peerConvs.find(c => c.peerAddress.toLowerCase() === address.toLowerCase())) {
-              peerConvs = [{ peerAddress: address, lastMessage: content, lastAt: new Date() }, ...peerConvs];
-          } else {
-              peerConvs = peerConvs.map(c => c.peerAddress.toLowerCase() === address.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c);
-          }
-          
-          const peerMsg = { ...newMsg, conversationId: `dm-${address.toLowerCase()}` };
-          peerMsgs = [...peerMsgs, peerMsg];
-          
-          localStorage.setItem(peerKey, JSON.stringify({ conversations: peerConvs, messages: peerMsgs }));
+      selfMsgs = [...selfMsgs, newMsg];
+      selfConvs = selfConvs.find(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase())
+        ? selfConvs.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
+        : [{ peerAddress: activePeer, lastMessage: content, lastAt: new Date() }, ...selfConvs];
+      localStorage.setItem(selfKey, JSON.stringify({ conversations: selfConvs, messages: selfMsgs }));
+      setMessages(selfMsgs);
+      setConversations(selfConvs);
+
+      // ── Write to peer's storage so they receive the message ──────────────
+      if (activePeer.toLowerCase() !== '0xinstitutionalsupport_0000') {
+        const peerKey = `whale_chat_history_${activePeer}`;
+        let peerConvs: any[] = [];
+        let peerMsgs: any[] = [];
+        try {
+          const raw = localStorage.getItem(peerKey);
+          if (raw) { const p = JSON.parse(raw); peerConvs = p.conversations || []; peerMsgs = p.messages || []; }
+        } catch {}
+
+        const peerMsg = { ...newMsg, conversationId: `dm-${address!.toLowerCase()}` };
+        peerMsgs = [...peerMsgs, peerMsg];
+        peerConvs = peerConvs.find((c: any) => c.peerAddress.toLowerCase() === address!.toLowerCase())
+          ? peerConvs.map((c: any) => c.peerAddress.toLowerCase() === address!.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
+          : [{ peerAddress: address, lastMessage: content, lastAt: new Date() }, ...peerConvs];
+        localStorage.setItem(peerKey, JSON.stringify({ conversations: peerConvs, messages: peerMsgs }));
       }
 
-      // Mock response for Institutional Support
-      if (activePeer === '0xInstitutionalSupport_0000') {
-          setTimeout(() => {
-              const responseMsg = {
-                  id: (Date.now() + 1).toString(),
-                  senderInboxId: activePeer,
-                  content: 'An institutional representative will review your inquiry shortly.',
-                  sentAtNs: BigInt(Date.now() + 1000) * 1000000n,
-                  conversationId: activePeerDmIdRef.current
-              };
-              setMessages(prev => {
-                  const msgs = [...prev, responseMsg];
-                  persistToLocal(conversations, msgs);
-                  return msgs;
-              });
-              setConversations(prev => {
-                  const mapped = prev.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: responseMsg.content, lastAt: new Date() } : c);
-                  persistToLocal(mapped, messages);
-                  return mapped;
-              });
-          }, 1200);
+      // ── Auto-reply from Institutional Support ────────────────────────────
+      if (activePeer.toLowerCase() === '0xinstitutionalsupport_0000') {
+        setTimeout(() => {
+          const replyId = (Date.now() + 1).toString();
+          const replyMsg = {
+            id: replyId,
+            senderInboxId: activePeer,
+            content: 'An institutional representative will review your inquiry shortly.',
+            sentAtNs: Date.now() + 1000,
+            conversationId: myConvId
+          };
+          setMessages(prev => { const m = [...prev, replyMsg]; persistToLocal(selfConvs, m); return m; });
+        }, 1400);
       }
+
     } catch (err) {
-      console.error("Failed to send", err);
-      alert("Failed to send message.");
-      setInputText(content);
+      console.error('[Chat] handleSend failed:', err);
+      setInputText(content); // restore on failure
     } finally {
       setSending(false);
     }
@@ -374,46 +395,6 @@ export function WhaleChat() {
     );
   }
 
-  // QR overlay — PC shows QR generator, mobile shows QR scanner
-  if (showScanner) {
-    return (
-      <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-white rounded-2xl border border-black/8 overflow-y-auto">
-         <div className="w-full max-w-sm">
-             <div className="flex justify-between items-center mb-6 px-2">
-                 <h3 className="font-mono font-bold uppercase tracking-widest text-lg">
-                   Scan Peer QR
-                 </h3>
-                 <button onClick={() => setShowScanner(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X size={20}/></button>
-             </div>
-             <p className="text-[11px] text-black/50 text-center mb-4 px-4 font-mono">
-               Scan a peer's Sovereign QR Code to instantly establish a zero-knowledge E2EE communication channel.
-             </p>
-             <QrScanner mode="scan" onScanSuccess={(addr) => handleStartConversationWithPeer(addr)} />
-         </div>
-      </div>
-    );
-  }
-
-  if (showMyQR) {
-    return (
-      <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-white rounded-2xl border border-black/8 overflow-y-auto">
-         <div className="w-full max-w-sm">
-             <div className="flex justify-between items-center mb-6 px-2">
-                 <h3 className="font-mono font-bold uppercase tracking-widest text-lg">
-                   My Sovereign QR
-                 </h3>
-                 <button onClick={() => setShowMyQR(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X size={20}/></button>
-             </div>
-             <QrScanner 
-                 mode="project" 
-                 projectValue={address} 
-                 projectTitle="My Sovereign Identity" 
-                 projectDescription="Have a peer scan this QR code to instantly open a secure encrypted chat channel with your address." 
-             />
-         </div>
-      </div>
-    );
-  }
 
   // ── Loading / Auto-init state ────────────────────────────────────────────────
   // Displayed while the XMTP client initialises automatically post-connection.
@@ -519,17 +500,17 @@ export function WhaleChat() {
               <Shield size={14} className="text-[#9945FF]" />
               <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">E2EE Secured</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <button
                   onClick={() => setShowScanner(true)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 text-[9px] font-bold uppercase tracking-widest text-black/60 transition-colors"
+                  className={`flex items-center gap-1.5 rounded-lg bg-black/5 hover:bg-black/10 font-bold uppercase tracking-widest text-black/60 transition-colors ${isMobile ? 'px-4 py-2.5 text-[11px]' : 'px-2.5 py-1.5 text-[9px]'}`}
                   title="Scan Peer QR"
               >
-                  <Camera size={12} /> Scan
+                  <Camera size={isMobile ? 14 : 12} /> Scan
               </button>
               <button
                   onClick={() => setShowMyQR(true)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 text-[9px] font-bold uppercase tracking-widest text-black/60 transition-colors"
+                  className={`flex items-center gap-1.5 rounded-lg bg-black/5 hover:bg-black/10 font-bold uppercase tracking-widest text-black/60 transition-colors ${isMobile ? 'px-4 py-2.5 text-[11px]' : 'px-2.5 py-1.5 text-[9px]'}`}
                   title="Show My QR"
               >
                   My QR
@@ -619,21 +600,27 @@ export function WhaleChat() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0 bg-[#FAFAFA]">
-              {messages.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center opacity-40">
-                  <Shield size={32} className="mb-2" />
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Cryptographic Tunnel Established</p>
-                  <p className="text-[10px] text-[#050505] max-w-xs text-center mt-2">Only you and {shortAddr(activePeer!)} can read these messages.</p>
-                </div>
-              ) : (
-                messages.map(msg => {
-                  // v5.3.0: senderInboxId (not senderAddress), sentAtNs (BigInt ns), content (decoded)
+              {(() => {
+                // Filter messages for the current active conversation only
+                const convId = `dm-${activePeer!.toLowerCase()}`;
+                const filteredMsgs = messages.filter(m =>
+                  m.conversationId === convId ||
+                  m.conversationId === `dm-${activePeer!.toLowerCase()}`
+                );
+                if (filteredMsgs.length === 0) return (
+                  <div className="flex-1 flex flex-col items-center justify-center opacity-40">
+                    <Shield size={32} className="mb-2" />
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Cryptographic Tunnel Established</p>
+                    <p className="text-[10px] text-[#050505] max-w-xs text-center mt-2">Only you and {shortAddr(activePeer!)} can read these messages.</p>
+                  </div>
+                );
+                return filteredMsgs.map(msg => {
                   const isMe = msg.senderInboxId
-                    ? msg.senderInboxId === client?.inboxId
+                    ? msg.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
                     : (msg.senderAddress || '').toLowerCase() === address?.toLowerCase();
                   const content = typeof msg.content === 'string' ? msg.content : (msg.fallback || 'Encrypted Data');
-                  const sentTime = msg.sentAtNs != null ? nsToDate(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
-                  
+                  // sentAtNs is now a plain number (ms), not BigInt
+                  const sentTime = typeof msg.sentAtNs === 'number' ? new Date(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
                   return (
                     <div key={msg.id} className={`flex flex-col max-w-[78%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`}>
                       <div className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed break-words ${
@@ -648,8 +635,8 @@ export function WhaleChat() {
                       </span>
                     </div>
                   );
-                })
-              )}
+                });
+              })()}
               {peerStatus.isTyping && (
                   <div className="flex self-start items-start max-w-[78%]">
                       <div className="px-3.5 py-2 rounded-2xl bg-white border border-[#9945FF]/20 shadow-sm flex items-center gap-1.5 rounded-bl-sm">
@@ -683,43 +670,96 @@ export function WhaleChat() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-[#0D0D0D] to-[#050505]">
-            {/* Ambient glow */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-80 h-80 rounded-full bg-[#00C076]/6 blur-[100px]" />
-            </div>
-            {/* Subtle grid */}
-            <div className="absolute inset-0 opacity-[0.04]" style={{
-              backgroundImage: 'linear-gradient(rgba(0,192,118,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(0,192,118,0.8) 1px, transparent 1px)',
-              backgroundSize: '48px 48px'
-            }} />
-            <div className="relative z-10 flex flex-col items-center gap-5 p-8 max-w-xs text-center">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-2xl bg-[#00C076]/25 blur-xl scale-150 animate-pulse" />
-                <div className="relative w-14 h-14 rounded-2xl bg-white/5 border border-[#00C076]/20 flex items-center justify-center backdrop-blur-sm">
-                  <Zap size={24} className="text-[#00C076]" />
+          <div className="flex-1 flex flex-col items-center justify-center bg-white">
+            <div className="flex flex-col items-center gap-8 p-8 max-w-sm text-center select-none">
+
+              {/* Logo + Bubble row */}
+              <div className="flex items-end gap-3">
+                {/* Official Logo */}
+                <img
+                  src="/official-whale.png"
+                  alt="Whale Alert Network"
+                  className="w-24 h-24 object-contain"
+                />
+                {/* Speech Bubble */}
+                <div className="relative mb-2">
+                  <div className="bg-black/[0.04] border border-black/[0.07] rounded-2xl rounded-bl-none px-4 py-3 text-left">
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#050505]/70 whitespace-nowrap">Whale Chat</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
+                      <span className="text-[9px] text-[#00C076] font-mono font-bold uppercase tracking-widest">E2EE Secure</span>
+                    </div>
+                  </div>
+                  {/* Bubble tail */}
+                  <div className="absolute -bottom-2 left-0 w-3 h-3 bg-black/[0.04] border-l border-b border-black/[0.07]"
+                    style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
                 </div>
               </div>
-              <div>
-                <h3 className="text-[12px] font-black uppercase tracking-[0.22em] text-white mb-2">Select a Channel</h3>
-                <p className="text-[10px] text-white/30 leading-relaxed font-mono">
-                  Enter an Ethereum address to open a zero-knowledge encrypted channel. Only you and your peer can read these messages.
+
+              {/* Welcome text */}
+              <div className="flex flex-col items-center gap-2">
+                <h2
+                  className="text-[30px] font-black text-[#050505] leading-[1.1] tracking-tight"
+                  style={{ fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}
+                >
+                  Welcome to<br />Whale Chat!
+                </h2>
+                <p className="text-[11px] text-black/35 leading-relaxed max-w-[240px]">
+                  Enter a wallet address to open a secure encrypted channel.
                 </p>
               </div>
-              <div className="flex flex-col gap-1.5 w-full">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.07]">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse shrink-0" />
-                  <span className="text-[9px] font-black uppercase tracking-widest text-[#00C076]">XMTP Protocol Active</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.07]">
-                  <Lock size={9} className="text-white/30 shrink-0" />
-                  <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Zero-Knowledge E2EE</span>
-                </div>
+
+              {/* Single minimal status row */}
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/20" />
+                <span className="text-[9px] font-mono uppercase tracking-widest text-black/30">Zero-Knowledge · End-to-End Encrypted</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/20" />
               </div>
+
             </div>
           </div>
         )}
+
       </div>
+
+      {/* ── Overlays ── */}
+      {showScanner && (
+        <div className="absolute inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
+           <div className="w-full max-w-sm">
+               <div className="flex justify-between items-center mb-8">
+                   <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505]">Scan Peer QR</h3>
+                   <button onClick={() => setShowScanner(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors">
+                     <X size={20} />
+                   </button>
+               </div>
+               <div className="mb-8">
+                 <p className="text-[10px] text-black/40 text-center font-mono leading-relaxed px-4">
+                   Establish a cryptographically secured P2P channel by scanning a peer&apos;s Sovereign QR identity.
+                 </p>
+               </div>
+               <QrScanner mode="scan" onScanSuccess={(addr) => handleStartConversationWithPeer(addr)} />
+           </div>
+        </div>
+      )}
+
+      {showMyQR && (
+        <div className="absolute inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
+           <div className="w-full max-w-sm">
+               <div className="flex justify-between items-center mb-8">
+                   <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505]">My Identity QR</h3>
+                   <button onClick={() => setShowMyQR(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors">
+                     <X size={20} />
+                   </button>
+               </div>
+               <QrScanner 
+                   mode="project" 
+                   projectValue={address} 
+                   projectTitle="Sovereign Identity" 
+                   projectDescription="Present this code to a peer. Once scanned, a zero-knowledge encrypted tunnel will be initialized between your identities." 
+               />
+           </div>
+        </div>
+      )}
     </div>
   );
 }

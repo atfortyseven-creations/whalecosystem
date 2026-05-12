@@ -30,13 +30,16 @@ export function useSovereignAccount() {
         // Run immediately
         checkHandshake();
         
-        // Poll every 500ms — catches cookie written by mobile QR handshake or
-        // MobileLanding.establishSession() without requiring a full page reload.
+        // Polling is only necessary for QR/Mobile handshakes where Wagmi isn't active.
+        // If Wagmi is already handling the connection natively, we can kill the polling
+        // to save CPU cycles and battery.
+        if (wagmiAccount.isConnected) return;
+        
+        // Poll every 500ms — catches cookie written by mobile QR handshake
         const poll = setInterval(checkHandshake, 500);
         
         return () => clearInterval(poll);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [wagmiAccount.isConnected]);
 
     // Priority 1: Direct Wagmi Connection (Active Extension/Mobile App)
     if (wagmiAccount.isConnected) {

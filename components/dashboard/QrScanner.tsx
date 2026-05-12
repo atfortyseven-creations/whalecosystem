@@ -200,18 +200,18 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 {state === 'idle' && (
                     <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-6 w-full">
-                        <div className="relative w-64 h-64 rounded-3xl border border-[var(--aztec-orchid)]/30 bg-white/3 flex flex-col items-center justify-center overflow-hidden backdrop-blur-md">
-                            <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 border-[var(--aztec-orchid)] rounded-tl-2xl" />
-                            <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 border-[var(--aztec-orchid)] rounded-tr-2xl" />
-                            <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 border-[var(--aztec-orchid)] rounded-bl-2xl" />
-                            <div className="absolute bottom-3 right-3 w-7 h-7 border-b-2 border-r-2 border-[var(--aztec-orchid)] rounded-br-2xl" />
-                            <Camera size={36} className="text-white/20 mb-2" />
-                            <span className="text-[9px] font-mono uppercase tracking-widest text-white/30">Awaiting Activation</span>
+                        <div className="relative w-64 h-64 rounded-3xl border border-[var(--az-orchid)]/30 bg-black/5 dark:bg-white/3 flex flex-col items-center justify-center overflow-hidden backdrop-blur-md">
+                            <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 border-[var(--az-orchid)] rounded-tl-2xl" />
+                            <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 border-[var(--az-orchid)] rounded-tr-2xl" />
+                            <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 border-[var(--az-orchid)] rounded-bl-2xl" />
+                            <div className="absolute bottom-3 right-3 w-7 h-7 border-b-2 border-r-2 border-[var(--az-orchid)] rounded-br-2xl" />
+                            <Camera size={36} className="text-black/20 dark:text-white/20 mb-2" />
+                            <span className="text-[9px] font-mono uppercase tracking-widest text-black/30 dark:text-white/30">Awaiting Activation</span>
                             <motion.div animate={{ y: [-90, 90] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                className="absolute left-6 right-6 h-0.5 bg-[var(--aztec-orchid)] shadow-[0_0_12px_var(--aztec-orchid)] opacity-40" />
+                                className="absolute left-6 right-6 h-0.5 bg-[var(--az-orchid)] shadow-[0_0_12px_var(--az-orchid)] opacity-40" />
                         </div>
                         <button onClick={startCamera}
-                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-[var(--aztec-orchid)] to-purple-600 text-white font-mono text-[11px] uppercase tracking-widest font-bold shadow-[0_0_30px_rgba(168,85,247,0.35)] active:scale-95 transition-all flex items-center justify-center gap-3">
+                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-[var(--az-orchid)] to-purple-600 text-white font-mono text-[11px] uppercase tracking-widest font-bold shadow-[0_0_30px_rgba(139,48,217,0.35)] active:scale-95 transition-all flex items-center justify-center gap-3">
                             <Camera size={16} /> Activate Camera
                         </button>
                     </motion.div>
@@ -221,8 +221,8 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 {state === 'requesting' && (
                     <motion.div key="requesting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-4 py-16">
-                        <div className="w-14 h-14 rounded-full border-2 border-[var(--aztec-orchid)] border-t-transparent animate-spin" />
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-white/40">Requesting camera access…</p>
+                        <div className="w-14 h-14 rounded-full border-2 border-[var(--az-orchid)] border-t-transparent animate-spin" />
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">Requesting camera access…</p>
                     </motion.div>
                 )}
 
@@ -230,8 +230,8 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 {state === 'validating' && (
                     <motion.div key="validating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-4 py-16">
-                        <Loader size={36} className="animate-spin text-[var(--aztec-orchid)]" />
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-white/40">Validating bridge token…</p>
+                        <Loader size={36} className="animate-spin text-[var(--az-orchid)]" />
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">Validating bridge token…</p>
                     </motion.div>
                 )}
 
@@ -239,7 +239,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 {state === 'scanning' && (
                     <motion.div key="scanning" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-5 w-full">
-                        <div className="relative w-72 h-72 rounded-3xl overflow-hidden border border-[var(--aztec-orchid)]/50 shadow-[0_0_40px_rgba(168,85,247,0.2)]">
+                        <div className="relative w-72 h-72 rounded-3xl overflow-hidden border border-[var(--az-orchid)]/50 shadow-[0_0_40px_rgba(139,48,217,0.2)]">
                             {/* The actual video element rendered by html5-qrcode will be moved into this container */}
                             <div id="scanner-viewfinder" className="w-full h-full [&>video]:w-full [&>video]:h-full [&>video]:object-cover" />
                             
@@ -248,18 +248,18 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
 
                             {/* Scan overlay */}
                             <div className="absolute inset-0 pointer-events-none">
-                                <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-[var(--aztec-orchid)] rounded-tl-2xl" />
-                                <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-[var(--aztec-orchid)] rounded-tr-2xl" />
-                                <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-[var(--aztec-orchid)] rounded-bl-2xl" />
-                                <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-[var(--aztec-orchid)] rounded-br-2xl" />
+                                <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-[var(--az-orchid)] rounded-tl-2xl" />
+                                <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-[var(--az-orchid)] rounded-tr-2xl" />
+                                <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-[var(--az-orchid)] rounded-bl-2xl" />
+                                <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-[var(--az-orchid)] rounded-br-2xl" />
                                 <motion.div animate={{ y: [-100, 100] }} transition={{ duration: 1.6, repeat: Infinity, ease: "linear" }}
-                                    className="absolute left-6 right-6 h-0.5 bg-[var(--aztec-orchid)] shadow-[0_0_16px_var(--aztec-orchid)]" />
+                                    className="absolute left-6 right-6 h-0.5 bg-[var(--az-orchid)] shadow-[0_0_16px_var(--az-orchid)]" />
                             </div>
                         </div>
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--aztec-orchid)]/70 animate-pulse">
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--az-orchid)]/70 animate-pulse">
                             Point at the QR code on your PC screen
                         </p>
-                        <button onClick={reset} className="text-white/30 text-xs font-mono uppercase tracking-widest hover:text-white/60 transition-colors">
+                        <button onClick={reset} className="text-black/30 dark:text-white/30 text-xs font-mono uppercase tracking-widest hover:text-black/60 dark:hover:text-white/60 transition-colors">
                             Cancel
                         </button>
                     </motion.div>
@@ -270,13 +270,13 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     <motion.div key="success" initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-5 text-center py-8">
                         <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 0.6, type: 'spring' }}
-                            className="w-20 h-20 rounded-full bg-[var(--aztec-chartreuse)]/10 border border-[var(--aztec-chartreuse)]/30 flex items-center justify-center">
-                            <CheckCircle size={40} className="text-[var(--aztec-chartreuse)]" />
+                            className="w-20 h-20 rounded-full bg-[var(--az-emerald)]/10 border border-[var(--az-emerald)]/30 flex items-center justify-center">
+                            <CheckCircle size={40} className="text-[var(--az-emerald)]" />
                         </motion.div>
-                        <h3 className="font-mono text-xl font-bold text-white tracking-tight">Bridge Established</h3>
-                        <p className="text-xs text-white/60 max-w-xs leading-relaxed">{message}</p>
+                        <h3 className="font-mono text-xl font-bold text-[#050505] dark:text-white tracking-tight">Bridge Established</h3>
+                        <p className="text-xs text-black/60 dark:text-white/60 max-w-xs leading-relaxed">{message}</p>
                         <button onClick={reset}
-                            className="mt-2 px-6 py-2 rounded-lg border border-white/10 text-white/50 text-[10px] uppercase tracking-widest font-mono hover:bg-white/5 transition-colors flex items-center gap-2">
+                            className="mt-2 px-6 py-2 rounded-lg border border-black/10 dark:border-white/10 text-black/50 dark:text-white/50 text-[10px] uppercase tracking-widest font-mono hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center gap-2">
                             <RefreshCcw size={12} /> Scan another
                         </button>
                     </motion.div>
@@ -289,10 +289,10 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                         <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
                             <XCircle size={40} className="text-red-400" />
                         </div>
-                        <h3 className="font-mono text-xl font-bold text-white tracking-tight">Link Failed</h3>
-                        <p className="text-xs text-white/60 max-w-xs leading-relaxed">{message}</p>
+                        <h3 className="font-mono text-xl font-bold text-[#050505] dark:text-white tracking-tight">Link Failed</h3>
+                        <p className="text-xs text-black/60 dark:text-white/60 max-w-xs leading-relaxed">{message}</p>
                         <button onClick={reset}
-                            className="mt-2 px-6 py-2 rounded-xl bg-[var(--aztec-orchid)]/10 border border-[var(--aztec-orchid)]/20 text-[var(--aztec-orchid)] text-[10px] uppercase tracking-widest font-mono hover:bg-[var(--aztec-orchid)]/20 transition-colors">
+                            className="mt-2 px-6 py-2 rounded-xl bg-[var(--az-orchid)]/10 border border-[var(--az-orchid)]/20 text-[var(--az-orchid)] text-[10px] uppercase tracking-widest font-mono hover:bg-[var(--az-orchid)]/20 transition-colors">
                             Try Again
                         </button>
                     </motion.div>

@@ -207,12 +207,28 @@ export default function WhaleDashboard() {
     const initialTab = searchParams.get('tab') || 'gold';
     const [activeTab, setActiveTab] = useState<string>(initialTab);
 
+    // ── Sync URL param to state ──────────────────────────────────────────
     React.useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab) {
+        if (tab && tab !== activeTab) {
             setActiveTab(tab);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]);
+
+    // ── Enforce valid tabs (Legacy Redirects) ───────────────────────────
+    React.useEffect(() => {
+        const LEGACY_TABS = [
+            'dashboard', 'watchlist', 'firehose', 'sov-intel', 'live-port',
+            'whale-port', 'graph', 'vault', 'trade', 'forensics',
+            'reputation', 'scanner'
+        ];
+        if (LEGACY_TABS.includes(activeTab)) {
+            setActiveTab('gold');
+            window.history.replaceState(null, '', '?tab=gold');
+        }
+    }, [activeTab]);
+
 
     // ── Panel Refresh Key ────────────────────────────────────────────────
     // Every time the user switches tabs OR returns to the page after it was
@@ -241,6 +257,7 @@ export default function WhaleDashboard() {
     const handleTabChange = React.useCallback((id: string) => {
         setActiveTab(id);
         setRefreshKey(k => k + 1);
+        window.history.pushState(null, '', `?tab=${id}`);
     }, []);
 
     const renderTabContent = () => {
@@ -262,10 +279,8 @@ export default function WhaleDashboard() {
             case 'forensics':
             case 'reputation':
             case 'scanner':
-                // Removed modules — redirect to Access Pass
-                if (typeof window !== 'undefined' && activeTab !== 'gold') {
-                    setActiveTab('gold');
-                }
+                // The useEffect will catch this and update state/URL cleanly.
+                // In the meantime, render the fallback pass.
                 return <><PanelHeader icon={Ticket} title="Access Pass" description="Mint your institutional clearance pass to unlock advanced analytics, private data feeds, and exclusive platform features." accent="#D4AF37" /><div className="flex-1 min-h-[950px] shrink-0"><DashboardErrorBoundary key={`gold-redirect-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div></>;
 
             case 'billing':
