@@ -44,8 +44,17 @@ export function useSovereignAccount() {
     // Priority 1: Direct Wagmi Connection (Active Extension/Mobile App)
     if (wagmiAccount.isConnected) {
         return {
-            ...wagmiAccount,
-            isSovereignHandshake: false
+            address: wagmiAccount.address,
+            isConnected: true,
+            isConnecting: wagmiAccount.isConnecting,
+            isReconnecting: wagmiAccount.isReconnecting,
+            isDisconnected: false,
+            status: 'connected',
+            connector: wagmiAccount.connector,
+            chainId: wagmiAccount.chainId,
+            chain: wagmiAccount.chain,
+            isSovereignHandshake: false,
+            isChecking: false
         };
     }
 
@@ -55,17 +64,29 @@ export function useSovereignAccount() {
             address: handshakeAddress as `0x${string}`,
             isConnected: true,
             isConnecting: false,
+            isReconnecting: false,
             isDisconnected: false,
             status: 'connected',
             chain: undefined,
             chainId: 1,
             connector: undefined,
-            isSovereignHandshake: true
-        } as const;
+            isSovereignHandshake: true,
+            isChecking: false
+        };
     }
 
+    // Priority 3: Fallback to Wagmi state (Disconnected/Connecting)
     return {
-        ...wagmiAccount,
-        isSovereignHandshake: false
+        address: wagmiAccount.address,
+        isConnected: false,
+        isConnecting: wagmiAccount.isConnecting,
+        isReconnecting: wagmiAccount.isReconnecting,
+        isDisconnected: wagmiAccount.isDisconnected,
+        status: wagmiAccount.status,
+        connector: wagmiAccount.connector,
+        chainId: wagmiAccount.chainId,
+        chain: wagmiAccount.chain,
+        isSovereignHandshake: false,
+        isChecking
     };
 }

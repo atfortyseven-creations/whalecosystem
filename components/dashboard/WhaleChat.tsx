@@ -33,7 +33,7 @@ function Avatar({ address }: { address: string }) {
 }
 
 export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
-  const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
+  const { address, isConnected, isSovereignHandshake, isChecking, connector } = useSovereignAccount();
   const { signMessageAsync } = useSignMessage();
 
   const [client, setClient] = useState<Client | null>(null);
@@ -125,9 +125,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // the error boundary surfaces a manual "Retry" button. This is better than
   // silently blocking mobile users from ever seeing the Activate button.
   useEffect(() => {
-    // CRITICAL FIX: Skip auto-init for QR handshake sessions (cookie-only).
-    // These sessions lack a local wallet signer required to derive XMTP keys.
-    const shouldInit = (!isMobile || forceAutoInit) && !isSovereignHandshake;
+    // CRITICAL: only attempt auto-init if we are NOT checking handshake status
+    // and we have a valid connector. Handshake sessions (cookie-only) cannot auto-init.
+    const shouldInit = !isChecking && (!isMobile || forceAutoInit) && !isSovereignHandshake && !!connector;
     if (isConnected && address && !client && !isInitializing && shouldInit) {
       initClient();
     }
@@ -318,7 +318,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             // will throw because there is no wagmi connector. Surface a clear error.
             const msg = sigErr?.message || '';
             if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector')) {
-              throw new Error('No active wallet connection. Please connect your wallet directly to use Whale Chat.');
+              if (isSovereignHandshake) {
+                throw new Error('No active wallet connection. Please connect your wallet directly (not via QR session) to activate Whale Chat.');
+              } else {
+                throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this device.');
+              }
             }
             throw sigErr;
           }
