@@ -95,8 +95,9 @@ export default function MobileChatPage() {
 
       {/* ── Chat Panel (fills remaining height, no overflow) ── */}
       <div className="flex-1 min-h-0 overflow-hidden">
-        {/* forceAutoInit=true: overrides mobile guard so XMTP auto-connects on /chat */}
-        <WhaleChat forceAutoInit />
+        {/* forceAutoInit disabled: prevents automatic initialization failures on mobile.
+            Users can read the protocol explanation and activate manually. */}
+        <WhaleChat />
       </div>
     </div>
   );

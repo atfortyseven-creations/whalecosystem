@@ -253,37 +253,37 @@ export default function ConnectPage() {
         if (!res.ok) return;
         const data = await res.json();
         
-        if (data.encryptedPayload && data.iv) {
+        if (data.encryptedPayload || data.serverJwt) {
           setSyncStatus("SYNCED");
           clearInterval(poll);
           
           let jwt: string | null = null;
 
           // ── Strategy 1: ECDH decryption (preferred) ──────────────────────
-          // Mobile encrypted the JWT with the shared secret derived from:
-          //   mobile.priv × desktop.pub  ≡  desktop.priv × mobile.pub
-          try {
-            const { deriveSharedSecret, decryptAESGCM } = await import('@/lib/web-crypto');
-            // Parse the QR URL to get the isECDH flag
-            let isECDHFlag = false;
+          if (data.encryptedPayload && data.iv) {
             try {
-              const qrUrl = new URL(qrData);
-              isECDHFlag = qrUrl.searchParams.get('ecdh') === '1';
-            } catch {
-              // Legacy JSON format fallback
-              try { isECDHFlag = JSON.parse(qrData).isECDH ?? false; } catch {}
-            }
-            const mobilePub = data.mobilePub;
-            if (mobilePub) {
-              const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, isECDHFlag);
-              const decrypted = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
-              // Validate it looks like a JWT (three base64url segments)
-              if (decrypted && decrypted.split('.').length === 3) {
-                jwt = decrypted;
+              const { deriveSharedSecret, decryptAESGCM } = await import('@/lib/web-crypto');
+              // Parse the QR URL to get the isECDH flag
+              let isECDHFlag = false;
+              try {
+                const qrUrl = new URL(qrData);
+                isECDHFlag = qrUrl.searchParams.get('ecdh') === '1';
+              } catch {
+                // Legacy JSON format fallback
+                try { isECDHFlag = JSON.parse(qrData).isECDH ?? false; } catch {}
               }
+              const mobilePub = data.mobilePub;
+              if (mobilePub) {
+                const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, isECDHFlag);
+                const decrypted = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
+                // Validate it looks like a JWT (three base64url segments)
+                if (decrypted && decrypted.split('.').length === 3) {
+                  jwt = decrypted;
+                }
+              }
+            } catch (decryptErr) {
+              console.warn('[QRPoll] ECDH decryption failed, trying server fallback:', decryptErr);
             }
-          } catch (decryptErr) {
-            console.warn('[QRPoll] ECDH decryption failed, trying server fallback:', decryptErr);
           }
 
           // ── Strategy 2: Server-minted JWT fallback ────────────────────────
