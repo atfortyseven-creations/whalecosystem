@@ -279,8 +279,8 @@ export default RateLimiter
 // The in-memory RateLimiter above handles server-side API routes only.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// import { Ratelimit } from '@upstash/ratelimit';
-// import { Redis } from '@upstash/redis';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 export type RateLimitTier = 'FREE' | 'STANDARD' | 'STARTER' | 'PRO' | 'ELITE';
 
@@ -296,11 +296,42 @@ let _upstashRedis: any | null = null;
 const _limiters = new Map<RateLimitTier, any>();
 
 function getUpstashRedis(): any | null {
-  return null; // Disabled Upstash for edge build stability
+  if (_upstashRedis) return _upstashRedis;
+
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (!url || !token) return null;
+
+  try {
+    _upstashRedis = new Redis({ url, token });
+    return _upstashRedis;
+  } catch (err) {
+    console.error('[RateLimiter:Redis] Connection failed:', err);
+    return null;
+  }
 }
 
 function getDistributedLimiter(tier: RateLimitTier): any | null {
-  return null;
+  if (_limiters.has(tier)) return _limiters.get(tier);
+
+  const redis = getUpstashRedis();
+  if (!redis) return null;
+
+  const config = TIER_CONFIG[tier];
+  try {
+    const limiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(config.requests, config.window),
+      analytics: true,
+      prefix: `@whale-fortress/rate-limit`,
+    });
+    _limiters.set(tier, limiter);
+    return limiter;
+  } catch (err) {
+    console.error(`[RateLimiter:Tier:${tier}] Failed to initialize:`, err);
+    return null;
+  }
 }
 
 export interface DistributedRateLimitResult {

@@ -141,8 +141,15 @@ export default async function middleware(request: NextRequest) {
 
     // 1. HONEYPOT TRAP — Instant Block
     if (!isBypassIP && matchesPattern(pathname, HONEYPOT_PATTERNS)) {
-      console.log(`[WhaleFortress] 🚨 Honeypot hit by IP: ${ip} on route: ${pathname}`);
-      logAuditSafe(request, 'SECURITY_HONEYPOT_HIT', 'anonymous', ip, { path: pathname });
+      const isCommonNoise = pathname.includes('wp-') || pathname.includes('phpmyadmin');
+      if (isCommonNoise) {
+        // Log common scanner noise at info level to keep console clean
+        console.info(`[WhaleFortress:Noise] 🤖 Scanner blocked: ${ip} -> ${pathname}`);
+      } else {
+        // High-priority alert for unexpected paths (genuine security threats)
+        console.error(`[WhaleFortress:SECURITY] 🚨 SHADOW_PROBE BLOCKED: ${ip} -> ${pathname}`);
+      }
+      logAuditSafe(request, 'SECURITY_HONEYPOT_HIT', 'anonymous', ip, { path: pathname, isNoise: isCommonNoise });
       return new NextResponse(null, { status: 404 });
     }
 

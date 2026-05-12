@@ -109,10 +109,45 @@ type WalletIntelligenceDelegate = {
   count(args?: { where?: Partial<{ address: string; category: string }> }): Promise<number>;
 };
 
+type NotificationRecord = {
+  id: string;
+  userId: string | null;
+  title: string;
+  message: string;
+  type: string;
+  isGlobal: boolean;
+  actionUrl: string | null;
+  read: boolean;
+  createdAt: Date;
+};
+
+type NotificationDelegate = {
+  create(args: { data: Omit<Partial<NotificationRecord>, 'id' | 'createdAt' | 'read'> }): Promise<NotificationRecord>;
+  findMany(args?: { where?: any; orderBy?: any; take?: number }): Promise<NotificationRecord[]>;
+  update(args: { where: { id: string }; data: Partial<NotificationRecord> }): Promise<NotificationRecord>;
+};
+
+type VerificationCodeRecord = {
+  id: string;
+  code: string;
+  userId: string;
+  used: boolean;
+  expiresAt: Date;
+  createdAt: Date;
+};
+
+type VerificationCodeDelegate = {
+  create(args: { data: Omit<Partial<VerificationCodeRecord>, 'id' | 'createdAt'> }): Promise<VerificationCodeRecord>;
+  findFirst(args: { where: any; orderBy?: any }): Promise<VerificationCodeRecord | null>;
+  update(args: { where: { id: string }; data: Partial<VerificationCodeRecord> }): Promise<VerificationCodeRecord>;
+};
+
 /** PrismaClient augmented with models not yet reflected in the generated client */
 type SovereignPrismaClient = PrismaClient & {
   cosmicEntity: CosmicEntityDelegate;
   walletIntelligence: WalletIntelligenceDelegate;
+  notification: NotificationDelegate;
+  verificationCode: VerificationCodeDelegate;
 };
 
 function getProductionUrl(): string | undefined {

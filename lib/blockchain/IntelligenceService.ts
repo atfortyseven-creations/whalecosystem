@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 import { redisClient as redis } from '../redis/client';
 import { aiService, ForensicAnalysis } from '../services/AIService';
 import { blockchainService } from './BlockchainService';
+import { safeJsonParse } from '../utils/json';
 
 // ─── PRODUCTION GUARD ────────────────────────────────────────────────────────
 // IntelligenceService requires Redis to cache 10-minute reports.
@@ -51,7 +52,7 @@ export class IntelligenceService {
         const cacheKey = `token_meta:${chainId}:${tokenAddress.toLowerCase()}`;
         const cached = await redis.get(cacheKey);
 
-        if (cached) return JSON.parse(cached);
+        if (cached) return safeJsonParse(cached, null, 'TOKEN_METADATA');
 
         // Barrier: We only use RPC if not in cache
         console.log(`🧠 [CU-SHIELD] RPC Fetch for metadata: ${tokenAddress} (Chain ${chainId})`);
@@ -87,7 +88,8 @@ export class IntelligenceService {
         const cached = await redis.get(cacheKey);
         
         if (cached) {
-            return JSON.parse(cached);
+            const parsed = safeJsonParse(cached, null, 'INTEL_REPORT') as IntelligenceReport | null;
+            if (parsed) return parsed;
         }
 
         console.log(`🧠 [IntelligenceService] Generating report for ${address}...`);
@@ -322,7 +324,7 @@ export class IntelligenceService {
     public async getLiveYieldOpportunities(): Promise<any[]> {
         const cacheKey = 'live_yield_opps';
         const cached = await redis.get(cacheKey);
-        if (cached) return JSON.parse(cached);
+        if (cached) return safeJsonParse(cached, [], 'YIELD_OPPS');
 
         console.log('📡 [Yield Discovery] Scanning On-Chain Pools (Uniswap V3 / Aave V3)...');
         
@@ -360,7 +362,7 @@ export class IntelligenceService {
     public async getLiveGovProposals(): Promise<any[]> {
         const cacheKey = 'live_gov_proposals';
         const cached = await redis.get(cacheKey);
-        if (cached) return JSON.parse(cached);
+        if (cached) return safeJsonParse(cached, [], 'GOV_PROPOSALS');
 
         console.log('📡 [Gov Discovery] Synchronizing with DAO Governance Layers...');
         

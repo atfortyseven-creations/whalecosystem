@@ -9,6 +9,7 @@ import { safeToFixed, safeToLocaleString, safeCompact } from '@/lib/utils/number
 import { etherscanPortfolioService } from './EtherscanPortfolioService';
 import { getEtherscanHistory, getEtherscanNFTs } from '../etherscan-api';
 import { safeRedisGet, safeRedisSet } from '../redis/client';
+import { safeJsonParse } from '../utils/json';
 
 /**
  * PortfolioService
@@ -498,8 +499,9 @@ export class PortfolioService {
     if (!deepScan && !forceRefresh && cached && cached !== 'TIMEOUT') {
       console.log(`[Portfolio] Returning persistent data for ${rawAddress}`);
       try {
-        return JSON.parse(cached);
-      } catch {
+        const parsed = safeJsonParse(cached, null, 'PORTFOLIO_AGGREGATE');
+        if (parsed) return parsed;
+      } catch (err) {
         // Corrupted/stale cache entry — evict silently and re-fetch.
       }
     }

@@ -85,10 +85,10 @@ async function resolveApiKey(key: string): Promise<ApiKeyRecord | null> {
         const { prisma } = await import('@/lib/prisma');
         const record = await prisma.apiKey.findUnique({
             where: { key },
-            select: { tier: true, secret: true, ownerId: true, enabled: true },
+            select: { plan: true, isActive: true, userId: true },
         });
-        if (!record || !record.enabled) return null;
-        return { tier: record.tier as Tier, secret: record.secret ?? undefined, ownerId: record.ownerId };
+        if (!record || !record.isActive) return null;
+        return { tier: record.plan as Tier, ownerId: record.userId };
     } catch {
         // Prisma not available (schema missing ApiKey model) → deny
         return null;
@@ -211,17 +211,20 @@ export async function GET(req: NextRequest) {
         // [PHASE 4 - REDIS MICRO-CACHING - 5s TTL to protect DB but keep real-time latency]
         const cached = await safeRedisGet(CACHE_KEY);
         if (cached) {
-            const parsed = JSON.parse(cached);
-            return NextResponse.json({
-                ...parsed,
-                meta: { ...parsed.meta, remaining, quota: tierCfg.rateLimit, cached: true }
-            }, {
-                headers: {
-                    'Cache-Control': 'no-store',
-                    'X-RateLimit-Limit': String(tierCfg.rateLimit),
-                    'X-RateLimit-Remaining': String(remaining),
-                }
-            });
+            const { safeJsonParse } = await import('@/lib/utils/json');
+            const parsed = safeJsonParse(cached, null, 'MARKET_SIGNALS') as any;
+            if (parsed && typeof parsed === 'object') {
+                return NextResponse.json({
+                    ...parsed,
+                    meta: { ...parsed.meta, remaining, quota: tierCfg.rateLimit, cached: true }
+                }, {
+                    headers: {
+                        'Cache-Control': 'no-store',
+                        'X-RateLimit-Limit': String(tierCfg.rateLimit),
+                        'X-RateLimit-Remaining': String(remaining),
+                    }
+                });
+            }
         }
 
         const { prisma } = await import('@/lib/prisma');

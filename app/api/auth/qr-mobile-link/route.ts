@@ -47,11 +47,12 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 2. Verify mobile identity from cookies ─────────────────────────
-    // We accept EITHER:
-    //   a) A pre-existing human_session JWT (best case — re-export it)
-    //   b) A sovereign_handshake wallet address (mint fresh JWT)
     const humanSession = req.cookies.get('human_session')?.value;
     const sovereignHandshake = req.cookies.get('sovereign_handshake')?.value;
+
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`[QR:Handshake] Inspecting session cookies. human_session: ${humanSession ? 'PRESENT' : 'MISSING'}, sovereign_handshake: ${sovereignHandshake || 'MISSING'}`);
+    }
 
     let walletAddress: string | null = null;
 
@@ -60,18 +61,21 @@ export async function POST(req: NextRequest) {
         const { verifyJWT } = await import('@/lib/jwt');
         const payload = await verifyJWT(humanSession);
         walletAddress = (payload.sub as string) || (payload.address as string) || null;
-      } catch {
-        // human_session expired or invalid — fall through to sovereign_handshake
+        if (walletAddress) console.log(`[QR:Handshake] Resolved wallet from human_session: ${walletAddress}`);
+      } catch (err: any) {
+        console.warn(`[QR:Handshake] human_session validation failed: ${err.message}`);
       }
     }
 
     if (!walletAddress && sovereignHandshake) {
       if (/^0x[a-fA-F0-9]{40}$/.test(sovereignHandshake)) {
         walletAddress = sovereignHandshake.toLowerCase();
+        console.log(`[QR:Handshake] Resolved wallet from sovereign_handshake: ${walletAddress}`);
       }
     }
 
     if (!walletAddress) {
+      console.error(`[QR:Handshake:FAILURE] No valid mobile session found for UUID: ${uuid}. IP: ${req.headers.get('x-forwarded-for')}`);
       return NextResponse.json(
         { error: 'Mobile session not found. Connect your wallet first.' },
         { status: 401 }

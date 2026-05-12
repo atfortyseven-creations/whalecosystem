@@ -24,49 +24,38 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
         }
 
-        const payload = JSON.parse(rawBody);
+        const { safeJsonParse } = await import('@/lib/utils/json');
+        const payload = safeJsonParse(rawBody, null, 'SUMSUB_WEBHOOK') as any;
+        if (!payload || typeof payload !== 'object') {
+            return NextResponse.json({ error: 'Malformed or empty payload' }, { status: 400 });
+        }
         const { applicantId, reviewStatus, reviewResult } = payload;
         const externalUserId = payload.externalUserId; // Currently mapped to userId
 
         console.log(`[Webhook] Processing update for ${externalUserId}: ${reviewStatus}`);
 
-        // 2. Map Status to our Enum
+        // 2. Map Status to our Enum ('PENDING', 'APPROVED', 'REJECTED')
         let kycStatus = 'PENDING';
-        let rejectionReason = null;
 
         if (reviewStatus === 'completed') {
             if (reviewResult?.reviewAnswer === 'GREEN') {
-                kycStatus = 'VERIFIED';
+                kycStatus = 'APPROVED';
             } else {
                 kycStatus = 'REJECTED';
-                rejectionReason = reviewResult?.rejectLabels?.join(', ');
             }
-        } else if (reviewStatus === 'pending') {
-            kycStatus = 'IN_REVIEW';
         }
 
-        // 3. Update Database (with Encryption for PII)
-        // In a real scenario, we'd fetch document data securely from Sumsub API here
-        // For webhook, we just store the status update
-        
+        // 3. Update Database
         await prisma.kYCRecord.upsert({
             where: { userId: externalUserId },
             create: {
                 userId: externalUserId,
                 applicantId,
-                status: kycStatus as any,
-                riskLevel: reviewResult?.reviewAnswer === 'GREEN' ? 'LOW' : 'HIGH',
-                rejectionReason,
-                submittedAt: new Date(),
-                verifiedAt: kycStatus === 'VERIFIED' ? new Date() : null,
-                // We encrypt sensitive fields when we fetch them details
-                documentType: encryptionService.encrypt('PASSPORT'), 
+                status: kycStatus,
+                documentType: 'PASSPORT', 
             },
             update: {
-                status: kycStatus as any,
-                riskLevel: reviewResult?.reviewAnswer === 'GREEN' ? 'LOW' : 'HIGH',
-                rejectionReason,
-                verifiedAt: kycStatus === 'VERIFIED' ? new Date() : null,
+                status: kycStatus,
             }
         });
 

@@ -310,6 +310,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     setIsInitializing(true);
     setInitError('');
     try {
+      if (isMobile) {
+          await new Promise(r => setTimeout(r, 1200));
+      }
+
       const wagmiSigner = {
         getAddress: async () => address,
         signMessage: async (msg: string | Uint8Array) => {

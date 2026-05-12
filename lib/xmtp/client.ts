@@ -235,7 +235,10 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
 
     for (const dm of dms) {
       try {
-        const members: any[] = typeof dm.members === 'function' ? await dm.members() : (dm.members ?? []);
+        // v5.3.0: dm.members can be a function or a property depending on the specific implementation/version
+        const rawMembers = (dm as any).members;
+        const members: any[] = typeof rawMembers === 'function' ? await rawMembers() : (rawMembers ?? []);
+        
         const hasPeer = members.some((m: any) => {
           const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
           return addrs.some((a: string) => a.toLowerCase() === normalizedPeer);
@@ -263,9 +266,10 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
 
     for (const dm of dms) {
       try {
-        const peerInboxId: string = await (typeof dm.peerInboxId === 'function'
-          ? dm.peerInboxId()
-          : (dm.peerInboxId ?? ''));
+        const rawPeerInboxId = (dm as any).peerInboxId;
+        const peerInboxId: string = await (typeof rawPeerInboxId === 'function'
+          ? rawPeerInboxId()
+          : (rawPeerInboxId ?? ''));
 
         if (!peerInboxId) continue;
 
@@ -276,10 +280,12 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
         };
         // v5.3.0: Use getInboxIdForAddress for reliable resolution
         let resolvedInboxId: string | null = null;
+        // v5.3.0: In some versions, it's on the client, in others it's getInboxIdByAddress
         try {
-          resolvedInboxId = await client.getInboxIdForAddress(peerAddress);
+          resolvedInboxId = await (client as any).getInboxIdForAddress?.(peerAddress) ?? 
+                            await (client as any).getInboxIdByAddress?.(peerAddress);
         } catch {
-          // Fallback to canMessage check if getInboxIdForAddress fails
+          // Fallback to canMessage check if specific inbox methods fail
           const result = await Client.canMessage([identifier], XMTP_ENV);
           if (result instanceof Map) {
             const entry = Array.from(result.entries()).find(([k]) => k.toLowerCase() === normalizedPeer);
@@ -333,7 +339,8 @@ export async function discoverNewPeers(
 
     for (const dm of dms) {
       try {
-        const members: any[] = typeof dm.members === 'function' ? await dm.members() : (dm.members ?? []);
+        const rawMembers = (dm as any).members;
+        const members: any[] = typeof rawMembers === 'function' ? await rawMembers() : (rawMembers ?? []);
         for (const m of members) {
           const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
           for (const addr of addrs) {

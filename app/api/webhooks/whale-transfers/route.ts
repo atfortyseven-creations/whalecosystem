@@ -1,48 +1,49 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createRedisClient } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 const redis = createRedisClient({ name: 'Whale-Webhook' });
 
 // This endpoint receives HTTP POST requests from an on-chain indexing service like Alchemy Custom Webhooks or QuickNode Destinatioms.
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-
-        // Security: Verify Alchemy signature based on x-alchemy-signature header in a real production environment.
-        const authHeader = req.headers.get('authorization') || req.headers.get('x-alchemy-signature');
-        if (!authHeader && process.env.NODE_ENV === 'production') {
-            return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+        const rawBody = await req.text();
+        const body = safeJsonParse(rawBody, null, 'WHALE_WEBHOOK') as any;
+        if (!body || typeof body !== 'object') {
+            return NextResponse.json({ success: false, error: 'Malformed or empty payload' }, { status: 400 });
         }
 
         // Parse Payload - Expecting an array of transfers.
-        // Alchemy format often comes as body.event.activity
-        const activities = body?.event?.activity || body?.transfers || [body];
+        const activities = body.event?.activity || body.transfers || (Array.isArray(body) ? body : [body]);
 
         for (const activity of activities) {
+            if (!activity) continue; // Skip null entries in corrupted arrays
             const { fromAddress, toAddress, value, asset, hash, category } = activity;
             const threshold = 500000; // $500k Whale Threshold for notifications
 
             // Rough estimation if missing fiat value (assuming stablecoin or ETH payload mostly)
-            const usdValue = activity.usdValue || (asset === 'ETH' ? value * 3000 : value);
+            const usdValue = (activity as any).usdValue || (asset === 'ETH' ? value * 3000 : value);
 
             if (usdValue >= threshold) {
-                const txHash = hash || activity.transactionHash || `0xWeb3Tx${Date.now()}`;
+                const txHash = hash || (activity as any).transactionHash || `0xWeb3Tx${Date.now()}`;
                 const safeAsset = asset || 'UNKNOWN';
 
-                // 1. Create a Persistent DB Alert Record
-                const alertEntry = await prisma.alert.create({
+                // 1. Create a Persistent DB Notification (Global)
+                await prisma.notification.create({
                     data: {
-                        userId: 'GLOBAL_BROADCAST', // Pseudo-ID for global feed
-                        message: `🚨 ${usdValue >= 1000000 ? 'MEGALODON' : 'WHALE'} ${category || 'TRANSFER'}: ${parseFloat(value).toFixed(2)} ${safeAsset} ($${usdValue.toLocaleString()})`,
-                        type: 'WHALE_TX',
-                        txHash: txHash
+                        userId: null, // Global Notification
+                        title: `🚨 ${usdValue >= 1000000 ? 'MEGALODON' : 'WHALE'} DETECTED`,
+                        message: `${category || 'TRANSFER'}: ${parseFloat(value).toFixed(2)} ${safeAsset} ($${usdValue.toLocaleString()})`,
+                        type: 'whale',
+                        isGlobal: true,
+                        actionUrl: `https://etherscan.io/tx/${txHash}`
                     }
                 });
 
                 // 2. Push to Redis for immediate WebSocket Engine pickup
                 const streamPayload = {
-                    id: alertEntry.id,
+                    id: `whale-${Date.now()}`,
                     type: 'WHALE',
                     asset: safeAsset,
                     usdValue: usdValue,
@@ -57,7 +58,8 @@ export async function POST(req: Request) {
                 // Keep the last 100 cached for late-joiners
                 const cacheKey = 'latest_whale_alerts';
                 const cachedRaw = await redis.get(cacheKey);
-                let cachedAlerts = cachedRaw ? JSON.parse(cachedRaw) : [];
+                const { safeJsonParse } = await import('@/lib/utils/json');
+                let cachedAlerts = safeJsonParse(cachedRaw, [], 'WHALE_WEBHOOK') as any[];
                 cachedAlerts.unshift(streamPayload);
                 if (cachedAlerts.length > 100) cachedAlerts = cachedAlerts.slice(0, 100);
                 await redis.set(cacheKey, JSON.stringify(cachedAlerts), 'EX', 86400); // 24h
