@@ -291,7 +291,9 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
 
   // ── SOFT CHALLENGE (high anomaly but below hard block) ────────────────────
   if (anomalyScore >= CHALLENGE_THRESHOLD) {
-    console.warn(`[WhaleFortress:WAF] ⚠️ HIGH_ANOMALY score=${anomalyScore} ip=${ip} reasons=${reasons.join(',')}`);
+    const isOnlyNoUA = reasons.length === 1 && reasons[0] === 'NO_UA';
+    const logFn = isOnlyNoUA ? console.log : console.warn;
+    logFn(`[WhaleFortress:WAF] ${isOnlyNoUA ? 'ℹ️' : '⚠️'} HIGH_ANOMALY score=${anomalyScore} ip=${ip} reasons=${reasons.join(',')}`);
     // Don't block yet — just log. Upgrade to block if count spikes.
   }
 

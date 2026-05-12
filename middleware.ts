@@ -141,7 +141,7 @@ export default async function middleware(request: NextRequest) {
 
     // 1. HONEYPOT TRAP — Instant Block
     if (!isBypassIP && matchesPattern(pathname, HONEYPOT_PATTERNS)) {
-      console.warn(`[WhaleFortress] 🚨 Honeypot hit by IP: ${ip} on route: ${pathname}`);
+      console.log(`[WhaleFortress] 🚨 Honeypot hit by IP: ${ip} on route: ${pathname}`);
       logAuditSafe(request, 'SECURITY_HONEYPOT_HIT', 'anonymous', ip, { path: pathname });
       return new NextResponse(null, { status: 404 });
     }
@@ -160,7 +160,7 @@ export default async function middleware(request: NextRequest) {
            : 'FREE';
          const limitCheck = await checkRateLimit(ip, resolvedTier);
         if (!limitCheck.success) {
-          console.warn(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
+          console.log(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
           // Fire-and-forget audit entry — do not await to avoid adding latency
           logAuditSafe(request, 'SECURITY_RATE_LIMITED', 'system', ip, { tier, limit: limitCheck.limit, path: pathname });
           return new NextResponse(

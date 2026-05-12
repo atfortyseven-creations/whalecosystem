@@ -60,9 +60,10 @@ export function WatchlistTable() {
             if (!t) return false;
             if (hiddenTokens.includes(t.symbol) || hiddenTokens.includes(t.address)) return false;
 
-            return ((t.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (t.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (t.address ?? '').toLowerCase().includes(search.toLowerCase()));
+            const term = search.trim().toLowerCase();
+            return ((t.symbol ?? '').toLowerCase().includes(term) ||
+            (t.name ?? '').toLowerCase().includes(term) ||
+            (t.address ?? '').toLowerCase().includes(term));
         });
     }, [serverTokens, search, settings?.hiddenAssets]);
 
@@ -77,8 +78,9 @@ export function WatchlistTable() {
             if (!w) return false;
             if (hiddenWallets.includes(w.address) || hiddenWallets.includes(w.label)) return false;
 
-            return ((w.label ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (w.address ?? '').toLowerCase().includes(search.toLowerCase()));
+            const term = search.trim().toLowerCase();
+            return ((w.label ?? '').toLowerCase().includes(term) ||
+            (w.address ?? '').toLowerCase().includes(term));
         });
     }, [serverWallets, search, settings?.hiddenAssets]);
 

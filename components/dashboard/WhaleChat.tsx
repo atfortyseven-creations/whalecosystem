@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap, Mic, MicOff, Play, Pause } from 'lucide-react';
+import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap, Mic, MicOff, Play, Pause, Wallet } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
+import { useAppKit } from '@reown/appkit/react';
 import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate, discoverNewPeers } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
 import type { Client } from '@xmtp/browser-sdk';
@@ -35,6 +36,7 @@ function Avatar({ address }: { address: string }) {
 export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const { address, isConnected, isSovereignHandshake, isChecking, connector } = useSovereignAccount();
   const { signMessageAsync } = useSignMessage();
+  const { open: openAppKit } = useAppKit();
 
   const [client, setClient] = useState<Client | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
@@ -319,7 +321,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             const msg = sigErr?.message || '';
             if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector')) {
               if (isSovereignHandshake) {
-                throw new Error('No active wallet connection. Please connect your wallet directly (not via QR session) to activate Whale Chat.');
+                throw new Error('QR_SESSION_RESTRICTION');
               } else {
                 throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this device.');
               }
@@ -338,6 +340,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         setTimeout(() => { try { window.location.reload(); } catch {} }, 3000);
       } else if (err?.code === 4001 || err?.message?.toLowerCase().includes('reject')) {
         setInitError('Signature rejected. You must sign the authorization to establish the secure channel.');
+      } else if (err?.message === 'QR_SESSION_RESTRICTION') {
+        setInitError('Whale Chat requires a direct wallet connection for end-to-end encryption. QR-linked sessions are restricted to read-only dashboard access.');
       } else if (err?.message?.includes('No active wallet')) {
         setInitError('No live wallet detected. Please connect your wallet directly (not via QR session) to activate Whale Chat.');
       } else {
@@ -797,12 +801,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   You are connected via a QR link. Whale Chat requires a direct wallet connection to sign and derive encryption keys. Please connect your wallet directly to this device to enable messaging.
                 </div>
                 <button
-                  onClick={initClient}
-                  disabled={isInitializing}
-                  className="w-full px-8 py-4 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                  onClick={() => openAppKit()}
+                  className="w-full px-8 py-4 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95"
                 >
-                  <Zap size={14} /> Attempt Manual Activation
+                  <Wallet size={14} /> Connect Wallet Directly
                 </button>
+                <p className="text-[9px] text-black/30 font-mono text-center uppercase tracking-widest">
+                  Establishes a direct cryptographic link for E2EE
+                </p>
               </div>
             ) : (
               // Mobile: auto-init is skipped — show a prominent manual trigger button
