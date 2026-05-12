@@ -324,17 +324,94 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     }
   }, [activePeer, address]);
 
+  const loadConversations = async () => {
+    try {
+      const stored = localStorage.getItem(`whale_chat_history_${address}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.conversations) setConversations(parsed.conversations);
+      } else {
+        setConversations([]);
+      }
+    } catch (e) {}
+  };
+
+  /**
+   * Derive a deterministic XMTP seed from a one-time wallet signature or the Sovereign Vault.
+   * This seed is used to initialize the XMTP client without further prompts.
+   * 
+   * MASTER-FIX: Achieves 0-signature activation for Vault users and 1-signature for external wallets.
+   */
+  const getDeterministicSeed = async (): Promise<string | null> => {
+    if (!address) return null;
+    const STORAGE_KEY = `whale_chat_seed_${address.toLowerCase()}`;
+    
+    // 1. Check local storage for previously cached seed
+    const cached = localStorage.getItem(STORAGE_KEY);
+    if (cached) return cached;
+
+    // 2. 🛡️ Sovereign Vault Bridge: If user has an internal wallet, we use it to achieve ZERO signatures.
+    try {
+      const VAULT_STORAGE_KEY = "sovereign_vault_v1";
+      const storedVault = localStorage.getItem(VAULT_STORAGE_KEY);
+      if (storedVault) {
+        // Vault decoding logic (hex XOR)
+        const salt = window.location.origin;
+        const obfKey = salt.split("").map(c => c.charCodeAt(0).toString(16)).join("").substring(0, 64);
+        let pk = "";
+        for (let i = 0; i < storedVault.length; i += 2) {
+          const byte = parseInt(storedVault.substring(i, i + 2), 16);
+          pk += String.fromCharCode(byte ^ obfKey.charCodeAt((i / 2) % obfKey.length));
+        }
+        
+        if (pk.startsWith("0x") && pk.length >= 66) {
+          console.log('[XMTP] MasterBridge: Auto-activating via Sovereign Vault (0 signatures)');
+          localStorage.setItem(STORAGE_KEY, pk); // Cache for XMTP
+          return pk;
+        }
+      }
+    } catch (vaultErr) {
+      console.warn('[XMTP] Vault bridge failed, falling back to signature:', vaultErr);
+    }
+
+    // 3. Request a one-time authorization signature (External Wallets: MetaMask, etc.)
+    try {
+      // MASTER-UX: We use a very clear message so the user knows this is the ONLY time they sign.
+      const SEED_MESSAGE = "Authorize Sovereign Whale Chat Access\n\n" +
+                           "This one-time signature will establish your end-to-end encrypted messaging identity. " +
+                           "Once authorized, you will NEVER be prompted for signatures on this device again.\n\n" +
+                           "Address: " + address;
+                           
+      const signature = await signMessageAsync({ message: SEED_MESSAGE });
+      
+      // Derive a private key from the signature using keccak256
+      const { keccak256 } = await import('viem');
+      const seed = keccak256(signature as `0x${string}`);
+      
+      // Persist for future silent sessions
+      localStorage.setItem(STORAGE_KEY, seed);
+      console.log('[XMTP] Identity established via one-time signature.');
+      return seed;
+    } catch (err: any) {
+      console.warn('[XMTP] Seed derivation failed or cancelled:', err);
+      return null;
+    }
+  };
+
   // Initialize REAL XMTP Network
   const initClient = async () => {
     if (!address) return;
-    // Prevent concurrent init calls (can happen on mobile with forceAutoInit + visibility events)
     if (initInFlight.current) return;
     initInFlight.current = true;
     setIsInitializing(true);
     setInitError('');
     try {
+      // ── Step 1: Attempt to get or derive a deterministic seed ────────────────
+      // On mobile, we prefer the deterministic path to avoid switching apps 4 times.
+      const seed = await getDeterministicSeed();
+      
       if (isMobile) {
-          await new Promise(r => setTimeout(r, 1200));
+          await new Promise(r => setTimeout(r, 800)); // Slight delay for UX
       }
 
       const wagmiSigner = {
@@ -343,8 +420,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           try {
             return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
           } catch (sigErr: any) {
-            // If this is a QR/cookie-based session without a live wallet, signMessageAsync
-            // will throw because there is no wagmi connector. Surface a clear error.
             const msg = sigErr?.message || '';
             if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector')) {
               if (isSovereignHandshake) {
@@ -357,7 +432,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           }
         }
       };
-      const realClient = await getXMTPClient(wagmiSigner);
+
+      // ── Step 2: Initialize client (silent if seed is provided) ───────────────
+      const realClient = await getXMTPClient(wagmiSigner, seed || undefined);
       setClient(realClient);
       await loadConversations();
     } catch (err: any) {
@@ -387,18 +464,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         JSON.stringify({ conversations: convs }) // ZERO-MOCK: We only store the address book locally, NEVER messages.
       );
     } catch (e) { console.warn('[Chat] persist failed', e); }
-  };
-
-  const loadConversations = async () => {
-    try {
-      const stored = localStorage.getItem(`whale_chat_history_${address}`);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.conversations) setConversations(parsed.conversations);
-      } else {
-        setConversations([]);
-      }
-    } catch (e) {}
   };
 
   // Load messages when active peer changes (handled by loadConversations but filtered in render)
