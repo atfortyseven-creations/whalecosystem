@@ -94,12 +94,19 @@ export function WhaleChat() {
   // auto-call initClient so the user doesn't have to tap a button.
   // XMTP v3 stores session keys in IndexedDB — after the first sign,
   // subsequent loads are silent (no wallet prompt needed).
+  // NOTE: On mobile, XMTP WASM chunks sometimes fail to load (ChunkLoadError).
+  // We skip auto-init on mobile and let the user trigger it manually to avoid
+  // silent failures that leave the UI frozen with no clear path forward.
   useEffect(() => {
     if (isConnected && address && !client && !isInitializing) {
-      initClient();
+      // Only auto-init on desktop. On mobile, show the manual retry button
+      // so the user can tap it AFTER the page is fully loaded and stable.
+      if (!isMobile) {
+        initClient();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address]);
+  }, [isConnected, address, isMobile]);
 
   // Telemetry: Heartbeat Loop
   useEffect(() => {
@@ -203,10 +210,15 @@ export function WhaleChat() {
       await loadConversations();
     } catch (err: any) {
       console.error('Init Error:', err);
-      if (err?.code === 4001 || err?.message?.toLowerCase().includes("reject")) {
-          setInitError('Signature rejected. You must sign the authorization to establish the secure channel.');
+      // ChunkLoadError — XMTP WASM failed to load. Offer a hard reload.
+      if (err?.name === 'ChunkLoadError' || err?.message?.includes('Loading chunk')) {
+        setInitError('XMTP module failed to load. Please reload the page and try again.');
+        // Auto-reload after 3s on ChunkLoadError
+        setTimeout(() => { try { window.location.reload(); } catch {} }, 3000);
+      } else if (err?.code === 4001 || err?.message?.toLowerCase().includes('reject')) {
+        setInitError('Signature rejected. You must sign the authorization to establish the secure channel.');
       } else {
-          setInitError('Failed to initialize secure communications channel.');
+        setInitError('Failed to initialize secure communications channel.');
       }
     } finally {
       setIsInitializing(false);
@@ -299,10 +311,11 @@ export function WhaleChat() {
             const mappedIds = new Set(mappedMsgs.map(m => m.id));
             
             // Extract my sent message contents to deduplicate optimistic ones
+            // Note: mappedMsgs only carries senderInboxId (no senderAddress field)
             const myMappedContents = new Set(mappedMsgs.filter(m => {
                 const isMe = m.senderInboxId
                     ? m.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
-                    : (m.senderAddress || '').toLowerCase() === address?.toLowerCase();
+                    : false;
                 return isMe;
             }).map(m => m.content.trim()));
 
@@ -552,7 +565,7 @@ export function WhaleChat() {
                   )}
                 </button>
               </div>
-            ) : (
+            ) : isInitializing ? (
               <div className="flex items-center gap-4 p-4 rounded-xl bg-[#9945FF]/5 border border-[#9945FF]/15">
                 <Activity size={18} className="text-[#9945FF] animate-spin shrink-0" />
                 <div>
@@ -560,6 +573,15 @@ export function WhaleChat() {
                   <p className="text-[9px] text-black/40 font-mono mt-0.5">Retrieving session keys from local storage. If this is your first session, approve the signature prompt in your wallet.</p>
                 </div>
               </div>
+            ) : (
+              // Mobile: auto-init is skipped — show a prominent manual trigger button
+              <button
+                onClick={initClient}
+                disabled={isInitializing}
+                className="w-full px-8 py-4 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_20px_rgba(153,69,255,0.4)] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+              >
+                <Zap size={14} /> Activate Secure Channel
+              </button>
             )}
           </div>
         </div>

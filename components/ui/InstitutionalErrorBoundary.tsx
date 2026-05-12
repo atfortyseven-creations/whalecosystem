@@ -32,6 +32,28 @@ export class InstitutionalErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error(`[Term-Error-Node]: ${this.props.moduleName || 'Global'} Failure`, error, errorInfo);
+
+    // ── ChunkLoadError Recovery ──────────────────────────────────────────────
+    // Stale Next.js chunks (after a new deployment) cause 404s on old chunk
+    // hashes. The only fix is a hard reload to get the fresh HTML + manifest.
+    const isChunkError =
+      error?.name === 'ChunkLoadError' ||
+      error?.message?.includes('Loading chunk') ||
+      error?.message?.includes('Failed to fetch dynamically imported module') ||
+      error?.message?.includes('Importing a module script failed');
+
+    if (isChunkError) {
+      const reloadKey = 'inst_chunk_reload_attempted';
+      try {
+        if (!sessionStorage.getItem(reloadKey)) {
+          sessionStorage.setItem(reloadKey, '1');
+          console.warn('[InstitutionalErrorBoundary] ChunkLoadError — reloading to fetch fresh chunks.');
+          window.location.reload();
+        } else {
+          sessionStorage.removeItem(reloadKey);
+        }
+      } catch {}
+    }
   }
 
   private handleReset = () => {

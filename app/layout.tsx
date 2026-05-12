@@ -201,6 +201,22 @@ export default async function RootLayout({
     }catch(e2){}
   }
 })();` }} />
+        {/* ── Global ChunkLoadError Recovery ──
+            Catches router-level dynamic import failures (stale deployment)
+            that bubble past React Error Boundaries. */}
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: `(function(){
+  window.addEventListener('unhandledrejection', function(event) {
+    var msg = event.reason ? (event.reason.message || event.reason.name || '') : '';
+    if (msg.includes('ChunkLoadError') || msg.includes('dynamically imported module')) {
+      if (!sessionStorage.getItem('global_chunk_reload')) {
+        sessionStorage.setItem('global_chunk_reload', '1');
+        window.location.reload(true);
+      } else {
+        sessionStorage.removeItem('global_chunk_reload');
+      }
+    }
+  });
+})();` }} />
         <script
           nonce={nonce}
           type="application/ld+json"

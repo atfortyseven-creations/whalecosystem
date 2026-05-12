@@ -57,6 +57,30 @@ export class DashboardErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("[DashboardErrorBoundary] Panel fault:", error.message, errorInfo.componentStack?.slice(0, 300));
+
+    // ── ChunkLoadError Recovery ──────────────────────────────────────────────
+    // When Next.js deploys a new build, old chunk hashes become 404s. The only
+    // correct fix is a hard reload to fetch the current HTML + chunk manifest.
+    // We guard with sessionStorage to avoid infinite reload loops.
+    const isChunkError =
+      error?.name === 'ChunkLoadError' ||
+      error?.message?.includes('Loading chunk') ||
+      error?.message?.includes('Failed to fetch dynamically imported module') ||
+      error?.message?.includes('Importing a module script failed');
+
+    if (isChunkError) {
+      const reloadKey = 'chunk_reload_attempted';
+      try {
+        if (!sessionStorage.getItem(reloadKey)) {
+          sessionStorage.setItem(reloadKey, '1');
+          console.warn('[DashboardErrorBoundary] ChunkLoadError detected — reloading page to fetch fresh chunks.');
+          window.location.reload();
+        } else {
+          // Second failure after reload — clear flag so next session tries again
+          sessionStorage.removeItem(reloadKey);
+        }
+      } catch {}
+    }
   }
 
   public render() {
