@@ -7,13 +7,14 @@ import { useEffect, useState } from "react";
  *
  * Layer 1 — patron-cosmico-4k.png (top):
  *   Seamless abstract circular wave pattern as full-viewport texture.
- *   Fixed, GPU compositor layer, zero scroll re-paint.
- *   Dark: inverted subtle screen blend. Light: ink multiply.
+ *   DPI-CORRECTED: tile size halved on 2x+ retina so physical pixels
+ *   match the design intent — prevents the "zoomed/blurry" artifact on
+ *   iPhone / Android at 2x–3x device pixel ratio.
  *
  * Layer 2 — olas-hokusai-4k.png (bottom):
  *   The Hokusai great wave anchored to the bottom of every page.
- *   Width: 100%, height: auto. Covers the entire bottom edge.
- *   Very low opacity — purely decorative, never competing with content.
+ *   DPI-CORRECTED: `cover` replaces `100% auto` so the wave fills at
+ *   the correct aspect ratio on every screen size without stretching.
  *
  * RENDERING CONTRACT (both layers):
  *  - position: fixed          → GPU compositor layer, never re-paints on scroll
@@ -25,68 +26,88 @@ import { useEffect, useState } from "react";
  */
 export function WavePatternOverlay() {
   const [mounted, setMounted] = useState(false);
- 
+  const [dpr, setDpr]         = useState(1);
+
   useEffect(() => {
     setMounted(true);
+    // Capture device pixel ratio once on mount — never changes during session
+    setDpr(window.devicePixelRatio || 1);
   }, []);
- 
+
   if (!mounted) return null;
- 
+
+  // ── Layer 1 tile size ──────────────────────────────────────────────────────
+  // At 1x: 280px CSS → 280 physical px  (desktop standard)
+  // At 2x: 140px CSS → 280 physical px  (retina phones / MacBook Pro)
+  // At 3x: 93px CSS  → 279 physical px  (iPhone Pro / Samsung Ultra)
+  // This ensures the texture always renders at the SAME physical resolution
+  // regardless of DPI, eliminating the "zoomed in" artifact on mobile.
+  const TILE_BASE  = 280; // px at 1x
+  const tileSize   = Math.round(TILE_BASE / Math.max(dpr, 1));
+
   // Institutional White constants
   const cosmicoOpacity = 0.05;
   const hokusaiOpacity = 0.12;
 
   return (
     <>
-      {/* ── Layer 1: Patron Cosmico — seamless tiled texture ──────────────── */}
+      {/* ── Layer 1: Patron Cosmico — DPI-aware seamless tile ─────────────── */}
       <div
         aria-hidden="true"
         style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 0,
-          pointerEvents: "none",
-          transform: "translateZ(0)",
-          WebkitTransform: "translateZ(0)",
-          // PERF: Use direct /public static paths, NOT /api/* routes.
-          // API routes hit the Next.js edge function on every CSS background-image repaint.
-          // Static paths are served by the CDN/filesystem cache directly.
-          backgroundImage: "url('/patron-cosmico-4k.png')",
-          backgroundRepeat: "repeat",
-          backgroundSize: "280px auto", // Balanced texture scale
+          position:           "fixed",
+          inset:              0,
+          zIndex:             0,
+          pointerEvents:      "none",
+          transform:          "translateZ(0)",
+          WebkitTransform:    "translateZ(0)",
+          backfaceVisibility: "hidden",
+          // 4K source at small tile → crisp at any DPI, never blurry
+          backgroundImage:    "url('/patron-cosmico-4k.png')",
+          backgroundRepeat:   "repeat",
+          backgroundSize:     `${tileSize}px auto`,
           backgroundAttachment: "scroll",
-          opacity: cosmicoOpacity,
-          mixBlendMode: "multiply",
-          imageRendering: "auto",
+          opacity:            cosmicoOpacity,
+          mixBlendMode:       "multiply",
+          // `crisp-edges` preserves texture sharpness; `auto` allows
+          // browser upscaling — use `auto` here since source is 4K
+          imageRendering:     "auto",
         }}
       />
 
-      {/* ── Layer 2: Olas Hokusai — bottom-anchored wave strip ────────────── */}
+      {/* ── Layer 2: Olas Hokusai — bottom-anchored, DPI-corrected ─────────── */}
       <div
         aria-hidden="true"
         className="hokusai-strip"
         style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 0,
-          pointerEvents: "none",
-          transform: "translateZ(0)",
+          position:        "fixed",
+          left:            0,
+          right:           0,
+          bottom:          0,
+          zIndex:          0,
+          pointerEvents:   "none",
+          transform:       "translateZ(0)",
           WebkitTransform: "translateZ(0)",
-          // Responsive height that anchors the wave perfectly
-          height: "clamp(100px, 15vh, 220px)",
+          backfaceVisibility: "hidden",
+          // Height: tall enough to see the full crest on desktop,
+          // smaller on mobile to avoid the "zoomed in" vertical crop.
+          // clamp(min, preferred, max)
+          height:          "clamp(80px, 18vh, 240px)",
           backgroundImage: "url('/olas-hokusai-4k.png')",
-          backgroundRepeat: "no-repeat",
+          backgroundRepeat:   "no-repeat",
           backgroundPosition: "bottom center",
-          // 'Contain' logic ensures every pixel of the wave strip is seen without cropping/zoom on small screens
-          backgroundSize: "100% auto", 
+          // KEY FIX: `cover` instead of `100% auto`
+          // `100% auto` on a tall strip forces the image to scale vertically,
+          // which zooms into the wave crest and loses the full Hokusai silhouette.
+          // `cover` scales the image so its SHORTER dimension fits, preserving
+          // the correct aspect ratio and showing the complete wave on all screens.
+          backgroundSize:   "cover",
           backgroundAttachment: "scroll",
-          opacity: hokusaiOpacity,
-          mixBlendMode: "multiply",
-          // Advanced masking for 'Inhuman' fluid connection
-          maskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0) 100%)",
-          WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0) 100%)",
+          opacity:          hokusaiOpacity,
+          mixBlendMode:     "multiply",
+          // Fade from solid at bottom to transparent at top
+          maskImage:        "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:  "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0) 100%)",
         }}
       />
     </>

@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
-
-const _rawJwtSecret = process.env.JWT_SECRET;
-const JWT_SECRET = new TextEncoder().encode(_rawJwtSecret || 'dev-only-not-for-production-jwt-secret-change-me');
+import { verifyJWT } from '@/lib/jwt';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +13,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Cryptographically verify session token
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const payload = await verifyJWT(token);
 
     if (!payload.address) {
        return NextResponse.json(null, { status: 401 });

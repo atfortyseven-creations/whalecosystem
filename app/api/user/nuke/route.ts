@@ -72,7 +72,7 @@ export async function POST(req: Request) {
 
                 // Record the irreversible cryptographic proof securely in General Log (Zk-Hash mapped)
                 const salt = process.env.NUKE_SALT || 'WhaleAlert_ZeroG_Salt_777';
-                const addressHash = createHash('sha256').update(userAddress + salt).digest('hex');
+                const deletionCommitment = createHash('sha256').update(userAddress + salt).digest('hex');
                 
                 await tx.log.create({
                     data: {
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
                         message: "DATA_NUKE",
                         source: "WhaleFortress Nuke Core",
                         metadata: {
-                            addressHash,
+                            deletionCommitment,
                             proofSignature: signature,
                             resolvedAt: new Date().toISOString()
                         }

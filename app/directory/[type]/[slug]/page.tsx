@@ -8,9 +8,9 @@ export const revalidate = 60; // 1-minute caching for directory updates
 export default async function KnowledgeGraphEntityPage({
   params
 }: {
-  params: { type: string, slug: string }
+  params: Promise<{ type: string, slug: string }>
 }) {
-  const { type, slug } = params;
+  const { type, slug } = await params;
 
   // Allowed dynamic types: 'people', 'companies', 'tokens'
   const TypeMapping: Record<string, string> = {

@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     try {
         // 1. Get User's Alert Rules
         const rules = await prisma.alertRule.findMany({
-            where: { userId, enabled: true }
+            where: { userId, isActive: true }
         });
 
         if (rules.length === 0) {
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
                     walletLabel: wallet.label,
                     walletAddress: wallet.address,
                     title: isBigMove ? '🚨 Whale Movement Detected' : '💼 Wallet Activity',
-                    description: `Detected ${tx.safeToFixed(value, 4)} ${symbol} transfer from ${wallet.label}`,
+                    description: `Detected ${safeToFixed(tx.value || 0, 4)} ${symbol} transfer from ${wallet.label}`,
                     action: {
                         type: 'TRANSFER',
                         token: symbol,

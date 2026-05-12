@@ -14,7 +14,15 @@ import { whaleEngine } from '@/lib/blockchain/whale-ws-engine';
 
 export const dynamic = 'force-dynamic';
 
+let activeSSE = 0;
+const MAX_SSE_PER_INSTANCE = 500;
+
 export async function GET(req: Request) {
+    if (activeSSE >= MAX_SSE_PER_INSTANCE) {
+        return new Response('Service at capacity', { status: 503 });
+    }
+    
+    activeSSE++;
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
@@ -46,6 +54,7 @@ export async function GET(req: Request) {
 
             // Cleanup on client disconnect
             req.signal.addEventListener('abort', () => {
+                activeSSE--;
                 clearInterval(keepAlive);
                 unsubscribe();
                 try { controller.close(); } catch {}

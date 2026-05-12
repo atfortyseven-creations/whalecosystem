@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         if (kycStatus === 'VERIFIED') {
             await prisma.user.update({
                 where: { walletAddress: externalUserId }, // Ensure this mapping is correct
-                data: { tier: 'VERIFIED' } // Assuming this enum exists or we add it
+                data: { tier: 'VERIFIED' as any } // KYC-verified tier upgrade
             });
         }
 

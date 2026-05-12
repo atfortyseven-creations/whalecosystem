@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SiweMessage } from 'siwe';
 import { prisma } from '@/lib/prisma';
-import { SignJWT } from 'jose';
 
 // FIX: Same VOID_SECRET_99_POLY vulnerability as lib/session.ts.
 // Removed hardcoded fallback. Guard instead of silently using a known secret.
@@ -55,20 +54,26 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Mint Sovereign JWT ────────────────────────────────────────────────────
-    const jwtPayload = {
+    const { mintJWT } = await import('@/lib/jwt');
+    const sessionToken = await mintJWT({
       sub: fields.address.toLowerCase(),
       address: fields.address.toLowerCase(),
       chainId: fields.chainId,
       domain: fields.domain,
       issuedAt: fields.issuedAt,
-      clearance: 'SOVEREIGN', // Institutional-grade access level
-    };
+      clearance: 'SOVEREIGN',
+      tier: user?.tier || 'FREE',
+      kycStatus: 'UNVERIFIED',
+      humanityScore: user?.humanityScore || 0,
+    });
 
-    const sessionToken = await new SignJWT(jwtPayload)
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('7d')
-      .sign(JWT_SECRET);
+    // Cache tier in Redis for 10 min (Edge Middleware Rate Limiting)
+    const { safeRedisSet } = await import('@/lib/redis/client');
+    await safeRedisSet(`tier:${fields.address.toLowerCase()}`, JSON.stringify({
+        tier: user?.tier || 'FREE',
+        kycStatus: 'UNVERIFIED',
+        humanityScore: user?.humanityScore || 0
+    }), 'EX', 600);
 
     // ── Build response with all session cookies ───────────────────────────────
     const res = NextResponse.json({

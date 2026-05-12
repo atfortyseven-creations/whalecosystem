@@ -23,13 +23,13 @@ interface TitaniumGateProps {
 }
 
 export function TitaniumGate({ children }: TitaniumGateProps) {
-    const { isConnected } = useAccount();
+    const { isConnected, isConnecting, isReconnecting } = useAccount();
     const pathname = usePathname();
     const router = useRouter();
 
     // Pre-compute isPublicPage synchronously so we can use it as the initial state.
     // This prevents the loader flash on /connect after disconnect.
-    const initialIsPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers', '/'].some(
+    const initialIsPublicPage = ['/', '/connect', '/docs', '/terms', '/privacy', '/developers', '/forum', '/careers', '/news', '/pricing'].some(
         path => path === pathname || (path !== '/' && pathname?.startsWith(path))
     );
 
@@ -49,7 +49,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     }, []);
     
     // Strict Whitelist: ONLY connect, docs, terms, privacy, and developers are visible to unauthenticated users.
-    const isPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers', '/'].some(
+    const isPublicPage = ['/', '/connect', '/docs', '/terms', '/privacy', '/developers', '/forum', '/careers', '/news', '/pricing'].some(
         path => path === pathname || (path !== '/' && pathname?.startsWith(path))
     );
 
@@ -63,10 +63,21 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     }, [isPublicPage]);
 
     useEffect(() => {
-        // Add a short debounce so transient connection states (e.g. wallet just
-        // connected but cookie not yet written) don't trigger a premature redirect.
+        // Increased debounce: 300ms was too short — on first mobile connection,
+        // establishSession() writes the cookie AFTER wagmi reconnects (~200-400ms).
+        // 1500ms gives wagmi + cookie-write time to complete before we gate.
+        // With ssr:true + cookieStorage in appkit.tsx, reconnect is now synchronous
+        // on return visits, so this guard only fires on the first-ever connect.
         const checkTimer = setTimeout(() => {
             if (!mounted) return;
+
+            // Failsafe: if we are in the middle of connecting/reconnecting, WAIT.
+            // This prevents aggressive redirects while the wallet modal is open.
+            if (isConnecting || isReconnecting) return;
+
+            // [EXPERT SECURITY FIX] Removed sovereign_pending_wakeup bypass.
+            // Relying on localStorage for gating allowed a permanent UI bypass to protected routes.
+            // If the user is genuinely recovering, isConnecting/isReconnecting will hold the gate.
 
             // Priority 1: Wagmi is connected
             if (isConnected) {
@@ -74,14 +85,15 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                 return;
             }
 
-            // Priority 2: Public Page
+            // Priority 2: Public Page (/, /connect, /docs, etc.)
             if (isPublicPage) {
                 setState('APP');
                 return;
             }
 
-            // Priority 3: Sovereign Handshake (Cookie)
-            const hasHandshake = typeof document !== 'undefined' && document.cookie.includes('sovereign_handshake=');
+            // Priority 3: Sovereign Handshake (Cookie — must have real 0x address)
+            const hasHandshake = typeof document !== 'undefined'
+                && document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
             if (hasHandshake) {
                 setState('APP');
                 return;
@@ -90,10 +102,10 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             // Otherwise: Access Denied — redirect to connect
             setState('AUTH');
             if (pathname !== '/connect') router.push('/connect');
-        }, 300); // 300ms debounce prevents false-positive redirects during connection handshake
+        }, 1500);
 
         return () => clearTimeout(checkTimer);
-    }, [isConnected, isPublicPage, router, mounted, pathname]);
+    }, [isConnected, isConnecting, isReconnecting, isPublicPage, router, mounted, pathname]);
 
 
     // [iOS PERFECTION] We no longer return an invisible div. Instead, we render
@@ -114,27 +126,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                     </div>
                 ) : (
                     /* THE SKELETON / LOADING ENGINE */
-                    <motion.div
-                        key="gate-loader"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[1000] bg-[#FAF9F6] flex flex-col items-center justify-center p-8"
-                    >
-                         <WhaleAlertLoader />
-                         <div className="mt-8 flex flex-col items-center gap-2">
-                             <div className="w-48 h-[1px] bg-black/5 relative overflow-hidden">
-                                 <motion.div 
-                                     className="absolute inset-0 bg-black/20"
-                                     animate={{ x: ['-100%', '100%'] }}
-                                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                 />
-                             </div>
-                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">
-                                 Sovereign Identity Resuming
-                             </span>
-                         </div>
-                    </motion.div>
+                    null
                 )}
             </AnimatePresence>
         </GateStateContext.Provider>

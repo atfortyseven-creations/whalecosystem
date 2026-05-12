@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
+// Axioma 452 — SW registered here (non-blocking)
+// Axioma 350 — Funnel tracking per navigation
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -8,7 +10,7 @@ import { useSovereignSessionLock } from '@/hooks/useSovereignSessionLock';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
-import { MobileNavBar } from '@/components/layout/MobileNavBar';
+
 import { ZoomWrapper } from './ZoomWrapper';
 import dynamic from 'next/dynamic';
 
@@ -24,10 +26,7 @@ const BillionWhaleNotification = dynamic(
   () => import('@/components/shared/UtilityPanels').then(m => ({ default: m.BillionWhaleNotification })),
   { ssr: false }
 );
-const ConnectWalletModal = dynamic(
-  () => import('@/components/shared/ConnectWalletModal').then(m => ({ default: m.ConnectWalletModal })),
-  { ssr: false }
-);
+
 const LinkedGate = dynamic(
   () => import('@/components/shared/LinkedGate').then(m => ({ default: m.LinkedGate })),
   { ssr: false }
@@ -36,18 +35,19 @@ const LinkedGate = dynamic(
 // ─────────────────────────────────────────────────────────────────────────────
 // Routes that don't need the gate (public / landing)
 // ─────────────────────────────────────────────────────────────────────────────
-const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/news'];
+const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/news', '/careers', '/pricing'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Routes that must NOT get the legacy black Downhead footer
 // ─────────────────────────────────────────────────────────────────────────────
 const NO_DOWNHEAD_PREFIXES = [
-  '/dashboard', '/portfolio', '/academy', '/support', '/network',
+  '/dashboard', '/portfolio', '/academy', '/support',
   '/docs', '/privacy', '/terms', '/ticket', '/news', '/connect',
-  '/voss-supremacy', '/sovereign-intel', '/predictions', '/ledger',
+  '/voss-supremacy', '/predictions', '/ledger',
   '/gold-registry', '/infrastructure', '/directory', '/company',
   '/vip', '/faq', '/api-marketplace', '/clearance', '/settings',
-  '/login', '/sign-up', '/legal', '/admin', '/developer',
+  '/login', '/sign-up', '/legal', '/admin', '/developer', '/forum',
+  '/careers',
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,12 +56,13 @@ const NO_DOWNHEAD_PREFIXES = [
 // WhaleProShell with its own fixed-inset shell) should be fully contained.
 // ─────────────────────────────────────────────────────────────────────────────
 const BOUNDED_PREFIXES = [
-  '/portfolio', '/academy', '/support', '/news', '/network',
-  '/predictions', '/ledger', '/sovereign-intel', '/voss-supremacy',
+  '/portfolio', '/academy', '/support', '/news',
+  '/predictions', '/ledger', '/voss-supremacy',
   '/gold-registry', '/vip', '/developer', '/developers', '/faq',
   '/ticket', '/settings', '/docs', '/privacy', '/terms', '/legal',
   '/connect', '/sign-up', '/login', '/admin', '/clearance',
   '/api-marketplace', '/directory', '/company', '/infrastructure',
+  '/forum',
 ];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -74,14 +75,51 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     fetchSettings();
   }, [fetchSettings]);
 
-  // Log page navigation
+  // ── Axioma 452: PWA Service Worker registration ─────────────────────────────
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js', { scope: '/' })
+        .then((reg) => {
+          console.info('[SW] Registered:', reg.scope);
+          // Check for waiting updates
+          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          reg.addEventListener('updatefound', () => {
+            const newSW = reg.installing;
+            if (!newSW) return;
+            newSW.addEventListener('statechange', () => {
+              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                console.info('[SW] Update available — will apply on next visit.');
+              }
+            });
+          });
+        })
+        .catch((err) => console.warn('[SW] Registration failed:', err));
+    }
+  }, []);
+
+  // ── Axioma 350: Funnel tracking per navigation (non-blocking) ───────────────
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Session log (existing)
       fetch('/api/session-logs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: `NAVIGATED_TO: ${pathname || '/'}` })
       }).catch(() => {});
+      // Funnel step tracking
+      const step = pathname === '/' ? 'LANDING'
+        : pathname.startsWith('/connect') ? 'WALLET_CONNECT'
+        : pathname.startsWith('/dashboard') ? 'DASHBOARD'
+        : pathname.startsWith('/pricing') ? 'PLAN_VIEW'
+        : null;
+      if (step) {
+        fetch('/api/analytics/funnel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step, ts: Date.now() }),
+        }).catch(() => {});
+      }
     }
   }, [pathname]);
 
@@ -93,7 +131,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   // BOUNDED    → h-[100dvh] overflow-hidden       (header + inner scroll box)
   // LANDING    → min-h-screen natural document scroll (immersive manifesto)
   const isDashboard = pathname.startsWith('/dashboard');
-  const isBounded = !isDashboard && pathname !== '/' && BOUNDED_PREFIXES.some(p => pathname.startsWith(p));
+  const isBounded = !isDashboard && (pathname === '/' || BOUNDED_PREFIXES.some(p => pathname.startsWith(p)));
   const isLanding = pathname === '/';
 
   // Strict body trap for PC/Desktop — completely block document-level scrolling on bounded modules
@@ -224,10 +262,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   // Root container
   const rootClass = isDashboard
-    ? 'fixed inset-0 h-[100vh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0'
+    ? 'fixed inset-0 h-[100vh] w-[100vw] overflow-hidden flex flex-col bg-transparent z-0'
     : isBounded
-      ? 'fixed inset-0 h-[100vh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0'
-      : 'min-h-[100vh] w-full relative z-0 flex flex-col bg-[#FAF9F6] overflow-x-hidden';
+      ? 'fixed inset-0 h-[100vh] w-[100vw] overflow-hidden flex flex-col bg-transparent z-0'
+      : 'min-h-[100vh] w-full relative z-0 flex flex-col bg-transparent overflow-x-hidden';
 
   // Inner wrapper (below header)
   const innerClass = isDashboard
@@ -248,18 +286,19 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     !NO_DOWNHEAD_PREFIXES.some(p => pathname.startsWith(p));
 
   const showInstitutionalHeader =
-    pathname === '/network' ||
+    pathname === '/ledger' ||
     pathname === '/portfolio' ||
     pathname === '/support' ||
     pathname === '/academy' ||
     pathname === '/vip' ||
+    pathname === '/news' ||
+    pathname === '/pricing' ||
+    pathname === '/careers' ||
+    pathname.startsWith('/forum') ||
     pathname === '/';
-
-  const showMobileNavBar = !pathname.startsWith('/news');
 
   return (
     <>
-      <ConnectWalletModal />
 
       <TitaniumGate>
         {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}
@@ -295,8 +334,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
           {/* Legacy dark footer — only on routes that still need it */}
           {showDownhead && <Downhead />}
-
-          {showMobileNavBar && <MobileNavBar />}
         </div>
       </TitaniumGate>
     </>

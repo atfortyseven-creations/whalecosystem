@@ -16,9 +16,9 @@ export async function GET(req: NextRequest) {
     try {
         const alerts = await Promise.race([
             whaleService.getLatestWhaleActivity(
-                50,       // Limit
-                undefined, // All tokens (symbol)
-                15000     // Min Value $15k (Sync with Institutional Filter)
+                50,
+                undefined as any,
+                15000 as any
             ),
             new Promise<never>((_, reject) =>
                 setTimeout(() => reject(new Error('Alpha scanner timeout')), API_TIMEOUT_MS)
@@ -38,15 +38,15 @@ export async function GET(req: NextRequest) {
             usdValue: evt.usdNum >= 1_000_000
                 ? `$${(evt.usdNum / 1_000_000).toFixed(2)}M`
                 : `$${(evt.usdNum / 1_000).toFixed(0)}K`,
-            dex: evt.dex || 'Ethereum',
-            winRate: evt.winRate || 92,
+            dex: (evt as any).dex || 'Ethereum',
+            winRate: (evt as any).winRate || 92,
             age: Math.floor((Date.now() - evt.ts) / 1000),
             hash: evt.hash,
             ts: evt.ts,
             type: evt.action === 'BUY' ? 'accumulation' : (evt.action === 'SELL' ? 'dump' : 'transfer'),
             confidence: evt.confidence || 95,
             // ⚡ V6.0 Deep Telemetry Fields
-            gasUsd: evt.gasUsd,
+            gasUsd: (evt as any).gasUsd,
             blockConfirmations: evt.confirmations,
             telemetryTag: evt.telemetryTag,
         }));

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-// Imports removed
 import { 
   exportTransactionsToCSV,
   type TransactionType 
@@ -8,6 +7,13 @@ import {
   getTransactionHistory, 
   getTransactionStats
 } from '@/lib/wallet/transactions-server';
+
+/** Safe JSON serializer — converts BigInt to string to avoid JSON.stringify crash */
+function safeStringify(data: unknown): string {
+  return JSON.stringify(data, (_, v) =>
+    typeof v === 'bigint' ? v.toString() : v
+  );
+}
 
 /**
  * GET /api/wallet/transactions
@@ -24,10 +30,8 @@ export async function GET(request: NextRequest) {
     const offset = searchParams.get('offset');
     const format = searchParams.get('format');
 
-    // We allow fetching public transaction data for any "address" (authUserId)
-    // In a real app, you might want to verify if the requestor owns the address via Clerk
     if (!authUserId) {
-        return NextResponse.json({ error: 'Missing authUserId (wallet address)' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing authUserId (wallet address)' }, { status: 400 });
     }
 
     const transactions = await getTransactionHistory(authUserId, {
@@ -49,7 +53,11 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ transactions });
+    // Use safe serializer to avoid BigInt crash
+    return new NextResponse(safeStringify({ transactions }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error fetching transactions:', error);
     return NextResponse.json(
@@ -60,7 +68,7 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * GET /api/wallet/transactions/stats
+ * POST /api/wallet/transactions/stats
  * Get transaction statistics
  */
 export async function POST(request: NextRequest) {
@@ -69,12 +77,15 @@ export async function POST(request: NextRequest) {
     const { authUserId } = body;
 
     if (!authUserId) {
-        return NextResponse.json({ error: 'Missing authUserId' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing authUserId' }, { status: 400 });
     }
 
     const stats = await getTransactionStats(authUserId);
 
-    return NextResponse.json({ stats });
+    return new NextResponse(safeStringify({ stats }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error fetching transaction stats:', error);
     return NextResponse.json(
@@ -83,4 +94,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

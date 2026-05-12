@@ -78,17 +78,17 @@ const FALLBACK_SECTIONS: ManifestoSection[] = [
   },
 ];
 
-export function parseReadmeToManifesto(): ManifestoSection[] {
+export function parseReadmeToManifesto(filename: string = 'README.md'): ManifestoSection[] {
   let content = '';
   try {
-    const readmePath = path.join(process.cwd(), 'README.md');
+    const readmePath = path.join(process.cwd(), filename);
     if (!fs.existsSync(readmePath)) {
-      console.warn('[MANIFESTO] README.md not found, using fallback content.');
+      console.warn(`[MANIFESTO] ${filename} not found, using fallback content.`);
       return FALLBACK_SECTIONS;
     }
     content = fs.readFileSync(readmePath, 'utf8');
   } catch (error) {
-    console.error('[MANIFESTO] Failed to read README.md, using fallback:', error);
+    console.error(`[MANIFESTO] Failed to read ${filename}, using fallback:`, error);
     return FALLBACK_SECTIONS;
   }
 

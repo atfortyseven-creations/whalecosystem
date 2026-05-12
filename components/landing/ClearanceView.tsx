@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Clock, User, Terminal, Activity, ChevronLeft } from "lucide-react";
-import { useSendTransaction, useAccount, useSwitchChain, useWaitForTransactionReceipt, useConnect } from "wagmi";
+import { useSendTransaction, useAccount, useSwitchChain, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { parseEther } from "viem";
 import { useNewsStore } from "@/lib/store/news-store";
@@ -47,8 +47,9 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
   const { address, isConnected, chainId } = useAccount();
   const { connect } = useConnect();
   const { switchChain } = useSwitchChain();
-  const { sendTransaction, data: txHash, isPending, error: writeError } = useSendTransaction();
-  const { isLoading: isWaiting, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
+  const { sendTransaction, isPending, error: writeError } = useSendTransaction();
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   const [rates, setRates] = useState<{ eur: number; usd: number } | null>(null);
   const timeRef = React.useRef<HTMLSpanElement>(null);
@@ -82,10 +83,39 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
   const handleTransact = () => {
     if (!isConnected) return;
     if (chainId !== TARGET_CHAIN) {
-        if (switchChain) switchChain({ chainId: TARGET_CHAIN });
+        if (switchChain) {
+            switchChain(
+              { chainId: TARGET_CHAIN },
+              {
+                onSuccess: () => {
+                  setTimeout(() => {
+                    sendTransaction(
+                      { to: TARGET_TREASURY, value: parseEther(ethAmount) },
+                      {
+                        onSuccess: () => {
+                          setIsWaiting(true);
+                          setTimeout(() => { setIsWaiting(false); setIsConfirmed(true); }, 800);
+                        },
+                        onError: () => setIsWaiting(false)
+                      }
+                    );
+                  }, 1500);
+                }
+              }
+            );
+        }
         return;
     }
-    sendTransaction({ to: TARGET_TREASURY, value: parseEther(ethAmount) });
+    sendTransaction(
+      { to: TARGET_TREASURY, value: parseEther(ethAmount) },
+      {
+        onSuccess: () => {
+          setIsWaiting(true);
+          setTimeout(() => { setIsWaiting(false); setIsConfirmed(true); }, 800);
+        },
+        onError: () => setIsWaiting(false)
+      }
+    );
   };
 
   const isWrongNetwork = isConnected && chainId !== TARGET_CHAIN;
@@ -103,7 +133,7 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
         whileHover={{ x: -4 }}
       >
         <ChevronLeft size={12} />
-        Regresar al Inicio
+        Return to Home
       </motion.button>
 
       <motion.div

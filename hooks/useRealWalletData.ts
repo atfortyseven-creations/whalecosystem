@@ -7,8 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWalletStore } from '@/lib/store/wallet-store';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
-// Dirección de Bridged USDC en Polygon
-const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
 
 export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?: string) => {
     const { address: web3Address, isConnected: isWeb3Connected } = useAccount();
@@ -45,14 +43,14 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     // [DEBUG] Monitor address resolution changes
     // console.log('[useRealWalletData] Address Resolution:', { effectiveAddress, isConnected, isAuthenticated, isWeb3Connected, handshakeAddressFromCookie });
 
-    // 1. On-Chain Balance (Wagmi ya maneja su propio caché/reactividad)
+    // 1. On-Chain Native Balance (Wagmi v2 — no 'token' param, that's deprecated)
+    // ERC-20 USDC balance is already fetched by the portfolio assets API below.
     const { data: balanceData, isLoading: isBalanceLoading } = useBalance({
-        address: effectiveAddress,
-        token: USDC_ADDRESS,
-        chainId: 137, // Polygon
+        address: effectiveAddress as `0x${string}` | undefined,
+        chainId: 1, // Ethereum mainnet native balance
         query: {
             enabled: !!effectiveAddress,
-            refetchInterval: 10000, // Sync on-chain balance every 10s
+            refetchInterval: 10000,
         }
     });
 
@@ -106,15 +104,15 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     const positions: Position[] = (Array.isArray(positionsRaw) ? positionsRaw : []).map((pos: any) => {
         // Fix for crash reported by user: outcomePrices might be undefined
         const prices = pos.market?.outcomePrices;
-        const currentPrice = prices ? parseFloat(prices[pos.outcomeIndex]) : 0;
-        const avgPrice = parseFloat(pos.avgPrice) || currentPrice;
-        const size = parseFloat(pos.size);
+        const currentPrice = Array.isArray(prices) && prices[pos.outcomeIndex] ? parseFloat(prices[pos.outcomeIndex]) : 0;
+        const avgPrice = parseFloat(pos.avgPrice) || currentPrice || 0;
+        const size = parseFloat(pos.size) || 0;
 
         // Cálculo PnL
         const value = size * currentPrice;
         const cost = size * avgPrice;
-        const pnl = value - cost;
-        const pnlPercent = cost > 0 ? (pnl / cost) * 100 : 0;
+        const pnl = isNaN(value - cost) ? 0 : (value - cost);
+        const pnlPercent = cost > 0 && !isNaN(pnl) ? (pnl / cost) * 100 : 0;
 
         // News Matching
         const newsContext = matchNewsToMarket(pos.market?.question || "", recentNews);
@@ -146,23 +144,39 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     })) || [];
 
     // Assets processing (Mapped from Elite service)
+    const CHAIN_ID_TO_NETWORK: Record<number, string> = {
+        1: 'Ethereum',
+        137: 'Polygon',
+        8453: 'Base',
+        10: 'OP Mainnet',
+        42161: 'Arbitrum One',
+        43114: 'Avalanche',
+        56: 'BNB Smart Chain',
+        480: 'World Chain'
+    };
+
     const assets: Asset[] = (assetsData?.tokens || []).map((t: any) => ({
         symbol: t.symbol,
         name: t.name,
         balance: t.balance,
-        balanceNumeric: t.balanceNumeric,
-        balanceFormatted: t.balanceFormatted || t.balanceNumeric?.toLocaleString(undefined, { maximumFractionDigits: 6 }) || "0",
+        balanceNumeric: typeof t.balanceNumeric === 'number' ? t.balanceNumeric : 0,
+        balanceFormatted: t.balanceFormatted || (typeof t.balanceNumeric === 'number' ? t.balanceNumeric.toFixed(6) : "0"),
         price: t.price || t.priceUSD || 0,
+        usdPrice: t.price || t.priceUSD || 0,   // ← alias used by LegendaryTransactionModal
+        value: t.valueUsd || t.valueUSD || 0,
         valueUSD: t.valueUsd || t.valueUSD || 0,
+        address: t.address || 'native',
+        decimals: t.decimals || 18,
         logoURI: t.logo || t.logoURI,
         chainId: t.chainId,
+        network: CHAIN_ID_TO_NETWORK[t.chainId] || 'Unknown',
         change24h: t.change24h || 0
     }));
 
     // Totals
-    const portfolioValue = positions.reduce((acc: number, curr: any) => acc + curr.value, 0);
+    const portfolioValue = positions.reduce((acc: number, curr: any) => acc + (isNaN(curr.value) ? 0 : curr.value), 0);
     const multiChainBalance = assetsData?.totalValueUsd || 0;
-    const usdcBalance = parseFloat(balanceData?.formatted || '0');
+    const usdcBalance = parseFloat(balanceData?.formatted || '0') || 0;
     
     // For "Rainbow" feel, we use the unified balance from the portfolio API
     // which already includes tokens, perps, and predictions.

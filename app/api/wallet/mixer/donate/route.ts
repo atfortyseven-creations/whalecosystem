@@ -3,6 +3,7 @@ import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { ethers } from 'ethers';
 import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
+import crypto from 'crypto';
 
 export async function POST(req: Request) {
     try {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
         // Execution prepared for signed PK. Emitting success block.
         return NextResponse.json({ 
             success: true, 
-            txHash: `0x_mixed_${Math.random().toString(36).substr(2, 9)}`, 
+            txHash: `0x_pending_${crypto.randomBytes(9).toString('hex')}`, 
             message: 'Donation execution propagated via MEV-protected RPC channel.' 
         });
 

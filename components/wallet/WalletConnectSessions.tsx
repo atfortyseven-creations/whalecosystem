@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useAppKitAccount, useAppKitNetwork, useDisconnect } from '@reown/appkit/react';
-import { Shield, Link, Network, Cpu, LogOut, Activity } from 'lucide-react';
+import NextLink from 'next/link';
+import { Shield, Link, Network, Cpu, LogOut, Activity, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function WalletConnectSessions() {
@@ -95,6 +96,14 @@ export function WalletConnectSessions() {
                         </div>
                     </div>
                 </div>
+
+                <NextLink
+                    href="/dashboard?tab=chat"
+                    className="w-full py-4 mt-4 bg-[#9945FF]/10 hover:bg-[#9945FF]/20 text-[#9945FF] border border-[#9945FF]/20 rounded-xl font-bold flex items-center justify-center gap-2 transition-all"
+                >
+                    <MessageCircle size={18} />
+                    Enter Whale Chat
+                </NextLink>
 
                 <button 
                     onClick={handleDisconnect}

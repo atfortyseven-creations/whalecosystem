@@ -22,88 +22,88 @@ const REGIONS: RegionData[] = [
         id: 'na-global',
         label: 'North America & Global',
         markets: [
-            { country: 'Canadá', market: 'Toronto Stock Exchange', product: 'Acciones y ETFs', hours: '15:30-22:00' },
-            { country: 'Canadá', market: 'Toronto Ventures Exchange', product: 'Acciones y ETFs', hours: '15:30-22:00' },
-            { country: 'Estados Unidos', market: 'CBOE', product: 'Opciones', hours: '15:30-22:15' },
-            { country: 'Estados Unidos', market: 'CME', product: 'Futuros', hours: '24:00-23:00' },
-            { country: 'Estados Unidos', market: 'CME', product: 'Opciones', hours: '24:00-23:00' },
-            { country: 'Estados Unidos', market: 'CBOT', product: 'Futuros', hours: '24:00-23:00' },
-            { country: 'Estados Unidos', market: 'COMEX', product: 'Futuros', hours: '24:00-23:00' },
-            { country: 'Estados Unidos', market: 'NASDAQ', product: 'Acciones y ETFs', hours: '15:30-22:00' },
-            { country: 'Estados Unidos', market: 'NYMEX', product: 'Futuros', hours: '24:00-23:00' },
-            { country: 'Estados Unidos', market: 'NYSE', product: 'Acciones y ETFs', hours: '15:30-22:00' },
-            { country: 'Estados Unidos', market: 'NYSE American', product: 'Acciones y ETFs', hours: '15:30-22:00' },
-            { country: 'Estados Unidos', market: 'NYSE Arca', product: 'Acciones y ETFs', hours: '15:30-22:00' },
-            { country: 'Globales', market: 'Tradegate', product: 'Acciones y ETFs', hours: '07:30-22:00' },
+            { country: 'Canada', market: 'Toronto Stock Exchange', product: 'Stocks & ETFs', hours: '15:30-22:00' },
+            { country: 'Canada', market: 'Toronto Ventures Exchange', product: 'Stocks & ETFs', hours: '15:30-22:00' },
+            { country: 'United States', market: 'CBOE', product: 'Options', hours: '15:30-22:15' },
+            { country: 'United States', market: 'CME', product: 'Futures', hours: '24:00-23:00' },
+            { country: 'United States', market: 'CME', product: 'Options', hours: '24:00-23:00' },
+            { country: 'United States', market: 'CBOT', product: 'Futures', hours: '24:00-23:00' },
+            { country: 'United States', market: 'COMEX', product: 'Futures', hours: '24:00-23:00' },
+            { country: 'United States', market: 'NASDAQ', product: 'Stocks & ETFs', hours: '15:30-22:00' },
+            { country: 'United States', market: 'NYMEX', product: 'Futures', hours: '24:00-23:00' },
+            { country: 'United States', market: 'NYSE', product: 'Stocks & ETFs', hours: '15:30-22:00' },
+            { country: 'United States', market: 'NYSE American', product: 'Stocks & ETFs', hours: '15:30-22:00' },
+            { country: 'United States', market: 'NYSE Arca', product: 'Stocks & ETFs', hours: '15:30-22:00' },
+            { country: 'Global', market: 'Tradegate', product: 'Stocks & ETFs', hours: '07:30-22:00' },
         ]
     },
     {
         id: 'asia-oceania',
         label: 'Asia & Oceania',
         markets: [
-            { country: 'Australia', market: 'ASX', product: 'Acciones y ETFs', hours: '24:00-06:00' },
-            { country: 'Hong Kong', market: 'HKEX', product: 'Acciones y ETFs', hours: '03:30-09:00' },
-            { country: 'Japón', market: 'TSE', product: 'Acciones y ETFs', hours: '02:00-04:30 & 05:30-08:00' },
-            { country: 'Singapur', market: 'SGX', product: 'Acciones y ETFs', hours: '03:00-06:00 & 07:00-11:00' },
+            { country: 'Australia', market: 'ASX', product: 'Stocks & ETFs', hours: '24:00-06:00' },
+            { country: 'Hong Kong', market: 'HKEX', product: 'Stocks & ETFs', hours: '03:30-09:00' },
+            { country: 'Japan', market: 'TSE', product: 'Stocks & ETFs', hours: '02:00-04:30 & 05:30-08:00' },
+            { country: 'Singapore', market: 'SGX', product: 'Stocks & ETFs', hours: '03:00-06:00 & 07:00-11:00' },
         ]
     },
     {
         id: 'uk-ireland',
         label: 'UK & Ireland',
         markets: [
-            { country: 'Irlanda', market: 'Euronext Dublin', product: 'Acciones y ETFs', hours: '09:00-17:30' },
-            { country: 'Reino Unido', market: 'LSE', product: 'Acciones y ETFs', hours: '09:00-17:30' },
+            { country: 'Ireland', market: 'Euronext Dublin', product: 'Stocks & ETFs', hours: '09:00-17:30' },
+            { country: 'United Kingdom', market: 'LSE', product: 'Stocks & ETFs', hours: '09:00-17:30' },
         ]
     },
     {
         id: 'europe-ag',
         label: 'Europe (A-G)',
         markets: [
-            { country: 'Alemania', market: 'Börse Frankfurt', product: 'Acciones y ETFs', hours: '08:00-22:00' },
-            { country: 'Alemania', market: 'Eurex', product: 'Futuros', hours: '08:00-22:00' },
-            { country: 'Alemania', market: 'Eurex', product: 'Opciones', hours: '08:00-17:30' },
-            { country: 'Alemania', market: 'Xetra', product: 'Bonos', hours: '09:00-17:30' },
-            { country: 'Alemania', market: 'Xetra', product: 'Acciones y ETFs', hours: '09:00-17:30' },
-            { country: 'Austria', market: 'Wiener Boerse AG', product: 'Acciones y ETFs', hours: '08:55-17:35' },
-            { country: 'Bélgica', market: 'Euronext Brussel', product: 'Bonos', hours: '09:00-17:30' },
-            { country: 'Bélgica', market: 'Euronext Brussel', product: 'Acciones y ETFs', hours: '09:00-17:30' },
-            { country: 'Bélgica', market: 'Derivatives Brussel', product: 'Futuros', hours: '09:00-17:30' },
-            { country: 'Bélgica', market: 'Derivatives Brussel', product: 'Opciones', hours: '09:00-17:30' },
-            { country: 'Dinamarca', market: 'Nasdaq Copenhagen', product: 'Futuros', hours: '09:00-16:55' },
-            { country: 'Dinamarca', market: 'Nasdaq Copenhagen', product: 'Opciones', hours: '09:00-16:55' },
-            { country: 'España', market: 'Bolsa de Madrid', product: 'Acciones y ETFs', hours: '09:00-17:45' },
-            { country: 'España', market: 'MEFF', product: 'Opciones', hours: '09:00-17:30' },
-            { country: 'España', market: 'MEFF (IBEX 35)', product: 'Futuros', hours: '08:00-22:00' },
-            { country: 'España', market: 'MEFF (other)', product: 'Futuros', hours: '09:00-17:30' },
-            { country: 'Finlandia', market: 'Nasdaq Helsinki', product: 'Futuros', hours: '09:00-17:25' },
-            { country: 'Finlandia', market: 'Nasdaq Helsinki', product: 'Opciones', hours: '09:00-17:25' },
-            { country: 'Francia', market: 'Derivatives Paris', product: 'Futuros', hours: '08:00-22:00' },
-            { country: 'Francia', market: 'Derivatives Paris', product: 'Opciones', hours: '09:00-17:30' },
-            { country: 'Francia', market: 'Euronext Paris', product: 'Bonos', hours: '09:00-17:30' },
-            { country: 'Francia', market: 'Euronext Paris', product: 'Acciones y ETFs', hours: '09:00-17:30' },
-            { country: 'Grecia', market: 'Athens Stock Exchange', product: 'Acciones y ETFs', hours: '09:15-16:20' },
+            { country: 'Germany', market: 'Börse Frankfurt', product: 'Stocks & ETFs', hours: '08:00-22:00' },
+            { country: 'Germany', market: 'Eurex', product: 'Futures', hours: '08:00-22:00' },
+            { country: 'Germany', market: 'Eurex', product: 'Options', hours: '08:00-17:30' },
+            { country: 'Germany', market: 'Xetra', product: 'Bonds', hours: '09:00-17:30' },
+            { country: 'Germany', market: 'Xetra', product: 'Stocks & ETFs', hours: '09:00-17:30' },
+            { country: 'Austria', market: 'Wiener Boerse AG', product: 'Stocks & ETFs', hours: '08:55-17:35' },
+            { country: 'Belgium', market: 'Euronext Brussel', product: 'Bonds', hours: '09:00-17:30' },
+            { country: 'Belgium', market: 'Euronext Brussel', product: 'Stocks & ETFs', hours: '09:00-17:30' },
+            { country: 'Belgium', market: 'Derivatives Brussel', product: 'Futures', hours: '09:00-17:30' },
+            { country: 'Belgium', market: 'Derivatives Brussel', product: 'Options', hours: '09:00-17:30' },
+            { country: 'Denmark', market: 'Nasdaq Copenhagen', product: 'Futures', hours: '09:00-16:55' },
+            { country: 'Denmark', market: 'Nasdaq Copenhagen', product: 'Options', hours: '09:00-16:55' },
+            { country: 'Spain', market: 'Bolsa de Madrid', product: 'Stocks & ETFs', hours: '09:00-17:45' },
+            { country: 'Spain', market: 'MEFF', product: 'Options', hours: '09:00-17:30' },
+            { country: 'Spain', market: 'MEFF (IBEX 35)', product: 'Futures', hours: '08:00-22:00' },
+            { country: 'Spain', market: 'MEFF (other)', product: 'Futures', hours: '09:00-17:30' },
+            { country: 'Finland', market: 'Nasdaq Helsinki', product: 'Futures', hours: '09:00-17:25' },
+            { country: 'Finland', market: 'Nasdaq Helsinki', product: 'Options', hours: '09:00-17:25' },
+            { country: 'France', market: 'Derivatives Paris', product: 'Futures', hours: '08:00-22:00' },
+            { country: 'France', market: 'Derivatives Paris', product: 'Options', hours: '09:00-17:30' },
+            { country: 'France', market: 'Euronext Paris', product: 'Bonds', hours: '09:00-17:30' },
+            { country: 'France', market: 'Euronext Paris', product: 'Stocks & ETFs', hours: '09:00-17:30' },
+            { country: 'Greece', market: 'Athens Stock Exchange', product: 'Stocks & ETFs', hours: '09:15-16:20' },
         ]
     },
     {
         id: 'europe-hz',
         label: 'Europe (H-Z)',
         markets: [
-            { country: 'Italia', market: 'Euronext Milan', product: 'Acciones y ETFs', hours: '09:00-17:30' },
-            { country: 'Italia', market: 'Euronext Milan', product: 'Futuros', hours: '08:00-20:00' },
-            { country: 'Italia', market: 'Euronext Milan', product: 'Opciones', hours: '09:00-18:00' },
-            { country: 'Noruega', market: 'Euronext Oslo Børs', product: 'Acciones y ETFs', hours: '09:00-16:25' },
-            { country: 'Países Bajos', market: 'Euronext Amsterdam', product: 'Bonos', hours: '09:00-17:30' },
-            { country: 'Países Bajos', market: 'Euronext Amsterdam', product: 'Acciones y ETFs', hours: '09:00-17:30' },
-            { country: 'Países Bajos', market: 'Derivatives Amsterdam', product: 'Futuros', hours: '08:00-22:00' },
-            { country: 'Países Bajos', market: 'Derivatives Amsterdam', product: 'Opciones', hours: '09:00-17:30' },
-            { country: 'Polonia', market: 'Warsaw Stock Exchange', product: 'Acciones y ETFs', hours: '09:00-16:50' },
-            { country: 'Portugal', market: 'Euronext Lisbon', product: 'Bonos', hours: '09:00-17:30' },
-            { country: 'Portugal', market: 'Euronext Lisbon', product: 'Acciones y ETFs', hours: '09:00-17:30' },
-            { country: 'República Checa', market: 'Prague Stock Exchange', product: 'Acciones y ETFs', hours: '09:00-16:30' },
-            { country: 'Suecia', market: 'Nasdaq Stockholm', product: 'Futuros', hours: '09:00-17:25' },
-            { country: 'Suecia', market: 'Nasdaq Stockholm', product: 'Opciones', hours: '09:00-17:25' },
-            { country: 'Suecia', market: 'Nasdaq Stockholm', product: 'Acciones y ETFs', hours: '09:00-17:30' },
-            { country: 'Suiza', market: 'SIX Swiss Exchange', product: 'Acciones y ETFs', hours: '09:00-17:30' },
+            { country: 'Italy', market: 'Euronext Milan', product: 'Stocks & ETFs', hours: '09:00-17:30' },
+            { country: 'Italy', market: 'Euronext Milan', product: 'Futures', hours: '08:00-20:00' },
+            { country: 'Italy', market: 'Euronext Milan', product: 'Options', hours: '09:00-18:00' },
+            { country: 'Norway', market: 'Euronext Oslo Bors', product: 'Stocks & ETFs', hours: '09:00-16:25' },
+            { country: 'Netherlands', market: 'Euronext Amsterdam', product: 'Bonds', hours: '09:00-17:30' },
+            { country: 'Netherlands', market: 'Euronext Amsterdam', product: 'Stocks & ETFs', hours: '09:00-17:30' },
+            { country: 'Netherlands', market: 'Derivatives Amsterdam', product: 'Futures', hours: '08:00-22:00' },
+            { country: 'Netherlands', market: 'Derivatives Amsterdam', product: 'Options', hours: '09:00-17:30' },
+            { country: 'Poland', market: 'Warsaw Stock Exchange', product: 'Stocks & ETFs', hours: '09:00-16:50' },
+            { country: 'Portugal', market: 'Euronext Lisbon', product: 'Bonds', hours: '09:00-17:30' },
+            { country: 'Portugal', market: 'Euronext Lisbon', product: 'Stocks & ETFs', hours: '09:00-17:30' },
+            { country: 'Czech Republic', market: 'Prague Stock Exchange', product: 'Stocks & ETFs', hours: '09:00-16:30' },
+            { country: 'Sweden', market: 'Nasdaq Stockholm', product: 'Futures', hours: '09:00-17:25' },
+            { country: 'Sweden', market: 'Nasdaq Stockholm', product: 'Options', hours: '09:00-17:25' },
+            { country: 'Sweden', market: 'Nasdaq Stockholm', product: 'Stocks & ETFs', hours: '09:00-17:30' },
+            { country: 'Switzerland', market: 'SIX Swiss Exchange', product: 'Stocks & ETFs', hours: '09:00-17:30' },
         ]
     }
 ];
@@ -173,10 +173,10 @@ export function GlobalMarketSessions() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="border-b border-slate-300">
-                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">País</th>
-                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Mercado</th>
-                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Producto</th>
-                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 text-right">Apertura</th>
+                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Country</th>
+                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Market</th>
+                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Product</th>
+                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 text-right">Hours (UTC)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -197,13 +197,13 @@ export function GlobalMarketSessions() {
                             <div className="p-8 bg-black/5 rounded-[2rem] border border-black/5 flex gap-6 items-start">
                                 <Info size={20} className="text-[var(--aave-purple)] mt-1 flex-shrink-0" />
                                 <p className="text-xs text-slate-500 leading-loose font-medium">
-                                    Ten en cuenta que solo ofrecemos el horario principal de negociación de **Xetra** en negociación continua con el modelo de negociación de subastas intradía (de 9:00 CET a 17:30 CET). No ofrecemos el horario de negociación minorista de Xetra durante la negociación temprana (de 8:00 CET a 9:00 CET) y la negociación tardía (de 17:30 CET a 22:00 CET) en el modelo de negociación de mini subastas.
+                                    Note: we only offer the main Xetra continuous trading hours (09:00–17:30 CET). Pre-trading (08:00–09:00 CET) and post-trading (17:30–22:00 CET) mini-auction sessions are not included.
                                 </p>
                             </div>
                             <div className="p-8 bg-[var(--aave-purple)]/5 rounded-[2rem] border border-[var(--aave-purple)]/10 flex gap-6 items-start">
                                 <Zap size={20} className="text-[var(--aave-purple)] mt-1 flex-shrink-0" />
                                 <p className="text-xs text-slate-700 leading-loose font-medium">
-                                    La operativa con **criptomonedas** está disponible las 24 horas del día, los 7 días de la semana. Ten en cuenta que esto excluye los reinicios obligatorios del servidor alrededor de medianoche y los periodos de mantenimiento general.
+                                    Cryptocurrency trading is available 24/7. Note that this excludes mandatory server restarts around midnight and scheduled maintenance windows.
                                 </p>
                             </div>
                         </div>

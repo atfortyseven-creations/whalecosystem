@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { safeRedisGet, safeRedisSet } from '../redis/client';
+import { getGbAllRpc } from '@/lib/blockchain/getblock-registry';
 
 /**
  * 🌌 WHALE INTELLIGENCE MATRIX V8.0 — ZERO SYNTHETIC DATA
@@ -59,17 +60,18 @@ const DEX_ROUTERS_BNB = new Set([
     '0x1111111254eeb25477b68fb85ed929f73a960582', // 1inch v5 BSC
 ]);
 
+// RPC_CONFIG — construido desde el registry (GetBlock primero, públicos de emergencia)
 const RPC_CONFIG = {
     ETH: [
-        'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d', // EP1 — primary (.io)
-        'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f', // EP2 — primary (.us)
-        'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234', // EP3 — backup 1
-        'https://go.getblock.io/31aef531b4e444f5bde76196502679da', // EP4 — backup 2
-    ],
+        ...getGbAllRpc('eth'),                                      // GB slots 1+2 (archive)
+        'https://cloudflare-eth.com',
+        'https://rpc.ankr.com/eth',
+    ].filter(Boolean),
     BNB: [
-        'https://go.getblock.us/bfb53e7124d44e55beaab2f172b43cfe',
+        ...getGbAllRpc('bsc'),                                      // GB slot 6
         'https://bsc-dataseed1.binance.org',
-    ]
+        'https://rpc.ankr.com/bsc',
+    ].filter(Boolean),
 };
 
 const BINANCE_24_TOKENS: Record<string, Record<string, { symbol: string; decimals: number }>> = {
@@ -164,16 +166,18 @@ class WhaleDataService {
             const fromBlock = latestHeight - blockCount;
 
             const tokenAddresses = Object.keys(BINANCE_24_TOKENS[chain]);
-            const logPromises = tokenAddresses.map(address =>
-                provider.getLogs({
-                    fromBlock,
-                    toBlock: latestHeight,
-                    address,
-                    topics: [ethers.id('Transfer(address,address,uint256)')]
-                }).catch(() => [])
-            );
+            
+            // [INSTITUTIONAL OPTIMIZATION]
+            // Batch all 20 tokens into a SINGLE getLogs request.
+            // This reduces Compute Unit usage by 95% and completely eliminates
+            // HTTP 429 'Too Many Requests' rate-limits on public and free RPCs.
+            const allLogs = await provider.getLogs({
+                fromBlock,
+                toBlock: latestHeight,
+                address: tokenAddresses,
+                topics: [ethers.id('Transfer(address,address,uint256)')]
+            }).catch(() => []);
 
-            const allLogs = (await Promise.all(logPromises)).flat();
             const movements: WhaleMovement[] = [];
 
             for (const log of allLogs.slice(0, 60)) {
@@ -277,12 +281,12 @@ class WhaleDataService {
 
         try {
             const cached = await safeRedisGet(cacheKey);
-            if (cached) return JSON.parse(cached);
+            if (cached && cached !== 'TIMEOUT') return JSON.parse(cached);
 
             // Scan ETH and BNB in parallel — real data only
             const [ethMovements, bnbMovements] = await Promise.all([
-                this.processRecentBlocks('ETH', 5),
-                this.processRecentBlocks('BNB', 5),
+                this.processRecentBlocks('ETH', 3),   // 3 bloques (~36s) — balance entre frescura y CU
+                this.processRecentBlocks('BNB', 3),
             ]);
 
             let allMovements = [...ethMovements, ...bnbMovements];
@@ -299,8 +303,8 @@ class WhaleDataService {
 
             allMovements = allMovements.sort((a, b) => b.ts - a.ts).slice(0, limit);
 
-            // Cache 15s — real data refreshes frequently enough
-            await safeRedisSet(cacheKey, JSON.stringify(allMovements), 'EX', '15');
+            // Cache 120s — reduce getLogs calls de ~5760/día a ~720/día (-87% CU)
+            await safeRedisSet(cacheKey, JSON.stringify(allMovements), 'EX', '120');
             return allMovements;
         } catch (error) {
             console.error('[WhaleService V8] Fatal error — returning empty:', error);

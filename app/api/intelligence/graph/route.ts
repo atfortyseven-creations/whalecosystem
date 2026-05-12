@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const graph = await graphMiner.mineLocalNetworkGraph();
+        const graph = await graphMiner.execute();
         return NextResponse.json({ success: true, graph });
     } catch (e: any) {
         console.warn('[Neural Graph] graphMiner failed, returning empty graph:', e.message);

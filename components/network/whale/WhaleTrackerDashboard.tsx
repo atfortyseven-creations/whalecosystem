@@ -309,12 +309,12 @@ export function WhaleTrackerDashboard() {
 
                     <div className="space-y-16">
                         <div className="flex items-center justify-between border-b border-white/10 pb-10">
-                            <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-6 overflow-x-auto no-scrollbar py-2">
                                     {['ALL', 'BTC', 'TOKENS'].map(tab => (
                                         <button
                                             key={tab}
                                             onClick={() => setActiveTab(tab)}
-                                            className={`px-6 sm:px-12 py-3 sm:py-5 rounded-xl sm:rounded-2xl text-[10px] sm:text-[12px] font-black uppercase tracking-[0.25em] transition-all ${
+                                            className={`px-6 sm:px-12 py-3 sm:py-5 rounded-xl sm:rounded-2xl text-[10px] sm:text-[12px] font-black uppercase tracking-[0.25em] transition-all whitespace-nowrap ${
                                                 activeTab === tab 
                                                 ? 'bg-white text-black shadow-lg scale-105' 
                                                 : 'bg-white/[0.02] text-white/40 border border-white/5 hover:text-white/90 hover:border-white/20'
@@ -333,34 +333,43 @@ export function WhaleTrackerDashboard() {
                             </div>
                         </div>
 
-                        <div className="bg-[#0a0a0a] border border-white/10 rounded-[2rem] sm:rounded-[5rem] overflow-hidden shadow-2xl relative">
-                            {isLoading && (
-                                <div className="h-[700px] flex flex-col items-center justify-center gap-10">
-                                    <div className="w-16 h-16 border-[6px] border-white/5 border-t-white animate-spin rounded-full shadow-lg" />
-                                    <div className="text-center space-y-3">
-                                        <span className="block text-[12px] uppercase font-black tracking-[0.6em] text-white animate-pulse">Synchronizing Block Data</span>
-                                        <span className="block text-[10px] font-black text-white/30 uppercase tracking-widest">Resolving Ledger State</span>
+                        <AnimatePresence mode="wait">
+                            <motion.div 
+                                key="tx-list"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.3 }}
+                                className="bg-[#0a0a0a] border border-white/10 rounded-[2rem] sm:rounded-[5rem] overflow-hidden shadow-2xl relative"
+                            >
+                                {isLoading && (
+                                    <div className="h-[700px] flex flex-col items-center justify-center gap-10">
+                                        <div className="w-16 h-16 border-[6px] border-white/5 border-t-white animate-spin rounded-full shadow-lg" />
+                                        <div className="text-center space-y-3">
+                                            <span className="block text-[12px] uppercase font-black tracking-[0.6em] text-white animate-pulse">Synchronizing Block Data</span>
+                                            <span className="block text-[10px] font-black text-white/30 uppercase tracking-widest">Resolving Ledger State</span>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {!isLoading && filtered.length > 0 && (
-                                <div className="divide-y divide-white/5">
-                                    {filtered.slice(0, 50).map((tx, i) => (
-                                        <TransactionRow key={tx.id || i} item={tx} index={i} />
-                                    ))}
-                                </div>
-                            )}
-
-                            {!isLoading && filtered.length === 0 && (
-                                <div className="h-[700px] flex flex-col items-center justify-center gap-10 opacity-30">
-                                    <div className="p-8 bg-white/[0.02] rounded-[3rem] border border-white/5">
-                                        <Database size={80} className="text-white/20" />
+                                {!isLoading && filtered.length > 0 && (
+                                    <div className="divide-y divide-white/5">
+                                        {filtered.slice(0, 50).map((tx, i) => (
+                                            <TransactionRow key={tx.id || i} item={tx} index={i} />
+                                        ))}
                                     </div>
-                                    <span className="text-sm uppercase font-black tracking-[0.5em] text-white/40">Database Empty</span>
-                                </div>
-                            )}
-                        </div>
+                                )}
+
+                                {!isLoading && filtered.length === 0 && (
+                                    <div className="h-[700px] flex flex-col items-center justify-center gap-10 opacity-30">
+                                        <div className="p-8 bg-white/[0.02] rounded-[3rem] border border-white/5">
+                                            <Database size={80} className="text-white/20" />
+                                        </div>
+                                        <span className="text-sm uppercase font-black tracking-[0.5em] text-white/40">Database Empty</span>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
                 </main>
             </div>

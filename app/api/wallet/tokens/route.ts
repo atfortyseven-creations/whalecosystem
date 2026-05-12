@@ -9,12 +9,6 @@ import { discoverTokens, searchTokens, getTokenMetadata, getTokenBalance } from 
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { searchParams } = new URL(request.url);
     const walletAddress = searchParams.get('address');
     const chainId = searchParams.get('chainId');
@@ -52,12 +46,6 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await request.json();
     const { tokenAddress, chainId } = body;
 

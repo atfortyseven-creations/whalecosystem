@@ -49,8 +49,7 @@ export function AlphaToaster() {
     };
 
     const isBuy = (action: string) => 
-        action.toUpperCase().includes('BUY') || 
-        action.toUpperCase().includes('COMPRA');
+        action.toUpperCase().includes('BUY');
 
     const sanitizeLabel = (label: string) => {
         const tacky = ["ALPHA CLEARANCE", "LIVE ALERT", "CLEARANCE ALERT"];
@@ -115,7 +114,7 @@ export function AlphaToaster() {
                                         }`}>
                                             {isBuy(activeAlert.action) ? <ArrowUpRight size={12} /> : <ArrowDownLeft size={12} />}
                                             <span className="text-[9px] font-black uppercase tracking-widest leading-none">
-                                                {isBuy(activeAlert.action) ? 'COMPRA' : 'VENTA'}
+                                                {isBuy(activeAlert.action) ? 'BUY' : 'SELL'}
                                             </span>
                                         </div>
                                         <button onClick={() => setActiveAlert(null)} className="text-black/10 dark:text-white/10 hover:text-black dark:hover:text-white transition-colors">
@@ -126,7 +125,7 @@ export function AlphaToaster() {
 
                                 <div className="grid grid-cols-2 gap-10 mb-8">
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-black/20 dark:text-white/20">Valoración</span>
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-black/20 dark:text-white/20">Valuation</span>
                                         <span className="text-[20px] font-mono font-black text-black dark:text-white tracking-tighter">
                                             {formatEUR(activeAlert.usdNum || 0)}
                                         </span>

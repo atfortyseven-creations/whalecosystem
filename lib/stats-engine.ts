@@ -71,13 +71,13 @@ export async function getLegendaryStats(address: string, forceDeep = false) {
     const cacheKey = `stats:${addrLower}`;
     const cached = await safeRedisGet(cacheKey);
     
-    if (!forceDeep && cached) {
+    if (!forceDeep && cached && cached !== 'TIMEOUT') {
         console.log(`[LEGENDARY-STATS] 📦 Returning persistent Redis data for ${addrLower}`);
         try {
             const data = JSON.parse(cached);
             return { ...data, fromCache: true };
-        } catch (e) {
-            console.warn(`[LEGENDARY-STATS] Cache parse error for ${addrLower}`);
+        } catch {
+            // Corrupted entry — re-fetch silently.
         }
     }
 
@@ -144,7 +144,10 @@ export async function getLegendaryStats(address: string, forceDeep = false) {
         return result;
     } catch (e) {
         console.error(`[LEGENDARY-STATS] ❌ UNIFICATION ERROR for ${addrLower}:`, e);
-       return cached ? { ...JSON.parse(cached), fromCache: true, error: true } : null;
+        if (cached && cached !== 'TIMEOUT') {
+            try { return { ...JSON.parse(cached), fromCache: true, error: true }; } catch { /* ignore */ }
+        }
+        return null;
     }
 }
 

@@ -12,6 +12,7 @@ import { MarketWebsocketProvider } from "@/src/context/MarketWebsocketProvider";
 import { SessionProvider } from "next-auth/react";
 import { CWIProvider } from "@/lib/bsv/CWIContext";
 import { useEffect } from "react";
+import { WalletConnectionBridge } from "@/components/providers/WalletConnectionBridge";
 
 export default function Providers({ children, initialState, cookies }: { children: React.ReactNode, initialState?: State, cookies?: string | null }) {
     useEffect(() => {
@@ -30,6 +31,7 @@ export default function Providers({ children, initialState, cookies }: { childre
                             <MarketWebsocketProvider>
                                 <WorldProvider>
                                     <CWIProvider>
+                                        <WalletConnectionBridge />
                                         {children}
                                     </CWIProvider>
                                 </WorldProvider>

@@ -106,11 +106,11 @@ export async function GET(req: NextRequest) {
  * Helper function to send events to SSE clients
  * Can be called from anywhere in the backend
  */
-export function emitPortfolioEvent(walletAddress: string, event: any) {
+function emitPortfolioEvent(walletAddress: string, event: any) {
   portfolioEmitter.emit(walletAddress, event);
 }
 
-export function broadcastPortfolioEvent(event: any) {
+function broadcastPortfolioEvent(event: any) {
   portfolioEmitter.broadcast(event);
 }
 

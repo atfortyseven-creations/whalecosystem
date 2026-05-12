@@ -2,6 +2,14 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
+
+@layer utilities {
+  .font-aztec-logo {
+    font-family: 'UnifrakturMaguntia', 'Old English Text MT', serif;
+  }
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
    A11Y GLOBAL REDUCED MOTION SUPPORT (Audit A11y & Motion Compliance)
    ────────────────────────────────────────────────────────────────────────── */
@@ -404,12 +412,57 @@ body,
  }
 
 /* Hide scrollbar while maintaining functionality */
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.no-scrollbar {
+.no-scrollbar,
+.hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Forum scroll containment is handled natively by ClientLayout's bounded <main> viewport */
+
+/* Prevent hover CSS from triggering repaint layers on touch devices */
+@media (hover: none) {
+  .forum-container button:hover,
+  .forum-container a:hover {
+    background-color: transparent !important;
+  }
+}
+
+/* ============================================================
+   240HZ MOBILE HARDWARE ACCELERATION (AZTEC SMOOTH SCROLL)
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Enforce extreme scroll smoothing and disable bounce boundaries */
+  html, body {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: none !important;
+    scroll-behavior: smooth !important;
+  }
+
+  /* Hardware acceleration removed from massive columns to prevent GPU texture memory overflow (black squares on scroll) */
+
+  /* Disable absolutely all expensive backdrop-filters on mobile.
+     This is the #1 cause of 60fps drops on mobile WebKit.
+     IMPORTANT: fallback must be white/transparent — NOT dark — to avoid
+     making white landing cards appear black on mobile. */
+  .backdrop-blur-sm, 
+  .backdrop-blur-md, 
+  .glass-vault, 
+  .glass-premium, 
+  .glass-sovereign {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    /* No forced background-color here — components define their own solid fallbacks */
+  }
+
+  /* Disable expensive box shadows on mobile */
+  * {
+    box-shadow: none !important;
+  }
 }
 
   .font-aztec-serif {
@@ -623,6 +676,58 @@ body,
     -webkit-backdrop-filter: blur(24px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
   }
+}
+
+/* ============================================================
+   FORUM LIGHT/DARK MODE ARCHITECTURE (AZTEC PERFECTION)
+   ============================================================ */
+
+html.forum-light-mode {
+  background-color: #f4f4f5 !important;
+}
+
+:root {
+  /* Default: Dark Mode (navy-black, NOT purple) */
+  --forum-bg: #0f0a1a;
+  --forum-text: #ffffff;
+  --forum-text-muted: rgba(255, 255, 255, 0.6);
+  --forum-border: rgba(255, 255, 255, 0.05);
+  --forum-surface: rgba(255, 255, 255, 0.02);
+  --forum-hover: #1a112a;
+  --forum-header-bg: rgba(0, 0, 0, 0.2);
+  --forum-subnav-bg: #110b1a;
+  --forum-button-bg: #ffffff;
+  --forum-button-text: #000000;
+}
+
+html.forum-light-mode {
+  /* Light Mode Overrides */
+  --forum-bg: #f4f4f5;
+  --forum-text: #18181b;
+  --forum-text-muted: #71717a;
+  --forum-border: rgba(0, 0, 0, 0.1);
+  --forum-surface: #ffffff;
+  --forum-hover: #fcfcfc;
+  --forum-header-bg: rgba(255, 255, 255, 0.8);
+  --forum-subnav-bg: #ffffff;
+  --forum-button-bg: #18181b;
+  --forum-button-text: #ffffff;
+}
+
+.forum-theme-root {
+  background-color: var(--forum-bg);
+  color: var(--forum-text);
+  /* Disable transition on initial load to prevent flash — JS adds class later */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Prevent the transition firing on first paint (added by JS after mount) */
+.forum-theme-root.theme-ready {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.forum-theme-root a:hover, .forum-theme-root button:hover {
+  transition-duration: 0.2s;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1006,3 +1111,112 @@ body,
   image-rendering: -webkit-optimize-contrast;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   SOVEREIGN SETTINGS — CSS FUNCTIONAL LAYER
+   These classes are applied to <html> by applyDOMClasses() in useSettingsStore.
+   Every toggle/selection in Settings has a real visual effect here.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── STEALTH MODE: blur & hide any element tagged [data-balance] ─────────────
+   Usage: add data-balance attribute to any span/div showing wallet balances.
+   Example: <span data-balance>${portfolio.total}</span>
+   ─────────────────────────────────────────────────────────────────────────── */
+html.stealth-active [data-balance] {
+  filter: blur(8px);
+  user-select: none;
+  transition: filter 0.3s ease;
+}
+html.stealth-active [data-balance]:hover {
+  filter: blur(0px); /* Reveal on hover — intentional UX */
+}
+
+/* ── SHOW BALANCES: when showBalances is OFF, hide [data-balance] fully ──────
+   The class hide-balances is applied when showBalances === false.
+   ─────────────────────────────────────────────────────────────────────────── */
+html.hide-balances [data-balance] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── UI DENSITY — RELAXED (default) ─────────────────────────────────────────*/
+html:not(.ui-compact):not(.ui-dense) .card-pad   { padding: 1.5rem; }
+html:not(.ui-compact):not(.ui-dense) .row-gap    { gap: 1rem; }
+html:not(.ui-compact):not(.ui-dense) .table-row  { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+
+/* ── UI DENSITY — COMPACT ────────────────────────────────────────────────── */
+html.ui-compact .card-pad                        { padding: 0.875rem; }
+html.ui-compact .row-gap                         { gap: 0.5rem; }
+html.ui-compact .table-row                       { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+html.ui-compact table td,
+html.ui-compact table th                         { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+html.ui-compact .p-4                             { padding: 0.65rem !important; }
+html.ui-compact .p-5                             { padding: 0.75rem !important; }
+html.ui-compact .gap-4                           { gap: 0.625rem !important; }
+html.ui-compact .gap-6                           { gap: 0.875rem !important; }
+html.ui-compact .mb-4                            { margin-bottom: 0.5rem !important; }
+html.ui-compact .mb-6                            { margin-bottom: 0.75rem !important; }
+
+/* ── UI DENSITY — DENSE ──────────────────────────────────────────────────── */
+html.ui-dense .card-pad                          { padding: 0.5rem; }
+html.ui-dense .row-gap                           { gap: 0.25rem; }
+html.ui-dense .table-row                         { padding-top: 0.2rem; padding-bottom: 0.2rem; }
+html.ui-dense table td,
+html.ui-dense table th                           { padding-top: 0.2rem !important; padding-bottom: 0.2rem !important; }
+html.ui-dense .p-4                               { padding: 0.4rem !important; }
+html.ui-dense .p-5                               { padding: 0.5rem !important; }
+html.ui-dense .gap-4                             { gap: 0.35rem !important; }
+html.ui-dense .gap-6                             { gap: 0.5rem !important; }
+html.ui-dense .mb-4                              { margin-bottom: 0.25rem !important; }
+html.ui-dense .mb-6                              { margin-bottom: 0.4rem !important; }
+html.ui-dense .h-16                              { height: 3.25rem !important; }
+html.ui-dense .h-\[52px\]                        { height: 44px !important; }
+
+/* ── HARDWARE ACCELERATION OFF: disable GPU compositing hints ────────────── */
+html.no-hw-accel * {
+  will-change: auto !important;
+  transform: none !important;
+  backface-visibility: visible !important;
+}
+/* Note: animations still work — we just remove GPU layer hints to save VRAM */
+
+/* ── FORUM LEGACY THEME VARS ────────────────────────────────────────────────── */
+.forum-theme-root {
+  --forum-bg: #FAF9F6;
+  --forum-surface: #F0EFEA;
+  --forum-border: rgba(0, 0, 0, 0.1);
+  --forum-text: #050505;
+  --forum-text-muted: rgba(0, 0, 0, 0.5);
+  --forum-hover: rgba(0, 0, 0, 0.05);
+  --forum-button-bg: #050505;
+  --forum-button-text: #FFFFFF;
+  --forum-accent: #00C076;
+}
+.dark .forum-theme-root {
+  --forum-bg: #050505;
+  --forum-surface: #111111;
+  --forum-border: rgba(255, 255, 255, 0.1);
+  --forum-text: #FFFFFF;
+  --forum-text-muted: #888888;
+  --forum-hover: rgba(255, 255, 255, 0.05);
+  --forum-button-bg: #FFFFFF;
+  --forum-button-text: #050505;
+  --forum-accent: #00C076;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   SOVEREIGN DYNAMIC SETTINGS CLASSES
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Show Balances: hide-balances class */
+html.hide-balances .balance-value,
+html.hide-balances [data-balance],
+html.hide-balances .privacy-sensitive {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Hardware Acceleration: disable GPU compositing hints */
+html.no-hw-accel * {
+  will-change: auto !important;
+}

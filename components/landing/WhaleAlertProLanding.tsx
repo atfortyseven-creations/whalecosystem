@@ -389,7 +389,7 @@ export function WhaleAlertProLanding() {
                  <div className="text-[10px] font-black text-white/40 uppercase tracking-widest">Engine</div>
                  <Link href="/vip" className="text-xs text-white/20 hover:text-cyan-400 transition-colors">Terminal</Link>
                  <Link href="/portfolio" className="text-xs text-white/20 hover:text-cyan-400 transition-colors">Portfolio</Link>
-                 <Link href="/network" className="text-xs text-white/20 hover:text-cyan-400 transition-colors">Network</Link>
+                 <Link href="/ledger" className="text-xs text-white/20 hover:text-cyan-400 transition-colors">Ledger</Link>
               </div>
               <div className="flex flex-col gap-4">
                  <div className="text-[10px] font-black text-white/40 uppercase tracking-widest">Connect</div>

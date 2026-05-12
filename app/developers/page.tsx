@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { ArrowRight, BookOpen, Terminal, Shield, Lock, Activity, Users, Puzzle, Code2, Server, Globe, Cpu, ArrowDown } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Terminal, Lock, Activity, Users, Server, Globe, Cpu, ArrowDown, ShieldCheck, Database, Key } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import { Downhead } from "@/components/shared/Downhead";
-import AntiPhishing from "@/components/security/AntiPhishing";
+import { SovereignFooter } from "@/components/landing/SovereignFooter";
 
 // ─── UTILITIES ───
 const StaggeredText = ({ text, className }: { text: string; className?: string }) => {
@@ -15,7 +13,7 @@ const StaggeredText = ({ text, className }: { text: string; className?: string }
       initial="hidden" 
       whileInView="visible" 
       viewport={{ once: true }} 
-      transition={{ staggerChildren: 0.05 }}
+      transition={{ staggerChildren: 0.03 }}
       className={className}
     >
       {text.split("").map((char, index) => (
@@ -38,83 +36,96 @@ const StaggeredText = ({ text, className }: { text: string; className?: string }
 
 // 1. Builder Announcements
 const BuilderAnnouncements = () => {
-  const announcements = [
-    {
-      date: "22 Jul",
-      title: "Adversarial Testnet is here!",
-      desc: "Start building privacy-preserving forensic apps.",
-      action: "Read Announcement",
-    },
-    {
-      date: "8 Jun",
-      title: "Zero-Knowledge Case Study: Local Identity Protocol",
-      desc: "Learn about using ZK-Proofs to add private identity verification to your quant scripts.",
-      action: "Read Article",
-    },
-    {
-      date: "1 May",
-      title: "V4 Public Engine is now live!",
-      desc: "Experience the predictive power of the Neural Trend Simulator for yourself.",
-      action: "Try Testnet",
-    }
-  ];
+  const [commits, setCommits] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    fetch('https://api.github.com/repos/ethereum/go-ethereum/commits?per_page=3')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setCommits(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto py-32 px-6">
       <div className="flex flex-col md:flex-row justify-between items-start mb-16 gap-8">
-        <h2 className="font-aztec-serif text-5xl md:text-7xl font-black text-[var(--aztec-ink)] leading-[0.9]">
-          Builder <br /><span className="italic text-[var(--aztec-orchid)]">Announcements</span>
+        <h2 className="font-serif text-5xl md:text-7xl font-normal text-[#0A0A0A] leading-[1.1] tracking-tight">
+          Infrastructure <br /><span className="text-black/40 italic">Releases.</span>
         </h2>
-        <div className="w-full border-t flex-1 mt-6 border-[var(--aztec-ink)]/10" />
+        <div className="w-full border-t flex-1 mt-6 border-black/10" />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {announcements.map((a, i) => (
-          <motion.div 
-             key={i}
-             initial={{ opacity: 0, y: 30 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-             transition={{ duration: 0.6, delay: i * 0.1 }}
-             className="group relative bg-[var(--aztec-parchment)] p-8 md:p-12 border border-[var(--aztec-ink)]/10 hover:border-[var(--aztec-orchid)]/50 transition-all cursor-pointer shadow-lg hover:shadow-2xl overflow-hidden min-h-[400px] flex flex-col justify-between"
-          >
-             <div className="absolute inset-0 noise-bg opacity-[0.03] pointer-events-none mix-blend-multiply" />
-             <div className="relative z-10">
-               <div className="font-aztec-mono text-[10px] uppercase tracking-widest text-[var(--aztec-ink)]/40 mb-8">{a.date}</div>
-               <h3 className="font-aztec-serif text-3xl font-black text-[var(--aztec-ink)] mb-6 leading-tight group-hover:text-[var(--aztec-orchid)] transition-colors">
-                  {a.title}
-               </h3>
-               <p className="font-sans text-[var(--aztec-ink)]/60 text-lg leading-relaxed mb-8">
-                  {a.desc}
-               </p>
-             </div>
-             <div className="relative z-10 font-aztec-mono text-[11px] font-black uppercase tracking-widest text-[var(--aztec-ink)] flex items-center gap-4 hover:gap-6 transition-all group-hover:text-[var(--aztec-orchid)]">
-                {a.action} <ArrowRight size={14} />
-             </div>
-          </motion.div>
-        ))}
+        {loading ? (
+           <div className="col-span-3 text-center py-20 font-mono text-[10px] uppercase tracking-widest text-black/40">
+             Synchronizing core repository state...
+           </div>
+        ) : commits.map((c, i) => {
+          const dateStr = new Date(c.commit.author.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const sha = c.sha.slice(0, 7);
+          const fullMsg = c.commit.message as string;
+          const title = fullMsg.split('\n')[0];
+          const desc = fullMsg.split('\n').slice(1).join(' ').trim() || "Core protocol architectural update and optimization.";
+
+          return (
+            <motion.div 
+               key={i}
+               initial={{ opacity: 0, y: 30 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ duration: 0.6, delay: i * 0.1 }}
+               className="group relative bg-white p-8 md:p-12 border border-black/10 hover:border-[#0044CC]/30 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,68,204,0.08)] rounded-sm min-h-[480px] flex flex-col justify-between"
+            >
+               <div className="relative z-10">
+                 <div className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-black/40 mb-8 flex items-center justify-between gap-2">
+                   <div className="flex items-center gap-2">
+                     <div className="w-1.5 h-1.5 rounded-full bg-[#0044CC] animate-pulse" /> {dateStr}
+                   </div>
+                   <span className="text-[#0044CC] bg-[#0044CC]/5 px-2 py-0.5 rounded-sm">SHA: {sha}</span>
+                 </div>
+                 <h3 className="font-serif text-2xl lg:text-[24px] font-normal text-[#0A0A0A] mb-6 leading-[1.3] group-hover:text-[#0044CC] transition-colors line-clamp-3">
+                    {title}
+                 </h3>
+                 <p className="font-sans text-[#1a1a1a] text-[13px] leading-[1.8] tracking-[0.01em] mb-8 line-clamp-4">
+                    {desc}
+                 </p>
+               </div>
+               <a href={c.html_url} target="_blank" rel="noopener noreferrer" className="relative z-10 font-mono text-[10px] font-bold uppercase tracking-widest text-[#0044CC] flex items-center gap-4 hover:gap-6 transition-all cursor-pointer">
+                  Inspect Diff <ArrowRight size={14} />
+               </a>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
 };
 
-// 2. Finally, the Full Stack (01-06)
+// 2. The Full Stack (01-08)
 const FullStack = () => {
   const stacks = [
-    { num: "01", title: "Incredibly Simple Privacy Controls", desc: "Easily program privacy or transparency—at any layer: user, data, metadata, transaction, or logic. With Whale Alert's deterministic protocol, public and private functions seamlessly interweave in a single smart contract." },
-    { num: "02", title: "Total Privacy, from End-to-End", desc: "Build apps with private accounts, data, transactions, and function execution with client-side zero-knowledge proofs. Private functions are executed on the user’s device, so sensitive data stays where it belongs." },
-    { num: "03", title: "Native Account Abstraction", desc: "Every account is a smart contract. This unlocks flexible, programmable identities—with features like gas sponsorship, custom nonce control, and alternative signature schemes—like passkeys." },
-    { num: "04", title: "Local Developer Environment", desc: "Builders can utilize the Forensic Sandbox—a local network pre-packaged with built-in accounts, tokens, and a node—to streamline testing, backtesting and development." },
-    { num: "05", title: "Powerful Tools, Familiar Workflows", desc: "Fully loaded with tools to enhance your experience—including CLI utilities to compile, deploy, interact with tracking projects, and run benchmarks. It also comes with IDE extensions for code completion." },
-    { num: "06", title: "Permissionless Ecosystem", desc: "Join an ambitious, growing community of frontline quants shipping and scaling everything from L1 compliance bridges to cross-chain integrations, core primitives, and full data-aggregators." }
+    { num: "01", title: "Cryptographic Identity", desc: "Identity is established through provable ownership of a secp256k1 private key. This enforces strict privacy and eliminates password-based attack vectors." },
+    { num: "02", title: "Ephemeral QR Exchange", desc: "Cross-device authentication is secured via an ephemeral X25519 key exchange. The mobile enclave securely tunnels the signed EIP-191 payload directly to the desktop session." },
+    { num: "03", title: "EdDSA Edge Middleware", desc: "Ed25519 asymmetric cryptography allows our edge routing to verify authentication tokens in microseconds, preventing token manipulation." },
+    { num: "04", title: "Redis-Backed Telemetry", desc: "A high-performance Redis cluster governs session rate-limiting. Institutional throughput is dynamically extracted and enforced per-request." },
+    { num: "05", title: "Neo4j Topological Graphs", desc: "Graph databases map complex institutional capital transfers, isolating structural behavior patterns from standard mempool noise." },
+    { num: "06", title: "EVM Energy & Z-Score Alerts", desc: "By tracking computational energy intra-block, our engines deploy Z-Score calculations to detect the accumulation of institutional positions before market impact." },
+    { num: "07", title: "Sovereign Forums", desc: "A communication layer where identities are linked to verifiable signatures. PII is hashed via SHA-256 to ensure complete privacy compliance." },
+    { num: "08", title: "Institutional SLAs", desc: "Atomic cryptographic validation integrates with Stripe Webhooks for zero-trust subscription tracking and automated API key delivery." }
   ];
 
   return (
     <div className="w-full max-w-[1400px] mx-auto py-40 px-6">
-      <div className="mb-24 px-4 border-l-4 border-[var(--aztec-chartreuse)]">
-         <h2 className="font-aztec-serif text-6xl md:text-8xl font-black text-[var(--aztec-ink)] leading-[0.85] uppercase">
-            Finally,<br/> <span className="italic">the Full Stack</span>.
+      <div className="mb-24 px-8 border-l-[3px] border-[#0044CC]">
+         <h2 className="font-serif text-5xl lg:text-[72px] font-normal text-[#0A0A0A] leading-[1.0] tracking-tight">
+            Core <br/> <span className="text-black/40 italic">Infrastructure.</span>
          </h2>
+         <p className="mt-10 font-sans text-[20px] text-[#1a1a1a] max-w-4xl leading-[1.8] tracking-[0.01em]">
+            Every system layer is built with precision. In collaboration with <strong>Aztec Network</strong>, we replaced legacy Web2 structures with a deterministic, cryptographically provable framework designed for high-frequency environments.
+         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-24 gap-x-16 lg:gap-x-32">
@@ -127,13 +138,13 @@ const FullStack = () => {
             transition={{ duration: 0.8, delay: (i % 2) * 0.2 }}
             className="group"
           >
-            <div className="font-aztec-mono text-3xl font-black text-[var(--aztec-ink)]/20 mb-6 group-hover:text-[var(--aztec-chartreuse)] transition-colors duration-500">
-               ( {s.num} )
+            <div className="font-mono text-3xl font-bold text-black/10 mb-6 group-hover:text-[#0044CC] transition-colors duration-500">
+               {s.num}
             </div>
-            <h3 className="font-aztec-serif text-3xl md:text-4xl font-black text-[var(--aztec-ink)] leading-tight mb-8 group-hover:text-[var(--aztec-ink)]">
+            <h3 className="font-serif text-[28px] font-normal text-[#0A0A0A] leading-[1.3] mb-6">
                {s.title}
             </h3>
-            <p className="font-sans text-lg text-[var(--aztec-ink)]/60 leading-relaxed border-l border-[var(--aztec-ink)]/10 pl-6 group-hover:border-[var(--aztec-chartreuse)] transition-colors duration-500">
+            <p className="font-sans text-[16px] text-black/70 leading-[1.8] border-l border-black/10 pl-6 group-hover:border-[#0044CC]/30 transition-colors duration-500">
                {s.desc}
             </p>
           </motion.div>
@@ -146,67 +157,64 @@ const FullStack = () => {
 // 3. Tools and Libraries Grid
 const ToolsAndLibraries = () => {
   return (
-    <div className="bg-[var(--aztec-parchment)] text-[var(--aztec-ink)] py-40 px-6 relative overflow-hidden border-t border-[var(--aztec-ink)]/5">
-       {/* Background Noise for contrast */}
-       <div className="absolute inset-0 noise-bg opacity-10 pointer-events-none mix-blend-overlay" />
-       
-       <div className="max-w-[1400px] mx-auto relative z-10 flex flex-col lg:flex-row gap-20">
+    <div className="bg-white text-[#0A0A0A] py-40 px-6 border-y border-black/5">
+       <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-20">
           <div className="lg:w-1/3">
-             <div className="font-aztec-mono text-[11px] uppercase tracking-[0.5em] text-[var(--aztec-chartreuse)] mb-6">Tools and Libraries</div>
-             <h2 className="font-aztec-serif text-6xl lg:text-7xl font-black uppercase leading-[0.9] mb-8">
-               Your tools <br/>are <span className="italic text-[var(--aztec-orchid)]">ready</span> <br/>and waiting.
+             <div className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold text-[#0044CC] mb-8">Tools and Repositories</div>
+             <h2 className="font-serif text-5xl lg:text-[64px] font-normal leading-[1.0] tracking-tight mb-10 text-balance">
+               Build on <br/>the <span className="italic text-black/40">Architecture.</span>
              </h2>
-             <p className="font-sans text-xl text-[var(--aztec-ink)]/60 italic border-l-2 border-[var(--aztec-chartreuse)] pl-6 py-2">
-               All You Have <br/>to Do Is Build
+             <p className="font-sans text-xl text-black/60 italic border-l-2 border-[#0044CC] pl-6 py-2 leading-relaxed">
+               Access our primary suites for heuristic intelligence and cryptographic validation.
              </p>
           </div>
 
-          <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
-             {/* Category 1 */}
-             <div className="bg-[var(--aztec-ink)]/5 p-10 hover:bg-[var(--aztec-ink)]/10 transition-colors border border-[var(--aztec-ink)]/5">
-                <div className="font-aztec-mono text-[10px] tracking-widest uppercase text-[var(--aztec-ink)]/40 mb-6 border-b border-[var(--aztec-ink)]/10 pb-4">Block Explorers</div>
-                <div className="space-y-4 font-aztec-serif text-2xl font-black">
-                   <div className="hover:text-[var(--aztec-chartreuse)] cursor-pointer transition-colors">Forensic Explorer</div>
-                   <div className="hover:text-[var(--aztec-chartreuse)] cursor-pointer transition-colors">WhaleScan</div>
+          <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">On-Chain Intelligence</div>
+                <div className="space-y-6 font-serif text-[22px] font-normal">
+                   <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
+                     Whale Alert Pro Terminal <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                   </div>
+                   <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
+                     The Akashic Ledger Engine <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                   </div>
                 </div>
              </div>
-             {/* Category 2 */}
-             <div className="bg-[var(--aztec-ink)]/5 p-10 hover:bg-[var(--aztec-ink)]/10 transition-colors border border-[var(--aztec-ink)]/5">
-                <div className="font-aztec-mono text-[10px] tracking-widest uppercase text-[var(--aztec-ink)]/40 mb-6 border-b border-[var(--aztec-ink)]/10 pb-4">Bridges</div>
-                <div className="space-y-4 font-aztec-serif text-2xl font-black">
-                   <div className="hover:text-[var(--aztec-chartreuse)] cursor-pointer transition-colors">human.tech</div>
+             <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">Identity Protocols</div>
+                <div className="space-y-6 font-serif text-[22px] font-normal">
+                   <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
+                     Sovereign Identity API <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                   </div>
+                   <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
+                     Humanity Score Matrix <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                   </div>
                 </div>
              </div>
-             {/* Category 3 */}
-             <div className="bg-[var(--aztec-ink)]/5 p-10 hover:bg-[var(--aztec-ink)]/10 transition-colors border border-[var(--aztec-ink)]/5">
-                <div className="font-aztec-mono text-[10px] tracking-widest uppercase text-[var(--aztec-ink)]/40 mb-6 border-b border-[var(--aztec-ink)]/10 pb-4">IDE Tools</div>
-                <div className="space-y-4 font-aztec-serif text-2xl font-black">
-                   <div className="hover:text-[var(--aztec-chartreuse)] cursor-pointer transition-colors">Noir VS Code Extension</div>
-                   <div className="hover:text-[var(--aztec-chartreuse)] cursor-pointer transition-colors">Remix IDE Plugin</div>
+             <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">Regulatory Compliance</div>
+                <div className="space-y-6 font-serif text-[22px] font-normal">
+                   <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
+                     MiCA Automation Toolkit <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                   </div>
+                   <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
+                     GDPR Entity Wiping Script <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                   </div>
                 </div>
              </div>
-             {/* Category 4 */}
-             <div className="bg-[var(--aztec-ink)]/5 p-10 hover:bg-[var(--aztec-ink)]/10 transition-colors border border-[var(--aztec-ink)]/5 md:row-span-2 flex flex-col justify-between">
+             <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm md:row-span-2 flex flex-col justify-between">
                 <div>
-                   <div className="font-aztec-mono text-[10px] tracking-widest uppercase text-[var(--aztec-ink)]/40 mb-6 border-b border-[var(--aztec-ink)]/10 pb-4">Wallets</div>
-                   
+                   <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">Development Environment</div>
                    <div className="mb-10">
-                      <div className="font-aztec-serif text-2xl font-black hover:text-[var(--aztec-chartreuse)] cursor-pointer transition-colors mb-3">Obsidion</div>
-                      <p className="font-sans text-sm text-[var(--aztec-parchment)]/50 leading-relaxed">
-                        User-friendly by design, privacy-preserving by default. Features passkey login, email recovery, and smooth dapp connectivity.
-                      </p>
-                   </div>
-
-                   <div>
-                      <div className="font-aztec-serif text-2xl font-black hover:text-[var(--aztec-chartreuse)] cursor-pointer transition-colors mb-3">Azguard</div>
-                      <p className="font-sans text-sm text-[var(--aztec-parchment)]/50 leading-relaxed">
-                        A browser extension wallet that lets you hold, send, and connect—privately and seamlessly inside the ecosystem.
+                      <div className="font-serif text-[26px] font-normal hover:text-[#0044CC] cursor-pointer transition-colors mb-6">Sovereign Sandbox</div>
+                      <p className="font-sans text-[15px] leading-[1.8] tracking-[0.01em] text-black/70">
+                        An isolated environment simulating live mempool latency and complex graphs, enabling quantitative developers to test alerts locally before mainnet deployment.
                       </p>
                    </div>
                 </div>
-
-                <div className="mt-12 font-aztec-mono text-[11px] font-black uppercase tracking-widest text-[var(--aztec-chartreuse)] flex items-center gap-4 hover:gap-6 transition-all cursor-pointer">
-                   See All Tools <ArrowRight size={14} />
+                <div className="mt-8 pt-8 border-t border-black/5 font-mono text-[10px] font-bold uppercase tracking-widest text-[#0044CC] flex items-center gap-4 hover:gap-6 transition-all cursor-pointer">
+                   Explore Documentation <ArrowRight size={14} />
                 </div>
              </div>
           </div>
@@ -218,38 +226,38 @@ const ToolsAndLibraries = () => {
 // 4. Sandbox Callout
 const SandboxSection = () => {
   return (
-    <div className="w-full border-t border-[var(--aztec-ink)]/10 bg-[var(--aztec-parchment)] relative overflow-hidden">
-       <div className="max-w-[1400px] mx-auto py-32 px-6 flex flex-col md:flex-row items-center gap-20 relative z-10">
+    <div className="w-full bg-[#FAF9F6]">
+       <div className="max-w-[1400px] mx-auto py-40 px-6 flex flex-col md:flex-row items-center gap-20">
           <div className="md:w-1/2">
-             <div className="font-aztec-mono text-[11px] uppercase tracking-[0.4em] text-[var(--aztec-orchid)] mb-6">Start in the Sandbox</div>
-             <h2 className="font-aztec-serif text-6xl md:text-8xl font-black text-[var(--aztec-ink)] uppercase leading-[0.9] mb-8 text-balance">
-                Build fast.<br/> Break <span className="italic">nothing</span>.
+             <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#0044CC] mb-8">Testing Environment</div>
+             <h2 className="font-serif text-5xl md:text-[80px] font-normal text-[#0A0A0A] leading-[1.0] tracking-tight mb-10 text-balance">
+                Test.<br/> Validate. <br/><span className="text-black/40 italic">Deploy.</span>
              </h2>
-             <p className="font-sans text-2xl text-[var(--aztec-ink)]/60 leading-relaxed mb-12">
-               Explore your new powers in the zero-knowledge execution Sandbox.
+             <p className="font-sans text-[20px] text-black/60 leading-[1.6] mb-12 max-w-md">
+               Test your integrations against live mempool data using our local zero-latency sandboxes.
              </p>
-             <button className="px-12 py-6 bg-[var(--aztec-ink)] text-[var(--aztec-parchment)] font-aztec-mono text-[11px] font-black uppercase tracking-widest transition-transform hover:scale-105 active:scale-95">
-                Go To Docs
+             <button className="px-10 py-5 bg-[#0A0A0A] text-white font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-[#222] transition-colors rounded-sm shadow-xl">
+                Access Sandbox
              </button>
           </div>
           
           <div className="md:w-1/2 w-full space-y-4">
              {[
-               { title: "Jump into the Local Sandbox", sub: "Terminal Environment", icon: Terminal },
-               { title: "Start working in Testnet", sub: "Right out of your browser", icon: Globe },
-               { title: "Build a Counter Contract", sub: "Go to the Starter Repo", icon: Code2 }
+               { title: "Instantiate Local Graph", sub: "Mock Neo4j Data Environment", icon: Database },
+               { title: "Invoke EdDSA Auth", sub: "Test session minting locally", icon: ShieldCheck },
+               { title: "Query Endpoint Latency", sub: "Benchmark API Performance", icon: Activity }
              ].map((item, i) => (
-                <div key={i} className="group p-8 bg-[var(--aztec-ink)]/5 border border-[var(--aztec-ink)]/10 flex items-center justify-between cursor-pointer hover:bg-[var(--aztec-chartreuse)]/10 hover:border-[var(--aztec-chartreuse)] transition-all">
-                   <div className="flex items-center gap-6">
-                      <div className="w-12 h-12 bg-[var(--aztec-ink)] text-[var(--aztec-parchment)] rounded-lg flex items-center justify-center group-hover:bg-[var(--aztec-chartreuse)] group-hover:text-[var(--aztec-ink)] transition-colors">
-                         <item.icon size={20} />
+                <div key={i} className="group p-8 bg-white border border-black/10 flex items-center justify-between cursor-pointer hover:border-[#0044CC]/40 hover:shadow-lg transition-all rounded-sm">
+                   <div className="flex items-center gap-8">
+                      <div className="w-14 h-14 bg-[#FAF9F6] border border-black/10 text-[#0A0A0A] rounded-full flex items-center justify-center group-hover:bg-[#0044CC] group-hover:text-white transition-colors">
+                         <item.icon size={22} strokeWidth={1.5} />
                       </div>
                       <div>
-                         <div className="font-aztec-serif text-2xl font-black text-[var(--aztec-ink)] mb-1">{item.title}</div>
-                         <div className="font-sans text-sm text-[var(--aztec-ink)]/50">{item.sub}</div>
+                         <div className="font-serif text-[22px] font-normal text-[#0A0A0A] mb-2">{item.title}</div>
+                         <div className="font-mono text-[10px] uppercase tracking-widest font-bold text-black/40">{item.sub}</div>
                       </div>
                    </div>
-                   <ArrowRight size={24} className="text-[var(--aztec-ink)]/20 group-hover:text-[var(--aztec-ink)] transition-colors group-hover:translate-x-2" />
+                   <ArrowRight size={20} className="text-black/20 group-hover:text-[#0044CC] transition-colors group-hover:translate-x-2" />
                 </div>
              ))}
           </div>
@@ -258,94 +266,93 @@ const SandboxSection = () => {
   );
 };
 
-// 5. Hybrid Transaction Lifecycle Graphic
+// 5. Authentication Lifecycle Diagram
 const TransactionDiagram = () => {
   return (
-    <div className="bg-[var(--aztec-ink)]/95 text-white py-40 px-6 relative overflow-hidden border-t-4 border-[var(--aztec-chartreuse)]">
-      <div className="absolute inset-0 noise-bg opacity-[0.05]" />
-      
-      <div className="max-w-[1400px] mx-auto text-center mb-32 relative z-10">
-         <div className="font-aztec-mono text-[10px] uppercase tracking-[0.5em] text-[var(--aztec-chartreuse)] mb-6">Hybrid Transaction Lifecycle</div>
-         <h2 className="font-aztec-serif text-6xl md:text-8xl font-black uppercase leading-[0.9] mb-8">
-            Inside a <span className="italic">Transaction</span>
+    <div className="bg-[#0A0A0A] text-white py-40 px-6">
+      <div className="max-w-[1400px] mx-auto text-center mb-32">
+         <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#0044CC] mb-8">System Flow</div>
+         <h2 className="font-serif text-5xl md:text-[72px] font-normal leading-[1.05] tracking-tight mb-10">
+            The Authentication <br/><span className="italic text-white/50">Lifecycle</span>
          </h2>
-         <p className="font-sans text-xl text-white/50 max-w-3xl mx-auto leading-relaxed border-b border-white/10 pb-16">
-            Travel alongside a hybrid transaction and discover how the determinisitic protocol efficiently processes both public and private functions—making it the ideal ledger for building and deploying tracking apps.
+         <p className="font-sans text-[18px] text-white/60 max-w-4xl mx-auto leading-[1.8] border-b border-white/10 pb-20">
+            Trace the execution path of a zero-trust login request. See how the protocol uses elliptic curve cryptography to enforce absolute session integrity from mobile to desktop.
          </p>
       </div>
 
-      {/* The Diagram Map */}
-      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-12 relative z-10 items-stretch">
-         {/* 1. USER */}
-         <div className="border border-white/10 p-8 flex flex-col justify-between hover:bg-white/5 transition-colors relative group">
-            <div className="font-aztec-mono text-[10px] uppercase tracking-[0.3em] text-white/40 mb-6">User</div>
-            <h3 className="font-aztec-serif text-3xl font-black text-[var(--aztec-chartreuse)] mb-4 leading-tight">App UI</h3>
-            <p className="font-sans text-sm text-white/60 mb-12">User opens app and is prompted to sign into browser-based wallet</p>
-            <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center font-aztec-mono text-xl font-black group-hover:bg-white group-hover:text-black transition-colors">1</div>
+      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 items-stretch">
+         {/* 1. Mobile Signer */}
+         <div className="border border-white/10 p-10 flex flex-col justify-between hover:bg-white/[0.02] transition-colors group rounded-sm">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-8">Phase 01</div>
+            <h3 className="font-serif text-[26px] font-normal text-[#0044CC] mb-6 leading-[1.2]">Mobile Enclave</h3>
+            <p className="font-sans text-[14px] text-white/60 mb-12 leading-[1.7]">The operator's mobile wallet receives a deterministic authentication string. The private key never leaves the device; it exclusively signs the payload via the secp256k1 curve.</p>
+            <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center font-mono text-xl font-bold group-hover:bg-white group-hover:text-black transition-colors mt-auto">
+                <Terminal size={20} strokeWidth={1.5} />
+            </div>
          </div>
 
-         {/* 2. DEV */}
-         <div className="border border-white/10 p-8 flex flex-col justify-between bg-white/5 hover:bg-white/10 transition-colors relative group col-span-1 lg:col-span-2">
-            <div className="font-aztec-mono text-[10px] uppercase tracking-[0.3em] text-white/40 mb-6">Dev</div>
-            <h3 className="font-aztec-serif text-3xl font-black mb-12">App Program (Hybrid Contract)</h3>
-            <div className="grid grid-cols-2 gap-4">
+         {/* 2. QR Mesh Tunnel */}
+         <div className="border border-white/10 p-10 flex flex-col justify-between bg-white/[0.02] hover:bg-white/[0.04] transition-colors group col-span-1 lg:col-span-2 rounded-sm">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-8">Phase 02</div>
+            <h3 className="font-serif text-[28px] font-normal mb-8">X25519 Ephemeral Handshake</h3>
+            <div className="grid grid-cols-2 gap-8">
                <div>
-                  <h4 className="font-aztec-serif text-xl font-bold text-[#FF0055] mb-2">Private Functions</h4>
-                  <p className="font-sans text-xs text-white/50 mb-4">Sensitive data stays on the user's device</p>
-                  <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center font-aztec-mono text-sm group-hover:border-[#FF0055] transition-colors">2A</div>
+                  <h4 className="font-mono text-[11px] font-bold tracking-widest uppercase text-white/80 mb-3">Key Exchange</h4>
+                  <p className="font-sans text-[13px] text-white/50 leading-[1.6]">Desktop and mobile generate ephemeral X25519 keys to establish a shared secret dynamically over an isolated channel.</p>
                </div>
                <div>
-                  <h4 className="font-aztec-serif text-xl font-bold text-[#00FFFF] mb-2">Public Functions</h4>
-                  <p className="font-sans text-xs text-white/50 mb-4">Public functions live on the network and execute per request</p>
-                  <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center font-aztec-mono text-sm group-hover:border-[#00FFFF] transition-colors">2B</div>
+                  <h4 className="font-mono text-[11px] font-bold tracking-widest uppercase text-white/80 mb-3">AES-GCM Tunnel</h4>
+                  <p className="font-sans text-[13px] text-white/50 leading-[1.6]">The signed EIP-191 payload is encrypted, protecting against network interception and packet sniffing.</p>
                </div>
             </div>
          </div>
 
-         {/* 3. Output / Private Execution */}
-         <div className="border border-[var(--aztec-orchid)]/30 p-8 flex flex-col justify-between bg-[var(--aztec-orchid)]/5 hover:bg-[var(--aztec-orchid)]/10 transition-colors relative group col-span-1 lg:col-span-2 shadow-[0_0_50px_rgba(209,37,199,0.05)]">
-            <div className="font-aztec-mono text-[10px] uppercase tracking-[0.3em] text-[var(--aztec-orchid)] mb-6">Aztec Wallet & PXE</div>
-            <p className="font-sans text-sm text-white/80 mb-8 leading-relaxed">App connects user's wallet and private execution environment (PXE) to execute functions client-side.</p>
+         {/* 3. EdDSA Middleware */}
+         <div className="border border-[#0044CC]/40 p-10 flex flex-col justify-between bg-[#0044CC]/5 hover:bg-[#0044CC]/10 transition-colors group col-span-1 lg:col-span-2 rounded-sm shadow-[0_0_40px_rgb(0,68,204,0.1)]">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#0044CC] mb-8">Phase 03</div>
+            <h3 className="font-serif text-[28px] font-normal mb-6">EdDSA Edge Middleware</h3>
+            <p className="font-sans text-[14px] text-white/80 mb-10 leading-[1.7]">The server performs an `ecrecover` verification. Upon validation, the system mints an asymmetric Ed25519 JWT. Our Edge architecture rigorously validates this JWT globally.</p>
             
-            <div className="bg-[#000] p-4 rounded-xl border border-white/10">
-               <div className="font-aztec-mono text-[8px] tracking-widest text-[var(--aztec-chartreuse)] mb-2 uppercase">Hybrid Transaction Output</div>
-               <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs text-white/90 font-bold">Private Proof</div>
-                  <div className="text-[10px] text-white/40">Hash of private state</div>
+            <div className="bg-black/50 p-6 rounded-sm border border-white/10 mt-auto">
+               <div className="flex items-center justify-between mb-4">
+                  <div className="text-[13px] text-white/90 font-mono font-bold">Ed25519 JWT</div>
+                  <div className="text-[10px] text-white/40 font-mono uppercase tracking-widest">Secure Session Cookie</div>
                </div>
                <div className="flex items-center justify-between">
-                  <div className="text-xs text-white/90 font-bold">Public Txn Request</div>
-                  <div className="text-[10px] text-white/40">Execution intent</div>
+                  <div className="text-[13px] text-white/90 font-mono font-bold">SameSite=Lax</div>
+                  <div className="text-[10px] text-white/40 font-mono uppercase tracking-widest">Cross-Site Protection</div>
                </div>
             </div>
          </div>
 
-         {/* 4. Decentralized Sequencer Network */}
-         <div className="border border-white/10 p-8 flex flex-col hover:bg-white/5 transition-colors relative group col-span-1 md:col-span-3 lg:col-span-3 min-h-[300px]">
-            <div className="font-aztec-mono text-[10px] uppercase tracking-[0.3em] text-[var(--aztec-chartreuse)] mb-6">Aztec Network</div>
-            <h3 className="font-aztec-serif text-4xl font-black mb-8">Decentralized Sequencer</h3>
-            <div className="flex flex-col md:flex-row gap-8 flex-1">
-               <div className="flex-1 bg-white/5 p-6 border-l-2 border-[#FF0055]">
-                  <p className="text-sm font-bold text-white mb-2">Verifies private transaction proofs</p>
-                  <p className="text-xs text-white/50">UTXO Model (4A)</p>
+         {/* 4. Redis Tier Limiting */}
+         <div className="border border-white/10 p-10 flex flex-col justify-center hover:bg-white/[0.02] transition-colors group col-span-1 md:col-span-3 lg:col-span-3 min-h-[300px] rounded-sm">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-8">Phase 04</div>
+            <h3 className="font-serif text-[32px] font-normal mb-10">Redis Telemetry & Isolation</h3>
+            <div className="flex flex-col md:flex-row gap-8">
+               <div className="flex-1 bg-white/[0.03] p-8 border-l-[3px] border-[#0044CC]">
+                  <p className="text-[13px] font-mono font-bold uppercase tracking-widest text-white mb-4">Tiered Rate Limiting</p>
+                  <p className="text-[14px] font-sans text-white/60 leading-[1.6]">The decrypted JWT payload dictates API request boundaries. Redis atomic counters enforce hard cryptographic ceilings.</p>
                </div>
-               <div className="flex-1 bg-white/5 p-6 border-l-2 border-[#00FFFF]">
-                  <p className="text-sm font-bold text-white mb-2">Retrieves and executes public functions</p>
-                  <p className="text-xs text-white/50">Account Based Model (4B)</p>
+               <div className="flex-1 bg-white/[0.03] p-8 border-l-[3px] border-white/20">
+                  <p className="text-[13px] font-mono font-bold uppercase tracking-widest text-white mb-4">COOP/COEP Headers</p>
+                  <p className="text-[14px] font-sans text-white/60 leading-[1.6]">COOP and COEP isolate the Terminal's execution environment. This mitigates hardware-level vulnerabilities, preventing malicious scripts from performing memory reads.</p>
                </div>
             </div>
          </div>
 
-         {/* 5. L1 Settlement */}
-         <div className="border border-white/10 p-8 flex flex-col justify-between hover:bg-white/5 transition-colors relative group col-span-1 md:col-span-2 lg:col-span-2 min-h-[300px]">
-            <div className="font-aztec-mono text-[10px] uppercase tracking-[0.3em] text-white/40 mb-6">Proven Chain</div>
-            <h3 className="font-aztec-serif text-4xl font-black text-[#627EEA] mb-8">L1 Ethereum</h3>
-            <p className="font-sans text-sm text-white/60 mb-8 leading-relaxed">
-               The block is settled on Ethereum—allowing anyone to verify the state of the network. Finalized Block ZK Proof of 32-block epoch.
+         {/* 5. Terminal Access */}
+         <div className="border border-white/10 p-10 flex flex-col justify-between hover:bg-white/[0.02] transition-colors group col-span-1 md:col-span-2 lg:col-span-2 min-h-[300px] rounded-sm">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-8">Phase 05</div>
+            <h3 className="font-serif text-[32px] font-normal text-white mb-8">Institutional Dashboard</h3>
+            <p className="font-sans text-[15px] text-white/60 mb-10 leading-[1.7]">
+               The cryptographic payload arrives pristine. The operator is granted access to the heuristic terminal, receiving intelligence directly extracted from the EVM.
             </p>
-            <div className="flex items-center gap-4 border-t border-white/10 pt-6">
-               <div className="w-12 h-12 flex-shrink-0 bg-[#627EEA]/20 border border-[#627EEA] text-[#627EEA] rounded-xl flex items-center justify-center font-bold">L1</div>
-               <div className="text-xs text-white/40">Verified On-Chain</div>
+            <div className="flex items-center gap-6 border-t border-white/10 pt-8 mt-auto">
+               <div className="w-12 h-12 flex-shrink-0 bg-white border border-white text-black rounded-full flex items-center justify-center font-bold">
+                   <Activity size={20} strokeWidth={1.5} />
+               </div>
+               <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-white/60">Terminal Granted</div>
             </div>
          </div>
 
@@ -354,44 +361,41 @@ const TransactionDiagram = () => {
   );
 };
 
-// 6. Bleeding Edge Research
+// 6. Institutional Compliance & Cryptography
 const ResearchSection = () => {
   return (
-    <div className="w-full bg-[var(--aztec-parchment)] py-40 px-6 relative overflow-hidden border-t-2 border-[var(--aztec-ink)]">
-      {/* Background Image Removed */}
-      <div className="absolute inset-0 z-0 bg-[var(--aztec-parchment)]" />
-
-      <div className="max-w-[1400px] mx-auto relative z-10 flex flex-col lg:flex-row gap-20 items-center">
+    <div className="w-full bg-[#FAF9F6] py-40 px-6 border-y border-black/5">
+      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-20 items-center">
          <div className="lg:w-1/3">
-            <h2 className="font-aztec-serif text-7xl font-black text-[var(--aztec-ink)] uppercase leading-[0.8] mb-12">
-               Bleeding-edge <br/><span className="italic text-[var(--aztec-orchid)]">Research</span>.
+            <h2 className="font-serif text-5xl md:text-[64px] font-normal text-[#0A0A0A] leading-[1.05] tracking-tight mb-12">
+               Institutional <br/><span className="italic text-black/40">Compliance.</span>
             </h2>
             <div className="space-y-6">
-               {["PLONK", "SHPLONK", "The Aztec Protocol", "Turbo-PLONK", "Zeromorph", "plookup", "Halo Infinite"].map((term, i) => (
-                  <div key={i} className="font-aztec-mono text-sm tracking-[0.3em] text-[var(--aztec-ink)]/20 uppercase hover:text-[var(--aztec-ink)] transition-colors cursor-default select-none">
+               {["MiCA Article 72", "GDPR Data Wipe", "Privacy-by-Void", "Ed25519 JWT", "X25519 Key Exchange", "AES-256-GCM Tunnels", "Neo4j Cypher Traversal"].map((term, i) => (
+                  <div key={i} className="font-mono text-[11px] font-bold tracking-[0.2em] text-black/30 uppercase hover:text-black/80 transition-colors cursor-default select-none">
                      {term}
                   </div>
                ))}
             </div>
          </div>
 
-         <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-12 lg:pl-16">
-            <div className="border-t-[10px] border-[var(--aztec-chartreuse)] pt-8">
-               <div className="font-aztec-serif text-8xl font-black text-[var(--aztec-ink)] mb-4">7</div>
-               <div className="font-aztec-mono text-[11px] uppercase tracking-widest text-[var(--aztec-ink)]/70 mb-2">White Papers</div>
-               <div className="font-sans text-sm text-[var(--aztec-ink)]/40">Published from 2018 to 2024</div>
+         <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-y-16 gap-x-12 lg:pl-20">
+            <div className="border-t-[3px] border-[#0044CC] pt-8">
+               <div className="font-serif text-[80px] font-normal text-[#0A0A0A] leading-[1.0] mb-6">0%</div>
+               <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/60 mb-3">Stored Passwords</div>
+               <div className="font-sans text-[14px] text-black/40 leading-relaxed">A pristine, mathematically proven Zero-Trust Environment.</div>
             </div>
 
-            <div className="border-t-[10px] border-[var(--aztec-ink)] pt-8">
-               <div className="font-aztec-serif text-8xl font-black text-[var(--aztec-ink)] mb-4">1,024</div>
-               <div className="font-aztec-mono text-[11px] uppercase tracking-widest text-[var(--aztec-ink)]/70 mb-2">Citations</div>
-               <div className="font-sans text-sm text-[var(--aztec-ink)]/40">In Peer Review Journals</div>
+            <div className="border-t-[3px] border-black/10 pt-8">
+               <div className="font-serif text-[80px] font-normal text-[#0A0A0A] leading-[1.0] mb-6">256</div>
+               <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/60 mb-3">Bit Encryption</div>
+               <div className="font-sans text-[14px] text-black/40 leading-relaxed">Securing the QR Mesh Data Stream from all interception vectors.</div>
             </div>
 
-            <div className="border-t-[10px] border-[var(--aztec-orchid)] pt-8">
-               <div className="font-aztec-serif text-8xl font-black text-[var(--aztec-ink)] mb-4">3</div>
-               <div className="font-aztec-mono text-[11px] uppercase tracking-widest text-[var(--aztec-ink)]/70 mb-2">Monumental Contributions</div>
-               <div className="font-sans text-sm text-[var(--aztec-ink)]/40">PLONK Cryptography, Noir DSL and Neural Trend System</div>
+            <div className="border-t-[3px] border-black/10 pt-8">
+               <div className="font-serif text-[80px] font-normal text-[#0A0A0A] leading-[1.0] mb-6">1</div>
+               <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/60 mb-3">Immutable Hash</div>
+               <div className="font-sans text-[14px] text-black/40 leading-relaxed">Replacing wiped entity data permanently to satisfy GDPR mandates.</div>
             </div>
          </div>
       </div>
@@ -404,36 +408,54 @@ const FAQs = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const faqs = [
-    "What is Whale Alert and why build on a privacy-first Layer 2?",
-    "How does the Forensic Protocol compare to other L2 blockchains for builders?",
-    "What programming language do I use to build projects on the engine?",
-    "What are Hybrid smart contracts and how are they different?",
-    "How do private tracking apps work under the hood?",
-    "How does the zk-rollup design benefit quantitative developers?",
-    "What tools are available for developers building on the terminal?",
-    "What kinds of private applications can I build?",
-    "How does decentralization work for forensic developers?"
+    {
+      q: "Why did the architecture migrate from HS256 to EdDSA (Ed25519) JWTs?",
+      a: "Symmetric HS256 requires the validation server to possess the exact same secret key used for signing, introducing a vulnerability vector if the edge environment is compromised. Ed25519 asymmetric cryptography allows our Edge Middleware to verify the integrity of the JWT mathematically using only the public key. This preserves the absolute confidentiality of the signing mechanism."
+    },
+    {
+      q: "How does the X25519 Ephemeral QR Mesh Handshake decisively prevent MitM attacks?",
+      a: "Legacy QR login mechanisms transmitted raw authentication tokens over standard web sockets, exposing them to network sniffers. Our protocol dictates that the desktop and mobile devices dynamically generate an ephemeral X25519 shared secret out-of-band. The EIP-191 payload is encrypted via AES-256-GCM before transmission."
+    },
+    {
+      q: "What is the critical function of COOP and COEP headers within the Terminal?",
+      a: "COOP and COEP isolate the Terminal's execution environment. This mitigates hardware-level vulnerabilities like Spectre or Meltdown, preventing malicious scripts from performing side-channel memory reads."
+    },
+    {
+      q: "How does the system autonomously achieve MiCA and GDPR compliance?",
+      a: "We implement 'Privacy-by-Void'. When a user invokes the 'Right to Be Forgotten', all Personally Identifiable Information (PII) is permanently wiped and substituted with a deterministic SHA-256 hash, ensuring compliance."
+    },
+    {
+      q: "Why employ Neo4j over traditional PostgreSQL for heuristic analysis?",
+      a: "Determining the origin of capital across multi-hop transactions is inefficient using traditional SQL JOIN operations. Neo4j’s graph architecture maps these complex relationships natively, resulting in significantly lower latency."
+    },
+    {
+      q: "How does Redis facilitate institutional rate-limiting without database bottlenecks?",
+      a: "The user tier is extracted from the verified EdDSA JWT on every request. This is evaluated against atomic counters in a distributed Redis cluster, enforcing rate limits in-memory with microsecond precision."
+    }
   ];
 
   return (
-    <div className="w-full bg-[var(--aztec-parchment)] text-[var(--aztec-ink)] py-40 px-6 border-t border-[var(--aztec-ink)]/5">
-       <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-20">
+    <div className="w-full bg-white text-[#0A0A0A] py-40 px-6">
+       <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-24">
           <div className="lg:w-1/3">
-             <div className="font-aztec-mono text-[10px] uppercase tracking-[0.4em] text-[var(--aztec-chartreuse)] mb-6">Discovery</div>
-             <h2 className="font-aztec-serif text-7xl font-black uppercase leading-[0.8] mb-12">
-               FAQs
+             <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#0044CC] mb-8">Documentation</div>
+             <h2 className="font-serif text-5xl md:text-[64px] font-normal leading-[1.05] tracking-tight mb-10">
+               Architectural<br /> <span className="italic text-black/40">Syllabus.</span>
              </h2>
+             <p className="font-sans text-[16px] text-black/60 leading-[1.8]">
+               Extensive documentation addressing the most complex cryptographic and architectural methodologies deployed within our infrastructure.
+             </p>
           </div>
-          <div className="lg:w-2/3 border-t border-[var(--aztec-parchment)]/10">
+          <div className="lg:w-2/3 border-t border-black/10">
              {faqs.map((f, i) => (
                 <div 
                    key={i} 
                    onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                   className="py-8 border-b border-[var(--aztec-parchment)]/10 flex justify-between items-center group cursor-pointer hover:border-[var(--aztec-chartreuse)] hover:pl-6 transition-all duration-300"
+                   className="py-10 border-b border-black/10 flex justify-between items-start group cursor-pointer hover:border-[#0044CC] transition-all duration-300"
                 >
-                   <div>
-                     <h4 className="font-aztec-serif text-2xl font-bold text-[var(--aztec-parchment)] group-hover:text-[var(--aztec-chartreuse)] pr-8 leading-tight">
-                       {f}
+                   <div className="flex-1 pr-12">
+                     <h4 className="font-serif text-[24px] font-normal text-[#0A0A0A] group-hover:text-[#0044CC] leading-[1.4] transition-colors">
+                       {f.q}
                      </h4>
                      <AnimatePresence>
                         {openIndex === i && (
@@ -441,14 +463,16 @@ const FAQs = () => {
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="mt-6 text-[var(--aztec-parchment)]/60 font-sans leading-relaxed pr-12 overflow-hidden"
+                              className="mt-6 text-[#1a1a1a] font-sans text-[16px] leading-[1.8] overflow-hidden"
                            >
-                              Built on the deterministic forensic axioms of the overarching Aztec architecture. This response acts as technical clarification regarding smart-contract inter-layer behaviors.
+                              {f.a}
                            </motion.div>
                         )}
                      </AnimatePresence>
                    </div>
-                   <ArrowDown className={`min-w-8 text-[var(--aztec-parchment)]/20 group-hover:text-[var(--aztec-chartreuse)] transition-transform duration-500 ${openIndex === i ? "rotate-0 text-[var(--aztec-chartreuse)]" : "-rotate-90"}`} size={32} />
+                   <div className={`w-10 h-10 shrink-0 border border-black/10 rounded-full flex items-center justify-center transition-all duration-500 group-hover:border-[#0044CC] ${openIndex === i ? "bg-[#0044CC] text-white rotate-0" : "bg-transparent text-black/30 -rotate-90"}`}>
+                      <ArrowDown size={18} strokeWidth={1.5} />
+                   </div>
                 </div>
              ))}
           </div>
@@ -457,103 +481,60 @@ const FAQs = () => {
   );
 };
 
-
 // ─── MAIN PAGE COMPONENT ───
 export default function DevelopersPage() {
   return (
-    <div className="min-h-screen bg-[var(--aztec-parchment)] overflow-hidden font-sans">
-      <AntiPhishing />
+    <div className="min-h-screen bg-[#FAF9F6] text-[#0A0A0A] overflow-x-hidden font-sans selection:bg-black/10 selection:text-[#0A0A0A]">
       
-      {/* Absolute Navbar matching Landing Page aesthetics */}
-      <div className="fixed top-0 left-0 right-0 z-[60] p-6 lg:p-10 pointer-events-none flex justify-center">
-         <div className="text-white mix-blend-difference font-aztec-mono text-[10px] md:text-[11px] font-black tracking-[0.3em] md:tracking-[0.5em] uppercase pointer-events-auto cursor-pointer hover:text-[var(--aztec-chartreuse)] transition-colors">
-            <Link href="/" className="px-3 hover:text-[var(--aztec-orchid)] transition-colors">Network</Link> // Token // Roadmap // Basics // Docs // Developers
-         </div>
+      {/* ── TOP NAV SPACER ── */}
+      <div className="fixed top-0 left-0 right-0 z-50 px-8 py-6 pointer-events-none flex justify-center backdrop-blur-md bg-[#FAF9F6]/80 border-b border-black/5">
+         <Link href="/" className="pointer-events-auto font-mono text-[10px] font-bold uppercase tracking-widest text-black/40 hover:text-black transition-colors flex items-center gap-2">
+            <ArrowRight size={12} className="rotate-180" /> Return to Terminal
+         </Link>
       </div>
       
       {/* ── HERO SECTION ── */}
-      <section className="relative min-h-[90vh] flex flex-col justify-center px-6 pt-32 pb-16">
-         {/* Background Immersion Removed for Fluidity */}
-         <div className="absolute inset-0 z-0 bg-[var(--aztec-parchment)]" />
-
-         {/* Grain & Noise */}
-         <div className="absolute inset-0 z-[1] noise-bg opacity-[0.25] mix-blend-multiply pointer-events-none" />
-         
+      <section className="relative min-h-[90vh] flex flex-col justify-center px-6 pt-32 pb-24">
          <div className="max-w-[1400px] mx-auto w-full relative z-10 text-center flex flex-col items-center mt-12">
             
             <motion.div 
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
-               className="font-aztec-mono text-[10px] uppercase tracking-[0.6em] text-[var(--aztec-ink)] mb-12 border border-[var(--aztec-ink)]/10 rounded-full px-6 py-2 bg-[var(--aztec-parchment)]/50 backdrop-blur-md shadow-xl"
+               className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-black/60 mb-12 border border-black/10 rounded-full px-6 py-2 bg-white shadow-sm"
             >
-               Developer Ecosystem
+               Developer Resources
             </motion.div>
 
-            <h1 className="font-aztec-serif text-[clamp(4rem,10vw,11rem)] font-black text-[var(--aztec-ink)] leading-[0.85] tracking-tighter uppercase text-balance max-w-[95vw] mb-12 drop-shadow-lg">
-               Meet your <br/>
-               <span className="italic relative inline-block text-[var(--aztec-orchid)] px-4 mt-2">
-                  match.
-                  <motion.div 
-                     initial={{ width: 0 }}
-                     animate={{ width: "120%" }}
-                     transition={{ duration: 1, delay: 0.5 }}
-                     className="absolute h-2 lg:h-4 bg-[var(--aztec-chartreuse)] bottom-[10%] -left-[10%] -z-10 -rotate-2" 
-                  />
+            <h1 className="font-serif text-[clamp(3.5rem,8vw,110px)] font-normal text-[#0A0A0A] leading-[0.95] tracking-tight text-balance max-w-[95vw] mb-12">
+               Master the <br/>
+               <span className="italic relative inline-block text-black/40 px-4 mt-2">
+                  Architecture.
                </span>
             </h1>
 
             <motion.p 
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}
-               transition={{ delay: 0.8 }}
-               className="font-sans text-2xl md:text-3xl text-[var(--aztec-ink)]/70 max-w-4xl font-medium leading-[1.6] mb-20 text-balance"
+               transition={{ delay: 0.2 }}
+               className="font-sans text-[20px] md:text-[24px] text-[#1a1a1a] max-w-4xl leading-[1.7] mb-20 text-balance tracking-[0.01em]"
             >
-               Finally, there’s a design space where you can build and deploy private forensic apps and realize any ambition.
+               The technical reference for institutional integrators and engineers. Built collaboratively with <strong>Aztec Network</strong>, we detail the cryptographic parameters, privacy models, and system architecture that powers the network.
             </motion.p>
 
          </div>
       </section>
 
-      {/* ── ANNOCUNCEMENTS ── */}
+      {/* ── SECTIONS ── */}
       <BuilderAnnouncements />
-
-      {/* ── FULL STACK (01 - 06) ── */}
       <FullStack />
-
-      {/* ── TOOLS AND LIBRARIES ── */}
       <ToolsAndLibraries />
-
-      {/* ── SANDBOX CALLOUT ── */}
       <SandboxSection />
-
-      {/* ── DIAGRAM ── */}
       <TransactionDiagram />
-
-      {/* ── RESEARCH ── */}
       <ResearchSection />
-
-      {/* ── FAQS ── */}
       <FAQs />
 
       {/* ── FOOTER CALLOUT ── */}
-      <div className="bg-[var(--aztec-chartreuse)] py-32 px-6 text-center border-t border-[var(--aztec-ink)]/10 relative overflow-hidden">
-         <div className="absolute inset-0 noise-bg opacity-[0.05] pointer-events-none mix-blend-multiply" />
-         <div className="relative z-10">
-            <h2 className="font-aztec-serif text-6xl md:text-8xl font-black text-[var(--aztec-ink)] uppercase tracking-tighter mb-12">
-               Build the future <br/>with an <span className="italic">edge</span>.
-            </h2>
-            <div className="flex flex-col md:flex-row max-w-xl mx-auto items-center gap-4 shadow-2xl">
-               <input 
-                 type="email" 
-                 placeholder="Enter email"
-                 className="flex-1 w-full bg-[var(--aztec-parchment)] md:bg-white/50 border border-[var(--aztec-ink)]/20 px-8 py-6 rounded-none outline-none font-aztec-mono text-sm tracking-widest uppercase focus:border-[var(--aztec-ink)] transition-colors placeholder:text-[var(--aztec-ink)]/30 text-[var(--aztec-ink)]"
-               />
-               <button className="w-full md:w-auto px-12 py-6 bg-[var(--aztec-ink)] text-[var(--aztec-chartreuse)] font-aztec-mono text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-transform active:scale-95 shadow-xl">
-                  Subscribe
-               </button>
-            </div>
-         </div>
-      </div>
+      <SovereignFooter />
 
     </div>
   );

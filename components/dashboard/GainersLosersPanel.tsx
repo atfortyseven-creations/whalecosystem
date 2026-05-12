@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { TrendingUp, TrendingDown, RefreshCw, Search, ArrowUpRight, ArrowDownRight, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
 import { useMarketData } from '@/lib/api-client';
+import { TokenInfoModal, TokenInfoPayload } from '@/components/ui/TokenInfoModal';
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 const fmt = (n: number) => {
@@ -23,43 +24,6 @@ const fmtPrice = (n: number) => {
 const pctColor = (v: number) => (v >= 0 ? '#00C076' : '#FF3B30');
 const pctFmt   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
 
-// ── Asset metadata map (Binance symbol → display info) ───────────────────────
-const ASSET_META: Record<string, { name: string; network: string; mcapRankHint: number }> = {
-    BTCUSDT:  { name: 'Bitcoin',         network: 'bitcoin',   mcapRankHint: 1  },
-    ETHUSDT:  { name: 'Ethereum',        network: 'ethereum',  mcapRankHint: 2  },
-    BNBUSDT:  { name: 'BNB',             network: 'bsc',       mcapRankHint: 3  },
-    SOLUSDT:  { name: 'Solana',          network: 'solana',    mcapRankHint: 4  },
-    XRPUSDT:  { name: 'XRP',             network: 'xrp',       mcapRankHint: 5  },
-    ADAUSDT:  { name: 'Cardano',         network: 'cardano',   mcapRankHint: 6  },
-    DOGEUSDT: { name: 'Dogecoin',        network: 'ethereum',  mcapRankHint: 7  },
-    SHIBUSDT: { name: 'Shiba Inu',       network: 'ethereum',  mcapRankHint: 8  },
-    DOTUSDT:  { name: 'Polkadot',        network: 'polkadot',  mcapRankHint: 9  },
-    AVAXUSDT: { name: 'Avalanche',       network: 'avalanche', mcapRankHint: 10 },
-    LINKUSDT: { name: 'Chainlink',       network: 'ethereum',  mcapRankHint: 11 },
-    MATICUSDT:{ name: 'Polygon',         network: 'polygon',   mcapRankHint: 12 },
-    UNIUSDT:  { name: 'Uniswap',         network: 'ethereum',  mcapRankHint: 13 },
-    ARBUSDT:  { name: 'Arbitrum',        network: 'arbitrum',  mcapRankHint: 14 },
-    OPUSDT:   { name: 'Optimism',        network: 'optimism',  mcapRankHint: 15 },
-    APTUSDT:  { name: 'Aptos',           network: 'aptos',     mcapRankHint: 16 },
-    INJUSDT:  { name: 'Injective',       network: 'injective', mcapRankHint: 17 },
-    PEPEUSDT: { name: 'Pepe',            network: 'ethereum',  mcapRankHint: 18 },
-    WIFUSDT:  { name: 'dogwifhat',       network: 'solana',    mcapRankHint: 19 },
-    BONKUSDT: { name: 'Bonk',            network: 'solana',    mcapRankHint: 20 },
-    FLOKIUSDT:{ name: 'Floki Inu',       network: 'bsc',       mcapRankHint: 21 },
-    FETUSDT:  { name: 'Fetch.ai',        network: 'ethereum',  mcapRankHint: 22 },
-    NEARUSDT: { name: 'NEAR Protocol',   network: 'near',      mcapRankHint: 23 },
-    LDOUSDT:  { name: 'Lido DAO',        network: 'ethereum',  mcapRankHint: 24 },
-    WLDUSDT:  { name: 'Worldcoin',       network: 'ethereum',  mcapRankHint: 25 },
-    STRKUSDT: { name: 'StarkNet',        network: 'starknet',  mcapRankHint: 26 },
-    JUPUSDT:  { name: 'Jupiter',         network: 'solana',    mcapRankHint: 27 },
-    PYTHUSDT: { name: 'Pyth Network',    network: 'solana',    mcapRankHint: 28 },
-    TIAUSDT:  { name: 'Celestia',        network: 'celestia',  mcapRankHint: 29 },
-    BLURUSDT: { name: 'Blur',            network: 'ethereum',  mcapRankHint: 30 },
-    GMXUSDT:  { name: 'GMX',             network: 'arbitrum',  mcapRankHint: 31 },
-    SUIUSDT:  { name: 'Sui',             network: 'sui',       mcapRankHint: 32 },
-    SEIUSDT:  { name: 'Sei',             network: 'sei',       mcapRankHint: 33 },
-    TONUSDT:  { name: 'Toncoin',         network: 'ton',       mcapRankHint: 34 },
-};
 
 const NETWORK_COLORS: Record<string, string> = {
     bitcoin: '#F7931A', ethereum: '#627EEA', bsc: '#F0B90B',
@@ -82,38 +46,63 @@ function stripUSDT(binanceSymbol: string): string {
 }
 
 // ── Row Component ─────────────────────────────────────────────────────────────
-function AssetRow({ rank, symbol, data, pctKey }: {
+function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, onClick }: {
     rank: number;
     symbol: string;
     data: any;
     pctKey: string;
+    currency: 'USD' | 'EUR';
+    eurRate: number;
+    dominance: number;
+    onClick: () => void;
 }) {
-    const meta  = ASSET_META[symbol] || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
+    const meta  = data.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
     const price = parseFloat(data.lastPrice) || 0;
     const pct   = parseFloat(data[pctKey] || data.priceChangePercent) || 0;
     const vol   = parseFloat(data.quoteVolume) || 0;
     const ticker = stripUSDT(symbol);
     const netColor = NETWORK_COLORS[meta.network] || NETWORK_COLORS.default;
+    const rate  = currency === 'EUR' ? eurRate : 1;
+    const sym   = currency === 'EUR' ? '€' : '$';
+
+    const fmtCurrency = (n: number) => {
+        const v = n * rate;
+        if (!v || isNaN(v)) return `${sym}—`;
+        if (v >= 1e12) return `${sym}${(v / 1e12).toFixed(2)}T`;
+        if (v >= 1e9)  return `${sym}${(v / 1e9).toFixed(2)}B`;
+        if (v >= 1e6)  return `${sym}${(v / 1e6).toFixed(2)}M`;
+        if (v >= 1e3)  return `${sym}${(v / 1e3).toFixed(1)}K`;
+        return `${sym}${v.toFixed(2)}`;
+    };
+    const fmtCurrencyPrice = (n: number) => {
+        const v = n * rate;
+        if (!v || isNaN(v)) return `${sym}—`;
+        if (v >= 1000) return `${sym}${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (v >= 1)    return `${sym}${v.toFixed(4)}`;
+        if (v >= 0.01) return `${sym}${v.toFixed(6)}`;
+        return `${sym}${v.toFixed(8)}`;
+    };
 
     return (
         <div
-            className="grid border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer"
-            style={{ gridTemplateColumns: '36px 2.8fr 1.8fr 1.1fr 1.1fr 1.5fr 0.9fr' }}
+            className="grid border-b border-black/[0.03] hover:bg-black/[0.02] hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:scale-[1.002] hover:z-10 relative transition-all items-center cursor-pointer bg-transparent"
+            style={{ gridTemplateColumns: '40px 2.8fr 1.6fr 1.1fr 1.5fr 1.2fr 1fr' }}
+            onClick={onClick}
         >
             {/* Rank */}
-            <div className="px-2 text-[10px] font-black text-[#888888] text-center">{rank}</div>
+            <div className="px-3 text-[10px] font-black text-[#888888] text-center">{rank}</div>
 
             {/* Asset */}
-            <div className="px-3 flex items-center gap-2.5 py-3">
+            <div className="px-3 flex items-center gap-3 py-3.5">
                 <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0 shadow-sm"
                     style={{ background: netColor }}
                 >
                     {ticker[0]}
                 </div>
                 <div>
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[12px] font-black text-[#050505]">{ticker}</span>
+                        <span className="text-[13px] font-black text-[#050505] tracking-tight">{ticker}</span>
                         <span
                             className="text-[8px] px-1.5 py-0.5 rounded font-black uppercase border"
                             style={{ color: netColor, borderColor: netColor + '44', background: netColor + '11' }}
@@ -121,42 +110,46 @@ function AssetRow({ rank, symbol, data, pctKey }: {
                             {meta.network}
                         </span>
                         {(data as any).getblockVerified && (
-                            <span className="text-[7px] px-1 py-0.5 rounded font-black uppercase bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/30">
-                                ✓ ON-CHAIN
+                            <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/30 shadow-[0_0_8px_rgba(0,192,118,0.2)]">
+                                ✓ VERIFIED
                             </span>
                         )}
                     </div>
-                    <div className="text-[9px] text-[#888888] font-medium mt-0.5">{meta.name}</div>
+                    <div className="text-[10px] text-[#888888] font-medium mt-0.5 tracking-wide">{meta.name}</div>
                 </div>
             </div>
 
             {/* Price */}
-            <div className="px-3">
-                <div className="text-[11px] font-black font-mono text-[#050505]">{fmtPrice(price)}</div>
+            <div className="px-3 flex flex-col justify-center">
+                <span className="text-[12px] font-black font-mono text-[#050505]">{fmtCurrencyPrice(price)}</span>
                 {(data as any).onChainPrice && (
-                    <div className="text-[8px] font-mono text-[#888888] mt-0.5">
-                        On-chain: ${parseFloat((data as any).onChainPrice).toLocaleString('en-US', { maximumFractionDigits: 2 })}
-                    </div>
+                    <span className="text-[9px] font-mono text-[#888888] mt-0.5">
+                        Oracle: {fmtCurrencyPrice(parseFloat((data as any).onChainPrice))}
+                    </span>
                 )}
             </div>
 
             {/* 24h % */}
-            <div className="px-3 text-right text-[11px] font-black font-mono" style={{ color: pctColor(pct) }}>
-                {pctFmt(pct)}
-            </div>
-
-            {/* % with arrow */}
-            <div className="px-3 flex justify-end items-center gap-1" style={{ color: pctColor(pct) }}>
-                {pct >= 0 ? <ArrowUpRight size={13}/> : <ArrowDownRight size={13}/>}
-                <span className="text-[10px] font-black">{Math.abs(pct).toFixed(2)}%</span>
+            <div className="px-3 text-right flex flex-col items-end gap-0.5">
+                <span className="text-[12px] font-black font-mono flex items-center gap-1" style={{ color: pctColor(pct) }}>
+                    {pct >= 0 ? <TrendingUp size={12}/> : <TrendingDown size={12}/>}
+                    {pctFmt(pct)}
+                </span>
             </div>
 
             {/* Volume */}
-            <div className="px-3 text-right text-[11px] font-bold font-mono text-[#050505]">{fmt(vol)}</div>
+            <div className="px-3 text-right text-[11px] font-bold font-mono text-[#050505]">{fmtCurrency(vol)}</div>
 
-            {/* Type badge */}
+            {/* Dominance (Calculated Mathematically) */}
+            <div className="px-3 text-right text-[11px] font-bold font-mono text-[#888888]">
+                {dominance.toFixed(2)}%
+            </div>
+
+            {/* Volatility */}
             <div className="px-3 flex justify-center">
-                <span className="text-[9px] font-mono text-[#050505]/40 uppercase tracking-widest">PERP</span>
+                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded border ${Math.abs(pct) > 10 ? 'bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20' : Math.abs(pct) > 5 ? 'bg-[#F7931A]/10 text-[#F7931A] border-[#F7931A]/20' : 'bg-black/5 text-[#888888] border-black/5'}`}>
+                    {Math.abs(pct) > 10 ? 'HIGH' : Math.abs(pct) > 5 ? 'MED' : 'LOW'}
+                </span>
             </div>
         </div>
     );
@@ -164,14 +157,9 @@ function AssetRow({ rank, symbol, data, pctKey }: {
 
 // ── Main Panel ────────────────────────────────────────────────────────────────
 export function GainersLosersPanel() {
-    // =========================================================================
-    // INJECTED DATA HOOK
-    // Enforcing strict on-chain reality. Waiting for endpoint assignment.
-    // =========================================================================
     const { data: rawData, isLoading, error } = useMarketData('gainersLosers');
-    const markets = rawData?.markets || [];
-    
-    // Status indicators (simulated until WS implementation injected by endpoints)
+    const markets = Array.isArray(rawData) ? rawData : rawData?.data || [];
+
     const isConnected = !isLoading && !error;
     const lastUpdate = new Date();
 
@@ -179,6 +167,33 @@ export function GainersLosersPanel() {
     const [view, setView]           = useState<ViewMode>('all');
     const [timeWindow, setTimeWindow] = useState<TimeWindow>('24h');
     const [network, setNetwork]     = useState<FilterNetwork>('all');
+    const [currency, setCurrency]   = useState<'USD' | 'EUR'>('USD');
+    const [eurRate, setEurRate]     = useState(0.92);
+    const [selectedToken, setSelectedToken] = useState<TokenInfoPayload | null>(null);
+
+    // Fetch live EUR/USD rate once on mount
+    useEffect(() => {
+        fetch('https://api.exchangerate-api.com/v4/latest/USD')
+            .then(r => r.json())
+            .then(d => { if (d?.rates?.EUR) setEurRate(d.rates.EUR); })
+            .catch(() => {}); // silently use default 0.92
+    }, []);
+
+    const handleRowClick = useCallback((symbol: string, data: any) => {
+        const meta = data.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
+        const netColor = NETWORK_COLORS[meta.network] || NETWORK_COLORS.default;
+        setSelectedToken({
+            symbol: stripUSDT(symbol),
+            name: meta.name,
+            network: meta.network,
+            netColor,
+            price: parseFloat(data.lastPrice) || 0,
+            pct: parseFloat(data.priceChangePercent) || 0,
+            volume: parseFloat(data.quoteVolume) || 0,
+            onChainPrice: data.onChainPrice ? parseFloat(data.onChainPrice) : undefined,
+            getblockVerified: !!data.getblockVerified,
+        });
+    }, []);
 
     // Map market stream data to display rows
     const allRows = useMemo(() => {
@@ -186,8 +201,7 @@ export function GainersLosersPanel() {
         markets.forEach((marketData: any) => {
             const { symbol } = marketData;
             if (!symbol?.endsWith('USDT')) return;
-            if (!ASSET_META[symbol]) return;
-            const meta = ASSET_META[symbol];
+            const meta = marketData.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
             const pct = parseFloat(marketData.priceChangePercent) || 0;
             const vol = parseFloat(marketData.quoteVolume) || 0;
             rows.push({ symbol, data: marketData, pct, vol, meta });
@@ -196,13 +210,14 @@ export function GainersLosersPanel() {
     }, [markets]);
 
     const pctKey = 'priceChangePercent';
+    const totalVolume = useMemo(() => allRows.reduce((sum, r) => sum + r.vol, 0), [allRows]);
 
     const filtered = useMemo(() => {
         return allRows
             .filter(r => network === 'all' || r.meta.network === network)
             .filter(r => {
-                const ticker = stripUSDT(r.symbol).toLowerCase();
-                const name = r.meta.name.toLowerCase();
+                const ticker = (r.symbol ? stripUSDT(r.symbol) : '').toLowerCase();
+                const name = (r.meta?.name || '').toLowerCase();
                 const q = search.toLowerCase();
                 return ticker.includes(q) || name.includes(q);
             })
@@ -224,39 +239,39 @@ export function GainersLosersPanel() {
         [...allRows].sort((a, b) => a.pct - b.pct).slice(0, 3), [allRows]);
 
     return (
-        <div className="w-full h-full min-h-0 flex flex-col p-4 space-y-5 overflow-hidden text-[#050505] font-sans">
+        <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-6 space-y-6 overflow-hidden text-[#050505] font-sans">
             {/* ── Summary Cards ── */}
-            <div className="grid grid-cols-2 gap-4 shrink-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
                 {/* Top Gainers */}
-                <div className="bg-white border border-[#E5E5E5] rounded p-5">
-                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E5E5E5]">
-                        <span className="text-[10px] font-bold text-[#050505] uppercase tracking-[0.1em]">
-                            24H GAINERS
+                <div className="bg-white/70 backdrop-blur-3xl border border-black/[0.05] rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
+                    <div className="flex items-center justify-between mb-5 pb-3 border-b border-black/[0.04]">
+                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.15em] flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse"/> 24H GAINERS
                         </span>
-                        <div className="flex items-center gap-1.5 opacity-50"><ArrowUpRight size={12}/></div>
+                        <div className="flex items-center gap-1.5 opacity-50"><TrendingUp size={14} className="text-[#00C076]"/></div>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         {isLoading ? (
-                            <div className="flex flex-col items-center justify-center py-4 text-[#888888]">
-                                <Loader2 className="animate-spin mb-2" size={16} />
-                                <span className="text-[9px] uppercase tracking-widest font-black text-[#888888]">WAITING FOR ON-CHAIN DATA</span>
+                            <div className="flex flex-col items-center justify-center py-6 text-[#888888]">
+                                <Loader2 className="animate-spin mb-3" size={20} />
+                                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-[#050505]/40 animate-pulse">SYNCHRONIZING TELEMETRY</span>
                             </div>
                         ) : topGainers.map((r, i) => (
-                            <div key={r.symbol} className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[9px] font-black text-[#888888] w-4">{i + 1}</span>
-                                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0"
+                            <div key={r.symbol} className="flex items-center justify-between group cursor-default">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] font-black text-[#050505]/20 w-4 group-hover:text-[#050505]/40 transition-colors">{i + 1}</span>
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm"
                                         style={{ background: NETWORK_COLORS[r.meta.network] || NETWORK_COLORS.default }}>
                                         {stripUSDT(r.symbol)[0]}
                                     </div>
-                                    <div>
-                                        <div className="text-[11px] font-black text-[#050505]">{stripUSDT(r.symbol)}</div>
-                                        <div className="text-[9px] text-[#888888]">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
+                                    <div className="flex flex-col justify-center">
+                                        <div className="text-[12px] font-black text-[#050505] leading-none mb-1">{stripUSDT(r.symbol)}</div>
+                                        <div className="text-[10px] font-mono text-[#888888] leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1" style={{ color: '#00C076' }}>
+                                <div className="flex items-center gap-1.5 bg-[#00C076]/10 px-2 py-1 rounded-md border border-[#00C076]/20" style={{ color: '#00C076' }}>
                                     <ArrowUpRight size={12}/>
-                                    <span className="text-[11px] font-black">{pctFmt(r.pct)}</span>
+                                    <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
                                 </div>
                             </div>
                         ))}
@@ -264,35 +279,35 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Top Losers */}
-                <div className="bg-white border border-[#E5E5E5] rounded p-5">
-                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E5E5E5]">
-                        <span className="text-[10px] font-bold text-[#050505] uppercase tracking-[0.1em]">
-                            24H LOSERS
+                <div className="bg-white/70 backdrop-blur-3xl border border-black/[0.05] rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
+                    <div className="flex items-center justify-between mb-5 pb-3 border-b border-black/[0.04]">
+                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.15em] flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[#FF3B30] animate-pulse"/> 24H LOSERS
                         </span>
-                        <div className="flex items-center gap-1.5 opacity-50"><ArrowDownRight size={12}/></div>
+                        <div className="flex items-center gap-1.5 opacity-50"><TrendingDown size={14} className="text-[#FF3B30]"/></div>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         {isLoading ? (
-                            <div className="flex flex-col items-center justify-center py-4 text-[#888888]">
-                                <Loader2 className="animate-spin mb-2" size={16} />
-                                <span className="text-[9px] uppercase tracking-widest font-black text-[#888888]">WAITING FOR ON-CHAIN DATA</span>
+                            <div className="flex flex-col items-center justify-center py-6 text-[#888888]">
+                                <Loader2 className="animate-spin mb-3" size={20} />
+                                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-[#050505]/40 animate-pulse">SYNCHRONIZING TELEMETRY</span>
                             </div>
                         ) : topLosers.map((r, i) => (
-                            <div key={r.symbol} className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[9px] font-black text-[#888888] w-4">{i + 1}</span>
-                                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black text-white shrink-0"
+                            <div key={r.symbol} className="flex items-center justify-between group cursor-default">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] font-black text-[#050505]/20 w-4 group-hover:text-[#050505]/40 transition-colors">{i + 1}</span>
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm"
                                         style={{ background: NETWORK_COLORS[r.meta.network] || NETWORK_COLORS.default }}>
                                         {stripUSDT(r.symbol)[0]}
                                     </div>
-                                    <div>
-                                        <div className="text-[11px] font-black text-[#050505]">{stripUSDT(r.symbol)}</div>
-                                        <div className="text-[9px] text-[#888888]">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
+                                    <div className="flex flex-col justify-center">
+                                        <div className="text-[12px] font-black text-[#050505] leading-none mb-1">{stripUSDT(r.symbol)}</div>
+                                        <div className="text-[10px] font-mono text-[#888888] leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1" style={{ color: '#FF3B30' }}>
+                                <div className="flex items-center gap-1.5 bg-[#FF3B30]/10 px-2 py-1 rounded-md border border-[#FF3B30]/20" style={{ color: '#FF3B30' }}>
                                     <ArrowDownRight size={12}/>
-                                    <span className="text-[11px] font-black">{pctFmt(r.pct)}</span>
+                                    <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
                                 </div>
                             </div>
                         ))}
@@ -300,95 +315,116 @@ export function GainersLosersPanel() {
                 </div>
             </div>
 
-            {/* ── Full Table ── */}
-            <div className="flex-1 min-h-0 bg-white border border-[#E5E5E5] rounded overflow-hidden flex flex-col">
+            {/* ── Full Ledger Table ── */}
+            <div className="flex-1 min-h-0 bg-white/70 backdrop-blur-3xl border border-black/[0.05] shadow-[0_8px_40px_rgba(0,0,0,0.03)] rounded-2xl overflow-hidden flex flex-col relative">
+                
+                {/* Background Gradient for Ledger */}
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/40 to-transparent -z-10" />
 
                 {/* Toolbar Row 1 */}
-                <div className="shrink-0 px-5 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
+                <div className="shrink-0 px-6 py-4 border-b border-black/[0.04] bg-white/50 backdrop-blur-md flex items-center gap-4 flex-wrap z-10">
                     {/* View toggle */}
-                    <div className="flex bg-[#F0F0F0] p-1 rounded-xl border border-[#E5E5E5]">
+                    <div className="flex bg-black/[0.03] p-1 rounded-xl border border-black/[0.05]">
                         {(['all', 'gainers', 'losers'] as ViewMode[]).map(v => (
                             <button key={v} onClick={() => setView(v)}
-                                className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${view === v ? 'bg-white text-[#050505] shadow-sm border border-[#E5E5E5]' : 'text-[#888888] hover:text-[#050505]'}`}>
-                                {v === 'gainers' ? 'Gainers' : v === 'losers' ? 'Losers' : 'All'}
+                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${view === v ? 'bg-white text-[#050505] shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-black/[0.05] scale-[1.02]' : 'text-[#888888] hover:text-[#050505]'}`}>
+                                {v === 'gainers' ? 'Gainers' : v === 'losers' ? 'Losers' : 'All Ledger'}
                             </button>
                         ))}
                     </div>
 
                     {/* Time window */}
-                    <div className="flex gap-1">
+                    <div className="flex gap-1.5">
                         {(['1h', '24h', '7d'] as TimeWindow[]).map(w => (
                             <button key={w} onClick={() => setTimeWindow(w)}
-                                className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border transition-all ${timeWindow === w ? 'bg-[#050505] text-white border-[#050505]' : 'text-[#888888] border-[#E5E5E5] hover:border-[#050505]'}`}>
+                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${timeWindow === w ? 'bg-[#050505] text-white border-[#050505]' : 'text-[#888888] border-black/10 hover:border-black/30 bg-white/50'}`}>
                                 {w}
                             </button>
                         ))}
                     </div>
 
                     {/* Search */}
-                    <div className="relative flex-1 min-w-[140px] max-w-xs">
-                        <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A0A0A0]"/>
+                    <div className="relative flex-1 min-w-[160px] max-w-sm">
+                        <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A0A0A0]"/>
                         <input value={search} onChange={e => setSearch(e.target.value)}
-                            placeholder="SEARCH TICKER..."
-                            className="w-full bg-white border border-[#E5E5E5] rounded pl-8 pr-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.1em] text-[#050505] outline-none focus:border-[#050505] transition-colors"/>
+                            placeholder="SEARCH TICKER OR NAME..."
+                            className="w-full bg-white border border-black/10 shadow-sm rounded-xl pl-10 pr-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] text-[#050505] outline-none focus:border-[#050505] transition-all"/>
                     </div>
 
-                    {/* Stream status */}
+                    {/* Currency Toggle */}
                     <div className="flex items-center gap-2 ml-auto">
-                        <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-[#050505]' : 'bg-[#FF3B30] animate-pulse'}`} />
-                        <span className="text-[9px] font-mono font-bold text-[#A0A0A0] uppercase tracking-widest flex items-center gap-1 border-l border-[#E5E5E5] pl-2">
-                            {lastUpdate instanceof Date && !isNaN(lastUpdate.getTime())
-                                ? lastUpdate.toTimeString().slice(0, 8)
-                                : '—'}
-                        </span>
+                        <div className="flex border border-black/10 rounded-lg overflow-hidden bg-white">
+                            {(['USD', 'EUR'] as const).map(c => (
+                                <button
+                                    key={c}
+                                    onClick={() => setCurrency(c)}
+                                    className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all"
+                                    style={currency === c
+                                        ? { background: '#050505', color: '#fff' }
+                                        : { background: 'transparent', color: '#888888' }
+                                    }
+                                >
+                                    {c === 'USD' ? '$' : '€'} {c}
+                                </button>
+                            ))}
+                        </div>
+                        {/* Stream status */}
+                        <div className="flex items-center gap-2 border-l border-black/10 pl-3">
+                            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#00C076] shadow-[0_0_8px_#00C076] animate-pulse' : 'bg-[#FF3B30] animate-pulse'}`} />
+                            <span className="text-[10px] font-mono font-black text-[#A0A0A0] uppercase tracking-widest">
+                                {lastUpdate instanceof Date && !isNaN(lastUpdate.getTime())
+                                    ? lastUpdate.toTimeString().slice(0, 8)
+                                    : '—'}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Toolbar Row 2 — Network selector */}
-                <div className="shrink-0 px-5 py-2 border-b border-[#E5E5E5] bg-white flex items-center gap-2 flex-wrap">
-                    <span className="text-[9px] font-black text-[#888888] uppercase tracking-widest mr-1">Network:</span>
+                <div className="shrink-0 px-6 py-2.5 border-b border-black/[0.04] bg-white/30 backdrop-blur-sm flex items-center gap-2.5 flex-wrap z-10">
+                    <span className="text-[9px] font-black text-[#050505]/40 uppercase tracking-[0.2em] mr-2">Topology:</span>
                     {ALL_NETWORKS.map(n => (
                         <button key={n} onClick={() => setNetwork(n)}
-                            className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border transition-all`}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all shadow-sm`}
                             style={network === n
                                 ? { background: n === 'all' ? '#050505' : NETWORK_COLORS[n] || '#050505', color: '#fff', borderColor: 'transparent' }
-                                : { color: '#888888', borderColor: '#E5E5E5', background: 'transparent' }}>
+                                : { color: '#888888', borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(255,255,255,0.8)' }}>
                             {n === 'all' ? 'All Networks' : n.charAt(0).toUpperCase() + n.slice(1)}
                         </button>
                     ))}
                 </div>
 
                 {/* Column Headers */}
-                <div className="shrink-0 grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em]"
-                    style={{ gridTemplateColumns: '36px 2.8fr 1.8fr 1.1fr 1.1fr 1.5fr 0.9fr' }}>
-                    {['#', 'Asset', 'Price (USD)', '24H %', 'Trend', 'Volume 24H', 'Type'].map((h, i) => (
-                        <div key={h} className={`px-3 py-2.5 ${i >= 3 && i <= 4 ? 'text-right' : i === 0 ? 'text-center' : ''}`}>{h}</div>
+                <div className="shrink-0 grid bg-black/[0.02] border-b border-black/[0.04] text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] shadow-inner z-10"
+                    style={{ gridTemplateColumns: '40px 2.8fr 1.6fr 1.1fr 1.5fr 1.2fr 1fr' }}>
+                    {['#', 'Asset Name', 'Oracle Price', '24H %', 'Volume 24H', 'Dominance', 'Volatility'].map((h, i) => (
+                        <div key={h} className={`px-3 py-3 ${i >= 3 && i <= 5 ? 'text-right' : i === 0 || i === 6 ? 'text-center' : ''}`}>{h}</div>
                     ))}
                 </div>
 
                 {/* Rows */}
-                <div className="flex-1 w-full overflow-y-auto msv-hide-scrollbar">
+                <div className="flex-1 w-full overflow-y-auto no-scrollbar relative z-0" style={{ scrollbarWidth: 'none' }}>
                     {isLoading ? (
                         <div className="flex-1 flex flex-col items-center justify-center text-[#888888] h-full p-12">
-                            <Loader2 className="animate-spin mb-4" size={32} />
-                            <p className="text-[11px] font-black uppercase tracking-[0.2em]">WAITING FOR ON-CHAIN ENDPOINT</p>
-                            <p className="text-[9px] mt-2">Zero-Mock Mandate Active</p>
+                            <Loader2 className="animate-spin mb-4" size={36} />
+                            <p className="text-[12px] font-black text-[#050505] uppercase tracking-[0.2em]">INITIALIZING LEDGER MATRIX</p>
+                            <p className="text-[10px] mt-2 tracking-widest opacity-60">Zero-Mock Protocol Enforced</p>
                         </div>
                     ) : error ? (
                         <div className="h-full flex flex-col items-center justify-center p-12">
-                            <AlertTriangle size={24} className="text-black/10 mb-3" />
-                            <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em]">
-                                Data Lake Unavailable
+                            <AlertTriangle size={32} className="text-black/20 mb-4" />
+                            <p className="text-[12px] font-black text-[#050505]/40 uppercase tracking-[0.3em]">
+                                Telemetry Disconnected
                             </p>
                         </div>
                     ) : filtered.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-center p-8 text-[#888888]">
-                            <Search size={28} className="mb-3 opacity-40"/>
-                            <p className="text-[11px] font-black text-[#111] uppercase tracking-widest mb-1">No assets found</p>
-                            <p className="text-[10px] uppercase tracking-widest opacity-60">Adjust filters or search term</p>
+                        <div className="flex flex-col items-center justify-center h-full text-center p-12 text-[#888888]">
+                            <Search size={32} className="mb-4 opacity-30"/>
+                            <p className="text-[12px] font-black text-[#111] uppercase tracking-[0.2em] mb-2">No intelligence found</p>
+                            <p className="text-[10px] uppercase tracking-widest opacity-60">Refine parameters</p>
                         </div>
                     ) : (
-                        <div className="flex flex-col">
+                        <div className="flex flex-col pb-6">
                             {filtered.map((r, i) => (
                                 <AssetRow
                                     key={r.symbol}
@@ -396,6 +432,10 @@ export function GainersLosersPanel() {
                                     symbol={r.symbol}
                                     data={r.data}
                                     pctKey="priceChangePercent"
+                                    currency={currency}
+                                    eurRate={eurRate}
+                                    dominance={totalVolume > 0 ? (r.vol / totalVolume) * 100 : 0}
+                                    onClick={() => handleRowClick(r.symbol, r.data)}
                                 />
                             ))}
                         </div>
@@ -403,11 +443,19 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 px-5 py-2.5 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em]">
-                    <span>{filtered.length} ASSETS · {network === 'all' ? 'ALL NETWORKS' : network.toUpperCase()} · {timeWindow}</span>
-                    <span className="font-mono text-[#050505]/40 tracking-widest">ON-CHAIN HOOKS</span>
+                <div className="shrink-0 px-6 py-3 border-t border-black/[0.04] bg-white/50 backdrop-blur-md flex items-center justify-between text-[10px] font-black text-[#050505]/40 uppercase tracking-[0.15em] z-10">
+                    <span>{filtered.length} VERIFIED ASSETS · {network === 'all' ? 'OMNI-CHAIN' : network.toUpperCase()} · {timeWindow}</span>
+                    <span className="font-mono tracking-[0.2em] flex items-center gap-2"><div className="w-1.5 h-1.5 bg-[#050505]/40 rounded-full"/> SECURE CONNECTION</span>
                 </div>
             </div>
+
+            {/* ── Token Info Modal ── */}
+            <TokenInfoModal
+                token={selectedToken}
+                currency={currency}
+                eurRate={eurRate}
+                onClose={() => setSelectedToken(null)}
+            />
         </div>
     );
 }

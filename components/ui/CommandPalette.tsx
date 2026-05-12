@@ -260,10 +260,7 @@ export function CommandPalette({ onNavigate, onBridgeOpen }: CommandPaletteProps
                       <button
                         key={r}
                         onClick={cmd.action}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left"
-                        style={{ background: "transparent" }}
-                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(0,0,0,0.04)")}
-                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left hover:bg-[rgba(0,0,0,0.04)]"
                       >
                         <Clock size={13} style={{ color: "rgba(0,0,0,0.2)" }} />
                         <span className="text-[12px] font-medium" style={{ color: "rgba(0,0,0,0.5)" }}>{r}</span>

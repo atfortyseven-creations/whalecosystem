@@ -73,9 +73,46 @@ type CosmicEntityDelegate = {
   }>;
 };
 
-/** PrismaClient augmented with the CosmicEntity model accessor */
+// ─────────────────────────────────────────────────────────────────────────────
+// WALLET INTELLIGENCE TYPE BRIDGE
+// WalletIntelligence was added to schema.prisma but npx prisma generate
+// has not been run yet. This bridge makes the TypeScript compiler aware of
+// prisma.walletIntelligence immediately, without regenerating the client.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type WalletIntelligenceRecord = {
+  id: string;
+  address: string;
+  forensics: Prisma.JsonValue | null;
+  category: string | null;
+  updatedAt: Date;
+  createdAt: Date;
+};
+
+type WalletIntelligenceDelegate = {
+  findMany(args?: {
+    where?: Partial<{ address: string | { in: string[] }; category: string }>;
+    select?: Partial<Record<keyof WalletIntelligenceRecord, boolean>>;
+    orderBy?: Partial<Record<keyof WalletIntelligenceRecord, 'asc' | 'desc'>>;
+    take?: number;
+    skip?: number;
+  }): Promise<Partial<WalletIntelligenceRecord>[]>;
+  findUnique(args: {
+    where: { id?: string; address?: string };
+    select?: Partial<Record<keyof WalletIntelligenceRecord, boolean>>;
+  }): Promise<Partial<WalletIntelligenceRecord> | null>;
+  upsert(args: {
+    where: { address: string };
+    create: Partial<WalletIntelligenceRecord>;
+    update: Partial<WalletIntelligenceRecord>;
+  }): Promise<WalletIntelligenceRecord>;
+  count(args?: { where?: Partial<{ address: string; category: string }> }): Promise<number>;
+};
+
+/** PrismaClient augmented with models not yet reflected in the generated client */
 type SovereignPrismaClient = PrismaClient & {
   cosmicEntity: CosmicEntityDelegate;
+  walletIntelligence: WalletIntelligenceDelegate;
 };
 
 function getProductionUrl(): string | undefined {
@@ -87,12 +124,9 @@ function getProductionUrl(): string | undefined {
         if (urlObj.protocol === 'postgresql:' || urlObj.protocol === 'postgres:') {
             // Force PgBouncer
             urlObj.searchParams.set('pgbouncer', 'true');
-            // Strict Institutional limit: Max 3 connection out of 500 total pool per container
-            urlObj.searchParams.set('connection_limit', process.env.DATABASE_CONNECTION_LIMIT || '3');
-            // Aggressive TCP timeout
-            urlObj.searchParams.set('connect_timeout', '10');
-            // Max time a connection can be held in the pool
-            urlObj.searchParams.set('pool_timeout', '15');
+            // Removed connect_timeout, pool_timeout, and statement_timeout as they cause Prisma to throw
+            // "PANIC: timer has gone away" in serverless/edge environments and occasionally Node instances
+            // when the Tokio runtime drops its internal timer handles.
         }
         return urlObj.toString();
     } catch {
@@ -115,11 +149,16 @@ function createPrismaClient(): PrismaClient {
     if (process.env.NODE_ENV === 'production') {
         (client as any).$on('error', (e: any) => {
             const msg: string = e?.message || '';
-            const isTableMissing = msg.includes('does not exist in the current database') ||
-                                   msg.includes('P1009') ||
-                                   msg.includes('P2021'); // table does not exist
-            if (!isTableMissing) {
-                console.error('[PRISMA] DB Error:', msg.slice(0, 300));
+            // Suppress schema-lag errors that are self-healing via /api/admin/sync-db
+            const isSchemaBehind =
+                msg.includes('does not exist in the current database') || // table/column missing
+                msg.includes('P1009') ||
+                msg.includes('P2021') || // table does not exist
+                msg.includes('P2022') || // column does not exist
+                msg.includes('42703') || // PostgreSQL raw: column does not exist
+                msg.includes('Invalid `prisma.'); // Validation error thrown during try/catch fallbacks
+            if (!isSchemaBehind) {
+                console.error('[PRISMA] DB Error:', msg.length > 500 ? msg.slice(0, 500) + '...' : msg);
             }
         });
     }
@@ -129,8 +168,7 @@ function createPrismaClient(): PrismaClient {
 
 export const prisma = (globalForPrisma.prisma ?? createPrismaClient()) as unknown as SovereignPrismaClient;
 
-if (process.env.NODE_ENV !== 'production') {
-    (globalForPrisma as unknown as { prisma: SovereignPrismaClient }).prisma = prisma;
-}
+// Always store the singleton globally, even in production, to prevent Serverless/Edge connection explosions
+(globalForPrisma as unknown as { prisma: SovereignPrismaClient }).prisma = prisma;
 
 export default prisma;

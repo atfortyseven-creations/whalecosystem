@@ -1,23 +1,22 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet, RefreshCw, ArrowUpRight, ArrowDownRight,
   Eye, EyeOff, PieChart, Globe, Copy, Search,
   ArrowDownLeft, Repeat, CreditCard, Plus, ChevronDown,
-  Check, Loader2, ShieldCheck, ExternalLink
+  Check, Loader2, ShieldCheck, ExternalLink, Activity, ShieldAlert
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
-import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
-import { useAccount, useSwitchChain } from 'wagmi';
-import { mainnet, base, optimism, arbitrum, polygon, worldchain } from 'wagmi/chains';
+import { useAccount, useSwitchChain, useConnect } from 'wagmi';
+import { mainnet, base, optimism, arbitrum, polygon } from 'wagmi/chains';
+import { useAppKit } from '@reown/appkit/react';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransactionModal';
 import { DepositModal } from '@/components/rainbow/DepositModal';
-import { coinbaseWallet } from 'wagmi/connectors';
-import { useConnect } from 'wagmi';
 import { toast } from 'sonner';
+import { ChainActivityPanel } from '@/components/portfolio/ChainActivityPanel';
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 const BG   = "#FAF9F6";
@@ -28,34 +27,60 @@ const CARD  = "#FFFFFF";
 
 // ── Chain color map ──────────────────────────────────────────────────────────
 const CHAIN_COLORS: Record<string, string> = {
-  "Ethereum": "#627EEA", "Base": "#0052FF", "Arbitrum One": "#12AAFF",
-  "OP Mainnet": "#FF0420", "Polygon": "#8247E5", "BNB Smart Chain": "#F0B90B",
-  "Avalanche": "#E84142", "Solana": "#9945FF",
+  "Ethereum": "#627EEA", "Base": "#0052FF", "Arbitrum One": "#12AAFF", "Arbitrum": "#12AAFF",
+  "OP Mainnet": "#FF0420", "Optimism": "#FF0420", "Polygon": "#8247E5", "BNB Smart Chain": "#F0B90B",
+  "Avalanche": "#E84142", "Solana": "#9945FF", "World Chain": "#000000",
 };
 
 // ── Supported networks for Switch Network ────────────────────────────────────
 const SUPPORTED_CHAINS = [
-  { chain: mainnet,    name: "Ethereum",    color: "#627EEA", symbol: "ETH" },
-  { chain: base,       name: "Base",        color: "#0052FF", symbol: "ETH" },
-  { chain: optimism,   name: "Optimism",    color: "#FF0420", symbol: "ETH" },
-  { chain: arbitrum,   name: "Arbitrum",    color: "#12AAFF", symbol: "ETH" },
-  { chain: polygon,    name: "Polygon",     color: "#8247E5", symbol: "POL" },
-  { chain: worldchain, name: "World Chain", color: "#000000", symbol: "WLD" },
+  { caipId: "eip155:1",     name: "Ethereum",    color: "#627EEA", symbol: "ETH",  id: 1 },
+  { caipId: "eip155:8453",  name: "Base",        color: "#0052FF", symbol: "ETH",  id: 8453 },
+  { caipId: "eip155:10",    name: "Optimism",    color: "#FF0420", symbol: "ETH",  id: 10 },
+  { caipId: "eip155:42161", name: "Arbitrum",    color: "#12AAFF", symbol: "ETH",  id: 42161 },
+  { caipId: "eip155:137",   name: "Polygon",     color: "#8247E5", symbol: "POL",  id: 137 },
+  { caipId: "eip155:480",   name: "World Chain", color: "#000000", symbol: "WLD",  id: 480 },
 ];
 
-function formatUSD(val: number) {
-  if (!val || isNaN(val)) return "$0.00";
-  return `$${safeToLocaleString(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+/** Fetch EUR/USD rate (cached in module scope so it refreshes every 5 min) */
+let _eurRate: number = 0.93; // sensible default
+let _eurFetched = 0;
+async function fetchEURRate() {
+  if (Date.now() - _eurFetched < 5 * 60_000) return _eurRate;
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD', { cache: 'no-store' });
+    const d = await r.json();
+    if (d?.rates?.EUR) { _eurRate = d.rates.EUR; _eurFetched = Date.now(); }
+  } catch { /* keep cached */ }
+  return _eurRate;
 }
 
-function formatAddr(addr: string) {
+function formatEUR(val: number, rate: number) {
+  if (!val || isNaN(val)) return "€0,00";
+  const eur = val * rate;
+  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(eur);
+}
+
+function useEURRate() {
+  const [rate, setRate] = useState(_eurRate || 0.93);
+  useEffect(() => {
+    fetchEURRate().then(setRate);
+    const t = setInterval(() => fetchEURRate().then(setRate), 5 * 60_000);
+    return () => clearInterval(t);
+  }, []);
+  return rate;
+}
+
+function formatAddr(addr: string | null | undefined) {
+  if (!addr || typeof addr !== 'string') return "—";
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
 // ── Asset Row ────────────────────────────────────────────────────────────────
-function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boolean }) {
+function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hidden: boolean; eurRate: number }) {
   const isPos = (asset.change24h ?? 0) >= 0;
   const chainColor = CHAIN_COLORS[asset.network] ?? "#888";
+  const valueEUR = formatEUR(asset.value ?? 0, eurRate);
 
   return (
     <motion.div
@@ -70,7 +95,7 @@ function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boo
         className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[11px] shrink-0 border"
         style={{ background: `${chainColor}14`, borderColor: `${chainColor}25`, color: chainColor }}
       >
-        {asset.symbol?.slice(0, 3) ?? "?"}
+        {typeof asset.symbol === 'string' ? asset.symbol.slice(0, 3) : "?"}
       </div>
 
       {/* Name + network */}
@@ -99,10 +124,10 @@ function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boo
         </div>
       </div>
 
-      {/* USD value */}
+      {/* EUR value */}
       <div className="text-right w-28 shrink-0">
         <div className="font-black font-mono text-sm" style={{ color: INK }}>
-          {hidden ? "••••••" : formatUSD(asset.value ?? 0)}
+          {hidden ? "••••••" : valueEUR}
         </div>
       </div>
     </motion.div>
@@ -139,6 +164,8 @@ function WalletAction({
 
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function PortfolioPage() {
+  const eurRate = useEURRate();
+  const fmt = useCallback((v: number) => formatEUR(v, eurRate), [eurRate]);
   const [hidden, setHidden] = useState(false);
   const [search, setSearch] = useState("");
   const [isTransferOpen, setIsTransferOpen] = useState(false);
@@ -150,11 +177,10 @@ export default function PortfolioPage() {
   const [accountCreated, setAccountCreated] = useState(false);
 
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading } = useLivePortfolio();
-  const { address: userAddress, isConnected } = useAppKitAccount();
-  const { chain } = useAccount();
+  const { address: userAddress, isConnected, chain } = useAccount();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
-  const { connect } = useConnect();
-  const { open } = useAppKit();
+  const { open: openAppKit } = useAppKit();
+  const { connect, connectors } = useConnect();
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = () => setRefreshKey(k => k + 1);
 
@@ -166,7 +192,7 @@ export default function PortfolioPage() {
       a.symbol?.toLowerCase().includes(search.toLowerCase()) ||
       a.network?.toLowerCase().includes(search.toLowerCase())
     )
-    .sort((a: any, b: any) => (b.value ?? 0) - (a.value ?? 0));
+    .sort((a: any, b: any) => (b.valueUSD ?? 0) - (a.valueUSD ?? 0));
 
   const openMode = (m: "send" | "swap" | "bridge" | "buy") => {
     setTransferMode(m);
@@ -176,12 +202,12 @@ export default function PortfolioPage() {
   const handleCreateOnChainAccount = async () => {
     setCreatingAccount(true);
     try {
-      // Coinbase Smart Wallet — creates a new on-chain account for the user
-      connect({ connector: coinbaseWallet({ preference: 'smartWalletOnly' }) });
-      toast.success("Smart Wallet initiated", { description: "Follow the prompts to create your on-chain account." });
+      // Open AppKit modal — user picks Coinbase Smart Wallet from the list
+      openAppKit();
+      toast.success('Wallet modal opened', { description: 'Select Coinbase Smart Wallet to create your on-chain account.' });
       setAccountCreated(true);
     } catch (e: any) {
-      toast.error("Account creation failed", { description: e.message });
+      toast.error('Account creation failed', { description: e.message });
     } finally {
       setCreatingAccount(false);
     }
@@ -215,15 +241,12 @@ export default function PortfolioPage() {
 
           <div className="flex flex-col items-center gap-3">
             <button
-              onClick={() => open()}
-              className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] transition-all hover:opacity-80 shadow-lg"
-              style={{ background: "#0052FF", color: "#FFFFFF" }}
+              onClick={() => openAppKit()}
+              className="px-8 py-3 rounded-2xl font-black text-[13px] uppercase tracking-widest transition-all hover:opacity-80 active:scale-95 shadow-lg"
+              style={{ background: INK, color: '#fff' }}
             >
               Connect Wallet
             </button>
-            <div className="scale-90 origin-center">
-              <appkit-button />
-            </div>
           </div>
 
           <p className="text-[10px] uppercase tracking-widest" style={{ color: MUTED }}>
@@ -260,9 +283,9 @@ export default function PortfolioPage() {
         <div className="flex items-center gap-3">
           {/* Address badge */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 border rounded-full" style={{ borderColor: BORDER, background: CARD }}>
-            <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : "—"}</span>
+            <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : '—'}</span>
             <button
-              onClick={() => { navigator.clipboard.writeText(userAddress ?? ""); toast.success("Copied!"); }}
+              onClick={() => { navigator.clipboard.writeText(userAddress ?? ''); toast.success('Copied!'); }}
               style={{ color: MUTED }}
               className="hover:opacity-100 transition-opacity opacity-50"
             >
@@ -276,12 +299,16 @@ export default function PortfolioPage() {
             className="p-2 rounded-xl border transition-all hover:bg-black/5"
             style={{ borderColor: BORDER, background: CARD, color: MUTED }}
           >
-            <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
+            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
           </button>
 
-          <div className="scale-90 origin-right">
-            <appkit-button />
-          </div>
+          <button
+            onClick={() => openAppKit()}
+            className="px-4 py-2 rounded-xl border font-mono text-[10px] font-black uppercase tracking-widest transition-all hover:bg-black/5"
+            style={{ borderColor: BORDER, background: CARD, color: MUTED }}
+          >
+            {userAddress ? formatAddr(userAddress) : 'Connect'}
+          </button>
         </div>
       </header>
 
@@ -297,7 +324,7 @@ export default function PortfolioPage() {
           <div className="p-8">
             <div className="flex items-start justify-between mb-6">
               <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em]" style={{ color: MUTED }}>
-                Total Portfolio Value
+                Total Portfolio Value · EUR
               </span>
               <button
                 onClick={() => setHidden(h => !h)}
@@ -311,7 +338,7 @@ export default function PortfolioPage() {
             {/* Big number */}
             <div className="flex items-end gap-5 flex-wrap mb-8">
               <div className="text-6xl md:text-7xl font-black tracking-tighter font-mono" style={{ color: INK }}>
-                {hidden ? <span style={{ color: MUTED }}>••••••••</span> : formatUSD(Number(totalPnl) ?? 0)}
+                {hidden ? <span style={{ color: MUTED }}>••••••••</span> : fmt(Number(totalPnl) ?? 0)}
               </div>
 
               {/* 24h pill */}
@@ -321,7 +348,7 @@ export default function PortfolioPage() {
                 }`}
               >
                 {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                {hidden ? "••••" : `${isPositive ? "+" : ""}${formatUSD(Number(change24hUSD) ?? 0)}`}
+                {hidden ? "••••" : `${isPositive ? "+" : ""}${fmt(Number(change24hUSD) ?? 0)}`}
                 <span className="opacity-60 text-xs">
                   ({hidden ? "••" : `${safeToFixed(Number(change24hPercent) ?? 0, 2)}%`})
                 </span>
@@ -355,8 +382,9 @@ export default function PortfolioPage() {
           <div className="text-[9px] font-mono font-black uppercase tracking-[0.3em] mb-6" style={{ color: MUTED }}>
             Wallet
           </div>
-          <div className="flex justify-around gap-2">
+          <div className="flex flex-wrap justify-around gap-2">
             <WalletAction icon={ArrowUpRight}   label="Send"   onClick={() => openMode("send")}   />
+            <WalletAction icon={ArrowDownLeft}  label="Receive" onClick={() => setIsDepositOpen(true)} />
             <WalletAction icon={Repeat}         label="Swap"   onClick={() => openMode("swap")}   />
             <WalletAction icon={Globe}          label="Bridge" onClick={() => openMode("bridge")} />
             <WalletAction icon={CreditCard}     label="Buy"    onClick={() => openMode("buy")}    />
@@ -388,14 +416,20 @@ export default function PortfolioPage() {
                 <button onClick={() => setShowNetworkSwitch(false)} style={{ color: MUTED }} className="text-[10px] font-mono font-black uppercase tracking-widest hover:opacity-100 opacity-50 transition-opacity">Close</button>
               </div>
               <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {SUPPORTED_CHAINS.map(({ chain: c, name, color, symbol }) => {
-                  const isActive = chain?.id === c.id;
+                {SUPPORTED_CHAINS.map(({ caipId, name, color, symbol, id }) => {
+                  const isActive = chain?.id === id;
                   return (
                     <button
-                      key={c.id}
-                      onClick={() => {
-                        switchChain({ chainId: c.id });
+                      key={id}
+                      onClick={async () => {
+                        if (isActive) return;
                         toast.info(`Switching to ${name}...`);
+                        try {
+                          await switchChain({ chainId: id });
+                          toast.success(`Connected to ${name}`);
+                        } catch (e: any) {
+                          toast.error("Failed to switch network");
+                        }
                       }}
                       disabled={isActive || isSwitching}
                       className="flex items-center gap-3 p-4 rounded-2xl border transition-all hover:shadow-sm group disabled:cursor-default"
@@ -473,7 +507,7 @@ export default function PortfolioPage() {
                         </button>
                       </div>
 
-                      {/* AppKit Universal */}
+                      {/* Universal Connect */}
                       <div className="rounded-2xl border p-5 flex flex-col justify-between hover:shadow-md transition-shadow" style={{ borderColor: BORDER, background: CARD }}>
                         <div className="flex items-start gap-4 mb-6">
                           <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0" style={{ borderColor: BORDER, background: "#FAF9F6" }}>
@@ -485,13 +519,15 @@ export default function PortfolioPage() {
                             <p className="text-[11px] mt-2 leading-relaxed" style={{ color: MUTED }}>Connect or create a new account using any supported Web3 provider via WalletConnect.</p>
                           </div>
                         </div>
-                        <button
-                          onClick={() => open()}
-                          className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all hover:bg-black/5 flex items-center justify-center gap-2 border shadow-sm"
-                          style={{ borderColor: BORDER, background: "#FAF9F6", color: INK }}
-                        >
-                          <ExternalLink size={14} /> Open Browser
-                        </button>
+                        <div className="w-full flex justify-center scale-90">
+                           <button
+                             onClick={() => openAppKit()}
+                             className="px-6 py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all hover:opacity-80 shadow-sm"
+                             style={{ background: INK, color: '#fff' }}
+                           >
+                             Connect Wallet
+                           </button>
+                        </div>
                       </div>
                     </div>
 
@@ -548,7 +584,7 @@ export default function PortfolioPage() {
             <div className="flex-1 text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>Asset</div>
             <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-widest hidden sm:block" style={{ color: MUTED }}>Balance</div>
             <div className="w-20 text-right text-[9px] font-mono font-black uppercase tracking-widest hidden md:block" style={{ color: MUTED }}>24H</div>
-            <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>Value</div>
+            <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>Value (EUR)</div>
           </div>
 
           {/* Rows */}
@@ -577,7 +613,7 @@ export default function PortfolioPage() {
               </div>
             ) : (
               filteredAssets.map((asset: any, i: number) => (
-                <AssetRow key={`${asset.symbol}-${asset.network}-${i}`} asset={asset} idx={i} hidden={hidden} />
+                <AssetRow key={`${asset.symbol}-${asset.network}-${i}`} asset={asset} idx={i} hidden={hidden} eurRate={eurRate} />
               ))
             )}
           </div>
@@ -620,7 +656,7 @@ export default function PortfolioPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-mono" style={{ color: MUTED }}>{safeToFixed(pct, 1)}%</span>
-                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "••••" : formatUSD(asset.value ?? 0)}</span>
+                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "••••" : formatEUR(asset.valueUSD ?? 0, eurRate)}</span>
                       </div>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(5,5,5,0.07)" }}>
@@ -636,6 +672,82 @@ export default function PortfolioPage() {
                 );
               })}
             </div>
+          </motion.div>
+        )}
+
+        {/* ── RISK PROFILE & EXPOSURE ── */}
+        {filteredAssets.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.24 }}
+            className="rounded-3xl border overflow-hidden"
+            style={{ borderColor: BORDER, background: CARD }}
+          >
+            <div className="px-6 py-5 border-b flex items-center gap-3" style={{ borderColor: BORDER }}>
+              <div className="w-1 h-5 rounded-full" style={{ background: INK }} />
+              <h2 className="font-black uppercase tracking-tight text-sm" style={{ color: INK }}>Exposure Profile</h2>
+            </div>
+            
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+               {(() => {
+                  const total = Number(totalPnl) || 1; // avoid division by zero
+                  const sorted = [...filteredAssets].sort((a, b) => (b.valueUSD ?? 0) - (a.valueUSD ?? 0));
+                  const topAsset = sorted[0];
+                  const topPct = topAsset ? ((topAsset.valueUSD ?? 0) / total) * 100 : 0;
+                  
+                  const stablecoins = ['USDC', 'USDT', 'DAI', 'USDe', 'FRAX', 'FDUSD'];
+                  const stableValue = filteredAssets.filter(a => stablecoins.includes(a.symbol?.toUpperCase())).reduce((sum, a) => sum + (a.valueUSD ?? 0), 0);
+                  const stablePct = (stableValue / total) * 100;
+
+                  let riskClass = "MODERATE";
+                  let riskColor = "text-amber-500";
+                  if (stablePct > 50) { riskClass = "CONSERVATIVE"; riskColor = "text-emerald-500"; }
+                  else if (topPct > 60) { riskClass = "AGGRESSIVE"; riskColor = "text-rose-500"; }
+
+                  return (
+                    <>
+                      <div className="space-y-2 border-r border-black/5 last:border-0 pr-4">
+                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
+                           <Activity size={12} /> Dominance
+                        </div>
+                        <div className="text-xl font-black font-mono text-black">
+                           {safeToFixed(topPct, 1)}% <span className="text-[11px] uppercase ml-1 opacity-50">{topAsset?.symbol || 'N/A'}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 border-r border-black/5 last:border-0 pr-4">
+                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
+                           <ShieldCheck size={12} /> Stablecoin Hedge
+                        </div>
+                        <div className="text-xl font-black font-mono text-black">
+                           {safeToFixed(stablePct, 1)}%
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
+                           <ShieldAlert size={12} /> Risk Classification
+                        </div>
+                        <div className={`text-xl font-black font-mono ${riskColor}`}>
+                           {riskClass}
+                        </div>
+                      </div>
+                    </>
+                  );
+               })()}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── CHAIN ACTIVITY (Uniswap-style on-chain history) ── */}
+        {userAddress && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.26 }}
+          >
+            <ChainActivityPanel address={userAddress} />
           </motion.div>
         )}
       </main>

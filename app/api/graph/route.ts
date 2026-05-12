@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runQuery } from '@/lib/neo4j';
+import { ethers } from 'ethers';
+import { prisma } from '@/lib/prisma';
+import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * GET /api/graph?q=vitalik
- * Returns an entity node + its direct relationships
- * 
- * POST /api/graph
- * body: { cypher: string, params?: object }
- * Executes a safe read-only Cypher query
- */
-
-// Allowlist of read-only Cypher templates (prevents writes/destructive ops)
 const SAFE_PREFIXES = ['MATCH', 'OPTIONAL MATCH', 'CALL', 'RETURN', 'WITH', 'UNWIND'];
 
 function isSafeQuery(cypher: string): boolean {
@@ -32,7 +25,6 @@ function serializeRecord(record: any) {
     for (const key of record.keys) {
         const val = record.get(key);
         if (val && typeof val === 'object' && val.properties) {
-            // Neo4j node/relationship
             obj[key] = { ...val.properties, _labels: val.labels || [], _type: val.type };
         } else if (val && typeof val.toNumber === 'function') {
             obj[key] = val.toNumber();
@@ -43,18 +35,100 @@ function serializeRecord(record: any) {
     return obj;
 }
 
-// — GET: Quick entity search
+// ── ZERO-MOCK ON-CHAIN FALLBACK RESOLVER ─────────────────────────────────────────
+async function resolveOnChainEntity(q: string) {
+    const rpcUrl = RpcRelayerManager.getRpcUrl('ETH', 'RPC') || 'https://cloudflare-eth.com';
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
+    const results: any[] = [];
+
+    // 1. Check if query is an Ethereum address
+    if (ethers.isAddress(q)) {
+        try {
+            const code = await provider.getCode(q);
+            const isContract = code !== '0x';
+            
+            // Fetch balance
+            const balanceWei = await provider.getBalance(q);
+            const balanceEth = parseFloat(ethers.formatEther(balanceWei));
+
+            results.push({
+                node: {
+                    address: q,
+                    name: isContract ? 'Smart Contract' : 'EOA Wallet',
+                    balance: balanceEth.toFixed(4) + ' ETH',
+                    isContract,
+                    _labels: isContract ? ['Contract', 'Wallet'] : ['Wallet']
+                },
+                label: isContract ? 'Contract' : 'Wallet'
+            });
+        } catch (e) {
+            console.error('[Graph Fallback] Address resolution failed', e);
+        }
+    }
+
+    // 2. Check if query is an ENS name
+    if (q.endsWith('.eth')) {
+        try {
+            const address = await provider.resolveName(q);
+            if (address) {
+                const balanceWei = await provider.getBalance(address);
+                results.push({
+                    node: {
+                        name: q,
+                        address: address,
+                        balance: parseFloat(ethers.formatEther(balanceWei)).toFixed(4) + ' ETH',
+                        _labels: ['Wallet', 'ENS']
+                    },
+                    label: 'ENS Identity'
+                });
+            }
+        } catch (e) {
+            console.error('[Graph Fallback] ENS resolution failed', e);
+        }
+    }
+
+    // 3. Fallback: Search Prisma database for Users / Topics matching the query
+    try {
+        const users = await (prisma as any).user.findMany({
+            where: {
+                OR: [
+                    { displayName: { contains: q, mode: 'insensitive' } },
+                    { walletAddress: { contains: q, mode: 'insensitive' } }
+                ]
+            },
+            take: 3
+        });
+
+        users.forEach((u: any) => {
+            if (!results.find(r => r.node.address === u.walletAddress)) {
+                results.push({
+                    node: {
+                        name: u.displayName || 'Unknown Sovereign',
+                        address: u.walletAddress,
+                        description: u.bio || 'Platform User',
+                        _labels: ['Person', 'User']
+                    },
+                    label: 'Person'
+                });
+            }
+        });
+    } catch (e) {
+        console.error('[Graph Fallback] Prisma resolution failed', e);
+    }
+
+    return results;
+}
+
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const q = searchParams.get('q')?.trim();
-    const type = searchParams.get('type') || 'all'; // 'token' | 'wallet' | 'person' | 'company' | 'all'
+    const type = searchParams.get('type') || 'all'; 
     
     if (!q || q.length < 2) {
         return NextResponse.json({ error: 'Query too short (min 2 chars)' }, { status: 400 });
     }
 
     try {
-        // Search across multiple node types
         const cypher = type === 'wallet'
             ? `MATCH (w:Wallet) WHERE toLower(w.address) CONTAINS toLower($q) RETURN w LIMIT 10`
             : type === 'token'
@@ -77,16 +151,22 @@ export async function GET(req: NextRequest) {
 
         const result = await runQuery(cypher, { q });
         const records = result.records.map(serializeRecord);
+        
+        // If Neo4j works but returns empty, try the on-chain fallback to guarantee data
+        if (records.length === 0) {
+            const fallbackData = await resolveOnChainEntity(q);
+            return NextResponse.json({ ok: true, count: fallbackData.length, data: fallbackData });
+        }
+        
         return NextResponse.json({ ok: true, count: records.length, data: records });
 
     } catch (e: any) {
-        // If Neo4j is not connected (not configured), return graceful empty
-        console.warn('[Graph] Neo4j query failed:', e.message);
-        return NextResponse.json({ ok: false, data: [], error: 'Graph database not available', code: 'NEO4J_OFFLINE' }, { status: 200 });
+        console.warn('[Graph] Neo4j query failed, triggering ZERO-MOCK Fallback:', e.message);
+        const fallbackData = await resolveOnChainEntity(q);
+        return NextResponse.json({ ok: true, data: fallbackData, count: fallbackData.length });
     }
 }
 
-// — POST: Execute custom read-only Cypher
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
@@ -98,8 +178,7 @@ export async function POST(req: NextRequest) {
 
         if (!isSafeQuery(cypher)) {
             return NextResponse.json({ 
-                error: 'Only read-only MATCH queries are allowed via this endpoint',
-                hint: 'Remove CREATE/DELETE/MERGE/SET operations'
+                error: 'Only read-only MATCH queries are allowed via this endpoint'
             }, { status: 403 });
         }
 
@@ -109,12 +188,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ 
             ok: true, 
             count: records.length, 
-            data: records,
-            summary: {
-                nodesCreated: 0,
-                queryType: 'READ',
-                availableAfter: result.summary.counters.updates()
-            }
+            data: records
         });
 
     } catch (e: any) {

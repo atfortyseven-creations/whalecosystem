@@ -2,61 +2,33 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Download, Mail, X, ChevronDown, ChevronUp, Calendar, Lock, ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Download, Mail, X, Calendar, ChevronLeft, ArrowRight, Clock, BookOpen, ExternalLink, Globe, Activity } from 'lucide-react';
 import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
 import { useAccount } from 'wagmi';
-import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 import { CryptoCheckoutModal } from './CryptoCheckoutModal';
 
-// ── Altura del InstitutionalHeader global ─────────────────────────────────────
-const HEADER_H = 68;
-
-// ── Fallback de imagen determinista por nuestro proxy ─
-const FALLBACK_BGS = [
-  "/api/proxy-image?seed=1",
-  "/api/proxy-image?seed=2",
-  "/api/proxy-image?seed=3",
-  "/api/proxy-image?seed=4",
-  "/api/proxy-image?seed=5",
-  "/api/proxy-image?seed=6",
-  "/api/proxy-image?seed=7",
-  "/api/proxy-image?seed=8",
-  "/api/proxy-image?seed=9",
-  "/api/proxy-image?seed=10"
-];
-
-function getArticleImage(article: NewsArticle): string {
-  if (article.imageUrl && article.imageUrl.startsWith('http')) {
-    return `/api/proxy-image?url=${encodeURIComponent(article.imageUrl)}`;
-  }
-  
-  let hash = 0;
-  for (let i = 0; i < article.id.length; i++) {
-    hash = article.id.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % FALLBACK_BGS.length;
-  return FALLBACK_BGS[index];
-}
-
-// ── Formato de fecha legible ──────────────────────────────────────────────────
 function formatDate(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString('es-ES', {
+  return d.toLocaleDateString('en-US', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-  }) + ' · ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  }) + ' · ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
 function formatShort(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
-    + ' · ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })
+    + ' · ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
 function todayKey(): string {
   return new Date().toISOString().split('T')[0];
 }
 
-// Fetches EUR equivalent for 0.015 ETH
+function estimateReadTime(text: string): number {
+  return Math.max(1, Math.ceil((text ?? '').split(/\s+/).length / 220));
+}
+
 async function fetchEthEur(): Promise<number | null> {
   try {
     const controller = new AbortController();
@@ -74,111 +46,91 @@ async function fetchEthEur(): Promise<number | null> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 export function NewsTerminal() {
   const { isNewsSubscribed, lastBackupDate, setLastBackupDate, archive, upsertDayArticles, getArchiveDates } = useNewsStore();
   const { address } = useAccount();
+  const router = useRouter();
 
-  // ── Access is FREE for all users — paywall disabled ────────────────────
-  // To re-enable, restore: const hasAccess = isNewsSubscribed || IS_WHITELISTED;
-  const hasAccess = true;
-
-  const [articles,    setArticles]    = useState<NewsArticle[]>([]);
-  const [loading,     setLoading]     = useState(true);
-  const [selected,    setSelected]    = useState<NewsArticle | null>(null);
-  const [fontSize,    setFontSize]    = useState(1);
-  const [checkoutOpen,setCheckoutOpen]= useState(false);
-  const [shareOpen,   setShareOpen]   = useState(false);
-  const [shareEmail,  setShareEmail]  = useState('');
-  const [shareNote,   setShareNote]   = useState('');
-  const [isSending,   setIsSending]   = useState(false);
-  const [shareSent,   setShareSent]   = useState(false);
-  const [ethEur,      setEthEur]      = useState<number | null>(null);
-  // Archive sidebar toggle
-  const [showArchive, setShowArchive] = useState(false);
-  const [marketTimes, setMarketTimes] = useState<{name: string, time: string, isOpen: boolean}[]>([]);
+  const [tier,         setTier]         = useState<string>('FREE');
+  const [articles,     setArticles]     = useState<NewsArticle[]>([]);
+  const [loading,      setLoading]      = useState(true);
+  const [selected,     setSelected]     = useState<NewsArticle | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [shareOpen,    setShareOpen]    = useState(false);
+  const [shareEmail,   setShareEmail]   = useState('');
+  const [shareNote,    setShareNote]    = useState('');
+  const [isSending,    setIsSending]    = useState(false);
+  const [shareSent,    setShareSent]    = useState(false);
+  const [ethEur,       setEthEur]       = useState<number | null>(null);
+  const [showArchive,  setShowArchive]  = useState(false);
+  const [marketTimes,  setMarketTimes]  = useState<{name: string, time: string, isOpen: boolean}[]>([]);
 
   const rightRef = useRef<HTMLDivElement>(null);
-  const imgRef   = useRef<HTMLImageElement>(null);
 
-  // ── Relojes Bursátiles Globales ─────────────────────────────────────────
+  // ── Market clocks ──────────────────────────────────────────────────────────
   useEffect(() => {
-    const updateTimes = () => {
+    const update = () => {
       const now = new Date();
       const utcHour = now.getUTCHours();
       const isWeekend = now.getUTCDay() === 0 || now.getUTCDay() === 6;
       const f = (tz: string) => now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
-      
       setMarketTimes([
-        { name: 'NY', time: f('America/New_York'), isOpen: !isWeekend && (utcHour >= 13 && utcHour < 20) },
-        { name: 'LON', time: f('Europe/London'), isOpen: !isWeekend && (utcHour >= 8 && utcHour < 16) },
-        { name: 'TYO', time: f('Asia/Tokyo'), isOpen: !isWeekend && (utcHour >= 0 && utcHour < 6) },
+        { name: 'NY',  time: f('America/New_York'), isOpen: !isWeekend && (utcHour >= 13 && utcHour < 20) },
+        { name: 'LON', time: f('Europe/London'),    isOpen: !isWeekend && (utcHour >= 8  && utcHour < 16) },
+        { name: 'TYO', time: f('Asia/Tokyo'),       isOpen: !isWeekend && (utcHour >= 0  && utcHour < 6)  },
       ]);
     };
-    updateTimes();
-    const intervalId = setInterval(updateTimes, 30000);
-    return () => clearInterval(intervalId);
+    update();
+    const id = setInterval(update, 30000);
+    return () => clearInterval(id);
   }, []);
 
-  // ── Carga de datos ───────────────────────────────────────────────────────
+  // ── Load data ──────────────────────────────────────────────────────────────
   useEffect(() => {
-    // Load ETH→EUR rate
     fetchEthEur().then(setEthEur);
 
-    // Check 1-Time share token
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const token  = params.get('share_token');
-      if (token && !hasAccess) {
-        try {
-          const decoded = JSON.parse(atob(token));
-          const key = `has_read_${decoded.id}`;
-          if (localStorage.getItem(key)) { setLoading(false); return; }
-          localStorage.setItem(key, '1');
-          window.history.replaceState({}, '', '/news');
-        } catch { /* token corrupto */ }
-      }
-    }
+    fetch('/api/auth/session', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.user?.tier) setTier(data.user.tier.split('_')[0].toUpperCase());
+      })
+      .catch(console.error);
 
     fetch('/api/news', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         const items: NewsArticle[] = data.articles ?? [];
         setArticles(items);
-        if (items.length > 0) setSelected(items[0]);
-        // Persist into today's archive bucket
         if (items.length > 0) {
+          setSelected(items[0]);
           upsertDayArticles(todayKey(), items);
         }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [hasAccess, upsertDayArticles]);
+  }, [upsertDayArticles]);
 
-  // Auto-scroll to top when article changes
   useEffect(() => {
     rightRef.current?.scrollTo({ top: 0, behavior: 'instant' });
   }, [selected?.id]);
 
-  // ── Descarga JSON al disco ───────────────────────────────────────────────
   const handleDownload = useCallback(async () => {
     const today = todayKey();
-    const blob  = new Blob([JSON.stringify({ date: today, articles }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ date: today, articles }, null, 2)], { type: 'application/json' });
     if ('showSaveFilePicker' in window) {
       try {
-        const handle   = await (window as any).showSaveFilePicker({ suggestedName: `${today}_WhaleNews.json`, types: [{ accept: { 'application/json': ['.json'] } }] });
+        const handle = await (window as any).showSaveFilePicker({ suggestedName: `${today}_WhaleNews.json`, types: [{ accept: { 'application/json': ['.json'] } }] });
         const writable = await handle.createWritable();
         await writable.write(blob); await writable.close();
         setLastBackupDate(today); return;
       } catch (e: any) { if (e.name === 'AbortError') return; }
     }
     const url = URL.createObjectURL(blob);
-    const a   = Object.assign(document.createElement('a'), { href: url, download: `${today}_WhaleNews.json` });
+    const a = Object.assign(document.createElement('a'), { href: url, download: `${today}_WhaleNews.json` });
     a.click(); URL.revokeObjectURL(url);
     setLastBackupDate(today);
   }, [articles, setLastBackupDate]);
 
-  // ── Compartir por email ──────────────────────────────────────────────────
   const handleShare = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected || !shareEmail) return;
@@ -193,326 +145,214 @@ export function NewsTerminal() {
     } finally { setIsSending(false); }
   };
 
-  // ── Paleta institucional pura ─────────────────────────────────────────────
-  const BG    = '#FAF9F6';
-  const TEXT  = '#0A0A0A';
-  const DIV   = 'rgba(0,0,0,0.08)';
-  const MUTED = 'rgba(0,0,0,0.4)';
-  const ACTIVE_BG = 'rgba(0,0,0,0.04)';
+  const openFullReport = () => {
+    if (!selected) return;
+    router.push(`/whalepost/full-report?id=${encodeURIComponent(selected.id)}`);
+  };
 
-  const panelH = `calc(100vh - ${HEADER_H}px)`;
+  const hasAccess = tier === 'PRO' || tier === 'ELITE';
 
-  // ── Pantalla: Carga eliminada por petición ──────────────────────────────
-  // if (loading) return null;
-
-  // ── Archive dates for sidebar ────────────────────────────────────────────
+  const BG      = '#FAF9F6';
+  const TEXT    = '#0A0A0A';
+  const DIV     = 'rgba(0,0,0,0.08)';
+  const MUTED   = 'rgba(0,0,0,0.45)';
+  const ACTIVE_BG = '#FFFFFF';
+  
   const archiveDates = getArchiveDates();
 
-  // ── Render principal ─────────────────────────────────────────────────────
   return (
     <>
-      <div
-        className="w-full h-full flex-1 relative flex flex-col min-h-0"
-        style={{
-          background: BG,
-          color: TEXT,
-          // Root optimization
-          willChange: 'transform',
-          transform: 'translateZ(0)',
-          backfaceVisibility: 'hidden',
-          overscrollBehavior: 'none',
-        }}
-      >
+      <div className="w-full h-full flex-1 relative flex flex-col min-h-0 font-serif" style={{ background: BG, color: TEXT }}>
         <div className="flex flex-1 w-full h-full min-h-0 overflow-hidden">
-
-          {/* ═══════════════════════════════════════════════════════════════
-              PANEL IZQUIERDO — Lista + Archivo
-              ═══════════════════════════════════════════════════════════ */}
+          {/* LEFT PANEL */}
           <div
-            style={{
-              borderRight: `1px solid ${DIV}`,
-              background: BG,
-              overflowY: 'auto',
-              height: '100%',
-              WebkitOverflowScrolling: 'touch',
-              willChange: 'transform',
-              transform: 'translateZ(0)',
-              backfaceVisibility: 'hidden',
-            }}
-            className={`flex-col shrink-0 w-full md:w-[28%] md:min-w-[320px] lg:min-w-[360px] ${selected ? 'hidden md:flex' : 'flex'}`}
+            style={{ borderRight: `1px solid ${DIV}`, background: '#F4F3EE', overflowY: 'auto' }}
+            className={`flex-col shrink-0 w-full md:w-[32%] md:min-w-[340px] lg:min-w-[380px] ${selected ? 'hidden md:flex' : 'flex'}`}
           >
-            {/* Cabecera sticky */}
-            <div
-              style={{ borderBottom: `1px solid ${DIV}`, background: BG, backdropFilter: 'blur(10px)' }}
-              className="sticky top-0 z-10 flex items-center justify-between px-6 py-5"
-            >
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3 md:gap-5 flex-wrap">
-                  {marketTimes.map(t => (
-                    <div key={t.name} className="flex items-center gap-1.5 shrink-0">
-                       <div className={`w-1 h-1 rounded-full ${t.isOpen ? 'bg-[#00C076] shadow-[0_0_8px_#00C076]' : 'bg-[#FF3B30] opacity-50'}`} />
-                       <span className="font-mono text-[9px] font-black uppercase tracking-widest text-[#050505]">
-                         {t.name} <span className="font-normal opacity-50 ml-0.5">{t.time}</span>
-                       </span>
-                    </div>
-                  ))}
-                </div>
+            <div style={{ borderBottom: `1px solid ${DIV}`, background: '#F4F3EE' }} className="sticky top-0 z-10 flex items-center justify-between px-6 py-5">
+              <div className="flex items-center gap-4 flex-wrap">
+                {marketTimes.map(t => (
+                  <div key={t.name} className="flex items-center gap-1.5 shrink-0">
+                    <div className={`w-1.5 h-1.5 rounded-full ${t.isOpen ? 'bg-[#00C076]' : 'bg-[#FF3B30] opacity-50'}`} />
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#050505]">
+                      {t.name} <span className="font-normal opacity-50 ml-0.5">{t.time}</span>
+                    </span>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {hasAccess && (
-                  <button onClick={handleDownload} title="Guardar en disco"
-                          className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
-                          style={{ borderColor: DIV }}>
-                    <Download size={13} color={MUTED} />
+                  <button onClick={handleDownload} title="Save Archives" className="w-8 h-8 flex items-center justify-center rounded-sm hover:bg-black/5 transition-colors">
+                    <Download size={14} color={TEXT} />
                   </button>
                 )}
-                {/* Archivo por fecha */}
-                <button onClick={() => setShowArchive(v => !v)} title="Archivo de noticias"
-                        className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
-                        style={{ borderColor: DIV, background: showArchive ? TEXT : 'transparent' }}>
-                  <Calendar size={13} color={showArchive ? BG : MUTED} />
+                <button onClick={() => setShowArchive(v => !v)} title="News Archive" className="w-8 h-8 flex items-center justify-center rounded-sm hover:bg-black/5 transition-colors">
+                  <Calendar size={14} color={TEXT} />
                 </button>
               </div>
             </div>
 
             {/* Archive browser */}
             {showArchive && archiveDates.length > 0 && (
-              <div style={{ borderBottom: `2px solid ${TEXT}`, background: 'rgba(0,0,0,0.02)' }}>
-                <p className="px-6 pt-4 pb-2 font-mono text-[8px] uppercase tracking-[0.35em] font-black" style={{ color: MUTED }}>
-                  Archivo — {archiveDates.length} días
-                </p>
+              <div style={{ borderBottom: `1px solid ${TEXT}`, background: '#EAE9E4' }}>
+                <p className="px-6 pt-5 pb-3 font-mono text-[9px] uppercase tracking-[0.25em] font-bold" style={{ color: MUTED }}>Archive ({archiveDates.length})</p>
                 {archiveDates.map(date => {
                   const count = archive[date]?.length ?? 0;
                   const isToday = date === todayKey();
                   return (
-                    <button
-                      key={date}
-                      onClick={() => {
+                    <button key={date} onClick={() => {
                         const dayArticles = archive[date];
-                        if (dayArticles?.length) {
-                          setArticles(dayArticles);
-                          setSelected(dayArticles[0]);
-                          setShowArchive(false);
-                        }
+                        if (dayArticles?.length) { setArticles(dayArticles); setSelected(dayArticles[0]); setShowArchive(false); }
                       }}
-                      className="w-full text-left px-6 py-3 flex items-center justify-between border-b transition-colors hover:opacity-70"
-                      style={{ borderColor: DIV }}
-                    >
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: isToday ? TEXT : MUTED }}>
-                        {new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        {isToday && <span className="ml-2 text-[7px]">· HOY</span>}
+                      className="w-full text-left px-6 py-4 flex items-center justify-between border-b border-black/5 hover:bg-black/5 transition-colors">
+                      <span className="font-sans text-xs font-semibold tracking-wide" style={{ color: isToday ? TEXT : MUTED }}>
+                        {new Date(date + 'T12:00:00').toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' })}
+                        {isToday && <span className="ml-2 font-mono text-[8px] px-1.5 py-0.5 bg-black text-white rounded-sm">TODAY</span>}
                       </span>
-                      <span className="font-mono text-[9px] font-black" style={{ color: MUTED }}>{count}</span>
+                      <span className="font-mono text-[10px]" style={{ color: MUTED }}>{count} Updates</span>
                     </button>
                   );
                 })}
               </div>
             )}
 
-            {/* Lista de artículos (Culling Activo: Máximo 50 Nodos en DOM para evitar Memory Saturation) */}
-            <div className="flex flex-col">
-              {articles.slice(0, 50).map(art => {
+            {/* Article list */}
+            <div className="flex flex-col py-2">
+              {articles.slice(0, 50).map((art, idx) => {
                 const isActive = selected?.id === art.id;
                 return (
-                  <button
-                    key={art.id}
-                    onClick={() => setSelected(art)}
-                    className="text-left w-full px-6 py-5 border-b relative group"
-                    style={{
-                      borderColor: DIV,
-                      background: isActive ? ACTIVE_BG : 'transparent',
-                      color: TEXT,
-                      // GPU promote each row: eliminates scroll jank on 120/240Hz iOS
-                      WebkitTapHighlightColor: 'transparent',
-                      touchAction: 'manipulation',
-                      WebkitFontSmoothing: 'antialiased',
-                      transition: 'background 0.1s ease',
-                    }}
-                  >
-                    {isActive && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: TEXT }} />
-                    )}
-                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] font-bold mb-2 transition-colors"
-                       style={{ color: isActive ? TEXT : MUTED }}>
-                      {formatShort(art.date)}
-                    </p>
-                    <p className="font-sans font-black leading-tight text-[13px] group-hover:opacity-80 transition-opacity">{art.title}</p>
+                  <button key={art.id} onClick={() => setSelected(art)}
+                    className="text-left w-full px-6 py-5 relative group transition-colors"
+                    style={{ background: isActive ? ACTIVE_BG : 'transparent' }}>
+                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-black" />}
+                    {!isActive && <div className="absolute bottom-0 left-6 right-6 h-[1px]" style={{ background: DIV }} />}
+                    
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className="font-mono text-[9px] uppercase tracking-widest font-bold" style={{ color: isActive ? '#0044CC' : MUTED }}>
+                        {formatShort(art.date)}
+                      </span>
+                      {art.source && (
+                        <>
+                          <span className="w-1 h-1 rounded-full bg-black/20" />
+                          <span className="font-mono text-[9px] uppercase tracking-widest truncate max-w-[120px]" style={{ color: MUTED }}>{art.source}</span>
+                        </>
+                      )}
+                    </div>
+                    
+                    <h3 className="font-serif text-[15px] leading-[1.4] font-medium" style={{ color: isActive ? TEXT : 'rgba(10,10,10,0.7)' }}>
+                      {art.title}
+                    </h3>
                   </button>
                 );
               })}
               {articles.length === 0 && (
-                <p className="p-6 font-mono text-xs uppercase" style={{ color: MUTED }}>Sin noticias disponibles.</p>
+                <div className="px-6 py-10 flex flex-col items-center text-center opacity-50">
+                  <BookOpen size={24} className="mb-3" />
+                  <p className="font-mono text-[10px] uppercase tracking-widest">No intelligence available.</p>
+                </div>
               )}
             </div>
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════════
-              PANEL DERECHO — Lectura institucional
-              ═══════════════════════════════════════════════════════════ */}
-          <div 
-             ref={rightRef} 
-             style={{ 
-               flex: 1, 
-               height: '100%', 
-               overflowY: 'auto', 
-               background: BG,
-               WebkitOverflowScrolling: 'touch',
-               willChange: 'transform',
-               transform: 'translateZ(0)',
-             }}
-             className={`${selected ? 'flex' : 'hidden md:flex'} flex-col w-full md:w-auto relative`}
-          >
-
+          {/* RIGHT PANEL */}
+          <div ref={rightRef} className={`flex-1 overflow-y-auto ${selected ? 'flex' : 'hidden md:flex'} flex-col relative bg-[#FAF9F6]`}>
             <AnimatePresence mode="wait">
               {selected && (
-                <motion.article key={selected.id}
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  transition={{ duration: 0.18 }}>
-
-                  {/* ── Barra de controles ─────────────────────────────── */}
-                  <div className="flex items-center justify-between px-6 md:px-10 xl:px-16 py-5 border-b"
-                       style={{ borderColor: DIV }}>
-                    <div className="flex items-center gap-3">
-                      <button 
-                        onClick={() => setSelected(null)}
-                        className="md:hidden flex items-center justify-center p-1 -ml-2 rounded-full border transition-all"
-                        style={{ borderColor: DIV, background: 'rgba(0,0,0,0.03)' }}
-                      >
-                         <ChevronLeft size={16} color={MUTED} />
+                <motion.article key={selected.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                  
+                  {/* Top Bar */}
+                  <div className="sticky top-0 z-20 flex items-center justify-between px-6 md:px-12 py-5 border-b border-black/10 bg-[#FAF9F6]/95 backdrop-blur-md">
+                    <div className="flex items-center gap-4">
+                      <button onClick={() => setSelected(null)} className="md:hidden p-1.5 -ml-1.5 hover:bg-black/5 rounded-full transition-colors">
+                        <ChevronLeft size={18} />
                       </button>
-                      <span className="font-mono text-[8px] uppercase tracking-[0.3em] font-medium" style={{ color: MUTED }}>
-                        {formatDate(selected.date)}
-                      </span>
+                      <div className="font-mono text-[9px] uppercase tracking-[0.2em] font-semibold text-black/40">
+                        Global Intelligence Network
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {/* EUR conversion */}
+                    <div className="flex items-center gap-4">
                       {ethEur && (
-                        <span className="font-mono text-[8px] uppercase tracking-widest px-2 py-1 border" style={{ borderColor: DIV, color: MUTED }}>
-                          1 ETH ≈ {ethEur.toLocaleString('es-ES')} €
+                        <span className="font-mono text-[9px] uppercase tracking-widest text-black/60 hidden sm:block">
+                          ETH/EUR {ethEur.toLocaleString('en-US')}
                         </span>
                       )}
-                      {/* Tamaño tipográfico */}
-                      <div className="flex border" style={{ borderColor: DIV }}>
-                        <button onClick={() => setFontSize(f => Math.max(0.85, +(f - 0.1).toFixed(1)))}
-                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
-                                style={{ color: MUTED }}>A−</button>
-                        <button onClick={() => setFontSize(1)}
-                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity border-x"
-                                style={{ color: MUTED, borderColor: DIV }}>A</button>
-                        <button onClick={() => setFontSize(f => Math.min(1.6, +(f + 0.1).toFixed(1)))}
-                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
-                                style={{ color: MUTED }}>A+</button>
-                      </div>
                       {hasAccess && (
-                        <button onClick={() => setShareOpen(true)}
-                                className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
-                                style={{ borderColor: DIV }}>
-                          <Mail size={13} color={MUTED} />
+                        <button onClick={() => setShareOpen(true)} className="flex items-center gap-2 px-3 py-1.5 border border-black/10 rounded-sm hover:bg-black/5 transition-colors">
+                          <Mail size={12} />
+                          <span className="font-mono text-[9px] uppercase tracking-widest font-bold">Share</span>
                         </button>
                       )}
                     </div>
                   </div>
 
-                  {/* IMAGEN HERO — GPU composited full-bleed hero */}
-                  <div className="w-full pb-8">
-                    <div
-                      className="w-full overflow-hidden bg-[#F0EFEC]"
-                      style={{
-                        // Mobile: smaller hero to preserve scroll perf on 6" screens
-                        height: `clamp(200px, 45vw, ${Math.round(480 * fontSize)}px)`,
-                        // Hard-composite to GPU layer — prevents texture upload stalls on A-series chips
-                        willChange: 'transform',
-                        transform: 'translateZ(0)',
-                        backfaceVisibility: 'hidden',
-                      }}
-                    >
-                      <motion.img
-                        key={selected.id}
-                        initial={{ opacity: 0, scale: 1.04 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        ref={imgRef}
-                        src={getArticleImage(selected)}
-                        alt={selected.title}
-                        className="w-full h-full object-cover"
-                        loading="eager"
-                        decoding="async"
-                        fetchPriority="high"
-                        style={{
-                          // Tell engine this image will animate — pre-allocate VRAM tile
-                          willChange: 'opacity, transform',
-                          transform: 'translateZ(0)',
-                        }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          if (target.dataset.errorHandled) return;
-                          target.dataset.errorHandled = 'true';
-                          let hash = 0;
-                          for (let i = 0; i < selected.id.length; i++) {
-                            hash = selected.id.charCodeAt(i) + ((hash << 5) - hash);
-                          }
-                          const index = (Math.abs(hash) + 1) % FALLBACK_BGS.length;
-                          target.src = FALLBACK_BGS[index];
-                        }}
-                      />
+                  {/* Header */}
+                  <div className="px-6 md:px-12 pt-16 pb-12 max-w-4xl mx-auto">
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="px-2 py-1 border border-[#0044CC]/20 text-[#0044CC] font-mono text-[10px] uppercase tracking-widest font-bold rounded-sm">
+                        Executive Brief
+                      </span>
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-black/40 flex items-center gap-1.5">
+                        <Globe size={11} /> {selected.source}
+                      </span>
                     </div>
-                  </div>
 
-                  {/* ── Contenido del artículo: Fuente + Título ──────────────── */}
-                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-4">
-                    {/* FUENTE + ETIQUETA */}
-                    <p className="font-mono text-[8px] uppercase tracking-[0.4em] mb-4" style={{ color: MUTED }}>
-                      {selected.source} · Análisis Institucional
-                    </p>
-
-                    {/* TÍTULO PRINCIPAL - Peso medio-alto */}
-                    <h1
-                      className="font-sans font-medium tracking-tight leading-[1.04] mb-0 translate-y-[-2px]"
-                      style={{
-                        fontSize: `clamp(2rem, ${3.2 * fontSize}rem, 5rem)`,
-                        color: TEXT,
-                        textWrap: 'balance' as any,
-                      }}
-                    >
+                    <h1 className="font-serif text-3xl md:text-4xl lg:text-[42px] leading-[1.15] font-normal tracking-tight text-[#0A0A0A] mb-8" style={{ textWrap: 'balance' as any }}>
                       {selected.title}
                     </h1>
-                  </div>
 
-                  {/* ANÁLISIS PRINCIPAL */}
-                  <div className="px-5 md:px-10 xl:px-16 pt-6 pb-12 max-w-[900px] w-full" style={{ overflowX: 'hidden' }}>
-                      {/* ── Full content — access is open to all users ── */}
-                      <div
-                        lang="es"
-                        className="font-sans font-semibold tracking-wide leading-[1.8] space-y-5 opacity-90 text-[12px] md:text-[13px] text-justify"
-                        style={{
-                          color: '#1a1a1a',
-                          wordBreak: 'break-word',
-                          hyphens: 'auto',
-                          WebkitHyphens: 'auto'
-                        }}
-                      >
-                        {selected.description
-                          ? selected.description.split(/\n\n+/).map((p, i) => (
-                              <p key={i} className="mb-6">{p}</p>
-                            ))
-                          : (
-                              <p>Sin contenido.</p>
-                            )
-                        }
+                    <div className="flex items-center gap-5 pt-6 border-t border-black/10">
+                      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/50">
+                        <Calendar size={12} /> {formatDate(selected.date)}
                       </div>
-
-                    {/* FOOTER LEGAL */}
-                    <div className="mt-20 pt-8 border-t" style={{ borderColor: DIV }}>
-                      <div className="flex justify-between items-center font-mono text-[10px] uppercase tracking-widest font-bold mb-3"
-                           style={{ color: MUTED }}>
-                        <span>Professional Analysis Report</span>
-                        <span>Strictly Educational Insights</span>
+                      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/50">
+                        <Clock size={12} /> {estimateReadTime(selected.description ?? '')} min read
                       </div>
-                      <p className="font-mono text-xs leading-relaxed uppercase tracking-wide opacity-50" style={{ color: MUTED }}>
-                        The analytical material provided herein is solely for educational purposes and should not be construed as investment, financial, or legal advice. Trading and interacting with digital assets inherently involves substantial risk, and full capital loss is possible. Information provided reflects market states at the time of publication.
-                      </p>
+                      {(() => {
+                         const positiveWords = ['surge', 'growth', 'gain', 'bull', 'rally', 'adopt', 'high', 'up', 'approve', 'soar', 'breakout'];
+                         const negativeWords = ['drop', 'fall', 'bear', 'hack', 'loss', 'crash', 'down', 'reject', 'ban', 'plunge', 'scam'];
+                         const textBody = (selected.title + ' ' + (selected.description ?? '')).toLowerCase();
+                         let posCount = 0; let negCount = 0;
+                         positiveWords.forEach(w => { posCount += (textBody.match(new RegExp('\\b'+w+'\\b', 'g')) || []).length; });
+                         negativeWords.forEach(w => { negCount += (textBody.match(new RegExp('\\b'+w+'\\b', 'g')) || []).length; });
+                         let sentiment = 'NEUTRAL';
+                         let sentColor = 'text-black/50 border-black/10';
+                         if (posCount > negCount) { sentiment = 'BULLISH'; sentColor = 'text-emerald-600 border-emerald-600/30'; }
+                         else if (negCount > posCount) { sentiment = 'BEARISH'; sentColor = 'text-rose-600 border-rose-600/30'; }
+                         
+                         return (
+                           <div className={`flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-sm border ${sentColor}`}>
+                             <Activity size={12} /> Semantic Sentiment: {sentiment}
+                           </div>
+                         );
+                      })()}
                     </div>
                   </div>
+
+                  {/* Content Preview */}
+                  <div className="px-6 md:px-12 pb-8 max-w-4xl mx-auto relative">
+                    <div className="prose prose-lg prose-neutral max-w-none font-serif text-[17px] leading-[1.9] text-[#222]">
+                      {selected.description ? selected.description.split(/\n\n+/).slice(0, 3).map((para, i) => {
+                        const text = para.trim();
+                        if (!text) return null;
+                        if (text.startsWith('## ')) return <h2 key={i} className="font-sans text-xl font-bold mt-8 mb-4 tracking-tight">{text.replace(/^##\s+/, '')}</h2>;
+                        return <p key={i} className={i === 0 ? "text-[19px] leading-[1.8] text-[#111]" : ""}>{text}</p>;
+                      }) : <p className="text-black/40 italic">Analysis unavailable.</p>}
+                    </div>
+                    
+                    <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#FAF9F6] to-transparent pointer-events-none" />
+                  </div>
+
+                  {/* Call to Action */}
+                  <div className="px-6 md:px-12 pb-24 max-w-4xl mx-auto text-center relative z-10">
+                    <button onClick={openFullReport} className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#0A0A0A] text-[#FAF9F6] hover:bg-[#222] transition-colors rounded-sm shadow-xl hover:shadow-2xl">
+                      <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em]">Read Full Analysis</span>
+                      <ArrowRight size={14} />
+                    </button>
+                    <p className="mt-4 font-mono text-[9px] uppercase tracking-widest text-black/40">
+                      Comprehensive insights and structured geopolitical breakdown.
+                    </p>
+                  </div>
+
                 </motion.article>
               )}
             </AnimatePresence>
@@ -520,53 +360,40 @@ export function NewsTerminal() {
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          MODALES
-          ═══════════════════════════════════════════════════════════ */}
       <CryptoCheckoutModal isOpen={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
-
+      
       <AnimatePresence>
         {shareOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                      style={{ background: 'rgba(0,0,0,0.82)' }}>
-            <motion.div initial={{ scale: 0.97, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.97 }}
-                        className="w-full max-w-md relative"
-                        style={{ background: BG, color: TEXT, border: `2px solid ${TEXT}` }}>
-              <div className="flex items-center justify-between px-7 py-5 border-b" style={{ borderColor: DIV }}>
-                <div className="flex items-center gap-3">
-                  <Mail size={18} />
-                  <span className="font-black text-lg uppercase tracking-tight">Compartir Intel</span>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} className="w-full max-w-md bg-[#FAF9F6] border border-black/10 shadow-2xl rounded-sm overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-black/5 bg-white">
+                <div className="flex items-center gap-2">
+                  <Mail size={16} className="text-[#0044CC]" />
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black">Distribute Intelligence</span>
                 </div>
-                <button onClick={() => setShareOpen(false)} className="opacity-50 hover:opacity-100 transition-opacity">
-                  <X size={18} />
-                </button>
+                <button onClick={() => setShareOpen(false)} className="p-1 hover:bg-black/5 rounded-sm text-black/50 hover:text-black transition-colors"><X size={16} /></button>
               </div>
-
+              
               {shareSent ? (
-                <div className="p-16 text-center font-mono text-sm font-black uppercase tracking-widest">Transmisión Completada ✓</div>
+                <div className="p-12 text-center">
+                  <div className="w-12 h-12 bg-[#00C076]/10 rounded-full flex items-center justify-center mx-auto mb-4 text-[#00C076]"><X size={24} className="rotate-45" style={{ display: 'none' }} />✓</div>
+                  <h3 className="font-serif text-xl mb-2 text-black">Transmission Secured</h3>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">The report has been dispatched.</p>
+                </div>
               ) : (
-                <form onSubmit={handleShare} className="p-7 space-y-7">
-                  <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2" style={{ color: MUTED }}>Destinatario</label>
-                    <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)}
-                           className="w-full bg-transparent outline-none border-b py-2 font-mono text-sm"
-                           style={{ borderColor: DIV, color: TEXT }} placeholder="correo@dominio.com" />
+                <form onSubmit={handleShare} className="p-6">
+                  <div className="mb-5">
+                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold text-black/50 mb-2">Target Address</label>
+                    <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)} className="w-full px-4 py-3 bg-white border border-black/10 font-mono text-[11px] outline-none focus:border-[#0044CC] transition-colors rounded-sm" placeholder="delegate@institution.com" />
                   </div>
-                  <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2" style={{ color: MUTED }}>Nota (Opcional)</label>
-                    <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3}
-                              className="w-full bg-transparent outline-none border p-3 font-serif text-sm resize-none"
-                              style={{ borderColor: DIV, color: TEXT }} />
+                  <div className="mb-8">
+                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold text-black/50 mb-2">Diplomatic Note (Optional)</label>
+                    <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3} className="w-full px-4 py-3 bg-white border border-black/10 font-serif text-[14px] outline-none focus:border-[#0044CC] transition-colors rounded-sm resize-none" placeholder="Provide context for this transmission..." />
                   </div>
-                  <button type="submit" disabled={isSending}
-                          className="w-full py-4 font-mono text-[10px] font-black uppercase tracking-widest disabled:opacity-40"
-                          style={{ background: TEXT, color: BG }}>
-                    {isSending ? 'Enviando...' : 'Transmitir Acceso Único (1-Time)'}
+                  <button type="submit" disabled={isSending} className="w-full py-4 bg-[#0A0A0A] text-white font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-[#222] disabled:opacity-50 transition-colors rounded-sm">
+                    {isSending ? 'Establishing Protocol...' : 'Authorize Transmission'}
                   </button>
-                  <p className="text-center font-mono text-[8px] uppercase tracking-widest" style={{ color: MUTED }}>
-                    El destinatario solo podrá leer esta noticia una vez.
-                  </p>
+                  <p className="text-center font-mono text-[8px] uppercase tracking-widest text-black/40 mt-4">Restricted access protocol enforced.</p>
                 </form>
               )}
             </motion.div>

@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import type { NodeType, NodeData, EdgeData } from './canvas-types';
+// Re-export for backward compatibility with existing imports
+export type { NodeType, NodeData, EdgeData } from './canvas-types';
 import { AnimatePresence } from 'framer-motion';
 import { CanvasNode as CanvasNodeComponent } from './CanvasNode';
 import { CanvasEdges } from './CanvasEdges';
@@ -8,25 +12,6 @@ import { ContextMenu } from './ContextMenu';
 import { TelemetryTerminal } from './TelemetryTerminal';
 import { WhaleSonar } from './WhaleSonar';
 
-export type NodeType = 'wallet' | 'bot' | 'contract' | 'api';
-export interface NodeData {
-    id: string;
-    type: NodeType;
-    x: number;
-    y: number;
-    title: string;
-    status: 'active' | 'syncing' | 'error';
-    latency: number;
-}
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
-
-export interface EdgeData {
-    id: string;
-    source: string;
-    target: string;
-    animated: boolean;
-    status: 'active' | 'error' | 'high-latency';
-}
 
 // Debounce helper
 function useDebounce<T>(value: T, delay: number): T {
@@ -143,7 +128,7 @@ export function CanvasEngine() {
         const x = clientX - canvasRect.left - pan.x;
         const y = clientY - canvasRect.top - pan.y;
         const newNode: NodeData = {
-            id: Math.random().toString(36).substr(2, 9),
+            id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `node-${Date.now()}-${performance.now().toString(36).replace('.', '')}`,
             type, x, y,
             title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
             status: 'syncing',

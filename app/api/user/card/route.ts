@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/session';
+import crypto from 'crypto';
 
 // ZERO-MOCK MANDATE: The VirtualCard model does not exist in schema.prisma.
 // The Striga KYC integration is pending. Both GET and POST are gated with 501.
@@ -44,10 +45,11 @@ export async function POST(request: NextRequest) {
     card = await db.virtualCard.create({
       data: {
         userId: session.userId,
-        cardNumber: `4111${Math.floor(Math.random() * 1000000000000)}`, // Encrypted in prod
+        // crypto.randomInt provides a CSPRNG — Math.random() is explicitly forbidden for financial data
+        cardNumber: `4111${crypto.randomInt(100000000000, 999999999999)}`,
         expiryMonth: new Date().getMonth() + 1,
         expiryYear: new Date().getFullYear() + 3,
-        cvv: Math.floor(100 + Math.random() * 900).toString(),
+        cvv: crypto.randomInt(100, 999).toString(),
         cardStatus: 'ACTIVE',
         balance: 0,
         kycStatus: 'VERIFIED'

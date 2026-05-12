@@ -3,7 +3,7 @@ import { mainnet, base, bsc, optimism } from 'wagmi/chains'
 import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors'
 
 // Project ID for WalletConnect
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.NEXT_PUBLIC_WC_PROJECT_ID || '0ce6bdc0b433d45ab19d32f130dd4f18';
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.NEXT_PUBLIC_WC_PROJECT_ID || 'bf1083a298e7222c838266166b12b2ba';
 
 export const WLD_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_WLD_TOKEN_ADDRESS || '0xdc6f18f83959cd25095c2453192f16d08b496666') as `0x${string}`;
 
@@ -22,12 +22,11 @@ export const config = createConfig({
         injected({ target: 'metaMask' }),
         walletConnect({
             projectId,
-            showQrModal: false,   // ← false: we manage the QR UI ourselves; true caused double-modal flicker
             metadata: {
                 name: 'WhaleAlert ID.fi',
                 description: 'The Sovereign Identity & Prediction Market Suite',
                 url: 'https://humanidfi.com',
-                icons: ['/official-whale-legendary.png'],
+                icons: ['https://humanidfi.com/official-whale-legendary.png'],
             }
         }),
         coinbaseWallet({ 

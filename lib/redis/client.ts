@@ -17,19 +17,39 @@ const memoryStore = new Map<string, any>();
 function createMockRedis(name?: string) {
     return {
         on: () => {},
-        get: async (k: string) => memoryStore.get(k) || null,
+        get: async (k: string) => memoryStore.get(k) ?? null,
         set: async (k: string, v: any) => { memoryStore.set(k, v); return 'OK'; },
-        setex: async (k: string, s: number, v: any) => { 
-            memoryStore.set(k, v); 
+        setex: async (k: string, s: number, v: any) => {
+            memoryStore.set(k, v);
             setTimeout(() => memoryStore.delete(k), s * 1000);
-            return 'OK'; 
+            return 'OK';
         },
-        del: async (k: string) => { 
-            const r = memoryStore.has(k) ? 1 : 0; 
-            memoryStore.delete(k); 
-            return r; 
+        del: async (k: string) => {
+            const r = memoryStore.has(k) ? 1 : 0;
+            memoryStore.delete(k);
+            return r;
         },
-        psubscribe: async () => {}, // [STUB] Crash-proof fallback
+        // ── Set operations (used by feature-flag index) ──────────────────────
+        sadd: async (k: string, ...members: string[]) => {
+            const set: Set<string> = memoryStore.get(k) || new Set();
+            let added = 0;
+            for (const m of members) { if (!set.has(m)) { set.add(m); added++; } }
+            memoryStore.set(k, set);
+            return added;
+        },
+        srem: async (k: string, ...members: string[]) => {
+            const set: Set<string> = memoryStore.get(k) || new Set();
+            let removed = 0;
+            for (const m of members) { if (set.delete(m)) removed++; }
+            memoryStore.set(k, set);
+            return removed;
+        },
+        smembers: async (k: string) => {
+            const set: Set<string> = memoryStore.get(k) || new Set();
+            return Array.from(set);
+        },
+        // ────────────────────────────────────────────────────────────────────
+        psubscribe: async () => {},
         punsubscribe: async () => {},
         subscribe: async () => {},
         unsubscribe: async () => {},
@@ -169,10 +189,7 @@ export async function safeRedisSet(key: string, value: string, ...args: any[]): 
 export async function safeRedisSAdd(key: string, member: string): Promise<void> {
     try {
         if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
-            const current = memoryStore.get(key) || [];
-            if (!current.includes(member)) {
-                memoryStore.set(key, [...current, member]);
-            }
+            await (redisClient as any).sadd(key, member);
             return;
         }
         await Promise.race([
@@ -185,7 +202,7 @@ export async function safeRedisSAdd(key: string, member: string): Promise<void> 
 export async function safeRedisSMembers(key: string): Promise<string[]> {
     try {
         if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
-            return memoryStore.get(key) || [];
+            return await (redisClient as any).smembers(key);
         }
         const members = await Promise.race([
             redisClient.smembers(key),

@@ -9,6 +9,7 @@ interface QRScannerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onScan?: (data: string) => void;
+  address?: string;
 }
 
 // ─── css injected once into <head> so it never re-runs ───────────────────────
@@ -97,7 +98,6 @@ function ScanLine({ active }: { active: boolean }) {
         strokeLinecap="round"
         strokeDasharray={`${PERIMETER * 0.22} ${PERIMETER * 0.78}`}
         style={{
-          filter: 'drop-shadow(0 0 6px #22c55e)',
           animation: `qr-perimeter-scan 1.8s linear infinite`,
         }}
       />
@@ -121,7 +121,6 @@ function ScanLine({ active }: { active: boolean }) {
           strokeWidth={STROKE + 0.5}
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ filter: 'drop-shadow(0 0 4px #22c55ebb)' }}
         />
       ))}
 
@@ -197,7 +196,7 @@ function ScannedOverlay() {
           className="text-center space-y-0.5"
         >
           <p className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-600">
-            ¡ Scanned !
+            Scanned!
           </p>
           <p className="text-[9px] font-medium uppercase tracking-widest text-black/30">
             Syncing terminal…
@@ -209,19 +208,21 @@ function ScannedOverlay() {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerModalProps) {
+export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress }: QRScannerModalProps) {
   const { address } = useAccount();
 
-  const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
+  const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error' | 'signing'>('idle');
   const [errMsg, setErrMsg]   = useState('');
   const [tab, setTab]         = useState<'camera' | 'file'>('camera');
   const [fileLoading, setFileLoading] = useState(false);
 
   // ── Stable refs for callbacks — NEVER go into useEffect dep array ──────────
-  const addressRef  = useRef(address);
+  const addressRef  = useRef(address || externalAddress);
+  const extAddrRef  = useRef(externalAddress);
   const onCloseRef  = useRef(onClose);
   const onScanRef   = useRef(onScan);
-  useEffect(() => { addressRef.current = address; },  [address]);
+  useEffect(() => { addressRef.current = address || externalAddress; },  [address, externalAddress]);
+  useEffect(() => { extAddrRef.current = externalAddress; }, [externalAddress]);
   useEffect(() => { onCloseRef.current = onClose; },  [onClose]);
   useEffect(() => { onScanRef.current  = onScan;  },  [onScan]);
 
@@ -229,10 +230,16 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
   const scannerRef    = useRef<any>(null);
   const initTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitingRef  = useRef(false);
+  // CRITICAL LOCK: prevents handleSuccess from firing multiple times at 4fps
+  // html5-qrcode fires the success callback on every frame that contains a valid
+  // QR code. Without this guard, the user receives 3-4 signature prompts before
+  // destroyScanner() resolves asynchronously and stops the camera loop.
+  const hasScannedRef = useRef(false);
 
   // ─── Core cleanup ─────────────────────────────────────────────────────────
   const destroyScanner = useCallback(async () => {
     isInitingRef.current = false;
+    hasScannedRef.current = false; // reset so scanner can be reused after closing and reopening
     if (initTimerRef.current) {
       clearTimeout(initTimerRef.current);
       initTimerRef.current = null;
@@ -245,32 +252,156 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
 
   // ─── Successful scan handler ───────────────────────────────────────────────
   const handleSuccess = useCallback(async (decodedText: string) => {
+    // ATOMIC LOCK: first call wins, all subsequent calls from the camera loop are ignored
+    if (hasScannedRef.current) return;
+    hasScannedRef.current = true;
+
     await destroyScanner();
     setStatus('success');
 
-    const addr = addressRef.current;
-    try {
-      const url       = new URL(decodedText);
-      const sessionId = url.searchParams.get('session');
+    const addr = addressRef.current || extAddrRef.current ||
+      (() => {
+        // Cookie fallback — reads sovereign_handshake set after wallet sign
+        if (typeof document !== 'undefined') {
+          const m = document.cookie.match(/sovereign_handshake=(0x[a-fA-F0-9]{40})/i);
+          return m?.[1] ?? null;
+        }
+        return null;
+      })();
 
-      if (sessionId && addr) {
-        const res = await fetch(`/api/auth/qr-session?id=${sessionId}`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ address: addr }),
-        });
-        if (!res.ok) {
-          setErrMsg('Handshake fallido. Refresca el código QR en el PC.');
+    try {
+      // ── Step 1: Parse QR — support BOTH URL format (new) and JSON (legacy) ──
+      let uuid: string | null = null;
+      let ephemeralPub: string | null = null;
+      let isECDH = false;
+
+      // Try URL format first (new — native camera compatible)
+      try {
+        const url = new URL(decodedText);
+        uuid = url.searchParams.get('uuid');
+        const rawPub = url.searchParams.get('pub');
+        ephemeralPub = rawPub ? decodeURIComponent(rawPub) : null;
+        isECDH = url.searchParams.get('ecdh') === '1';
+
+        // Expiry check
+        const exp = url.searchParams.get('exp');
+        if (exp && Date.now() > parseInt(exp, 10)) {
+          setErrMsg('QR code expired. Refresh it on the desktop terminal.');
           setStatus('error');
+          hasScannedRef.current = false;
           return;
         }
-      } else if (!addr) {
-        setErrMsg('Conecta tu wallet antes de escanear.');
+      } catch {
+        // Not a URL — try legacy JSON format
+        try {
+          const parsed = JSON.parse(decodedText);
+          uuid = parsed.uuid ?? null;
+          ephemeralPub = parsed.ephemeralPub ?? null;
+          isECDH = parsed.isECDH ?? false;
+        } catch {
+          setErrMsg('QR code not recognized. Make sure you scan the Whale Alert Network desktop QR.');
+          setStatus('error');
+          hasScannedRef.current = false;
+          return;
+        }
+      }
+
+      if (!uuid || !ephemeralPub) {
+        setErrMsg('Invalid QR code: missing session data. Please refresh the desktop QR.');
         setStatus('error');
+        hasScannedRef.current = false;
         return;
       }
-    } catch {
-      // Non-handshake QR — pass through anyway
+
+      // ── Step 2: Generate mobile ephemeral keypair ──────────────────────────
+      const { generateX25519KeyPair, deriveSharedSecret, encryptAESGCM } = await import('@/lib/web-crypto');
+      const mobilePair = await generateX25519KeyPair();
+
+      // ── Step 3: Derive shared secret and get a JWT to encrypt ─────────────
+      // The JWT we send to the desktop proves mobile's identity.
+      // We derive sharedSecret = X25519(mobile.priv, desktop.pub)
+      // Desktop will decrypt using X25519(desktop.priv, mobile.pub) — same secret.
+      const shared = await deriveSharedSecret(mobilePair.privateKey, ephemeralPub, isECDH);
+
+      // Try to get JWT from human_session cookie via export-jwt first,
+      // then fall back to qr-mobile-link which mints a fresh one.
+      let jwt: string | null = null;
+      let useServerMint = false;
+
+      try {
+        const exportRes = await fetch('/api/auth/export-jwt', { credentials: 'include' });
+        if (exportRes.ok) {
+          const exportData = await exportRes.json();
+          jwt = exportData.jwt ?? null;
+        }
+      } catch {
+        // Network error — fall through to server mint
+      }
+
+      if (!jwt) {
+        // Mobile doesn't have human_session yet (first-time QR scan).
+        // Use qr-mobile-link which mints from sovereign_handshake cookie.
+        useServerMint = true;
+      }
+
+      // ── Step 4: Encrypt the JWT (if we have one) ──────────────────────────
+      // If we're using server-mint mode, qr-mobile-link handles encryption
+      // server-side AND stores in Redis in one shot. We skip client encryption.
+      let encryptedPayload: string;
+      let iv: string;
+      let tag: string | null = null;
+
+      if (!useServerMint && jwt) {
+        const encrypted = await encryptAESGCM(shared, jwt);
+        encryptedPayload = encrypted.encryptedPayload;
+        iv = encrypted.iv;
+        tag = encrypted.tag;
+      } else {
+        // Placeholder values — qr-mobile-link will create the real ones server-side
+        encryptedPayload = 'server-minted';
+        iv = 'server-minted';
+      }
+
+      // ── Step 5: POST to backend to complete the handshake ─────────────────
+      const endpoint = '/api/auth/qr-mobile-link';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uuid,
+          encryptedPayload,
+          iv,
+          tag,
+          mobilePub: mobilePair.publicKey,
+        }),
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        const errText = errBody.error || 'Handshake failed';
+
+        if (res.status === 401) {
+          setErrMsg('Wallet not connected. Connect your wallet first, then scan the QR code.');
+        } else {
+          setErrMsg(`${errText}. Refresh the QR on your desktop and try again.`);
+        }
+        setStatus('error');
+        hasScannedRef.current = false;
+        return;
+      }
+
+      // If server minted, also set human_session locally from the response cookie
+      // (browser will auto-store it since fetch with credentials:include handles cookies)
+
+      setStatus('success');
+
+    } catch (e: any) {
+      console.error('[QRScanner] Unexpected error:', e);
+      setErrMsg('An unexpected error occurred. Please try again.');
+      setStatus('error');
+      hasScannedRef.current = false;
+      return;
     }
 
     onScanRef.current?.(decodedText);
@@ -282,34 +413,95 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
     if (isInitingRef.current || scannerRef.current) return;
     isInitingRef.current = true;
 
+    // ── CRITICAL iOS FIX: Explicit getUserMedia permission request ────────────
+    // iOS Safari and WKWebView (MetaMask/Coinbase in-app browser) require an
+    // explicit getUserMedia call BEFORE html5-qrcode.start() — otherwise the
+    // camera access prompt never appears and the scanner silently fails.
+    // This also warms up the camera stream, reducing startup latency on Android.
+    let permissionGranted = false;
+    let warmStream: MediaStream | null = null;
     try {
-      const { Html5Qrcode } = await import('html5-qrcode');
-      const scanner = new Html5Qrcode('qr-reader');
-      scannerRef.current = scanner;
+      warmStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' }, // Rear camera preferred
+          width:  { ideal: 1280 },
+          height: { ideal: 720  },
+        },
+        audio: false,
+      });
+      permissionGranted = true;
+      // Keep the stream alive but stop tracks — html5-qrcode will open its own
+      warmStream.getTracks().forEach(t => t.stop());
+      warmStream = null;
+    } catch (permErr: any) {
+      isInitingRef.current = false;
+      if (permErr?.name === 'NotAllowedError' || permErr?.name === 'PermissionDeniedError') {
+        setErrMsg('Camera permission denied. Please allow camera access in your browser settings and try again.');
+      } else if (permErr?.name === 'NotFoundError') {
+        setErrMsg('No camera found on this device. Use the Gallery tab to upload a QR image.');
+      } else {
+        setErrMsg('Unable to access camera. Try the Gallery tab to upload a QR screenshot.');
+      }
+      setStatus('error');
+      return;
+    }
 
-      await scanner.start(
-        { facingMode: "environment" },
-        { fps: 15 }, // omitted qrbox config parses full frame at maximum performance
-        (text: string) => { handleSuccess(text); },
-        (_err: unknown) => { /* frame errors ignored */ }
-      );
+    // ── Start html5-qrcode with optimal settings ──────────────────────────────
+    let attempts = 0;
+    const MAX_ATTEMPTS = 3;
 
-      setStatus('scanning');
-    } catch {
+    const tryStart = async (facingMode: 'environment' | 'user'): Promise<boolean> => {
       try {
-        if (scannerRef.current) {
-          await scannerRef.current.start(
-            { facingMode: "user" },
-            { fps: 15 },
-            (text: string) => { handleSuccess(text); },
-            (_err: unknown) => {}
-          );
-          setStatus('scanning');
-          return;
-        }
-      } catch (e2) {}
+        const { Html5Qrcode } = await import('html5-qrcode');
+        // Ensure the container DOM node exists before starting
+        const container = document.getElementById('qr-reader');
+        if (!container) return false;
 
-      setErrMsg('Permiso de cámara requerido para el Sovereign Sync.');
+        const scanner = new Html5Qrcode('qr-reader');
+        scannerRef.current = scanner;
+
+        await scanner.start(
+          {
+            facingMode,
+          },
+          {
+            fps: 8,               // Higher fps for faster detection on modern phones
+            qrbox: { width: 240, height: 240 }, // Fixed viewfinder — matches ScanLine SVG
+            aspectRatio: 1.0,
+            disableFlip: false,   // Allow mirrored QR codes (some screens invert)
+            formatsToSupport: [0], // QR_CODE only — faster than scanning all barcode types
+          } as any,
+          (text: string) => { handleSuccess(text); },
+          (_err: unknown) => { /* per-frame decode errors are expected and ignored */ }
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    // Attempt 1: rear camera (environment)
+    let started = await tryStart('environment');
+
+    // Attempt 2: front camera fallback (user)
+    if (!started) {
+      if (scannerRef.current) {
+        try { await scannerRef.current.clear(); } catch {}
+        scannerRef.current = null;
+      }
+      started = await tryStart('user');
+    }
+
+    if (started) {
+      setStatus('scanning');
+      isInitingRef.current = false;
+    } else {
+      // Both camera modes failed — last resort: show error
+      if (scannerRef.current) {
+        try { await scannerRef.current.clear(); } catch {}
+        scannerRef.current = null;
+      }
+      setErrMsg('Could not start camera. Try the Gallery tab to upload a QR screenshot instead.');
       setStatus('error');
       isInitingRef.current = false;
     }
@@ -363,7 +555,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
       const decoded = await scanFileForQR(file);
       await handleSuccess(decoded);
     } catch {
-      setErrMsg('No se detectó un código QR válido en la imagen.');
+      setErrMsg('No valid QR code detected in the image.');
       setStatus('error');
     } finally {
       setFileLoading(false);
@@ -388,13 +580,13 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6]/96 backdrop-blur-2xl overflow-y-auto py-10"
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6] overflow-y-auto py-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]"
         >
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 p-3 rounded-full bg-black/5 hover:bg-black/10 text-black/60 transition-all z-50 border border-black/10"
-            aria-label="Cerrar scanner"
+            className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 p-3 rounded-full bg-black/5 hover:bg-black/10 text-black/60 transition-all z-50 border border-black/10"
+            aria-label="Close scanner"
           >
             <X size={22} />
           </button>
@@ -424,7 +616,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                     : 'bg-white text-black/40 border-black/10 hover:border-black/20'
                 }`}
               >
-                <Camera size={13} /> Cámara
+                <Camera size={13} /> Camera
               </button>
               <button
                 onClick={() => setTab('file')}
@@ -434,7 +626,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                     : 'bg-white text-black/40 border-black/10 hover:border-black/20'
                 }`}
               >
-                <Upload size={13} /> Galería
+                <Upload size={13} /> Gallery
               </button>
             </div>
 
@@ -445,11 +637,10 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
               {tab === 'camera' && (
                 <>
                   <div className="relative w-full h-[320px] rounded-[20px] overflow-hidden bg-black flex items-center justify-center shadow-inner">
-                    {/* The html5-qrcode library injects the video here */}
-                    <div
+                      <div
                       id="qr-reader"
                       className="absolute inset-0 w-full h-full"
-                      style={{ display: status === 'error' || status === 'success' ? 'none' : 'block' }}
+                      style={{ display: status === 'error' || status === 'success' || status === 'signing' ? 'none' : 'block' }}
                     />
 
                     {/* Animated perimeter scan line — perfectly centered now */}
@@ -460,7 +651,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-10">
                         <Loader2 size={28} className="animate-spin text-white/40 mb-3" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-white/50">
-                          Iniciando cámara…
+                          Initializing camera...
                         </span>
                       </div>
                     )}
@@ -482,7 +673,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                         onClick={handleRetry}
                         className="text-[9px] font-black uppercase tracking-[0.2em] px-5 py-2.5 bg-black text-white rounded-full mx-auto mt-2 hover:bg-black/80 transition-colors"
                       >
-                        Reintentar
+                        Retry
                       </button>
                     </div>
                   )}
@@ -497,19 +688,19 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                   </div>
                   <div className="text-center space-y-1">
                     <p className="text-[12px] font-black uppercase tracking-widest text-[#050505]">
-                      Subir imagen QR
+                      Upload QR Image
                     </p>
                     <p className="text-[10px] text-black/40 font-medium leading-relaxed max-w-[200px]">
-                      Selecciona una captura de pantalla del código QR del terminal PC.
+                      Select a screenshot of the QR code from your desktop terminal.
                     </p>
                   </div>
 
                   <label className="relative cursor-pointer">
                     <span className="flex items-center gap-2 px-6 py-3 bg-[#050505] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-colors">
                       {fileLoading ? (
-                        <><Loader2 size={13} className="animate-spin" /> Procesando…</>
+                        <><Loader2 size={13} className="animate-spin" /> Processing...</>
                       ) : (
-                        <><Upload size={13} /> Seleccionar Imagen</>
+                        <><Upload size={13} /> Select Image</>
                       )}
                     </span>
                     <input
@@ -549,8 +740,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
             <div className="mt-6 text-center space-y-1">
               <p className="text-[11px] text-[#050505]/50 leading-relaxed font-semibold max-w-[280px]">
                 {tab === 'camera'
-                  ? 'Apunta la cámara al QR mostrado en el terminal PC para sincronizar al instante.'
-                  : 'Haz una captura del QR en el PC y súbela aquí si la cámara no está disponible.'}
+                  ? 'Point your camera at the QR code shown on the desktop terminal to sync instantly.'
+                  : 'Take a screenshot of the QR on your PC and upload it here if the camera is unavailable.'}
               </p>
             </div>
           </motion.div>

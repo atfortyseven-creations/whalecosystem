@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ethereumResilientProvider, baseResilientProvider } from '@/lib/blockchain/ResilientProvider';
 import { ethers } from 'ethers';
 
-export const revalidate = 300; // Cache for 5 minutes
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {

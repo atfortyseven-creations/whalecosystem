@@ -151,11 +151,11 @@ export async function sendWelcomeEmail(email: string, name?: string): Promise<vo
                   <tr>
                     <td style="padding: 60px;">
                       <h2 style="font-family: 'Martel', serif; font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0 0 30px;">
-                        Bienvenido a <span style="font-style: italic;">Whale Alert Network</span>.
+                        Welcome to <span style="font-style: italic;">Whale Alert Network</span>.
                       </h2>
                       
                       <p style="font-size: 16px; line-height: 1.8; margin-bottom: 30px; font-weight: 500;">
-                        Has sido integrado exitosamente en el flujo de inteligencia on-chain más avanzado del planeta. Tu terminal ha sido validada y ahora formas parte de la élite que monitoriza la liquidez soberana del sistema financiero descentralizado.
+                        You have been successfully integrated into the most advanced on-chain intelligence stream on the planet. Your terminal has been validated, and you are now part of the elite monitoring the sovereign liquidity of the decentralized financial system.
                       </p>
 
                       <div style="background-color: #1D1A10; color: #B6EA26; padding: 30px; font-family: 'Roboto Mono', monospace; font-size: 12px; margin-bottom: 40px; border-left: 4px solid #D125C7;">
@@ -163,13 +163,13 @@ export async function sendWelcomeEmail(email: string, name?: string): Promise<vo
                           STATUS: PRE-LAUNCH PREPARATION // CODE: ARCHANGEL
                         </div>
                         <p style="margin: 0; line-height: 1.6;">
-                          Nuestro equipo de ingeniería está finalizando la inmersión total de los sensores. Estamos peer-eando directamente con los validadores de L1 y L2 en Frankfurt y New York para garantizar que recibas la telemetría del mempool en menos de 14ms. <br/><br/>
-                          La fase final de "Archive Doctrine" ha comenzado. Estamos depurando cada micra de código para que tu interfaz con la red sea descabelladamente legendaria.
+                          Our engineering team is finalizing the total immersion of the sensors. We are peering directly with L1 and L2 validators in Frankfurt and New York to ensure you receive mempool telemetry in under 14ms. <br/><br/>
+                          The final phase of the "Archive Doctrine" has commenced. We are debugging every micrometer of code so that your interface with the network is outrageously legendary.
                         </p>
                       </div>
 
                       <p style="font-size: 14px; line-height: 1.6; color: rgba(29, 26, 16, 0.6); margin-bottom: 40px;">
-                        Pronto recibirás las credenciales de acceso para el Forensic Stream V1. Prepárate para la soberanía absoluta de tus datos.
+                        You will soon receive access credentials for the Forensic Stream V1. Prepare for absolute data sovereignty.
                       </p>
 
                       <!-- Action CTA -->

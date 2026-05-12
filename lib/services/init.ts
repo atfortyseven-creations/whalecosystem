@@ -10,7 +10,7 @@ export function initializeBackgroundServices() {
     if (typeof window !== 'undefined') return; // Server-only
     if (process.env.NODE_ENV === 'test') return;
     
-    if (!isDispatcherStarted && global.globalRedisClient) {
+    if (!isDispatcherStarted && (global as any).globalRedisClient) {
         // Run asynchronously
         dispatcher.start().catch(err => {
             console.error('Failed to start Megalodon Dispatcher:', err);

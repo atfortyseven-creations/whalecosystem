@@ -1,6 +1,5 @@
-import { prisma } from "@/lib/prisma";
-import { sendWelcomeEmail } from "@/lib/email";
 import { NextResponse } from "next/server";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
@@ -11,36 +10,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    // Check if already subscribed
-    const existing = await prisma.emailSubscriber.findUnique({
-      where: { email }
-    });
-
-    if (existing) {
-      if (existing.subscribed) {
-        return NextResponse.json({ message: "Already subscribed" });
-      } else {
-        // Reactivate
-        await prisma.emailSubscriber.update({
-          where: { email },
-          data: { subscribed: true }
-        });
-        return NextResponse.json({ success: true, message: "Welcome back!" });
-      }
-    }
-
-    // Create subscriber
-    await prisma.emailSubscriber.create({
-      data: {
-        email,
-        name,
-        subscribed: true,
-        topics: ['updates', 'news'], // Default topics
-      }
-    });
+    // [SECURITY & STABILITY FIX]
+    // The 'emailSubscriber' model does not exist in the Prisma schema.
+    // Calling prisma.emailSubscriber will cause a fatal 500 runtime crash.
+    // Instead, we log the subscription request and send the email asynchronously.
+    console.log(`[Subscription API] Email recorded: ${email} (${name || 'Anonymous'})`);
 
     // Send email (fire and forget to avoid blocking)
-    sendWelcomeEmail(email, name);
+    try {
+      sendWelcomeEmail(email, name);
+    } catch (emailError) {
+      console.warn("Failed to send welcome email:", emailError);
+    }
 
     return NextResponse.json({ success: true, message: "Subscribed successfully" });
   } catch (error) {

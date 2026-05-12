@@ -9,12 +9,13 @@ const Star = ({ speed, color }: { speed: number; color: string }) => {
   
   // Create a hyperdrive "streak" look
   const item = useMemo(() => {
-    const angle = Math.random() * Math.PI * 2;
-    const radius = Math.random() * 500 + 50; // Don't start too close to center
+    const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+    const angle = secureRandom() * Math.PI * 2;
+    const radius = secureRandom() * 500 + 50; // Don't start too close to center
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
-    const z = Math.random() * -2000; // Start far away
-    return { x, y, z, angle };
+    const z = secureRandom() * -2000; // Start far away
+    return { x, y, z, angle, secureRandom };
   }, []);
 
   useFrame((state, delta) => {
@@ -29,7 +30,7 @@ const Star = ({ speed, color }: { speed: number; color: string }) => {
     if (mesh.current.position.z > 500) {
       mesh.current.position.z = -1500;
       // Reset x/y to initial radius to prevent flying out too far over time
-      const radius = Math.random() * 500 + 50;
+      const radius = item.secureRandom() * 500 + 50;
       mesh.current.position.x = Math.cos(item.angle) * radius;
       mesh.current.position.y = Math.sin(item.angle) * radius;
     }
@@ -54,9 +55,10 @@ const Star = ({ speed, color }: { speed: number; color: string }) => {
 const StarfieldScene = () => {
   const starsCount = 800;
   const stars = useMemo(() => {
+    const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
     return Array.from({ length: starsCount }).map((_, i) => ({
       id: i,
-      speed: Math.random() * 0.8 + 0.2,
+      speed: secureRandom() * 0.8 + 0.2,
       color: i % 10 === 0 ? '#60a5fa' : '#ffffff', // Subtle blue hints
     }));
   }, []);

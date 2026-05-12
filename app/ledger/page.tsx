@@ -36,6 +36,8 @@ export default function LedgerPage() {
                     hash: b.hash,
                     timestamp: new Date(Number(b.timestamp) * 1000).toISOString(),
                     size: `${(Number(b.size) / 1024 / 1024).toFixed(3)} MB`,
+                    txCount: b.transactions.length,
+                    gasUsedPct: b.gasLimit > 0n ? Number((b.gasUsed * 10000n) / b.gasLimit) / 100 : 0,
                     status: "VERIFIED",
                 });
             }
@@ -57,6 +59,8 @@ export default function LedgerPage() {
                         hash: block.hash,
                         timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
                         size: `${(Number(block.size) / 1024 / 1024).toFixed(3)} MB`,
+                        txCount: block.transactions.length,
+                        gasUsedPct: block.gasLimit > 0n ? Number((block.gasUsed * 10000n) / block.gasLimit) / 100 : 0,
                         status: "VERIFIED",
                     };
                     if (prev.find(b => b.hash === newBlock.hash)) return prev;
@@ -128,6 +132,8 @@ export default function LedgerPage() {
                                 <tr className="border-b border-black/[0.05] bg-[#FAFAFA]">
                                     <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40">Block No.</th>
                                     <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40">Cryptographic Hash</th>
+                                    <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40 text-right">Txns</th>
+                                    <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40 text-right">Gas Consumed</th>
                                     <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40">Entropy</th>
                                     <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40 whitespace-nowrap">Condition</th>
                                 </tr>
@@ -161,6 +167,19 @@ export default function LedgerPage() {
                                                 >
                                                     <Copy size={12}/>
                                                 </button>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5 align-middle border-r border-black/[0.02]">
+                                            <div className="text-[11px] font-mono flex items-center justify-end gap-2 text-[#111]">
+                                                {row.txCount}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5 align-middle border-r border-black/[0.02]">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <div className="text-[11px] font-mono font-bold text-[#111]">{row.gasUsedPct.toFixed(2)}%</div>
+                                                <div className="w-12 h-1 bg-black/5 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-black/30" style={{ width: `${Math.min(row.gasUsedPct, 100)}%` }} />
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 align-middle border-r border-black/[0.02]">

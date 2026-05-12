@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { ethers } from "ethers";
+import { getPriceCached } from '@/lib/price-cache';
 
 // Force dynamic execution for SSE
 export const dynamic = 'force-dynamic';
@@ -32,18 +33,16 @@ export async function GET(req: NextRequest) {
                 let txCount = 0;
                 let ethPriceUSD = 3000; // Fallback
                 
-                // Fetch real ETH price background task
+                // Fetch real ETH price background task using centralized cache
                 const updateEthPrice = async () => {
                     try {
-                        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-                        const data = await res.json();
-                        if (data.ethereum?.usd) ethPriceUSD = data.ethereum.usd;
+                        ethPriceUSD = await getPriceCached('ethereum', 'ETH');
                     } catch (e) {
                         console.error("Failed to fetch ETH price", e);
                     }
                 };
                 updateEthPrice();
-                setInterval(updateEthPrice, 60000); // Update every minute
+                const priceInterval = setInterval(updateEthPrice, 60000); // Update every minute
                 
                 provider.on("pending", async (txHash) => {
                     txCount++;
@@ -107,6 +106,7 @@ export async function GET(req: NextRequest) {
 
                 req.signal.addEventListener("abort", () => {
                     clearInterval(pingInterval);
+                    clearInterval(priceInterval); // Fix memory leak
                     provider.removeAllListeners();
                     provider.destroy();
                 });

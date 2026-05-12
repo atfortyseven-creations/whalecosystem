@@ -13,38 +13,34 @@ export async function POST(req: NextRequest) {
 
     // ─── INSTITUTIONAL AUTHENTICATION RESOLUTION ─────────────────────────────
     const hasHandshakeCookie = req.cookies.get('sovereign_handshake')?.value;
-    
+    let rawUserId = walletAddress || hasHandshakeCookie || (session as any)?.user?.email;
+    let userId = rawUserId ? rawUserId.toLowerCase() : undefined;
+
     if (signature && message && walletAddress) {
       try {
-        const isValid = await verifyMessage({
-            address: walletAddress as `0x${string}`,
-            message: message,
-            signature: signature as `0x${string}`
-        });
+            const isValid = await verifyMessage({
+                address: walletAddress as `0x${string}`,
+                message: message,
+                signature: signature as `0x${string}`
+            });
 
-        if (!isValid) {
-            console.error(`[Security:Handshake] Verification FAILED for ${walletAddress}`);
-            return NextResponse.json({ error: 'Identity verification failed: Signature mismatch.' }, { status: 401 });
-        }
-        
-        console.log(`[Security:Handshake] Identity verified via ECDSA for ${walletAddress}`);
-      } catch (e: any) {
-        console.error(`[Security:Handshake:Error]`, e.message);
-        return NextResponse.json({ error: 'Indentity verification error: Invalid payload.' }, { status: 400 });
-      }
-    } else if (!session?.user?.email && !hasHandshakeCookie) {
+            if (!isValid) {
+                console.error(`[Security:Handshake] Verification FAILED for ${walletAddress}`);
+                return NextResponse.json({ error: 'Identity verification failed: Signature mismatch.' }, { status: 401 });
+            }
+            
+            console.log(`[Security:Handshake] Identity verified via ECDSA for ${walletAddress}`);
+          } catch (e: any) {
+            console.error(`[Security:Handshake:Error]`, e.message);
+            return NextResponse.json({ error: 'Indentity verification error: Invalid payload.' }, { status: 400 });
+          }
+    } else if (!(session as any)?.user?.email && !hasHandshakeCookie) {
       // If no signature/message AND no session AND no handshake cookie, we reject.
       return NextResponse.json({ error: 'Unauthorized: Cryptographic Handshake required.' }, { status: 401 });
     }
 
-    let userId = walletAddress || hasHandshakeCookie || session?.user?.email;
-
     if (!userId) {
         return NextResponse.json({ error: 'Unauthorized: No identity resolved.' }, { status: 401 });
-    }
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized: No wallet or session found' }, { status: 401 });
     }
 
     // Ensure User exists in DB for foreign key constraints
@@ -70,10 +66,57 @@ export async function POST(req: NextRequest) {
         result = await cashier.syncUserBalance(userId, userId);
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
         success: true,
         ...(result || {})
     });
+
+    const kycStatus = 'UNVERIFIED';
+
+    // ── Mint Sovereign JWT (human_session) ───────────────────────────────────
+    try {
+        const { mintJWT } = await import('@/lib/jwt');
+        const sessionToken = await mintJWT({
+            sub: userId,
+            address: userId,
+            clearance: 'SOVEREIGN',
+            tier: existingUser?.tier || 'FREE',
+            kycStatus: kycStatus,
+            humanityScore: existingUser?.humanityScore || 0,
+            issuedAt: new Date().toISOString()
+        });
+
+        response.cookies.set('human_session', sessionToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 604800, // 7 days
+        });
+
+        // Cache tier in Redis for 10 min (Edge Middleware Rate Limiting)
+        const { safeRedisSet } = await import('@/lib/redis/client');
+        await safeRedisSet(`tier:${userId}`, JSON.stringify({
+            tier: existingUser?.tier || 'FREE',
+            kycStatus: kycStatus,
+            humanityScore: existingUser?.humanityScore || 0
+        }), 'EX', 600);
+
+    } catch (jwtErr) {
+        console.error('[WalletSync] Failed to mint human_session:', jwtErr);
+    }
+
+    // Clean backend architecture: issue the identity cookie directly from the server
+    // after cryptographic verification, reducing client-side trust.
+    response.cookies.set('sovereign_handshake', userId, {
+        path: '/',
+        maxAge: 604800, // 7 days
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false // false so the frontend can read it if needed, but issued by backend
+    });
+
+    return response;
 
   } catch (error: any) {
     console.error('Wallet Sync Error:', error);

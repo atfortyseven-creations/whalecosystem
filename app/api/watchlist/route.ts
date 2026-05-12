@@ -1,28 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 export const dynamic = 'force-dynamic';
 
-// ── Helper: resolve user by wallet address from request header ──────────────
-// The client sends the connected wallet in the x-wallet-address header.
-// We upsert on walletAddress so each wallet has its own persistent watchlist.
-async function resolveUser(req: Request): Promise<string | null> {
-    const walletAddress = req.headers.get('x-wallet-address')?.toLowerCase().trim();
+async function resolveUser(req: NextRequest): Promise<string | null> {
+    const validation = await validateSecureRequest(req);
+    const authWallet = (validation.valid && validation.userId) ? validation.userId : null;
 
-    if (walletAddress && walletAddress.startsWith('0x') && walletAddress.length >= 42) {
+    if (authWallet) {
         const user = await prisma.user.upsert({
-            where: { walletAddress },
+            where: { walletAddress: authWallet },
             update: {},
-            create: { walletAddress }
+            create: { walletAddress: authWallet }
         });
         return user.id;
     }
 
-    // No wallet header — return null; caller decides how to handle
     return null;
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
     try {
         const userId = await resolveUser(req);
         if (!userId) {
@@ -41,7 +39,7 @@ export async function GET(req: Request) {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { symbol, chain } = body;
@@ -54,6 +52,9 @@ export async function POST(req: Request) {
         if (!userId) {
             return NextResponse.json({ success: false, error: 'Wallet not connected' }, { status: 401 });
         }
+
+        const count = await prisma.watchlist.count({ where: { userId } });
+        if (count >= 100) return NextResponse.json({ success: false, error: 'Limit reached (100 tokens max)' }, { status: 403 });
 
         const added = await prisma.watchlist.create({
             data: {
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
     }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
     try {
         const { searchParams } = new URL(req.url);
         const symbol = searchParams.get('symbol');

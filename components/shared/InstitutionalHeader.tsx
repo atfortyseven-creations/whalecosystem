@@ -2,55 +2,72 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { SystemsUtilityHeader } from './SystemsUtilityHeader';
 import Image from 'next/image';
 import { SplashContainer } from '@/components/shared/SplashContainer';
 
-type NavGroup = {
-    label: string;
-    links: { href: string; label: string; desc: string; activePathMatch?: string }[];
-};
+const MENU_ITEMS = [
+  { label: "Home", href: "/" },
+  { label: "Blockchain", href: "#", subItems: [{ label: "Portfolio", description: "Track and manage your on-chain assets.", href: "/portfolio" }] },
+  { label: "Forum", href: "/forum" },
+  { label: "Ecosystem", href: "#", subItems: [{ label: "News", description: "Global intel.", href: "/news" }, { label: "Academy", description: "Learn.", href: "/academy" }, { label: "Careers", description: "Join us.", href: "/careers" }] },
+  { label: "Pricing", href: "/pricing" }
+];
+
+function MegaMenuItem({ item }: { item: any }) {
+  const [isHovered, setIsHovered] = useState(false);
+  return (
+    <div 
+      className="relative group h-full flex items-center"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <Link
+        href={item.href}
+        className="font-mono text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-black/5"
+        style={{ color: "rgba(10,10,10,0.85)" }}
+        onMouseEnter={e => (e.currentTarget.style.color = "rgba(10,10,10,1)")}
+        onMouseLeave={e => (e.currentTarget.style.color = "rgba(10,10,10,0.85)")}
+      >
+        <span>{item.label}</span>
+        {item.subItems && <span className="opacity-40 text-[7px] mt-[1px]">▼</span>}
+      </Link>
+      
+      <AnimatePresence>
+        {isHovered && (item.subItems || item.description) && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-[100%] left-0 w-[240px] bg-white border border-black/10 shadow-2xl z-50 p-1 rounded-sm mt-1"
+          >
+            {item.subItems ? (
+              <div className="flex flex-col">
+                {item.subItems.map((sub: any, idx: number) => (
+                  <Link key={idx} href={sub.href} className="flex flex-col p-3 hover:bg-black/5 transition-colors rounded-sm">
+                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">{sub.label}</span>
+                    <span className="font-sans text-[11px] text-[#555] leading-tight mt-1 opacity-80">{sub.description}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Link href={item.href} className="block p-3 hover:bg-black/5 transition-colors rounded-sm">
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] block mb-1">{item.label}</span>
+                <span className="font-sans text-[11px] text-[#555] leading-tight opacity-80">{item.description}</span>
+              </Link>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export function InstitutionalHeader() {
-    const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const navGroups: NavGroup[] = [
-        {
-            label: "Home",
-            links: [
-                { href: '/dashboard', label: 'Dashboard', desc: 'General portfolio overview and balances.' }
-                // { href: '/voss-supremacy', label: 'Sniper Trading', desc: 'Automated high-speed execution tools.' }
-            ]
-        },
-        {
-            label: "Analytics",
-            links: [
-                { href: '/sovereign-intel', label: 'Intelligence', desc: 'On-chain analytics and graphing.' },
-                { href: '/ledger', label: 'Transaction History', desc: 'Complete history of all wallet actions.' },
-                // { href: '/predictions', label: 'Polymarket', desc: 'Decentralized prediction markets.' },
-                { href: '/news', label: 'Global News', desc: 'Curated market and crypto news.' }
-            ]
-        },
-        {
-            label: "Assets",
-            links: [
-                { href: '/portfolio', label: 'Cold Wallet', desc: 'Secure long-term asset storage.' }
-                // { href: '/gold-registry', label: 'Identity Credentials', desc: 'Your verified ID and access passes.' }
-            ]
-        },
-        {
-            label: "Ecosystem",
-            links: [
-                { href: '/academy', label: 'Academy', desc: 'Educational courses and articles.' },
-                { href: '/developer', label: 'Developers', desc: 'API links and system architecture.' },
-                { href: '/support', label: 'Support', desc: 'Help center and system status.' }
-            ]
-        }
-    ];
 
     return (
         <header
@@ -80,60 +97,19 @@ export function InstitutionalHeader() {
                             />
                         </SplashContainer>
                     </motion.div>
-                    <div className="flex flex-col leading-none text-[#050505]">
+                    <div className="flex flex-col leading-none text-[#050505] justify-center">
                         <span className="font-aztec-serif text-[18px] font-black uppercase tracking-tighter leading-none">
                             Whale Alert Network
                         </span>
-                        <span className="font-mono text-[7px] font-bold uppercase tracking-[0.4em] mt-0.5" style={{ color: 'rgba(5,5,5,0.4)' }}>
-                            Terminal
-                        </span>
                     </div>
                 </Link>
+            </div>
 
-                {/* Vertical divider */}
-                <div className="hidden lg:block h-8 w-px" style={{ backgroundColor: 'rgba(5,5,5,0.08)' }} />
-
-                {/* ─── DESKTOP NAV ─── */}
-                <nav className="hidden xl:flex items-center gap-2">
-                    {navGroups.map((group) => (
-                        <div key={group.label} className="relative group/nav px-2 py-4 cursor-default">
-                             <div className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
-                                  style={{ color: 'rgba(5,5,5,0.5)' }}>
-                                 {group.label}
-                                 <ChevronDown size={12} className="opacity-50" />
-                             </div>
-                             
-                             {/* DROPDOWN MENU - Ivory Standard */}
-                             <div className="absolute top-full left-0 mt-0 opacity-0 translate-y-2 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto transition-all duration-300 z-50">
-                                 <div className="rounded-xl shadow-2xl flex flex-col p-2 backdrop-blur-3xl min-w-[340px]"
-                                      style={{ backgroundColor: 'rgba(250,249,246,0.95)', border: '1px solid rgba(5,5,5,0.08)' }}>
-                                     {group.links.map(link => {
-                                         const isActive = pathname === link.href;
-                                         return (
-                                             <Link 
-                                                 href={link.href} 
-                                                 key={link.label}
-                                                 className="flex flex-col gap-1 px-4 py-4 rounded-lg transition-all hover:scale-[1.01]"
-                                                 style={{ 
-                                                     backgroundColor: isActive ? 'rgba(5,5,5,0.03)' : 'transparent',
-                                                 }}
-                                                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(5,5,5,0.03)'}
-                                                 onMouseLeave={(e) => {
-                                                     if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-                                                 }}
-                                             >
-                                                 <span className="text-[12px] font-black uppercase tracking-widest text-[#050505]">
-                                                     {link.label}
-                                                 </span>
-                                                 <span className="text-[10px] font-medium leading-relaxed tracking-wide" style={{ color: 'rgba(5,5,5,0.45)' }}>
-                                                     {link.desc}
-                                                 </span>
-                                             </Link>
-                                         );
-                                     })}
-                                 </div>
-                             </div>
-                        </div>
+            {/* CENTER: Tronscan Inspired Navigation Menu */}
+            <div className="hidden lg:flex items-center justify-center absolute left-[50%] translate-x-[-50%] h-full z-20">
+                <nav className="flex items-center gap-1 h-full">
+                    {MENU_ITEMS.map((item, index) => (
+                        <MegaMenuItem key={index} item={item} />
                     ))}
                 </nav>
             </div>
@@ -165,41 +141,19 @@ export function InstitutionalHeader() {
                         className="absolute top-full left-0 right-0 z-[90] p-6 shadow-2xl"
                         style={{ backgroundColor: '#FAF9F6', borderBottom: '1px solid rgba(5,5,5,0.08)' }}
                     >
-                        <div className="grid grid-cols-1 gap-6 mb-5 pb-5" style={{ borderBottom: '1px solid rgba(5,5,5,0.08)' }}>
-                            {navGroups.map((group) => (
-                                <div key={group.label} className="flex flex-col gap-3">
-                                     <span className="text-[9px] font-black uppercase tracking-[0.3em] px-2" style={{ color: 'rgba(5,5,5,0.4)' }}>
-                                         {group.label}
-                                     </span>
-                                     <div className="flex flex-col gap-2">
-                                        {group.links.map(link => {
-                                             const isActive = pathname === link.href;
-                                             return (
-                                                 <Link
-                                                     key={link.href}
-                                                     href={link.href}
-                                                     onClick={() => setIsMenuOpen(false)}
-                                                     className="flex flex-col gap-1 px-4 py-3 rounded-xl transition-all border"
-                                                     style={{
-                                                         backgroundColor: isActive ? 'rgba(5,5,5,0.04)' : 'transparent',
-                                                         borderColor: isActive ? 'rgba(5,5,5,0.08)' : 'transparent',
-                                                     }}
-                                                 >
-                                                     <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">
-                                                         {link.label}
-                                                     </span>
-                                                     <span className="text-[9px] font-medium leading-relaxed" style={{ color: 'rgba(5,5,5,0.45)' }}>
-                                                         {link.desc}
-                                                     </span>
-                                                 </Link>
-                                             );
-                                        })}
-                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        <div className="flex flex-col items-center w-full">
+                        <div className="flex flex-col items-center w-full pt-2">
+                            <div className="w-full flex flex-col gap-2 mb-6 pb-6 border-b border-black/10">
+                                {MENU_ITEMS.map((item, index) => (
+                                    <Link 
+                                        key={index} 
+                                        href={item.href} 
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="font-mono text-[11px] font-black uppercase tracking-[0.2em] py-3 text-center text-[#050505] hover:bg-black/5 rounded-lg transition-colors"
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </div>
                             <SystemsUtilityHeader />
                         </div>
                     </motion.div>
