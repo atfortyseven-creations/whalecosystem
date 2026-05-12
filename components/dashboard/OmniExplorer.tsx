@@ -105,8 +105,7 @@ export function OmniExplorer() {
                 <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto pt-16 pb-12 gap-8">
                     <div className="text-center space-y-4 border-b border-[#E5E5E5] pb-8 w-full">
                         <div className="flex items-center justify-center gap-3 mb-2">
-                             <div className="w-1.5 h-4 bg-[#888888] rounded" />
-                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#888888]">OMNI-CHAIN LEDGER SEARCH</span>
+                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#888888]">TRANSACTION & ADDRESS SEARCH</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black uppercase tracking-[0.05em] text-[#050505] leading-none">
                             GLOBAL SEARCH

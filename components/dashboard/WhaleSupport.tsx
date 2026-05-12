@@ -109,10 +109,7 @@ export function WhaleSupport() {
                         Direct secure link to tactical maintenance architecture.
                     </p>
                 </div>
-                <div className="flex items-center gap-1.5 hidden md:flex">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#00C076]">Online</span>
-                </div>
+                <div className="flex items-center gap-1.5 hidden md:flex" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

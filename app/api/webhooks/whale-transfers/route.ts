@@ -58,7 +58,6 @@ export async function POST(req: Request) {
                 // Keep the last 100 cached for late-joiners
                 const cacheKey = 'latest_whale_alerts';
                 const cachedRaw = await redis.get(cacheKey);
-                const { safeJsonParse } = await import('@/lib/utils/json');
                 let cachedAlerts = safeJsonParse(cachedRaw, [], 'WHALE_WEBHOOK') as any[];
                 cachedAlerts.unshift(streamPayload);
                 if (cachedAlerts.length > 100) cachedAlerts = cachedAlerts.slice(0, 100);

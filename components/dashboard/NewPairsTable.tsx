@@ -110,8 +110,8 @@ export function NewPairsTable() {
                     <button onClick={() => refetch()} className="p-1.5 rounded-lg border border-[#E5E5E5] text-[#888888] hover:text-[#050505] transition-colors">
                         <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
                     </button>
-                    <span className="flex items-center gap-1.5 text-[9px] font-black tracking-widest uppercase" style={{ color: '#00C076' }}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${loading ? '' : 'animate-pulse'}`} style={{ background: '#00C076' }} /> LIVE · {lastRefresh.toTimeString().slice(0,8)}
+                    <span className="flex items-center gap-1.5 text-[9px] font-black tracking-widest uppercase" style={{ color: '#888888' }}>
+                        SECURE SYNC
                     </span>
                 </div>
             </div>

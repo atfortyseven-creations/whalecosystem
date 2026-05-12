@@ -330,7 +330,7 @@ export default function AztecMempoolSpace() {
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#388E3C] animate-pulse" />
-                            <span className="text-[9px] text-[#A0A0A0] font-bold uppercase tracking-widest">Syncing L1</span>
+                            <span className="text-[9px] text-[#A0A0A0] font-bold uppercase tracking-widest">Network Verification</span>
                         </div>
                     </div>
 

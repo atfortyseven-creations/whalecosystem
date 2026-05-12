@@ -83,8 +83,42 @@ export async function POST(req: Request) {
         
         console.log(`[Handshake:Success] OMEGA Sync verified for ${normalizedAddress} on token ${token.slice(0, 8)}...`);
         
-        // [PERFECTION] Set cookie for the mobile user so they transition to the news shell
+        // [PERFECTION] Mint and set secure JWT for the mobile user
+        const { mintJWT } = await import('@/lib/jwt');
+        const { prisma } = await import('@/lib/prisma');
+        
+        const user = await prisma.user.upsert({
+            where: { walletAddress: normalizedAddress },
+            update: { lastActive: new Date() },
+            create: {
+                walletAddress: normalizedAddress,
+                tier: 'INITIATE',
+                lastActive: new Date()
+            }
+        });
+
+        const jwt = await mintJWT({
+            sub: normalizedAddress,
+            address: normalizedAddress,
+            clearance: 'SOVEREIGN',
+            tier: user.tier || 'FREE',
+            kycStatus: 'UNVERIFIED',
+            humanityScore: user.humanityScore || 0,
+            iss: 'whale-alert-network',
+            source: 'qr-sync-handshake',
+            issuedAt: new Date().toISOString()
+        });
+
         const response = NextResponse.json({ status: 'queued' });
+        
+        response.cookies.set('human_session', jwt, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 604800,
+            path: '/',
+        });
+
         response.cookies.set('sovereign_handshake', normalizedAddress, {
             path: '/',
             maxAge: 604800,

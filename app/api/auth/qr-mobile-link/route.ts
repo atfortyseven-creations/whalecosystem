@@ -46,40 +46,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing encrypted payload fields' }, { status: 400 });
     }
 
-    // ── 2. Verify mobile identity from cookies ─────────────────────────
+    // ── 2. Verify mobile identity exclusively from secure JWT ───────────
     const humanSession = req.cookies.get('human_session')?.value;
-    const sovereignHandshake = req.cookies.get('sovereign_handshake')?.value;
 
-    if (process.env.NODE_ENV !== 'production') {
-        console.log(`[QR:Handshake] Inspecting session cookies. human_session: ${humanSession ? 'PRESENT' : 'MISSING'}, sovereign_handshake: ${sovereignHandshake || 'MISSING'}`);
+    if (!humanSession) {
+      console.error(`[QR:Handshake:FAILURE] No secure JWT found for UUID: ${uuid}. IP: ${req.headers.get('x-forwarded-for')}`);
+      return NextResponse.json(
+        { error: 'Session expired or unauthenticated. Please re-sign in your mobile wallet.' },
+        { status: 401 }
+      );
     }
 
     let walletAddress: string | null = null;
-
-    if (humanSession) {
-      try {
+    try {
         const { verifyJWT } = await import('@/lib/jwt');
         const payload = await verifyJWT(humanSession);
         walletAddress = (payload.sub as string) || (payload.address as string) || null;
-        if (walletAddress) console.log(`[QR:Handshake] Resolved wallet from human_session: ${walletAddress}`);
-      } catch (err: any) {
-        console.warn(`[QR:Handshake] human_session validation failed: ${err.message}`);
-      }
-    }
-
-    if (!walletAddress && sovereignHandshake) {
-      if (/^0x[a-fA-F0-9]{40}$/.test(sovereignHandshake)) {
-        walletAddress = sovereignHandshake.toLowerCase();
-        console.log(`[QR:Handshake] Resolved wallet from sovereign_handshake: ${walletAddress}`);
-      }
-    }
-
-    if (!walletAddress) {
-      console.error(`[QR:Handshake:FAILURE] No valid mobile session found for UUID: ${uuid}. IP: ${req.headers.get('x-forwarded-for')}`);
-      return NextResponse.json(
-        { error: 'Mobile session not found. Connect your wallet first.' },
-        { status: 401 }
-      );
+        if (walletAddress) {
+            console.log(`[QR:Handshake] Resolved wallet from secure session: ${walletAddress}`);
+        } else {
+            throw new Error('JWT payload missing address');
+        }
+    } catch (err: any) {
+        console.error(`[QR:Handshake] JWT validation failed: ${err.message}`);
+        return NextResponse.json({ error: 'Invalid security token' }, { status: 401 });
     }
 
     // ── 3. Mint a sovereign JWT for this wallet address ──────────────────
