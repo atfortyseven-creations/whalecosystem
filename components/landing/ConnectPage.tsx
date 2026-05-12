@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 // useRouter removed — mobile redirect was disabled; router no longer needed here
@@ -18,9 +19,16 @@ import {
   ExternalLink,
   Smartphone,
   Monitor,
+  ScanLine,
 } from "lucide-react";
 import { QRCodeSVG as QRCode } from "qrcode.react";
 import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
+
+// QR Scanner — iOS-safe dynamic import (same as MobileLanding)
+const DynamicQRScannerModal = dynamic(
+  () => import("@/components/wallet/QRScannerModal"),
+  { ssr: false }
+);
 
 // ─── Detect mobile/tablet via UA ─────────────────────────────────────────────
 function useIsMobile() {
@@ -130,6 +138,8 @@ export default function ConnectPage() {
   const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED" | "ERROR">("IDLE");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  // ── Mobile QR Scanner state (scan desktop QR from phone) ─────────────────
+  const [showMobileScanner, setShowMobileScanner] = useState(false);
 
   // ── Surface errors ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -398,10 +408,6 @@ export default function ConnectPage() {
     openAppKit();
   }, [openAppKit]);
 
-  const qrUrl = mounted && typeof window !== "undefined"
-    ? `${window.location.origin}/connect?session=${qrSession ?? ""}`
-    : "";
-
   return (
     <div
       className="min-h-screen w-full flex flex-col text-[#050505] font-mono overflow-auto selection:bg-[#050505] selection:text-[#FDFCF8]"
@@ -553,6 +559,31 @@ export default function ConnectPage() {
                        setLinked(false);
                     }} 
                   />
+
+                  {/* ── Mobile: Scan QR to link PC session ─────────────────── */}
+                  {isMobile && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3, duration: 0.4 }}
+                      className="mt-4 pt-4 border-t border-[#050505]/10 flex flex-col items-center gap-3"
+                    >
+                      <span className="text-[9px] font-mono uppercase tracking-widest text-[#050505]/40">
+                        Link Desktop Session
+                      </span>
+                      <button
+                        id="mobile-scan-qr-btn"
+                        onClick={() => setShowMobileScanner(true)}
+                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all hover:bg-[#050505]/80"
+                      >
+                        <ScanLine size={16} />
+                        Scan QR — Log in on PC
+                      </button>
+                      <span className="text-[9px] font-mono text-[#050505]/30 text-center leading-relaxed">
+                        Point camera at the QR code displayed on your desktop browser.
+                      </span>
+                    </motion.div>
+                  )}
                 </motion.div>
               ) : mounted && isLinked ? (
                 <motion.div
@@ -596,6 +627,28 @@ export default function ConnectPage() {
                       Auto-redirecting in 3s...
                     </span>
                   </div>
+
+                  {/* ── Mobile: Scan QR to link PC session (post-sign state) ─ */}
+                  {isMobile && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4, duration: 0.4 }}
+                      className="mt-2 pt-4 border-t border-[#050505]/10 w-full flex flex-col items-center gap-3"
+                    >
+                      <button
+                        id="mobile-scan-qr-verified-btn"
+                        onClick={() => setShowMobileScanner(true)}
+                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-[#050505]/20 bg-white font-black uppercase tracking-widest text-[11px] text-[#050505] active:scale-[0.97] transition-all hover:border-[#050505]/50"
+                      >
+                        <ScanLine size={16} />
+                        Scan QR — Link PC Session
+                      </button>
+                      <span className="text-[9px] font-mono text-[#050505]/30 text-center">
+                        Scan the QR shown on your PC to transfer this session.
+                      </span>
+                    </motion.div>
+                  )}
                 </motion.div>
 
               ) : !mounted ? (
@@ -654,6 +707,23 @@ export default function ConnectPage() {
         </motion.div>
 
       </main>
+
+      {/* ── Mobile QR Scanner Modal (scan desktop QR from phone) ── */}
+      {isMobile && mounted && (
+        <DynamicQRScannerModal
+          isOpen={showMobileScanner}
+          onClose={() => setShowMobileScanner(false)}
+          address={address ?? ""}
+          onScan={(_result: string) => {
+            setShowMobileScanner(false);
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[11px] border border-white/20 font-black uppercase tracking-[0.2em] px-6 py-5 rounded-[20px] shadow-2xl text-center';
+            toast.textContent = 'SESSION SYNCHRONIZED';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+          }}
+        />
+      )}
 
       {/* Footer */}
       <footer className="relative z-[100] px-8 py-6 border-t border-[#050505]/10 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 bg-[#FDFCF8]">

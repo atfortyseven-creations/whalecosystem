@@ -202,56 +202,45 @@ export async function listConversations(client: Client): Promise<any[]> {
 /**
  * Retrieve message history for a specific peer conversation.
  *
- * FIX v2: Instead of always calling newDmWithIdentifier (which can return a
- * stale local conversation that hasn't been synced from the network), we:
- *  1. Sync the full conversation list from the XMTP network.
- *  2. List all DMs and find the one whose peerInboxId matches the target.
- *  3. If found, sync that specific conversation and return its messages.
- *  4. If not found, fall back to newDmWithIdentifier (creates/reuses the DM).
+ * FIX v3 — Dual-perspective DM discovery:
+ *  The core problem: XMTP DMs are asymmetric at creation time.
+ *  - SENDER calls newDmWithIdentifier(peer) → creates a DM object locally.
+ *  - RECEIVER never created that DM locally — they need conversations.sync()
+ *    to pull it from the network, then listDms() to find it by member address.
  *
- * This guarantees the RECEIVER sees messages sent by the SENDER because
- * step 1 forces a network pull that discovers any new DM invitations.
+ * Strategy (in order of reliability):
+ *  1. conversations.sync() — pulls ALL new DMs from the p2p network (critical for receiver)
+ *  2. listDms() → find by peer Ethereum address in dm.members[] — works for both parties
+ *  3. listDms() → find by peerInboxId() — slower but covers edge cases
+ *  4. newDmWithIdentifier() fallback — creates/reuses via identifier (sender path)
+ *
+ * Each found DM is individually sync()d before messages() to guarantee
+ * the latest messages are returned, not a stale local snapshot.
  */
 export async function getMessages(client: Client, peerAddress: string): Promise<any[]> {
-  // Step 1: Sync the full conversation list to discover new DMs from peers
+  const normalizedPeer = peerAddress.toLowerCase();
+
+  // ── Step 1: Global sync — CRITICAL for receiver discovery ────────────────
+  // Without this, the receiver's client never knows about DMs created by the sender.
   try {
     await client.conversations.sync();
   } catch (e) {
     console.warn('[XMTP] conversations.sync() failed:', e);
   }
 
-  // Step 2: Try to find an existing DM with this peer via inboxId matching
+  // ── Step 2: Search by Ethereum address in dm.members (fastest, most reliable) ──
   try {
     const dms = await client.conversations.listDms();
-
-    // Resolve the peer's inboxId from their Ethereum address
-    // canMessage returns a Map<identifier, inboxId> in some SDK versions,
-    // but the most reliable method is to check peerInboxId on each DM.
     let targetDm: any = null;
 
     for (const dm of dms) {
       try {
-        // peerInboxId() is async in v5.3.0
-        const peerInboxId: string =
-          typeof dm.peerInboxId === 'function'
-            ? await dm.peerInboxId()
-            : dm.peerInboxId;
-
-        // The XMTP inboxId for an Ethereum address is deterministic.
-        // We match by resolving the peer address to an inboxId.
-        // We look up by comparing with canMessage result.
-        if (!peerInboxId) continue;
-
-        // Also check dm members / peer metadata for Ethereum address match
         const members: any[] = dm.members ?? [];
-        const peerMember = members.find((m: any) => {
+        const hasPeer = members.some((m: any) => {
           const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
-          return addrs.some(
-            (a: string) => a.toLowerCase() === peerAddress.toLowerCase(),
-          );
+          return addrs.some((a: string) => a.toLowerCase() === normalizedPeer);
         });
-
-        if (peerMember) {
+        if (hasPeer) {
           targetDm = dm;
           break;
         }
@@ -259,23 +248,108 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
     }
 
     if (targetDm) {
-      await targetDm.sync();
+      // Individual DM sync — pulls latest messages for this specific conversation
+      try { await targetDm.sync(); } catch {}
       const msgs = await targetDm.messages();
-      return msgs;
+      return msgs ?? [];
     }
   } catch (e) {
-    console.warn('[XMTP] listDms matching failed, falling back:', e);
+    console.warn('[XMTP] Member-address DM search failed:', e);
   }
 
-  // Step 3: Fallback — create or get the DM by identifier (sender path)
-  const identifier: XmtpIdentifier = {
-    identifier: peerAddress,
-    identifierKind: 'Ethereum',
-  };
-  const dm = await client.conversations.newDmWithIdentifier(identifier);
-  await dm.sync();
-  const msgs = await dm.messages();
-  return msgs;
+  // ── Step 3: Search by peerInboxId() — covers identity-key-only DMs ─────────
+  try {
+    const dms = await client.conversations.listDms();
+
+    for (const dm of dms) {
+      try {
+        const peerInboxId: string =
+          typeof dm.peerInboxId === 'function'
+            ? await dm.peerInboxId()
+            : (dm.peerInboxId ?? '');
+
+        if (!peerInboxId) continue;
+
+        // Cross-reference: resolve peer address → inboxId via canMessage
+        const identifier: XmtpIdentifier = {
+          identifier: peerAddress,
+          identifierKind: 'Ethereum',
+        };
+        const result = await Client.canMessage([identifier], XMTP_ENV);
+        let resolvedInboxId: string | null = null;
+
+        if (result instanceof Map) {
+          resolvedInboxId = result.get(normalizedPeer) ?? result.get(peerAddress) ?? null;
+        } else if (result && typeof result === 'object') {
+          resolvedInboxId = (result as any)[normalizedPeer] ?? (result as any)[peerAddress] ?? null;
+        }
+
+        if (resolvedInboxId && peerInboxId.toLowerCase() === resolvedInboxId.toLowerCase()) {
+          try { await dm.sync(); } catch {}
+          const msgs = await dm.messages();
+          return msgs ?? [];
+        }
+      } catch {}
+    }
+  } catch (e) {
+    console.warn('[XMTP] peerInboxId DM search failed:', e);
+  }
+
+  // ── Step 4: Fallback — newDmWithIdentifier (creates/reuses, sender path) ────
+  try {
+    const identifier: XmtpIdentifier = {
+      identifier: peerAddress,
+      identifierKind: 'Ethereum',
+    };
+    const dm = await client.conversations.newDmWithIdentifier(identifier);
+    try { await dm.sync(); } catch {}
+    const msgs = await dm.messages();
+    return msgs ?? [];
+  } catch (e) {
+    console.warn('[XMTP] newDmWithIdentifier fallback failed:', e);
+    return [];
+  }
+}
+
+/**
+ * Discover all DMs from the network and return new peer addresses
+ * not yet present in the known set. Used by WhaleChat global sync loop.
+ */
+export async function discoverNewPeers(
+  client: Client,
+  selfAddress: string,
+  knownPeers: Set<string>,
+): Promise<string[]> {
+  try {
+    await client.conversations.sync();
+    const dms: any[] = await client.conversations.listDms();
+    const newPeers: string[] = [];
+    const selfNorm = selfAddress.toLowerCase();
+
+    for (const dm of dms) {
+      try {
+        const members: any[] = dm.members ?? [];
+        for (const m of members) {
+          const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
+          for (const addr of addrs) {
+            const norm = addr.toLowerCase();
+            if (
+              /^0x[a-fA-F0-9]{40}$/i.test(norm) &&
+              norm !== selfNorm &&
+              !knownPeers.has(norm)
+            ) {
+              newPeers.push(addr);
+              knownPeers.add(norm);
+            }
+          }
+        }
+      } catch {}
+    }
+    return newPeers;
+  } catch (e) {
+    console.warn('[XMTP] discoverNewPeers failed:', e);
+    return [];
+  }
 }
 
 /** Async generator streaming all incoming messages in real time */

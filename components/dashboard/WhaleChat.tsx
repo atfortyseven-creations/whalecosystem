@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
-import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate } from '@/lib/xmtp/client';
+import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate, discoverNewPeers } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
 import type { Client } from '@xmtp/browser-sdk';
 
@@ -104,23 +104,18 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     }
   }, [isConnected, address, client]);
 
-  // ── AUTO-INITIALIZE: When wallet is connected and XMTP not yet started, ──────
-  // auto-call initClient so the user doesn't have to tap a button.
+  // AUTO-INITIALIZE: When wallet is connected and XMTP not yet started, auto-init.
   // XMTP v3 stores session keys in IndexedDB — after the first sign,
   // subsequent loads are silent (no wallet prompt needed).
-  // NOTE: On mobile, XMTP WASM chunks sometimes fail to load (ChunkLoadError).
-  // We skip auto-init on mobile and let the user trigger it manually to avoid
-  // silent failures that leave the UI frozen with no clear path forward.
+  // We always attempt auto-init on both desktop and mobile. If WASM fails on mobile,
+  // the error boundary surfaces a manual "Retry" button. This is better than
+  // silently blocking mobile users from ever seeing the Activate button.
   useEffect(() => {
     if (isConnected && address && !client && !isInitializing) {
-      // forceAutoInit=true (used by /chat route) overrides the mobile guard.
-      // On desktop always auto-init. On mobile only when forceAutoInit is set.
-      if (!isMobile || forceAutoInit) {
-        initClient();
-      }
+      initClient();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, isMobile, forceAutoInit]);
+  }, [isConnected, address]);
 
   // Telemetry: Heartbeat Loop
   useEffect(() => {
@@ -300,66 +295,41 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     convIdToPeer.current.set(activePeerDmIdRef.current, activePeer);
   }, [client, activePeer]);
 
-  // ── Global Conversation Sync Loop ─────────────────────────────────────────────────
-  // Runs every 8 seconds. Syncs the full XMTP conversation graph from the network
-  // and then calls listDms() to surface any new DMs initiated by remote peers.
-  // Without this step, the receiver never discovers a new DM until they manually
-  // add the sender’s address — which was the root cause of “messages only appear
-  // when both people connect simultaneously”.
+  // ── Global Conversation Sync Loop ──────────────────────────────────────────────────────
+  // Runs every 6 seconds. Uses discoverNewPeers() to find incoming DMs
+  // initiated by remote peers without needing the receiver to manually add them.
+  // Also refreshes active-peer messages on every cycle.
   useEffect(() => {
     if (!client || !address) return;
     let cancelled = false;
 
+    // Track known peers to avoid duplicate discovery
+    const knownSet = new Set<string>(conversations.map(c => c.peerAddress.toLowerCase()));
+
     const syncGlobal = async () => {
       try {
-        // Step 1: pull the full conversation graph from the XMTP p2p network
-        await client.conversations.sync();
+        // Discover new peers from the XMTP network
+        const newPeerAddrs = await discoverNewPeers(client, address, knownSet);
 
-        // Step 2: list all DMs and discover any not yet in local state
-        const dms: any[] = await client.conversations.listDms();
-        if (!dms?.length || cancelled) return;
-
-        setConversations(prev => {
-          const prevSet = new Set(prev.map(c => c.peerAddress.toLowerCase()));
-          const toAdd: ConversationMeta[] = [];
-
-          for (const dm of dms) {
-            try {
-              // Find the peer member (the one who is NOT us)
-              const members: any[] = dm.members ?? [];
-              const peerMember = members.find((m: any) => {
-                const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
-                return addrs.some(
-                  (a: string) => a.toLowerCase() !== address.toLowerCase()
-                );
-              });
-              if (!peerMember) continue;
-
-              const addrs: string[] = peerMember.accountAddresses ?? peerMember.addresses ?? [];
-              const peerAddr = addrs.find((a: string) => /^0x[a-fA-F0-9]{40}$/i.test(a));
-              if (!peerAddr || prevSet.has(peerAddr.toLowerCase())) continue;
-
-              // New conversation discovered from the network
-              toAdd.push({
-                peerAddress: peerAddr,
+        if (newPeerAddrs.length > 0 && !cancelled) {
+          setConversations(prev => {
+            const prevSet = new Set(prev.map(c => c.peerAddress.toLowerCase()));
+            const toAdd: ConversationMeta[] = newPeerAddrs
+              .filter(a => !prevSet.has(a.toLowerCase()))
+              .map(a => ({
+                peerAddress: a,
                 lastMessage: '✉ New message received',
                 lastAt: new Date(),
-              });
+              }));
 
-              // Register the DM mapping so fetchMessages can find it
-              peerToConvId.current.set(peerAddr.toLowerCase(), `dm-${peerAddr.toLowerCase()}`);
-              convIdToPeer.current.set(`dm-${peerAddr.toLowerCase()}`, peerAddr);
-            } catch { /* skip malformed DM entry */ }
-          }
+            if (!toAdd.length) return prev;
+            const updated = [...toAdd, ...prev];
+            persistToLocal(updated);
+            return updated;
+          });
+        }
 
-          if (!toAdd.length) return prev; // no change — bail out early
-          const updated = [...toAdd, ...prev];
-          persistToLocal(updated);
-          return updated;
-        });
-
-        // Step 3: if there’s an active peer, also refresh messages now
-        // (covers the case where a message arrives mid-poll-interval)
+        // Also refresh active-peer messages mid-interval
         if (activePeerRef.current && !cancelled) {
           const msgs = await getMessages(client, activePeerRef.current);
           if (cancelled) return;
@@ -388,16 +358,18 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     };
 
     syncGlobal();
-    const globalPoll = setInterval(syncGlobal, 8000);
+    const globalPoll = setInterval(syncGlobal, 6000);
     return () => { cancelled = true; clearInterval(globalPoll); };
   }, [client, address]);
 
-  // ── Real-time incoming message polling (REAL XMTP NETWORK) ────────────────
-  // Every 4 seconds, sync with the decentralized network to fetch new messages.
+  // ── Real-time incoming message polling (REAL XMTP NETWORK) ──────────────
+  // Every 5 seconds, sync with the decentralized network to fetch new messages.
   // The global sync loop (above) ensures the receiver discovers new DM invites.
+  // GUARD: isFetching prevents concurrent calls from stacking on slow networks.
   useEffect(() => {
     if (!client || !activePeer || !address) return;
     let isMounted = true;
+    let isFetching = false;
     
     // Ignore the institutional support mock for network requests
     if (activePeer.toLowerCase() === '0xinstitutionalsupport_0000') {
@@ -413,8 +385,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     }
 
     const fetchMessages = async () => {
+      // Skip if a fetch is already in-flight (prevents stacking on slow network)
+      if (isFetching || !isMounted) return;
+      isFetching = true;
       try {
-        // getMessages now handles conversations.sync() internally before listing
+        // getMessages handles conversations.sync() internally before listing
         const msgs = await getMessages(client, activePeer);
         if (!isMounted) return;
         
@@ -451,11 +426,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         });
       } catch (err) {
         console.warn('[XMTP] Network sync error:', err);
+      } finally {
+        isFetching = false;
       }
     };
 
     fetchMessages();
-    const poll = setInterval(fetchMessages, 4000);
+    const poll = setInterval(fetchMessages, 5000);
     return () => { isMounted = false; clearInterval(poll); };
   }, [client, activePeer, address]);
 

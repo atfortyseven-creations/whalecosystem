@@ -323,10 +323,11 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
       // Desktop will decrypt using X25519(desktop.priv, mobile.pub) — same secret.
       const shared = await deriveSharedSecret(mobilePair.privateKey, ephemeralPub, isECDH);
 
-      // Try to get JWT from human_session cookie via export-jwt first,
-      // then fall back to qr-mobile-link which mints a fresh one.
+      // ── Step 3b: Try to get an existing JWT from human_session cookie ────
+      // If the mobile already has a session (returning user), we re-use it.
+      // Otherwise, qr-mobile-link will mint a fresh JWT server-side from
+      // the sovereign_handshake cookie (set after wallet connection + sign).
       let jwt: string | null = null;
-      let useServerMint = false;
 
       try {
         const exportRes = await fetch('/api/auth/export-jwt', { credentials: 'include' });
@@ -335,45 +336,44 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           jwt = exportData.jwt ?? null;
         }
       } catch {
-        // Network error — fall through to server mint
+        // Network error — fall through to server-side mint path
       }
 
-      if (!jwt) {
-        // Mobile doesn't have human_session yet (first-time QR scan).
-        // Use qr-mobile-link which mints from sovereign_handshake cookie.
-        useServerMint = true;
-      }
+      // ── Step 4: Build the POST payload ────────────────────────────────────
+      // PATH A — Client has JWT: encrypt it with the shared ECDH secret.
+      // PATH B — No JWT yet: send isServerMint=true so the backend mints one
+      //          from sovereign_handshake and stores it as serverJwt in Redis.
+      //          Do NOT send placeholder strings — they corrupt the Redis entry
+      //          and cause the desktop's AES-GCM decryption to throw every time.
+      let postBody: Record<string, unknown>;
 
-      // ── Step 4: Encrypt the JWT (if we have one) ──────────────────────────
-      // If we're using server-mint mode, qr-mobile-link handles encryption
-      // server-side AND stores in Redis in one shot. We skip client encryption.
-      let encryptedPayload: string;
-      let iv: string;
-      let tag: string | null = null;
-
-      if (!useServerMint && jwt) {
+      if (jwt) {
+        // PATH A: encrypt JWT client-side
         const encrypted = await encryptAESGCM(shared, jwt);
-        encryptedPayload = encrypted.encryptedPayload;
-        iv = encrypted.iv;
-        tag = encrypted.tag;
+        postBody = {
+          uuid,
+          encryptedPayload: encrypted.encryptedPayload,
+          iv: encrypted.iv,
+          tag: encrypted.tag,
+          mobilePub: mobilePair.publicKey,
+          isServerMint: false,
+        };
       } else {
-        // Placeholder values — qr-mobile-link will create the real ones server-side
-        encryptedPayload = 'server-minted';
-        iv = 'server-minted';
+        // PATH B: tell server to mint JWT and store as serverJwt only
+        postBody = {
+          uuid,
+          mobilePub: mobilePair.publicKey,
+          isServerMint: true,
+          // Still send mobilePub so desktop poll can include it in the payload
+          // for future ECDH decryption if server later supports encrypt-at-rest.
+        };
       }
 
       // ── Step 5: POST to backend to complete the handshake ─────────────────
-      const endpoint = '/api/auth/qr-mobile-link';
-      const res = await fetch(endpoint, {
+      const res = await fetch('/api/auth/qr-mobile-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          uuid,
-          encryptedPayload,
-          iv,
-          tag,
-          mobilePub: mobilePair.publicKey,
-        }),
+        body: JSON.stringify(postBody),
         credentials: 'include',
       });
 
@@ -391,9 +391,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
         return;
       }
 
-      // If server minted, also set human_session locally from the response cookie
-      // (browser will auto-store it since fetch with credentials:include handles cookies)
-
+      // Browser auto-stores human_session cookie from response (credentials:include)
       setStatus('success');
 
     } catch (e: any) {

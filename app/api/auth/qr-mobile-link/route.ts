@@ -31,17 +31,22 @@ import { isAddress } from 'viem';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { uuid, encryptedPayload, iv, tag, mobilePub } = body;
+    const { uuid, encryptedPayload, iv, tag, mobilePub, isServerMint } = body;
 
-    // ── 1. Validate required fields ────────────────────────────────────────
+    // ── 1. Validate required fields ────────────────────────────────────
     if (!uuid || typeof uuid !== 'string' || uuid.length < 8) {
       return NextResponse.json({ error: 'Missing or invalid uuid' }, { status: 400 });
     }
-    if (!encryptedPayload || !iv || !mobilePub) {
+    if (!mobilePub) {
+      return NextResponse.json({ error: 'Missing mobilePub' }, { status: 400 });
+    }
+    // In client-encrypt mode (isServerMint !== true), encryptedPayload + iv are required.
+    // In server-mint mode (isServerMint === true), they are omitted intentionally.
+    if (!isServerMint && (!encryptedPayload || !iv)) {
       return NextResponse.json({ error: 'Missing encrypted payload fields' }, { status: 400 });
     }
 
-    // ── 2. Verify mobile identity from cookies ─────────────────────────────
+    // ── 2. Verify mobile identity from cookies ─────────────────────────
     // We accept EITHER:
     //   a) A pre-existing human_session JWT (best case — re-export it)
     //   b) A sovereign_handshake wallet address (mint fresh JWT)
@@ -51,9 +56,6 @@ export async function POST(req: NextRequest) {
     let walletAddress: string | null = null;
 
     if (humanSession) {
-      // Already has a valid session → mint JWT directly from cookie
-      // We trust the existing session without re-verifying to avoid
-      // EdDSA key import overhead on every QR scan.
       try {
         const { verifyJWT } = await import('@/lib/jwt');
         const payload = await verifyJWT(humanSession);
@@ -64,7 +66,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (!walletAddress && sovereignHandshake) {
-      // Validate it's a real Ethereum address (not a spoofed cookie)
       if (/^0x[a-fA-F0-9]{40}$/.test(sovereignHandshake)) {
         walletAddress = sovereignHandshake.toLowerCase();
       }
@@ -77,12 +78,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 3. Mint a sovereign JWT for this wallet address ────────────────────
-    // This JWT will be sent (encrypted) to the desktop and used to establish
-    // the desktop session via /api/auth/qr-hydrate.
+    // ── 3. Mint a sovereign JWT for this wallet address ──────────────────
     const { prisma } = await import('@/lib/prisma');
-    
-    // Ensure the user exists so foreign keys and tiers don't break
     const existingUser = await prisma.user.upsert({
       where: { walletAddress: walletAddress.toLowerCase() },
       update: { lastActive: new Date() },
@@ -92,7 +89,7 @@ export async function POST(req: NextRequest) {
         lastActive: new Date()
       }
     });
-    
+
     const jwt = await mintJWT({
       sub: walletAddress,
       address: walletAddress,
@@ -105,26 +102,35 @@ export async function POST(req: NextRequest) {
       issuedAt: new Date().toISOString()
     });
 
-    // ── 4. Package and store in Redis ──────────────────────────────────────
-    // The encrypted payload ALREADY contains the JWT (encrypted by mobile).
-    // We store the entire encrypted bundle so the desktop can decrypt it.
-    // TTL: 300 seconds (5 min) — matches the QR expiry window.
-    const sessionPayload = JSON.stringify({
-      encryptedPayload,
-      iv,
-      tag: tag || null,
-      mobilePub,
-      // Include the raw (server-minted) JWT as a server-side fallback in case
-      // the ECDH decryption fails on the desktop (e.g. key mismatch from an
-      // iOS X25519 implementation quirk). Desktop prefers decrypted JWT but
-      // falls back to this if decryption returns invalid JSON.
-      serverJwt: jwt,
-    });
+    // ── 4. Build and store Redis payload depending on mode ────────────────
+    // PATH A (client-encrypted): store the full ECDH bundle so the desktop
+    //   can decrypt it with X25519(desktop.priv, mobilePub). serverJwt is
+    //   a fallback in case decryption fails (iOS X25519 key format quirk).
+    // PATH B (server-mint): mobile had no JWT to encrypt. Store ONLY serverJwt
+    //   + mobilePub. The desktop poll detects the absence of encryptedPayload
+    //   and goes straight to the serverJwt fallback — no AES-GCM attempted.
+    let sessionPayload: string;
+
+    if (!isServerMint && encryptedPayload && iv) {
+      // PATH A: client encrypted the JWT — store encrypted bundle + fallback
+      sessionPayload = JSON.stringify({
+        encryptedPayload,
+        iv,
+        tag: tag || null,
+        mobilePub,
+        serverJwt: jwt,
+      });
+    } else {
+      // PATH B: server mints — store serverJwt only (no encrypted garbage)
+      sessionPayload = JSON.stringify({
+        mobilePub,
+        serverJwt: jwt,
+      });
+    }
 
     await safeRedisSet(`qr-session:${uuid}`, sessionPayload, 'EX', 300);
 
     // ── 5. Also set human_session on this response for the mobile ──────────
-    // This ensures future calls to export-jwt also succeed from mobile.
     const response = NextResponse.json({ success: true });
     response.cookies.set('human_session', jwt, {
       httpOnly: true,
