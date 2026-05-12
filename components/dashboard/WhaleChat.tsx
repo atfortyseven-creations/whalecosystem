@@ -245,6 +245,21 @@ export function WhaleChat() {
     convIdToPeer.current.set(activePeerDmIdRef.current, activePeer);
   }, [client, activePeer]);
 
+  // ── Global Conversation Sync Loop ─────────────────────────────────────────────
+  // Runs every 30 seconds to ensure the client processes invites from new peers
+  useEffect(() => {
+    if (!client || !address) return;
+    let isMounted = true;
+    const syncGlobal = async () => {
+      try {
+        await client.conversations.sync();
+      } catch (e) {}
+    };
+    syncGlobal();
+    const globalPoll = setInterval(syncGlobal, 30000);
+    return () => { isMounted = false; clearInterval(globalPoll); };
+  }, [client, address]);
+
   // ── Real-time incoming message polling (REAL XMTP NETWORK) ────────────────
   // Every 3 seconds, sync with the decentralized network to fetch new messages.
   useEffect(() => {
@@ -274,11 +289,32 @@ export function WhaleChat() {
           id: m.id,
           senderInboxId: m.senderInboxId,
           content: m.content || m.fallback || 'Encrypted Data',
-          sentAtNs: Number(BigInt(m.sentAtNs) / 1000000n), // Convert XMTP BigInt ns to ms timestamp
+          sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(), // Convert safely to ms timestamp
           conversationId: `dm-${activePeer.toLowerCase()}`
         }));
         
-        setMessages(mappedMsgs);
+        setMessages(prev => {
+            const activeId = `dm-${activePeer.toLowerCase()}`;
+            const others = prev.filter(p => p.conversationId !== activeId);
+            const mappedIds = new Set(mappedMsgs.map(m => m.id));
+            
+            // Extract my sent message contents to deduplicate optimistic ones
+            const myMappedContents = new Set(mappedMsgs.filter(m => {
+                const isMe = m.senderInboxId
+                    ? m.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
+                    : (m.senderAddress || '').toLowerCase() === address?.toLowerCase();
+                return isMe;
+            }).map(m => m.content.trim()));
+
+            // Keep optimistic messages only if they haven't been synced from the network
+            const optimistic = prev.filter(p => {
+                if (p.conversationId !== activeId || mappedIds.has(p.id) || p.id.length >= 20) return false;
+                if (myMappedContents.has(p.content.trim())) return false;
+                if (Date.now() - parseInt(p.id) > 15000) return false; // expire after 15s
+                return true;
+            });
+            return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
+        });
       } catch (err) {
         console.warn('[XMTP] Network sync error:', err);
       }
@@ -302,6 +338,15 @@ export function WhaleChat() {
             alert('Invalid Ethereum address format.');
             setSending(false);
             return;
+        }
+
+        if (peer.toLowerCase() !== '0xinstitutionalsupport_0000') {
+            const canMsg = await canReceiveMessages(client, peer);
+            if (!canMsg) {
+                alert(`The address ${peer} is not activated on the Sovereign P2P network. They must connect to the terminal first.`);
+                setSending(false);
+                return;
+            }
         }
 
         const newConv = { peerAddress: peer, lastMessage: '', lastAt: new Date() };
@@ -346,18 +391,32 @@ export function WhaleChat() {
     try {
       // ── 1. REAL ON-CHAIN DECENTRALIZED TRANSMISSION ──────────────────────────────
       if (activePeer.toLowerCase() !== '0xinstitutionalsupport_0000') {
+        const canMsg = await canReceiveMessages(client, activePeer);
+        if (!canMsg) {
+            alert(`The address ${activePeer} is no longer reachable on the network.`);
+            setSending(false);
+            return;
+        }
         await sendMessage(client, activePeer, content);
         
-        // Optimistically update the UI so it feels instantaneous
-        const now = Date.now();
-        const optimisticMsg = {
-          id: now.toString(),
-          senderInboxId: client.inboxId,
-          content: content,
-          sentAtNs: now,
-          conversationId: `dm-${activePeer.toLowerCase()}`
-        };
-        setMessages(prev => [...prev, optimisticMsg]);
+        // Exact Network Sync — Immediately fetch to guarantee 100% accurate rendering (no duplicates)
+        try {
+            const msgs = await getMessages(client, activePeer);
+            const mappedMsgs = msgs.map((m: any) => ({
+                id: m.id,
+                senderInboxId: m.senderInboxId,
+                content: m.content || m.fallback || 'Encrypted Data',
+                sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(),
+                conversationId: `dm-${activePeer.toLowerCase()}`
+            }));
+            setMessages(prev => {
+                const activeId = `dm-${activePeer.toLowerCase()}`;
+                const others = prev.filter(p => p.conversationId !== activeId);
+                return [...others, ...mappedMsgs].sort((a, b) => a.sentAtNs - b.sentAtNs);
+            });
+        } catch (syncErr) {
+            console.warn('[XMTP] Post-send sync failed:', syncErr);
+        }
       }
 
       // ── 2. UPDATE LOCAL ADDRESS BOOK ──────────────────────────────────────────────

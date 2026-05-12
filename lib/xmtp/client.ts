@@ -182,7 +182,6 @@ export async function sendMessage(
     identifier: toAddress,
     identifierKind: 'Ethereum',
   };
-  await client.conversations.sync();
   // v5.3.0: newDmWithIdentifier takes an Identifier object
   const dm = await client.conversations.newDmWithIdentifier(identifier);
   await dm.send(content);
@@ -206,10 +205,10 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
     identifier: peerAddress,
     identifierKind: 'Ethereum',
   };
-  await client.conversations.sync();
   const dm = await client.conversations.newDmWithIdentifier(identifier);
   await dm.sync();
-  return dm.messages();
+  const msgs = await dm.messages();
+  return msgs;
 }
 
 /** Async generator streaming all incoming messages in real time */

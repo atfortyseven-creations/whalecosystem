@@ -367,7 +367,7 @@ export function WhaleProShell({
     useEffect(() => {
         if (RESTRICTED_TABS.includes(activeTab)) {
             if (!isWalletConnected) {
-                onTabChange('market-data');
+                onTabChange('gold');
                 toast.error("Session Lost", { description: "You have been disconnected." });
             }
         }
