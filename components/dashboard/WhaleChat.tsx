@@ -317,12 +317,12 @@ export function WhaleChat() {
                     ? m.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
                     : false;
                 return isMe;
-            }).map(m => m.content.trim()));
+            }).map(m => typeof m.content === 'string' ? m.content.trim() : ''));
 
             // Keep optimistic messages only if they haven't been synced from the network
             const optimistic = prev.filter(p => {
                 if (p.conversationId !== activeId || mappedIds.has(p.id) || p.id.length >= 20) return false;
-                if (myMappedContents.has(p.content.trim())) return false;
+                if (myMappedContents.has(typeof p.content === 'string' ? p.content.trim() : '')) return false;
                 if (Date.now() - parseInt(p.id) > 15000) return false; // expire after 15s
                 return true;
             });
