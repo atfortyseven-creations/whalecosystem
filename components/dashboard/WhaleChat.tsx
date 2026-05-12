@@ -186,33 +186,38 @@ export function WhaleChat() {
     }
   }, [activePeer, address]);
 
-  // Initialize Local Storage Chat
+  // Initialize REAL XMTP Network
   const initClient = async () => {
     if (!address) return;
     setIsInitializing(true);
     setInitError('');
     try {
-      setClient({ inboxId: address } as any); // mock client
+      const wagmiSigner = {
+        getAddress: async () => address,
+        signMessage: async (msg: string | Uint8Array) => {
+          return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
+        }
+      };
+      const realClient = await getXMTPClient(wagmiSigner);
+      setClient(realClient);
       await loadConversations();
     } catch (err: any) {
       console.error('Init Error:', err);
-      setInitError('Failed to initialize secure communications channel.');
+      if (err?.code === 4001 || err?.message?.toLowerCase().includes("reject")) {
+          setInitError('Signature rejected. You must sign the authorization to establish the secure channel.');
+      } else {
+          setInitError('Failed to initialize secure communications channel.');
+      }
     } finally {
       setIsInitializing(false);
     }
   };
 
-  // ── Safe serialization helper (BigInt → number) ──────────────────────────
-  const safeMsg = (msg: any) => ({
-    ...msg,
-    sentAtNs: typeof msg.sentAtNs === 'bigint' ? Number(msg.sentAtNs / 1000000n) : msg.sentAtNs,
-  });
-
-  const persistToLocal = (convs: ConversationMeta[], msgs: any[]) => {
+  const persistToLocal = (convs: ConversationMeta[]) => {
     try {
       localStorage.setItem(
         `whale_chat_history_${address}`,
-        JSON.stringify({ conversations: convs, messages: msgs.map(safeMsg) })
+        JSON.stringify({ conversations: convs }) // ZERO-MOCK: We only store the address book locally, NEVER messages.
       );
     } catch (e) { console.warn('[Chat] persist failed', e); }
   };
@@ -223,17 +228,9 @@ export function WhaleChat() {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed.conversations) setConversations(parsed.conversations);
-        if (parsed.messages) setMessages(parsed.messages);
       } else {
         const defaultConv = { peerAddress: '0xInstitutionalSupport_0000', lastMessage: 'Secure channel initialized.', lastAt: new Date() };
         setConversations([defaultConv]);
-        setMessages([{
-          id: '1',
-          senderInboxId: '0xInstitutionalSupport_0000',
-          content: 'Welcome to the Secure Client Communications channel. All messages are zero-knowledge encrypted end-to-end.',
-          sentAtNs: Date.now(),
-          conversationId: 'dm-0xinstitutionalsupport_0000'
-        }]);
       }
     } catch (e) {}
   };
@@ -248,26 +245,48 @@ export function WhaleChat() {
     convIdToPeer.current.set(activePeerDmIdRef.current, activePeer);
   }, [client, activePeer]);
 
-  // ── Real-time incoming message polling (localStorage P2P) ────────────────
-  // Every 2 seconds, check if the peer has written new messages to our storage.
+  // ── Real-time incoming message polling (REAL XMTP NETWORK) ────────────────
+  // Every 3 seconds, sync with the decentralized network to fetch new messages.
   useEffect(() => {
     if (!client || !activePeer || !address) return;
-    let lastCount = 0;
-    const poll = setInterval(() => {
+    let isMounted = true;
+    
+    // Ignore the institutional support mock for network requests
+    if (activePeer.toLowerCase() === '0xinstitutionalsupport_0000') {
+      const mockMsg = {
+          id: '1',
+          senderAddress: activePeer,
+          content: 'Welcome to the Secure Client Communications channel. All messages are zero-knowledge encrypted end-to-end.',
+          sentAtNs: Date.now(),
+          conversationId: `dm-${activePeer.toLowerCase()}`
+      };
+      setMessages([mockMsg]);
+      return;
+    }
+
+    const fetchMessages = async () => {
       try {
-        const stored = localStorage.getItem(`whale_chat_history_${address}`);
-        if (!stored) return;
-        const parsed = JSON.parse(stored);
-        const msgs: any[] = parsed.messages || [];
-        if (msgs.length !== lastCount) {
-          lastCount = msgs.length;
-          setMessages(msgs);
-          const convs: ConversationMeta[] = parsed.conversations || [];
-          setConversations(convs);
-        }
-      } catch {}
-    }, 2000);
-    return () => clearInterval(poll);
+        const msgs = await getMessages(client, activePeer);
+        if (!isMounted) return;
+        
+        // Map decoded real XMTP messages to our UI shape
+        const mappedMsgs = msgs.map((m: any) => ({
+          id: m.id,
+          senderInboxId: m.senderInboxId,
+          content: m.content || m.fallback || 'Encrypted Data',
+          sentAtNs: Number(BigInt(m.sentAtNs) / 1000000n), // Convert XMTP BigInt ns to ms timestamp
+          conversationId: `dm-${activePeer.toLowerCase()}`
+        }));
+        
+        setMessages(mappedMsgs);
+      } catch (err) {
+        console.warn('[XMTP] Network sync error:', err);
+      }
+    };
+
+    fetchMessages();
+    const poll = setInterval(fetchMessages, 3000);
+    return () => { isMounted = false; clearInterval(poll); };
   }, [client, activePeer, address]);
 
   const handleStartConversationWithPeer = async (peerAddr: string) => {
@@ -281,7 +300,7 @@ export function WhaleChat() {
             const exists = prev.find(c => c.peerAddress.toLowerCase() === peer.toLowerCase());
             if (exists) return prev;
             const updated = [newConv, ...prev];
-            persistToLocal(updated, messages);
+            persistToLocal(updated);
             return updated;
         });
 
@@ -315,53 +334,44 @@ export function WhaleChat() {
     }
 
     try {
-      const now = Date.now();
-      const myConvId = `dm-${activePeer.toLowerCase()}`;
-      const newMsg = {
-        id: now.toString(),
-        senderInboxId: client?.inboxId,
-        content: content,
-        sentAtNs: now,         // plain number — JSON-safe
-        conversationId: myConvId
-      };
-
-      // ── Update sender's own storage ──────────────────────────────────────
-      const selfKey = `whale_chat_history_${address}`;
-      let selfConvs: ConversationMeta[] = [];
-      let selfMsgs: any[] = [];
-      try {
-        const raw = localStorage.getItem(selfKey);
-        if (raw) { const p = JSON.parse(raw); selfConvs = p.conversations || []; selfMsgs = p.messages || []; }
-      } catch {}
-
-      selfMsgs = [...selfMsgs, newMsg];
-      selfConvs = selfConvs.find(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase())
-        ? selfConvs.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
-        : [{ peerAddress: activePeer, lastMessage: content, lastAt: new Date() }, ...selfConvs];
-      localStorage.setItem(selfKey, JSON.stringify({ conversations: selfConvs, messages: selfMsgs }));
-      setMessages(selfMsgs);
-      setConversations(selfConvs);
-
-      // ── Write to peer's storage so they receive the message ──────────────
+      // ── 1. REAL ON-CHAIN DECENTRALIZED TRANSMISSION ──────────────────────────────
       if (activePeer.toLowerCase() !== '0xinstitutionalsupport_0000') {
-        const peerKey = `whale_chat_history_${activePeer}`;
-        let peerConvs: any[] = [];
-        let peerMsgs: any[] = [];
-        try {
-          const raw = localStorage.getItem(peerKey);
-          if (raw) { const p = JSON.parse(raw); peerConvs = p.conversations || []; peerMsgs = p.messages || []; }
-        } catch {}
-
-        const peerMsg = { ...newMsg, conversationId: `dm-${address!.toLowerCase()}` };
-        peerMsgs = [...peerMsgs, peerMsg];
-        peerConvs = peerConvs.find((c: any) => c.peerAddress.toLowerCase() === address!.toLowerCase())
-          ? peerConvs.map((c: any) => c.peerAddress.toLowerCase() === address!.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
-          : [{ peerAddress: address, lastMessage: content, lastAt: new Date() }, ...peerConvs];
-        localStorage.setItem(peerKey, JSON.stringify({ conversations: peerConvs, messages: peerMsgs }));
+        await sendMessage(client, activePeer, content);
+        
+        // Optimistically update the UI so it feels instantaneous
+        const now = Date.now();
+        const optimisticMsg = {
+          id: now.toString(),
+          senderInboxId: client.inboxId,
+          content: content,
+          sentAtNs: now,
+          conversationId: `dm-${activePeer.toLowerCase()}`
+        };
+        setMessages(prev => [...prev, optimisticMsg]);
       }
 
-      // ── Auto-reply from Institutional Support ────────────────────────────
+      // ── 2. UPDATE LOCAL ADDRESS BOOK ──────────────────────────────────────────────
+      setConversations(prev => {
+        const updated = prev.find(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase())
+          ? prev.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
+          : [{ peerAddress: activePeer, lastMessage: content, lastAt: new Date() }, ...prev];
+        persistToLocal(updated);
+        return updated;
+      });
+
+      // ── 3. AUTO-REPLY BOT (LOCAL MOCK ONLY) ──────────────────────────────────────────────
       if (activePeer.toLowerCase() === '0xinstitutionalsupport_0000') {
+        const now = Date.now();
+        const myConvId = `dm-${activePeer.toLowerCase()}`;
+        const newMsg = {
+          id: now.toString(),
+          senderInboxId: client?.inboxId,
+          content: content,
+          sentAtNs: now,         
+          conversationId: myConvId
+        };
+        setMessages(prev => [...prev, newMsg]);
+
         setTimeout(() => {
           const replyId = (Date.now() + 1).toString();
           const replyMsg = {
@@ -371,7 +381,7 @@ export function WhaleChat() {
             sentAtNs: Date.now() + 1000,
             conversationId: myConvId
           };
-          setMessages(prev => { const m = [...prev, replyMsg]; persistToLocal(selfConvs, m); return m; });
+          setMessages(prev => [...prev, replyMsg]);
         }, 1400);
       }
 

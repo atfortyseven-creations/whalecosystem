@@ -174,6 +174,17 @@ export default function ConnectPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
+  // ── Absolute Perfection: Auto-Hydrate session independently on ConnectPage ──
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const hasCookie = document.cookie.split("; ").some((r) => r.startsWith("sovereign_handshake="));
+      const hasLocal = localStorage.getItem("sovereign_session_v2");
+      if (hasCookie || hasLocal) {
+        setLinked(true);
+      }
+    }
+  }, [setLinked]);
+
   // ── QR session (X25519 Ephemeral + AES-GCM) ──────────────────────────────
   const [ephemeral, setEphemeral] = useState<{ publicKey: string; privateKey: string } | null>(null);
   const [qrData, setQrData] = useState('');
@@ -307,7 +318,7 @@ export default function ConnectPage() {
   }, [qrSession, ephemeral, qrData, syncStatus]);
 
 
-  // ── Redirect enforcement: multiple layers to prevent stuck screen ──────────
+  // ── Redirect enforcement: Only redirect when actually linked ──────────
   useEffect(() => {
     if (!mounted || !isConnected) return;
     try {
@@ -323,36 +334,11 @@ export default function ConnectPage() {
       window.location.replace("/dashboard");
     };
 
-    // Layer 1: redirect immediately if already linked
+    // Only redirect if already linked (meaning they have signed)
+    // NEVER auto-redirect based on time or visibility, as it interrupts signing!
     if (isLinked) {
       doHardRedirect();
-      return;
     }
-
-    // Layer 2: auto-redirect after 3s even if isLinked never fired
-    // Covers race condition where LinkedGate sets cookie but store update lags
-    const timer3s = setTimeout(() => {
-      doHardRedirect();
-    }, 3000);
-
-    // Layer 3: absolute fallback after 8s — wallet is connected, just go
-    const timer8s = setTimeout(() => {
-      doHardRedirect();
-    }, 8000);
-
-    // Visibility change (iOS background suspension)
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        doHardRedirect();
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      clearTimeout(timer3s);
-      clearTimeout(timer8s);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
   }, [isConnected, mounted, isLinked]);
 
   // Separate effect: isLinked flips → redirect instantly

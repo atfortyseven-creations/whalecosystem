@@ -805,18 +805,20 @@ export function MobileLanding() {
 
 
 
-  // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
+  // ── Hide rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
     if (!isLinked) return;
     const id = setInterval(() => {
-      // Remove any lingering AppKit/WalletConnect modal backdrop
-      const el = document.querySelector('w3m-modal, [data-rk]');
-      // Only remove w3m-modal, not the RainbowKit overlay [data-rk] which we need
-      const w3m = document.querySelector('w3m-modal');
-      if (w3m) w3m.remove();
+      // Hide any lingering AppKit/WalletConnect modal backdrop instead of removing it from DOM
+      const w3m = document.querySelector('w3m-modal') as HTMLElement | null;
+      if (w3m && w3m.style.display !== 'none') {
+        w3m.style.display = 'none';
+        // Attempt clean close as well
+        try { rkCloseModal(); } catch {}
+      }
     }, 400);
     return () => clearInterval(id);
-  }, [isLinked]);
+  }, [isLinked, rkCloseModal]);
 
   // ── Scroll to top on landing ─────────────────────────────────────────────────
   useEffect(() => {

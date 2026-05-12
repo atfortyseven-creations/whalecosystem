@@ -281,9 +281,9 @@ export function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => v
           <div className="absolute inset-0 bg-[#050505] translate-y-[101%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
           <span className="relative z-10 font-mono text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3">
             {isSigning ? (
-              <><RefreshCw size={14} className="animate-spin" /> Cryptographic Signing...</>
+              <><RefreshCw size={14} className="animate-spin" /> <span>Cryptographic Signing...</span></>
             ) : (
-              <><Fingerprint size={14} /> Initiate Handshake</>
+              <><Fingerprint size={14} /> <span>Initiate Handshake</span></>
             )}
           </span>
         </button>
