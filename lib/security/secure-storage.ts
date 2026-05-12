@@ -178,10 +178,10 @@ export class SecureStorage {
 export class SecureSessionStorage {
   private static prefix = 'secure_session_';
   
-  static setItem(key: string, value: any, encrypt = true): void {
+  static setItem(key: string, value: any, shouldEncrypt = true): void {
     try {
       const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
-      const finalValue = encrypt ? encrypt(stringValue) : stringValue;
+      const finalValue = shouldEncrypt ? encrypt(stringValue) : stringValue;
       
       sessionStorage.setItem(this.prefix + key, finalValue);
     } catch (error) {

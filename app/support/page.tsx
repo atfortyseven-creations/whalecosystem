@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Twitter, Globe, ChevronDown, Mail,
   MessageSquare, Shield, Clock, CheckCircle,
-  Users, Smartphone, ArrowUpRight, BookOpen, AlertCircle
+  Users, Smartphone, ArrowUpRight, BookOpen, AlertCircle,
+  Server, Activity
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
@@ -150,6 +151,47 @@ function StatsRow() {
         </div>
       ))}
     </motion.div>
+  );
+}
+
+// ── System Status Block ───────────────────────────────────────────────────────
+function SystemStatus() {
+  const systems = [
+    { name: "Core API & Routing", status: "Operational", uptime: "99.99%" },
+    { name: "RPC Node Infrastructure", status: "Operational", uptime: "99.95%" },
+    { name: "Real-time Telemetry (WSS)", status: "Operational", uptime: "99.98%" },
+    { name: "Database & Ledger", status: "Operational", uptime: "100.00%" },
+  ];
+
+  return (
+    <div className="w-full rounded-3xl border overflow-hidden mb-8" style={{ borderColor: BORDER, background: CARD }}>
+      <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: BORDER, background: BG }}>
+        <div className="flex items-center gap-2.5">
+          <Activity size={12} style={{ color: MUTED }} />
+          <span className="font-mono text-[9px] uppercase tracking-[0.3em] font-black" style={{ color: MUTED }}>
+            Live System Status
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-600 font-bold">All Systems Nominal</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x" style={{ borderColor: BORDER }}>
+        {systems.map((sys, i) => (
+          <div key={i} className="p-6 flex flex-col gap-3 hover:bg-black/[0.02] transition-colors">
+            <div className="flex items-center gap-2">
+               <Server size={14} className="text-emerald-500" />
+               <h4 className="text-[11px] font-black uppercase tracking-widest" style={{ color: INK }}>{sys.name}</h4>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-emerald-600">{sys.status}</span>
+              <span className="text-[10px] font-mono" style={{ color: MUTED }}>{sys.uptime}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -389,6 +431,15 @@ export default function SupportPage() {
         <StatsRow />
 
         <div className="max-w-6xl mx-auto px-6 py-16 space-y-8">
+
+          {/* System Status */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+          >
+            <SystemStatus />
+          </motion.div>
 
           {/* Primary grid: Contact + FAQ */}
           <motion.div

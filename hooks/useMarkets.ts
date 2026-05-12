@@ -87,7 +87,7 @@ export const useMarkets = () => {
 
                     try {
                         const [question, balances, totalSupply] = await Promise.all([
-                            publicClient.readContract({ address: marketAddress, abi: MARKET_ABI, functionName: 'question' }).catch(() => "Mercado Sin Título"),
+                            publicClient.readContract({ address: marketAddress, abi: MARKET_ABI, functionName: 'question' }).catch(() => "Untitled Market"),
                             publicClient.readContract({ address: marketAddress, abi: MARKET_ABI, functionName: 'getPoolBalances' }).catch(() => [0n, 0n]),
                             publicClient.readContract({ address: marketAddress, abi: MARKET_ABI, functionName: 'totalSupply' }).catch(() => 0n),
                         ]);
@@ -132,7 +132,7 @@ export const useMarkets = () => {
                 setMarkets(validMarkets.reverse());
 
             } catch (error) {
-                console.error("Error crítico fetching markets:", error);
+                console.error("Critical error fetching markets:", error);
             } finally {
                 setIsLoading(false);
             }

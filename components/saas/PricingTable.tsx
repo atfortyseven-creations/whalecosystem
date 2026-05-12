@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, X, Shield, Zap, Globe, Database, ArrowRight } from 'lucide-react';
-import { SAAS_PLANS } from '@/lib/saas/plans';
+import { SAAS_PLANS, PlanTier } from '@/lib/saas/plans';
 import { Button } from '@/components/ui/button';
 import { useAccount } from 'wagmi';
 
@@ -46,10 +46,10 @@ export function PricingTable() {
 
     // Get ordered plans skipping FREE
     const plansToShow = [
-        SAAS_PLANS['standard'],
-        SAAS_PLANS['starter'],
-        SAAS_PLANS['pro'],
-        SAAS_PLANS['Elite']
+        SAAS_PLANS[PlanTier.STANDARD],
+        SAAS_PLANS[PlanTier.STARTER],
+        SAAS_PLANS[PlanTier.PRO],
+        SAAS_PLANS[PlanTier.ELITE],
     ];
 
     return (
@@ -75,8 +75,8 @@ export function PricingTable() {
             {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {plansToShow.map((plan, idx) => {
-                    const isPro = plan.tier === 'pro';
-                    const isInst = plan.tier === 'Elite';
+                    const isPro = plan.tier === PlanTier.PRO;
+                    const isInst = plan.tier === PlanTier.ELITE;
                     
                     return (
                         <motion.div
@@ -84,10 +84,10 @@ export function PricingTable() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.1 }}
                             key={plan.tier}
-                            className={`relative rounded-3xl p-8 flex flex-col ${
+                            className={`relative rounded-xl p-8 flex flex-col transition-all duration-300 ${
                                 isInst 
-                                ? 'bg-[#0a0a0a]/90 backdrop-blur-2xl border-2 border-indigo-500 shadow-[0_0_50px_rgba(99,102,241,0.2)]'
-                                : 'bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 hover:border-white/20'
+                                ? 'bg-[#0a0a0a]/90 backdrop-blur-2xl border-t-2 border-t-indigo-500 border border-white/5 shadow-[0_0_50px_rgba(99,102,241,0.05)]'
+                                : 'bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 hover:border-white/10'
                             }`}
                         >
                             {/* Badges */}
@@ -108,38 +108,38 @@ export function PricingTable() {
                                     {plan.name}
                                 </h3>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-black text-white tracking-tighter">
-                                        ${isAnnual ? plan.priceMetrics.annual : plan.priceMetrics.monthly}
+                                    <span className="text-4xl font-mono font-bold text-white tracking-tight">
+                                        €{isAnnual ? plan.priceMetrics.annual : plan.priceMetrics.monthly}
                                     </span>
-                                    <span className="text-white/40 text-sm font-medium uppercase tracking-widest">
-                                        / {isAnnual ? 'year' : 'mo'}
+                                    <span className="text-white/40 text-[10px] font-mono uppercase tracking-widest">
+                                        / {isAnnual ? 'YR' : 'MO'}
                                     </span>
                                 </div>
                             </div>
 
                             {/* Limits List */}
                             <div className="flex-1 space-y-4 mb-8">
-                                <div className="pb-4 border-b border-white/5 space-y-3">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-white/60">Daily Requests</span>
-                                        <span className="text-white font-mono font-bold">
-                                            {plan.limits.requestsPerDay === -1 ? 'Unlimited' : plan.limits.requestsPerDay.toLocaleString()}
+                                <div className="pb-4 border-b border-white/5 space-y-0">
+                                    <div className="flex justify-between items-center text-[13px] py-2 border-b border-white/[0.02]">
+                                        <span className="text-white/50 tracking-wide">Daily Requests</span>
+                                        <span className="text-white font-mono font-medium">
+                                            {plan.limits.requestsPerDay === -1 ? '∞' : plan.limits.requestsPerDay.toLocaleString()}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-white/60">Max Tokens</span>
-                                        <span className="text-white font-mono font-bold">
-                                            {plan.limits.maxTokens === -1 ? 'All + Custom' : plan.limits.maxTokens}
+                                    <div className="flex justify-between items-center text-[13px] py-2 border-b border-white/[0.02]">
+                                        <span className="text-white/50 tracking-wide">Max Tokens</span>
+                                        <span className="text-white font-mono font-medium">
+                                            {plan.limits.maxTokens === -1 ? 'ALL' : plan.limits.maxTokens}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-white/60">API Keys</span>
-                                        <span className="text-white font-mono font-bold">{plan.limits.maxApiKeys}</span>
+                                    <div className="flex justify-between items-center text-[13px] py-2 border-b border-white/[0.02]">
+                                        <span className="text-white/50 tracking-wide">API Keys</span>
+                                        <span className="text-white font-mono font-medium">{plan.limits.maxApiKeys}</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-white/60">Data History</span>
-                                        <span className="text-white font-mono font-bold">
-                                            {plan.limits.dataWindowHours >= 720 ? `${plan.limits.dataWindowHours/24/30} Months` : `${plan.limits.dataWindowHours} Hours`}
+                                    <div className="flex justify-between items-center text-[13px] py-2 border-b border-white/[0.02]">
+                                        <span className="text-white/50 tracking-wide">Data History</span>
+                                        <span className="text-white font-mono font-medium">
+                                            {plan.limits.dataWindowHours >= 720 ? `${plan.limits.dataWindowHours/24/30} MO` : `${plan.limits.dataWindowHours} HR`}
                                         </span>
                                     </div>
                                 </div>
@@ -180,11 +180,11 @@ export function PricingTable() {
 
 function FeatureRow({ label, active, highlight = false }: { label: string, active: boolean, highlight?: boolean }) {
     return (
-        <div className={`flex items-start gap-4 text-sm ${active ? (highlight ? 'text-indigo-300' : 'text-white/80') : 'text-white/20'}`}>
-            <div className="shrink-0 mt-0.5">
-                {active ? <Check size={16} className={highlight ? 'text-indigo-400' : 'text-green-400'} /> : <X size={16} />}
+        <div className={`flex justify-between items-center text-[13px] py-1.5 ${active ? (highlight ? 'text-indigo-300' : 'text-white/70') : 'text-white/20'}`}>
+            <span className={`tracking-wide ${highlight ? 'font-medium' : ''}`}>{label}</span>
+            <div className="shrink-0">
+                {active ? <Check size={14} className={highlight ? 'text-indigo-400' : 'text-green-500/80'} /> : <X size={14} className="text-white/10" />}
             </div>
-            <span className={highlight ? 'font-bold' : ''}>{label}</span>
         </div>
     );
 }

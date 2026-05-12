@@ -19,10 +19,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate password
-    const passwordValidation = isValidPassword(password);
-    if (!passwordValidation.valid) {
+    const isValid = isValidPassword(password);
+    if (!isValid) {
       return NextResponse.json(
-        { error: passwordValidation.error },
+        { error: 'Password does not meet requirements' },
         { status: 400 }
       );
     }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // Update user with password and marked as verified
     // Also store the generated wallet if provided
-    const user = await prisma.authUser.update({
+    const user = await (prisma.authUser as any).update({
       where: { email },
       data: {
         passwordHash,
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     // Create the associated User profile if it doesn't exist
     if (walletAddress) {
         try {
-            await prisma.user.upsert({
+            await (prisma.user as any).upsert({
                 where: { walletAddress },
                 update: {
                     email,

@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     // Create or update AuthUser
     // We use upsert to handle cases where the user might already exist but not be verified
-    const user = await prisma.authUser.upsert({
+    const user = await (prisma.authUser as any).upsert({
       where: { email },
       update: {},
       create: {
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     
 
 
-    await prisma.verificationCode.create({
+    await (prisma as any).verificationCode.create({
       data: {
         code,
         userId: user.id,

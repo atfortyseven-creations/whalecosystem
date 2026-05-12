@@ -1,119 +1,316 @@
 // lib/blockchain/rpc-relayer.ts
 /**
- * RpcRelayerManager - Sovereign Multi-Account RPC Load Balancer
- * Distributes requests across multiple GetBlock accounts to bypass the 550k CU daily limit.
+ * RpcRelayerManager — Multi-Chain RPC Load Balancer
+ *
+ * Distribuye requests entre todos los endpoints GetBlock del registry
+ * usando Round-Robin con cooldown automático en caso de 429/500.
+ *
+ * Clusters soportados:
+ *   ETH_RPC (6 endpoints), ETH_WSS (4), ETH_MEV
+ *   SOL_RPC (4 endpoints), SOL_WSS (2)
+ *   BASE_RPC (2 endpoints), BASE_WSS (2)
+ *   POL_RPC (4 endpoints), POL_WSS (2)
+ *   BSC_RPC (4 endpoints), BSC_WSS (2)
+ *   ARB_RPC (2 endpoints), ARB_WSS (2)
+ *   OP_RPC, WORLD_RPC, BTC_RPC, AVAX_RPC, HYPEREVM_RPC, BERA_RPC
+ *
+ * ANTI-BAN: Los backups solo entran en juego cuando el primario falla.
+ * El cooldown es de 5 min para 429/500 antes de reintentar.
  */
 
-type NetworkTag = 'ETH' | 'POLYGON' | 'BSC' | 'SOL' | 'ARB';
-type ProtocolType = 'RPC' | 'WSS';
+export type NetworkTag =
+  | 'ETH'
+  | 'SOL'
+  | 'BASE'
+  | 'POL'
+  | 'BSC'
+  | 'ARB'
+  | 'OP'
+  | 'WORLD'
+  | 'BTC'
+  | 'AVAX'
+  | 'HYPEREVM'
+  | 'BERA';
+
+export type ProtocolType = 'RPC' | 'WSS' | 'MEV';
 
 interface Endpoint {
-    url: string;
-    failures: number;
-    lastFailedAt: number | null;
+  url: string;
+  failures: number;
+  lastFailedAt: number | null;
 }
 
+// Fallbacks públicos por red, usados si el cluster GetBlock está vacío
+const PUBLIC_FALLBACKS: Partial<Record<string, string>> = {
+  ETH_RPC:      'https://eth.llamarpc.com',
+  ETH_WSS:      'wss://ethereum-rpc.publicnode.com',
+  SOL_RPC:      'https://api.mainnet-beta.solana.com',
+  SOL_WSS:      'wss://api.mainnet-beta.solana.com',
+  BASE_RPC:     'https://mainnet.base.org',
+  BASE_WSS:     'wss://base-rpc.publicnode.com',
+  POL_RPC:      'https://polygon-rpc.com',
+  POL_WSS:      'wss://polygon-bor-rpc.publicnode.com',
+  BSC_RPC:      'https://bsc-dataseed1.binance.org',
+  BSC_WSS:      'wss://bsc-rpc.publicnode.com',
+  ARB_RPC:      'https://arb1.arbitrum.io/rpc',
+  ARB_WSS:      'wss://arbitrum-one-rpc.publicnode.com',
+  OP_RPC:       'https://mainnet.optimism.io',
+  WORLD_RPC:    'https://worldchain-mainnet.g.alchemy.com/public',
+  BTC_RPC:      'https://mempool.space/api',
+  AVAX_RPC:     'https://api.avax.network/ext/bc/C/rpc',
+  HYPEREVM_RPC: 'https://rpc.hyperliquid.xyz/evm',
+  BERA_RPC:     'https://rpc.berachain.com',
+};
+
 export class RpcRelayerManager {
-    private static endpoints: Record<string, Endpoint[]> = {};
-    private static indices: Record<string, number> = {};
+  private static endpoints: Record<string, Endpoint[]> = {};
+  private static indices: Record<string, number> = {};
 
-    // Cooldown duration before trying a failed endpoint again (5 minutes)
-    private static readonly COOLDOWN_MS = 5 * 60 * 1000;
+  /** Cooldown de 5 min antes de reintentar un endpoint fallido */
+  private static readonly COOLDOWN_MS = 5 * 60 * 1000;
 
-    static {
-        this.initialize();
+  static {
+    this.initialize();
+  }
+
+  private static initialize() {
+    // ── ETH ────────────────────────────────────────────────────────────────────────
+    // Primarios (cuentas 1-3) → Backup (cuentas 12-14). RR natural.
+    this.loadCluster('ETH_RPC', [
+      process.env.GB_ETH_RPC_1,
+      process.env.GB_ETH_RPC_2,
+      process.env.RPC_CLUSTER_ETH_RPC,  // legacy comma-separated
+      // — backups (cuentas 12–14) — solo entran si primarios en cooldown
+      process.env.GB_ETH_RPC_B1,
+      process.env.GB_ETH_RPC_B2,
+      process.env.GB_ETH_RPC_B3,
+      process.env.GB_ETH_RPC_B4,
+    ]);
+    this.loadCluster('ETH_WSS', [
+      process.env.GB_ETH_WSS_1,
+      process.env.GB_ETH_WSS_2,
+      process.env.RPC_CLUSTER_ETH_WSS,  // legacy comma-separated
+      // — backups —
+      process.env.GB_ETH_WSS_B1,
+      process.env.GB_ETH_WSS_B2,
+    ]);
+    this.loadCluster('ETH_MEV', [process.env.GB_ETH_MEV_RPC]);
+
+    // ── SOLANA ───────────────────────────────────────────────────────────────────────
+    // Primarios (cuentas 4-5) → Backup (cuentas 15-16). RR natural.
+    this.loadCluster('SOL_RPC', [
+      process.env.GB_SOL_RPC_1,
+      process.env.GB_SOL_RPC_EXTRA,
+      process.env.GB_SOL_RPC_2,
+      process.env.GB_SOL_RPC_3,
+      process.env.RPC_CLUSTER_SOL_RPC,  // legacy comma-separated
+      // — backups (cuentas 15–16) —
+      process.env.GB_SOL_RPC_B1,
+      process.env.GB_SOL_RPC_B2,
+      process.env.GB_SOL_RPC_B3,
+    ]);
+    this.loadCluster('SOL_WSS', [
+      process.env.GB_SOL_WSS_1,
+      // — backup —
+      process.env.GB_SOL_WSS_B1,
+    ]);
+
+    // ── BASE ────────────────────────────────────────────────────────────────────────
+    // Primario (cuenta 11) → Backup (cuenta 22). RR natural.
+    this.loadCluster('BASE_RPC', [
+      process.env.GB_BASE_RPC_1,
+      // — backup (cuenta 22) —
+      process.env.GB_BASE_RPC_B1,
+    ]);
+    this.loadCluster('BASE_WSS', [
+      process.env.GB_BASE_WSS_1,
+      // — backup —
+      process.env.GB_BASE_WSS_B1,
+    ]);
+
+    // ── POLYGON ──────────────────────────────────────────────────────────────────────
+    // Primarios (cuentas 6-7) → Backup (cuentas 17-18). RR natural.
+    this.loadCluster('POL_RPC', [
+      process.env.GB_POL_RPC_1,
+      process.env.GB_POL_RPC_EXTRA,
+      process.env.GB_POL_RPC_2,
+      process.env.GB_POL_RPC_3,
+      process.env.RPC_CLUSTER_POLYGON_RPC,
+      // — backups (cuentas 17–18) —
+      process.env.GB_POL_RPC_B1,
+      process.env.GB_POL_RPC_B2,
+      process.env.GB_POL_RPC_B3,
+    ]);
+    this.loadCluster('POL_WSS', [
+      process.env.GB_POL_WSS_1,
+      process.env.RPC_CLUSTER_POLYGON_WSS,
+      // — backup —
+      process.env.GB_POL_WSS_B1,
+    ]);
+
+    // ── BSC ─────────────────────────────────────────────────────────────────────────
+    // Primarios (cuentas 8-9) → Backup (cuentas 19-20). RR natural.
+    this.loadCluster('BSC_RPC', [
+      process.env.GB_BSC_RPC_1,
+      process.env.GB_BSC_RPC_2,
+      process.env.GB_BSC_RPC_3,
+      process.env.RPC_CLUSTER_BSC_RPC,
+      // — backups (cuentas 19–20) —
+      process.env.GB_BSC_RPC_B1,
+      process.env.GB_BSC_RPC_B2,
+      process.env.GB_BSC_RPC_B3,
+    ]);
+    this.loadCluster('BSC_WSS', [
+      process.env.GB_BSC_WSS_1,
+      process.env.RPC_CLUSTER_BSC_WSS,
+      // — backup —
+      process.env.GB_BSC_WSS_B1,
+    ]);
+
+    // ── ARBITRUM ──────────────────────────────────────────────────────────────────────
+    // Primario (cuenta 10) → Backup (cuenta 21). RR natural.
+    this.loadCluster('ARB_RPC', [
+      process.env.GB_ARB_RPC_1,
+      process.env.RPC_CLUSTER_ARB_RPC,  // legacy comma-separated (2 URLs)
+      // — backup (cuenta 21) —
+      process.env.GB_ARB_RPC_B1,
+    ]);
+    this.loadCluster('ARB_WSS', [
+      process.env.GB_ARB_WSS_1,
+      // — backup —
+      process.env.GB_ARB_WSS_B1,
+    ]);
+
+    // ── OPTIMISM ──────────────────────────────────────────────────────────────
+    this.loadCluster('OP_RPC', [process.env.GB_OP_RPC_1]);
+
+    // ── WORLDCHAIN ────────────────────────────────────────────────────────────
+    this.loadCluster('WORLD_RPC', [process.env.GB_WORLD_RPC_1]);
+
+    // ── BITCOIN ───────────────────────────────────────────────────────────────
+    this.loadCluster('BTC_RPC', [process.env.GB_BTC_RPC_1]);
+
+    // ── AVALANCHE ─────────────────────────────────────────────────────────────
+    this.loadCluster('AVAX_RPC', [process.env.GB_AVAX_RPC_1]);
+
+    // ── META-CHAINS 2025 ──────────────────────────────────────────────────────
+    this.loadCluster('HYPEREVM_RPC', [process.env.GB_HYPEREVM_RPC_1]);
+    this.loadCluster('BERA_RPC',     [process.env.GB_BERA_RPC_1]);
+
+    // ── Startup log ────────────────────────────────────────────────────────────
+    const totalActive = Object.values(this.endpoints).reduce(
+      (acc, cluster) => acc + cluster.length, 0
+    );
+    console.log(`[RpcRelayer] 🚀 Initialized — ${totalActive} total endpoint slots loaded.`);
+  }
+
+  /**
+   * Carga un cluster desde un array de strings o variables env.
+   * Soporta valores con comas (legacy RPC_CLUSTER_*="url1,url2").
+   * Filtra duplicados y placeholders vacíos.
+   */
+  private static loadCluster(key: string, sources: (string | undefined)[]) {
+    const urls = new Set<string>();
+
+    for (const source of sources) {
+      if (!source) continue;
+      // Soporta comas (legacy formato RPC_CLUSTER_*)
+      source.split(',').forEach(u => {
+        const clean = u.trim().replace(/^["']|["']$/g, '');
+        if (clean.length > 10) urls.add(clean);
+      });
     }
 
-    private static initialize() {
-        this.loadCluster('ETH_WSS', process.env.RPC_CLUSTER_ETH_WSS);
-        this.loadCluster('ETH_RPC', process.env.RPC_CLUSTER_ETH_RPC);
-        
-        this.loadCluster('POLYGON_RPC', process.env.RPC_CLUSTER_POLYGON_RPC);
-        this.loadCluster('POLYGON_WSS', process.env.RPC_CLUSTER_POLYGON_WSS);
-        
-        this.loadCluster('BSC_RPC', process.env.RPC_CLUSTER_BSC_RPC);
-        this.loadCluster('BSC_WSS', process.env.RPC_CLUSTER_BSC_WSS);
-        
-        this.loadCluster('SOL_RPC', process.env.RPC_CLUSTER_SOL_RPC);
-        
-        this.loadCluster('ARB_RPC', process.env.RPC_CLUSTER_ARB_RPC);
+    this.endpoints[key] = Array.from(urls).map(url => ({
+      url,
+      failures: 0,
+      lastFailedAt: null,
+    }));
+    this.indices[key] = 0;
+
+    if (this.endpoints[key].length > 0) {
+      console.log(`[RpcRelayer] ✅ ${key}: ${this.endpoints[key].length} endpoint(s)`);
+    }
+  }
+
+  /**
+   * Obtiene el siguiente URL disponible (Round-Robin).
+   * Salta endpoints en cooldown por 429/500.
+   * Si todos están caídos, devuelve el fallback público.
+   */
+  static getRpcUrl(network: NetworkTag, protocol: ProtocolType = 'RPC'): string {
+    const key = `${network}_${protocol}`;
+    const cluster = this.endpoints[key];
+    const fallback = PUBLIC_FALLBACKS[key] ?? '';
+
+    if (!cluster || cluster.length === 0) {
+      console.warn(`[RpcRelayer] No endpoints for ${key} — using public fallback.`);
+      return fallback;
     }
 
-    private static loadCluster(key: string, envVar?: string) {
-        if (!envVar) {
-            this.endpoints[key] = [];
-            this.indices[key] = 0;
-            return;
-        }
+    const now = Date.now();
+    const startIndex = this.indices[key];
 
-        const urls = envVar.split(',').map(url => url.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
-        this.endpoints[key] = urls.map(url => ({
-            url,
-            failures: 0,
-            lastFailedAt: null
-        }));
-        this.indices[key] = 0;
+    for (let i = 0; i < cluster.length; i++) {
+      const idx = (startIndex + i) % cluster.length;
+      const ep = cluster[idx];
+
+      if (ep.lastFailedAt && now - ep.lastFailedAt < this.COOLDOWN_MS) {
+        continue; // Aún en cooldown
+      }
+
+      if (ep.lastFailedAt) {
+        // Cooldown expirado — recuperar endpoint
+        ep.lastFailedAt = null;
+        ep.failures = 0;
+      }
+
+      // Avanzar índice Round-Robin para la próxima llamada
+      this.indices[key] = (idx + 1) % cluster.length;
+      return ep.url;
     }
 
-    /**
-     * Gets the next available RPC URL for a given network using Round-Robin.
-     * Skips endpoints currently in timeout (429 Rate Limit).
-     */
-    static getRpcUrl(network: NetworkTag, protocol: ProtocolType = 'RPC'): string {
-        const key = `${network}_${protocol}`;
-        const cluster = this.endpoints[key];
+    // Todos en cooldown — intentar con el primero de todos modos
+    console.error(`[RpcRelayer] ⚠️ ALL nodes cooling down for ${key} — forcing primary.`);
+    return cluster[0].url;
+  }
 
-        if (!cluster || cluster.length === 0) {
-            console.warn(`[RpcRelayer] No endpoints configured in .env for ${key}. Using public fallback.`);
-            if (network === 'ETH' && protocol === 'RPC') return 'https://eth.llamarpc.com';
-            if (network === 'BSC' && protocol === 'RPC') return 'https://bsc-dataseed1.binance.org';
-            if (network === 'POLYGON' && protocol === 'RPC') return 'https://polygon-rpc.com';
-            if (network === 'ARB' && protocol === 'RPC') return 'https://arb1.arbitrum.io/rpc';
-            if (network === 'SOL' && protocol === 'RPC') return 'https://api.mainnet-beta.solana.com';
-            return ''; 
-        }
+  /**
+   * Reporta un fallo (429/500/timeout) — pone el endpoint en cooldown.
+   */
+  static reportFailure(network: NetworkTag, protocol: ProtocolType, url: string): void {
+    const key = `${network}_${protocol}`;
+    const cluster = this.endpoints[key];
+    if (!cluster) return;
 
-        const now = Date.now();
-        const startIndex = this.indices[key];
-        
-        for (let i = 0; i < cluster.length; i++) {
-            // Traverse array starting from current index
-            const currentIndex = (startIndex + i) % cluster.length;
-            const endpoint = cluster[currentIndex];
+    const ep = cluster.find(e => e.url === url);
+    if (ep) {
+      ep.failures += 1;
+      ep.lastFailedAt = Date.now();
+      console.warn(`[RpcRelayer] 🔴 COOLDOWN → ${url.slice(0, 50)} | Fails: ${ep.failures}`);
+    }
+  }
 
-            // If it failed recently, check if cooldown has passed
-            if (endpoint.lastFailedAt) {
-                if (now - endpoint.lastFailedAt < this.COOLDOWN_MS) {
-                    continue; // Skip this node, still healing
-                } else {
-                    // Node recovered
-                    endpoint.lastFailedAt = null;
-                }
-            }
+  /**
+   * Estado completo de todos los clusters para el dashboard de monitorización.
+   */
+  static getClusterStatus(): Record<string, { total: number; healthy: number; endpoints: { url: string; failures: number; inCooldown: boolean }[] }> {
+    const now = Date.now();
+    const result: ReturnType<typeof this.getClusterStatus> = {};
 
-            // Valid node found, update index for next time (Round-Robin)
-            this.indices[key] = (currentIndex + 1) % cluster.length;
-            return endpoint.url;
-        }
-
-        // Failsafe: All nodes are down. Return the primary node anyway to try our luck
-        console.error(`[RpcRelayer] ALL NODES DOWN OR RATE LIMITED FOR ${key}!`);
-        return cluster[0].url;
+    for (const [key, cluster] of Object.entries(this.endpoints)) {
+      const endpoints = cluster.map(ep => ({
+        url: ep.url.replace(/\/([a-f0-9]{20,})/, '/****'),
+        failures: ep.failures,
+        inCooldown: ep.lastFailedAt !== null && now - ep.lastFailedAt < this.COOLDOWN_MS,
+      }));
+      result[key] = {
+        total: cluster.length,
+        healthy: endpoints.filter(e => !e.inCooldown).length,
+        endpoints,
+      };
     }
 
-    /**
-     * Report a node that returned 429 or 500, temporarily removing it from the pool.
-     */
-    static reportFailure(network: NetworkTag, protocol: ProtocolType, url: string) {
-        const key = `${network}_${protocol}`;
-        const cluster = this.endpoints[key];
-        if (!cluster) return;
-
-        const endpoint = cluster.find(e => e.url === url);
-        if (endpoint) {
-            endpoint.failures += 1;
-            endpoint.lastFailedAt = Date.now();
-            console.warn(`[RpcRelayer] ENDPOINT BLACKLISTED (429/Timeout) -> ${url}. Fails: ${endpoint.failures}`);
-        }
-    }
+    return result;
+  }
 }

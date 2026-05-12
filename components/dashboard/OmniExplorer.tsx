@@ -8,6 +8,7 @@ import {
 import { usePublicClient, useBlockNumber } from 'wagmi';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { formatEther } from 'viem';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function OmniExplorer() {
     const { address } = useAccount();
@@ -26,7 +27,7 @@ export function OmniExplorer() {
 
     // ── On-chain block feed ─────────────────────────────────────────────────
     useEffect(() => {
-        if (!address || !publicClient || !blockNumber) return;
+        if (!publicClient || !blockNumber) return;
 
         const fetchBlock = async () => {
             try {
@@ -72,7 +73,7 @@ export function OmniExplorer() {
         };
 
         fetchBlock();
-    }, [blockNumber, publicClient, address]);
+    }, [blockNumber, publicClient]);
 
     // ── Search handler ──────────────────────────────────────────────────────
     const handleSearch = async () => {
@@ -202,37 +203,51 @@ export function OmniExplorer() {
                             {blocks.length === 0 && (
                                 <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] uppercase tracking-[0.2em] animate-pulse">Establishing Peer Link...</div>
                             )}
-                            {blocks.map((block, i) => (
-                                <button 
-                                    key={i} 
-                                    onClick={() => setSelectedBlock(block)}
-                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-all gap-4 group"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-[#FAF9F6] rounded-xl flex items-center justify-center border border-[#E5E5E5] group-hover:bg-[#050505] group-hover:text-white transition-all">
-                                            <Box size={16} />
-                                        </div>
-                                        <div className="flex flex-col gap-1 text-left">
-                                            <span className="text-lg font-mono font-black text-[#050505] group-hover:text-[#888888] transition-colors">{block.height}</span>
-                                            <span className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center gap-2">
-                                                <Clock size={10} /> {block.age}
-                                            </span>
-                                        </div>
-                                    </div>
+                            <AnimatePresence>
+                                {blocks.map((block, i) => (
+                                    <motion.button 
+                                        key={block.height} 
+                                        layout
+                                        initial={{ opacity: 0, y: -20, backgroundColor: "#E8F5E9" }}
+                                        animate={{ opacity: 1, y: 0, backgroundColor: "#FFFFFF" }}
+                                        transition={{ duration: 0.8 }}
+                                        onClick={() => setSelectedBlock(block)}
+                                        className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-all gap-4 group relative overflow-hidden"
+                                    >
+                                        {/* Animation: Mined pulse effect on mount */}
+                                        <motion.div
+                                            initial={{ opacity: 0.8, scale: 0.9 }}
+                                            animate={{ opacity: [0.8, 0, 0], scale: [0.9, 1.05, 1] }}
+                                            transition={{ duration: 1.5, ease: "easeOut" }}
+                                            className="absolute inset-0 bg-[#E8F5E9] z-0 pointer-events-none"
+                                        />
 
-                                    <div className="flex flex-col gap-1.5 sm:text-right">
-                                        <div className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center sm:justify-end gap-2">
-                                            <ShieldCheck size={10} className="text-[#050505]" /> 
-                                            VALIDATOR: <span className="text-[#050505] font-bold">{block.validator}</span>
+                                        <div className="flex items-center gap-4 relative z-10">
+                                            <div className="w-12 h-12 bg-[#FAF9F6] rounded-xl flex items-center justify-center border border-[#E5E5E5] group-hover:bg-[#050505] group-hover:text-white transition-all">
+                                                <Box size={16} />
+                                            </div>
+                                            <div className="flex flex-col gap-1 text-left">
+                                                <span className="text-lg font-mono font-black text-[#050505] group-hover:text-[#888888] transition-colors">{block.height}</span>
+                                                <span className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center gap-2">
+                                                    <Clock size={10} /> {block.age}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center sm:justify-end gap-3">
-                                            <span>{block.txs} TXS</span>
-                                            <span className="h-2 w-[1px] bg-[#E5E5E5]" />
-                                            <span>{block.size}</span>
+
+                                        <div className="flex flex-col gap-1.5 sm:text-right relative z-10">
+                                            <div className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center sm:justify-end gap-2">
+                                                <ShieldCheck size={10} className="text-[#050505]" /> 
+                                                VALIDATOR: <span className="text-[#050505] font-bold">{block.validator}</span>
+                                            </div>
+                                            <div className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center sm:justify-end gap-3">
+                                                <span>{block.txs} TXS</span>
+                                                <span className="h-2 w-[1px] bg-[#E5E5E5]" />
+                                                <span>{block.size}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </button>
-                            ))}
+                                    </motion.button>
+                                ))}
+                            </AnimatePresence>
                         </div>
                     </div>
 

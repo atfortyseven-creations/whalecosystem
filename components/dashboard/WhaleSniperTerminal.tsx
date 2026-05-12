@@ -229,7 +229,7 @@ export default function WhaleSniperTerminal() {
                 {activeTab === 'clearance' && <ClearanceSim />}
                 
                  {/* Fallback for components in heavy development */}
-                 {!['terminal', 'utxos', 'triggers', 'mempool', 'visuals', 'espionage', 'rpc', 'zk_aztec', 'graph', 'capital', 'academy', 'assist', 'vault', 'consensus', 'contracts', 'id', 'primitives'].includes(activeTab) && (
+                 {!['terminal', 'utxos', 'triggers', 'mempool', 'visuals', 'espionage', 'rpc', 'zk_aztec', 'graph', 'capital', 'academy', 'assist', 'vault', 'consensus', 'contracts', 'id', 'primitives', 'entropy', 'entity', 'cipher', 'state', 'doctrine', 'clearance'].includes(activeTab) && (
                     <div className="flex flex-col items-center justify-center h-full opacity-30">
                        <Database size={48} className="mb-4 text-[#050505]" />
                        <div className="text-[10px] font-bold tracking-widest uppercase text-[#888888]">Module Under Development</div>

@@ -80,7 +80,7 @@ export function AddressDashboard({ address }: AddressDashboardProps) {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-12 border-b border-slate-100">
                     <div className="space-y-6 flex-1 min-w-0">
                         <div className="flex items-center gap-4">
-                            <Link href="/network" className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all duration-300">
+                            <Link href="/ledger" className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all duration-300">
                                 <ArrowLeft size={20} />
                             </Link>
                             <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-100">

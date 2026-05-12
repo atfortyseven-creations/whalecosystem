@@ -412,7 +412,7 @@ function OverviewTab({ analytics, netWorth, stakingPositions, liquidityPools }: 
                         </div>
                         <div>
                             <h4 className="text-sm font-black text-white uppercase tracking-widest leading-none mb-1">Scientific Analysis Active</h4>
-                            <p className="text-xs text-blue-200/60 font-medium">Direct DeFi positions detected via RPC Multicall. Data verified 100% On-Chain.</p>
+                            <p className="text-xs text-blue-200/60 font-medium">Direct DeFi positions detected via RPC Multicall.</p>
                         </div>
                     </div>
                     {stakingPositions.find((p: any) => p.details?.healthFactor) && (

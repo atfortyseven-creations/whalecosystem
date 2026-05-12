@@ -1,13 +1,21 @@
 /**
- * GetBlock WebSocket Whale Engine — EP2
+ * GetBlock WebSocket Whale Engine — Registry-backed
  * Subscribes to all on-chain ERC-20 Transfer events above $WHALE_THRESHOLD_USD
  * Feeds the WhalePortfolio leaderboard and the live whale alert feed.
- * Uses: wss://go.getblock.io/95cb42a5aa444537a068031ce279d343
+ * WSS pool: getblock-registry.ts (GB_ETH_WSS_*)
  */
 
 import WebSocket from 'ws';
+import { getGbAllWss } from './getblock-registry';
 
-const WS_URL = process.env.GETBLOCK_ETH_WS_2 || process.env.GETBLOCK_ETH_WS || 'wss://ethereum-rpc.publicnode.com';
+// Construye la pool WSS desde el registry dinámicamente para respetar el CU Circuit Breaker
+const getActiveWssUrls = (): string[] => {
+    const gb = getGbAllWss('eth');
+    return gb.length > 0 ? gb : ['wss://ethereum-rpc.publicnode.com'];
+};
+
+let wssIndex = 0;
+
 let backoff = 5000;
 const WHALE_USD_THRESHOLD = parseInt(process.env.WHALE_THRESHOLD_USD || '50000', 10);
 
@@ -52,12 +60,17 @@ class WhaleWebSocketEngine {
 
     connect() {
         if (this.ws?.readyState === WebSocket.OPEN) return;
-        if (!WS_URL) {
-            console.warn('[WhaleEngine] GETBLOCK_ETH_WS_2 is not set. Real-time stream disabled.');
+        const activeUrls = getActiveWssUrls();
+        if (activeUrls.length === 0) {
+            console.warn('[WhaleEngine] No WSS endpoints available. Stream disabled.');
             return;
         }
+        
+        const url = activeUrls[wssIndex % activeUrls.length];
+        wssIndex = (wssIndex + 1) % activeUrls.length;
 
-        this.ws = new WebSocket(WS_URL);
+        this.ws = new WebSocket(url);
+        console.info(`[WhaleEngine] Connecting to WSS: ${url.slice(0, 48)}...`);
 
         this.ws.on('open', () => {
             console.info('[WhaleEngine] GetBlock WS connected (EP2)');

@@ -61,11 +61,11 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
             );
             // If we got at least one price, the endpoint is healthy
             if (Object.keys(prices).length > 0) break;
-            else {
-                console.warn(`[API] RPC ${ep} returns empty slot0 results.`);
-            }
+            // slot0 returned empty — RPC degraded, CEX fallback covers this
+
         } catch (e) {
-            console.error('[API] Provider exception:', e);
+            console.log('[API] RPC provider exception — degrading to CEX data:', (e as Error).message);
+
             RpcRelayerManager.reportFailure('ETH', 'RPC', ep);
             continue;
         }
@@ -91,7 +91,7 @@ async function fetchCexMarkets(): Promise<any[] | null> {
         
         if (resKu.ok) {
             const parsedKu = await resKu.json();
-            if (parsedKu?.data?.ticker && Array.isArray(parsedKu.data.ticker)) {
+            if (parsedKu?.data?.ticker && Array.isArray(parsedKu.data.ticker) && parsedKu.data.ticker.length > 0) {
                 return parsedKu.data.ticker.map((t: any) => ({
                     symbol: t.symbol.replace('-', ''),
                     lastPrice: t.last,
@@ -101,13 +101,14 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             }
         }
     } catch (e) {
-        console.warn('[API] KuCoin fetch failed, falling back to MEXC', e);
+        console.log('[API] KuCoin unavailable — falling back to MEXC');
+
     }
 
     // 2. Try MEXC API (Globally accessible, no strict geographic blocks)
     try {
         const controllerMexc = new AbortController();
-        const idMexc = setTimeout(() => controllerMexc.abort(), 6000); // 6s timeout for MEXC
+        const idMexc = setTimeout(() => controllerMexc.abort(), 6000);
         
         const res = await fetch('https://api.mexc.com/api/v3/ticker/24hr', {
             cache: 'no-store',
@@ -121,14 +122,16 @@ async function fetchCexMarkets(): Promise<any[] | null> {
         if (res.ok) {
             const raw = await res.json();
             if (Array.isArray(raw) && raw.length > 0) {
-                return raw.map(t => ({
+                // MEXC returns priceChangePercent as a decimal (e.g. "0.0056" = 0.56%), so we must multiply by 100
+                return raw.map((t: any) => ({
                     ...t,
                     priceChangePercent: t.priceChangePercent ? (parseFloat(t.priceChangePercent) * 100).toFixed(3) : "0.000"
                 }));
             }
         }
     } catch (e) {
-        console.warn('[API] MEXC fetch failed, falling back to Binance', e);
+        console.log('[API] MEXC unavailable — falling back to Binance');
+
     }
 
     // 2. Fallback to Binance
@@ -150,13 +153,51 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             if (Array.isArray(rawBinance) && rawBinance.length > 0) return rawBinance;
         }
     } catch (e) {
-        console.warn('[API] Binance fetch failed', e);
+        console.log('[API] Binance unavailable — trying CoinGecko');
+
     }
     
+    // 4. Final fallback: CoinGecko (free tier, globally accessible, no IP blocks)
+    try {
+        const cgIds = 'bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin,shiba-inu,polkadot,avalanche-2,chainlink,matic-network,uniswap,arbitrum,optimism,aptos,injective-protocol,pepe,dogwifcoin,bonk,floki,fetch-ai,near,lido-dao,worldcoin-wld,starknet,jupiter,pyth-network,celestia,blur,gmx,sui,sei-network,toncoin';
+        const controllerCg = new AbortController();
+        const idCg = setTimeout(() => controllerCg.abort(), 8000);
+        const resCg = await fetch(
+            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${cgIds}&order=market_cap_desc&per_page=100&page=1&price_change_percentage=24h`,
+            { cache: 'no-store', signal: controllerCg.signal, headers: { 'Accept': 'application/json' } }
+        ).finally(() => clearTimeout(idCg));
+        if (resCg.ok) {
+            const cgData = await resCg.json();
+            if (Array.isArray(cgData) && cgData.length > 0) {
+                const CG_SYMBOL_MAP: Record<string, string> = {
+                    'bitcoin':'BTCUSDT','ethereum':'ETHUSDT','binancecoin':'BNBUSDT','solana':'SOLUSDT',
+                    'ripple':'XRPUSDT','cardano':'ADAUSDT','dogecoin':'DOGEUSDT','shiba-inu':'SHIBUSDT',
+                    'polkadot':'DOTUSDT','avalanche-2':'AVAXUSDT','chainlink':'LINKUSDT','matic-network':'MATICUSDT',
+                    'uniswap':'UNIUSDT','arbitrum':'ARBUSDT','optimism':'OPUSDT','aptos':'APTUSDT',
+                    'injective-protocol':'INJUSDT','pepe':'PEPEUSDT','dogwifcoin':'WIFUSDT','bonk':'BONKUSDT',
+                    'floki':'FLOKIUSDT','fetch-ai':'FETUSDT','near':'NEARUSDT','lido-dao':'LDOUSDT',
+                    'worldcoin-wld':'WLDUSDT','starknet':'STRKUSDT','jupiter':'JUPUSDT','pyth-network':'PYTHUSDT',
+                    'celestia':'TIAUSDT','blur':'BLURUSDT','gmx':'GMXUSDT','sui':'SUIUSDT',
+                    'sei-network':'SEIUSDT','toncoin':'TONUSDT',
+                };
+                console.log('[API] Using CoinGecko fallback, got', cgData.length, 'assets');
+                return cgData.map((c: any) => ({
+                    symbol: CG_SYMBOL_MAP[c.id] || (c.symbol.toUpperCase() + 'USDT'),
+                    lastPrice: c.current_price?.toString() || '0',
+                    priceChangePercent: c.price_change_percentage_24h?.toFixed(3) || '0.000',
+                    quoteVolume: c.total_volume?.toString() || '0',
+                    source: 'coingecko',
+                }));
+            }
+        }
+    } catch (e) {
+        console.log('[API] CoinGecko unavailable — returning null (all sources exhausted)');
+
+    }
+
     return null;
 }
 
-// ── USDT pairs we want to surface (ordered by priority) ──────────────────────
 const PRIORITY_SYMBOLS = new Set([
     'BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','ADAUSDT',
     'DOGEUSDT','SHIBUSDT','DOTUSDT','AVAXUSDT','LINKUSDT','MATICUSDT',
@@ -165,6 +206,43 @@ const PRIORITY_SYMBOLS = new Set([
     'WLDUSDT','STRKUSDT','JUPUSDT','PYTHUSDT','TIAUSDT','BLURUSDT',
     'GMXUSDT','SUIUSDT','SEIUSDT','TONUSDT',
 ]);
+
+const ASSET_META: Record<string, { name: string; network: string; mcapRankHint: number }> = {
+    BTCUSDT:  { name: 'Bitcoin',         network: 'bitcoin',   mcapRankHint: 1  },
+    ETHUSDT:  { name: 'Ethereum',        network: 'ethereum',  mcapRankHint: 2  },
+    BNBUSDT:  { name: 'BNB',             network: 'bsc',       mcapRankHint: 3  },
+    SOLUSDT:  { name: 'Solana',          network: 'solana',    mcapRankHint: 4  },
+    XRPUSDT:  { name: 'XRP',             network: 'xrp',       mcapRankHint: 5  },
+    ADAUSDT:  { name: 'Cardano',         network: 'cardano',   mcapRankHint: 6  },
+    DOGEUSDT: { name: 'Dogecoin',        network: 'ethereum',  mcapRankHint: 7  },
+    SHIBUSDT: { name: 'Shiba Inu',       network: 'ethereum',  mcapRankHint: 8  },
+    DOTUSDT:  { name: 'Polkadot',        network: 'polkadot',  mcapRankHint: 9  },
+    AVAXUSDT: { name: 'Avalanche',       network: 'avalanche', mcapRankHint: 10 },
+    LINKUSDT: { name: 'Chainlink',       network: 'ethereum',  mcapRankHint: 11 },
+    MATICUSDT:{ name: 'Polygon',         network: 'polygon',   mcapRankHint: 12 },
+    UNIUSDT:  { name: 'Uniswap',         network: 'ethereum',  mcapRankHint: 13 },
+    ARBUSDT:  { name: 'Arbitrum',        network: 'arbitrum',  mcapRankHint: 14 },
+    OPUSDT:   { name: 'Optimism',        network: 'optimism',  mcapRankHint: 15 },
+    APTUSDT:  { name: 'Aptos',           network: 'aptos',     mcapRankHint: 16 },
+    INJUSDT:  { name: 'Injective',       network: 'injective', mcapRankHint: 17 },
+    PEPEUSDT: { name: 'Pepe',            network: 'ethereum',  mcapRankHint: 18 },
+    WIFUSDT:  { name: 'dogwifhat',       network: 'solana',    mcapRankHint: 19 },
+    BONKUSDT: { name: 'Bonk',            network: 'solana',    mcapRankHint: 20 },
+    FLOKIUSDT:{ name: 'Floki Inu',       network: 'bsc',       mcapRankHint: 21 },
+    FETUSDT:  { name: 'Fetch.ai',        network: 'ethereum',  mcapRankHint: 22 },
+    NEARUSDT: { name: 'NEAR Protocol',   network: 'near',      mcapRankHint: 23 },
+    LDOUSDT:  { name: 'Lido DAO',        network: 'ethereum',  mcapRankHint: 24 },
+    WLDUSDT:  { name: 'Worldcoin',       network: 'ethereum',  mcapRankHint: 25 },
+    STRKUSDT: { name: 'StarkNet',        network: 'starknet',  mcapRankHint: 26 },
+    JUPUSDT:  { name: 'Jupiter',         network: 'solana',    mcapRankHint: 27 },
+    PYTHUSDT: { name: 'Pyth Network',    network: 'solana',    mcapRankHint: 28 },
+    TIAUSDT:  { name: 'Celestia',        network: 'celestia',  mcapRankHint: 29 },
+    BLURUSDT: { name: 'Blur',            network: 'ethereum',  mcapRankHint: 30 },
+    GMXUSDT:  { name: 'GMX',             network: 'arbitrum',  mcapRankHint: 31 },
+    SUIUSDT:  { name: 'Sui',             network: 'sui',       mcapRankHint: 32 },
+    SEIUSDT:  { name: 'Sei',             network: 'sei',       mcapRankHint: 33 },
+    TONUSDT:  { name: 'Toncoin',         network: 'ton',       mcapRankHint: 34 },
+};
 
 // ... synthetic fallback purged ...
 
@@ -179,6 +257,9 @@ export async function GET(_req: NextRequest) {
 
     // ── Step 1: Fetch CEX Data (Primary) ───────────────────────────────────
     let marketData = await fetchCexMarkets();
+    if (marketData && marketData.length === 0) {
+        marketData = null; // Treat empty array as failure
+    }
     let source = marketData ? 'live-exchange' : 'degraded-exchange';
 
     // ── Step 2: Fallback or Enrich with GetBlock on-chain prices ─────
@@ -243,7 +324,10 @@ export async function GET(_req: NextRequest) {
 
     // ── Filter to priority USDT pairs + sort by volume for top display ────────
     const filtered = (marketData as any[]).filter(t => PRIORITY_SYMBOLS.has(t.symbol));
-    const finalData = filtered.length > 0 ? filtered : marketData;
+    const finalData = (filtered.length > 0 ? filtered : marketData).map((t: any) => ({
+        ...t,
+        meta: ASSET_META[t.symbol] || { name: t.symbol, network: 'ethereum', mcapRankHint: 999 }
+    }));
 
     _cachedMarkets = finalData;
     _cacheTs = Date.now();

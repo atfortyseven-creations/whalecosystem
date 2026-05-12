@@ -1,33 +1,49 @@
-# Contributing to Whale Alert Network
+# SOVEREIGN ARCHITECTURE CONTRIBUTING PROTOCOL
 
-Thank you for your interest in contributing! We are building the most respected, sovereign, privacy-first on-chain intelligence platform in Web3.
+> [!WARNING]
+> **STRICT PROCEDURAL MANDATE**
+> The Sovereign Terminal is an institutional-grade codebase. We do not accept casual contributions, unverified logic modifications, or superficial UI tweaks. Every pull request is subjected to rigorous academic peer review and mathematical scrutiny. If you cannot abide by these Draconian standards, do not attempt to contribute.
 
-## Ground Rules
+## 1. Architectural Philosophy & Zero-Simulation
 
-- **Privacy First**: Any new feature must respect the Zero-Knowledge and Sovereign Vault architecture. We do not track users.
-- **Performance**: The frontend terminal is optimized for 240Hz rendering. Heavy logic should run in the background (Whale Worker or Sovereign Vault), not on the UI thread.
-- **Quality Requirements**: "Perfect and flawless code quality." We use TypeScript. Strict mode is mandated. 
+Before writing a single line of code, you must internalize the philosophical tenets of the Sovereign Architecture:
+1. **The Zero-Simulation Mandate:** Absolutely no mock data, stubbed APIs, or synthetic rendering states. All UI components must ingest live, deterministic telemetry.
+2. **Absolute Separation of Concerns:** The Next.js frontend must remain blissfully ignorant of cryptographic hashing logic. The Node.js indexing workers must never touch UI rendering paths.
+3. **Graceful Degradation:** If an external system fails (e.g., Neo4j graph latency spikes), your code must degrade elegantly to an in-memory matrix without crashing the main Event Loop.
 
-## Pull Request Guidelines
+## 2. The Pull Request Crucible
 
-1. **Branch Naming**: 
-   - `feat/feature-name`
-   - `fix/issue-description`
-   - `docs/what-changed`
-2. **Conventional Commits**: We strictly enforce Conventional Commits.
-   - `feat:` for new features
-   - `fix:` for bug fixes
-   - `chore:` for maintenance
-   - `docs:` for documentation updates
-3. **Tests**: If adding new worker heuristics or contract logic, you must include unit tests. Our goal is 100% coverage.
+If you believe your optimization or feature is worthy of inclusion in the Sovereign Core, follow this exact sequence:
 
-## Running Locally for Development
+### 2.1 Branch Nomenclature
+Branches must reflect the absolute precision of the work contained within.
+* **Cryptography/Security:** `matrix/crypto-enhancement-[descriptor]`
+* **High-Frequency Backend:** `engine/telemetry-optimization-[descriptor]`
+* **Institutional Frontend:** `terminal/ui-refinement-[descriptor]`
+* **Example:** `engine/eip1153-transient-storage-parser`
 
-Please refer to the `QUICKSTART.md` for standard running instructions. If you modify the Prisma schema, remember to generate the client:
-```bash
-npx prisma generate
-```
+### 2.2 Cryptographic Commit Signatures
+**Unsigned commits will be automatically rejected by the pipeline.** 
+You must cryptographically sign every single commit using a verified GPG/PGP key tied to your identity. Non-repudiation is a fundamental axiom of this repository.
 
-## How to Report Issues
+### 2.3 The Peer Review Payload
+Your Pull Request description must be structured as a formal technical monograph:
+1. **Abstract:** What mathematical or engineering problem does this solve?
+2. **Algorithmic Complexity:** Provide Big-O notation analysis for any new iteration loops or database queries.
+3. **Thermodynamic Impact:** Does this increase client-side CPU load or server-side memory consumption? Provide hard metrics.
+4. **Architectural Verification:** Prove that your code does not violate the Zero-Trust `TitaniumGate` middleware.
 
-Use the templates in `.github/ISSUE_TEMPLATE` to report bugs or request features. Be as detailed as possible, especially regarding environment and hardware constraints.
+## 3. Code Standards & Maximum Perfection
+
+This codebase demands a level of perfection rarely seen outside of mission-critical aerospace systems.
+
+* **Type Safety:** `any` is strictly prohibited. You must define exhaustive, rigorous TypeScript interfaces.
+* **Error Handling:** Silent failures are forbidden. Use the `InstitutionalErrorBoundary` and emit verifiable logs for all exceptions.
+* **Asynchronous Integrity:** Race conditions must be mathematically eliminated using state locks or singleton patterns. Never assume a promise will resolve sequentially.
+* **Aesthetics:** If touching the frontend, your code must respect the existing hyper-premium, high-fidelity UI constraints. We do not accept messy CSS.
+
+## 4. Final Admonition
+
+*"The attainment of absolute perfection transpires not when there remains nothing further to add, but when there is unequivocally nothing left to strip away."*
+
+If your contribution adds unnecessary bloat, it will be discarded. If it refines the system closer to absolute mathematical truth, you will earn your place in the Sovereign ecosystem.

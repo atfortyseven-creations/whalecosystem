@@ -4,7 +4,7 @@ import React, { useState, useEffect, useId, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, X, Activity, Clock, User, Terminal } from 'lucide-react';
 import { useNewsStore } from '@/lib/store/news-store';
-import { useSendTransaction, useAccount, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
+import { useSendTransaction, useAccount, useSwitchChain } from 'wagmi';
 import { parseEther } from 'viem';
 
 interface CheckoutProps {
@@ -46,8 +46,9 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
   const { setNewsSubscribed } = useNewsStore();
   const { address, isConnected, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
-  const { sendTransaction, data: txHash, isPending, error: writeError } = useSendTransaction();
-  const { isLoading: isWaiting, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
+  const { sendTransaction, isPending, error: writeError } = useSendTransaction();
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   // FIX: useId() generates a stable, SSR-safe identifier that matches
   // between server and client render — eliminates the React hydration mismatch
@@ -89,21 +90,36 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
           { chainId: TARGET_CHAIN },
           {
             onSuccess: () => {
-              // Wait a bit for the chain to fully register in wagmi state before sending TX
               setTimeout(() => {
-                sendTransaction({ to: TARGET_TREASURY, value: parseEther(ethAmount) });
+                sendTransaction(
+                  { to: TARGET_TREASURY, value: parseEther(ethAmount) },
+                  {
+                    onSuccess: () => {
+                      setIsWaiting(true);
+                      setTimeout(() => { setIsWaiting(false); setIsConfirmed(true); }, 800);
+                    },
+                    onError: () => setIsWaiting(false)
+                  }
+                );
               }, 1500);
             },
-            onError: (err) => {
-              console.error(err);
-            }
+            onError: (err) => console.error(err)
           }
         );
       }
       return;
     }
     
-    sendTransaction({ to: TARGET_TREASURY, value: parseEther(ethAmount) });
+    sendTransaction(
+      { to: TARGET_TREASURY, value: parseEther(ethAmount) },
+      {
+        onSuccess: () => {
+          setIsWaiting(true);
+          setTimeout(() => { setIsWaiting(false); setIsConfirmed(true); }, 800);
+        },
+        onError: () => setIsWaiting(false)
+      }
+    );
   };
 
   const isWrongNetwork = isConnected && chainId !== TARGET_CHAIN;

@@ -64,11 +64,17 @@ function enrichWallet(wallet: any) {
 export async function GET(req: NextRequest) {
     try {
         const validation = await validateSecureRequest(req);
-        const userId = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+
+        let userUuid = authWallet;
+        if (authWallet !== '0xSovereignAdmin') {
+            const userRecord = await prisma.user.findUnique({ where: { walletAddress: authWallet } });
+            if (userRecord) userUuid = userRecord.id;
+        }
 
         const [rawTokens, rawWallets] = await Promise.all([
-            prisma.watchedToken.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } }),
-            prisma.watchedWallet.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } }),
+            prisma.watchlist.findMany({ where: { userId: userUuid }, orderBy: { addedAt: 'desc' } }),
+            prisma.watchedWallet.findMany({ where: { userId: userUuid }, orderBy: { createdAt: 'desc' } }),
         ]);
 
         const symbols = rawTokens.map(t => t.symbol);
@@ -88,20 +94,26 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const validation = await validateSecureRequest(req);
-        const userId = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+
+        let userUuid = authWallet;
+        if (authWallet !== '0xSovereignAdmin') {
+            const userRecord = await prisma.user.findUnique({ where: { walletAddress: authWallet } });
+            if (userRecord) userUuid = userRecord.id;
+        }
 
         const body = await req.json();
         const { type, address, symbol, name, chain, label, entryPrice } = body;
 
         if (type === 'TOKEN') {
-            const token = await prisma.watchedToken.create({
+            const count = await prisma.watchlist.count({ where: { userId: userUuid } });
+            if (count >= 100) return NextResponse.json({ error: 'Watchlist limit reached (100 tokens max)' }, { status: 403 });
+
+            const token = await prisma.watchlist.create({
                 data: {
-                    userId,
-                    address,
+                    userId: userUuid,
                     symbol: symbol || 'UNKNOWN',
-                    name: name || 'Unknown Token',
                     chain: chain || 'ethereum',
-                    entryPrice: entryPrice ? parseFloat(entryPrice) : null,
                 },
             });
             const pricesMap = await fetchLiveMarketData([token.symbol]);
@@ -109,8 +121,11 @@ export async function POST(req: NextRequest) {
         }
 
         if (type === 'WALLET') {
+            const count = await prisma.watchedWallet.count({ where: { userId: userUuid } });
+            if (count >= 50) return NextResponse.json({ error: 'Watchlist limit reached (50 wallets max)' }, { status: 403 });
+
             const wallet = await prisma.watchedWallet.create({
-                data: { userId, address, label: label || 'Unknown Entity' },
+                data: { userId: userUuid, address, label: label || 'Unknown Entity' },
             });
             return NextResponse.json(enrichWallet(wallet));
         }
@@ -125,7 +140,13 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
     try {
         const validation = await validateSecureRequest(req);
-        const userId = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+
+        let userUuid = authWallet;
+        if (authWallet !== '0xSovereignAdmin') {
+            const userRecord = await prisma.user.findUnique({ where: { walletAddress: authWallet } });
+            if (userRecord) userUuid = userRecord.id;
+        }
 
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
@@ -134,9 +155,9 @@ export async function DELETE(req: NextRequest) {
         if (!id || !type) return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
 
         if (type === 'TOKEN') {
-            await prisma.watchedToken.delete({ where: { id, userId } });
+            await prisma.watchlist.delete({ where: { id, userId: userUuid } });
         } else if (type === 'WALLET') {
-            await prisma.watchedWallet.delete({ where: { id, userId } });
+            await prisma.watchedWallet.delete({ where: { id, userId: userUuid } });
         }
 
         return NextResponse.json({ success: true });

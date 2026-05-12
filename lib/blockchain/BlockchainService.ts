@@ -43,8 +43,10 @@ export class BlockchainService {
       
       // Elite-grade Fallback Provider
       // Connects to multiple RPCs and switches automatically if one fails.
-      const providers = config.rpcUrls.map((url, index) => ({
-        provider: new ethers.JsonRpcProvider(url, undefined, { staticNetwork: true }),
+      const validUrls = config.rpcUrls.filter(url => url && url.length > 5 && !url.includes('undefined'));
+      
+      const providers = validUrls.map((url, index) => ({
+        provider: new ethers.JsonRpcProvider(url, config.chainId, { staticNetwork: true }),
         priority: index + 1, // Higher priority for Alchemy/Primary
         stallTimeout: index === 0 ? 500 : 2000,
       }));
@@ -321,9 +323,8 @@ export const blockchainService = new BlockchainService([
     chainId: ChainId.WORLDCHAIN,
     name: 'World Chain',
     rpcUrls: [
-      'https://go.getblock.io/889c09939a894084931a2f6417724a9e', // GetBlock Primary
-      `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
-      'https://rpc.worldchain.org' 
+      process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : 'https://worldchain-mainnet.g.alchemy.com/public',
+      'https://worldchain-mainnet.g.alchemy.com/public'
     ],
     bundlerUrl: `https://api.pimlico.io/v2/480/rpc?apikey=${process.env.NEXT_PUBLIC_PIMLICO_API_KEY}`,
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },

@@ -4,20 +4,22 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, ArrowDownRight, RefreshCcw, TrendingUp, Wallet, Loader2, PieChart, Activity, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus, Github, Twitter } from 'lucide-react';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
-import { usePortfolioStore } from '@/lib/portfolio/store';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { PortfolioSkeleton } from '@/components/ui/skeleton-loader';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
+import { useRealWalletData } from '@/hooks/useRealWalletData';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
 // Helper to format wallet address in TXO format
-function formatTXO(address: string | undefined, symbol: string): string {
-    if (!address) return 'UNKNOWN';
-    if (symbol === 'ETH' || symbol === 'MATIC' || symbol === 'BNB') return 'NATIVE COIN';
-    return 'ERC-20 TOKEN';
+function formatTXO(address: string, symbol: string | undefined): string {
+    const time = new Date().getTime().toString().slice(-4);
+    const symStr = typeof symbol === 'string' ? symbol : 'UNK';
+    const sym = symStr.substring(0, 3).toUpperCase();
+    const addr = typeof address === 'string' && address.length >= 6 ? address.substring(2, 6).toUpperCase() : 'XXXX';
+    return `TXO-${addr}-${sym}-${time}`;
 }
 
 export default function PortfolioDashboard({ walletAddress }: { walletAddress?: string }) {
@@ -32,18 +34,14 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const effectiveAddress = walletAddress || web3Address || sovereignAddress;
     const isConnected = !!effectiveAddress;
 
-    const { 
-        getPortfolio, 
-        fetchPortfolio 
-    } = usePortfolioStore();
+    const {
+        assets = [],
+        totalBalance: totalValueStr,
+        change24hUSD: totalChange24h = 0,
+        isLoading
+    } = useRealWalletData([], effectiveAddress ?? undefined);
 
-    // Select state based on current address
-    const { 
-        assets, 
-        totalValue, 
-        totalChange24h, 
-        isLoading 
-    } = getPortfolio(effectiveAddress || '');
+    const totalValue = parseFloat(totalValueStr || '0');
 
     const [previousAssets, setPreviousAssets] = useState<string[]>([]);
     const [newAssetIds, setNewAssetIds] = useState<Set<string>>(new Set());
@@ -52,15 +50,6 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const [isEyesOff, setIsEyesOff] = useState(false);
 
     useEffect(() => { setMounted(true); }, []);
-
-    // 1. SYNC DATA
-    useEffect(() => {
-        if (effectiveAddress) {
-            fetchPortfolio(effectiveAddress);
-            const interval = setInterval(() => fetchPortfolio(effectiveAddress), 30000); 
-            return () => clearInterval(interval);
-        }
-    }, [effectiveAddress, fetchPortfolio]);
 
     // 2. DETECT NEW ASSETS
     useEffect(() => {
@@ -309,7 +298,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     </div>
 
                     <button
-                        onClick={() => effectiveAddress && fetchPortfolio(effectiveAddress)}
+                        onClick={() => window.location.reload()}
                         className="p-5 hover:bg-black/5 rounded-[1.5rem] transition-all text-black/20 hover:text-black border border-transparent hover:border-black/[0.06] group"
                     >
                         <RefreshCcw size={24} className={cn(isLoading && "animate-spin")} strokeWidth={2.5} />
@@ -351,10 +340,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 >
                                     <div className="flex items-center gap-6 relative z-10 flex-1">
                                         <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg border bg-black/5 border-black/[0.06] text-black/40 group-hover:bg-black group-hover:text-white transition-all">
-                                            {asset.symbol.slice(0, 3)}
+                                            {typeof asset.symbol === 'string' ? asset.symbol.slice(0, 3) : '?'}
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-lg font-black text-black tracking-tight">{asset.symbol}</div>
+                                            <div className="text-lg font-black text-black tracking-tight">{asset.symbol || 'Unknown'}</div>
                                             <div className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{asset.network}</div>
                                         </div>
                                         <ArrowRight size={18} className="text-black/10 ml-auto mr-6 group-hover:text-[#00F2EA] transition-all" strokeWidth={2.5} />
@@ -362,10 +351,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                     
                                     <div className="text-right mx-10 relative z-10">
                                         <div className="text-black font-mono font-black text-3xl tracking-tighter">
-                                            {isEyesOff ? "***.**" : `$${safeToLocaleString(asset.value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                            {isEyesOff ? "***.**" : `$${safeToLocaleString(asset.valueUSD || 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </div>
                                         <div className="text-[10px] text-black/30 font-bold uppercase tracking-widest mt-1">
-                                            {isEyesOff ? "**" : safeToFixed(asset.balance, 6)} {asset.symbol}
+                                            {isEyesOff ? "**" : safeToFixed(asset.balanceNumeric || asset.balance || 0, 6)} {asset.symbol}
                                         </div>
                                     </div>
 

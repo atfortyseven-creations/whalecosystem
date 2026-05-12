@@ -294,7 +294,7 @@ export function NewPairsTable() {
 
             {/* ── Status Footer ── */}
             <div className="shrink-0 px-5 py-2.5 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em]">
-                <span>{filtered.length} PAIRS · WAITING ON-CHAIN INJECTION</span>
+                <span>{filtered.length} PAIRS · ON-CHAIN VERIFIED</span>
                 <span className="font-mono text-[#050505]/40 tracking-widest">WAN SECURITY ENGINE</span>
             </div>
         </div>

@@ -1,13 +1,20 @@
 import { z } from 'zod';
 import { redisClient } from './redis/client';
+import { getGbAllRpc, getGbRpc } from '@/lib/blockchain/getblock-registry';
+
+// ─── Tipos ────────────────────────────────────────────────────────────────────
+
+type SupportedChain = 'SOLANA' | 'ETHEREUM' | 'BSC' | 'POLYGON' | 'BASE' | 'ARB' | 'OP';
 
 interface RPCEndpoint {
     url: string;
-    chain: 'SOLANA' | 'ETHEREUM';
+    chain: SupportedChain;
     latencyMs: number;
     health: 'HEALTHY' | 'DEGRADED' | 'DEAD';
     errorCount: number;
 }
+
+// ─── Validación ───────────────────────────────────────────────────────────────
 
 const RpcSchema = z.string().url();
 
@@ -16,28 +23,77 @@ function safeParseRPC(envValue: string | undefined, fallback: string): string {
     return res.success ? res.data : fallback;
 }
 
+// ─── Pool — GetBlock primary + public fallbacks ───────────────────────────────
+/**
+ * Para ETH y chains cubiertas por el registry:
+ *   - Prioridad 1: endpoints activos del GetBlock Registry
+ *   - Prioridad 2: fallbacks públicos
+ *
+ * Para SOL: no hay registry EVM, usamos directamente las GB vars + públicos.
+ */
 const RPC_POOL: Record<string, RPCEndpoint[]> = {
     SOLANA: [
-        { url: safeParseRPC(process.env.SOLANA_RPC_1, 'https://go.getblock.io/d7b69447567646fbbf33146095d32c19'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: safeParseRPC(process.env.SOLANA_RPC_2, 'https://go.getblock.io/3cc93340fea44554a8b3b40d3e071131'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: safeParseRPC(process.env.SOLANA_RPC_3, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: safeParseRPC(process.env.SOLANA_RPC_4, 'https://ssc-dao.genesysgo.net'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 }
-    ],
+        { url: safeParseRPC(process.env.GB_SOL_RPC_1, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: safeParseRPC(process.env.GB_SOL_RPC_2 ?? process.env.SOLANA_RPC_2, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://api.mainnet-beta.solana.com', chain: 'SOLANA' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://ssc-dao.genesysgo.net',       chain: 'SOLANA' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+    ].filter((ep, idx, arr) => arr.findIndex(e => e.url === ep.url) === idx), // deduplica
+
     ETHEREUM: [
-        { url: safeParseRPC(process.env.ETH_RPC_1, 'https://cloudflare-eth.com'), chain: 'ETHEREUM', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: safeParseRPC(process.env.ETH_RPC_2, 'https://rpc.ankr.com/eth'), chain: 'ETHEREUM', latencyMs: 0, health: 'HEALTHY', errorCount: 0 }
-    ]
+        // GetBlock Archive slots 1 + 2 desde el registry
+        ...getGbAllRpc('eth').map(url => ({
+            url, chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
+        })),
+        // Públicos de emergencia
+        { url: 'https://cloudflare-eth.com', chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/eth',   chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://eth.llamarpc.com',   chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+    ],
+
+    BSC: [
+        ...( getGbRpc('bsc') ? [{ url: getGbRpc('bsc') as string, chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
+        { url: 'https://bsc-dataseed1.binance.org', chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://bsc-dataseed2.binance.org', chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/bsc',          chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+    ],
+
+    POLYGON: [
+        ...( getGbRpc('polygon') ? [{ url: getGbRpc('polygon') as string, chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
+        { url: 'https://polygon-rpc.com',           chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/polygon',      chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://polygon.llamarpc.com',       chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+    ],
+
+    BASE: [
+        ...( getGbRpc('base') ? [{ url: getGbRpc('base') as string, chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 }] : []),
+        { url: 'https://mainnet.base.org',          chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/base',         chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://base.llamarpc.com',          chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+    ],
+
+    ARB: [
+        ...getGbAllRpc('arb').map(url => ({
+            url, chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
+        })),
+        { url: 'https://arb1.arbitrum.io/rpc',      chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/arbitrum',     chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+    ],
+
+    OP: [
+        { url: 'https://mainnet.optimism.io',        chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://rpc.ankr.com/optimism',      chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+    ],
 };
 
 const REDIS_HEALTH_KEY = 'rpc:cluster:health:matrix';
 
 export class GlobalRPCRouter {
     /**
-     * Synchronizes local state with GLobal Redis Health Matrix
+     * Sincroniza estado local con el Redis Health Matrix global.
      */
-    private static async syncHealth(chain: 'SOLANA' | 'ETHEREUM') {
+    private static async syncHealth(chain: SupportedChain) {
         try {
-            if (!redisClient || redisClient.__isMock) return;
+            if (!redisClient || (redisClient as any).__isMock) return;
             const globalHealth = await redisClient.hgetall(`${REDIS_HEALTH_KEY}:${chain}`);
             if (!globalHealth) return;
 
@@ -50,55 +106,84 @@ export class GlobalRPCRouter {
                     node.errorCount = parsed.errorCount;
                 }
             });
-        } catch (e) {
-            // fail-open: use local state if redis is down
+        } catch {
+            // fail-open: usa estado local si Redis está caído
         }
     }
 
     /**
-     * Retrieves the best completely healthy RPC for the given chain.
-     * Note: In high-performance loops, calling this every time is fine due to local pool selection.
+     * Devuelve el mejor RPC saludable para la chain dada.
+     * Ordena por latencia si hay múltiples sanos.
      */
-    static getBestRPC(chain: 'SOLANA' | 'ETHEREUM'): string {
-        // [INSTITUTIONAL] Trigger async sync (fire-and-forget for this tick)
+    static getBestRPC(chain: SupportedChain): string {
+        // Trigger async sync (fire-and-forget)
         this.syncHealth(chain).catch(() => {});
 
         const pool = RPC_POOL[chain];
+        if (!pool || pool.length === 0) {
+            console.warn(`[GlobalRPCRouter] No pool for ${chain}`);
+            return '';
+        }
+
         const healthyNodes = pool.filter(n => n.health === 'HEALTHY');
-        
+
         if (healthyNodes.length === 0) {
+            // Emergencia: todos degradados — devolver el primero
             return pool[0].url;
         }
 
-        healthyNodes.sort((a, b) => a.latencyMs - b.latencyMs);
+        // Prioridad: menor latencia (0 = sin datos = va al final)
+        healthyNodes.sort((a, b) => {
+            if (a.latencyMs === 0 && b.latencyMs === 0) return 0;
+            if (a.latencyMs === 0) return 1;
+            if (b.latencyMs === 0) return -1;
+            return a.latencyMs - b.latencyMs;
+        });
+
         return healthyNodes[0].url;
     }
 
     /**
-     * Reports an RPC failure, incrementing error count and broadcasting to the cluster.
+     * Reporta un fallo, incrementando errorCount y propagando al cluster Redis.
      */
-    static async reportFailure(url: string, chain: 'SOLANA' | 'ETHEREUM') {
-        const node = RPC_POOL[chain].find(n => n.url === url);
+    static async reportFailure(url: string, chain: SupportedChain): Promise<void> {
+        const pool = RPC_POOL[chain];
+        if (!pool) return;
+
+        const node = pool.find(n => n.url === url);
         if (node) {
             node.errorCount += 1;
-            if (node.errorCount > 3) node.health = 'DEGRADED';
+            if (node.errorCount > 3)  node.health = 'DEGRADED';
             if (node.errorCount > 10) node.health = 'DEAD';
-            
-            console.warn(`[RPC ROUTER] Endpoint ${url} degraded. Errors: ${node.errorCount}. Status: ${node.health}`);
 
-            // PERSIST TO CLUSTER
+            console.warn(`[GlobalRPCRouter] Endpoint ${url.slice(0, 48)} → ${node.health} (errors: ${node.errorCount})`);
+
+            // Persistir al cluster Redis
             try {
-                if (redisClient && !redisClient.__isMock) {
+                if (redisClient && !(redisClient as any).__isMock) {
                     await redisClient.hset(
                         `${REDIS_HEALTH_KEY}:${chain}`,
                         url,
                         JSON.stringify({ health: node.health, errorCount: node.errorCount })
                     );
-                    // Expire health state after 1 hour of silence to allow auto-recovery
                     await redisClient.expire(`${REDIS_HEALTH_KEY}:${chain}`, 3600);
                 }
-            } catch (e) {}
+            } catch { /* fail-open */ }
         }
     }
-}
 
+    /** Lista completa del pool para debugging */
+    static getPoolStatus(): Record<string, { url: string; health: string; errors: number; latencyMs: number }[]> {
+        return Object.fromEntries(
+            Object.entries(RPC_POOL).map(([chain, pool]) => [
+                chain,
+                pool.map(n => ({
+                    url: n.url.replace(/\/([a-f0-9]{20,})/, '/****'),
+                    health: n.health,
+                    errors: n.errorCount,
+                    latencyMs: n.latencyMs,
+                })),
+            ])
+        );
+    }
+}

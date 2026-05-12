@@ -128,7 +128,6 @@ function ParticleBackground() {
 export function SovereignLanding() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const openConnectModal = useUIStore(s => s.openConnectModal);
   const { isConnected, connector } = useSovereignAccount();
   
   useEffect(() => { setMounted(true); }, []);
@@ -177,7 +176,7 @@ export function SovereignLanding() {
                </button>
              </div>
           ) : (
-            <button onClick={() => openConnectModal()} className="relative group overflow-hidden rounded-lg">
+            <button onClick={() => router.push('/connect')} className="relative group overflow-hidden rounded-lg">
                <div className="absolute inset-0 bg-gradient-to-r from-[#00f5ff] to-[#9f00ff] opacity-80 group-hover:opacity-100 transition-opacity" />
                <div className="relative h-9 px-6 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest text-white border border-white/10 rounded-lg group-hover:border-transparent transition-colors">
                   <Fingerprint size={14} /> Connect Identity
@@ -300,30 +299,13 @@ export function SovereignLanding() {
                        {connector?.id || 'Connected'} / 0xSOVEREIGN...
                      </div>
                    ) : (
-                     <button onClick={() => openConnectModal()} className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors">
+                     <button onClick={() => router.push('/connect')} className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors">
                        Initialize Identity
                      </button>
                    )}
                 </div>
 
-                {/* Live Feed Stream Tracker */}
-                <div className="flex flex-col gap-3 flex-1">
-                   <div className="flex items-center justify-between">
-                     <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Data Stream</span>
-                     <span className="flex h-2 w-2 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00f5ff] opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00f5ff]"></span>
-                     </span>
-                   </div>
-                   <div className="flex-1 rounded-xl bg-black/40 border border-white/5 p-4 flex flex-col gap-3 overflow-hidden mask-fade-bottom">
-                      {/* Fake stream items */}
-                      <StreamItem text="Syncing EVM..." />
-                      <StreamItem text="Validating block 1948332..." />
-                      <StreamItem text="Detected anomalous signature." highlight />
-                      <StreamItem text="Parsing calldata..." />
-                      <StreamItem text="Awaiting next ping..." />
-                   </div>
-                </div>
+
 
             </div>
         </aside>

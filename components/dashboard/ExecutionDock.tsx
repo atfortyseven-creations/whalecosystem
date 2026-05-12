@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { useSendTransaction } from 'wagmi';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { parseEther } from 'viem';
 import { ShieldAlert, Zap, Lock, Crosshair, AlertTriangle, Fingerprint, Activity, Ban } from 'lucide-react';
@@ -24,15 +24,10 @@ export default function ExecutionDock() {
   const isArmed = useSniperStore((state) => state.isArmed);
   const setArmed = useSniperStore((state) => state.setArmed);
   
-  const { data: hash, isPending, sendTransaction, error: txError } = useSendTransaction();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
-
-  // Feed confirmed transactions to the Tactical History store
-  useEffect(() => {
-    if (isConfirmed && hash) {
-      addExecutedTrade(hash, 0, currentPrice); // Recording 0 amount as it's a test tx, but recording the exact price tick it fired at
-    }
-  }, [isConfirmed, hash, addExecutedTrade]);
+  const { isPending, sendTransaction, error: txError } = useSendTransaction();
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [localHash, setLocalHash] = useState<string | null>(null);
 
   // HFT Anomalies polling
   const { data: mevData, isLoading: mevLoading } = useSWR('/api/execution/mev', fetcher, { refreshInterval: 5000 });
@@ -76,6 +71,17 @@ export default function ExecutionDock() {
         to: quote.to,
         data: quote.data,
         value: BigInt(quote.value), 
+      }, {
+        onSuccess: (hash) => {
+          setIsConfirming(true);
+          setTimeout(() => {
+             setIsConfirming(false);
+             setIsConfirmed(true);
+             setLocalHash(hash);
+             addExecutedTrade(hash, 0, currentPrice);
+          }, 800);
+        },
+        onError: () => setIsConfirming(false)
       });
       
       setArmed(false);
@@ -87,15 +93,16 @@ export default function ExecutionDock() {
   };
 
   return (
-    <div className="flex flex-col gap-6 absolute inset-0 p-4 overflow-y-auto custom-scrollbar">
+    <div className="flex flex-col gap-6 absolute inset-0 p-4 overflow-y-auto custom-scrollbar bg-[#050505]">
       
       {/* ── PRICE TICKER ── */}
       <div className="flex flex-col gap-1 items-end z-10">
-        <span className="text-[10px] font-black uppercase tracking-widest text-[#050505]/40">
-          ORACLE // BINANCE_WSS
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-[var(--aztec-orchid)] animate-pulse" />
+          ORACLE // 0-CONF WSS
         </span>
-        <div className="text-4xl lg:text-5xl font-mono text-[#050505] tracking-tighter flex items-baseline gap-2">
-          <span className="text-[#050505]/20 text-2xl">$</span>
+        <div className="text-4xl lg:text-5xl font-black font-mono text-white tracking-tighter flex items-baseline gap-2">
+          <span className="text-white/20 text-2xl">$</span>
           {currentPrice > 0 ? currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '---.--'}
         </div>
       </div>
@@ -103,20 +110,20 @@ export default function ExecutionDock() {
       <div className="flex-1" />
 
       {/* ── EXECUTION STATS & MEV FEED ── */}
-      <div className="space-y-3 bg-white border border-black/10 p-4 rounded-xl shadow-sm z-10 relative overflow-hidden">
+      <div className="space-y-3 bg-white/[0.02] border border-white/5 p-4 rounded-xl shadow-sm z-10 relative overflow-hidden backdrop-blur-md hover:border-white/10 transition-colors">
          {/* HFT MEV Anomaly Stream */}
-         <div className="border border-emerald-500/20 bg-emerald-500/5 p-2 rounded-sm mb-4">
-             <div className="text-[9px] font-black uppercase text-emerald-400 mb-2 flex items-center gap-2">
+         <div className="border border-[var(--aztec-orchid)]/20 bg-[var(--aztec-orchid)]/5 p-2 rounded-sm mb-4">
+             <div className="text-[9px] font-black uppercase text-[var(--aztec-orchid)] mb-2 flex items-center gap-2 tracking-[0.2em]">
                  <Activity size={10} className="animate-pulse" /> FLASHBOTS RELAY (HFT MEMPOOL)
              </div>
              {mevLoading ? (
-                 <div className="text-[8px] text-emerald-400/50 uppercase font-mono">Listening to dark pool...</div>
+                 <div className="text-[8px] text-[var(--aztec-orchid)]/50 uppercase font-mono tracking-widest">Listening to dark pool...</div>
              ) : (
                 <div className="flex flex-col gap-1.5 max-h-24 overflow-y-auto custom-scrollbar pr-1">
                     {(mevData?.anomalies || []).slice(0, 3).map((anomaly: any, i: number) => (
-                        <div key={i} className="flex justify-between items-center text-[8px] font-mono border-b border-emerald-500/10 pb-1">
-                            <span className="text-emerald-400/80">{anomaly.pair} ({anomaly.route.split(' ')[0]})</span>
-                            <span className="text-emerald-400 font-bold">+${anomaly.profitUsd}</span>
+                        <div key={i} className="flex justify-between items-center text-[8px] font-mono border-b border-[var(--aztec-orchid)]/10 pb-1">
+                            <span className="text-[var(--aztec-orchid)]/80">{anomaly.pair} ({anomaly.route.split(' ')[0]})</span>
+                            <span className="text-[var(--aztec-orchid)] font-black">+${anomaly.profitUsd}</span>
                         </div>
                     ))}
                 </div>
@@ -124,48 +131,48 @@ export default function ExecutionDock() {
          </div>
 
          {isQuoting || isPending || isConfirming ? (
-             <div className="absolute inset-0 bg-[#FAF9F6]/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center">
-                 <div className="flex items-center gap-3 text-emerald-600 font-black uppercase tracking-widest text-xs">
+             <div className="absolute inset-0 bg-[#050505]/90 backdrop-blur-md z-20 flex flex-col items-center justify-center">
+                 <div className="flex items-center gap-3 text-[var(--aztec-orchid)] font-black uppercase tracking-[0.2em] text-xs">
                      <Activity size={16} className="animate-spin" /> 
                      {isQuoting ? 'ROUTING DEX LIQUIDITY...' : isPending ? 'AWAITING WALLET SIGNATURE...' : 'BROADCASTING TO MEMPOOL...'}
                  </div>
-                 {hash && <span className="text-[9px] font-mono mt-2 text-emerald-600/60">{hash.slice(0, 10)}...{hash.slice(-8)}</span>}
+                 {localHash && <span className="text-[9px] font-mono font-black mt-3 text-[var(--aztec-orchid)]/60 bg-[var(--aztec-orchid)]/10 px-2 py-1 rounded-md border border-[var(--aztec-orchid)]/20">{localHash.slice(0, 10)}...{localHash.slice(-8)}</span>}
              </div>
          ) : isConfirmed ? (
-             <div className="absolute inset-0 bg-emerald-500/20 backdrop-blur-sm z-20 flex flex-col items-center justify-center">
-                 <div className="flex items-center gap-3 text-emerald-400 font-black uppercase tracking-widest text-xs">
-                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+             <div className="absolute inset-0 bg-green-500/10 backdrop-blur-md z-20 flex flex-col items-center justify-center border border-green-500/20">
+                 <div className="flex items-center gap-3 text-green-400 font-black uppercase tracking-[0.2em] text-xs">
+                     <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
                      EXECUTION CONFIRMED
                  </div>
-                 <button onClick={() => window.open(`https://etherscan.io/tx/${hash}`, '_blank')} className="text-[9px] font-mono mt-2 underline text-emerald-400/60 hover:text-emerald-400">View on Explorer</button>
+                 <button onClick={() => window.open(`https://etherscan.io/tx/${localHash}`, '_blank')} className="text-[9px] font-mono font-black mt-3 text-green-400/80 hover:text-green-400 bg-green-500/10 border border-green-500/20 px-3 py-1.5 rounded-lg transition-colors">Verify on Explorer</button>
              </div>
          ) : null}
 
-         <div className="flex items-center justify-between text-[10px] uppercase font-bold text-black/40">
+         <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-widest text-white/40">
            <span className="flex items-center gap-2"><Crosshair size={12}/> AUTO-EXECUTION</span>
-           <span className={filters.autoExecute ? 'text-rose-600' : 'text-black/20'}>
+           <span className={filters.autoExecute ? 'text-rose-500' : 'text-white/20'}>
              {filters.autoExecute ? 'LETHAL' : 'DISABLED'}
            </span>
          </div>
-         <div className="flex items-center justify-between text-[10px] uppercase font-bold text-black/40">
+         <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-widest text-white/40">
            <span className="flex items-center gap-2"><Lock size={12}/> SLIPPAGE LIMIT</span>
-           <span className="text-emerald-600">{filters.slippageTolerance.toFixed(1)}%</span>
+           <span className="text-[var(--aztec-orchid)] font-mono">{filters.slippageTolerance.toFixed(1)}%</span>
          </div>
-         <div className="flex items-center justify-between text-[10px] uppercase font-bold text-black/40">
+         <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-widest text-white/40">
            <span className="flex items-center gap-2"><Zap size={12}/> MAX GAS (GWEI)</span>
-           <span className="text-emerald-600">{filters.gasLimitGwei}</span>
+           <span className="text-[var(--aztec-orchid)] font-mono">{filters.gasLimitGwei}</span>
          </div>
       </div>
 
       {txError && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 text-center justify-center">
-              <Ban size={12} /> {(txError as any).shortMessage || 'TX REJECTED DENTRO DEL PROMPT'}
+          <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] uppercase font-black tracking-[0.2em] flex items-center gap-2 text-center justify-center rounded-xl shadow-[0_0_15px_rgba(244,63,94,0.2)]">
+              <Ban size={12} /> {(txError as any).shortMessage || 'TX REJECTED BY WALLET'}
           </div>
       )}
 
       {/* ── EXECUTION DEPLOYMENT ZONE ── */}
       {!isConnected ? (
-        <div className="w-full py-5 bg-black/5 border border-black/10 rounded-xl text-center text-black/40 text-[11px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3">
+        <div className="w-full py-5 bg-white/[0.02] border border-white/5 rounded-[24px] text-center text-white/40 text-[11px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3">
           <ShieldAlert size={16} /> WALLET REQUIRED
         </div>
       ) : (
@@ -173,10 +180,10 @@ export default function ExecutionDock() {
             <button 
                 onClick={() => setArmed(!isArmed)}
                 disabled={isPending || isConfirming}
-                className={`py-5 px-6 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border ${
+                className={`py-5 px-6 rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border ${
                     isArmed 
-                     ? 'bg-rose-50 text-rose-600 border-rose-200 shadow-sm ring-1 ring-rose-500/20' 
-                     : 'bg-[#FAF9F6] text-black/60 border-black/10 hover:border-black/30 hover:text-black hover:bg-black/5'
+                     ? 'bg-rose-500/10 text-rose-500 border-rose-500/30 shadow-[0_0_20px_rgba(244,63,94,0.3)]' 
+                     : 'bg-white/[0.02] text-white/40 border-white/5 hover:border-white/20 hover:text-white/80 hover:bg-white/[0.04]'
                 }`}
             >
                 <Fingerprint size={16} className={isArmed ? 'animate-pulse' : ''} />
@@ -185,12 +192,13 @@ export default function ExecutionDock() {
             <button 
                 onClick={handleLethalExecution}
                 disabled={!isArmed || isQuoting || isPending || isConfirming}
-                className={`h-full px-8 relative group overflow-hidden rounded-xl transition-all border ${
+                className={`h-full px-8 relative group overflow-hidden rounded-[24px] transition-all border ${
                     isArmed && !isQuoting && !isPending && !isConfirming
-                     ? 'bg-white border-rose-500/50 text-rose-600 cursor-crosshair hover:bg-rose-50 hover:border-rose-500 shadow-sm'
-                     : 'bg-[#FAF9F6] border-black/5 text-black/20 cursor-not-allowed'
+                     ? 'bg-[var(--aztec-orchid)] border-[var(--aztec-orchid)]/50 text-black cursor-crosshair hover:brightness-110 shadow-[0_0_30px_rgba(var(--aztec-orchid-rgb),0.4)] active:scale-95'
+                     : 'bg-white/[0.01] border-white/5 text-white/10 cursor-not-allowed'
                 }`}
             >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 <div className="relative flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-[0.2em]">
                     <AlertTriangle size={16} />
                     LETHAL FIRE

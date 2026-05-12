@@ -11,9 +11,11 @@
 import { 
   startRegistration, 
   startAuthentication,
-  type RegistrationResponseJSON,
-  type AuthenticationResponseJSON
 } from '@simplewebauthn/browser'
+
+// Type imports — compatible with both @simplewebauthn/browser v9+ and v10+
+type RegistrationResponseJSON = Awaited<ReturnType<typeof startRegistration>>;
+type AuthenticationResponseJSON = Awaited<ReturnType<typeof startAuthentication>>;
 
 export interface PasskeyCredential {
   id: string

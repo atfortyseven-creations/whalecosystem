@@ -1,242 +1,242 @@
 export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: string, overview: string, features: { title: string, desc: string }[] }> = {
     'dashboard': {
-        title: 'OVERVIEW: CENTRO DE CONTROL MACROECONÓMICO',
-        subtitle: 'SÍNTESIS ESTRUCTURAL Y TELEMETRÍA GLOBAL',
-        overview: 'El epicentro operativo de Sovereign Terminal. Este entorno consolida en una única interfaz el estado del mercado global en tiempo real, operando como un centro neurálgico de inteligencia financiera. Procesa y traduce vectores críticos de fluctuación —desde inyecciones masivas de liquidez hasta disrupciones en la latencia de las redes L1— proporcionando al operador institucional una ventaja táctica inigualable basada en datos empíricos.\n\nMediante un procesamiento analítico continuo, este módulo filtra el ruido inherente de la blockchain para presentar métricas destiladas y precisas, garantizando que el diseño de estrategias se sustente exclusivamente en indicadores alfa purificados.',
+        title: 'OVERVIEW: MACROECONOMIC COMMAND CENTER',
+        subtitle: 'STRUCTURAL SYNTHESIS & GLOBAL TELEMETRY',
+        overview: 'The operational epicenter of Sovereign Terminal. This environment consolidates the global market state into a single interface in real-time, functioning as a financial intelligence nerve center. It processes and translates critical fluctuation vectors—from massive liquidity injections to L1 network latency disruptions—providing the institutional operator with an unmatched, data-driven tactical advantage.\n\nThrough continuous analytical processing, this module filters the inherent blockchain noise to present distilled and precise metrics, ensuring that strategy design is based exclusively on purified alpha indicators.',
         features: [
-            { title: 'Convergencia Analítica', desc: 'Agregación algorítmica instantánea de las variaciones inter-mercado para reflejar de forma fidedigna el estado del ecosistema.' },
-            { title: 'Monitor de Integridad RPC', desc: 'Evaluación exhaustiva de la latencia criptográfica (sub-milisegundos) y redundancia de las conexiones de los nodos globales.' },
-            { title: 'Normalización de Métricas', desc: 'Las métricas clave son normalizadas y suavizadas dinámicamente según los picos de volatilidad detectados en el marco temporal activo.' }
+            { title: 'Analytical Convergence', desc: 'Instant algorithmic aggregation of inter-market variations to accurately reflect the true state of the ecosystem.' },
+            { title: 'RPC Integrity Monitor', desc: 'Exhaustive evaluation of cryptographic latency (sub-millisecond) and redundancy of global node connections.' },
+            { title: 'Metric Normalization', desc: 'Key metrics are dynamically normalized and smoothed according to volatility spikes detected in the active timeframe.' }
         ]
     },
     'watchlist': {
-        title: 'WATCHLIST: SEGUIMIENTO HEURÍSTICO DE ENTIDADES',
-        subtitle: 'SISTEMA DE RADAR Y VIGILANCIA INSTITUCIONAL',
-        overview: 'El módulo Watchlist trasciende el seguimiento tradicional de cotizaciones, operando como una infraestructura de vigilancia orientada al marcaje de clústeres institucionales y "Smart Money". Este entorno permite la clasificación técnica y el aislamiento de direcciones específicas, dotando al usuario de un sistema de alerta temprana ante perturbaciones on-chain significativas.\n\nAl establecer un cruce de datos entre el comportamiento histórico de la entidad observada y sus transferencias en tiempo real, este visor actúa como la primera línea defensiva frente a manipulaciones sistémicas o rotaciones masivas de capital.',
+        title: 'WATCHLIST: HEURISTIC ENTITY TRACKING',
+        subtitle: 'INSTITUTIONAL RADAR & SURVEILLANCE SYSTEM',
+        overview: 'The Watchlist module transcends traditional price tracking, operating as a surveillance infrastructure aimed at tagging institutional clusters and "Smart Money". This environment allows for the technical classification and isolation of specific addresses, equipping the user with an early warning system against significant on-chain perturbations.\n\nBy cross-referencing the historical behavior of the observed entity with its real-time transfers, this viewer acts as the first line of defense against systemic manipulations or massive capital rotations.',
         features: [
-            { title: 'Vigilancia Vectorial Independiente', desc: 'Mapeo ininterrumpido de entidades con integración directa al registro local, sin dependencia de bases de datos centralizadas de terceros.' },
-            { title: 'Umbrales Predictivos de Alerta', desc: 'Configuración avanzada de fronteras y parámetros que desencadenan notificaciones ante el movimiento de capital institucional.' },
-            { title: 'Filtrado de Ruido Transaccional', desc: 'Supresión proactiva de oscilaciones menores ("dusting attacks") para enfocar la visión exclusivamente en transferencias de alto impacto.' }
+            { title: 'Independent Vector Surveillance', desc: 'Uninterrupted mapping of entities with direct integration to the local ledger, completely independent of third-party centralized databases.' },
+            { title: 'Predictive Alert Thresholds', desc: 'Advanced configuration of boundaries and parameters that trigger notifications upon institutional capital movement.' },
+            { title: 'Transactional Noise Filtering', desc: 'Proactive suppression of minor oscillations ("dusting attacks") to focus vision exclusively on high-impact transfers.' }
         ]
     },
     'news': {
-        title: 'LIVE NEWS: TERMINAL DE INTELIGENCIA ESTRATÉGICA',
-        subtitle: 'PARSEADO Y EVALUACIÓN DE SENTIMIENTO MEDIÁTICO',
-        overview: 'Desarrollado para decodificar flujos masivos de información macroeconómica y eventos sociopolíticos globales. El módulo de Live News no es un simple agregador, sino una infraestructura basada en Procesamiento de Lenguaje Natural (NLP) diseñada para ponderar la relevancia sectorial procedente de las agencias globales de noticias (Bloomberg, Reuters y flujos de grado privado).\n\nEl sistema aísla e interpreta el impacto direccional de la semántica mediática sobre cualquier clase de activo. Esto permite al gestor anticipar patrones de acumulación o capitulación institucional mucho antes de que dichas noticias se materialicen formalmente en el Order Book.',
+        title: 'LIVE NEWS: STRATEGIC INTELLIGENCE TERMINAL',
+        subtitle: 'MEDIA SENTIMENT PARSING & EVALUATION',
+        overview: 'Developed to decode massive streams of macroeconomic information and global socio-political events. The Live News module is not a simple aggregator, but a Natural Language Processing (NLP) infrastructure designed to weigh sector relevance from global news agencies (Bloomberg, Reuters, and private-grade feeds).\n\nThe system isolates and interprets the directional impact of media semantics on any asset class. This allows the manager to anticipate institutional accumulation or capitulation patterns long before these news items formally materialize in the Order Book.',
         features: [
-            { title: 'Evaluación Cuantitativa de Sentimiento', desc: 'Medición de la polarización semántica y el impacto macroeconómico sobre las entidades informativas a nivel mundial.' },
-            { title: 'Flujo Asíncrono Continuo', desc: 'Despliegue ininterrumpido de reportes financieros de última hora con máxima prioridad de sincronización web.' },
-            { title: 'Depuración Semántica', desc: 'Algoritmos selectivos que descartan redundancias sensacionalistas para presevar exclusivamente la señal fundamental del mercado.' }
+            { title: 'Quantitative Sentiment Evaluation', desc: 'Measurement of semantic polarization and macroeconomic impact on global informative entities.' },
+            { title: 'Continuous Asynchronous Flow', desc: 'Uninterrupted deployment of breaking financial reports with maximum web synchronization priority.' },
+            { title: 'Semantic Debugging', desc: 'Selective algorithms that discard sensationalist redundancies to preserve exclusively the fundamental market signal.' }
         ]
     },
     'gold': {
-        title: 'TICKET MINT: ETIQUETA DORADA INSTITUCIONAL',
-        subtitle: 'ACCESO A ARQUITECTURA PRIVILEGIADA Y RUTAS EXCLUSIVAS',
-        overview: 'El nivel de acceso superior de Sovereign Terminal. Este enclave perimetrado alberga las herramientas paramétricas más exigentes, restringidas a entidades con estatus operativo Golden. Garantiza una infraestructura con ancho de banda no compartido, proporcionando resiliencia absoluta frente a latencias extremas o colapsos de proveedores públicos.\n\nDesbloqueando las capas subyacentes de la terminal, asegura permisos escalados que garantizan un aislamiento total (Zero-Knowledge) y acceso sin restricciones a los conductos de datos primarios, asegurando que las operaciones críticas jamás se detengan por limitaciones técnicas.',
+        title: 'TICKET MINT: INSTITUTIONAL GOLDEN LABEL',
+        subtitle: 'ACCESS TO PRIVILEGED ARCHITECTURE & EXCLUSIVE ROUTES',
+        overview: 'The upper access echelon of Sovereign Terminal. This perimetered enclave houses the most demanding parametric tools, restricted to entities with Golden operational status. It guarantees an infrastructure with unshared bandwidth, providing absolute resilience against extreme latencies or public provider collapses.\n\nUnlocking the terminal\'s underlying layers, it ensures escalated permissions that guarantee total isolation (Zero-Knowledge) and unrestricted access to primary data conduits, ensuring critical operations never halt due to technical limitations.',
         features: [
-            { title: 'Vectores de Datos Dedicados', desc: 'Priorización absoluta en la asignación de nodos RPC corporativos, eliminando los clásicos cuellos de botella durante hiper-saturaciones.' },
-            { title: 'Ofuscamiento y Privacidad (ZK)', desc: 'Activación de módulos de trazabilidad oculta basados en cifrado Zero-Knowledge para navegar sin exposición perimetral.' },
-            { title: 'Eliminación de Restricciones (Rate Limits)', desc: 'Permisos absolutos para el despliegue de analíticas intensivas sin las barreras de limitación de solicitudes habituales.' }
+            { title: 'Dedicated Data Vectors', desc: 'Absolute priority in the allocation of corporate RPC nodes, eliminating classic bottlenecks during hyper-saturations.' },
+            { title: 'Obfuscation & Privacy (ZK)', desc: 'Activation of hidden traceability modules based on Zero-Knowledge encryption to navigate without perimeter exposure.' },
+            { title: 'Rate Limit Elimination', desc: 'Absolute permissions for the deployment of intensive analytics without standard request limitation barriers.' }
         ]
     },
     'markets': {
-        title: 'TOP MARKETS: PANÓPTICO MICROESTRUCTURAL',
-        subtitle: 'ANÁLISIS FORENSE DE PROFUNDIDAD DE LIBRO Y LIQUIDEZ',
-        overview: 'El visor Top Markets ejecuta una modelización analítica continua sobre los pares de trading más dominantes del mundo criptográfico. Operando como un escáner microestructural, se sumerge en el registro de órdenes (Order Book) para discernir empíricamente entre liquidez real, manipulación del libro ("Spoofing") o "Wash Trading".\n\nDescompone volumétricamente la arquitectura y resistencia de las posturas compradoras y vendedoras. Esto revela zonas de concentración de "Smart Money", niveles reales de soporte y resistencia (Bid/Ask Walls), e identifica con claridad quirúrgica hacia qué vectores geográficos fluye la dominancia financiera.',
+        title: 'TOP MARKETS: MICROSTRUCTURAL PANOPTICON',
+        subtitle: 'FORENSIC ANALYSIS OF BOOK DEPTH & LIQUIDITY',
+        overview: 'The Top Markets viewer executes continuous analytical modeling on the most dominant trading pairs in the crypto world. Operating as a microstructural scanner, it dives into the Order Book to empirically discern between real liquidity, book manipulation ("Spoofing"), or "Wash Trading".\n\nIt volumetrically decomposes the architecture and resistance of buying and selling postures. This reveals concentrations of "Smart Money", real support and resistance levels (Bid/Ask Walls), and identifies with surgical clarity the geographical vectors towards which financial dominance flows.',
         features: [
-            { title: 'Radiografía del Order Book', desc: 'Identificación algorítmica de barreras ilusorias de capital diseñadas para orientar o atrapar al inversor minorista.' },
-            { title: 'Cinemática de Capital', desc: 'Mapeo cuantitativo de los flujos netos inter-exchange (Netflows) y métricas direccionales del volumen global.' },
-            { title: 'Corrección de Fragmentación', desc: 'Mitigación heurística de distorsiones en los precios al consolidar plataformas atomizadas en un solo índice métrico verdadero.' }
+            { title: 'Order Book Radiography', desc: 'Algorithmic identification of illusory capital barriers designed to guide or trap the retail investor.' },
+            { title: 'Capital Kinematics', desc: 'Quantitative mapping of net inter-exchange flows (Netflows) and directional metrics of global volume.' },
+            { title: 'Fragmentation Correction', desc: 'Heuristic mitigation of price distortions by consolidating atomized platforms into a single true metric index.' }
         ]
     },
     'newpairs': {
-        title: 'NEW LISTINGS: ANÁLISIS DE CONTRATOS GÉNESIS',
-        subtitle: 'AUDITORÍA SÍNCRONA DE ACTIVOS DE RECIENTE EMISIÓN',
-        overview: 'El campo de pruebas donde los protocolos emergen a la red principal. Este sistema actúa como un periscopio hipersensible interconectado al mempool (EVM), interceptando la creación de contratos inteligentes (Contract Creation Events) y rastreando la provisión de liquidez inicial en Formadores de Mercado Automatizados (AMM).\n\nMediante una evaluación de riesgo algorítmica, examina métricas fundamentales de salud del token: renuncias de llaves maestras, quema de liquidez, y tasas engañosas ("Honeypot Diagnostics"), sirviendo de escudo analítico definitivo frente al fraude durante periodos primigenios de alta volatilidad.',
+        title: 'NEW LISTINGS: GENESIS CONTRACT ANALYSIS',
+        subtitle: 'SYNCHRONOUS AUDIT OF RECENTLY ISSUED ASSETS',
+        overview: 'The testing ground where protocols emerge onto the mainnet. This system acts as a hypersensitive periscope interconnected to the EVM mempool, intercepting the creation of smart contracts (Contract Creation Events) and tracking initial liquidity provision in Automated Market Makers (AMMs).\n\nThrough an algorithmic risk evaluation, it examines fundamental token health metrics: master key renunciations, liquidity burns, and deceptive taxes ("Honeypot Diagnostics"), serving as the definitive analytical shield against fraud during primal periods of high volatility.',
         features: [
-            { title: 'Interceptación Mempool', desc: 'Detección en el instante cero: lectura forense del contrato antes o durante el bloque exacto de su inserción en la blockchain.' },
-            { title: 'Diagnóstico Estructural de Riesgos', desc: 'Auditoría automática sobre la distribución de las billeteras fundadoras y el grado real de descentralización inicial.' },
-            { title: 'Umbrales de Liquidez Funcional', desc: 'Filtra tokens inmateriales basándose exclusivamente en concentraciones de capital de lanzamiento económicamente serias.' }
+            { title: 'Mempool Interception', desc: 'Detection at zero-instant: forensic reading of the contract before or during the exact block of its insertion into the blockchain.' },
+            { title: 'Structural Risk Diagnosis', desc: 'Automatic audit of the distribution of founding wallets and the real degree of initial decentralization.' },
+            { title: 'Functional Liquidity Thresholds', desc: 'Filters immaterial tokens based exclusively on economically serious concentrations of launch capital.' }
         ]
     },
     'omniexplorer': {
-        title: 'OMNI EXPLORER: MOTOR FORENSE MULTICADENA',
-        subtitle: 'CARTOGRAFÍA Y DECODIFICACIÓN CRIPTOGRÁFICA UNIVERSAL',
-        overview: 'El Omni Explorer reemplaza la fragmentación e ineficiencia de los navegadores de bloques convencionales. Constituye un ecosistema agnóstico capaz de interpretar arquitecturas procedentes de la red Ethereum (EVM), Bitcoin (UTXO) y otras L1, agrupadas bajo una interfaz purificada de ruidos visuales y distracciones.\n\nProporciona a las firmas analíticas capacidades avanzadas para desestructurar cualquier métrica referenciada (Hashes de Transacción, Bloques, Direcciones Contractuales), transformando el código de máquina bruto (Hex/Opcodes) en un diagrama lógico, transparente y apto para investigaciones o auditorías.',
+        title: 'OMNI EXPLORER: MULTI-CHAIN FORENSIC ENGINE',
+        subtitle: 'UNIVERSAL CRYPTOGRAPHIC CARTOGRAPHY & DECODING',
+        overview: 'The Omni Explorer replaces the fragmentation and inefficiency of conventional block browsers. It constitutes an agnostic ecosystem capable of interpreting architectures from the Ethereum network (EVM), Bitcoin (UTXO), and other L1s, grouped under an interface purified of visual noise and distractions.\n\nIt provides analytical firms with advanced capabilities to destructure any referenced metric (Transaction Hashes, Blocks, Contract Addresses), transforming raw machine code (Hex/Opcodes) into a logical, transparent diagram suitable for investigations or audits.',
         features: [
-            { title: 'Detección de Cadena Dinámica', desc: 'Resolución e indexado automático de la red base (Target Network) partiendo únicamente de la heurística de entrada del hash.' },
-            { title: 'Decodificación Legible Humana', desc: 'Traducción directa y sin fricciones de los "Call Datas" y metadatos hacia registros funcionales y claros.' },
-            { title: 'Ergonomía de Aislamiento Visual', desc: 'Centralización de los deltas de saldo relevantes, eliminando la contaminación perimetral publicitaria inherente en exploradores gratuitos.' }
+            { title: 'Dynamic Chain Detection', desc: 'Automatic resolution and indexing of the base network (Target Network) starting solely from the input hash heuristic.' },
+            { title: 'Human-Readable Decoding', desc: 'Direct and frictionless translation of "Call Datas" and metadata into functional and clear records.' },
+            { title: 'Visual Isolation Ergonomics', desc: 'Centralization of relevant balance deltas, eliminating the advertising perimeter pollution inherent in free explorers.' }
         ]
     },
     'brc': {
-        title: 'BRC EXPLORER: INSPECTOR NATIVO DE BITCOIN',
-        subtitle: 'SEGUIMIENTO METODOLÓGICO DE LA ECONOMÍA ORDINAL L1',
-        overview: 'Una infraestructura tecnológica diseñada a medida para el escrutinio forense y la preservación del ledger unificado de Bitcoin. Interrumpe sistemáticamente los segmentos "Witness" de las operaciones (Taproot) para examinar la información adyacente subyacente, dotando de total visibilidad a las inscripciones Ordinals y los suministros del ecosistema BRC-20.\n\nMediante su motor de estado continuo, permite calcular capitalizaciones de mercado fragmentadas directamente sobre los satoshis legendarios, sin necesidad de interactuar con puentes de confianza cruzada (Bridges) ni depender del dictado de indexadores centralizados.',
+        title: 'BRC EXPLORER: NATIVE BITCOIN INSPECTOR',
+        subtitle: 'METHODOLOGICAL TRACKING OF THE L1 ORDINAL ECONOMY',
+        overview: 'A custom-designed technological infrastructure for forensic scrutiny and preservation of the unified Bitcoin ledger. It systematically interrupts the "Witness" segments of operations (Taproot) to examine the underlying adjacent information, providing total visibility to Ordinals inscriptions and BRC-20 ecosystem supplies.\n\nThrough its continuous state engine, it allows calculating fragmented market capitalizations directly on legendary satoshis, without the need to interact with cross-trust bridges or depend on the dictates of centralized indexers.',
         features: [
-            { title: 'Extracción Nativa del Ledger de BTC', desc: 'Lectura directa de las transacciones sin procesar acopladas a los nodos de validación Bitcoin Core.' },
-            { title: 'Telemetría de Abstracción BRC-20', desc: 'Representación rigurosa de las transferencias secundarias, saldos y retenciones institucionales en el protocolo subyacente.' },
-            { title: 'Modelado UTXO Optimizado', desc: 'Examen de fragmentación del "polvo cósmico" de satoshis para facilitar auditorías y re-consolidación de billeteras institucionales.' }
+            { title: 'Native BTC Ledger Extraction', desc: 'Direct reading of raw transactions coupled to Bitcoin Core validation nodes.' },
+            { title: 'BRC-20 Abstraction Telemetry', desc: 'Rigorous representation of secondary transfers, balances, and institutional retentions in the underlying protocol.' },
+            { title: 'Optimized UTXO Modeling', desc: 'Fragmentation examination of the "cosmic dust" of satoshis to facilitate audits and re-consolidation of institutional wallets.' }
         ]
     },
     'firehose': {
-        title: 'WHALE FIREHOSE PRO: SISMÓGRAFO DE RED L1',
-        subtitle: 'MONITORIZACIÓN EXTREMA Y EN DIRECTO DEDE EL MEMPOOL',
-        overview: 'El componente de inteligencia más intenso de Sovereign Terminal. "Whale Firehose" se materializa como un conducto WebSockets de inyección directa que captura, parsea y escupe decenas de miles de eventos de la Red Principal (Global Blocks) cada segundo. \n\nConcebido para operadores de élite, requiere un dominio absoluto sobre el "ruido blanco" on-chain. Integra filtros paramétricos estrictos alojados en el lado del cliente (Local Computing) para discriminar operaciones polares pequeñas y revelar inequívocamente aquellas transferencias con volumen de grado masivo que impactarán los libros de órdenes en los próximos minutos.',
+        title: 'WHALE FIREHOSE PRO: L1 NETWORK SEISMOGRAPH',
+        subtitle: 'EXTREME & LIVE MONITORING DIRECTLY FROM THE MEMPOOL',
+        overview: 'The most intense intelligence component of Sovereign Terminal. "Whale Firehose" materializes as a direct-injection WebSockets conduit that captures, parses, and spits out tens of thousands of Mainnet events (Global Blocks) every second.\n\nConceived for elite operators, it requires absolute dominance over on-chain "white noise". It integrates strict parametric filters hosted on the client-side (Local Computing) to discriminate small polar operations and unequivocally reveal those transfers with massive-grade volume that will impact order books in the coming minutes.',
         features: [
-            { title: 'Renderizado en Alta Frecuencia (Zero-Mock)', desc: 'Indexación asíncrona real desde el nodo EVM principal sin demoras añadidas, visualizando el historial transaccional verdadero.' },
-            { title: 'Filtrado Atómico de Alta Escala', desc: 'Sistemas heurísticos de evasión que eliminan instantáneamente micro-movimientos para focalizar el radar en la actividad "Whale".' },
-            { title: 'Telemetría Táctil y Estructurada', desc: 'Clasificación tabular automatizada (Tipo de Transferencia, Moneda Principal, Direccionalidad, Dólares Ajustados, Gwei).' }
+            { title: 'High-Frequency Rendering (Zero-Mock)', desc: 'Real asynchronous indexing from the main EVM node without added delays, visualizing the true transactional history.' },
+            { title: 'Atomic High-Scale Filtering', desc: 'Heuristic evasion systems that instantly eliminate micro-movements to focus the radar on "Whale" activity.' },
+            { title: 'Tactile & Structured Telemetry', desc: 'Automated tabular classification (Transfer Type, Main Currency, Directionality, Adjusted Dollars, Gwei).' }
         ]
     },
     'sov-intel': {
-        title: 'SOVEREIGN INTEL: INTELIGENCIA DE SEGUNDA CAPA',
-        subtitle: 'DESANONIMIZACIÓN Y PATRONES DE CONTRA-ESPIONAJE',
-        overview: 'La sublimación del perfilado institucional. Sovereign Intel funciona cruzando exhaustivas bases de datos deterministas con comportamientos probabilísticos, identificando con inmensa precisión "Billeteras Opacas" pertenecientes a fondos de cobertura, custodios o grandes formadores (Market Makers).\n\nAl aplicar modelos de conglomeración (Clustering), despliega un marco analítico capaz de detectar el reposicionamiento estratégico del denominado "Dinero Antiguo" (Smart Money). Resulta fundamental para pronosticar distribuciones ocultas u operaciones Over-The-Counter (OTC) masivas que los participantes minoristas desconocen por completo.',
+        title: 'SOVEREIGN INTEL: SECOND-LAYER INTELLIGENCE',
+        subtitle: 'DE-ANONYMIZATION & COUNTER-ESPIONAGE PATTERNS',
+        overview: 'The sublimation of institutional profiling. Sovereign Intel works by crossing exhaustive deterministic databases with probabilistic behaviors, identifying with immense precision "Opaque Wallets" belonging to hedge funds, custodians, or large Market Makers.\n\nBy applying clustering models, it deploys an analytical framework capable of detecting the strategic repositioning of the so-called "Smart Money". It is fundamental for forecasting hidden distributions or massive Over-The-Counter (OTC) operations that retail participants are completely unaware of.',
         features: [
-            { title: 'Modelos de Desanonimización', desc: 'Identificación semántica heurística correlacionando patrones de consumo de red, tiempos de emisión y puentes recurrentes.' },
-            { title: 'Ruta Forense de Actividad OTC', desc: 'Detección exhaustiva de liquidaciones extremas realizadas peer-to-peer, evadiendo totalmente el rastro algorítmico convencional.' },
-            { title: 'Diagramación de Acumulación Base', desc: 'Estudio intensivo de la balanza de un clúster determinado contrastando las salidas frente a las entradas durante un trimestre fiscal completo.' }
+            { title: 'De-Anonymization Models', desc: 'Heuristic semantic identification correlating network consumption patterns, emission times, and recurring bridges.' },
+            { title: 'Forensic Route of OTC Activity', desc: 'Exhaustive detection of extreme liquidations carried out peer-to-peer, totally evading conventional algorithmic tracking.' },
+            { title: 'Base Accumulation Diagramming', desc: 'Intensive study of a specific cluster\'s balance by contrasting outflows versus inflows over a full fiscal quarter.' }
         ]
     },
     'inst-ledger': {
-        title: 'INSTITUTIONAL LEDGER: EL REGISTRO AUDITABLE',
-        subtitle: 'PERSISTENCIA, COMPLIANCE Y METRÍA HISTÓRICA',
-        overview: 'El Registro Institucional (Ledger) es una plataforma inmutable y persistente en la que quedan asentadas, analizadas y archivadas las alteraciones monetarias macro-económicas (Large Value Events). Actuando como la memoria a largo plazo de Blockchain y una biblioteca de auditoría corporativa.\n\nPermite a analistas cuantitativos y equipos de Compliance retrotraerse en el tiempo matemático para verificar fluctuaciones críticas, documentar eventos excepcionales (Cisnes Negros) u obtener exportaciones íntegras libres de alteración requeridas para reportes KYC/AML, juntas accionistas y requerimientos legales internacionales.',
+        title: 'INSTITUTIONAL LEDGER: THE AUDITABLE RECORD',
+        subtitle: 'PERSISTENCE, COMPLIANCE & HISTORICAL METRICS',
+        overview: 'The Institutional Ledger is an immutable and persistent platform where macroeconomic monetary alterations (Large Value Events) are recorded, analyzed, and archived. Acting as the long-term memory of the Blockchain and a corporate audit library.\n\nIt allows quantitative analysts and Compliance teams to go back in mathematical time to verify critical fluctuations, document exceptional events (Black Swans), or obtain intact, alteration-free exports required for KYC/AML reports, shareholder meetings, and international legal requirements.',
         features: [
-            { title: 'Preservación Histórica Sin Fricción', desc: 'Trazabilidad determinista, ofreciendo los metadatos puros que enmarcaron perturbaciones volumétricas previas en el mercado.' },
-            { title: 'Criterio de Búsqueda Multiparamétrico', desc: 'Herramientas de filtrado avanzadas basadas en umbrales de capital dolarizado, hashes nativos y estatus temporal.' },
-            { title: 'Entregables Modulares', desc: 'Formatos tabulares depurados de máxima legibilidad técnica listos para revisión y auditoría fiscal.' }
+            { title: 'Frictionless Historical Preservation', desc: 'Deterministic traceability, offering the pure metadata that framed previous volumetric perturbations in the market.' },
+            { title: 'Multi-Parametric Search Criteria', desc: 'Advanced filtering tools based on dollarized capital thresholds, native hashes, and temporal status.' },
+            { title: 'Modular Deliverables', desc: 'Purified tabular formats of maximum technical readability ready for review and fiscal audit.' }
         ]
     },
     'mass-transfer': {
-        title: 'MASS TRANSFERS: MAPEO DE DISTRIBUCIÓN DE RESERVAS',
-        subtitle: 'ANÁLISIS DE MIGRACIONES HACIA EXCHANGES CENTRALIZADOS',
-        overview: 'Un módulo macro enfocado exhaustivamente a rastrear y notificar redistribuciones inminentes de las grandes reservas globales (Hot/Cold Wallets). El sistema monitoriza transiciones en depósitos desde y hacia plataformas de intercambio de liquidación (Exchanges Centralizados), identificando el clima general y anticipando contundentemente perturbaciones en el inventario circulante ("Supply Shocks").\n\nInterpreta las grandes fugas o picos de flujos con lógica heurística implacable: identifica si cientos de millones han ingresado agresivamente a Binance u OKX (presión vendedora) o si han sido extraídos hacia Billeteras de Auto-Custodia (escasez inminente).',
+        title: 'MASS TRANSFERS: RESERVE DISTRIBUTION MAPPING',
+        subtitle: 'ANALYSIS OF MIGRATIONS TOWARDS CENTRALIZED EXCHANGES',
+        overview: 'A macro module exhaustively focused on tracking and notifying imminent redistributions of large global reserves (Hot/Cold Wallets). The system monitors deposit transitions to and from Centralized Exchanges, identifying the general climate and decisively anticipating disruptions in circulating inventory ("Supply Shocks").\n\nIt interprets large outflows or influx spikes with relentless heuristic logic: identifying whether hundreds of millions have aggressively entered Binance or OKX (selling pressure) or if they have been extracted to Self-Custody Wallets (imminent scarcity).',
         features: [
-            { title: 'Clasificador Automático Multi-Categoría', desc: 'Distingue con rigor métrico ingresos netos a plataformas, rotación interna fría/caliente o traslados a staking protocolar.' },
-            { title: 'Medidor de Agotamiento (Depletion Rates)', desc: 'Señales inmediatas informando de contracciones súbitas de reservas, propiciadoras típicas de severos "Short-Squeezes".' },
-            { title: 'Trazabilidad Visual Tectónica', desc: 'Disposición monocromática de escala total ofreciendo densidades informativas insuperables por métrica cuadrada.' }
+            { title: 'Automatic Multi-Category Classifier', desc: 'Distinguishes with metric rigor net inflows to platforms, internal hot/cold rotation, or transfers to protocol staking.' },
+            { title: 'Depletion Rates Meter', desc: 'Immediate signals reporting sudden reserve contractions, typical precursors to severe "Short-Squeezes".' },
+            { title: 'Tectonic Visual Traceability', desc: 'Monochromatic full-scale layout offering insuperable information densities per square metric.' }
         ]
     },
     'graph': {
-        title: 'ENTITY GRAPH: CARTOGRAFÍA RELACIONAL D3',
-        subtitle: 'VISUALIZACIÓN MULTIMODAL MEDIANTE FUERZAS DIRIGIDAS',
-        overview: 'La materialización de la inteligencia forense relacional. Translada aburridas filas alfanuméricas hacia representaciones espaciales dinámicas de teoría topológica de Grafos. Impulsado por algoritmos Force-Directed y lógicas Neo4j, revela los ejes ocultos entre entidades e instituciones de un solo vistazo.\n\nBajo este marco, los nodos (Wallets/Contracts) despliegan gravedad proporcional a su capital acumulado. Al aislar redes interconectadas y evaluar enlaces cruzados, el operador logra percibir ramificaciones para blanqueamiento de fondos (Money Laundering Hops), aglomeración piramidal de fondos corporativos o estructuras anidadas subrepticias.',
+        title: 'ENTITY GRAPH: D3 RELATIONAL CARTOGRAPHY',
+        subtitle: 'MULTIMODAL VISUALIZATION THROUGH DIRECTED FORCES',
+        overview: 'The materialization of relational forensic intelligence. It translates basic alphanumeric rows into dynamic spatial representations of Graph topological theory. Driven by Force-Directed algorithms and Neo4j logic, it reveals the hidden axes between entities and institutions at a single glance.\n\nUnder this framework, nodes (Wallets/Contracts) deploy gravity proportional to their accumulated capital. By isolating interconnected networks and evaluating cross-links, the operator can perceive ramifications for money laundering (Money Laundering Hops), pyramidal agglomeration of corporate funds, or surreptitious nested structures.',
         features: [
-            { title: 'Modelos Gravitacionales Dinámicos D3', desc: 'Los nodos financieros gravitan e interaccionan fluidamente basándose en la correlación monetaria inyectada o drenada entre ellos.' },
-            { title: 'Centralidad y Analítica de Concentración', desc: 'La selección individualiza e inmoviliza vectores clave, revelando riesgo y proporción distributiva del saldo total retenido.' },
-            { title: 'Rendimiento Inmersivo Garantizado', desc: 'Procesamiento vectorial hiperoptimizado garantizando fotogramas fijos sin cortes ni fallos de renderizado en análisis extensos.' }
+            { title: 'D3 Dynamic Gravitational Models', desc: 'Financial nodes gravitate and interact fluidly based on the monetary correlation injected or drained between them.' },
+            { title: 'Centrality & Concentration Analytics', desc: 'Selection individualizes and immobilizes key vectors, revealing risk and the distributive proportion of the total retained balance.' },
+            { title: 'Guaranteed Immersive Performance', desc: 'Hyper-optimized vector processing guaranteeing fixed frames without cuts or rendering failures in extensive analyses.' }
         ]
     },
     'defi': {
-        title: 'DEFI YIELDS: RASTREADOR DE RENTABILIDAD PURA',
-        subtitle: 'DISECCIÓN ESTRATÉGICA DEL COMPORTAMIENTO PASIVO',
-        overview: 'El puente maestro para monitorizar el comportamiento de la distribución pasiva institucional. Rastrea y compila en directo bóvedas (Vaults) y reservas de liquidez (Liquidity Pools) provenientes de los ecosistemas descentralizados sistémicos clave (tales como Aave, Curve Liquid Assets o Uniswap V3).\n\nSu finalidad reside en segregar analíticamente el rendimiento orgánico "Real Yield" procedente de la hiperinflación originada por las emisiones nocivas de los propios protocolos. Desnuda dónde y cómo el "Dinero Institucional" deposita resguardos masivos asumiendo riesgo impermanente marginal para asegurar intereses reales escalables.',
+        title: 'DEFI YIELDS: PURE PROFITABILITY TRACKER',
+        subtitle: 'STRATEGIC DISSECTION OF PASSIVE BEHAVIOR',
+        overview: 'The master bridge to monitor the behavior of institutional passive distribution. It live-tracks and compiles vaults and Liquidity Pools from key systemic decentralized ecosystems (such as Aave, Curve Liquid Assets, or Uniswap V3).\n\nIts purpose is to analytically segregate the organic "Real Yield" from the hyperinflation caused by the harmful emissions of the protocols themselves. It strips bare where and how "Institutional Money" deposits massive safeguards, assuming marginal impermanent risk to secure scalable real interest.',
         features: [
-            { title: 'Cálculos Duales Puros APY/APR', desc: 'Desmitificación absoluta de las rentabilidades exageradas abstrayendo el delta artificial inducido por subsidios algorítmicos ineficientes.' },
-            { title: 'Verificación Estricta del Cierre de Valor (TVL)', desc: 'Auditoría sobre el espesor monetario de las carteras institucionales para detectar focos vulnerables a drenados repentinos.' },
-            { title: 'Discrepancias Algorítmicas de Spread', desc: 'Señala de manera explícita brechas de liquidez de rendimiento aprovechables a lo largo del espectro multi-cadena.' }
+            { title: 'Pure APY/APR Dual Calculations', desc: 'Absolute demystification of exaggerated yields by abstracting the artificial delta induced by inefficient algorithmic subsidies.' },
+            { title: 'Strict Total Value Locked (TVL) Verification', desc: 'Audit of the monetary thickness of institutional portfolios to detect vulnerable hotspots prone to sudden draining.' },
+            { title: 'Algorithmic Spread Discrepancies', desc: 'Explicitly points out exploitable yield liquidity gaps across the multi-chain spectrum.' }
         ]
     },
     'polymarket': {
-        title: 'POLYMARKET: VISUALIZADOR DE ORÁCULOS DE PREDICCIÓN',
-        subtitle: 'PROBABILIDAD MATEMÁTICA ANTE INCERTIDUMBRE POLÍTICA GLOBAL',
-        overview: 'Una inserción del pulso probabilístico. Integra los valores predictivos más robustos provenientes del mercado asimétrico de predicciones de mayor tamaño: Polymarket. Este visor captura y transfiere la sabiduría agregada y la apuesta monetaria literal sobre decisiones socioeconómicas globales.\n\nBajo esta ventana analítica, la terminal disuelve especulaciones y narrativa pública en estadísticas crudas derivadas de dinero arriesgado ("Skin in the Game"). El mercado indica objetivamente el porcentaje exacto de que un acontecimiento de riesgo sistémico o hito fundacional ocurra, basándose inquebrantablemente en la liquidez subyacente.',
+        title: 'POLYMARKET: PREDICTION ORACLE VIEWER',
+        subtitle: 'MATHEMATICAL PROBABILITY IN GLOBAL POLITICAL UNCERTAINTY',
+        overview: 'An insertion of the probabilistic pulse. It integrates the most robust predictive values from the largest asymmetric prediction market: Polymarket. This viewer captures and transfers the aggregated wisdom and literal monetary bets on global socioeconomic decisions.\n\nUnder this analytical window, the terminal dissolves speculation and public narrative into raw statistics derived from risked money ("Skin in the Game"). The market objectively indicates the exact percentage that a systemic risk event or foundational milestone will occur, unwaveringly based on underlying liquidity.',
         features: [
-            { title: 'Modelos Asignativos basados en Probabilidad', desc: 'Cristalización del spread especulativo en certezas asimétricas numéricas, libres de opinión analítica personal o periodística.' },
-            { title: 'Evaluación del Momentum Subyacente', desc: 'Permite vislumbrar cómo choques drásticos monetarios en las redes asimétricas definen de antemano sentencias políticas cruciales.' },
-            { title: 'Seguimiento Táctico Binario (Escenarios Sí/No)', desc: 'Mapeo riguroso de inflexiones a lo largo de lapsos pre-definidos marcados por altísimos niveles de presión social y económica.' }
+            { title: 'Probability-Based Allocative Models', desc: 'Crystallization of the speculative spread into numerical asymmetric certainties, free of personal or journalistic analytical opinion.' },
+            { title: 'Underlying Momentum Evaluation', desc: 'Allows foreseeing how drastic monetary shocks in asymmetric networks predefine crucial political verdicts.' },
+            { title: 'Binary Tactical Tracking (Yes/No Scenarios)', desc: 'Rigorous mapping of inflections across pre-defined intervals marked by extremely high levels of social and economic pressure.' }
         ]
     },
     'forge': {
-        title: 'COSMIC FORGE: ENTORNOS SOBERANOS Y CLI',
-        subtitle: 'NÚCLEO DE PROTOCOLIZACIÓN Y CONTROL DEL "CERO MOCK/FAKE"',
-        overview: 'El verdadero yunque de comando reservado para el administrador total del clúster terminal. Cosmic Forge representa el acceso centralizado para inspeccionar y alterar parámetros de extracción internos. Es la única zona donde se otorga injerencia absoluta sobre cómo la terminal enruta, consulta e interactúa con el mundo exterior.\n\nSoberanía al máximo exponente: garantiza mediante su uso que todas las informaciones provienen de "Nodos RPC Transparentes", consolidando el mandato inquebrantable de "Zero-Mock Data". Permite ajustes finos sobre frecuencias de actualización (Polling), y variables de autenticación, transformando la plataforma entera en tu base de control.',
+        title: 'COSMIC FORGE: SOVEREIGN ENVIRONMENTS & CLI',
+        subtitle: 'CORE PROTOCOLIZATION & "ZERO MOCK/FAKE" CONTROL',
+        overview: 'The true command anvil reserved for the terminal cluster\'s total administrator. Cosmic Forge represents the centralized access to inspect and alter internal extraction parameters. It is the only zone where absolute interference is granted over how the terminal routes, queries, and interacts with the outside world.\n\nSovereignty to the maximum exponent: its use guarantees that all information comes from "Transparent RPC Nodes", consolidating the unyielding mandate of "Zero-Mock Data". It allows fine adjustments over refresh rates (Polling) and authentication variables, transforming the entire platform into your control base.',
         features: [
-            { title: 'Interfaz Integrada de Terminal', desc: 'Una simulación estructural que admite comandos avanzados para recargar conectores sin necesidad de interrumpir flujos L1 de mercado.' },
-            { title: 'Confirmación y Dictamen Anti-Simulación', desc: 'Auditorías operacionales para asegurar y verificar que todos los datos transitorios están extraídos sin falsificaciones orgánicas ni estocásticas.' },
-            { title: 'Modularidad Abierta Empresarial', desc: 'Diseñado fundamentalmente para pre-escalar y tolerar secuencias de fondo y futuras implementaciones robóticas automatizadas (Bots/Algos).' }
+            { title: 'Integrated Terminal Interface', desc: 'A structural simulation that admits advanced commands to reload connectors without interrupting L1 market flows.' },
+            { title: 'Anti-Simulation Confirmation & Ruling', desc: 'Operational audits to ensure and verify that all transient data is extracted without organic or stochastic falsifications.' },
+            { title: 'Enterprise Open Modularity', desc: 'Fundamentally designed to pre-scale and tolerate background sequences and future automated robotic implementations (Bots/Algos).' }
         ]
     },
     'portfolio': {
-        title: 'MAIN PORTFOLIO: VISUALIZADOR DE PATRIMONIO ESTABLE',
-        subtitle: 'AMALGAMA MACRO-ECONÓMICA DEL BALANCE GENERAL ABSOLUTO',
-        overview: 'El punto logístico consolidado sobre tus recursos líquidos globales. "Main Portfolio" consolida la visión completa sobre las reservas criptográficas poseídas transversalmente. Mide tus tenencias resguardadas en stablecoins, almacenes rígidos (Hard-Assets multi-firma) e inversiones especulativas.\n\nConfiere la posibilidad al arquitecto y su mesa de negociación para equilibrar carteras de altísima envergadura, examinando la proporción matemática exacta de cada activo bajo una infraestructura hermética, encriptada vectorialmente en memoria terminal que nunca cede el trazado al alojamiento online de Sovereign Terminal.',
+        title: 'MAIN PORTFOLIO: STABLE EQUITY VISUALIZER',
+        subtitle: 'MACRO-ECONOMIC AMALGAM OF THE ABSOLUTE BALANCE SHEET',
+        overview: 'The consolidated logistical checkpoint for your global liquid resources. "Main Portfolio" consolidates the complete view of cryptographic reserves held cross-chain. It measures your holdings safeguarded in stablecoins, rigid vaults (Multi-sig Hard-Assets), and speculative investments.\n\nIt grants the architect and their trading desk the ability to balance ultra-high net worth portfolios, examining the exact mathematical proportion of each asset under a hermetic infrastructure, vectorially encrypted in terminal memory that never yields tracing to Sovereign Terminal\'s online hosting.',
         features: [
-            { title: 'Compilación Criptográfica Perimetral', desc: 'Integración estructural algorítmica sin vulnerar permisos de la Web3 (Read-Only Matrix) manteniendo llaves invioladas.' },
-            { title: 'Arquitectura de Gráficos Circulares de Dominancia', desc: 'Distribución porcentual segmentada para observar la divergencia entre beneficios y activos en flotación negativa.' },
-            { title: 'Control de Cobertura y Riesgo Sistémico', desc: 'Proyecta holísticamente la fragilidad o robustez frente a disrupciones inminentes del capital de terceros resguardado en protocolos descentralizados.' }
+            { title: 'Perimeter Cryptographic Compilation', desc: 'Algorithmic structural integration without violating Web3 permissions (Read-Only Matrix), keeping keys uncompromised.' },
+            { title: 'Dominance Pie Chart Architecture', desc: 'Segmented percentage distribution to observe the divergence between profits and assets in negative float.' },
+            { title: 'Systemic Risk & Hedging Control', desc: 'Holistically projects fragility or robustness against imminent disruptions of third-party capital safeguarded in decentralized protocols.' }
         ]
     },
     'live-port': {
-        title: 'QUICK PORTFOLIO: MARCADOR ECONÓMICO LATERAL',
-        subtitle: 'VIGILANCIA ASÍNCRONA DURANTE EJECUCIONES MULTITAREA',
-        overview: 'Diseñado bajo la extrema premisa de funcionalidad periférica minimalista. El "Quick Portfolio" actúa como un indicador radial sin exigir recursos gráficos continuos masivos desde la GPU local.\n\nSu finalidad reside en mostrar imperceptiblemente balances vitales seleccionados mientras el campo de concentración principal y el procesador de datos abordan paneles de análisis profundo y heurísticas Forenses D3. Garantiza la supervisión atenta sin fisuras en panoramas concurrentes o inestables.',
+        title: 'QUICK PORTFOLIO: LATERAL ECONOMIC SCOREBOARD',
+        subtitle: 'ASYNCHRONOUS SURVEILLANCE DURING MULTITASKING',
+        overview: 'Designed under the extreme premise of minimalist peripheral functionality. The "Quick Portfolio" acts as a radial indicator without demanding continuous massive graphical resources from the local GPU.\n\nIts purpose lies in imperceptibly displaying selected vital balances while the main concentration field and data processor tackle deep analysis panels and D3 Forensic heuristics. It guarantees attentive supervision without fissures in concurrent or unstable landscapes.',
         features: [
-            { title: 'Línea de Inicialización Rápida y Limpia', desc: 'Ausencia total de renders innecesarios para entregar respuesta paramétrica transcurrido el décimo del segundo post-autenticación.' },
-            { title: 'Rutas de Alto Impacto Aislado', desc: 'Priorización semántica del top accionario subyacente de la dirección conectada suprimiendo visibilidad genérica residual o polvorienta (Dust).' },
-            { title: 'Cese Computacional al Colapso', desc: 'Cierre automático total de los listeners al no hallarse visible la ventana activa de este módulo, en pro de máxima rentabilidad de memoria y CPU.' }
+            { title: 'Clean & Fast Initialization Line', desc: 'Total absence of unnecessary renders to deliver parametric response within a tenth of a second post-authentication.' },
+            { title: 'Isolated High-Impact Routes', desc: 'Semantic prioritization of the underlying top equities of the connected address, suppressing residual or "dusty" generic visibility.' },
+            { title: 'Computational Cease on Collapse', desc: 'Total automatic closure of listeners when the active window of this module is not visible, in favor of maximum memory and CPU profitability.' }
         ]
     },
     'whale-port': {
-        title: 'WHALE HOLDINGS: ESPEJO ANALÍTICO INSIDER',
-        subtitle: 'PROYECCIÓN Y SUPERPOSICIÓN DE FONDOS CONTRARIOS',
-        overview: 'El proyector holográfico de inversión adversaria por excelencia. Esta disciplina permite calcar y proyectar sobre la plataforma las carteras conocidas u opacas de instituciones dominantes y tesorerías gigantes.\n\nConstituye la Prueba Ácida del operador contemporáneo: observar, superponer y comparar al milímetro el comportamiento (Cost Basis / Token Allocation) de los grandes "Insiders" frente a las lógicas adoptadas por la mesa local. Aporta deducciones crudas destinadas puramente a mitigar errores a través del aprendizaje empírico modelado basándose en la élite interconectada de ballenas del sistema.',
+        title: 'WHALE HOLDINGS: INSIDER ANALYTICAL MIRROR',
+        subtitle: 'PROJECTION & SUPERPOSITION OF OPPOSING FUNDS',
+        overview: 'The holographic projector of adversarial investment par excellence. This discipline allows tracing and projecting onto the platform the known or opaque portfolios of dominant institutions and giant treasuries.\n\nIt constitutes the Acid Test of the contemporary operator: to observe, superimpose, and compare down to the millimeter the behavior (Cost Basis / Token Allocation) of the great "Insiders" against the logics adopted by the local desk. It provides raw deductions aimed purely at mitigating errors through empirical learning modeled on the system\'s interconnected elite of whales.',
         features: [
-            { title: 'Copia Visual Institucional no-Operativa', desc: 'Ingreso foráneo heurístico para clonar la exposición de billeteras colosales en tableros gráficos amigables propios de la Terminal.' },
-            { title: 'Trazas Longitudinales de Admisión y Costo Base', desc: 'Calcula con logaritmos precisos en qué zonas de precio de congestión estos administradores en silencio concentraron las grandes compras.' },
-            { title: 'Evaluación de Diferenciales', desc: 'Confrontación empírica y visual de exposiciones al riesgo: confronta tu nivel distributivo frente al blindaje macro-estructural corporativo externo.' }
+            { title: 'Non-Operational Institutional Visual Copy', desc: 'Heuristic foreign entry to clone the exposure of colossal wallets onto friendly graphic boards native to the Terminal.' },
+            { title: 'Longitudinal Traces of Admission & Cost Basis', desc: 'Calculates with precise logarithms in which congestion price zones these silent administrators concentrated large purchases.' },
+            { title: 'Spread Evaluation', desc: 'Empirical and visual confrontation of risk exposures: confronts your distributive level against external corporate macro-structural shielding.' }
         ]
     },
     'vault': {
-        title: 'SOVEREIGN VAULT: EL NÚCLEO ZERO-TRUST',
-        subtitle: 'DEFENSA EN PROFUNDIDAD, ENCRIPTACIÓN Y MEMORIA AISLADA',
-        overview: 'Sovereign Vault funge como la pieza maestra del engranaje en materia de auto-Soberanía estricta y arquitectura defensiva. Un confinamiento en la memoria virtual (Sandboxing In-Memory) diseñado para resguardar las credenciales criptográficas, configuraciones asimétricas de APIs corporativas u otra variante de parámetro ultrasensible dictada por el usuario o su mesa organizativa.\n\nNo confía en ninguna base de datos, servicio "Cloud" subyacente ni cookies obsoletas. Está cimentado bajo un paradigma "Security-by-Design". El cerrojo permanece clausurado hasta su acreditación mediante verificación paramétrica Web3, evadiendo ataques XSS (Cross Site Scripting) e inspecciones no autorizadas remotas.',
+        title: 'SOVEREIGN VAULT: THE ZERO-TRUST CORE',
+        subtitle: 'DEFENSE IN DEPTH, ENCRYPTION & ISOLATED MEMORY',
+        overview: 'Sovereign Vault acts as the master gear in strict self-sovereignty and defensive architecture. A virtual memory confinement (Sandboxing In-Memory) designed to protect cryptographic credentials, asymmetric configurations of corporate APIs, or any other ultra-sensitive parameter variant dictated by the user or their organizational desk.\n\nIt trusts no database, underlying "Cloud" service, or obsolete cookies. It is cemented under a "Security-by-Design" paradigm. The lock remains closed until accredited via Web3 parametric verification, evading XSS (Cross Site Scripting) attacks and unauthorized remote inspections.',
         features: [
-            { title: 'Persistencia Volátil (RAM-Based Security)', desc: 'Integración estructural inamovible de bases criptográficas estables y cifradas que mueren irreparablemente si ocurriese una falla de conexión fortuita o recargas hostiles temporales.' },
-            { title: 'Validación Criptográfica y Firma ECDSA', desc: 'Activación únicamente ejecutada al cruzar transacciones lógicas seguras por parte del conector MetaMask o proveedores soberanos Hardware-Based.' },
-            { title: 'Inexistencia de Rastró Público o Registro Secundario', desc: 'Fomenta el lema "Conoce y Controla Tus Propias Llaves", anulando vectores centralizados históricamente explotados con devastación técnica en otras plataformas analíticas estándar.' }
+            { title: 'Volatile Persistence (RAM-Based Security)', desc: 'Immovable structural integration of stable and encrypted cryptographic bases that die irreparably if a fortuitous connection failure or temporary hostile reloads occur.' },
+            { title: 'Cryptographic Validation & ECDSA Signature', desc: 'Activation exclusively executed by crossing secure logical transactions by the MetaMask connector or Hardware-Based sovereign providers.' },
+            { title: 'Absence of Public Trail or Secondary Record', desc: 'Fosters the motto "Know and Control Your Own Keys", nullifying centralized vectors historically exploited with technical devastation on other standard analytical platforms.' }
         ]
     },
     'zk': {
-        title: 'ZK SHIELD: BLINDAJE DE PRIVACIDAD AVANZADA',
-        subtitle: 'PROTOCOLOS DE MITIGACIÓN RELACIONAL Y SYBIL-SAFE',
-        overview: 'El escudo anti-trazamiento on-chain necesario para la preservación táctica del macro-analista. Toda operación y consulta web implica una potencial extracción relacional por corporativos de Análisis Forense de terceros. ZK Shield es el panel para activar barreras protectoras destinadas a asegurar una experiencia "Stealth" que obvia y enmascara la ruta del operador local respecto de su interacción hacia los nodos L1/L2.\n\nAdiciona algoritmos determinísticos probabilísticos (Spoofing & Enrutado Selectivo) encargados deliberadamente de difuminar ruidos telemétricos. Mitigando ataques de correlaciones de direcciones IP (Vulnerabilidades OPSEC comunes), permitiendo una inmersión forense anónima rigurosa e intransigente en materia de Seguridad Perimetral.',
+        title: 'ZK SHIELD: ADVANCED PRIVACY ARMOR',
+        subtitle: 'SYBIL-SAFE & RELATIONAL MITIGATION PROTOCOLS',
+        overview: 'The essential anti-tracking on-chain shield for the tactical preservation of the macro-analyst. Every operation and web query implies potential relational extraction by third-party Forensic Analysis corporates. ZK Shield is the panel to activate protective barriers aimed at ensuring a "Stealth" experience that bypasses and masks the local operator\'s route regarding their interaction towards L1/L2 nodes.\n\nIt adds deterministic probabilistic algorithms (Spoofing & Selective Routing) deliberately tasked with blurring telemetric noise. Mitigating IP address correlation attacks (common OPSEC Vulnerabilities), allowing for rigorous and uncompromising anonymous forensic immersion in terms of Perimeter Security.',
         features: [
-            { title: 'Enrutador Subterfugio Periférico', desc: 'División programada de múltiples peticiones cruzadas contra oráculos de precios y nodos RPC para encubrir intenciones analíticas directas y focales.' },
-            { title: 'Supresión Telemetría Adversaria (Ad-Hoc Antivirus)', desc: 'Motor que filtra respuestas que intentasen recopilar correlaciones lógicas directas al usuario que observa el panorama del mercado institucional activamente.' },
-            { title: 'Canales Seguros Listos para Pruebas de Cero Conocimiento', desc: 'Una directiva escalable hacia redes verdaderamente anónimas L2 (Rollups OP o ZK) sin alterar drásticamente la fluidez terminal.' }
+            { title: 'Peripheral Subterfuge Router', desc: 'Programmed division of multiple cross-requests against price oracles and RPC nodes to conceal direct and focal analytical intentions.' },
+            { title: 'Adversarial Telemetry Suppression (Ad-Hoc Antivirus)', desc: 'Engine that filters responses attempting to collect logical correlations directly to the user actively observing the institutional market landscape.' },
+            { title: 'Secure Channels Ready for Zero-Knowledge Proofs', desc: 'A scalable directive towards truly anonymous L2 networks (OP or ZK Rollups) without drastically altering terminal fluidity.' }
         ]
     },
     'logs': {
-        title: 'SESSION LOGS: AUDITORÍA BIDIRENCCIONAL SOC2',
-        subtitle: 'INSPECTOR DE BITÁCORAS DE TRANSACCIONES OPERATORIAS',
-        overview: 'El módulo supremo en garantía procesal operativa interna. Un control en tiempo real capaz de fiscalizar de principio a fin cada alteración local milimétrica sobre las variables del ecosistema. Desde los inicializadores Web3 de Wallet Handshake hasta intervenciones directas sobre conectores locales de la App o visualizadores gráficos profundos interactivos interceptados de reojo. \n\nA nivel corporativo e institucional es vital comprender exáctamente cuándo o a causa de qué se derivó una lectura crucial, por consiguiente provee una documentación algorítmica imborrable durante la sesión, constituyéndose como herramienta de revisión y depuración inmaculada fundamental en ambientes sin simulación asintótica de "Mock Data" alguna.',
+        title: 'SESSION LOGS: SOC2 BIDIRECTIONAL AUDIT',
+        subtitle: 'OPERATIONAL TRANSACTION LOG INSPECTOR',
+        overview: 'The supreme module in internal operational procedural guarantee. A real-time control capable of auditing from start to finish every millimeter local alteration on the ecosystem variables. From Web3 Wallet Handshake initializers to direct interventions on local App connectors or deep interactive graphic viewers intercepted from the corner of the eye.\n\nAt a corporate and institutional level, it is vital to understand exactly when or because of what a crucial reading was derived, therefore providing an indelible algorithmic documentation during the session, constituting itself as an immaculate review and debugging tool fundamental in environments without any asymptotic simulation of "Mock Data".',
         features: [
-            { title: 'Trazabilidad de Clics y Consultas Forenses API', desc: 'Registros indexados milisegundo a milisegundo de eventos directos sin omitir cambios de panel o recálculo volumétrico derivado.' },
-            { title: 'Inspección Longitudinal y Depuración Cruda', desc: 'Validación en sitio directo de posibles colapsos por cuellos de botella garantizando certeza empírica sobre los canales consumibles.' },
-            { title: 'Informes Estructurados sin Corrupción de Archivos', desc: 'Despliegues aptos para examinación técnica meticulosa de forma clara y explícita, exenta de decoraciones redundantes o abstractas inútiles para un analista auditor.' }
+            { title: 'Click Traceability & API Forensic Queries', desc: 'Indexed records millisecond by millisecond of direct events without omitting panel changes or derived volumetric recalculations.' },
+            { title: 'Longitudinal Inspection & Raw Debugging', desc: 'Direct on-site validation of possible collapses due to bottlenecks guaranteeing empirical certainty over consumable channels.' },
+            { title: 'Structured Reports without File Corruption', desc: 'Deployments suitable for meticulous technical examination in a clear and explicit way, free of redundant or useless abstract decorations for an auditing analyst.' }
         ]
     },
     'academy': {
-        title: 'ACADEMY: BIBLIOTECA INSTITUCIONAL DE RIGOR',
-        subtitle: 'CONCEPTUALIZACIÓN DOCTRINARIA Y MODELOS MENTALES CIENTÍFICOS',
-        overview: 'La provisión inagotable de datos purificados estocásticamente debe venir respaldada por un grado superior del bagaje epistemológico subyacente. Academy conforma un repositorio asilado de interferencias macro-económicas centrado puramente en afinar los escudos doctrinales sobre las metodologías avanzadas.\n\nSoberanía Cognitiva plena: Este apartado fomenta un profundo entendimiento de ataques Flash Loans, ingeniería de Front-Running e iteraciones en Market-Making orgánico, inmunizando intelectualmente al gestor contra narrativas ficticias minoristas forjadas sobre emociones e ilusión transaccional. La ventaja del analista radica verdaderamente en asimilar que todos los rumbos económicos suceden programáticamente (Vía Hardware y Liquidez).',
+        title: 'ACADEMY: INSTITUTIONAL RIGOR LIBRARY',
+        subtitle: 'DOCTRINAL CONCEPTUALIZATION & SCIENTIFIC MENTAL MODELS',
+        overview: 'The inexhaustible provision of stochastically purified data must be backed by a superior degree of underlying epistemological baggage. Academy forms an isolated repository of macroeconomic interferences purely focused on honing doctrinal shields over advanced methodologies.\n\nFull Cognitive Sovereignty: This section fosters a deep understanding of Flash Loan attacks, Front-Running engineering, and organic Market-Making iterations, intellectually immunizing the manager against fictional retail narratives forged on emotions and transactional illusion. The analyst\'s advantage truly lies in assimilating that all economic courses happen programmatically (Via Hardware and Liquidity).',
         features: [
-            { title: 'Currículum Formativo de Modelos Defensivos Criptográficos', desc: 'Clasificación pragmática rigurosa con capítulos dedicados y exentos a disecciones de las estructuras que dictan Web3 subyacente L1 y L2 por capas jerárquicas lógicas.' },
-            { title: 'Taxonomía Forense Superior del Glosario Técnico Operacional', desc: 'Reducción contundente de malentendidos mediante homogenización global descriptiva asumiendo los mismos términos que entidades institucionales y peritos de ciber-inteligencia.' },
-            { title: 'Visibilidad Pura y Cero-Impacto Viso-Distractivo', desc: 'Cápsula lectora diseñada específicamente impidiendo sangrados laterales con bordes estrictos sin degradados agresivos para asimilación concentrativamente absoluta.' }
+            { title: 'Cryptographic Defensive Models Formative Curriculum', desc: 'Rigorous pragmatic classification with chapters dedicated and exempt to dissections of the structures that dictate underlying Web3 L1 and L2 by logical hierarchical layers.' },
+            { title: 'Superior Forensic Taxonomy of the Operational Technical Glossary', desc: 'Resounding reduction of misunderstandings through global descriptive homogenization assuming the same terms as institutional entities and cyber-intelligence experts.' },
+            { title: 'Pure Visibility & Zero-Distractive Visual Impact', desc: 'Reading capsule designed specifically preventing lateral bleeding with strict borders without aggressive gradients for absolute concentrative assimilation.' }
         ]
     },
     'support': {
-        title: 'SUPPORT: PROTOCOLO TÁCTICO DE COMUNICACIÓN DIRECTA',
-        subtitle: 'ENLACES ESTRATÉGICOS E INTERVENCIONES LOGÍSTICAS DE CHOQUE',
-        overview: 'Cuando el análisis logarítmico choca contra una distorsión algorítmica externa no resuelta, o sucede un cierre de nodo crítico a nivel continental (API Blackout), Sovereign Support establece automáticamente la línea roja corporativa para la intervención humana inmediata y efectiva de alta resolución técnica.\n\nEvita retrasos fatales posibilitando el contacto y comunicación vertical desde los terminales criptográficos directo hacia la gobernanza directiva del sistema; resolviendo fallas complejas, mitigando dudas operativas durante ejecuciones tácticas inusuales sin delegar información ni datos privados a mesas de servicio públicas externas vulnerables a manipulación técnica e infiltraciones lógicas en cadena cruzada.',
+        title: 'SUPPORT: DIRECT COMMUNICATION TACTICAL PROTOCOL',
+        subtitle: 'STRATEGIC LINKS & SHOCK LOGISTICAL INTERVENTIONS',
+        overview: 'When logarithmic analysis crashes against an unresolved external algorithmic distortion, or a critical continental-level node closure (API Blackout) occurs, Sovereign Support automatically establishes the corporate red line for immediate and effective human intervention of high technical resolution.\n\nIt avoids fatal delays enabling vertical contact and communication from the cryptographic terminals directly to the system\'s directive governance; resolving complex failures, mitigating operational doubts during unusual tactical executions without delegating information or private data to public external service desks vulnerable to technical manipulation and cross-chain logical infiltrations.',
         features: [
-            { title: 'Escalamiento Determinístico Simultáneo a Operadores (Ad-Hocles)', desc: 'Garantiza sin intermediar que pautas complejas logarítmicas atascadas o fallas locales lleguen directamente al centro de mandos resolutivos técnicos integrales.' },
-            { title: 'Integridad Absoluta Cero Exposición Operacional Concreta y Conectiva (Zero Leak Contexture)', desc: 'Inmediata preservación y enmascaramiento transaccional si requiriese enviar captura local de un problema específico sin adjuntar ni revelar Seed Phrases o Tokens privados localizados.' },
-            { title: 'Provisión Continua Documentada in Situ de Status y Avería Sistémica', desc: 'Tableros e informáticos adyacentes para validar proactiva e institucionamente eventos mundiales catastróficos que afecten temporalmente a todo el protocolo Web3 como conjunto subyacentes globales de oráculos caídos temporalmente con absoluta transparencia estricta rigurosa.' }
+            { title: 'Simultaneous Deterministic Escalation to Operators (Ad-Hocles)', desc: 'Guarantees without intermediation that stuck complex logarithmic guidelines or local failures reach directly to the comprehensive technical resolutive command center.' },
+            { title: 'Absolute Integrity Zero Concrete & Connective Operational Exposure (Zero Leak Contexture)', desc: 'Immediate preservation and transactional masking if it required sending a local capture of a specific problem without attaching or revealing localized Seed Phrases or Private Tokens.' },
+            { title: 'Continuous Documented In Situ Provision of Status & Systemic Breakdown', desc: 'Adjacent boards and computer scientists to proactively and institutionally validate catastrophic global events that temporarily affect the entire Web3 protocol as underlying global sets of temporarily fallen oracles with absolute strict rigorous transparency.' }
         ]
     }
 };

@@ -67,7 +67,54 @@ export class PortfolioService {
    */
   public async getFullPortfolio(chainId: ChainId, address: string, forceRefresh = false, preFetchedNetWorth: any = null) {
     const chain = moralisService.getChainName(chainId);
-    
+
+    // ─── EARLY GUARD: Route unsupported chains directly to RPC fallback ──────
+    // Moralis v2.2 supports: ETH(1), Polygon(137), BSC(56), Avalanche(43114),
+    // Arbitrum(42161), Optimism(10), Base(8453). All others (e.g. World Chain 480)
+    // fall through to this path to prevent mis-routed 'eth' queries & timeouts.
+    const MORALIS_SUPPORTED = new Set([1, 137, 56, 43114, 42161, 10, 8453]);
+    if (!MORALIS_SUPPORTED.has(chainId)) {
+      console.log(`[Portfolio] Chain ${chainId} not Moralis-supported — routing to RPC fallback.`);
+      try {
+        const { blockchainService } = await import('./BlockchainService');
+        const commonTokens = this.getCommonTokensForChain(chainId);
+        const rpcResult = await blockchainService.fetchPortfolio(chainId, address, commonTokens);
+        const nativeSymbol = this.getNativeSymbol(chainId);
+        const nativeBalanceFormatted = parseFloat(ethers.formatUnits(rpcResult.nativeBalance, 18));
+        const nativePriceMap = await PriceService.getBulkPrices([{
+          symbol: nativeSymbol, address: 'native', chainId
+        }]).catch(() => ({} as Record<string, any>));
+        const price = nativePriceMap[nativeSymbol.toUpperCase()]?.price || 0;
+        const nativeToken = {
+          address: 'native',
+          balance: rpcResult.nativeBalance,
+          balanceNumeric: nativeBalanceFormatted,
+          balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }),
+          name: nativeSymbol,
+          symbol: nativeSymbol,
+          decimals: 18,
+          logo: null,
+          price,
+          valueUsd: nativeBalanceFormatted * price,
+          change24h: 0,
+          chainId,
+          sector: 'Layer 1',
+          isUnknown: false,
+        };
+        return {
+          chainId,
+          address,
+          nativeBalance: rpcResult.nativeBalance,
+          nativeValueUsd: nativeBalanceFormatted * price,
+          totalValueUsd: nativeBalanceFormatted * price,
+          tokens: [nativeToken],
+        };
+      } catch (rpcError: any) {
+        console.warn(`[Portfolio] RPC fallback failed for chain ${chainId}:`, rpcError.message);
+        return { chainId, address, error: 'FETCH_FAILED', nativeBalance: '0', nativeValueUsd: 0, totalValueUsd: 0, tokens: [] };
+      }
+    }
+
     try {
       console.log(`[Portfolio-Moralis] Fetching ${chain} portfolio for ${address.slice(0, 10)}...`);
       
@@ -106,7 +153,16 @@ export class PortfolioService {
             const decimals = parseInt(t.decimals || '18', 10);
             const balRaw = t.balance ? ethers.formatUnits(t.balance, decimals) : (t.balance_formatted || '0');
             const bal = parseFloat(balRaw);
-            // Show any real balance, regardless of USD pricing from Moralis
+            const price = parseFloat(t.usd_price || '0');
+            
+            // Show any real balance, regardless of USD pricing from Moralis, 
+            // BUT filter out obvious spam (massive balance with 0 price)
+            if (bal > 1000000 && price === 0) return false;
+            
+            // Filter out fake native tokens (e.g., ERC20 token named ETH with 0 price)
+            const isFakeNative = (t.symbol === 'ETH' || t.symbol === 'MATIC' || t.symbol === 'WLD' || t.symbol === 'BNB' || t.symbol === 'AVAX' || t.symbol === 'SOL') && price === 0 && t.token_address;
+            if (isFakeNative) return false;
+
             return bal > 0.000001;
         })
         .map(async (t: any) => {
@@ -170,17 +226,17 @@ export class PortfolioService {
       }
 
       // Add native token
-      if (nativeBalanceFormatted > 0) {
+      if (nativeBalanceFormatted >= 0) {
         enrichedTokens.unshift({
           address: 'native',
           balance: nativeBalance.toString(),
           balanceNumeric: nativeBalanceFormatted,
-          balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }),
+          balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }) || '0.0000',
           name: chainId === ChainId.MAINNET ? 'Ethereum' : `${nativeSymbol} Native`,
           symbol: nativeSymbol,
           decimals: 18,
           logo: null,
-          price: nativeValueUsd / nativeBalanceFormatted || 0,
+          price: nativeValueUsd / (nativeBalanceFormatted || 1) || 0,
           valueUsd: nativeValueUsd,
           change24h: 0,
           chainId,
@@ -269,7 +325,7 @@ export class PortfolioService {
           const filteredTokens = tokensWithPrices.filter(t => t !== null);
 
           // Add native
-          if (nativeBalanceFormatted > 0) {
+          if (nativeBalanceFormatted >= 0) {
               const nativePrice = await PriceService.getBulkPrices([{
                   symbol: nativeSymbol,
                   address: 'native',
@@ -281,7 +337,7 @@ export class PortfolioService {
                   address: 'native',
                   balance: rpcResult.nativeBalance,
                   balanceNumeric: nativeBalanceFormatted,
-                  balanceFormatted: safeToLocaleString(nativeBalanceFormatted),
+                  balanceFormatted: safeToLocaleString(nativeBalanceFormatted) || '0.0000',
                   name: nativeSymbol,
                   symbol: nativeSymbol,
                   decimals: 18,
@@ -437,12 +493,14 @@ export class PortfolioService {
     // 0. Check Redis Persistent Cache (Force skip if deepScan is requested)
     const cacheKey = `portfolio:${rawAddress}:${targetChains.join(',')}${deepScan ? ':deep' : ''}`;
     const cached = await safeRedisGet(cacheKey);
-    if (!deepScan && !forceRefresh && cached) {
+    // Guard: safeRedisGet returns the string 'TIMEOUT' on Redis timeout.
+    // Treating 'TIMEOUT' as a valid cache hit would cause JSON.parse to throw.
+    if (!deepScan && !forceRefresh && cached && cached !== 'TIMEOUT') {
       console.log(`[Portfolio] Returning persistent data for ${rawAddress}`);
       try {
         return JSON.parse(cached);
-      } catch (e) {
-        console.warn(`[Portfolio:Cache] Error parsing for ${rawAddress}, fetching fresh.`);
+      } catch {
+        // Corrupted/stale cache entry — evict silently and re-fetch.
       }
     }
 
@@ -565,9 +623,8 @@ export class PortfolioService {
 
     const activeChainIds = new Set(activeChainsData.active_chains.map((c: any) => parseInt(c.chain_id)));
     
-    // Filter target chains to only those that actually have assets (plus Mainnet/Base as defaults)
-    const essentialChains = [ChainId.MAINNET, ChainId.BASE];
-    const chainsToQuery = targetChains.filter(id => activeChainIds.has(id) || essentialChains.includes(id));
+    // Always query all requested chains — each will at minimum show native 0.0000 balance
+    const chainsToQuery = targetChains;
 
     console.log(`[Portfolio-SPEED] Querying ${chainsToQuery.length}/${targetChains.length} active chains in parallel...`);
 
@@ -577,9 +634,10 @@ export class PortfolioService {
       chainsToQuery.map(async (id) => {
           const fetchPromise = this.getFullPortfolio(id, address, forceRefresh, netWorthData);
           
-          // 4s timeout per chain to ensure snappy login
+          // 5s timeout per chain — Moralis should always respond within 3s.
+          // If RPC fallback is triggered, 5s is still enough for public nodes.
           const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 4000)
+              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 5000)
           );
 
           try {
@@ -656,9 +714,16 @@ export class PortfolioService {
         // We don't recurse here to avoid infinite loops, but we can do a quick extra check
     }
     
-    // Sort tokens by value across ALL chains
+    // Sort tokens by value across ALL chains, deduplicating native tokens per chain
+    const seen = new Set<string>();
     const allTokens = validResults
       .flatMap(r => r.tokens)
+      .filter(t => {
+        const key = `${t.chainId}:${t.address}:${t.symbol}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
       .sort((a, b) => b.valueUsd - a.valueUsd);
 
     // 4. Removed Phantom Exchange PnL to strictly enforce On-Chain data
@@ -841,7 +906,12 @@ export class PortfolioService {
   public async getCachedHistory(address: string, period: string) {
     const key = `history:${address}:${period}`;
     const cached = await safeRedisGet(key);
-    return cached ? JSON.parse(cached) : null;
+    if (!cached || cached === 'TIMEOUT') return null;
+    try {
+      return JSON.parse(cached);
+    } catch {
+      return null;
+    }
   }
 
   public async setCachedHistory(address: string, period: string, data: any) {

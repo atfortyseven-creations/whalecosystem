@@ -1,138 +1,159 @@
 "use client";
 
-import React, { useState } from 'react';
-import { BookOpen, Terminal, Database, ShieldCheck, Cpu, Globe, Search } from 'lucide-react';
+import React from 'react';
+import Link from 'next/link';
+import { ArrowRight, Terminal, Code, Server, Shield, Zap, Book, Scale } from 'lucide-react';
+
+const CARDS = [
+  {
+    tab: 'docs',
+    icon: <Book size={18} />,
+    title: 'Documentation',
+    desc: 'Platform architecture, SIWE authentication, Neo4j Akashic Ledger, smart contracts, and node deployment.',
+    href: '/docs/intro',
+    cta: 'Read docs',
+    links: [
+      { label: 'Core Concepts', href: '/docs/intro' },
+      { label: 'Architecture', href: '/docs/platform/architecture' },
+      { label: 'Authentication', href: '/docs/platform/auth' },
+    ],
+  },
+  {
+    tab: 'developer',
+    icon: <Code size={18} />,
+    title: 'Developer',
+    desc: 'REST API, WebSocket streams, TypeScript & Python SDKs, webhooks, and rate limits per plan.',
+    href: '/docs/developer/overview',
+    cta: 'API reference',
+    links: [
+      { label: 'REST API', href: '/docs/developer/api/overview' },
+      { label: 'WebSocket API', href: '/docs/developer/ws/connection' },
+      { label: 'TypeScript SDK', href: '/docs/developer/sdk/typescript' },
+    ],
+  },
+  {
+    tab: 'operator',
+    icon: <Server size={18} />,
+    title: 'Operator',
+    desc: 'Run full nodes, sequencers, and provers. Hardware requirements, keystore management, and monitoring.',
+    href: '/docs/operator/overview',
+    cta: 'Run a node',
+    links: [
+      { label: 'Prerequisites', href: '/docs/operator/prerequisites' },
+      { label: 'Running a Node', href: '/docs/operator/setup/node' },
+      { label: 'Monitoring', href: '/docs/operator/monitoring' },
+    ],
+  },
+  {
+    tab: 'legal',
+    icon: <Scale size={18} />,
+    title: 'Legal',
+    desc: 'Terms of service, privacy policy, cookie policy, risk disclosure, and the Whale Code of conduct.',
+    href: '/docs/terms-of-service',
+    cta: 'View legal',
+    links: [
+      { label: 'Terms of Service', href: '/docs/terms-of-service' },
+      { label: 'Privacy Policy', href: '/docs/privacy-policy' },
+      { label: 'Risk Disclosure', href: '/docs/risk-disclosure' },
+    ],
+  },
+];
+
+const QUICK = [
+  { label: 'Quickstart (5 min)', href: '/docs/quickstart', badge: 'START HERE', icon: <Zap size={13} /> },
+  { label: 'Authentication guide', href: '/docs/platform/auth', icon: <Shield size={13} /> },
+  { label: 'API reference', href: '/docs/developer/api/overview', icon: <Code size={13} /> },
+  { label: 'Run a full node', href: '/docs/operator/setup/node', icon: <Terminal size={13} /> },
+];
 
 export default function DocsPage() {
-    const [searchQuery, setSearchQuery] = useState("");
-    
-    return (
-        <div 
-            style={{ backgroundColor: "#020202", color: "#E0E0E0", minHeight: "100vh" }} 
-            className="w-full overflow-x-hidden font-sans selection:bg-[#D4AF37]/30 selection:text-white"
-        >
-            <div className="w-full max-w-[1200px] mx-auto pt-32 pb-40 px-6 lg:px-12 flex flex-col items-start">
-                
-                {/* ── TOPOGRAPHY ── */}
-                <div style={{ color: "#D4AF37" }} className="font-mono text-[10px] font-medium tracking-[0.4em] uppercase mb-8 opacity-80">
-                    Architectural Treatise • Section D-1
-                </div>
-                
-                <h1 
-                    style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} 
-                    className="text-5xl md:text-7xl font-light tracking-tight leading-[1.05] mb-6"
-                >
-                    Technical Specifications.
-                </h1>
-                
-                <div className="flex items-center gap-6 mb-12">
-                    <p style={{ color: "#545F73" }} className="font-mono text-sm uppercase tracking-widest m-0">
-                        Version: Alpha Release 1.5.0
-                    </p>
-                    <a 
-                        href="/SOVEREIGN_WHITEPAPER.md" 
-                        download="Whale_Alert_Whitepaper.md"
-                        className="bg-[#D4AF37] text-black font-mono text-xs font-bold uppercase tracking-wider py-2 px-6 rounded-md hover:bg-[#F2d36d] transition-colors"
-                    >
-                        Download PDF/MD Variant
-                    </a>
-                </div>
+  return (
+    <div className="doc-content">
 
-                {/* ── SEARCH BAR ── */}
-                <div className="w-full max-w-2xl mb-24 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A94A6]" size={20} />
-                    <input 
-                        type="text" 
-                        placeholder="Search the sovereign archives..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-[#0A0C0F] border border-[#ffffff10] rounded-xl py-4 pl-12 pr-4 text-[#F5F5F5] font-mono text-sm focus:outline-none focus:border-[#D4AF37] transition-colors"
-                        style={{ outline: "none", boxShadow: "none" }}
-                    />
-                    {searchQuery && (
-                        <div className="absolute top-full mt-2 w-full bg-[#0A0C0F] border border-[#ffffff10] rounded-xl p-4 z-10 text-sm text-[#8A94A6] font-mono">
-                            Press Enter to search for &quot;{searchQuery}&quot;...
-                        </div>
-                    )}
-                </div>
+      {/* Hero */}
+      <div className="mb-16">
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-25 mb-4">
+          Whale Alert · Documentation v2.0
+        </p>
+        <h1 className="text-[2.5rem] md:text-[3.5rem] font-black tracking-tighter uppercase leading-none mb-6">
+          Documentation
+        </h1>
+        <p className="text-[1rem] leading-relaxed opacity-60 max-w-xl">
+          Everything you need to integrate, operate, and build on top of the Whale Alert Network —
+          the institutional on-chain intelligence platform.
+        </p>
+      </div>
 
-                {/* ── MODULE CARDS ── */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-24">
-                    <div style={{ backgroundColor: "rgba(10, 12, 15, 0.6)", border: "1px solid rgba(255, 255, 255, 0.04)" }} className="p-8 rounded-xl backdrop-blur-sm">
-                        <Terminal style={{ color: "#D4AF37" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 style={{ color: "#EAEAEA" }} className="text-lg font-medium mb-2">Ingestion Layer</h3>
-                        <p style={{ color: "#8A94A6" }} className="text-sm font-light leading-relaxed">
-                            WebSockets bound to EVM RPC clusters, extracting blocks asynchronously.
-                        </p>
-                    </div>
-                    <div style={{ backgroundColor: "rgba(10, 12, 15, 0.6)", border: "1px solid rgba(255, 255, 255, 0.04)" }} className="p-8 rounded-xl backdrop-blur-sm">
-                        <Database style={{ color: "#D4AF37" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 style={{ color: "#EAEAEA" }} className="text-lg font-medium mb-2">State Engine</h3>
-                        <p style={{ color: "#8A94A6" }} className="text-sm font-light leading-relaxed">
-                            PostgreSQL coupled with Prisma ORM. Topologies persisted with zero latency.
-                        </p>
-                    </div>
-                    <div style={{ backgroundColor: "rgba(10, 12, 15, 0.6)", border: "1px solid rgba(255, 255, 255, 0.04)" }} className="p-8 rounded-xl backdrop-blur-sm">
-                        <ShieldCheck style={{ color: "#D4AF37" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 style={{ color: "#EAEAEA" }} className="text-lg font-medium mb-2">Authentication</h3>
-                        <p style={{ color: "#8A94A6" }} className="text-sm font-light leading-relaxed">
-                            Clerk sessions intertwined with Wagmi configurations for strict validation.
-                        </p>
-                    </div>
-                </div>
-
-                {/* ── CORE TEXT SECTIONS ── */}
-                <div className="flex flex-col gap-20 w-full max-w-3xl">
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "rgba(212, 175, 55, 0.3)" }} className="font-mono text-3xl md:text-4xl font-medium shrink-0">
-                            01.
-                        </div>
-                        <div>
-                            <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-2xl font-light mb-4">
-                                Abstract Configuration
-                            </h2>
-                            <p style={{ color: "#8A94A6" }} className="text-base font-light leading-relaxed">
-                                The Whale Alert Network is not a conventional application. It operates as an infinite coordinate canvas 
-                                structured via Next.js and optimized through Framer Motion physics. State management transcends local buffers, 
-                                securing absolute mathematical coherence of the user's intelligence topology.
-                            </p>
-                        </div>
-                    </section>
-
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "rgba(212, 175, 55, 0.3)" }} className="font-mono text-3xl md:text-4xl font-medium shrink-0">
-                            02.
-                        </div>
-                        <div>
-                            <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-2xl font-light mb-4">
-                                Event Synthesis
-                            </h2>
-                            <p style={{ color: "#8A94A6" }} className="text-base font-light leading-relaxed mb-6">
-                                Blockchain interactions contain immense stochastic noise. Our algorithm filters transactional artifacts through 
-                                conditional heuristics (Z-score variations, liquidity pools drain signatures) allowing only empirically significant 
-                                "Whale Events" to penetrate the visualization layer.
-                            </p>
-                            <div style={{ backgroundColor: "#000", border: "1px solid rgba(255, 255, 255, 0.1)" }} className="p-4 rounded-lg font-mono text-xs overflow-x-auto text-[#8A94A6]">
-                                <code>
-                                    <span style={{ color: "#a855f7" }}>import</span> {'{ BlockchainListener }'} <span style={{ color: "#a855f7" }}>from</span> <span style={{ color: "#4ade80" }}>'@/core/ingestion'</span>;<br/><br/>
-                                    <span style={{ color: "#D4AF37" }}>const</span> filterNoise = (tx: Entity) =&gt; {'{'}<br/>
-                                    &nbsp;&nbsp;<span style={{ color: "#D4AF37" }}>if</span> (tx.volume &lt; THRESHOLD) <span style={{ color: "#D4AF37" }}>return</span> <span style={{ color: "#4ade80" }}>false</span>;<br/>
-                                    &nbsp;&nbsp;<span style={{ color: "#D4AF37" }}>return</span> verifySignatures(tx);<br/>
-                                    {'};'}
-                                </code>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                {/* ── FOOTER MARK ── */}
-                <div className="w-full flex flex-col items-center justify-center mt-32 pt-16 border-t" style={{ borderColor: "rgba(255, 255, 255, 0.05)" }}>
-                    <Globe style={{ color: "rgba(255, 255, 255, 0.05)" }} size={48} className="mb-6" />
-                    <p style={{ color: "#545F73" }} className="font-mono text-xs uppercase tracking-[0.2em] font-medium text-center">
-                        Whale Alert Protocol · Core Infrastructure
-                    </p>
-                </div>
-            </div>
+      {/* Quick links */}
+      <div className="mb-16">
+        <p className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-25 mb-4">Quick access</p>
+        <div className="flex flex-col gap-px border border-black/8 dark:border-white/8">
+          {QUICK.map((q, i) => (
+            <Link key={i} href={q.href}
+              className="flex items-center justify-between px-5 py-3.5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
+              <div className="flex items-center gap-3">
+                <span className="opacity-35 group-hover:opacity-70 transition-opacity">{q.icon}</span>
+                <span className="font-mono text-[12px] tracking-tight">{q.label}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                {q.badge && (
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-[#00C076] font-black">{q.badge}</span>
+                )}
+                <ArrowRight size={12} className="opacity-20 group-hover:opacity-60 group-hover:translate-x-0.5 transition-all" />
+              </div>
+            </Link>
+          ))}
         </div>
-    );
+      </div>
+
+      {/* Section cards */}
+      <div className="mb-16">
+        <p className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-25 mb-4">Sections</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px border border-black/8 dark:border-white/8">
+          {CARDS.map((card, i) => (
+            <div key={i} className="p-7 hover:bg-black/[0.025] dark:hover:bg-white/[0.025] transition-colors flex flex-col gap-4 border-b border-r border-black/8 dark:border-white/8 last:border-b-0">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="opacity-40">{card.icon}</span>
+                  <span className="font-mono text-[11px] font-black uppercase tracking-[0.2em]">{card.title}</span>
+                </div>
+                <span className="font-mono text-[9px] uppercase tracking-widest opacity-20 border border-current px-2 py-0.5">
+                  {card.tab}
+                </span>
+              </div>
+              <p className="text-[13px] leading-relaxed opacity-55">{card.desc}</p>
+              <div className="flex flex-col gap-1 mt-1">
+                {card.links.map((lnk, j) => (
+                  <Link key={j} href={lnk.href}
+                    className="flex items-center gap-2 font-mono text-[11px] opacity-40 hover:opacity-100 hover:text-[#00C076] transition-all group">
+                    <span className="opacity-30 group-hover:opacity-100">→</span>
+                    {lnk.label}
+                  </Link>
+                ))}
+              </div>
+              <Link href={card.href}
+                className="mt-2 self-start flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-2 border border-current opacity-30 hover:opacity-100 transition-all group">
+                {card.cta} <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Platform info */}
+      <div className="border-t border-black/8 dark:border-white/8 pt-12 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+        {[
+          { value: '12', label: 'Chains indexed' },
+          { value: 'v2.0', label: 'Current version' },
+          { value: 'TRC-20', label: 'Payment network' },
+        ].map((s, i) => (
+          <div key={i}>
+            <div className="font-black text-[2rem] tracking-tighter">{s.value}</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest opacity-30 mt-1">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
 }

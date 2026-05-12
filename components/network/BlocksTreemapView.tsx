@@ -218,7 +218,7 @@ export function BlocksTreemapView() {
                             {[1, 2, 3, 4, 5].map(i => (
                                 <motion.div
                                     key={i}
-                                    initial={{ y: -20, opacity: 0, x: Math.random() * 100 + 40 }}
+                                    initial={{ y: -20, opacity: 0, x: 40 + ((i * 37) % 100) }}
                                     animate={{ y: 200, opacity: [0, 1, 0] }}
                                     transition={{ repeat: Infinity, duration: 2, delay: i * 0.4 }}
                                     className="absolute w-1 h-1 bg-blue-400 rounded-full"

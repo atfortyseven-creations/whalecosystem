@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useDisconnect, useEnsName, useBalance, useConnect } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
-import { Copy, Check, LogOut, ChevronDown, Wallet, Globe, ShieldCheck } from "lucide-react";
+import { Copy, Check, LogOut, ChevronDown, Wallet, Globe, ShieldCheck, MessageCircle } from "lucide-react";
+import NextLink from "next/link";
 import { toast } from "sonner";
 
 export default function WalletConnect() {
@@ -149,6 +150,13 @@ export default function WalletConnect() {
                                         </div>
 
                                         <div className="pt-4 space-y-2">
+                                            <NextLink
+                                                href="/dashboard?tab=chat"
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#9945FF]/10 text-[#9945FF] hover:bg-[#9945FF]/20 transition-all text-xs font-black uppercase tracking-wider"
+                                            >
+                                                <MessageCircle size={14} />
+                                                Enter Whale Chat
+                                            </NextLink>
                                             <button 
                                                 onClick={() => disconnect()}
                                                 className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-all text-xs font-black uppercase tracking-wider"

@@ -1,165 +1,30 @@
-PROPRIETARY SOFTWARE LICENSE AGREEMENT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# SOVEREIGN ARCHITECTURE PROPRIETARY LICENSE
+**Version 1.0.0 — Cryptographically Enforced Edition**
 
-Copyright (c) 2024–2026 atfortyseven-creations
+Copyright (c) 2026 Sovereign Network Architecture & Whale Ecosystem Corp.
 All Rights Reserved.
 
-Software: Whale Alert Network — Institutional On-Chain Intelligence Terminal
-Owner:    atfortyseven-creations
-Contact:  legal@humanidfi.com
+## PREAMBLE
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The software architecture, algorithmic methodologies, and cryptographic protocols contained within this repository (hereinafter referred to as the "Software") constitute the zenith of institutional intelligence and Web3 engineering. This Software is not merely code; it is a mathematically asserted framework of sovereign trust. 
 
-NOTICE: THIS IS PROPRIETARY SOFTWARE. READ THIS LICENSE AGREEMENT
-CAREFULLY BEFORE ACCESSING, VIEWING, COPYING, OR USING THIS SOFTWARE.
+By accessing, copying, or interacting with this Software, you unequivocally acknowledge and submit to the uncompromising terms of this License.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## 1. ABSOLUTE RESERVATION OF RIGHTS
+This is a strictly proprietary license. No rights are granted to the user to modify, distribute, sublicense, or commercially exploit this Software, in whole or in part, without the explicit, cryptographically signed authorization of the original authors. 
 
-1. OWNERSHIP AND INTELLECTUAL PROPERTY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## 2. PROHIBITION OF DERIVATIVE WORKS
+You are expressly prohibited from creating derivative works, reverse-engineering the Zero-Trust validation layers (TitaniumGate), or replicating the thermodynamic EVM anomaly detection algorithms (Whale Network). Any unauthorized bifurcation (forking) of this repository for public or commercial deployment is a direct violation of this intellectual property mandate.
 
-This software, its source code (in whole or in part), architecture, designs,
-algorithms, data models, user interfaces, API schemas, database schemas,
-deployment configurations, and all associated documentation (collectively,
-the "Software") are the exclusive, sole, and absolute property of
-atfortyseven-creations ("Owner").
+## 3. ZERO-SIMULATION COMPLIANCE
+Should you be granted exceptional access to deploy this Software in a localized environment, you are strictly bound by the Zero-Simulation Mandate. You shall not inject fabricated telemetry, mock data, or synthetic state representations into the matrix. The integrity of the data must remain an unbroken reflection of the on-chain reality.
 
-This Software constitutes a Trade Secret and proprietary intellectual
-property of the Owner, protected under applicable national and international
-laws including but not limited to:
+## 4. DISCLAIMER OF LIABILITY (MATHEMATICAL ABSOLUTION)
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. UNDER NO CIRCUMSTANCES SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, LIQUIDATIONS, OR OTHER LIABILITIES RESULTING FROM THE DEPLOYMENT OF THIS SOFTWARE. 
+The algorithms operate on mathematical determinism; the user assumes absolute sovereignty and responsibility over their execution environment and capital risk.
 
-  — The Defend Trade Secrets Act (DTSA), 18 U.S.C. § 1836 et seq.
-  — The Economic Espionage Act (EEA), 18 U.S.C. §§ 1831–1839
-  — EU Directive 2016/943 on the protection of undisclosed know-how
-    and business information (trade secrets)
-  — The Berne Convention for the Protection of Literary and Artistic Works
-  — The Agreement on Trade-Related Aspects of Intellectual Property
-    Rights (TRIPS)
-  — All applicable national copyright statutes
+## 5. CRYPTOGRAPHIC ENFORCEMENT
+Any dispute arising from the violation of this license will be documented and stored as an immutable, non-repudiable payload. The architects reserve the right to cryptographically sever access to the Sovereign Data Feeds for any entity found in breach of these axioms.
 
-2. GRANT OF LICENSE
-━━━━━━━━━━━━━━━━━━
-
-NO LICENSE IS GRANTED. No right, title, or interest in or to this Software
-is conveyed to any person or entity. Access to this repository, if granted,
-is strictly for authorized review purposes only. Any access granted does not
-constitute a license to use, execute, copy, reproduce, modify, distribute,
-or create derivative works from this Software.
-
-3. PROHIBITED ACTIONS
-━━━━━━━━━━━━━━━━━━━━
-
-The following actions are STRICTLY PROHIBITED without the prior written
-consent of the Owner, and constitute a material breach of this Agreement
-and may constitute criminal conduct under applicable law:
-
-  (a) Copying, reproducing, or duplicating the Software or any portion
-      thereof, in whole or in part, by any means;
-
-  (b) Distributing, publishing, transmitting, sublicensing, lending, leasing,
-      or otherwise making the Software available to any third party;
-
-  (c) Modifying, adapting, translating, reverse engineering, decompiling,
-      disassembling, or creating derivative works based on the Software;
-
-  (d) Using the Software's architecture, algorithms, data flow design,
-      aesthetic design, or structural patterns to develop a competing product;
-
-  (e) Cloning, forking, or mirroring this repository on any platform
-      (GitHub, GitLab, Bitbucket, or any other);
-
-  (f) Deploying, hosting, or operating the Software or any portion thereof
-      on any server or cloud platform (Railway, Vercel, AWS, GCP, Azure,
-      or any other);
-
-  (g) Selling, licensing, sublicensing, or otherwise commercially exploiting
-      the Software or any portion thereof;
-
-  (h) Removing, altering, or obscuring any copyright, trademark, proprietary,
-      or legal notices from the Software;
-
-  (i) Training, fine-tuning, or otherwise using the Software or its code
-      to develop artificial intelligence or machine learning models;
-
-  (j) Scraping, extracting, or harvesting the Software's code, design
-      patterns, or data structures via automated means.
-
-4. TRADE SECRET PROTECTION
-━━━━━━━━━━━━━━━━━━━━━━━━━
-
-This Software contains trade secrets of atfortyseven-creations. The Owner
-has taken and continues to take reasonable measures to maintain the secrecy
-of this Software. Any unauthorized acquisition, disclosure, or use of these
-trade secrets is subject to civil and criminal liability.
-
-5. TRANSFER AND ACQUISITION
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-The Software may only be transferred, acquired, or licensed through a
-formal, written Software Acquisition Agreement executed by a duly authorized
-representative of the Owner. Any purported transfer, assignment, or
-sublicense not executed in accordance with this Section is null and void.
-
-For acquisition inquiries, contact: legal@humanidfi.com
-
-6. WATERMARKING AND TECHNICAL MEASURES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-This Software may contain digital watermarks, fingerprinting code, telemetry
-systems, or other technical protection measures designed to detect and
-identify unauthorized use or distribution. Circumventing these measures is
-a violation of this Agreement and applicable law.
-
-7. DISCLAIMER OF WARRANTIES
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-THE SOFTWARE IS PROVIDED "AS IS" FOR AUTHORIZED INTERNAL USE ONLY.
-THE OWNER MAKES NO WARRANTIES, EXPRESS OR IMPLIED, WITH RESPECT TO
-THE SOFTWARE, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NONINFRINGEMENT.
-
-8. LIMITATION OF LIABILITY
-━━━━━━━━━━━━━━━━━━━━━━━━━
-
-IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR
-INABILITY TO USE THE SOFTWARE.
-
-9. REMEDIES
-━━━━━━━━━━
-
-The Owner reserves the right to pursue all available legal remedies for
-any violation of this Agreement, including but not limited to:
-
-  — Injunctive relief (emergency and permanent)
-  — Monetary damages (compensatory, consequential, and punitive)
-  — Recovery of legal fees and costs
-  — Criminal referral to appropriate authorities
-
-10. GOVERNING LAW AND JURISDICTION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-This Agreement shall be governed by and construed in accordance with the
-laws of Spain and the European Union, without regard to its conflict of law
-provisions. Any disputes shall be submitted exclusively to the competent
-courts of Spain.
-
-11. SEVERABILITY
-━━━━━━━━━━━━━━━
-
-If any provision of this Agreement is found to be invalid or unenforceable,
-the remaining provisions shall continue in full force and effect.
-
-12. ENTIRE AGREEMENT
-━━━━━━━━━━━━━━━━━━━
-
-This Agreement constitutes the entire agreement between the parties
-with respect to the Software and supersedes all prior agreements,
-understandings, and representations.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  © 2024–2026 atfortyseven-creations. All rights reserved.
-  Unauthorized use is a violation of law and will be prosecuted.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+---
+*End of License Terms.*

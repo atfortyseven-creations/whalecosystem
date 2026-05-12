@@ -1,393 +1,412 @@
 "use client";
 
-import React from "react";
-import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
-import { SovereignFooter } from "./SovereignFooter";
-import { Scan } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { SovereignGlobe3D } from "./SovereignGlobe3D";
+import Link from "next/link";
+import { ArrowRight, Scan, MessageSquare, ChevronRight, Shield, Zap, Globe2, Layers, Cpu, Code2, Network } from "lucide-react";
+import { useEthMetrics } from "@/hooks/useEthMetrics";
+import { PRICING_TIERS } from "@/lib/config/pricing-tiers";
+import { StackableCarousel } from "@/components/ui/StackableCarousel";
+import { motion, AnimatePresence } from "framer-motion";
 
-// Pre-defined list of lottie files matching the narrative sections.
-// This preserves the "zero build-time bloat" since these are just string paths
-// and they are fetched on-demand at runtime by OptimizedLocalLottie.
-const MANIFESTO_LOTTIES = [
-  "Earth globe rotating with Seamless loop animation.json",
-  "DeeWork About Blockchain.json",
-  "Crypto coins.json",
-  "Big Data Analytics.json",
-  "Isometric data analysis.json",
-  "A Female Employee is Reading Financial Statements.json",
-  "enterprice.json",
-  "Manufacturing Industry Working Staff.json",
-  "Business Analysis.json",
-  "Browser Loading.json",
-  "Abstract Isometric Loader #1.json",
-  "Trade.json",
-  "Online Payment.json",
-  "Payments.json",
-  "website.json",
-  "Share.json",
-  "History.json",
-  "Search for value.json",
-  "Business plan.json",
-  "Business.json",
-  "Virtual Education.json",
-  "Distance Learning.json",
-  "Geography.json",
-  "Bitcoin touch.json",
-  "Invest - Trade - concept.json",
-  "BlockChain.json"
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+
+function LottieFromUrl({ url, className, style }: { url: string; className?: string; style?: React.CSSProperties; }) {
+  const [animData, setAnimData] = useState<object | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(url, { signal: controller.signal })
+      .then((r) => r.json())
+      .then(setAnimData)
+      .catch((err) => {
+        if (err?.name !== "AbortError") console.warn("[Lottie] Failed to load animation:", url);
+      });
+    return () => controller.abort();
+  }, [url]);
+
+  if (!animData) return <div className={className} style={{ ...style, backgroundColor: "transparent" }} />;
+  return <Lottie animationData={animData} loop autoplay className={className} style={style ?? { width: "100%", height: "auto" }} aria-hidden="true" />;
+}
+
+// ─── Constants ──────────────────────────────────────────────────────────────
+
+const FEATURES = [
+  { icon: Zap, title: "Mempool Intelligence", desc: "Intercept institutional capital before block confirmation. Sub-second detection across 12 chains." },
+  { icon: Shield, title: "Cryptographic Identity", desc: "Zero passwords. Your wallet is your key. Every session is mathematically verifiable via ECDSA." },
+  { icon: Globe2, title: "On-Chain Forensics", desc: "De-obfuscate mixer outputs, trace multi-hop routes, and map entity clusters in real time." },
 ];
 
-const IMMERSIVE_PAGES = [
-  {
-    title: "I. Telemetría de Capa Base y Extracción Determinística",
-    paragraphs: [
-      "La red opera intrínsecamente como un panóptico descentralizado sobre el protocolo de consenso. Renunciando a dependencias exógenas y a indexadores de alta latencia, el núcleo troncal se amalgama a la base criptográfica de la máquina virtual nativa. Establecemos conexiones en un nivel de zócalo web de latencia cero, absorbiendo cada trazo termodinámico de las transacciones en el preciso instante en que la mempool las consolida. Prescindimos de abstracciones de intermediarios para consumir directamente el calldata crudo codificado en secuencias puramente hexadecimales.",
-      "A través de heurísticas formales de multidimensionalidad algorítmica, nuestro motor deductivo desvela los flujos ofuscados que transitan entre puentes cruzados y bóvedas en la sombra. Esto transciende la simple medición del volumen termodinámico observable; la infraestructura interroga activamente las mutaciones de estado para abstraer la genuina intencionalidad computacional. Correlacionando la entropía geométrica de los sumideros de recepción, dictaminamos la diferencia fundamental entre diversificaciones rutinarias y la consolidación de asedios por entidades hiper-estructuradas.",
-      "Cada exhalación paramétrica que distorsiona nuestros intervalos estáticos genera coeficientes de ponderación inexorables. La evaluación sistémica no consiste en el simple trazado de proyecciones probables, sino en ejecuciones forenses matemáticas de autopsias predictivas, orquestadas y resueltas a ráfagas continuas de doscientos cuarenta nanosegundos analíticos por ciclo métrico del motor base."
-    ]
-  },
-  {
-    title: "II. Validadores de Conocimiento Cero y Árboles Inmutables",
-    paragraphs: [
-      "El modelo de intercesión algorítmica destierra categóricamente las premisas laxas de los sistemas analíticos públicos, operando en dominios exclusivamente criptográficos. Las atestiguaciones asíncronas exigen una verificación matemática prístina: pruebas integrales de conocimiento cero (ZK-SNARKs). Este paradigma valida proposiciones booleanas y condiciones operativas puras sin vulnerar la opacidad del canal subyacente. Tal infraestructura anula drásticamente la propensión a la corrosión estadística provocada por inyecciones y manipulaciones externas.",
-      "Dentro de este estrato abstracto e inescrutable se aloja el Registro Algorítmico Funcional, un baluarte hermético ensamblado en secuencias de Merkle jerarquizadas. Todas las alteraciones sistémicas, las anomalías topológicas y las trazas asimétricas quedan incrustadas en hashes irrevocables y perpetuamente trazables mediante derivaciones formales algorítmicas. La robustez técnica de nuestra compilación fáctica asegura una infalibilidad criptográfica absoluta.",
-      "Nos desligamos completamente de los mecanismos de confianza tradicionales vulnerables; nuestra garantía de precisión no emana de la reputación humana, sino del determinismo algorítmico distribuido inmutable. Uniendo los protocolos matemáticos más prístinos disponibles, cristalizamos un perímetro de ingestión en la gran red que funciona como un observatorio impenetrable e inmarcesible, absolutamente aislado de la volatilidad emocional."
-    ]
-  },
-  {
-    title: "III. Expansión Autónoma y Soberanía Inter-Cadena",
-    paragraphs: [
-      "La directiva evolutiva concebida en la arquitectura de génesis encamina a la superestructura hacia una hibridación autónoma con frameworks de abstrusión inter-cadena inexplorables. Priorizamos converger paramétricamente con ecosistemas subyacentes de agregación cero, con la intención primordial de ofuscar exhaustivamente cualquier rúbrica operativa generada por la comunicación de los procesos observadores, instaurando invisibilidad técnica con máxima fidelidad determinista.",
-      "Desbordando los horizontes contemporáneos del cálculo polinómico, el cianotipo base de nuestra arquitectura de ingestión está siendo re-instrumentado para integrar primitivas de resistencia post-cuántica y curvas elípticas aberrantes. Codificamos los agregados de datos teóricos bajo dominios de confinamiento temporal asíncrono que son matemáticamente impenetrables frente al descifrado de algoritmos de Shor y a la desfragmentación entrópica ejecutada por topologías supraconductivas.",
-      "A medida que avanzamos hacia este vector, garantizamos implícitamente el axioma fundador de soberanía infraestructural, blindando los cimientos de la red analítica como una fortaleza hiperdimensional a un nivel abisal. El objetivo supremo no descansa en atenuar superficialmente los vectores de ataque contemporáneos, sino en invalidar algorítmicamente la viabilidad misma de la interceptación matemática externa en las inminentes eras del dominio cuántico digital."
-    ]
-  },
-  {
-    title: "IV. Neuralidad Predictiva Abisal y Filtrado Máximo",
-    paragraphs: [
-      "Nuestra concepción topológica final incuba sin retorno un subsistema matricial abisal configurado en torno a arquitecturas de Graph Neural Networks (GNN). Esta inyección arquitectónica habilita autónomamente al núcleo cognitivo para tejer cartografías completas sobre agrupaciones inescrutables de firmas oscuras. Subyugando a las redes de nodos subyacentes e inferiendo su estructura celular original determinista, el ensamblador lógico pulveriza con precisión la entropía de los clusters estocásticos.",
-      "Estando pertrechados y preparados para subsumir la fricción letal de los mecanismos de Valor Máximo Extraíble (MEV), nuestros conductos base canalizan toda la lógica deductiva por subsistemas totalmente apartados del mempool primario. Esta convergencia técnica y asilamiento criptográfico mitiga algorítmicamente la fagocitación parasitaria de datos, estabilizando permanentemente nuestros canales métricos y aislando la asimetría sistémica contra las maquinaciones caníbales de los bots competidores en épocas de distorsión líquida.",
-      "Como manifestación incontestable de trascendencia digital matemática, el pináculo evolutivo disecciona y amalgama sus funciones deductivas con las infraestructuras modulares de validadores fraccionados (Liquid Restaking). Esta hibridación hiperespacial nos confiere, como protocolo maestro, las facultades de desglosar instantáneamente las cascadas regresivas del consenso central de la red global inmutada, consolidando el arma criptográfica analítica incontestable para el futuro."
-    ]
-  },
-  {
-    title: "V. Perspectiva Histórica y Valor Subyacente",
-    paragraphs: [
-      "La cronología de la evolución criptográfica revela un patrón irrefutable: la descentralización no es un mero fenómeno cíclico, sino una reestructuración sistémica de los medios de transferencia fiduciarios hacia reservas puramente algorítmicas, impermeables a la inflación originada por políticas centrales.",
-      "Identificamos que la búsqueda de valor intrínseco en la era digital no descansa en oráculos centralizados, sino en métricas deterministas extraídas de la cadena misma. Las asimetrías de información se disipan cuando la lectura termodinámica de los contratos inteligentes permite auditar el capital sin custodios.",
-      "El diseño de un plan de negocio descentralizado exige la abolición total de jerarquías tradicionales. Al codificar las directivas operacionales en agentes sintéticos, la gobernanza institucional transmuta de una estructura de confianza humana hacia una certidumbre matemática implacable y automatizada.",
-      "Las corporaciones soberanas del mañana no dependerán de fronteras jurisdiccionales tangibles, operando exclusivamente mediante arquitecturas en la red soberana donde la liquidación es instantánea, perpetua y verificada asíncronamente mediante atestiguaciones on-chain."
-    ]
-  },
-  {
-    title: "VI. Formación Algorítmica y Omnipresencia Geográfica",
-    paragraphs: [
-      "El paradigma de la educación virtual aplicado a la infraestructura de capa uno garantiza la formación asimétrica de élites técnicas. La integración académica pura directamente en el entorno de pruebas on-chain cultiva validadores y arquitectos desprovistos del sesgo de los currículos tradicionales.",
-      "El aprendizaje distribuido a través de todo el consenso oblitera las barreras epistemológicas vigentes. Al destilar principios criptográficos en canales de transmisión de conocimiento cero, formamos nodos humanos que piensan y operan a la misma frecuencia de la máquina virtual subyacente.",
-      "Desvinculados del concepto obsoleto de Estado-nación geográfico, la dispersión topológica de nuestro observatorio nos confiere una ubicuidad absoluta. Esta neutralidad espacial blinda nuestro radar contra incursiones regulatorias asimétricas y garantiza resiliencia perpetua ante interrupciones locales."
-    ]
-  },
-  {
-    title: "VII. Acumulación Dinámica y Soberanía Criptográfica",
-    paragraphs: [
-      "El contacto directo con el estrato base criptográfico no es un mero punto de entrada; es la singularidad fundacional. Al observar los movimientos génesis de capital, nuestro rastreador aísla la fuente primordial de volumen, descartando el ruido secundario propagado por mercados derivativos subyacentes.",
-      "El comercio unificado bajo dinámicas de inversión institucionales transmuta de una especulación estocástica hacia ejecuciones paramétricas puras. Evaluamos los flujos cruzados de liquidez con rigor analítico, desconstruyendo portafolios agregados instante por instante mientras navegan redes ofuscadas.",
-      "Finalmente, el propio sustrato del consenso distribuido actúa como el ente verificador supremo. Al adherirnos a su arquitectura modular, certificamos de manera inmutable que todos los procesos de telemetría y recolección analítica permanezcan encriptados, infalsificables y custodiados por el determinismo matemático absoluto."
-    ]
-  }
+const HERO_TAGS = ["Free to start", "12 Blockchains", "Mempool alerts", "Cryptographic identity", "Community forum"];
+
+const FALLBACK_FORUM_POSTS = [
+  { walletSlug: "0x7a2f...c3e1", title: "Tracing the $400M BTC consolidation — Binance cold wallet cluster analysis", date: "May 9, 16:42" },
+  { walletSlug: "0x3d9b...a0f2", title: "Aztec Network privacy model vs. zkSync: which ZK-rollup wins for institutional use?", date: "May 9, 13:11" },
+  { walletSlug: "0x1c8e...7f4a", title: "Post-ETF era: mapping the new institutional wallet fingerprints", date: "May 8, 21:00" },
 ];
 
-// ── 50 Historic Catastrophic Crypto & Finance Events ──────────────────────
-const HISTORIC_EVENTS = [
-  { date: "Oct 1929", code: "BLACK-001", title: "Crac del 29 — Jueves Negro", text: "La desintegración del 89% del Dow Jones Industrial Average en tres años, evaporando garantías hipotecarias y aniquilando 14 millones de empleos en EE.UU. El mayor colapso bursátil del siglo XX, preludio directo de la Gran Depresión global." },
-  { date: "Aug 1971", code: "NIXON-002", title: "Nixon Shock — Fin del Patrón Oro", text: "Richard Nixon suprime unilateralmente la convertibilidad dólar-oro, destruyendo el sistema Bretton Woods. El orden monetario mundial mutó hacia una flotación libre de monedas fiduciarias sin respaldo intrínseco. El mayor reajuste del poder de compra global del siglo moderno." },
-  { date: "Oct 1987", code: "BLACK-003", title: "Lunes Negro 1987 — Colapso Algorítmico", text: "El Dow Jones cae un 22.6% en un solo día. Los programas de 'portfolio insurance' disparan ventas en cascada por lógica algorítmica. Primer crash causado sistemáticamente por software automatizado, premonición directa de los flash crashes del siglo XXI." },
-  { date: "Sep 1992", code: "SOROS-004", title: "La Ruptura del Sistema Monetario Europeo", text: "George Soros apostó $10B contra la libra esterlina forzando su expulsión del ERM. La devaluación forzosa del Banco de Inglaterra acumuló pérdidas de £3.4B en un solo día. Demostración empírica de que los especuladores privados pueden superar la capacidad de defensa de los bancos centrales soberanos." },
-  { date: "Dec 1994", code: "PESO-005", title: "Crisis del Peso Mexicano — El Error de Diciembre", text: "La devaluación abrupta del peso desencadenó una fuga de capitales salvaje desde los mercados emergentes. El efecto Tequila infectó los mercados de Argentina, Brasil y el Sudeste Asiático. El FMI requirió un rescate de $50B para evitar el default soberano completo." },
-  { date: "Jul 1997", code: "ASIA-006", title: "Crisis Financiera Asiática", text: "El colapso del baht tailandés detonó un contagio que colapsó las monedas de Indonesia, Corea del Sur y Malasia. El FMI impuso ajustes de austeridad que exterminaron clases medias enteras. El PIB de Indonesia cayó un 13.7% en un año: el mayor contracción económica desde la Segunda Guerra Mundial en la región." },
-  { date: "Aug 1998", code: "RUSIA-007", title: "Default Soberano de Rusia", text: "Moscow repudió $40B en deuda gubernamental interna (GKOs), devaluó el rublo y moratorizó los pagos a acreedores privados extranjeros. El colapso arrastró al hedge fund LTCM al borde del abismo sistémico, requiring una operación de rescate coordinada por la Fed de New York para evitar el contagio global." },
-  { date: "Sep 1998", code: "LTCM-008", title: "La Implosión de Long-Term Capital Management", text: "Un fondo con dos premios Nobel en su consejo directivo perdió $4.6B en semanas por el colapso de sus modelos matemáticos de arbitraje. La Fed orquestó un rescate privado de $3.65B de 14 bancos para evitar que su liquidación forzada colapsara los mercados de bonos globales." },
-  { date: "Mar 2000", code: "DOTCOM-009", title: "Estallido de la Burbuja Punto-Com", text: "El NASDAQ pierde el 78% de su valor entre 2000 y 2002. Empresas valoradas en miles de millones sin ingresos reales se evaporan en meses. Webvan, Pets.com y Boo.com queman $2T en capital especulativo. El mayor destructor de riqueza tecnológica del milenio hasta la llegada de las ICOs." },
-  { date: "Sep 2001", code: "911-010", title: "Cierre de la Bolsa de Nueva York Post-11S", text: "La NYSE cierra durante 6 días hábiles consecutivos, el período más largo desde 1933. Al reabrir, el Dow Jones pierde $1.4T en valor de mercado en una sola semana. El primer evento terrorista con consecuencias sistémicas sobre la arquitectura financiera global moderna." },
-  { date: "Sep 2008", code: "LEH-011", title: "Quiebra de Lehman Brothers", text: "La mayor bancarrota corporativa de la historia: $613B en deuda. El colapso del banco de inversión con 158 años de historia congeló el crédito interbancario mundial en cuestión de horas, provocando el mayor rescate financiero gubernamental de la historia: $700B solo en EE.UU." },
-  { date: "Oct 2008", code: "BAIL-012", title: "El Rescate TARP — Socialización de Pérdidas Privadas", text: "El gobierno estadounidense inyecta $700B en bancos privados insolventes con dinero de los contribuyentes. La paradoja fundacional del capitalismo moderno: los beneficios son privados, los colapsos son públicos. El evento que inspiró directamente el Bloque Génesis de Bitcoin con el mensaje de Satoshi." },
-  { date: "Jan 2009", code: "BTC-013", title: "Génesis de Bitcoin — El Bloque 0", text: "Satoshi Nakamoto embute en el primer bloque de la cadena un mensaje periodístico sobre el segundo rescate de los bancos británicos, declarando la guerra a la finanza centralizada. El nacimiento de la primera moneda digital verdaderamente descentralizada, inalterable y sin custodio central." },
-  { date: "May 2010", code: "PIZZA-014", title: "La Pizza de Bitcoin — 10,000 BTC", text: "Laszlo Hanyecz paga 10,000 BTC por dos pizzas, la primera transacción comercial documentada en Bitcoin. Al precio máximo histórico alcanzado en 2024, esa pizza equivaldría a $680 millones. El evento de asignación de valor más mítico en la historia de la economía digital." },
-  { date: "Mar 2013", code: "CYPRUS-015", title: "Crisis Bancaria de Chipre — Corralito Digital", text: "El BCE y el FMI imponen un 'bail-in' sobre los depósitos bancarios chipriotas superiores a €100,000. El gobierno graba con un 9.9% los ahorros de los ciudadanos para salvar los bancos. La demanda de Bitcoin se disparó 300% en Europa en 72 horas." },
-  { date: "Apr 2013", code: "BTC-016", title: "Primer Gran Crash de Bitcoin — $266 a $50", text: "El primer mercado bajista severo de Bitcoin. El precio colapsa desde $266 a $50 en horas tras la sobrecarga del exchange Mt. Gox durante un pico de demanda sin precedentes. El primer crash generado por infraestructura centralizada deficiente en un mercado descentralizado." },
-  { date: "Feb 2014", code: "GOXZERO-017", title: "Mt. Gox Colapsa — 850,000 BTC Robados", text: "El exchange que procesaba el 70% del volumen global de Bitcoin anuncia la pérdida de 850,000 BTC (≈$450M en ese momento). Las claves privadas fueron extraídas durante años sin detección. El evento fundacional que demostró que la custodia centralizada es irreconciliable con la soberanía criptográfica." },
-  { date: "Aug 2015", code: "CHINA-018", title: "Lunes Negro Chino — Flash Crash del Shanghai Composite", text: "El índice bursátil de Shanghái pierde el 8.49% en un día, borrando $3.2T en valor de mercado. El gobierno chino interviene con compras masivas de emergencia. El evento provocó una cadena de colapsos globales que afectó a 19 bolsas en un mismo día." },
-  { date: "Jun 2016", code: "DAO-019", title: "El Ataque al DAO y el Hard Fork de Ethereum", text: "Un atacante drena 3.6 millones de ETH explotando una vulnerabilidad de reentrada en el contrato The DAO. La comunidad de Ethereum decide revertir la cadena mediante hard fork, dividiendo el ecosistema en ETH y ETC. La primera crisis existencial de la gobernanza descentralizada." },
-  { date: "Jan 2018", code: "ICO-020", title: "El Gran Estallido ICO — Fin del Boom", text: "El mercado de ICOs alcanza $6.3B recaudados en 2017 para colapsar un 90%+ en 2018. Proyectos sin productos reales ni equipos verificables evaporan miles de millones. La SEC emite advertencias masivas y cierra operaciones fraudulentas. El eco moderno de la burbuja punto-com." },
-  { date: "Dec 2017", code: "BCASH-021", title: "La Gran Bifurcación de Bitcoin — BCH vs BTC", text: "La guerra civil de Bitcoin culmina en el hard fork que genera Bitcoin Cash. La disputa sobre el tamaño del bloque divide a la comunidad, los mineros y los exchanges. El precio de BTC colapsa 45% en tres semanas, demostrando la fragilidad geopolítica de la gobernanza descentralizada." },
-  { date: "Nov 2018", code: "BCHSV-022", title: "La Guerra de Hashing BCH/BSV", text: "Craig Wright y Roger Ver lanzan una guerra de minería destructiva para imponer su versión del protocolo. El costo de la 'guerra de hash' destruye miles de millones de rentabilidad de mineros, con ambas cadenas sufriendo reorganizaciones y cero confirmaciones durante días." },
-  { date: "Mar 2020", code: "COVIDCRASH-023", title: "Jueves Negro Covid — Bitcoin cae 50% en 24h", text: "El 12 de marzo de 2020, Bitcoin pierde el 50% de su valor en un solo día de trading, cayendo de $8,000 a $4,000. Las liquidaciones en cascada de posiciones apalancadas en derivados destruyeron $1B en menos de una hora. El mayor crash porcentual en un solo día desde 2013." },
-  { date: "Apr 2021", code: "TURKEY-024", title: "Colapso de la Lira Turca — Fuga hacia Crypto", text: "La lira turca pierde el 44% de su valor en 2021 tras la decisión del presidente Erdoğan de despedir al gobernador del banco central. El volumen de trading de USDTRY en exchanges de crypto se dispara 1,200%. La primera hiperinflación soberana donde el refugio masivo fue digital." },
-  { date: "May 2021", code: "CHINABAN-025", title: "China Prohíbe Todas las Transacciones Crypto", text: "Beijing prohíbe a instituciones financieras procesar transacciones de criptomonedas y fuerza el cierre de operaciones de minado. El hashrate global de Bitcoin colapsa un 50%. El mayor choque regulatorio de la historia del mercado, demostrando la resiliencia descentralizada: la red se recuperó en 3 meses." },
-  { date: "May 2022", code: "LUNA-026", title: "El Colapso de Terra/LUNA — $60B Evaporados", text: "El algoritmo de la stablecoin UST colapsa en espiral de muerte. LUNA pasa de $80 a $0.0001 en 72 horas. $60B en capitalización se evaporan, arrastran decenas de fondos de venture capital y causan el contagio más devastador en el ecosistema DeFi de la historia." },
-  { date: "Jun 2022", code: "3AC-027", title: "Insolvencia de Three Arrows Capital", text: "El hedge fund criptográfico más grande del mundo colapsa con $3.5B en deudas. Su exposición masiva a LUNA y a productos de rendimiento estructurado tipo stETH/ETH trigger margin calls imposibles de cubrir. El efecto dominó destruyó a Voyager Digital, BlockFi y Genesis en semanas." },
-  { date: "Jun 2022", code: "CELSIUS-028", title: "Celsius Bloquea los Retiros — 1.7M Usuarios Atrapados", text: "La plataforma de préstamos congela todos los retiros, swaps y transferencias. 1.7 millones de usuarios no pueden acceder a sus fondos durante meses en pleno proceso de bancarrota. La mayor captura de capital minorista de la historia del crédito criptográfico." },
-  { date: "Nov 2022", code: "FTX-029", title: "El Colapso de FTX — El Escándalo Maestro", text: "Sam Bankman-Fried diseña una arquitectura opaca donde Alameda Research accede libremente a los depósitos de clientes de FTX. $8B en fondos de usuarios son utilizados para trading propio. El mayor fraude corporativo desde Enron, terminando con SBF arrestado en las Bahamas." },
-  { date: "Nov 2022", code: "CONTAGIO-030", title: "El Contagio Post-FTX — BlockFi, Genesis, Gemini", text: "La quiebra de FTX inicia una reacción en cadena. BlockFi declara bancarrota con $1.2B de exposición a FTX. Genesis congela retiros. Gemini suspende su producto Earn. El mercado pierde $200B en capitalización en dos semanas. La mayor crisis de confianza sistémica en la historia del ecosistema." },
-  { date: "Mar 2023", code: "SVB-031", title: "Colapso de Silicon Valley Bank — Detonante Bancario", text: "SVB colapsa en 48 horas con $175B en depósitos, la segunda mayor quiebra bancaria en historia americana. Circle (USDC) revela $3.3B atrapados en SVB. USDC desacopla al $0.87, generando pánico en todo DeFi. El contagio financiero tradicional invade el ecosistema descentralizado." },
-  { date: "Jan 2024", code: "ETFBUY-032", title: "Aprobación ETF Bitcoin Spot EE.UU. — El Gran Influx", text: "La SEC aprueba los primeros ETFs de Bitcoin spot en EE.UU. tras años de resistencia. BlackRock, Fidelity y Invesco absorben $12B en los primeros 30 días. El mayor flujo de capital institucional hacia un activo digital en la historia financiera moderna." },
-  { date: "Apr 2024", code: "HALVING-033", title: "Cuarto Halving de Bitcoin — Recompensa a 3.125 BTC", text: "El nuevo halving reduce la emisión de Bitcoin a 3.125 BTC por bloque. Por primera vez, las comisiones de transacción superan la recompensa en bloque durante el período de alta congestión, marcando la transición estructural hacia una economía de fees pura." },
-  { date: "Mar 2020", code: "BITMEX-034", title: "BitMEX Liquidaciones — $1B en 1 Hora", text: "Durante el crash del COVID, BitMEX procesa $1B en liquidaciones forzadas en menos de 60 minutos, acelerando el colapso del mercado. La plataforma luego es acusada por el DOJ de operar sin licencia AML. El caso paradigmático del riesgo de los exchanges derivativos sin regulación." },
-  { date: "May 2010", code: "FLASH-035", title: "Flash Crash de 2010 — 1,000 Puntos en Minutos", text: "El Dow Jones cae casi 1,000 puntos en minutos por algoritmos de HFT en reacción en cadena. El evento expuso la fragilidad sistémica del mercado de valores moderno dominado por trading algorítmico. La SEC implementó circuit breakers tras el evento." },
-  { date: "Feb 2021", code: "GAME-036", title: "GameStop Gamma Squeeze — r/WallStreetBets vs Hedge Funds", text: "Pequeños inversores coordinados en Reddit ejecutan un short squeeze masivo contra fondos de cobertura. GameStop sube 2,400% en semanas. Melvin Capital pierde $6.8B. Robinhood suspende las compras, exponiendo cómo la regulación protege al capital institucional frente al minorista." },
-  { date: "Aug 2022", code: "TORNADO-038", title: "Sanción de Tornado Cash por la OFAC", text: "El gobierno de EE.UU. sanciona por primera vez contratos inteligentes inmutables en cadena. El desarrollador Roman Storm fue arrestado. La acción marca el inicio de la era de represalia regulatoria sobre privacidad criptográfica." },
-  { date: "May 2022", code: "BEANSTALK-039", title: "Hack de Beanstalk — $182M por Flash Loan Governance Attack", text: "Un atacante ejecuta un préstamo flash de $1B, adquiere temporalmente el control de la gobernanza del protocolo en una única transacción y drena $182M en activos. El ataque más sofisticado en DeFi hasta la fecha." },
-  { date: "Mar 2022", code: "RONIN-040", title: "Hack del Ronin Bridge — $625M Robados", text: "Hackers vinculados al grupo Lazarus de Corea del Norte comprometen 5 de 9 validadores del puente Ronin de Axie Infinity. $625M en ETH y USDC son robados. El mayor hack de la historia DeFi demostró que la descentralización no es binaria sino espectral." },
-  { date: "Oct 2021", code: "SQUID-041", title: "Squid Game Token — Rug Pull de $3.4M", text: "Un token SQUID basado en la popular serie Netflix colapsa 99.99% en segundos cuando sus creadores ejecutan un rug pull. El token subió 2,400% en horas antes del colapso. El caso más emblemático del ciclo de pump-and-dump alimentado por tendencias culturales virales." },
-  { date: "Dec 2021", code: "JUNO-042", title: "Crisis de Gobernanza de Juno Network", text: "La comunidad de Juno vota confiscar 3.3M tokens de un solo whale wallet sospechoso. La propuesta se ejecuta en blockchain y luego se descubre que afecta en parte a una wallet equivocada. La primera 'censura descentralizada' documentada en la historia del DAO." },
-  { date: "Nov 2022", code: "BINANCE-043", title: "CZ Revela Insolvencia FTX — El Tweet Catalizador", text: "CZ de Binance publica en Twitter la decisión de liquidar las posiciones de FTT. En 24 horas, $6.3B son retirados de FTX. El evento digital más costoso de la historia: un tweet que desencadenó la mayor corrida bancaria crypto jamás registrada." },
-  { date: "Jun 2023", code: "SEC-044", title: "La SEC Demanda a Binance y Coinbase", text: "La SEC presenta cargos contra los dos mayores exchanges del mundo en días consecutivos, calificando docenas de tokens como securities no registrados. El impacto regulatorio borra $100B en capitalización. El inicio del período de mayor presión regulatoria coordinada sobre crypto." },
-  { date: "Aug 2023", code: "XRP-045", title: "XRP No Es Security para Retail — Victoria Parcial", text: "La jueza Analisa Torres dictamina que las ventas de XRP al público no constituyen ofertas de securities bajo la ley Howey. La primera victoria legal de peso de la industria contra la SEC, reabriendo debates sobre la taxonomía regulatoria de activos digitales." },
-  { date: "Dec 2023", code: "BINDEPART-046", title: "CZ Se Declara Culpable — Multa de $4.3B a Binance", text: "Changpeng Zhao se declara culpable de violaciones AML y es sentenciado a 4 meses de prisión. Binance paga la mayor multa de la historia crypto: $4.3B al DOJ/FinCEN. El intercambio de mayor volumen del mundo es forzado a reestructurarse bajo supervisión federal." },
-  { date: "Mar 2024", code: "MEME-047", title: "El Ciclo MEME 2024 — Dogwifhat y BOME", text: "El mercado de los memecoins alcanza $65B de capitalización total. Dogwifhat sube 10,000%. Book of Meme captura $1B de market cap en 48 horas desde su lanzamiento. La mayor burbuja especulativa de activos sin utilidad intrínseca de la historia moderna del trading." },
-  { date: "Oct 2024", code: "EIGEN-048", title: "EigenLayer y el Riesgo Sistémico del Restaking", text: "EigenLayer lanza su token EIGEN con polémicas restricciones de transferibilidad. La promesa del restaking genera $15B en depósitos pero su modelo económico circular genera preocupaciones sistémicas que evocan directamente los CDOs colateralizados de la crisis de 2008." },
-  { date: "Nov 2024", code: "HYPERLIQ-049", title: "$200M Whale Exploit en Hyperliquid", text: "Un operador acumula una posición de $200M en JELLY ejecutando manipulación del precio fundacional y forzando al protocolo a asumir pérdidas sistémicas. El vault HLP pierde millones en horas. Revela la fragilidad de los DEX perpetuos con liquidez insuficiente en vaults primarios." },
-  { date: "Apr 2025", code: "TRUMP-050", title: "Aranceles Trump 2025 — Crypto Pierde $1T en Semanas", text: "El presidente Trump anuncia aranceles del 145% sobre importaciones chinas. El mercado crypto pierde $1T en capitalización en 10 días. Bitcoin cae de $109,000 a $74,000. La primera demostración escala masiva de que los activos digitales son altamente correlados con la geopolítica macroeconómica." },
+const KEY_EVENTS = [
+  { date: "Jan 2009", code: "BTC-000", text: "Bitcoin Block 0 — Satoshi's direct answer to the TARP bailout: immutable, trustless, sovereign." },
+  { date: "Feb 2014", code: "MTGOX",  text: "850,000 BTC stolen — centralised custody proven irreconcilable with cryptographic sovereignty." },
+  { date: "May 2022", code: "LUNA",   text: "$60B Terra death spiral — algorithmic stablecoins without overcollateralisation cannot survive." },
+  { date: "Nov 2022", code: "FTX",    text: "Sam Bankman-Fried's $8B fraud — opacity destroys ecosystems. On-chain transparency is the only answer." },
+  { date: "Jan 2024", code: "ETF",    text: "First US Spot Bitcoin ETF — $12B institutional inflow in 30 days. The institutional era begins." },
+  { date: "Apr 2025", code: "BYBIT",  text: "$1.4B stolen by Lazarus Group — even tier-1 custody is vulnerable to social engineering." },
 ];
 
-const LEFT_SIDEBAR_CONTENT = [
-  {
-    title: "Desfalco de Mt. Gox (2014)",
-    text: "El paroxismo originario de la fragilidad del custodio centralizado. Al delegar la custodia de ochocientas cincuenta mil unidades de Bitcoin a una infraestructura de servidores tradicional con bases de datos SQL mutables, la asimetría de seguridad derivó en la sustracción silente y prolongada del setenta por ciento del volumen global. Postulado fundacional absoluto: la posesión algorítmica fidedigna es inexistente fuera de las claves privadas criptográficas."
-  },
-  {
-    title: "Espiral de Muerte de Terra/LUNA (2022)",
-    text: "La demostración empírica del fracaso matemático de las stablecoins algorítmicas subcolateralizadas. Fomentados por reservas de fe en lugar de inmutabilidad matemática sobredimensionada, los anclajes de valor colapsaron bajo presión hiperbólica, evaporando sesenta mil millones de capital fiduciario en setenta y dos horas. Revela crudamente que la economía cibernética no sobrevive al apalancamiento sin anclas tangibles en capa cero."
-  },
-  {
-    title: "Colapso del Imperio FTX (2022)",
-    text: "El cenit global de la opacidad institucional en el siglo XXI. Operando tras una falsa cortina de regulación, la rehipotecación algorítmica del capital de los usuarios mediante 'puertas traseras' en el código base tradicional facilitó la dilapidación abismal de reservas. Esta implosión sistemática purificó el ecosistema, evidenciando que sin herramientas de transparencia on-chain y liquidación determinista, los oráculos humanos caen en depravación."
-  },
-  {
-    title: "La Caída de Celsius Network (2022)",
-    text: "El espejismo del rendimiento perpétuo. La rehipotecación en cascada de activos minoristas en protocolos exóticos sin contingencia de liquidez desembocó en insolvencia matemática inmediata. Evidencia taxativa de que la opacidad del balance off-chain invariablemente enmascara riesgos catastróficos si no hay respaldos deterministas públicamente auditables."
-  },
-  {
-    title: "El Cisma de Tornado Cash (2022)",
-    text: "Intervención a nivel estado en la capa de protocolo. La sanción a contratos inteligentes inmutables por la OFAC demostró la latencia coercitiva de las jurisdicciones fiduciarias sobre desarrolladores de código abierto. Un preludio a la batalla final por la privacidad algorítmica, demostrando que verdaderas redes criptográficas requieren ofuscación irremediablemente cifrada."
-  },
-  {
-    title: "Saturación del Consenso Central (2024)",
-    text: "El monopolio progresivo de la validación. Plataformas dominantes de Liquid Staking aglomeraron cotas críticas del poder confirmatorio de la red principal, evidenciando la inherente vulnerabilidad paulatina del Proof-of-Stake frente a carteles oligopólicos de capitalización. Un recordatorio drástico de que los ecosistemas de élite tienden hacia asimetrías de poder cuasi-feudales de no mediar sistemas de corrección."
-  }
+const ARCHITECTURE = [
+  { id: "SYS-1", label: "Performance", desc: "Optimized response times and seamless data synchronization.", color: "#00C076", icon: Zap },
+  { id: "SYS-2", label: "Authentication", desc: "Secure, frictionless access with advanced identity verification.", color: "#00C076", icon: Shield },
+  { id: "SYS-3", label: "Data Engine", desc: "Real-time processing and intelligent information structuring.", color: "#1a1a1a", icon: Layers },
+  { id: "SYS-4", label: "Community", desc: "Interactive tools designed for engagement and clear communication.", color: "#1a1a1a", icon: MessageSquare },
+  { id: "SYS-5", label: "Operations", desc: "Automated billing and seamless regulatory compliance features.", color: "#555", icon: Cpu },
+  { id: "SYS-6", label: "Infrastructure", desc: "High availability and robust server management protocols.", color: "#555", icon: Network },
+  { id: "SYS-7", label: "Analytics", desc: "Clear metrics and predictive modeling for business growth.", color: "#888", icon: Code2 },
+  { id: "SYS-8", label: "Security", desc: "Comprehensive protection layers safeguarding all user data.", color: "#888", icon: Shield },
 ];
 
-const RIGHT_SIDEBAR_CONTENT = [
-  {
-    title: "Bifurcación de The DAO (2016)",
-    text: "El evento de fisura más profundo en la axiomática del 'Código es Ley'. Tras la recolección masiva de Ether en la naciente Máquina Virtual de Ethereum, un ataque por reentrada de funciones drenó severamente el contrato maestro. La corrección requirió una amputación brutal mediante bifurcación dura (Hard Fork), alterando para siempre la génesis de la red y exponiendo la inmadurez biológica de la lógica computacional inmutable pura."
-  },
-  {
-    title: "Extracción del Ronin Bridge (2022)",
-    text: "El siniestro absoluto por la ilusión de la descentralización. Un puente de escalabilidad cedió más de seiscientos millones de dólares porque su autoridad matemática residía en un esquema M-de-N extremadamente precario (cinco de nueve validadores). Al comprometer las firmas mediante vectores de ataque de ingeniería social corporativa, se desmanteló por completo la narrativa subyacente de seguridad distribuida real."
-  },
-  {
-    title: "La Fisura de Wormhole (2022)",
-    text: "El clímax de vulnerabilidad en la topología poli-cadena (Cross-chain). Mediante la falsificación algorítmica de atestaciones y la elusión de validaciones triviales en los contratos inteligentes de puenteo, la arquitectura sufrió una sustracción inmediata de gran magnitud sin contramedidas reactivas posibles. Concluyendo definitivamente que los vectores poli-cadena elevan la entropía sistémica exponencialmente si no se auditan a prueba de abismos."
-  },
-  {
-    title: "La Anomalía Nomad (2022)",
-    text: "Decadencia técnica en puentes de enrutamiento cross-chain. Una configuración paramétrica nula de variables en la rutina de validación de Merkle permitió el primer saqueo masivo de extracción colectiva descentralizada ('crowdsourced'). Una advertencia draconiana testificando empíricamente que cualquier abstracción superflua en la criptografía transfiere valor infinito directamente al vacío basal."
-  },
-  {
-    title: "Desacoplamiento de USDC (2023)",
-    text: "El contagio residual del mecanismo de reserva fraccionaria clásica. La sobredependencia de tesorería hacia entidades fiduciarias (Silicon Valley Bank) socavó temporalmente la paridad absoluta de la stablecoin hegemónica del ecosistema. Una comprobación taxativa: toda conjunción vinculante, por sutil que fuese, con las fallas de la banca analógica expone a la arquitectura on-chain al caos externo."
-  },
-  {
-    title: "El Vacío de Iron Finance (2021)",
-    text: "La histeria irracional del arbitraje de sobreestabilización colateral. Un diseño tokenómico defectuoso detonó un bucle de retroalimentación puramente entrópico e hiperbólico, hundiendo el capital líquido y diluyendo el token de gobernanza en una deflación precipitada y letal. El suceso cristaliza de nuevo que el capital altamente eficiente es completamente agnóstico ante la narrativa carente de resiliencia empírica probada."
-  }
-];
+const FADE_UP: any = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
 
-export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void } = {}) {
-  
+// ─── Component ──────────────────────────────────────────────────────────────
+
+export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { onOpenScanner?: () => void; hideMap?: boolean; }) {
+  const { blockNumber, baseFeeGwei, syncing } = useEthMetrics();
+  const [globalStats, setGlobalStats] = useState<{ tokens: string; cap: string } | null>(null);
+  const [liveTopics, setLiveTopics] = useState<any[] | null>(null);
+
+  useEffect(() => {
+    fetch("/api/market/global").then((r) => r.json()).then((data) => {
+      if (data?.data) setGlobalStats({ tokens: data.data.active_cryptocurrencies.toLocaleString(), cap: "$" + (data.data.total_market_cap.usd / 1e12).toFixed(2) + "T" });
+    }).catch(() => {});
+    
+    fetch("/api/forum/topics?limit=3&filter=latest").then((r) => r.json()).then((data) => setLiveTopics(Array.isArray(data) ? data : [])).catch(() => setLiveTopics([]));
+  }, []);
+
+  const previewTiers = PRICING_TIERS.filter((t) => ["STARTER", "PRO", "ELITE"].includes(t.id));
+
   return (
-    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-clip">
+    <div className="relative bg-[#FAFAF8] text-[#0a0a0a] font-sans antialiased overflow-x-hidden selection:bg-black/10">
 
-      <div className="relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 pb-16">
+      {/* ── HERO ──────────────────────────────────────────────────────────────── */}
+      <section className="relative w-full min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between border-b border-black/5 overflow-hidden">
         
-        {/* Left Academic Column */}
-        <aside className="hidden min-[1350px]:flex flex-col pt-36 w-[320px] shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto no-scrollbar pb-12">
-          <div className="border-b-[1.5px] border-black pb-2 mb-8">
-            <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#555]">
-              Tracto I: Opacidad y Ruina
-            </h3>
+        {/* Left Content */}
+        <motion.div 
+          initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+          className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-32 pb-24 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
+        >
+
+
+          <motion.h1 variants={FADE_UP} className="text-[48px] sm:text-[64px] md:text-[80px] xl:text-[96px] font-black tracking-tighter leading-[0.9] uppercase text-[#0a0a0a] mb-8 drop-shadow-sm">
+            Whale<br />Alert<br /><span className="text-black/30">Network</span>
+          </motion.h1>
+
+          <motion.p variants={FADE_UP} className="font-serif text-[16px] sm:text-[18px] text-slate-600 leading-relaxed max-w-lg mb-12">
+            Track institutional capital before markets react. Real-time on-chain intelligence — from mempool to execution.
+          </motion.p>
+
+          {/* Live Stats Glassmorphism Bar */}
+          <motion.div variants={FADE_UP} className="flex flex-wrap items-center gap-x-8 gap-y-6 p-6 md:p-8 bg-white/60 backdrop-blur-2xl border border-black/5 rounded-3xl mb-10 shadow-xl shadow-black/5 max-w-2xl">
+            {[
+              { label: "ETH Block", val: syncing ? "Syncing..." : blockNumber ?? "---" },
+              { label: "Base Fee", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "---" },
+              { label: "Active Tokens", val: globalStats?.tokens ?? "---" },
+              { label: "Total Cap", val: globalStats?.cap ?? "---" }
+            ].map((stat, i) => (
+              <div key={stat.label} className="flex items-center gap-8">
+                <div className="flex flex-col gap-1.5">
+                  <span className="font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{stat.label}</span>
+                  <span className="font-mono text-[14px] sm:text-[16px] font-black text-[#0a0a0a]">{stat.val}</span>
+                </div>
+                {i !== 3 && <div className="w-px h-10 bg-black/10 hidden sm:block" />}
+              </div>
+            ))}
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row gap-4 mb-10">
+            <Link href="/dashboard" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#0a0a0a] text-white rounded-xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10">
+              Enter the Network <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link href="/pricing" className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white border border-black/10 text-[#0a0a0a] rounded-xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:border-black/30 hover:bg-slate-50 active:scale-[0.98] transition-all">
+              View Plans
+            </Link>
+          </motion.div>
+
+          {/* Trust Signals */}
+          <motion.div variants={FADE_UP} className="flex flex-wrap items-center gap-4 pt-8 border-t border-black/5">
+            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 mr-2">Secured by</span>
+            {["Stripe", "Ethereum", "Aztec ZK"].map((label) => (
+              <span key={label} className="font-mono text-[9px] sm:text-[10px] font-black text-slate-600 bg-white border border-black/5 px-4 py-1.5 rounded-full shadow-sm">
+                {label}
+              </span>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Right Globe */}
+        <div className="absolute inset-0 w-full h-[100dvh] opacity-30 pointer-events-none lg:relative lg:w-1/2 lg:h-screen lg:opacity-100 lg:pointer-events-auto z-0 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent z-10 hidden lg:block" />
+          {!hideMap && <SovereignGlobe3D />}
+        </div>
+        
+        {/* Mobile Scanner Button */}
+        {onOpenScanner && (
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[200] bg-white/80 backdrop-blur-xl border-t border-black/10 flex justify-center py-4 px-6" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
+            <button onClick={onOpenScanner} className="w-full max-w-sm px-8 py-4 bg-[#0a0a0a] text-white rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] active:scale-95 transition-transform flex items-center justify-center gap-3 shadow-2xl">
+              <Scan size={16} /> Connect Wallet
+            </button>
           </div>
-          <div className="flex flex-col gap-24">
-            {LEFT_SIDEBAR_CONTENT.map((item, i) => (
-              <article key={i} className="flex flex-col relative group">
-                <div className="absolute -left-4 top-1 bottom-0 w-px bg-black/10 group-hover:bg-black transition-colors duration-500" />
-                <h4 className="font-mono text-[9px] uppercase tracking-widest text-[#222] font-bold mb-3 leading-loose">
-                  [{String(i + 1).padStart(2, '0')}] {item.title}
-                </h4>
-                <p className="font-serif text-[11px] text-[#444] leading-[1.85] text-justify opacity-80 group-hover:opacity-100 transition-opacity duration-500">
-                  {item.text}
-                </p>
-              </article>
+        )}
+      </section>
+
+      {/* ── SHOWCASE ────────────────────────────────────────────────────────── */}
+      <section className="w-full py-24 md:py-40 bg-white overflow-hidden relative">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 mb-16 md:mb-24">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={FADE_UP} className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+            <div>
+              <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 block mb-4">Platform Interface</span>
+              <h2 className="text-[40px] sm:text-[56px] md:text-[72px] font-black tracking-tighter uppercase leading-[0.95]">
+                Clean design.<br /><span className="text-black/20">Expert execution.</span>
+              </h2>
+            </div>
+            <p className="font-serif text-[16px] sm:text-[18px] text-slate-500 max-w-lg leading-relaxed">
+              A comprehensive and intuitive dashboard designed to provide a clear overview of the platform, combining powerful forensic tools with an elegant, institutional aesthetic.
+            </p>
+          </motion.div>
+        </div>
+        
+        <div className="w-full relative py-12 md:py-20 flex justify-center">
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-[#FAFAF8] to-white opacity-50" />
+          <StackableCarousel className="w-full relative z-10" itemClassName="w-[85vw] md:w-[900px] lg:w-[1100px] hover:scale-[1.01] transition-transform duration-700 cursor-grab active:cursor-grabbing">
+            {[
+              "/system-shots/Captura de pantalla 2026-05-07 012904.png",
+              "/system-shots/Captura de pantalla 2026-05-07 032204.png",
+              "/system-shots/Captura de pantalla 2026-05-10 002811.png",
+              "/system-shots/Captura de pantalla 2026-05-10 002900.png"
+            ].map((src, idx) => (
+              <img key={idx} src={src} className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" alt={`Terminal view ${idx + 1}`} />
+            ))}
+          </StackableCarousel>
+        </div>
+      </section>
+
+      {/* ── FEATURES ──────────────────────────────────────────────────────────── */}
+      <section className="w-full py-20 md:py-32 bg-[#FAFAF8] border-y border-black/5">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
+            {FEATURES.map((f, i) => (
+              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.8, ease: "easeOut" as any } } }} className="group bg-white p-10 md:p-12 rounded-3xl border border-black/5 hover:border-black/15 hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 flex flex-col gap-8">
+                <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-black/5 flex items-center justify-center group-hover:bg-[#0a0a0a] transition-colors duration-500">
+                  <f.icon size={24} strokeWidth={1.5} className="text-[#0a0a0a] group-hover:text-white transition-colors duration-500" />
+                </div>
+                <div>
+                  <h3 className="font-mono text-[13px] md:text-[14px] font-black uppercase tracking-[0.15em] mb-4 text-[#0a0a0a]">{f.title}</h3>
+                  <p className="font-serif text-[15px] md:text-[16px] text-slate-500 leading-relaxed font-medium">{f.desc}</p>
+                </div>
+              </motion.div>
             ))}
           </div>
-        </aside>
+        </div>
+      </section>
 
-        {/* Central Immersive Manifesto */}
-        <main className="w-full max-w-[850px] shrink-0 py-12 sm:py-16 flex flex-col gap-16 sm:gap-24">
-          
-          <header className="flex flex-col gap-6 text-center mb-8">
-          <h1 className="text-[32px] md:text-[42px] font-serif text-black leading-tight tracking-tight">
-            En la búsqueda de la <br/><span className="italic font-light">transparencia</span>
-          </h1>
-          <div className="flex justify-center -mt-2 mb-2">
-            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.3em] text-black/30">
+      {/* ── PLANS PREVIEW ─────────────────────────────────────────────────────── */}
+      <section className="w-full py-24 md:py-40 bg-white">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 md:mb-24">
+            <div>
+              <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 block mb-4">Subscription Tiers</span>
+              <h2 className="text-[40px] sm:text-[56px] md:text-[72px] font-black tracking-tighter uppercase leading-[0.95]">
+                The right access.<br /><span className="text-black/20">For every firm.</span>
+              </h2>
+            </div>
+            <Link href="/pricing" className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-slate-50 border border-black/5 text-[#0a0a0a] rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] hover:border-black/20 hover:bg-white transition-all group">
+              View Full Pricing <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {previewTiers.map((tier, i) => (
+              <motion.div key={tier.id} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.8 } } }}>
+                <Link href="/pricing" className={`group flex flex-col p-10 md:p-12 rounded-[2rem] transition-all duration-500 relative border ${ tier.highlight ? "bg-[#0a0a0a] text-white border-black shadow-2xl hover:bg-black" : "bg-white border-black/5 hover:border-black/15 hover:shadow-xl hover:shadow-black/5" }`}>
+                  {tier.badge && (
+                    <span className="absolute -top-4 left-10 font-mono text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg" style={{ backgroundColor: tier.highlight ? "white" : "#0a0a0a", color: tier.highlight ? "#0a0a0a" : "white" }}>
+                      {tier.badge}
+                    </span>
+                  )}
+                  <div className="flex justify-between items-center mb-8">
+                    <span className="font-mono text-[12px] font-black uppercase tracking-[0.2em] opacity-50">{tier.id}</span>
+                    <ChevronRight size={18} className={`transition-transform duration-300 opacity-30 group-hover:opacity-100 group-hover:translate-x-1`} />
+                  </div>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="font-black text-[56px] md:text-[64px] tracking-tighter leading-none">€{tier.priceMonthly}</span>
+                  </div>
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest opacity-40 mb-10 block">EUR / month</span>
+                  <span className="font-mono text-[16px] font-black uppercase tracking-[0.15em] mb-4 block">{tier.name}</span>
+                  <p className="font-serif text-[15px] opacity-60 leading-relaxed min-h-[60px]">{tier.tagline}</p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FORUM TEASER ──────────────────────────────────────────────────────── */}
+      <section className="w-full py-24 md:py-40 bg-[#FAFAF8] border-y border-black/5 overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 grid grid-cols-1 lg:grid-cols-5 gap-16 lg:gap-24 items-center">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} className="lg:col-span-2">
+            <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 block mb-4">Sovereign Community</span>
+            <h2 className="text-[40px] sm:text-[56px] font-black tracking-tighter uppercase leading-[0.95] mb-8">
+              Every post.<br /><span className="text-black/30">Cryptographically signed.</span>
+            </h2>
+
+            <div className="my-10 w-full max-w-[280px]">
+              <LottieFromUrl url="/lotties/DeeWork About Blockchain.json" />
+            </div>
+
+            <p className="font-serif text-[16px] md:text-[18px] text-slate-600 leading-relaxed mb-10 max-w-md">
+              The only forum where every message carries an ECDSA wallet signature. No anonymous posts. No repudiation. Identity is your cryptographic key.
+            </p>
+            <Link href="/forum" className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white border border-black/10 text-[#0a0a0a] rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] hover:border-black/30 hover:bg-slate-50 active:scale-[0.98] transition-all group">
+              <MessageSquare size={14} /> Open Forum
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
+
+          <div className="lg:col-span-3 flex flex-col gap-4">
+            {liveTopics === null ? (
+              Array.from({ length: 3 }, (_, i) => (
+                <div key={i} className="bg-white p-8 rounded-2xl border border-black/5 animate-pulse flex flex-col gap-4">
+                  <div className="flex justify-between">
+                    <div className="h-3 w-32 bg-slate-100 rounded" />
+                    <div className="h-3 w-20 bg-slate-100 rounded" />
+                  </div>
+                  <div className="h-4 w-full bg-slate-100 rounded" />
+                  <div className="h-4 w-2/3 bg-slate-100 rounded" />
+                </div>
+              ))
+            ) : liveTopics.length > 0 ? (
+              liveTopics.map((p, i) => {
+                const sig = p.author?.walletAddress ? `${p.author.walletAddress.slice(0, 6)}...${p.author.walletAddress.slice(-4)}` : "0xUNKNOWN";
+                const dateStr = new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                return (
+                  <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { delay: i * 0.1, duration: 0.6 } } }} className="bg-white p-8 rounded-2xl border border-black/5 hover:border-black/15 hover:shadow-lg transition-all group cursor-pointer">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-mono text-[10px] font-black text-[#0a0a0a] tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-black/5">✓ {sig}</span>
+                      <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest">{dateStr}</span>
+                    </div>
+                    <p className="font-serif text-[16px] text-[#0a0a0a] leading-relaxed font-medium group-hover:text-black/60 transition-colors">{p.title}</p>
+                  </motion.div>
+                );
+              })
+            ) : (
+              FALLBACK_FORUM_POSTS.map((p, i) => (
+                <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { delay: i * 0.1, duration: 0.6 } } }} className="bg-white p-8 rounded-2xl border border-black/5 hover:border-black/15 hover:shadow-lg transition-all group cursor-pointer">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-mono text-[10px] font-black text-[#0a0a0a] tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-black/5">✓ {p.walletSlug}</span>
+                    <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest">{p.date}</span>
+                  </div>
+                  <p className="font-serif text-[16px] text-[#0a0a0a] leading-relaxed font-medium group-hover:text-black/60 transition-colors">{p.title}</p>
+                </motion.div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── COMPACT CHRONICLE ─────────────────────────────────────────────────── */}
+      <section className="w-full py-24 md:py-40 bg-white">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} className="mb-16 md:mb-24">
+            <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 block mb-4">Chronicle</span>
+            <h2 className="text-[40px] sm:text-[56px] font-black tracking-tighter uppercase leading-[0.95]">
+              Six events that<br /><span className="text-black/20">shaped everything.</span>
+            </h2>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {KEY_EVENTS.map((ev, i) => (
+              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.6 } } }} className="bg-[#FAFAF8] p-10 rounded-[2rem] border border-black/5 hover:bg-slate-50 transition-colors">
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest">{ev.date}</span>
+                  <span className="font-mono text-[10px] font-black text-[#0a0a0a] bg-white px-3 py-1 rounded-full border border-black/5">{ev.code}</span>
+                </div>
+                <p className="font-serif text-[15px] md:text-[16px] text-slate-600 leading-relaxed font-medium">{ev.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SYSTEM ARCHITECTURE ──────────────────────────────────────────────────── */}
+      <section className="w-full py-24 md:py-40 bg-[#0a0a0a] text-white">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP} className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-20 lg:mb-32">
+            <div>
+              <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 block mb-4">Architecture v2.0</span>
+              <h2 className="text-[40px] sm:text-[56px] md:text-[72px] font-black tracking-tighter uppercase leading-[0.95]">
+                Comprehensive.<br /><span className="text-white/30">Elegant scale.</span>
+              </h2>
+            </div>
+            <p className="font-serif text-[16px] sm:text-[18px] text-white/60 max-w-lg text-left lg:text-right leading-relaxed">
+              A robust foundation meticulously engineered to provide seamless navigation, cryptographic security, and a fluid institutional experience.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {ARCHITECTURE.map((pillar, i) => (
+              <motion.div key={pillar.id} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { delay: i * 0.05, duration: 0.5 } } }} className="bg-[#141414] p-8 md:p-10 rounded-3xl border border-white/5 hover:bg-[#1a1a1a] hover:border-white/10 transition-colors group">
+                <div className="flex items-center justify-between mb-8">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-white/30 group-hover:text-white/60 transition-colors">{pillar.id}</span>
+                  <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/5">
+                    <pillar.icon size={16} className="text-white/50" />
+                  </div>
+                </div>
+                <h3 className="font-mono text-[12px] md:text-[14px] font-black uppercase tracking-[0.15em] text-white mb-4">{pillar.label}</h3>
+                <p className="font-serif text-[14px] text-white/50 leading-relaxed">{pillar.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-20 pt-10 border-t border-white/10 flex flex-col md:flex-row items-start md:items-center gap-8 justify-between">
+            <div className="flex flex-wrap gap-4">
+              {["Intuitive Interface", "Secure Infrastructure", "Real-time Processing", "Reliable Uptime"].map((tag) => (
+                <span key={tag} className="font-mono text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white/10 text-white/40 bg-white/5">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-white/30 shrink-0">
+              Architecture Signed & Verified ✓
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CLOSING ───────────────────────────────────────────────────────────── */}
+      <section className="w-full py-32 md:py-48 bg-white">
+        <div className="max-w-[850px] mx-auto px-6 text-center flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full bg-[#FAFAF8] border border-black/5 flex items-center justify-center mb-10">
+            <Shield size={20} className="text-[#0a0a0a]" />
+          </div>
+          <h2 className="text-[36px] md:text-[56px] font-serif text-[#0a0a0a] leading-tight tracking-tight mb-8">
+            In the pursuit of <br /><span className="italic font-light text-slate-500">absolute transparency</span>.
+          </h2>
+          <div className="flex justify-center mb-10">
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 bg-slate-50 px-4 py-2 rounded-full border border-black/5">
               © 2026 atfortyseven-creations
             </span>
           </div>
-          <p className="font-serif text-[13px] text-[#444] max-w-xl mx-auto leading-relaxed border-t border-b border-black/10 py-6">
-            Documento fundacional sobre la abstracción matemática pura, los mecanismos criptográficos de 
-            conocimiento cero y los paradigmas heurísticos deterministas que cimentan la infraestructura global inmutable.
+          <p className="font-serif text-[15px] md:text-[18px] text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            Foundational document on pure mathematical abstraction, zero-knowledge cryptographic mechanisms,
+            and deterministic heuristic paradigms that cement the immutable global infrastructure.
           </p>
-        </header>
-
-        <div className="flex flex-col gap-16">
-          {IMMERSIVE_PAGES.map((page, pageIndex) => (
-            <section key={pageIndex} className="flex flex-col relative w-full">
-              <div className="w-full border-b-[1.5px] border-black pb-3 mb-6 flex items-end">
-                <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
-                  {page.title}
-                </h2>
-              </div>
-              
-              {/* Stack Data Grid - Dense and tightly packed */}
-              <div className="flex flex-col gap-[1px] bg-black border border-black shadow-sm">
-                {page.paragraphs.map((para, pIndex) => {
-                   const globalIndex = (pageIndex * 3) + pIndex;
-                   const lottieFile = MANIFESTO_LOTTIES[globalIndex % MANIFESTO_LOTTIES.length];
-
-                   return (
-                     <div key={pIndex} tabIndex={0} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden focus:outline-none cursor-pointer">
-                       
-                       {/* Lottie fixed block on the left (solid stack integration) */}
-                       <div className="w-full sm:w-[240px] bg-[#f5f4ef] flex items-center justify-center p-8 sm:p-6 border-b sm:border-b-0 sm:border-r border-black/10 shrink-0 relative overflow-hidden transition-colors duration-500 group-hover:bg-[#f0efe9]">
-                          <div className="w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] grayscale mix-blend-multiply opacity-85 transition-transform duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105">
-                             <OptimizedLocalLottie filename={lottieFile} />
-                          </div>
-                          <div className="absolute top-3 left-3 text-[9px] font-mono opacity-20 select-none">
-                            SEC-{pageIndex + 1}.{pIndex + 1}
-                          </div>
-                       </div>
-                       
-                       {/* Text Content */}
-                       <div className="flex-1 p-5 sm:p-6 md:p-8 flex items-start">
-                          <span className="font-mono text-[10px] text-black/30 tracking-widest mr-3 sm:mr-6 select-none flex-shrink-0 mt-[2px]">
-                             [{String(pageIndex + 1).padStart(2, '0')}.{String(pIndex + 1).padStart(2, '0')}]
-                          </span>
-                          <p className="font-serif text-[12px] sm:text-[13px] text-[#222] leading-[1.8] text-justify w-full">
-                             {para}
-                          </p>
-                       </div>
-
-                     </div>
-                   );
-                })}
-               </div>
-            </section>
-          ))}
         </div>
-
-        {/* ─── 50 Historic Catastrophic Events Chronicle ─── */}
-        <CatastropheChronicle />
-
-        </main>
-
-        {/* Right Academic Column */}
-        <aside className="hidden min-[1350px]:flex flex-col pt-36 w-[320px] shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto no-scrollbar pb-12">
-          <div className="border-b-[1.5px] border-black pb-2 mb-8">
-            <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#555]">
-              Tracto II: Entropía Central
-            </h3>
-          </div>
-          <div className="flex flex-col gap-24">
-            {RIGHT_SIDEBAR_CONTENT.map((item, i) => (
-              <article key={i} className="flex flex-col relative group">
-                <div className="absolute -left-4 top-1 bottom-0 w-px bg-black/10 group-hover:bg-black transition-colors duration-500" />
-                <h4 className="font-mono text-[9px] uppercase tracking-widest text-[#222] font-bold mb-3 leading-loose">
-                  [{String(i + 4).padStart(2, '0')}] {item.title}
-                </h4>
-                <p className="font-serif text-[11px] text-[#444] leading-[1.85] text-justify opacity-80 group-hover:opacity-100 transition-opacity duration-500">
-                  {item.text}
-                </p>
-              </article>
-            ))}
-          </div>
-        </aside>
-
-      </div>
-
-      {/* Floating Scanner Panel - ABOVE MobileNavBar (z-[200] > z-[100]) */}
-      {onOpenScanner && (
-        <div className="fixed bottom-0 left-0 w-full flex flex-col pointer-events-none z-[200]">
-           <div className="h-16 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full pointer-events-none" />
-           {/* Full dock bar — pointer-events-auto so taps reach the button */}
-           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-3 pointer-events-auto" style={{ paddingBottom: 'max(0.75rem, calc(env(safe-area-inset-bottom) + 64px))' }}>
-             <button
-               type="button"
-               onClick={onOpenScanner}
-               className="px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 active:scale-95 transition-all flex items-center gap-3 rounded-none select-none touch-manipulation"
-               style={{ WebkitTapHighlightColor: 'transparent', cursor: 'pointer' }}
-             >
-               <Scan size={13} />
-               Session Log &amp; Scan
-             </button>
-           </div>
-        </div>
-      )}
-
-      {/* ─── Sovereign Footer (full-bleed, outside max-width container) ─── */}
-      <div className="relative z-10">
-        <SovereignFooter />
-      </div>
+      </section>
 
     </div>
-  );
-}
-
-function CatastropheChronicle() {
-  return (
-    <section
-      className="w-full max-w-[850px] shrink-0 pt-12 pb-16 flex flex-col"
-      aria-label="Crónica de Eventos Históricos Catastróficos"
-    >
-      <div className="border-b-[1.5px] border-black pb-3 mb-0 flex items-end gap-4">
-        <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
-          CRÓNICA HISTÓRICA — 50 Eventos que Detonaron el Orden Financiero
-        </h2>
-      </div>
-      <div className="flex flex-col gap-[1px] bg-black border border-black border-t-0 shadow-sm">
-        {HISTORIC_EVENTS.map((ev, i) => (
-          <div
-            key={ev.code}
-            className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden cursor-default hover:bg-[#f5f4ef] transition-colors duration-300"
-          >
-            {/* Date / Code pill */}
-            <div className="w-full sm:w-[160px] bg-[#f5f4ef] group-hover:bg-[#eceae3] border-b sm:border-b-0 sm:border-r border-black/10 flex flex-col items-center justify-center p-4 shrink-0 transition-colors duration-300">
-              <span className="font-mono text-[8px] font-black uppercase tracking-[0.2em] text-black/30 mb-1">{ev.date}</span>
-              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black/60 group-hover:text-black transition-colors duration-300">{ev.code}</span>
-            </div>
-            {/* Content */}
-            <div className="flex-1 p-5 sm:p-6 flex flex-col gap-1.5">
-              <span className="font-mono text-[10px] font-black uppercase tracking-widest text-black">
-                [{String(i + 1).padStart(2, '0')}] {ev.title}
-              </span>
-              <p className="font-serif text-[12px] sm:text-[13px] text-[#333] leading-[1.8] text-justify">
-                {ev.text}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }

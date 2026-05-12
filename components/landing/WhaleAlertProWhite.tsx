@@ -217,8 +217,32 @@ function LiveTicker() {
 
 const STATS_DATA = [
   { value: 48, suffix: "M+", label: "Whale events detected" },
-  { value: 24, suffix: "", label: "ERC-20 tokens scanned" },
-  { value: 12, suffix: "s", label: "Average latency from chain" },
+  { value: 24, suffix: "", label: "ERC-20 tokens monitored" },
+  { value: 12, suffix: "s", label: "Block-to-API latency" },
+];
+
+const PLATFORM_SCREENSHOTS = [
+  {
+    src: '/system-shots/Captura de pantalla 2026-05-10 002811.png',
+    title: 'Ticket Mint — Genesis Access',
+    desc: 'The WGT-GENESIS credential portal. Cryptographically allocates permanent access passes on Optimism L2. Only 200 Genesis tickets exist globally.',
+    badge: 'ZK Identity Layer',
+    badgeColor: '#8b5cf6',
+  },
+  {
+    src: '/system-shots/Captura de pantalla 2026-05-10 002900.png',
+    title: 'Capital Ledger — Mass Transfers',
+    desc: 'Real-time forensic feed of ERC-20 mass transfer events. Every transaction is ECDSA-verified, classified, and delivered in under 10ms. Shown: $599K aggregate across 80 verified operations.',
+    badge: 'Live Intelligence Feed',
+    badgeColor: '#06b6d4',
+  },
+  {
+    src: '/system-shots/Captura de pantalla 2026-05-10 002953.png',
+    title: 'Aztec Pipeline — ZK Block Sequencer',
+    desc: 'Live view of Aztec Network rollup blocks progressing through proving, sequencing, and settlement on Ethereum. Our sovereign ZK layer for privacy-preserving forensic proofs.',
+    badge: 'Aztec ZK Layer',
+    badgeColor: '#10b981',
+  },
 ];
 
 const API_CAPABILITIES = [
@@ -341,7 +365,6 @@ export function WhaleAlertProWhite() {
   // Wallet integration
   const router = useRouter();
   const { isConnected } = useAccount();
-  const openConnectModal = useUIStore(s => s.openConnectModal);
 
   React.useEffect(() => { setMounted(true); }, []);
 
@@ -350,9 +373,9 @@ export function WhaleAlertProWhite() {
     if (isConnected) {
       router.push('/dashboard');
     } else {
-      openConnectModal();
+      router.push('/connect');
     }
-  }, [isConnected, router, openConnectModal]);
+  }, [isConnected, router]);
 
   React.useEffect(() => {
     const update = () => setCurrentTime(new Date().toISOString().slice(11, 19) + " UTC");
@@ -388,9 +411,9 @@ export function WhaleAlertProWhite() {
 
           {/* Desktop Center Navigation */}
           <div className="hidden lg:flex items-center gap-6">
-            <Link href="/network" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
+            <Link href="/ledger" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
               <Anchor size={16} className="text-slate-400 group-hover:text-cyan-600" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-950">Whale Tracker</span>
+              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-950">Whale Ledger</span>
             </Link>
             <Link href="/portfolio" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-100 rounded-xl transition-all group">
               <TrendingUp size={16} className="text-slate-400 group-hover:text-indigo-600" />
@@ -445,10 +468,10 @@ export function WhaleAlertProWhite() {
               className="w-full max-w-[1400px] mt-4 bg-white/95 backdrop-blur-3xl border border-slate-200 rounded-[2.5rem] p-8 flex flex-col gap-4 lg:hidden shadow-2xl z-[110]"
             >
               {[
-                { href: '/network', icon: Anchor, label: 'Whale Tracker', color: 'text-cyan-600' },
+                { href: '/ledger', icon: Anchor, label: 'Whale Ledger', color: 'text-cyan-600' },
                 { href: '/portfolio', icon: TrendingUp, label: 'Whale Profile', color: 'text-indigo-600' },
                 { href: '/support', icon: LifeBuoy, label: 'Support', color: 'text-rose-600' },
-                { href: '/vip', icon: LayoutDashboard, label: 'Terminal', color: 'text-slate-950' },
+                { href: '/dashboard', icon: LayoutDashboard, label: 'Terminal', color: 'text-slate-950' },
               ].map((link) => (
                 <Link 
                   key={link.href}
@@ -680,6 +703,195 @@ export function WhaleAlertProWhite() {
                 <p className="text-slate-500 font-medium leading-relaxed text-sm uppercase tracking-wide">{cap.desc}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          CRYPTOGRAPHIC FORENSICS & DARK POOL RADAR (NEW MODULES)
+          ───────────────────────────────────────────────────────────── */}
+      <section className="py-40 px-6 md:px-12 bg-white relative overflow-hidden" aria-label="Cryptographic Forensics">
+        <div className="max-w-[1400px] mx-auto space-y-32">
+          
+          {/* Feature 1: Dark Pool Radar */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="order-2 lg:order-1 relative h-[600px] w-full rounded-[3rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-2xl group">
+              <Image 
+                src={LANDING_ASSETS.spheres} 
+                alt="Dark Pool Radar Spheres" 
+                fill 
+                className="object-cover group-hover:scale-105 transition-transform duration-1000" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent" />
+              <div className="absolute bottom-10 left-10 right-10">
+                 <div className="px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl w-fit mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                   Module Active
+                 </div>
+                 <h3 className="text-3xl font-black text-white uppercase italic tracking-tight">Dark Pool <br/> Radar Matrix</h3>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2 space-y-8">
+              <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-200 rounded-full shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 italic">Off-Chain Detection</span>
+              </div>
+              <h2 className="text-[5vw] lg:text-7xl font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
+                Illuminate The <br /><span className="text-slate-300">Unseen</span>
+              </h2>
+              <p className="text-xl font-medium text-slate-500 leading-relaxed">
+                Standard order books only show what they want you to see. Our Dark Pool Radar aggregates OTC block trades and hidden liquidity movements across 14 major venues, bringing invisible institutional volume into the light.
+              </p>
+              <ul className="space-y-4 pt-4">
+                {[
+                  "OTC Block Trade Detection",
+                  "Cross-Chain Liquidity Routing",
+                  "Hidden Accumulation Heatmaps"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-4 text-sm font-black text-slate-700 uppercase tracking-widest">
+                    <CheckCircle2 size={18} className="text-rose-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Feature 2: Ecosystem Metaverse */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="space-y-8">
+              <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-200 rounded-full shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 italic">3D Topology</span>
+              </div>
+              <h2 className="text-[5vw] lg:text-7xl font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
+                Ecosystem <br /><span className="text-slate-300">Metaverse</span>
+              </h2>
+              <p className="text-xl font-medium text-slate-500 leading-relaxed">
+                Navigate the blockchain like never before. Our 3D topological maps visualize complex wallet interactions, identifying hidden relationships between entities, protocols, and smart contracts instantly.
+              </p>
+              <ul className="space-y-4 pt-4">
+                {[
+                  "Interactive 3D Wallet Graphs",
+                  "Protocol Exposure Visualizations",
+                  "Sybil Cluster Identification"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-4 text-sm font-black text-slate-700 uppercase tracking-widest">
+                    <CheckCircle2 size={18} className="text-cyan-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="relative h-[600px] w-full rounded-[3rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-2xl group">
+              <Image 
+                src={LANDING_ASSETS.metaverse} 
+                alt="Ecosystem Metaverse 3D" 
+                fill 
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-1000 mix-blend-luminosity opacity-90" 
+              />
+              <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
+              <div className="absolute bottom-10 left-10 right-10">
+                 <div className="px-4 py-2 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl w-fit mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                   Engine Online
+                 </div>
+                 <h3 className="text-3xl font-black text-slate-900 uppercase italic tracking-tight drop-shadow-xl">Topological <br/> Graph Engine</h3>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          PLATFORM IN ACTION — SCREENSHOTS
+          ───────────────────────────────────────────────────────────── */}
+      <section className="py-40 px-6 md:px-12 bg-slate-50/80 border-t border-slate-100 relative overflow-hidden" aria-label="Platform Preview">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="text-center space-y-8 mb-24">
+            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white border border-slate-100 rounded-full shadow-md">
+              <div className="w-2 h-2 rounded-full bg-violet-500 animate-ping" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Terminal Preview</span>
+            </div>
+            <h2 className="text-[7vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">
+              The Platform<br /><span className="text-slate-300">In Action</span>
+            </h2>
+            <p className="text-xl font-medium text-slate-500 max-w-3xl mx-auto leading-relaxed">
+              Every module shown is live, real-data, and production-grade. This is what institutional intelligence looks like.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {PLATFORM_SCREENSHOTS.map((shot, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.15 }}
+                viewport={{ once: true }}
+                className="group flex flex-col bg-white rounded-[3rem] border border-slate-200 overflow-hidden hover:border-slate-300 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500"
+              >
+                {/* Screenshot */}
+                <div className="relative overflow-hidden rounded-t-[3rem] bg-slate-100" style={{ aspectRatio: '16/10' }}>
+                  <Image
+                    src={shot.src}
+                    alt={shot.title}
+                    fill
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent" />
+                  <div
+                    className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-lg"
+                    style={{ backgroundColor: shot.badgeColor }}
+                  >
+                    {shot.badge}
+                  </div>
+                </div>
+                {/* Text */}
+                <div className="p-8 flex flex-col gap-4 flex-1">
+                  <h3 className="text-xl font-black text-slate-950 uppercase italic tracking-tight">{shot.title}</h3>
+                  <p className="text-slate-500 font-medium leading-relaxed text-sm flex-1">{shot.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Blockchain illustration images */}
+          <div className="mt-20 flex flex-col md:flex-row items-center gap-12 bg-white rounded-[3rem] border border-slate-200 p-12 shadow-xl shadow-slate-200/40">
+            <div className="flex items-center gap-8 shrink-0">
+              <div className="relative w-32 h-32 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/system-shots/istockphoto-865597192-612x612.jpg"
+                  alt="Blockchain network topology"
+                  fill
+                  className="object-cover opacity-80 mix-blend-multiply"
+                />
+              </div>
+              <div className="relative w-32 h-32 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/system-shots/pngtree-blockchain-network-illustration-with-cubes-vector-png-image_18614224.jpg"
+                  alt="Distributed ledger architecture"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+            <div className="space-y-4 max-w-2xl">
+              <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-cyan-50 border border-cyan-100 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                <span className="text-[9px] font-black uppercase tracking-[0.35em] text-cyan-600">Decentralised Architecture</span>
+              </div>
+              <h3 className="text-3xl font-black text-slate-950 uppercase italic tracking-tight leading-tight">
+                Sovereign<br />Node Network
+              </h3>
+              <p className="text-slate-500 font-medium leading-relaxed">
+                Our intelligence infrastructure runs across a globally distributed node mesh with no single point of failure. Each node independently validates on-chain events before they reach the API layer — guaranteeing data integrity through consensus, not trust.
+              </p>
+              <div className="flex flex-wrap gap-3 pt-2">
+                {['99.99% Uptime SLA', 'Multi-region deployment', 'Zero mock data policy', 'ECDSA verification'].map(tag => (
+                  <span key={tag} className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-slate-500">{tag}</span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

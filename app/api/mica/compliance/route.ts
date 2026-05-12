@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { jwtVerify } from 'jose';
+import { verifyJWT } from '@/lib/jwt';
 import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-not-for-production-jwt-secret-change-me';
 
 /**
  * Enterprise Endpoint: MiCA & GDPR Compliance Toolkit
@@ -24,8 +22,7 @@ export async function POST(req: NextRequest) {
         let payload: any;
         
         try {
-            const verified = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
-            payload = verified.payload;
+            payload = await verifyJWT(token);
         } catch (e) {
             return NextResponse.json({ error: 'Invalid or forged token' }, { status: 403 });
         }

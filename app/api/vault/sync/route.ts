@@ -12,6 +12,11 @@ export async function POST(request: Request) {
         const vaultUrl = process.env.SOVEREIGN_VAULT_URL;
         const vaultSecret = process.env.SOVEREIGN_VAULT_SECRET || 'SOVEREIGN_QUANTUM_KEY_777';
 
+        const authHeader = request.headers.get('authorization');
+        if (authHeader !== `Bearer ${vaultSecret}`) {
+            return NextResponse.json({ error: 'Unauthorized Vault Access' }, { status: 401 });
+        }
+
         if (!vaultUrl) {
             return NextResponse.json({ error: 'SOVEREIGN_VAULT_URL not configured.' }, { status: 500 });
         }

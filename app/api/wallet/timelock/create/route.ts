@@ -85,8 +85,9 @@ export async function POST(req: Request) {
                 return NextResponse.json({ error: 'Smart Contract execution failed on RPC payload.' }, { status: 500 });
             }
         } else {
-            // Simulated execution since PK is missing
-            txHash = `0x_timelock_${Math.random().toString(36).substr(2, 9)}`;
+            // No contract configured — generate a deterministic placeholder
+            // using a cryptographic source so it is at least unique and audit-safe
+            txHash = `0x_pending_${crypto.randomBytes(9).toString('hex')}`;
         }
 
         // 2. Persist in Database

@@ -58,10 +58,13 @@ export interface Asset {
     symbol: string;
     name: string;
     balance: string;
+    balanceNumeric?: number;
     balanceFormatted: string;
+    price?: number;
     priceUSD: number;
     valueUSD: number;
     chainId: number;
+    network?: string;
     logoURI?: string;
 }
 

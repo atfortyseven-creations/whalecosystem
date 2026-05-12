@@ -5,9 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const routes = [
     { path: '', priority: 1, frequency: 'daily' },
-    { path: '/network/whale-tracker', priority: 1, frequency: 'always' },
     { path: '/vip', priority: 0.9, frequency: 'hourly' },
-    { path: '/network', priority: 0.9, frequency: 'hourly' },
     { path: '/academy', priority: 0.9, frequency: 'weekly' },
     { path: '/docs/whitepaper', priority: 1, frequency: 'monthly' },
     { path: '/developers', priority: 0.8, frequency: 'monthly' },

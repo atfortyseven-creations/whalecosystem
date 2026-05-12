@@ -12,12 +12,16 @@
 
 import { NextResponse } from 'next/server';
 import { newPairsEngine } from '@/lib/blockchain/new-pairs-ws-engine';
+import { getGbAllRpc } from '@/lib/blockchain/getblock-registry';
 
 export const dynamic = 'force-dynamic';
 
-// ── GetBlock EP4 HTTP — market intel reads (slot0) ─────────────────────────
-const EP4_HTTP = 'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f'; // EP2 — primary (.us)
-const EP1_HTTP = 'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d'; // EP1 — primary (.io)
+// HTTP endpoints para slot0() — GetBlock Registry primero, públicos de emergencia
+const SLOT0_ENDPOINTS = [
+    ...getGbAllRpc('eth'),        // GB_ETH_RPC_1 + GB_ETH_RPC_2 (archive)
+    'https://eth.llamarpc.com',
+    'https://cloudflare-eth.com',
+];
 
 // Uniswap V3 slot0 selector
 const SIG_SLOT0 = '0x3850c7bd';
@@ -29,7 +33,7 @@ interface Slot0Result {
 }
 
 async function fetchSlot0(poolAddress: string): Promise<Slot0Result | null> {
-    for (const ep of [EP4_HTTP, EP1_HTTP]) {
+    for (const ep of SLOT0_ENDPOINTS) {
         try {
             const res = await fetch(ep, {
                 method: 'POST',

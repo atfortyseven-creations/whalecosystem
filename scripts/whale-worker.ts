@@ -44,7 +44,10 @@ process.on('uncaughtException', (err: any) => {
     'getaddrinfo',     // DNS lookup failure prefix
     'UNKNOWN_ERROR',   // ethers catch-all
     'connection timeout exceeded',
-    'NETWORK_ERROR'
+    'NETWORK_ERROR',
+    '-32005',          // RPC Quota Exhaustion
+    'rate limit',      // RPC Rate Limiting
+    'quota'            // RPC Quota Limit
   ];
 
   if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {
@@ -75,7 +78,10 @@ process.on('unhandledRejection', (reason: any, promise) => {
     'getaddrinfo',     // DNS lookup failure prefix
     'UNKNOWN_ERROR',   // ethers catch-all
     'connection timeout exceeded',
-    'NETWORK_ERROR'
+    'NETWORK_ERROR',
+    '-32005',          // RPC Quota Exhaustion
+    'rate limit',      // RPC Rate Limiting
+    'quota'            // RPC Quota Limit
   ];
 
   if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {
@@ -112,14 +118,18 @@ async function startWorker() {
         const httpServer = createServer();
         initializeWebSocket(httpServer);
         
-        const PORT = process.env.WS_PORT || 3001;
+        const PORT = process.env.PORT || process.env.WS_PORT || 3001;
         let currentPort = Number(PORT);
 
         const startServer = () => {
-            httpServer.listen(currentPort, () => {
+            httpServer.listen(currentPort, '0.0.0.0', () => {
                 console.log(`🚀 [Data Hub] WebSocket Server running on port ${currentPort}`);
             }).on('error', (err: any) => {
                 if (err.code === 'EADDRINUSE') {
+                    if (process.env.NODE_ENV === 'production') {
+                        console.error(`💀 [WebSocket] FATAL: Port ${currentPort} in use. Railway container must exit.`);
+                        process.exit(1);
+                    }
                     console.warn(`[Whale Worker] Port ${currentPort} is busy, trying ${currentPort + 1}...`);
                     currentPort++;
                     startServer();
@@ -130,6 +140,17 @@ async function startWorker() {
         };
 
         startServer();
+
+        // ── GRACEFUL SHUTDOWN (Railway / Docker containers) ──────────────
+        const shutdown = async (signal: string) => {
+            console.log(`\n🛑 [SHUTDOWN] Received ${signal}. Terminating Sovereign Workers gracefully...`);
+            httpServer.close(() => console.log('✅ [WebSocket] Server closed.'));
+            try { await prisma.$disconnect(); console.log('✅ [DB] Prisma disconnected.'); } catch {}
+            if (redisClient) { try { await redisClient.quit(); console.log('✅ [Redis] Disconnected.'); } catch {} }
+            process.exit(0);
+        };
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
+        process.on('SIGINT', () => shutdown('SIGINT'));
 
 
         // Use Resilient Providers with WebSocket Push support

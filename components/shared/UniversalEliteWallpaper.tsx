@@ -13,7 +13,7 @@ export function UniversalEliteWallpaper() {
 
     return (
         <div className={`fixed inset-0 z-[-1] pointer-events-none overflow-hidden select-none transition-all duration-1000 ${
-            isConnected ? 'bg-white dark:bg-black' : 'bg-[#00050a]'
+            isConnected ? 'bg-[#FAF9F6]' : 'bg-[#00050a]'
         }`}>
             {/* The Majestic Fluid Layer — Multiplied for Depth using Ultra HQ Image */}
             <div className="absolute inset-0 z-0 transition-opacity duration-1000" 
@@ -22,8 +22,9 @@ export function UniversalEliteWallpaper() {
                     backgroundSize: "320px 200px", 
                     backgroundRepeat: "repeat",
                     backgroundPosition: "top left",
-                    opacity: isConnected ? 1 : 0.2,
-                    filter: isConnected ? 'none' : 'hue-rotate(180deg) brightness(0.5)'
+                    opacity: isConnected ? 0.6 : 0.2,
+                    filter: isConnected ? 'none' : 'hue-rotate(180deg) brightness(0.5)',
+                    mixBlendMode: isConnected ? 'multiply' : 'lighten'
                 }}
             >
             </div>

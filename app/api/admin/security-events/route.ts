@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
-import { jwtVerify } from 'jose';
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET && process.env.SKIP_ENV_VALIDATION !== 'true') {
-    throw new Error("CRITICAL: JWT_SECRET environment variable is missing");
-}
+import { verifyJWT } from '@/lib/jwt';
 
 // Simple admin authentication check
 async function isAdminAuthenticated(request: NextRequest): Promise<boolean> {
@@ -17,7 +13,7 @@ async function isAdminAuthenticated(request: NextRequest): Promise<boolean> {
     }
 
     try {
-        await jwtVerify(adminToken.value, new TextEncoder().encode(JWT_SECRET));
+        await verifyJWT(adminToken.value);
         return true;
     } catch {
         return false;
@@ -34,8 +30,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const severity = searchParams.get('severity');
-    const limit = parseInt(searchParams.get('limit') || '100');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const rawLimit = parseInt(searchParams.get('limit') || '100');
+    const limit = Math.min(rawLimit, 500); // Hard cap at 500 to prevent DoS
+    const rawOffset = parseInt(searchParams.get('offset') || '0');
+    const offset = Math.max(0, rawOffset); // Prevent negative offset
 
     try {
         // Build where clause

@@ -68,7 +68,7 @@ export function AcademyInteractiveEngine({
     };
 
     const handleToggleComplete = async (lessonId: string) => {
-        if (!address) return alert("Billetera no conectada");
+        if (!address) return alert("Wallet not connected");
         const isCompleted = completedLessons.has(lessonId);
         
         // Optimistic UI update

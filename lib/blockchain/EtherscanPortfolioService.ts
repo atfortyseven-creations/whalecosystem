@@ -39,7 +39,21 @@ export class EtherscanPortfolioService {
         nativeBalance: '0',
         nativeValueUsd: 0,
         totalValueUsd: 0,
-        tokens: [],
+        tokens: [{
+          address: 'native',
+          balance: '0',
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+          logo: null,
+          chainId: ChainId.MAINNET,
+          price: 0,
+          change24h: 0,
+          valueUsd: 0,
+          balanceNumeric: 0,
+          balanceFormatted: '0.0000',
+          sector: 'Layer 1',
+        }],
         nfts: [],
       };
     }
@@ -69,14 +83,23 @@ export class EtherscanPortfolioService {
         balanceFormatted: safeToLocaleString(balanceNumeric, { maximumFractionDigits: 4 }),
         sector: getSectorForSymbol(t.tokenSymbol),
       };
-    }).filter(t => t.balanceNumeric > 0.000001); // Show real balances even without USD price
+    }).filter(t => {
+      // Spam shield: Massive balance + 0 value
+      if (t.balanceNumeric > 1000000 && t.valueUsd === 0) return false;
+      
+      // Fake native token shield: token named ETH with 0 value
+      const isFakeNative = (t.symbol === 'ETH' || t.symbol === 'WETH') && t.valueUsd === 0;
+      if (isFakeNative) return false;
+
+      return t.balanceNumeric > 0.000001;
+    }); // Show real balances even without USD price
 
     // Add native ETH
     const ethBalance = parseFloat(portfolio.ethBalance);
     const ethPrice = prices['ETH']?.price || 2500;
     const ethValueUsd = ethBalance * ethPrice;
     
-    if (ethBalance > 0.0001) {
+    if (ethBalance >= 0) {
       enrichedTokens.unshift({
         address: 'native',
         balance: BigInt(Math.floor(ethBalance * 1e18)).toString(),
@@ -89,7 +112,7 @@ export class EtherscanPortfolioService {
         change24h: 0,
         valueUsd: ethValueUsd,
         balanceNumeric: ethBalance,
-        balanceFormatted: safeToLocaleString(ethBalance, { maximumFractionDigits: 6 }),
+        balanceFormatted: safeToLocaleString(ethBalance, { maximumFractionDigits: 6 }) || '0.0000',
         sector: 'Layer 1',
       });
     }

@@ -233,5 +233,81 @@ docker run -p 3000:3000 whale-corporation/terminal:latest
   'api/reference/conversations': { title: 'Conversations API', category: 'API Reference', content: '# Conversations API\n\nSecure communication logs between agents and operators.' },
   'whale-code/reference/auto-loop': { title: 'Auto-Looping', category: 'Whale Code', content: '# Auto-Looping Protocols\n\nContinuous state re-evaluation at the node level.' },
   'whale-code/reference/docker': { title: 'Docker Reference', category: 'Whale Code', content: '# Docker Reference\n\nContainerization standards for sovereign subagents.' },
-  'whale-code/reference/inner-workings': { title: 'Inner Workings', category: 'Whale Code', content: '# Inner Workings\n\nDeep dive into the kinetic flow engine and ZK-memory synchronization.' }
+  'whale-code/reference/inner-workings': { title: 'Inner Workings', category: 'Whale Code', content: '# Inner Workings\n\nDeep dive into the kinetic flow engine and ZK-memory synchronization.' },
+  'terms-of-service': {
+    title: 'Terms of Service',
+    category: 'Legal',
+    content: `
+# Terms of Service
+
+**Last Updated:** May 2026
+
+Welcome to the Whale Alert Network ("Platform"). By accessing or using the Platform, you agree to be bound by these Terms of Service.
+
+## 1. Institutional Access
+Access to the terminal is granted strictly to verified sovereign entities. You are responsible for maintaining the confidentiality of your EIP-4361 (SIWE) session credentials.
+
+## 2. API Usage & Rate Limiting
+API access is governed by your subscription tier. The Platform reserves the right to throttle or suspend access if usage exceeds the automated limits defined in the Developer Overview.
+
+## 3. Data Integrity
+While we employ advanced cryptographic primitives to ensure data fidelity, on-chain telemetry is provided "as is". We make no warranties regarding the absolute completeness of dark-pool liquidity feeds.
+
+## 4. Node Operations
+Operators participating in the decentralized network must adhere to the hardware and uptime requirements specified in the Operator documentation. Malicious behavior will result in stake slashing.
+    `
+  },
+  'privacy-policy': {
+    title: 'Privacy Policy',
+    category: 'Legal',
+    content: `
+# Privacy Policy
+
+**Last Updated:** May 2026
+
+Whale Alert Corporation™ respects the privacy of our institutional clients. This policy outlines our data handling practices.
+
+## Zero-Knowledge Architecture
+The Platform operates on a principle of absolute data minimization.
+
+* **Identity:** We do not store email addresses or personal identifiers unless explicitly provided for billing. Authentication is handled entirely via ECDSA signatures.
+* **Telemetry:** Your private queries, Watchlist configurations, and Neural Hub filters are encrypted client-side. The protocol cannot decipher your surveillance targets.
+
+## Data Retention
+Node operator IP addresses and telemetry metrics are retained for 14 days solely for network health diagnostics, after which they are permanently purged from the active cache.
+    `
+  },
+  'cookie-policy': {
+    title: 'Cookie Policy',
+    category: 'Legal',
+    content: `
+# Cookie Policy
+
+The Whale Alert Platform uses cookies exclusively for secure session management and essential institutional functionality.
+
+## Essential Cookies
+* \`sovereign_handshake\`: An encrypted JWT that maintains your authenticated session across the terminal.
+* \`theme_preference\`: Stores your dark/light mode UI configuration.
+
+## Third-Party Tracking
+We **do not** use third-party analytics, marketing trackers, or cross-site tracking pixels. Your surveillance activity remains entirely isolated within the Platform.
+    `
+  },
+  'risk-disclosure': {
+    title: 'Risk Disclosure',
+    category: 'Legal',
+    content: `
+# Risk Disclosure
+
+**WARNING: High-Volatility Environments**
+
+The tools provided by the Whale Alert Network are designed for professional, institutional actors analyzing on-chain dynamics.
+
+## 1. Protocol Risks
+Interacting with decentralized networks, including L2 rollups and dark pools, involves inherent smart contract and consensus risks.
+
+## 2. Signal Validity
+Heuristic signals, including "Whale Intensity" and "Flow Velocity", are predictive models based on historical blockchain state. They do not constitute financial advice and are susceptible to manipulation by highly capitalized actors via wash-trading.
+    `
+  }
 };

@@ -1,7 +1,9 @@
 /**
- * Multi-Chain Configuration for Expert-Level Whale Tracking
- * Supports: Ethereum, Base, Polygon, Arbitrum, Optimism
+ * Multi-Chain Configuration — 20-Endpoint GetBlock Registry
+ * All rpcUrls[0] pulls from getblock-registry.ts (canonical source).
+ * Fallbacks: Alchemy → public nodes.
  */
+import { getGbRpc } from './blockchain/getblock-registry';
 
 export interface ChainConfig {
   id: number;
@@ -30,8 +32,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://go.getblock.io/276cfe902ecc4e0d95a8dbe075f074e0',
-      'https://go.getblock.io/34ae04c673824c17968a73fe46d9e2a5',
+      getGbRpc('eth') || 'https://cloudflare-eth.com',  // GB Registry slot 1 (Archive)
       'https://cloudflare-eth.com',
       'https://rpc.ankr.com/eth',
     ],
@@ -50,8 +51,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://go.getblock.us/15d9a6ffbaeb4c7e9033e03d50bfa1bb',
-      'https://go.getblock.io/5a013f7843c74447bb1cd62f03776f0e',
+      getGbRpc('bsc') || 'https://bsc-dataseed1.binance.org',  // GB Registry slot 6
       'https://bsc-dataseed1.binance.org',
       'https://rpc.ankr.com/bsc',
     ],
@@ -70,10 +70,10 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://base-mainnet.g.alchemy.com/v2/',
-      'https://base.llamarpc.com',
-      'https://developer-access-mainnet.base.org',
+      getGbRpc('base') || 'https://mainnet.base.org',  // GB Registry slot 7 (Archive)
       'https://mainnet.base.org',
+      'https://base.llamarpc.com',
+      'https://rpc.ankr.com/base',
     ],
     blockExplorerUrls: ['https://basescan.org'],
     iconUrl: '/chains/base.svg',
@@ -90,7 +90,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://polygon-mainnet.g.alchemy.com/v2/',
+      getGbRpc('polygon') || 'https://polygon-rpc.com',  // GB Registry slot 5 (Archive)
       'https://polygon-rpc.com',
       'https://rpc.ankr.com/polygon',
     ],
@@ -109,7 +109,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://arb-mainnet.g.alchemy.com/v2/',
+      getGbRpc('arb') || 'https://arb1.arbitrum.io/rpc',  // GB Registry slot 8 (Archive)
       'https://arb1.arbitrum.io/rpc',
       'https://rpc.ankr.com/arbitrum',
     ],
@@ -128,7 +128,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://opt-mainnet.g.alchemy.com/v2/',
+      getGbRpc('op') || 'https://mainnet.optimism.io',  // GB Registry slot 10
       'https://mainnet.optimism.io',
       'https://rpc.ankr.com/optimism',
     ],
@@ -165,7 +165,10 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       symbol: 'SOL',
       decimals: 9,
     },
-    rpcUrls: ['https://api.mainnet-beta.solana.com'],
+    rpcUrls: [
+      process.env.GB_SOL_RPC_1 || 'https://api.mainnet-beta.solana.com',  // GB Registry slot 5
+      'https://api.mainnet-beta.solana.com',
+    ],
     blockExplorerUrls: ['https://solscan.io'],
     iconUrl: '/chains/solana.svg',
     color: '#14F195',

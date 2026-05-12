@@ -52,7 +52,7 @@ export async function withApiAuth(
 
   // 2. IP Whitelisting Validation (If enabled on Key)
   if (apiKeyRecord.ipWhitelist.length > 0) {
-    const clientIp = req.headers.get('x-forwarded-for') || req.ip || 'unknown';
+    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
     // Naive check. In prod, we parse CIDR blocks.
     if (!apiKeyRecord.ipWhitelist.includes(clientIp) && clientIp !== '::1' && clientIp !== '127.0.0.1') {
       return { error: NextResponse.json({ error: 'IP Address not whitelisted for this API Key' }, { status: 403 }) };

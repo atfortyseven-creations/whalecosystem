@@ -50,7 +50,7 @@ async function safeAlchemyFetch(url: string, body: any) {
     
     // Alchemy returns "Monthly cap reached" or "402 Payment Required" as text when plan is exhausted
     if (!text.startsWith('{') && !text.startsWith('[')) {
-      console.warn(`[Alchemy] Non-JSON response (possibly quota reached): ${text.slice(0, 100)}`);
+      console.log(`[Alchemy] Non-JSON response (possibly quota reached): ${text.slice(0, 100)}`);
       return { result: { transfers: [] } };
     }
     

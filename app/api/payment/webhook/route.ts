@@ -135,6 +135,29 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // --- SaaS V4.0 Sovereign Credits Integration ---
+    if (dbUser) {
+       const creditsToAdd = planId.toLowerCase() === 'elite' ? 30000 : 8000;
+       await db.user.update({
+         where: { id: dbUser.id },
+         data: {
+           tier: planId,
+           isPro: true,
+           creditsBalance: { increment: creditsToAdd }
+         }
+       });
+
+       await db.creditLedger.create({
+         data: {
+           userId: dbUser.id,
+           amount: creditsToAdd,
+           action: 'STRIPE_SUBSCRIPTION_ACTIVATION',
+           description: `SaaS V4.0 ${planId.toUpperCase()} Tier Activation`
+         }
+       });
+    }
+    // -----------------------------------------------
+
     // Log API key provisioning event
     await db.auditLog.create({
       data: {
@@ -189,14 +212,37 @@ export async function POST(req: NextRequest) {
     if (!invoice.subscription) return NextResponse.json({ ok: true });
 
     const stripeSub = await stripe.subscriptions.retrieve(invoice.subscription as string);
+    const sovereignUserId = stripeSub.metadata?.sovereign_user_id || invoice.metadata?.sovereign_user_id;
 
-    await db.subscription.updateMany({
-      where: { status: 'ACTIVE' }, // Narrowed by stripeSubscriptionId if model has it
-      data: {
-        expiresAt:  new Date((stripeSub as any).current_period_end * 1000),
-        updatedAt:  new Date(),
-      },
-    });
+    if (sovereignUserId) {
+      await db.subscription.updateMany({
+        where: { userId: sovereignUserId, status: 'ACTIVE' },
+        data: {
+          expiresAt:  new Date((stripeSub as any).current_period_end * 1000),
+          updatedAt:  new Date(),
+        },
+      });
+
+      // --- SaaS V4.0 Sovereign Credits Renewal ---
+      const dbUser = await db.user.findFirst({ where: { walletAddress: sovereignUserId } });
+      if (dbUser) {
+        const planId = stripeSub.metadata?.plan_id || 'pro';
+        const creditsToAdd = planId.toLowerCase() === 'elite' ? 30000 : 8000;
+        await db.user.update({
+          where: { id: dbUser.id },
+          data: { creditsBalance: { increment: creditsToAdd } }
+        });
+        await db.creditLedger.create({
+          data: {
+            userId: dbUser.id,
+            amount: creditsToAdd,
+            action: 'STRIPE_SUBSCRIPTION_RENEWAL',
+            description: `SaaS V4.0 ${planId.toUpperCase()} Tier Monthly Renewal`
+          }
+        });
+      }
+      // -------------------------------------------
+    }
 
     console.log('[WAC Webhook] Subscription renewed:', invoice.subscription);
   }
@@ -229,6 +275,16 @@ export async function POST(req: NextRequest) {
         where: { userId: sovereignId },
         data: { status: 'CANCELLED', updatedAt: new Date() },
       });
+
+      // --- SaaS V4.0 Sovereign Downgrade ---
+      const dbUser = await db.user.findFirst({ where: { walletAddress: sovereignId } });
+      if (dbUser) {
+        await db.user.update({
+          where: { id: dbUser.id },
+          data: { tier: 'free', isPro: false }
+        });
+      }
+      // -------------------------------------
     }
 
     console.log('[WAC Webhook] Subscription canceled for:', sovereignId);

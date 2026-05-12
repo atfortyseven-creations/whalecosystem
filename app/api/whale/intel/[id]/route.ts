@@ -12,10 +12,10 @@ import { prisma } from '@/lib/prisma';
  * to surface actual on-chain intelligence. Returns 404 when no data exists
  * rather than returning a fabricated Bitcoin address that doesn't exist on-chain.
  */
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { txid } = await request.json();
-        const intelId = params.id;
+        const { id: intelId } = await params;
 
         if (!txid) {
             return NextResponse.json({

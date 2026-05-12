@@ -2,18 +2,17 @@
   "apps": [
     {
       "name": "sovereign-web",
-      "script": "node_modules/next/dist/bin/next",
-      "args": "start",
+      "script": "server.js",
       "cwd": "/app",
       "interpreter": "node",
       "instances": 1,
-      "exec_mode": "fork",
+      "exec_mode": "cluster",
       "env": {
         "NODE_ENV": "production",
         "HOSTNAME": "0.0.0.0",
-        "NODE_OPTIONS": "--max-old-space-size=2048"
+        "NODE_OPTIONS": "--max-old-space-size=4096"
       },
-      "max_memory_restart": "1800M",
+      "max_memory_restart": "3800M",
       "restart_delay": 3000,
       "exp_backoff_restart_delay": 200,
       "max_restarts": 15,

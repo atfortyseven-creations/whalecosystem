@@ -139,7 +139,7 @@ function buildSphereGeometry(count: number) {
     positions[i * 3 + 1] = y * r;
     positions[i * 3 + 2] = Math.sin(theta) * rad * r;
 
-    scales[i]     = 0.3 + Math.random() * 1.8;
+    scales[i]     = 0.5 + Math.random() * 2.5;
     speeds[i]     = 0.6 + Math.random() * 0.8;
     offsets[i]    = Math.random();
 
@@ -172,7 +172,7 @@ function ParticleMesh({ explode, mouse }: { explode: number; mouse: [number, num
   const ringRef = useRef<THREE.Line>(null!);
   const { viewport } = useThree();
 
-  const PARTICLE_COUNT = 62000;
+  const PARTICLE_COUNT = 25000;
   const geometry = useMemo(() => buildSphereGeometry(PARTICLE_COUNT), []);
 
   const particleMaterial = useMemo(
@@ -256,7 +256,7 @@ function ParticleMesh({ explode, mouse }: { explode: number; mouse: [number, num
 // ─────────────────────────────────────────────────────────────────────────────
 function DustField() {
   const ref = useRef<THREE.Points>(null!);
-  const count = 8000;
+  const count = 3000;
 
   const geo = useMemo(() => {
     const pos = new Float32Array(count * 3);

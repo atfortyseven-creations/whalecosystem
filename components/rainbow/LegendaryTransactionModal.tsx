@@ -96,7 +96,7 @@ export function LegendaryTransactionModal({
     initialSubMode = "standard"
 }: LegendaryTransactionModalProps) {
   const [mode, setMode] = useState<"send" | "swap" | "bridge" | "buy">(initialMode);
-  const [subMode, setSubMode] = useState<string>(initialSubMode);
+  const [subMode, setSubMode] = useState<string>(initialSubMode === 'standard' && initialMode === 'buy' ? 'EUR' : initialSubMode);
   
   // Chain State
   const { address, chain } = useAccount();
@@ -142,7 +142,7 @@ export function LegendaryTransactionModal({
      }
   }, [balances, fromAsset, fromAssetSymbol]);
 
-  // Quote Fetcher
+  // Quote Fetcher — uses Li.Fi (1inch API key is invalid)
   useEffect(() => {
     if (!amount || parseFloat(amount) <= 0 || !isOpen || (mode !== 'swap' && mode !== 'bridge' && mode !== 'buy')) {
         setQuote(null);
@@ -152,37 +152,72 @@ export function LegendaryTransactionModal({
 
     const activeFromAsset = fromAsset || balances.find(b => b.symbol === fromAssetSymbol && b.chainId === sourceChain.id);
     const amountInUnits = parseUnits(amount, activeFromAsset?.decimals || 18);
+    const amountInWei = amountInUnits.toString();
 
     const fetchQuote = async () => {
         try {
             setErrorMsg(null);
-            
-            const fromTokenAddress = activeFromAsset?.address || resolveTokenAddress(fromAssetSymbol, sourceChain.id);
-            const toTokenAddress = resolveTokenAddress(toAssetSymbol, mode === 'swap' ? sourceChain.id : targetChain.id);
-            const amountInWei = amountInUnits.toString();
 
             if (mode === 'buy') {
-                setQuote({ price: 1.0 }); // Simplified for UI
+                // For buy mode, fetch live ETH/BTC/WLD price in EUR via CoinGecko
+                const coinMap: Record<string, string> = { 'ETH': 'ethereum', 'USDC': 'usd-coin', 'WLD': 'worldcoin-wld', 'BTC': 'bitcoin' };
+                const coinId = coinMap[toAssetSymbol.toUpperCase()] || 'ethereum';
+                const currency = (['USD','EUR','GBP'].includes(subMode.toUpperCase()) ? subMode : 'EUR').toLowerCase();
+                try {
+                    const priceRes = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=${currency}`);
+                    const priceData = await priceRes.json();
+                    const price = priceData?.[coinId]?.[currency] || 0;
+                    setQuote({ price, currency });
+                } catch {
+                    setQuote({ price: 0, currency: subMode.toLowerCase() });
+                }
                 return;
             }
 
-            const res = await fetch(`/api/wallet/swap?action=quote&chainId=${sourceChain.id}&fromToken=${fromTokenAddress}&toToken=${toTokenAddress}&amount=${amountInWei}&address=${address}`);
+            // Resolve token addresses for swap/bridge
+            let fromTokenAddress: string;
+            let toTokenAddress: string;
+            try {
+                fromTokenAddress = activeFromAsset?.address || resolveTokenAddress(fromAssetSymbol, sourceChain.id);
+                toTokenAddress = (toAsset?.address && toAsset.address !== '') 
+                    ? toAsset.address 
+                    : resolveTokenAddress(toAssetSymbol, mode === 'swap' ? sourceChain.id : targetChain.id);
+            } catch (resolveErr: any) {
+                setErrorMsg(`Token not found: ${resolveErr.message}`);
+                return;
+            }
+
+            const walletAddr = address || '0x0000000000000000000000000000000000000001';
+
+            // Use Li.Fi quote API directly (no API key required)
+            const res = await fetch('/api/wallet/quote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fromChain: sourceChain.id,
+                    toChain: mode === 'swap' ? sourceChain.id : targetChain.id,
+                    fromToken: fromTokenAddress,
+                    toToken: toTokenAddress,
+                    fromAmount: amountInWei,
+                    fromAddress: walletAddr,
+                })
+            });
             if (res.ok) {
                 const data = await res.json();
                 setQuote(data);
             } else {
-                const err = await res.json();
-                setErrorMsg(err.error || "Failed to get route");
+                const err = await res.json().catch(() => ({}));
+                setErrorMsg(err.error || 'Unable to get route. Check token pair and amount.');
             }
         } catch (e: any) {
-            console.error("Quote fetch failed", e);
-            setErrorMsg("Network error fetching quote");
+            console.error('Quote fetch failed', e);
+            setErrorMsg('Network error fetching route.');
         }
     };
 
-    const timer = setTimeout(fetchQuote, 500);
+    const timer = setTimeout(fetchQuote, 600);
     return () => clearTimeout(timer);
-  }, [amount, fromAssetSymbol, toAssetSymbol, sourceChain, targetChain, mode, isOpen, address, balances]);
+  }, [amount, fromAssetSymbol, toAssetSymbol, toAsset, sourceChain, targetChain, mode, subMode, isOpen, address, balances]);
 
   const handleExecute = async () => {
       if (mode === 'buy') {
@@ -313,7 +348,9 @@ export function LegendaryTransactionModal({
               });
 
               toast.success("Transfer Initiated", { description: `Broadcast successful. Hash: ${hash.slice(0, 10)}...` });
+              // Invalidate both portfolio and history so UI reflects the send immediately
               queryClient.invalidateQueries({ queryKey: ['portfolio-assets'] });
+              queryClient.invalidateQueries({ queryKey: ['enriched-history'] });
               onClose();
 
           } else if (mode === 'swap' || mode === 'bridge') {
@@ -364,6 +401,7 @@ export function LegendaryTransactionModal({
               if (hash) {
                   toast.success(`Execution Initiated`, { description: "Atomic swap broadcasted." });
                   queryClient.invalidateQueries({ queryKey: ['portfolio-assets'] });
+                  queryClient.invalidateQueries({ queryKey: ['enriched-history'] });
                   onClose();
               }
           }
@@ -396,9 +434,9 @@ export function LegendaryTransactionModal({
             className="relative w-full max-w-lg"
           >
             <InstitutionalErrorBoundary moduleName="Wallet">
-              <div className="p-0 border rounded-3xl overflow-hidden shadow-2xl" style={{ borderColor: BORDER, background: BG }}>
+              <div className="p-0 border rounded-3xl shadow-2xl" style={{ borderColor: BORDER, background: BG }}>
                 
-                <div className="p-6 border-b" style={{ borderColor: BORDER, background: CARD }}>
+                <div className="p-6 border-b rounded-t-3xl" style={{ borderColor: BORDER, background: CARD }}>
                   <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
                           <div className="w-10 h-10 border rounded-xl flex items-center justify-center" style={{ borderColor: BORDER, background: BG }}>
@@ -417,7 +455,9 @@ export function LegendaryTransactionModal({
                               key={t}
                               onClick={() => {
                                   setMode(t);
-                                  setSubMode(t === 'buy' ? 'USD' : 'standard');
+                                  setSubMode(t === 'buy' ? 'EUR' : 'standard');
+                                  setQuote(null);
+                                  setErrorMsg(null);
                               }}
                               className={`flex-1 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest transition-all ${mode === t ? 'bg-[#050505] text-[#FAF9F6] shadow-md' : 'text-black/40 hover:text-black/80'}`}
                           >
@@ -444,7 +484,7 @@ export function LegendaryTransactionModal({
                 {/* ── BUY CRYPTO MODE ── */}
                 {mode === 'buy' ? (
                       <div className="space-y-6">
-                        <div className="border rounded-2xl p-6 relative overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
+                        <div className="border rounded-2xl p-6 relative" style={{ borderColor: BORDER, background: CARD }}>
                            <div className="flex justify-between items-end mb-4">
                                 <div className="flex-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>Spend ({subMode})</label>
@@ -459,7 +499,7 @@ export function LegendaryTransactionModal({
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <div className="flex rounded-lg border p-1 gap-1" style={{ borderColor: BORDER, background: BG }}>
-                                        {['USD', 'EUR', 'GBP'].map(c => (
+                                        {['EUR', 'USD', 'GBP'].map(c => (
                                             <button 
                                                 key={c}
                                                 onClick={() => setSubMode(c)}
@@ -484,7 +524,9 @@ export function LegendaryTransactionModal({
                                 <div className="flex-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>Receive (Est.)</label>
                                     <div className="text-4xl font-black tracking-tighter" style={{ color: MUTED }}>
-                                        {quote && quote.price ? (Number(amount) / quote.price).toLocaleString(undefined, { maximumFractionDigits: 5 }) : '0.00'}
+                                        {quote?.price && Number(amount) > 0
+                                            ? `≈ ${(Number(amount) / quote.price).toLocaleString('de-DE', { maximumFractionDigits: 5 })} ${toAssetSymbol}`
+                                            : '—'}
                                     </div>
                                 </div>
                                 <div className="border rounded-xl px-4 py-2 flex items-center gap-3" style={{ borderColor: BORDER, background: BG }}>
@@ -524,7 +566,7 @@ export function LegendaryTransactionModal({
                         )}
 
                         {/* ── FROM INPUT ── */}
-                        <div className="border rounded-2xl p-6 relative overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
+                        <div className="border rounded-2xl p-6 relative" style={{ borderColor: BORDER, background: CARD }}>
                             <div className="flex justify-between items-end mb-4">
                                 <div className="flex-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>{mode === 'send' ? 'Amount' : 'Selling'}</label>
@@ -555,7 +597,11 @@ export function LegendaryTransactionModal({
                                 <button 
                                     onClick={() => {
                                         const asset = balances.find(b => b.symbol === fromAssetSymbol);
-                                        if (asset) setAmount(asset.balanceFormatted || '0');
+                                        if (asset) {
+                                            // Use balanceNumeric (a JS number) for clean parseUnits input
+                                            const numericMax = asset.balanceNumeric ?? parseFloat(asset.balanceFormatted || '0');
+                                            setAmount(numericMax.toString());
+                                        }
                                     }}
                                     className="hover:text-black cursor-pointer"
                                     style={{ color: MUTED }}
@@ -590,7 +636,11 @@ export function LegendaryTransactionModal({
                                     <div className="flex-1">
                                         <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>Receiving (Est.)</label>
                                         <div className="text-4xl font-black tracking-tighter" style={{ color: MUTED }}>
-                                            {quote && quote.estimate ? (Number(quote.estimate.toAmount) / (10 ** (quote.estimate.toToken?.decimals || 6))).toFixed(4) : '0.00'}
+                                            {quote?.estimate?.toAmount
+                                                ? (Number(quote.estimate.toAmount) / (10 ** (quote.estimate?.toToken?.decimals ?? 6))).toFixed(4)
+                                                : quote?.action?.toAmount
+                                                    ? (Number(quote.action.toAmount) / (10 ** (toAsset?.decimals ?? 6))).toFixed(4)
+                                                    : '—'}
                                         </div>
                                     </div>
                                     <div className="border rounded-xl flex items-center gap-3 cursor-pointer" style={{ borderColor: BORDER, background: BG }}>

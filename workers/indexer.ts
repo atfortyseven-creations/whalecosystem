@@ -58,7 +58,11 @@ async function startSiphons() {
 
         console.log(`[Siphon] Extracted Block ${block.number} on ${chain.name} | Txs: ${block.transactions.length}`);
       },
-      onError: error => console.error('[Siphon] Block Watch Error:', error)
+      onError: error => {
+        const errStr = String(error);
+        if (errStr.includes('-32005') || errStr.includes('rate limit') || errStr.includes('quota')) return;
+        console.error('[Siphon] Block Watch Error:', error);
+      }
     });
   });
 }

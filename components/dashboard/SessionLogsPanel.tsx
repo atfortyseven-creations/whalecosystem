@@ -1,4 +1,4 @@
-// @ts-nocheck
+// SessionLogsPanel — Activity audit viewer with virtualised rendering
 "use client";
 
 import React, { useState, useRef } from "react";

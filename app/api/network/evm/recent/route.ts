@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
+import { getPriceCached } from '@/lib/price-cache';
 
 const WHALE_USD_THRESHOLD = 0; // $0 minimum to guarantee system vitality and Zero-Mock compliance
 
@@ -47,50 +48,64 @@ interface ChainConfig {
 
 // The GETBLOCK_POOL and hardcoded public RPCs are deleted in favor of the Institutional Multi-Account RpcRelayerManager.
 
-const CHAINS: ChainConfig[] = [
-  {
-    label: 'ETHEREUM',
-    chainId: 1,
-    rpcUrls: [
-      RpcRelayerManager.getRpcUrl('ETH', 'RPC') || 'https://cloudflare-eth.com',
-      RpcRelayerManager.getRpcUrl('ETH', 'WSS') // Fallback to WebSocket if RPC endpoint stalls
-    ],
-    nativeSymbol: 'ETH',
-    priceKey: 'ETH',
-  },
-  {
-    label: 'BASE',
-    chainId: 8453,
-    rpcUrls: [
-      RpcRelayerManager.getRpcUrl('ARB', 'RPC') || 'https://mainnet.base.org', // Base/L2 general endpoint config
-    ],
-    nativeSymbol: 'ETH',
-    priceKey: 'ETH',
-  },
-  {
-    label: 'BSC',
-    chainId: 56,
-    rpcUrls: [
-      RpcRelayerManager.getRpcUrl('BSC', 'RPC') || 'https://bsc-dataseed1.binance.org',
-    ],
-    nativeSymbol: 'BNB',
-    priceKey: 'BNB',
-  },
-];
+// Build chain configs lazily at request time so environment variables are
+// guaranteed to be populated (static init runs before .env is injected in
+// some Railway edge cases causing BSC to report "No working RPC").
+function getChains(): ChainConfig[] {
+  return [
+    {
+      label: 'ETHEREUM',
+      chainId: 1,
+      rpcUrls: [
+        RpcRelayerManager.getRpcUrl('ETH', 'RPC') || 'https://cloudflare-eth.com',
+        RpcRelayerManager.getRpcUrl('ETH', 'WSS'),
+      ].filter(Boolean),
+      nativeSymbol: 'ETH',
+      priceKey: 'ETH',
+    },
+    {
+      label: 'BASE',
+      chainId: 8453,
+      rpcUrls: [
+        process.env.BASE_MAINNET_RPC_URL ||
+        RpcRelayerManager.getRpcUrl('ARB', 'RPC') ||
+        'https://mainnet.base.org',
+      ].filter(Boolean),
+      nativeSymbol: 'ETH',
+      priceKey: 'ETH',
+    },
+    {
+      label: 'BSC',
+      chainId: 56,
+      rpcUrls: [
+        // Priority 1: institutional GetBlock endpoint (keyed, highest reliability)
+        process.env.GETBLOCK_BSC_RPC
+          ? `https://go.getblock.io/${process.env.GETBLOCK_BSC_RPC}/bsc/mainnet/`
+          : null,
+        // Priority 2: env override
+        process.env.BSC_RPC_URL || null,
+        // Priority 3: RpcRelayerManager (multi-account rotation)
+        RpcRelayerManager.getRpcUrl('BSC', 'RPC') || null,
+        // Priority 4–7: public fallback cascade
+        'https://bsc.publicnode.com',
+        'https://bsc-rpc.publicnode.com',
+        'https://bsc-dataseed1.binance.org',
+        'https://bsc-dataseed2.binance.org',
+        'https://bsc-dataseed3.binance.org',
+        'https://bsc-dataseed4.binance.org',
+      ].filter(Boolean) as string[],
+      nativeSymbol: 'BNB',
+      priceKey: 'BNB',
+    },
+  ];
+}
 
 // In-memory cache to avoid hammering RPCs
 type CacheEntry = { data: any[]; ts: number };
 const cache: Record<string, CacheEntry> = {};
 const CACHE_TTL = 30_000; // 30 seconds
 
-// Simple token price cache
-const priceCache: Record<string, { price: number; ts: number }> = {};
-
 async function getPrice(symbol: string): Promise<number> {
-  const PRICE_TTL = 60_000;
-  const cached = priceCache[symbol];
-  if (cached && Date.now() - cached.ts < PRICE_TTL) return cached.price;
-
   const idMap: Record<string, string> = {
     ETH: 'ethereum', BNB: 'binancecoin', BTC: 'bitcoin',
     USDT: 'tether', USDC: 'usd-coin', DAI: 'dai',
@@ -99,23 +114,9 @@ async function getPrice(symbol: string): Promise<number> {
   };
   const coinId = idMap[symbol];
   if (!coinId || ['USDT', 'USDC', 'DAI', 'BUSD'].includes(symbol)) {
-    priceCache[symbol] = { price: 1, ts: Date.now() };
     return 1;
   }
-
-  try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`,
-      { signal: AbortSignal.timeout(3000) }
-    );
-    const json = await res.json();
-    const price = json[coinId]?.usd || 0;
-    priceCache[symbol] = { price, ts: Date.now() };
-    return price;
-  } catch {
-    const fallbacks: Record<string, number> = { ETH: 3300, BNB: 600, BTC: 86000, SOL: 145, MATIC: 0.7, LINK: 18 };
-    return fallbacks[symbol] || 0;
-  }
+  return getPriceCached(coinId, symbol);
 }
 
 async function scanChain(chain: ChainConfig): Promise<any[]> {
@@ -138,7 +139,7 @@ async function scanChain(chain: ChainConfig): Promise<any[]> {
   }
 
   if (!provider) {
-    console.warn(`[EVM Scan] No working RPC for ${chain.label}`);
+    console.log(`[EVM Scan] No active RPC for ${chain.label} — degrading gracefully`);
     return [];
   }
 
@@ -231,7 +232,7 @@ async function scanChain(chain: ChainConfig): Promise<any[]> {
         }
       }
     } catch (e: any) {
-      console.warn(`[EVM Scan] Log scan failed for ${chain.label}:`, e.message);
+      console.log(`[EVM Scan] Log scan failed for ${chain.label}:`, e.message);
     }
 
     cache[cacheKey] = { data: results, ts: Date.now() };
@@ -251,8 +252,8 @@ export async function GET(request: Request) {
     const chainFilter = searchParams.get('chain'); // optional ?chain=ETHEREUM
 
     const chainsToScan = chainFilter
-      ? CHAINS.filter(c => c.label === chainFilter)
-      : CHAINS;
+      ? getChains().filter(c => c.label === chainFilter)
+      : getChains();
 
     const results = await Promise.allSettled(chainsToScan.map(scanChain));
     const txs = results

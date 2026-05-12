@@ -60,8 +60,8 @@ async function triggerPortfolioRefresh(walletAddress: string) {
 async function broadcastToSSE(walletAddress: string, event: any) {
   // This will be connected to our SSE service
   // For now, we can use a simple in-memory event emitter
-  if (global.sseEmitter) {
-    global.sseEmitter.emit(`wallet:${walletAddress}`, event);
+  if ((global as any).sseEmitter) {
+    (global as any).sseEmitter.emit(`wallet:${walletAddress}`, event);
   }
 }
 

@@ -113,12 +113,13 @@ export function ApiTerminal() {
             }
 
             // Capture headers
+            const secureRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
             const hdrs: Record<string, string> = {
                 'Content-Type':            res.headers.get('content-type') || 'application/json',
                 'X-Response-Time-ms':      elapsedStr,
                 'X-Status':                String(res.status),
                 'X-RateLimit-Limit':       '1000',
-                'X-RateLimit-Remaining':   String(Math.floor(Math.random() * 900 + 50)),
+                'X-RateLimit-Remaining':   String(Math.floor(secureRandom() * 900 + 50)),
                 'X-RateLimit-Reset':       String(Math.floor(Date.now() / 1000) + 3600),
                 'Cache-Control':           'no-store',
                 'X-Powered-By':            'WhaleAlert Neural Engine v3',

@@ -9,6 +9,7 @@ import {
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import useSWR from 'swr';
 import { ScrollFloat } from '@/components/ui/ScrollFloat';
+import { useSovereignENS } from '@/hooks/useSovereignENS';
 
 interface WhaleEntity {
     rank: number;
@@ -203,32 +204,8 @@ export function WhalePortfolio() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[#F0F0F0]">
-                                {filteredWhales.map((w, i) => (
-                                    <tr key={w.rank} className="hover:bg-[#FAF9F6] transition-colors group">
-                                        <td className="px-6 py-4 text-[10px] font-black text-[#888888]">{w.rank}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-[#050505] flex items-center justify-center text-[10px] font-black text-white">
-                                                    {w.label[0]}
-                                                </div>
-                                                <div>
-                                                    <div className="text-[12px] font-black text-[#050505] uppercase tracking-tight">{w.label}</div>
-                                                    <div className="text-[9px] font-mono text-[#888888]">{w.address.slice(0,12)}...{w.address.slice(-6)}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-[11px] font-black font-mono">{fmt(w.netWorthUSD)}</td>
-                                        <td className={`px-6 py-4 text-right text-[11px] font-black font-mono ${pctColor(w.change24h)}`}>{pctFmt(w.change24h)}</td>
-                                        <td className="px-6 py-4 text-right">
-                                            <span className="text-[8px] px-2 py-1 rounded-full bg-[#F0F0F0] text-[#888888] font-black uppercase tracking-wider">{w.category}</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="text-[11px] font-black text-[#050505]">{w.topHolding}</div>
-                                            <div className="text-[8px] text-[#888888] uppercase tracking-widest">{w.topHoldingPct}% DOMINANCE</div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-[11px] font-black font-mono text-[#00C076]">{w.winRate}%</td>
-                                        <td className={`px-6 py-4 text-right text-[11px] font-black font-mono ${pctColor(w.pnl30d)}`}>{fmt(w.pnl30d)}</td>
-                                    </tr>
+                                {filteredWhales.map((w) => (
+                                    <WhaleRow key={w.rank} w={w} />
                                 ))}
                             </tbody>
                         </table>
@@ -244,5 +221,50 @@ export function WhalePortfolio() {
                 )}
             </div>
         </div>
+    );
+}
+
+// -- Subcomponent to resolve ENS independently without breaking hook rules --
+function WhaleRow({ w }: { w: WhaleEntity }) {
+    const { ensName, ensAvatar } = useSovereignENS(w.address as `0x${string}`);
+
+    return (
+        <tr className="hover:bg-[#FAF9F6] transition-colors group">
+            <td className="px-6 py-4 text-[10px] font-black text-[#888888]">{w.rank}</td>
+            <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                    {ensAvatar ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={ensAvatar} alt={w.label} className="w-8 h-8 rounded-full border border-[#E5E5E5] object-cover shadow-sm" />
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-[#050505] flex items-center justify-center text-[10px] font-black text-white shadow-sm">
+                            {w.label[0]}
+                        </div>
+                    )}
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <div className="text-[12px] font-black text-[#050505] uppercase tracking-tight">{w.label}</div>
+                            {ensName && (
+                                <span className="px-1.5 py-0.5 bg-[#0052FF]/10 text-[#0052FF] rounded-md text-[8px] font-black font-mono tracking-wider">
+                                    {ensName}
+                                </span>
+                            )}
+                        </div>
+                        <div className="text-[9px] font-mono text-[#888888]">{w.address.slice(0, 12)}...{w.address.slice(-6)}</div>
+                    </div>
+                </div>
+            </td>
+            <td className="px-6 py-4 text-right text-[11px] font-black font-mono">{fmt(w.netWorthUSD)}</td>
+            <td className={`px-6 py-4 text-right text-[11px] font-black font-mono ${pctColor(w.change24h)}`}>{pctFmt(w.change24h)}</td>
+            <td className="px-6 py-4 text-right">
+                <span className="text-[8px] px-2 py-1 rounded-full bg-[#F0F0F0] text-[#888888] font-black uppercase tracking-wider">{w.category}</span>
+            </td>
+            <td className="px-6 py-4 text-right">
+                <div className="text-[11px] font-black text-[#050505]">{w.topHolding}</div>
+                <div className="text-[8px] text-[#888888] uppercase tracking-widest">{w.topHoldingPct}% DOMINANCE</div>
+            </td>
+            <td className="px-6 py-4 text-right text-[11px] font-black font-mono text-[#00C076]">{w.winRate}%</td>
+            <td className={`px-6 py-4 text-right text-[11px] font-black font-mono ${pctColor(w.pnl30d)}`}>{fmt(w.pnl30d)}</td>
+        </tr>
     );
 }

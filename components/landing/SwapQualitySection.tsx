@@ -18,7 +18,7 @@ export function SwapQualitySection() {
 
   const handleProbarAhora = () => {
     if (isSignedIn) {
-      router.push('/network/whale-tracker');
+      router.push('/ledger');
     } else {
       router.push('/?login=true');
     }

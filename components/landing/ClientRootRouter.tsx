@@ -2,31 +2,50 @@
 
 import React, { useEffect, useState } from "react";
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
+import { AztecArchitectureSection } from "./AztecArchitectureSection";
+import { SovereignFooter } from "./SovereignFooter";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+
+
 
 export function ClientRootRouter() {
   const { isConnected } = useSovereignAccount();
-  const [hasValidSession, setHasValidSession] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
 
-  // Once connected, verify the sovereign_handshake cookie exists.
-  // We track this internally but do NOT navigate — the user is sovereign
-  // and chooses their own destination via CTAs on the /connect page.
   useEffect(() => {
-    if (isConnected) {
-      const checkSiwe = setInterval(() => {
-        if (
-          typeof document !== "undefined" &&
-          (document.cookie.includes("sovereign_handshake=") ||
-            document.cookie.includes("siwe_session="))
-        ) {
-          clearInterval(checkSiwe);
-          setHasValidSession(true);
-        }
-      }, 500);
-      return () => clearInterval(checkSiwe);
-    }
+    const check = () => {
+      const hasCookie = typeof document !== "undefined" &&
+        (document.cookie.includes("sovereign_handshake=") ||
+         document.cookie.includes("siwe_session="));
+      
+      if (isConnected || hasCookie) {
+        setHasSession(true);
+      } else {
+        setHasSession(false);
+      }
+    };
+    check();
+    
+    // Poll to catch any external cookie updates
+    const interval = setInterval(check, 500);
+    return () => clearInterval(interval);
   }, [isConnected]);
 
-  // The Immersive Manifesto is the universal public face of the platform.
-  return <ImmersiveManifestoLanding />;
+  return (
+    <div className="flex flex-col w-full">
+
+      {/* Session Navigation Bar removed — Now handled by the Unified Master InstitutionalHeader */}
+
+      {/* ── Main Manifesto Landing ── */}
+      <ImmersiveManifestoLanding />
+
+      {/* ── Aztec Architecture Academic Section ── */}
+      <AztecArchitectureSection />
+
+      {/* ── Footer ── */}
+      <SovereignFooter />
+    </div>
+  );
 }

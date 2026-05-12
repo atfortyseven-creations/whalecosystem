@@ -3,18 +3,20 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, Eye, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useDisconnect } from 'wagmi';
 import { useUIStore } from '@/lib/store/ui-store';
-import { useSettingsStore } from '@/lib/store/settings-store';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { CurrencySwitcher } from './CurrencySwitcher';
 
 // ─── IVORY SYSTEMS UTILITY HEADER ───
 // Perfectly visible on cream/ivory background
 export function SystemsUtilityHeader() {
     const { address, isConnected } = useSovereignAccount();
-    const { activePanel, setActivePanel, openConnectModal } = useUIStore();
+    const { activePanel, setActivePanel } = useUIStore();
     const { disconnect } = useDisconnect();
+    const router = useRouter();
 
     const icons = [
         { id: 'notifications', icon: Bell, label: 'Notifications' },
@@ -68,7 +70,7 @@ export function SystemsUtilityHeader() {
                         e.preventDefault();
                         e.stopPropagation();
                         if (!isConnected) {
-                            openConnectModal();
+                            router.push('/connect');
                         } else {
                             setSettingsOpen(true);
                         }

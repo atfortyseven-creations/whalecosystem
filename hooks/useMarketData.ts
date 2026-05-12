@@ -30,7 +30,8 @@ export function useMarketData() {
                 const res = await fetch(`/api/wallet/portfolio?address=${address}`);
                 const data = await res.json();
                 if (data.portfolio) {
-                    setPortfolioValue(data.portfolio.safeToLocaleString(totalValueUSD, { minimumFractionDigits: 2 }));
+                    const totalValueUSD = data.portfolio.totalValueUSD || 0;
+                    setPortfolioValue(totalValueUSD.toLocaleString(undefined, { minimumFractionDigits: 2 }));
                     
                     // Find USDC balance across chains
                     const usdcAsset = data.portfolio.assets.find((a: any) => a.symbol === 'USDC');

@@ -126,7 +126,7 @@ export function DropdownNav() {
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center gap-1">
-                        <NavLink href="/network" label="Whale Tracker" icon={Anchor} isActive={pathname === '/network'} />
+                        <NavLink href="/ledger" label="Whale Ledger" icon={Anchor} isActive={pathname === '/ledger'} />
                         <NavLink href="/portfolio" label="Whale Profile" icon={TrendingUp} isActive={pathname === '/portfolio'} />
                         <NavLink href="/support" label="Support" icon={LifeBuoy} isActive={pathname === '/support'} />
                     </div>
@@ -208,7 +208,7 @@ export function DropdownNav() {
                                                 <button
                                                     onClick={() => {
                                                         setShowSettings(false);
-                                                        router.push('/network');
+                                                        router.push('/ledger');
                                                     }}
                                                     className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-2xl transition-all flex items-center justify-between group"
                                                 >
@@ -216,7 +216,7 @@ export function DropdownNav() {
                                                         <div className="p-2 bg-indigo-500/10 rounded-xl group-hover:bg-indigo-500/20 transition-colors">
                                                             <Globe size={18} className="text-indigo-400" />
                                                         </div>
-                                                        <span className="font-bold">Data Network</span>
+                                                        <span className="font-bold">Whale Ledger</span>
                                                     </div>
                                                 </button>
 
@@ -324,12 +324,12 @@ export function DropdownNav() {
                         >
                             <div className="flex flex-col p-4 gap-2">
                                 <Link 
-                                    href="/network" 
+                                    href="/ledger" 
                                     className="flex items-center gap-3 px-4 py-4 bg-white/5 rounded-xl text-white font-bold"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     <Anchor size={20} className="text-indigo-500" />
-                                    Whale Tracker
+                                    Whale Ledger
                                 </Link>
                                 <Link 
                                     href="/portfolio" 

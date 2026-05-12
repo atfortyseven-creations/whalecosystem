@@ -1,25 +1,31 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  // We keep a non-blocking check for local development, but in prod this will fail fast.
-  console.warn('WARNING: STRIPE_SECRET_KEY is not defined in environment variables.');
-} else if (process.env.STRIPE_SECRET_KEY.startsWith('pk_')) {
-  console.error('USER ALERT: STRIPE_SECRET_KEY is set to a Publishable Key (starts with pk_). You have swapped your Stripe keys! Payment processing will fail.');
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'mock_key', {
-  apiVersion: '2026-01-28.clover' as any, // Matched to User account precisely
+// NOTE: STRIPE_SECRET_KEY is validated at runtime when stripe is first used.
+// No module-level console.warn — it would pollute Railway [err] logs.
+// Fallback to a dummy key because the SDK throws 'Neither apiKey nor config.authenticator provided' during static generation without it
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_build_validation', {
+  apiVersion: '2026-01-28.clover' as any,
   typescript: true,
 });
+
 
 /**
  * Mapping of internal PlanTier to Stripe Price IDs.
  * Note: These should ideally be moved to environment variables or fetched from Stripe API.
  */
-export const PRICE_IDS: Record<string, string> = {
-  STANDARD: process.env.STRIPE_STANDARD_PRICE_ID || process.env.STRIPE_PRICE_STANDARD || 'ST_PLAN_STANDARD_PLACEHOLDER',
-  STARTER: process.env.STRIPE_STARTER_PRICE_ID || process.env.STRIPE_PRICE_STARTER || 'ST_PLAN_STARTER_PLACEHOLDER',
-  PRO: process.env.STRIPE_PRO_PRICE_ID || process.env.STRIPE_PRICE_PRO || 'ST_PLAN_PRO_PLACEHOLDER',
-  Elite: process.env.STRIPE_Elite_PRICE_ID || process.env.STRIPE_PRICE_Elite || 'ST_PLAN_Elite_PLACEHOLDER',
+// Monthly price IDs — maps STRIPE_PRICE_* env vars (existing) + STRIPE_*_PRICE_ID_MO (canonical)
+export const PRICE_IDS: Record<string, Record<string, string>> = {
+  MONTHLY: {
+    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_MO || process.env.STRIPE_PRICE_STANDARD || '',
+    STARTER:  process.env.STRIPE_STARTER_PRICE_ID_MO  || process.env.STRIPE_PRICE_STARTER  || '',
+    PRO:      process.env.STRIPE_PRO_PRICE_ID_MO      || process.env.STRIPE_PRICE_PRO       || '',
+    ELITE:    process.env.STRIPE_ELITE_PRICE_ID_MO    || process.env.STRIPE_PRICE_INSTITUTIONAL || '',
+  },
+  ANNUAL: {
+    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_YR || process.env.STRIPE_PRICE_STANDARD || '',
+    STARTER:  process.env.STRIPE_STARTER_PRICE_ID_YR  || process.env.STRIPE_PRICE_STARTER  || '',
+    PRO:      process.env.STRIPE_PRO_PRICE_ID_YR      || process.env.STRIPE_PRICE_PRO       || '',
+    ELITE:    process.env.STRIPE_ELITE_PRICE_ID_YR    || process.env.STRIPE_PRICE_INSTITUTIONAL || '',
+  }
 };
 

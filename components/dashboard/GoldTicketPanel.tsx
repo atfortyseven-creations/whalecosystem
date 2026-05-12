@@ -6,7 +6,9 @@ import { toast } from 'sonner';
 import {
   useConnect, useSignMessage,
   useReadContract, useSwitchChain, useAccount,
+  useSendTransaction
 } from 'wagmi';
+import { parseEther } from 'viem';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { injected } from 'wagmi/connectors';
 import {
@@ -14,36 +16,12 @@ import {
   Clock, CheckCircle2, Flame, PenTool, ShieldCheck, ArrowRight
 } from 'lucide-react';
 import { WhaleLogo } from '@/components/shared/WhaleLogo';
-import { useUIStore } from '@/lib/store/ui-store';
+import { useRouter } from 'next/navigation';
 
-// ── Contract ──────────────────────────────────────────────────────────────────
-const CONTRACT = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
+// ── Treasury ──────────────────────────────────────────────────────────────────
+const TREASURY_WALLET = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
 const OPTIMISM_CHAIN_ID = 10;
 const MAX_SUPPLY = 200;
-
-const ABI = [
-  { inputs: [], name: 'mint', outputs: [], stateMutability: 'payable', type: 'function' },
-  {
-    inputs: [{ internalType: 'address', name: 'account', type: 'address' }, { internalType: 'uint256', name: 'id', type: 'uint256' }],
-    name: 'balanceOf', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view', type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'id', type: 'uint256' }],
-    name: 'totalSupply', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view', type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'id', type: 'uint256' }],
-    name: 'maxSupply', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view', type: 'function',
-  },
-  {
-    inputs: [], name: 'mintPrice',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view', type: 'function',
-  },
-] as const;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const truncAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -171,7 +149,16 @@ function SignaturePad({ onSignature, disabled, onMint, mintLabel }: {
   const stop = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
-    if (hasDrawn && canvasRef.current) onSignature(canvasRef.current.toDataURL('image/png'));
+    if (!hasDrawn || !canvasRef.current) return;
+    // Export to a small fixed-resolution JPEG to stay well under the 10KB API limit.
+    // High-DPR canvases (Retina/mobile) produce 50-150KB PNGs which the server rejects.
+    const src = canvasRef.current;
+    const thumb = document.createElement('canvas');
+    thumb.width  = 320;
+    thumb.height = 80;
+    const tCtx = thumb.getContext('2d');
+    if (tCtx) tCtx.drawImage(src, 0, 0, 320, 80);
+    onSignature(thumb.toDataURL('image/jpeg', 0.4));
   };
 
   return (
@@ -220,12 +207,18 @@ function GlobalLedger({ feed }: { feed: any[] }) {
              <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.3em]">Optimism Mainnet</span>
          </div>
          <div className="grid text-[9px] font-black text-black/30 uppercase tracking-[0.2em] bg-white border-b border-black/[0.04] shrink-0"
-              style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-              <div className="px-6 py-3">Verified Sovereign</div>
+              style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr' }}>
+              <div className="px-6 py-3">Sovereign Entity</div>
+              <div className="px-6 py-3">Identity / Tier</div>
               <div className="px-6 py-3">Temporal Entry</div>
               <div className="px-6 py-3 text-right">Cryptographic Seal</div>
          </div>
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-black/[0.04]">
+            {feed?.length === 0 && (
+                <div className="p-8 text-center text-xs font-black text-black/20 uppercase tracking-[0.2em]">
+                    Awaiting first Genesis signature...
+                </div>
+            )}
             {feed?.map((f: any, i: number) => {
                 let displaySig = "";
                 try {
@@ -234,17 +227,30 @@ function GlobalLedger({ feed }: { feed: any[] }) {
                 } catch { displaySig = f.signatureData; }
                 
                 return (
-                    <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-                        <div className="px-6 py-4 flex items-center gap-3">
-                             <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.4)]" />
-                             <span className="text-xs font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
+                    <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr' }}>
+                        <div className="px-6 py-4 flex flex-col justify-center">
+                             <div className="flex items-center gap-2 mb-1">
+                                 <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.4)]" />
+                                 <span className="text-xs font-black font-mono text-black">{f.userAddress.slice(0,8)}...{f.userAddress.slice(-6)}</span>
+                             </div>
+                             {f.twitterHandle && (
+                                <span className="text-[9px] font-black text-black/40 uppercase tracking-[0.1em]">@{f.twitterHandle}</span>
+                             )}
                         </div>
-                        <div className="px-6 py-4 text-[9px] font-black font-mono text-black/40 uppercase">
+                        <div className="px-6 py-4 flex flex-col justify-center gap-1">
+                             <span className="text-[10px] font-black uppercase text-[#D4AF37] tracking-[0.1em]">{f.serialCode || 'GENESIS'}</span>
+                             <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.2em]">{f.tier || 'TIER 1'}</span>
+                        </div>
+                        <div className="px-6 py-4 text-[10px] font-black font-mono text-black/60 uppercase">
                              {new Date(f.claimedAt).toLocaleTimeString()}
                         </div>
                          <div className="px-6 py-2 flex justify-end">
-                              {displaySig?.startsWith('data:image') && (
-                                 <img src={displaySig} className="h-6 opacity-70 mix-blend-multiply grayscale hover:grayscale-0 transition-all" alt="Sig" />
+                              {displaySig?.startsWith('data:image') ? (
+                                 <div className="bg-[#FAF9F6] border border-black/5 rounded-lg px-3 py-1 shadow-sm">
+                                     <img src={displaySig} className="h-10 opacity-80 mix-blend-multiply hover:opacity-100 hover:scale-110 transition-all duration-300" alt="Sig" />
+                                 </div>
+                              ) : (
+                                 <span className="text-[8px] font-black text-black/20 uppercase tracking-widest">NO SEAL</span>
                               )}
                          </div>
                     </div>
@@ -258,38 +264,44 @@ function GlobalLedger({ feed }: { feed: any[] }) {
 export function GoldTicketPanel() {
   const { address, isConnected, chainId, isSovereignHandshake } = useSovereignAccount();
   const { isConnected: isWagmiConnected } = useAccount(); // Real wagmi connector state
-  const { openConnectModal } = useUIStore();
+  const router = useRouter();
   const { switchChain } = useSwitchChain();
   const { signMessage, isPending: isSigning } = useSignMessage();
+  const { sendTransactionAsync } = useSendTransaction();
   const [dbStats, setDbStats] = useState<any>(null);
   const [signatureData, setSignatureData] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
+  const MINT_FEE_ETH = "0.00111"; // Highly addictive micro-transaction fee
 
-  const fetchStats = useCallback(async () => {
+  const fetchStats = useCallback(async (isMounted: boolean = true) => {
     try {
       const q = address ? `?address=${address}` : '';
       const res = await fetch(`/api/golden-ticket/claim${q}`);
       const json = await res.json();
-      setDbStats(json);
+      if (isMounted) setDbStats(json);
     } catch {}
   }, [address]);
 
   useEffect(() => {
-    fetchStats();
-    const id = setInterval(fetchStats, 5000);
-    return () => clearInterval(id);
+    let isMounted = true;
+    fetchStats(isMounted);
+    const id = setInterval(() => fetchStats(isMounted), 5000);
+    return () => {
+      isMounted = false;
+      clearInterval(id);
+    };
   }, [fetchStats]);
 
   const handleMint = useCallback(async () => {
-    if (!isConnected) { openConnectModal(); return; }
+    if (!isConnected) { router.push('/connect'); return; }
 
-    // If user has only a cookie/QR session, they have no wagmi connector → cannot sign
+    // If user is not Wagmi connected, they cannot pay the required fee
     if (!isWagmiConnected) {
-      toast.error('Wallet connection required for signing', {
-        description: 'Your current session cannot sign transactions. Click to connect a Web3 wallet (MetaMask, WalletConnect, or Google Auth).',
+      toast.error('Wallet connection required for minting', {
+        description: 'A connected Web3 wallet is required to process the mint transaction fee.',
         duration: 6000,
       });
-      openConnectModal();
+      router.push('/connect');
       return;
     }
 
@@ -300,50 +312,74 @@ export function GoldTicketPanel() {
     if (isMinting || isSigning) return;
 
     setIsMinting(true);
-    const toastId = toast.loading('Awaiting wallet signature...');
 
-    signMessage(
-      { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
-      {
-        onSuccess: async (cryptoSignature: string) => {
-          toast.dismiss(toastId);
-          const t2 = toast.loading('Encoding Institutional Identity...');
-          try {
-            const res = await fetch('/api/golden-ticket/claim', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                walletAddress: address,
-                cryptoSignature,
-                signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() })
-              })
-            });
-            toast.dismiss(t2);
-            const json = await res.json();
-            if (res.ok) {
-              toast.success('Access Granted — Welcome to the Genesis Ledger ✓');
-              fetchStats();
-            } else if (res.status === 409) {
-              toast.info('You already hold a Genesis Ticket.');
-              fetchStats();
-            } else {
-              toast.error(`Mint failed: ${json.error || 'Unknown server error'}`);
-            }
-          } catch (e) {
-            toast.dismiss(t2);
-            toast.error('Server error saving your ticket. Try again.');
-          } finally {
+    const performClaim = async (cryptoSig?: string) => {
+      const t2 = toast.loading('Encoding Institutional Identity...');
+      try {
+        const res = await fetch('/api/golden-ticket/claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            walletAddress: address,
+            cryptoSignature: cryptoSig,
+            signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() })
+          })
+        });
+        toast.dismiss(t2);
+        const json = await res.json();
+        if (res.ok) {
+          toast.success('Access Granted — Welcome to the Genesis Ledger ✓');
+          fetchStats();
+        } else if (res.status === 409) {
+          toast.info('You already hold a Genesis Ticket.');
+          fetchStats();
+        } else {
+          toast.error(`Mint failed: ${json.error || 'Unknown server error'}`);
+        }
+      } catch (e) {
+        toast.dismiss(t2);
+        toast.error('Server error saving your ticket. Try again.');
+      } finally {
+        setIsMinting(false);
+      }
+    };
+
+    try {
+      if (chainId !== OPTIMISM_CHAIN_ID) {
+          toast.info('Switching to Optimism Network...');
+          await switchChain({ chainId: OPTIMISM_CHAIN_ID });
+      }
+
+      const txToast = toast.loading(`Initiating Sovereign Mint Protocol (${MINT_FEE_ETH} ETH)...`);
+      
+      const txHash = await sendTransactionAsync({
+          to: TREASURY_WALLET,
+          value: parseEther(MINT_FEE_ETH)
+      });
+      
+      toast.dismiss(txToast);
+      toast.success(`Transaction sent: ${txHash.slice(0,10)}... Please sign the ledger entry.`);
+
+      const signToastId = toast.loading('Awaiting cryptographic signature...');
+      signMessage(
+        { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
+        {
+          onSuccess: async (cryptoSignature: string) => {
+            toast.dismiss(signToastId);
+            await performClaim(cryptoSignature);
+          },
+          onError: (err: any) => {
+            toast.dismiss(signToastId);
+            toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
             setIsMinting(false);
           }
-        },
-        onError: (err: any) => {
-          toast.dismiss(toastId);
-          toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
-          setIsMinting(false);
         }
-      }
-    );
-  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, openConnectModal, fetchStats]);
+      );
+    } catch (error: any) {
+      toast.error(`Mint execution failed: ${error?.shortMessage || error?.message || 'Transaction rejected'}`);
+      setIsMinting(false);
+    }
+  }, [isConnected, isWagmiConnected, isSovereignHandshake, signatureData, isMinting, isSigning, address, signMessage, sendTransactionAsync, switchChain, chainId, router, fetchStats]);
 
   const hasTicket = dbStats?.ticket || false;
 
@@ -380,7 +416,7 @@ export function GoldTicketPanel() {
                       onMint={handleMint}
                       mintLabel={
                         isMinting || isSigning ? 'SIGNING...' :
-                        !isConnected || !isWagmiConnected ? 'CONNECT WALLET' : 'AUTHORIZE MINT'
+                        !isConnected || !isWagmiConnected ? 'CONNECT WALLET' : `MINT FOR ${MINT_FEE_ETH} ETH`
                       }
                     />
                  </div>
