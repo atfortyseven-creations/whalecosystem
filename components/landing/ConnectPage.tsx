@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
-import { useRouter } from "next/navigation";
+// useRouter removed — mobile redirect was disabled; router no longer needed here
 import { useUIStore } from "@/lib/store/ui-store";
 import { SignContractStep } from "@/components/shared/LinkedGate";
 import { toast } from "sonner";
@@ -117,7 +117,7 @@ function WalletButton({
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function ConnectPage() {
-  const router = useRouter();
+  // router intentionally removed (mobile redirect disabled — see comment above)
   const isMobile = useIsMobile();
   const { isConnected, address } = useAccount();
   const { connect, connectors, isPending, isError, error } = useConnect();
@@ -348,14 +348,13 @@ export default function ConnectPage() {
     }
   }, [isLinked, mounted, isConnected]);
 
-  // ── Mobile Redirect ───────────────────────────────────────────────────────
-  // Mobile users have their own standalone UI on the landing page (MobileLanding.tsx).
-  // If they somehow land on /connect, redirect them to the landing page immediately.
-  useEffect(() => {
-    if (mounted && isMobile) {
-      router.replace("/");
-    }
-  }, [mounted, isMobile, router]);
+  // ── Mobile Redirect: DISABLED ────────────────────────────────────────────────
+  // Previously, mobile users were redirected from /connect → /. However, this
+  // caused the Sign In to be invisible on mobile without Desktop Mode, because
+  // MobileLanding has connectivity issues in restricted mobile browser contexts.
+  // ConnectPage already has MOBILE_WALLETS buttons + AppKit modal support, so
+  // mobile users can now connect directly here without needing Desktop Mode.
+  // (router is retained in scope for other potential uses — do not remove import)
 
 
   // ── Desktop handler: EIP-6963 extension lookup ───────────────────────────

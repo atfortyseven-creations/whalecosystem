@@ -300,17 +300,96 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     convIdToPeer.current.set(activePeerDmIdRef.current, activePeer);
   }, [client, activePeer]);
 
-  // ── Global Conversation Sync Loop ─────────────────────────────────────────────
-  // Runs every 10 seconds. Syncs the full conversation list so the receiver
-  // discovers new DMs created by remote peers, then refreshes active messages.
+  // ── Global Conversation Sync Loop ─────────────────────────────────────────────────
+  // Runs every 8 seconds. Syncs the full XMTP conversation graph from the network
+  // and then calls listDms() to surface any new DMs initiated by remote peers.
+  // Without this step, the receiver never discovers a new DM until they manually
+  // add the sender’s address — which was the root cause of “messages only appear
+  // when both people connect simultaneously”.
   useEffect(() => {
     if (!client || !address) return;
+    let cancelled = false;
+
     const syncGlobal = async () => {
-      try { await client.conversations.sync(); } catch {}
+      try {
+        // Step 1: pull the full conversation graph from the XMTP p2p network
+        await client.conversations.sync();
+
+        // Step 2: list all DMs and discover any not yet in local state
+        const dms: any[] = await client.conversations.listDms();
+        if (!dms?.length || cancelled) return;
+
+        setConversations(prev => {
+          const prevSet = new Set(prev.map(c => c.peerAddress.toLowerCase()));
+          const toAdd: ConversationMeta[] = [];
+
+          for (const dm of dms) {
+            try {
+              // Find the peer member (the one who is NOT us)
+              const members: any[] = dm.members ?? [];
+              const peerMember = members.find((m: any) => {
+                const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
+                return addrs.some(
+                  (a: string) => a.toLowerCase() !== address.toLowerCase()
+                );
+              });
+              if (!peerMember) continue;
+
+              const addrs: string[] = peerMember.accountAddresses ?? peerMember.addresses ?? [];
+              const peerAddr = addrs.find((a: string) => /^0x[a-fA-F0-9]{40}$/i.test(a));
+              if (!peerAddr || prevSet.has(peerAddr.toLowerCase())) continue;
+
+              // New conversation discovered from the network
+              toAdd.push({
+                peerAddress: peerAddr,
+                lastMessage: '✉ New message received',
+                lastAt: new Date(),
+              });
+
+              // Register the DM mapping so fetchMessages can find it
+              peerToConvId.current.set(peerAddr.toLowerCase(), `dm-${peerAddr.toLowerCase()}`);
+              convIdToPeer.current.set(`dm-${peerAddr.toLowerCase()}`, peerAddr);
+            } catch { /* skip malformed DM entry */ }
+          }
+
+          if (!toAdd.length) return prev; // no change — bail out early
+          const updated = [...toAdd, ...prev];
+          persistToLocal(updated);
+          return updated;
+        });
+
+        // Step 3: if there’s an active peer, also refresh messages now
+        // (covers the case where a message arrives mid-poll-interval)
+        if (activePeerRef.current && !cancelled) {
+          const msgs = await getMessages(client, activePeerRef.current);
+          if (cancelled) return;
+          const mappedMsgs = msgs.map((m: any) => ({
+            id: m.id,
+            senderInboxId: m.senderInboxId,
+            content: m.content || m.fallback || 'Encrypted Data',
+            sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(),
+            conversationId: `dm-${activePeerRef.current!.toLowerCase()}`
+          }));
+          setMessages(prev => {
+            const activeId = `dm-${activePeerRef.current!.toLowerCase()}`;
+            const others = prev.filter(p => p.conversationId !== activeId);
+            const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
+            const optimistic = prev.filter(p => {
+              if (p.conversationId !== activeId || mappedIds.has(p.id) || p.id.length >= 20) return false;
+              if (Date.now() - parseInt(p.id) > 15000) return false;
+              return true;
+            });
+            return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
+          });
+        }
+      } catch (e) {
+        console.warn('[WhaleChat] Global sync error:', e);
+      }
     };
+
     syncGlobal();
-    const globalPoll = setInterval(syncGlobal, 10000);
-    return () => clearInterval(globalPoll);
+    const globalPoll = setInterval(syncGlobal, 8000);
+    return () => { cancelled = true; clearInterval(globalPoll); };
   }, [client, address]);
 
   // ── Real-time incoming message polling (REAL XMTP NETWORK) ────────────────
