@@ -154,7 +154,7 @@ export function GovernanceProposals() {
     }
 
     return (
-        <div className="flex flex-col space-y-4 max-w-5xl mx-auto">
+        <div className="flex flex-col space-y-4 w-full mx-auto">
             <div className="flex items-center justify-between mb-2">
                 <div>
                     <h2 className="text-sm font-black text-[#050505] uppercase tracking-widest flex items-center gap-2">

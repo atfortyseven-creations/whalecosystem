@@ -388,7 +388,7 @@ export function MassTransferIntel() {
             </button>
           </div>
         ) : (
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full mx-auto">
             <SummaryCards events={events} />
 
             <div className="bg-white border border-[#E0E0E0] rounded flex flex-col shadow-sm">

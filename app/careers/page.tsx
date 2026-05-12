@@ -1,8 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ArrowRight, Shield, Globe, Cpu, CheckCircle2, Clock, MapPin, DollarSign, Zap, Users, ChevronRight, Mail } from 'lucide-react';
+import { ArrowRight, Shield, Globe, Cpu, CheckCircle2, Clock, MapPin, DollarSign, Zap, Users, ChevronRight, Mail, Code } from 'lucide-react';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { motion } from 'framer-motion';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 export const metadata: Metadata = {
   title: 'Careers | Whale Alert Network',
@@ -23,27 +25,39 @@ export default function CareersPage() {
   return (
     <div className="relative min-h-screen bg-[#FAFAF8] text-[#0a0a0a] font-sans antialiased overflow-x-hidden selection:bg-black/10">
 
-      {/* Hero Section */}
-      <header className="w-full border-b border-black/5 bg-white">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-24 md:pt-36 pb-16 md:pb-24">
-          <div className="flex items-center gap-3 mb-6 sm:mb-8">
-            <div className="w-2 h-2 rounded-full bg-[#0a0a0a] animate-pulse" />
-            <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] text-slate-400">We Are Hiring</span>
-          </div>
-          <h1 className="text-[40px] sm:text-[56px] md:text-[72px] font-black tracking-tighter leading-[1] md:leading-[0.95] text-[#0a0a0a] mb-6 sm:mb-8">
-            Build the Intelligence<br className="hidden sm:block" />
-            <span className="text-black/40"> Layer of Finance.</span>
-          </h1>
-          <p className="text-[15px] sm:text-[18px] text-slate-500 font-medium max-w-2xl leading-relaxed mb-10">
-            We track the largest capital flows in the world, in real time, with cryptographic precision. Join our engineering and intelligence teams to build the tools that give institutional traders a forensic edge over the market.
-          </p>
-          <div className="flex flex-wrap items-center gap-3">
-            {['Remote-First', 'High Autonomy', 'Institutional Scale', 'Async Culture'].map(tag => (
-              <div key={tag} className="px-4 py-2 sm:px-5 sm:py-2.5 bg-slate-50 border border-black/5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-600">
-                {tag}
-              </div>
-            ))}
-          </div>
+      {/* ── NESTR HERO ── */}
+      <header className="w-full bg-[#FAFAF8] pt-32 pb-16 px-6 lg:px-12">
+        <div className="max-w-[1400px] mx-auto">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
+                
+                <div className="w-full lg:w-1/2 relative z-10 space-y-6 lg:space-y-8 text-center lg:text-left">
+                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#FAFAF8] border border-black/5 rounded-full shadow-sm mx-auto lg:mx-0">
+                        <Code size={14} className="text-[#0044CC]" />
+                        <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">We Are Hiring</span>
+                    </div>
+                    
+                    <h1 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-[0.95]">
+                        Build the <br /><span className="text-[#0044CC]">Protocol.</span>
+                    </h1>
+                    
+                    <p className="font-serif text-[16px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                        We track the largest capital flows in the world, in real time, with cryptographic precision. Join our engineering and intelligence teams to build the tools that give institutional traders a forensic edge over the market.
+                    </p>
+
+                    <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3 pt-4">
+                        {['Remote-First', 'High Autonomy', 'Institutional Scale', 'Async Culture'].map(tag => (
+                        <div key={tag} className="px-5 py-2.5 bg-slate-50 border border-black/5 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-600 shadow-sm">
+                            {tag}
+                        </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 shadow-sm p-6 overflow-hidden">
+                    <RemoteLottie path="Manufacturing Industry Working Staff.json" className="scale-[1.15] w-full h-full object-contain" />
+                </div>
+
+            </motion.div>
         </div>
       </header>
 

@@ -16,13 +16,15 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy
 // Monthly price IDs — maps STRIPE_PRICE_* env vars (existing) + STRIPE_*_PRICE_ID_MO (canonical)
 export const PRICE_IDS: Record<string, Record<string, string>> = {
   MONTHLY: {
-    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_MO || process.env.STRIPE_PRICE_STANDARD || '',
+    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_MO || 'prod_UVQSatw61ksVah',
+    FREE:     'prod_UVQPgIwLPGfUiY', // Basic Free (No payment required, but mapped for structural consistency if needed)
     STARTER:  process.env.STRIPE_STARTER_PRICE_ID_MO  || process.env.STRIPE_PRICE_STARTER  || '',
     PRO:      process.env.STRIPE_PRO_PRICE_ID_MO      || process.env.STRIPE_PRICE_PRO       || '',
     ELITE:    process.env.STRIPE_ELITE_PRICE_ID_MO    || process.env.STRIPE_PRICE_INSTITUTIONAL || '',
   },
   ANNUAL: {
-    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_YR || process.env.STRIPE_PRICE_STANDARD || '',
+    STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_YR || 'prod_UVQSatw61ksVah',
+    FREE:     'prod_UVQPgIwLPGfUiY',
     STARTER:  process.env.STRIPE_STARTER_PRICE_ID_YR  || process.env.STRIPE_PRICE_STARTER  || '',
     PRO:      process.env.STRIPE_PRO_PRICE_ID_YR      || process.env.STRIPE_PRICE_PRO       || '',
     ELITE:    process.env.STRIPE_ELITE_PRICE_ID_YR    || process.env.STRIPE_PRICE_INSTITUTIONAL || '',

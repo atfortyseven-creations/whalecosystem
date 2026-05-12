@@ -1,34 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
 import { SovereignGlobe3D } from "./SovereignGlobe3D";
 import Link from "next/link";
-import { ArrowRight, Scan, MessageSquare, ChevronRight, Shield, Zap, Globe2, Layers, Cpu, Code2, Network } from "lucide-react";
+import { ArrowRight, Scan, Shield, Zap, Globe2, Layers, LineChart, Network } from "lucide-react";
 import { useEthMetrics } from "@/hooks/useEthMetrics";
-import { PRICING_TIERS } from "@/lib/config/pricing-tiers";
 import { StackableCarousel } from "@/components/ui/StackableCarousel";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { RemoteLottie } from "@/components/ui/RemoteLottie";
+import { SovereignFooter } from "@/components/landing/SovereignFooter";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
-
-const FEATURES = [
-  { icon: Zap, title: "Mempool Intelligence", desc: "Intercept institutional capital before block confirmation. Sub-second detection across 12 chains." },
-  { icon: Shield, title: "Cryptographic Identity", desc: "Zero passwords. Your wallet is your key. Every session is mathematically verifiable via ECDSA." },
-  { icon: Globe2, title: "On-Chain Forensics", desc: "De-obfuscate mixer outputs, trace multi-hop routes, and map entity clusters in real time." },
-];
-
-const ARCHITECTURE = [
-  { id: "SYS-1", label: "Performance", desc: "Optimized response times and seamless data synchronization.", color: "#00C076", icon: Zap },
-  { id: "SYS-2", label: "Authentication", desc: "Secure, frictionless access with advanced identity verification.", color: "#00C076", icon: Shield },
-  { id: "SYS-3", label: "Data Engine", desc: "Real-time processing and intelligent information structuring.", color: "#1a1a1a", icon: Layers },
-  { id: "SYS-4", label: "Community", desc: "Interactive tools designed for engagement and clear communication.", color: "#1a1a1a", icon: MessageSquare },
-  { id: "SYS-5", label: "Operations", desc: "Automated billing and seamless regulatory compliance features.", color: "#555", icon: Cpu },
-  { id: "SYS-6", label: "Infrastructure", desc: "High availability and robust server management protocols.", color: "#555", icon: Network },
-  { id: "SYS-7", label: "Analytics", desc: "Clear metrics and predictive modeling for business growth.", color: "#888", icon: Code2 },
-  { id: "SYS-8", label: "Security", desc: "Comprehensive protection layers safeguarding all user data.", color: "#888", icon: Shield },
-];
 
 const FADE_UP: any = {
   hidden: { opacity: 0, y: 30 },
@@ -53,13 +35,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
       {/* ── HERO ──────────────────────────────────────────────────────────────── */}
       <section className="relative w-full min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between border-b border-black/5 overflow-hidden">
         
-        {/* Large Lottie Background Overlay */}
-        <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none flex items-center justify-center">
-            <div className="w-[120%] max-w-[1600px] aspect-square">
-                <RemoteLottie path="Connected world.json" />
-            </div>
-        </div>
-
         {/* Left Content */}
         <motion.div 
           initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
@@ -67,7 +42,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         >
 
           <motion.h1 variants={FADE_UP} className="text-[48px] sm:text-[64px] md:text-[80px] xl:text-[96px] font-black tracking-tighter leading-[0.9] uppercase text-[#0a0a0a] mb-8 drop-shadow-sm">
-            Whale<br />Alert<br /><span className="text-black/30">Network</span>
+            Whale<br />Alert<br /><span className="text-[#0044CC]">Network</span>
           </motion.h1>
 
           <motion.p variants={FADE_UP} className="font-serif text-[16px] sm:text-[18px] text-slate-600 leading-relaxed max-w-lg mb-12">
@@ -75,7 +50,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.p>
 
           {/* Live Stats Glassmorphism Bar */}
-          <motion.div variants={FADE_UP} className="flex flex-wrap items-center gap-x-8 gap-y-6 p-6 md:p-8 bg-white/60 backdrop-blur-2xl border border-black/5 rounded-3xl mb-10 shadow-xl shadow-black/5 max-w-2xl">
+          <motion.div variants={FADE_UP} className="flex flex-wrap items-center gap-x-8 gap-y-6 p-6 md:p-8 bg-white/80 backdrop-blur-2xl border border-black/5 rounded-3xl mb-10 shadow-xl shadow-black/5 max-w-2xl">
             {[
               { label: "ETH Block", val: syncing ? "Syncing..." : blockNumber ?? "---" },
               { label: "Base Fee", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "---" },
@@ -119,8 +94,98 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         )}
       </section>
 
+      {/* ── BENTO BOX: WHY WHALE ALERT NETWORK ──────────────────────────────── */}
+      <section className="w-full py-24 md:py-40 bg-white">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 space-y-16">
+            <div className="text-center max-w-3xl mx-auto space-y-6 mb-20">
+                <h2 className="text-[40px] sm:text-[56px] font-black tracking-tighter uppercase leading-[0.95] text-[#0a0a0a]">
+                    Architectural <span className="text-[#0044CC]">Precision.</span>
+                </h2>
+                <p className="font-serif text-[18px] text-slate-500 leading-relaxed">
+                    Designed for institutional quantitative teams. We eliminate the noise, providing mathematical certainty and actionable intelligence through three core pillars.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                {/* Bento Card 1 */}
+                <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
+                    <div className="w-full lg:w-1/2 space-y-6">
+                        <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
+                            <Layers size={20} className="text-[#0a0a0a]" />
+                        </div>
+                        <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
+                            Cryptographic Integrity.
+                        </h3>
+                        <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
+                            The Sovereign Protocol operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data cannot be intercepted or exposed.
+                        </p>
+                    </div>
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white rounded-3xl border border-black/5">
+                        <RemoteLottie path="Abstract Isometric Loader #1.json" className="scale-125 transition-transform duration-700 group-hover:scale-150" />
+                    </div>
+                </div>
+
+                {/* Bento Card 2 */}
+                <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
+                    <div className="w-full h-[200px] flex items-center justify-center bg-white rounded-3xl border border-black/5 mb-8">
+                        <RemoteLottie path="Business Analysis.json" className="scale-150 transition-transform duration-700 group-hover:scale-[1.6]" />
+                    </div>
+                    <div className="space-y-6">
+                        <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
+                            <LineChart size={20} className="text-[#0a0a0a]" />
+                        </div>
+                        <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
+                            Entity Resolution.
+                        </h3>
+                        <p className="text-[15px] text-slate-500 leading-relaxed font-serif">
+                            We map complex multi-hop interactions and de-obfuscate mixer outputs in real-time, grouping fragmented wallets into unified institutional entities for absolute clarity.
+                        </p>
+                    </div>
+                </div>
+
+                {/* Bento Card 3 */}
+                <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
+                    <div className="space-y-6 mb-8">
+                        <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
+                            <Network size={20} className="text-[#0a0a0a]" />
+                        </div>
+                        <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
+                            Quantitative AI Models.
+                        </h3>
+                        <p className="text-[15px] text-slate-500 leading-relaxed font-serif">
+                            Our heuristic algorithms process 12TB of raw blockchain state daily, detecting liquidity injections and massive accumulations prior to market impact.
+                        </p>
+                    </div>
+                    <div className="w-full h-[200px] flex items-center justify-center bg-white rounded-3xl border border-black/5">
+                        <RemoteLottie path="Big Data Analytics.json" className="scale-125 transition-transform duration-700 group-hover:scale-150" />
+                    </div>
+                </div>
+
+                {/* Bento Card 4 */}
+                <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white rounded-3xl border border-black/5">
+                        <RemoteLottie path="Trade.json" className="scale-110 transition-transform duration-700 group-hover:scale-125" />
+                    </div>
+                    <div className="w-full lg:w-1/2 space-y-6">
+                        <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
+                            <Zap size={20} className="text-[#0a0a0a]" />
+                        </div>
+                        <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
+                            Pre-Execution Tracking.
+                        </h3>
+                        <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
+                            Relying on block confirmations means you are already too late. Our dedicated node mesh directly interfaces with the global mempool, allowing you to intercept and analyze institutional orders milliseconds after they are signed, giving you the ultimate execution edge.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+      </section>
+
       {/* ── SHOWCASE ────────────────────────────────────────────────────────── */}
-      <section className="w-full py-24 md:py-40 bg-white overflow-hidden relative">
+      <section className="w-full py-24 md:py-40 bg-[#FAFAF8] overflow-hidden relative border-t border-black/5">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 mb-16 md:mb-24">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={FADE_UP} className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
             <div className="relative">
@@ -135,7 +200,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         </div>
         
         <div className="w-full relative py-12 md:py-20 flex justify-center">
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-[#FAFAF8] to-white opacity-50" />
           <StackableCarousel className="w-full relative z-10" itemClassName="w-[85vw] md:w-[900px] lg:w-[1100px] hover:scale-[1.01] transition-transform duration-700 cursor-grab active:cursor-grabbing">
             {[
               "/system-shots/Captura de pantalla 2026-05-07 012904.png",
@@ -149,70 +213,20 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         </div>
       </section>
 
-      {/* ── MATHEMATICAL CERTAINTY ── */}
-      <section className="py-40 bg-[#FAFAF8] relative overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-            <div className="space-y-10 relative z-10">
-                <h2 className="text-[48px] md:text-[86px] font-black text-[#0a0a0a] leading-[0.85] tracking-tighter uppercase">
-                    Mathematical <br /> <span className="text-slate-300">Certainty</span>.
-                </h2>
-                <p className="font-serif text-[18px] md:text-[22px] text-slate-500 max-w-md leading-relaxed">
-                    We eliminate the heuristic gap. Our systems identify the structural shifts in the global ledger before they manifest as price action.
-                </p>
-                <div className="flex flex-col gap-6 pt-4">
-                    <div className="flex items-center gap-6">
-                        <div className="w-12 h-px bg-black opacity-10" />
-                        <span className="font-mono text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">System Core v3.0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="relative aspect-square w-full max-w-[700px] mx-auto flex items-center justify-center">
-                <div className="absolute inset-0 bg-slate-200/20 blur-[120px] rounded-full" />
-                <RemoteLottie path="Abstract Isometric Loader #1.json" className="relative z-10 scale-150" />
-            </div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ──────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 md:py-32 bg-white border-y border-black/5">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
-            {FEATURES.map((f, i) => (
-              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.8, ease: "easeOut" as any } } }} className="group bg-slate-50/50 p-10 md:p-12 rounded-3xl border border-black/5 hover:border-black/15 hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 flex flex-col gap-8">
-                <div className="w-14 h-14 rounded-2xl bg-white border border-black/5 flex items-center justify-center group-hover:bg-[#0a0a0a] transition-colors duration-500 shadow-sm">
-                  <f.icon size={24} strokeWidth={1.5} className="text-[#0a0a0a] group-hover:text-white transition-colors duration-500" />
-                </div>
-                <div>
-                  <h3 className="font-mono text-[13px] md:text-[14px] font-black uppercase tracking-[0.15em] mb-4 text-[#0a0a0a]">{f.title}</h3>
-                  <p className="font-serif text-[15px] md:text-[16px] text-slate-500 leading-relaxed font-medium">{f.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── CLOSING ───────────────────────────────────────────────────────────── */}
-      <section className="w-full py-32 md:py-48 bg-[#FAFAF8]">
+      <section className="w-full py-32 md:py-48 bg-white border-t border-black/5">
         <div className="max-w-[850px] mx-auto px-6 text-center flex flex-col items-center">
-          <div className="w-64 h-64 mb-12 opacity-10">
-             <RemoteLottie path="Connected world.json" />
-          </div>
           <h2 className="text-[36px] md:text-[56px] font-serif text-[#0a0a0a] leading-tight tracking-tight mb-8">
             In the pursuit of <br /><span className="italic font-light text-slate-500">absolute transparency</span>.
           </h2>
-          <div className="flex justify-center mb-10">
-            <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 bg-white px-6 py-3 rounded-full border border-black/5 shadow-sm">
-              © 2026 atfortyseven-creations
-            </span>
-          </div>
           <p className="font-serif text-[15px] md:text-[18px] text-slate-500 max-w-2xl mx-auto leading-relaxed">
             Foundational document on pure mathematical abstraction, zero-knowledge cryptographic mechanisms,
             and deterministic heuristic paradigms that cement the immutable global infrastructure.
           </p>
         </div>
       </section>
+      
+      <SovereignFooter />
     </div>
   );
 }

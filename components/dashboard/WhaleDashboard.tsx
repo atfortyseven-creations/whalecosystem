@@ -72,7 +72,7 @@ const MorphoYieldDashboard = dynamic(
 
 import "@/app/dashboard/dashboard.css";
 
-// ── Minimal Aztec-style panel header with hover description ───────────────────
+// ── Nestr-Style Institutional Panel Header (Lottie-Free, Space-Optimized) ─────────
 const PanelHeader = ({
     icon: Icon,
     title,
@@ -84,48 +84,40 @@ const PanelHeader = ({
     description: string;
     accent?: string;
 }) => {
-    const [hovered, setHovered] = React.useState(false);
     return (
-        <div
-            className="relative shrink-0 flex items-center justify-between mb-6 pb-5 border-b border-black/[0.07] cursor-default select-none"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-        >
-            {/* Left */}
-            <div className="flex items-start gap-4">
-                <div
-                    className="w-8 h-8 rounded-[3px] flex items-center justify-center shrink-0 mt-0.5 transition-transform duration-300"
-                    style={{
-                        background: `${accent}0D`,
-                        border: `1px solid ${accent}20`,
-                        transform: hovered ? 'scale(1.08)' : 'scale(1)',
-                    }}
-                >
-                    <Icon size={13} strokeWidth={1.6} style={{ color: accent }} />
-                </div>
-                <div className="flex flex-col gap-1 min-w-0">
-                    <h2
-                        className="text-[12px] font-black uppercase text-[#050505] leading-none tracking-[0.28em]"
-                        style={{ fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}
-                    >
-                        {title}
-                    </h2>
-                    <div
-                        className="overflow-hidden transition-all duration-300 ease-out"
-                        style={{ maxHeight: hovered ? '48px' : '0px', opacity: hovered ? 1 : 0 }}
-                    >
-                        <p className="text-[10.5px] text-black/45 font-normal leading-snug max-w-[520px] pt-0.5">
-                            {description}
-                        </p>
-                    </div>
+        <div className="w-full bg-white rounded-[2rem] border border-black/5 shadow-sm p-6 md:p-8 mb-6 flex flex-col md:flex-row items-center gap-6 md:gap-12 relative overflow-hidden">
+            {/* Abstract Accent Glow (Lottie Alternative) */}
+            <div 
+                className="absolute -right-20 -top-20 w-64 h-64 rounded-full blur-[80px] opacity-20 pointer-events-none" 
+                style={{ background: accent }} 
+            />
+            
+            {/* Left: Icon & Badge */}
+            <div className="shrink-0">
+                <div className="w-16 h-16 rounded-[1.25rem] flex items-center justify-center border shadow-sm relative z-10" style={{ background: `${accent}0A`, borderColor: `${accent}20` }}>
+                    <Icon size={28} strokeWidth={1.5} style={{ color: accent }} />
                 </div>
             </div>
 
-            {/* Right accent line */}
-            <div
-                className="hidden md:block h-px flex-1 ml-8 transition-all duration-500"
-                style={{ background: hovered ? `linear-gradient(to right, ${accent}40, transparent)` : `linear-gradient(to right, rgba(0,0,0,0.06), transparent)` }}
-            />
+            {/* Center: Title & Mono Tag */}
+            <div className="flex-1 min-w-0 relative z-10 w-full text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FAFAF8] border border-black/5 rounded-full shadow-sm mb-3">
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
+                    <span className="font-mono text-[9px] font-bold tracking-[0.3em] uppercase text-slate-500">
+                        Sovereign Terminal
+                    </span>
+                </div>
+                <h2 className="text-[28px] md:text-[36px] font-black uppercase text-[#0A0A0A] leading-none tracking-tighter truncate">
+                    {title}
+                </h2>
+            </div>
+
+            {/* Right: Description (Perfectly constrained) */}
+            <div className="w-full md:w-[45%] relative z-10">
+                <p className="font-serif text-[13px] md:text-[14px] text-slate-500 leading-relaxed md:border-l-2 md:pl-6 text-center md:text-left" style={{ borderColor: `${accent}30` }}>
+                    {description}
+                </p>
+            </div>
         </div>
     );
 };

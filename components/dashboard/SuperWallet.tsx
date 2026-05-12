@@ -393,7 +393,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
                     <div className="animate-fade-in space-y-12">
                         {/* Elite Analytics Section - Expanded Width */}
                         <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-                            <div className="max-w-6xl mx-auto px-4 pt-12">
+                            <div className="w-full mx-auto px-4 pt-12">
                                 <PortfolioDashboard walletAddress={displayAddress} />
                             </div>
                         </div>

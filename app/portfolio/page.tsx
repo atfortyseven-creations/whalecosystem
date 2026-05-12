@@ -18,6 +18,7 @@ import { DepositModal } from '@/components/rainbow/DepositModal';
 import { toast } from 'sonner';
 import { ChainActivityPanel } from '@/components/portfolio/ChainActivityPanel';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 const BG   = "#FAF9F6";
@@ -314,6 +315,31 @@ export default function PortfolioPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 pb-8 pt-8 space-y-5">
+
+        {/* ── EMPTY STATE / WELCOME HERO (NESTR STYLE) ── */}
+        {!userAddress && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-[#FAFAF8] rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 mb-10 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
+                <div className="w-full lg:w-1/2 relative z-10 space-y-6 md:space-y-8">
+                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm">
+                        <Activity size={14} className="text-[#0044CC]" />
+                        <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Quantitative Portfolio</span>
+                    </div>
+                    <h2 className="text-[40px] md:text-[56px] font-black uppercase text-[#0A0A0A] leading-[0.95] tracking-tighter">
+                        Track liquidity. <br /><span className="text-[#0044CC]">Zero noise.</span>
+                    </h2>
+                    <p className="font-serif text-[16px] md:text-[18px] text-slate-500 leading-relaxed">
+                        Connect your wallet to instantiate the Sovereign Dashboard. Our heuristic engine will map your holdings across 14 networks instantly, computing your exposure profile and aggregating stablecoin dominance.
+                    </p>
+                    <button onClick={() => openAppKit()} className="px-8 py-4 bg-[#0A0A0A] text-white rounded-xl font-mono text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/80 transition-colors shadow-lg flex items-center justify-center gap-3 w-full sm:w-auto">
+                        Connect Terminal <ArrowUpRight size={16} />
+                    </button>
+                </div>
+                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white rounded-3xl border border-black/5 shadow-sm p-6 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent z-10 hidden lg:block" />
+                    <RemoteLottie path="Isometric data analysis.json" className="scale-125 w-full h-full object-contain" />
+                </div>
+            </motion.div>
+        )}
 
         {/* ── BALANCE CARD ── */}
         <motion.div
