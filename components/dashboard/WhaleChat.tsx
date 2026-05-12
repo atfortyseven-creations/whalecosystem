@@ -718,7 +718,7 @@ export function WhaleChat() {
                 return filteredMsgs.map(msg => {
                   const isMe = msg.senderInboxId
                     ? msg.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
-                    : (msg.senderAddress || '').toLowerCase() === address?.toLowerCase();
+                    : false;
                   const content = typeof msg.content === 'string' ? msg.content : (msg.fallback || 'Encrypted Data');
                   // sentAtNs is now a plain number (ms), not BigInt
                   const sentTime = typeof msg.sentAtNs === 'number' ? new Date(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
