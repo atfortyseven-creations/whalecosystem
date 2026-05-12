@@ -34,6 +34,20 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: true });
         }
 
+        // ── Ghost Typing Fix: explicit stop_typing clears the key immediately ──
+        // Called by the sender right after dm.send() so the receiver's next
+        // poll (within 3s) sees isTyping=false instead of waiting for the 5s TTL.
+        if (type === 'stop_typing') {
+            if (!peer || !isAddress(peer)) {
+                return NextResponse.json({ error: 'Invalid peer target' }, { status: 400 });
+            }
+            const normalizedPeer = peer.toLowerCase();
+            // Write sentinel '0' with 1s TTL — the GET handler treats '0' as isTyping=false.
+            // This eliminates the 5s ghost-typing tail after the user sends a message.
+            await safeRedisSet(`chat:typing:${normalizedAddress}:${normalizedPeer}`, '0', 'EX', 1);
+            return NextResponse.json({ success: true });
+        }
+
         return NextResponse.json({ error: 'Unknown telemetry type' }, { status: 400 });
     } catch (err) {
         console.error('[Chat/Telemetry/POST]', err);
@@ -61,7 +75,8 @@ export async function GET(request: NextRequest) {
         if (self && isAddress(self)) {
             const normalizedSelf = self.toLowerCase();
             const typingStr = await safeRedisGet(`chat:typing:${normalizedPeer}:${normalizedSelf}`);
-            isTyping = !!typingStr;
+            // isTyping is true only when the key exists AND is NOT the stop_typing sentinel ('0')
+            isTyping = !!typingStr && typingStr !== '0';
         }
 
         return NextResponse.json({

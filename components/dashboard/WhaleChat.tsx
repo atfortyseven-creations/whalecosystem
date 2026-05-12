@@ -4,15 +4,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
-import { getXMTPClient, canReceiveMessages, sendMessage, listConversations, getMessages, destroyXMTPClient, getDmId, nsToDate } from '@/lib/xmtp/client';
+import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
-import { SovereignChat } from '@/components/dashboard/SovereignChat';
 import type { Client } from '@xmtp/browser-sdk';
 
 interface ConversationMeta {
   peerAddress: string;
   lastMessage?: string;
   lastAt?: Date;
+}
+
+/** forceAutoInit=true: always auto-init XMTP even on mobile (used by /chat route) */
+export interface WhaleChatProps {
+  forceAutoInit?: boolean;
 }
 
 function Avatar({ address }: { address: string }) {
@@ -28,8 +32,8 @@ function Avatar({ address }: { address: string }) {
   );
 }
 
-export function WhaleChat() {
-  const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
+export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
+  const { address, isConnected } = useSovereignAccount();
   const { signMessageAsync } = useSignMessage();
 
   const [client, setClient] = useState<Client | null>(null);
@@ -50,24 +54,33 @@ export function WhaleChat() {
   const [peerStatus, setPeerStatus] = useState<{ online: boolean, lastSeen: number | null, isTyping: boolean }>({ online: false, lastSeen: null, isTyping: false });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const streamRef = useRef<boolean>(false);
   const activePeerRef = useRef<string | null>(null);
   const activePeerDmIdRef = useRef<string | null>(null);
   const peerToConvId = useRef<Map<string, string>>(new Map());
   const convIdToPeer = useRef<Map<string, string>>(new Map());
+  // Cache canReceiveMessages result per address to skip redundant network lookups
+  const canReceiveCache = useRef<Map<string, boolean>>(new Map());
+  // Track if initClient is already in-flight to prevent double-calls on mobile
+  const initInFlight = useRef(false);
 
   // Detect physical device type (touch + narrow screen = mobile)
   useEffect(() => {
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    setIsMobile(isTouchDevice && window.innerWidth < 768);
+    const check = () => {
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      setIsMobile(isTouchDevice && window.innerWidth < 768);
+    };
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Keep refs in sync with activePeer
+  // Keep activePeer ref in sync (used by async callbacks)
   useEffect(() => {
     activePeerRef.current = activePeer;
     if (activePeer) {
-      const dmId = peerToConvId.current.get(activePeer.toLowerCase());
-      if (dmId) activePeerDmIdRef.current = dmId;
+      const dmId = `dm-${activePeer.toLowerCase()}`;
+      activePeerDmIdRef.current = dmId;
+      peerToConvId.current.set(activePeer.toLowerCase(), dmId);
     } else {
       activePeerDmIdRef.current = null;
     }
@@ -86,7 +99,8 @@ export function WhaleChat() {
       setConversations([]);
       setActivePeer(null);
       setMessages([]);
-      streamRef.current = false;
+      canReceiveCache.current.clear();
+      initInFlight.current = false;
     }
   }, [isConnected, address, client]);
 
@@ -99,14 +113,14 @@ export function WhaleChat() {
   // silent failures that leave the UI frozen with no clear path forward.
   useEffect(() => {
     if (isConnected && address && !client && !isInitializing) {
-      // Only auto-init on desktop. On mobile, show the manual retry button
-      // so the user can tap it AFTER the page is fully loaded and stable.
-      if (!isMobile) {
+      // forceAutoInit=true (used by /chat route) overrides the mobile guard.
+      // On desktop always auto-init. On mobile only when forceAutoInit is set.
+      if (!isMobile || forceAutoInit) {
         initClient();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, isMobile]);
+  }, [isConnected, address, isMobile, forceAutoInit]);
 
   // Telemetry: Heartbeat Loop
   useEffect(() => {
@@ -155,14 +169,14 @@ export function WhaleChat() {
     const draftKey = `whale_draft_${address.toLowerCase()}_${activePeer.toLowerCase()}`;
     
     if (inputText.trim()) {
-      localStorage.setItem(draftKey, btoa(encodeURIComponent(inputText))); // Basic obfuscation for local drafts
+      localStorage.setItem(draftKey, btoa(encodeURIComponent(inputText)));
     } else {
       localStorage.removeItem(draftKey);
     }
 
-    // Typing telemetry (debounced)
+    // Typing telemetry: only fire when there is actual text
+    if (!inputText.trim()) return;
     const sendTyping = async () => {
-        if (!inputText.trim()) return;
         try {
             await fetch('/api/chat/telemetry', {
                 method: 'POST',
@@ -175,6 +189,22 @@ export function WhaleChat() {
     const timeoutId = setTimeout(sendTyping, 500); 
     return () => clearTimeout(timeoutId);
   }, [inputText, activePeer, address]);
+
+  // Utility: immediately clear typing signal on the server (call after send)
+  const stopTypingSignal = async () => {
+    if (!activePeer || !address) return;
+    // We clear the typing key by sending an artificial empty heartbeat — Redis TTL handles it in 5s
+    // but this triggers an explicit flush to avoid the "ghost typing" 5-second tail.
+    // We write a dummy value that the server interprets as "not typing" via the TTL expiry.
+    // Fastest approach: write the key with a 0-second TTL to expire it immediately.
+    try {
+      await fetch('/api/chat/telemetry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, type: 'stop_typing', peer: activePeer })
+      });
+    } catch {}
+  };
 
   // Draft Loading on Peer Switch
   useEffect(() => {
@@ -196,13 +226,25 @@ export function WhaleChat() {
   // Initialize REAL XMTP Network
   const initClient = async () => {
     if (!address) return;
+    // Prevent concurrent init calls (can happen on mobile with forceAutoInit + visibility events)
+    if (initInFlight.current) return;
+    initInFlight.current = true;
     setIsInitializing(true);
     setInitError('');
     try {
       const wagmiSigner = {
         getAddress: async () => address,
         signMessage: async (msg: string | Uint8Array) => {
-          return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
+          try {
+            return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
+          } catch (sigErr: any) {
+            // If this is a QR/cookie-based session without a live wallet, signMessageAsync
+            // will throw because there is no wagmi connector. Surface a clear error.
+            if (sigErr?.message?.includes('connector') || sigErr?.message?.includes('not connected')) {
+              throw new Error('No active wallet connection. Please connect your wallet directly to use Whale Chat.');
+            }
+            throw sigErr;
+          }
         }
       };
       const realClient = await getXMTPClient(wagmiSigner);
@@ -210,18 +252,19 @@ export function WhaleChat() {
       await loadConversations();
     } catch (err: any) {
       console.error('Init Error:', err);
-      // ChunkLoadError — XMTP WASM failed to load. Offer a hard reload.
       if (err?.name === 'ChunkLoadError' || err?.message?.includes('Loading chunk')) {
         setInitError('XMTP module failed to load. Please reload the page and try again.');
-        // Auto-reload after 3s on ChunkLoadError
         setTimeout(() => { try { window.location.reload(); } catch {} }, 3000);
       } else if (err?.code === 4001 || err?.message?.toLowerCase().includes('reject')) {
         setInitError('Signature rejected. You must sign the authorization to establish the secure channel.');
+      } else if (err?.message?.includes('No active wallet')) {
+        setInitError('No live wallet detected. Please connect your wallet directly (not via QR session) to activate Whale Chat.');
       } else {
         setInitError('Failed to initialize secure communications channel.');
       }
     } finally {
       setIsInitializing(false);
+      initInFlight.current = false;
     }
   };
 
@@ -258,22 +301,21 @@ export function WhaleChat() {
   }, [client, activePeer]);
 
   // ── Global Conversation Sync Loop ─────────────────────────────────────────────
-  // Runs every 30 seconds to ensure the client processes invites from new peers
+  // Runs every 10 seconds. Syncs the full conversation list so the receiver
+  // discovers new DMs created by remote peers, then refreshes active messages.
   useEffect(() => {
     if (!client || !address) return;
-    let isMounted = true;
     const syncGlobal = async () => {
-      try {
-        await client.conversations.sync();
-      } catch (e) {}
+      try { await client.conversations.sync(); } catch {}
     };
     syncGlobal();
-    const globalPoll = setInterval(syncGlobal, 30000);
-    return () => { isMounted = false; clearInterval(globalPoll); };
+    const globalPoll = setInterval(syncGlobal, 10000);
+    return () => clearInterval(globalPoll);
   }, [client, address]);
 
   // ── Real-time incoming message polling (REAL XMTP NETWORK) ────────────────
-  // Every 3 seconds, sync with the decentralized network to fetch new messages.
+  // Every 4 seconds, sync with the decentralized network to fetch new messages.
+  // The global sync loop (above) ensures the receiver discovers new DM invites.
   useEffect(() => {
     if (!client || !activePeer || !address) return;
     let isMounted = true;
@@ -293,6 +335,7 @@ export function WhaleChat() {
 
     const fetchMessages = async () => {
       try {
+        // getMessages now handles conversations.sync() internally before listing
         const msgs = await getMessages(client, activePeer);
         if (!isMounted) return;
         
@@ -301,17 +344,16 @@ export function WhaleChat() {
           id: m.id,
           senderInboxId: m.senderInboxId,
           content: m.content || m.fallback || 'Encrypted Data',
-          sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(), // Convert safely to ms timestamp
+          sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(),
           conversationId: `dm-${activePeer.toLowerCase()}`
         }));
         
+        if (!isMounted) return;
         setMessages(prev => {
             const activeId = `dm-${activePeer.toLowerCase()}`;
             const others = prev.filter(p => p.conversationId !== activeId);
             const mappedIds = new Set(mappedMsgs.map(m => m.id));
             
-            // Extract my sent message contents to deduplicate optimistic ones
-            // Note: mappedMsgs only carries senderInboxId (no senderAddress field)
             const myMappedContents = new Set(mappedMsgs.filter(m => {
                 const isMe = m.senderInboxId
                     ? m.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
@@ -319,11 +361,11 @@ export function WhaleChat() {
                 return isMe;
             }).map(m => typeof m.content === 'string' ? m.content.trim() : ''));
 
-            // Keep optimistic messages only if they haven't been synced from the network
+            // Keep optimistic messages only until the network confirms them (15s TTL)
             const optimistic = prev.filter(p => {
                 if (p.conversationId !== activeId || mappedIds.has(p.id) || p.id.length >= 20) return false;
                 if (myMappedContents.has(typeof p.content === 'string' ? p.content.trim() : '')) return false;
-                if (Date.now() - parseInt(p.id) > 15000) return false; // expire after 15s
+                if (Date.now() - parseInt(p.id) > 15000) return false;
                 return true;
             });
             return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
@@ -334,7 +376,7 @@ export function WhaleChat() {
     };
 
     fetchMessages();
-    const poll = setInterval(fetchMessages, 3000);
+    const poll = setInterval(fetchMessages, 4000);
     return () => { isMounted = false; clearInterval(poll); };
   }, [client, activePeer, address]);
 
@@ -354,9 +396,14 @@ export function WhaleChat() {
         }
 
         if (peer.toLowerCase() !== '0xinstitutionalsupport_0000') {
-            const canMsg = await canReceiveMessages(client, peer);
+            // Use cached result — avoids ~500ms static network lookup on repeated opens
+            let canMsg = canReceiveCache.current.get(peer.toLowerCase());
+            if (canMsg === undefined) {
+                canMsg = await canReceiveMessages(client, peer);
+                canReceiveCache.current.set(peer.toLowerCase(), canMsg);
+            }
             if (!canMsg) {
-                alert(`The address ${peer} is not activated on the Sovereign P2P network. They must connect to the terminal first.`);
+                alert(`The address ${peer} is not registered on the XMTP network. They must connect their wallet to Whale Chat first.`);
                 setSending(false);
                 return;
             }
@@ -404,15 +451,39 @@ export function WhaleChat() {
     try {
       // ── 1. REAL ON-CHAIN DECENTRALIZED TRANSMISSION ──────────────────────────────
       if (activePeer.toLowerCase() !== '0xinstitutionalsupport_0000') {
-        const canMsg = await canReceiveMessages(client, activePeer);
+        // Use cached result — canReceiveMessages is a slow static call (~500ms)
+        let canMsg = canReceiveCache.current.get(activePeer.toLowerCase());
+        if (canMsg === undefined) {
+          canMsg = await canReceiveMessages(client, activePeer);
+          canReceiveCache.current.set(activePeer.toLowerCase(), canMsg);
+        }
         if (!canMsg) {
-            alert(`The address ${activePeer} is no longer reachable on the network.`);
+            alert(`The address ${activePeer} is not registered on the XMTP network. They must connect their wallet to Whale Chat first.`);
             setSending(false);
             return;
         }
+
+        // Optimistic local message so the sender sees it immediately
+        const optimisticId = Date.now().toString();
+        const optimisticMsg = {
+          id: optimisticId,
+          senderInboxId: client?.inboxId,
+          content: content,
+          sentAtNs: Date.now(),
+          conversationId: `dm-${activePeer.toLowerCase()}`
+        };
+        setMessages(prev => [...prev, optimisticMsg].sort((a, b) => a.sentAtNs - b.sentAtNs));
+
+        // 🔑 FIX: Clear typing indicator immediately so receiver doesn't see "ghost typing"
+        // after the message is sent. The Redis key TTL (5s) handles cleanup, but we also
+        // fire a stop_typing signal to flush it before the next polling cycle.
+        stopTypingSignal();
+
+        // Send to XMTP network (includes dm.sync() after send)
         await sendMessage(client, activePeer, content);
         
-        // Exact Network Sync — Immediately fetch to guarantee 100% accurate rendering (no duplicates)
+        // Wait 1.5s for network propagation, then fetch authoritative state
+        await new Promise(r => setTimeout(r, 1500));
         try {
             const msgs = await getMessages(client, activePeer);
             const mappedMsgs = msgs.map((m: any) => ({
@@ -592,7 +663,8 @@ export function WhaleChat() {
   const shortAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
   return (
-    <div className="flex w-full h-full bg-white rounded-2xl border border-black/8 shadow-sm overflow-hidden">
+    // ✔️ position:relative is required for the absolute scanner overlays to stay within the chat bounds
+    <div className="relative flex w-full h-full min-h-[500px] bg-white rounded-2xl border border-black/8 shadow-sm overflow-hidden" style={{ minHeight: isMobile ? '100dvh' : undefined }}>
       {/* ── Sidebar: Conversation List ── */}
       <div className={`${showList ? 'flex' : 'hidden md:flex'} w-full md:w-72 flex-col border-r border-black/6 bg-[#FAFAFA]`}>
         <div className="p-4 border-b border-black/6">

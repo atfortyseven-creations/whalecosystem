@@ -424,7 +424,7 @@ function ConnectedScreen({
           className="w-full"
         >
           <Link
-            href="/dashboard?tab=chat"
+            href="/chat"
             className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[3px] border-black/20 bg-white hover:border-black transition-all text-black"
             style={{ fontSize: "11px" }}
           >
