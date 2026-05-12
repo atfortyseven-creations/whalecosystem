@@ -86,41 +86,47 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
         // Ensure previous instances are cleaned up
         await stopCamera();
 
-        try {
-            const scanner = new Html5Qrcode(QR_CONTAINER_ID);
-            scannerRef.current = scanner;
+        // Switch to scanning state to mount the DOM container FIRST
+        setState('scanning');
 
-            const config = {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-                aspectRatio: 1.0
-            };
+        // Wait a tiny bit for React to commit the DOM
+        setTimeout(async () => {
+            const container = document.getElementById(QR_CONTAINER_ID);
+            if (!container) return; // Safeguard: component unmounted before timeout
 
-            await scanner.start(
-                { facingMode: "environment" },
-                config,
-                (decodedText) => {
-                    handleDecode(decodedText);
-                },
-                () => {
-                    // Ongoing scan, ignore errors
+            try {
+                const scanner = new Html5Qrcode(QR_CONTAINER_ID);
+                scannerRef.current = scanner;
+
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                };
+
+                await scanner.start(
+                    { facingMode: "environment" },
+                    config,
+                    (decodedText) => {
+                        handleDecode(decodedText);
+                    },
+                    () => {
+                        // Ongoing scan, ignore errors
+                    }
+                );
+            } catch (err: any) {
+                console.error("[Scanner] Start failure:", err);
+                setState('error');
+                
+                if (err?.toString().includes("NotAllowedError")) {
+                    setMessage('Camera access denied. Tap "Allow" when prompted, then try again.');
+                } else if (err?.toString().includes("NotFound")) {
+                    setMessage('No camera found on this device.');
+                } else {
+                    setMessage(`Camera error: ${err.message || 'Check permissions and try again.'}`);
                 }
-            );
-
-            setState('scanning');
-        } catch (err: any) {
-            console.error("[Scanner] Start failure:", err);
-            setState('error');
-            
-            if (err?.toString().includes("NotAllowedError")) {
-                setMessage('Camera access denied. Tap "Allow" when prompted, then try again.');
-            } else if (err?.toString().includes("NotFound")) {
-                setMessage('No camera found on this device.');
-            } else {
-                setMessage(`Camera error: ${err.message || 'Check permissions and try again.'}`);
+                await stopCamera();
             }
-            await stopCamera();
-        }
+        }, 100);
     };
 
     const reset = async () => { 
@@ -192,8 +198,6 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
 
     return (
         <div className={`w-full flex flex-col items-center gap-6 ${className ?? ''}`}>
-            {/* Hidden/Placeholder container for Html5Qrcode */}
-            <div id={QR_CONTAINER_ID} className="hidden pointer-events-none opacity-0 w-0 h-0" />
 
             <AnimatePresence mode="wait">
                 {/* IDLE */}
@@ -240,11 +244,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     <motion.div key="scanning" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-5 w-full">
                         <div className="relative w-72 h-72 rounded-3xl overflow-hidden border border-[var(--az-orchid)]/50 shadow-[0_0_40px_rgba(139,48,217,0.2)]">
-                            {/* The actual video element rendered by html5-qrcode will be moved into this container */}
-                            <div id="scanner-viewfinder" className="w-full h-full [&>video]:w-full [&>video]:h-full [&>video]:object-cover" />
-                            
-                            {/* Inject the video into the viewfinder */}
-                            <VideoReparenter sourceId={QR_CONTAINER_ID} targetId="scanner-viewfinder" />
+                            <div id={QR_CONTAINER_ID} className="w-full h-full [&>video]:w-full [&>video]:h-full [&>video]:object-cover" />
 
                             {/* Scan overlay */}
                             <div className="absolute inset-0 pointer-events-none">
@@ -302,28 +302,4 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
     );
 }
 
-/**
- * Utility component to move the video element created by html5-qrcode
- * into the visible viewfinder without breaking React's expectations.
- */
-function VideoReparenter({ sourceId, targetId }: { sourceId: string; targetId: string }) {
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const source = document.getElementById(sourceId);
-            const target = document.getElementById(targetId);
-            if (!source || !target) return;
 
-            const video = source.querySelector('video');
-            if (video && video.parentElement !== target) {
-                // Move video to target
-                target.appendChild(video);
-                // Hide the source's auto-generated elements but keep the video visible
-                source.style.display = 'none';
-                clearInterval(interval);
-            }
-        }, 100);
-        return () => clearInterval(interval);
-    }, [sourceId, targetId]);
-
-    return null;
-}

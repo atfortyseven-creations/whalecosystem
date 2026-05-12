@@ -293,7 +293,17 @@ export function WhaleChat() {
       if (!client || !peerAddr || sending) return;
       setSending(true);
       try {
-        const peer = peerAddr.trim();
+        let peer = peerAddr.trim();
+        if (peer.toLowerCase().startsWith('ethereum:')) {
+            peer = peer.substring(9).split('@')[0];
+        }
+        
+        if (!/^0x[a-fA-F0-9]{40}$/.test(peer) && peer.toLowerCase() !== '0xinstitutionalsupport_0000') {
+            alert('Invalid Ethereum address format.');
+            setSending(false);
+            return;
+        }
+
         const newConv = { peerAddress: peer, lastMessage: '', lastAt: new Date() };
 
         setConversations(prev => {
