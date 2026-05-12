@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap } from 'lucide-react';
+import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap, Mic, MicOff, Play, Pause } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
 import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate, discoverNewPeers } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
@@ -53,7 +53,19 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [peerStatus, setPeerStatus] = useState<{ online: boolean, lastSeen: number | null, isTyping: boolean }>({ online: false, lastSeen: null, isTyping: false });
 
+  // ── Audio recording state ──────────────────────────────────────────────────
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Playing audio messages ─────────────────────────────────────────────────
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const activePeerRef = useRef<string | null>(null);
   const activePeerDmIdRef = useRef<string | null>(null);
   const peerToConvId = useRef<Map<string, string>>(new Map());
@@ -62,6 +74,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const canReceiveCache = useRef<Map<string, boolean>>(new Map());
   // Track if initClient is already in-flight to prevent double-calls on mobile
   const initInFlight = useRef(false);
+  // Persistent known-peers set — survives across sync cycles (fixes mobile-to-mobile)
+  const knownPeersRef = useRef<Set<string>>(new Set());
 
   // Detect physical device type (touch + narrow screen = mobile)
   useEffect(() => {
@@ -201,6 +215,70 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     } catch {}
   };
 
+  // ── Voice Recording: Hold-to-Record ─────────────────────────────────────────
+  const startRecording = useCallback(async () => {
+    if (isRecording || !activePeer) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/mp4')
+        ? 'audio/mp4'
+        : 'audio/webm';
+
+      const recorder = new MediaRecorder(stream, { mimeType });
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        // Stop all tracks to release mic
+        stream.getTracks().forEach(t => t.stop());
+        if (audioChunksRef.current.length === 0) return;
+
+        const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const dataUrl = reader.result as string;
+          // Send as special prefix so receiver knows it's audio
+          const audioMsg = `__AUDIO__${dataUrl}`;
+          if (client && activePeer && activePeer.toLowerCase() !== '0xinstitutionalsupport_0000') {
+            const optimisticId = Date.now().toString();
+            setMessages(prev => [...prev, {
+              id: optimisticId,
+              senderInboxId: client?.inboxId,
+              content: audioMsg,
+              sentAtNs: Date.now(),
+              conversationId: `dm-${activePeer.toLowerCase()}`
+            }]);
+            try { await sendMessage(client, activePeer, audioMsg); } catch {}
+          }
+        };
+        reader.readAsDataURL(blob);
+
+        if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+        setIsRecording(false);
+        setRecordingSeconds(0);
+      };
+
+      recorder.start(100); // collect chunks every 100ms
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
+      setRecordingSeconds(0);
+      recordingTimerRef.current = setInterval(() => setRecordingSeconds(s => s + 1), 1000);
+    } catch (err) {
+      console.warn('[Voice] Microphone access denied or unavailable:', err);
+    }
+  }, [isRecording, activePeer, client]);
+
+  const stopRecording = useCallback(() => {
+    if (!isRecording || !mediaRecorderRef.current) return;
+    try { mediaRecorderRef.current.stop(); } catch {}
+    if (recordingTimerRef.current) { clearInterval(recordingTimerRef.current); recordingTimerRef.current = null; }
+  }, [isRecording]);
+
   // Draft Loading on Peer Switch
   useEffect(() => {
     if (activePeer && address) {
@@ -299,17 +377,19 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // Runs every 6 seconds. Uses discoverNewPeers() to find incoming DMs
   // initiated by remote peers without needing the receiver to manually add them.
   // Also refreshes active-peer messages on every cycle.
+  // FIX: knownPeersRef is a persistent ref — not rebuilt on every render — so
+  // newly discovered peers are remembered across cycles (fixes mobile-to-mobile).
   useEffect(() => {
     if (!client || !address) return;
     let cancelled = false;
 
-    // Track known peers to avoid duplicate discovery
-    const knownSet = new Set<string>(conversations.map(c => c.peerAddress.toLowerCase()));
+    // Seed the persistent ref with already-known conversations (idempotent)
+    conversations.forEach(c => knownPeersRef.current.add(c.peerAddress.toLowerCase()));
 
     const syncGlobal = async () => {
       try {
-        // Discover new peers from the XMTP network
-        const newPeerAddrs = await discoverNewPeers(client, address, knownSet);
+        // Discover new peers from the XMTP network (uses persistent ref, not stale snapshot)
+        const newPeerAddrs = await discoverNewPeers(client, address, knownPeersRef.current);
 
         if (newPeerAddrs.length > 0 && !cancelled) {
           setConversations(prev => {
@@ -719,8 +799,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const shortAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
   return (
-    // ✔️ position:relative is required for the absolute scanner overlays to stay within the chat bounds
-    <div className="relative flex w-full h-full min-h-[500px] bg-white rounded-2xl border border-black/8 shadow-sm overflow-hidden" style={{ minHeight: isMobile ? '100dvh' : undefined }}>
+    // ✔️ position:relative required for absolute scanner overlays
+    // h-full fills the parent (MobileChatPage flex-1 min-h-0), NO minHeight override
+    <div className="relative flex w-full h-full bg-white overflow-hidden" style={{ borderRadius: isMobile ? 0 : '1rem', border: isMobile ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
       {/* ── Sidebar: Conversation List ── */}
       <div className={`${showList ? 'flex' : 'hidden md:flex'} w-full md:w-72 flex-col border-r border-black/6 bg-[#FAFAFA]`}>
         <div className="p-4 border-b border-black/6">
@@ -866,17 +947,38 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                     ? msg.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
                     : false;
                   const content = typeof msg.content === 'string' ? msg.content : (msg.fallback || 'Encrypted Data');
+                  const isAudio = content.startsWith('__AUDIO__');
+                  const audioSrc = isAudio ? content.slice('__AUDIO__'.length) : null;
                   // sentAtNs is now a plain number (ms), not BigInt
                   const sentTime = typeof msg.sentAtNs === 'number' ? new Date(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
                   return (
-                    <div key={msg.id} className={`flex flex-col max-w-[78%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`}>
-                      <div className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed break-words ${
-                        isMe
-                          ? 'bg-[#050505] text-white rounded-br-sm'
-                          : 'bg-white text-[#050505] rounded-bl-sm border border-black/8 shadow-sm'
-                      }`}>
-                        {content}
-                      </div>
+                    <div key={msg.id} className={`flex flex-col max-w-[80%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`}>
+                      {isAudio && audioSrc ? (
+                        <div className={`px-3 py-2.5 rounded-2xl ${
+                          isMe
+                            ? 'bg-[#050505] rounded-br-sm'
+                            : 'bg-white rounded-bl-sm border border-black/8 shadow-sm'
+                        }`}>
+                          <div className={`flex items-center gap-2 mb-1.5 ${isMe ? 'text-white/60' : 'text-black/40'}`}>
+                            <Mic size={10} />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Voice Message</span>
+                          </div>
+                          <audio
+                            controls
+                            src={audioSrc}
+                            className="h-8 max-w-[200px]"
+                            style={{ filter: isMe ? 'invert(1) brightness(0.8)' : 'none' }}
+                          />
+                        </div>
+                      ) : (
+                        <div className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed break-words ${
+                          isMe
+                            ? 'bg-[#050505] text-white rounded-br-sm'
+                            : 'bg-white text-[#050505] rounded-bl-sm border border-black/8 shadow-sm'
+                        }`}>
+                          {content}
+                        </div>
+                      )}
                       <span className="text-[9px] text-black/25 mt-1 px-1 font-mono">
                         {new Date(sentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
@@ -896,20 +998,51 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="p-3 border-t border-black/6 bg-white shrink-0">
-              <form onSubmit={handleSend} className="flex gap-2">
+            <div
+              className="shrink-0 bg-white border-t border-black/6"
+              style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+            >
+              {/* ── Audio recording indicator ── */}
+              {isRecording && (
+                <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-red-500">
+                    Recording… {recordingSeconds}s
+                  </span>
+                  <span className="text-[9px] text-black/30 font-mono">(tap mic to stop)</span>
+                </div>
+              )}
+              <form onSubmit={handleSend} className="flex gap-2 p-3">
+                {/* Mic button */}
+                <button
+                  type="button"
+                  onPointerDown={startRecording}
+                  onPointerUp={stopRecording}
+                  onPointerLeave={stopRecording}
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-95 shrink-0 ${
+                    isRecording
+                      ? 'bg-red-500 text-white shadow-[0_0_12px_rgba(239,68,68,0.4)]'
+                      : 'bg-black/[0.05] text-black/50 hover:bg-black/10'
+                  }`}
+                  title={isRecording ? 'Release to send audio' : 'Hold to record voice'}
+                >
+                  {isRecording ? <MicOff size={15} /> : <Mic size={15} />}
+                </button>
+
                 <input
+                  ref={inputRef}
                   type="text"
+                  inputMode="text"
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
                   placeholder="Draft encrypted message..."
-                  className="flex-1 bg-black/[0.03] border border-black/8 rounded-xl px-4 py-3 text-[13px] text-[#050505] focus:outline-none focus:border-[#9945FF]/30 placeholder:text-black/30"
-                  style={{ WebkitAppearance: 'none' }}
+                  className="flex-1 bg-black/[0.03] border border-black/8 rounded-xl px-4 py-3 text-[#050505] focus:outline-none focus:border-[#9945FF]/30 placeholder:text-black/30"
+                  style={{ WebkitAppearance: 'none', fontSize: '16px', lineHeight: '1.4' }}
                 />
                 <button
                   type="submit"
-                  disabled={!inputText.trim() || sending}
-                  className="w-11 h-11 rounded-xl bg-[#050505] flex items-center justify-center text-white disabled:opacity-30 hover:bg-[#9945FF] hover:shadow-[0_0_15px_rgba(153,69,255,0.3)] transition-all active:scale-95"
+                  disabled={(!inputText.trim() && !isRecording) || sending}
+                  className="w-11 h-11 rounded-xl bg-[#050505] flex items-center justify-center text-white disabled:opacity-30 hover:bg-[#9945FF] hover:shadow-[0_0_15px_rgba(153,69,255,0.3)] transition-all active:scale-95 shrink-0"
                 >
                   <Send size={15} />
                 </button>

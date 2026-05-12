@@ -399,11 +399,47 @@ function ConnectedScreen({
 
 
 
-        {/* ── Forum CTA ── */}
+        {/* ── SCANNER UNLOCKED badge ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="w-full flex items-center gap-3 px-5 py-4 rounded-[20px] bg-white border-[3px] border-black/10"
+        >
+          <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center shrink-0">
+            <Scan size={16} className="text-black/60" />
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Scanner Unlocked</span>
+            <span className="text-[9px] font-mono text-black/40 mt-0.5 leading-relaxed">
+              You can use the scanner to link the desktop terminal.
+            </span>
+          </div>
+        </motion.div>
+
+        {/* ── OPEN QR SCANNER · SYNC DESKTOP ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.5 }}
+          className="w-full"
+        >
+          <button
+            id="open-qr-scanner-btn"
+            onClick={onScan}
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] bg-[#1a0533] hover:bg-[#2D0A59] active:scale-[0.97] transition-all text-white shadow-lg"
+            style={{ fontSize: "11px" }}
+          >
+            <ScanLine size={18} />
+            Open QR Scanner · Sync Desktop
+          </button>
+        </motion.div>
+
+        {/* ── Forum CTA ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
           className="w-full"
         >
           <Link
@@ -412,7 +448,7 @@ function ConnectedScreen({
             style={{ fontSize: "11px", color: "black" }}
           >
             <MessageSquare size={18} className="group-hover:text-white transition-colors" />
-            Sovereign Forum
+            Access Sovereign Forum
           </Link>
         </motion.div>
 
@@ -420,16 +456,16 @@ function ConnectedScreen({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
+          transition={{ delay: 0.35, duration: 0.5 }}
           className="w-full"
         >
           <Link
             href="/chat"
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[3px] border-black/20 bg-white hover:border-black transition-all text-black"
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[2px] border-[#9945FF]/30 bg-gradient-to-r from-[#9945FF]/10 to-[#6B2FBB]/10 hover:from-[#9945FF]/20 hover:to-[#6B2FBB]/20 transition-all text-[#7B35CC]"
             style={{ fontSize: "11px" }}
           >
             <MessageCircle size={18} />
-            Encrypted Chat
+            Enter Whale Chat Encrypted
           </Link>
         </motion.div>
 
@@ -439,16 +475,26 @@ function ConnectedScreen({
             id="sovereign-disconnect-btn"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.5 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
             whileTap={{ scale: 0.98 }}
             onClick={onDisconnect}
-            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-black/5 transition-all mt-4 text-black/50 hover:text-black"
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-black/5 transition-all mt-2 text-red-400/70 hover:text-red-500"
             style={{ fontSize: "10px" }}
           >
             <LogOut size={16} />
-            Disconnect Wallet
+            Disconnect Session · Change Wallet
           </motion.button>
         )}
+
+        {/* ── QR Sync hint ── */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="text-[9px] font-mono text-black/30 text-center leading-relaxed px-4"
+        >
+          On the Desktop Terminal, click <span className="font-black text-black/50">Direct QR Handshake</span>, then scan the code with this button to sync your institutional session.
+        </motion.p>
 
         {/* ── Session History Panel ── */}
         <motion.div

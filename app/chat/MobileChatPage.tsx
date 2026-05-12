@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { ArrowLeft, Shield, Lock } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 // SSR-unsafe — XMTP uses browser WASM
 const WhaleChat = dynamic(
@@ -23,10 +24,46 @@ const WhaleChat = dynamic(
 );
 
 export default function MobileChatPage() {
+  // ── visualViewport keyboard fix ──────────────────────────────────────────
+  // On iOS Safari, 100dvh does NOT shrink when the software keyboard opens.
+  // The keyboard overlaps the input bar from below. Fix: track the real
+  // visible height via window.visualViewport and apply it as an inline style.
+  // This prevents the layout from reflowing / scrolling erratically.
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.visualViewport) return;
+
+    const vv = window.visualViewport!;
+
+    const update = () => {
+      // Cancel any pending RAF to batch updates
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        setViewportHeight(vv.height);
+      });
+    };
+
+    update(); // initial
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  const containerStyle: React.CSSProperties = viewportHeight
+    ? { height: `${viewportHeight}px`, overflow: "hidden" }
+    : { height: "100dvh", overflow: "hidden" };
+
   return (
     <div
       className="flex flex-col bg-[#FAFAFA] text-[#050505]"
-      style={{ height: "100dvh", overflow: "hidden" }}
+      style={containerStyle}
     >
       {/* ── Top Navigation Bar ── */}
       <header className="shrink-0 h-14 flex items-center justify-between px-4 bg-white border-b border-black/8 z-10">
@@ -56,8 +93,8 @@ export default function MobileChatPage() {
         <div className="w-[60px]" />
       </header>
 
-      {/* ── Chat Panel (fills remaining height) ── */}
-      <div className="flex-1 overflow-hidden">
+      {/* ── Chat Panel (fills remaining height, no overflow) ── */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         {/* forceAutoInit=true: overrides mobile guard so XMTP auto-connects on /chat */}
         <WhaleChat forceAutoInit />
       </div>
