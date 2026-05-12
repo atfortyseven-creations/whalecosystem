@@ -33,7 +33,7 @@ function Avatar({ address }: { address: string }) {
 }
 
 export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
-  const { address, isConnected } = useSovereignAccount();
+  const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
   const { signMessageAsync } = useSignMessage();
 
   const [client, setClient] = useState<Client | null>(null);
@@ -125,9 +125,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // the error boundary surfaces a manual "Retry" button. This is better than
   // silently blocking mobile users from ever seeing the Activate button.
   useEffect(() => {
-    // Mobile: only auto-init if forceAutoInit is true (saves WASM overhead on home screen)
-    // Desktop: always attempt auto-init for seamless institutional experience
-    const shouldInit = !isMobile || forceAutoInit;
+    // CRITICAL FIX: Skip auto-init for QR handshake sessions (cookie-only).
+    // These sessions lack a local wallet signer required to derive XMTP keys.
+    const shouldInit = (!isMobile || forceAutoInit) && !isSovereignHandshake;
     if (isConnected && address && !client && !isInitializing && shouldInit) {
       initClient();
     }
@@ -316,7 +316,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           } catch (sigErr: any) {
             // If this is a QR/cookie-based session without a live wallet, signMessageAsync
             // will throw because there is no wagmi connector. Surface a clear error.
-            if (sigErr?.message?.includes('connector') || sigErr?.message?.includes('not connected')) {
+            const msg = sigErr?.message || '';
+            if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector')) {
               throw new Error('No active wallet connection. Please connect your wallet directly to use Whale Chat.');
             }
             throw sigErr;
@@ -782,6 +783,22 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   <p className="text-[11px] font-black uppercase tracking-widest text-[#9945FF]">Establishing Secure Channel</p>
                   <p className="text-[9px] text-black/40 font-mono mt-0.5">Retrieving session keys from local storage. If this is your first session, approve the signature prompt in your wallet.</p>
                 </div>
+              </div>
+            ) : isSovereignHandshake ? (
+              <div className="flex flex-col gap-3">
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
+                  <p className="font-black uppercase tracking-widest mb-1 flex items-center gap-2 text-amber-950">
+                    <Shield size={14} /> Limited Handshake Session
+                  </p>
+                  You are connected via a QR link. Whale Chat requires a direct wallet connection to sign and derive encryption keys. Please connect your wallet directly to this device to enable messaging.
+                </div>
+                <button
+                  onClick={initClient}
+                  disabled={isInitializing}
+                  className="w-full px-8 py-4 rounded-xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                >
+                  <Zap size={14} /> Attempt Manual Activation
+                </button>
               </div>
             ) : (
               // Mobile: auto-init is skipped — show a prominent manual trigger button
