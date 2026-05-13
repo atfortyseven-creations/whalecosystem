@@ -186,14 +186,14 @@ function SigningOverlay({
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-[26px] font-black tracking-tighter text-[#050505] leading-none">
-          {isSigning ? "Tunnel Established" : error ? "Connection Rejected" : "Connecting..."}
+          <h2 className="text-[24px] font-black tracking-tighter text-[#050505] leading-none">
+          {isSigning ? "Action Required" : error ? "Connection Failed" : "Connecting..."}
           </h2>
           <p className="text-[12px] text-[#050505]/50 leading-relaxed">
             {error
-              ? "Could not cryptographically verify the wallet."
+              ? "Could not cryptographically verify the wallet. Please try again."
               : isSigning
-              ? "Wallet linked successfully. Validating security credentials in the Sovereign Protocol..."
+              ? "Please open your wallet app to approve the signature request. This is required for secure terminal access."
               : "Establishing encrypted tunnel with the Sovereign Network... Please wait."}
           </p>
         </div>
@@ -792,12 +792,9 @@ export function MobileLanding() {
             if (addr) { 
               console.log('[Sovereign:Sync] Found address in storage key:', key, addr);
               
-              // AUTO-REPAIR: If we found it in storage but not in cookie, write it now
-              // to satisfy TitaniumGate and establish the session immediately.
               const hasHandshake = document.cookie.includes('sovereign_handshake=');
               if (!hasHandshake) {
-                console.log('[Sovereign:Sync] Auto-repairing session cookie...');
-                document.cookie = `sovereign_handshake=${addr}; path=/; max-age=604800; SameSite=Lax`;
+                console.log('[Sovereign:Sync] Missing session cookie, proceeding to handshake...');
               }
 
               clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 

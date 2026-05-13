@@ -887,6 +887,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           ) : isInitializing ? (
             <div className="flex flex-col items-center gap-5">
               <p className="text-[12px] text-black/40 font-mono uppercase tracking-[0.2em] font-bold">Synchronizing Encrypted Channel...</p>
+              {isMobile && (
+                <p className="text-[10px] text-red-500 font-bold max-w-[260px] leading-relaxed mx-auto text-center">
+                  Action Required: Please open your wallet app to approve the signature request.
+                </p>
+              )}
             </div>
           ) : (
             <button
@@ -1149,8 +1154,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 Awaiting connection initialization...
               </p>
             </div>
-            
-
           </div>
         )}
 
