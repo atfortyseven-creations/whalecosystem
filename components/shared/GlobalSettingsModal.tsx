@@ -10,7 +10,7 @@ import {
     Landmark, Monitor, Zap, Network, Shield, Fingerprint, Lock, 
     ActivitySquare, Crosshair, BarChart2, Radio, Server, CheckCircle
 } from 'lucide-react';
-import { useDisconnect } from 'wagmi';
+import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 
 type TabKey = 'general' | 'network' | 'sonar' | 'privacy' | 'execution' | 'display';
 
@@ -33,7 +33,7 @@ export function GlobalSettingsModal() {
         toast.success(`${label} updated`, { duration: 1800, position: 'bottom-right' });
     };
 
-    const { disconnect } = useDisconnect();
+    const { nuclearDisconnect } = useSovereignSignOut();
     const [mounted, setMounted] = useState(false);
     const [activeTab, setActiveTab] = useState<TabKey>('general');
     const [confirmDisconnect, setConfirmDisconnect] = useState(false);
@@ -43,21 +43,9 @@ export function GlobalSettingsModal() {
     if (!mounted) return null;
 
     const handleDisconnect = async () => {
-        try { sessionStorage.setItem('__disconnected__', '1'); } catch {}
-        try { disconnect(); } catch {}
-        try { ['nextauth.message', 'hasReadDocs'].forEach(k => localStorage.removeItem(k)); } catch {}
-        try {
-            document.cookie.split(';').forEach(c => {
-                const name = c.split('=')[0].trim();
-                if (!name) return;
-                document.cookie = `${name}=;expires=${new Date(0).toUTCString()};path=/;SameSite=Lax`;
-                document.cookie = `${name}=;expires=${new Date(0).toUTCString()};path=/;domain=${window.location.hostname};SameSite=Lax`;
-            });
-        } catch {}
-        try { await signOut({ redirect: false }); } catch {}
         setConfirmDisconnect(false);
         setSettingsOpen(false);
-        window.location.href = '/connect';
+        await nuclearDisconnect();
     };
 
     return (

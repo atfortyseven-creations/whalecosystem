@@ -8,7 +8,12 @@ import Link from "next/link";
 import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect, useBalance, useEnsName } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare, MessageCircle } from "lucide-react";
+import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { 
+  Scan, MessageSquare, LogOut, MessageCircle, ScanLine, 
+  Fingerprint, ChevronDown, CheckCircle, Zap, Shield, Menu,
+  ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X 
+} from 'lucide-react';
 
 // ── Reown AppKit + WagmiAdapter localStorage key patterns ─────────────────
 // These are ALL the keys that Reown AppKit v1/v2 and its WagmiAdapter write
@@ -326,7 +331,7 @@ function ConnectedScreen({
         <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/80 to-white/95 backdrop-blur-[2px]" />
       </div>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center px-6 py-10 gap-5 max-w-[480px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-6 pt-10 pb-24 gap-5 max-w-[480px] w-full mx-auto">
         
         {/* Header & Logo */}
         <motion.div 
@@ -949,43 +954,15 @@ export function MobileLanding() {
 
 
 
-  // ── handleDisconnect: first-tap guaranteed via React state (no DOM mutation) ──
+  // ── handleDisconnect ──
+  const { nuclearDisconnect } = useSovereignSignOut();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleDisconnect = useCallback(async () => {
-    if (isDisconnecting) return; // Guard: prevent double-tap race
-    setIsDisconnecting(true);   // Triggers immediate re-render
-
-    // 1. Expire the sovereign_handshake cookie immediately
-    document.cookie = 'sovereign_handshake=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-    
-    // 2. Clear state locally so UI updates instantly
-    setIsLinked(false);
-    setLinkedAddress(null);
-
-    // 3. Nuke all WalletConnect and Wagmi persistent state
-    try {
-      Object.keys(localStorage).forEach(k => {
-        const lower = k.toLowerCase();
-        if (
-          lower.includes('walletconnect') || lower.includes('wagmi') ||
-          lower.includes('wc@2') || lower.includes('appkit') ||
-          lower.includes('reown') || lower.includes('w3m') ||
-          lower.includes('rainbow') || lower.includes('metamask') ||
-          lower.includes('coinbase') || lower.includes('session')
-        ) localStorage.removeItem(k);
-      });
-      sessionStorage.clear();
-    } catch {}
-
-    // 4. Disconnect wagmi
-    try { if (disconnect) disconnect(); } catch {}
-    
-    // 5. Force clean reload (600ms gives React time to unmount cleanly)
-    setTimeout(() => {
-      if (typeof window !== 'undefined') window.location.href = window.location.pathname;
-    }, 600);
-  }, [isDisconnecting, disconnect]);
+    if (isDisconnecting) return;
+    setIsDisconnecting(true);
+    await nuclearDisconnect();
+  }, [isDisconnecting, nuclearDisconnect]);
 
   if (!mounted) return null;
 
@@ -1157,7 +1134,7 @@ export function MobileLanding() {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-28 pb-[max(2rem,env(safe-area-inset-bottom,2rem))] gap-8 max-w-[500px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-28 pb-24 gap-8 max-w-[500px] w-full mx-auto">
 
         {/* Hero */}
         <motion.div

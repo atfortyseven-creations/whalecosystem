@@ -436,13 +436,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
           } catch (sigErr: any) {
             const msg = sigErr?.message || '';
-            if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector')) {
+            if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector') || msg.includes('signMessage')) {
                 const hasVault = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_vault');
                 if (isSovereignHandshake && !hasVault) {
-                  throw new Error('QR_SESSION_RESTRICTION');
+                  throw new Error('To use Whale Chat on mobile, please connect your wallet directly to this browser using the "Connect Wallet" button on the landing page.');
                 } else {
-                throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this device.');
-              }
+                  throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this terminal.');
+                }
             }
             throw sigErr;
           }
@@ -462,14 +462,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         setInitError('Secure messaging module failed to load. Please check your network connection and reload the terminal.');
       } else if (err?.code === 4001 || errorMsg.toLowerCase().includes('reject')) {
         setInitError('Identity authorization rejected. You must approve the secure channel signature to proceed.');
-      } else if (errorMsg === 'QR_SESSION_RESTRICTION') {
-        setInitError('Whale Chat requires a direct wallet connection for end-to-end encryption. Mobile QR-linked sessions are restricted to read-only dashboard access.');
-      } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector')) {
-        setInitError('Active wallet connection lost. Please ensure your wallet app is open and synchronized with this device.');
+      } else if (errorMsg.includes('To use Whale Chat on mobile')) {
+        setInitError(errorMsg);
+      } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector') || errorMsg.includes('signMessage')) {
+        setInitError('Active wallet connection lost or not detected. Please ensure your wallet app is open and connected directly to this browser.');
       } else if (errorMsg.includes('WASM') || errorMsg.includes('wasm')) {
-        setInitError('Cryptographic WASM engine failure. This is often caused by browser security extensions. Please try in a clean session.');
+        setInitError('Cryptographic WASM engine failure. This is often caused by browser security settings or incompatible device architectures.');
       } else {
-        setInitError(`Network handshake failure: ${errorMsg.slice(0, 50) || 'Unknown Protocol Error'}. Please retry or check network status.`);
+        setInitError(`Network handshake failure: ${errorMsg.slice(0, 80) || 'Unknown Protocol Error'}. Please retry.`);
       }
     } finally {
       setIsInitializing(false);
