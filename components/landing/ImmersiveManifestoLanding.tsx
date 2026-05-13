@@ -40,12 +40,13 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-32 pb-24 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
         >
 
-          <motion.h1 variants={FADE_UP} className="text-[48px] sm:text-[64px] md:text-[80px] xl:text-[96px] font-black tracking-tighter leading-[0.9] uppercase text-[#0a0a0a] mb-8 drop-shadow-sm">
-            Whale<br />Alert<br /><span className="text-[#0044CC]">Network</span>
+          <motion.h1 variants={FADE_UP} className="text-[40px] sm:text-[56px] md:text-[64px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-4xl">
+            Track institutional capital <br />
+            <span className="text-[#0044CC]">before markets react.</span>
           </motion.h1>
 
-          <motion.p variants={FADE_UP} className="font-serif text-[16px] sm:text-[18px] text-slate-600 leading-relaxed max-w-lg mb-12">
-            Track institutional capital before markets react. Real-time on-chain intelligence — from mempool to execution.
+          <motion.p variants={FADE_UP} className="text-[18px] sm:text-[20px] font-medium text-slate-600 leading-relaxed max-w-2xl mb-12">
+            Real-time on-chain intelligence — from mempool to execution.
           </motion.p>
 
           {/* Live Stats Glassmorphism Bar */}
@@ -77,11 +78,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.div>
         </motion.div>
 
-        {/* Right Lottie Presentation (Replaces Globe) */}
+        {/* Right 4K Wave Presentation */}
         <div className="absolute right-0 top-0 w-[60%] lg:w-1/2 h-full opacity-60 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 flex items-center justify-end lg:justify-center overflow-hidden mix-blend-multiply lg:relative">
           <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent z-10 hidden lg:block" />
-          <div className="w-full h-full max-w-[800px] max-h-[800px] flex items-center justify-center translate-x-[20%] lg:translate-x-[5%]">
-             <RemoteLottie path="server-rack.json" className="w-[200%] h-[200%] lg:w-[150%] lg:h-[150%] object-contain scale-[1.4] opacity-100 drop-shadow-2xl" />
+          <div className="w-full h-full flex items-center justify-center translate-x-[20%] lg:translate-x-[5%]">
+             <img src="/olas-hokusai-4k.png" className="w-[150%] h-[150%] lg:w-[120%] lg:h-[120%] object-cover scale-[1.2] opacity-90 drop-shadow-2xl mix-blend-multiply" alt="4K Wave" />
           </div>
         </div>
         
@@ -122,15 +123,15 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                             The Sovereign Protocol operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data cannot be intercepted or exposed.
                         </p>
                     </div>
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-8">
-                        <RemoteLottie path="isometric-cube.json" className="w-[150%] h-[150%] object-contain scale-[1.3] transition-transform duration-700 group-hover:scale-[1.4]" />
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
+                        <RemoteLottie path="Isometric data analysis.json" className="w-[120%] h-[120%] object-contain scale-[1.1] transition-transform duration-700 group-hover:scale-[1.2]" />
                     </div>
                 </div>
 
                 {/* Bento Card 2 */}
                 <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
-                    <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 mb-8 overflow-hidden p-6">
-                        <RemoteLottie path="social.json" className="w-full h-full object-contain scale-[1.6] transition-transform duration-700 group-hover:scale-[1.8]" />
+                    <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 mb-8 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
+                        <RemoteLottie path="Connected world.json" className="w-full h-full object-contain scale-[1.3] transition-transform duration-700 group-hover:scale-[1.4]" />
                     </div>
                     <div className="space-y-6">
                         <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
@@ -158,16 +159,16 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                             Our heuristic algorithms process 12TB of raw blockchain state daily, detecting liquidity injections and massive accumulations prior to market impact.
                         </p>
                     </div>
-                    <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6">
-                        <RemoteLottie path="DeeWork About Blockchain.json" className="w-full h-full object-contain scale-[1.4] transition-transform duration-700 group-hover:scale-[1.5]" />
+                    <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
+                        <RemoteLottie path="Big Data Analytics.json" className="w-full h-full object-contain scale-[1.3] transition-transform duration-700 group-hover:scale-[1.4]" />
                     </div>
                 </div>
 
                 {/* Bento Card 4 */}
                 <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-8 relative">
-                        <div className="absolute inset-0 bg-[#0044CC]/5 pointer-events-none mix-blend-multiply" />
-                        <RemoteLottie path="Abstract Isometric Loader #1.json" className="w-[150%] h-[150%] object-contain scale-[1.5] transition-transform duration-700 group-hover:scale-[1.6]" />
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
+                        <div className="absolute inset-0 bg-[#0044CC]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
+                        <RemoteLottie path="BlockChain.json" className="w-[120%] h-[120%] object-contain scale-[1.1] transition-transform duration-700 group-hover:scale-[1.2]" />
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
                         <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
