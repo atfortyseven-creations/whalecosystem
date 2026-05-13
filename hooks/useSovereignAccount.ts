@@ -20,7 +20,12 @@ export function useSovereignAccount() {
             // Fast cookie parse — match any 0x address in sovereign_handshake cookie
             const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
             if (match?.[1]) {
-                setHandshakeAddress(match[1].toLowerCase());
+                try {
+                    const { getAddress } = require('viem');
+                    setHandshakeAddress(getAddress(match[1]));
+                } catch {
+                    setHandshakeAddress(match[1].toLowerCase());
+                }
             } else {
                 setHandshakeAddress(null);
             }

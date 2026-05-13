@@ -439,10 +439,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector') || msg.includes('signMessage')) {
                 const hasVault = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_vault');
                 if (isSovereignHandshake && !hasVault) {
-                  throw new Error('To use Whale Chat on mobile, please connect your wallet directly to this browser using the "Connect Wallet" button on the landing page.');
-                } else {
-                  throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this terminal.');
+                  // EXPERT: Instead of throwing, we just log. The catch block will show a "Retry" or "Sync" state.
+                  console.warn('[WhaleChat:Mobile] Signature requested on linked session without Vault.');
                 }
+                throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this terminal.');
             }
             throw sigErr;
           }
@@ -465,7 +465,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       } else if (errorMsg.includes('To use Whale Chat on mobile')) {
         setInitError(errorMsg);
       } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector') || errorMsg.includes('signMessage') || errorMsg.toLowerCase().includes('unknown signer')) {
-        setInitError('Active wallet connection lost or not detected. Please ensure your wallet app is open and connected directly to this browser.');
+        if (isSovereignHandshake) {
+           setInitError('Secure identity not yet synchronized from desktop. Please keep this browser open while the desktop terminal finishes the handshake.');
+        } else {
+           setInitError('Active wallet connection lost or not detected. Please ensure your wallet app is open and connected directly to this browser.');
+        }
       } else if (errorMsg.includes('WASM') || errorMsg.includes('wasm')) {
         setInitError('Cryptographic WASM engine failure. This is often caused by browser security settings or incompatible device architectures.');
       } else {

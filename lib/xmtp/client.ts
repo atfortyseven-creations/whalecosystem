@@ -77,7 +77,11 @@ function buildXmtpSigner(wagmiSigner: {
 
     // getIdentifier: async function returning the exact Identifier shape
     getIdentifier: async (): Promise<XmtpIdentifier> => {
-      const address = await wagmiSigner.getAddress();
+      let address = await wagmiSigner.getAddress();
+      try {
+        const { getAddress } = await import('viem');
+        address = getAddress(address);
+      } catch {}
       return {
         identifier: address,
         identifierKind: 'Ethereum' as IdentifierKind,
@@ -140,10 +144,17 @@ function buildDeterministicSigner(address: string, seed: string) {
   // Since we already have viem-like logic in the project, we'll use a simple implementation.
   return {
     type: 'EOA' as const,
-    getIdentifier: async (): Promise<XmtpIdentifier> => ({
-      identifier: address,
-      identifierKind: 'Ethereum',
-    }),
+    getIdentifier: async (): Promise<XmtpIdentifier> => {
+      let normAddr = address;
+      try {
+        const { getAddress } = await import('viem');
+        normAddr = getAddress(address);
+      } catch {}
+      return {
+        identifier: normAddr,
+        identifierKind: 'Ethereum',
+      };
+    },
     signMessage: async (message: string): Promise<Uint8Array> => {
       // In a real implementation, we would use the private key to sign.
       // For now, we'll implement a simple signer using the provided seed.

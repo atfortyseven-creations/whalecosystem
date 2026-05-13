@@ -56,7 +56,7 @@ const PRICING_TIERS: PricingTier[] = [
   },
   {
     id: 'INSTITUTIONAL',
-    name: 'Institutional',
+    name: 'Whale Alert Pro',
     priceMonthly: 299,
     tagline: 'The ultimate firm-wide edge.',
     accentColor: '#9945FF',
@@ -85,6 +85,7 @@ const PRICING_TIERS: PricingTier[] = [
 // ── Components ──────────────────────────────────────────────────────────────
 
 function PricingCard(tier: PricingTier) {
+  const { isConnected } = useAccount();
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -130,7 +131,11 @@ function PricingCard(tier: PricingTier) {
           tier.highlight ? 'bg-white text-slate-950 hover:bg-slate-100 shadow-xl' : 'bg-slate-950 text-white hover:bg-black'
         }`}
       >
-        Select Tier
+        {tier.id === 'STARTER' ? (
+          isConnected ? 'Actual Plan' : 'Try'
+        ) : (
+          'Purchase Whale'
+        )}
       </Link>
     </motion.div>
   );

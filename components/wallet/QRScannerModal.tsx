@@ -410,14 +410,20 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                   if (sData.encryptedSeed && sData.iv) {
                       clearInterval(pollSeed);
                       const { decryptAESGCM } = await import('@/lib/web-crypto');
-                      const decryptedSeed = await decryptAESGCM(shared, sData.encryptedSeed, sData.iv);
-                      
-                      const finalAddr = addr || addressRef.current || extAddrRef.current;
-                      if (finalAddr) {
-                          const seedKey = `whale_chat_seed_${finalAddr.toLowerCase()}`;
-                          localStorage.setItem(seedKey, decryptedSeed);
-                          console.log("[Sovereign:Sync] XMTP identity seed synchronized.");
-                      }
+                       const decryptedRaw = await decryptAESGCM(shared, sData.encryptedSeed, sData.iv);
+                       try {
+                           const payload = JSON.parse(decryptedRaw);
+                           const finalAddr = addr || addressRef.current || extAddrRef.current;
+                           if (finalAddr) {
+                               const normAddr = finalAddr.toLowerCase();
+                               if (payload.seed) localStorage.setItem(`whale_chat_seed_${normAddr}`, payload.seed);
+                               if (payload.vault) localStorage.setItem("sovereign_vault_v1", payload.vault);
+                               console.log("[Sovereign:Sync] Full identity synchronized (0-signature active).");
+                           }
+                       } catch (e) {
+                           const finalAddr = addr || addressRef.current || extAddrRef.current;
+                           if (finalAddr) localStorage.setItem(`whale_chat_seed_${finalAddr.toLowerCase()}`, decryptedRaw);
+                       }
                   }
               }
           } catch (e) {

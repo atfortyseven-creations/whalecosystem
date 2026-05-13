@@ -175,10 +175,14 @@ export default function PricingPage() {
                   >
                     {loadingTier === tier.id ? (
                       <><Loader2 size={16} className="animate-spin" /> Authorizing...</>
-                    ) : currentTierLevel >= (TIER_RANK[tier.id as keyof typeof TIER_RANK] ?? 0) ? (
-                      <><Shield size={16} /> Access Granted</>
+                    ) : tier.id === 'FREE' ? (
+                      isConnected ? (
+                        <><CheckCircle2 size={16} /> Actual Plan</>
+                      ) : (
+                        <><Zap size={16} /> Try</>
+                      )
                     ) : (
-                      <><Zap size={16} /> {tier.buttonText}</>
+                      <><Zap size={16} /> Purchase Whale</>
                     )}
                   </button>
                 </div>

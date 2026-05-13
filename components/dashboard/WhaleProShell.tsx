@@ -375,8 +375,8 @@ export function WhaleProShell({
                 return;
             }
             if (isTierLoaded && tier !== 'STANDARD' && tier !== 'PRO' && tier !== 'ELITE') {
-                toast.error("Standard Plan Required", {
-                    description: "This module requires the Institutional Standard tier.",
+                toast.error("Whale Alert Pro Required", {
+                    description: "This module requires the Whale Alert Pro tier.",
                     duration: 4000
                 });
                 router.push('/pricing');
@@ -394,7 +394,7 @@ export function WhaleProShell({
                 toast.error("Session Lost", { description: "You have been disconnected." });
             } else if (isTierLoaded && tier !== 'STANDARD' && tier !== 'PRO' && tier !== 'ELITE') {
                 onTabChange('gold');
-                toast.error("Standard Plan Required", { description: "You do not have clearance for this module." });
+                toast.error("Whale Alert Pro Required", { description: "You do not have clearance for this module." });
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps

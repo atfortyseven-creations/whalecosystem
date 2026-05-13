@@ -50,7 +50,7 @@ export const PRICING_TIERS: PricingTier[] = [
   },
   {
     id:           'STANDARD',
-    name:         'Institutional Standard',
+    name:         'Whale Alert Pro',
     tagline:      'Unrestricted forensic capacity.',
     priceMonthly: '15',
     priceAnnual:  '150',
@@ -65,7 +65,7 @@ export const PRICING_TIERS: PricingTier[] = [
       { text: 'Zero-Latency Private Node Infrastructure' },
       { text: 'Priority Cryptographic Support Access' },
     ],
-    buttonText: 'Upgrade to Standard',
+    buttonText: 'Purchase Whale',
   },
 ];
 

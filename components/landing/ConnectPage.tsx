@@ -199,27 +199,37 @@ export default function ConnectPage() {
               if (mobilePub) {
                 const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, isECDHFlag);
 
-                // ── [EXPERT-SYNC] Push XMTP Seed to Mobile ──────────────────────
-                // If this desktop already has an XMTP identity seed, we send it
-                // to the mobile so it can initialize chat silently.
+                // ── [EXPERT-SYNC] Push Identity & Vault to Mobile ─────────────────
+                // We push both the XMTP seed and the Sovereign Vault (if they exist)
+                // to allow the mobile device to operate with zero signatures.
                 const addressToUse = jwt ? address : (isConnected ? address : null);
                 if (addressToUse) {
                   const seedKey = `whale_chat_seed_${addressToUse.toLowerCase()}`;
                   const localSeed = localStorage.getItem(seedKey);
-                  if (localSeed) {
-                    console.log("[Sovereign:Sync] Pushing XMTP seed to mobile device...");
+                  const VAULT_KEY = "sovereign_vault_v1";
+                  const localVault = localStorage.getItem(VAULT_KEY);
+
+                  if (localSeed || localVault) {
+                    console.log("[Sovereign:Sync] Pushing identity & vault to mobile...");
                     const { encryptAESGCM } = await import('@/lib/web-crypto');
-                    const encryptedSeed = await encryptAESGCM(shared, localSeed);
+                    
+                    const syncPayload = {
+                      seed: localSeed,
+                      vault: localVault
+                    };
+                    
+                    const encryptedSync = await encryptAESGCM(shared, JSON.stringify(syncPayload));
+                    
                     fetch('/api/auth/qr-sync-seed', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                         uuid: qrSession,
-                        encryptedSeed: encryptedSeed.encryptedPayload,
-                        iv: encryptedSeed.iv,
-                        tag: encryptedSeed.tag
+                        encryptedSeed: encryptedSync.encryptedPayload,
+                        iv: encryptedSync.iv,
+                        tag: encryptedSync.tag
                       })
-                    }).catch(e => console.warn("[Sovereign:Sync] Seed push failed:", e));
+                    }).catch(e => console.warn("[Sovereign:Sync] Identity push failed:", e));
                   }
                 }
 
