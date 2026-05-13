@@ -93,7 +93,7 @@ export default function FiatCardIssuance({ walletAddress, balance }: { walletAdd
                 </h2>
                 <p className="text-lg text-[#1F1F1F]/60 max-w-xl font-medium leading-relaxed">
                     Spend your crypto instantly, anywhere. Android & Apple Pay ready. Zero foreign transaction fees. 
-                    <span className="block mt-2 text-[#1F1F1F] font-bold">Authenticated by Sovereign ID. Spendable for real.</span>
+                    <span className="block mt-2 text-[#1F1F1F] font-bold">Authenticated by KYC. Spendable for real.</span>
                 </p>
             </div>
 
@@ -125,7 +125,7 @@ export default function FiatCardIssuance({ walletAddress, balance }: { walletAdd
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-2">
                                     <Shield size={32} className="opacity-80" />
-                                    <div className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full">Sovereign ID VERIFIED</div>
+                                    <div className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full">KYC VERIFIED</div>
                                 </div>
                                 <span className="font-mono text-lg tracking-widest opacity-60">DEBIT</span>
                             </div>

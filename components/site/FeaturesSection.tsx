@@ -67,13 +67,13 @@ export function FeaturesSection() {
                     <FeatureCard
                         icon={ShieldCheck}
                         title="Biometric Privacy (ZK-Snarks)"
-                        description="Verify your Sovereign Identity without ever revealing your actual biometric data. Your face generates a zero-knowledge mathematical proof; your data never leaves your device."
+                        description="Verify your KYC without ever revealing your actual biometric data. Your face generates a zero-knowledge mathematical proof; your data never leaves your device."
                         delay={0}
                     />
                     <FeatureCard
                         icon={LockOpen}
                         title="Total Digital Sovereignty"
-                        description="Your identity credentials live in your wallet, not on our servers. You are the sole owner of your Sovereign ID; you decide what you share, with whom, and when."
+                        description="Your identity credentials live in your wallet, not on our servers. You are the sole owner of your KYC; you decide what you share, with whom, and when."
                         delay={0.1}
                     />
                     <FeatureCard

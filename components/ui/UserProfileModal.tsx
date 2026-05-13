@@ -233,12 +233,12 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#888888] mb-2">Sovereign Name</label>
+                                                    <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#888888] mb-2">KYC Name</label>
                                                     <input 
                                                         type="text" 
                                                         value={displayName}
                                                         onChange={(e) => setDisplayName(e.target.value)}
-                                                        placeholder="Sovereign Identity"
+                                                        placeholder="KYC Identity"
                                                         maxLength={50}
                                                         className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[14px] text-[#050505] font-bold focus:border-black focus:bg-white focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-[#BBBBBB]"
                                                     />

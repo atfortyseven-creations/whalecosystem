@@ -26,7 +26,7 @@ const PAGES = [
 
   // ── ZK Layer ──
   { id: "zk",            label: "Cryptographic Integrity",  group: "ZK Layer",       icon: null },
-  { id: "zk-identity",   label: "Sovereign ID",    group: "ZK Layer",       icon: null },
+  { id: "zk-identity",   label: "KYC",    group: "ZK Layer",       icon: null },
 
   // ── Communications ──
   { id: "chat",          label: "Whale Chat",      group: "Communications", icon: null },

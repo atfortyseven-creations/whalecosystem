@@ -109,9 +109,8 @@ export default function MobileChatPage() {
         <div className="w-10" />
       </header>
 
-      {/* ── Chat Panel ── */}
       <div className="flex-1 min-h-0 overflow-hidden relative">
-        <WhaleChat forceAutoInit={true} />
+        <WhaleChat forceAutoInit={false} />
       </div>
     </div>
   );

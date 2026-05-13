@@ -72,7 +72,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-6 text-indigo-500">
                 <Shield size={28} />
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tight mb-3">Sovereign Identity</h2>
+              <h2 className="text-2xl font-black uppercase tracking-tight mb-3">KYC</h2>
               <p className="text-sm text-black/50 dark:text-white/50 mb-8 max-w-[280px] leading-relaxed">
                 Generate a fresh, cryptographically secure non-custodial wallet instantly. Mined locally, never leaves your browser.
               </p>
@@ -89,7 +89,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                     </>
                 ) : (
                     <>
-                        <Zap size={16} /> Mint Identity
+                        <Zap size={16} /> Mint KYC
                     </>
                 )}
               </button>
@@ -172,7 +172,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6">
                 <CheckCircle2 size={40} />
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Identity Activated</h2>
+              <h2 className="text-2xl font-black uppercase tracking-tight mb-2">KYC Activated</h2>
               <p className="text-xs text-black/50 dark:text-white/50 mb-8 font-mono">
                 {wallet.address}
               </p>

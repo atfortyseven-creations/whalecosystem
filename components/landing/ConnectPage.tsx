@@ -19,7 +19,8 @@ import {
   Smartphone,
   Monitor,
   ScanLine,
-  Shield,
+  Lock,
+  Cpu,
   Activity
 } from "lucide-react";
 import { QRCodeSVG as QRCode } from "qrcode.react";
@@ -334,11 +335,11 @@ export default function ConnectPage() {
             <div className="relative z-10 flex flex-col h-full">
               <div className="inline-flex self-start mb-6">
                 <h2 className="text-[32px] font-black uppercase tracking-tighter leading-[0.9] text-[#050505]">
-                  Direct <br/><span className="text-black/30">Handshake</span>
+                  Secure <br/><span className="text-black/30">Sync</span>
                 </h2>
               </div>
               <p className="text-[9px] font-mono text-[#050505]/40 uppercase tracking-[0.4em] mb-12 border-l border-black/20 pl-4 py-1">
-                P2P Encrypted Session Sync
+                Encrypted Session Synchronization
               </p>
 
               <div className="flex flex-col items-center gap-8 flex-1 justify-center">
@@ -412,7 +413,7 @@ export default function ConnectPage() {
             <div className="relative z-10 flex flex-col h-full">
 
               <h2 className="text-[32px] font-black uppercase tracking-tighter leading-[0.9] mb-4 text-[#050505]">
-                Inject <br/><span className="text-black/30">Identity</span>
+                Authentication <br/><span className="text-black/30">Portal</span>
               </h2>
 
               {mounted && !isConnected && (
@@ -438,21 +439,21 @@ export default function ConnectPage() {
                   <div className="w-full max-w-[120px] aspect-square rounded-full border border-black/5 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.05)] flex items-center justify-center overflow-hidden mb-2 relative group">
                     <div className="absolute inset-0 bg-[#FAFAF8] opacity-50" />
                     <CheckCircle size={48} className="text-emerald-500 z-10" />
-                    <div className="absolute inset-0 border-[2px] border-emerald-500/20 rounded-full animate-[spin_12s_linear_infinite] [border-style:dashed]" />
+                    <div className="absolute inset-0 border-[2px] border-emerald-500/20 rounded-full [border-style:dashed]" />
                   </div>
 
                   <div className="flex flex-col items-center text-center space-y-5 max-w-md">
                     <h2 className="text-5xl font-black uppercase tracking-tighter leading-none text-[#050505]">
-                      Access<br/><span className="text-black/30">Granted.</span>
+                      Session<br/><span className="text-black/30">Verified.</span>
                     </h2>
                     <p className="font-serif text-[15px] leading-relaxed text-[#050505]/60 font-medium">
-                      Cryptographic attestation perfectly resolved. Your institutional identity is secured. Welcome to the world's most advanced on-chain intelligence system.
+                      Cryptographic attestation perfectly resolved. Your session is now verified. Welcome to the institutional terminal.
                     </p>
                   </div>
 
                   <div className="flex flex-col items-center gap-3">
                     <div className="flex items-center gap-3 px-6 py-4 bg-white border border-black/5 rounded-2xl shadow-sm">
-                       <Shield size={16} className="text-emerald-500" />
+                       <CheckCircle size={16} className="text-emerald-500" />
                        <span className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-[#050505]">
                          {address?.slice(0,6)}...{address?.slice(-4)} Verified
                        </span>
@@ -501,7 +502,7 @@ export default function ConnectPage() {
                 /* ── SKELETON ── */
                 <div className="flex flex-col gap-4 flex-1 mt-4">
                   {[0, 1, 2, 3].map((i) => (
-                    <div key={i} className="w-full h-[84px] rounded-[20px] bg-black/5 animate-pulse" />
+                    <div key={i} className="w-full h-[84px] rounded-[20px] bg-black/5" />
                   ))}
                 </div>
 
@@ -525,9 +526,9 @@ export default function ConnectPage() {
               {/* Security note */}
               {mounted && !isConnected && (
                 <div className="mt-10 p-6 rounded-[24px] flex items-start gap-4 bg-[#FAFAF8] border border-black/5">
-                  <Shield size={20} className="text-[#050505]/30 mt-0.5 shrink-0" />
+                  <Lock size={20} className="text-[#050505]/30 mt-0.5 shrink-0" />
                   <p className="text-[10px] text-[#050505]/50 font-mono leading-relaxed uppercase tracking-[0.15em]">
-                    Zero custody architecture. Identity attested via strictly verified ECDSA. No usernames. No passwords. Absolute cryptographic sovereignty.
+                    Secure architecture. Identity attested via strictly verified ECDSA. No local passwords. Direct cryptographic sovereignty.
                   </p>
                 </div>
               )}

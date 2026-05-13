@@ -142,7 +142,7 @@ export function WhalePortfolio() {
                     Capital Registry
                 </ScrollFloat>
                 <div className="flex items-center gap-2 mt-2 opacity-40">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#050505] animate-pulse" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#050505]" />
                     <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]">Institutional Depth Tracking Active</span>
                 </div>
             </div>
@@ -178,8 +178,8 @@ export function WhalePortfolio() {
                     </div>
                     {liveWhaleCount > 0 && (
                         <span className="flex items-center gap-2 px-3 py-1.5 bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-full text-[9px] font-black text-[#D4AF37] uppercase tracking-widest">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse"/>
-                            {liveWhaleCount} live signals
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"/>
+                            {liveWhaleCount} active signals
                         </span>
                     )}
                     <div className="relative flex-1 min-w-[200px] max-w-xs">

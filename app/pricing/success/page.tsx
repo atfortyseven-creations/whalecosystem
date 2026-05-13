@@ -90,7 +90,7 @@ function SuccessContent() {
                         </h1>
                         
                         <p className="text-[#050505]/60 text-sm md:text-base font-medium leading-relaxed mb-6">
-                            The Stripe cryptographic payload has been verified. Your Sovereign Identity is now infused with {verifiedTier || 'Premium'} privileges.
+                            The Stripe cryptographic payload has been verified. Your KYC is now infused with {verifiedTier || 'Premium'} privileges.
                         </p>
 
                         {sessionId && (

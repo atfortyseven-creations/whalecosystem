@@ -106,8 +106,8 @@ export function ZkKYBVault() {
               <motion.div key="verifying" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center w-full">
                 <div className="w-full max-w-[200px]">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/60">Idenfy AI Oracle</span>
-                    <span className="text-[9px] text-emerald-600 animate-pulse">Analyzing</span>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/60">Cryptographic Oracle</span>
+                    <span className="text-[9px] text-emerald-600">Verifying</span>
                   </div>
                   <div className="w-full h-1 bg-black/5 rounded-full overflow-hidden">
                     <motion.div className="h-full bg-emerald-500" initial={{ width: "0%" }} animate={{ width: "100%" }} transition={{ duration: 2.5, ease: "linear" }} />
@@ -118,7 +118,7 @@ export function ZkKYBVault() {
 
             {stage === "MINTING" && (
               <motion.div key="minting" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center">
-                <Shield size={24} className="text-emerald-500 animate-pulse mb-4" />
+                <Key size={24} className="text-emerald-500 mb-4" />
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">Minting Zk-SBT...</span>
               </motion.div>
             )}

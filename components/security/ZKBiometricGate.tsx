@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAccount } from 'wagmi';
+import { useAccount, useSignMessage } from 'wagmi';
 import { QRCodeSVG as QRCode } from "qrcode.react";
 
 interface ZKBiometricGateProps {
@@ -10,13 +10,15 @@ interface ZKBiometricGateProps {
 }
 
 export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
-  const [stage, setStage] = useState<"IDLE" | "SCANNING" | "PROCESSING" | "SUCCESS" | "ERROR">("IDLE");
+  const [stage, setStage] = useState<"IDLE" | "WARNING" | "SIGNING" | "READY_TO_SCAN" | "SCANNING" | "PROCESSING" | "SUCCESS" | "ERROR">("IDLE");
   const [errorMessage, setErrorMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
+  const [authSignature, setAuthSignature] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -38,12 +40,32 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
     };
   }, [stream]);
 
-  const handleStart = async () => {
+  const handleInitiate = async () => {
     if (!address) {
       setErrorMessage("Please connect your wallet first.");
       setStage("ERROR");
       return;
     }
+    setStage("WARNING");
+  };
+
+  const handleSign = async () => {
+    try {
+      setStage("SIGNING");
+      const ts = Date.now();
+      const message = `Authorize KYC Biometric Attestation\n\nWallet: ${address}\nTimestamp: ${ts}\n\nBy signing, you bind your 3D neural mesh to this cryptographic session.`;
+      
+      const signature = await signMessageAsync({ message });
+      setAuthSignature(signature);
+      setStage("READY_TO_SCAN");
+    } catch (error: any) {
+      console.error("[ZK-Gate] Signing Error:", error);
+      setErrorMessage(error.message || "Signature rejected");
+      setStage("ERROR");
+    }
+  };
+
+  const handleScan = async () => {
     try {
       setStage("SCANNING");
       
@@ -54,7 +76,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
       setStream(mediaStream);
       if (videoRef.current) videoRef.current.srcObject = mediaStream;
 
-      // 2. Wait for Video Ready (Molecular Precision)
+      // 2. Wait for Video Ready
       if (videoRef.current) {
         await new Promise((resolve, reject) => {
           const timeout = setTimeout(() => reject(new Error("Camera timeout")), 10000);
@@ -71,7 +93,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
         });
       }
 
-      // 3. Capture "Neural Mesh" Frame
+      // 3. Capture Frame
       let capturedFrame = "";
       if (videoRef.current && canvasRef.current) {
         const ctx = canvasRef.current.getContext('2d');
@@ -79,46 +101,43 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
         capturedFrame = canvasRef.current.toDataURL('image/jpeg', 0.5);
       }
 
-      // 4. Cryptographic Challenge (Anti-Replay Nonce)
+      setStage("PROCESSING");
+
+      // 4. Cryptographic Challenge
       const nonceRes = await fetch('/api/auth/nonce');
       const { nonce } = await nonceRes.json();
-      if (!nonce) throw new Error("Failed to retrieve cryptographic challenge");
-
-      // [ZERO-SIGNATURE] The user has already established their identity via the Sovereign Handshake.
-      // We rely on the `human_session` secure cookie for authentication. No second signature needed!
-      const ts = Date.now();
-      const signature = "0xZkBioSession_ZeroSignature"; // Placeholder to satisfy endpoint schema
-
-
-      setStage("PROCESSING");
       
-      // 6. Verify via Oracle API (Molecular Transmission)
+      // 5. Verify via Oracle
       const response = await fetch('/api/oracle/zk-biometrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           address, 
-          signature,
+          signature: authSignature,
           payload: capturedFrame,
           nonce,
-          timestamp: ts
+          timestamp: Date.now()
         })
       });
 
       if (!response.ok) throw new Error("Attestation failed");
       
-      // Stop camera
       mediaStream.getTracks().forEach(t => t.stop());
       setStream(null);
 
       setStage("SUCCESS");
-      if (onSuccess) onSuccess(signature);
+      if (onSuccess) onSuccess(authSignature || "0xVerified");
 
     } catch (error: any) {
       console.error("[ZK-Gate] Verification Error:", error);
       if (stream) stream.getTracks().forEach(t => t.stop());
       setStream(null);
-      setErrorMessage(error.message || "Verification failed");
+      
+      let msg = error.message || "Verification failed";
+      if (msg.toLowerCase().includes("permission") || msg.toLowerCase().includes("notallowed")) {
+        msg = "PERMISSION DENIED: Please enable camera access in your browser settings and try again.";
+      }
+      setErrorMessage(msg);
       setStage("ERROR");
     }
   };
@@ -183,9 +202,21 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
               </motion.div>
             )}
 
-            {stage === "PROCESSING" && (
+            {(stage === "PROCESSING" || stage === "SIGNING") && (
               <motion.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center bg-black/5 rounded-full">
                 <div className="absolute inset-0 border-[2px] border-black/10 rounded-full animate-[spin_3s_linear_infinite] [border-style:dashed]" />
+              </motion.div>
+            )}
+
+            {stage === "WARNING" && (
+              <motion.div key="warning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center bg-amber-500/10 rounded-full border border-amber-500/20">
+                <Shield size={32} className="text-amber-600 opacity-40" />
+              </motion.div>
+            )}
+
+            {stage === "READY_TO_SCAN" && (
+              <motion.div key="ready" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center bg-green-500/10 rounded-full border border-green-500/20">
+                <CheckCircle2 size={32} className="text-green-600 opacity-40" />
               </motion.div>
             )}
 
@@ -201,13 +232,40 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
           <AnimatePresence mode="wait">
             {stage === "IDLE" && (
               <motion.div key="text-idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">Biometric Attestation</h3>
+                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">KYC Biometric Attestation</h3>
                 <p className="text-[10px] text-black/50 leading-relaxed max-w-[260px] mx-auto tracking-wide">
                   Prove personhood securely. No PII is stored. A Zero-Knowledge proof will be minted to your wallet.
                 </p>
               </motion.div>
             )}
             
+            {stage === "WARNING" && (
+              <motion.div key="text-warning" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-amber-600">Wallet Attention</h3>
+                <p className="text-[10px] text-black/50 leading-relaxed max-w-[260px] mx-auto tracking-wide">
+                  A signature request will arrive in your wallet app. Please be ready to approve it.
+                </p>
+              </motion.div>
+            )}
+
+            {stage === "SIGNING" && (
+              <motion.div key="text-signing" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">Awaiting Signature</h3>
+                <p className="text-[10px] text-black/50 leading-relaxed tracking-wide uppercase font-black">
+                  PLEASE OPEN YOUR WALLET APP...
+                </p>
+              </motion.div>
+            )}
+
+            {stage === "READY_TO_SCAN" && (
+              <motion.div key="text-ready" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-green-600">Signature Valid</h3>
+                <p className="text-[10px] text-black/50 leading-relaxed tracking-wide">
+                  Identity bound. Ready for biometric scan.
+                </p>
+              </motion.div>
+            )}
+
             {stage === "SCANNING" && (
               <motion.div key="text-scanning" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                 <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">3D Liveness Check</h3>
@@ -219,9 +277,9 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
 
             {stage === "PROCESSING" && (
               <motion.div key="text-processing" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">Hashing Identity</h3>
+                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">Verifying Proof</h3>
                 <p className="text-[10px] text-black/50 flex items-center justify-center gap-2 tracking-wide uppercase font-black">
-                  GENERATING ZK-SNARK PROOF...
+                  GENERATING ZK-SNARK...
                 </p>
               </motion.div>
             )}
@@ -256,7 +314,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
             <p className="text-[11px] text-black/50 leading-relaxed">
               1. Center your face within the biometric camera overlay.<br/>
               2. The neural engine extracts 3D liveness data securely.<br/>
-              3. Processing is automated and verified using your active Sovereign Session.<br/>
+              3. Approve the wallet signature request to hash the attestation.<br/>
               4. A Zero-Knowledge SNARK is injected into your session without storing visual data.
             </p>
         </div>
@@ -264,12 +322,32 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
         {stage === "IDLE" && isMobile && (
           <div className="w-full flex flex-col gap-3">
             {address ? (
-              <button
-                onClick={handleStart}
-                className="w-full py-4 bg-[#050505] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                Initiate Secure Scan
-              </button>
+              <div className="flex flex-col gap-3">
+                {stage === "IDLE" && (
+                  <button
+                    onClick={handleInitiate}
+                    className="w-full py-4 bg-[#050505] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
+                  >
+                    Initiate Secure Scan
+                  </button>
+                )}
+                {stage === "WARNING" && (
+                  <button
+                    onClick={handleSign}
+                    className="w-full py-4 bg-amber-600 text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+                  >
+                    Proceed to Wallet Signature
+                  </button>
+                )}
+                {stage === "READY_TO_SCAN" && (
+                  <button
+                    onClick={handleScan}
+                    className="w-full py-4 bg-green-600 text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+                  >
+                    Start Face Scan Now
+                  </button>
+                )}
+              </div>
             ) : (
               <div className="flex flex-col gap-4">
                 <p className="text-[10px] text-center text-black/40 uppercase font-black tracking-widest">

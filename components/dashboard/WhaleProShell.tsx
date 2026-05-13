@@ -42,10 +42,10 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'mass-transfer',label: 'Mass Transfers',    icon: null, requiresZK: true },
     { id: 'omniexplorer', label: 'Block Explorer',    icon: null, requiresZK: true },
     { id: 'defi',         label: 'DeFi Yields',       icon: null, requiresZK: true },
-    { id: 'morpho',       label: 'Morpho Base',       icon: null, badge: 'LIVE', badgeColor: '#0052FF', requiresZK: true },
+    { id: 'morpho',       label: 'Morpho Base',       icon: null, requiresZK: true },
 
     { id: 'zk',           label: 'Cryptographic Integrity',    icon: null,    dividerBefore: 'ZK Layer', requiresZK: true },
-    { id: 'zk-identity',  label: 'Sovereign ID',      icon: null, badge: 'ZK', badgeColor: '#10B981' },
+    { id: 'zk-identity',  label: 'KYC',      icon: null, badge: 'ZK', badgeColor: '#10B981' },
 
     { id: 'chat',         label: 'Whale Chat',       icon: null, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF', requiresZK: true },
     { id: 'logs',         label: 'Session Logs',      icon: null,  dividerBefore: 'System' },
@@ -662,7 +662,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         <span className="flex items-center gap-1.5 min-w-[120px]">
                             Global Latency:
                             <span className={latency > 150 ? 'text-[#FF3B30]' : latency > 0 ? 'text-[#00FF55]' : 'text-[#888888]'}>
-                                {latency > 0 ? `${latency}ms` : 'SYNCING'}
+                                {latency > 0 ? `${latency}ms` : '--'}
                             </span>
                         </span>
                         {/* UX-19: Real node status from /api/network/getblock-health */}
@@ -683,7 +683,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         )}
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5">Protocol: Live</span>
+                        <span className="flex items-center gap-1.5">Protocol: Active</span>
                         <span className="text-[#888888]">© 2026 atfortyseven-creations</span>
                     </div>
                 </footer>

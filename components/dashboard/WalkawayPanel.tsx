@@ -92,7 +92,7 @@ export const WalkawayPanel = () => {
             <CardHeader className="flex flex-row items-center justify-between border-b border-[#F0F0F0] pb-4">
                 <div className="space-y-0.5">
                     <CardTitle className="text-[#050505] tracking-widest text-[11px] uppercase font-black flex items-center gap-1.5">
-                        <Shield size={14} className="text-[#FF3B30]" /> Walkaway Switch v3
+                        <Lock size={14} className="text-[#FF3B30]" /> Walkaway Switch v3
                     </CardTitle>
                     <p className="text-[9px] text-[#888888] uppercase tracking-widest font-bold">
                         Decentralized Ownership Handover

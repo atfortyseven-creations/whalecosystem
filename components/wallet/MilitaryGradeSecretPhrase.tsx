@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Copy, Download, Eye, EyeOff, Check, Shield, Lock, QrCode, Printer } from 'lucide-react';
+import { AlertTriangle, Copy, Download, Eye, EyeOff, Check, Lock, QrCode, Printer } from 'lucide-react';
 import { KMS } from '@/lib/blockchain/KMS';
 import { toast } from 'sonner';
 
-export function MilitaryGradeSecretPhrase({ onConfirm }: { onConfirm?: (mnemonic: string) => void }) {
+export function ProtocolRecoveryPhrase({ onConfirm }: { onConfirm?: (mnemonic: string) => void }) {
     const [mnemonic, setMnemonic] = useState<string>('');
     const [words, setWords] = useState<string[]>([]);
     const [isRevealed, setIsRevealed] = useState(false);
@@ -108,7 +108,7 @@ Wallet: Whale Alert Network Terminal v4.0
                         <AlertTriangle className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                        <h2 className="text-2xl font-black text-red-600 mb-2 uppercase">DANGER ZONE - CRITICAL</h2>
+                        <h2 className="text-2xl font-black text-black mb-2 uppercase">SECURITY PROTOCOL - CRITICAL</h2>
                         <ul className="space-y-1 text-red-700 font-bold text-sm">
                             <li>• This phrase is the ONLY way to recover your wallet</li>
                             <li>• If you lose it, you LOSE YOUR FUNDS forever</li>
@@ -122,10 +122,10 @@ Wallet: Whale Alert Network Terminal v4.0
             {/* Security Stats with Live Monitoring */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <StatCard
-                    icon={<Shield className="animate-pulse text-[#00ff9d]" />}
+                    icon={<Lock className="text-[#050505]" />}
                     label="Entropy"
                     value="256-bit"
-                    description="Military Grade"
+                    description="Institutional Protocol"
                     active
                 />
                 <StatCard
@@ -145,8 +145,8 @@ Wallet: Whale Alert Network Terminal v4.0
                     <div className="w-12 h-12 bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-500 mx-auto mb-3 border border-indigo-500/20">
                         <AlertTriangle size={20} />
                     </div>
-                    <div className="text-sm text-red-400 font-bold mb-1">Quantum Resistance</div>
-                    <div className="text-xs text-indigo-500/70">Post-Quantum Sig.</div>
+                    <div className="text-sm text-black font-bold mb-1">Cryptographic Hardening</div>
+                    <div className="text-xs text-black/50">Verified Protocol</div>
                 </div>
             </div>
 
@@ -169,10 +169,10 @@ Wallet: Whale Alert Network Terminal v4.0
 
                 <div className="relative z-10">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-2xl font-black text-purple-900">Your Recovery Phrase</h3>
+                        <h3 className="text-2xl font-black text-[#050505]">Recovery Phrase</h3>
                         <button
                             onClick={() => setIsRevealed(!isRevealed)}
-                            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-xl font-bold hover:bg-neutral-800 transition-colors"
                         >
                             {isRevealed ? (
                                 <><EyeOff className="w-4 h-4" /> Hide</>
@@ -197,7 +197,7 @@ Wallet: Whale Alert Network Terminal v4.0
                     <div className="flex flex-wrap gap-3 mt-8">
                         <button
                             onClick={handleCopy}
-                            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-xl font-bold hover:bg-neutral-800 transition-colors disabled:opacity-50"
                             disabled={!isRevealed}
                         >
                             {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -205,21 +205,21 @@ Wallet: Whale Alert Network Terminal v4.0
                         </button>
                         <button
                             onClick={handleDownloadPDF}
-                            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors"
+                            className="flex items-center gap-2 px-6 py-3 border border-black text-black rounded-xl font-bold hover:bg-black/5 transition-colors"
                         >
                             <Download className="w-4 h-4" />
                             Download Backup
                         </button>
                         <button
                             onClick={handlePrint}
-                            className="flex items-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition-colors"
+                            className="flex items-center gap-2 px-6 py-3 border border-black text-black rounded-xl font-bold hover:bg-black/5 transition-colors"
                         >
                             <Printer className="w-4 h-4" />
                             Print
                         </button>
                         <button
                             onClick={generateSecurePhrase}
-                            className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                            className="flex items-center gap-2 px-6 py-3 border border-black text-black rounded-xl font-bold hover:bg-black/5 transition-colors"
                         >
                             Generate New
                         </button>
@@ -229,10 +229,10 @@ Wallet: Whale Alert Network Terminal v4.0
 
             {/* Verification Section */}
             {!isVerified && (
-                <div className="bg-gradient-to-br from-purple-100 to-blue-100 border-2 border-purple-300 rounded-3xl p-8">
-                    <h3 className="text-2xl font-black text-purple-900 mb-4">Security Verification</h3>
-                    <p className="text-purple-700 mb-6">
-                        To confirm that you saved your phrase, enter the following words:
+                <div className="bg-[#FAFAF8] border border-black/10 rounded-3xl p-8">
+                    <h3 className="text-2xl font-black text-black mb-4">Verification</h3>
+                    <p className="text-black/60 mb-6">
+                        Confirm sequence stability by entering the following words:
                     </p>
 
                     <div className="space-y-4">

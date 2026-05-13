@@ -6,7 +6,7 @@ import { Shield, Zap, CheckCircle2, User, Globe, ArrowRight } from 'lucide-react
 import { toast } from 'sonner';
 
 /**
- * SOVEREIGN IDENTITY CARD (Pillar 2)
+ * KYC IDENTITY CARD (Pillar 2)
  * --------------------------------
  * A high-end UI component displaying decentralized identity (Paymail/DID).
  * Features real-time resolution and 10000% institutional fidelity.
@@ -57,7 +57,7 @@ export const SovereignIdentityCard = ({ handle = 'ceo@humanidfi.com' }: { handle
                             <Shield className="text-[var(--aztec-chartreuse)]" size={28} />
                         </div>
                         <div>
-                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40">Sovereign Profile</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40">KYC Profile</span>
                             <h3 className="text-xl font-bold font-aztec-serif tracking-tight">{identity?.human_id || 'UNKNOWN'}</h3>
                         </div>
                     </div>

@@ -185,7 +185,7 @@ const ToolsAndLibraries = () => {
                 <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">Identity Protocols</div>
                 <div className="space-y-6 font-serif text-[22px] font-normal">
                    <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
-                     Sovereign Identity API <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                     KYC API <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                    </div>
                    <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
                      Humanity Score Matrix <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />

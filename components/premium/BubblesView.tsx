@@ -328,10 +328,10 @@ export default function BubblesView({ limit }: { limit?: number }) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-black/50 dark:bg-neutral-900/50 backdrop-blur-xl rounded-[2.5rem] border border-white/20 overflow-hidden shadow-2xl">
+        <div className="flex flex-col h-full bg-[#FAFAF8] rounded-[2.5rem] border border-[#E5E5E5] overflow-hidden shadow-sm">
             {/* Header / Controls */}
-            <div className="p-6 border-b border-black/5 flex flex-col md:flex-row gap-4 justify-between items-center z-20">
-                <div className="flex items-center gap-2 bg-white/40 p-1.5 rounded-2xl border border-black/5">
+            <div className="p-6 border-b border-[#E5E5E5] flex flex-col md:flex-row gap-4 justify-between items-center z-20">
+                <div className="flex items-center gap-2 bg-[#F0F0F0] p-1.5 rounded-2xl border border-[#E5E5E5]">
                     {(['1h', '24h', '7d', '30d', '1y'] as Timeframe[]).map((tf) => {
                          const labels: Record<string, string> = {
                              '1h': t('market.hour'),
@@ -357,13 +357,13 @@ export default function BubblesView({ limit }: { limit?: number }) {
 
                 <div className="flex items-center gap-3">
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black/20" size={18} />
                         <input 
                             type="text"
                             placeholder={t('common.search')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-11 pr-6 py-3 bg-white/10 border border-white/5 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/10 transition-all w-64 text-white"
+                            className="pl-11 pr-6 py-3 bg-white border border-[#E5E5E5] rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-black/5 transition-all w-64 text-[#050505]"
                         />
                     </div>
                 </div>
@@ -442,11 +442,11 @@ export default function BubblesView({ limit }: { limit?: number }) {
                                     {/* Risk Badge */}
                                     {node.coin.riskLevel && (
                                         <div className="absolute top-2 right-2 z-20">
-                                            <div className={`w-2.5 h-2.5 rounded-full animate-pulse shadow-lg ${
-                                                node.coin.riskLevel === 'CRITICAL' ? 'bg-rose-500 shadow-rose-500/50' :
-                                                node.coin.riskLevel === 'HIGH' ? 'bg-orange-500 shadow-orange-500/50' :
-                                                node.coin.riskLevel === 'MEDIUM' ? 'bg-yellow-500 shadow-yellow-500/50' :
-                                                'bg-emerald-500 shadow-emerald-500/50'
+                                            <div className={`w-2.5 h-2.5 rounded-full shadow-lg ${
+                                                node.coin.riskLevel === 'CRITICAL' ? 'bg-rose-500' :
+                                                node.coin.riskLevel === 'HIGH' ? 'bg-orange-500' :
+                                                node.coin.riskLevel === 'MEDIUM' ? 'bg-yellow-500' :
+                                                'bg-emerald-500'
                                             }`} />
                                         </div>
                                     )}
@@ -471,10 +471,10 @@ export default function BubblesView({ limit }: { limit?: number }) {
             )}
 
             {/* Footer Stats */}
-            <div className="p-6 bg-black/5 border-t border-black/5 flex justify-between items-center">
+            <div className="p-6 bg-[#FAF9F6] border-t border-[#E5E5E5] flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${isSettled ? 'bg-emerald-500' : 'bg-emerald-500 animate-pulse'}`} />
-                    <span className="text-[10px] font-black uppercase text-white/40 tracking-widest">
+                    <div className={`w-2 h-2 rounded-full ${isSettled ? 'bg-emerald-500' : 'bg-emerald-500'}`} />
+                    <span className="text-[10px] font-black uppercase text-black/40 tracking-widest">
                         {isSettled ? t('market.drag_move') : t('market.settling')}
                     </span>
                 </div>

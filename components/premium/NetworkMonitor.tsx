@@ -72,7 +72,7 @@ export default function NetworkMonitor() {
                 <Globe className="text-blue-400" size={32} />
             </div>
             <div>
-                <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic">Satellite Network Core</h3>
+                <h3 className="text-2xl font-black text-white tracking-tighter uppercase italic">Node Network Core</h3>
                 <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] mt-1">DEDICATED NODE UPLINK ESTABLISHED</p>
             </div>
         </div>
@@ -89,7 +89,7 @@ export default function NetworkMonitor() {
                         <span className="text-xs font-black text-orange-500 uppercase tracking-widest">Bitcoin Core</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
                         <span className="text-[10px] font-mono text-green-500">ONLINE</span>
                     </div>
                 </div>
@@ -125,7 +125,7 @@ export default function NetworkMonitor() {
                         <span className="text-xs font-black text-blue-500 uppercase tracking-widest">Base RPC</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
                         <span className="text-[10px] font-mono text-green-500">50K CU/DAY</span>
                     </div>
                 </div>
@@ -134,7 +134,7 @@ export default function NetworkMonitor() {
                     <div>
                         <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Throughput Capacity</div>
                         <div className="text-2xl font-black text-white font-mono">
-                            HIGH VELOCITY
+                            NOMINAL
                         </div>
                     </div>
                     <div className="flex justify-between items-end">
@@ -144,7 +144,7 @@ export default function NetworkMonitor() {
                         </div>
                         <div className="text-right">
                              <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Status</div>
-                             <div className="font-black text-blue-400">TURBO ACTIVE</div>
+                             <div className="font-black text-blue-400">OPERATIONAL</div>
                         </div>
                     </div>
                 </div>

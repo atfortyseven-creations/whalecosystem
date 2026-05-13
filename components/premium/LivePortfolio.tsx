@@ -29,9 +29,9 @@ export function LivePortfolio() {
 
     if (!mounted) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] shadow-sm max-w-4xl mx-auto mt-8 animate-pulse text-center">
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] shadow-sm max-w-4xl mx-auto mt-8 text-center">
                 <RefreshCcw size={32} className="text-[#888888] animate-spin mb-4 mx-auto" />
-                <span className="text-sm font-black uppercase text-[#888888] tracking-widest">INITIALIZING SECURE VAULT...</span>
+                <span className="text-sm font-black uppercase text-[#888888] tracking-widest">INITIALIZING VAULT...</span>
             </div>
         );
     }
@@ -48,9 +48,9 @@ export function LivePortfolio() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8 animate-pulse text-center">
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8 text-center">
                 <RefreshCcw size={32} className="text-[#888888] animate-spin mb-4 mx-auto" />
-                <span className="text-sm font-black uppercase text-[#888888] tracking-widest">SYNCING ON-CHAIN DATA...</span>
+                <span className="text-sm font-black uppercase text-[#888888] tracking-widest">PROCESSING ON-CHAIN DATA...</span>
             </div>
         );
     }
@@ -64,8 +64,8 @@ export function LivePortfolio() {
             <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] p-10 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-6">
                     <span className="flex items-center gap-1.5 text-[8.5px] font-mono font-black text-[#888888] uppercase tracking-[0.2em]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#050505] animate-pulse opacity-70" />
-                        SYSTEM TELEMETRY SYNCHRONIZED
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#050505] opacity-70" />
+                        SYSTEMS OPERATIONAL
                     </span>
                 </div>
                 

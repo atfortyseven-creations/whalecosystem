@@ -156,7 +156,7 @@ export function SovereignLanding() {
             <span className="text-[14px] font-black tracking-tighter text-white">WHALE ALERT NET</span>
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00f5ff] flex items-center gap-1.5">
               <span className="w-1 h-1 rounded-full bg-[#00f5ff] animate-pulse" />
-              Sovereign Identity
+              KYC
             </span>
           </div>
         </div>
@@ -282,7 +282,7 @@ export function SovereignLanding() {
         <aside className="w-[320px] shrink-0 border-l border-white/5 bg-[#0a0a0a]/60 backdrop-blur-md hidden xl:flex flex-col h-full sticky top-0 overflow-hidden">
             <div className="h-full w-full overflow-y-auto no-scrollbar p-6 flex flex-col gap-6">
                 
-                {/* Sovereign ID Panel */}
+                {/* KYC Panel */}
                 <div className="p-5 rounded-2xl border border-white/10 bg-black/50 flex flex-col gap-4 relative overflow-hidden group">
                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#ffd700] to-transparent opacity-50" />
                    <div className="flex items-center gap-3">
@@ -290,7 +290,7 @@ export function SovereignLanding() {
                          <Fingerprint size={20} className="text-[#ffd700]" />
                       </div>
                       <div>
-                         <div className="text-[11px] font-black uppercase tracking-widest text-[#ffd700]">Sovereign Identity</div>
+                         <div className="text-[11px] font-black uppercase tracking-widest text-[#ffd700]">KYC</div>
                          <div className="text-[9px] font-mono text-white/40">Zk-Proof Generation Ready</div>
                       </div>
                    </div>

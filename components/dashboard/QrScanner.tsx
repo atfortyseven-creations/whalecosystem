@@ -204,18 +204,18 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 {state === 'idle' && (
                     <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-6 w-full">
-                        <div className="relative w-64 h-64 rounded-3xl border border-[var(--az-orchid)]/30 bg-black/5 dark:bg-white/3 flex flex-col items-center justify-center overflow-hidden backdrop-blur-md">
-                            <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 border-[var(--az-orchid)] rounded-tl-2xl" />
-                            <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 border-[var(--az-orchid)] rounded-tr-2xl" />
-                            <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 border-[var(--az-orchid)] rounded-bl-2xl" />
-                            <div className="absolute bottom-3 right-3 w-7 h-7 border-b-2 border-r-2 border-[var(--az-orchid)] rounded-br-2xl" />
+                        <div className="relative w-64 h-64 rounded-3xl border border-[#9945FF]/30 bg-black/5 dark:bg-white/3 flex flex-col items-center justify-center overflow-hidden backdrop-blur-md">
+                            <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 border-[#9945FF] rounded-tl-2xl" />
+                            <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 border-[#9945FF] rounded-tr-2xl" />
+                            <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 border-[#9945FF] rounded-bl-2xl" />
+                            <div className="absolute bottom-3 right-3 w-7 h-7 border-b-2 border-r-2 border-[#9945FF] rounded-br-2xl" />
                             <Camera size={36} className="text-black/20 dark:text-white/20 mb-2" />
                             <span className="text-[9px] font-mono uppercase tracking-widest text-black/30 dark:text-white/30">Awaiting Activation</span>
                             <motion.div animate={{ y: [-90, 90] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                className="absolute left-6 right-6 h-0.5 bg-[var(--az-orchid)] shadow-[0_0_12px_var(--az-orchid)] opacity-40" />
+                                className="absolute left-6 right-6 h-0.5 bg-[#9945FF] shadow-[0_0_12px_#9945FF] opacity-40" />
                         </div>
                         <button onClick={startCamera}
-                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-[var(--az-orchid)] to-purple-600 text-white font-mono text-[11px] uppercase tracking-widest font-bold shadow-[0_0_30px_rgba(139,48,217,0.35)] active:scale-95 transition-all flex items-center justify-center gap-3">
+                            className="w-full py-4 rounded-2xl bg-[#9945FF] text-white font-mono text-[11px] uppercase tracking-widest font-bold shadow-[0_0_30px_rgba(153,69,255,0.35)] active:scale-95 transition-all flex items-center justify-center gap-3">
                             <Camera size={16} /> Activate Camera
                         </button>
                     </motion.div>
@@ -225,7 +225,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 {state === 'requesting' && (
                     <motion.div key="requesting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-4 py-16">
-                        <div className="w-14 h-14 rounded-full border-2 border-[var(--az-orchid)] border-t-transparent animate-spin" />
+                        <div className="w-14 h-14 rounded-full border-2 border-[#9945FF] border-t-transparent animate-spin" />
                         <p className="font-mono text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">Requesting camera access…</p>
                     </motion.div>
                 )}
@@ -234,7 +234,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 {state === 'validating' && (
                     <motion.div key="validating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-4 py-16">
-                        <Loader size={36} className="animate-spin text-[var(--az-orchid)]" />
+                        <Loader size={36} className="animate-spin text-[#9945FF]" />
                         <p className="font-mono text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">Validating bridge token…</p>
                     </motion.div>
                 )}
@@ -243,20 +243,20 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 {state === 'scanning' && (
                     <motion.div key="scanning" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-5 w-full">
-                        <div className="relative w-72 h-72 rounded-3xl overflow-hidden border border-[var(--az-orchid)]/50 shadow-[0_0_40px_rgba(139,48,217,0.2)]">
+                        <div className="relative w-72 h-72 rounded-3xl overflow-hidden border border-[#9945FF]/50 shadow-[0_0_40px_rgba(153,69,255,0.2)]">
                             <div id={QR_CONTAINER_ID} className="w-full h-full [&>video]:w-full [&>video]:h-full [&>video]:object-cover" />
 
                             {/* Scan overlay */}
                             <div className="absolute inset-0 pointer-events-none">
-                                <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-[var(--az-orchid)] rounded-tl-2xl" />
-                                <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-[var(--az-orchid)] rounded-tr-2xl" />
-                                <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-[var(--az-orchid)] rounded-bl-2xl" />
-                                <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-[var(--az-orchid)] rounded-br-2xl" />
+                                <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-[#9945FF] rounded-tl-2xl" />
+                                <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-[#9945FF] rounded-tr-2xl" />
+                                <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-[#9945FF] rounded-bl-2xl" />
+                                <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-[#9945FF] rounded-br-2xl" />
                                 <motion.div animate={{ y: [-100, 100] }} transition={{ duration: 1.6, repeat: Infinity, ease: "linear" }}
-                                    className="absolute left-6 right-6 h-0.5 bg-[var(--az-orchid)] shadow-[0_0_16px_var(--az-orchid)]" />
+                                    className="absolute left-6 right-6 h-0.5 bg-[#9945FF] shadow-[0_0_16px_#9945FF]" />
                             </div>
                         </div>
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--az-orchid)]/70 animate-pulse">
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-[#9945FF]/70 animate-pulse">
                             Point at the QR code on your PC screen
                         </p>
                         <button onClick={reset} className="text-black/30 dark:text-white/30 text-xs font-mono uppercase tracking-widest hover:text-black/60 dark:hover:text-white/60 transition-colors">
@@ -270,8 +270,8 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     <motion.div key="success" initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-5 text-center py-8">
                         <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 0.6, type: 'spring' }}
-                            className="w-20 h-20 rounded-full bg-[var(--az-emerald)]/10 border border-[var(--az-emerald)]/30 flex items-center justify-center">
-                            <CheckCircle size={40} className="text-[var(--az-emerald)]" />
+                            className="w-20 h-20 rounded-full bg-[#10B981]/10 border border-[#10B981]/30 flex items-center justify-center">
+                            <CheckCircle size={40} className="text-[#10B981]" />
                         </motion.div>
                         <h3 className="font-mono text-xl font-bold text-[#050505] dark:text-white tracking-tight">Bridge Established</h3>
                         <p className="text-xs text-black/60 dark:text-white/60 max-w-xs leading-relaxed">{message}</p>
@@ -292,7 +292,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                         <h3 className="font-mono text-xl font-bold text-[#050505] dark:text-white tracking-tight">Link Failed</h3>
                         <p className="text-xs text-black/60 dark:text-white/60 max-w-xs leading-relaxed">{message}</p>
                         <button onClick={reset}
-                            className="mt-2 px-6 py-2 rounded-xl bg-[var(--az-orchid)]/10 border border-[var(--az-orchid)]/20 text-[var(--az-orchid)] text-[10px] uppercase tracking-widest font-mono hover:bg-[var(--az-orchid)]/20 transition-colors">
+                            className="mt-2 px-6 py-2 rounded-xl bg-[#9945FF]/10 border border-[#9945FF]/20 text-[#9945FF] text-[10px] uppercase tracking-widest font-mono hover:bg-[#9945FF]/20 transition-colors">
                             Try Again
                         </button>
                     </motion.div>

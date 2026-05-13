@@ -163,7 +163,7 @@ export function SovereignChat() {
   if (!isConnectedToNetwork) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[600px] gap-5 bg-white rounded-3xl border border-black/5 shadow-sm p-8 text-center m-4">
-        <Shield size={32} strokeWidth={1.5} className="text-[#050505] mb-2" />
+        <Lock size={32} strokeWidth={1.5} className="text-[#050505] mb-2" />
         <h3 className="text-lg font-bold text-[#050505] tracking-tight">Encrypted Channel Inactive</h3>
         <p className="text-xs text-black/50 max-w-sm">
           Initialize the secure messaging protocol to communicate directly with peers or institutional support.
@@ -228,7 +228,7 @@ export function SovereignChat() {
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center shrink-0 border border-black/5">
-                  <Shield size={12} className="text-[#050505]" />
+                  <Lock size={12} className="text-[#050505]" />
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-[12px] font-bold text-[#050505] truncate">
@@ -305,7 +305,7 @@ export function SovereignChat() {
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-            <Shield size={32} className="text-black/10 mb-4" />
+            <Lock size={32} className="text-black/10 mb-4" />
             <h3 className="text-lg font-bold text-black/80 tracking-tight">No Active Channel</h3>
             <p className="text-[12px] text-black/40 max-w-xs mt-2 leading-relaxed">
               Select an existing channel or initiate a new secure connection to begin communicating.
