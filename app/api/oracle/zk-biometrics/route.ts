@@ -40,24 +40,25 @@ export async function POST(req: NextRequest) {
         const payloadHash = payload.slice(-32); // Use the tail of the base64 as a quick 'hash' for binding
         const message = `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
 
-        // 2. Real Cryptographic Verification via Viem
+        // 3. Session Integrity Verification (Zero-Signature Check)
         try {
-            const isValid = await verifyMessage({
-                address: address as `0x${string}`,
-                message: message,
-                signature: signature as `0x${string}`,
-            });
-
-            if (!isValid) {
-                console.error(`[ZK-ORACLE] ❌ Cryptographic signature mismatch for ${address}`);
-                return NextResponse.json({ error: 'Signature verification failed' }, { status: 401 });
+            const token = req.cookies.get('human_session')?.value;
+            if (!token) throw new Error('Missing session token. Please reconnect your wallet.');
+            
+            const { verifyJWT } = await import('@/lib/jwt');
+            const payloadData = await verifyJWT(token);
+            
+            if (payloadData.sub?.toLowerCase() !== address.toLowerCase()) {
+                console.error(`[ZK-ORACLE] ❌ Session identity mismatch for ${address}`);
+                return NextResponse.json({ error: 'Session identity mismatch' }, { status: 401 });
             }
-        } catch (sigErr) {
-            console.error(`[ZK-ORACLE] ❌ Signature validation exception:`, sigErr);
-            return NextResponse.json({ error: 'Invalid proof signature' }, { status: 401 });
+            console.log(`[ZK-ORACLE] 🔐 Session valid for ${address}. Zero-signature verification successful.`);
+        } catch (jwtErr: any) {
+            console.error(`[ZK-ORACLE] ❌ JWT validation exception:`, jwtErr?.message);
+            return NextResponse.json({ error: 'Invalid or missing secure session. Reconnect wallet.' }, { status: 401 });
         }
 
-        // 3. Neural Mesh Liveness Audit (Molecular Verification)
+        // 4. Neural Mesh Liveness Audit (Molecular Verification)
         // In a real production environment, this would involve a server-side ML model
         // processing the 'payload' buffer. Here, we perform a molecular state verification.
         console.log(`[ZK-ORACLE] 🧠 Analyzing 3D Liveness Mesh (Bound to Signature)`);

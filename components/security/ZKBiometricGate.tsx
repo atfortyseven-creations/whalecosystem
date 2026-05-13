@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSignMessage, useAccount } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { QRCodeSVG as QRCode } from "qrcode.react";
 
 interface ZKBiometricGateProps {
@@ -16,7 +16,6 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
 
   useEffect(() => {
@@ -85,19 +84,11 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
       const { nonce } = await nonceRes.json();
       if (!nonce) throw new Error("Failed to retrieve cryptographic challenge");
 
-      // 5. Cryptographic Signature (Binding Identity to Biometric Data + Nonce)
+      // [ZERO-SIGNATURE] The user has already established their identity via the Sovereign Handshake.
+      // We rely on the `human_session` secure cookie for authentication. No second signature needed!
       const ts = Date.now();
-      const payloadHash = capturedFrame.slice(-32);
-      const signature = await signMessageAsync({ 
-        message: `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nNonce: ${nonce}\nTimestamp: ${ts}` 
-      });
+      const signature = "0xZkBioSession_ZeroSignature"; // Placeholder to satisfy endpoint schema
 
-      // Save seed to prevent double-signing in Whale Chat
-      const existingSeed = localStorage.getItem(`whale_chat_seed_${address.toLowerCase()}`);
-      if (!existingSeed) {
-        const { keccak256 } = await import('viem');
-        localStorage.setItem(`whale_chat_seed_${address.toLowerCase()}`, keccak256(signature as `0x${string}`));
-      }
 
       setStage("PROCESSING");
       
@@ -265,7 +256,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
             <p className="text-[11px] text-black/50 leading-relaxed">
               1. Center your face within the biometric camera overlay.<br/>
               2. The neural engine extracts 3D liveness data securely.<br/>
-              3. Approve the wallet signature request to hash the attestation.<br/>
+              3. Processing is automated and verified using your active Sovereign Session.<br/>
               4. A Zero-Knowledge SNARK is injected into your session without storing visual data.
             </p>
         </div>
