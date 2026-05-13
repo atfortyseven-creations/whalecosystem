@@ -3,13 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { ClientRootRouter } from '@/components/landing/ClientRootRouter';
 import { ClientMobileLanding } from '@/components/landing/ClientMobileLanding';
-import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
-import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: boolean }) {
     const [mounted, setMounted] = useState(false);
     const [isPhysicallyMobile, setIsPhysicallyMobile] = useState(isMobileUserAgent);
-    const [showSplash, setShowSplash] = useState(true);
     const [hasSession, setHasSession] = useState(false);
 
     useEffect(() => {
@@ -26,13 +23,8 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
         setMounted(true);
     }, []);
 
-    if (!mounted) {
-        return <WhaleAlertLoader bg="#FDFCF8" color="#050505" />;
-    }
-
-    if (showSplash) {
-        return <LoadingScreen onComplete={() => setShowSplash(false)} />;
-    }
+    // Render nothing at all while hydrating — avoids any flash/loader
+    if (!mounted) return null;
 
     // Unauthenticated users only see PC landing page as requested
     if (!hasSession) {

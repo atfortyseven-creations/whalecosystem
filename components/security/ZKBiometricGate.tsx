@@ -49,10 +49,6 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
       
       {/* Left side: Scanner */}
       <div className="relative z-10 flex flex-col items-center w-full md:w-1/2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/5 rounded-full mb-8">
-          <Shield size={12} className="text-emerald-600" />
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-700">ZK-Oracle Active</span>
-        </div>
 
         <div className="relative w-32 h-32 mb-8 flex items-center justify-center">
           <AnimatePresence mode="wait">

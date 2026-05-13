@@ -807,7 +807,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         <div className="flex items-center justify-between px-8 py-6 border-b border-black/5 bg-[#FAFAF8] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-[#0044CC] animate-pulse" />
-            <span className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#050505]">Secure Network</span>
           </div>
           <span className="font-mono text-[10px] uppercase tracking-widest text-black/40">End-to-End Encrypted</span>
         </div>

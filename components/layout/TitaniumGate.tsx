@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { SafeErrorBoundary } from '@/components/ui/SafeErrorBoundary';
-import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 import { createContext, useContext } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
@@ -113,29 +111,17 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
     return (
         <GateStateContext.Provider value={{ state, hasPlayedIntro: true }}>
-            <AnimatePresence mode="wait">
-                {/* THE APPLICATION (or EMERGENCY BYPASS) */}
-                {(state === 'APP' || forceVisible) ? (
-                    <div 
-                        className="relative z-10"
-                        style={forceVisible ? { opacity: 1, zIndex: 999, display: 'block' } : {}}
-                    >
-                        <SafeErrorBoundary>
-                            {children}
-                        </SafeErrorBoundary>
-                    </div>
-                ) : (
-                    <motion.div 
-                        key="loader" 
-                        initial={{ opacity: 0 }} 
-                        animate={{ opacity: 1 }} 
-                        exit={{ opacity: 0, transition: { duration: 0.5, ease: "easeOut" } }}
-                        className="fixed inset-0 z-[999] flex items-center justify-center bg-[#FDFCF8]"
-                    >
-                        <WhaleAlertLoader bg="transparent" color="#050505" />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* THE APPLICATION (or EMERGENCY BYPASS) — zero loading UI */}
+            {(state === 'APP' || forceVisible) ? (
+                <div 
+                    className="relative z-10"
+                    style={forceVisible ? { opacity: 1, zIndex: 999, display: 'block' } : {}}
+                >
+                    <SafeErrorBoundary>
+                        {children}
+                    </SafeErrorBoundary>
+                </div>
+            ) : null}
         </GateStateContext.Provider>
     );
 }

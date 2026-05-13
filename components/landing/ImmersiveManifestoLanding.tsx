@@ -78,12 +78,26 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.div>
         </motion.div>
 
-        {/* Right 4K Wave Presentation */}
-        <div className="absolute right-0 top-0 w-[60%] lg:w-1/2 h-full opacity-60 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 flex items-center justify-end lg:justify-center overflow-hidden mix-blend-multiply lg:relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent z-10 hidden lg:block" />
-          <div className="w-full h-full flex items-center justify-center translate-x-[20%] lg:translate-x-[5%]">
-             <img src="/olas-hokusai-4k.png" className="w-[150%] h-[150%] lg:w-[120%] lg:h-[120%] object-cover scale-[1.2] opacity-90 drop-shadow-2xl mix-blend-multiply" alt="4K Wave" />
-          </div>
+        {/* Right 4K Wave — strictly right half, never bleeds over text */}
+        <div className="hidden lg:block absolute right-0 top-0 w-1/2 h-full z-0 overflow-hidden pointer-events-none">
+          {/* Hard left-edge mask: cream fades cleanly into the wave */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-[#FAFAF8]/70 to-transparent z-10" style={{ width: '45%' }} />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] to-transparent z-10" style={{ width: '20%' }} />
+          <img
+            src="/olas-hokusai-4k.png"
+            alt="Wave"
+            className="absolute inset-0 w-full h-full object-cover object-left"
+            style={{ opacity: 0.85, mixBlendMode: 'multiply' }}
+          />
+        </div>
+        {/* Mobile: subtle wave behind content */}
+        <div className="lg:hidden absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <img
+            src="/olas-hokusai-4k.png"
+            alt="Wave"
+            className="absolute right-0 top-0 w-3/4 h-full object-cover object-left"
+            style={{ opacity: 0.18, mixBlendMode: 'multiply' }}
+          />
         </div>
         
         {/* Mobile Scanner Button */}
@@ -168,7 +182,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                 <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
                     <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
                         <div className="absolute inset-0 bg-[#0044CC]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
-                        <RemoteLottie path="BlockChain.json" className="w-[120%] h-[120%] object-contain scale-[1.1] transition-transform duration-700 group-hover:scale-[1.2]" />
+                        <RemoteLottie path="/BlockChain.json" className="w-[120%] h-[120%] object-contain scale-[1.1] transition-transform duration-700 group-hover:scale-[1.2]" />
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
                         <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
