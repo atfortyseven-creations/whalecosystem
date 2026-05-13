@@ -99,6 +99,222 @@ Whale Alert Corporation™ is the global leader in high-fidelity on-chain data s
 Our mission is to provide sovereign entities with the tools required to navigate the complex landscape of global digital capital flows with absolute precision and security.
     `
   },
+  'quickstart': {
+    title: 'Quickstart (5 min)',
+    category: 'Guides',
+    content: `
+# Platform Quickstart
+
+Initialize your Sovereign Terminal session and execute your first query in under 5 minutes.
+
+## 1. Cryptographic Handshake
+Navigate to the Connect portal. If you are on a PC, use your mobile device to scan the QR code and authorize the session via ECDSA signature.
+
+## 2. Global Mempool Access
+Once authenticated, navigate to the Dashboard. The terminal will automatically synchronize with the Neo4j active memory graph.
+
+## 3. First API Request
+Generate an API key in your Settings panel and execute a test query:
+\`\`\`bash
+curl -H "Authorization: Bearer \$WHALE_KEY" https://api.humanidfi.com/v3/telemetry/ping
+\`\`\`
+    `
+  },
+  'platform/architecture': {
+    title: 'Platform Architecture',
+    category: 'Core Architecture',
+    content: `
+# Sovereign Architecture
+
+The Sovereign Master Node infrastructure is designed for absolute deterministic reliability and zero-latency execution.
+
+## The Tri-Layer Matrix
+1. **Edge Ingestion**: Globally distributed Rust nodes listen directly to the Ethereum, Base, and Solana mempools.
+2. **Kinetic Memory Mesh**: Incoming telemetry is streamed via Kafka into a distributed Redis/Neo4j graph for real-time clustering.
+3. **Execution Terminal**: The frontend React/Next.js interface acts as a passive, zero-mock observer, rendering the state of the graph.
+
+## Decentralization Posture
+While the memory mesh is proprietary, all execution routing is handled locally by the user's wallet. The platform never holds custody of assets or private keys.
+    `
+  },
+  'platform/auth': {
+    title: 'Authentication (SIWE)',
+    category: 'Core Architecture',
+    content: `
+# SIWE & Zero-Knowledge Authentication
+
+Authentication on the Sovereign Protocol is strictly cryptographic. We do not use passwords.
+
+## The EIP-4361 Standard
+Sign-In with Ethereum (SIWE) provides a secure, standard way to authenticate.
+1. The server generates a single-use \`Nonce\`.
+2. The client signs a standard message containing the \`Nonce\`, \`Domain\`, and \`URI\`.
+3. The server verifies the ECDSA signature against the provided \`Address\`.
+
+## Biometric Liveness (V3)
+For institutional access, the terminal requires a 3D ZK-Liveness attestation. This ensures the operator is biologically present and mitigates automated Sybil attacks.
+    `
+  },
+  'developer/overview': {
+    title: 'Developer Overview',
+    category: 'Developer',
+    content: `
+# Developer Integration
+
+Welcome to the Sovereign API. Our infrastructure provides programmatic access to the world's most sophisticated on-chain surveillance data.
+
+## Access Tiers
+* **Standard**: REST access, 60 requests/min.
+* **Pro**: REST + WebSocket access, 300 requests/min.
+* **Institutional**: Dedicated Kafka streams, infinite limits.
+
+Navigate to your Dashboard > Settings to generate your \`wh_...\` API keys.
+    `
+  },
+  'developer/api/overview': {
+    title: 'REST API Reference',
+    category: 'Developer',
+    content: `
+# REST API V3
+
+The primary interface for historical queries, state fetching, and configuration.
+
+## Base URL
+\`https://api.humanidfi.com/v3\`
+
+## Authentication
+Pass your API key via the \`x-sovereign-key\` header.
+
+## Core Endpoints
+* \`/wallet/{address}/telemetry\`: Get historical flows.
+* \`/mempool/pending\`: Query active institutional dark pool transactions.
+* \`/zk-proof/verify\`: Validate a user's biological attestation.
+    `
+  },
+  'developer/ws/connection': {
+    title: 'WebSocket Streaming',
+    category: 'Developer',
+    content: `
+# High-Frequency WebSocket Streams
+
+For real-time telemetry, subscribe to our multiplexed WebSocket endpoints.
+
+## Connection
+\`wss://stream.humanidfi.com/v3/connect?token=YOUR_API_KEY\`
+
+## Channels
+Subscribe to channels using the \`SUBSCRIBE\` opcode:
+\`\`\`json
+{
+  "op": "SUBSCRIBE",
+  "channel": "whale_alerts_eth",
+  "threshold": 5000000
+}
+\`\`\`
+    `
+  },
+  'developer/sdk/typescript': {
+    title: 'TypeScript SDK',
+    category: 'Developer',
+    content: `
+# Sovereign TypeScript SDK
+
+The official, fully typed SDK for Node.js and browser environments.
+
+## Installation
+\`\`\`bash
+npm install @sovereign/whale-sdk
+\`\`\`
+
+## Usage
+\`\`\`typescript
+import { SovereignClient } from '@sovereign/whale-sdk';
+
+const client = new SovereignClient({ apiKey: process.env.WHALE_KEY });
+
+client.on('whaleTx', (tx) => {
+  console.log(\`Massive transfer: \${tx.usdValue} on \${tx.chain}\`);
+});
+\`\`\`
+    `
+  },
+  'operator/overview': {
+    title: 'Node Operator Overview',
+    category: 'Operator',
+    content: `
+# Node Operator Infrastructure
+
+Become a foundational pillar of the Sovereign Network by deploying a full indexing node.
+
+## Why Operate?
+Node operators receive programmatic yield generated by the network's API fees, proportional to their uptime and verified data integrity.
+
+## Node Types
+1. **Archive Indexer**: Stores the full historical graph.
+2. **Mempool Sentinel**: Monitors edge connections for pending transactions.
+    `
+  },
+  'operator/prerequisites': {
+    title: 'Hardware Prerequisites',
+    category: 'Operator',
+    content: `
+# Hardware Requirements
+
+Running a Sovereign Node requires institutional-grade hardware.
+
+## Minimum Specifications (Mempool Sentinel)
+* **CPU**: 8 Cores (e.g., AMD Ryzen 7 / Intel Core i7)
+* **RAM**: 32 GB ECC
+* **Storage**: 2 TB NVMe Gen4 SSD
+* **Network**: 1 Gbps Symmetric Fiber
+
+## Recommended Specifications (Archive Indexer)
+* **CPU**: 32 Cores (e.g., AMD EPYC / Intel Xeon)
+* **RAM**: 256 GB ECC
+* **Storage**: 16 TB NVMe Gen5 RAID 0
+* **Network**: 10 Gbps Dedicated Line
+    `
+  },
+  'operator/setup/node': {
+    title: 'Node Deployment Guide',
+    category: 'Operator',
+    content: `
+# Deploying a Full Node
+
+## 1. Clone the Repository
+\`\`\`bash
+git clone https://github.com/atfortyseven/sovereign-node.git
+cd sovereign-node
+\`\`\`
+
+## 2. Configure Environment
+Edit the \`.env.operator\` file and inject your staking wallet private key.
+
+## 3. Initialize Docker Swarm
+\`\`\`bash
+docker compose -f docker-compose.prod.yml up -d
+\`\`\`
+The node will begin synchronizing the graph. This process may take up to 72 hours.
+    `
+  },
+  'operator/monitoring': {
+    title: 'Telemetry & Monitoring',
+    category: 'Operator',
+    content: `
+# Node Monitoring
+
+Maintain a 99.99% uptime to avoid cryptographic slashing.
+
+## Grafana Dashboard
+Every node instance ships with a pre-configured Grafana dashboard accessible at port \`3030\`.
+
+## Critical Alerts
+Set up alerting for:
+* **Sync Delay**: If your node falls more than 50 blocks behind the mainnet.
+* **Disk IO**: NVMe degradation can cause database corruption.
+* **Memory Pressure**: Sudden spikes in RAM usage during high-volatility market events.
+    `
+  },
   'get-started': {
     title: 'Terminal Quickstart',
     category: 'Guides',

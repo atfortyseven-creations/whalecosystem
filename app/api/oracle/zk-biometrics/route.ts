@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyMessage } from 'viem';
+import { prisma } from '@/lib/prisma';
 
 /**
  * SOVEREIGN ZK-BIOMETRICS ORACLE (V3)
@@ -11,17 +12,33 @@ import { verifyMessage } from 'viem';
 
 export async function POST(req: NextRequest) {
     try {
-        const { address, signature, payload, timestamp } = await req.json();
+        const { address, signature, payload, timestamp, nonce } = await req.json();
 
-        if (!address || !signature || !payload) {
-            return NextResponse.json({ error: 'Missing cryptographic proof components' }, { status: 400 });
+        if (!address || !signature || !payload || !nonce || !timestamp) {
+            return NextResponse.json({ error: 'Missing cryptographic proof components or nonce' }, { status: 400 });
+        }
+
+        // 0. Strict Temporal Bound Check (60 seconds max delta)
+        const timeDelta = Math.abs(Date.now() - timestamp);
+        if (timeDelta > 60000) {
+            console.error(`[ZK-ORACLE] ❌ Temporal drift detected (${timeDelta}ms). Possible replay attack.`);
+            return NextResponse.json({ error: 'Payload expired' }, { status: 401 });
         }
 
         console.log(`[ZK-ORACLE] 🔵 Molecular audit initiated for: ${address}`);
 
-        // 1. Verify Payload Integrity
+        // 1. Verify Nonce (The Kill Switch)
+        const storedNonce = await prisma.siweNonce.findUnique({ where: { nonce } });
+        if (!storedNonce || storedNonce.expiresAt < new Date()) {
+            console.error(`[ZK-ORACLE] ❌ Invalid or expired nonce for ${address}. Violent rejection.`);
+            return NextResponse.json({ error: 'Invalid challenge response' }, { status: 401 });
+        }
+        // Destroy the nonce immediately (One-Time Use)
+        await prisma.siweNonce.delete({ where: { nonce } });
+
+        // 2. Verify Payload Integrity
         const payloadHash = payload.slice(-32); // Use the tail of the base64 as a quick 'hash' for binding
-        const message = `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nTimestamp: ${timestamp}`;
+        const message = `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
 
         // 2. Real Cryptographic Verification via Viem
         try {
@@ -48,6 +65,16 @@ export async function POST(req: NextRequest) {
         // 4. Persistence & Sovereign Attestation Issuance
         // Zero-Knowledge Proof minted immediately upon molecular verification.
         console.log(`[ZK-ORACLE] ✅ Molecular liveness confirmed for ${address}. Zero-Knowledge Proof minted.`);
+
+        // 5. Update Database (Zero Mock)
+        // Ensure the identity is fully recognized by the session layer.
+        await prisma.user.upsert({
+            where: { walletAddress: address.toLowerCase() },
+            // @ts-ignore: Schema updated but Prisma client may be stale locally
+            update: { isZkVerified: true },
+            // @ts-ignore: Schema updated but Prisma client may be stale locally
+            create: { walletAddress: address.toLowerCase(), isZkVerified: true, tier: 'FREE' }
+        });
 
         return NextResponse.json({
             success: true,

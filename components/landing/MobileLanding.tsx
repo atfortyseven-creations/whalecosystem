@@ -1190,6 +1190,20 @@ export function MobileLanding() {
           transition={{ delay: 0.25, duration: 0.7 }}
           className="w-full flex flex-col gap-3"
         >
+          {(() => {
+            const isZk = searchParams?.get('tab') === 'zk-identity' || searchParams?.get('next')?.includes('zk-identity');
+            if (!isZk) return null;
+            return (
+              <div className="w-full p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-start gap-3 mb-2">
+                <Fingerprint size={16} className="text-emerald-600 mt-0.5 shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 leading-tight">Identity Verification Flow</span>
+                  <span className="text-[9px] text-emerald-600/80 font-medium mt-1 leading-relaxed">Please connect your wallet on mobile to initiate the mandatory 3D Biometric scan for terminal access.</span>
+                </div>
+              </div>
+            );
+          })()}
+
           <div className="flex items-center gap-3 mb-1">
             <div className="flex-1 h-px bg-[#E5E5E5]" />
             <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#050505]/30">Connect Wallet</span>

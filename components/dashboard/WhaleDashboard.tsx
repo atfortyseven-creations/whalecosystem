@@ -10,7 +10,7 @@ import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBo
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
 import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBoundary';
 import { useSearchParams } from 'next/navigation';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 
@@ -151,57 +151,12 @@ const UnderDevelopmentPanel = ({
 
 export default function WhaleDashboard() {
     const searchParams = useSearchParams();
-    const { address, isConnected } = useAccount();
+    const { address, isConnected, isZkVerified: hasPassedZK, isChecking: isCheckingZK } = useSovereignAccount();
     const initialTab = searchParams.get('tab') || 'gold';
     const [activeTab, setActiveTab] = useState<string>(initialTab);
-    const [hasPassedZK, setHasPassedZK] = useState(false);
-    const [isCheckingZK, setIsCheckingZK] = useState(true);
 
-    // [SOVEREIGN-GATE] Cryptographic verification of KYC status
-    React.useEffect(() => {
-        const checkZKStatus = async () => {
-            if (!address) {
-                setIsCheckingZK(false);
-                return;
-            }
-            try {
-                // Priority 1: Persistent Local Storage (Fast path)
-                const localPassed = localStorage.getItem(`zk_attestation_v1_${address.toLowerCase()}`);
-                if (localPassed) {
-                    setHasPassedZK(true);
-                    setIsCheckingZK(false);
-                    return;
-                }
-
-                // Priority 2: Server-side validation (Truth path)
-                const res = await fetch('/api/auth/session');
-                const data = await res.json();
-                if (data?.user?.isZkVerified) {
-                    setHasPassedZK(true);
-                    localStorage.setItem(`zk_attestation_v1_${address.toLowerCase()}`, 'true');
-                }
-            } catch (err) {
-                console.warn('[ZK-GATE] Status check failed:', err);
-            } finally {
-                setIsCheckingZK(false);
-            }
-        };
-        checkZKStatus();
-    }, [address]);
-
-    const handleZKSuccess = async () => {
-        if (address) {
-            localStorage.setItem(`zk_attestation_v1_${address.toLowerCase()}`, 'true');
-            // Optimistic update + Server sync
-            setHasPassedZK(true);
-            try {
-                await fetch('/api/oracle/zk-biometrics/confirm', { 
-                    method: 'POST', 
-                    body: JSON.stringify({ address, status: 'SUCCESS' }) 
-                });
-            } catch {}
-        }
-    };
+    // [SOVEREIGN-GATE] Cryptographic verification is now handled centrally via useSovereignAccount
+    // which polls the server in the background for mobile handoff completion.
 
     // ── Sync URL param to state ──────────────────────────────────────────
     React.useEffect(() => {
@@ -380,7 +335,7 @@ export default function WhaleDashboard() {
                     <div className="flex flex-col items-center justify-center min-h-[600px] w-full max-w-4xl mx-auto px-4">
                         <div className="w-full">
                            <InstitutionalErrorBoundary moduleName="ZK-Biometric Identity Gate">
-                            <ZKBiometricGate onSuccess={handleZKSuccess} />
+                            <ZKBiometricGate onSuccess={() => window.location.reload()} />
                         </InstitutionalErrorBoundary>
                         </div>
                         <p className="mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 text-center">
