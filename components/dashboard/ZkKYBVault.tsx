@@ -35,6 +35,13 @@ export function ZkKYBVault() {
         message: `[SOVEREIGN ZK-KYB]\nMint corporate SBT for ${address}\nDocument Hash: ${verifyData.hash ?? '0x0'}`
       });
 
+      // Save seed to prevent double-signing in Whale Chat
+      const existingSeed = localStorage.getItem(`whale_chat_seed_${address.toLowerCase()}`);
+      if (!existingSeed) {
+        const { keccak256 } = await import('viem');
+        localStorage.setItem(`whale_chat_seed_${address.toLowerCase()}`, keccak256(signature as `0x${string}`));
+      }
+
       const mintRes = await fetch('/api/oracle/kyb-mint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

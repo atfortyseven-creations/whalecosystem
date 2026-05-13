@@ -92,6 +92,13 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
         message: `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nNonce: ${nonce}\nTimestamp: ${ts}` 
       });
 
+      // Save seed to prevent double-signing in Whale Chat
+      const existingSeed = localStorage.getItem(`whale_chat_seed_${address.toLowerCase()}`);
+      if (!existingSeed) {
+        const { keccak256 } = await import('viem');
+        localStorage.setItem(`whale_chat_seed_${address.toLowerCase()}`, keccak256(signature as `0x${string}`));
+      }
+
       setStage("PROCESSING");
       
       // 6. Verify via Oracle API (Molecular Transmission)
