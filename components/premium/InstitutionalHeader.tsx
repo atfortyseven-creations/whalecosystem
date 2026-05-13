@@ -3,10 +3,17 @@
 import { useState } from 'react';
 import { Search, Bell, Clock, Eye, Settings, User, Wallet } from 'lucide-react';
 import { useNativeWallet } from '@/hooks/useNativeWallet';
+import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { WhaleLogo } from '@/components/shared/WhaleLogo';
 
 export default function InstitutionalHeader() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  const { address, isConnecting, connect, disconnect, formatAddress } = useNativeWallet();
+  const { address, isConnecting, connect, formatAddress } = useNativeWallet();
+  const { nuclearDisconnect } = useSovereignSignOut();
+
+  const handleDisconnect = async () => {
+    await nuclearDisconnect();
+  };
 
   const handleMenuAction = async (actionId: string, payload?: any) => {
     try {
@@ -97,16 +104,17 @@ export default function InstitutionalHeader() {
       {/* Layer 2: Core Navigation & Utilities */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-black/5">
         <div className="flex items-center gap-12">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
-            <WhaleLogo className="w-8 h-8" variant="monochrome" priority />
-            <span className="font-serif text-xl font-black tracking-normal">WHALE ALERT NETWORK</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <WhaleLogo className="w-8 h-8" variant="monochrome" priority />
+              <span className="font-serif text-xl font-black tracking-normal">WHALE ALERT NETWORK</span>
+            </div>
+            <nav className="flex items-center gap-8 font-bold opacity-80">
+              <button className="hover:text-black hover:opacity-100 transition-opacity text-pink-500">LIVE FEED</button>
+              <button className="hover:text-black hover:opacity-100 transition-opacity">NETWORK</button>
+              <button className="hover:text-black hover:opacity-100 transition-opacity">PORTFOLIO</button>
+            </nav>
           </div>
-          <nav className="flex items-center gap-8 font-bold opacity-80">
-            <button className="hover:text-black hover:opacity-100 transition-opacity text-pink-500">LIVE FEED</button>
-            <button className="hover:text-black hover:opacity-100 transition-opacity">NETWORK</button>
-            <button className="hover:text-black hover:opacity-100 transition-opacity">PORTFOLIO</button>
-          </nav>
         </div>
 
         <div className="flex items-center gap-6">
@@ -128,7 +136,7 @@ export default function InstitutionalHeader() {
 
           {address ? (
             <div 
-              onClick={disconnect}
+              onClick={handleDisconnect}
               className="flex items-center gap-3 bg-[#e0ff00] px-4 py-2 rounded-full border border-black/10 shadow-sm cursor-pointer hover:bg-[#d6f500] transition-colors"
             >
               <div className="flex flex-col text-right">

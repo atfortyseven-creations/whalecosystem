@@ -126,6 +126,15 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   // ── Auto-Link Wallet WITHOUT secondary signature ────────────────────────
   useEffect(() => {
     if (!isMounted) return;
+
+    // Nuclear Logout Guard: If the user just manually disconnected in this tab session,
+    // do NOT auto-link them back immediately even if the wallet is still connected.
+    const justDisconnected = sessionStorage.getItem('__disconnected__') === '1';
+    if (justDisconnected && !isLinked) {
+        console.log('[LinkedGate] Nuclear Logout Guard active — blocking auto-link');
+        return;
+    }
+
     // Triple-check all layers — zero false positives
     if (typeof document !== 'undefined' && hasValidStoredSession(address)) {
       setLinked(true);
