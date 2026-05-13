@@ -223,15 +223,34 @@ export default function ConnectPage() {
   }, [qrSession, ephemeral, qrData, syncStatus]);
 
   useEffect(() => {
-    if (!mounted || !isConnected) return;
+    if (!mounted || !isConnected || !address) return;
     try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
+
+    // [EXPERT-FIX] If wallet is connected but not yet linked (cookie missing),
+    // we establish the link immediately to trigger redirection.
+    if (!isLinked) {
+      console.log("[Sovereign] Auto-linking desktop connection...");
+      const norm = address.toLowerCase();
+      // Layer 1: Cookie
+      document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+      // Layer 2: localStorage (for LinkedGate parity)
+      try {
+        localStorage.setItem('sovereign_session_v2', JSON.stringify({
+          address: norm,
+          exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
+        }));
+      } catch {}
+      setLinked(true);
+      return;
+    }
 
     if (isLinked) {
       setPendingId(null);
-      const t = setTimeout(() => { window.location.replace("/dashboard"); }, 5000);
+      // Immediate redirect for production-grade speed
+      const t = setTimeout(() => { window.location.replace("/dashboard"); }, 100);
       return () => clearTimeout(t);
     }
-  }, [isConnected, mounted, isLinked]);
+  }, [isConnected, address, mounted, isLinked, setLinked]);
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
     setPendingId(walletId);

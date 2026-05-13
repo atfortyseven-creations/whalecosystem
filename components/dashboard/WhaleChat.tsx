@@ -464,7 +464,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         setInitError('Identity authorization rejected. You must approve the secure channel signature to proceed.');
       } else if (errorMsg.includes('To use Whale Chat on mobile')) {
         setInitError(errorMsg);
-      } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector') || errorMsg.includes('signMessage')) {
+      } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector') || errorMsg.includes('signMessage') || errorMsg.toLowerCase().includes('unknown signer')) {
         setInitError('Active wallet connection lost or not detected. Please ensure your wallet app is open and connected directly to this browser.');
       } else if (errorMsg.includes('WASM') || errorMsg.includes('wasm')) {
         setInitError('Cryptographic WASM engine failure. This is often caused by browser security settings or incompatible device architectures.');
@@ -843,17 +843,29 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               <div className="w-full bg-red-50 text-red-700 text-[12px] font-mono p-5 rounded-xl border border-red-100 text-center leading-relaxed">
                 {initError}
               </div>
-              <button
-                onClick={initClient}
-                disabled={isInitializing}
-                className="w-full py-5 rounded-xl bg-[#050505] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#0044CC] hover:shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-              >
-                {isInitializing ? (
-                  <><Activity size={16} className="animate-spin" /> Initializing Handshake...</>
-                ) : (
-                  <><Lock size={16} /> Retry Protocol Initialization</>
-                )}
-              </button>
+              
+              {/* Expert UX: If the error is about a missing connector, offer to open the wallet modal */}
+              {(initError.includes('wallet connection lost') || initError.includes('Connect your wallet') || initError.toLowerCase().includes('unknown signer')) ? (
+                <button
+                  onClick={() => openAppKit()}
+                  className="w-full py-5 rounded-xl bg-[#050505] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#0044CC] hover:shadow-lg transition-all flex items-center justify-center gap-3 active:scale-[0.97]"
+                >
+                  <Wallet size={16} />
+                  Connect Wallet
+                </button>
+              ) : (
+                <button
+                  onClick={initClient}
+                  disabled={isInitializing}
+                  className="w-full py-5 rounded-xl bg-[#050505] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#0044CC] hover:shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                  {isInitializing ? (
+                    <><Activity size={16} className="animate-spin" /> Initializing Handshake...</>
+                  ) : (
+                    <><Lock size={16} /> Retry Protocol Initialization</>
+                  )}
+                </button>
+              )}
             </div>
           ) : isInitializing ? (
             <div className="flex flex-col items-center gap-5">
