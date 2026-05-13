@@ -21,7 +21,6 @@ export default function TermsPage() {
                 <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }} className="w-full text-center flex flex-col items-center mb-24">
                     <motion.div variants={FADE_UP} className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm mb-8">
                         <ShieldCheck size={16} className="text-[#0044CC]" />
-                        <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Institutional Agreement • Section L-1</span>
                     </motion.div>
                     
                     <motion.h1 variants={FADE_UP} className="text-[48px] sm:text-[64px] md:text-[80px] font-black tracking-tighter leading-[0.95] text-[#0A0A0A] uppercase mb-8">

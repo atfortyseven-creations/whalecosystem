@@ -321,7 +321,6 @@ export default function PortfolioPage() {
                 <div className="w-full lg:w-1/2 relative z-10 space-y-6 md:space-y-8">
                     <div className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm">
                         <Activity size={14} className="text-[#0044CC]" />
-                        <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Quantitative Portfolio</span>
                     </div>
                     <h2 className="text-[40px] md:text-[56px] font-black uppercase text-[#0A0A0A] leading-[0.95] tracking-tighter">
                         Track liquidity. <br /><span className="text-[#0044CC]">Zero noise.</span>

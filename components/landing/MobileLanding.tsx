@@ -1157,7 +1157,7 @@ export function MobileLanding() {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-32 pb-[max(2rem,env(safe-area-inset-bottom,2rem))] gap-8 max-w-[440px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-28 pb-[max(2rem,env(safe-area-inset-bottom,2rem))] gap-8 max-w-[500px] w-full mx-auto">
 
         {/* Hero */}
         <motion.div
@@ -1167,7 +1167,7 @@ export function MobileLanding() {
           className="text-center"
         >
           {/* Security trust badge removed */}
-          <h1 className="text-[2.6rem] sm:text-[3.2rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
+          <h1 className="text-[2.4rem] sm:text-[3rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
             Track institutional capital
             <span className="block" style={{ color: '#0044CC' }}>before markets react.</span>
           </h1>

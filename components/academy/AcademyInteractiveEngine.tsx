@@ -137,7 +137,6 @@ export function AcademyInteractiveEngine({
                 <div className="w-full lg:w-1/2 relative z-10 space-y-6 lg:space-y-8 text-center lg:text-left">
                     <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#FAFAF8] border border-black/5 rounded-full shadow-sm mx-auto lg:mx-0">
                         <GraduationCap size={14} className="text-[#0044CC]" />
-                        <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Quantitative Institute</span>
                     </div>
                     
                     <h1 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-[0.95]">

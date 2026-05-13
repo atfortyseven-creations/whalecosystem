@@ -135,7 +135,7 @@ export default function DeveloperLanding() {
             {/* Block 1 */}
             <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
                 <div className="w-full lg:w-1/2 order-2 lg:order-1 bg-[#FAFAF8] rounded-[3rem] border border-black/5 shadow-sm p-12 flex items-center justify-center aspect-square">
-                    <RemoteLottie path="Data network.json" className="scale-125 w-full max-w-[500px]" />
+                    <RemoteLottie path="Connected world.json" className="scale-125 w-full max-w-[500px]" />
                 </div>
                 <div className="w-full lg:w-1/2 order-1 lg:order-2 space-y-8">
                     <div className="w-12 h-12 rounded-2xl bg-[#0044CC]/10 flex items-center justify-center">
@@ -164,7 +164,7 @@ export default function DeveloperLanding() {
                     </p>
                 </div>
                 <div className="w-full lg:w-1/2 bg-[#FAFAF8] rounded-[3rem] border border-black/5 shadow-sm p-12 flex items-center justify-center aspect-square">
-                    <RemoteLottie path="Security.json" className="scale-125 w-full max-w-[500px]" />
+                    <RemoteLottie path="/BlockChain.json" className="scale-125 w-full max-w-[500px]" />
                 </div>
             </div>
 

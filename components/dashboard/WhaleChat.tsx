@@ -150,11 +150,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // We always attempt auto-init on both desktop and mobile. If WASM fails on mobile,
   // the error boundary surfaces a manual "Retry" button. This is better than
   // silently blocking mobile users from ever seeing the Activate button.
-  useEffect(() => {
-    if (isConnected && address && forceAutoInit && !client && !initInFlight.current && !initError) {
-      handleConnect();
-    }
-  }, [isConnected, address, forceAutoInit, client, initError, handleConnect]);
 
   // Telemetry: Heartbeat Loop
   useEffect(() => {
@@ -344,7 +339,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     }
   }, [activePeer, address]);
 
-  const loadConversations = async () => {
+  const loadConversations = useCallback(async () => {
     try {
       const stored = localStorage.getItem(`whale_chat_history_${address}`);
       if (stored) {
@@ -354,7 +349,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         setConversations([]);
       }
     } catch (e) {}
-  };
+  }, [address]);
 
   /**
    * Derive a deterministic XMTP seed from a one-time wallet signature or the Sovereign Vault.
@@ -362,7 +357,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
    * 
    * MASTER-FIX: Achieves 0-signature activation for Vault users and 1-signature for external wallets.
    */
-  const getDeterministicSeed = async (): Promise<string | null> => {
+  const getDeterministicSeed = useCallback(async (): Promise<string | null> => {
     if (!address) return null;
     const STORAGE_KEY = `whale_chat_seed_${address.toLowerCase()}`;
     
@@ -416,10 +411,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       console.warn('[XMTP] Seed derivation failed or cancelled:', err);
       return null;
     }
-  };
+  }, [address, signMessageAsync]);
 
   // Initialize REAL XMTP Network
-  const initClient = async () => {
+  const initClient = useCallback(async () => {
     if (!address) return;
     if (initInFlight.current) return;
     initInFlight.current = true;
@@ -442,9 +437,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           } catch (sigErr: any) {
             const msg = sigErr?.message || '';
             if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector')) {
-              if (isSovereignHandshake) {
-                throw new Error('QR_SESSION_RESTRICTION');
-              } else {
+                const hasVault = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_vault');
+                if (isSovereignHandshake && !hasVault) {
+                  throw new Error('QR_SESSION_RESTRICTION');
+                } else {
                 throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this device.');
               }
             }
@@ -479,7 +475,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       setIsInitializing(false);
       initInFlight.current = false;
     }
-  };
+  }, [address, getDeterministicSeed, isMobile, signMessageAsync, isSovereignHandshake, loadConversations]);
+
+  // AUTO-INITIALIZE: When wallet is connected and XMTP not yet started, auto-init.
+  useEffect(() => {
+    if (isConnected && address && forceAutoInit && !client && !initInFlight.current && !initError) {
+      initClient();
+    }
+  }, [isConnected, address, forceAutoInit, client, initError, initClient]);
 
   const persistToLocal = (convs: ConversationMeta[]) => {
     try {
@@ -809,7 +812,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-[#0044CC] animate-pulse" />
           </div>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-black/40">End-to-End Encrypted</span>
+          <div className="w-4" />
         </div>
 
         {/* Hero Institutional Section */}
@@ -1108,15 +1111,15 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
               <div className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm">
                   <Shield size={14} className="text-[#0044CC]" />
-                  <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">End-to-End Encryption</span>
+                  <div className="w-4" />
               </div>
 
               <h2 className="text-[32px] md:text-[40px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-none mt-2">
-                Whale Alert Network
+                Sovereign Protocol.
               </h2>
               
               <p className="font-sans text-[15px] md:text-[17px] text-slate-500 leading-relaxed max-w-xl mx-auto mt-2 font-bold tracking-widest uppercase">
-                Presenting FORUM P2P by Humanity Ledger
+                Peer-to-Peer Secure Terminal
               </p>
 
               <p className="font-mono text-[10px] text-black/30 uppercase tracking-[0.2em] mt-8">

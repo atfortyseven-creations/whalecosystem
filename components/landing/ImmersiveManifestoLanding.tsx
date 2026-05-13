@@ -37,7 +37,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         {/* Left Content */}
         <motion.div 
           initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-          className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-32 pb-24 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
+          className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-20 pb-24 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
         >
 
           <motion.h1 variants={FADE_UP} className="text-[40px] sm:text-[56px] md:text-[64px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-4xl">
