@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap, Mic, MicOff, Play, Pause, Wallet, QrCode } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
-import { RemoteLottie } from '@/components/ui/RemoteLottie';
+
 import { useAppKit } from '@reown/appkit/react';
 import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate, discoverNewPeers } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
@@ -1102,8 +1102,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           <div className="flex-1 flex flex-col items-center justify-center bg-[#FAFAF8] relative overflow-hidden p-6">
             <div className="flex flex-col items-center gap-6 max-w-2xl text-center select-none relative z-10">
               
-              <div className="w-24 h-24 mb-4 flex items-center justify-center">
-                 <RemoteLottie path="Safe Box.json" className="w-full h-full scale-125 opacity-100" />
+              <div className="w-24 h-24 mb-4 flex items-center justify-center bg-black/[0.02] rounded-full border border-black/5">
+                 <Shield size={40} className="text-[#050505]/40" />
               </div>
 
               <div className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm">
@@ -1116,7 +1116,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               </h2>
               
               <p className="font-serif text-[15px] md:text-[17px] text-slate-500 leading-relaxed max-w-xl mx-auto mt-2">
-                Encrypted Peer-to-Peer Relay. This communication architecture operates entirely outside centralized databases. Every transmission is mathematically secured on the XMTP network, guaranteeing that your strategic intelligence remains strictly between authenticated nodes.
+                This communication architecture operates entirely outside centralized databases. Every transmission is mathematically secured via end-to-end encryption on the decentralized XMTP network, guaranteeing that your strategic intelligence remains strictly between authenticated nodes.
               </p>
 
               <p className="font-mono text-[10px] text-black/30 uppercase tracking-[0.2em] mt-8">
@@ -1124,10 +1124,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               </p>
             </div>
             
-            {/* Background ambient Lottie */}
-            <div className="absolute opacity-[0.03] pointer-events-none -right-20 -bottom-20">
-               <RemoteLottie path="isometric-cube.json" className="w-[500px] h-[500px]" />
-            </div>
+
           </div>
         )}
 

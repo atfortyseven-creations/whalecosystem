@@ -6,7 +6,7 @@ import {
   Ticket, Flame, Search, Layers, LineChart, Book,
   Network, Compass, Landmark, BarChart3, FlaskConical,
   Wallet, Shield, Database, MessageSquare,
-  LayoutDashboard, MessageCircle, Camera
+  LayoutDashboard, MessageCircle, Camera, Fingerprint
 } from 'lucide-react';
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
@@ -70,6 +70,18 @@ const WhaleChat = dynamic(
 );
 const MorphoYieldDashboard = dynamic(
   () => import('@/components/dashboard/MorphoYieldDashboard').then(m => m.MorphoYieldDashboard),
+  { ssr: false }
+);
+const SovereignAMLOracle = dynamic(
+  () => import('@/components/dashboard/SovereignAMLOracle').then(m => m.SovereignAMLOracle),
+  { ssr: false }
+);
+const ZkKYBVault = dynamic(
+  () => import('@/components/dashboard/ZkKYBVault').then(m => m.ZkKYBVault),
+  { ssr: false }
+);
+const ZKBiometricGate = dynamic(
+  () => import('@/components/security/ZKBiometricGate').then(m => m.ZKBiometricGate),
   { ssr: false }
 );
 
@@ -279,6 +291,9 @@ export default function WhaleDashboard() {
 
             case 'zk':
                 return <><PanelHeader icon={Shield} title="ZK Shield" description="Monitor Aztec Network's zero-knowledge rollup pipeline. Visualise pending proofs and mempool activity." accent="#9945FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`zk-shield-${refreshKey}`}><AztecMempoolSpace /></DashboardErrorBoundary></div></>;
+
+            case 'zk-identity':
+                return <><PanelHeader icon={Fingerprint} title="ZK Identity & Compliance" description="Zero-knowledge biometric authentication, KYC/KYB document vault, and real-time AML telemetry. No PII is stored." accent="#10B981" /><div className="flex flex-col gap-6 w-full min-h-[950px] shrink-0"><DashboardErrorBoundary key={`zk-identity-${refreshKey}`}><div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full"><div className="flex flex-col gap-6"><ZKBiometricGate /><SovereignAMLOracle /></div><ZkKYBVault /></div></DashboardErrorBoundary></div></>;
 
             case 'news':
                 return <><PanelHeader icon={Newspaper} title="News" description="The latest news and market analysis curated from key sources in crypto and global finance." accent="#050505" /><div className="h-[750px] shrink-0"><DashboardErrorBoundary key={`news-${refreshKey}`}><NewsOfToday /></DashboardErrorBoundary></div></>;

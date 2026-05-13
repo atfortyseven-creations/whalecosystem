@@ -1,0 +1,89 @@
+"use client";
+
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { UploadCloud, FileText, CheckCircle, Shield, Key } from "lucide-react";
+
+export function ZkKYBVault() {
+  const [stage, setStage] = useState<"IDLE" | "UPLOADING" | "VERIFYING" | "MINTING" | "COMPLETED">("IDLE");
+
+  const handleUpload = () => {
+    setStage("UPLOADING");
+    setTimeout(() => setStage("VERIFYING"), 1500);
+    setTimeout(() => setStage("MINTING"), 4000);
+    setTimeout(() => setStage("COMPLETED"), 6000);
+  };
+
+  return (
+    <div className="bg-[#050505] rounded-[24px] p-8 text-white font-mono relative overflow-hidden border border-white/10 shadow-2xl">
+      {/* Dark mode abstract matrix background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.1)_0%,transparent_70%)] pointer-events-none" />
+      
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-[18px] font-black uppercase tracking-widest text-white">Institutional KYB Vault</h2>
+            <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mt-1">Zk-Proof Corporate Identity Protocol</p>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+            <Key size={16} className="text-emerald-500" />
+          </div>
+        </div>
+
+        <div className="w-full min-h-[250px] sm:aspect-[2/1] rounded-2xl border border-dashed border-white/20 bg-white/[0.02] flex flex-col items-center justify-center p-6 relative overflow-hidden group">
+          
+          <AnimatePresence mode="wait">
+            {stage === "IDLE" && (
+              <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center cursor-pointer" onClick={handleUpload}>
+                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-white/10 transition-all">
+                   <UploadCloud size={20} className="text-white/60" />
+                </div>
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">Upload Corporate Docs</span>
+                <span className="text-[9px] text-white/40 tracking-wider mt-2 max-w-[200px] text-center">Drag & drop Articles of Incorporation or Proof of Address</span>
+              </motion.div>
+            )}
+
+            {stage === "UPLOADING" && (
+              <motion.div key="uploading" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center">
+                <FileText size={24} className="text-white/40 animate-bounce mb-4" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/80">Encrypting Payload...</span>
+              </motion.div>
+            )}
+
+            {stage === "VERIFYING" && (
+              <motion.div key="verifying" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center w-full">
+                <div className="w-full max-w-[200px]">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/60">Idenfy AI Oracle</span>
+                    <span className="text-[9px] text-emerald-500 animate-pulse">Analyzing</span>
+                  </div>
+                  <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div className="h-full bg-emerald-500" initial={{ width: "0%" }} animate={{ width: "100%" }} transition={{ duration: 2.5, ease: "linear" }} />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {stage === "MINTING" && (
+              <motion.div key="minting" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center">
+                <Shield size={24} className="text-emerald-500 animate-pulse mb-4" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">Minting Zk-SBT...</span>
+              </motion.div>
+            )}
+
+            {stage === "COMPLETED" && (
+              <motion.div key="completed" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
+                  <CheckCircle size={24} className="text-emerald-500" />
+                </div>
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-400">KYB Attestation Issued</span>
+                <span className="text-[9px] text-white/40 tracking-wider mt-2">Zero-knowledge proof saved to wallet. Source files permanently destroyed.</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+        </div>
+      </div>
+    </div>
+  );
+}

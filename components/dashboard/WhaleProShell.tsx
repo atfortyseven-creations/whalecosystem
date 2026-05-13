@@ -10,7 +10,7 @@ import {
     Network, Ticket, Flame, Menu,
     BookOpen, Database, MessageSquare,
     Landmark, Compass,
-    LineChart, Lock, Book, Info, X, ArrowUpRight, CreditCard,
+    LineChart, Lock, Book, Info, X, ArrowUpRight, CreditCard, Fingerprint,
     MessageCircle
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
@@ -51,6 +51,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'morpho',       label: 'Morpho Base',       icon: <Database size={17}/>, badge: 'LIVE', badgeColor: '#0052FF' },
 
     { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/>,    dividerBefore: 'ZK Layer' },
+    { id: 'zk-identity',  label: 'Sovereign ID',      icon: <Fingerprint size={17}/>, badge: 'ZK', badgeColor: '#10B981' },
 
     { id: 'chat',         label: 'Whale Chat',       icon: <MessageCircle size={17}/>, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF' },
     { id: 'logs',         label: 'Session Logs',      icon: <Database size={17}/>,  dividerBefore: 'System' },

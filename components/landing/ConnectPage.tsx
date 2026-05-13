@@ -7,7 +7,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { useUIStore } from "@/lib/store/ui-store";
 import { toast } from "sonner";
-import { RemoteLottie } from "@/components/ui/RemoteLottie";
+
 import {
   ArrowRight,
   Loader2,
@@ -258,11 +258,6 @@ export default function ConnectPage() {
         {/* Precision Blueprint Grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
         
-        {/* Massive Lottie Integration - Rotated & Faded for scale */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] mix-blend-multiply pointer-events-none select-none">
-          <RemoteLottie path="Abstract Isometric Loader #1.json" className="w-[180%] h-[180%] object-contain scale-[1.2]" />
-        </div>
-        
         {/* Vignette & Soft lighting */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#FDFCF8_100%)] z-10 opacity-80" />
       </div>
@@ -324,7 +319,7 @@ export default function ConnectPage() {
                         </div>
                         <div className="flex items-center gap-4 group/item w-full p-2 rounded-xl hover:bg-black/5 transition-colors">
                           <span className="text-[9px] font-mono bg-black/5 text-[#050505] w-6 h-6 flex items-center justify-center rounded-full border border-black/10 group-hover/item:bg-black group-hover/item:text-white transition-colors">2</span>
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]/70">Scan crypto matrix</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]/70">Scan QR code</span>
                         </div>
                         <div className="flex items-center gap-4 group/item w-full p-2 rounded-xl hover:bg-black/5 transition-colors">
                           <span className="text-[9px] font-mono bg-black/5 text-[#050505] w-6 h-6 flex items-center justify-center rounded-full border border-black/10 group-hover/item:bg-black group-hover/item:text-white transition-colors">3</span>
@@ -349,7 +344,7 @@ export default function ConnectPage() {
                 {qrSession && (
                   <button onClick={() => { setQrSession(null); setSyncStatus("IDLE"); }}
                     className="text-[9px] font-mono text-[#050505]/30 hover:text-[#050505] uppercase tracking-[0.4em] transition-colors">
-                    Refresh Matrix
+                    Refresh QR
                   </button>
                 )}
               </div>
@@ -385,10 +380,9 @@ export default function ConnectPage() {
                   transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                   className="flex flex-col items-center justify-center gap-10 flex-1 py-8 px-4"
                 >
-                  {/* Majestic Lottie Container */}
-                  <div className="w-full max-w-[260px] aspect-square rounded-full border border-black/5 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.05)] flex items-center justify-center overflow-hidden mb-2 relative group">
+                  <div className="w-full max-w-[120px] aspect-square rounded-full border border-black/5 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.05)] flex items-center justify-center overflow-hidden mb-2 relative group">
                     <div className="absolute inset-0 bg-[#FAFAF8] opacity-50" />
-                    <RemoteLottie path="Server infrastructure.json" className="w-[150%] h-[150%] object-contain scale-[1.3] filter contrast-125 saturate-50 mix-blend-darken" />
+                    <CheckCircle size={48} className="text-emerald-500 z-10" />
                     <div className="absolute inset-0 border-[2px] border-emerald-500/20 rounded-full animate-[spin_12s_linear_infinite] [border-style:dashed]" />
                   </div>
 
@@ -418,11 +412,18 @@ export default function ConnectPage() {
                       <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
                       <span className="relative z-10 flex items-center gap-3">Enter Terminal <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></span>
                     </button>
-                    <div className="flex items-center gap-3">
-                      <Activity size={12} className="text-[#050505]/30 animate-pulse" />
+                    <div className="flex items-center gap-1">
                       <span className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-[0.3em]">
-                        Auto-routing in 5s...
+                        Auto-routing
                       </span>
+                      <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
+                        className="text-[10px] font-mono text-[#050505]/40 tracking-widest"
+                      >
+                        ...
+                      </motion.span>
                     </div>
                   </div>
 
@@ -438,7 +439,7 @@ export default function ConnectPage() {
                         className="w-full flex items-center justify-center gap-3 py-4 rounded-xl border border-black/10 bg-white shadow-sm font-black uppercase tracking-[0.2em] text-[11px] text-[#050505] active:scale-[0.97] transition-all hover:border-black/30"
                       >
                         <ScanLine size={16} />
-                        Scan Matrix to Sync
+                        Scan QR to Sync
                       </button>
                     </motion.div>
                   )}

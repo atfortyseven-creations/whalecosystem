@@ -7,7 +7,7 @@ import {
   Globe, LayoutDashboard,
   Book, Network, Landmark,
   Shield, Database, MessageSquare,
-  Command
+  Command, Fingerprint
 } from "lucide-react";
 
 // ── Only the routes that actually exist in SIDEBAR_ITEMS ──────────────────────
@@ -30,6 +30,7 @@ const PAGES = [
 
   // ── ZK Layer ──
   { id: "zk",            label: "Aztec Pipeline",  group: "ZK Layer",       icon: <Shield size={15} /> },
+  { id: "zk-identity",   label: "Sovereign ID",    group: "ZK Layer",       icon: <Fingerprint size={15} /> },
 
   // ── Communications ──
   { id: "chat",          label: "Whale Chat",      group: "Communications", icon: <MessageSquare size={15} /> },
