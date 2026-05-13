@@ -98,6 +98,7 @@ model User {
   avatarUrl         String?  @db.Text
   bio               String?  @db.Text
   isPro             Boolean  @default(false)
+  isZkVerified      Boolean  @default(false)
   tier              String   @default("FREE")
   lastActive        DateTime @default(now())
   goldTicketTokenId String?

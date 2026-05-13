@@ -10,7 +10,8 @@ interface ZKBiometricGateProps {
 }
 
 export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
-  const [stage, setStage] = useState<"IDLE" | "SCANNING" | "PROCESSING" | "SUCCESS">("IDLE");
+  const [stage, setStage] = useState<"IDLE" | "SCANNING" | "PROCESSING" | "SUCCESS" | "ERROR">("IDLE");
+  const [errorMessage, setErrorMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -43,9 +44,18 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
 
       // 2. Wait for Video Ready (Molecular Precision)
       if (videoRef.current) {
-        await new Promise((resolve) => {
-          if (videoRef.current!.readyState >= 2) resolve(true);
-          else videoRef.current!.onloadeddata = () => resolve(true);
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error("Camera timeout")), 10000);
+          const check = () => {
+            if (!videoRef.current) return;
+            if (videoRef.current.readyState >= 2) {
+              clearTimeout(timeout);
+              resolve(true);
+            } else {
+              requestAnimationFrame(check);
+            }
+          };
+          check();
         });
       }
 
@@ -87,11 +97,12 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
       setStage("SUCCESS");
       if (onSuccess) onSuccess(signature);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("[ZK-Gate] Verification Error:", error);
       if (stream) stream.getTracks().forEach(t => t.stop());
       setStream(null);
-      setStage("IDLE");
+      setErrorMessage(error.message || "Verification failed");
+      setStage("ERROR");
     }
   };
 
@@ -108,11 +119,14 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
             {stage === "IDLE" && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/5 rounded-full flex items-center justify-center">
                 {!isMobile ? (
-                  <img 
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
-                    alt="Scan on Mobile"
-                    className="w-24 h-24 p-1 bg-white rounded-lg shadow-sm grayscale"
-                  />
+                  <div className="flex flex-col items-center gap-3">
+                    <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                      alt="Scan on Mobile"
+                      className="w-24 h-24 p-2 bg-white rounded-xl shadow-lg border border-black/10"
+                    />
+                    <span className="text-[8px] font-black uppercase tracking-widest text-black/40">Mobile Handoff Req.</span>
+                  </div>
                 ) : (
                   <div className="w-12 h-12 border-2 border-black/10 rounded-full" />
                 )}
@@ -144,7 +158,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
                     strokeDasharray="301.59" 
                     initial={{ strokeDashoffset: 301.59 }}
                     animate={{ strokeDashoffset: 0 }} 
-                    transition={{ ease: "linear", duration: 2.5 }}
+                    transition={{ ease: "easeInOut", duration: 1.5 }} // [MOLECULAR-SPEED] Rapid initial capture
                   />
                 </svg>
               </motion.div>
@@ -199,6 +213,16 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
                 <p className="text-[10px] text-black/50 leading-relaxed tracking-wide">
                   Zero-Knowledge Proof injected into session. Sovereignty guaranteed.
                 </p>
+              </motion.div>
+            )}
+
+            {stage === "ERROR" && (
+              <motion.div key="text-error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-red-500">Security Fault</h3>
+                <p className="text-[10px] text-red-500/70 leading-relaxed tracking-wide uppercase font-black">
+                  {errorMessage}
+                </p>
+                <button onClick={() => setStage("IDLE")} className="mt-4 text-[9px] font-black uppercase tracking-[0.2em] text-black/40 underline">Retry Access</button>
               </motion.div>
             )}
           </AnimatePresence>

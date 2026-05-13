@@ -28,7 +28,8 @@ export const RemoteLottie = ({
     const [error, setError] = useState(false);
 
     useEffect(() => {
-        const fullPath = path.startsWith('/') ? path : `/lotties/${path}`;
+        const rawPath = path.startsWith('/') ? path : `/lotties/${path}`;
+        const fullPath = encodeURI(rawPath);
         
         fetch(fullPath)
             .then(res => {

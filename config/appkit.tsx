@@ -16,11 +16,10 @@ import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors';
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
     || process.env.NEXT_PUBLIC_WC_PROJECT_ID
-    || 'bf1083a298e7222c838266166b12b2ba'; // Whale Alert Network production project
-if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
-    if (typeof window !== 'undefined') {
-        console.warn('[WalletConnect] Using hardcoded project ID. Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.');
-    }
+    || '093232b25784a0694c642ad54a6331fa'; // Master WalletConnect ID (Synced from next.config.js)
+
+if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID && typeof window !== 'undefined') {
+    console.warn('[WalletConnect] Using hardcoded project ID. Ensure NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is set in production.');
 }
 
 // 2. Interstellar Node Override
@@ -97,20 +96,23 @@ const queryClient = new QueryClient()
 // or a Railway preview URL), the WalletConnect Cloud relay will SILENTLY REJECT the session.
 // This causes the "Open Wallet" deep-link button on mobile to do absolutely nothing.
 //
-// Therefore, we MUST hardcode the canonical URL here, even for local development.
-const CANONICAL_APP_URL = 'https://humanidfi.com';
+// [MOBILE-HARDENING] Resolve canonical URL dynamically from window location.
+// This prevents 'Domain Mismatch' errors on preview/deployment URLs.
+const getCanonicalUrl = () => {
+  if (typeof window === 'undefined') return 'https://humanidfi.com';
+  return window.location.origin;
+};
+
+const CANONICAL_APP_URL = getCanonicalUrl();
 
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Humanity Ledger',
     url: CANONICAL_APP_URL,
-    icons: ['https://humanidfi.com/official-whale-monochrome.png'],
+    icons: [`${CANONICAL_APP_URL}/official-whale-monochrome.png`],
     redirect: {
-        // universal: the HTTPS URL wallets use after signing to return to the dApp.
-        // For web apps, ONLY this field should be set.
-        // redirect.native ('wc://') is for native iOS/Android apps with a registered
-        // URI scheme — setting it for a web app confuses wallets and can silently
-        // break the post-sign redirect on some Android implementations.
+        // [INSTITUTIONAL PERFECTION] For web apps, ONLY universal (HTTPS) should be set.
+        // native redirects ('wc://') cause app-switching loops on some Android/iOS wallet implementations.
         universal: CANONICAL_APP_URL,
     }
 }
