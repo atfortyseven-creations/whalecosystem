@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
 import { motion } from "framer-motion";
 import { ShieldAlert, CheckCircle, Search, Server, Activity, AlertTriangle, Fingerprint } from "lucide-react";
 
@@ -8,14 +9,29 @@ export function SovereignAMLOracle({ address = "0x..." }: { address?: string }) 
   const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
 
+  const { address: connectedAddress } = useAccount();
+  const targetAddress = address !== "0x..." ? address : connectedAddress;
+
   useEffect(() => {
-    // Simulate ZK Oracle check fetching AML score
-    const timeout = setTimeout(() => {
-      setScore(98);
-      setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timeout);
-  }, []);
+    if (!targetAddress) return;
+    setLoading(true);
+    
+    // Pure On-Chain/API articulated fetch. Zero mock data.
+    const fetchOracleData = async () => {
+      try {
+        const response = await fetch(`/api/oracle/aml-telemetry?address=${targetAddress}`);
+        if (!response.ok) throw new Error("Oracle failed");
+        const data = await response.json();
+        setScore(data.score ?? 0);
+      } catch (error) {
+        setScore(0); // Failsafe score
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOracleData();
+  }, [targetAddress]);
 
   return (
     <div className="bg-white border border-black/5 rounded-[24px] p-6 shadow-sm font-mono text-[#050505]">
@@ -46,7 +62,7 @@ export function SovereignAMLOracle({ address = "0x..." }: { address?: string }) 
             {loading ? (
               <div className="text-[32px] font-black leading-none animate-pulse">--</div>
             ) : (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-[40px] font-black leading-none tracking-tighter text-emerald-600">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`text-[40px] font-black leading-none tracking-tighter ${score >= 80 ? 'text-emerald-600' : score >= 50 ? 'text-yellow-500' : 'text-red-600'}`}>
                 {score}
               </motion.div>
             )}
@@ -57,7 +73,7 @@ export function SovereignAMLOracle({ address = "0x..." }: { address?: string }) 
               initial={{ width: 0 }} 
               animate={{ width: loading ? '0%' : `${score}%` }} 
               transition={{ duration: 1, ease: "easeOut" }}
-              className="h-full bg-emerald-500 rounded-full" 
+              className={`h-full rounded-full ${score >= 80 ? 'bg-emerald-500' : score >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`} 
             />
           </div>
         </div>

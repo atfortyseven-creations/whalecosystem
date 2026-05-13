@@ -1,17 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UploadCloud, FileText, CheckCircle, Shield, Key } from "lucide-react";
+import { useSignMessage, useAccount } from "wagmi";
 
 export function ZkKYBVault() {
   const [stage, setStage] = useState<"IDLE" | "UPLOADING" | "VERIFYING" | "MINTING" | "COMPLETED">("IDLE");
 
-  const handleUpload = () => {
-    setStage("UPLOADING");
-    setTimeout(() => setStage("VERIFYING"), 1500);
-    setTimeout(() => setStage("MINTING"), 4000);
-    setTimeout(() => setStage("COMPLETED"), 6000);
+  const { signMessageAsync } = useSignMessage();
+  const { address } = useAccount();
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !address || stage !== "IDLE") return;
+
+    try {
+      setStage("UPLOADING");
+      const formData = new FormData();
+      formData.append('document', file);
+      formData.append('address', address);
+
+      const uploadRes = await fetch('/api/oracle/kyb-upload', {
+        method: 'POST',
+        body: formData
+      });
+      if (!uploadRes.ok) throw new Error("Upload failed");
+      
+      setStage("VERIFYING");
+      const verifyData = await uploadRes.json();
+      
+      setStage("MINTING");
+      const signature = await signMessageAsync({
+        message: `[SOVEREIGN ZK-KYB]\nMint corporate SBT for ${address}\nDocument Hash: ${verifyData.hash ?? '0x0'}`
+      });
+
+      const mintRes = await fetch('/api/oracle/kyb-mint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, signature })
+      });
+      if (!mintRes.ok) throw new Error("Mint failed");
+
+      setStage("COMPLETED");
+    } catch (err) {
+      setStage("IDLE");
+    }
   };
 
   return (
@@ -34,13 +68,14 @@ export function ZkKYBVault() {
           
           <AnimatePresence mode="wait">
             {stage === "IDLE" && (
-              <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center cursor-pointer" onClick={handleUpload}>
+              <motion.label key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center cursor-pointer">
+                <input type="file" className="hidden" onChange={handleUpload} accept=".pdf,.png,.jpg,.jpeg" />
                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-white/10 transition-all">
                    <UploadCloud size={20} className="text-white/60" />
                 </div>
                 <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">Upload Corporate Docs</span>
-                <span className="text-[9px] text-white/40 tracking-wider mt-2 max-w-[200px] text-center">Drag & drop Articles of Incorporation or Proof of Address</span>
-              </motion.div>
+                <span className="text-[9px] text-white/40 tracking-wider mt-2 max-w-[200px] text-center">Select Articles of Incorporation or Proof of Address</span>
+              </motion.label>
             )}
 
             {stage === "UPLOADING" && (

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Shield, CheckCircle, Fingerprint, Lock, Activity, UserCheck } from "lucide-react";
+import { useSignMessage, useAccount } from 'wagmi';
 
 interface ZKBiometricGateProps {
   onSuccess?: (zkProofSignature: string) => void;
@@ -10,38 +11,35 @@ interface ZKBiometricGateProps {
 
 export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
   const [stage, setStage] = useState<"IDLE" | "SCANNING" | "PROCESSING" | "SUCCESS">("IDLE");
-  const [scanProgress, setScanProgress] = useState(0);
+  const { signMessageAsync } = useSignMessage();
+  const { address } = useAccount();
 
-  useEffect(() => {
-    if (stage === "SCANNING") {
-      const interval = setInterval(() => {
-        setScanProgress(p => {
-          if (p >= 100) {
-            clearInterval(interval);
-            setStage("PROCESSING");
-            return 100;
-          }
-          return p + 5;
-        });
-      }, 100);
-      return () => clearInterval(interval);
-    }
-    
-    if (stage === "PROCESSING") {
-      const timeout = setTimeout(() => {
-        setStage("SUCCESS");
-        if (onSuccess) {
-           // Simulate generating a zero-knowledge proof of liveness
-           onSuccess("zkp_0x" + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join(''));
-        }
-      }, 2500);
-      return () => clearTimeout(timeout);
-    }
-  }, [stage, onSuccess]);
+  const handleStart = async () => {
+    if (!address) return;
+    try {
+      setStage("SCANNING");
+      
+      // Pure cryptographic attestation, zero mock timers.
+      const signature = await signMessageAsync({ 
+        message: `[SOVEREIGN ZK-GATE]\nRequest biometric liveness attestation for ${address}\nTimestamp: ${Date.now()}` 
+      });
 
-  const handleStart = () => {
-    setStage("SCANNING");
-    setScanProgress(0);
+      setStage("PROCESSING");
+      
+      const response = await fetch('/api/oracle/zk-biometrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, signature })
+      });
+
+      if (!response.ok) throw new Error("Attestation failed");
+      
+      setStage("SUCCESS");
+      if (onSuccess) onSuccess(signature);
+
+    } catch (error) {
+      setStage("IDLE");
+    }
   };
 
   return (
@@ -79,7 +77,13 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
                 {/* Progress Ring */}
                 <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="4" />
-                  <circle cx="50" cy="50" r="48" fill="none" stroke="#10B981" strokeWidth="4" strokeDasharray="301.59" strokeDashoffset={301.59 - (scanProgress / 100) * 301.59} className="transition-all duration-100 ease-linear" />
+                  <motion.circle 
+                    cx="50" cy="50" r="48" fill="none" stroke="#10B981" strokeWidth="4" 
+                    strokeDasharray="301.59" 
+                    initial={{ strokeDashoffset: 301.59 }}
+                    animate={{ strokeDashoffset: 0 }} 
+                    transition={{ ease: "linear", duration: 2, repeat: Infinity }}
+                  />
                 </svg>
               </motion.div>
             )}
