@@ -212,10 +212,8 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/status',
         ];
 
-        // [SOVEREIGN-GATE] Allow dashboard/chat access if connected so they can reach the ZK-Gate
-        if (isConnected) {
-            DIRECT_ACCESS_ROUTES.push('/dashboard', '/chat');
-        }
+        // [SOVEREIGN-GATE] Always allow dashboard/chat so they can reach the ZK-Gate and connect from there
+        DIRECT_ACCESS_ROUTES.push('/dashboard', '/chat');
 
         const isDirectAccessRoute = DIRECT_ACCESS_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
 

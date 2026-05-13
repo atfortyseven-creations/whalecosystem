@@ -20,7 +20,16 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
   const { address } = useAccount();
 
   useEffect(() => {
-    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    const checkMobile = () => {
+      const ua = navigator.userAgent || '';
+      const isUaMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+      const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      const isSmall = window.innerWidth < 1024;
+      setIsMobile(isUaMobile || (isTouch && isSmall));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Cleanup stream on unmount
@@ -31,7 +40,11 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
   }, [stream]);
 
   const handleStart = async () => {
-    if (!address) return;
+    if (!address) {
+      setErrorMessage("Please connect your wallet first.");
+      setStage("ERROR");
+      return;
+    }
     try {
       setStage("SCANNING");
       
@@ -67,16 +80,21 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
         capturedFrame = canvasRef.current.toDataURL('image/jpeg', 0.5);
       }
 
-      // 4. Cryptographic Signature (Binding Identity to Biometric Data)
+      // 4. Cryptographic Challenge (Anti-Replay Nonce)
+      const nonceRes = await fetch('/api/auth/nonce');
+      const { nonce } = await nonceRes.json();
+      if (!nonce) throw new Error("Failed to retrieve cryptographic challenge");
+
+      // 5. Cryptographic Signature (Binding Identity to Biometric Data + Nonce)
       const ts = Date.now();
       const payloadHash = capturedFrame.slice(-32);
       const signature = await signMessageAsync({ 
-        message: `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nTimestamp: ${ts}` 
+        message: `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nNonce: ${nonce}\nTimestamp: ${ts}` 
       });
 
       setStage("PROCESSING");
       
-      // 5. Verify via Oracle API (Molecular Transmission)
+      // 6. Verify via Oracle API (Molecular Transmission)
       const response = await fetch('/api/oracle/zk-biometrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,6 +102,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
           address, 
           signature,
           payload: capturedFrame,
+          nonce,
           timestamp: ts
         })
       });
@@ -120,11 +139,13 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/5 rounded-full flex items-center justify-center">
                 {!isMobile ? (
                   <div className="flex flex-col items-center gap-3">
-                    <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
-                      alt="Scan on Mobile"
-                      className="w-24 h-24 p-2 bg-white rounded-xl shadow-lg border border-black/10"
-                    />
+                    <div className="w-24 h-24 p-2 bg-white rounded-xl shadow-lg border border-black/10 flex items-center justify-center">
+                      <QRCode 
+                        value={typeof window !== 'undefined' ? window.location.href : ''} 
+                        size={80} 
+                        level="M" 
+                      />
+                    </div>
                     <span className="text-[8px] font-black uppercase tracking-widest text-black/40">Mobile Handoff Req.</span>
                   </div>
                 ) : (
@@ -243,12 +264,34 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
         </div>
 
         {stage === "IDLE" && isMobile && (
-          <button
-            onClick={handleStart}
-            className="w-full py-4 bg-[#050505] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
-          >
-            Initiate Secure Scan
-          </button>
+          <div className="w-full flex flex-col gap-3">
+            {address ? (
+              <button
+                onClick={handleStart}
+                className="w-full py-4 bg-[#050505] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                Initiate Secure Scan
+              </button>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <p className="text-[10px] text-center text-black/40 uppercase font-black tracking-widest">
+                  Authentication Required
+                </p>
+                <button
+                  onClick={() => {
+                    const appKit = require('@reown/appkit/react');
+                    if (appKit && appKit.useAppKit) {
+                      const { open } = appKit.useAppKit();
+                      if (open) open();
+                    }
+                  }}
+                  className="w-full py-4 bg-[#0044CC] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
+                  Connect Mobile Wallet
+                </button>
+              </div>
+            )}
+          </div>
         )}
         {stage === "IDLE" && !isMobile && (
           <div className="w-full p-8 bg-white rounded-3xl border border-black/10 flex flex-col items-center gap-6 shadow-sm">

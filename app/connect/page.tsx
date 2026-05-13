@@ -37,7 +37,8 @@ function RealDeviceRouter() {
     
     const isAlreadyLinked = document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
     if (isAlreadyLinked && !hasUuid) {
-      window.location.replace('/');
+      const next = urlParams.get('next') || '/';
+      window.location.replace(next);
       return;
     }
 
