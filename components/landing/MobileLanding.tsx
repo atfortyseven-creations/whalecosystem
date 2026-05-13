@@ -477,13 +477,14 @@ function ConnectedScreen({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={{ scale: 0.97 }}
             onClick={onDisconnect}
-            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-black/5 transition-all mt-2 text-red-400/70 hover:text-red-500"
+            disabled={false}
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-red-50 transition-all mt-2 text-red-400/70 hover:text-red-500 active:scale-95"
             style={{ fontSize: "10px" }}
           >
             <LogOut size={16} />
-            Disconnect Session · Change Wallet
+            Disconnect · Change Wallet
           </motion.button>
         )}
 
@@ -948,16 +949,12 @@ export function MobileLanding() {
 
 
 
-  // ── handleDisconnect: clears session and resets all state ───────────────
+  // ── handleDisconnect: first-tap guaranteed via React state (no DOM mutation) ──
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+
   const handleDisconnect = useCallback(async () => {
-    // Visual feedback of the nuclear purge
-    const btn = document.getElementById('sovereign-disconnect-btn');
-    if (btn) {
-        btn.innerHTML = '<span class="animate-pulse">NUKING SESSION...</span>';
-        btn.style.backgroundColor = '#dc2626';
-        btn.style.color = '#FFFFFF';
-        btn.style.pointerEvents = 'none';
-    }
+    if (isDisconnecting) return; // Guard: prevent double-tap race
+    setIsDisconnecting(true);   // Triggers immediate re-render
 
     // 1. Expire the sovereign_handshake cookie immediately
     document.cookie = 'sovereign_handshake=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
@@ -966,44 +963,29 @@ export function MobileLanding() {
     setIsLinked(false);
     setLinkedAddress(null);
 
-    // 3. Nuke all WalletConnect and Wagmi persistent state to fix Rainbow/Trust bugs
+    // 3. Nuke all WalletConnect and Wagmi persistent state
     try {
       Object.keys(localStorage).forEach(k => {
         const lower = k.toLowerCase();
         if (
-          lower.includes('walletconnect') || 
-          lower.includes('wagmi') || 
-          lower.includes('wc@2') ||
-          lower.includes('appkit') ||
-          lower.includes('reown') ||
-          lower.includes('w3m') ||
-          lower.includes('rainbow') ||
-          lower.includes('metamask') ||
-          lower.includes('coinbase') ||
-          lower.includes('session')
-        ) {
-          localStorage.removeItem(k);
-        }
+          lower.includes('walletconnect') || lower.includes('wagmi') ||
+          lower.includes('wc@2') || lower.includes('appkit') ||
+          lower.includes('reown') || lower.includes('w3m') ||
+          lower.includes('rainbow') || lower.includes('metamask') ||
+          lower.includes('coinbase') || lower.includes('session')
+        ) localStorage.removeItem(k);
       });
       sessionStorage.clear();
     } catch {}
 
-    // 4. Disconnect wagmi async
-    try { 
-      if (disconnect) {
-        disconnect(); 
-      }
-    } catch (err) {
-      console.warn("Wagmi disconnect error", err);
-    }
+    // 4. Disconnect wagmi
+    try { if (disconnect) disconnect(); } catch {}
     
-    // 5. Force a clean window reload to guarantee a pristine state for the next wallet
+    // 5. Force clean reload (600ms gives React time to unmount cleanly)
     setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        window.location.href = window.location.pathname;
-      }
-    }, 800);
-  }, [disconnect]);
+      if (typeof window !== 'undefined') window.location.href = window.location.pathname;
+    }, 600);
+  }, [isDisconnecting, disconnect]);
 
   if (!mounted) return null;
 
@@ -1175,7 +1157,7 @@ export function MobileLanding() {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-32 pb-[calc(2rem+env(safe-area-inset-bottom))] gap-8 max-w-[440px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-32 pb-[max(2rem,env(safe-area-inset-bottom,2rem))] gap-8 max-w-[440px] w-full mx-auto">
 
         {/* Hero */}
         <motion.div
@@ -1185,13 +1167,13 @@ export function MobileLanding() {
           className="text-center"
         >
           {/* Security trust badge removed */}
-          <h1 className="text-[2.6rem] sm:text-[3.2rem] font-black tracking-tight leading-[1.0] mb-2 uppercase" style={{ color: INK }}>
-            WHALE ALERT NETWORK
+          <h1 className="text-[2.6rem] sm:text-[3.2rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
+            Track institutional capital
+            <span className="block" style={{ color: '#0044CC' }}>before markets react.</span>
           </h1>
           <p className="text-[12px] font-medium leading-relaxed max-w-[300px] mx-auto" style={{ color: MUTED }}>
-            Your private key never leaves your device. Direct, on-chain connection — zero intermediaries.
+            Real-time on-chain intelligence — from mempool to execution. Your key never leaves your device.
           </p>
-          {/* Manual reconnect escape hatch removed as per user request for full automation */}
         </motion.div>
 
         {/* Wallet Buttons */}
