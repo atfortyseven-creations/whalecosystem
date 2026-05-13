@@ -5,10 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
-// useRouter removed — mobile redirect was disabled; router no longer needed here
 import { useUIStore } from "@/lib/store/ui-store";
-import { SignContractStep } from "@/components/shared/LinkedGate";
 import { toast } from "sonner";
+import { RemoteLottie } from "@/components/ui/RemoteLottie";
 import {
   ArrowRight,
   Loader2,
@@ -20,17 +19,17 @@ import {
   Smartphone,
   Monitor,
   ScanLine,
+  Shield,
+  Activity
 } from "lucide-react";
 import { QRCodeSVG as QRCode } from "qrcode.react";
-import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
 
-// QR Scanner — iOS-safe dynamic import (same as MobileLanding)
+// QR Scanner — iOS-safe dynamic import
 const DynamicQRScannerModal = dynamic(
   () => import("@/components/wallet/QRScannerModal"),
   { ssr: false }
 );
 
-// ─── Detect mobile/tablet via UA ─────────────────────────────────────────────
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -43,89 +42,58 @@ function useIsMobile() {
   return isMobile;
 }
 
-// ─── Desktop wallets (EIP-6963 extensions) ───────────────────────────────────
 const DESKTOP_WALLETS = [
-  {
-    id: "metamask",
-    name: "MetaMask",
-    badge: "Browser Extension",
-    logo: "/wallets/metamask.svg",
-    rdns: "io.metamask",
-    installUrl: "https://metamask.io/download/",
-    delay: 0,
-  },
-  {
-    id: "coinbase",
-    name: "Coinbase Wallet",
-    badge: "Browser Extension",
-    logo: "/wallets/coinbase.png",
-    rdns: "com.coinbase.wallet",
-    installUrl: "https://www.coinbase.com/wallet",
-    delay: 0.1,
-  },
-  {
-    id: "rainbow",
-    name: "Rainbow",
-    badge: "Browser Extension",
-    logo: "/wallets/rainbow.png",
-    rdns: "me.rainbow",
-    installUrl: "https://rainbow.me/extension",
-    delay: 0.2,
-  },
+  { id: "metamask", name: "MetaMask", badge: "Browser Extension", logo: "/wallets/metamask.svg", rdns: "io.metamask", installUrl: "https://metamask.io/download/", delay: 0 },
+  { id: "coinbase", name: "Coinbase Wallet", badge: "Browser Extension", logo: "/wallets/coinbase.png", rdns: "com.coinbase.wallet", installUrl: "https://www.coinbase.com/wallet", delay: 0.1 },
+  { id: "rainbow", name: "Rainbow", badge: "Browser Extension", logo: "/wallets/rainbow.png", rdns: "me.rainbow", installUrl: "https://rainbow.me/extension", delay: 0.2 },
 ];
 
-// ─── Mobile wallets (all open AppKit which uses WC deep-links) ───────────────
 const MOBILE_WALLETS = [
   { id: "metamask-mobile",   name: "MetaMask",       badge: "Tap to open app", logo: "/wallets/metamask.svg",  delay: 0 },
   { id: "coinbase-mobile",   name: "Coinbase Wallet", badge: "Tap to open app", logo: "/wallets/coinbase.png",  delay: 0.1 },
   { id: "rainbow-mobile",    name: "Rainbow",        badge: "Tap to open app", logo: "/wallets/rainbow.png",   delay: 0.2 },
 ];
 
-// ─── Wallet button ────────────────────────────────────────────────────────────
 function WalletButton({
   logo, name, badge, onClick, loading = false, delay = 0, extraIcon,
 }: {
-  logo: string; name: string; badge: string;
-  onClick: () => void; loading?: boolean; delay?: number;
-  extraIcon?: React.ReactNode;
+  logo: string; name: string; badge: string; onClick: () => void; loading?: boolean; delay?: number; extraIcon?: React.ReactNode;
 }) {
   return (
     <motion.button
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       onClick={loading ? undefined : onClick}
       disabled={loading}
-      className="group relative w-full flex items-center gap-4 p-5 rounded-[24px] transition-all duration-300 hover:-translate-y-0.5 text-[#050505] disabled:opacity-50 disabled:cursor-not-allowed bg-white border border-[#E5E5E5] shadow-sm hover:shadow-md hover:border-black/20"
+      className="group relative w-full flex items-center gap-4 p-5 rounded-[20px] transition-all duration-500 ease-[0.16,1,0.3,1] text-[#050505] disabled:opacity-50 disabled:cursor-not-allowed bg-white border border-[#E5E5E5] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 hover:border-black/20 overflow-hidden"
     >
-      <div className="w-11 h-11 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center p-2 shadow-sm group-hover:scale-105 transition-transform duration-300 shrink-0">
-        <img
-          src={logo} alt={name} className="w-full h-full object-contain"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        />
+      <div className="absolute inset-0 bg-[#FAFAF8] translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
+      <div className="relative z-10 w-11 h-11 rounded-xl bg-white border border-[#E5E5E5] shadow-sm flex items-center justify-center p-2 group-hover:scale-105 group-hover:border-black/10 transition-all duration-500 shrink-0">
+        <img src={logo} alt={name} className="w-full h-full object-contain filter group-hover:drop-shadow-md transition-all duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
       </div>
-      <div className="flex-1 text-left min-w-0">
-        <p className="text-[13px] font-black uppercase tracking-tight truncate text-[#050505]">
+      <div className="relative z-10 flex-1 text-left min-w-0">
+        <p className="text-[13px] font-black uppercase tracking-widest truncate text-[#050505] group-hover:text-black transition-colors duration-300">
           {loading ? "Connecting…" : name}
         </p>
-        <p className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-widest mt-0.5 truncate">
+        <p className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-[0.2em] mt-1 truncate group-hover:text-[#050505]/60 transition-colors duration-300">
           {badge}
         </p>
       </div>
-      {loading ? (
-        <Loader2 size={14} className="animate-spin text-[#050505]/30 shrink-0" />
-      ) : extraIcon ? (
-        <span className="text-[#050505]/30 group-hover:text-[#050505] transition-colors shrink-0">{extraIcon}</span>
-      ) : (
-        <ArrowRight size={14} className="text-[#050505]/30 group-hover:text-[#050505] group-hover:translate-x-1 transition-all shrink-0" />
-      )}
+      <div className="relative z-10">
+        {loading ? (
+          <Loader2 size={16} className="animate-spin text-black shrink-0" />
+        ) : extraIcon ? (
+          <span className="text-black/30 group-hover:text-black transition-colors duration-300 shrink-0">{extraIcon}</span>
+        ) : (
+          <ArrowRight size={16} className="text-black/30 group-hover:text-black group-hover:translate-x-1 transition-all duration-300 shrink-0" />
+        )}
+      </div>
     </motion.button>
   );
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function ConnectPage() {
-  // router intentionally removed (mobile redirect disabled — see comment above)
   const isMobile = useIsMobile();
   const { isConnected, address } = useAccount();
   const { connect, connectors, isPending, isError, error } = useConnect();
@@ -138,64 +106,37 @@ export default function ConnectPage() {
   const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED" | "ERROR">("IDLE");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
-  // ── Mobile QR Scanner state (scan desktop QR from phone) ─────────────────
   const [showMobileScanner, setShowMobileScanner] = useState(false);
 
-  // ── Surface errors ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isError || !error) return;
     setPendingId(null);
     const msg = error.message ?? "Unknown error";
 
-    // Suppress false-positive 'Connector already connected' error from wagmi
-    // This fires when the user returns from a mobile wallet app with an active session
-    if (
-      msg.toLowerCase().includes("already connected") ||
-      msg.toLowerCase().includes("connector already")
-    ) {
-      return;
-    }
+    if (msg.toLowerCase().includes("already connected") || msg.toLowerCase().includes("connector already")) return;
 
-    const isNotFound =
-      msg.toLowerCase().includes("provider not found") ||
-      msg.toLowerCase().includes("not installed") ||
-      msg.toLowerCase().includes("no injected");
-    const isRejected =
-      msg.toLowerCase().includes("user rejected") ||
-      msg.toLowerCase().includes("rejected");
+    const isNotFound = msg.toLowerCase().includes("provider not found") || msg.toLowerCase().includes("not installed") || msg.toLowerCase().includes("no injected");
+    const isRejected = msg.toLowerCase().includes("user rejected") || msg.toLowerCase().includes("rejected");
 
     if (isNotFound) {
-      toast.error("Extension not installed", {
-        description: "Install the wallet browser extension, then refresh.",
-        action: {
-          label: "Download MetaMask",
-          onClick: () => window.open("https://metamask.io/download/", "_blank"),
-        },
-        duration: 7000,
-      });
+      toast.error("Extension missing", { description: "Wallet browser extension is required.", action: { label: "Install", onClick: () => window.open("https://metamask.io/download/", "_blank") }, duration: 7000 });
     } else if (isRejected) {
-      toast.error("Request rejected", {
-        description: "You cancelled the signature in your wallet.",
-      });
+      toast.error("Signature rejected", { description: "The cryptographic handshake was aborted." });
     } else {
-      toast.error("Connection Failed", { description: msg });
+      toast.error("Handshake Failed", { description: msg });
     }
   }, [isError, error]);
 
   useEffect(() => { setMounted(true); }, []);
 
-  // ── Absolute Perfection: Auto-Hydrate session independently on ConnectPage ──
   useEffect(() => {
     if (typeof document !== "undefined") {
       const hasCookie = document.cookie.split("; ").some((r) => r.startsWith("sovereign_handshake="));
       const hasLocal = localStorage.getItem("sovereign_session_v2");
-      if (hasCookie || hasLocal) {
-        setLinked(true);
-      }
+      if (hasCookie || hasLocal) setLinked(true);
     }
   }, [setLinked]);
 
-  // ── QR session (X25519 Ephemeral + AES-GCM) ──────────────────────────────
   const [ephemeral, setEphemeral] = useState<{ publicKey: string; privateKey: string } | null>(null);
   const [qrData, setQrData] = useState('');
 
@@ -205,20 +146,11 @@ export default function ConnectPage() {
       const pair = await generateX25519KeyPair();
       setEphemeral(pair);
       
-      const sessId = typeof crypto !== 'undefined' && crypto.randomUUID 
-          ? crypto.randomUUID() 
-          : Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('') + '-' + Date.now().toString(36);
+      const sessId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('') + '-' + Date.now().toString(36);
       setQrSession(sessId);
 
-      // ── CRITICAL FIX: QR must be a valid HTTPS URL, NOT raw JSON ──────────
-      // iOS/Android native cameras only display deep-link prompts for URLs.
-      // Raw JSON QR codes show as unclickable plain text — users have no idea
-      // what to do with them. A URL format means:
-      //   1. Native camera detects "Open in Safari/Chrome" → user taps it
-      //   2. The mobile browser opens the app at /connect with the QR params
-      //   3. MobileEnforcer stores the params and triggers in-app handshake
       const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.humanidfi.com';
-      const expiresAt = Date.now() + 300000; // 5 minutes
+      const expiresAt = Date.now() + 300000;
       const qrUrl = new URL('/connect', origin);
       qrUrl.searchParams.set('uuid', sessId);
       qrUrl.searchParams.set('pub', encodeURIComponent(pair.publicKey));
@@ -227,16 +159,13 @@ export default function ConnectPage() {
       setQrData(qrUrl.toString());
       setSyncStatus("AWAITING");
 
-      // Auto-refresh QR after 4.5 minutes (before the 5-min Redis TTL expires)
-      // to ensure the desktop never silently waits on a dead session.
       const refreshTimer = setTimeout(() => {
         setQrSession(null);
         setSyncStatus("IDLE");
-      }, 270000); // 4.5 min
+      }, 270000); 
       return () => clearTimeout(refreshTimer);
 
     } catch (e: any) {
-      console.error('Failed to init ephemeral keys:', e);
       setErrorMessage(e.message || "Failed to initialize Web Crypto API.");
       setSyncStatus("ERROR");
     }
@@ -244,7 +173,6 @@ export default function ConnectPage() {
 
   useEffect(() => { if (!qrSession && mounted) initEphemeral(); }, [qrSession, initEphemeral, mounted]);
 
-  // ── Poll QR scan (Decryption) ──────────────────────────────────────────────
   useEffect(() => {
     if (!qrSession || !ephemeral || syncStatus === "SYNCED") return;
     const poll = setInterval(async () => {
@@ -256,260 +184,172 @@ export default function ConnectPage() {
         if (data.encryptedPayload || data.serverJwt) {
           setSyncStatus("SYNCED");
           clearInterval(poll);
-          
           let jwt: string | null = null;
 
-          // ── Strategy 1: ECDH decryption (preferred) ──────────────────────
           if (data.encryptedPayload && data.iv) {
             try {
               const { deriveSharedSecret, decryptAESGCM } = await import('@/lib/web-crypto');
-              // Parse the QR URL to get the isECDH flag
               let isECDHFlag = false;
               try {
-                const qrUrl = new URL(qrData);
-                isECDHFlag = qrUrl.searchParams.get('ecdh') === '1';
+                isECDHFlag = new URL(qrData).searchParams.get('ecdh') === '1';
               } catch {
-                // Legacy JSON format fallback
                 try { isECDHFlag = JSON.parse(qrData).isECDH ?? false; } catch {}
               }
               const mobilePub = data.mobilePub;
               if (mobilePub) {
                 const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, isECDHFlag);
                 const decrypted = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
-                // Validate it looks like a JWT (three base64url segments)
-                if (decrypted && decrypted.split('.').length === 3) {
-                  jwt = decrypted;
-                }
+                if (decrypted && decrypted.split('.').length === 3) jwt = decrypted;
               }
-            } catch (decryptErr) {
-              console.warn('[QRPoll] ECDH decryption failed, trying server fallback:', decryptErr);
-            }
+            } catch (err) {}
           }
 
-          // ── Strategy 2: Server-minted JWT fallback ────────────────────────
-          // /api/auth/qr-mobile-link stores a `serverJwt` alongside the encrypted
-          // payload as a fallback for iOS X25519 key format edge cases.
           if (!jwt && data.serverJwt) {
             try {
               const { verifyJWT } = await import('@/lib/jwt');
-              await verifyJWT(data.serverJwt); // Validate it's legit before using
+              await verifyJWT(data.serverJwt);
               jwt = data.serverJwt;
-              console.log('[QRPoll] Using server-minted JWT fallback');
-            } catch {
-              console.warn('[QRPoll] Server JWT fallback also invalid');
-            }
+            } catch (err) {}
           }
 
-          if (!jwt) {
-            console.error('[QRPoll] Both decryption strategies failed. Aborting hydration.');
-            setSyncStatus("ERROR");
-            return;
-          }
+          if (!jwt) { setSyncStatus("ERROR"); return; }
 
-          // ── Hydrate the desktop session (HttpOnly cookie via server) ──────
-          const hydrateRes = await fetch('/api/auth/qr-hydrate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jwt }),
-          });
-
-          if (hydrateRes.ok) {
-            setTimeout(() => window.location.replace("/"), 100);
-          } else {
-            console.error('[QRPoll] Hydration failed:', await hydrateRes.text());
-            setSyncStatus("ERROR");
-          }
+          const hydrateRes = await fetch('/api/auth/qr-hydrate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jwt }) });
+          if (hydrateRes.ok) setTimeout(() => window.location.replace("/"), 100);
+          else setSyncStatus("ERROR");
         }
-      } catch (err: any) {
-        console.error('[QRPoll] Poll error:', err?.message);
-      }
+      } catch (err) {}
     }, 1000);
     return () => clearInterval(poll);
   }, [qrSession, ephemeral, qrData, syncStatus]);
 
-
-  // ── Redirect enforcement: Only redirect when actually linked ──────────
   useEffect(() => {
     if (!mounted || !isConnected) return;
-    try {
-      if (sessionStorage.getItem("__disconnected__") === "1") {
-        sessionStorage.removeItem("__disconnected__");
-        return;
-      }
-    } catch {}
+    try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
 
-    const doHardRedirect = () => {
-      setPendingId(null);
-      // Force full page navigation — client router won't flush cookies
-      window.location.replace("/dashboard");
-    };
-
-    // Only redirect if already linked (meaning they have signed)
-    // NEVER auto-redirect based on time or visibility, as it interrupts signing!
     if (isLinked) {
-      doHardRedirect();
+      setPendingId(null);
+      const t = setTimeout(() => { window.location.replace("/"); }, 5000);
+      return () => clearTimeout(t);
     }
   }, [isConnected, mounted, isLinked]);
 
-  // Separate effect: isLinked flips → redirect instantly
-  useEffect(() => {
-    if (isLinked && mounted && isConnected) {
-      window.location.replace("/dashboard");
+  const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
+    setPendingId(walletId);
+    if (!rdns) { openAppKit(); setPendingId(null); return; }
+    let connector = connectors.find((c: any) => c.id === rdns) || connectors.find((c) => c.name.toLowerCase().includes(walletId.toLowerCase())) || connectors.find((c) => c.id === "injected" || (c as any).type === "injected");
+    if (connector) connect({ connector });
+    else {
+      setPendingId(null);
+      if (installUrl) toast.error("Extension missing", { action: { label: "Install", onClick: () => window.open(installUrl, "_blank") } });
     }
-  }, [isLinked, mounted, isConnected]);
+  }, [connect, connectors, openAppKit]);
 
-  // ── Mobile Redirect: DISABLED ────────────────────────────────────────────────
-  // Previously, mobile users were redirected from /connect → /. However, this
-  // caused the Sign In to be invisible on mobile without Desktop Mode, because
-  // MobileLanding has connectivity issues in restricted mobile browser contexts.
-  // ConnectPage already has MOBILE_WALLETS buttons + AppKit modal support, so
-  // mobile users can now connect directly here without needing Desktop Mode.
-  // (router is retained in scope for other potential uses — do not remove import)
-
-
-  // ── Desktop handler: EIP-6963 extension lookup ───────────────────────────
-  const handleDesktopWallet = useCallback(
-    (walletId: string, rdns: string | null, installUrl: string | null) => {
-      setPendingId(walletId);
-
-      // No rdns → WalletConnect / AppKit modal
-      if (!rdns) {
-        openAppKit();
-        setPendingId(null);
-        return;
-      }
-
-      // 1. Exact EIP-6963 rdns match
-      let connector = connectors.find((c: any) => c.id === rdns);
-      // 2. Name substring match
-      if (!connector) connector = connectors.find((c) => c.name.toLowerCase().includes(walletId.toLowerCase()));
-      // 3. Generic injected (window.ethereum)
-      if (!connector) connector = connectors.find((c) => c.id === "injected" || (c as any).type === "injected");
-
-      if (connector) {
-        connect({ connector });
-      } else {
-        setPendingId(null);
-        if (installUrl) {
-          toast.error("Extension not detected", {
-            description: `The ${walletId} extension is not active in this browser.`,
-            action: { label: "Install", onClick: () => window.open(installUrl, "_blank") },
-            duration: 7000,
-          });
-        }
-      }
-    },
-    [connect, connectors, openAppKit]
-  );
-
-  // ── Mobile handler: AppKit opens WC deep-link → native app ───────────────
   const handleMobileWallet = useCallback(() => {
     try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {}
     openAppKit();
   }, [openAppKit]);
 
   return (
-    <div
-      className="min-h-screen w-full flex flex-col text-[#050505] font-mono overflow-auto selection:bg-[#050505] selection:text-[#FDFCF8]"
-      style={{
-        backgroundColor: "#FDFCF8",
-      }}
-    >
-      <WavePatternOverlay />
+    <div className="min-h-screen w-full flex flex-col font-mono overflow-auto bg-[#FDFCF8] text-[#050505] selection:bg-[#050505] selection:text-white relative">
+      
+      {/* ── Immersive Light Mode Architectural Background ── */}
+      <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
+        {/* Precision Blueprint Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        
+        {/* Massive Lottie Integration - Rotated & Faded for scale */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] mix-blend-multiply pointer-events-none select-none">
+          <RemoteLottie path="Abstract Isometric Loader #1.json" className="w-[180%] h-[180%] object-contain scale-[1.2]" />
+        </div>
+        
+        {/* Vignette & Soft lighting */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#FDFCF8_100%)] z-10 opacity-80" />
+      </div>
 
-
-      {/* Main */}
       <main className="flex-1 relative z-10 flex flex-col justify-center items-center p-4 py-12 md:p-8 lg:p-12">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`w-full my-auto ${mounted && isConnected ? 'max-w-2xl grid grid-cols-1' : 'max-w-4xl grid grid-cols-1 lg:grid-cols-2'} rounded-[36px] overflow-hidden bg-white shadow-2xl`}
-          style={{ border: "1px solid rgba(5,5,5,0.08)" }}
+          initial={{ opacity: 0, y: 40, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className={`w-full my-auto ${mounted && isConnected ? 'max-w-2xl grid grid-cols-1' : 'max-w-5xl grid grid-cols-1 lg:grid-cols-2'} rounded-[40px] overflow-hidden bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[0_30px_80px_rgba(0,0,0,0.06)] relative`}
         >
-          {/* ── LEFT: QR panel ── */}
+          {/* Subtle reflection lines for frosted glass effect */}
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-black/5 to-transparent opacity-30" />
+
+          {/* ── LEFT: QR Matrix ── */}
           {!(mounted && isConnected) && (
-          <div
-            className="relative p-8 lg:p-12 flex flex-col overflow-hidden"
-            style={{ borderRight: "1px solid rgba(5,5,5,0.06)", background: "rgba(250,249,246,0.5)" }}
-          >
+          <div className="relative p-10 lg:p-16 flex flex-col overflow-hidden border-b lg:border-b-0 lg:border-r border-black/5 bg-[#FAFAF8]/50">
             <div className="relative z-10 flex flex-col h-full">
-              <div
-                className="inline-flex self-start px-5 py-3 rounded-2xl mb-3 bg-white"
-                style={{ border: "1px solid rgba(5,5,5,0.08)" }}
-              >
-                <h2 className="text-3xl font-black uppercase tracking-tighter leading-none text-[#050505]">
-                  Direct QR Handshake
+              <div className="inline-flex self-start mb-6">
+                <h2 className="text-[32px] font-black uppercase tracking-tighter leading-[0.9] text-[#050505]">
+                  Direct <br/><span className="text-black/30">Handshake</span>
                 </h2>
               </div>
-              <div className="mb-8 border-b border-[#050505]/10 pb-4" />
+              <p className="text-[9px] font-mono text-[#050505]/40 uppercase tracking-[0.4em] mb-12 border-l border-black/20 pl-4 py-1">
+                P2P Encrypted Session Sync
+              </p>
 
-              <div className="flex flex-col items-center gap-6 flex-1 justify-center">
-                <div className="p-5 bg-white rounded-[28px] shadow-sm border border-black/5 flex flex-col items-center">
-                  <AnimatePresence mode="wait">
-                    {syncStatus === "ERROR" ? (
-                      <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-[180px] h-[180px] flex flex-col items-center justify-center bg-red-50 text-red-600 rounded-xl border border-red-200 p-4 text-center">
-                        <span className="text-[10px] font-black uppercase tracking-widest mb-2">Cryptographic Failure</span>
-                        <span className="text-[9px] font-mono leading-tight">{errorMessage}</span>
-                        <span className="text-[9px] font-mono mt-4 text-red-400">Use HTTPS or localhost.</span>
-                      </motion.div>
-                    ) : qrSession && mounted ? (
-                      <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-                        <QRCode value={qrData} size={180} level="H" bgColor="#FFFFFF" fgColor="#050505" />
-                      </motion.div>
-                    ) : (
-                      <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                        className="w-[180px] h-[180px] flex items-center justify-center">
-                        <Loader2 size={28} className="animate-spin text-black/10" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+              <div className="flex flex-col items-center gap-8 flex-1 justify-center">
+                <div className="p-8 bg-white rounded-[32px] shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-black/5 flex flex-col items-center relative group">
+                  <div className="relative z-10">
+                    <AnimatePresence mode="wait">
+                      {syncStatus === "ERROR" ? (
+                        <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-[180px] h-[180px] flex flex-col items-center justify-center text-red-500 text-center">
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">Decryption Failure</span>
+                          <span className="text-[9px] font-mono leading-tight opacity-70">{errorMessage}</span>
+                        </motion.div>
+                      ) : qrSession && mounted ? (
+                        <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="bg-white">
+                          <QRCode value={qrData} size={180} level="H" bgColor="#FFFFFF" fgColor="#050505" />
+                        </motion.div>
+                      ) : (
+                        <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-[180px] h-[180px] flex items-center justify-center">
+                          <Loader2 size={32} className="animate-spin text-black/20" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                  
                   {qrSession && mounted && (
-                    <div className="mt-4 flex flex-col items-center text-center gap-1">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-red-500 bg-red-100 px-2 py-0.5 rounded border border-red-200">
-                        DO NOT SCAN WITH METAMASK
+                    <div className="mt-8 flex flex-col items-center text-center gap-1 z-10 w-full">
+                      <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#050505]/50">
+                        Scan with native camera
                       </span>
-                      <span className="text-[9px] font-mono uppercase tracking-widest text-[#050505]/50">
-                        Scan with native phone camera
-                      </span>
-                      <div className="mt-5 flex flex-col items-start text-left gap-3.5 w-full max-w-[280px]">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#050505]/70 border-b border-[#050505]/10 w-full pb-1 mb-1">
-                          Authentication Protocol
-                        </span>
-                        <div className="flex items-start gap-2.5">
-                          <span className="text-[9px] font-mono bg-[#050505]/5 text-[#050505]/70 px-1.5 py-0.5 rounded mt-0.5">1</span>
-                          <span className="text-[11px] font-medium leading-relaxed text-[#050505]/60">Activate your native mobile camera application or integrated secure scanner.</span>
+                      <div className="mt-6 flex flex-col items-start text-left gap-4 w-full max-w-[280px]">
+                        <div className="flex items-center gap-4 group/item w-full p-2 rounded-xl hover:bg-black/5 transition-colors">
+                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] w-6 h-6 flex items-center justify-center rounded-full border border-black/10 group-hover/item:bg-black group-hover/item:text-white transition-colors">1</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]/70">Activate native camera</span>
                         </div>
-                        <div className="flex items-start gap-2.5">
-                          <span className="text-[9px] font-mono bg-[#050505]/5 text-[#050505]/70 px-1.5 py-0.5 rounded mt-0.5">2</span>
-                          <span className="text-[11px] font-medium leading-relaxed text-[#050505]/60">Align the viewfinder precisely with the cryptographic QR matrix presented above.</span>
+                        <div className="flex items-center gap-4 group/item w-full p-2 rounded-xl hover:bg-black/5 transition-colors">
+                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] w-6 h-6 flex items-center justify-center rounded-full border border-black/10 group-hover/item:bg-black group-hover/item:text-white transition-colors">2</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]/70">Scan crypto matrix</span>
                         </div>
-                        <div className="flex items-start gap-2.5">
-                          <span className="text-[9px] font-mono bg-[#050505]/5 text-[#050505]/70 px-1.5 py-0.5 rounded mt-0.5">3</span>
-                          <span className="text-[11px] font-medium leading-relaxed text-[#050505]/60">Acknowledge the subsequent secure deep-link prompt to finalize the session handshake.</span>
+                        <div className="flex items-center gap-4 group/item w-full p-2 rounded-xl hover:bg-black/5 transition-colors">
+                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] w-6 h-6 flex items-center justify-center rounded-full border border-black/10 group-hover/item:bg-black group-hover/item:text-white transition-colors">3</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]/70">Acknowledge signature</span>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 h-6">
                   <AnimatePresence mode="wait">
-                    {syncStatus === "SYNCED" ? (
+                    {syncStatus === "SYNCED" && (
                       <motion.div key="ok" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-2">
-                        <CheckCircle size={13} className="text-emerald-500" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Synced — Redirecting…</span>
+                        <CheckCircle size={14} className="text-emerald-500" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Synced — Entering Terminal</span>
                       </motion.div>
-                    ) : (
-                      null
                     )}
                   </AnimatePresence>
                 </div>
 
                 {qrSession && (
                   <button onClick={() => { setQrSession(null); setSyncStatus("IDLE"); }}
-                    className="text-[9px] font-mono text-[#050505]/30 hover:text-[#050505]/70 uppercase tracking-widest transition-colors mt-4">
-                    Refresh QR
+                    className="text-[9px] font-mono text-[#050505]/30 hover:text-[#050505] uppercase tracking-[0.4em] transition-colors">
+                    Refresh Matrix
                   </button>
                 )}
               </div>
@@ -517,198 +357,133 @@ export default function ConnectPage() {
           </div>
           )}
 
-          {/* ── RIGHT: Smart wallet connect ── */}
-          <div
-            className="relative p-8 lg:p-12 flex flex-col bg-white"
-          >
+          {/* ── RIGHT: Injection Portal ── */}
+          <div className="relative p-10 lg:p-16 flex flex-col bg-white/40">
             <div className="relative z-10 flex flex-col h-full">
 
-              <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-2 text-[#050505]">
-                Connect Wallet
+              <h2 className="text-[32px] font-black uppercase tracking-tighter leading-[0.9] mb-4 text-[#050505]">
+                Inject <br/><span className="text-black/30">Identity</span>
               </h2>
 
-              {/* Device mode indicator — only visible pre-connection */}
               {mounted && !isConnected && (
-                <div className="flex items-center gap-1.5 mb-6 border-b border-[#050505]/10 pb-4">
-                  {isMobile
-                    ? <Smartphone size={9} className="text-[#2D0A59]" />
-                    : <Monitor size={9} className="text-[#2D0A59]" />
-                  }
-                  <span className="text-[8px] font-mono uppercase tracking-widest text-[#050505]/40">
-                    {isMobile ? "Mobile — tap to open native app" : "Desktop — opens browser extension"}
+                <div className="flex items-center gap-3 mb-10 border-b border-black/5 pb-6">
+                  {isMobile ? <Smartphone size={14} className="text-[#050505]/40" /> : <Monitor size={14} className="text-[#050505]/40" />}
+                  <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-[#050505]/40">
+                    {isMobile ? "Mobile Native Injection" : "Desktop Extension Gateway"}
                   </span>
                 </div>
               )}
 
               {/* ─────────────────────────────────────────────────────── */}
-              {/* SOVEREIGN CONNECTED STATE                               */}
-              {/* AGGRESSIVE AUTO-REDIRECT ENFORCEMENT                    */}
+              {/* SPECTACULAR LIGHT-MODE WELCOME SEQUENCE                 */}
               {/* ─────────────────────────────────────────────────────── */}
-              {mounted && isConnected && !isLinked ? (
+              {mounted && (isConnected || isLinked) ? (
                 <motion.div
-                  key="sign-contract"
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  key="spectacular-welcome"
+                  initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col flex-1"
+                  transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col items-center justify-center gap-10 flex-1 py-8 px-4"
                 >
-                  <SignContractStep 
-                    onSigned={() => setLinked(true)} 
-                    onDisconnect={() => {
-                       try { disconnect(); } catch {}
-                       setLinked(false);
-                    }} 
-                  />
+                  {/* Majestic Lottie Container */}
+                  <div className="w-full max-w-[260px] aspect-square rounded-full border border-black/5 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.05)] flex items-center justify-center overflow-hidden mb-2 relative group">
+                    <div className="absolute inset-0 bg-[#FAFAF8] opacity-50" />
+                    <RemoteLottie path="Server infrastructure.json" className="w-[150%] h-[150%] object-contain scale-[1.3] filter contrast-125 saturate-50 mix-blend-darken" />
+                    <div className="absolute inset-0 border-[2px] border-emerald-500/20 rounded-full animate-[spin_12s_linear_infinite] [border-style:dashed]" />
+                  </div>
 
-                  {/* ── Mobile: Scan QR to link PC session ─────────────────── */}
-                  {isMobile && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3, duration: 0.4 }}
-                      className="mt-4 pt-4 border-t border-[#050505]/10 flex flex-col items-center gap-3"
-                    >
-                      <span className="text-[9px] font-mono uppercase tracking-widest text-[#050505]/40">
-                        Link Desktop Session
-                      </span>
-                      <button
-                        id="mobile-scan-qr-btn"
-                        onClick={() => setShowMobileScanner(true)}
-                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all hover:bg-[#050505]/80"
-                      >
-                        <ScanLine size={16} />
-                        Scan QR — Log in on PC
-                      </button>
-                      <span className="text-[9px] font-mono text-[#050505]/30 text-center leading-relaxed">
-                        Point camera at the QR code displayed on your desktop browser.
-                      </span>
-                    </motion.div>
-                  )}
-                </motion.div>
-              ) : mounted && isLinked ? (
-                <motion.div
-                  key="connected-state"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col items-center justify-center gap-6 flex-1 py-12"
-                >
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20" />
-                    <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shadow-lg relative z-10">
-                      <CheckCircle size={36} className="text-emerald-400" />
+                  <div className="flex flex-col items-center text-center space-y-5 max-w-md">
+                    <h2 className="text-5xl font-black uppercase tracking-tighter leading-none text-[#050505]">
+                      Access<br/><span className="text-black/30">Granted.</span>
+                    </h2>
+                    <p className="font-serif text-[15px] leading-relaxed text-[#050505]/60 font-medium">
+                      Cryptographic attestation perfectly resolved. Your institutional identity is secured. Welcome to the world's most advanced on-chain intelligence system.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-3 px-6 py-4 bg-white border border-black/5 rounded-2xl shadow-sm">
+                       <Shield size={16} className="text-emerald-500" />
+                       <span className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-[#050505]">
+                         {address?.slice(0,6)}...{address?.slice(-4)} Verified
+                       </span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-center text-center max-w-[280px]">
-                    <span className="text-[14px] font-black uppercase tracking-widest text-emerald-400">
-                      Identity Verified
-                    </span>
-                    <span className="text-[10px] font-mono text-emerald-400/60 break-all mt-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-400/20">
-                      {address}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col items-center gap-3 mt-4">
-                    <Loader2 size={24} className="animate-spin text-[#050505]/30" />
-                    <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/50 animate-pulse">
-                      Entering Humanity Ledger™...
-                    </span>
-                  </div>
-
-                  <div className="mt-8 flex flex-col items-center gap-2">
+                  <div className="mt-6 flex flex-col items-center gap-4 w-full max-w-[320px]">
                     <button
-                      className="text-[11px] font-black uppercase tracking-widest text-white bg-black px-6 py-3 rounded-2xl hover:bg-black/80 transition-colors"
-                      onClick={() => { window.location.href = '/dashboard'; }}
+                      className="relative w-full flex items-center justify-center gap-4 py-5 rounded-[20px] bg-[#050505] text-white font-black uppercase tracking-[0.25em] text-[12px] shadow-[0_10px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-500 overflow-hidden group"
+                      onClick={() => { window.location.replace('/'); }}
                     >
-                      Enter Dashboard →
+                      <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
+                      <span className="relative z-10 flex items-center gap-3">Enter Terminal <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></span>
                     </button>
-                    <span className="text-[9px] font-mono text-[#050505]/30 mt-1">
-                      Auto-redirecting in 3s...
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <Activity size={12} className="text-[#050505]/30 animate-pulse" />
+                      <span className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-[0.3em]">
+                        Auto-routing in 5s...
+                      </span>
+                    </div>
                   </div>
 
-                  {/* ── Mobile: Scan QR to link PC session (post-sign state) ─ */}
                   {isMobile && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8 }}
+                      initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4, duration: 0.4 }}
-                      className="mt-2 pt-4 border-t border-[#050505]/10 w-full flex flex-col items-center gap-3"
+                      transition={{ delay: 0.4, duration: 0.6 }}
+                      className="mt-6 pt-6 border-t border-black/5 w-full flex flex-col items-center gap-4"
                     >
                       <button
-                        id="mobile-scan-qr-verified-btn"
                         onClick={() => setShowMobileScanner(true)}
-                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-[#050505]/20 bg-white font-black uppercase tracking-widest text-[11px] text-[#050505] active:scale-[0.97] transition-all hover:border-[#050505]/50"
+                        className="w-full flex items-center justify-center gap-3 py-4 rounded-xl border border-black/10 bg-white shadow-sm font-black uppercase tracking-[0.2em] text-[11px] text-[#050505] active:scale-[0.97] transition-all hover:border-black/30"
                       >
                         <ScanLine size={16} />
-                        Scan QR — Link PC Session
+                        Scan Matrix to Sync
                       </button>
-                      <span className="text-[9px] font-mono text-[#050505]/30 text-center">
-                        Scan the QR shown on your PC to transfer this session.
-                      </span>
                     </motion.div>
                   )}
                 </motion.div>
 
               ) : !mounted ? (
                 /* ── SKELETON ── */
-                <div className="flex flex-col gap-3 flex-1">
+                <div className="flex flex-col gap-4 flex-1 mt-4">
                   {[0, 1, 2, 3].map((i) => (
-                    <div key={i} className="w-full h-[72px] rounded-[24px] bg-[#050505]/5 animate-pulse" />
+                    <div key={i} className="w-full h-[84px] rounded-[20px] bg-black/5 animate-pulse" />
                   ))}
                 </div>
 
               ) : isMobile ? (
-                /* ── MOBILE: all buttons fire AppKit → WalletConnect deep-link → native app ── */
-                <div className="flex flex-col gap-3 flex-1">
+                /* ── MOBILE CONNECT ── */
+                <div className="flex flex-col gap-4 flex-1 mt-4">
                   {MOBILE_WALLETS.map((w) => (
-                    <WalletButton
-                      key={w.id}
-                      logo={w.logo}
-                      name={w.name}
-                      badge={w.badge}
-                      onClick={handleMobileWallet}
-                      loading={isPending && pendingId === w.id}
-                      delay={w.delay}
-                      extraIcon={<ExternalLink size={13} />}
-                    />
+                    <WalletButton key={w.id} logo={w.logo} name={w.name} badge={w.badge} onClick={handleMobileWallet} loading={isPending && pendingId === w.id} delay={w.delay} extraIcon={<ExternalLink size={16} />} />
                   ))}
                 </div>
 
               ) : (
-                /* ── DESKTOP: EIP-6963 extension first, AppKit modal fallback ── */
-                <div className="flex flex-col gap-3 flex-1">
+                /* ── DESKTOP CONNECT ── */
+                <div className="flex flex-col gap-4 flex-1 mt-4">
                   {DESKTOP_WALLETS.map((w) => (
-                    <WalletButton
-                      key={w.id}
-                      logo={w.logo}
-                      name={w.name}
-                      badge={w.badge}
-                      onClick={() => handleDesktopWallet(w.id, w.rdns, w.installUrl)}
-                      loading={isPending && pendingId === w.id}
-                      delay={w.delay}
-                    />
+                    <WalletButton key={w.id} logo={w.logo} name={w.name} badge={w.badge} onClick={() => handleDesktopWallet(w.id, w.rdns, w.installUrl)} loading={isPending && pendingId === w.id} delay={w.delay} />
                   ))}
                 </div>
               )}
 
-              {/* Security note — only when not yet connected */}
+              {/* Security note */}
               {mounted && !isConnected && (
-                <div className="mt-6 p-4 rounded-2xl flex items-start gap-3 bg-[#FAF9F6] border border-[#050505]/10">
-                  <Fingerprint size={14} className="text-[#050505]/40 mt-0.5 shrink-0" />
-                  <p className="text-[9px] text-[#050505]/60 font-medium leading-relaxed">
-                    This portal does not hold custody of assets. All interactions are verified on-chain via ECDSA signature. No username. No password.
+                <div className="mt-10 p-6 rounded-[24px] flex items-start gap-4 bg-[#FAFAF8] border border-black/5">
+                  <Shield size={20} className="text-[#050505]/30 mt-0.5 shrink-0" />
+                  <p className="text-[10px] text-[#050505]/50 font-mono leading-relaxed uppercase tracking-[0.15em]">
+                    Zero custody architecture. Identity attested via strictly verified ECDSA. No usernames. No passwords. Absolute cryptographic sovereignty.
                   </p>
                 </div>
               )}
             </div>
           </div>
         </motion.div>
-
       </main>
 
-      {/* ── Mobile QR Scanner Modal (scan desktop QR from phone) ── */}
+      {/* ── Mobile QR Scanner Modal ── */}
       {isMobile && mounted && (
         <DynamicQRScannerModal
           isOpen={showMobileScanner}
@@ -717,7 +492,7 @@ export default function ConnectPage() {
           onScan={(_result: string) => {
             setShowMobileScanner(false);
             const toast = document.createElement('div');
-            toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[11px] border border-white/20 font-black uppercase tracking-[0.2em] px-6 py-5 rounded-[20px] shadow-2xl text-center';
+            toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-[#050505] text-white text-[11px] font-black uppercase tracking-[0.3em] px-6 py-5 rounded-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] text-center';
             toast.textContent = 'SESSION SYNCHRONIZED';
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
@@ -726,26 +501,26 @@ export default function ConnectPage() {
       )}
 
       {/* Footer */}
-      <footer className="relative z-[100] px-8 py-6 border-t border-[#050505]/10 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 bg-[#FDFCF8]">
-        <div className="flex items-center gap-3">
+      <footer className="relative z-[100] px-8 py-6 border-t border-black/5 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 bg-[#FDFCF8]/80 backdrop-blur-md">
+        <div className="flex items-center gap-4">
           <img
             src="/official-whale-monochrome.png"
-            className="w-4 h-4 opacity-40 grayscale invert-0 brightness-0"
+            className="w-5 h-5 opacity-40 grayscale"
             alt=""
             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
-          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#050505]/40">© 2026 atfortyseven-creations</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#050505]/40">© 2026 atfortyseven-creations</span>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
           <a href="https://twitter.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="text-[#050505]/40 hover:text-[#050505] transition-colors">
-            <Twitter size={16} />
+            <Twitter size={18} />
           </a>
           <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-[#050505]/40 hover:text-[#050505] transition-colors">
-            <Github size={16} />
+            <Github size={18} />
           </a>
           <div className="flex flex-col items-end">
-            <span className="text-[8px] font-black uppercase tracking-widest text-[#050505]/40">Status: Operational</span>
-            <span className="text-[7px] font-mono text-emerald-600 uppercase tracking-widest font-bold">L1/L2 Ingress Active</span>
+            <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#050505]/40">Status: Operational</span>
+            <span className="text-[8px] font-mono text-emerald-600 uppercase tracking-[0.3em] font-bold">L1/L2 Ingress Active</span>
           </div>
         </div>
       </footer>

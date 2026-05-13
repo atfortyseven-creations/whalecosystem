@@ -351,7 +351,7 @@ export default function WhaleDashboard() {
             onTabChange={handleTabChange}
             isExternalEmbed={false}
         >
-            <div className="flex flex-col gap-6 w-full pb-12 h-full">
+            <div className="flex flex-col gap-6 w-full pb-12 h-full scrollbar-hide" style={{ zoom: 0.80 }}>
                 {renderTabContent()}
             </div>
         </WhaleProShell>

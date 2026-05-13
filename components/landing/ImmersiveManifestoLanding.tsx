@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { SovereignGlobe3D } from "./SovereignGlobe3D";
 import Link from "next/link";
 import { ArrowRight, Scan, Shield, Zap, Globe2, Layers, LineChart, Network } from "lucide-react";
 import { useEthMetrics } from "@/hooks/useEthMetrics";
@@ -78,10 +77,12 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.div>
         </motion.div>
 
-        {/* Right Globe */}
-        <div className="absolute inset-0 w-full h-[100dvh] opacity-30 pointer-events-none lg:relative lg:w-1/2 lg:h-screen lg:opacity-100 lg:pointer-events-auto z-0 flex items-center justify-center">
+        {/* Right Lottie Presentation (Replaces Globe) */}
+        <div className="absolute inset-0 w-full h-[100dvh] opacity-20 pointer-events-none lg:relative lg:w-1/2 lg:h-screen lg:opacity-100 lg:pointer-events-auto z-0 flex items-center justify-center overflow-hidden mix-blend-multiply">
           <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent z-10 hidden lg:block" />
-          {!hideMap && <SovereignGlobe3D />}
+          <div className="w-full h-full max-w-[800px] max-h-[800px] flex items-center justify-center translate-x-[5%]">
+             <RemoteLottie path="Abstract Isometric Loader #1.json" className="w-[150%] h-[150%] object-contain scale-[1.3] opacity-90 drop-shadow-2xl" />
+          </div>
         </div>
         
         {/* Mobile Scanner Button */}
@@ -121,15 +122,15 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                             The Sovereign Protocol operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data cannot be intercepted or exposed.
                         </p>
                     </div>
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white rounded-3xl border border-black/5">
-                        <RemoteLottie path="Abstract Isometric Loader #1.json" className="scale-125 transition-transform duration-700 group-hover:scale-150" />
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white rounded-3xl border border-black/5 overflow-hidden p-8">
+                        <RemoteLottie path="Server infrastructure.json" className="w-full h-full object-contain scale-[1.3] transition-transform duration-700 group-hover:scale-[1.4]" />
                     </div>
                 </div>
 
                 {/* Bento Card 2 */}
                 <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
-                    <div className="w-full h-[200px] flex items-center justify-center bg-white rounded-3xl border border-black/5 mb-8">
-                        <RemoteLottie path="Business Analysis.json" className="scale-150 transition-transform duration-700 group-hover:scale-[1.6]" />
+                    <div className="w-full h-[200px] flex items-center justify-center bg-white rounded-3xl border border-black/5 mb-8 overflow-hidden p-6">
+                        <RemoteLottie path="Business Analysis.json" className="w-full h-full object-contain scale-[1.4] transition-transform duration-700 group-hover:scale-[1.5]" />
                     </div>
                     <div className="space-y-6">
                         <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
@@ -157,15 +158,15 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                             Our heuristic algorithms process 12TB of raw blockchain state daily, detecting liquidity injections and massive accumulations prior to market impact.
                         </p>
                     </div>
-                    <div className="w-full h-[200px] flex items-center justify-center bg-white rounded-3xl border border-black/5">
-                        <RemoteLottie path="Big Data Analytics.json" className="scale-125 transition-transform duration-700 group-hover:scale-150" />
+                    <div className="w-full h-[200px] flex items-center justify-center bg-white rounded-3xl border border-black/5 overflow-hidden p-6">
+                        <RemoteLottie path="Big Data Analytics.json" className="w-full h-full object-contain scale-[1.4] transition-transform duration-700 group-hover:scale-[1.5]" />
                     </div>
                 </div>
 
                 {/* Bento Card 4 */}
                 <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white rounded-3xl border border-black/5">
-                        <RemoteLottie path="Trade.json" className="scale-110 transition-transform duration-700 group-hover:scale-125" />
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white rounded-3xl border border-black/5 overflow-hidden p-8">
+                        <RemoteLottie path="Trade.json" className="w-full h-full object-contain scale-[1.2] transition-transform duration-700 group-hover:scale-[1.3]" />
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
                         <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
@@ -226,7 +227,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         </div>
       </section>
       
-      <SovereignFooter />
     </div>
   );
 }

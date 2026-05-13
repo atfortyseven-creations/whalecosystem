@@ -151,12 +151,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // the error boundary surfaces a manual "Retry" button. This is better than
   // silently blocking mobile users from ever seeing the Activate button.
   useEffect(() => {
-    // CRITICAL: only attempt auto-init if we are NOT checking handshake status
-    // and we have a valid connector. Handshake sessions (cookie-only) cannot auto-init.
-    const shouldInit = !isChecking && (!isMobile || forceAutoInit) && !isSovereignHandshake && !!connector;
-    if (isConnected && address && !client && !isInitializing && shouldInit) {
-      initClient();
-    }
+    // Auto-initialization is disabled. Users must manually activate the secure channel.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, isMobile, forceAutoInit]);
 
@@ -477,7 +472,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       } else if (errorMsg.includes('WASM') || errorMsg.includes('wasm')) {
         setInitError('Cryptographic WASM engine failure. This is often caused by browser security extensions. Please try in a clean session.');
       } else {
-        setInitError(`Sovereign tunnel failure: ${errorMsg.slice(0, 50) || 'Unknown Protocol Error'}. Please retry or check network status.`);
+        setInitError(`Network handshake failure: ${errorMsg.slice(0, 50) || 'Unknown Protocol Error'}. Please retry or check network status.`);
       }
     } finally {
       setIsInitializing(false);
@@ -809,86 +804,71 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     return (
       <div className="flex flex-col h-full min-h-[500px] bg-white rounded-2xl border border-black/5 shadow-sm overflow-y-auto">
         {/* Minimalist Protocol Header */}
-        <div className="flex items-center justify-center px-6 py-8 shrink-0">
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-1 h-1 rounded-full bg-[#9945FF] animate-pulse" />
+        <div className="flex items-center justify-between px-8 py-6 border-b border-black/5 bg-[#FAFAF8] shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#0044CC] animate-pulse" />
+            <span className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#050505]">Secure Network</span>
           </div>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-black/40">End-to-End Encrypted</span>
         </div>
 
-        {/* Hero Marketing Section */}
-        <div className="flex-1 px-8 py-10 flex flex-col items-center justify-center text-center gap-8">
-          <div className="relative group">
-            {/* Ambient glow around the whale */}
-            <div className="absolute inset-0 bg-[#9945FF]/20 blur-[60px] rounded-full scale-150 animate-pulse" />
+        {/* Hero Institutional Section */}
+        <div className="flex-1 px-8 py-16 flex flex-col items-center justify-center text-center gap-10">
+          <div className="relative">
             <img 
               src="/official-whale.png" 
-              alt="Sovereign Whale" 
-              className="relative w-48 h-48 md:w-56 md:h-56 object-contain filter drop-shadow-[0_0_30px_rgba(153,69,255,0.3)] group-hover:scale-105 transition-transform duration-700 ease-out" 
+              alt="Whale Alert Network" 
+              className="relative w-64 h-64 md:w-80 md:h-80 object-contain grayscale opacity-90 drop-shadow-2xl" 
             />
           </div>
 
-          <div className="space-y-2">
-            <p className="text-[#050505] text-[14px] font-medium tracking-tight">
-              "¡ Your Whale Chat is ready !"
-            </p>
-            <p className="text-black/30 text-[10px] font-mono uppercase tracking-[0.3em]">
-              Point-to-Point Encryption
+          <div className="space-y-4 max-w-2xl">
+            <h2 className="text-[#050505] text-[36px] md:text-[48px] font-black uppercase tracking-tighter leading-none">
+              Institutional <br /> Communications.
+            </h2>
+            <p className="text-[#050505]/60 text-[14px] md:text-[16px] font-serif leading-relaxed px-4">
+              A cryptographically secure, decentralized messaging protocol. 
+              All transmissions are encrypted peer-to-peer. No server storage. Absolute privacy.
             </p>
           </div>
-
         </div>
 
-          {/* Key properties - P2P Marketing Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 px-6 pb-8">
-            {[
-              { label: '0 Server Storage', desc: 'Messages stored only on your device. Real P2P.' },
-              { label: 'Forward Secrecy', desc: 'Each session is unique. Total mathematical privacy.' },
-              { label: 'Gasless Auth', desc: 'Free cryptographic identity. No network fees.' },
-            ].map((item) => (
-              <div key={item.label} className="p-4 rounded-2xl border border-black/5 bg-black/[0.01] hover:bg-black/[0.02] transition-colors">
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#9945FF] mb-1.5">{item.label}</p>
-                <p className="text-[10px] text-black/40 leading-snug font-mono uppercase tracking-wider">{item.desc}</p>
+        {/* Action Area */}
+        <div className="bg-[#FAFAF8] p-8 md:p-12 border-t border-black/5 flex flex-col items-center">
+          {initError ? (
+            <div className="flex flex-col items-center gap-6 w-full max-w-md">
+              <div className="w-full bg-red-50 text-red-700 text-[12px] font-mono p-5 rounded-xl border border-red-100 text-center leading-relaxed">
+                {initError}
               </div>
-            ))}
-          </div>
-
-          {/* Status / Action */}
-          <div className="mt-auto pt-6 px-6 pb-6">
-            {initError ? (
-              <div className="flex flex-col gap-3">
-                <div className="bg-red-50 text-red-700 text-[11px] font-mono p-4 rounded-xl border border-red-100 leading-relaxed">
-                  {initError}
-                </div>
-                <button
-                  onClick={initClient}
-                  disabled={isInitializing}
-                  className="w-full px-8 py-4 rounded-2xl bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#9945FF] hover:shadow-[0_0_25px_rgba(153,69,255,0.4)] transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
-                >
-                  {isInitializing ? (
-                    <><Activity size={14} className="animate-spin" /> Initialising...</>
-                  ) : (
-                    <><Lock size={14} /> Retry Authentication</>
-                  )}
-                </button>
-              </div>
-            ) : isInitializing ? (
-              <div className="flex flex-col items-center gap-4">
-                <Activity size={18} className="text-[#9945FF] animate-spin" />
-                <p className="text-[10px] text-black/30 font-mono uppercase tracking-widest">Establishing Connection...</p>
-              </div>
-            ) : (
               <button
                 onClick={initClient}
                 disabled={isInitializing}
-                className="group relative px-12 py-4 rounded-full bg-white border border-black/10 text-[#050505] text-[11px] font-bold uppercase tracking-widest hover:border-[#9945FF] hover:text-[#9945FF] transition-all active:scale-95 disabled:opacity-50"
+                className="w-full py-5 rounded-xl bg-[#050505] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#0044CC] hover:shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-50"
               >
-                Access Channel
-                <div className="absolute inset-0 rounded-full bg-[#9945FF]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                {isInitializing ? (
+                  <><Activity size={16} className="animate-spin" /> Initializing Handshake...</>
+                ) : (
+                  <><Lock size={16} /> Retry Protocol Initialization</>
+                )}
               </button>
-            )}
-          </div>
+            </div>
+          ) : isInitializing ? (
+            <div className="flex flex-col items-center gap-5">
+              <Activity size={24} className="text-[#0044CC] animate-spin" />
+              <p className="text-[12px] text-black/40 font-mono uppercase tracking-[0.2em] font-bold">Synchronizing Encrypted Channel...</p>
+            </div>
+          ) : (
+            <button
+              onClick={initClient}
+              disabled={isInitializing}
+              className="w-full max-w-md py-6 rounded-xl bg-[#050505] text-white text-[13px] font-black uppercase tracking-[0.2em] hover:bg-[#0044CC] hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+            >
+              <Shield size={18} /> Initialize Secure Connection
+            </button>
+          )}
         </div>
-      );
+      </div>
+    );
     }
 
   const shortAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;

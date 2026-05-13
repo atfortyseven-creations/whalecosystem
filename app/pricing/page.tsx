@@ -86,9 +86,9 @@ export default function PricingPage() {
             <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Access Tiers</span>
           </motion.div>
           
-          <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-[48px] md:text-[64px] font-black uppercase tracking-tighter leading-[0.95] mb-6">
-            Institutional <br className="hidden md:block" />
-            <span className="text-[#0044CC]">Infrastructure.</span>
+          <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-[36px] md:text-[56px] font-black uppercase tracking-tighter leading-[0.95] mb-6">
+            The Whale Alert <br className="hidden md:block" />
+            <span className="text-[#0044CC]">Network Prices.</span>
           </motion.h1>
           
           <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-[16px] md:text-[18px] text-slate-500 font-serif max-w-2xl mx-auto leading-relaxed">
@@ -114,11 +114,18 @@ export default function PricingPage() {
                   style={{ background: tier.accentColor }} 
                 />
 
-                {/* Massive Lottie Header */}
-                <div className="w-full aspect-[16/9] bg-[#FAFAF8] relative flex items-center justify-center p-8 border-b border-black/5">
-                   <RemoteLottie path={tier.lottie || 'Safe Box.json'} className={`w-full h-full object-contain ${isStandard ? 'scale-125' : 'scale-110'}`} />
+                {/* Blockchain Network Illustration Header */}
+                <div className="w-full aspect-[16/9] relative overflow-hidden border-b border-black/5" style={{ background: isStandard ? '#F5F8FF' : '#FAFAF8' }}>
+                   {/* Full-bleed illustration */}
+                   <img
+                     src="/lotties/pngtree-blockchain-network-illustration-with-cubes-vector-png-image_18614224.png"
+                     alt="Blockchain Network"
+                     className={`absolute inset-0 w-full h-full object-contain p-6 transition-all duration-500 ${isStandard ? 'opacity-100 scale-105' : 'opacity-60 grayscale scale-100'}`}
+                   />
+                   {/* Subtle gradient overlay for depth */}
+                   <div className={`absolute inset-0 ${isStandard ? 'bg-gradient-to-br from-[#0044CC]/5 via-transparent to-[#0044CC]/5' : 'bg-gradient-to-br from-black/5 via-transparent to-black/5'}`} />
                    {tier.badge && (
-                     <div className="absolute top-6 left-6 px-4 py-2 bg-[#0044CC] text-white rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-lg">
+                     <div className="absolute top-6 left-6 px-4 py-2 bg-[#0044CC] text-white rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-lg z-10">
                        {tier.badge}
                      </div>
                    )}

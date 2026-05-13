@@ -150,8 +150,8 @@ export function MobileManifesto() {
 
         {/* Block 2 */}
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="flex flex-col gap-8">
-            <div className="w-full aspect-square bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 flex items-center justify-center p-8 shadow-sm">
-                <RemoteLottie path="Business Analysis.json" className="scale-150" />
+            <div className="w-full aspect-square bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 flex items-center justify-center p-8 shadow-sm overflow-hidden">
+                <RemoteLottie path="Business Analysis.json" className="w-full h-full object-contain scale-[1.5]" />
             </div>
             <div className="space-y-4">
                 <div className="w-10 h-10 rounded-2xl bg-[#0044CC]/10 flex items-center justify-center mb-2">
@@ -166,8 +166,8 @@ export function MobileManifesto() {
 
         {/* Block 3 */}
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="flex flex-col gap-8">
-            <div className="w-full aspect-square bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 flex items-center justify-center p-8 shadow-sm">
-                <RemoteLottie path="Trade.json" className="scale-125" />
+            <div className="w-full aspect-square bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 flex items-center justify-center p-8 shadow-sm overflow-hidden">
+                <RemoteLottie path="Trade.json" className="w-full h-full object-contain scale-[1.3]" />
             </div>
             <div className="space-y-4">
                 <div className="w-10 h-10 rounded-2xl bg-[#0044CC]/10 flex items-center justify-center mb-2">

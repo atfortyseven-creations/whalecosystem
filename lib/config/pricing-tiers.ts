@@ -32,7 +32,7 @@ export const TIER_RANK: Record<PricingTier['id'], number> = {
 export const PRICING_TIERS: PricingTier[] = [
   {
     id:           'FREE',
-    name:         'Sovereign Free',
+    name:         'Whale Alert Free',
     tagline:      'Core intelligence layer access.',
     priceMonthly: '0',
     priceAnnual:  '0',
@@ -59,7 +59,7 @@ export const PRICING_TIERS: PricingTier[] = [
     highlight:    true,
     lottie:       'Safe Box.json',
     features: [
-      { text: 'Everything in Sovereign Free', highlight: true },
+      { text: 'Everything in Whale Alert Free', highlight: true },
       { text: 'Mass Transfers Real-Time Interception', highlight: true },
       { text: 'DeFi Yields & Liquidity Flow Analytics', highlight: true },
       { text: 'Zero-Latency Private Node Infrastructure' },

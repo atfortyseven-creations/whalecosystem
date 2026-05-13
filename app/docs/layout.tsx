@@ -110,7 +110,6 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-[780px] mx-auto py-16 px-6 lg:px-12 flex-1">
             {children}
           </div>
-          <SovereignFooter />
         </main>
       </div>
 
