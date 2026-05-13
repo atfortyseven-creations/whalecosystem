@@ -12,26 +12,26 @@ import { motion } from 'framer-motion';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 const FADE_UP = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
 };
 
-// ── Lottie Feature Cards ──────────────────────────────────────────────────────
+// ── Lottie Feature Cards (Institutional Palette) ────────────────────────────────
 const FEATURES = [
   {
-    lottie: 'Big Data Analytics.json',
-    title: 'Mempool Intelligence',
-    desc: 'Intercept institutional-scale transactions milliseconds after they are signed. Our bare-metal node mesh feeds directly from the raw Ethereum mempool, providing pre-execution alpha unavailable to any public RPC consumer.',
+    lottie: 'Business Analysis.json',
+    title: 'KYC Identity Attestation',
+    desc: 'Verify institutional actors via zero-knowledge biometric proofs. Our protocol ensures that no personal data is stored, while guaranteeing the humanity of every network participant.',
   },
   {
-    lottie: 'Trade.json',
-    title: 'Pre-Execution Tracking',
-    desc: 'Relying on block confirmations means you are already late. We detect and classify multi-million dollar liquidity movements before AMM spot prices shift — giving you the asymmetric edge that defines institutional performance.',
+    lottie: 'Isometric data analysis.json',
+    title: 'Protocol Transparency',
+    desc: 'Gain visibility into the cryptographic layers of the network. We provide mathematical certainty for every transaction and identity claim within the HumanID ecosystem.',
   },
   {
-    lottie: 'Connected world.json',
-    title: 'Entity Resolution',
-    desc: 'Map complex multi-hop interactions across chains. We de-obfuscate mixer outputs in real-time and group fragmented wallets into unified institutional entities, delivering counterparty clarity at the deepest protocol layer.',
+    lottie: 'Earth globe rotating with Seamless loop animation.json',
+    title: 'Global Resolution',
+    desc: 'Map multi-hop interactions across global chains. We de-obfuscate mixer outputs and group fragmented wallets into unified institutional entities.',
   },
 ];
 
@@ -95,53 +95,52 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] text-[#0a0a0a] font-sans overflow-x-hidden selection:bg-[#0044CC]/10">
+    <div className="min-h-screen bg-[#FAFAF8] text-[#0a0a0a] font-sans overflow-x-hidden selection:bg-black/10">
 
       <main className="relative z-10 w-full">
 
-        {/* ── HERO ──────────────────────────────────────────────────────────── */}
-        <section className="w-full pt-28 pb-20 px-6 border-b border-black/5">
-          <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-8">
+        {/* ── HERO (Nestr Style) ──────────────────────────────────────────── */}
+        <section className="w-full pt-32 pb-20 px-6 border-b border-black/10">
+          <div className="max-w-5xl mx-auto flex flex-col items-start gap-8">
             <motion.div
               initial="hidden" animate="visible" variants={FADE_UP}
-              className="flex flex-col items-center gap-6"
+              className="flex flex-col items-start gap-8"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/8 shadow-sm">
-                <Zap size={12} className="text-[#0044CC]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0a0a0a]/60">Institutional Intelligence Layer</span>
+              <div className="inline-flex items-center gap-3 px-0 py-0 bg-transparent">
+                <span className="text-[11px] font-black uppercase tracking-[0.3em] text-black/30">Institutional Licensing</span>
               </div>
 
-              <h1 className="text-[44px] md:text-[72px] font-black uppercase tracking-tighter leading-[0.92] text-[#0a0a0a]">
-                Absolute Control.<br />
-                <span className="text-[#0044CC]">Zero Compromise.</span>
+              <h1 className="text-[52px] md:text-[96px] font-black uppercase tracking-tighter leading-[0.88] text-[#0a0a0a]">
+                Pure.<br />
+                <span className="text-black/20">Institutional.</span>
               </h1>
 
-              <p className="text-[17px] md:text-[20px] font-serif text-[#0a0a0a]/50 max-w-2xl leading-relaxed">
-                The most powerful cryptographic terminal for decentralized markets. Gain asymmetric advantages with zero-latency mempool intelligence and military-grade P2P communications.
+              <p className="text-[20px] md:text-[24px] font-serif text-[#0a0a0a]/60 max-w-2xl leading-tight">
+                The definitive cryptographic identity and intelligence layer for the sovereign institution.
               </p>
             </motion.div>
           </div>
         </section>
 
-        {/* ── LOTTIE FEATURE STRIP ──────────────────────────────────────────── */}
-        <section className="w-full py-24 md:py-36 bg-white border-b border-black/5">
-          <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20">
+        {/* ── FEATURES GRID ────────────────────────────────────────────────── */}
+        <section className="w-full py-24 md:py-36 bg-white border-b border-black/10">
+          <div className="max-w-[1400px] mx-auto px-6">
             <motion.div
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}
-              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
+              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-0 border-t border-l border-black/10"
             >
               {FEATURES.map((f, i) => (
                 <motion.div
                   key={i} variants={FADE_UP}
-                  className="flex flex-col rounded-[2.5rem] border border-black/6 bg-[#FAFAF8] overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group"
+                  className="flex flex-col border-r border-b border-black/10 p-12 bg-white hover:bg-slate-50/50 transition-colors duration-500 group"
                 >
-                  <div className="w-full h-[260px] flex items-center justify-center p-8 bg-white border-b border-black/5 group-hover:bg-slate-50 transition-colors">
-                    <RemoteLottie path={f.lottie} className="w-full h-full" />
+                  <div className="w-full h-[240px] flex items-center justify-center mb-10 overflow-hidden">
+                    <RemoteLottie path={f.lottie} className="w-full h-full scale-125" />
                   </div>
-                  <div className="p-8 flex flex-col gap-4">
-                    <h3 className="text-[18px] font-black uppercase tracking-tight text-[#0a0a0a]">{f.title}</h3>
-                    <p className="text-[14px] text-[#0a0a0a]/50 leading-relaxed font-serif">{f.desc}</p>
+                  <div className="flex flex-col gap-4">
+                    <h3 className="text-[20px] font-black uppercase tracking-tight text-[#0a0a0a]">{f.title}</h3>
+                    <p className="text-[15px] text-[#0a0a0a]/50 leading-relaxed font-serif">{f.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -150,79 +149,61 @@ export default function PricingPage() {
         </section>
 
         {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
-        <section className="w-full py-24 md:py-36 bg-[#FAFAF8]">
+        <section className="w-full py-24 md:py-48 bg-[#FAFAF8]">
           <div className="px-6 max-w-[1400px] mx-auto">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
               variants={FADE_UP}
-              className="text-center mb-16"
+              className="mb-24"
             >
-              <h2 className="text-[36px] md:text-[56px] font-black uppercase tracking-tighter text-[#0a0a0a]">
-                License <span className="text-[#0044CC]">Acquisition.</span>
+              <h2 className="text-[40px] md:text-[72px] font-black uppercase tracking-tighter text-[#0a0a0a] leading-none">
+                Identity <br /><span className="text-black/10">Acquisition.</span>
               </h2>
-              <p className="text-[16px] font-serif text-[#0a0a0a]/50 mt-4 max-w-xl mx-auto">
-                Select the access tier that matches your operational requirements.
-              </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-black/10 border border-black/10 max-w-6xl mx-auto overflow-hidden">
               {PRICING_TIERS.map((tier, index) => {
                 const isStandard = tier.id === 'STANDARD';
+                const tierName = isStandard ? 'KYC STANDARD' : tier.id === 'PRO' ? 'KYC PRO' : tier.name;
+                
                 return (
                   <motion.div
                     key={tier.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className={`relative flex flex-col rounded-[2.5rem] border overflow-hidden transition-all duration-500 hover:-translate-y-1 ${
-                      isStandard
-                        ? 'bg-white border-[#0044CC]/20 shadow-[0_0_60px_rgba(0,68,204,0.08)]'
-                        : 'bg-white border-black/8 hover:shadow-xl'
-                    }`}
+                    className="relative flex flex-col bg-white p-12 md:p-16"
                   >
-                    {isStandard && (
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-[#0044CC]" />
-                    )}
-
-                    <div className="p-8 md:p-12 flex-1 flex flex-col">
-                      {tier.badge && (
-                        <div className="mb-6 inline-flex self-start px-4 py-1.5 bg-[#0044CC]/8 border border-[#0044CC]/15 text-[#0044CC] rounded-full text-[10px] font-black uppercase tracking-[0.2em]">
-                          {tier.badge}
+                    <div className="flex-1 flex flex-col">
+                      <div className="mb-12">
+                        <div className="mb-6 inline-flex self-start px-0 text-black/30 text-[10px] font-black uppercase tracking-[0.3em]">
+                          {tier.id === 'FREE' ? 'Operational Access' : 'Institutional License'}
                         </div>
-                      )}
-
-                      <div className="mb-8">
-                        <h2 className="text-[32px] md:text-[42px] font-black uppercase tracking-tighter leading-none mb-3 text-[#0a0a0a]">
-                          {tier.name}
+                        <h2 className="text-[36px] md:text-[48px] font-black uppercase tracking-tighter leading-none mb-4 text-[#0a0a0a]">
+                          {tierName}
                         </h2>
-                        <p className="font-mono text-[12px] text-[#0a0a0a]/40 uppercase tracking-widest leading-relaxed">
+                        <p className="font-mono text-[11px] text-[#0a0a0a]/40 uppercase tracking-[0.2em] leading-relaxed max-w-sm">
                           {tier.tagline}
                         </p>
                       </div>
 
-                      <div className="mb-10 pb-10 border-b border-black/6">
-                        <div className="flex items-start gap-2">
-                          <span className="text-[56px] md:text-[72px] font-black tracking-tighter leading-[0.85] text-[#0a0a0a]">
+                      <div className="mb-12">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-[64px] md:text-[84px] font-black tracking-tighter leading-none text-[#0a0a0a]">
                             {tier.priceMonthly}€
                           </span>
-                          <span className="text-[13px] font-bold uppercase tracking-widest text-[#0a0a0a]/30 pt-3">
+                          <span className="text-[13px] font-bold uppercase tracking-widest text-[#0a0a0a]/20">
                             / month
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex-1 space-y-4 mb-10">
+                      <div className="flex-1 space-y-5 mb-16">
                         {tier.features.map((feature, fIdx) => (
-                          <div key={fIdx} className="flex items-start gap-3">
-                            <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                              feature.highlight ? 'bg-[#0044CC] text-white' : 'bg-black/5 text-[#0a0a0a]/40'
-                            }`}>
-                              <CheckCircle2 size={12} strokeWidth={3} />
-                            </div>
-                            <span className={`text-[14px] leading-relaxed ${
-                              feature.highlight ? 'text-[#0a0a0a] font-medium' : 'text-[#0a0a0a]/50'
-                            }`}>
+                          <div key={fIdx} className="flex items-start gap-4">
+                            <div className="mt-1 w-1.5 h-1.5 bg-black rounded-full shrink-0" />
+                            <span className="text-[15px] leading-tight text-[#0a0a0a]/60 font-serif">
                               {feature.text}
                             </span>
                           </div>
@@ -232,22 +213,18 @@ export default function PricingPage() {
                       <button
                         onClick={() => handleSubscribeClick(tier.id)}
                         disabled={loadingTier === tier.id || (!isTierLoaded && isConnected)}
-                        className={`w-full py-4 rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 ${
-                          isStandard
-                            ? 'bg-[#0044CC] text-white hover:bg-[#0033AA] shadow-[0_4px_24px_rgba(0,68,204,0.25)] hover:shadow-[0_8px_32px_rgba(0,68,204,0.35)]'
-                            : 'bg-[#0a0a0a] text-white hover:bg-black/80'
-                        } disabled:opacity-40 disabled:cursor-not-allowed`}
+                        className={`w-full py-6 text-[12px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 border ${
+                          isStandard || tier.id === 'PRO'
+                            ? 'bg-black text-white hover:bg-white hover:text-black border-black'
+                            : 'bg-white text-black hover:bg-black hover:text-white border-black'
+                        } disabled:opacity-20 disabled:cursor-not-allowed`}
                       >
                         {loadingTier === tier.id ? (
-                          <><Loader2 size={16} className="animate-spin" /> Authorizing...</>
+                          <Loader2 size={16} className="animate-spin" />
                         ) : tier.id === 'FREE' ? (
-                          isConnected ? (
-                            <><CheckCircle2 size={16} /> Current Plan</>
-                          ) : (
-                            <><Lock size={16} /> Connect Wallet</>
-                          )
+                          isConnected ? 'ACTIVE SESSION' : 'INITIALIZE ACCESS'
                         ) : (
-                          <><ArrowRight size={16} /> Acquire License</>
+                          'ACQUIRE LICENSE'
                         )}
                       </button>
                     </div>
@@ -258,29 +235,26 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── WHY UPGRADE ──────────────────────────────────────────────────── */}
-        <section className="w-full py-24 md:py-36 bg-white border-t border-black/5">
-          <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20">
+        {/* ── WHY KYC ──────────────────────────────────────────────────── */}
+        <section className="w-full py-24 md:py-48 bg-white border-t border-black/10">
+          <div className="max-w-[1400px] mx-auto px-6">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}
               variants={FADE_UP}
-              className="text-center mb-16"
+              className="mb-24"
             >
-              <h2 className="text-[32px] md:text-[48px] font-black uppercase tracking-tighter text-[#0a0a0a] mb-4">
-                Why Upgrade to <span className="text-[#0044CC]">Whale Pro?</span>
+              <h2 className="text-[36px] md:text-[56px] font-black uppercase tracking-tighter text-[#0a0a0a] mb-6">
+                Institutional <span className="text-black/10">Rigour.</span>
               </h2>
-              <p className="text-[16px] font-serif text-[#0a0a0a]/50 max-w-2xl mx-auto">
-                In the institutional DeFi landscape, latency and asymmetric information are the only true edges. Here is what you unlock.
+              <p className="text-[18px] font-serif text-[#0a0a0a]/50 max-w-2xl">
+                In the sovereign DeFi landscape, mathematical identity and zero-trust communications are the only true protections.
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <ProFeatureCard icon={<Activity size={22} />} title="Mass Transfer Interception" desc="Detect multi-million dollar liquidity movements before they impact AMM spot prices. Our node architecture listens directly to the mempool." />
-              <ProFeatureCard icon={<LineChart size={22} />} title="Yield & Flow Analytics" desc="Track smart money depositing into deep DeFi primitives. Uncover where the largest institutional wallets are parking their stablecoins." />
-              <ProFeatureCard icon={<Cpu size={22} />} title="Zero-Latency Nodes" desc="Bypass congested public RPC endpoints. Pro users are routed through our dedicated bare-metal infrastructure for instantaneous execution." />
-              <ProFeatureCard icon={<Globe size={22} />} title="Aztec & Morpho Visibility" desc="Gain deep visibility into complex layered protocols. We untangle obfuscated lending pools to give you clear counterparty risk metrics." />
-              <ProFeatureCard icon={<Lock size={22} />} title="ZK-Encrypted Priority" desc="Your communications and requests are processed with priority cryptographic signing, ensuring zero dropped messages in the Whale Chat network." />
-              <ProFeatureCard icon={<Crosshair size={22} />} title="Tactical Dashboard" desc="A completely unlocked dashboard allowing you to customize indicators, set custom algorithmic alerts, and export raw analytical data." />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              <ProFeatureCard title="Biometric Binding" desc="Every identity is cryptographically bound to a physical biometric template via zero-knowledge proofs, eliminating synthetic identity risk." />
+              <ProFeatureCard title="Protocol Transparency" desc="Direct, un-mediated access to the deepest layers of blockchain state, providing sub-millisecond telemetry for institutional decision making." />
+              <ProFeatureCard title="Encrypted Flow" desc="All communications and analytical requests are processed through our proprietary p2p encryption mesh, ensuring zero protocol-level leakage." />
             </div>
           </div>
         </section>
@@ -292,14 +266,12 @@ export default function PricingPage() {
   );
 }
 
-function ProFeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+function ProFeatureCard({ title, desc }: { title: string; desc: string }) {
   return (
-    <div className="bg-[#FAFAF8] border border-black/6 p-8 rounded-[2rem] hover:bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
-      <div className="w-12 h-12 rounded-2xl bg-white border border-black/8 text-[#0044CC] flex items-center justify-center mb-5 shadow-sm group-hover:scale-105 transition-transform">
-        {icon}
-      </div>
-      <h3 className="text-[15px] font-black uppercase tracking-wide text-[#0a0a0a] mb-3">{title}</h3>
-      <p className="text-[13px] text-[#0a0a0a]/50 leading-relaxed font-serif">{desc}</p>
+    <div className="flex flex-col gap-6 p-0 group">
+      <div className="w-12 h-px bg-black transition-all group-hover:w-full duration-700" />
+      <h3 className="text-[18px] font-black uppercase tracking-tight text-[#0a0a0a]">{title}</h3>
+      <p className="text-[14px] text-[#0a0a0a]/50 leading-relaxed font-serif">{desc}</p>
     </div>
   );
 }

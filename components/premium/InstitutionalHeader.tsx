@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Search, Bell, Clock, Eye, Settings, User, Wallet } from 'lucide-react';
 import { useNativeWallet } from '@/hooks/useNativeWallet';
 import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
-import { WhaleLogo } from '@/components/shared/WhaleLogo';
+import { HumanIDLogo } from '@/components/shared/WhaleLogo';
 
 export default function InstitutionalHeader() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -23,30 +23,30 @@ export default function InstitutionalHeader() {
         body: JSON.stringify({ action: actionId, payload }),
       });
       const data = await res.json();
-      console.log('Institutional Action:', data.message);
+      console.log('Protocol Action:', data.message);
       setActiveMenu(null);
     } catch (e) {
-      console.error('Failed to communicate with the Sovereign backend.', e);
+      console.error('Failed to communicate with the HumanID backend.', e);
     }
   };
 
   return (
-    <div className="w-full flex flex-col font-serif uppercase tracking-widest text-[10px] text-[#1a1a1a] bg-[#ebe6db] border-b border-black/10 relative z-50">
+    <div className="w-full flex flex-col font-sans uppercase tracking-[0.15em] text-[10px] text-[#0A0A0A] bg-[#FAFAF8] border-b border-black/5 relative z-50 selection:bg-black/10">
       
-      {/* Layer 1: Institutional Menu & Connection Status */}
-      <div className="flex items-center justify-between px-6 py-2 border-b border-black/5">
-        <div className="flex items-center gap-6 font-bold">
+      {/* Layer 1: Protocol Menu & Connectivity Status */}
+      <div className="flex items-center justify-between px-6 py-2 border-b border-black/5 bg-white/50 backdrop-blur-md">
+        <div className="flex items-center gap-6 font-black">
           <div className="relative" onMouseLeave={() => setActiveMenu(null)}>
             <button 
               onMouseEnter={() => setActiveMenu('file')}
-              className="hover:text-black hover:opacity-100 opacity-70 transition-opacity"
+              className="hover:text-black opacity-40 hover:opacity-100 transition-opacity"
             >
-              File
+              Protocol
             </button>
             {activeMenu === 'file' && (
-              <div className="absolute top-full left-0 mt-1 w-48 bg-[#f5f2eb] border border-black/10 shadow-2xl py-2 z-50 rounded-sm">
-                <button onClick={() => handleMenuAction('file_save')} className="w-full text-left px-4 py-2 hover:bg-black/5 transition-colors">Save State</button>
-                <button onClick={() => handleMenuAction('file_export')} className="w-full text-left px-4 py-2 hover:bg-black/5 transition-colors">Export Matrix</button>
+              <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">
+                <button onClick={() => handleMenuAction('file_save')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Commit State</button>
+                <button onClick={() => handleMenuAction('file_export')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Export Ledger</button>
               </div>
             )}
           </div>
@@ -54,13 +54,13 @@ export default function InstitutionalHeader() {
           <div className="relative" onMouseLeave={() => setActiveMenu(null)}>
             <button 
               onMouseEnter={() => setActiveMenu('edit')}
-              className="hover:text-black hover:opacity-100 opacity-70 transition-opacity"
+              className="hover:text-black opacity-40 hover:opacity-100 transition-opacity"
             >
               Edit
             </button>
             {activeMenu === 'edit' && (
-              <div className="absolute top-full left-0 mt-1 w-48 bg-[#f5f2eb] border border-black/10 shadow-2xl py-2 z-50 rounded-sm">
-                <button onClick={() => handleMenuAction('edit_preferences')} className="w-full text-left px-4 py-2 hover:bg-black/5 transition-colors">Preferences</button>
+              <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">
+                <button onClick={() => handleMenuAction('edit_preferences')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Preferences</button>
               </div>
             )}
           </div>
@@ -68,14 +68,14 @@ export default function InstitutionalHeader() {
           <div className="relative" onMouseLeave={() => setActiveMenu(null)}>
              <button 
                onMouseEnter={() => setActiveMenu('view')}
-               className="hover:text-black hover:opacity-100 opacity-70 transition-opacity"
+               className="hover:text-black opacity-40 hover:opacity-100 transition-opacity"
              >
                View
              </button>
              {activeMenu === 'view' && (
-               <div className="absolute top-full left-0 mt-1 w-48 bg-[#f5f2eb] border border-black/10 shadow-2xl py-2 z-50 rounded-sm">
-                 <button onClick={() => handleMenuAction('view_toggle_mode', 'institutional')} className="w-full text-left px-4 py-2 hover:bg-black/5 transition-colors">Institutional Mode</button>
-                 <button onClick={() => handleMenuAction('view_toggle_mode', 'standard')} className="w-full text-left px-4 py-2 hover:bg-black/5 transition-colors">Standard Mode</button>
+               <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">
+                 <button onClick={() => handleMenuAction('view_toggle_mode', 'institutional')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Forensic Mode</button>
+                 <button onClick={() => handleMenuAction('view_toggle_mode', 'standard')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Standard Mode</button>
                </div>
              )}
           </div>
@@ -83,105 +83,107 @@ export default function InstitutionalHeader() {
           <div className="relative" onMouseLeave={() => setActiveMenu(null)}>
              <button 
                onMouseEnter={() => setActiveMenu('analytics')}
-               className="hover:text-black hover:opacity-100 opacity-70 transition-opacity"
+               className="hover:text-black opacity-40 hover:opacity-100 transition-opacity"
              >
-               Analytics
+               Intelligence
              </button>
              {activeMenu === 'analytics' && (
-               <div className="absolute top-full left-0 mt-1 w-48 bg-[#f5f2eb] border border-black/10 shadow-2xl py-2 z-50 rounded-sm">
-                 <button onClick={() => handleMenuAction('analytics_generate')} className="w-full text-left px-4 py-2 hover:bg-black/5 transition-colors">Run Deep Quantum Scan</button>
+               <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">
+                 <button onClick={() => handleMenuAction('analytics_generate')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Run Deterministic Scan</button>
                </div>
              )}
           </div>
         </div>
         
-        <div className="flex items-center gap-4 text-xs font-mono font-bold">
-          <span className="text-black/60">ID: 0X7683...784A</span>
-          <span className="text-pink-500 tracking-widest text-[10px]">CONNECTED</span>
+        <div className="flex items-center gap-4 text-[9px] font-black">
+          <span className="text-black/30">IDENTIFIER: {address ? `${address.slice(0, 10)}...${address.slice(-4)}` : 'NULL'}</span>
+          <div className="flex items-center gap-1.5 bg-black/5 px-2.5 py-1 rounded-full border border-black/5">
+            <div className="w-1 h-1 rounded-full bg-black/40" />
+            <span className="text-black/60 tracking-[0.2em]">{address ? 'ESTABLISHED' : 'VOID'}</span>
+          </div>
         </div>
       </div>
 
       {/* Layer 2: Core Navigation & Utilities */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-black/5">
+      <div className="flex items-center justify-between px-6 py-5 border-b border-black/5">
         <div className="flex items-center gap-12">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <WhaleLogo className="w-8 h-8" variant="monochrome" priority />
-              <span className="font-serif text-xl font-black tracking-normal">WHALE ALERT NETWORK</span>
+              <HumanIDLogo className="w-7 h-7" priority />
+              <span className="font-black text-lg tracking-tight">HUMANID PROTOCOL</span>
             </div>
-            <nav className="flex items-center gap-8 font-bold opacity-80">
-              <button className="hover:text-black hover:opacity-100 transition-opacity text-pink-500">LIVE FEED</button>
-              <button className="hover:text-black hover:opacity-100 transition-opacity">NETWORK</button>
-              <button className="hover:text-black hover:opacity-100 transition-opacity">PORTFOLIO</button>
+            <nav className="flex items-center gap-8 font-black">
+              <button className="hover:text-black transition-opacity text-black">TELEMETRY</button>
+              <button className="hover:text-black opacity-30 hover:opacity-100 transition-opacity">NETWORK</button>
+              <button className="hover:text-black opacity-30 hover:opacity-100 transition-opacity">LEDGER</button>
             </nav>
           </div>
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-4 opacity-60">
-            <Search size={16} className="hover:opacity-100 cursor-pointer" />
+          <div className="flex items-center gap-5 opacity-30">
+            <Search size={16} className="hover:opacity-100 cursor-pointer transition-opacity" />
             <div className="relative">
-              <Bell size={16} className="hover:opacity-100 cursor-pointer" />
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-pink-500 rounded-full" />
+              <Bell size={16} className="hover:opacity-100 cursor-pointer transition-opacity" />
+              <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-black rounded-full" />
             </div>
-            <div className="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full border border-black/10">
-              <span className="text-[9px] font-bold">EUR</span>
-              <Settings size={12} />
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-black/5 rounded-lg border border-black/5">
+              <span className="text-[8px] font-black">USD</span>
+              <Settings size={10} />
             </div>
-            <Clock size={16} className="hover:opacity-100 cursor-pointer" />
-            <Bell size={16} className="hover:opacity-100 cursor-pointer" />
-            <Eye size={16} className="hover:opacity-100 cursor-pointer" />
-            <Settings size={16} className="hover:opacity-100 cursor-pointer" />
+            <Clock size={16} className="hover:opacity-100 cursor-pointer transition-opacity" />
+            <Eye size={16} className="hover:opacity-100 cursor-pointer transition-opacity" />
+            <Settings size={16} className="hover:opacity-100 cursor-pointer transition-opacity" />
           </div>
 
           {address ? (
             <div 
               onClick={handleDisconnect}
-              className="flex items-center gap-3 bg-[#e0ff00] px-4 py-2 rounded-full border border-black/10 shadow-sm cursor-pointer hover:bg-[#d6f500] transition-colors"
+              className="flex items-center gap-4 bg-black text-white px-5 py-2.5 rounded-2xl shadow-xl shadow-black/10 cursor-pointer hover:bg-black/80 transition-all active:scale-95 group"
             >
               <div className="flex flex-col text-right">
-                 <span className="font-mono font-bold text-[10px] leading-tight text-black">{formatAddress(address)}</span>
-                 <span className="font-bold text-[8px] leading-tight text-black/60">SOVEREIGN CONNECTED</span>
+                 <span className="font-mono font-bold text-[10px] leading-tight opacity-90">{formatAddress(address)}</span>
+                 <span className="font-black text-[8px] leading-tight opacity-40 group-hover:opacity-100 transition-opacity">TERMINATE SESSION</span>
               </div>
-              <div className="bg-black/10 p-1.5 rounded-full">
-                 <User size={14} className="text-black" />
+              <div className="bg-white/10 p-1.5 rounded-xl">
+                 <User size={14} className="text-white" />
               </div>
             </div>
           ) : (
             <button 
               onClick={connect}
               disabled={isConnecting}
-              className="flex items-center gap-2 bg-[#722ED1] text-white px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest hover:bg-[#B37FEB] transition-all disabled:opacity-50"
+              className="flex items-center gap-3 bg-black text-white px-7 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-black/80 transition-all active:scale-95 disabled:opacity-20 shadow-xl shadow-black/10"
             >
               {isConnecting ? <Clock size={16} className="animate-spin" /> : <Wallet size={16} />}
-              <span>{isConnecting ? 'Bridging...' : 'Connect Node'}</span>
+              <span>{isConnecting ? 'Authenticating...' : 'Connect Identity'}</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Layer 3: Global Metrics Bar */}
-      <div className="flex items-center gap-12 px-6 py-2 font-bold font-sans overflow-x-auto whitespace-nowrap scrollbar-hide">
+      <div className="flex items-center gap-12 px-6 py-2.5 font-black text-[9px] overflow-x-auto whitespace-nowrap scrollbar-hide bg-white/30 backdrop-blur-sm">
         <div className="flex items-center gap-2">
-            <span className="text-black/60">GLOBAL LIQUIDITY</span>
-            <span className="text-black mr-1">$4.2B</span>
-            <span className="text-green-500">+0.8%</span>
+            <span className="text-black/20">TOTAL CAPITALIZATION</span>
+            <span className="text-black">$4.27T</span>
+            <span className="text-black/40 font-serif italic">+0.82%</span>
         </div>
         <div className="flex items-center gap-2">
-            <span className="text-black/60">TOTAL VOLUME</span>
-            <span className="text-black">$4.2B</span>
+            <span className="text-black/20">AGGREGATE VOLUME</span>
+            <span className="text-black">$182.4B</span>
         </div>
         <div className="flex items-center gap-2">
-            <span className="text-black/60">ACTIVE WHALES</span>
-            <span className="text-black">1,240</span>
+            <span className="text-black/20">VERIFIED IDENTITIES</span>
+            <span className="text-black">1,240,891</span>
         </div>
         <div className="flex items-center gap-2">
-            <span className="text-black/60">NETWORK PULSE</span>
-            <span className="text-[#e0ff00]">99.9%</span>
+            <span className="text-black/20">PROTOCOL STABILITY</span>
+            <span className="text-black">100.00%</span>
         </div>
         <div className="flex items-center gap-2">
-            <span className="text-black/60">VOLUME MOMENTUM</span>
-            <span className="text-pink-500">HIGH</span>
+            <span className="text-black/20">NETWORK LATENCY</span>
+            <span className="text-black">12MS</span>
         </div>
       </div>
     </div>

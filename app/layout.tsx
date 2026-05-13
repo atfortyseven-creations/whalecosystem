@@ -41,16 +41,16 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'HOME | Whale Alert Network',
-    template: '%s | Whale Alert Network'
+    default: 'HumanID Protocol | Institutional Identity Layer',
+    template: '%s | HumanID Protocol'
   },
-  description: 'La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.',
+  description: 'The definitive HumanID Protocol for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
   keywords: [
-    'Whale Alert Network', 'Whale Alert', 'Whale Tracker', 'Crypto Whale Detector', 'On-chain Analytics', 'Crypto Community'
+    'HumanID Protocol', 'HumanID', 'Institutional Identity', 'ZK-Biometrics', 'On-chain Intelligence', 'Zero-Knowledge Proofs'
   ],
-  authors: [{ name: 'Whale Alert Network Team' }],
-  creator: 'Whale Alert Network Team',
-  publisher: 'Whale Alert Network Team',
+  authors: [{ name: 'HumanID Protocol Foundation' }],
+  creator: 'HumanID Protocol Foundation',
+  publisher: 'HumanID Protocol Foundation',
   metadataBase: new URL('https://www.humanidfi.com'),
   alternates: {
     canonical: '/',
@@ -72,19 +72,19 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Whale Alert',
+    title: 'HumanID',
   },
   openGraph: {
-    title: 'HOME | Whale Alert Network',
-    description: 'La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.',
+    title: 'HumanID Protocol | Institutional Identity Layer',
+    description: 'The definitive HumanID Protocol for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
     url: 'https://www.humanidfi.com',
-    siteName: 'Whale Alert Network',
+    siteName: 'HumanID Protocol',
     images: [
       {
-        url: '/logo-landingpage.png',
+        url: '/humanid_protocol_logo_1778714491433.png',
         width: 1200,
         height: 1200,
-        alt: 'Whale Alert Network',
+        alt: 'HumanID Protocol',
       },
     ],
     locale: 'en_US',
@@ -92,14 +92,14 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HOME | Whale Alert Network',
-    description: 'La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.',
-    images: ['/logo-landingpage.png'],
+    title: 'HumanID Protocol | Institutional Identity Layer',
+    description: 'The definitive HumanID Protocol for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+    images: ['/humanid_protocol_logo_1778714491433.png'],
   },
 }
 
 export const viewport = {
-  themeColor: '#FAF9F6',
+  themeColor: '#FAFAF8',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -123,8 +123,8 @@ export default async function RootLayout({
       {
         "@type": "WebSite",
         "url": "https://www.humanidfi.com/",
-        "name": "Whale Alert Network",
-        "description": "La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.",
+        "name": "HumanID Protocol",
+        "description": "The definitive HumanID Protocol for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.",
         "publisher": {
           "@id": "https://www.humanidfi.com/#organization"
         }
@@ -132,44 +132,44 @@ export default async function RootLayout({
       {
         "@type": "Organization",
         "@id": "https://www.humanidfi.com/#organization",
-        "name": "Whale Alert Network Team",
+        "name": "HumanID Protocol Foundation",
         "url": "https://www.humanidfi.com",
-        "logo": "https://www.humanidfi.com/logo-landingpage.png",
+        "logo": "https://www.humanidfi.com/humanid_protocol_logo_1778714491433.png",
         "sameAs": [
-          "https://github.com/atfortyseven-creations/whalecosystem"
+          "https://github.com/atfortyseven-creations/Humanity-Ledger"
         ]
       },
       {
         "@type": "SoftwareApplication",
-        "name": "Whale Alert Network Terminal",
+        "name": "HumanID Terminal",
         "operatingSystem": "Web",
         "applicationCategory": "FinanceApplication",
         "creator": {
           "@id": "https://www.humanidfi.com/#organization"
         },
-        "description": "Whale Alert Network terminal for real-time elite on-chain intelligence.",
-        "url": "https://www.humanidfi.com/network",
+        "description": "HumanID Terminal for real-time institutional on-chain identity and intelligence.",
+        "url": "https://www.humanidfi.com/dashboard",
         "featureList": [
-          "Sovereign PC Vault (Local Daemon Zero-Trust)",
-          "Next.js Hybrid Safari iOS Webview + QR State Sync",
-          "Hardhat L2 Aztec Network ZK Integrations",
-          "Whale Worker (Prisma + Neo4j + BullMQ)"
+          "HumanID Terminal (Zero-Trust Forensic Suite)",
+          "ZK-Biometric Identity Attestation",
+          "Aztec Network L2 Privacy Integration",
+          "Protocol Ledger Heuristics"
         ]
       },
       {
         "@type": "SoftwareSourceCode",
-        "name": "Whale Alert Base Architecture",
-        "codeRepository": "https://github.com/atfortyseven-creations/whalecosystem",
+        "name": "HumanID Protocol Architecture",
+        "codeRepository": "https://github.com/atfortyseven-creations/Humanity-Ledger",
         "programmingLanguage": ["TypeScript", "Solidity", "PostgreSQL", "Neo4j", "React", "Next.js"],
-        "description": "Dual-hybrid architecture running Next.js 15 App router over a Zero-Latency Bento UI."
+        "description": "Institutional-grade identity layer running Next.js 15 App router over a sterilized Ivory-and-Ink UI."
       },
       {
         "@type": "DataFeed",
-        "name": "Live Institutional Flow Feed",
+        "name": "Live Institutional Identity Feed",
         "dataFeedElement": {
           "@type": "DataFeedItem",
-          "name": "EVM Thermodynamic Matrix",
-          "description": "Live stochastic tracing of accumulated gas signatures natively via local Node daemon connected to Ethereum."
+          "name": "Protocol Identity Matrix",
+          "description": "Real-time cryptographic attestation of network participants via local Node daemon."
         }
       }
     ]
@@ -190,8 +190,8 @@ export default async function RootLayout({
             with sessionStorage so WC v2 sessions survive within the tab. */}
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: `(function(){
   try{
-    window.localStorage.setItem('__sovereign_probe__','1');
-    window.localStorage.removeItem('__sovereign_probe__');
+    window.localStorage.setItem('__humanid_probe__','1');
+    window.localStorage.removeItem('__humanid_probe__');
   }catch(e){
     try{
       var _ss=window.sessionStorage;
@@ -225,12 +225,12 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className="bg-[#0a001a] text-white antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300"
+        className="bg-[#FAFAF8] text-[#0A0A0A] antialiased selection:bg-black/10 selection:text-black transition-colors duration-300"
         suppressHydrationWarning
       >
 
 
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-white text-black px-4 py-2 rounded-lg font-bold text-sm">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-black text-white px-4 py-2 rounded-lg font-bold text-sm">
           Skip to absolute content
         </a>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>

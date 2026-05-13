@@ -107,7 +107,7 @@ const CANONICAL_APP_URL = getCanonicalUrl();
 
 const metadata = {
     name: 'Whale Alert Network',
-    description: 'Humanity Ledger',
+    description: 'Institutional Grade Whale Tracking',
     url: CANONICAL_APP_URL,
     icons: [`${CANONICAL_APP_URL}/official-whale-monochrome.png`],
     redirect: {
@@ -125,7 +125,7 @@ const siweConfig = createSIWEConfig({
     domain: typeof window !== 'undefined' ? window.location.host : 'humanidfi.com',
     uri: typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com',
     chains: [1, 10, 56, 137, 8453, 42161, 480],
-    statement: 'Sign in to Humanity Ledger'
+    statement: 'Sign in to Whale Alert Network'
   }),
   createMessage: ({ address, ...args }) => formatMessage(args, address),
   getNonce: async () => {

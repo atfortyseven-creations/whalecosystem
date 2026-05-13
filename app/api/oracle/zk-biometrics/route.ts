@@ -12,7 +12,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
     try {
-        const { address, signature, payload, timestamp, nonce } = await req.json();
+        const { address, signature, payload, timestamp, nonce, uuid } = await req.json();
 
         if (!address || !signature || !payload || !nonce || !timestamp) {
             return NextResponse.json({ error: 'Missing cryptographic proof components or nonce' }, { status: 400 });
@@ -76,6 +76,21 @@ export async function POST(req: NextRequest) {
             // @ts-ignore: Schema updated but Prisma client may be stale locally
             create: { walletAddress: address.toLowerCase(), isZkVerified: true, tier: 'FREE' }
         });
+
+        // 6. QR Session Synchronization (Legacy-Bridge)
+        // If this verification happened as part of a QR-sync flow, notify the PC.
+        if (uuid) {
+            const { safeRedisGet, safeRedisSet } = await import('@/lib/redis/client');
+            const sessionData = await safeRedisGet(`qr-session:${uuid}`);
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    parsed.kycVerified = true;
+                    await safeRedisSet(`qr-session:${uuid}`, JSON.stringify(parsed), 'EX', 300);
+                    console.log(`[ZK-ORACLE] 📡 Synchronized KYC status for QR session: ${uuid}`);
+                } catch (e) {}
+            }
+        }
 
         return NextResponse.json({
             success: true,

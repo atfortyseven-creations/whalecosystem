@@ -48,7 +48,7 @@ export function WhalecosystemTweetFeed({
             </div>
             <div className="flex flex-col">
               <span className={`text-[11px] font-black uppercase tracking-widest ${isDark ? 'text-white/80' : 'text-black/80'}`}>
-                @whalecosystem
+                @humanityledger
               </span>
               {/* "Live Feed" text has been explicitly removed as requested */}
             </div>
@@ -62,11 +62,11 @@ export function WhalecosystemTweetFeed({
               <RefreshCw size={11} className="currentColor" />
             </button>
             <a
-              href="https://twitter.com/whalecosystem"
+              href="https://twitter.com/humanityledger"
               target="_blank"
               rel="noopener noreferrer"
               className={`p-1.5 rounded-lg border transition-all ${isDark ? 'bg-white/5 hover:bg-[#1d9bf0]/20 border-white/10 hover:border-[#1d9bf0]/30 text-white/40' : 'bg-black/5 hover:bg-[#1d9bf0]/10 border-black/10 hover:border-[#1d9bf0]/30 text-black/40'}`}
-              title="Open @whalecosystem on X"
+              title="Open @humanityledger on X"
             >
               <ExternalLink size={11} className="hover:text-[#1d9bf0] currentColor" />
             </a>
@@ -85,7 +85,7 @@ export function WhalecosystemTweetFeed({
               className="twitter-timeline" 
               data-theme={theme}
               data-chrome="noheader nofooter noborders transparent"
-              href="https://twitter.com/whalecosystem?ref_src=twsrc%5Etfw">
+              href="https://twitter.com/humanityledger?ref_src=twsrc%5Etfw">
            </a>
         </div>
       </div>

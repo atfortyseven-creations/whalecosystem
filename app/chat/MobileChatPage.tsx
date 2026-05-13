@@ -103,7 +103,8 @@ export default function MobileChatPage() {
         </Link>
 
         <div className="flex items-center gap-2">
-          {/* Central brand symbol could go here, or remain empty for maximum minimalism */}
+          <img src="/official-whale-monochrome.png" alt="Whale Chat" className="w-8 h-8 opacity-90 mix-blend-multiply" />
+          <span className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-black">Whale Chat</span>
         </div>
 
         <div className="w-10" />

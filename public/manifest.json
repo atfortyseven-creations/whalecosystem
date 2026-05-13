@@ -1,13 +1,13 @@
 {
-  "name": "Whale Alert Network — Sovereign Terminal",
-  "short_name": "WAN Terminal",
+  "name": "HumanID Protocol — Sovereign Terminal",
+  "short_name": "HumanID",
   "description": "Institutional on-chain intelligence. Real-time mempool surveillance. Cryptographic identity. Zero-mock. Zero-trust.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#FDFCF8",
-  "theme_color": "#050505",
+  "background_color": "#FAFAF8",
+  "theme_color": "#0A0A0A",
   "lang": "en",
   "dir": "ltr",
   "categories": ["finance", "productivity", "utilities"],
@@ -67,14 +67,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Sovereign Intelligence Terminal — Desktop"
+      "label": "HumanID Sovereign Terminal — Desktop"
     },
     {
       "src": "/system-shots/Captura de pantalla 2026-05-07 012904.png",
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Sovereign Intelligence Terminal — Mobile"
+      "label": "HumanID Sovereign Terminal — Mobile"
     }
   ],
   "shortcuts": [
@@ -86,10 +86,10 @@
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
-      "name": "Forum",
-      "short_name": "Forum",
-      "description": "Sovereign cryptographic forum",
-      "url": "/forum",
+      "name": "Chat",
+      "short_name": "Chat",
+      "description": "HumanID cryptographic chat",
+      "url": "/chat",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
@@ -104,7 +104,7 @@
   "related_applications": [],
   "protocol_handlers": [
     {
-      "protocol": "web+wan",
+      "protocol": "web+humanid",
       "url": "/protocol?q=%s"
     }
   ]

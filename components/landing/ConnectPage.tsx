@@ -150,7 +150,7 @@ export default function ConnectPage() {
       const sessId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('') + '-' + Date.now().toString(36);
       setQrSession(sessId);
 
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.humanidfi.com';
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.humanidprotocol.com';
       const expiresAt = Date.now() + 300000;
       const qrUrl = new URL('/connect', origin);
       qrUrl.searchParams.set('uuid', sessId);
@@ -251,6 +251,14 @@ export default function ConnectPage() {
           }
 
           if (!jwt) { setSyncStatus("ERROR"); return; }
+          
+          // [KYC-SYNC-WAIT]
+          // We wait for kycVerified to be true in the session data before final redirection.
+          if (!data.kycVerified) {
+            console.log("[Sovereign:Sync] Wallet synced. Awaiting biometric attestation...");
+            return;
+          }
+
           const hydrateRes = await fetch('/api/auth/qr-hydrate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jwt }) });
           if (hydrateRes.ok) window.location.replace("/dashboard");
           else setSyncStatus("ERROR");
@@ -447,7 +455,7 @@ export default function ConnectPage() {
                       Session<br/><span className="text-black/30">Verified.</span>
                     </h2>
                     <p className="font-serif text-[15px] leading-relaxed text-[#050505]/60 font-medium">
-                      Cryptographic attestation perfectly resolved. Your session is now verified. Welcome to the institutional terminal.
+                      Cryptographic attestation perfectly resolved. Your session is now verified. Welcome to the HumanID Terminal.
                     </p>
                   </div>
 
@@ -563,7 +571,7 @@ export default function ConnectPage() {
             alt=""
             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
-          <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#050505]/40">© 2026 atfortyseven-creations</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#050505]/40">© 2026 HumanID Protocol</span>
         </div>
         <div className="flex items-center gap-8">
           <a href="https://twitter.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="text-[#050505]/40 hover:text-[#050505] transition-colors">

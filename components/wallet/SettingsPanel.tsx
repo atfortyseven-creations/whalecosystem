@@ -179,7 +179,7 @@ export default function SettingsPanel() {
       </section>
 
       <div className="text-center text-xs text-[#1F1F1F]/30 pt-4">
-        Whale Alert Network Terminal v1.0.0 (Phase 4 Build)
+        HumanID Protocol Terminal v1.0.0 (Institutional Build)
       </div>
     </div>
   );
@@ -189,7 +189,7 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
     const [input, setInput] = useState('');
     const [isHovering, setIsHovering] = useState(false);
     
-    const correctPhrase = "Whale Alert Network";
+    const correctPhrase = "HumanID Protocol";
     const isMatched = input === correctPhrase;
 
     return (
@@ -197,11 +197,11 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
             {/* Glassmorphism Container */}
             <div className="bg-red-500/5 backdrop-blur-xl border border-red-500/10 rounded-2xl p-6 space-y-4 transition-all hover:bg-red-500/10">
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-red-600 uppercase tracking-widest">
-                        Security Verification
+                    <label className="text-xs font-black text-red-600 uppercase tracking-widest">
+                        Protocol Verification
                     </label>
                     <p className="text-sm text-[#1F1F1F]/60">
-                        Type <span className="font-mono font-bold bg-white/50 px-1 rounded text-red-500">{correctPhrase}</span> to reveal your secret phrase.
+                        Type <span className="font-mono font-bold bg-white/50 px-1 rounded text-red-500">{correctPhrase}</span> to reveal your recovery phrase.
                     </p>
                 </div>
 

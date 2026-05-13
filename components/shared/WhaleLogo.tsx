@@ -1,29 +1,17 @@
-"use client";
-
-import React from 'react';
-import Image from 'next/image';
-
-interface WhaleLogoProps {
-    className?: string;
-    variant?: 'monochrome' | 'classic';
-    priority?: boolean;
-}
-
 /**
- * 🐋 SOVEREIGN BRAND IDENTITY ENGINE
- * Centrally manages the official whale logo visualization.
+ * 🆔 HUMANID BRAND IDENTITY ENGINE
+ * Centrally manages the official HumanID Protocol logo visualization.
  */
-export function WhaleLogo({ 
+export function HumanIDLogo({ 
     className = "w-10 h-10", 
-    variant = 'monochrome',
     priority = true 
-}: WhaleLogoProps) {
-    // Reference the institutional logo via our hardened checkpoint-image API
+}: { className?: string; priority?: boolean }) {
+    // Reference the institutional logo
     return (
         <div className={`relative flex items-center justify-center ${className}`}>
             <Image
-                src="/official-whale-monochrome.png"
-                alt="Sovereign Whale Alert"
+                src="/humanid_protocol_logo_1778714491433.png"
+                alt="HumanID Protocol"
                 fill
                 className="object-contain transition-all duration-300 transform-gpu"
                 priority={priority}

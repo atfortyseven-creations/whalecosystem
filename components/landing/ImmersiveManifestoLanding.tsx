@@ -40,7 +40,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-32 pb-20 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
         >
 
-          <motion.h1 variants={FADE_UP} className="text-[40px] sm:text-[56px] md:text-[64px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-4xl">
+          <motion.h1 variants={FADE_UP} className="text-[28px] sm:text-[48px] md:text-[64px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-4xl">
             Track institutional capital <br />
             <span className="text-[#0044CC]">before markets react.</span>
           </motion.h1>
@@ -49,18 +49,18 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
             Real-time on-chain intelligence — from mempool to execution.
           </motion.p>
 
-          {/* Live Stats Glassmorphism Bar */}
-          <motion.div variants={FADE_UP} className="flex flex-row items-center justify-between gap-2 p-5 sm:p-8 bg-white/80 backdrop-blur-3xl border border-black/5 rounded-[2rem] mb-10 shadow-xl shadow-black/5 max-w-2xl w-full">
+          {/* Performance Status — Institutional Readout */}
+          <motion.div variants={FADE_UP} className="flex flex-row items-center justify-between gap-2 p-5 sm:p-8 bg-white border border-black/5 rounded-[2rem] mb-10 shadow-sm max-w-2xl w-full">
             {[
-              { label: "ETH Block", val: syncing ? "..." : (blockNumber ? `#${blockNumber.toLocaleString()}` : "---") },
-              { label: "Base Fee", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "---" },
-              { label: "Active Tokens", val: globalStats?.tokens ?? "---" },
-              { label: "Total Cap", val: globalStats?.cap ?? "---" }
+              { label: "Network State", val: blockNumber ? `#${blockNumber.toLocaleString()}` : "Operational" },
+              { label: "Gas Topology", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "Nominal" },
+              { label: "Entity Density", val: globalStats?.tokens ?? "Verified" },
+              { label: "Capital Flow", val: globalStats?.cap ?? "Nominal" }
             ].map((stat, i) => (
               <div key={stat.label} className="flex items-center">
                 <div className="flex flex-col gap-1">
-                  <span className="font-mono text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 truncate">{stat.label}</span>
-                  <span className="font-mono text-[12px] sm:text-[16px] font-black text-[#0a0a0a] truncate">{stat.val}</span>
+                  <span className="font-mono text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-black/20 truncate">{stat.label}</span>
+                  <span className="font-mono text-[12px] sm:text-[16px] font-black text-[#0a0a0a] truncate tracking-tight">{stat.val}</span>
                 </div>
                 {i !== 3 && <div className="w-px h-8 bg-black/5 mx-2 sm:mx-6" />}
               </div>
@@ -100,17 +100,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           />
         </div>
         
-        {/* Mobile Scanner Button */}
-        {onOpenScanner && (
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[200] bg-white/80 backdrop-blur-xl border-t border-black/10 flex justify-center py-4 px-6" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
-            <button onClick={onOpenScanner} className="w-full max-w-sm px-8 py-4 bg-[#0a0a0a] text-white rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] active:scale-95 transition-transform flex items-center justify-center gap-3 shadow-2xl">
-              <Scan size={16} /> Connect Wallet
-            </button>
-          </div>
-        )}
+
       </section>
 
-      {/* ── BENTO BOX: WHY WHALE ALERT NETWORK ──────────────────────────────── */}
+      {/* ── BENTO BOX: WHY HUMANID PROTOCOL ──────────────────────────────── */}
       <section className="w-full py-24 md:py-40 bg-white">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 space-y-16">
             <div className="text-center max-w-3xl mx-auto space-y-6 mb-20">
@@ -118,7 +111,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                     Architectural <span className="text-[#0044CC]">Precision.</span>
                 </h2>
                 <p className="font-serif text-[18px] text-slate-500 leading-relaxed">
-                    Designed for institutional quantitative teams. We eliminate the noise, providing mathematical certainty and actionable intelligence through three core pillars.
+                    Designed for institutional compliance and quantitative research. We eliminate the noise, providing mathematical certainty and actionable intelligence.
                 </p>
             </div>
 
@@ -131,17 +124,17 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                             Cryptographic Integrity.
                         </h3>
                         <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
-                            The Sovereign Protocol operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data cannot be intercepted or exposed.
+                            The HumanID Protocol operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data remains private.
                         </p>
                     </div>
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
                         <RemoteLottie path="DeeWork About Blockchain.json" className="w-full h-full scale-125" />
                     </div>
                 </div>
 
                 {/* Bento Card 2 */}
                 <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
-                    <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 mb-8 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
+                    <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] rounded-[2rem] border border-black/5 mb-8 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
                          <RemoteLottie path="Connected world.json" className="scale-125" />
                     </div>
                     <div className="space-y-6">
@@ -149,7 +142,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                             Entity Resolution.
                         </h3>
                         <p className="text-[15px] text-slate-500 leading-relaxed font-serif">
-                            We map complex multi-hop interactions and de-obfuscate mixer outputs in real-time, grouping fragmented wallets into unified institutional entities for absolute clarity.
+                            We map complex multi-hop interactions and resolve fragmented on-chain fingerprints into unified institutional entities for absolute regulatory clarity.
                         </p>
                     </div>
                 </div>
@@ -158,10 +151,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                 <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
                     <div className="space-y-6 mb-8">
                         <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
-                            Quantitative AI Models.
+                            Heuristic Engines.
                         </h3>
                         <p className="text-[15px] text-slate-500 leading-relaxed font-serif">
-                            Our heuristic algorithms process 12TB of raw blockchain state daily, detecting liquidity injections and massive accumulations prior to market impact.
+                            Our deterministic algorithms process vast arrays of raw blockchain state, detecting liquidity patterns and massive accumulations with mathematical precision.
                         </p>
                     </div>
                     <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
@@ -171,16 +164,16 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
 
                 {/* Bento Card 4 */}
                 <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
                         <div className="absolute inset-0 bg-[#0044CC]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
                          <RemoteLottie path="Trade.json" className="w-full h-full scale-125" />
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
                         <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
-                            Pre-Execution Tracking.
+                            Heuristic Tracking.
                         </h3>
                         <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
-                            Relying on block confirmations means you are already too late. Our dedicated node mesh directly interfaces with the global mempool, allowing you to intercept and analyze institutional orders milliseconds after they are signed, giving you the ultimate execution edge.
+                            Relying on block confirmations is insufficient for institutional operations. Our dedicated node mesh directly interfaces with the global mempool, allowing you to intercept and analyze capital flows milliseconds after they are signed.
                         </p>
                     </div>
                 </div>

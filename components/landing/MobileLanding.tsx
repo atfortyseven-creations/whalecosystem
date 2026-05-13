@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
+import { ZKBiometricGate } from "@/components/security/ZKBiometricGate";
 import { AztecArchitectureSection } from "./AztecArchitectureSection";
 import { SovereignFooter } from "./SovereignFooter";
 import { useSearchParams } from "next/navigation";
@@ -101,18 +102,18 @@ const MUTED = "rgba(5,5,5,0.50)";
 function buildSovereignMessage(address: string): string {
   return [
     '═══════════════════════════════',
-    '  Whale Alert Network',
-    '  SOVEREIGN ACCESS PROTOCOL',
+    '  HumanID Protocol',
+    '  SOVEREIGN ACCESS HANDSHAKE',
     '═══════════════════════════════',
     '',
     `Identity: ${address}`,
     `Nonce: ${Date.now()}`,
-    `Network: WHALE_TERMINAL_V4`,
+    `Network: HUMANID_PROTOCOL_V1`,
     '',
     'By signing you confirm that',
     'you are the sole owner of this',
     'address and authorize access',
-    'to the institutional terminal.',
+    'to the secure dashboard.',
     '═══════════════════════════════',
   ].join('\n');
 }
@@ -331,10 +332,10 @@ function ConnectedScreen({
            transition={{ duration: 0.6 }}
            className="w-full flex flex-col items-center justify-center gap-5 mb-4 mt-2"
         >
-           <img src="/logo-landingpage.png" alt="Whale Logo" className="h-20 w-auto object-contain drop-shadow-sm" style={{ filter: "grayscale(100%)" }} />
+           <WhaleLogo className="h-16 w-auto" />
            <div className="flex flex-col items-center text-center">
-             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">Whale Alert</h1>
-             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Humanity Ledger™</p>
+             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">HumanID Protocol</h1>
+             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Institutional Identity Ledger</p>
            </div>
         </motion.div>
 
@@ -471,7 +472,7 @@ function ConnectedScreen({
             style={{ fontSize: "11px" }}
           >
             <MessageCircle size={18} />
-            Enter Whale Chat Encrypted
+            Enter HumanID Chat Encrypted
           </Link>
         </motion.div>
 
@@ -484,15 +485,15 @@ function ConnectedScreen({
         >
           <button
             onClick={() => {
-               window.location.href = '/dashboard?tab=zk-identity';
+               setShowKyc(true);
             }}
-            className="w-full flex flex-col items-center justify-center gap-1 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[2px] border-[#10B981]/40 bg-gradient-to-r from-[#10B981]/10 to-[#059669]/10 hover:from-[#10B981]/20 hover:to-[#059669]/20 transition-all text-[#059669]"
+            className="w-full flex flex-col items-center justify-center gap-1 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[2px] border-black bg-white hover:bg-black hover:text-white transition-all text-black"
           >
             <div className="flex items-center gap-3">
                <Fingerprint size={18} />
-               <span style={{ fontSize: "11px" }}>Verify KYC</span>
+               <span style={{ fontSize: "11px" }}>Verify ZK-Biometric KYC</span>
             </div>
-            <span className="text-[8px] font-bold opacity-60 tracking-[0.2em]">MANDATORY 3D BIOMETRIC GATE</span>
+            <span className="text-[8px] font-bold opacity-40 tracking-[0.2em]">MANDATORY 1-MINUTE FORENSIC SCAN</span>
           </button>
         </motion.div>
 
@@ -617,6 +618,8 @@ export function MobileLanding() {
 
   const [isActuallySigning, setIsActuallySigning] = useState(false);
   const [signingError, setSigningError] = useState<string | null>(null);
+  const [showKyc, setShowKyc] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   // Start with connect overlay visible — like Scroll.io, users see wallet buttons immediately
   // The ImmersiveManifesto is moved to a secondary "Learn More" link below the buttons.
@@ -659,6 +662,8 @@ export function MobileLanding() {
            console.log('[Auth] Existing session valid for:', norm);
            setLinkedAddress(norm);
            setIsLinked(true);
+           if (data.kycVerified) setIsVerified(true);
+           else setShowKyc(true);
            return;
         }
       }
@@ -697,6 +702,7 @@ export function MobileLanding() {
       console.log('[Auth] Handshake successful for:', norm);
       setLinkedAddress(norm);
       setIsLinked(true);
+      setShowKyc(true); // Mandatory KYC after link
       setConnecting(null);
       setShowFallbackBtn(false);
       try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
@@ -971,6 +977,24 @@ export function MobileLanding() {
   // The cookie value IS the wallet address: sovereign_handshake=0xABCD...
   // This means after signing we never need wagmi to reconnect to show the
   // ConnectedScreen. Works even if WalletConnect session drops after signing.
+  if (isLinked && effectiveAddress && showKyc && !isVerified) {
+    return (
+      <div className="fixed inset-0 z-[10000] bg-[#FAFAF8] flex flex-col p-6 overflow-auto">
+        <div className="flex-1 flex flex-col items-center justify-center py-10">
+          <div className="w-full max-w-lg">
+            <ZKBiometricGate 
+              uuid={uuidParam}
+              onSuccess={() => {
+                setIsVerified(true);
+                setShowKyc(false);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (isLinked && effectiveAddress) {
     return (
       <div className="w-full min-h-[100dvh] bg-[#FAF9F6]">
@@ -1031,7 +1055,7 @@ export function MobileLanding() {
             >
               <WhaleLogo className="w-6 h-6" />
             </div>
-            <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
+            <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">HumanID Protocol</span>
           </div>
           <button
             onClick={() => setShowConnectOverlay(true)}
@@ -1077,7 +1101,7 @@ export function MobileLanding() {
             <WhaleLogo className="w-6 h-6" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
+            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>HumanID Protocol</span>
           </div>
         </div>
         <button 
@@ -1401,7 +1425,7 @@ export function MobileLanding() {
             ))}
           </div>
           <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/25 text-center">
-            © 2026 Whale Alert Network. Pure Mathematics.
+            © 2026 HumanID Protocol. Institutional Sterility.
           </p>
         </footer>
       </div>

@@ -18,26 +18,25 @@ const AZTEC_PILLARS = [
   {
     index: "03",
     label: "Noir: Domain-Specific Cryptography",
-    protocol: "NOIR LANGUAGE · ACIR IR · BARRETENBERG BACKEND",
-    body: "Aztec's native circuit programming language, Noir, compiles to an intermediate representation (ACIR — Abstract Circuit Intermediate Representation) that is subsequently transpiled into arithmetic circuits solvable by the Barretenberg proving backend. Sovereign Terminal's integration leverages Noir circuits to encode private query logic — enabling operators to formulate cryptographic proofs of on-chain knowledge without exposing surveillance strategies or target addresses to any external observer."
+    protocol: "NOIR LANGUAGE · ACIR IR · BARRETENBERG             body: "Aztec's native circuit programming language, Noir, compiles to an intermediate representation (ACIR — Abstract Circuit Intermediate Representation) that is subsequently transpiled into arithmetic circuits solvable by the Barretenberg proving backend. HumanID Protocol's integration leverages Noir circuits to encode private query logic — enabling operators to formulate cryptographic proofs of on-chain knowledge without exposing surveillance strategies or target addresses to any external observer."
   },
   {
     index: "04",
     label: "Note Encryption & UTXO Model",
     protocol: "AZTEC NOTES · HYBRID ENCRYPTION · NULLIFIER TREE",
-    body: "Private state in Aztec is modeled as encrypted notes: discrete value commitments appended to an append-only Merkle tree. Each note is encrypted under the recipient's public key using hybrid encryption (ECDH key exchange + symmetric cipher). Expenditure is proven via nullifiers — one-way hash derivatives that prevent double-spending without revealing which note was consumed. Sovereign Terminal exploits this architecture to establish private channels that are cryptographically verifiable yet computationally opaque to external forensic analysis."
+    body: "Private state in Aztec is modeled as encrypted notes: discrete value commitments appended to an append-only Merkle tree. Each note is encrypted under the recipient's public key using hybrid encryption (ECDH key exchange + symmetric cipher). Expenditure is proven via nullifiers — one-way hash derivatives that prevent double-spending without revealing which note was consumed. HumanID Terminal exploits this architecture to establish private channels that are cryptographically verifiable yet computationally opaque to external forensic analysis."
   },
   {
     index: "05",
-    label: "Sovereign Integration Architecture",
+    label: "HumanID Integration Architecture",
     protocol: "AZTEC.JS SDK · PRIVATE FUNCTION CALLS · FEE ABSTRACTION",
-    body: "The Sovereign Terminal's cryptographic authentication pipeline is designed for native Aztec.js SDK compatibility. Session establishment initiates a private function call circuit that commits the operator's ECDSA public key into an Aztec contract state without broadcasting the identity on-chain in readable form. Fee abstraction allows relayers to submit proofs on behalf of operators, preserving network-level anonymity at the transport layer while maintaining cryptographic accountability at the proof layer."
+    body: "The HumanID Terminal's cryptographic authentication pipeline is designed for native Aztec.js SDK compatibility. Session establishment initiates a private function call circuit that commits the operator's ECDSA public key into an Aztec contract state without broadcasting the identity on-chain in readable form. Fee abstraction allows relayers to submit proofs on behalf of operators, preserving network-level anonymity at the transport layer while maintaining cryptographic accountability at the proof layer."
   },
   {
     index: "06",
     label: "Zero-Knowledge Surveillance Proofs",
     protocol: "ZK-ATTESTATIONS · RANGE PROOFS · MEMBERSHIP CIRCUITS",
-    body: "The most fundamental operational requirement of the Sovereign Terminal is the ability to prove knowledge of on-chain events without revealing the methodology of surveillance. Through Aztec-compatible ZK-attestation circuits, the system generates membership proofs demonstrating that a given wallet address is part of a classified watchlist, and range proofs certifying that a transfer volume exceeds institutional thresholds — all without disclosing the watchlist contents, the threshold parameters, or the surveillance history to any party, including the infrastructure layer itself."
+    body: "The most fundamental operational requirement of the HumanID Terminal is the ability to prove knowledge of on-chain events without revealing the methodology of surveillance. Through Aztec-compatible ZK-attestation circuits, the system generates membership proofs demonstrating that a given wallet address is part of a classified watchlist, and range proofs certifying that a transfer volume exceeds institutional thresholds — all without disclosing the watchlist contents, the threshold parameters, or the surveillance history to any party, including the infrastructure layer itself."
   }
 ];
 
@@ -57,7 +56,7 @@ export function AztecArchitectureSection() {
 
   return (
     <section
-      className="w-full bg-[#FDFCF8] border-t border-black/8"
+      className="w-full bg-[#FAFAF8] border-t border-black/8"
       aria-label="Aztec Network Integration Architecture"
     >
       <div className="w-full max-w-[1750px] mx-auto px-5 sm:px-8 py-24 flex flex-col gap-16">
@@ -81,7 +80,7 @@ export function AztecArchitectureSection() {
           {/* Academic abstract */}
           <div className="flex flex-col gap-4 font-serif text-[13px] text-[#222] leading-relaxed text-justify">
             <p>
-              The Sovereign Terminal's cryptographic substrate is anchored to{" "}
+              The HumanID Terminal's cryptographic substrate is anchored to{" "}
               <strong>Aztec Network</strong> — the first general-purpose zero-knowledge Layer 2 on
               Ethereum with native programmable privacy. The selection of Aztec as the foundational
               cryptographic layer is not a commercial alignment; it is a precise engineering decision
@@ -108,10 +107,10 @@ export function AztecArchitectureSection() {
                 <button
                   key={pillar.index}
                   onClick={() => setExpanded(isOpen ? null : pillar.index)}
-                  className="bg-[#fdfbf6] text-left flex flex-col sm:flex-row items-stretch group overflow-hidden hover:bg-[#f5f4ef] transition-colors duration-200 w-full"
+                  className="bg-white text-left flex flex-col sm:flex-row items-stretch group overflow-hidden hover:bg-[#FAFAF8] transition-colors duration-200 w-full"
                 >
                   {/* Index column */}
-                  <div className="w-full sm:w-[100px] bg-[#f5f4ef] group-hover:bg-[#eceae3] border-b sm:border-b-0 sm:border-r border-black/10 flex items-center justify-center p-4 shrink-0 transition-colors duration-200">
+                  <div className="w-full sm:w-[100px] bg-[#FAFAF8] group-hover:bg-[#f2f1eb] border-b sm:border-b-0 sm:border-r border-black/10 flex items-center justify-center p-4 shrink-0 transition-colors duration-200">
                     <span className="font-mono text-[22px] font-black text-black/15 leading-none select-none">
                       {pillar.index}
                     </span>
@@ -154,8 +153,8 @@ export function AztecArchitectureSection() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-[1px] bg-black/10 border border-black/10 border-t-0">
             {SPECS.map((spec) => (
-              <div key={spec.key} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch">
-                <div className="w-full sm:w-[200px] bg-[#f5f4ef] border-b sm:border-b-0 sm:border-r border-black/8 px-4 py-3 flex items-center shrink-0">
+              <div key={spec.key} className="bg-white flex flex-col sm:flex-row items-stretch">
+                <div className="w-full sm:w-[200px] bg-[#FAFAF8] border-b sm:border-b-0 sm:border-r border-black/8 px-4 py-3 flex items-center shrink-0">
                   <span className="font-mono text-[8px] uppercase tracking-wider text-black/45 font-bold">
                     {spec.key}
                   </span>
@@ -176,12 +175,14 @@ export function AztecArchitectureSection() {
             Operational Axiom
           </span>
           <p className="font-serif text-[13px] text-[#444] leading-relaxed text-justify">
-            In the architecture of sovereign intelligence, the ultimate security property is not the
+            In the architecture of institutional intelligence, the ultimate security property is not the
             encryption of data in transit, but the mathematical impossibility of proving{" "}
             <em>who surveils</em>, <em>what is surveilled</em>, and <em>when surveillance occurs</em>{" "}
             — even to a computationally unbounded adversary with access to all on-chain data. Aztec
             Network is the only production-grade system that provides this guarantee through verified
             cryptographic proofs rather than policy, jurisdiction, or trust.
+          </p>
+        </div> rather than policy, jurisdiction, or trust.
           </p>
         </div>
 

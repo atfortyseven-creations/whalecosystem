@@ -13,11 +13,13 @@ interface PersistedUIState {
 interface UIState extends PersistedUIState {
   isConnectModalOpen: boolean;
   isLinked: boolean;
+  isZkVerified: boolean;
   toggleStealthMode: () => void;
   setStealthMode: (value: boolean) => void;
   openConnectModal: () => void;
   closeConnectModal: () => void;
   setLinked: (value: boolean) => void;
+  setZkVerified: (value: boolean) => void;
   setActivePanel: (panel: 'history' | 'notifications' | 'settings' | 'privacy' | null) => void;
 }
 
@@ -32,6 +34,7 @@ export const useUIStore = create<UIState>()(
       // Resets on every page load; correct value is re-derived from cookie in LinkedGate.
       isConnectModalOpen: false,
       isLinked: false,
+      isZkVerified: false,
 
       // ── Actions ──────────────────────────────────────────────────────────
       toggleStealthMode: () => set((state) => ({ isStealthMode: !state.isStealthMode })),
@@ -39,6 +42,7 @@ export const useUIStore = create<UIState>()(
       openConnectModal: () => set({ isConnectModalOpen: true }),
       closeConnectModal: () => set({ isConnectModalOpen: false }),
       setLinked: (value: boolean) => set({ isLinked: value }),
+      setZkVerified: (value: boolean) => set({ isZkVerified: value }),
       setActivePanel: (panel) => set({ activePanel: panel }),
     }),
     {

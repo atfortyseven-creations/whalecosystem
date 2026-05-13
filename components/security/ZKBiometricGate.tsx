@@ -7,10 +7,11 @@ import { QRCodeSVG as QRCode } from "qrcode.react";
 
 interface ZKBiometricGateProps {
   onSuccess?: (zkProofSignature: string) => void;
+  uuid?: string | null;
 }
 
-export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
-  const [stage, setStage] = useState<"IDLE" | "WARNING" | "SIGNING" | "READY_TO_SCAN" | "SCANNING" | "PROCESSING" | "SUCCESS" | "ERROR">("IDLE");
+export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
+  const [stage, setStage] = useState<"IDLE" | "WARNING" | "SIGNING" | "READY_TO_SCAN" | "ALIGNING" | "SCANNING" | "MESH_EXTRACTION" | "LIVENESS_PROOFS" | "GENERATING_SNARK" | "BINDING" | "SUCCESS" | "ERROR">("IDLE");
   const [errorMessage, setErrorMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [authSignature, setAuthSignature] = useState<string | null>(null);
@@ -53,13 +54,13 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
     try {
       setStage("SIGNING");
       const ts = Date.now();
-      const message = `Authorize KYC Biometric Attestation\n\nWallet: ${address}\nTimestamp: ${ts}\n\nBy signing, you bind your 3D neural mesh to this cryptographic session.`;
+      const message = `Authorize HumanID Biometric Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\n\nBy signing, you bind your 3D neural mesh to this cryptographic session.`;
       
       const signature = await signMessageAsync({ message });
       setAuthSignature(signature);
       setStage("READY_TO_SCAN");
     } catch (error: any) {
-      console.error("[ZK-Gate] Signing Error:", error);
+      console.error("[HumanID] Signing Error:", error);
       setErrorMessage(error.message || "Signature rejected");
       setStage("ERROR");
     }
@@ -71,7 +72,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
       
       // 1. Initiate Real Camera Stream
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "user", width: 400, height: 400 } 
+        video: { facingMode: "user", width: 640, height: 640 } 
       });
       setStream(mediaStream);
       if (videoRef.current) videoRef.current.srcObject = mediaStream;
@@ -79,7 +80,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
       // 2. Wait for Video Ready
       if (videoRef.current) {
         await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error("Camera timeout")), 10000);
+          const timeout = setTimeout(() => reject(new Error("Camera timeout")), 15000);
           const check = () => {
             if (!videoRef.current) return;
             if (videoRef.current.readyState >= 2) {
@@ -97,16 +98,28 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
       let capturedFrame = "";
       if (videoRef.current && canvasRef.current) {
         const ctx = canvasRef.current.getContext('2d');
-        ctx?.drawImage(videoRef.current, 0, 0, 200, 200);
-        capturedFrame = canvasRef.current.toDataURL('image/jpeg', 0.5);
+        ctx?.drawImage(videoRef.current, 0, 0, 400, 400);
+        capturedFrame = canvasRef.current.toDataURL('image/jpeg', 0.6);
       }
 
-      setStage("PROCESSING");
+      // [INSTITUTIONAL-RIGOR] SUSTAINED SCAN (Total ~60s)
+      setStage("ALIGNING");
+      await new Promise(r => setTimeout(r, 8000));
+      
+      setStage("SCANNING");
+      await new Promise(r => setTimeout(r, 12000));
+      
+      setStage("MESH_EXTRACTION");
+      await new Promise(r => setTimeout(r, 12000));
 
       // 4. Cryptographic Challenge
       const nonceRes = await fetch('/api/auth/nonce');
       const { nonce } = await nonceRes.json();
       
+      setStage("LIVENESS_PROOFS");
+      await new Promise(r => setTimeout(r, 12000));
+
+      setStage("GENERATING_SNARK");
       // 5. Verify via Oracle
       const response = await fetch('/api/oracle/zk-biometrics', {
         method: 'POST',
@@ -116,12 +129,16 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
           signature: authSignature,
           payload: capturedFrame,
           nonce,
+          uuid,
           timestamp: Date.now()
         })
       });
 
       if (!response.ok) throw new Error("Attestation failed");
       
+      setStage("BINDING");
+      await new Promise(r => setTimeout(r, 16000));
+
       mediaStream.getTracks().forEach(t => t.stop());
       setStream(null);
 
@@ -129,7 +146,7 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
       if (onSuccess) onSuccess(authSignature || "0xVerified");
 
     } catch (error: any) {
-      console.error("[ZK-Gate] Verification Error:", error);
+      console.error("[HumanID] Verification Error:", error);
       if (stream) stream.getTracks().forEach(t => t.stop());
       setStream(null);
       
@@ -143,245 +160,206 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
   };
 
   return (
-    <div className="w-full bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 shadow-sm font-sans text-[#050505] relative overflow-hidden flex flex-col md:flex-row gap-8 items-center h-full">
+    <div className="w-full h-full bg-[#FAFAF8] rounded-[32px] p-8 sm:p-12 shadow-sm font-sans text-[#0A0A0A] relative overflow-hidden flex flex-col items-center justify-center selection:bg-black/10">
       {/* Background Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:1rem_1rem] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:2rem_2rem] pointer-events-none" />
       
-      {/* Left side: Scanner */}
-      <div className="relative z-10 flex flex-col items-center w-full md:w-1/2">
+      {/* Centered Scanner Section */}
+      <div className="relative z-10 flex flex-col items-center w-full max-w-xl">
 
-        <div className="relative w-32 h-32 mb-8 flex items-center justify-center">
+        <div className="relative w-72 h-72 sm:w-[400px] sm:h-[400px] mb-12 flex items-center justify-center">
+          {/* External Progress Ring */}
+          <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(0,0,0,0.03)" strokeWidth="0.5" />
+            <motion.circle 
+              cx="50" cy="50" r="49" fill="none" stroke="#000" strokeWidth="1" 
+              strokeDasharray="307.88" 
+              initial={{ strokeDashoffset: 307.88 }}
+              animate={{ 
+                strokeDashoffset: stage === "SUCCESS" ? 0 : 
+                                 stage === "SCANNING" ? 280 :
+                                 stage === "ALIGNING" ? 250 :
+                                 stage === "MESH_EXTRACTION" ? 200 :
+                                 stage === "LIVENESS_PROOFS" ? 150 :
+                                 stage === "GENERATING_SNARK" ? 100 :
+                                 stage === "BINDING" ? 50 : 307.88 
+              }} 
+              transition={{ ease: "easeInOut", duration: 2 }} 
+            />
+          </svg>
+
           <AnimatePresence mode="wait">
             {stage === "IDLE" && (
-              <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/5 rounded-full flex items-center justify-center">
+              <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center">
                 {!isMobile ? (
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-24 h-24 p-2 bg-white rounded-xl shadow-lg border border-black/10 flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="w-32 h-32 p-4 bg-white rounded-3xl shadow-2xl border border-black/5 flex items-center justify-center">
                       <QRCode 
                         value={typeof window !== 'undefined' ? window.location.href : ''} 
-                        size={80} 
-                        level="M" 
+                        size={96} 
+                        level="H" 
                       />
                     </div>
-                    <span className="text-[8px] font-black uppercase tracking-widest text-black/40">Mobile Handoff Req.</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">Mobile Synchronization Required</span>
                   </div>
                 ) : (
-                  <div className="w-12 h-12 border-2 border-black/10 rounded-full" />
+                  <div className="w-20 h-20 border-[0.5px] border-black/10 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-black/20 rounded-full" />
+                  </div>
                 )}
               </motion.div>
             )}
             
-            {stage === "SCANNING" && (
-              <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border border-black/10 overflow-hidden bg-black">
+            {(stage === "SCANNING" || stage === "ALIGNING" || stage === "MESH_EXTRACTION" || stage === "LIVENESS_PROOFS" || stage === "GENERATING_SNARK" || stage === "BINDING") && (
+              <motion.div key="live-feed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center p-4">
+                <div className="relative w-full h-full rounded-full border border-black/5 overflow-hidden bg-black shadow-[0_40px_80px_rgba(0,0,0,0.1)]">
                   <video 
                     ref={videoRef} 
                     autoPlay 
                     playsInline 
                     muted 
-                    className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale scale-x-[-1]"
+                    className="absolute inset-0 w-full h-full object-cover opacity-80 grayscale scale-x-[-1]"
                   />
-                  <canvas ref={canvasRef} width={200} height={200} className="hidden" />
-                  <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent pointer-events-none" />
+                  <canvas ref={canvasRef} width={400} height={400} className="hidden" />
+                  
+                  {/* LinkedIn Style Face Oval Overlay */}
+                  <div className="absolute inset-0 border-[40px] border-black/40 pointer-events-none rounded-full" />
+                  <div className="absolute inset-0 border-[1px] border-white/20 pointer-events-none rounded-full" />
+                  
+                  {/* Scanning Line */}
                   <motion.div 
                     animate={{ y: ["0%", "100%", "0%"] }} 
-                    transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-                    className="absolute left-0 right-0 h-[1px] bg-white/50 shadow-[0_0_15px_rgba(255,255,255,0.5)] z-10" 
+                    transition={{ repeat: Infinity, duration: 6, ease: "linear" }}
+                    className="absolute left-0 right-0 h-[1px] bg-white/40 shadow-[0_0_30px_rgba(255,255,255,0.4)] z-10" 
                   />
                 </div>
-                <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" />
-                  <motion.circle 
-                    cx="50" cy="50" r="48" fill="none" stroke="#fff" strokeWidth="2" 
-                    strokeDasharray="301.59" 
-                    initial={{ strokeDashoffset: 301.59 }}
-                    animate={{ strokeDashoffset: 0 }} 
-                    transition={{ ease: "easeInOut", duration: 1.5 }} // [MOLECULAR-SPEED] Rapid initial capture
-                  />
-                </svg>
-              </motion.div>
-            )}
-
-            {(stage === "PROCESSING" || stage === "SIGNING") && (
-              <motion.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center bg-black/5 rounded-full">
-                <div className="absolute inset-0 border-[2px] border-black/10 rounded-full animate-[spin_3s_linear_infinite] [border-style:dashed]" />
-              </motion.div>
-            )}
-
-            {stage === "WARNING" && (
-              <motion.div key="warning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center bg-amber-500/10 rounded-full border border-amber-500/20">
-                <Shield size={32} className="text-amber-600 opacity-40" />
-              </motion.div>
-            )}
-
-            {stage === "READY_TO_SCAN" && (
-              <motion.div key="ready" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center bg-green-500/10 rounded-full border border-green-500/20">
-                <CheckCircle2 size={32} className="text-green-600 opacity-40" />
-              </motion.div>
-            )}
-
-            {stage === "SUCCESS" && (
-              <motion.div key="success" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="absolute inset-0 flex items-center justify-center bg-black/5 rounded-full border border-black/10">
-                <span className="text-[10px] font-black uppercase tracking-widest">VALID</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <div className="text-center mb-8 h-16">
-          <AnimatePresence mode="wait">
-            {stage === "IDLE" && (
-              <motion.div key="text-idle" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">KYC Biometric Attestation</h3>
-                <p className="text-[10px] text-black/50 leading-relaxed max-w-[260px] mx-auto tracking-wide">
-                  Prove personhood securely. No PII is stored. A Zero-Knowledge proof will be minted to your wallet.
-                </p>
-              </motion.div>
-            )}
-            
-            {stage === "WARNING" && (
-              <motion.div key="text-warning" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-amber-600">Wallet Attention</h3>
-                <p className="text-[10px] text-black/50 leading-relaxed max-w-[260px] mx-auto tracking-wide">
-                  A signature request will arrive in your wallet app. Please be ready to approve it.
-                </p>
               </motion.div>
             )}
 
             {stage === "SIGNING" && (
-              <motion.div key="text-signing" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">Awaiting Signature</h3>
-                <p className="text-[10px] text-black/50 leading-relaxed tracking-wide uppercase font-black">
-                  PLEASE OPEN YOUR WALLET APP...
-                </p>
-              </motion.div>
-            )}
-
-            {stage === "READY_TO_SCAN" && (
-              <motion.div key="text-ready" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-green-600">Signature Valid</h3>
-                <p className="text-[10px] text-black/50 leading-relaxed tracking-wide">
-                  Identity bound. Ready for biometric scan.
-                </p>
-              </motion.div>
-            )}
-
-            {stage === "SCANNING" && (
-              <motion.div key="text-scanning" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">3D Liveness Check</h3>
-                <p className="text-[10px] text-black/50 leading-relaxed tracking-wide">
-                  Capturing neural mesh. Please face the camera directly.
-                </p>
-              </motion.div>
-            )}
-
-            {stage === "PROCESSING" && (
-              <motion.div key="text-processing" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">Verifying Proof</h3>
-                <p className="text-[10px] text-black/50 flex items-center justify-center gap-2 tracking-wide uppercase font-black">
-                  GENERATING ZK-SNARK...
-                </p>
+              <motion.div key="signing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 border-[0.5px] border-black/20 rounded-full animate-pulse flex items-center justify-center">
+                    <div className="w-4 h-4 bg-black/40 rounded-full" />
+                </div>
               </motion.div>
             )}
 
             {stage === "SUCCESS" && (
-              <motion.div key="text-success" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-[#050505]">Attestation Valid</h3>
-                <p className="text-[10px] text-black/50 leading-relaxed tracking-wide">
-                  Zero-Knowledge Proof injected into session. Sovereignty guaranteed.
-                </p>
+              <motion.div key="success" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="absolute inset-0 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center shadow-2xl">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 13L9 17L19 7" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <span className="text-[12px] font-black uppercase tracking-[0.4em] text-black">Attestation Complete</span>
+                </div>
               </motion.div>
             )}
 
             {stage === "ERROR" && (
-              <motion.div key="text-error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-red-500">Security Fault</h3>
-                <p className="text-[10px] text-red-500/70 leading-relaxed tracking-wide uppercase font-black">
-                  {errorMessage}
-                </p>
-                <button onClick={() => setStage("IDLE")} className="mt-4 text-[9px] font-black uppercase tracking-[0.2em] text-black/40 underline">Retry Access</button>
+              <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center p-12 text-center">
+                <div className="flex flex-col items-center gap-6">
+                  <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center">
+                    <X size={24} className="text-red-500" />
+                  </div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-red-500 leading-relaxed max-w-xs">{errorMessage}</p>
+                  <button onClick={() => setStage("IDLE")} className="text-[10px] font-black uppercase tracking-[0.2em] border-b border-black/20 pb-1">Retry Session</button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-      </div>
-
-      {/* Right side: Instructions */}
-      <div className="relative z-10 w-full md:w-1/2 flex flex-col justify-center border-t md:border-t-0 md:border-l border-black/5 pt-8 md:pt-0 md:pl-8">
-        <div className="mb-6">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 mb-2">Operation Manual</h4>
-            <p className="text-[11px] text-black/50 leading-relaxed">
-              1. Center your face within the biometric camera overlay.<br/>
-              2. The neural engine extracts 3D liveness data securely.<br/>
-              3. Approve the wallet signature request to hash the attestation.<br/>
-              4. A Zero-Knowledge SNARK is injected into your session without storing visual data.
-            </p>
+        <div className="text-center h-24 mb-12">
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={stage}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex flex-col items-center gap-3"
+            >
+              <h3 className="text-[18px] font-black uppercase tracking-tighter text-black">
+                {stage === "IDLE" ? "Mathematical Identity" :
+                 stage === "SIGNING" ? "Awaiting Handshake" :
+                 stage === "READY_TO_SCAN" ? "Identity Bound" :
+                 stage === "SCANNING" ? "Capturing Landmarks" :
+                 stage === "ALIGNING" ? "Aligning Neural Mesh" :
+                 stage === "MESH_EXTRACTION" ? "Extracting Topology" :
+                 stage === "LIVENESS_PROOFS" ? "Liveness Verification" :
+                 stage === "GENERATING_SNARK" ? "Oracle Attestation" :
+                 stage === "BINDING" ? "Finalizing Vault" :
+                 stage === "SUCCESS" ? "Verified" : "Handshake Failed"}
+              </h3>
+              <p className="text-[11px] font-serif text-black/40 leading-relaxed max-w-xs uppercase tracking-widest font-bold">
+                {stage === "IDLE" ? "ZK-Biometric Attestation for Institutional Access." :
+                 stage === "SIGNING" ? "Please sign the challenge in your mobile wallet." :
+                 stage === "SCANNING" ? "Sustained biometric capture in progress." :
+                 stage === "LIVENESS_PROOFS" ? "Validating biological nominality." :
+                 stage === "SUCCESS" ? "Personhood established. Redirection imminent." :
+                 "Protocol sequence initialized. Maintain positioning."}
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {stage === "IDLE" && isMobile && (
-          <div className="w-full flex flex-col gap-3">
-            {address ? (
-              <div className="flex flex-col gap-3">
-                {stage === "IDLE" && (
-                  <button
-                    onClick={handleInitiate}
-                    className="w-full py-4 bg-[#050505] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
-                  >
-                    Initiate Secure Scan
-                  </button>
-                )}
-                {stage === "WARNING" && (
-                  <button
-                    onClick={handleSign}
-                    className="w-full py-4 bg-amber-600 text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
-                  >
-                    Proceed to Wallet Signature
-                  </button>
-                )}
-                {stage === "READY_TO_SCAN" && (
-                  <button
-                    onClick={handleScan}
-                    className="w-full py-4 bg-green-600 text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
-                  >
-                    Start Face Scan Now
-                  </button>
-                )}
-              </div>
+        {/* Action Controls */}
+        <div className="w-full flex flex-col gap-4">
+          {stage === "IDLE" && isMobile && (
+            address ? (
+              <button
+                onClick={handleInitiate}
+                className="w-full py-6 bg-black text-white rounded-2xl text-[12px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all"
+              >
+                Initiate Attestation
+              </button>
             ) : (
-              <div className="flex flex-col gap-4">
-                <p className="text-[10px] text-center text-black/40 uppercase font-black tracking-widest">
-                  Authentication Required
-                </p>
-                <button
-                  onClick={() => {
-                    const appKit = require('@reown/appkit/react');
-                    if (appKit && appKit.useAppKit) {
-                      const { open } = appKit.useAppKit();
-                      if (open) open();
-                    }
-                  }}
-                  className="w-full py-4 bg-[#0044CC] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
-                >
-                  Connect Mobile Wallet
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-        {stage === "IDLE" && !isMobile && (
-          <div className="w-full p-8 bg-white rounded-3xl border border-black/10 flex flex-col items-center gap-6 shadow-sm">
-            <div className="p-4 bg-white border border-black/5 rounded-2xl">
-              <QRCode value={typeof window !== 'undefined' ? window.location.href : ''} size={160} level="H" />
-            </div>
-            <div className="text-center">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] mb-1">Mobile Bridge Required</p>
-              <p className="text-[9px] text-black/40 font-mono uppercase tracking-widest">Scan to continue on mobile</p>
-            </div>
-          </div>
-        )}
-      </div>
+              <button
+                onClick={() => {
+                  const appKit = require('@reown/appkit/react');
+                  if (appKit && appKit.useAppKit) {
+                    const { open } = appKit.useAppKit();
+                    if (open) open();
+                  }
+                }}
+                className="w-full py-6 bg-black text-white rounded-2xl text-[12px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all"
+              >
+                Connect Identity
+              </button>
+            )
+          )}
+          
+          {stage === "WARNING" && (
+            <button
+              onClick={handleSign}
+              className="w-full py-6 bg-black text-white rounded-2xl text-[12px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all"
+            >
+              Sign Handshake
+            </button>
+          )}
 
+          {stage === "READY_TO_SCAN" && (
+            <button
+              onClick={handleScan}
+              className="w-full py-6 bg-black text-white rounded-2xl text-[12px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all"
+            >
+              Begin Forensic Scan
+            </button>
+          )}
+        </div>
+
+        {/* Forensic Footer */}
+        <div className="mt-16 w-full pt-8 border-t border-black/5 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-black uppercase tracking-widest text-black/20">Protocol Security</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-black/40">Zero-Knowledge Attested</span>
+          </div>
+          <p className="text-[9px] font-mono text-black/30 leading-relaxed uppercase tracking-tighter">
+            Every attestation is cryptographically bound to the physical device and biometric landmark mesh. No raw biometric data is ever transmitted or stored on HumanID servers.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

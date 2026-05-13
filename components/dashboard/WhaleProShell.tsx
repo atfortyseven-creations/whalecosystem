@@ -56,42 +56,7 @@ const RESTRICTED_TABS = [
     'mass-transfer', 'defi'
 ];
 
-function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
-    const [flash, setFlash] = useState<'up' | 'down' | null>(null);
-    const prevValue = React.useRef(value);
 
-    React.useEffect(() => {
-        if (value !== prevValue.current) {
-            const v = parseFloat(String(value).replace(/[^0-9.-]+/g, ""));
-            const p = parseFloat(String(prevValue.current).replace(/[^0-9.-]+/g, ""));
-            if (!isNaN(v) && !isNaN(p)) {
-                setFlash(v > p ? 'up' : 'down');
-                const timer = setTimeout(() => setFlash(null), 600);
-                prevValue.current = value;
-                return () => clearTimeout(timer);
-            }
-            prevValue.current = value;
-        }
-    }, [value]);
-
-    return (
-        <div className="relative">
-            <AnimatePresence>
-                {flash && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 0.15, scale: 1.05 }}
-                        exit={{ opacity: 0 }}
-                        className={`absolute inset-0 -m-1 rounded-sm blur-md ${flash === 'up' ? 'bg-[#00FF55]' : 'bg-[#FF3B30]'}`}
-                    />
-                )}
-            </AnimatePresence>
-            <div className="relative z-10 transition-colors duration-300">
-                {children}
-            </div>
-        </div>
-    );
-}
 
 
 
@@ -104,82 +69,22 @@ function timerToMs(t: '15m' | '1h' | '24h' | 'never'): number | null {
 }
 
 function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavItem, isActive: boolean, isCollapsed: boolean, onClick: () => void }) {
-    const itemRef = useRef<HTMLButtonElement>(null);
-    const [mouse, setMouse] = useState({ x: 0, y: 0 });
-    const [isHovered, setIsHovered] = useState(false);
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        if (!itemRef.current) return;
-        const rect = itemRef.current.getBoundingClientRect();
-        setMouse({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    };
-
-    // Aztec Network Magnetic 3D transform calculations
-    const rotateX = isHovered ? (mouse.y - 24) / -6 : 0;
-    const rotateY = isHovered ? (mouse.x - 100) / 15 : 0;
-
     return (
-        <motion.button
-            ref={itemRef}
+        <button
             onClick={onClick}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            initial={false}
-            animate={{
-                rotateX,
-                rotateY,
-                z: isHovered ? 20 : isActive ? 8 : 0,
-                scale: isHovered ? 1.03 : isActive ? 1.01 : 1,
-            }}
-            transition={{ type: "spring", stiffness: 450, damping: 20, mass: 0.8 }}
-            style={{ transformStyle: "preserve-3d" }}
-            className={`relative w-full flex items-center justify-between py-2.5 px-3 rounded-xl group select-none outline-none ${
+            className={`relative w-full flex items-center justify-between py-2.5 px-3 rounded-xl group select-none outline-none transition-all ${
                 isActive 
-                    ? 'bg-[#050505] shadow-[0_12px_40px_rgba(0,0,0,0.25)] border border-[#1A1A1A]' 
+                    ? 'bg-[#050505] shadow-lg border border-[#1A1A1A]' 
                     : 'bg-transparent border border-transparent hover:bg-black/[0.03]'
             }`}
         >
-            {/* Dynamic Volumetric Lighting Layer */}
-            {isHovered && !isActive && (
-                <div 
-                    className="absolute inset-0 rounded-xl pointer-events-none opacity-50 transition-opacity duration-300"
-                    style={{ background: `radial-gradient(circle 50px at ${mouse.x}px ${mouse.y}px, rgba(0,0,0,0.06), transparent 100%)` }}
-                />
-            )}
-            
-            {/* Aztec Emerald Glow for Active Item */}
-            {isActive && (
-                <div 
-                    className="absolute inset-0 rounded-xl pointer-events-none opacity-40 transition-opacity duration-300"
-                    style={{
-                        background: isHovered ? `radial-gradient(circle 90px at ${mouse.x}px ${mouse.y}px, #00C076, transparent 100%)` : 'none',
-                        mixBlendMode: 'screen'
-                    }}
-                />
-            )}
-
-            {/* Front Extrusion Layer */}
-            <motion.div 
-                className="relative flex items-center w-full"
-                animate={{ z: isHovered ? 12 : 0 }}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                style={{ transformStyle: "preserve-3d" }}
-            >
-                {/* Active Neon Indicator */}
-                <AnimatePresence>
-                    {isActive && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 18 }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] bg-[#00C076] rounded-r-full shadow-[0_0_12px_#00C076]"
-                        />
-                    )}
-                </AnimatePresence>
+            <div className="relative flex items-center w-full">
+                {isActive && (
+                    <div className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-[#00C076] rounded-r-full" />
+                )}
 
                 {item.icon && (
-                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#00C076] drop-shadow-[0_0_5px_rgba(0,192,118,0.5)]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
+                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#00C076]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
                         {item.icon}
                     </span>
                 )}
@@ -192,7 +97,7 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavI
 
                 {!isCollapsed && item.badge && (
                     <span
-                        className={`ml-2 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[4px] border shrink-0 transition-colors`}
+                        className="ml-2 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[4px] border shrink-0 transition-colors"
                         style={isActive
                             ? { background: 'rgba(0,192,118,0.15)', color: '#00C076', borderColor: 'rgba(0,192,118,0.3)' }
                             : { background: `${item.badgeColor ?? '#00C076'}15`, color: item.badgeColor ?? '#00C076', borderColor: `${item.badgeColor ?? '#00C076'}30` }
@@ -204,8 +109,8 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavI
                 {!isCollapsed && item.externalUrl && (
                     <ArrowUpRight size={12} className={`ml-2 transition-colors ${isActive ? 'text-[#00C076]' : 'text-[#A0A0A0] group-hover:text-[#050505]'}`} />
                 )}
-            </motion.div>
-        </motion.button>
+            </div>
+        </button>
     );
 }
 
@@ -447,8 +352,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         <div className="flex items-center gap-2.5 px-3 py-2">
                             <img src="/official-whale-monochrome.png" className="w-6 h-6 shrink-0" alt="WAN" />
                             <div className="flex flex-col leading-tight">
-                                <span className="text-[11px] font-black uppercase tracking-tighter text-[#050505]">Whale Alert</span>
-                                <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30">Network</span>
+                                <span className="text-[11px] font-black uppercase tracking-tighter text-[#050505]">HumanID</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30">KYC GATE</span>
                             </div>
                         </div>
                     </div>
@@ -666,25 +571,11 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                             </span>
                         </span>
                         {/* UX-19: Real node status from /api/network/getblock-health */}
-                        <span className="flex items-center gap-1.5">
-                            Nodes:
-                            <span className={
-                                nodeStatus === 'OPERATIONAL' ? 'text-[#00FF55]' :
-                                nodeStatus === 'DEGRADED'    ? 'text-[#FFB800]' : 'text-[#FF3B30]'
-                            }>
-                                {nodeStatus}
-                            </span>
-                        </span>
-                        {/* ETH block in status bar */}
-                        {blockNumber && (
-                            <span className="flex items-center gap-1.5">
-                                <Globe size={11} /> ETH: <span className="text-[#050505]">{blockNumber}</span>
-                            </span>
-                        )}
+                        <span className="flex items-center gap-1.5">Nodes: <span className="text-[#050505]">{nodeStatus}</span></span>
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5">Protocol: Active</span>
-                        <span className="text-[#888888]">© 2026 atfortyseven-creations</span>
+                        <span className="flex items-center gap-1.5">Protocol: ACTIVE</span>
+                        <span className="text-[#888888]">© 2026 HUMANID KYC</span>
                     </div>
                 </footer>
             </div>
