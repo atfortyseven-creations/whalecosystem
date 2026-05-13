@@ -233,7 +233,7 @@ function chainName(id?: number): string {
 
 // ── Connected Screen ──────────────────────────────────────────────────────────
 function ConnectedScreen({
-  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect, signMessageAsync
+  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect, signMessageAsync, initialScanData
 }: {
   address: string; onScan: () => void;
   showScanner: boolean; onCloseScanner: () => void;

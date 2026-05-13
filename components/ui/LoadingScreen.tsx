@@ -10,8 +10,8 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
     useEffect(() => {
         const timer = setTimeout(() => {
             setVideoEnded(true);
-            setTimeout(onComplete, 1000); // Wait for fade out
-        }, 8000); // 8 seconds max
+            setTimeout(onComplete, 0); // Trigger immediately
+        }, 6000); // exactly 6 seconds
         return () => clearTimeout(timer);
     }, [onComplete]);
 

@@ -78,10 +78,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         </motion.div>
 
         {/* Right Lottie Presentation (Replaces Globe) */}
-        <div className="absolute inset-0 w-full h-[100dvh] opacity-20 pointer-events-none lg:relative lg:w-1/2 lg:h-screen lg:opacity-100 lg:pointer-events-auto z-0 flex items-center justify-center overflow-hidden mix-blend-multiply">
+        <div className="absolute right-0 top-0 w-[60%] lg:w-1/2 h-full opacity-60 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 flex items-center justify-end lg:justify-center overflow-hidden mix-blend-multiply lg:relative">
           <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent z-10 hidden lg:block" />
-          <div className="w-full h-full max-w-[800px] max-h-[800px] flex items-center justify-center translate-x-[5%]">
-             <RemoteLottie path="Abstract Isometric Loader #1.json" className="w-[150%] h-[150%] object-contain scale-[1.3] opacity-90 drop-shadow-2xl" />
+          <div className="w-full h-full max-w-[800px] max-h-[800px] flex items-center justify-center translate-x-[20%] lg:translate-x-[5%]">
+             <RemoteLottie path="server-rack.json" className="w-[200%] h-[200%] lg:w-[150%] lg:h-[150%] object-contain scale-[1.4] opacity-100 drop-shadow-2xl" />
           </div>
         </div>
         
