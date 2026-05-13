@@ -177,8 +177,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                      (pathname.startsWith('/forum') && !pathname.startsWith('/forum/settings'));
     // Only redirect if NOT connected at all (not just un-signed)
     if (!isLinked && !isWalletConnected && !isPublic) {
-      const t = setTimeout(() => router.replace('/connect'), 400);
-      return () => clearTimeout(t);
+      router.replace('/connect');
     }
   }, [isLinked, isWalletConnected, isMounted, pathname, router]);
 

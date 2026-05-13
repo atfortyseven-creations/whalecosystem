@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import {
-  Activity, AlertTriangle, Copy, Bell, BellOff, Loader2,
-  Clock, CheckCircle, File, Building, Flame, RefreshCw
-} from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -79,16 +76,15 @@ function EventRow({ event }: { event: any }) {
             {event.action}
           </span>
           <span className="text-[9px] font-mono text-[#888888] flex items-center gap-1">
-            <Clock size={10} />
             {new Date(event.timestamp).toLocaleTimeString("en-US", { hour12: false })}
           </span>
         </div>
         <div className="flex items-center gap-3 text-[9px] font-mono text-[#888888]">
           <span className="uppercase flex items-center gap-1">
-            <CheckCircle size={10} className="text-[#050505]" /> {event.confirmations} Confs
+            {event.confirmations} Confs
           </span>
           <span className="uppercase flex items-center gap-1">
-            <Flame size={10} className="text-[#050505]" /> {event.gasPriceGwei} Gwei
+            {event.gasPriceGwei} Gwei
           </span>
           <span className="uppercase text-[#050505] font-black border border-[#E5E5E5] px-1.5 py-0.5 rounded-sm">
             {event.chain}
@@ -136,12 +132,12 @@ function EventRow({ event }: { event: any }) {
               {shortAddr(event.hash)}
             </a>
             <button onClick={() => copy(event.hash)} className="hover:text-[#050505] transition-colors" title="Copy hash">
-              <Copy size={11} />
+              [COPY]
             </button>
           </div>
           {event.method && event.method !== "Native Transfer" && (
             <div className="flex items-center gap-1 uppercase bg-[#F5F5F5] px-2 py-0.5 rounded text-[#050505] border border-[#E5E5E5]">
-              <File size={10} /> {event.method}
+              {event.method}
             </div>
           )}
         </div>
@@ -151,13 +147,13 @@ function EventRow({ event }: { event: any }) {
       <div className="mt-3 pt-3 border-t border-dashed border-[#F0F0F0] flex items-center justify-between text-[9px] font-mono bg-[#FAF9F6] px-3 py-2 rounded-sm border border-[#E5E5E5]">
         <div className="flex items-center gap-3">
           <span className="uppercase text-[#888888] font-black tracking-widest flex items-center gap-1.5">
-            <CheckCircle size={10} className="text-[#050505]" /> TX Hash
+            TX Hash
           </span>
           <span className="text-[#050505] max-w-[240px] truncate" title={event.hash}>
             {event.hash}
           </span>
           <button onClick={() => copy(event.hash)} className="hover:text-[#050505] text-[#888888] transition-colors">
-            <Copy size={10} />
+            [COPY]
           </button>
           {copied && <span className="text-[#00C076] font-black">COPIED</span>}
         </div>
@@ -295,7 +291,6 @@ export function MassTransferIntel() {
       <div className="flex flex-wrap items-center justify-between px-8 py-6 border-b border-[#E5E5E5] bg-white gap-4 shrink-0">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <Building size={22} className="text-[#050505]" />
             <h1 className="text-2xl font-bold uppercase tracking-tighter text-[#050505]">
               CAPITAL LEDGER
             </h1>
@@ -344,7 +339,7 @@ export function MassTransferIntel() {
                 : "border-[#E5E5E5] bg-white hover:bg-[#F0F0F0] text-[#050505]"
             }`}
           >
-            {isSonarActive ? <Bell size={12} /> : <BellOff size={12} />} Sonar
+            {isSonarActive ? "SONAR ON" : "SONAR OFF"}
           </button>
 
           {/* Chain filter */}
@@ -381,7 +376,6 @@ export function MassTransferIntel() {
           </div>
         ) : error ? (
           <div className="h-48 flex flex-col items-center justify-center gap-3">
-            <AlertTriangle size={24} className="text-[#050505]" />
             <p className="text-[11px] font-black text-[#050505] uppercase tracking-[0.3em]">Telemetry Failure</p>
             <button onClick={handleSync} className="text-[10px] font-black uppercase tracking-widest underline text-[#050505]">
               Retry
@@ -412,7 +406,6 @@ export function MassTransferIntel() {
 
               {filtered.length === 0 ? (
                 <div className="py-20 text-center flex flex-col items-center gap-4">
-                  <Activity size={32} className="text-[#E5E5E5]" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-[#888888]">
                     NO QUALIFYING CAPITAL EVENTS
                   </span>

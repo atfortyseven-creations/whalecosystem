@@ -20,7 +20,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
   const generateIdentity = async () => {
     setIsGenerating(true);
     // Simulate complex ZK generation for theatrical effect
-    await new Promise(r => setTimeout(r, 1200));
+    // Wallet generation initialized immediately (Molecular Precision)
     const newWallet = ethers.Wallet.createRandom();
     setWallet({
       address: newWallet.address,

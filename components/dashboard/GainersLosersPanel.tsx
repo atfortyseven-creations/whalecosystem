@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { TrendingUp, TrendingDown, RefreshCw, Search, ArrowUpRight, ArrowDownRight, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Search, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
+import { ModuleHeader } from './ModuleHeader';
 import { useMarketData } from '@/lib/api-client';
 import { TokenInfoModal, TokenInfoPayload } from '@/components/ui/TokenInfoModal';
 
@@ -132,7 +133,6 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
             {/* 24h % */}
             <div className="px-3 text-right flex flex-col items-end gap-0.5">
                 <span className="text-[12px] font-black font-mono flex items-center gap-1" style={{ color: pctColor(pct) }}>
-                    {pct >= 0 ? <TrendingUp size={12}/> : <TrendingDown size={12}/>}
                     {pctFmt(pct)}
                 </span>
             </div>
@@ -240,6 +240,8 @@ export function GainersLosersPanel() {
 
     return (
         <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-6 space-y-6 overflow-hidden text-[#050505] font-sans">
+            <ModuleHeader moduleId="markets" />
+            
             {/* ── Summary Cards ── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
                 {/* Top Gainers */}
@@ -248,7 +250,6 @@ export function GainersLosersPanel() {
                         <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.15em] flex items-center gap-2">
                             24H GAINERS
                         </span>
-                        <div className="flex items-center gap-1.5 opacity-50"><TrendingUp size={14} className="text-[#00C076]"/></div>
                     </div>
                     <div className="space-y-4">
                         {isLoading ? (
@@ -270,7 +271,6 @@ export function GainersLosersPanel() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-[#00C076]/10 px-2 py-1 rounded-md border border-[#00C076]/20" style={{ color: '#00C076' }}>
-                                    <ArrowUpRight size={12}/>
                                     <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
                                 </div>
                             </div>
@@ -284,7 +284,6 @@ export function GainersLosersPanel() {
                         <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.15em] flex items-center gap-2">
                             24H LOSERS
                         </span>
-                        <div className="flex items-center gap-1.5 opacity-50"><TrendingDown size={14} className="text-[#FF3B30]"/></div>
                     </div>
                     <div className="space-y-4">
                         {isLoading ? (
@@ -306,7 +305,6 @@ export function GainersLosersPanel() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-[#FF3B30]/10 px-2 py-1 rounded-md border border-[#FF3B30]/20" style={{ color: '#FF3B30' }}>
-                                    <ArrowDownRight size={12}/>
                                     <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
                                 </div>
                             </div>
@@ -442,7 +440,7 @@ export function GainersLosersPanel() {
                 {/* Footer */}
                 <div className="shrink-0 px-6 py-3 border-t border-black/[0.04] bg-white/50 backdrop-blur-md flex items-center justify-between text-[10px] font-black text-[#050505]/40 uppercase tracking-[0.15em] z-10">
                     <span>{filtered.length} VERIFIED ASSETS · {network === 'all' ? 'OMNI-CHAIN' : network.toUpperCase()} · {timeWindow}</span>
-                    <span className="font-mono tracking-[0.2em] flex items-center gap-2"><div className="w-1.5 h-1.5 bg-[#050505]/40 rounded-full"/> SECURE CONNECTION</span>
+                    <span className="font-mono tracking-[0.2em] flex items-center gap-2"> SECURE CONNECTION</span>
                 </div>
             </div>
 

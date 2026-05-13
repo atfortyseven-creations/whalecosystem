@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Scan, Shield, Zap, Globe2, Layers, LineChart, Network } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useEthMetrics } from "@/hooks/useEthMetrics";
 import { StackableCarousel } from "@/components/ui/StackableCarousel";
 import { motion } from "framer-motion";
@@ -127,9 +127,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                 {/* Bento Card 1 */}
                 <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
                     <div className="w-full lg:w-1/2 space-y-6">
-                        <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
-                            <Layers size={20} className="text-[#0a0a0a]" />
-                        </div>
                         <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
                             Cryptographic Integrity.
                         </h3>
@@ -138,19 +135,16 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                         </p>
                     </div>
                     <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
-                        <RemoteLottie path="Isometric data analysis.json" className="w-[120%] h-[120%] object-contain scale-[1.1] transition-transform duration-700 group-hover:scale-[1.2]" />
+                        <div className="text-[120px] font-black text-black/5 select-none tracking-tighter">ZK</div>
                     </div>
                 </div>
 
                 {/* Bento Card 2 */}
                 <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
                     <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 mb-8 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
-                        <RemoteLottie path="Connected world.json" className="w-full h-full object-contain scale-[1.3] transition-transform duration-700 group-hover:scale-[1.4]" />
+                         <div className="text-[60px] font-black text-black/5 select-none tracking-tighter">MAP</div>
                     </div>
                     <div className="space-y-6">
-                        <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
-                            <LineChart size={20} className="text-[#0a0a0a]" />
-                        </div>
                         <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
                             Entity Resolution.
                         </h3>
@@ -163,9 +157,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                 {/* Bento Card 3 */}
                 <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
                     <div className="space-y-6 mb-8">
-                        <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
-                            <Network size={20} className="text-[#0a0a0a]" />
-                        </div>
                         <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
                             Quantitative AI Models.
                         </h3>
@@ -174,7 +165,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                         </p>
                     </div>
                     <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
-                        <RemoteLottie path="Big Data Analytics.json" className="w-full h-full object-contain scale-[1.3] transition-transform duration-700 group-hover:scale-[1.4]" />
+                         <div className="text-[60px] font-black text-black/5 select-none tracking-tighter">AI</div>
                     </div>
                 </div>
 
@@ -182,12 +173,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                 <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
                     <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
                         <div className="absolute inset-0 bg-[#0044CC]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
-                        <RemoteLottie path="/BlockChain.json" className="w-[120%] h-[120%] object-contain scale-[1.1] transition-transform duration-700 group-hover:scale-[1.2]" />
+                         <div className="text-[120px] font-black text-black/5 select-none tracking-tighter">P-E</div>
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
-                        <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center">
-                            <Zap size={20} className="text-[#0a0a0a]" />
-                        </div>
                         <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
                             Pre-Execution Tracking.
                         </h3>
@@ -225,6 +213,21 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
               "/system-shots/Captura de pantalla 2026-05-10 002900.png"
             ].map((src, idx) => (
               <img key={idx} src={src} className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" alt={`Terminal view ${idx + 1}`} />
+            ))}
+          </StackableCarousel>
+        </div>
+
+        {/* Second Screenshot Strip: Protocol Handshake & Execution */}
+        <div className="w-full relative py-12 md:py-20 flex justify-center bg-white">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/50 to-transparent pointer-events-none" />
+          <StackableCarousel className="w-full relative z-10" itemClassName="w-[85vw] md:w-[900px] lg:w-[1100px] hover:scale-[1.01] transition-transform duration-700 cursor-grab active:cursor-grabbing">
+            {[
+              "/system-shots/Captura de pantalla 2026-05-13 191540.png",
+              "/system-shots/Captura de pantalla 2026-05-13 191728.png",
+              "/system-shots/Captura de pantalla 2026-05-13 191813.png",
+              "/system-shots/Captura de pantalla 2026-05-13 192204.png"
+            ].map((src, idx) => (
+              <img key={idx} src={src} className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" alt={`Protocol view ${idx + 1}`} />
             ))}
           </StackableCarousel>
         </div>

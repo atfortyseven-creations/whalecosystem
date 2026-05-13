@@ -7,10 +7,8 @@ import { useConnect, useSignMessage, useReadContract, useSwitchChain, useAccount
 import { parseEther } from 'viem';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { injected } from 'wagmi/connectors';
-import {
-  Lock, ExternalLink, Activity, Network, Hash, Focus,
-  Clock, CheckCircle, Orbit, PenTool, ShieldCheck, X, ScanFace, FileSignature, Globe, Cpu, Zap
-} from 'lucide-react';
+
+import { ModuleHeader } from './ModuleHeader';
 import { useRouter } from 'next/navigation';
 
 // ── Contract Params ───────────────────────────────────────────────────────────
@@ -76,12 +74,12 @@ const AllocationTelemetryBar = React.memo(function AllocationTelemetryBar({ mint
           CAPACITY REACHED <span className="text-black font-mono font-medium">{fill}%</span>
         </span>
         {isAlmostFull ? (
-          <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.2, repeat: Infinity }} className="flex items-center gap-2 text-black font-bold">
-             <Activity size={12} /> NEARING CAPACITY LIMIT
+          <motion.span className="flex items-center gap-2 text-black font-bold">
+             NEARING CAPACITY LIMIT
           </motion.span>
         ) : (
           <span className="flex items-center gap-2 text-black/80">
-            <Lock size={12} /> L2 PROVISIONING ACTIVE
+            L2 PROVISIONING ACTIVE
           </span>
          )}
       </div>
@@ -89,7 +87,7 @@ const AllocationTelemetryBar = React.memo(function AllocationTelemetryBar({ mint
   );
 });
 
-function AcademicStatCard({ label, value, icon: Icon, isApex = false }: { label: string; value: string; icon: any; isApex?: boolean }) {
+function AcademicStatCard({ label, value, isApex = false }: { label: string; value: string; isApex?: boolean }) {
   return (
     <div className={`relative flex flex-col justify-between p-5 md:p-6 overflow-hidden border transition-all ${isApex ? 'bg-black text-white border-black shadow-none' : 'bg-white border-[#E5E5E5]'}`}>
         {isApex && (
@@ -97,9 +95,6 @@ function AcademicStatCard({ label, value, icon: Icon, isApex = false }: { label:
         )}
         <div className="flex items-center justify-between mb-4 z-10">
            <p className="text-[10px] font-black text-[#A0A0A0] uppercase tracking-[0.2em]">{label}</p>
-           <div className={`w-6 h-6 rounded-md flex items-center justify-center ${isApex ? 'bg-white/10' : 'bg-[#FAF9F6]'}`}>
-              <Icon size={12} className={isApex ? 'text-white' : 'text-[#A0A0A0]'} />
-           </div>
         </div>
         <p className={`text-sm md:text-base lg:text-lg font-black font-mono tracking-tighter truncate z-10 ${isApex ? 'text-white' : 'text-[#050505]'}`}>
             {value}
@@ -187,7 +182,7 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
          <div className="space-y-1">
              <label className="text-[10px] font-bold uppercase text-black tracking-[0.2em] flex items-center gap-2">
-               <FileSignature size={14} /> CRYPTOGRAPHIC AUTHORIZATION
+               CRYPTOGRAPHIC AUTHORIZATION
              </label>
              <p className="text-[9px] text-[#A0A0A0] uppercase tracking-widest font-normal max-w-[280px]">
                  Provide internal signature authorization to proceed with issuance.
@@ -195,14 +190,14 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
          </div>
          <div className="flex items-center gap-3">
            {hasDrawn && !disabled && (
-             <button onClick={() => {
-               const ctx = canvasRef.current?.getContext('2d');
-               ctx?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-               setHasDrawn(false);
-               onSignature("");
-             }} className="text-[10px] font-bold uppercase tracking-widest text-[#A0A0A0] hover:text-black transition-colors bg-black/5 hover:bg-black/10 px-4 py-2 flex items-center gap-2 rounded-md">
-               <X size={12} /> CLEAR
-             </button>
+              <button onClick={() => {
+                const ctx = canvasRef.current?.getContext('2d');
+                ctx?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+                setHasDrawn(false);
+                onSignature("");
+              }} className="text-[10px] font-bold uppercase tracking-widest text-[#A0A0A0] hover:text-black transition-colors bg-black/5 hover:bg-black/10 px-4 py-2 flex items-center gap-2 rounded-md">
+                CLEAR
+              </button>
            )}
            <button
              onClick={onMint}
@@ -222,7 +217,6 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
         
         {!hasDrawn && !disabled && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-40 z-0">
-            <ScanFace size={28} className="text-black opacity-30 mb-3" />
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">AWAITING SIGNATURE INPUT</p>
           </div>
         )}
@@ -238,11 +232,10 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
       <div className="w-full h-full flex flex-col bg-[#FAF9F6] overflow-hidden">
          <div className="px-6 py-5 border-b border-[#E5E5E5] bg-white shrink-0 flex items-center justify-between z-10 relative">
              <div className="flex items-center gap-4">
-                 <ShieldCheck size={16} className="text-black" />
                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">VERIFIED LEDGER</span>
              </div>
              <span className="text-[9px] font-bold text-black uppercase tracking-[0.2em] bg-black/5 px-3 py-1 rounded-[4px] border border-black/10 flex items-center gap-2">
-                 <Network size={12} /> NETWORK: OPTIMISM MAINNET
+                 REGIONAL: OPTIMISM MAINNET
              </span>
          </div>
          {/* Formal Academic Header */}
@@ -259,7 +252,6 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/[0.03]">
             {displayFeed.length === 0 ? (
                <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center text-center p-8">
-                  <ShieldCheck size={32} className="text-[#E5E5E5] mb-4" />
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#888888]">NO INSTITUTIONAL CLEARANCES ISSUED</p>
                   <p className="text-[9px] text-[#A0A0A0] mt-2 tracking-widest uppercase">Awaiting Genesis Ticket Allocations</p>
                </div>
@@ -283,10 +275,9 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
                                 {String(i+1).padStart(3, '0')}
                             </div>
                             {/* Identity */}
-                            <div className="px-6 py-5 flex items-center gap-3">
-                                 <div className="w-2 h-2 rounded-full bg-black shadow-[0_0_10px_rgba(0,0,0,0.5)]" />
-                                 <span className="text-[13px] font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
-                            </div>
+                             <div className="px-6 py-5 flex items-center gap-3">
+                                  <span className="text-[13px] font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
+                             </div>
                             {/* Clearance */}
                             <div className="px-6 py-5">
                                  <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-[#111111] text-white border border-white/20 whitespace-nowrap rounded-md shadow-sm">
@@ -296,19 +287,18 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
                             {/* L2 Eligbility */}
                             <div className="px-6 py-5">
                                  <span className={`text-[10px] font-bold uppercase tracking-[0.1em] flex items-center gap-1.5 ${f.networkLaunchEligible ? 'text-black' : 'text-[#888888]'}`}>
-                                     {f.networkLaunchEligible ? <CheckCircle size={14}/> : <Clock size={14}/>}
                                      {f.networkLaunchEligible ? 'WHITELISTED L2' : 'PENDING'}
                                  </span>
                             </div>
-                            {/* X Intel */}
-                            <div className="px-6 py-5 text-center">
-                                {hasTwtr ? (
-                                   <a href={`https://x.com/${f.twitterHandle}`} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-black hover:text-[#444] uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
-                                      @{f.twitterHandle} <ExternalLink size={12} />
-                                   </a>
-                                ) : (
-                                   <span className="text-[10px] font-bold text-[#444444] uppercase tracking-widest">—</span>
-                                )}
+                            {/* Social Resolution */}
+                            <div className="px-6 py-5">
+                                 <span className="text-[10px] font-mono text-black font-bold uppercase">{f.twitterHandle || 'HIDDEN'}</span>
+                            </div>
+                            {/* Signature ID */}
+                            <div className="px-6 py-5">
+                                 <span className="text-[10px] font-mono text-[#A0A0A0] uppercase tracking-widest">
+                                     {f.serialCode?.slice(-12) || '0x00...000'}
+                                 </span>
                             </div>
                             {/* Temporal Ingestion */}
                             <div className="px-6 py-5 text-[11px] sm:text-[12px] font-black font-mono flex flex-col gap-0.5">
@@ -464,15 +454,7 @@ export function VossSupremacyPanel() {
     <div className="w-full h-full min-h-0 flex flex-col gap-6 overflow-hidden bg-[#FAF9F6] text-[#050505] p-0 md:p-6 lg:p-8">
       
       {/* ── FORMAL HERO HEADER ── */}
-      <div className="flex flex-col gap-2 shrink-0 z-10 px-4 md:px-0 mt-2">
-         <h1 className="text-xl md:text-2xl font-black uppercase tracking-[0.1em] text-[#050505] flex items-center gap-3">
-             <Hash className="text-black" size={28} />
-             TICKET MINT
-         </h1>
-         <p className="text-[11px] text-[#A0A0A0] max-w-3xl font-black tracking-[0.05em] leading-relaxed">
-             Institutional clearance portal. Provides strict cryptographic allocation and access verification for eligible network entities.
-         </p>
-      </div>
+      <ModuleHeader moduleId="gold" />
 
       <div className="grid lg:grid-cols-2 gap-6 shrink-0 px-4 md:px-0">
           {/* OVERVIEW COMPONENT */}
@@ -492,7 +474,7 @@ export function VossSupremacyPanel() {
                   </div>
                   <div className="border-t border-[#E5E5E5] pt-4 flex flex-col gap-1">
                      <span className="text-[10px] text-[#A0A0A0] uppercase tracking-[0.1em] font-black">Network Status</span>
-                     <span className="text-[11px] font-mono font-black text-[#050505] flex items-center gap-2"> <span className="w-1.5 h-1.5 bg-black rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)]"></span> ACTIVE</span>
+                     <span className="text-[11px] font-mono font-black text-[#050505] flex items-center gap-2"> ACTIVE</span>
                   </div>
                </div>
           </div>
@@ -515,10 +497,10 @@ export function VossSupremacyPanel() {
             </div>
           ) : (
             <div className="bg-white border border-[#E5E5E5] rounded-xl p-6 lg:p-8 grid grid-cols-2 gap-px bg-[#E5E5E5] overflow-hidden relative shadow-sm">
-               <AcademicStatCard label="SERIAL IDENTIFIER" value={dbStats.ticket.serialCode} icon={Lock} isApex />
-               <AcademicStatCard label="WALLET ADDRESS" value={truncAddr(address!)} icon={ScanFace} />
-               <AcademicStatCard label="NETWORK LAYER" value="Optimism L2" icon={Network} />
-               <AcademicStatCard label="AUTHORIZATION STATUS" value="MINTED" icon={ShieldCheck} />
+               <AcademicStatCard label="SERIAL IDENTIFIER" value={dbStats.ticket.serialCode} isApex />
+               <AcademicStatCard label="WALLET ADDRESS" value={truncAddr(address!)} />
+               <AcademicStatCard label="NETWORK LAYER" value="Optimism L2" />
+               <AcademicStatCard label="AUTHORIZATION STATUS" value="MINTED" />
             </div>
           )}
       </div>
@@ -526,10 +508,10 @@ export function VossSupremacyPanel() {
       {/* ── CRYPTOGRAPHIC METADATA INJECTION ── */}
       {hasTicket && (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-px bg-[#E5E5E5] border border-[#E5E5E5] rounded-xl overflow-hidden shadow-sm mx-4 md:mx-0">
-          <AcademicStatCard label="ZKP ENTROPY HASH" value={`0x${getDeterministicHash(address + 'zkp1')}${getDeterministicHash(address + 'zkp2')}...${getDeterministicHash(address + 'zkp3').slice(0,4)}`} icon={Orbit} />
-          <AcademicStatCard label="STATE ROOT PATH" value={`ROOT-${getDeterministicHash(address + 'root').toUpperCase()}`} icon={Network} />
-          <AcademicStatCard label="EXECUTION LATENCY" value={`${(0.3 + (parseInt(getDeterministicHash(address || '').slice(0, 2), 16) % 120) / 100).toFixed(3)} ms`} icon={Zap} />
-          <AcademicStatCard label="VALIDATION PATHWAY" value="DETERMINISTIC" icon={Cpu} />
+          <AcademicStatCard label="ZKP ENTROPY HASH" value={`0x${getDeterministicHash(address + 'zkp1')}${getDeterministicHash(address + 'zkp2')}...${getDeterministicHash(address + 'zkp3').slice(0,4)}`} />
+          <AcademicStatCard label="STATE ROOT PATH" value={`ROOT-${getDeterministicHash(address + 'root').toUpperCase()}`} />
+          <AcademicStatCard label="EXECUTION LATENCY" value={`${(0.3 + (parseInt(getDeterministicHash(address || '').slice(0, 2), 16) % 120) / 100).toFixed(3)} ms`} />
+          <AcademicStatCard label="VALIDATION PATHWAY" value="DETERMINISTIC" />
         </div>
       )}
 

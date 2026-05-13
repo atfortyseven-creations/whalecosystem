@@ -3,15 +3,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    LayoutDashboard,
-    Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
-    Globe, Cpu, Shield,
-    Network, Ticket, Flame, Menu,
-    BookOpen, Database, MessageSquare,
-    Landmark, Compass,
-    LineChart, Lock, Book, Info, X, ArrowUpRight, CreditCard, Fingerprint,
-    MessageCircle
+    X, ArrowUpRight
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -37,25 +30,25 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'gold',          label: 'Ticket Mint',       icon: <Ticket size={17}/>,    dividerBefore: 'Overview' },
-    { id: 'portfolio',     label: 'Main Portfolio',    icon: <Wallet size={17}/> },
-    { id: 'billing',       label: 'Billing & Plan',    icon: <CreditCard size={17}/> },
+    { id: 'gold',          label: 'Ticket Mint',       icon: null,    dividerBefore: 'Overview' },
+    { id: 'portfolio',     label: 'Main Portfolio',    icon: null },
+    { id: 'billing',       label: 'Billing & Plan',    icon: null },
 
-    { id: 'markets',      label: 'Top Markets',       icon: <LayoutDashboard size={17}/>, dividerBefore: 'Intelligence' },
-    { id: 'newpairs',     label: 'New Listings',      icon: <Search size={17}/> },
+    { id: 'markets',      label: 'Pre-Execution Tracking',       icon: null, dividerBefore: 'Intelligence' },
+    { id: 'newpairs',     label: 'New Listings',      icon: null },
 
-    { id: 'inst-ledger',  label: 'Whale Ledger',      icon: <Book size={17}/>,      dividerBefore: 'On-Chain Intel' },
-    { id: 'mass-transfer',label: 'Mass Transfers',    icon: <Network size={17}/> },
-    { id: 'omniexplorer', label: 'Block Explorer',    icon: <Search size={17}/> },
-    { id: 'defi',         label: 'DeFi Yields',       icon: <Landmark size={17}/> },
-    { id: 'morpho',       label: 'Morpho Base',       icon: <Database size={17}/>, badge: 'LIVE', badgeColor: '#0052FF' },
+    { id: 'inst-ledger',  label: 'Entity Resolution',      icon: null,      dividerBefore: 'On-Chain Intel' },
+    { id: 'mass-transfer',label: 'Mass Transfers',    icon: null },
+    { id: 'omniexplorer', label: 'Block Explorer',    icon: null },
+    { id: 'defi',         label: 'DeFi Yields',       icon: null },
+    { id: 'morpho',       label: 'Morpho Base',       icon: null, badge: 'LIVE', badgeColor: '#0052FF' },
 
-    { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/>,    dividerBefore: 'ZK Layer' },
-    { id: 'zk-identity',  label: 'Sovereign ID',      icon: <Fingerprint size={17}/>, badge: 'ZK', badgeColor: '#10B981' },
+    { id: 'zk',           label: 'Cryptographic Integrity',    icon: null,    dividerBefore: 'ZK Layer' },
+    { id: 'zk-identity',  label: 'Sovereign ID',      icon: null, badge: 'ZK', badgeColor: '#10B981' },
 
-    { id: 'chat',         label: 'Whale Chat',       icon: <MessageCircle size={17}/>, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF' },
-    { id: 'logs',         label: 'Session Logs',      icon: <Database size={17}/>,  dividerBefore: 'System' },
-    { id: 'support',      label: 'Support',           icon: <MessageSquare size={17}/> },
+    { id: 'chat',         label: 'Whale Chat',       icon: null, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF' },
+    { id: 'logs',         label: 'Session Logs',      icon: null,  dividerBefore: 'System' },
+    { id: 'support',      label: 'Support',           icon: null },
 ];
 
 const RESTRICTED_TABS = [
@@ -184,12 +177,14 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavI
                     )}
                 </AnimatePresence>
 
-                <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#00C076] drop-shadow-[0_0_5px_rgba(0,192,118,0.5)]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
-                    {item.icon}
-                </span>
+                {item.icon && (
+                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#00C076] drop-shadow-[0_0_5px_rgba(0,192,118,0.5)]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
+                        {item.icon}
+                    </span>
+                )}
 
                 {!isCollapsed && (
-                    <span className={`ml-3 text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FAF9F6]' : 'text-[#555555] group-hover:text-[#050505]'}`}>
+                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FAF9F6]' : 'text-[#555555] group-hover:text-[#050505]'}`}>
                         {item.label}
                     </span>
                 )}
@@ -420,7 +415,6 @@ export function WhaleProShell({
                     className="fixed inset-0 z-[9999] flex flex-col items-center justify-center text-center"
                     style={{ background: 'rgba(250,249,246,0.97)', backdropFilter: 'blur(24px)' }}
                 >
-                    <Lock size={48} className="mb-6 text-black/20" strokeWidth={1} />
                     <h2 className="text-2xl font-black uppercase tracking-[0.2em] text-[#050505] mb-2">Session Locked</h2>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-black/40 mb-8">
                         Auto-lock after {autoDisconnectTimer} of inactivity
@@ -429,7 +423,6 @@ export function WhaleProShell({
                         onClick={unlockSession}
                         className="px-8 py-3.5 bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-all active:scale-[0.98]"
                     >
-                        <Shield size={13} className="inline mr-2 mb-0.5" />
                         Resume Session
                     </button>
                 </motion.div>
@@ -579,16 +572,16 @@ export function WhaleProShell({
                         <button
                             onClick={() => setShowInfoModal(true)}
                             title="Module Information"
-                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 hover:scale-105 hover:shadow-sm text-[#888888] hover:text-[#050505] transition-all flex items-center justify-center w-10 h-10"
+                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 hover:scale-105 hover:shadow-sm text-[#888888] hover:text-[#050505] transition-all flex items-center justify-center w-10 h-10 text-[11px] font-black uppercase"
                         >
-                            <Info size={18} />
+                            INFO
                         </button>
                         <button
                             onClick={() => setSettingsOpen(true)}
                             title="Open Settings"
-                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 hover:scale-105 hover:shadow-sm text-[#888888] hover:text-[#050505] transition-all flex items-center justify-center w-10 h-10"
+                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 hover:scale-105 hover:shadow-sm text-[#888888] hover:text-[#050505] transition-all flex items-center justify-center w-10 h-10 text-[11px] font-black uppercase"
                         >
-                            <Settings size={18} />
+                            SET
                         </button>
                     </div>
                 </header>
@@ -632,12 +625,12 @@ export function WhaleProShell({
                 {/* Only renders on real mobile hardware (screen.width < 1024).  */}
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
                 <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} h-16 border-t border-black/10 bg-white items-center justify-around px-1 shrink-0 z-50`} style={{ minHeight: '64px', maxHeight: '64px' }}>
-                    {[
-                        { id: 'markets',     icon: <LayoutDashboard size={20} />, label: 'Markets' },
-                        { id: 'newpairs',    icon: <Search size={20} />,          label: 'Listings' },
-                        { id: 'portfolio',   icon: <Wallet size={20} />,          label: 'Portfolio' },
-                        { id: 'chat',        icon: <MessageCircle size={20} />,    label: 'Chat' },
-                        { id: 'menu',        icon: <Menu size={20} />,            label: 'Menu' },
+                     {[
+                        { id: 'markets',     icon: null, label: 'Markets' },
+                        { id: 'newpairs',    icon: null, label: 'Listings' },
+                        { id: 'portfolio',   icon: null, label: 'Portfolio' },
+                        { id: 'chat',        icon: null, label: 'Chat' },
+                        { id: 'menu',        icon: null, label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
                         return (
@@ -666,14 +659,14 @@ export function WhaleProShell({
                 <footer className="hidden md:flex h-7 border-t border-black/10 bg-white items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5 min-w-[120px]">
-                            <Globe size={11} /> Global Latency:
+                            Global Latency:
                             <span className={latency > 150 ? 'text-[#FF3B30]' : latency > 0 ? 'text-[#00FF55]' : 'text-[#888888]'}>
                                 {latency > 0 ? `${latency}ms` : 'SYNCING'}
                             </span>
                         </span>
                         {/* UX-19: Real node status from /api/network/getblock-health */}
                         <span className="flex items-center gap-1.5">
-                            <Cpu size={11} /> Nodes:
+                            Nodes:
                             <span className={
                                 nodeStatus === 'OPERATIONAL' ? 'text-[#00FF55]' :
                                 nodeStatus === 'DEGRADED'    ? 'text-[#FFB800]' : 'text-[#FF3B30]'
@@ -689,7 +682,7 @@ export function WhaleProShell({
                         )}
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5"><Shield size={11} /> Protocol: Live</span>
+                        <span className="flex items-center gap-1.5">Protocol: Live</span>
                         <span className="text-[#888888]">© 2026 atfortyseven-creations</span>
                     </div>
                 </footer>

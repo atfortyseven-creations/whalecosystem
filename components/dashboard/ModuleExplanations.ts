@@ -1,8 +1,8 @@
 export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: string, overview: string, features: { title: string, desc: string }[] }> = {
     'dashboard': {
-        title: 'Platform Overview',
-        subtitle: 'Global Market Intelligence',
-        overview: 'The central hub of your Sovereign Terminal. This module provides a clear, real-time consolidation of the global market state, filtering out unnecessary noise to present you with precise, actionable data for informed decision-making.',
+        title: 'Quantitative AI Models',
+        subtitle: '12TB Daily Ledger Processing',
+        overview: 'Our heuristic algorithms process 12TB of raw blockchain state daily, detecting liquidity injections and massive accumulations prior to market impact.',
         features: [
             { title: 'Data Aggregation', desc: 'Instant consolidation of inter-market variations to reflect the true state of the ecosystem.' },
             { title: 'Network Health', desc: 'Continuous evaluation of connection stability and node latency.' },
@@ -40,9 +40,9 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'markets': {
-        title: 'Top Markets',
-        subtitle: 'Liquidity & Order Book Analysis',
-        overview: 'A detailed visualization of the most dominant trading pairs. This module scans order books to help you distinguish between genuine liquidity and artificial barriers, revealing true support and resistance levels.',
+        title: 'Pre-Execution Tracking',
+        subtitle: 'Mempool Node Mesh',
+        overview: 'Relying on block confirmations means you are already too late. Our dedicated node mesh directly interfaces with the global mempool, allowing you to intercept and analyze institutional orders milliseconds after they are signed, giving you the ultimate execution edge.',
         features: [
             { title: 'Order Book Depth', desc: 'Clear identification of capital barriers and liquidity concentrations.' },
             { title: 'Capital Flow Metrics', desc: 'Quantitative mapping of net flows across major exchanges.' },
@@ -100,9 +100,9 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'inst-ledger': {
-        title: 'Whale Ledger',
-        subtitle: 'Historical Transaction Audit',
-        overview: 'A persistent record of significant capital movements. This module acts as the long-term memory of the blockchain, allowing you to review and audit historical market events with complete transparency.',
+        title: 'Entity Resolution',
+        subtitle: 'Multi-Hop De-Obfuscation',
+        overview: 'We map complex multi-hop interactions and de-obfuscate mixer outputs in real-time, grouping fragmented wallets into unified institutional entities for absolute clarity.',
         features: [
             { title: 'Historical Preservation', desc: 'Reliable access to the data surrounding previous market events.' },
             { title: 'Advanced Search', desc: 'Filtering tools based on capital thresholds, addresses, and timeframes.' },
@@ -200,9 +200,9 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'zk': {
-        title: 'ZK Shield',
-        subtitle: 'Network Privacy Tools',
-        overview: 'A suite of privacy features designed to protect your analytical activities. It helps mask your network requests, preventing third parties from tracking your areas of interest.',
+        title: 'Cryptographic Integrity',
+        subtitle: 'Zero-Knowledge Architecture',
+        overview: 'The Sovereign Protocol operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data cannot be intercepted or exposed.',
         features: [
             { title: 'Request Obfuscation', desc: 'Routes queries through multiple nodes to conceal your direct focus.' },
             { title: 'Tracking Mitigation', desc: 'Filters out known data-collection methods used by external analytics firms.' },

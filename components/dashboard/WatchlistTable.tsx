@@ -2,10 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Search, Loader2, Star, Plus, Wallet, Coins, Trash2,
-    TrendingUp, TrendingDown, Users, Activity, ArrowUpRight, ArrowDownRight, Zap, AlertTriangle
-} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useMarketData } from '@/lib/api-client';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
@@ -95,15 +92,14 @@ export function WatchlistTable() {
                     {(['TOKENS', 'WALLETS'] as const).map(v => (
                         <button key={v} onClick={() => setView(v)}
                             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[9px] font-black tracking-widest uppercase transition-all ${view === v ? 'bg-white text-[#050505] shadow-sm border border-[#E5E5E5]' : 'text-[#888888] hover:text-[#050505]'}`}>
-                            {v === 'TOKENS' ? <Coins size={12}/> : <Wallet size={12}/>} {v}
+                            {v}
                         </button>
                     ))}
                 </div>
                 {/* Search */}
                 <div className="relative flex-1 min-w-[180px] max-w-xs">
-                    <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]" />
                     <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter watchlist…"
-                        className="w-full bg-white border border-[#E5E5E5] rounded-lg pl-8 pr-3 py-1.5 text-[11px] font-mono text-[#050505] outline-none focus:border-[#050505] transition-all"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-lg px-3 py-1.5 text-[11px] font-mono text-[#050505] outline-none focus:border-[#050505] transition-all"
                     />
                 </div>
                 {/* Add New - Disabled until API injection is complete */}
@@ -111,7 +107,7 @@ export function WatchlistTable() {
                     disabled
                     className="ml-auto flex items-center gap-1.5 px-4 py-2 bg-[#E5E5E5] text-[#888888] rounded-lg text-[9px] font-black uppercase tracking-widest cursor-not-allowed transition-colors"
                 >
-                    <Plus size={13}/> Add
+                    Add
                 </button>
             </div>
 
@@ -133,7 +129,6 @@ export function WatchlistTable() {
                                 </div>
                             ) : error ? (
                                 <div className="h-full flex flex-col items-center justify-center">
-                                    <AlertTriangle size={24} className="text-black/10 mb-3" />
                                     <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em]">
                                         Data Lake Unavailable
                                     </p>
@@ -162,7 +157,6 @@ export function WatchlistTable() {
                                                             style={{ gridTemplateColumns: '2.5fr 1.5fr 1fr 1fr 1.2fr 1fr 1fr 1fr 0.8fr' }}>
                                                             {/* Token */}
                                                             <div className="px-3 flex items-center gap-2.5">
-                                                                <Star size={12} className="text-[#D4AF37] fill-[#D4AF37] shrink-0" />
                                                                 <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
                                                                     style={{ background: CHAIN_COLORS[t.chain || 'ethereum'] || '#888' }}>
                                                                     {t.symbol ? t.symbol.charAt(0) : '?'}
@@ -185,7 +179,6 @@ export function WatchlistTable() {
 
                                                             {/* 24h Chg */}
                                                             <div className={`px-3 text-right text-[10px] font-black font-mono flex items-center justify-end gap-0.5 ${pctColor(md.change24h ?? 0)}`}>
-                                                                {(md.change24h ?? 0) >= 0 ? <ArrowUpRight size={10}/> : <ArrowDownRight size={10}/>}
                                                                 {pctFmt(md.change24h ?? 0)}
                                                             </div>
 
@@ -219,7 +212,7 @@ export function WatchlistTable() {
                                                             {/* Delete / Save */}
                                                             <div className="px-3 flex justify-end">
                                                                 <button disabled className="p-1.5 text-[#E5E5E5] rounded-lg transition-colors cursor-not-allowed">
-                                                                    <Trash2 size={14}/>
+                                                                    DEL
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -254,7 +247,6 @@ export function WatchlistTable() {
                                 </div>
                             ) : error ? (
                                 <div className="h-full flex flex-col items-center justify-center">
-                                    <AlertTriangle size={24} className="text-black/10 mb-3" />
                                     <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em]">
                                         Data Lake Unavailable
                                     </p>
@@ -288,7 +280,6 @@ export function WatchlistTable() {
                                                             style={{ gridTemplateColumns: '2.2fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr 0.8fr' }}>
                                                             {/* Entity */}
                                                             <div className="px-3 flex items-center gap-2">
-                                                                <Star size={12} className="text-[#D4AF37] fill-[#D4AF37] shrink-0" />
                                                                 <div className="flex flex-col">
                                                                     <span className="text-[11px] font-black text-[#050505]">{w.label || 'Unknown Wallet'}</span>
                                                                     <div className="flex gap-1 mt-0.5">
@@ -332,19 +323,19 @@ export function WatchlistTable() {
                                                             {/* Alpha Score */}
                                                             <div className="px-3 text-right">
                                                                 <span className={`text-[10px] font-black font-mono flex items-center justify-end gap-1 ${(an.alphaScore ?? 0) > 70 ? 'text-[#D4AF37]' : 'text-[#888888]'}`}>
-                                                                    <Zap size={10}/>{an.alphaScore != null ? an.alphaScore : '—'}
+                                                                    {an.alphaScore != null ? an.alphaScore : '—'}
                                                                 </span>
                                                             </div>
 
                                                             {/* Last Active */}
                                                             <div className="px-3 text-right text-[9px] font-mono text-[#888888]">
-                                                                <Activity size={9} className="inline mr-1"/> {lastActive}
+                                                                {lastActive}
                                                             </div>
 
                                                             {/* Delete */}
                                                             <div className="px-3 flex justify-end">
                                                                 <button disabled className="p-1.5 text-[#E5E5E5] transition-colors cursor-not-allowed">
-                                                                    <Trash2 size={14}/>
+                                                                    DEL
                                                                 </button>
                                                             </div>
                                                         </div>

@@ -8,11 +8,7 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
 
     // Auto-complete after video duration if onEnded fails (fallback)
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setVideoEnded(true);
-            setTimeout(onComplete, 0); // Trigger immediately
-        }, 6000); // exactly 6 seconds
-        return () => clearTimeout(timer);
+        // Molecular Attention: Manual fallback removed to eliminate mock/simulated behaviors.
     }, [onComplete]);
 
     return (

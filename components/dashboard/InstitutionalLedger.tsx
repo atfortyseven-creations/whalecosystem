@@ -4,10 +4,11 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Database, Shield, ExternalLink, Hash, Clock,
-  Activity, Search, RefreshCw, CheckCircle2,
-  Layers, Cpu, Lock, TrendingUp, AlertTriangle
+  Clock, RefreshCw, Search,
+  AlertTriangle,
+  ChevronRight
 } from 'lucide-react';
+import { ModuleHeader } from './ModuleHeader';
 import { useOmniInfrastructure } from '@/lib/api-client';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -36,17 +37,16 @@ function shortHash(h: string) {
 }
 
 function StatCard({
-  icon, label, value, sub, accent = false,
+  label, value, accent = false,
 }: {
-  icon: React.ReactNode; label: string; value: string; sub?: string; accent?: boolean;
+  label: string; value: string; accent?: boolean;
 }) {
   return (
-    <div className={`bg-white shadow-sm rounded-xl border ${accent ? 'border-emerald-200 shadow-none' : 'border-[#E5E5E5]'} p-5 flex flex-col gap-2`}>
+    <div className={`bg-white shadow-sm rounded-xl border ${accent ? 'border-black/10 shadow-none' : 'border-[#E5E5E5]'} p-5 flex flex-col gap-2`}>
       <div className="flex items-center gap-2">
-        <span className={accent ? 'text-emerald-500' : 'text-[#050505]/30'}>{icon}</span>
         <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50">{label}</span>
       </div>
-      <span className={`text-xl md:text-2xl font-black font-mono leading-none ${accent ? 'text-emerald-700' : 'text-[#050505]'}`}>
+      <span className={`text-xl md:text-2xl font-black font-mono leading-none ${accent ? 'text-[#050505]' : 'text-[#050505]'}`}>
         {value}
       </span>
     </div>
@@ -61,7 +61,6 @@ function StateChip({ state }: { state: LedgerEntry['protocolState'] }) {
   }[state];
   return (
     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded border text-[9px] font-bold uppercase tracking-widest ${cfg.bg} ${cfg.border} ${cfg.text}`}>
-      <div className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {state}
     </div>
   );
@@ -124,19 +123,13 @@ export default function InstitutionalLedger() {
     <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] overflow-hidden rounded-xl border border-[#E5E5E5]">
 
       {/* ── Page Header ── */}
-      <div className="shrink-0 px-6 pt-5 pb-4 flex items-center justify-between border-b border-[#E5E5E5] bg-white">
-        <div className="flex flex-col gap-0.5">
-          <h1 className="text-[13px] font-black uppercase tracking-widest text-[#050505]">
-            INSTITUTIONAL LEDGER
-          </h1>
-          <p className="text-[10px] text-[#050505]/40 font-bold leading-tight max-w-md uppercase tracking-[0.1em]">
-            Verified chronology of MACRO-ECONOMIC state.
-          </p>
-        </div>
+      <div className="shrink-0 pt-4 px-2">
+        <ModuleHeader moduleId="inst-ledger" />
+      </div>
+      <div className="shrink-0 px-6 pb-4 flex items-center justify-end border-b border-[#E5E5E5] bg-white -mt-10">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">Telemetry Active</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-black/5">
+            <span className="text-[9px] font-black uppercase tracking-widest text-black/40">Telemetry Active</span>
           </div>
           <button
             onClick={() => refetch()}
@@ -151,23 +144,19 @@ export default function InstitutionalLedger() {
       {/* ── Stats Row ── */}
       <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-4 px-6 py-4 border-b border-[#E5E5E5]">
         <StatCard
-          icon={<Layers size={14} />}
           label="INDEXED BLOCKS"
           value={stats ? stats.totalBlocks.toLocaleString() : '—'}
         />
         <StatCard
-          icon={<CheckCircle2 size={14} />}
           label="FINALIZATION YIELD"
           value={stats ? `${stats.finalizedPct.toFixed(1)}%` : '—'}
           accent
         />
         <StatCard
-          icon={<Database size={14} />}
           label="AVERAGE ENTROPY"
           value={stats ? `${stats.avgPayloadMB} MB` : '—'}
         />
         <StatCard
-          icon={<Cpu size={14} />}
           label="ACTIVE OBSERVERS"
           value={stats ? `${stats.observersActive}` : '—'}
         />
@@ -237,7 +226,6 @@ export default function InstitutionalLedger() {
                 >
                   {/* Block ID */}
                   <div className="col-span-2 flex items-center gap-2">
-                    <Hash size={10} className="text-[#050505]/20 shrink-0" />
                     <span className="text-[11px] font-black font-mono text-[#050505]">{entry.blockHex}</span>
                   </div>
 
@@ -250,7 +238,6 @@ export default function InstitutionalLedger() {
 
                   {/* SHA-256 Hash */}
                   <div className="col-span-4 flex items-center gap-2">
-                    <Lock size={9} className="text-[#050505]/20 shrink-0" />
                     <span className="text-[10px] font-mono text-[#050505]/50 truncate">{shortHash(entry.sha256Hash)}</span>
                     <a
                       href={`https://etherscan.io/block/${parseInt(entry.blockHex, 16)}`}
@@ -259,7 +246,7 @@ export default function InstitutionalLedger() {
                       onClick={e => e.stopPropagation()}
                       className="shrink-0 text-[#050505]/20 hover:text-[#050505] transition-colors"
                     >
-                      <ExternalLink size={9} />
+                      <ChevronRight size={10} />
                     </a>
                   </div>
 
@@ -343,8 +330,7 @@ export default function InstitutionalLedger() {
                   rel="noreferrer"
                   className="w-full text-center py-3 rounded-xl bg-[#050505] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#050505]/80 transition-colors flex items-center justify-center gap-2 mt-auto"
                 >
-                  <ExternalLink size={12} />
-                  Verify on Etherscan
+                  Verify External State
                 </a>
               </div>
             </motion.div>
@@ -355,11 +341,9 @@ export default function InstitutionalLedger() {
       <div className="shrink-0 px-6 py-3 border-t border-[#E5E5E5] bg-white flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/40">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             L1 NETWORK ACTIVE
           </div>
           <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/40">
-            <Shield size={10} />
             STATE VERIFIED
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { Send, MessageCircle, Plus, ArrowLeft, Shield, Lock, Activity, X, Camera, Zap, Mic, MicOff, Play, Pause, Wallet, QrCode } from 'lucide-react';
+
 import { useSignMessage } from 'wagmi';
 
 import { useAppKit } from '@reown/appkit/react';
@@ -425,12 +425,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       // On mobile, we prefer the deterministic path to avoid switching apps 4 times.
       const seed = await getDeterministicSeed();
       
-      if (isMobile) {
-          await new Promise(r => setTimeout(r, 800)); // Slight delay for UX
-      }
-
       const wagmiSigner = {
-        getAddress: async () => address,
+        getAddress: async () => address as string,
         signMessage: async (msg: string | Uint8Array) => {
           try {
             return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
@@ -439,7 +435,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector') || msg.includes('signMessage')) {
                 const hasVault = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_vault');
                 if (isSovereignHandshake && !hasVault) {
-                  // EXPERT: Instead of throwing, we just log. The catch block will show a "Retry" or "Sync" state.
                   console.warn('[WhaleChat:Mobile] Signature requested on linked session without Vault.');
                 }
                 throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this terminal.');
@@ -449,7 +444,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         }
       };
 
-      // ── Step 2: Initialize client (silent if seed is provided) ───────────────
+      // ── Step 2: Initialize client (Direct Execution) ───────────────
       const realClient = await getXMTPClient(wagmiSigner, seed || undefined);
       setClient(realClient);
       await loadConversations();
@@ -484,13 +479,12 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // AUTO-INITIALIZE: When wallet is connected and XMTP not yet started, auto-init.
   // [EXPERT-SILENT-ENTRY]: If a seed is present, we initialize IMMEDIATELY without showing any prompt.
   useEffect(() => {
-    const seedKey = `whale_chat_seed_${address?.toLowerCase() || ''}`;
-    const hasSeed = !!localStorage.getItem(seedKey);
-    
-    if (isConnected && address && (forceAutoInit || hasSeed) && !client && !initInFlight.current && !initError) {
+    // Aggressive Auto-Init: Trigger for all connected users.
+    // If a seed exists (silent), it happens instantly. If not, it prompts for the one-time identity signature.
+    if (isConnected && address && !client && !initInFlight.current && !initError) {
       initClient();
     }
-  }, [isConnected, address, forceAutoInit, client, initError, initClient]);
+  }, [isConnected, address, client, initError, initClient]);
 
   const persistToLocal = (convs: ConversationMeta[]) => {
     try {
@@ -755,10 +749,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
         // Send to XMTP network (includes dm.sync() after send)
         await sendMessage(client, activePeer, content);
-        
-        // Wait 1.5s for network propagation, then fetch authoritative state
-        await new Promise(r => setTimeout(r, 1500));
-        try {
+        // Fetch authoritative state immediately after send
+      try {
             const msgs = await getMessages(client, activePeer);
             const mappedMsgs = msgs.map((m: any) => ({
                 id: m.id,
@@ -798,9 +790,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   if (!isConnected) {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[500px] gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-[#9945FF]/10 border border-[#9945FF]/20 flex items-center justify-center">
-          <MessageCircle size={24} className="text-[#9945FF]" />
-        </div>
         <h3 className="text-sm font-black uppercase tracking-widest text-[#050505]">Whale Chat</h3>
         <p className="text-xs text-black/40 text-center max-w-xs">Connect your wallet to access maximum security decentralized messaging.</p>
       </div>
@@ -837,8 +826,26 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               Welcome to, <br /> Whale Chat.
             </h2>
             <div className="w-12 h-px bg-black/10 mx-auto my-6" />
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-xl mx-auto mb-10">
+              <div className="space-y-2">
+                <span className="text-[10px] font-black text-black/20 uppercase tracking-widest">01</span>
+                <p className="text-[11px] font-black uppercase text-black/60">Connect Wallet</p>
+                <p className="text-[10px] text-black/30 font-serif">Authorize browser session via AppKit.</p>
+              </div>
+              <div className="space-y-2">
+                <span className="text-[10px] font-black text-black/20 uppercase tracking-widest">02</span>
+                <p className="text-[11px] font-black uppercase text-[#00C076]">KYC Verified</p>
+                <p className="text-[10px] text-black/30 font-serif">3D ZK-Proof attestation confirmed.</p>
+              </div>
+              <div className="space-y-2">
+                <span className="text-[10px] font-black text-black/20 uppercase tracking-widest">03</span>
+                <p className="text-[11px] font-black uppercase text-black/60">P2P Secured</p>
+                <p className="text-[10px] text-black/30 font-serif">Persistent encryption across all devices.</p>
+              </div>
+            </div>
+
             <p className="text-[#050505]/40 text-[13px] md:text-[15px] font-serif leading-relaxed px-6 max-w-sm mx-auto text-center">
-              A private, decentralized protocol for institutional communications. 
               Zero-knowledge encryption. Absolute sovereignty.
             </p>
           </div>
@@ -858,7 +865,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   onClick={() => openAppKit()}
                   className="w-full py-5 rounded-xl bg-[#050505] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#0044CC] hover:shadow-lg transition-all flex items-center justify-center gap-3 active:scale-[0.97]"
                 >
-                  <Wallet size={16} />
                   Connect Wallet
                 </button>
               ) : (
@@ -868,16 +874,15 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   className="w-full py-5 rounded-xl bg-[#050505] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#0044CC] hover:shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                 >
                   {isInitializing ? (
-                    <><Activity size={16} className="animate-spin" /> Initializing Handshake...</>
+                    <>Handshaking...</>
                   ) : (
-                    <><Lock size={16} /> Retry Protocol Initialization</>
+                    <>Retry Protocol Initialization</>
                   )}
                 </button>
               )}
             </div>
           ) : isInitializing ? (
             <div className="flex flex-col items-center gap-5">
-              <Activity size={24} className="text-[#0044CC] animate-spin" />
               <p className="text-[12px] text-black/40 font-mono uppercase tracking-[0.2em] font-bold">Synchronizing Encrypted Channel...</p>
             </div>
           ) : (
@@ -886,7 +891,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               disabled={isInitializing}
               className="w-full max-w-md py-6 rounded-xl bg-[#050505] text-white text-[13px] font-black uppercase tracking-[0.2em] hover:bg-[#0044CC] hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-3"
             >
-              <Shield size={18} /> Initialize Secure Connection
+              Initialize Secure Connection
             </button>
           )}
         </div>
@@ -907,17 +912,17 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowScanner(true)}
-                className="p-2.5 rounded-xl bg-black/[0.03] text-black/40 hover:bg-black/5 transition-all"
+                className="p-2.5 rounded-xl bg-black/[0.03] text-black/40 hover:bg-black/5 transition-all text-[10px] font-black uppercase"
                 title="Scan Peer QR"
               >
-                <Camera size={18} />
+                SCAN
               </button>
               <button
                 onClick={() => setShowMyQR(true)}
-                className="p-2.5 rounded-xl bg-black/[0.03] text-black/40 hover:bg-black/5 transition-all"
+                className="p-2.5 rounded-xl bg-black/[0.03] text-black/40 hover:bg-black/5 transition-all text-[10px] font-black uppercase"
                 title="Show My QR"
               >
-                <QrCode size={18} />
+                QR
               </button>
             </div>
           </div>
@@ -934,9 +939,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             <button
               onClick={handleStartConversation}
               disabled={sending}
-              className="w-9 h-9 bg-[#9945FF] rounded-lg flex items-center justify-center text-white hover:bg-[#7c35d4] transition-colors active:scale-95 disabled:opacity-50"
+              className="w-9 h-9 bg-[#050505] rounded-lg flex items-center justify-center text-white hover:bg-black/80 transition-colors active:scale-95 disabled:opacity-50 text-[18px] font-light"
             >
-              <Plus size={14} />
+              +
             </button>
           </div>
         </div>
@@ -944,7 +949,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         <div className="flex-1 overflow-y-auto">
           {conversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center">
-              <Lock size={28} className="text-black/10" />
               <p className="text-[10px] text-black/30 font-medium uppercase tracking-widest">Vault is Empty</p>
             </div>
           ) : (
@@ -980,17 +984,17 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           <>
             <div className="h-14 px-4 border-b border-black/6 flex items-center justify-between bg-white shrink-0">
               <div className="flex items-center gap-3">
-                <button onClick={() => setShowList(true)} className="md:hidden p-1.5 rounded-lg hover:bg-black/5 text-black/50">
-                  <ArrowLeft size={16} />
+                <button onClick={() => setShowList(true)} className="md:hidden p-1.5 rounded-lg hover:bg-black/5 text-black/50 text-[10px] font-black">
+                  BACK
                 </button>
                 <Avatar address={activePeer!} />
                 <div className="flex flex-col">
                   <span className="text-[11px] font-bold text-[#050505] font-mono flex items-center gap-1.5">
                     {shortAddr(activePeer!)}
-                    {peerStatus.online && <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />}
+                    {peerStatus.online && <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />}
                   </span>
                   {peerStatus.isTyping && (
-                    <span className="text-[9px] text-[#9945FF] font-black tracking-widest uppercase animate-pulse">Decrypting...</span>
+                    <span className="text-[9px] text-[#050505] font-black tracking-widest uppercase animate-pulse">Decrypting...</span>
                   )}
                 </div>
               </div>
@@ -1031,8 +1035,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                             : 'bg-white rounded-bl-sm border border-black/8 shadow-sm'
                         }`}>
                           <div className={`flex items-center gap-2 mb-1.5 ${isMe ? 'text-white/60' : 'text-black/40'}`}>
-                            <Mic size={10} />
-                            <span className="text-[9px] font-black uppercase tracking-widest">Voice Message</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest">AUDIO</span>
                           </div>
                           <audio
                             controls
@@ -1076,15 +1079,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               {/* ── Audio recording indicator ── */}
               {isRecording && (
                 <div className="flex items-center gap-2 px-4 pt-3 pb-1">
-                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-red-500">
-                    Recording… {recordingSeconds}s
-                  </span>
-                  <span className="text-[9px] text-black/30 font-mono">(tap mic to stop)</span>
+                    <div className="flex items-center gap-1.5 bg-[#FAF9F6] border border-black/5 px-2 py-1 rounded-md">
+                        <span className="text-[10px] font-mono text-red-500 uppercase font-bold">REC</span>
+                        <span className="text-[9px] font-mono text-black/40">{recordingSeconds}s</span>
+                    </div>
                 </div>
               )}
               <form onSubmit={handleSend} className="flex gap-2 p-3">
-                {/* Mic button */}
                 <button
                   type="button"
                   onPointerDown={startRecording}
@@ -1098,7 +1099,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   style={{ touchAction: 'none' }}
                   title={isRecording ? 'Release to send audio' : 'Hold to record voice'}
                 >
-                  {isRecording ? <MicOff size={15} /> : <Mic size={15} />}
+                  <span className="text-[9px] font-black uppercase tracking-widest">{isRecording ? 'OFF' : 'REC'}</span>
                 </button>
 
                 <input
@@ -1114,9 +1115,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <button
                   type="submit"
                   disabled={(!inputText.trim() && !isRecording) || sending}
-                  className="w-11 h-11 rounded-xl bg-[#050505] flex items-center justify-center text-white disabled:opacity-30 hover:bg-[#9945FF] hover:shadow-[0_0_15px_rgba(153,69,255,0.3)] transition-all active:scale-95 shrink-0"
+                  className="w-11 h-11 rounded-xl bg-[#050505] flex items-center justify-center text-white disabled:opacity-30 hover:bg-black/80 hover:shadow-[0_0_15px_rgba(0,0,0,0.3)] transition-all active:scale-95 shrink-0 text-[10px] font-black uppercase"
                 >
-                  <Send size={15} />
+                  SEND
                 </button>
               </form>
             </div>
@@ -1126,12 +1127,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             <div className="flex flex-col items-center gap-6 max-w-2xl text-center select-none relative z-10">
               
               <div className="w-24 h-24 mb-4 flex items-center justify-center bg-black/[0.02] rounded-full border border-black/5">
-                 <Shield size={40} className="text-[#050505]/40" />
+                 <div className="w-10 h-10 border-2 border-black/20 rounded-full" />
               </div>
 
               <div className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm">
-                  <Shield size={14} className="text-[#0044CC]" />
-                  <div className="w-4" />
+                  <span className="text-[9px] font-black uppercase tracking-widest text-black/40">SECURE LINK ENCRYPTED</span>
               </div>
 
               <h2 className="text-[32px] md:text-[40px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-none mt-2">
@@ -1159,8 +1159,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
            <div className="w-full max-w-sm">
                <div className="flex justify-between items-center mb-8">
                    <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505]">Scan Peer QR</h3>
-                   <button onClick={() => setShowScanner(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors">
-                     <X size={20} />
+                   <button onClick={() => setShowScanner(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors text-[11px] font-black uppercase">
+                     X
                    </button>
                </div>
                <div className="mb-8">
@@ -1178,8 +1178,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
            <div className="w-full max-w-sm">
                <div className="flex justify-between items-center mb-8">
                    <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505]">My Identity QR</h3>
-                   <button onClick={() => setShowMyQR(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors">
-                     <X size={20} />
+                   <button onClick={() => setShowMyQR(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors text-[11px] font-black uppercase">
+                     X
                    </button>
                </div>
                <QrScanner 

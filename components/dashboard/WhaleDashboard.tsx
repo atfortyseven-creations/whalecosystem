@@ -2,16 +2,13 @@
 // WhaleDashboard v2 — Camera & ScannerZone removed, Morpho restored
 import React, { useState } from 'react';
 import { 
-  Globe, Lock, BookOpen, Star, Newspaper, 
-  Ticket, Flame, Search, Layers, LineChart, Book,
-  Network, Compass, Landmark, BarChart3, FlaskConical,
-  Wallet, Shield, Database, MessageSquare,
-  LayoutDashboard, MessageCircle, Camera, Fingerprint
 } from 'lucide-react';
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
 import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBoundary';
 import { useSearchParams } from 'next/navigation';
+import { useAccount } from 'wagmi';
+import dynamic from 'next/dynamic';
 
 // ── Active panels (visible to users) ──────────────────────────────────────────
 import { ScannerZone }             from '@/components/dashboard/ScannerZone';
@@ -37,11 +34,11 @@ import { WatchlistTable }       from '@/components/dashboard/WatchlistTable';
 // import SovereignIntelTab        from '@/components/dashboard/SovereignIntelTab';
 // import { VirtualizedFirehose }  from '@/components/premium/VirtualizedFirehose';
 // import { LivePortfolio }        from '@/components/premium/LivePortfolio';
+
 const AztecMempoolSpace = dynamic(
   () => import('@/components/premium/AztecMempoolSpace'),
   { ssr: false }
 );
-import dynamic from 'next/dynamic';
 
 // Heavy / SSR-unsafe dynamic imports
 const PortfolioDashboard = dynamic(
@@ -96,30 +93,17 @@ import "@/app/dashboard/dashboard.css";
 const UnderDevelopmentPanel = ({
     title,
     subtitle,
-    icon: Icon,
     accent = '#050505',
 }: {
     title: string;
     subtitle: string;
-    icon: any;
     accent?: string;
 }) => (
     <div className="flex flex-col items-center justify-center min-h-[520px] w-full select-none">
         {/* Ambient glow */}
         <div
             className="relative flex items-center justify-center mb-10"
-            style={{ filter: `drop-shadow(0 0 48px ${accent}30)` }}
         >
-            {/* Outer pulse ring */}
-            <div
-                className="absolute rounded-full animate-ping opacity-[0.06]"
-                style={{ width: 96, height: 96, background: accent }}
-            />
-            {/* Inner static ring */}
-            <div
-                className="absolute rounded-full opacity-[0.10]"
-                style={{ width: 72, height: 72, background: accent }}
-            />
             {/* Icon container */}
             <div
                 className="relative w-14 h-14 rounded-2xl flex items-center justify-center"
@@ -128,7 +112,6 @@ const UnderDevelopmentPanel = ({
                     border: `1px solid ${accent}25`,
                 }}
             >
-                <Icon size={22} strokeWidth={1.4} style={{ color: accent }} />
             </div>
         </div>
 
@@ -164,8 +147,23 @@ const UnderDevelopmentPanel = ({
 
 export default function WhaleDashboard() {
     const searchParams = useSearchParams();
+    const { address } = useAccount();
     const initialTab = searchParams.get('tab') || 'gold';
     const [activeTab, setActiveTab] = useState<string>(initialTab);
+    const [hasPassedZK, setHasPassedZK] = useState(false);
+
+    // Persistent ZK state for session
+    React.useEffect(() => {
+        const passed = localStorage.getItem(`zk_attestation_v1_${address?.toLowerCase()}`);
+        if (passed) setHasPassedZK(true);
+    }, [address]);
+
+    const handleZKSuccess = () => {
+        if (address) {
+            localStorage.setItem(`zk_attestation_v1_${address.toLowerCase()}`, 'true');
+        }
+        setHasPassedZK(true);
+    };
 
     // ── Sync URL param to state ──────────────────────────────────────────
     React.useEffect(() => {
@@ -323,7 +321,18 @@ export default function WhaleDashboard() {
             isExternalEmbed={false}
         >
             <div className="flex flex-col gap-6 w-full pb-12 h-full scrollbar-hide pt-4">
-                {renderTabContent()}
+                {!hasPassedZK ? (
+                    <div className="flex flex-col items-center justify-center min-h-[600px] w-full max-w-4xl mx-auto px-4">
+                        <div className="w-full">
+                           <ZKBiometricGate onSuccess={handleZKSuccess} />
+                        </div>
+                        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 text-center">
+                            Institutional Access Requires 3D ZK-Liveness Attestation
+                        </p>
+                    </div>
+                ) : (
+                    renderTabContent()
+                )}
             </div>
         </WhaleProShell>
     );

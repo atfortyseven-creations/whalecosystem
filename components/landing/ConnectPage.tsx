@@ -251,7 +251,7 @@ export default function ConnectPage() {
 
           if (!jwt) { setSyncStatus("ERROR"); return; }
           const hydrateRes = await fetch('/api/auth/qr-hydrate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jwt }) });
-          if (hydrateRes.ok) setTimeout(() => window.location.replace("/dashboard"), 100);
+          if (hydrateRes.ok) window.location.replace("/dashboard");
           else setSyncStatus("ERROR");
         }
       } catch (err) {}
@@ -284,8 +284,8 @@ export default function ConnectPage() {
     if (isLinked) {
       setPendingId(null);
       // Immediate redirect for production-grade speed
-      const t = setTimeout(() => { window.location.replace("/dashboard"); }, 100);
-      return () => clearTimeout(t);
+      window.location.replace("/dashboard");
+      return;
     }
   }, [isConnected, address, mounted, isLinked, setLinked]);
 

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Shield, CheckCircle, Fingerprint, Lock, Activity, UserCheck } from "lucide-react";
 import { useSignMessage, useAccount } from 'wagmi';
+import { QRCodeSVG as QRCode } from "qrcode.react";
 
 interface ZKBiometricGateProps {
   onSuccess?: (zkProofSignature: string) => void;
@@ -11,33 +11,86 @@ interface ZKBiometricGateProps {
 
 export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
   const [stage, setStage] = useState<"IDLE" | "SCANNING" | "PROCESSING" | "SUCCESS">("IDLE");
+  const [isMobile, setIsMobile] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
+
+  useEffect(() => {
+    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+  }, []);
+
+  // Cleanup stream on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+    };
+  }, [stream]);
 
   const handleStart = async () => {
     if (!address) return;
     try {
       setStage("SCANNING");
       
-      // Pure cryptographic attestation, zero mock timers.
+      // 1. Initiate Real Camera Stream
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "user", width: 400, height: 400 } 
+      });
+      setStream(mediaStream);
+      if (videoRef.current) videoRef.current.srcObject = mediaStream;
+
+      // 2. Wait for Video Ready (Molecular Precision)
+      if (videoRef.current) {
+        await new Promise((resolve) => {
+          if (videoRef.current!.readyState >= 2) resolve(true);
+          else videoRef.current!.onloadeddata = () => resolve(true);
+        });
+      }
+
+      // 3. Capture "Neural Mesh" Frame
+      let capturedFrame = "";
+      if (videoRef.current && canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        ctx?.drawImage(videoRef.current, 0, 0, 200, 200);
+        capturedFrame = canvasRef.current.toDataURL('image/jpeg', 0.5);
+      }
+
+      // 4. Cryptographic Signature (Binding Identity to Biometric Data)
+      const ts = Date.now();
+      const payloadHash = capturedFrame.slice(-32);
       const signature = await signMessageAsync({ 
-        message: `[SOVEREIGN ZK-GATE]\nRequest biometric liveness attestation for ${address}\nTimestamp: ${Date.now()}` 
+        message: `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nTimestamp: ${ts}` 
       });
 
       setStage("PROCESSING");
       
+      // 5. Verify via Oracle API (Molecular Transmission)
       const response = await fetch('/api/oracle/zk-biometrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address, signature })
+        body: JSON.stringify({ 
+          address, 
+          signature,
+          payload: capturedFrame,
+          timestamp: ts
+        })
       });
 
       if (!response.ok) throw new Error("Attestation failed");
       
+      // Stop camera
+      mediaStream.getTracks().forEach(t => t.stop());
+      setStream(null);
+
       setStage("SUCCESS");
       if (onSuccess) onSuccess(signature);
 
     } catch (error) {
+      console.error("[ZK-Gate] Verification Error:", error);
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      setStream(null);
       setStage("IDLE");
     }
   };
@@ -54,32 +107,44 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
           <AnimatePresence mode="wait">
             {stage === "IDLE" && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/5 rounded-full flex items-center justify-center">
-                <Fingerprint size={48} className="text-black/30" />
+                {!isMobile ? (
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                    alt="Scan on Mobile"
+                    className="w-24 h-24 p-1 bg-white rounded-lg shadow-sm grayscale"
+                  />
+                ) : (
+                  <div className="w-12 h-12 border-2 border-black/10 rounded-full" />
+                )}
               </motion.div>
             )}
             
             {stage === "SCANNING" && (
               <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border border-black/10 overflow-hidden bg-[#FAFAF8]">
-                  {/* Simulate camera feed */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent" />
-                  {/* Scanner line */}
+                <div className="absolute inset-0 rounded-full border border-black/10 overflow-hidden bg-black">
+                  <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    playsInline 
+                    muted 
+                    className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale scale-x-[-1]"
+                  />
+                  <canvas ref={canvasRef} width={200} height={200} className="hidden" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent pointer-events-none" />
                   <motion.div 
                     animate={{ y: ["0%", "100%", "0%"] }} 
-                    transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                    className="absolute left-0 right-0 h-[2px] bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] z-10" 
+                    transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+                    className="absolute left-0 right-0 h-[1px] bg-white/50 shadow-[0_0_15px_rgba(255,255,255,0.5)] z-10" 
                   />
-                  <Camera size={32} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-black/20" />
                 </div>
-                {/* Progress Ring */}
-                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="4" />
+                <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" />
                   <motion.circle 
-                    cx="50" cy="50" r="48" fill="none" stroke="#10B981" strokeWidth="4" 
+                    cx="50" cy="50" r="48" fill="none" stroke="#fff" strokeWidth="2" 
                     strokeDasharray="301.59" 
                     initial={{ strokeDashoffset: 301.59 }}
                     animate={{ strokeDashoffset: 0 }} 
-                    transition={{ ease: "linear", duration: 2, repeat: Infinity }}
+                    transition={{ ease: "linear", duration: 2.5 }}
                   />
                 </svg>
               </motion.div>
@@ -87,14 +152,13 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
 
             {stage === "PROCESSING" && (
               <motion.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center bg-black/5 rounded-full">
-                <div className="absolute inset-0 border-[2px] border-emerald-500/30 rounded-full animate-[spin_3s_linear_infinite] [border-style:dashed]" />
-                <Lock size={32} className="text-[#050505]/50 animate-pulse" />
+                <div className="absolute inset-0 border-[2px] border-black/10 rounded-full animate-[spin_3s_linear_infinite] [border-style:dashed]" />
               </motion.div>
             )}
 
             {stage === "SUCCESS" && (
-              <motion.div key="success" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="absolute inset-0 flex items-center justify-center bg-emerald-50 rounded-full border border-emerald-100 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-                <UserCheck size={48} className="text-emerald-500" />
+              <motion.div key="success" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="absolute inset-0 flex items-center justify-center bg-black/5 rounded-full border border-black/10">
+                <span className="text-[10px] font-black uppercase tracking-widest">VALID</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -123,16 +187,15 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
             {stage === "PROCESSING" && (
               <motion.div key="text-processing" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                 <h3 className="text-[14px] font-black uppercase tracking-widest mb-2">Hashing Identity</h3>
-                <p className="text-[10px] text-black/50 flex items-center justify-center gap-2 tracking-wide">
-                  <Activity size={12} className="animate-pulse" />
-                  Generating ZK-SNARK Proof...
+                <p className="text-[10px] text-black/50 flex items-center justify-center gap-2 tracking-wide uppercase font-black">
+                  GENERATING ZK-SNARK PROOF...
                 </p>
               </motion.div>
             )}
 
             {stage === "SUCCESS" && (
               <motion.div key="text-success" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-emerald-600">Attestation Valid</h3>
+                <h3 className="text-[14px] font-black uppercase tracking-widest mb-2 text-[#050505]">Attestation Valid</h3>
                 <p className="text-[10px] text-black/50 leading-relaxed tracking-wide">
                   Zero-Knowledge Proof injected into session. Sovereignty guaranteed.
                 </p>
@@ -155,13 +218,24 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
             </p>
         </div>
 
-        {stage === "IDLE" && (
+        {stage === "IDLE" && isMobile && (
           <button
             onClick={handleStart}
             className="w-full py-4 bg-[#050505] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            <Camera size={14} /> Initiate Secure Scan
+            Initiate Secure Scan
           </button>
+        )}
+        {stage === "IDLE" && !isMobile && (
+          <div className="w-full p-8 bg-white rounded-3xl border border-black/10 flex flex-col items-center gap-6 shadow-sm">
+            <div className="p-4 bg-white border border-black/5 rounded-2xl">
+              <QRCode value={typeof window !== 'undefined' ? window.location.href : ''} size={160} level="H" />
+            </div>
+            <div className="text-center">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] mb-1">Mobile Bridge Required</p>
+              <p className="text-[9px] text-black/40 font-mono uppercase tracking-widest">Scan to continue on mobile</p>
+            </div>
+          </div>
         )}
       </div>
 

@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import { ExternalLink, ShieldCheck, FileText, BookOpen, Terminal, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function InstitutionalFooter() {
@@ -23,14 +22,6 @@ export default function InstitutionalFooter() {
             The Sovereign Intelligence Protocol for advanced on-chain observability. 
             Built on the principles of absolute privacy and zero-knowledge state transitions.
           </p>
-          <div className="flex gap-4">
-            <div className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center hover:bg-black/5 cursor-pointer transition-colors">
-              <span className="text-[10px] font-bold">X</span>
-            </div>
-            <div className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center hover:bg-black/5 cursor-pointer transition-colors">
-              <span className="text-[10px] font-bold">TG</span>
-            </div>
-          </div>
         </div>
 
         {/* Links Column 1: Core */}
@@ -39,25 +30,21 @@ export default function InstitutionalFooter() {
           <ul className="space-y-4">
             <li>
               <a href="https://downhead.com" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
                 Downhead
               </a>
             </li>
               <li>
               <Link href="/dashboard" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
                 Dashboard Terminal
               </Link>
             </li>
             <li>
               <Link href="/academy" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
                 Academy
               </Link>
             </li>
             <li>
               <Link href="/support" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
                 Support
               </Link>
             </li>
@@ -70,13 +57,11 @@ export default function InstitutionalFooter() {
           <ul className="space-y-4">
             <li>
               <Link href="/privacy" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                <ShieldCheck size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
                 Privacy
               </Link>
             </li>
             <li>
               <Link href="/terms" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                <FileText size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
                 Terms
               </Link>
             </li>
@@ -89,13 +74,11 @@ export default function InstitutionalFooter() {
           <ul className="space-y-4">
             <li>
               <Link href="/docs" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                <BookOpen size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
                 Docs
               </Link>
             </li>
             <li>
               <Link href="/developers" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                <Terminal size={14} className="opacity-0 group-hover:opacity-100 -ml-5 transition-all" />
                 Developers
               </Link>
             </li>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, EyeOff, Server, Activity, Hash, CheckCircle, Database, Box, X, Clock, ShieldCheck, Zap } from 'lucide-react';
+import { ModuleHeader } from '../dashboard/ModuleHeader';
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { usePublicClient, useBlockNumber } from 'wagmi';
 import { formatEther } from 'viem';
@@ -17,6 +17,11 @@ interface ZkTransaction {
     from: string;
     to: string;
     type: string;
+    time: string;
+    shielded: boolean;
+    method: string;
+    gas: number;
+    nonce: number;
 }
 
 interface SequencerBlock {
@@ -53,7 +58,6 @@ export default function AztecMempoolSpace() {
 
         const syncState = async () => {
             try {
-                // Fetch the latest block to act as the "SUBMITTING" / "FINALIZED" L2 Batch
                 const block = await publicClient.getBlock({
                     blockNumber: blockNumber,
                     includeTransactions: true
@@ -61,15 +65,14 @@ export default function AztecMempoolSpace() {
 
                 const rawTxs = block.transactions as any[];
                 
-                // Formulate the L2 Sequencer Block representation
-                const totalFeeEther = Number(formatEther(block.baseFeePerGas || 0n)) * rawTxs.length * 21000; // approximation
+                const totalFeeEther = Number(formatEther(block.baseFeePerGas || 0n)) * rawTxs.length * 21000;
                 const fillPercent = block.gasLimit > 0 ? (Number(block.gasUsed) / Number(block.gasLimit)) * 100 : 80;
 
                 const newSequencerBlock: SequencerBlock = {
                     id: Number(block.number),
-                    txs: [], // We populate the global live pipeline instead
+                    txs: [], 
                     status: 'FINALIZED',
-                    totalFee: totalFeeEther > 0 ? totalFeeEther : 0.054, // fallback if baseFee is missing
+                    totalFee: totalFeeEther > 0 ? totalFeeEther : 0.054,
                     fillPercentage: fillPercent,
                     validator: block.miner ? (block.miner.substring(0,6) + '...' + block.miner.substring(38)) : '0xSync...',
                     size: (Number(block.size) / 1000).toFixed(2) + ' KB',
@@ -81,12 +84,9 @@ export default function AztecMempoolSpace() {
                     const exists = prev.find(p => p.id === newSequencerBlock.id);
                     if (exists) return prev;
 
-                    // Update statuses to simulate the rollup pipeline:
-                    // Newest is FINALIZED (already on L1), the "building" is a fake one we prepend
                     const historic = [newSequencerBlock, ...prev].slice(0, 3);
                     historic.forEach(b => b.status = 'FINALIZED');
 
-                    // Prepend the active pipeline blocks
                     const pipeline = [
                         { ...newSequencerBlock, id: newSequencerBlock.id + 2, status: 'BUILDING', fillPercentage: 20 + ((newSequencerBlock.id * 17) % 60), totalFee: totalFeeEther * 0.4 },
                         { ...newSequencerBlock, id: newSequencerBlock.id + 1, status: 'PROVING', fillPercentage: 100, totalFee: totalFeeEther * 0.9 },
@@ -96,7 +96,6 @@ export default function AztecMempoolSpace() {
                     return pipeline.sort((a,b) => a.id - b.id);
                 });
 
-                // Extract high value txs for the "Live ZK Pipeline"
                 const valTxs = rawTxs
                     .filter((t: any) => t.value && t.value > 0n)
                     .sort((a,b) => (a.value < b.value ? 1 : -1))
@@ -112,19 +111,23 @@ export default function AztecMempoolSpace() {
                         return {
                             id: t.hash,
                             pxeHash: t.hash,
-                            feeJuice: Number((t.gasPrice || t.maxFeePerGas || 0n)) / 1e9, // Gas price in Gwei = Fee Juice proxy
+                            feeJuice: Number((t.gasPrice || t.maxFeePerGas || 0n)) / 1e9,
                             stage: deterministicStage,
                             timestamp: Date.now(),
                             sizeKb: deterministicSize,
                             from: t.from,
                             to: t.to || 'Contract',
-                            type: 'SHIELDED_TRANSFER'
+                            type: 'SHIELDED_TRANSFER',
+                            time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+                            shielded: true,
+                            method: 'transfer()',
+                            gas: 21000,
+                            nonce: 1
                         };
                     });
                     
                     setTransactions(prev => {
                         const merged = [...newZkTxs, ...prev];
-                        // Advance stages of existing txs to simulate movement
                         const advanced = merged.map(tx => {
                             if (tx.stage === 'PXE_GENERATING') return { ...tx, stage: 'KERNEL_PROOF' as const };
                             if (tx.stage === 'KERNEL_PROOF') return { ...tx, stage: 'SEQUENCER_QUEUE' as const };
@@ -132,15 +135,13 @@ export default function AztecMempoolSpace() {
                             if (tx.stage === 'ROLLUP_BATCH') return { ...tx, stage: 'L1_SETTLED' as const };
                             return tx;
                         });
-                        // Filter out old settled ones
                         return advanced.filter(t => t.stage !== 'L1_SETTLED').slice(0, 15);
                     });
                 }
 
-                // Update Stats
                 setGlobalStats(prev => ({
-                    tps: rawTxs.length / 12, // approx block time
-                    avgFeeJuice: Number(block.baseFeePerGas || 0n) / 1e9, // Base fee in Gwei
+                    tps: rawTxs.length / 12,
+                    avgFeeJuice: Number(block.baseFeePerGas || 0n) / 1e9,
                     anonymitySetSize: prev.anonymitySetSize + valTxs.length,
                     totalShieldedVol: prev.totalShieldedVol + valTxs.reduce((acc, t) => acc + Number(formatEther(t.value)), 0) * 3000
                 }));
@@ -168,26 +169,13 @@ export default function AztecMempoolSpace() {
 
     return (
         <div className="absolute inset-0 flex flex-col bg-[#FAF9F6] text-[#050505] font-sans overflow-hidden">
-            {/* ── Formal Academic Header ── */}
-            <div className="flex items-end justify-between px-8 py-8 border-b border-[#E5E5E5] bg-white shrink-0">
+            <div className="shrink-0 pt-4 px-2 bg-white">
+                <ModuleHeader moduleId="zk" />
+            </div>
+            <div className="flex items-end justify-between px-8 pb-8 border-b border-[#E5E5E5] bg-white shrink-0 -mt-8">
                 <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <EyeOff size={24} className="text-[#050505]" />
-                        <h1 className="text-3xl font-bold uppercase tracking-tighter text-[#050505]">
-                            AZTEC NETWORK SPACE
-                        </h1>
-                    </div>
-                    <div className="flex items-center gap-3 ml-9">
-                        <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-[#050505] bg-[#F0F0F0] px-2 py-0.5 rounded-sm border border-[#CCCCCC]">
-                            <Shield size={10} /> Fully Shielded
-                        </span>
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#A0A0A0]">
-                            L2 ZK-ROLLUP MEMPOOL (ON-CHAIN SYNC)
-                        </p>
-                    </div>
                 </div>
 
-                {/* Global Stats */}
                 <div className="flex items-center gap-4">
                     {[
                         { label: 'Network TPS', val: globalStats.tps, unit: 'tx/s', isNum: true, format: (v: number) => v.toFixed(2) },
@@ -211,10 +199,11 @@ export default function AztecMempoolSpace() {
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-                {/* LEFT: Sequencer Blocks (The "Space") */}
                 <div className="w-2/3 p-8 flex flex-col border-r border-[#E5E5E5] bg-[#FAF9F6] relative">
                     <div className="flex items-center gap-3 mb-8 shrink-0">
-                        <Server size={18} className="text-[#050505]" />
+                        <div className="px-4 py-1.5 rounded-lg border border-black/5 text-[9px] font-black text-black/40 uppercase tracking-widest">
+                            NETWORK: AZTEC_MAINNET
+                        </div>
                         <h3 className="text-sm font-black text-[#050505] uppercase tracking-[0.2em]">Sequencer Block Pipeline</h3>
                     </div>
 
@@ -245,7 +234,6 @@ export default function AztecMempoolSpace() {
                                         onClick={() => setSelectedBlock(block)}
                                         className={`shrink-0 w-64 h-80 bg-white border-2 ${borderColor} rounded-xl flex flex-col overflow-hidden relative shadow-md hover:shadow-xl transition-shadow text-left ${block.status === 'PROVING' ? 'shadow-purple-500/20' : ''}`}
                                     >
-                                        {/* Animation: Mined pulse effect if finalized */}
                                         {isFinalized && (
                                             <motion.div
                                                 initial={{ opacity: 0, scale: 0.8 }}
@@ -255,7 +243,6 @@ export default function AztecMempoolSpace() {
                                             />
                                         )}
 
-                                        {/* Block Background Fill for Building */}
                                         {isBuilding && (
                                             <div 
                                                 className="absolute bottom-0 left-0 right-0 bg-[#FFF8E1] transition-all duration-1000 ease-linear z-0"
@@ -321,16 +308,10 @@ export default function AztecMempoolSpace() {
                     </div>
                 </div>
 
-                {/* RIGHT: Live Mempool Feed */}
                 <div className="w-1/3 p-8 flex flex-col bg-white">
                     <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E5E5E5]">
                         <div className="flex items-center gap-3">
-                            <Activity size={18} className="text-[#050505]" />
-                            <h3 className="text-sm font-black text-[#050505] uppercase tracking-[0.2em]">Live ZK Pipeline</h3>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#388E3C] animate-pulse" />
-                            <span className="text-[9px] text-[#A0A0A0] font-bold uppercase tracking-widest">Network Verification</span>
+                            <span className="text-[11px] font-black text-[#050505] uppercase tracking-widest">REAL-TIME TELEMETRY</span>
                         </div>
                     </div>
 
@@ -353,19 +334,25 @@ export default function AztecMempoolSpace() {
                                     >
                                         <div className="flex justify-between items-start mb-3 border-b border-[#E5E5E5] border-dashed pb-2">
                                             <div className="flex items-center gap-2">
-                                                <Hash size={12} className="text-[#A0A0A0]" />
+                                                <span className="text-[10px] font-mono text-black/30">{tx.time}</span>
+                                                <span className="text-black/20 text-[12px]">→</span>
                                                 <span className="text-[11px] font-mono text-[#050505]">{tx.pxeHash.slice(0,14)}...</span>
                                             </div>
                                             <span className="text-[10px] font-mono text-[#050505] font-black">{tx.feeJuice.toFixed(4)} FJ</span>
                                         </div>
 
                                         <div className="flex items-center justify-between gap-3">
+                                            <div className="flex items-center gap-2">
+                                                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded border ${tx.shielded ? 'bg-[#00C076]/10 text-[#00C076] border-[#00C076]/20' : 'bg-black/5 text-[#888888] border-black/5'}`}>
+                                                    {tx.shielded ? 'SHIELDED' : 'PUBLIC'}
+                                                </span>
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-black/30">
+                                                    {tx.method}
+                                                </span>
+                                            </div>
                                             <div className={`px-2 py-0.5 rounded-sm border text-[8px] font-black uppercase tracking-widest ${stageStyle}`}>
                                                 {getStageLabel(tx.stage)}
                                             </div>
-                                            <span className="text-[10px] font-mono text-[#A0A0A0] flex items-center gap-1">
-                                                <Database size={10} /> {tx.sizeKb}kb
-                                            </span>
                                         </div>
                                     </motion.button>
                                 );
@@ -375,7 +362,6 @@ export default function AztecMempoolSpace() {
                 </div>
             </div>
 
-            {/* INSPECTION MODALS */}
             <AnimatePresence>
                 {(selectedBlock || selectedTx) && (
                     <motion.div 
@@ -394,13 +380,13 @@ export default function AztecMempoolSpace() {
                                 onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
                                 className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] hover:text-[#050505] hover:bg-[#FAF9F6] transition-all"
                             >
-                                <X size={18} />
+                                X
                             </button>
 
                             <div className="p-8 md:p-10">
                                 <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5]">
                                     <div className="w-12 h-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded flex items-center justify-center">
-                                        {selectedBlock ? <Box size={20} className="text-[#050505]" /> : <Activity size={20} className="text-[#050505]" />}
+                                        <div className="w-5 h-5 bg-black" />
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505]">
@@ -433,6 +419,18 @@ export default function AztecMempoolSpace() {
                                     )}
                                 </div>
 
+                                {selectedTx && (
+                                    <div className="bg-white border-t border-[#E5E5E5] mt-10 -mx-8 -mb-10 px-8 py-4 flex items-center justify-between text-[9px] font-black uppercase tracking-[0.2em] text-black/30">
+                                        <div className="flex items-center gap-6">
+                                            <span>GAS: {selectedTx.gas} GWEI</span>
+                                            <span>NONCE: {selectedTx.nonce}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-black/40">
+                                            VERIFY EXTERNAL STATE
+                                        </div>
+                                    </div>
+                                )}
+
                                 <button
                                     onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
                                     className="w-full mt-10 py-3 bg-[#050505] text-white rounded font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#A0A0A0] transition-colors"
@@ -458,7 +456,7 @@ function DetailRow({ label, value, copy, highlight, green }: any) {
                 </span>
                 {copy && (
                     <button className="p-2 hover:bg-black/5 rounded-xl transition-all text-black/10 hover:text-black">
-                        <ShieldCheck size={14} />
+                        [COPY]
                     </button>
                 )}
             </div>
