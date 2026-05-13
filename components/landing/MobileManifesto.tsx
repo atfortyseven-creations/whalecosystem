@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle, ChevronDown, Activity, Globe, Shield, Zap, Layers, LineChart, Network } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RemoteLottie } from "@/components/ui/RemoteLottie";
-import { SovereignFooter } from "@/components/landing/SovereignFooter";
 
 interface Flow {
   txid: string;
@@ -95,8 +94,9 @@ export function MobileManifesto() {
             <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Sovereign Intelligence</span>
           </motion.div>
 
-          <motion.h1 variants={FADE_UP} className="text-[48px] sm:text-[56px] font-black tracking-tighter leading-[0.95] uppercase mb-6 text-[#0A0A0A]">
-            Whale<br />Alert<br /><span className="text-[#0044CC]">Network</span>
+          <motion.h1 variants={FADE_UP} className="text-[40px] sm:text-[48px] font-black tracking-tighter leading-[1.05] mb-6 text-[#0A0A0A] max-w-xs">
+            Track institutional capital <br />
+            <span className="text-[#0044CC]">before markets react.</span>
           </motion.h1>
 
           <motion.p variants={FADE_UP} className="font-serif text-[18px] text-slate-500 leading-relaxed mb-10 max-w-sm">
@@ -259,7 +259,42 @@ export function MobileManifesto() {
         </div>
       </section>
 
-      <SovereignFooter />
+      {/* ── Mobile Footer ── */}
+      <footer className="bg-[#0a0a0a] text-white px-6 py-12 flex flex-col items-center gap-8">
+        <img src="/official-whale.png" alt="Whale Alert Network" className="w-16 h-16 object-contain grayscale opacity-60" />
+        <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/40">Whale Alert Network</span>
+
+        {/* Social */}
+        <div className="flex items-center gap-6">
+          <a href="https://t.me/humanityledger" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-[#0088cc] transition-colors">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" fill="#0088cc"/>
+              <path d="M5.491 11.74 17.094 7.24c.539-.194 1.01.131.835.951l-1.97 9.28c-.147.664-.537.825-1.087.513l-3.004-2.213-1.45 1.394c-.16.16-.295.295-.606.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.08 14.348l-2.951-.924c-.641-.2-.656-.641.136-.951z" fill="white"/>
+            </svg>
+          </a>
+          <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-black transition-colors">
+            <svg viewBox="0 0 24 24" width="14" height="14">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.26 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="white"/>
+            </svg>
+          </a>
+        </div>
+
+        {/* Regulatory badges */}
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+          {['GDPR', 'KYC/AML', 'MiCA', 'ISO 27001'].map(b => (
+            <span key={b} className="font-mono text-[8px] font-black uppercase tracking-[0.2em] text-white/25">{b}</span>
+          ))}
+        </div>
+
+        {/* Legal links */}
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+          {[['Terms', '/terms'], ['Privacy', '/privacy'], ['Docs', '/docs']].map(([l, h]) => (
+            <Link key={l} href={h} className="font-mono text-[9px] uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">{l}</Link>
+          ))}
+        </div>
+
+        <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">© 2026 Whale Alert Network</span>
+      </footer>
 
     </div>
   );
