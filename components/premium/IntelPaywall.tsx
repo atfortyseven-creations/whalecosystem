@@ -18,7 +18,7 @@ export const IntelPaywall = ({ intelId, onUnlock }: { intelId: string; onUnlock:
 
     const handleUnlock = async () => {
         if (!identity) {
-            toast.error("Sovereign Identity Required. Please initialize your wallet.");
+            toast.error("KYC Required. Please initialize your wallet.");
             return;
         }
 

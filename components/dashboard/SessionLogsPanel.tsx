@@ -91,7 +91,7 @@ export function SessionLogsPanel() {
       },
       {
         accessorKey: "userId",
-        header: "Sovereign ID",
+        header: "KYC",
         cell: (info: any) => <span className="font-mono text-black/80">{info.getValue() as string || "Anonymous"}</span>,
       },
       {
@@ -154,7 +154,7 @@ export function SessionLogsPanel() {
           <div className="sticky top-0 z-10 bg-[#FAF9F6] border-b border-black/10 shadow-sm grid" style={{ gridTemplateColumns: '1.5fr 2fr 3fr 1.5fr' }}>
               <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Timestamp</div>
               <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Action / Event</div>
-              <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Sovereign ID</div>
+              <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">KYC</div>
               <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">IP Address</div>
           </div>
           <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>

@@ -90,7 +90,7 @@ export default function LegendaryNewsFeed({ isPremium, walletAddress }: Legendar
             <div className="p-2 bg-blue-500/20 rounded-lg">
                 <BrainCircuit className="text-blue-400 w-8 h-8" />
             </div>
-            Whale Alert Network <span className="text-blue-500">INTELLIGENCE</span>
+            Whale Alert Network <span className="text-blue-500">OPERATIONS</span>
           </motion.h1>
           <p className="text-gray-400 mt-2 font-medium max-w-2xl">
             Accurate predictions in markets
@@ -104,7 +104,7 @@ export default function LegendaryNewsFeed({ isPremium, walletAddress }: Legendar
             className="group px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-900/20 disabled:opacity-50"
           >
             <RefreshCw size={18} className={syncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'} />
-            {syncing ? 'SYNCING INTEL...' : 'UPDATE MARKETS'}
+            {syncing ? 'PROCESSING...' : 'UPDATE NODES'}
           </button>
         </div>
       </div>
@@ -113,7 +113,7 @@ export default function LegendaryNewsFeed({ isPremium, walletAddress }: Legendar
         <div className="absolute inset-0 z-30 pt-20">
           <PremiumLocked
             feature="WHALE ALERT NETWORK INTELLIGENCE"
-            description="Access Elite-grade market intelligence verified by senior analysts (AI). Detect arbitrage opportunities and value bets."
+            description="Access Elite-grade market data verified by decentralized oracles. Detect arbitrage opportunities and value bets."
             icon="sparkles"
             onUpgrade={() => console.log("Upgrade requested")}
           />
@@ -124,7 +124,7 @@ export default function LegendaryNewsFeed({ isPremium, walletAddress }: Legendar
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-50">
            {[1,2,3,4,5,6].map(i => (
-             <div key={i} className="h-[450px] bg-white/5 rounded-3xl animate-pulse border border-white/10" />
+             <div key={i} className="h-[450px] bg-white/5 rounded-3xl border border-white/10" />
            ))}
         </div>
       ) : (
@@ -140,7 +140,7 @@ export default function LegendaryNewsFeed({ isPremium, walletAddress }: Legendar
       {articles.length === 0 && !loading && (
         <div className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
           <Newspaper size={48} className="text-white/20 mb-4" />
-          <p className="text-xl font-bold text-white/40">No recent market intelligence. Start a scan.</p>
+          <p className="text-xl font-bold text-white/40">No recent market data. Synchronize data nodes.</p>
         </div>
       )}
     </div>

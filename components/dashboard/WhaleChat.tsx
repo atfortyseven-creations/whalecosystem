@@ -999,10 +999,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <div className="flex flex-col">
                   <span className="text-[11px] font-bold text-[#050505] font-mono flex items-center gap-1.5">
                     {shortAddr(activePeer!)}
-                    {peerStatus.online && <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />}
                   </span>
                   {peerStatus.isTyping && (
-                    <span className="text-[9px] text-[#050505] font-black tracking-widest uppercase animate-pulse">Decrypting...</span>
+                    <span className="text-[9px] text-[#050505]/40 font-mono tracking-widest uppercase">Typing</span>
                   )}
                 </div>
               </div>
@@ -1191,7 +1190,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                <QrScanner 
                    mode="project" 
                    projectValue={address} 
-                   projectTitle="Sovereign Identity" 
+                   projectTitle="KYC Identity" 
                    projectDescription="Present this code to a peer. Once scanned, a zero-knowledge encrypted tunnel will be initialized between your identities." 
                />
            </div>

@@ -141,7 +141,7 @@ export default function WhaleSniperTerminal() {
                 >
                   <div className="flex items-center justify-between">
                     <span>{cat.label}</span>
-                    {activeTab === cat.id && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+                    {activeTab === cat.id && <div className="w-1.5 h-1.5 rounded-full bg-[#050505]" />}
                   </div>
                 </button>
               ))}
@@ -170,9 +170,9 @@ export default function WhaleSniperTerminal() {
                    exit={{ opacity: 0 }}
                    className="h-full flex flex-col space-y-4"
                  >
-                   <div className="h-8 w-1/4 bg-[#050505]/5 animate-pulse rounded-lg" />
-                   <div className="flex-1 bg-[#050505]/5 border border-[#E5E5E5] animate-pulse rounded-2xl" />
-                   <div className="h-12 w-full bg-[#050505]/5 animate-pulse rounded-lg" />
+                   <div className="h-8 w-1/4 bg-[#050505]/5 rounded-lg" />
+                   <div className="flex-1 bg-[#050505]/5 border border-[#E5E5E5] rounded-2xl" />
+                   <div className="h-12 w-full bg-[#050505]/5 rounded-lg" />
                  </motion.div>
               ) : (
                  <motion.div

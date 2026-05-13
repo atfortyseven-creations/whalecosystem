@@ -179,7 +179,6 @@ function SigningOverlay({
         </div>
 
         <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/8 rounded-full shadow-sm">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/60 font-mono">
             {address.slice(0, 8)}…{address.slice(-6)}
           </span>
@@ -319,21 +318,11 @@ function ConnectedScreen({
   const fmtDate   = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-white text-black">
-      {/* Black and White Spinning World Background */}
-      <div className="fixed inset-0 z-0 flex items-center justify-center overflow-hidden bg-[#fafafa]">
-        <motion.img 
-           src="/rectangle_large_type_2_a9c6cc1e1738c43864683c13c43314d9.jpg"
-           alt="Rotating World"
-           className="absolute min-w-[150vw] min-h-[150vh] object-cover opacity-15"
-           style={{ filter: "grayscale(100%) contrast(150%)" }}
-           animate={{ rotate: 360 }}
-           transition={{ duration: 180, ease: "linear", repeat: Infinity }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/80 to-white/95 backdrop-blur-[2px]" />
-      </div>
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-[#FAFAF8] text-black">
+      {/* Clean ivory background — no globe */}
+      <div className="fixed inset-0 z-0 bg-[#FAFAF8] pointer-events-none" />
 
-      <main className="relative z-10 flex-1 flex flex-col items-center px-6 pt-10 pb-24 gap-5 max-w-[480px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-6 pt-10 pb-8 gap-5 max-w-[480px] w-full mx-auto">
         
         {/* Header & Logo */}
         <motion.div 
@@ -349,23 +338,19 @@ function ConnectedScreen({
            </div>
         </motion.div>
 
-        {/* ── Sovereign Identity Card ── */}
+        {/* ── KYC Identity Card ── */}
         <motion.div
            initial={{ opacity: 0, scale: 0.98 }}
            animate={{ opacity: 1, scale: 1 }}
            transition={{ delay: 0.1, duration: 0.6 }}
            className="w-full bg-white rounded-[32px] border-[3px] border-black shadow-[0_12px_40px_rgb(0,0,0,0.12)] overflow-hidden flex flex-col"
         >
-          {/* Header */}
-          <div className="bg-black px-6 py-8 flex flex-col items-center text-center gap-4">
-            <div className="px-4 py-1.5 rounded-full border border-white/30 flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white">Active Session · Verified</span>
-            </div>
-            <p className="text-[44px] font-black tracking-tighter text-white leading-none tabular-nums mt-2">
+          {/* Identity card header — black bg with time */}
+          <div className="bg-black px-6 py-8 flex flex-col items-center text-center gap-2">
+            <p className="text-[44px] font-black tracking-tighter text-white leading-none tabular-nums">
               {fmtTime(now)}
             </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/50">{fmtDate(now)}</p>
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/40">{fmtDate(now)}</p>
           </div>
 
           {/* On-chain data row */}
@@ -377,7 +362,7 @@ function ConnectedScreen({
             <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Balance</p>
               <p className="text-[13px] font-black font-mono tracking-wider text-black truncate">
-                {fmtBalance() ?? <span className="text-black/30 animate-pulse">Loading…</span>}
+                {fmtBalance() ?? <span className="text-black/25">—</span>}
               </p>
             </div>
           </div>
@@ -406,6 +391,19 @@ function ConnectedScreen({
         </motion.div>
 
 
+
+        {/* ── Signature / QR sync note ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
+          className="w-full flex items-start gap-3 px-5 py-4 rounded-[20px] bg-white border border-black/8"
+        >
+          <Scan size={14} className="text-black/40 mt-0.5 shrink-0" />
+          <p className="text-[10px] text-[#050505]/50 font-medium leading-relaxed">
+            Scan the <span className="font-black text-black/70">QR Code</span> from the Desktop Terminal to link your session securely — no additional signature required.
+          </p>
+        </motion.div>
 
         {/* ── SCANNER UNLOCKED badge ── */}
         <motion.div
@@ -477,7 +475,7 @@ function ConnectedScreen({
           </Link>
         </motion.div>
 
-        {/* ── [SOVEREIGN-MANDATE] IDENTITY VERIFICATION GATE ── */}
+        {/* ── [KYC-MANDATE] IDENTITY VERIFICATION GATE ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -486,15 +484,13 @@ function ConnectedScreen({
         >
           <button
             onClick={() => {
-               // [MASTER-UX] We force a redirect to the ZK Identity tab.
-               // On mobile, this will be rendered by the MobileEnforcer or directly in the landing state.
                window.location.href = '/dashboard?tab=zk-identity';
             }}
-            className="w-full flex flex-col items-center justify-center gap-1 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[2px] border-[#10B981]/40 bg-gradient-to-r from-[#10B981]/10 to-[#059669]/10 hover:from-[#10B981]/20 hover:to-[#059669]/20 transition-all text-[#059669] shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+            className="w-full flex flex-col items-center justify-center gap-1 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[2px] border-[#10B981]/40 bg-gradient-to-r from-[#10B981]/10 to-[#059669]/10 hover:from-[#10B981]/20 hover:to-[#059669]/20 transition-all text-[#059669]"
           >
             <div className="flex items-center gap-3">
                <Fingerprint size={18} />
-               <span style={{ fontSize: "11px" }}>Verify Sovereign Identity</span>
+               <span style={{ fontSize: "11px" }}>Verify KYC</span>
             </div>
             <span className="text-[8px] font-bold opacity-60 tracking-[0.2em]">MANDATORY 3D BIOMETRIC GATE</span>
           </button>
@@ -523,41 +519,10 @@ function ConnectedScreen({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-[9px] font-mono text-black/30 text-center leading-relaxed px-4"
+          className="text-[9px] font-mono text-black/30 text-center leading-relaxed px-4 pb-6"
         >
-          On the Desktop Terminal, click <span className="font-black text-black/50">Direct QR Handshake</span>, then scan the code with this button to sync your institutional session.
+          On the Desktop Terminal, click <span className="font-black text-black/50">Direct QR Handshake</span>, then scan the code with this button to link your session.
         </motion.p>
-
-        {/* ── Session History Panel ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="w-full bg-white rounded-[24px] border-[3px] border-black overflow-hidden flex flex-col mt-6 shadow-[0_8px_24px_rgb(0,0,0,0.06)]"
-        >
-          <div className="bg-black px-6 py-5 flex items-center justify-between">
-            <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Session Log</h3>
-            <div className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-black text-white">{sessionHistory.length}</div>
-          </div>
-          <div className="flex flex-col max-h-[280px] overflow-y-auto">
-             {sessionHistory.length === 0 ? (
-               <div className="p-8 text-center text-[10px] font-black uppercase tracking-widest text-black/40">No records.</div>
-             ) : (
-               sessionHistory.map((s, i) => (
-                 <div key={i} className={`px-6 py-5 flex flex-col gap-2.5 ${i !== sessionHistory.length - 1 ? 'border-b-2 border-black/5' : ''}`}>
-                    <div className="flex items-center justify-between">
-                       <span className="text-[10px] font-black uppercase tracking-widest text-black">{s.date}</span>
-                       <span className="text-[11px] font-mono font-bold text-black/60">{s.time}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                       <span className="text-[9px] font-black uppercase tracking-[0.15em] text-black/40">{s.provider}</span>
-                       <span className="text-[9px] font-black uppercase tracking-[0.15em] text-black/60">{s.os}</span>
-                    </div>
-                 </div>
-               ))
-             )}
-          </div>
-        </motion.div>
       </main>
 
       <DynamicQRScannerModal
@@ -1089,22 +1054,8 @@ export function MobileLanding() {
   return (
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: '#FAFAF8', color: INK }}>
 
-      {/* Layer 0: ivory base */}
+      {/* Pure ivory base — no pattern noise */}
       <div className="fixed inset-0 z-0 bg-[#FAFAF8] pointer-events-none" />
-
-      {/* Layer 1: Cosmic pattern background */}
-      <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
-        <motion.div
-          className="absolute"
-          style={{ inset: "-10%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "120%", backgroundRepeat: "repeat", opacity: 0.08 }}
-          animate={{ x: ["0%", "-2%", "0%"], y: ["0%", "-1%", "0%"] }}
-          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white/90" />
-      </div>
-
-      {/* Layer 2: top fade */}
-      <div className="fixed top-0 left-0 right-0 h-36 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,0.97) 0%, transparent 100%)" }} />
 
       {/* Fixed Header */}
       <motion.header
@@ -1127,12 +1078,6 @@ export function MobileLanding() {
           </div>
           <div className="flex flex-col">
             <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
-            {isLinked && (
-              <div className="flex items-center gap-1 mt-0.5">
-                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[7px] font-black uppercase tracking-widest text-emerald-600/80">Secured · Connected</span>
-              </div>
-            )}
           </div>
         </div>
         <button 
@@ -1147,7 +1092,7 @@ export function MobileLanding() {
       {showDebug && (
         <div className="fixed inset-0 z-[99999] bg-black/95 overflow-auto p-4 font-mono text-[10px] text-green-400">
           <div className="flex justify-between items-center mb-3">
-            <span className="text-yellow-400 font-bold text-[11px]">SOVEREIGN DEBUG</span>
+            <span className="text-yellow-400 font-bold text-[11px]">KYC DEBUG</span>
             <button onClick={() => setShowDebug(false)} className="text-red-400 font-bold px-3 py-1 border border-red-400 rounded">CLOSE</button>
           </div>
           <div className="space-y-2">
@@ -1171,7 +1116,7 @@ export function MobileLanding() {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-28 pb-24 gap-8 max-w-[500px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-28 pb-12 gap-6 max-w-[500px] w-full mx-auto">
 
         {/* Hero */}
         <motion.div
@@ -1180,13 +1125,25 @@ export function MobileLanding() {
           transition={{ delay: 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="text-center"
         >
-          {/* Security trust badge removed */}
-          <h1 className="text-[2.4rem] sm:text-[3rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
+          <h1 className="text-[2.2rem] sm:text-[2.8rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
             Track institutional capital
             <span className="block" style={{ color: '#0044CC' }}>before markets react.</span>
           </h1>
-          <p className="text-[12px] font-medium leading-relaxed max-w-[300px] mx-auto" style={{ color: MUTED }}>
+          <p className="text-[12px] font-medium leading-relaxed max-w-[280px] mx-auto" style={{ color: MUTED }}>
             Real-time on-chain intelligence — from mempool to execution. Your key never leaves your device.
+          </p>
+        </motion.div>
+
+        {/* Wallet app readiness note */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22, duration: 0.5 }}
+          className="w-full flex items-start gap-3 px-4 py-3.5 rounded-2xl bg-amber-50 border border-amber-100/80"
+        >
+          <Fingerprint size={14} className="text-amber-600 mt-0.5 shrink-0" />
+          <p className="text-[10px] text-amber-700/80 font-medium leading-relaxed">
+            <span className="font-black text-amber-700">Have your wallet app open and ready.</span> When you tap a wallet below, a signature request will arrive in your wallet — approve it to access the terminal.
           </p>
         </motion.div>
 
@@ -1204,7 +1161,7 @@ export function MobileLanding() {
               <div className="w-full p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-start gap-3 mb-2">
                 <Fingerprint size={16} className="text-emerald-600 mt-0.5 shrink-0" />
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 leading-tight">Identity Verification Flow</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 leading-tight">KYC Identity Verification Flow</span>
                   <span className="text-[9px] text-emerald-600/80 font-medium mt-1 leading-relaxed">Please connect your wallet on mobile to initiate the mandatory 3D Biometric scan for terminal access.</span>
                 </div>
               </div>
@@ -1432,117 +1389,20 @@ export function MobileLanding() {
         </motion.div>
       </main>
 
-      {/* ── Institution-Grade Mobile Footer (Synced with PC Downhead) ── */}
-      <div className="relative w-full overflow-hidden mt-auto bg-[#020202] text-white selection:bg-[#D4AF37]/30 rounded-t-3xl border-t border-white/10">
+      {/* ── Minimal Mobile Footer ── */}
+      <div className="relative w-full bg-[#FAFAF8] border-t border-black/5">
         
-        {/* WAVE IMAGE — Full bleed behind content */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <img
-            src="/olas-hokusai-4k.png"
-            alt="Wave pattern"
-            className="w-full h-full object-cover object-bottom"
-          />
-          <div className="absolute inset-0 bg-[#020202]/85" />
-        </div>
-
-        <footer className="relative z-10 w-full px-6 pt-16 pb-[calc(3rem+env(safe-area-inset-bottom))] flex flex-col gap-10">
-          
-          {/* Upper: Branding */}
-          <div className="flex flex-col gap-3 text-center items-center">
-            <h2 className="text-3xl font-light leading-none tracking-tight text-[#FAF9F6]">
-              Whale Alert Network<span className="text-[#D4AF37]">.</span>
-            </h2>
-            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#8A94A6]">
-              Institutional Terminal Layer
-            </p>
-          </div>
-
-          {/* Middle: Subscription */}
-          <div className="w-full flex flex-col gap-3 z-20">
-             <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#8A94A6]/70 text-center">
-                Establish Academic Correspondence
-             </p>
-             <form onSubmit={(e) => {
-                 e.preventDefault();
-                 const email = (e.target as any).email.value;
-                 if (!email) return;
-                 const btn = (e.target as any).querySelector('button');
-                 btn.innerHTML = 'Sending...';
-                 btn.disabled = true;
-                 fetch('/api/subscribe', {
-                     method: 'POST',
-                     body: JSON.stringify({ email })
-                 }).then(() => {
-                     btn.innerHTML = 'Subscribed';
-                 }).catch(() => {
-                     btn.innerHTML = 'Error';
-                     btn.disabled = false;
-                 });
-             }} className="flex flex-col overflow-hidden rounded border border-white/10 bg-[#050505]/70 w-full max-w-[320px] mx-auto shadow-xl">
-                <input
-                   name="email"
-                   type="email"
-                   placeholder="ENTER SECURE EMAIL"
-                   className="bg-transparent px-4 py-3 outline-none font-mono text-[10px] tracking-widest text-[#E0E0E0] placeholder:text-[#545F73] text-center"
-                />
-                <button type="submit" className="px-4 py-3.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] bg-[#EAEAEA] text-[#0A0A0A] hover:bg-white transition-colors active:scale-95 disabled:opacity-50">
-                   Subscribe
-                </button>
-             </form>
-          </div>
-
-          <div className="w-full h-px bg-white/5" />
-
-          {/* Lower: Nav Links + Copyright */}
-          <div className="flex flex-col items-center gap-6">
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-4">
-              {[
-                ['Privacy Policy', '/privacy'], 
-                ['Technical Docs', '/docs'], 
-                ['Terms of Service', '/terms']
-              ].map(([label, href]) => (
-                <a key={label} href={href} className="text-[9px] font-mono uppercase tracking-[0.2em] font-medium text-[#8A94A6] hover:text-[#D4AF37] transition-colors relative z-20 p-2 -m-2">
-                   {label}
-                </a>
-              ))}
-            </div>
-            
-            <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#545F73] text-center">
-              © 2026 Whale Alert Network. Pure Mathematics.
-            </p>
-
-            {/* ─── Powered By Aztec ─────────────────────────────── */}
-            <div className="flex flex-col items-center gap-2.5 pt-4 relative z-50">
-              <span className="font-mono text-[8px] uppercase tracking-[0.35em] text-[#545F73]/90 font-bold">
-                Powered by
-              </span>
-              <a
-                href="https://aztec.network"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2.5 opacity-80 hover:opacity-100 transition-all duration-500 cursor-pointer"
-                aria-label="Built on Aztec Network"
-              >
-                {/* Aztec geometric diamond mark — white for dark bg */}
-                <svg
-                  width="16" height="16"
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="group-hover:scale-110 group-hover:drop-shadow-[0_0_6px_rgba(212,175,55,0.5)] transition-all duration-300"
-                >
-                  <path d="M16 2L30 16L16 30L2 16Z" fill="white" fillOpacity="0.9"/>
-                  <path d="M16 7L25 16L16 25L7 16Z" fill="#020202" fillOpacity="0.85"/>
-                  <path d="M16 11L21 16L16 21L11 16Z" fill="white" fillOpacity="0.7"/>
-                </svg>
-                <span className="font-mono text-[11px] font-black uppercase tracking-[0.22em] text-[#EAEAEA] group-hover:text-[#D4AF37] transition-colors duration-300">
-                  Aztec
-                </span>
+        <footer className="w-full px-6 py-8 flex flex-col items-center gap-5 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
+            {[['Privacy', '/privacy'], ['Docs', '/docs'], ['Terms', '/terms'], ['Pricing', '/pricing']].map(([label, href]) => (
+              <a key={label} href={href} className="text-[9px] font-mono uppercase tracking-[0.2em] font-medium text-black/30 hover:text-black/70 transition-colors">
+                {label}
               </a>
-            </div>
-
+            ))}
           </div>
-
+          <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/25 text-center">
+            © 2026 Whale Alert Network. Pure Mathematics.
+          </p>
         </footer>
       </div>
     </div>

@@ -41,7 +41,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <Zap size={16} className="text-[#050505]" />
-                    <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505]">LIVE ON-CHAIN STATUS</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505]">ON-CHAIN STATUS</h3>
                     <span className="text-[7px] border border-[#E5E5E5] bg-[#FAF9F6] text-[#A0A0A0] px-2 py-0.5 font-bold uppercase tracking-widest">BASE RPC</span>
                 </div>
                 <button
@@ -54,7 +54,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
             </div>
 
             {isLoading && !data && (
-                <div className="text-[9px] text-[#888888] uppercase tracking-widest animate-pulse">Reading blockchain state...</div>
+                <div className="text-[9px] text-[#888888] uppercase tracking-widest">Reading blockchain state...</div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -364,7 +364,7 @@ export function SovereignVault() {
 
                 </div>
 
-                {/* ── ON-CHAIN LIVE STATUS ─────────────────────────────────────────── */}
+                {/* ── ON-CHAIN STATUS ─────────────────────────────────────────── */}
                 <OnChainStatusPanel address={address} />
 
                 {/* ── GUARDIAN MULTI-SIG ───────────────────────────────────────────── */}

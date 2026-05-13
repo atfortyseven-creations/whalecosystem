@@ -147,7 +147,7 @@ export function WhaleSupport() {
 
                 <div className="relative z-20 flex flex-col gap-3 max-w-lg">
                     <div className="flex items-center gap-2 mb-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                         <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/40">Operations Center</span>
                     </div>
                     <h1 className="text-[32px] md:text-[42px] font-black uppercase tracking-tighter leading-none">
@@ -170,7 +170,7 @@ export function WhaleSupport() {
                 >
                     {/* Form header */}
                     <div className="px-6 py-5 border-b border-black/5 bg-[#FAFAF8] flex items-center gap-2.5">
-                        <Shield size={12} className="text-[#0044CC]" />
+                        <Lock size={12} className="text-[#0044CC]" />
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0a0a0a]">Dispatch Protocol Request</span>
                     </div>
 
@@ -322,7 +322,7 @@ export function WhaleSupport() {
                         </div>
                         <div className="text-center space-y-1">
                             <div className="flex items-center justify-center gap-1.5 mb-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">Systems Nominal</span>
                             </div>
                             <p className="text-[12px] font-black uppercase tracking-tight">Response SLA: 24h</p>

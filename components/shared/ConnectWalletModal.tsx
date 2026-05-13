@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield, Zap, QrCode, ChevronRight, Loader2, CheckCircle2, Wallet, Radio, Terminal } from 'lucide-react';
+import { X, Cpu, Zap, QrCode, ChevronRight, Loader2, CheckCircle2, Wallet, Radio, Terminal, Lock } from 'lucide-react';
 import { useAccount, useConnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { useUIStore } from '@/lib/store/ui-store';
@@ -129,11 +129,11 @@ export function ConnectWalletModal() {
                     <div className="flex items-center justify-between px-6 py-5 border-b border-[#050505]/10 bg-[#FAF9F6]">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full border border-[#050505]/10 flex items-center justify-center bg-white shadow-sm">
-                                <Shield size={14} className="text-[#050505]" />
+                                <Terminal size={14} className="text-[#050505]" />
                             </div>
                             <div>
-                                <div className="text-[12px] font-black text-[#050505] uppercase tracking-widest leading-none">Cryptographic Vault</div>
-                                <div className="text-[9px] font-mono text-black/50 uppercase tracking-widest mt-1">Sovereign Connection Portal</div>
+                                <div className="text-[12px] font-black text-[#050505] uppercase tracking-widest leading-none">Authentication</div>
+                                <div className="text-[9px] font-mono text-black/50 uppercase tracking-widest mt-1">Network Node Access</div>
                             </div>
                         </div>
                         <button onClick={closeConnectModal} className="text-black/40 hover:text-black hover:bg-black/5 transition-colors p-2 rounded-full">
@@ -204,16 +204,16 @@ export function ConnectWalletModal() {
                                                 <div className="flex items-center gap-3 text-white">
                                                     <QrCode size={15} />
                                                     <div className="text-left">
-                                                        <div className="text-[11px] font-black uppercase tracking-wide">Mobile Bridge (Native)</div>
-                                                        <div className="text-[8px] text-white/60 font-mono uppercase tracking-widest">Full EVM Execution Ready</div>
+                                                        <div className="text-[11px] font-black uppercase tracking-wide">Direct Sync</div>
+                                                        <div className="text-[8px] text-white/60 font-mono uppercase tracking-widest">Session Synchronization</div>
                                                     </div>
                                                 </div>
-                                                <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse shrink-0" />
+                                                <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] shrink-0" />
                                             </button>
 
                                             <button onClick={handleLedger} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
                                                 <div className="flex items-center gap-2.5">
-                                                    <Shield size={14} className="text-[#050505]" />
+                                                    <Cpu size={14} className="text-[#050505]" />
                                                     <span className="text-[11px] font-black text-[#050505] uppercase tracking-wide">Hardware Wallet</span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
@@ -257,7 +257,7 @@ export function ConnectWalletModal() {
                                     {isPolling && (
                                         <div className="w-full bg-[#FAF9F6] border border-[#050505]/10 p-3 rounded-xl text-center">
                                             <p className="text-[10px] text-[#050505] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-2">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse"/> WAITING FOR CONNECTION...
+                                                <span className="w-1.5 h-1.5 rounded-full bg-black"/> AWAITING HANDSHAKE...
                                             </p>
                                         </div>
                                     )}
@@ -277,13 +277,13 @@ export function ConnectWalletModal() {
 
                                     <div className="text-center space-y-2">
                                         <h3 className="text-xl font-black text-[#050505] tracking-tighter uppercase">
-                                            {ledgerLoading ? 'CONNECTING...' : 'DEVICE READY'}
+                                            {ledgerLoading ? 'INITIALIZING...' : 'DEVICE READY'}
                                         </h3>
                                     </div>
 
                                     <div className="w-full bg-[#FAF9F6] border border-[#050505]/10 rounded-2xl p-5 flex flex-col gap-3 text-[11px] font-bold text-black/60">
                                         <div className="flex items-center gap-3"><Zap size={14} className="text-[#050505]" /><span>Secure Connection Active</span></div>
-                                        <div className="flex items-center gap-3"><Shield size={14} className="text-[#050505]" /><span>Hardware Protected Session</span></div>
+                                        <div className="flex items-center gap-3"><Lock size={14} className="text-[#050505]" /><span>Hardware Protected Session</span></div>
                                     </div>
 
                                     <button onClick={() => setView('selection')} className="text-[11px] font-black text-black/40 uppercase tracking-[0.2em] hover:text-[#050505] transition-colors mt-6 py-2 px-6">

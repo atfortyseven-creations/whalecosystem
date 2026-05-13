@@ -118,7 +118,7 @@ export function RealPrivacySettings() {
           <div className="flex justify-between items-center mb-3">
              <div>
                 <h4 className="text-white text-sm font-medium">IP Whitelisting</h4>
-                <p className="text-xs text-gray-500">Lock sovereign identity to these IPs only.</p>
+                <p className="text-xs text-gray-500">Lock KYC to these IPs only.</p>
              </div>
           </div>
           <div className="flex gap-2">
@@ -154,7 +154,7 @@ export function RealPrivacySettings() {
         <div className="p-4 rounded-xl hover:bg-white/5 border border-white/5 transition-colors group">
           <div className="flex justify-between items-center mb-3">
              <div>
-                <h4 className="text-white text-sm font-medium">Sovereign Identity Visibility</h4>
+                <h4 className="text-white text-sm font-medium">KYC Visibility</h4>
                 <p className="text-xs text-gray-500">How your wallets appear in peer discovery.</p>
              </div>
           </div>

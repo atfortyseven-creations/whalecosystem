@@ -118,7 +118,7 @@ const SovereignIntelTab: React.FC = () => {
                                         </p>
                                     </div>
                                     <Badge variant={isNodeActive ? "default" : "outline"} className={`px-3 py-1 uppercase tracking-widest text-[9px] font-black ${isNodeActive ? 'bg-[#00C076] hover:bg-[#00C076]/90 text-white border-transparent' : 'text-[#888888] border-[#E5E5E5]'}`}>
-                                        {isNodeActive ? 'Live • Gossiping' : 'Dormant'}
+                                        {isNodeActive ? 'Active • Gossiping' : 'Dormant'}
                                     </Badge>
                                 </CardHeader>
                                 <CardContent className="pt-6">
@@ -150,7 +150,7 @@ const SovereignIntelTab: React.FC = () => {
                                             </div>
                                             <div className="p-4 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] text-center">
                                                 <p className="text-[9px] text-[#888888] uppercase tracking-widest mb-1 font-bold">Latency</p>
-                                                <p className="text-xl font-black text-[#00C076]">{isNodeActive ? 'Live' : '--'}</p>
+                                                <p className="text-xl font-black text-[#00C076]">{isNodeActive ? 'Active' : '--'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -158,7 +158,7 @@ const SovereignIntelTab: React.FC = () => {
                             </Card>
 
                             <div className="space-y-4">
-                                <Suspense fallback={<div className="h-44 rounded-2xl bg-[#E5E5E5] animate-pulse" />}>
+                                <Suspense fallback={<div className="h-44 rounded-2xl bg-[#E5E5E5]" />}>
                                     <WalkawayPanel />
                                 </Suspense>
                             </div>

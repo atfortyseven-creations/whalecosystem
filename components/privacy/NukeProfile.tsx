@@ -120,7 +120,7 @@ export function NukeProfile() {
                                 <div className="flex gap-3 mb-4 text-red-600">
                                     <AlertTriangle size={20} className="shrink-0" />
                                     <p className="text-xs font-bold font-mono tracking-widest uppercase leading-loose">
-                                        WARNING: Once executed, your sovereign identity is purged. You will lose access to all vaults. To proceed, type "NUKE".
+                                        WARNING: Once executed, your KYC is purged. You will lose access to all vaults. To proceed, type "NUKE".
                                     </p>
                                 </div>
                                 <input 
