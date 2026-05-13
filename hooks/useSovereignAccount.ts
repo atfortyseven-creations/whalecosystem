@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 export function useSovereignAccount() {
     const wagmiAccount = useAccount();
     const [handshakeAddress, setHandshakeAddress] = useState<string | null>(null);
+    const [isZkVerified, setIsZkVerified] = useState(false);
     const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
@@ -29,11 +30,22 @@ export function useSovereignAccount() {
             } else {
                 setHandshakeAddress(null);
             }
-            setIsChecking(false);
+        };
+
+        const checkZkStatus = async () => {
+            try {
+                const res = await fetch('/api/auth/session');
+                const data = await res.json();
+                if (data?.user?.isZkVerified) {
+                    setIsZkVerified(true);
+                }
+            } catch {}
         };
 
         // Run immediately
         checkHandshake();
+        checkZkStatus();
+        setIsChecking(false);
         
         // Polling is only necessary for QR/Mobile handshakes where Wagmi isn't active.
         // If Wagmi is already handling the connection natively, we can kill the polling
@@ -59,6 +71,7 @@ export function useSovereignAccount() {
             chainId: wagmiAccount.chainId,
             chain: wagmiAccount.chain,
             isSovereignHandshake: false,
+            isZkVerified: isZkVerified,
             isChecking: false
         };
     }
@@ -76,6 +89,7 @@ export function useSovereignAccount() {
             chainId: 1,
             connector: undefined,
             isSovereignHandshake: true,
+            isZkVerified: isZkVerified,
             isChecking: false
         };
     }

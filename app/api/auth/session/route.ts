@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
               id: walletAddress,
               email: user?.email || '',
               tier: user?.tier || (payload.tier as string) || 'FREE',
+              isZkVerified: user?.isZkVerified || false,
               humanityScore: user?.humanityScore || 0,
               walletAddress: walletAddress.toLowerCase(),
               subscription: subscription || null,
@@ -63,7 +64,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(serializeData({
         authenticated: !!user,
         user: user
-          ? { id: handshake, email: user.email || '', tier: user.tier, humanityScore: user.humanityScore, walletAddress: user.walletAddress, subscription: subscription, transactions: userTransactions }
+          ? { 
+              id: handshake, 
+              email: user.email || '', 
+              tier: user.tier, 
+              isZkVerified: user.isZkVerified,
+              humanityScore: user.humanityScore, 
+              walletAddress: user.walletAddress, 
+              subscription: subscription, 
+              transactions: userTransactions 
+            }
           : null,
       }));
     }

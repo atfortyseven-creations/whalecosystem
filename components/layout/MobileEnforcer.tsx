@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { MobileLanding as MobileSovereignLanding } from '@/components/landing/MobileLanding';
 import dynamic from 'next/dynamic';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { usePathname } from 'next/navigation';
 
 // Lazy-load the authenticated mobile news shell
@@ -16,7 +16,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [showNews, setShowNews] = useState(false);
-    const { isConnected, address } = useAccount();
+    const { isConnected, address, isZkVerified } = useSovereignAccount();
     const pathname = usePathname();
 
     // Track previous connection state to detect NEW wallet connections
@@ -210,9 +210,13 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/academy',
             '/support',
             '/status',
-            '/dashboard',
-            '/chat',
         ];
+
+        // [SOVEREIGN-GATE] Allow dashboard/chat access if connected so they can reach the ZK-Gate
+        if (isConnected) {
+            DIRECT_ACCESS_ROUTES.push('/dashboard', '/chat');
+        }
+
         const isDirectAccessRoute = DIRECT_ACCESS_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
 
         if (isDirectAccessRoute) {

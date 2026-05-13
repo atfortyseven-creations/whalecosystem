@@ -19,17 +19,40 @@ export function OmniExplorer() {
     const [selectedBlock, setSelectedBlock] = useState<any | null>(null);
     const [selectedTx, setSelectedTx] = useState<any | null>(null);
 
-    const publicClient = usePublicClient();
-    const { data: blockNumber } = useBlockNumber({ watch: true });
+    const wagmiClient = usePublicClient();
+    const { data: wagmiBlock } = useBlockNumber({ watch: true });
+    
+    // [INSTITUTIONAL FALLBACK] Maintain data stream even if Wagmi is disconnected
+    const [fallbackClient, setFallbackClient] = useState<any>(null);
+    const [fallbackBlock, setFallbackBlock] = useState<bigint | null>(null);
+
+    useEffect(() => {
+        if (!wagmiClient) {
+            import('viem').then(({ createPublicClient, http }) => {
+                const client = createPublicClient({
+                    chain: { id: 1, name: 'Ethereum', nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 }, rpcUrls: { default: { http: ['https://eth.llamarpc.com'] }, public: { http: ['https://eth.llamarpc.com'] } } } as any,
+                    transport: http()
+                });
+                setFallbackClient(client);
+                client.getBlockNumber().then(setFallbackBlock);
+            });
+        }
+    }, [wagmiClient]);
+
+    const publicClient = wagmiClient || fallbackClient;
+    const blockNumber = wagmiBlock || fallbackBlock;
     
     const [blocks, setBlocks] = useState<any[]>([]);
     const [massiveTxs, setMassiveTxs] = useState<any[]>([]);
 
     // ── On-chain block feed ─────────────────────────────────────────────────
     useEffect(() => {
+        // [MOLECULAR PRECISION] Early exit if RPC bridge is not yet established.
+        // This prevents the 'Critical Node Failure' crash during early mobile hydration.
         if (!publicClient || !blockNumber) return;
 
         const fetchBlock = async () => {
+            if (!publicClient) return;
             try {
                 const block = await publicClient.getBlock({
                     blockNumber: blockNumber,
@@ -68,7 +91,9 @@ export function OmniExplorer() {
                     setMassiveTxs(prev => [...newMassive, ...prev].slice(0, 5));
                 }
             } catch (e) {
-                console.error('Failed to fetch block', e);
+                // [SILENT RECOVERY] Log failure but do not bubble up to the ErrorBoundary.
+                // Mobile network conditions can cause intermittent RPC timeouts.
+                console.warn('[OmniExplorer] RPC Synchronization Lag:', e);
             }
         };
 

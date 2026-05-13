@@ -8,6 +8,7 @@ import { useSignMessage } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate, discoverNewPeers } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import type { Client } from '@xmtp/browser-sdk';
 
 interface ConversationMeta {
@@ -457,8 +458,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         setInitError('Secure messaging module failed to load. Please check your network connection and reload the terminal.');
       } else if (err?.code === 4001 || errorMsg.toLowerCase().includes('reject')) {
         setInitError('Identity authorization rejected. You must approve the secure channel signature to proceed.');
-      } else if (errorMsg.includes('To use Whale Chat on mobile')) {
-        setInitError(errorMsg);
       } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector') || errorMsg.includes('signMessage') || errorMsg.toLowerCase().includes('unknown signer')) {
         if (isSovereignHandshake) {
            setInitError('Secure identity not yet synchronized from desktop. Please keep this browser open while the desktop terminal finishes the handshake.');
@@ -813,12 +812,16 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
         {/* Hero Institutional Section */}
         <div className="flex-1 px-8 py-16 flex flex-col items-center justify-center text-center gap-10">
-          <div className="relative">
-            <img 
-              src="/official-whale.png" 
-              alt="Whale Alert Network" 
-              className="relative w-64 h-64 md:w-80 md:h-80 object-contain grayscale opacity-90 drop-shadow-2xl" 
-            />
+          <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+            {isInitializing ? (
+              <RemoteLottie path="Abstract Isometric Loader #1.json" className="w-full h-full" />
+            ) : (
+              <img 
+                src="/official-whale.png" 
+                alt="Whale Alert Network" 
+                className="relative w-full h-full object-contain grayscale opacity-90 drop-shadow-2xl" 
+              />
+            )}
           </div>
 
           <div className="space-y-4 max-w-2xl">

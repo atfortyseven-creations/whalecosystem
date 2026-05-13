@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, ChevronRight, Search,
-    X, ArrowUpRight
+    X, ArrowUpRight, Globe, Info
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -27,26 +27,27 @@ interface NavItem {
     badgeColor?: string;
     dividerBefore?: string;
     externalUrl?: string;
+    requiresZK?: boolean;
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold',          label: 'Ticket Mint',       icon: null,    dividerBefore: 'Overview' },
-    { id: 'portfolio',     label: 'Main Portfolio',    icon: null },
+    { id: 'portfolio',     label: 'Main Portfolio',    icon: null, requiresZK: true },
     { id: 'billing',       label: 'Billing & Plan',    icon: null },
 
-    { id: 'markets',      label: 'Pre-Execution Tracking',       icon: null, dividerBefore: 'Intelligence' },
-    { id: 'newpairs',     label: 'New Listings',      icon: null },
+    { id: 'markets',      label: 'Pre-Execution Tracking',       icon: null, dividerBefore: 'Intelligence', requiresZK: true },
+    { id: 'newpairs',     label: 'New Listings',      icon: null, requiresZK: true },
 
-    { id: 'inst-ledger',  label: 'Entity Resolution',      icon: null,      dividerBefore: 'On-Chain Intel' },
-    { id: 'mass-transfer',label: 'Mass Transfers',    icon: null },
-    { id: 'omniexplorer', label: 'Block Explorer',    icon: null },
-    { id: 'defi',         label: 'DeFi Yields',       icon: null },
-    { id: 'morpho',       label: 'Morpho Base',       icon: null, badge: 'LIVE', badgeColor: '#0052FF' },
+    { id: 'inst-ledger',  label: 'Entity Resolution',      icon: null,      dividerBefore: 'On-Chain Intel', requiresZK: true },
+    { id: 'mass-transfer',label: 'Mass Transfers',    icon: null, requiresZK: true },
+    { id: 'omniexplorer', label: 'Block Explorer',    icon: null, requiresZK: true },
+    { id: 'defi',         label: 'DeFi Yields',       icon: null, requiresZK: true },
+    { id: 'morpho',       label: 'Morpho Base',       icon: null, badge: 'LIVE', badgeColor: '#0052FF', requiresZK: true },
 
-    { id: 'zk',           label: 'Cryptographic Integrity',    icon: null,    dividerBefore: 'ZK Layer' },
+    { id: 'zk',           label: 'Cryptographic Integrity',    icon: null,    dividerBefore: 'ZK Layer', requiresZK: true },
     { id: 'zk-identity',  label: 'Sovereign ID',      icon: null, badge: 'ZK', badgeColor: '#10B981' },
 
-    { id: 'chat',         label: 'Whale Chat',       icon: null, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF' },
+    { id: 'chat',         label: 'Whale Chat',       icon: null, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF', requiresZK: true },
     { id: 'logs',         label: 'Session Logs',      icon: null,  dividerBefore: 'System' },
     { id: 'support',      label: 'Support',           icon: null },
 ];
@@ -208,17 +209,15 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavI
     );
 }
 
-export function WhaleProShell({ 
-    children, 
-    activeTab, 
-    onTabChange,
-    isExternalEmbed = false,
-}: { 
+interface WhaleProShellProps { 
     children: React.ReactNode;
     activeTab: string;
     onTabChange: (id: string) => void;
     isExternalEmbed?: boolean;
-}) {
+    isZkVerified?: boolean;
+}
+
+export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbed = false, isZkVerified = false }: WhaleProShellProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
@@ -279,11 +278,11 @@ export function WhaleProShell({
             try {
                 const res  = await fetch('/api/network/getblock-health', { cache: 'no-store' });
                 const data = await res.json();
-                if (!res.ok || data?.status === 'offline')  setNodeStatus('OPERATIONAL');
+                if (!res.ok || data?.status === 'offline')  setNodeStatus('OFFLINE');
                 else if (data?.status === 'degraded')        setNodeStatus('DEGRADED');
                 else                                         setNodeStatus('OPERATIONAL');
             } catch {
-                setNodeStatus('OPERATIONAL');
+                setNodeStatus('OFFLINE');
             }
         };
         checkHealth();
@@ -460,7 +459,9 @@ export function WhaleProShell({
 
                 {/* Sidebar Navigation */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pt-1 pb-4 px-2 space-y-0.5 no-scrollbar" style={{ overscrollBehavior: 'contain', touchAction: 'pan-y', contain: 'strict' }}>
-                    {SIDEBAR_ITEMS.map((item, index) => {
+                    {SIDEBAR_ITEMS
+                        .filter(item => !item.requiresZK || isZkVerified)
+                        .map((item, index) => {
                         const isActive = activeTab === item.id;
                         return (
                             <div key={item.id} style={{ perspective: 1200 }}>

@@ -477,6 +477,29 @@ function ConnectedScreen({
           </Link>
         </motion.div>
 
+        {/* ── [SOVEREIGN-MANDATE] IDENTITY VERIFICATION GATE ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="w-full"
+        >
+          <button
+            onClick={() => {
+               // [MASTER-UX] We force a redirect to the ZK Identity tab.
+               // On mobile, this will be rendered by the MobileEnforcer or directly in the landing state.
+               window.location.href = '/dashboard?tab=zk-identity';
+            }}
+            className="w-full flex flex-col items-center justify-center gap-1 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[2px] border-[#10B981]/40 bg-gradient-to-r from-[#10B981]/10 to-[#059669]/10 hover:from-[#10B981]/20 hover:to-[#059669]/20 transition-all text-[#059669] shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+          >
+            <div className="flex items-center gap-3">
+               <Fingerprint size={18} />
+               <span style={{ fontSize: "11px" }}>Verify Sovereign Identity</span>
+            </div>
+            <span className="text-[8px] font-bold opacity-60 tracking-[0.2em]">MANDATORY 3D BIOMETRIC GATE</span>
+          </button>
+        </motion.div>
+
         {/* ── Disconnect session button ── */}
         {onDisconnect && (
           <motion.button

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Scan } from "lucide-react";
 import { useEthMetrics } from "@/hooks/useEthMetrics";
 import { StackableCarousel } from "@/components/ui/StackableCarousel";
 import { motion } from "framer-motion";
@@ -135,14 +135,14 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                         </p>
                     </div>
                     <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
-                        <div className="text-[120px] font-black text-black/5 select-none tracking-tighter">ZK</div>
+                        <RemoteLottie path="DeeWork About Blockchain.json" className="w-full h-full scale-125" />
                     </div>
                 </div>
 
                 {/* Bento Card 2 */}
                 <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
                     <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 mb-8 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
-                         <div className="text-[60px] font-black text-black/5 select-none tracking-tighter">MAP</div>
+                         <RemoteLottie path="Connected world.json" className="scale-125" />
                     </div>
                     <div className="space-y-6">
                         <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
@@ -165,7 +165,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                         </p>
                     </div>
                     <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
-                         <div className="text-[60px] font-black text-black/5 select-none tracking-tighter">AI</div>
+                         <RemoteLottie path="Isometric data analysis.json" className="w-full h-full scale-110" />
                     </div>
                 </div>
 
@@ -173,7 +173,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                 <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
                     <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
                         <div className="absolute inset-0 bg-[#0044CC]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
-                         <div className="text-[120px] font-black text-black/5 select-none tracking-tighter">P-E</div>
+                         <RemoteLottie path="Trade.json" className="w-full h-full scale-125" />
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
                         <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
