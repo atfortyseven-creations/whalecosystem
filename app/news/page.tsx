@@ -15,10 +15,7 @@ export default function WhaleNewsPage() {
       <div className="w-full max-w-[1400px] mx-auto pt-32 pb-16 px-6 lg:px-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
             <div className="w-full lg:w-1/2 relative z-10 space-y-8 text-center lg:text-left">
-                <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#FAFAF8] border border-black/5 rounded-full shadow-sm mx-auto lg:mx-0">
-                    <Globe size={14} className="text-[#0044CC]" />
-                    <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Global Intelligence Feed</span>
-                </div>
+                
                 
                 <h1 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-[0.95]">
                     News <br /><span className="text-[#0044CC]">Terminal.</span>

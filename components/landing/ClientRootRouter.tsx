@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
 import { AztecArchitectureSection } from "./AztecArchitectureSection";
 import { SovereignFooter } from "./SovereignFooter";
-import { CookieConsent } from "@/components/ui/CookieConsent";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -47,9 +46,6 @@ export function ClientRootRouter() {
 
       {/* ── Footer ── */}
       <SovereignFooter />
-
-      {/* ── Cookie Consent ── */}
-      <CookieConsent />
     </div>
   );
 }

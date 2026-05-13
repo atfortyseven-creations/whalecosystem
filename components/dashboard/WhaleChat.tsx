@@ -151,9 +151,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // the error boundary surfaces a manual "Retry" button. This is better than
   // silently blocking mobile users from ever seeing the Activate button.
   useEffect(() => {
-    // Auto-initialization is disabled. Users must manually activate the secure channel.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, isMobile, forceAutoInit]);
+    if (isConnected && address && forceAutoInit && !client && !initInFlight.current && !initError) {
+      handleConnect();
+    }
+  }, [isConnected, address, forceAutoInit, client, initError, handleConnect]);
 
   // Telemetry: Heartbeat Loop
   useEffect(() => {

@@ -42,10 +42,7 @@ function ForumHomeContent() {
         {/* ── ACADEMIC WELCOME HERO ── */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white dark:bg-[#111] rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-6 md:p-16 flex flex-col items-center justify-center overflow-hidden relative">
             <div className="w-full max-w-2xl relative z-10 space-y-6 md:space-y-8 text-center">
-                <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#FAFAF8] dark:bg-[#0A0A0A] border border-black/5 dark:border-white/5 rounded-full shadow-sm mx-auto">
-                    <Activity size={14} className="text-[#0044CC] dark:text-[#4d88ff]" />
-                    <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Sovereign Discourse</span>
-                </div>
+                
                 <h2 className="text-[36px] md:text-[56px] lg:text-[64px] font-black uppercase text-[#0A0A0A] dark:text-white leading-[1.05] md:leading-[0.95] tracking-tighter">
                     Whale Alert <br className="hidden md:block" /><span className="text-[#0044CC] dark:text-[#4d88ff]">Network.</span>
                 </h2>

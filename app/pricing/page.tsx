@@ -81,10 +81,7 @@ export default function PricingPage() {
         
         {/* ── HEADER ── */}
         <div className="text-center mb-20">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm mb-6">
-            <Settings size={14} className="text-[#0044CC]" />
-            <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Access Tiers</span>
-          </motion.div>
+          
           
           <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-[36px] md:text-[56px] font-black uppercase tracking-tighter leading-[0.95] mb-6">
             The Whale Alert <br className="hidden md:block" />

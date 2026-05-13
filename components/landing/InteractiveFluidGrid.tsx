@@ -11,6 +11,10 @@ export function InteractiveFluidGrid() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    if (window.innerWidth < 768) {
+      return; // Do not initialize heavy rAF grid on mobile
+    }
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 

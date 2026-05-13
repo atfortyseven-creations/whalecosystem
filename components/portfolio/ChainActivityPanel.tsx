@@ -334,11 +334,6 @@ export function ChainActivityPanel({ address }: { address: string }) {
         ))}
       </div>
 
-      <div className="px-6 py-3 border-t" style={{ borderColor: BORDER, background: BG }}>
-        <span className="text-[9px] font-mono uppercase tracking-widest" style={{ color: MUTED }}>
-          Click any chain to expand on-chain activity · Powered by Etherscan v2
-        </span>
-      </div>
     </div>
   );
 }

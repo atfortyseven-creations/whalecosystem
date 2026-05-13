@@ -278,7 +278,6 @@ export default function PortfolioPage() {
           </div>
           <div>
             <div className="font-black text-sm uppercase tracking-tight" style={{ color: INK }}>Portfolio</div>
-            <div className="text-[9px] font-mono uppercase tracking-widest" style={{ color: MUTED }}>On-chain Intelligence</div>
           </div>
         </div>
 
@@ -645,14 +644,6 @@ export default function PortfolioPage() {
             )}
           </div>
 
-          {/* Footer */}
-          {filteredAssets.length > 0 && (
-            <div className="px-6 py-3 border-t" style={{ borderColor: BORDER, background: CARD }}>
-              <span className="text-[9px] font-mono uppercase tracking-widest" style={{ color: MUTED }}>
-                Live on-chain data · Updates every 30s
-              </span>
-            </div>
-          )}
         </motion.div>
 
         {/* ── ALLOCATION ── */}

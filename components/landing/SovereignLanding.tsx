@@ -194,7 +194,7 @@ export function SovereignLanding() {
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-4 px-2">Navigation Matrix</div>
           <div className="flex flex-col gap-1 flex-1">
             <NavItem icon={<LayoutDashboard size={16} />} label="Command Center" active />
-            <NavItem icon={<Activity size={16} />} label="Live Telemetry" />
+
             <NavItem icon={<Globe size={16} />} label="Global Consensus" />
             <NavItem icon={<Zap size={16} />} label="Sovereign Intel" />
             <NavItem icon={<Database size={16} />} label="Event Ledger" />

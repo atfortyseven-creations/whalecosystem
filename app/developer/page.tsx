@@ -30,10 +30,7 @@ const BuilderAnnouncements = () => {
   return (
     <div className="w-full max-w-[1400px] mx-auto py-24 px-6 lg:px-12">
       <div className="flex flex-col mb-16 gap-4">
-        <div className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm w-fit">
-            <Activity size={14} className="text-[#0044CC]" />
-            <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Live Telemetry</span>
-        </div>
+        
         <h2 className="text-[36px] md:text-[48px] font-black uppercase text-[#0A0A0A] leading-none tracking-tight">
           Infrastructure <span className="text-[#0044CC]">Releases.</span>
         </h2>
@@ -95,14 +92,7 @@ export default function DeveloperLanding() {
       <section className="pt-40 pb-20 px-6 lg:px-12 max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
         
         <div className="w-full lg:w-1/2 space-y-10 relative z-10 text-center lg:text-left">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm"
-          >
-            <Terminal size={16} className="text-[#0044CC]" />
-            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-600">Sovereign Protocol API</span>
-          </motion.div>
+          
           
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-[48px] sm:text-[64px] lg:text-[80px] font-black text-[#0A0A0A] leading-[0.95] tracking-tighter uppercase">
             Build on the <br />
