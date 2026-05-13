@@ -213,9 +213,8 @@ export default function ConnectPage() {
           }
 
           if (!jwt) { setSyncStatus("ERROR"); return; }
-
           const hydrateRes = await fetch('/api/auth/qr-hydrate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jwt }) });
-          if (hydrateRes.ok) setTimeout(() => window.location.replace("/"), 100);
+          if (hydrateRes.ok) setTimeout(() => window.location.replace("/dashboard"), 100);
           else setSyncStatus("ERROR");
         }
       } catch (err) {}
@@ -229,7 +228,7 @@ export default function ConnectPage() {
 
     if (isLinked) {
       setPendingId(null);
-      const t = setTimeout(() => { window.location.replace("/"); }, 5000);
+      const t = setTimeout(() => { window.location.replace("/dashboard"); }, 5000);
       return () => clearTimeout(t);
     }
   }, [isConnected, mounted, isLinked]);
@@ -404,26 +403,23 @@ export default function ConnectPage() {
                     </div>
                   </div>
 
-                  <div className="mt-6 flex flex-col items-center gap-4 w-full max-w-[320px]">
-                    <button
-                      className="relative w-full flex items-center justify-center gap-4 py-5 rounded-[20px] bg-[#050505] text-white font-black uppercase tracking-[0.25em] text-[12px] shadow-[0_10px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-500 overflow-hidden group"
-                      onClick={() => { window.location.replace('/'); }}
-                    >
-                      <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
-                      <span className="relative z-10 flex items-center gap-3">Enter Terminal <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></span>
-                    </button>
-                    <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-[0.3em]">
-                        Auto-routing
-                      </span>
-                      <motion.span
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
-                        className="text-[10px] font-mono text-[#050505]/40 tracking-widest"
-                      >
-                        ...
-                      </motion.span>
+                  <div className="mt-6 flex flex-col items-center gap-4 w-full max-w-[320px] min-h-[100px] justify-center">
+                    <div className="flex items-center gap-3">
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-black/60"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                      />
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-black/60"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                      />
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-black/60"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                      />
                     </div>
                   </div>
 

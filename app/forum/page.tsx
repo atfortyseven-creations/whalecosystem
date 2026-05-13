@@ -15,13 +15,13 @@ function ForumHomeContent() {
   const [categories, setCategories] = useState<any[]>([]);
   const searchParams = useSearchParams();
   const rawFilter = searchParams.get('filter');
-  const filter = rawFilter || 'matrix';
+  const filter = rawFilter || 'latest';
   const isRestricted = false; // Removed hardcoded restriction
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);
   useEffect(() => {
     if (!isRestricted) {
-      fetch(`/api/forum/topics?limit=30&filter=${filter === 'matrix' ? 'latest' : filter}`)
+      fetch(`/api/forum/topics?limit=30&filter=${filter}`)
         .then(r => r.json())
         .then(data => { if (Array.isArray(data)) setTopics(data); })
         .catch(console.error);
@@ -40,29 +40,21 @@ function ForumHomeContent() {
       
       <div className="max-w-[1200px] mx-auto mb-20">
         {/* ── ACADEMIC WELCOME HERO ── */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white dark:bg-[#111] rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-6 md:p-16 flex flex-col lg:flex-row items-center gap-10 md:gap-16 overflow-hidden relative">
-            
-            {/* Ambient background Lottie (Lottie 1) */}
-            <div className="absolute opacity-[0.03] dark:opacity-[0.05] pointer-events-none -left-20 -top-20 z-0">
-               <RemoteLottie path="isometric-cube.json" className="w-[500px] h-[500px]" />
-            </div>
-
-            <div className="w-full lg:w-1/2 relative z-10 space-y-6 md:space-y-8 text-center lg:text-left">
-                <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#FAFAF8] dark:bg-[#0A0A0A] border border-black/5 dark:border-white/5 rounded-full shadow-sm mx-auto lg:mx-0">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white dark:bg-[#111] rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-6 md:p-16 flex flex-col items-center justify-center overflow-hidden relative">
+            <div className="w-full max-w-2xl relative z-10 space-y-6 md:space-y-8 text-center">
+                <div className="inline-flex items-center gap-3 px-4 py-2 bg-[#FAFAF8] dark:bg-[#0A0A0A] border border-black/5 dark:border-white/5 rounded-full shadow-sm mx-auto">
                     <Activity size={14} className="text-[#0044CC] dark:text-[#4d88ff]" />
                     <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">Cryptographic Perimeter</span>
                 </div>
                 <h2 className="text-[36px] md:text-[56px] lg:text-[64px] font-black uppercase text-[#0A0A0A] dark:text-white leading-[1.05] md:leading-[0.95] tracking-tighter">
-                    Sovereign <br className="hidden md:block" /><span className="text-[#0044CC] dark:text-[#4d88ff]">Dialogue.</span>
+                    Whale Alert <br className="hidden md:block" /><span className="text-[#0044CC] dark:text-[#4d88ff]">Network.</span>
                 </h2>
-                <p className="font-serif text-[15px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                <p className="font-sans text-[15px] md:text-[17px] text-slate-500 leading-relaxed max-w-xl mx-auto font-bold tracking-widest uppercase">
+                    Presenting FORUM P2P by Humanity Ledger
+                </p>
+                <p className="font-serif text-[15px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto">
                     A secure perimeter for institutional discourse. All interactions are cryptographically signed, ensuring absolute authenticity. This eliminates the noise of public networks and fosters a highly focused, academic environment strictly for authenticated participants.
                 </p>
-            </div>
-            
-            {/* Primary Display Lottie (Lottie 2) */}
-            <div className="w-full lg:w-1/2 relative z-10 aspect-square md:aspect-video flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[1.5rem] md:rounded-[2rem] border border-black/5 dark:border-white/5 shadow-sm p-4 md:p-8 overflow-hidden">
-                <RemoteLottie path="social.json" className="scale-[1.5] md:scale-[1.8] w-full" />
             </div>
         </motion.div>
       </div>
@@ -74,7 +66,7 @@ function ForumHomeContent() {
         <div className="lg:col-span-4 flex flex-col gap-0 pt-4 border-t border-white/10">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-[#555]">Categories</h2>
           {categories.length === 0 ? (
-             <div className="py-4 text-[13px] text-black/40 dark:text-white/30 font-sans">Loading matrix...</div>
+             <div className="py-4 text-[13px] text-black/40 dark:text-white/30 font-sans">Loading categories...</div>
           ) : categories.map(cat => (
             <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-5 transition-all duration-300 ease-in-out px-4 rounded-xl sm:-mx-4 hover:bg-black/5 dark:hover:bg-white/[0.02] border border-transparent hover:border-black/10 dark:hover:border-white/5 border-b-black/5 dark:border-b-white/5 mb-2 hover:shadow-md dark:hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]" style={{ transformStyle: 'preserve-3d' }}>
 
@@ -97,7 +89,7 @@ function ForumHomeContent() {
         <div className="lg:col-span-8 flex flex-col">
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#555]">
-              {filter === 'matrix' ? 'Categories Overview' : filter}
+              {filter === 'latest' ? 'Categories Overview' : filter}
             </h2>
           </div>
 

@@ -242,6 +242,7 @@ function ConnectedScreen({
   chainId?: number;
   onDisconnect?: () => void;
   signMessageAsync?: any;
+  initialScanData?: string | null;
 }) {
   const now = useLiveClock();
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -532,6 +533,7 @@ function ConnectedScreen({
         isOpen={showScanner}
         onClose={onCloseScanner}
         address={address}
+        initialScanData={initialScanData}
         onScan={(_result: string) => {
           const toast = document.createElement('div');
           toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[11px] border border-white/20 font-black uppercase tracking-[0.2em] px-6 py-5 rounded-[20px] shadow-2xl text-center';
@@ -605,6 +607,17 @@ export function MobileLanding() {
 
   // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
+
+  // Auto-sync for mobile camera scans
+  const uuidParam = searchParams?.get('uuid');
+  const [autoSyncStarted, setAutoSyncStarted] = useState(false);
+
+  useEffect(() => {
+    if (isLinked && effectiveAddress && uuidParam && !autoSyncStarted) {
+      setAutoSyncStarted(true);
+      setShowScanner(true);
+    }
+  }, [isLinked, effectiveAddress, uuidParam, autoSyncStarted]);
 
   const [isActuallySigning, setIsActuallySigning] = useState(false);
   const [signingError, setSigningError] = useState<string | null>(null);
@@ -1014,6 +1027,7 @@ export function MobileLanding() {
            chainId={chainId}
            onDisconnect={handleDisconnect}
            signMessageAsync={signMessageAsync}
+           initialScanData={(autoSyncStarted && uuidParam) ? window.location.href : null}
         />
       </div>
     );

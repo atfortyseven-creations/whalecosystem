@@ -30,10 +30,13 @@ function RealDeviceRouter() {
 
   useEffect(() => {
     // If already authenticated, redirect to root immediately — no connect needed.
-    // This prevents authenticated users from seeing the wallet-connect portal
-    // when TitaniumGate or any other mechanism sends them to /connect.
+    // However, if there is a 'uuid' parameter, they are trying to link a desktop
+    // session, so we MUST stay on this page to let MobileLanding handle the sync.
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasUuid = urlParams.has('uuid');
+    
     const isAlreadyLinked = document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
-    if (isAlreadyLinked) {
+    if (isAlreadyLinked && !hasUuid) {
       window.location.replace('/');
       return;
     }

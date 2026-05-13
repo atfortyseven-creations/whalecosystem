@@ -10,6 +10,7 @@ interface QRScannerModalProps {
   onClose: () => void;
   onScan?: (data: string) => void;
   address?: string;
+  initialScanData?: string | null;
 }
 
 // ─── css injected once into <head> so it never re-runs ───────────────────────
@@ -208,7 +209,7 @@ function ScannedOverlay() {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress }: QRScannerModalProps) {
+export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress, initialScanData }: QRScannerModalProps) {
   const { address } = useAccount();
 
   const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error' | 'signing'>('idle');
@@ -517,12 +518,19 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
       return;
     }
 
+    if (initialScanData) {
+      setStatus('scanning');
+      hasScannedRef.current = false;
+      handleSuccess(initialScanData);
+      return;
+    }
+
     setStatus('idle');
     initTimerRef.current = setTimeout(() => { initScanner(); }, 350);
 
     return () => { destroyScanner(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, initialScanData]);
 
   // ─── Tab switch effect ───────────────────────────────────────────────────
   useEffect(() => {

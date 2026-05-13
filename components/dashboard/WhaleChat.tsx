@@ -1112,11 +1112,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               </div>
 
               <h2 className="text-[32px] md:text-[40px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-none mt-2">
-                Cryptographic <br className="md:hidden" /> Perimeter.
+                Whale Alert Network
               </h2>
               
-              <p className="font-serif text-[15px] md:text-[17px] text-slate-500 leading-relaxed max-w-xl mx-auto mt-2">
-                This communication architecture operates entirely outside centralized databases. Every transmission is mathematically secured via end-to-end encryption on the decentralized XMTP network, guaranteeing that your strategic intelligence remains strictly between authenticated nodes.
+              <p className="font-sans text-[15px] md:text-[17px] text-slate-500 leading-relaxed max-w-xl mx-auto mt-2 font-bold tracking-widest uppercase">
+                Presenting FORUM P2P by Humanity Ledger
               </p>
 
               <p className="font-mono text-[10px] text-black/30 uppercase tracking-[0.2em] mt-8">

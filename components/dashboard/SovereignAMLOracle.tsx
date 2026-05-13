@@ -34,15 +34,15 @@ export function SovereignAMLOracle({ address = "0x..." }: { address?: string }) 
   }, [targetAddress]);
 
   return (
-    <div className="bg-white border border-black/5 rounded-[24px] p-6 shadow-sm font-mono text-[#050505]">
-      <div className="flex items-center justify-between mb-6 border-b border-black/5 pb-4">
+    <div className="bg-white border border-black/5 rounded-[24px] p-8 shadow-sm font-sans text-[#050505] flex flex-col h-full">
+      <div className="flex items-center justify-between mb-8 border-b border-black/5 pb-6">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center">
             <Server size={14} className="text-black/60" />
           </div>
           <div>
-            <h3 className="text-[12px] font-black uppercase tracking-widest">AML ZK-Oracle</h3>
-            <p className="text-[9px] text-black/40 uppercase tracking-[0.2em] mt-0.5">Idenfy Telemetry Engine</p>
+            <h3 className="text-[14px] font-black uppercase tracking-widest text-[#050505]">AML ZK-Oracle</h3>
+            <p className="text-[10px] text-black/40 uppercase tracking-[0.2em] mt-1">Idenfy Telemetry Engine</p>
           </div>
         </div>
         <div className="flex items-center gap-2 px-3 py-1 bg-black/5 rounded-full">
@@ -60,13 +60,13 @@ export function SovereignAMLOracle({ address = "0x..." }: { address?: string }) 
           </div>
           <div className="flex items-end gap-2">
             {loading ? (
-              <div className="text-[32px] font-black leading-none animate-pulse">--</div>
+              <div className="text-[48px] font-black leading-none animate-pulse text-black/20">--</div>
             ) : (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`text-[40px] font-black leading-none tracking-tighter ${score >= 80 ? 'text-emerald-600' : score >= 50 ? 'text-yellow-500' : 'text-red-600'}`}>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`text-[48px] font-black leading-none tracking-tighter ${score >= 80 ? 'text-emerald-600' : score >= 50 ? 'text-yellow-500' : 'text-red-600'}`}>
                 {score}
               </motion.div>
             )}
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/30 mb-2">/ 100</span>
+            <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-black/30 mb-2">/ 100</span>
           </div>
           <div className="w-full h-1 bg-black/5 rounded-full mt-4 overflow-hidden">
             <motion.div 
@@ -100,8 +100,8 @@ export function SovereignAMLOracle({ address = "0x..." }: { address?: string }) 
 
 function CheckItem({ title, status, delay }: { title: string, status: "scanning" | "clear" | "flagged", delay: number }) {
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg bg-[#FAFAF8] border border-black/5">
-      <span className="text-[10px] font-bold uppercase tracking-[0.1em] truncate flex-1 pr-2">{title}</span>
+    <div className="flex items-center justify-between p-4 rounded-xl bg-[#FAFAF8] border border-black/5 min-w-0 gap-3">
+      <span className="text-[11px] font-bold uppercase tracking-[0.1em] truncate flex-1 pr-2 text-[#050505]">{title}</span>
       <div className="flex items-center gap-2 shrink-0">
         {status === "scanning" && (
           <div className="flex items-center gap-1.5">
