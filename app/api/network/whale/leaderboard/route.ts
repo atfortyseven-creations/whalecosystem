@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { redisClient as redis } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,17 +12,20 @@ export async function GET() {
         const cached = await redis.get(cacheKey);
 
         if (cached) {
-            return NextResponse.json({ whales: JSON.parse(cached), source: 'cache' });
+            const parsed = safeJsonParse(cached, null, 'WHALE_LEADERBOARD');
+            if (parsed) return NextResponse.json({ whales: parsed, source: 'cache' });
         }
 
         // Aggregate volume from WhaleActivity in the last 24h
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-        // [QUERY-PERFECTION] Grouping by address to get volume leaders
+        // NOTE: WhaleActivity.usdValue is a String field in the Prisma schema —
+        // Prisma _sum/_orderBy only work on numeric types (Float/Int/BigInt).
+        // We use valueBTC (Float) for aggregation and derive a USD proxy in the map.
         const result = await prisma.whaleActivity.groupBy({
             by: ['walletAddress'],
             _sum: {
-                usdValue: true,
+                valueBTC: true,
             },
             _count: {
                 id: true,
@@ -33,33 +37,36 @@ export async function GET() {
             },
             orderBy: {
                 _sum: {
-                    usdValue: 'desc',
+                    valueBTC: 'desc',
                 },
             },
             take: 500,
         });
 
-        // Fetch labels and tiers from WhaleSnapshot if available
-        const addresses = result.map((r: any) => r.walletAddress);
-        // Fallback for missing Prisma models - removed whaleSnapshot and walletAnalytics queries
-        const snapshotMap = new Map();
-        const analyticsMap = new Map();
+        // Fallback for missing Prisma models — whaleSnapshot and walletAnalytics removed
+        const snapshotMap = new Map<string, any>();
+        const analyticsMap = new Map<string, any>();
 
-        const leaderboard = result.map((r: any, index: number) => {
-            const snap = snapshotMap.get(r.walletAddress);
-            const analytic = analyticsMap.get(r.walletAddress.toLowerCase());
+        const leaderboard = result.map((r, index: number) => {
+            const snap = snapshotMap.get(r.walletAddress ?? '');
+            const analytic = analyticsMap.get((r.walletAddress ?? '').toLowerCase());
             const metadata = analytic?.metadata as any;
             const pnlData = metadata?.profitLossBreakdown || { totalPnlUsd: 0 };
+
+            // Derive USD estimate from valueBTC (use $65k as floor if btcPriceAtTx unavailable)
+            const volumeBtc = Number(r._sum.valueBTC || 0);
+            const volumeUsd = volumeBtc * 65000;
 
             return {
                 rank: index + 1,
                 address: r.walletAddress,
-                label: snap?.label || `Whale-${r.walletAddress.slice(2, 6)}`,
-                volume24h: Number(r._sum.usdValue || 0),
-                pnlUsd: pnlData.totalPnlUsd || 0, // REAL PNL from WalletAnalytics memory
+                label: snap?.label || `Whale-${(r.walletAddress ?? '0x000000').slice(2, 6)}`,
+                volume24h: volumeUsd,
+                volumeBtc,
+                pnlUsd: pnlData.totalPnlUsd || 0,
                 txCount: r._count.id,
                 chain: snap?.chain || 'ETH',
-                tier: snap?.tier || (Number(r._sum.usdValue) > 1000000 ? 'MEGA' : 'ALPHA'),
+                tier: snap?.tier || (volumeUsd > 1000000 ? 'MEGA' : 'ALPHA'),
                 lastActive: yesterday.toISOString(),
                 trend: index < 50 ? 'up' : 'stable',
             };

@@ -15,6 +15,7 @@
  */
 
 import { NextRequest } from 'next/server';
+import { safeJsonParse } from '@/lib/utils/json';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -157,8 +158,8 @@ export async function GET(req: NextRequest) {
                                 // Parseamos el index 1 que asume ['payload', '{"hash":...}']
                                 const jsonPayload = fieldValues[1];
                                 if (jsonPayload) {
-                                    const alert = JSON.parse(jsonPayload);
-                                    send('whale', alert);
+                                    const alert = safeJsonParse(jsonPayload, null, 'WHALE_XREAD_STREAM');
+                                    if (alert) send('whale', alert);
                                 }
                             }
                         } else {

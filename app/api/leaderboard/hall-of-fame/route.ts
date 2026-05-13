@@ -18,6 +18,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -34,8 +35,9 @@ export async function GET(req: NextRequest) {
     try {
         // [PHASE 4 - REDIS CACHE FAST PATH]
         const cached = await safeRedisGet(CACHE_KEY);
-        if (cached) {
-            return NextResponse.json(JSON.parse(cached));
+        if (cached && cached !== 'TIMEOUT') {
+            const parsed = safeJsonParse(cached, null, 'HALL_OF_FAME');
+            if (parsed) return NextResponse.json(parsed);
         }
 
         const { prisma } = await import('@/lib/prisma');

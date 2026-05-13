@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { redisClient } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +11,8 @@ export async function GET(req: NextRequest) {
     const cachedData = await redisClient.get(CACHE_KEY);
     
     if (cachedData) {
-      return NextResponse.json(JSON.parse(cachedData));
+      const parsed = safeJsonParse(cachedData, null, 'LIQUIDATIONS');
+      if (parsed) return NextResponse.json(parsed);
     }
 
     let depth, ticker, currentPrice;

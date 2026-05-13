@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { redisClient as redis } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,8 @@ export async function GET() {
         const cached = await redis.get(cacheKey);
 
         if (cached) {
-            return NextResponse.json({ whales: JSON.parse(cached), source: 'cache' });
+            const parsed = safeJsonParse(cached, null, 'TOP_WHALES');
+            if (parsed) return NextResponse.json({ whales: parsed, source: 'cache' });
         }
 
         // Real BTC/ETH prices

@@ -8,6 +8,7 @@ import {
     safeRedisSAdd,
     safeRedisSMembers,
 } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 const BLOCKED_IP_PREFIX = 'sovereign:blocked_ip:';
 const BLOCKED_IP_INDEX  = 'sovereign:blocked_ip_index';
@@ -53,7 +54,11 @@ export async function GET(): Promise<NextResponse> {
                 continue;
             }
 
-            const entry: BlockedIPEntry = JSON.parse(raw);
+            const entry = safeJsonParse<BlockedIPEntry>(raw, null, 'BLOCKED_IP_ENTRY');
+            if (!entry) {
+                await redisClient.srem?.(BLOCKED_IP_INDEX, ip).catch(() => {});
+                continue;
+            }
 
             // Double-check application-level expiry for permanent blocks (no Redis TTL)
             if (entry.expiresAt && new Date(entry.expiresAt) <= now) {

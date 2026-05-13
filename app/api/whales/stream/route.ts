@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createRedisClient, createSubClient } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,18 +18,19 @@ export async function GET(req: Request) {
                 try {
                     const cachedRaw = await redis.get('latest_whale_alerts');
                     if (cachedRaw) {
-                        const alerts = JSON.parse(cachedRaw);
+                        const alerts = safeJsonParse(cachedRaw, [], 'WHALE_STREAM_HISTORY');
                         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'HISTORY', alerts })}\n\n`));
                     }
                 } catch (e) {
-                    console.error("Failed to fetch whale cache", e);
+                    console.error('Failed to fetch whale cache', e);
                 }
 
-                pSubscriber.subscribe('whale_alerts_stream', (err) => {
-                    if (err) console.error("Redis sub error:", err);
+                // Explicit types eliminate the three implicit-any errors
+                pSubscriber.subscribe('whale_alerts_stream', (err: Error | null) => {
+                    if (err) console.error('Redis sub error:', err);
                 });
 
-                pSubscriber.on('message', (channel, message) => {
+                pSubscriber.on('message', (channel: string, message: string) => {
                     if (channel === 'whale_alerts_stream') {
                         controller.enqueue(encoder.encode(`data: ${message}\n\n`));
                     }

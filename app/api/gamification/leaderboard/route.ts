@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 /**
  * GET /api/gamification/leaderboard
@@ -20,10 +21,13 @@ export async function GET(req: NextRequest) {
         // ── CACHE LAYER (MAXIMA PERFECCION) ───────────────────────────────────
         if (type === 'volume') {
            const cached = await safeRedisGet(`${CACHE_KEY}:${limit}`);
-           if (cached) {
-               return NextResponse.json(JSON.parse(cached), {
-                   headers: { 'X-Cache': 'HIT', 'Cache-Control': 'no-store' }
-               });
+           if (cached && cached !== 'TIMEOUT') {
+               const parsed = safeJsonParse(cached, null, 'GAMIFICATION_LEADERBOARD');
+               if (parsed) {
+                   return NextResponse.json(parsed, {
+                       headers: { 'X-Cache': 'HIT', 'Cache-Control': 'no-store' }
+                   });
+               }
            }
         }
 

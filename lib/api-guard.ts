@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { RedisRateLimiter } from './redis/rate-limiter';
 import { safeRedisGet, safeRedisSet, redisClient } from './redis/client';
 import { timingSafeEqual } from 'crypto';
+import { safeJsonParse } from '@/lib/utils/json';
 
 export interface ApiKeyValidation {
   valid: boolean;
@@ -47,8 +48,8 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
   let subscription: any = null;
   const cachedKey = await safeRedisGet(cacheKey);
   
-  if (cachedKey) {
-    subscription = JSON.parse(cachedKey);
+  if (cachedKey && cachedKey !== 'TIMEOUT') {
+    subscription = safeJsonParse(cachedKey, null, 'API_GUARD_KEY_CACHE');
   } else {
     subscription = await (prisma as any).apiSubscription.findFirst({
       where: { keyHash },

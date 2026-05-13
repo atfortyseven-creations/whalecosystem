@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 import { AGGREGATION_KEYS } from '@/lib/indexer/aggregation-service';
 
 export const dynamic = 'force-dynamic';
@@ -19,10 +20,13 @@ export async function GET(req: NextRequest) {
     try {
         // ── Fast path ─────────────────────────────────────────────────────────
         const cached = await safeRedisGet(AGGREGATION_KEYS.SECTOR_RANKINGS);
-        if (cached) {
-            return NextResponse.json(JSON.parse(cached), {
-                headers: { 'X-Cache': 'HIT', 'Cache-Control': 'no-store' },
-            });
+        if (cached && cached !== 'TIMEOUT') {
+            const parsed = safeJsonParse(cached, null, 'SECTOR_RANKINGS');
+            if (parsed) {
+                return NextResponse.json(parsed, {
+                    headers: { 'X-Cache': 'HIT', 'Cache-Control': 'no-store' },
+                });
+            }
         }
 
         // ── Cache miss: direct Prisma query + repopulate ──────────────────────

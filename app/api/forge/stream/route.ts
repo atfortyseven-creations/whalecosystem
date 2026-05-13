@@ -29,9 +29,13 @@ export async function GET(request: NextRequest) {
 
         subClient.on('pmessage', async (pattern: string, channel: string, message: string) => {
             if (channel.startsWith('sovereign:forge:trigger:')) {
-                const entity = JSON.parse(message);
-                const payload = `data: ${JSON.stringify({ type: 'ENTITY_SPAWN', entity })}\n\n`;
-                await writer.write(new TextEncoder().encode(payload));
+                try {
+                    const entity = JSON.parse(message);
+                    const payload = `data: ${JSON.stringify({ type: 'ENTITY_SPAWN', entity })}\n\n`;
+                    await writer.write(new TextEncoder().encode(payload));
+                } catch {
+                    console.warn('[ForgeSSE] Malformed pmessage skipped on channel:', channel);
+                }
             }
         });
 

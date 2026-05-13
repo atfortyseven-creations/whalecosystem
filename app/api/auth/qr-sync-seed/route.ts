@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { safeRedisSet, safeRedisGet } from '@/lib/redis/client';
+import { safeJsonParse } from '@/lib/utils/json';
 
 /**
  * [EXPERT-SYNC] QR Seed Bridge
@@ -32,7 +33,9 @@ export async function GET(req: NextRequest) {
   if (!uuid) return NextResponse.json({ error: 'Missing uuid' }, { status: 400 });
   
   const data = await safeRedisGet(`qr-seed:${uuid}`);
-  if (!data) return NextResponse.json({ pending: true });
+  if (!data || data === 'TIMEOUT') return NextResponse.json({ pending: true });
   
-  return NextResponse.json(JSON.parse(data));
+  const parsed = safeJsonParse(data, null, 'QR_SYNC_SEED');
+  if (!parsed) return NextResponse.json({ error: 'Invalid seed data' }, { status: 500 });
+  return NextResponse.json(parsed);
 }
