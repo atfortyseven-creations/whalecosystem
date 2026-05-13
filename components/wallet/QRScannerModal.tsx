@@ -395,6 +395,36 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
       // Browser auto-stores human_session cookie from response (credentials:include)
       setStatus('success');
 
+      // ── [EXPERT-SYNC] Receive XMTP Seed from Desktop ──────────────────────
+      // We poll for a few seconds to see if the desktop pushed an identity seed.
+      // If we get it, the user can enter chat without a signature.
+      let seedAttempts = 0;
+      const pollSeed = setInterval(async () => {
+          seedAttempts++;
+          if (seedAttempts > 10) { clearInterval(pollSeed); return; } // Timeout after 10s
+
+          try {
+              const sRes = await fetch(`/api/auth/qr-sync-seed?uuid=${uuid}`);
+              if (sRes.ok) {
+                  const sData = await sRes.json();
+                  if (sData.encryptedSeed && sData.iv) {
+                      clearInterval(pollSeed);
+                      const { decryptAESGCM } = await import('@/lib/web-crypto');
+                      const decryptedSeed = await decryptAESGCM(shared, sData.encryptedSeed, sData.iv);
+                      
+                      const finalAddr = addr || addressRef.current || extAddrRef.current;
+                      if (finalAddr) {
+                          const seedKey = `whale_chat_seed_${finalAddr.toLowerCase()}`;
+                          localStorage.setItem(seedKey, decryptedSeed);
+                          console.log("[Sovereign:Sync] XMTP identity seed synchronized.");
+                      }
+                  }
+              }
+          } catch (e) {
+              console.warn("[Sovereign:Sync] Seed sync error:", e);
+          }
+      }, 1000);
+
     } catch (e: any) {
       console.error('[QRScanner] Unexpected error:', e);
       setErrMsg('An unexpected error occurred. Please try again.');

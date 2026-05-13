@@ -478,8 +478,12 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   }, [address, getDeterministicSeed, isMobile, signMessageAsync, isSovereignHandshake, loadConversations]);
 
   // AUTO-INITIALIZE: When wallet is connected and XMTP not yet started, auto-init.
+  // [EXPERT-SILENT-ENTRY]: If a seed is present, we initialize IMMEDIATELY without showing any prompt.
   useEffect(() => {
-    if (isConnected && address && forceAutoInit && !client && !initInFlight.current && !initError) {
+    const seedKey = `whale_chat_seed_${address?.toLowerCase() || ''}`;
+    const hasSeed = !!localStorage.getItem(seedKey);
+    
+    if (isConnected && address && (forceAutoInit || hasSeed) && !client && !initInFlight.current && !initError) {
       initClient();
     }
   }, [isConnected, address, forceAutoInit, client, initError, initClient]);

@@ -198,8 +198,35 @@ export default function ConnectPage() {
               const mobilePub = data.mobilePub;
               if (mobilePub) {
                 const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, isECDHFlag);
-                const decrypted = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
-                if (decrypted && decrypted.split('.').length === 3) jwt = decrypted;
+
+                // ── [EXPERT-SYNC] Push XMTP Seed to Mobile ──────────────────────
+                // If this desktop already has an XMTP identity seed, we send it
+                // to the mobile so it can initialize chat silently.
+                const addressToUse = jwt ? address : (isConnected ? address : null);
+                if (addressToUse) {
+                  const seedKey = `whale_chat_seed_${addressToUse.toLowerCase()}`;
+                  const localSeed = localStorage.getItem(seedKey);
+                  if (localSeed) {
+                    console.log("[Sovereign:Sync] Pushing XMTP seed to mobile device...");
+                    const { encryptAESGCM } = await import('@/lib/web-crypto');
+                    const encryptedSeed = await encryptAESGCM(shared, localSeed);
+                    fetch('/api/auth/qr-sync-seed', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        uuid: qrSession,
+                        encryptedSeed: encryptedSeed.encryptedPayload,
+                        iv: encryptedSeed.iv,
+                        tag: encryptedSeed.tag
+                      })
+                    }).catch(e => console.warn("[Sovereign:Sync] Seed push failed:", e));
+                  }
+                }
+
+                if (data.encryptedPayload && data.iv) {
+                  const decrypted = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
+                  if (decrypted && decrypted.split('.').length === 3) jwt = decrypted;
+                }
               }
             } catch (err) {}
           }
