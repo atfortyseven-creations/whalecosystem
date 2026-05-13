@@ -90,7 +90,6 @@ export function MobileManifesto() {
         <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }} className="relative z-10">
 
           <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FAFAF8] border border-slate-200 rounded-full shadow-sm mb-8">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#0044CC] animate-pulse" />
             <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Sovereign Intelligence</span>
           </motion.div>
 
@@ -220,7 +219,6 @@ export function MobileManifesto() {
           <div className="flex items-center justify-between">
             {!loading && lastUpdated && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-[#FAFAF8] rounded-full border border-black/5 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#0044CC] animate-pulse" />
                 <span className="font-mono text-[9px] font-bold text-slate-500 uppercase tracking-widest">{updatedLabel}</span>
               </div>
             )}

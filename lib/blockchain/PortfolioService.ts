@@ -517,7 +517,7 @@ export class PortfolioService {
         try {
             // 🔥 [Elite RESILIENCE] 15-second Global Hard-Timeout
             const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('GLOBAL_PORTFOLIO_TIMEOUT')), 15000)
+                setTimeout(() => reject(new Error('GLOBAL_PORTFOLIO_TIMEOUT')), 30000)
             );
 
             return await Promise.race([
@@ -639,7 +639,7 @@ export class PortfolioService {
           // 5s timeout per chain — Moralis should always respond within 3s.
           // If RPC fallback is triggered, 5s is still enough for public nodes.
           const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 5000)
+              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 10000)
           );
 
           try {

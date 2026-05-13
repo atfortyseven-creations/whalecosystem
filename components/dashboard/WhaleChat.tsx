@@ -810,7 +810,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         {/* Minimalist Protocol Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-black/5 bg-[#FAFAF8] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-[#0044CC] animate-pulse" />
           </div>
           <div className="w-4" />
         </div>
@@ -826,12 +825,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           </div>
 
           <div className="space-y-4 max-w-2xl">
-            <h2 className="text-[#050505] text-[36px] md:text-[48px] font-black uppercase tracking-tighter leading-none">
-              Institutional <br /> Communications.
+            <h2 className="text-[#050505] text-[32px] md:text-[44px] font-black uppercase tracking-tighter leading-tight">
+              Welcome to, <br /> Whale Chat.
             </h2>
-            <p className="text-[#050505]/60 text-[14px] md:text-[16px] font-serif leading-relaxed px-4">
-              A cryptographically secure, decentralized messaging protocol. 
-              All transmissions are encrypted peer-to-peer. No server storage. Absolute privacy.
+            <div className="w-12 h-px bg-black/10 mx-auto my-6" />
+            <p className="text-[#050505]/40 text-[13px] md:text-[15px] font-serif leading-relaxed px-6 max-w-sm mx-auto text-center">
+              A private, decentralized protocol for institutional communications. 
+              Zero-knowledge encryption. Absolute sovereignty.
             </p>
           </div>
         </div>

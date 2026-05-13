@@ -48,12 +48,6 @@ export function SystemsUtilityHeader() {
                         title={item.label}
                     >
                         <item.icon size={15} strokeWidth={activePanel === item.id ? 2.5 : 1.8} />
-                        {item.id === 'notifications' && (
-                            <div
-                                className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full animate-pulse"
-                                style={{ background: 'rgba(0,0,0,0.6)' }}
-                            />
-                        )}
                     </motion.button>
                 ))}
             </div>

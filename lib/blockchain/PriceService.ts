@@ -1,4 +1,4 @@
-
+import { safeJsonParse } from '../utils/json';
 import { alchemyClient } from '../wallet/alchemy-client';
 import { getBulkPricesWithChange, STEEL_DOME_FALLBACKS } from '../priceHelper';
 import { LRUCache } from 'lru-cache';
@@ -127,7 +127,7 @@ export class PriceService {
     const res = await fetch(url, { 
       headers, 
       cache: 'no-store', // [REAL-TIME] no Next.js Data Cache — always fresh
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(10000)
     });
     if (res.status === 429) {
         console.warn('[PriceService] ⚠️ CoinGecko 429 Throttled for markets. Using STEEL DOME Fallback immediately.');
@@ -135,7 +135,8 @@ export class PriceService {
     }
     if (!res.ok) throw new Error(`CG Status ${res.status}`);
     
-    const data = await res.json();
+    const text = await res.text();
+    const data = safeJsonParse<any[]>(text, [], 'PRICE_SERVICE_MARKETS');
     return data.map((coin: any) => ({
       id: coin.id,
       symbol: coin.symbol.toUpperCase(),
@@ -169,11 +170,12 @@ export class PriceService {
 
     try {
       const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${address}`, {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(8000)
       });
       const text = await res.text();
       if (!text) return null;
-      const data = JSON.parse(text);
+      const data = safeJsonParse<any>(text, null, 'PRICE_SERVICE_DEXSCREENER');
+      if (!data) return null;
       const pair = data.pairs?.[0]; // Get most liquid pair
       
       if (pair) {
