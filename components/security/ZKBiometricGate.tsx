@@ -43,11 +43,12 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white border border-black/5 rounded-[32px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.04)] font-mono text-[#050505] relative overflow-hidden">
+    <div className="w-full bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 shadow-sm font-sans text-[#050505] relative overflow-hidden flex flex-col md:flex-row gap-8 items-center h-full">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:1rem_1rem] pointer-events-none" />
       
-      <div className="relative z-10 flex flex-col items-center">
+      {/* Left side: Scanner */}
+      <div className="relative z-10 flex flex-col items-center w-full md:w-1/2">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/5 rounded-full mb-8">
           <Shield size={12} className="text-emerald-600" />
           <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-700">ZK-Oracle Active</span>
@@ -144,15 +145,30 @@ export function ZKBiometricGate({ onSuccess }: ZKBiometricGateProps) {
           </AnimatePresence>
         </div>
 
+      </div>
+
+      {/* Right side: Instructions */}
+      <div className="relative z-10 w-full md:w-1/2 flex flex-col justify-center border-t md:border-t-0 md:border-l border-black/5 pt-8 md:pt-0 md:pl-8">
+        <div className="mb-6">
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 mb-2">Operation Manual</h4>
+            <p className="text-[11px] text-black/50 leading-relaxed">
+              1. Center your face within the biometric camera overlay.<br/>
+              2. The neural engine extracts 3D liveness data securely.<br/>
+              3. Approve the wallet signature request to hash the attestation.<br/>
+              4. A Zero-Knowledge SNARK is injected into your session without storing visual data.
+            </p>
+        </div>
+
         {stage === "IDLE" && (
           <button
             onClick={handleStart}
-            className="w-full py-4 bg-[#050505] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] transition-all active:scale-95"
+            className="w-full py-4 bg-[#050505] text-white rounded-xl text-[11px] font-black uppercase tracking-[0.2em] shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            Initiate Secure Scan
+            <Camera size={14} /> Initiate Secure Scan
           </button>
         )}
       </div>
+
     </div>
   );
 }

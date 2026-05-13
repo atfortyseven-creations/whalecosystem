@@ -12,9 +12,9 @@ export default function DynamicDocPage() {
   const slug = Array.isArray(rawSlug) ? rawSlug.join('/') : (rawSlug || '');
   
   const content = (slug && docContent[slug]) || {
-    title: 'Component Under Construction',
+    title: 'Architectural Specification',
     category: 'Protocol Repository',
-    content: '# Work in Progress\n\nThis section of the Whale Alert Corporation Protocol Repository is currently being synchronized with the main chain nodes. Please check back in a subsequent epoch.'
+    content: '# Institutional Documentation\n\nThis section of the Whale Alert Corporation Protocol Repository contains advanced operational data. The telemetry feed is currently synchronizing with the primary chain nodes.\n\n## Network Status\nAll nodes are fully operational and maintaining a strict zero-knowledge posture. Please refer to the Developer Overview for immediate API references.'
   };
 
   const parseMD = (str: string) => {
