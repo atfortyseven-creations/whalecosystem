@@ -37,7 +37,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         {/* Left Content */}
         <motion.div 
           initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-          className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-20 pb-24 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
+          className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-32 pb-20 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
         >
 
           <motion.h1 variants={FADE_UP} className="text-[40px] sm:text-[56px] md:text-[64px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-4xl">
@@ -50,14 +50,14 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.p>
 
           {/* Live Stats Glassmorphism Bar */}
-          <motion.div variants={FADE_UP} className="flex flex-wrap items-center gap-x-8 gap-y-6 p-6 md:p-8 bg-white/80 backdrop-blur-2xl border border-black/5 rounded-3xl mb-10 shadow-xl shadow-black/5 max-w-2xl">
+          <motion.div variants={FADE_UP} className="flex flex-wrap items-center gap-x-4 sm:gap-x-8 gap-y-4 sm:gap-y-6 p-6 md:p-8 bg-white/80 backdrop-blur-2xl border border-black/5 rounded-3xl mb-10 shadow-xl shadow-black/5 max-w-2xl">
             {[
               { label: "ETH Block", val: syncing ? "Syncing..." : blockNumber ?? "---" },
               { label: "Base Fee", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "---" },
               { label: "Active Tokens", val: globalStats?.tokens ?? "---" },
               { label: "Total Cap", val: globalStats?.cap ?? "---" }
             ].map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-8">
+              <div key={stat.label} className="flex items-center gap-4 sm:gap-8">
                 <div className="flex flex-col gap-1.5">
                   <span className="font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{stat.label}</span>
                   <span className="font-mono text-[14px] sm:text-[16px] font-black text-[#0a0a0a]">{stat.val}</span>

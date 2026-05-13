@@ -1,4 +1,5 @@
 import { safeRedisGet, safeRedisSet } from '../redis/client';
+import { safeJsonParse } from '../utils/json';
 
 /**
  * MORALIS_API_KEY from Environment
@@ -80,12 +81,8 @@ export class MoralisService {
     // Guard: safeRedisGet returns the string 'TIMEOUT' on Redis timeout,
     // which is NOT valid JSON. Skip the parse to avoid SyntaxErrors.
     if (cached && cached !== 'TIMEOUT') {
-      try {
-        return JSON.parse(cached) as T;
-      } catch {
-        // Corrupted cache entry — evict silently and re-fetch from source.
-        // Do NOT log here to avoid log spam on every cache miss.
-      }
+      const parsed = safeJsonParse<T | null>(cached, null, `MORALIS_CACHE:${endpoint}`);
+      if (parsed) return parsed;
     }
 
     // ─── Phase 2: Thundering Herd Protection (Deduplication) ───
@@ -149,7 +146,9 @@ export class MoralisService {
                 throw new Error(`Moralis API Error (${response.status}): ${errorText}`);
             }
 
-            const data = await response.json();
+            const text = await response.text();
+            const data = safeJsonParse<T>(text, null as any, `MORALIS_API:${endpoint}`);
+            if (!data) throw new Error('MALFORMED_JSON_RESPONSE');
             
             // ─── Phase 3: Selective Persistence ─────────────────
             // Historical data (history, token transfers) gets longer TTL

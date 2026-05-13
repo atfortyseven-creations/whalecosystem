@@ -5,6 +5,7 @@ import {
   MarketSentiment,
   RawNewsItem
 } from '@/lib/news-intelligence';
+import { safeJsonParse } from '@/lib/utils/json';
 
 export const revalidate = 0;
 
@@ -269,8 +270,9 @@ function padTo300(articles: UINewsArticle[]) {
 export async function GET() {
   const originalResponse = await GET_internal();
   try {
-    const json = await originalResponse.clone().json();
-    if (json.articles) {
+    const text = await originalResponse.clone().text();
+    const json = safeJsonParse<any>(text, null, 'NEWS_GET_INTERNAL_CLONE');
+    if (json && json.articles) {
         const padded = padTo300(json.articles);
         return NextResponse.json({ ...json, count: padded.length, articles: padded });
     }
@@ -291,7 +293,9 @@ async function GET_internal() {
         { headers: { 'Accept': 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(6000) }
       );
       if (res.ok) {
-        const json = await res.json();
+        const text = await res.text();
+        const json = safeJsonParse<any>(text, null, 'NEWS_CRYPTOPANIC_API');
+        if (!json) continue;
         const results: CryptoPanicArticle[] = json.results ?? [];
         if (results.length > 0) {
           const articles: UINewsArticle[] = results.slice(0, 50).map(item => {
