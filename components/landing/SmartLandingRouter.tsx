@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { ClientRootRouter } from '@/components/landing/ClientRootRouter';
 import { ClientMobileLanding } from '@/components/landing/ClientMobileLanding';
+import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 
 export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: boolean }) {
     const [mounted, setMounted] = useState(false);
@@ -30,11 +31,7 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
     }, []);
 
     if (!mounted) {
-        return (
-            <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-black/20">
-                INITIALIZING...
-            </div>
-        );
+        return <WhaleAlertLoader bg="#FDFCF8" color="#050505" />;
     }
 
     // Any physical mobile/tablet → always MobileLanding, covering ALL cases:

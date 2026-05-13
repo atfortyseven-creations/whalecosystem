@@ -125,8 +125,15 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                         </SafeErrorBoundary>
                     </div>
                 ) : (
-                    /* THE SKELETON / LOADING ENGINE */
-                    null
+                    <motion.div 
+                        key="loader" 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0, transition: { duration: 0.5, ease: "easeOut" } }}
+                        className="fixed inset-0 z-[999] flex items-center justify-center bg-[#FDFCF8]"
+                    >
+                        <WhaleAlertLoader bg="transparent" color="#050505" />
+                    </motion.div>
                 )}
             </AnimatePresence>
         </GateStateContext.Provider>

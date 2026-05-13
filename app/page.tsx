@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { headers } from 'next/headers';
 import { SmartLandingRouter } from '@/components/landing/SmartLandingRouter';
+import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,11 +12,7 @@ export default async function Home() {
 
   return (
     <main>
-      <Suspense fallback={
-        <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-black/20">
-          INITIALIZING...
-        </div>
-      }>
+      <Suspense fallback={<WhaleAlertLoader bg="#FDFCF8" color="#050505" />}>
         <SmartLandingRouter isMobileUserAgent={isMobile} />
       </Suspense>
     </main>

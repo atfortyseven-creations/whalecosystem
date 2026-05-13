@@ -9,6 +9,7 @@ import {
   AlertTriangle, CreditCard, Building2, User, Crown, Activity
 } from "lucide-react";
 import Link from "next/link";
+import { WhaleAlertLoader } from "@/components/ui/WhaleAlertLoader";
 
 const PLANS = [
   {
@@ -110,7 +111,7 @@ function SecurityBadge({ text }: { text: string }) {
 
 export default function ApiMarketplacePage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white font-mono text-xs uppercase tracking-widest">Loading Marketplace...</div>}>
+    <React.Suspense fallback={<WhaleAlertLoader bg="#000000" color="#FFFFFF" />}>
       <ApiMarketplacePageContent />
     </React.Suspense>
   );

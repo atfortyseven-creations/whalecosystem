@@ -123,7 +123,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
   }, [pathname]);
 
-  const isPublicPath = PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
+  const isPublicPath = pathname === '/' || PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
   const content = !isPublicPath ? <LinkedGate>{children}</LinkedGate> : children;
 
   // ── Layout mode ───────────────────────────────────────────────────────────
@@ -131,7 +131,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   // BOUNDED    → h-[100dvh] overflow-hidden       (header + inner scroll box)
   // LANDING    → min-h-screen natural document scroll (immersive manifesto)
   const isDashboard = pathname.startsWith('/dashboard');
-  const isBounded = !isDashboard && (pathname === '/' || BOUNDED_PREFIXES.some(p => pathname.startsWith(p)));
+  const isBounded = !isDashboard && BOUNDED_PREFIXES.some(p => pathname.startsWith(p));
   const isLanding = pathname === '/';
 
   // Strict body trap for PC/Desktop — completely block document-level scrolling on bounded modules

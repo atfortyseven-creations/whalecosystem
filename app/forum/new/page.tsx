@@ -6,12 +6,13 @@ import Link from 'next/link';
 import { ChevronDown, Save, FileLock2, Plus, ShieldCheck } from 'lucide-react';
 import { useSignMessage, useAccount } from 'wagmi';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 
 const DRAFT_KEY = 'forum_draft_new_topic';
 
 export default function NewTopicPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#FFFDF8] dark:bg-[#050505] flex items-center justify-center text-black/50 dark:text-white/50 text-[10px] uppercase font-bold tracking-widest">Loading...</div>}>
+    <React.Suspense fallback={<WhaleAlertLoader bg="transparent" color="#050505" />}>
       <NewTopicContent />
     </React.Suspense>
   );

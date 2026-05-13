@@ -8,6 +8,7 @@ import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { motion } from 'framer-motion';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { Activity } from 'lucide-react';
+import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 
 function ForumHomeContent() {
   const [topics, setTopics] = useState<any[]>([]);
@@ -183,7 +184,7 @@ function ForumHomeContent() {
 
 export default function ForumHomePage() {
   return (
-    <Suspense fallback={<div className="w-full pt-10 px-4 text-center text-gray-500">Loading forum...</div>}>
+    <Suspense fallback={<WhaleAlertLoader bg="transparent" color="#050505" />}>
       <ForumHomeContent />
     </Suspense>
   );
