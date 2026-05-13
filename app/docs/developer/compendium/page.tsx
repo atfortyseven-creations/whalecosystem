@@ -1,105 +1,130 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { DISCLAIMER, INTRODUCTION_PARAGRAPHS, CHAPTERS, Paragraph } from '@/app/developers/compendium-content';
 
-const renderParagraph = (p: Paragraph, index: number) => {
-  switch (p.type) {
-    case 'h3':
-      return <h3 key={index} className="text-xl font-bold mt-12 mb-6 font-serif text-[#0A0A0A] dark:text-white leading-[1.3]">{p.text}</h3>;
-    case 'h4':
-      return <h4 key={index} className="text-sm font-bold uppercase tracking-widest mt-10 mb-4 font-mono text-[#0044CC] dark:text-[#4488FF]">{p.text}</h4>;
-    case 'code':
-      return (
-        <pre key={index} className="bg-black/5 dark:bg-white/5 p-6 rounded-md font-mono text-xs overflow-x-auto my-6 border border-black/10 dark:border-white/10 text-[#0A0A0A] dark:text-white/80">
-          <code>{p.text}</code>
-        </pre>
-      );
-    case 'math':
-      return (
-        <div key={index} className="bg-[#FAF9F6] dark:bg-black/40 p-6 rounded-sm font-mono text-sm overflow-x-auto my-6 border-l-4 border-[#0044CC] text-center italic text-[#0A0A0A] dark:text-white/70">
-          {p.text}
-        </div>
-      );
-    case 'list':
-      return (
-        <ul key={index} className="list-none pl-6 my-6 space-y-4">
-          {p.items?.map((item, i) => (
-            <li key={i} className="relative text-[15px] leading-[1.8] text-[#1a1a1a] dark:text-white/70">
-              <span className="absolute -left-6 top-1.5 w-1.5 h-1.5 rounded-full bg-[#0044CC] opacity-50" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      );
-    case 'flowchart':
-      return null;
-    default:
-      return <p key={index} className="text-[16px] leading-[1.9] text-[#1a1a1a] dark:text-white/75 mb-6 tracking-[0.01em]">{p.text}</p>;
-  }
-};
-
-export default function CompendiumPage() {
+export default function APICompendiumPage() {
   return (
-    <div className="max-w-4xl mx-auto py-12 px-6">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-20"
-      >
-        <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#0044CC] dark:text-[#4488FF] mb-8">Architectural Syllabus</div>
-        <h1 className="font-serif text-5xl md:text-6xl font-normal leading-[1.05] tracking-tight text-[#0A0A0A] dark:text-white mb-8">
-          The Compendium of <br/><span className="italic text-black/40 dark:text-white/40">Sovereign Intelligence.</span>
-        </h1>
-        
-        <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-sm mb-12">
-          <h4 className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-red-600 dark:text-red-400 mb-3">Regulatory Disclaimer</h4>
-          <p className="text-sm leading-relaxed text-red-900/80 dark:text-red-200/60 font-serif italic">{DISCLAIMER}</p>
-        </div>
+    <div className="doc-content">
+      <p className="font-mono text-[10px] uppercase tracking-[0.25em] opacity-25 mb-8">Developer / API Compendium</p>
+      <h1>API Compendium</h1>
 
-        <div className="prose prose-lg dark:prose-invert max-w-none">
-          {INTRODUCTION_PARAGRAPHS.map((p, i) => renderParagraph(p, i))}
-        </div>
-      </motion.div>
+      <p>
+        Referencia exhaustiva de los endpoints REST de Whale Alert Network. Todas las peticiones
+        deben incluir la cookie <code>human_session</code>. Los datos se devuelven en formato JSON
+        con la estructura estándar: <code>{`{ success: boolean, data: any, timestamp: number }`}</code>.
+      </p>
 
-      <div className="space-y-32 border-t border-black/10 dark:border-white/10 pt-20">
-        {CHAPTERS.map((chapter) => (
-          <motion.div 
-            key={chapter.id}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="scroll-mt-32"
-            id={chapter.id}
-          >
-            <div className="mb-16">
-              <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[#0044CC] dark:text-[#4488FF] block mb-4">
-                {chapter.number}
-              </span>
-              <h2 className="font-serif text-4xl md:text-5xl font-normal leading-[1.1] text-[#0A0A0A] dark:text-white mb-6">
-                {chapter.title}
-              </h2>
-              <p className="text-xl text-black/50 dark:text-white/50 font-sans leading-relaxed max-w-3xl border-l-2 border-black/10 dark:border-white/10 pl-6">
-                {chapter.subtitle}
-              </p>
-            </div>
+      <h2>1. Inteligencia On-Chain (Whales)</h2>
 
-            <div className="space-y-16">
-              {chapter.sections.map((section) => (
-                <div key={section.id} id={section.id} className="scroll-mt-32">
-                  <h3 className="font-serif text-2xl font-normal text-[#0A0A0A] dark:text-white mb-8 border-b border-black/5 dark:border-white/5 pb-4">
-                    {section.title}
-                  </h3>
-                  <div className="prose prose-lg dark:prose-invert max-w-none">
-                    {section.content.map((p, i) => renderParagraph(p, i))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        ))}
+      <div className="endpoint-block mb-8">
+        <h3><code>GET /api/whale/alerts</code></h3>
+        <p>Obtiene las alertas más recientes generadas por el motor Z-Score.</p>
+        <h4>Parámetros Query:</h4>
+        <ul>
+          <li><code>chain</code> (opcional): Filtra por red (e.g., <code>ethereum</code>, <code>base</code>, <code>solana</code>).</li>
+          <li><code>minUsd</code> (opcional): Valor mínimo en dólares (default: 500000).</li>
+          <li><code>tier</code> (opcional): Filtra por anomalía (<code>PROBE</code>, <code>HIGH_CONVICTION</code>, <code>MEGA_EVENT</code>).</li>
+          <li><code>limit</code> (opcional): Máximo de resultados (default: 50, max: 200).</li>
+        </ul>
+        <h4>Respuesta de ejemplo (200 OK):</h4>
+        <pre>{`{
+  "success": true,
+  "data": [
+    {
+      "hash": "0x123...abc",
+      "chain": "ethereum",
+      "from": "0xSource...",
+      "to": "0xDest...",
+      "valueUsd": 2500000,
+      "token": "USDC",
+      "zScore": 3.4,
+      "tier": "HIGH_CONVICTION",
+      "timestamp": 1715600000000
+    }
+  ]
+}`}</pre>
       </div>
+
+      <div className="endpoint-block mb-8">
+        <h3><code>GET /api/intel/institutional</code> <span className="text-[10px] bg-green-500/10 text-green-600 px-2 py-0.5 rounded ml-2">STANDARD</span></h3>
+        <p>Devuelve flujos de capital asociados a entidades institucionales conocidas (etiquetadas en Neo4j).</p>
+        <h4>Parámetros Query:</h4>
+        <ul>
+          <li><code>entity</code> (opcional): Filtra por nombre (e.g., <code>Binance</code>, <code>Wintermute</code>).</li>
+          <li><code>timeframe</code> (opcional): Ventana de tiempo (<code>24h</code>, <code>7d</code>, <code>30d</code>).</li>
+        </ul>
+      </div>
+
+      <h2>2. Mercados y DeFi</h2>
+
+      <div className="endpoint-block mb-8">
+        <h3><code>GET /api/market/top</code></h3>
+        <p>Los 50 activos con mayor volumen de transacciones on-chain en las últimas 24 horas.</p>
+        <h4>Respuesta de ejemplo (200 OK):</h4>
+        <pre>{`{
+  "success": true,
+  "data": [
+    {
+      "symbol": "WETH",
+      "volume24h": 1250000000,
+      "priceChange24h": 2.5,
+      "currentPrice": 3100.50
+    }
+  ]
+}`}</pre>
+      </div>
+
+      <div className="endpoint-block mb-8">
+        <h3><code>GET /api/defi/morpho</code></h3>
+        <p>Datos de TVL y APY de los pools (vaults) de Morpho Blue en la red Base.</p>
+      </div>
+
+      <h2>3. Entidades y Wallets</h2>
+
+      <div className="endpoint-block mb-8">
+        <h3><code>GET /api/wallet/:address</code></h3>
+        <p>Perfil completo de un wallet, incluyendo etiquetas heurísticas y balance nativo.</p>
+        <h4>Respuesta de ejemplo (200 OK):</h4>
+        <pre>{`{
+  "success": true,
+  "data": {
+    "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "balance": "145.2",
+    "txCount": 15420,
+    "labels": ["Vitalik", "Ethereum Foundation", "Early Adopter"],
+    "isContract": false
+  }
+}`}</pre>
+      </div>
+
+      <h2>4. Autenticación y Perfil</h2>
+
+      <div className="endpoint-block mb-8">
+        <h3><code>GET /api/auth/session</code></h3>
+        <p>Devuelve el estado de la sesión actual verificando el JWT de la cookie.</p>
+        <h4>Respuesta de ejemplo (200 OK):</h4>
+        <pre>{`{
+  "success": true,
+  "data": {
+    "userId": "usr_12345",
+    "address": "0xTuWallet...",
+    "tier": "ELITE",
+    "subscriptionStatus": "active"
+  }
+}`}</pre>
+      </div>
+
+      <div className="endpoint-block mb-8">
+        <h3><code>POST /api/payment/stripe/checkout</code></h3>
+        <p>Inicia el flujo de Stripe Checkout para comprar o mejorar una suscripción.</p>
+        <h4>Cuerpo (JSON):</h4>
+        <pre>{`{
+  "planId": "price_1Nx...",
+  "successUrl": "https://humanidfi.com/dashboard/billing",
+  "cancelUrl": "https://humanidfi.com/dashboard/billing"
+}`}</pre>
+      </div>
+
     </div>
   );
 }

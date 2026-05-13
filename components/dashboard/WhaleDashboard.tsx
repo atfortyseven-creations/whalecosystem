@@ -37,7 +37,10 @@ import { WatchlistTable }       from '@/components/dashboard/WatchlistTable';
 // import SovereignIntelTab        from '@/components/dashboard/SovereignIntelTab';
 // import { VirtualizedFirehose }  from '@/components/premium/VirtualizedFirehose';
 // import { LivePortfolio }        from '@/components/premium/LivePortfolio';
-import AztecMempoolSpace           from '@/components/premium/AztecMempoolSpace';
+const AztecMempoolSpace = dynamic(
+  () => import('@/components/premium/AztecMempoolSpace'),
+  { ssr: false }
+);
 import dynamic from 'next/dynamic';
 
 // Heavy / SSR-unsafe dynamic imports
