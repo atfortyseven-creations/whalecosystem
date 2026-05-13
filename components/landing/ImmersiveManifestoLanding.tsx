@@ -50,19 +50,19 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.p>
 
           {/* Live Stats Glassmorphism Bar */}
-          <motion.div variants={FADE_UP} className="flex flex-wrap items-center gap-x-4 sm:gap-x-8 gap-y-4 sm:gap-y-6 p-6 md:p-8 bg-white/80 backdrop-blur-2xl border border-black/5 rounded-3xl mb-10 shadow-xl shadow-black/5 max-w-2xl">
+          <motion.div variants={FADE_UP} className="flex flex-row items-center justify-between gap-2 p-5 sm:p-8 bg-white/80 backdrop-blur-3xl border border-black/5 rounded-[2rem] mb-10 shadow-xl shadow-black/5 max-w-2xl w-full">
             {[
-              { label: "ETH Block", val: syncing ? "Syncing..." : blockNumber ?? "---" },
+              { label: "ETH Block", val: syncing ? "..." : (blockNumber ? `#${blockNumber.toLocaleString()}` : "---") },
               { label: "Base Fee", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "---" },
               { label: "Active Tokens", val: globalStats?.tokens ?? "---" },
               { label: "Total Cap", val: globalStats?.cap ?? "---" }
             ].map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-4 sm:gap-8">
-                <div className="flex flex-col gap-1.5">
-                  <span className="font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{stat.label}</span>
-                  <span className="font-mono text-[14px] sm:text-[16px] font-black text-[#0a0a0a]">{stat.val}</span>
+              <div key={stat.label} className="flex items-center">
+                <div className="flex flex-col gap-1">
+                  <span className="font-mono text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 truncate">{stat.label}</span>
+                  <span className="font-mono text-[12px] sm:text-[16px] font-black text-[#0a0a0a] truncate">{stat.val}</span>
                 </div>
-                {i !== 3 && <div className="w-px h-10 bg-black/10 hidden sm:block" />}
+                {i !== 3 && <div className="w-px h-8 bg-black/5 mx-2 sm:mx-6" />}
               </div>
             ))}
           </motion.div>
@@ -95,8 +95,8 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           <img
             src="/olas-hokusai-4k.png"
             alt="Wave"
-            className="absolute right-0 top-0 w-3/4 h-full object-cover object-left"
-            style={{ opacity: 0.18, mixBlendMode: 'multiply' }}
+            className="absolute -right-20 top-0 w-full h-full object-cover object-left"
+            style={{ opacity: 0.45, mixBlendMode: 'multiply' }}
           />
         </div>
         

@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
+import { AztecArchitectureSection } from "./AztecArchitectureSection";
+import { SovereignFooter } from "./SovereignFooter";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect, useBalance, useEnsName } from "wagmi";
@@ -1015,15 +1017,15 @@ export function MobileLanding() {
   // CRITICAL: This block must be AFTER all isLinked guards above.
   if (!showConnectOverlay) {
     return (
-      <div className="w-full min-h-[100dvh] bg-[#FDFCF8] relative">
+      <div className="w-full min-h-[100dvh] bg-[#FAFAF8] relative">
         <motion.header
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed top-4 left-4 right-4 z-[999] flex items-center justify-between px-5 py-3 rounded-full"
-          style={{ background: "rgba(255,255,255,0.80)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: `1px solid ${FAINT}`, boxShadow: "0 4px 24px rgba(5,5,5,0.07)" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
+          style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(0,0,0,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.03)" }}
         >
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <div
               className="w-6 h-6 shrink-0 cursor-pointer select-none"
               onClick={() => {
@@ -1038,32 +1040,37 @@ export function MobileLanding() {
           </div>
           <button
             onClick={() => setShowConnectOverlay(true)}
-            className="px-4 py-2 rounded-full bg-[#050505] text-white text-[9px] font-black uppercase tracking-widest shadow-lg hover:bg-black/80 active:scale-95 transition-all"
+            className="px-4 py-2 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
           >
             Connect Wallet
           </button>
         </motion.header>
 
-        <ImmersiveManifestoLanding onOpenScanner={() => setShowConnectOverlay(true)} hideMap={true} />
+        <div className="flex flex-col w-full">
+          <ImmersiveManifestoLanding onOpenScanner={() => setShowConnectOverlay(true)} hideMap={true} />
+          <AztecArchitectureSection />
+          <SovereignFooter />
+        </div>
       </div>
     );
   }
 
   // ── Render: Connect Overlay ────────────────────────────────────────────────
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: '#FAFAF8', color: INK }}>
 
       {/* Layer 0: ivory base */}
-      <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
+      <div className="fixed inset-0 z-0 bg-[#FAFAF8] pointer-events-none" />
 
       {/* Layer 1: Cosmic pattern background */}
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
         <motion.div
           className="absolute"
-          style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.045 }}
-          animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
-          transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
+          style={{ inset: "-10%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "120%", backgroundRepeat: "repeat", opacity: 0.08 }}
+          animate={{ x: ["0%", "-2%", "0%"], y: ["0%", "-1%", "0%"] }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
         />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white/90" />
       </div>
 
       {/* Layer 2: top fade */}
@@ -1073,11 +1080,11 @@ export function MobileLanding() {
       <motion.header
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between px-5 py-3 rounded-full"
-        style={{ background: "rgba(255,255,255,0.80)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: `1px solid ${FAINT}`, boxShadow: "0 4px 24px rgba(5,5,5,0.07)" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
+        style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(0,0,0,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.03)" }}
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <div
             className="w-6 h-6 shrink-0 cursor-pointer select-none"
             onClick={() => {
@@ -1100,7 +1107,7 @@ export function MobileLanding() {
         </div>
         <button 
           onClick={() => setShowConnectOverlay(false)}
-          className="px-3 py-1.5 rounded-full border border-black/10 text-[9px] font-black uppercase tracking-widest text-black/60 hover:bg-black/5 transition-colors"
+          className="px-4 py-2 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
         >
           Explore
         </button>
