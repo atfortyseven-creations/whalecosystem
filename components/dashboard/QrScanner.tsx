@@ -305,6 +305,4 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
         </div>
     );
 }
-}
-
 

@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { useUIStore } from "@/lib/store/ui-store";
 import { toast } from "sonner";
@@ -99,6 +99,7 @@ export default function ConnectPage() {
   const { isConnected, address } = useAccount();
   const { connect, connectors, isPending, isError, error } = useConnect();
   const { disconnect } = useDisconnect();
+  const { signMessageAsync } = useSignMessage();
   const { open: openAppKit } = useAppKit();
   const { isLinked, setLinked } = useUIStore();
 
@@ -108,6 +109,7 @@ export default function ConnectPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [showMobileScanner, setShowMobileScanner] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
 
   useEffect(() => {
     if (!isError || !error) return;
@@ -272,21 +274,53 @@ export default function ConnectPage() {
     if (!mounted || !isConnected || !address) return;
     try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
 
-    // [EXPERT-FIX] If wallet is connected but not yet linked (cookie missing),
-    // we establish the link immediately to trigger redirection.
-    if (!isLinked) {
-      console.log("[Sovereign] Auto-linking desktop connection...");
+    // Enforce cryptographic handshake on desktop to match mobile and derive seed
+    if (!isLinked && !isSigning) {
+      console.log("[Sovereign] Initiating desktop handshake...");
+      setIsSigning(true);
       const norm = address.toLowerCase();
-      // Layer 1: Cookie
-      document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-      // Layer 2: localStorage (for LinkedGate parity)
-      try {
-        localStorage.setItem('sovereign_session_v2', JSON.stringify({
-          address: norm,
-          exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
-        }));
-      } catch {}
-      setLinked(true);
+      const message = [
+        '═══════════════════════════════',
+        '  Whale Alert Network',
+        '  SOVEREIGN ACCESS HANDSHAKE',
+        '═══════════════════════════════',
+        '',
+        `Identity: ${norm}`,
+        `Nonce: ${Date.now()}`,
+        `Network: WHALE_ALERT_NETWORK_V1`,
+        '',
+        'By signing you confirm that',
+        'you are the sole owner of this',
+        'address and authorize access',
+        'to the secure dashboard.',
+        '═══════════════════════════════',
+      ].join('\n');
+
+      signMessageAsync({ message })
+        .then(async (signature) => {
+          try {
+            const { keccak256 } = await import('viem');
+            const seed = keccak256(signature as `0x${string}`);
+            localStorage.setItem(`whale_chat_seed_${norm}`, seed);
+          } catch (e) {
+            console.warn('[ConnectPage] Seed derivation error:', e);
+          }
+
+          document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+          try {
+            localStorage.setItem('sovereign_session_v2', JSON.stringify({
+              address: norm,
+              exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
+            }));
+          } catch {}
+          setLinked(true);
+          setIsSigning(false);
+        })
+        .catch((err) => {
+          console.error("Handshake failed", err);
+          setIsSigning(false);
+          disconnect();
+        });
       return;
     }
 
@@ -296,7 +330,7 @@ export default function ConnectPage() {
       window.location.replace("/dashboard");
       return;
     }
-  }, [isConnected, address, mounted, isLinked, setLinked]);
+  }, [isConnected, address, mounted, isLinked, setLinked, isSigning, signMessageAsync, disconnect]);
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
     setPendingId(walletId);
@@ -455,7 +489,7 @@ export default function ConnectPage() {
                       Session<br/><span className="text-black/30">Verified.</span>
                     </h2>
                     <p className="font-serif text-[15px] leading-relaxed text-[#050505]/60 font-medium">
-                      Cryptographic attestation perfectly resolved. Your session is now verified. Welcome to the HumanID Terminal.
+                      Cryptographic attestation perfectly resolved. Your session is now verified. Welcome to the Sovereign Terminal.
                     </p>
                   </div>
 
@@ -571,7 +605,7 @@ export default function ConnectPage() {
             alt=""
             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
-          <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#050505]/40">© 2026 HumanID Protocol</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#050505]/40">© 2026 Whale Alert Network</span>
         </div>
         <div className="flex items-center gap-8">
           <a href="https://twitter.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="text-[#050505]/40 hover:text-[#050505] transition-colors">

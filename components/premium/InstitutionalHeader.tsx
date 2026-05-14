@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Search, Bell, Clock, Eye, Settings, User, Wallet } from 'lucide-react';
 import { useNativeWallet } from '@/hooks/useNativeWallet';
 import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
-import { HumanIDLogo } from '@/components/shared/WhaleLogo';
+import { WhaleLogo } from '@/components/shared/WhaleLogo';
 
 export default function InstitutionalHeader() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -26,7 +26,7 @@ export default function InstitutionalHeader() {
       console.log('Protocol Action:', data.message);
       setActiveMenu(null);
     } catch (e) {
-      console.error('Failed to communicate with the HumanID backend.', e);
+      console.error('Failed to communicate with the Whale Alert backend.', e);
     }
   };
 
@@ -109,8 +109,8 @@ export default function InstitutionalHeader() {
         <div className="flex items-center gap-12">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <HumanIDLogo className="w-7 h-7" priority />
-              <span className="font-black text-lg tracking-tight">HUMANID PROTOCOL</span>
+              <WhaleLogo className="w-7 h-7" priority />
+              <span className="font-black text-lg tracking-tight">WHALE ALERT NETWORK</span>
             </div>
             <nav className="flex items-center gap-8 font-black">
               <button className="hover:text-black transition-opacity text-black">TELEMETRY</button>

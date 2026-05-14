@@ -154,19 +154,19 @@ export function SovereignFooter() {
               className="flex flex-col items-center gap-6"
             >
               <img
-                src="/humanid_protocol_logo_1778714491433.png"
-                alt="HumanID Protocol"
+                src="/official-whale-monochrome.png"
+                alt="Whale Alert Network"
                 className="w-24 h-24 sm:w-32 sm:h-32 object-contain"
               />
               <span className="font-mono text-[11px] font-black uppercase tracking-[0.4em] text-black/80">
-                HumanID Protocol
+                Whale Alert Network
               </span>
             </motion.div>
 
             {/* ─── Social Connectivity ─── */}
             <div className="flex items-center gap-6">
               {/* Telegram — official paper-plane logo */}
-              <a href="https://t.me/humanityledger" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 group">
+              <a href="https://t.me/WhaleAlert" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 group">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black/5 group-hover:bg-black">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" className="fill-black/20 group-hover:fill-white transition-colors"/>
@@ -177,7 +177,7 @@ export function SovereignFooter() {
               </a>
 
               {/* X (Twitter) — official X logo */}
-              <a href="https://x.com/humanityledger" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 group">
+              <a href="https://x.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 group">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black/5 group-hover:bg-black">
                   <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.26 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z" className="fill-black/40 group-hover:fill-white transition-colors"/>
@@ -271,7 +271,7 @@ export function SovereignFooter() {
             {/* ─── Copyright & Powered By ─── */}
             <div className="flex flex-col items-center gap-6 pt-4">
               <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">
-                © 2026 HumanID Protocol. Pure Mathematics.
+                © 2026 Whale Alert Network. Pure Mathematics.
               </span>
               
               <div className="flex flex-col items-center gap-3">

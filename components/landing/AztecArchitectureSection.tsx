@@ -18,7 +18,8 @@ const AZTEC_PILLARS = [
   {
     index: "03",
     label: "Noir: Domain-Specific Cryptography",
-    protocol: "NOIR LANGUAGE · ACIR IR · BARRETENBERG             body: "Aztec's native circuit programming language, Noir, compiles to an intermediate representation (ACIR — Abstract Circuit Intermediate Representation) that is subsequently transpiled into arithmetic circuits solvable by the Barretenberg proving backend. HumanID Protocol's integration leverages Noir circuits to encode private query logic — enabling operators to formulate cryptographic proofs of on-chain knowledge without exposing surveillance strategies or target addresses to any external observer."
+    protocol: "NOIR LANGUAGE · ACIR IR · BARRETENBERG",
+    body: "Aztec's native circuit programming language, Noir, compiles to an intermediate representation (ACIR — Abstract Circuit Intermediate Representation) that is subsequently transpiled into arithmetic circuits solvable by the Barretenberg proving backend. Whale Alert Network's integration leverages Noir circuits to encode private query logic — enabling operators to formulate cryptographic proofs of on-chain knowledge without exposing surveillance strategies or target addresses to any external observer."
   },
   {
     index: "04",

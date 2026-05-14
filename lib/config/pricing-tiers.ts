@@ -32,7 +32,7 @@ export const TIER_RANK: Record<PricingTier['id'], number> = {
 export const PRICING_TIERS: PricingTier[] = [
   {
     id:           'FREE',
-    name:         'HumanID Standard',
+    name:         'Whale Alert Network',
     tagline:      'Core cryptographic identity layer.',
     priceMonthly: '0',
     priceAnnual:  '0',
@@ -44,13 +44,13 @@ export const PRICING_TIERS: PricingTier[] = [
       { text: 'Protocol Ledger & Block Visibility' },
       { text: 'Deterministic Heuristic Tracking' },
       { text: 'Secure P2P Encrypted Terminal' },
-      { text: 'HumanID Protocol Academy Access' },
+      { text: 'Whale Alert Network Academy Access' },
     ],
     buttonText: 'Initialize',
   },
   {
     id:           'STANDARD',
-    name:         'HumanID Pro',
+    name:         'Whale Chat Pro',
     tagline:      'Unrestricted institutional capacity.',
     priceMonthly: '15',
     priceAnnual:  '150',
@@ -59,7 +59,7 @@ export const PRICING_TIERS: PricingTier[] = [
     highlight:    true,
     lottie:       'Safe Box.json',
     features: [
-      { text: 'Everything in HumanID Standard', highlight: true },
+      { text: 'Everything in Whale Alert Network', highlight: true },
       { text: 'Mass Transfer Real-Time Interception', highlight: true },
       { text: 'Institutional Flow & Yield Analytics', highlight: true },
       { text: 'Zero-Latency Private Node Access' },

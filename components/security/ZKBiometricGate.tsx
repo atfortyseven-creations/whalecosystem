@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useSignMessage } from 'wagmi';
 import { QRCodeSVG as QRCode } from "qrcode.react";
+import { X } from "lucide-react";
 
 interface ZKBiometricGateProps {
   onSuccess?: (zkProofSignature: string) => void;
@@ -54,13 +55,13 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
     try {
       setStage("SIGNING");
       const ts = Date.now();
-      const message = `Authorize HumanID Biometric Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\n\nBy signing, you bind your 3D neural mesh to this cryptographic session.`;
+      const message = `Authorize Whale Alert Biometric Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\n\nBy signing, you bind your 3D neural mesh to this cryptographic session.`;
       
       const signature = await signMessageAsync({ message });
       setAuthSignature(signature);
       setStage("READY_TO_SCAN");
     } catch (error: any) {
-      console.error("[HumanID] Signing Error:", error);
+      console.error("[Whale] Signing Error:", error);
       setErrorMessage(error.message || "Signature rejected");
       setStage("ERROR");
     }
@@ -146,7 +147,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
       if (onSuccess) onSuccess(authSignature || "0xVerified");
 
     } catch (error: any) {
-      console.error("[HumanID] Verification Error:", error);
+      console.error("[Whale] Verification Error:", error);
       if (stream) stream.getTracks().forEach(t => t.stop());
       setStream(null);
       
@@ -191,22 +192,9 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
           <AnimatePresence mode="wait">
             {stage === "IDLE" && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center">
-                {!isMobile ? (
-                  <div className="flex flex-col items-center gap-6">
-                    <div className="w-32 h-32 p-4 bg-white rounded-3xl shadow-2xl border border-black/5 flex items-center justify-center">
-                      <QRCode 
-                        value={typeof window !== 'undefined' ? window.location.href : ''} 
-                        size={96} 
-                        level="H" 
-                      />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">Mobile Synchronization Required</span>
-                  </div>
-                ) : (
                   <div className="w-20 h-20 border-[0.5px] border-black/10 rounded-full flex items-center justify-center">
                     <div className="w-2 h-2 bg-black/20 rounded-full" />
                   </div>
-                )}
               </motion.div>
             )}
             
@@ -306,7 +294,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
 
         {/* Action Controls */}
         <div className="w-full flex flex-col gap-4">
-          {stage === "IDLE" && isMobile && (
+          {stage === "IDLE" && (
             address ? (
               <button
                 onClick={handleInitiate}
@@ -356,7 +344,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
             <span className="text-[9px] font-black uppercase tracking-widest text-black/40">Zero-Knowledge Attested</span>
           </div>
           <p className="text-[9px] font-mono text-black/30 leading-relaxed uppercase tracking-tighter">
-            Every attestation is cryptographically bound to the physical device and biometric landmark mesh. No raw biometric data is ever transmitted or stored on HumanID servers.
+            Every attestation is cryptographically bound to the physical device and biometric landmark mesh. No raw biometric data is ever transmitted or stored on Whale Alert servers.
           </p>
         </div>
       </div>

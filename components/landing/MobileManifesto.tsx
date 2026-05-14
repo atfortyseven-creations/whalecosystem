@@ -90,7 +90,7 @@ export function MobileManifesto() {
         <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }} className="relative z-10">
 
           <motion.div variants={FADE_UP} className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#FAFAF8] border border-slate-200 rounded-full shadow-sm mb-8">
-            <span className="text-[9px] font-black uppercase tracking-widest text-black/40">HumanID Protocol</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-black/40">Whale Alert Network</span>
           </motion.div>
 
           <motion.h1 variants={FADE_UP} className="text-[40px] sm:text-[48px] font-black tracking-tighter leading-[1.05] mb-6 text-[#0A0A0A] max-w-xs">
@@ -257,7 +257,7 @@ export function MobileManifesto() {
       {/* ── Mobile Footer ── */}
       <footer className="bg-[#0a0a0a] text-white px-6 py-12 flex flex-col items-center gap-8">
         <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[10px] font-black">H</div>
-        <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/40">HumanID Protocol</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/40">Whale Alert Network</span>
 
         {/* Social */}
         <div className="flex items-center gap-6">
@@ -288,7 +288,7 @@ export function MobileManifesto() {
           ))}
         </div>
 
-        <span className="font-mono text-[8px] uppercase tracking-widest text-white/10">© 2026 HumanID Protocol</span>
+        <span className="font-mono text-[8px] uppercase tracking-widest text-white/10">© 2026 Whale Alert Network</span>
       </footer>
 
     </div>

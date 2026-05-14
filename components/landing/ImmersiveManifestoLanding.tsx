@@ -50,7 +50,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.p>
 
           {/* Performance Status — Institutional Readout */}
-          <motion.div variants={FADE_UP} className="flex flex-row items-center justify-between gap-2 p-5 sm:p-8 bg-white border border-black/5 rounded-[2rem] mb-10 shadow-sm max-w-2xl w-full">
+          <motion.div variants={FADE_UP} className="grid grid-cols-2 lg:flex lg:flex-row items-center justify-between gap-6 lg:gap-2 p-6 sm:p-8 bg-white border border-black/5 rounded-[2rem] mb-10 shadow-sm max-w-2xl w-full">
             {[
               { label: "Network State", val: blockNumber ? `#${blockNumber.toLocaleString()}` : "Operational" },
               { label: "Gas Topology", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "Nominal" },
@@ -62,7 +62,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                   <span className="font-mono text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-black/20 truncate">{stat.label}</span>
                   <span className="font-mono text-[12px] sm:text-[16px] font-black text-[#0a0a0a] truncate tracking-tight">{stat.val}</span>
                 </div>
-                {i !== 3 && <div className="w-px h-8 bg-black/5 mx-2 sm:mx-6" />}
+                {i !== 3 && <div className="hidden lg:block w-px h-8 bg-black/5 mx-2 sm:mx-6" />}
               </div>
             ))}
           </motion.div>
@@ -103,7 +103,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
 
       </section>
 
-      {/* ── BENTO BOX: WHY HUMANID PROTOCOL ──────────────────────────────── */}
+      {/* ── BENTO BOX: WHY WHALE ALERT NETWORK ──────────────────────────────── */}
       <section className="w-full py-24 md:py-40 bg-white">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 space-y-16">
             <div className="text-center max-w-3xl mx-auto space-y-6 mb-20">
@@ -124,7 +124,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                             Cryptographic Integrity.
                         </h3>
                         <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
-                            The HumanID Protocol operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data remains private.
+                            The Whale Alert Network operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data remains private.
                         </p>
                     </div>
                     <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">

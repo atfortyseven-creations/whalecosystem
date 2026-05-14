@@ -41,16 +41,16 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'HumanID Protocol | Institutional Identity Layer',
-    template: '%s | HumanID Protocol'
+    default: 'Whale Alert Network | Institutional Identity Layer',
+    template: '%s | Whale Alert Network'
   },
-  description: 'The definitive HumanID Protocol for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+  description: 'The definitive Whale Alert Network for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
   keywords: [
-    'HumanID Protocol', 'HumanID', 'Institutional Identity', 'ZK-Biometrics', 'On-chain Intelligence', 'Zero-Knowledge Proofs'
+    'Whale Alert Network', 'Whale Alert', 'Institutional Identity', 'ZK-Biometrics', 'On-chain Intelligence', 'Zero-Knowledge Proofs'
   ],
-  authors: [{ name: 'HumanID Protocol Foundation' }],
-  creator: 'HumanID Protocol Foundation',
-  publisher: 'HumanID Protocol Foundation',
+  authors: [{ name: 'Whale Alert Network Foundation' }],
+  creator: 'Whale Alert Network Foundation',
+  publisher: 'Whale Alert Network Foundation',
   metadataBase: new URL('https://www.humanidfi.com'),
   alternates: {
     canonical: '/',
@@ -75,16 +75,16 @@ export const metadata = {
     title: 'HumanID',
   },
   openGraph: {
-    title: 'HumanID Protocol | Institutional Identity Layer',
-    description: 'The definitive HumanID Protocol for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+    title: 'Whale Alert Network | Institutional Identity Layer',
+    description: 'The definitive Whale Alert Network for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
     url: 'https://www.humanidfi.com',
-    siteName: 'HumanID Protocol',
+    siteName: 'Whale Alert Network',
     images: [
       {
         url: '/humanid_protocol_logo_1778714491433.png',
         width: 1200,
         height: 1200,
-        alt: 'HumanID Protocol',
+        alt: 'Whale Alert Network',
       },
     ],
     locale: 'en_US',
@@ -92,8 +92,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HumanID Protocol | Institutional Identity Layer',
-    description: 'The definitive HumanID Protocol for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+    title: 'Whale Alert Network | Institutional Identity Layer',
+    description: 'The definitive Whale Alert Network for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
     images: ['/humanid_protocol_logo_1778714491433.png'],
   },
 }
@@ -123,8 +123,8 @@ export default async function RootLayout({
       {
         "@type": "WebSite",
         "url": "https://www.humanidfi.com/",
-        "name": "HumanID Protocol",
-        "description": "The definitive HumanID Protocol for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.",
+        "name": "Whale Alert Network",
+        "description": "The definitive Whale Alert Network for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.",
         "publisher": {
           "@id": "https://www.humanidfi.com/#organization"
         }
@@ -132,7 +132,7 @@ export default async function RootLayout({
       {
         "@type": "Organization",
         "@id": "https://www.humanidfi.com/#organization",
-        "name": "HumanID Protocol Foundation",
+        "name": "Whale Alert Network Foundation",
         "url": "https://www.humanidfi.com",
         "logo": "https://www.humanidfi.com/humanid_protocol_logo_1778714491433.png",
         "sameAs": [

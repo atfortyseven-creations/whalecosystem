@@ -1,8 +1,10 @@
+import Image from 'next/image';
+
 /**
- * 🆔 HUMANID BRAND IDENTITY ENGINE
- * Centrally manages the official HumanID Protocol logo visualization.
+ * 🐳 WHALE BRAND IDENTITY ENGINE
+ * Centrally manages the official Whale Alert Network logo visualization.
  */
-export function HumanIDLogo({ 
+export function WhaleLogo({ 
     className = "w-10 h-10", 
     priority = true 
 }: { className?: string; priority?: boolean }) {
@@ -10,8 +12,8 @@ export function HumanIDLogo({
     return (
         <div className={`relative flex items-center justify-center ${className}`}>
             <Image
-                src="/humanid_protocol_logo_1778714491433.png"
-                alt="HumanID Protocol"
+                src="/official-whale-monochrome.png"
+                alt="Whale Alert Network"
                 fill
                 className="object-contain transition-all duration-300 transform-gpu"
                 priority={priority}

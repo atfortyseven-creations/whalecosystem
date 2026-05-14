@@ -179,7 +179,7 @@ export default function SettingsPanel() {
       </section>
 
       <div className="text-center text-xs text-[#1F1F1F]/30 pt-4">
-        HumanID Protocol Terminal v1.0.0 (Institutional Build)
+        Whale Alert Network Terminal v1.0.0 (Institutional Build)
       </div>
     </div>
   );
@@ -189,7 +189,7 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
     const [input, setInput] = useState('');
     const [isHovering, setIsHovering] = useState(false);
     
-    const correctPhrase = "HumanID Protocol";
+    const correctPhrase = "Whale Alert Network";
     const isMatched = input === correctPhrase;
 
     return (

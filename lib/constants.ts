@@ -1,5 +1,5 @@
 /**
- * HUMANID PROTOCOL - INSTITUTIONAL CONSTANTS
+ * WHALE ALERT NETWORK - INSTITUTIONAL CONSTANTS
  * 
  * Centralized registry for visual assets, identities, and system parameters.
  */

@@ -226,14 +226,14 @@ export default async function middleware(request: NextRequest) {
     const nextAuthToken = request.cookies.get('next-auth.session-token');
     const sovereignHandshakeCookie = request.cookies.get('sovereign_handshake');
 
-    // Validate SIWE JWT from human_session cookie
+    // Validate SIWE JWT from whale_session cookie
     let siweSessionValid = false;
     let userTier = 'FREE'; // Default tier
-    const humanSessionCookie = request.cookies.get('human_session')?.value;
-    if (humanSessionCookie) {
+    const whaleSessionCookie = request.cookies.get('whale_session')?.value;
+    if (whaleSessionCookie) {
       try {
         const { verifyJWT } = await import('./lib/jwt');
-        const payload = await verifyJWT(humanSessionCookie);
+        const payload = await verifyJWT(whaleSessionCookie);
         siweSessionValid = true;
         if (payload.tier) {
           userTier = payload.tier as string;
@@ -335,7 +335,7 @@ export default async function middleware(request: NextRequest) {
       `script-src ${scriptSrc}`,
       "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com https://res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://www.humanidfi.com https://*.googleusercontent.com",
+      "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com https://res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://whalealert.network https://*.googleusercontent.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "connect-src 'self' https://api.web3modal.org https://pulse.walletconnect.org https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us https://go.getblock.io wss://go.getblock.io https://cca-lite.coinbase.com https://*.coinbase.com wss://stream.binance.com:9443 https://stream.binance.com https://cdn.jsdelivr.net https://raw.githubusercontent.com https://*.githubusercontent.com https://*.xmtp.network wss://*.xmtp.network https://grpc.xmtp.network wss://grpc.xmtp.network https://production.xmtp.network wss://production.xmtp.network https://dev.xmtp.network wss://dev.xmtp.network",
       "frame-src 'self' https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com https://*.reown.app https://accounts.google.com",

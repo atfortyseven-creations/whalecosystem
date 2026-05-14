@@ -102,13 +102,13 @@ const MUTED = "rgba(5,5,5,0.50)";
 function buildSovereignMessage(address: string): string {
   return [
     '═══════════════════════════════',
-    '  HumanID Protocol',
+    '  Whale Alert Network',
     '  SOVEREIGN ACCESS HANDSHAKE',
     '═══════════════════════════════',
     '',
     `Identity: ${address}`,
     `Nonce: ${Date.now()}`,
-    `Network: HUMANID_PROTOCOL_V1`,
+    `Network: WHALE_ALERT_NETWORK_V1`,
     '',
     'By signing you confirm that',
     'you are the sole owner of this',
@@ -240,7 +240,7 @@ function chainName(id?: number): string {
 
 // ── Connected Screen ──────────────────────────────────────────────────────────
 function ConnectedScreen({
-  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect, signMessageAsync, initialScanData
+  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect, signMessageAsync, initialScanData, setShowKyc
 }: {
   address: string; onScan: () => void;
   showScanner: boolean; onCloseScanner: () => void;
@@ -250,6 +250,7 @@ function ConnectedScreen({
   onDisconnect?: () => void;
   signMessageAsync?: any;
   initialScanData?: string | null;
+  setShowKyc: (v: boolean) => void;
 }) {
   const now = useLiveClock();
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -334,8 +335,8 @@ function ConnectedScreen({
         >
            <WhaleLogo className="h-16 w-auto" />
            <div className="flex flex-col items-center text-center">
-             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">HumanID Protocol</h1>
-             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Institutional Identity Ledger</p>
+             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">Whale Alert Network</h1>
+             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Institutional Terminal</p>
            </div>
         </motion.div>
 
@@ -455,7 +456,7 @@ function ConnectedScreen({
             style={{ fontSize: "11px", color: "black" }}
           >
             <MessageSquare size={18} className="group-hover:text-white transition-colors" />
-            Access Sovereign Forum
+            Access Whale Alert Forum
           </Link>
         </motion.div>
 
@@ -472,7 +473,7 @@ function ConnectedScreen({
             style={{ fontSize: "11px" }}
           >
             <MessageCircle size={18} />
-            Enter HumanID Chat Encrypted
+            Enter Whale Chat Encrypted
           </Link>
         </motion.div>
 
@@ -1008,6 +1009,7 @@ export function MobileLanding() {
            onDisconnect={handleDisconnect}
            signMessageAsync={signMessageAsync}
            initialScanData={(autoSyncStarted && uuidParam) ? window.location.href : null}
+           setShowKyc={setShowKyc}
         />
       </div>
     );
@@ -1055,7 +1057,7 @@ export function MobileLanding() {
             >
               <WhaleLogo className="w-6 h-6" />
             </div>
-            <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">HumanID Protocol</span>
+            <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
           </div>
           <button
             onClick={() => setShowConnectOverlay(true)}
@@ -1101,7 +1103,7 @@ export function MobileLanding() {
             <WhaleLogo className="w-6 h-6" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>HumanID Protocol</span>
+            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
           </div>
         </div>
         <button 
@@ -1425,7 +1427,7 @@ export function MobileLanding() {
             ))}
           </div>
           <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/25 text-center">
-            © 2026 HumanID Protocol. Institutional Sterility.
+            © 2026 Whale Alert Network. Institutional Grade.
           </p>
         </footer>
       </div>

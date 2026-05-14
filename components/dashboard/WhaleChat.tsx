@@ -488,11 +488,20 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // [EXPERT-SILENT-ENTRY]: If a seed is present, we initialize IMMEDIATELY without showing any prompt.
   useEffect(() => {
     // Aggressive Auto-Init: Trigger for all connected users.
-    // If a seed exists (silent), it happens instantly. If not, it prompts for the one-time identity signature.
     if (isConnected && address && !client && !initInFlight.current && !initError) {
-      initClient();
+      const STORAGE_KEY = `whale_chat_seed_${address.toLowerCase()}`;
+      const hasSeed = typeof localStorage !== 'undefined' && !!localStorage.getItem(STORAGE_KEY);
+      const hasVault = typeof localStorage !== 'undefined' && !!localStorage.getItem("sovereign_vault_v1");
+      const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      
+      // On mobile, ONLY auto-init if we already have the deterministic seed/vault.
+      // If we don't, auto-init will trigger a wallet signature prompt without a user gesture,
+      // which iOS and Android aggressively block, leading to false 'connection lost' errors.
+      if (hasSeed || hasVault || !isTouch || forceAutoInit) {
+        initClient();
+      }
     }
-  }, [isConnected, address, client, initError, initClient]);
+  }, [isConnected, address, client, initError, initClient, forceAutoInit]);
 
   const persistToLocal = (convs: ConversationMeta[]) => {
     try {
