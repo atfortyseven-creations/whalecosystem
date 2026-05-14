@@ -361,67 +361,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     } catch (e) {}
   }, [address]);
 
-  /**
-   * Derive a deterministic XMTP seed from a one-time wallet signature or the Sovereign Vault.
-   * This seed is used to initialize the XMTP client without further prompts.
-   * 
-   * MASTER-FIX: Achieves 0-signature activation for Vault users and 1-signature for external wallets.
-   */
-  const getDeterministicSeed = useCallback(async (): Promise<string | null> => {
-    if (!address) return null;
-    const STORAGE_KEY = `whale_chat_seed_${address.toLowerCase()}`;
-    
-    // 1. Check local storage for previously cached seed
-    const cached = localStorage.getItem(STORAGE_KEY);
-    if (cached) return cached;
-
-    // 2. 🛡️ Sovereign Vault Bridge: If user has an internal wallet, we use it to achieve ZERO signatures.
-    try {
-      const VAULT_STORAGE_KEY = "sovereign_vault_v1";
-      const storedVault = localStorage.getItem(VAULT_STORAGE_KEY);
-      if (storedVault) {
-        // Vault decoding logic (hex XOR)
-        const salt = window.location.origin;
-        const obfKey = salt.split("").map(c => c.charCodeAt(0).toString(16)).join("").substring(0, 64);
-        let pk = "";
-        for (let i = 0; i < storedVault.length; i += 2) {
-          const byte = parseInt(storedVault.substring(i, i + 2), 16);
-          pk += String.fromCharCode(byte ^ obfKey.charCodeAt((i / 2) % obfKey.length));
-        }
-        
-        if (pk.startsWith("0x") && pk.length >= 66) {
-          console.log('[XMTP] MasterBridge: Auto-activating via Sovereign Vault (0 signatures)');
-          localStorage.setItem(STORAGE_KEY, pk); // Cache for XMTP
-          return pk;
-        }
-      }
-    } catch (vaultErr) {
-      console.warn('[Whale Protocol] Vault bridge failed, falling back to signature:', vaultErr);
-    }
-
-    // 3. Request a one-time authorization signature (External Wallets: MetaMask, etc.)
-    try {
-      // MASTER-UX: We use a very clear message so the user knows this is the ONLY time they sign.
-      const SEED_MESSAGE = "Authorize Sovereign Whale Chat Access\n\n" +
-                           "This one-time signature will establish your end-to-end encrypted messaging identity. " +
-                           "Once authorized, you will NEVER be prompted for signatures on this device again.\n\n" +
-                           "Address: " + address;
-                           
-      const signature = await signMessageAsync({ message: SEED_MESSAGE });
-      
-      // Derive a private key from the signature using keccak256
-      const { keccak256 } = await import('viem');
-      const seed = keccak256(signature as `0x${string}`);
-      
-      // Persist for future silent sessions
-      localStorage.setItem(STORAGE_KEY, seed);
-      console.log('[XMTP] Identity established via one-time signature.');
-      return seed;
-    } catch (err: any) {
-      console.warn('[XMTP] Seed derivation failed or cancelled:', err);
-      return null;
-    }
-  }, [address, signMessageAsync]);
+  // getDeterministicSeed removed as it produces invalid XMTP signatures.
+  // The XMTP SDK automatically caches session keys in IndexedDB.
 
   // Initialize REAL XMTP Network
   const initClient = useCallback(async () => {
@@ -431,9 +372,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     setIsInitializing(true);
     setInitError('');
     try {
-      // ── Step 1: Attempt to get or derive a deterministic seed ────────────────
-      // On mobile, we prefer the deterministic path to avoid switching apps 4 times.
-      const seed = await getDeterministicSeed();
+      // ── Step 1: Use standard wagmi signer ────────────────
+      // XMTP SDK automatically caches keys in IndexedDB, so returning users are not prompted.
       
       const wagmiSigner = {
         getAddress: async () => address as string,
@@ -455,7 +395,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       };
 
       // ── Step 2: Initialize client (Direct Execution) ───────────────
-      const realClient = await getXMTPClient(wagmiSigner, seed || undefined);
+      const realClient = await getXMTPClient(wagmiSigner);
       setClient(realClient);
       await loadConversations();
     } catch (err: any) {
@@ -482,27 +422,22 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       setIsInitializing(false);
       initInFlight.current = false;
     }
-  }, [address, getDeterministicSeed, isMobile, signMessageAsync, isSovereignHandshake, loadConversations]);
+  }, [address, isMobile, signMessageAsync, isSovereignHandshake, loadConversations]);
 
-  // AUTO-INITIALIZE: When wallet is connected and XMTP not yet started, auto-init.
-  // [EXPERT-SILENT-ENTRY]: If a seed is present, we initialize IMMEDIATELY without showing any prompt.
   useEffect(() => {
     // Aggressive Auto-Init: Trigger for all connected users.
     if (isConnected && address && !client && !initInFlight.current && !initError) {
-      const STORAGE_KEY = `whale_chat_seed_${address.toLowerCase()}`;
-      const hasSeed = typeof localStorage !== 'undefined' && !!localStorage.getItem(STORAGE_KEY);
       const hasVault = typeof localStorage !== 'undefined' && !!localStorage.getItem("sovereign_vault_v1");
       const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
       
-      // On mobile, ONLY auto-init if we already have the deterministic seed/vault,
-      // OR if this is a QR-linked sovereign handshake session (no extra wallet prompt needed).
-      // If none of the above, auto-init will trigger a wallet signature prompt without a user gesture,
-      // which iOS and Android aggressively block, leading to false 'connection lost' errors.
-      if (hasSeed || hasVault || !isTouch || forceAutoInit || isSovereignHandshake) {
+      // On mobile, auto-init can trigger unwanted wallet app switches if the keys aren't in IndexedDB.
+      // However, if forceAutoInit is true or it's a handshake session, we proceed.
+      // For returning users with IndexedDB keys, the auto-init is completely silent!
+      if (hasVault || !isTouch || forceAutoInit || isSovereignHandshake) {
         initClient();
       }
     }
-  }, [isConnected, address, client, initError, initClient, forceAutoInit]);
+  }, [isConnected, address, client, initError, initClient, forceAutoInit, isSovereignHandshake]);
 
   const persistToLocal = (convs: ConversationMeta[]) => {
     try {

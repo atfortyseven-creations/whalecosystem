@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import {
   Chrome,
   Smartphone,
@@ -18,6 +19,12 @@ import {
   Lock,
   Zap,
 } from "lucide-react";
+
+// Dynamically import PCKYCGate to avoid SSR issues
+const PCKYCGate = dynamic(
+  () => import("@/components/auth/PCKYCGate").then(m => m.PCKYCGate),
+  { ssr: false }
+);
 
 // ── Wave Background using olas-hokusai-4k.png ──────────────────────────────────
 function WaveBackground() {
@@ -126,12 +133,32 @@ function ConnectPanel() {
   const { openConnectModal } = useConnectModal();
   const { isConnected, address } = useAccount();
   const router = useRouter();
+  const [kycRequired, setKycRequired] = useState(false);
+  const [kycDone, setKycDone] = useState(false);
 
+  // Check if KYC already completed (cookie present)
   useEffect(() => {
-    if (isConnected) {
-      setTimeout(() => router.replace("/"), 1200);
+    if (typeof document === "undefined") return;
+    const alreadyVerified =
+      document.cookie.includes("whale_session=") ||
+      document.cookie.includes("kyc_verified=true");
+    if (alreadyVerified) setKycDone(true);
+  }, []);
+
+  // When wallet connects AND kyc not done → show KYC gate
+  useEffect(() => {
+    if (isConnected && !kycDone) {
+      setKycRequired(true);
     }
-  }, [isConnected, router]);
+  }, [isConnected, kycDone]);
+
+  // When KYC completes → redirect
+  const handleKYCVerified = () => {
+    setKycRequired(false);
+    setKycDone(true);
+    // Small delay for success animation
+    setTimeout(() => router.replace("/"), 2800);
+  };
 
   return (
     <section
@@ -200,9 +227,15 @@ function ConnectPanel() {
               <p className="font-mono text-white/40 text-[11px]">
                 {address?.slice(0, 10)}…{address?.slice(-8)}
               </p>
-              <p className="font-mono text-[9px] uppercase tracking-widest text-white/25">
-                Redirigiendo al terminal…
-              </p>
+              {!kycDone ? (
+                <p className="font-mono text-[9px] uppercase tracking-widest text-amber-400/70 animate-pulse">
+                  Verificación KYC requerida…
+                </p>
+              ) : (
+                <p className="font-mono text-[9px] uppercase tracking-widest text-emerald-400/60">
+                  KYC verificado · Accediendo…
+                </p>
+              )}
             </motion.div>
           ) : (
             <button
@@ -246,6 +279,14 @@ function ConnectPanel() {
         </div>
       </motion.div>
     </section>
+
+    {/* PC KYC Gate — full screen overlay after wallet connect */}
+    {kycRequired && address && (
+      <PCKYCGate
+        walletAddress={address}
+        onVerified={handleKYCVerified}
+      />
+    )}
   );
 }
 

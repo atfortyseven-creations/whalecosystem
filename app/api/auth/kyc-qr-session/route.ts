@@ -1,44 +1,94 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { safeRedisSet, safeRedisGet } from '@/lib/redis/client';
+import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
+/**
+ * POST /api/auth/kyc-qr-session
+ *
+ * Called by the mobile device after completing biometric verification.
+ * Stores the encrypted liveness payload + score in Redis so the
+ * PC can poll and decrypt it.
+ *
+ * Body:
+ *   { uuid, encryptedPayload, livenessScore, spoofType? }
+ */
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
-    
-    // Distributed Strict Rate Limiting (Anti-DDoS via Redis)
+
+    // Rate limiting: max 3 attempts per IP per minute
     const rlKey = `kyc-rate-limit:${ip}`;
-    const lastRequestStr = await safeRedisGet(rlKey);
-    const now = Date.now();
-    
-    if (lastRequestStr) {
-      const lastRequest = parseInt(lastRequestStr, 10);
-      if (now - lastRequest < 1000) {
-        return NextResponse.json({ error: 'Too Many Requests. Core Defense Activated.' }, { status: 429 });
-      }
-    }
-    
-    // TTL 2s to automatically clear the rate limit key
-    await safeRedisSet(rlKey, now.toString(), 'EX', 2);
+    const rlRaw = await safeRedisGet(rlKey);
+    const rlCount = rlRaw ? parseInt(rlRaw, 10) : 0;
 
-    const { uuid, encryptedPayload } = await req.json();
-    
-    if (!uuid || !encryptedPayload) {
-      return NextResponse.json({ error: 'Malformed payload. Sovereign node rejected.' }, { status: 400 });
+    if (rlCount >= 3) {
+      return NextResponse.json(
+        { error: 'Too Many Requests. Sovereign defense activated.' },
+        { status: 429 }
+      );
     }
 
-    // Check if session already exists and is success to prevent overwrite replay attacks
+    await safeRedisSet(rlKey, String(rlCount + 1), 'EX', 60);
+
+    const body = await req.json();
+    const { uuid, encryptedPayload, livenessScore, spoofType } = body;
+
+    if (!uuid || typeof uuid !== 'string' || uuid.length < 8) {
+      return NextResponse.json({ error: 'Invalid session identifier' }, { status: 400 });
+    }
+
+    if (!encryptedPayload) {
+      return NextResponse.json({ error: 'Missing biometric payload' }, { status: 400 });
+    }
+
+    // Validate liveness score
+    if (typeof livenessScore !== 'number' || livenessScore < 72) {
+      console.warn(`[KYC:Session] Liveness score too low: ${livenessScore} for UUID: ${uuid.slice(0, 8)}`);
+      return NextResponse.json(
+        { error: 'Liveness verification did not meet threshold.' },
+        { status: 422 }
+      );
+    }
+
+    // Check the session exists and is PENDING (not already completed or burned)
     const existing = await safeRedisGet(`kyc-session:${uuid}`);
-    if (existing && existing !== 'PENDING') {
-      return NextResponse.json({ error: 'Session immutable.' }, { status: 403 });
+    if (!existing) {
+      return NextResponse.json({ error: 'Session expired or not found.' }, { status: 404 });
     }
 
-    // TTL 120s (EX 120) strictly enforced at DB level
-    await safeRedisSet(`kyc-session:${uuid}`, encryptedPayload, 'EX', 120);
+    let existingSession: Record<string, any>;
+    try {
+      existingSession = JSON.parse(existing);
+    } catch {
+      return NextResponse.json({ error: 'Corrupted session state.' }, { status: 409 });
+    }
 
-    return NextResponse.json({ success: true, timestamp: Date.now() });
+    if (existingSession.status !== 'PENDING') {
+      return NextResponse.json({ error: 'Session already completed.' }, { status: 409 });
+    }
 
+    // Anti-spoofing gate: if server detects spoof → log and silently fail
+    if (spoofType && spoofType !== null) {
+      console.warn(`[KYC:Session] Spoof detected (${spoofType}) for UUID: ${uuid.slice(0, 8)}, IP: ${ip}`);
+      // Return 200 but don't update the session (client sees no response)
+      return NextResponse.json({ success: false, status: 'ANALYZING' });
+    }
+
+    // Write VERIFIED state
+    const updatedSession = JSON.stringify({
+      ...existingSession,
+      status: 'VERIFIED',
+      encryptedPayload,
+      livenessScore,
+      completedAt: Date.now(),
+    });
+
+    await safeRedisSet(`kyc-session:${uuid}`, updatedSession, 'EX', 120);
+
+    console.log(`[KYC:Session] Verified — UUID: ${uuid.slice(0, 8)}, score: ${livenessScore}`);
+
+    return NextResponse.json({ success: true, status: 'VERIFIED', timestamp: Date.now() });
   } catch (error: any) {
-    console.error('[KYC-QR-SESSION] Mutation Fault:', error);
-    return NextResponse.json({ error: 'Internal Cryptographic Fault' }, { status: 500 });
+    console.error('[KYC:Session] Fault:', error);
+    return NextResponse.json({ error: 'Internal cryptographic fault' }, { status: 500 });
   }
 }
