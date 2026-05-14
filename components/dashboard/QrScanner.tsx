@@ -45,9 +45,22 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
     }, [stopCamera]);
 
     const handleDecode = async (decodedText: string) => {
+        let extractedText = decodedText.trim();
+        
+        try {
+            // Check if it's a URL and extract 'address' or 'token' if present
+            const url = new URL(extractedText);
+            extractedText = url.searchParams.get('address') ?? url.searchParams.get('token') ?? extractedText;
+        } catch {
+            // Not a URL, check for ethereum: prefix
+            if (extractedText.toLowerCase().startsWith('ethereum:')) {
+                extractedText = extractedText.substring(9).split('@')[0];
+            }
+        }
+
         if (onScanSuccess) {
             await stopCamera();
-            onScanSuccess(decodedText);
+            onScanSuccess(extractedText);
             return;
         }
         
@@ -55,16 +68,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
         await stopCamera();
         
         try {
-            let token = decodedText;
-            try {
-                // If it's a URL, extract the token
-                const url = new URL(decodedText);
-                token = url.searchParams.get('token') ?? decodedText;
-            } catch {
-                // Not a URL, use raw text as token
-            }
-
-            const res = await fetch(`/api/bridge/generate?token=${encodeURIComponent(token)}`);
+            const res = await fetch(`/api/bridge/generate?token=${encodeURIComponent(extractedText)}`);
             const data = await res.json();
             
             if (data.valid) {

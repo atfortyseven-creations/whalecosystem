@@ -40,19 +40,22 @@ function ForumHomeContent() {
       
       <div className="max-w-[1200px] mx-auto mb-20">
         {/* ── ACADEMIC WELCOME HERO ── */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white dark:bg-[#111] rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-6 md:p-16 flex flex-col items-center justify-center overflow-hidden relative">
-            <div className="w-full max-w-2xl relative z-10 space-y-6 md:space-y-8 text-center">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white dark:bg-[#111] rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-10 md:p-20 flex flex-col items-start justify-center overflow-hidden relative">
+            <div className="w-full max-w-3xl relative z-10 space-y-6 md:space-y-8 text-left">
                 
-                <h2 className="text-[36px] md:text-[56px] lg:text-[64px] font-black uppercase text-[#0A0A0A] dark:text-white leading-[1.05] md:leading-[0.95] tracking-tighter">
+                <h2 className="text-[40px] md:text-[64px] lg:text-[72px] font-black uppercase text-[#0A0A0A] dark:text-white leading-[1] md:leading-[0.95] tracking-tighter">
                     Whale Alert <br className="hidden md:block" /><span className="text-[#0044CC] dark:text-[#4d88ff]">Network.</span>
                 </h2>
-                <p className="font-sans text-[15px] md:text-[17px] text-slate-500 leading-relaxed max-w-xl mx-auto font-bold tracking-widest uppercase">
+                <p className="font-sans text-[14px] md:text-[16px] text-[#0044CC] dark:text-[#4d88ff] leading-relaxed max-w-2xl font-black tracking-[0.3em] uppercase">
                     Presenting FORUM P2P by Humanity Ledger
                 </p>
-                <p className="font-serif text-[15px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto">
+                <p className="font-serif text-[16px] md:text-[20px] text-slate-500 leading-relaxed max-w-2xl font-medium">
                     A secure perimeter for institutional discourse. All interactions are cryptographically signed, ensuring absolute authenticity. This eliminates the noise of public networks and fosters a highly focused, academic environment strictly for authenticated participants.
                 </p>
             </div>
+            
+            {/* Ambient Background Elements to balance the left-alignment */}
+            <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 dark:opacity-5 pointer-events-none" style={{ background: 'radial-gradient(circle at center right, #0044CC 0%, transparent 70%)' }} />
         </motion.div>
       </div>
       
@@ -131,7 +134,7 @@ function ForumHomeContent() {
 
                     {/* Title & Badges */}
                     <div className="flex-1 flex flex-col pr-0 sm:pr-4 min-w-0 relative z-10">
-                      <span className="font-bold text-[18px] leading-[1.3] text-black dark:text-white group-hover:text-[#00C076] transition-colors line-clamp-2">
+                      <span className="font-bold text-[18px] leading-[1.3] text-black dark:text-white group-hover:text-[#00C076] transition-colors line-clamp-2 break-words">
                         {topic.title}
                       </span>
                       <div className="flex items-center gap-2 mt-3 flex-wrap">

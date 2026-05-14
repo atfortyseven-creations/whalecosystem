@@ -8,7 +8,7 @@ export const revalidate = 0;
 
 export async function GET() {
     try {
-        const [ethBlock, bscBlock, ethGas, bscGas, whaleMovements] = await Promise.all([
+        const results = await Promise.allSettled([
             mainnetClient.getBlockNumber(),
             bscClient.getBlockNumber(),
             mainnetClient.getGasPrice(),
@@ -16,17 +16,24 @@ export async function GET() {
             whaleService.getLatestWhaleActivity(5)
         ]);
 
-        const tickerItems = [
-            `ETH BLOCK: ${ethBlock}`,
-            `BSC BLOCK: ${bscBlock}`,
-            `ETH GAS: ${Math.floor(Number(formatUnits(ethGas, 9)))} GWEI`,
-            `BSC GAS: ${Number(formatUnits(bscGas, 9)).toFixed(2)} GWEI`,
-        ];
+        const ethBlock = results[0].status === 'fulfilled' ? results[0].value : null;
+        const bscBlock = results[1].status === 'fulfilled' ? results[1].value : null;
+        const ethGas = results[2].status === 'fulfilled' ? results[2].value : null;
+        const bscGas = results[3].status === 'fulfilled' ? results[3].value : null;
+        const whaleMovements = results[4].status === 'fulfilled' ? results[4].value : [];
+
+        const tickerItems = [];
+        if (ethBlock) tickerItems.push(`ETH BLOCK: ${ethBlock}`);
+        if (bscBlock) tickerItems.push(`BSC BLOCK: ${bscBlock}`);
+        if (ethGas) tickerItems.push(`ETH GAS: ${Math.floor(Number(formatUnits(ethGas, 9)))} GWEI`);
+        if (bscGas) tickerItems.push(`BSC GAS: ${Number(formatUnits(bscGas, 9)).toFixed(2)} GWEI`);
 
         // Add latest whale movements to the ticker
-        whaleMovements.forEach(m => {
-            tickerItems.push(`⚠ WHALE: ${m.amount} ${m.token} ON ${m.chain} detected`);
-        });
+        if (Array.isArray(whaleMovements)) {
+            whaleMovements.forEach(m => {
+                tickerItems.push(`⚠ WHALE: ${m.amount} ${m.token} ON ${m.chain} detected`);
+            });
+        }
 
         // Add Price Data (Mocked but real-ish using Binance Ticker)
         const res = await fetch('https://api.binance.com/api/v3/ticker/24hr', { cache: 'no-store' });
