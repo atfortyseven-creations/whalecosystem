@@ -31,6 +31,7 @@ export function CareersPageClient() {
                     </p>
 
                     <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3 pt-4">
+                        {['Engineering', 'Cryptography', 'Intelligence', 'Design'].map(tag => (
                         <div key={tag} className="px-5 py-2.5 bg-slate-50 border border-black/5 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-600 shadow-sm">
                             {tag}
                         </div>

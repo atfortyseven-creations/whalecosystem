@@ -33,7 +33,6 @@ function NewTopicContent() {
   const [draftSaved, setDraftSaved] = useState(false);
   const [documents, setDocuments]   = useState<{ title: string, url: string }[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [uploadingFile, setUploadingFile] = useState(false);
   const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
 
   // ── Restore draft on mount ────────────────────────────────────────────────
