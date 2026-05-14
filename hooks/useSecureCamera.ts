@@ -1,0 +1,116 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+interface UseSecureCameraOptions {
+  facingMode?: 'user' | 'environment';
+  onFrame?: (canvas: HTMLCanvasElement) => void;
+}
+
+export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCameraOptions) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const frameRafId = useRef<number>(0);
+
+  const startCamera = useCallback(async () => {
+    if (isInitializing) return;
+    setIsInitializing(true);
+    setError(null);
+
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('WebRTC API not supported in this browser.');
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode,
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
+
+      streamRef.current = stream;
+      setHasPermission(true);
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(e => {
+          console.error("Video play error:", e);
+        });
+      }
+    } catch (err: any) {
+      console.error('Camera initialization failed:', err);
+      setHasPermission(false);
+      setError(err.message || 'Camera access denied or unavailable.');
+    } finally {
+      setIsInitializing(false);
+    }
+  }, [facingMode, isInitializing]);
+
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    cancelAnimationFrame(frameRafId.current);
+  }, []);
+
+  const captureFrame = useCallback((): string | null => {
+    if (!videoRef.current || !canvasRef.current) return null;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+    
+    if (context && video.videoWidth > 0 && video.videoHeight > 0) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL('image/jpeg', 0.85); // High quality JPEG
+    }
+    return null;
+  }, []);
+
+  // Frame processing loop for intelligent overlay/tracking
+  useEffect(() => {
+    if (!onFrame || !hasPermission || !videoRef.current || !canvasRef.current) return;
+
+    const processFrame = () => {
+      if (videoRef.current && canvasRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          onFrame(canvas);
+        }
+      }
+      frameRafId.current = requestAnimationFrame(processFrame);
+    };
+
+    frameRafId.current = requestAnimationFrame(processFrame);
+    return () => cancelAnimationFrame(frameRafId.current);
+  }, [onFrame, hasPermission]);
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  return {
+    videoRef,
+    canvasRef,
+    hasPermission,
+    isInitializing,
+    error,
+    startCamera,
+    stopCamera,
+    captureFrame,
+  };
+}

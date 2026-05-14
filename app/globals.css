@@ -155,15 +155,13 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     --stealth-blur: 0px;
 
     /* ═══════════════════════════════════════════════════════
-       MARCA DE AGUA CÓSMICA 4K / HOKUSAI (TRANSPARENT BLEND)
+       MARCA DE AGUA CÓSMICA 4K / MATRIZ INSTITUCIONAL (SVG)
+       Reemplazamos el PNG estático por un SVG en Base64 para calidad infinita al hacer zoom
        ═══════════════════════════════════════════════════════ */
-    /* PERF: Use direct static paths, NOT /api/* routes.
-       API routes hit the server on every background paint event.
-       Static files are served from CDN/edge and cached by the browser. */
-    --wave-pattern: url("/patron-cosmico-4k.png");
-    --wave-pattern-opacity: 0.04;
-    --olas-hokusai: url("/olas-hokusai-4k.png");
-    --olas-hokusai-opacity: 0.15;
+    --wave-pattern: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%23000' fill-opacity='0.015' fill-rule='evenodd'/%3E%3C/svg%3E");
+    --wave-pattern-opacity: 1;
+    --olas-hokusai: none;
+    --olas-hokusai-opacity: 0;
     
     /* Institutional Layout Constants */
     --header-height: 68px;

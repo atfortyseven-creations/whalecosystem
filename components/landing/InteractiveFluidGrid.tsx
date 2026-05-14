@@ -12,32 +12,26 @@ export function InteractiveFluidGrid() {
     if (!canvas) return;
 
     if (window.innerWidth < 768) {
-      return; // Do not initialize heavy rAF grid on mobile
+      return; // Do not initialize on mobile
     }
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
     if (!ctx) return;
 
     let width = 0;
     let height = 0;
     let animationFrameId: number;
-    let lastTime = performance.now();
 
-    // Configuración para el "Minecraft pixel blur" estilo Letta Code
-    const CELL_SIZE = 18; // Tamaño de píxel más ajustado a Letta Code
-    const BASE_HZ = 144;
-    const DAMPING = 0.95; // Los píxeles tardan un poco más en desaparecer para dejar rastro
-    const MOUSE_RADIUS = 56; // Reducido un 20% para mayor precisión
-
-    // Buffer [alpha], un solo valor por celda
-    let alphaBuffer: Float32Array;
-    let cols = 0;
-    let rows = 0;
-
+    // Telemetry Cursor Variables
     let mouseX = -1000;
     let mouseY = -1000;
-    let targetMouseX = -1000;
-    let targetMouseY = -1000;
+    let currentX = -1000;
+    let currentY = -1000;
+    let isActive = false;
+
+    // The size is "almost the size of the cursor" -> standard cursor is ~24px, we make it ~32px with a glow.
+    const RADIUS = 14; 
+    const GLOW_RADIUS = 32;
 
     const initGrid = () => {
       width = window.innerWidth;
@@ -50,25 +44,20 @@ export function InteractiveFluidGrid() {
       ctx.scale(dpr, dpr);
       canvas.style.width = width + "px";
       canvas.style.height = height + "px";
-
-      cols = Math.ceil(width / CELL_SIZE);
-      rows = Math.ceil(height / CELL_SIZE);
-
-      const numCells = rows * cols;
-      alphaBuffer = new Float32Array(numCells);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      targetMouseX = e.clientX;
-      targetMouseY = e.clientY;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (!isActive) {
+        currentX = mouseX;
+        currentY = mouseY;
+        isActive = true;
+      }
     };
 
     const handleMouseLeave = () => {
-      // Dejar de inyectar fuerza cuando el mouse sale
-      targetMouseX = -1000;
-      targetMouseY = -1000;
-      mouseX = -1000;
-      mouseY = -1000;
+      isActive = false;
     };
 
     window.addEventListener("resize", initGrid);
@@ -77,58 +66,30 @@ export function InteractiveFluidGrid() {
 
     initGrid();
 
-    const render = (time: number) => {
-      let dt = (time - lastTime) / 1000;
-      if (dt > 1 / 30) dt = 1 / 30; 
-      lastTime = time;
-
-      const rate = dt * BASE_HZ; 
-
-      if (targetMouseX > -1000) {
-        mouseX += (targetMouseX - mouseX) * Math.min(1, 0.4 * rate);
-        mouseY += (targetMouseY - mouseY) * Math.min(1, 0.4 * rate);
-      }
-
-      // En lugar de tapar todo con solid fill #FDFCF8, limpiamos el canvas 
-      // para que el efecto overlay actúe por encima de todos los elementos (mix-blend-multiply)
+    const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      const dampFactor = Math.pow(DAMPING, rate);
-      const rSq = MOUSE_RADIUS * MOUSE_RADIUS;
+      if (isActive) {
+        // High precision telemetry interpolation (zero-latency feel but smooth)
+        currentX += (mouseX - currentX) * 0.45;
+        currentY += (mouseY - currentY) * 0.45;
 
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          const idx = i * cols + j;
-          let alpha = alphaBuffer[idx];
+        // Draw perfect purple glow
+        const gradient = ctx.createRadialGradient(currentX, currentY, 0, currentX, currentY, GLOW_RADIUS);
+        gradient.addColorStop(0, "rgba(139, 92, 246, 0.8)"); // Vivid Purple center
+        gradient.addColorStop(0.4, "rgba(139, 92, 246, 0.3)");
+        gradient.addColorStop(1, "rgba(139, 92, 246, 0)");
 
-          const cx = j * CELL_SIZE + CELL_SIZE / 2;
-          const cy = i * CELL_SIZE + CELL_SIZE / 2;
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, GLOW_RADIUS, 0, Math.PI * 2);
+        ctx.fill();
 
-          const dx = mouseX - cx;
-          const dy = mouseY - cy;
-          const distSq = dx * dx + dy * dy;
-
-          if (distSq < rSq && targetMouseX > -1000) {
-            const dist = Math.sqrt(distSq);
-            // Ruido para darle el efecto de pixeles dispares (Letta style)
-            const noise = Math.random() * 0.6 + 0.4;
-            const force = ((MOUSE_RADIUS - dist) / MOUSE_RADIUS) * noise;
-            alpha += force * 0.3 * rate; 
-          }
-
-          alpha *= dampFactor;
-          if (alpha > 1) alpha = 1;
-          if (alpha < 0.05) alpha = 0;
-
-          alphaBuffer[idx] = alpha;
-
-          if (alpha > 0) {
-            // Color morado vibrante tipo Letta Code con stroke omitido para que se vean como bloques limpios
-            // Hacemos que los bloques tengan más opacidad pero sin ser totalmente sólidos para el blur
-            ctx.fillStyle = `rgba(113, 88, 226, ${alpha * 0.6})`;
-            ctx.fillRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-          }
-        }
+        // Core dot
+        ctx.fillStyle = "rgba(167, 139, 250, 1)";
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, RADIUS, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       animationFrameId = requestAnimationFrame(render);
@@ -149,7 +110,9 @@ export function InteractiveFluidGrid() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-[50] mix-blend-multiply"
+      // z-[0] or z-[-1] to ensure it stays BEHIND the interactive content
+      // mix-blend-screen for that beautiful luminous purple effect over the background
+      className="fixed inset-0 pointer-events-none z-0 mix-blend-screen opacity-90"
       style={{
            display: "block",
            transform: "translateZ(0)", 

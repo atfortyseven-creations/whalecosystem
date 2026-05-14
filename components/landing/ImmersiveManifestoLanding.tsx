@@ -43,12 +43,12 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           />
         </div>
 
-        {/* Left Side: Minimalist White Panel / Button perfectly adjusted */}
+        {/* Left Side: Institutional Glass Panel perfectly adjusted */}
         <div className="relative z-10 w-full lg:w-1/2 min-h-screen flex items-center">
-          {/* The white background layer perfectly occupying the left half with a subtle shadow */}
-          <div className="absolute inset-0 bg-white/95 backdrop-blur-sm lg:rounded-r-[40px] shadow-[20px_0_50px_rgba(0,0,0,0.03)] border-r border-black/5" />
+          {/* A much softer, premium gradient background that fades out smoothly instead of a stark white box */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-transparent backdrop-blur-md" />
           
-          {/* Content inside the white panel */}
+          {/* Content inside the panel */}
           <motion.div 
             initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
             className="relative z-20 flex flex-col justify-center w-full px-6 sm:px-12 md:px-20 py-24 lg:py-0"
