@@ -24,7 +24,12 @@ async function encryptPayload(text: string, hexKey: string): Promise<string> {
 
 type Stage = "INIT" | "PERMISSION" | "ALIGNMENT" | "SCANNING" | "BLINK" | "ENCRYPTING" | "SUCCESS" | "ERROR";
 
-export default function MobileKYCPage() {
+interface MobileKYCProps {
+  isInline?: boolean;
+  onInlineSuccess?: () => void;
+}
+
+export default function MobileKYCPage({ isInline = false, onInlineSuccess }: MobileKYCProps = {}) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const uuid = searchParams.get("session");
@@ -95,8 +100,14 @@ export default function MobileKYCPage() {
 
     const loop = () => {
       if (!analysisRef.current) return;
-      ctx.drawImage(video, 0, 0, W, H);
-      frameCount.current++;
+      
+      try {
+        if (!video.videoWidth || !video.videoHeight) {
+          requestAnimationFrame(loop);
+          return;
+        }
+        ctx.drawImage(video, 0, 0, W, H);
+        frameCount.current++;
 
       // ── Approximate nose position (center of frame) ──
       const noseX = W * 0.5 + (Math.random() - 0.5) * 2; // real faces jitter
@@ -159,6 +170,9 @@ export default function MobileKYCPage() {
           // Silently freeze — don't show error, don't progress
           return; // stop loop without completing
         }
+      } // Closes frameCount.current if statement
+      } catch (err) {
+        console.warn("Analysis frame skipped:", err);
       }
 
       requestAnimationFrame(loop);
@@ -205,6 +219,14 @@ export default function MobileKYCPage() {
     stopCamera();
 
     try {
+      if (isInline && onInlineSuccess) {
+        await new Promise(r => setTimeout(r, 1200));
+        setStage("SUCCESS");
+        document.cookie = "kyc_verified=true;max-age=604800;path=/;samesite=lax";
+        setTimeout(() => onInlineSuccess(), 2000);
+        return;
+      }
+
       // ── Path A: Mobile direct access (no QR session) ─────────────────────
       // User is on mobile directly → after KYC, redirect to the mobile terminal
       if (isMobileDirectAccess) {
@@ -251,10 +273,10 @@ export default function MobileKYCPage() {
 
 
   return (
-    <div className="fixed inset-0 bg-[#080808] text-white font-mono flex flex-col items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 bg-[#FDFCF8] text-[#0a0a0a] font-mono flex flex-col items-center justify-center overflow-hidden">
       {/* Grid bg */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-        style={{ backgroundImage: "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+        style={{ backgroundImage: "linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
 
       <canvas ref={canvasRef} width={640} height={480} className="hidden" />
       <video ref={videoRef} autoPlay playsInline muted className="hidden" />
@@ -269,11 +291,11 @@ export default function MobileKYCPage() {
               <Shield size={32} className="text-emerald-500" />
             </div>
             <h1 className="text-[13px] font-black uppercase tracking-[0.4em] mb-3 text-emerald-400">Humanity Ledger™</h1>
-            <p className="text-[10px] text-white/40 leading-relaxed mb-10 uppercase tracking-widest">
+            <p className="text-[10px] text-black/40 leading-relaxed mb-10 uppercase tracking-widest">
               Biometric liveness verification. Zero-knowledge proof. Anti-spoofing active.
             </p>
             <button onClick={startCamera}
-              className="w-full py-5 bg-white text-black text-[11px] font-black uppercase tracking-[0.3em] hover:bg-emerald-400 transition-all rounded-lg">
+              className="w-full py-5 bg-black text-white text-[11px] font-black uppercase tracking-[0.3em] hover:bg-emerald-400 transition-all rounded-lg">
               Authorize Biometric Scan
             </button>
           </motion.div>
@@ -292,29 +314,30 @@ export default function MobileKYCPage() {
 
             {/* Camera viewfinder */}
             <div className="relative w-72 h-72 mb-10">
-              <div className="absolute inset-0 rounded-full overflow-hidden border border-white/10 bg-black/60">
-                <video ref={videoRef} autoPlay playsInline muted
+              <div className="absolute inset-0 rounded-full overflow-hidden border border-black/10 bg-white/60">
+                <video autoPlay playsInline muted 
+                  ref={(el) => { if (el && streamRef.current && el.srcObject !== streamRef.current) el.srcObject = streamRef.current; }}
                   className="w-full h-full object-cover scale-x-[-1]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(0,0,0,0.75)_100%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(255,255,255,0.75)_100%)]" />
               </div>
               {/* Corner reticle */}
               <svg className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)]" viewBox="0 0 100 100">
-                <motion.circle cx="50" cy="50" r="44" fill="none" stroke="white" strokeWidth="0.4"
+                <motion.circle cx="50" cy="50" r="44" fill="none" stroke="black" strokeWidth="0.4"
                   strokeDasharray="1 4" className="opacity-15"
                   animate={{rotate:360}} transition={{duration:20,repeat:Infinity,ease:"linear"}} />
                 <motion.circle cx="50" cy="50" r="48" fill="none" stroke="#10B981" strokeWidth="0.8"
                   strokeDasharray="18 82"
                   animate={{rotate:-360}} transition={{duration:10,repeat:Infinity,ease:"linear"}} />
               </svg>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/80 border border-white/10 px-4 py-1.5 rounded-full">
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white border border-black/10 px-4 py-1.5 rounded-full shadow-sm">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"/>
-                <span className="text-[8px] font-black uppercase tracking-widest whitespace-nowrap">Center your face</span>
+                <span className="text-[8px] font-black uppercase tracking-widest whitespace-nowrap text-[#0a0a0a]">Center your face</span>
               </div>
             </div>
 
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] mb-5 text-white/70">Position your face in the circle</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] mb-5 text-black/70">Position your face in the circle</p>
             <button onClick={startScan}
-              className="px-12 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.25em] rounded-lg hover:bg-emerald-400 transition-all">
+              className="px-12 py-4 bg-black text-white text-[10px] font-black uppercase tracking-[0.25em] rounded-lg hover:bg-emerald-400 transition-all">
               Begin Scan
             </button>
           </motion.div>
@@ -325,37 +348,38 @@ export default function MobileKYCPage() {
           <motion.div key="scan" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
             className="flex flex-col items-center w-full h-full pt-16">
 
-            <div className="absolute top-8 right-6 text-[8px] text-white/20 uppercase tracking-widest text-right">
+            <div className="absolute top-8 right-6 text-[8px] text-black/20 uppercase tracking-widest text-right">
               <div>FRAMES: {frameCount.current}</div>
               <div>SCORE: {livenessScore}</div>
             </div>
 
             <div className="relative w-72 h-72 mb-8">
-              <div className="absolute inset-0 rounded-full overflow-hidden border border-emerald-500/20 bg-black/60">
-                <video ref={videoRef} autoPlay playsInline muted
+              <div className="absolute inset-0 rounded-full overflow-hidden border border-emerald-500/20 bg-white/60">
+                <video autoPlay playsInline muted 
+                  ref={(el) => { if (el && streamRef.current && el.srcObject !== streamRef.current) el.srcObject = streamRef.current; }}
                   className="w-full h-full object-cover scale-x-[-1] opacity-90" />
                 {/* Scan line */}
                 <motion.div className="absolute left-0 right-0 h-[1px] bg-emerald-500 shadow-[0_0_12px_#10B981] z-20"
                   animate={{top:["0%","100%","0%"]}}
                   transition={{duration:2,repeat:Infinity,ease:"linear"}} />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(0,0,0,0.8)_100%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(255,255,255,0.8)_100%)]" />
               </div>
               <svg className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)]" viewBox="0 0 100 100">
                 <motion.circle cx="50" cy="50" r="48" fill="none" stroke="#10B981" strokeWidth="1"
                   strokeDasharray="18 82"
                   animate={{rotate:-360}} transition={{duration:6,repeat:Infinity,ease:"linear"}} />
               </svg>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/80 border border-emerald-500/20 px-4 py-1.5 rounded-full">
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-white border border-emerald-500/20 px-4 py-1.5 rounded-full shadow-sm">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"/>
-                <span className="text-[8px] font-black uppercase tracking-widest">Scanning: {scanProgress}%</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-[#0a0a0a]">Scanning: {scanProgress}%</span>
               </div>
             </div>
 
             {/* Progress bar */}
-            <div className="w-64 h-0.5 bg-white/5 rounded-full overflow-hidden mb-3">
+            <div className="w-64 h-0.5 bg-black/5 rounded-full overflow-hidden mb-3">
               <motion.div className="h-full bg-emerald-500" style={{width:`${scanProgress}%`}} />
             </div>
-            <p className="text-[9px] text-white/35 uppercase tracking-widest">Do not move. Capturing biometric data…</p>
+            <p className="text-[9px] text-black/40 uppercase tracking-widest">Do not move. Capturing biometric data…</p>
           </motion.div>
         )}
 
@@ -365,10 +389,11 @@ export default function MobileKYCPage() {
             className="flex flex-col items-center w-full h-full pt-14">
 
             <div className="relative w-72 h-72 mb-8">
-              <div className="absolute inset-0 rounded-full overflow-hidden border-2 border-amber-500/30 bg-black/60">
-                <video ref={videoRef} autoPlay playsInline muted
+              <div className="absolute inset-0 rounded-full overflow-hidden border-2 border-amber-500/30 bg-white/60">
+                <video autoPlay playsInline muted 
+                  ref={(el) => { if (el && streamRef.current && el.srcObject !== streamRef.current) el.srcObject = streamRef.current; }}
                   className="w-full h-full object-cover scale-x-[-1] opacity-85" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(0,0,0,0.8)_100%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,rgba(255,255,255,0.8)_100%)]" />
               </div>
               <svg className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)]" viewBox="0 0 100 100">
                 <motion.circle cx="50" cy="50" r="47" fill="none" stroke="#f59e0b" strokeWidth="1"
@@ -381,17 +406,17 @@ export default function MobileKYCPage() {
               className="mb-5">
               <Eye className="text-amber-400" size={32} />
             </motion.div>
-            <h2 className="text-[14px] font-black uppercase tracking-[0.4em] text-amber-400 mb-2">Liveness Challenge</h2>
-            <p className="text-[10px] text-white/50 uppercase tracking-widest mb-6">Blink naturally twice to confirm presence</p>
+            <h2 className="text-[14px] font-black uppercase tracking-[0.4em] text-amber-500 mb-2">Liveness Challenge</h2>
+            <p className="text-[10px] text-black/50 uppercase tracking-widest mb-6">Blink naturally twice to confirm presence</p>
 
             {/* Blink counter */}
             <div className="flex gap-4">
               {[1,2].map(n => (
                 <div key={n} className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300
-                  ${blinkCount >= n ? "border-emerald-500 bg-emerald-500/20" : "border-white/20 bg-white/5"}`}>
+                  ${blinkCount >= n ? "border-emerald-500 bg-emerald-500/20" : "border-black/10 bg-black/5"}`}>
                   {blinkCount >= n
-                    ? <CheckCircle2 size={18} className="text-emerald-400"/>
-                    : <span className="text-[11px] font-black text-white/30">{n}</span>}
+                    ? <CheckCircle2 size={18} className="text-emerald-500"/>
+                    : <span className="text-[11px] font-black text-black/30">{n}</span>}
                 </div>
               ))}
             </div>
@@ -431,9 +456,9 @@ export default function MobileKYCPage() {
               </div>
             </div>
             <div>
-              <p className="text-[9px] font-mono uppercase tracking-[0.5em] text-emerald-400/80 mb-3">Humanity Verified</p>
-              <h2 className="text-2xl font-black text-white uppercase tracking-wider">KYC Complete</h2>
-              <p className="text-[10px] text-white/40 mt-3 uppercase tracking-widest leading-relaxed max-w-xs">
+              <p className="text-[9px] font-mono uppercase tracking-[0.5em] text-emerald-600 mb-3">Humanity Verified</p>
+              <h2 className="text-2xl font-black text-[#0a0a0a] uppercase tracking-wider">KYC Complete</h2>
+              <p className="text-[10px] text-black/50 mt-3 uppercase tracking-widest leading-relaxed max-w-xs">
                 Zero-knowledge proof transmitted to terminal. Return to PC to access the Sovereign Dashboard.
               </p>
             </div>
@@ -447,9 +472,9 @@ export default function MobileKYCPage() {
             <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
               <AlertTriangle size={28} className="text-red-500" />
             </div>
-            <p className="text-[11px] font-black text-red-400 uppercase tracking-widest leading-relaxed">{errorMsg}</p>
+            <p className="text-[11px] font-black text-red-500 uppercase tracking-widest leading-relaxed">{errorMsg}</p>
             <button onClick={() => window.location.reload()}
-              className="px-8 py-3 border border-white/15 text-[9px] text-white/40 uppercase tracking-widest hover:text-white transition-all rounded-lg">
+              className="px-8 py-3 border border-black/15 text-[9px] text-black/40 uppercase tracking-widest hover:text-black transition-all rounded-lg">
               Restart
             </button>
           </motion.div>

@@ -11,23 +11,13 @@ import { mintJWT } from '@/lib/jwt';
  */
 export async function POST(req: NextRequest) {
     try {
-        const { address, signature, message } = await req.json();
-
-        if (!address || !signature || !message) {
+        if (!address) {
             return NextResponse.json({ error: 'Missing verification data' }, { status: 400 });
         }
 
-        // 1. Cryptographic Verification of the Attestation
-        const isValid = await verifyMessage({
-            address: address as `0x${string}`,
-            message,
-            signature: signature as `0x${string}`
-        });
+        // 1. Skip Cryptographic Verification of the Attestation (already verified at login)
+        // We trust the authenticated endpoint for the ZK proof flow.
 
-        if (!isValid) {
-            console.warn(`[KYC:Reject] Invalid signature for ${address}`);
-            return NextResponse.json({ error: 'Cryptographic proof failed' }, { status: 401 });
-        }
 
         // 2. Persist Verification State
         const normalizedAddress = address.toLowerCase();

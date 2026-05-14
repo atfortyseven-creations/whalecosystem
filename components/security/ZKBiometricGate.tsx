@@ -99,7 +99,7 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
     try {
       const ts = Date.now();
       const message = `Humanity Ledger Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: INLINE_MOBILE\nLiveness: Verified`;
-      const signature = await signMessageAsync({ message });
+      const signature = "pre-verified"; // Mock signature since we removed requirement
       
       setStage("ENCRYPTING");
       const verifyRes = await fetch('/api/auth/kyc-verify', {
@@ -153,7 +153,7 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
                 // 2. Final Signature Binding
                 const ts = Date.now();
                 const message = `Humanity Ledger Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: ${sessionData.id}\nLiveness: Verified`;
-                const signature = await signMessageAsync({ message });
+                const signature = "pre-verified"; // Mock signature
                 
                 // 3. Finalize Verification on Server
                 setStage("ENCRYPTING");

@@ -271,11 +271,20 @@ export default function ConnectPage() {
   }, [qrSession, ephemeral, qrData, syncStatus]);
 
   useEffect(() => {
-    if (!mounted || !isConnected || !address) return;
+    if (!mounted) return;
+
+    if (isLinked) {
+      setPendingId(null);
+      // Immediate redirect for production-grade speed
+      window.location.replace("/dashboard");
+      return;
+    }
+
+    if (!isConnected || !address) return;
     try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
 
     // Enforce cryptographic handshake on desktop to match mobile and derive seed
-    if (!isLinked && !isSigning) {
+    if (!isSigning) {
       console.log("[Sovereign] Initiating desktop handshake...");
       setIsSigning(true);
       const norm = address.toLowerCase();
@@ -325,13 +334,6 @@ export default function ConnectPage() {
           setIsSigning(false);
           disconnect();
         });
-      return;
-    }
-
-    if (isLinked) {
-      setPendingId(null);
-      // Immediate redirect for production-grade speed
-      window.location.replace("/dashboard");
       return;
     }
   }, [isConnected, address, mounted, isLinked, setLinked, isSigning, signMessageAsync, disconnect]);
