@@ -11,7 +11,7 @@ import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { motion } from 'framer-motion';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
-const FADE_UP = {
+const FADE_UP: any = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
 };
@@ -164,7 +164,7 @@ export default function PricingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-black/10 border border-black/10 max-w-6xl mx-auto overflow-hidden">
               {PRICING_TIERS.map((tier, index) => {
                 const isStandard = tier.id === 'STANDARD';
-                const tierName = isStandard ? 'KYC STANDARD' : tier.id === 'PRO' ? 'KYC PRO' : tier.name;
+                const tierName = isStandard ? 'KYC STANDARD' : tier.name;
                 
                 return (
                   <motion.div
@@ -213,8 +213,8 @@ export default function PricingPage() {
                       <button
                         onClick={() => handleSubscribeClick(tier.id)}
                         disabled={loadingTier === tier.id || (!isTierLoaded && isConnected)}
-                        className={`w-full py-6 text-[12px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 border ${
-                          isStandard || tier.id === 'PRO'
+                        className={`w-full py-6 text-[10px] sm:text-[12px] text-center whitespace-nowrap font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 border ${
+                          isStandard
                             ? 'bg-black text-white hover:bg-white hover:text-black border-black'
                             : 'bg-white text-black hover:bg-black hover:text-white border-black'
                         } disabled:opacity-20 disabled:cursor-not-allowed`}

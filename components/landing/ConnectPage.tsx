@@ -304,9 +304,21 @@ export default function ConnectPage() {
               address: norm,
               exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
             }));
-          } catch {}
+            
+            // ── [1-SIGNATURE BRIDGE] Derive XMTP Seed from Handshake ──
+            const { keccak256 } = await import('viem');
+            const seed = keccak256(signature as `0x${string}`);
+            localStorage.setItem(`whale_chat_seed_${norm}`, seed);
+            
+          } catch (e) {
+            console.error("Failed to store session artifacts", e);
+          }
+          
           setLinked(true);
           setIsSigning(false);
+          
+          // ── Instant Redirect (No manual reload required) ──
+          window.location.replace("/dashboard");
         })
         .catch((err) => {
           console.error("Handshake failed", err);

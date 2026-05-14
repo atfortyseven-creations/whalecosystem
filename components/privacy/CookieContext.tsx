@@ -56,11 +56,8 @@ export const CookieProvider = ({ children }: { children: React.ReactNode }) => {
                 setTimeout(() => setShowBanner(true), 3000);
             }
         } else {
-            // [LEGENDARY POLISH] Delay banner to avoid intrusive "wall of alerts"
-            const timer = setTimeout(() => {
-                setShowBanner(true);
-            }, 3000); 
-            return () => clearTimeout(timer);
+            // [LEGENDARY POLISH] Show banner immediately to comply with strict immediate decision requirement
+            setShowBanner(true);
         }
         setIsLoaded(true);
     }, []);
