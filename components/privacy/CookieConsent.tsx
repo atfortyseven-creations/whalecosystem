@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCookieConsent } from './CookieContext';
-import { useCookieConsent } from './CookieContext';
 
 export function CookieConsent() {
     const { showBanner, acceptAll, rejectAll } = useCookieConsent();
