@@ -687,6 +687,14 @@ export function MobileLanding() {
       const message = buildSovereignMessage(norm);
       const signature = await signMessageAsync({ message });
 
+      try {
+         const { keccak256 } = await import('viem');
+         const seed = keccak256(signature as `0x${string}`);
+         localStorage.setItem(`whale_chat_seed_${norm}`, seed);
+      } catch (seedErr) {
+         console.warn('[Auth] Could not derive chat seed during handshake', seedErr);
+      }
+
       const verifyRes = await fetch('/api/auth/sovereign-verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

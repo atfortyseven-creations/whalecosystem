@@ -448,31 +448,18 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     if (isInitingRef.current || scannerRef.current) return;
     isInitingRef.current = true;
 
-    // ── CRITICAL iOS FIX: Explicit getUserMedia permission request ────────────
-    // iOS Safari and WKWebView (MetaMask/Coinbase in-app browser) require an
-    // explicit getUserMedia call BEFORE html5-qrcode.start() — otherwise the
-    // camera access prompt never appears and the scanner silently fails.
-    // This also warms up the camera stream, reducing startup latency on Android.
-    let permissionGranted = false;
-    let warmStream: MediaStream | null = null;
+    // ── CRITICAL iOS FIX: Use built-in camera request ────────────
     try {
-      warmStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: 'environment' }, // Rear camera preferred
-          width:  { ideal: 1280 },
-          height: { ideal: 720  },
-        },
-        audio: false,
-      });
-      permissionGranted = true;
-      // Keep the stream alive but stop tracks — html5-qrcode will open its own
-      warmStream.getTracks().forEach(t => t.stop());
-      warmStream = null;
+      const { Html5Qrcode } = await import('html5-qrcode');
+      const cameras = await Html5Qrcode.getCameras();
+      if (!cameras || cameras.length === 0) {
+        throw new Error('NotFoundError');
+      }
     } catch (permErr: any) {
       isInitingRef.current = false;
-      if (permErr?.name === 'NotAllowedError' || permErr?.name === 'PermissionDeniedError') {
+      if (permErr?.name === 'NotAllowedError' || permErr?.name === 'PermissionDeniedError' || permErr?.message?.includes('denied')) {
         setErrMsg('Camera permission denied. Please allow camera access in your browser settings and try again.');
-      } else if (permErr?.name === 'NotFoundError') {
+      } else if (permErr?.name === 'NotFoundError' || permErr?.message === 'NotFoundError') {
         setErrMsg('No camera found on this device. Use the Gallery tab to upload a QR image.');
       } else {
         setErrMsg('Unable to access camera. Try the Gallery tab to upload a QR screenshot.');

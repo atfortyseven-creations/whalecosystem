@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { ChevronDown, ChevronUp, Send, CheckCircle, Zap, Shield } from 'lucide-react';
+import { ChevronDown, ChevronUp, Send, CheckCircle, Zap, Shield, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 

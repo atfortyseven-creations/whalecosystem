@@ -106,13 +106,9 @@ export default function PricingPage() {
               initial="hidden" animate="visible" variants={FADE_UP}
               className="flex flex-col items-start gap-8"
             >
-              <div className="inline-flex items-center gap-3 px-0 py-0 bg-transparent">
-                <span className="text-[11px] font-black uppercase tracking-[0.3em] text-black/30">Institutional Licensing</span>
-              </div>
-
               <h1 className="text-[52px] md:text-[96px] font-black uppercase tracking-tighter leading-[0.88] text-[#0a0a0a]">
-                Pure.<br />
-                <span className="text-black/20">Institutional.</span>
+                WAKE<br />
+                <span className="text-black/20">UP.</span>
               </h1>
 
               <p className="text-[20px] md:text-[24px] font-serif text-[#0a0a0a]/60 max-w-2xl leading-tight">
@@ -163,9 +159,6 @@ export default function PricingPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-black/10 border border-black/10 max-w-6xl mx-auto overflow-hidden">
               {PRICING_TIERS.map((tier, index) => {
-                const isStandard = tier.id === 'STANDARD';
-                const tierName = isStandard ? 'KYC STANDARD' : tier.name;
-                
                 return (
                   <motion.div
                     key={tier.id}
@@ -177,11 +170,8 @@ export default function PricingPage() {
                   >
                     <div className="flex-1 flex flex-col">
                       <div className="mb-12">
-                        <div className="mb-6 inline-flex self-start px-0 text-black/30 text-[10px] font-black uppercase tracking-[0.3em]">
-                          {tier.id === 'FREE' ? 'Operational Access' : 'Institutional License'}
-                        </div>
                         <h2 className="text-[36px] md:text-[48px] font-black uppercase tracking-tighter leading-none mb-4 text-[#0a0a0a]">
-                          {tierName}
+                          {tier.name}
                         </h2>
                         <p className="font-mono text-[11px] text-[#0a0a0a]/40 uppercase tracking-[0.2em] leading-relaxed max-w-sm">
                           {tier.tagline}
@@ -214,7 +204,7 @@ export default function PricingPage() {
                         onClick={() => handleSubscribeClick(tier.id)}
                         disabled={loadingTier === tier.id || (!isTierLoaded && isConnected)}
                         className={`w-full py-6 text-[10px] sm:text-[12px] text-center whitespace-nowrap font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 border ${
-                          isStandard
+                          tier.id === 'STANDARD'
                             ? 'bg-black text-white hover:bg-white hover:text-black border-black'
                             : 'bg-white text-black hover:bg-black hover:text-white border-black'
                         } disabled:opacity-20 disabled:cursor-not-allowed`}

@@ -26,7 +26,7 @@ async function encryptPayload(text: string, hexKey: string): Promise<string> {
   return btoa(String.fromCharCode(...Array.from(combined)));
 }
 
-export default function MobileKYCPage() {
+export default function MobileKYCPage({ isInline, onInlineSuccess }: { isInline?: boolean, onInlineSuccess?: () => void } = {}) {
   const searchParams = useSearchParams();
   const uuid = searchParams.get("session");
   const ekey = searchParams.get("ekey");
@@ -55,13 +55,17 @@ export default function MobileKYCPage() {
   }, [stopCamera]);
 
   useEffect(() => {
+    if (isInline) {
+      setStage("PERMISSION");
+      return;
+    }
     if (!uuid || !ekey) {
       setErrorMsg("INVALID SECURE TUNNEL IDENTIFIER.");
       setStage("ERROR");
     } else {
       setStage("PERMISSION");
     }
-  }, [uuid, ekey]);
+  }, [uuid, ekey, isInline]);
 
   const startTelemetry = async () => {
     try {
@@ -131,6 +135,14 @@ export default function MobileKYCPage() {
     stopCamera();
     
     try {
+      if (isInline && onInlineSuccess) {
+         setStage("SUCCESS");
+         setTimeout(() => {
+             onInlineSuccess();
+         }, 1000);
+         return;
+      }
+
       // 1. Generate Zero-Knowledge success payload
       const payload = JSON.stringify({
         verified: true,
@@ -159,22 +171,21 @@ export default function MobileKYCPage() {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#050505] text-[#FAFAFA] font-mono flex flex-col items-center justify-center overflow-hidden selection:bg-emerald-500/30">
+    <div className="fixed inset-0 bg-white text-[#0a0a0a] font-mono flex flex-col items-center justify-center overflow-hidden selection:bg-black/10">
       
       {/* Background Matrix Grid */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-           style={{ backgroundImage: "linear-gradient(#FAFAFA 1px, transparent 1px), linear-gradient(90deg, #FAFAFA 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+           style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
 
       <AnimatePresence mode="wait">
         
         {stage === "PERMISSION" && (
           <motion.div key="permission" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center text-center max-w-sm px-6 relative z-10">
-            <Lock className="w-12 h-12 text-emerald-500 mb-6" />
             <h1 className="text-xl font-bold uppercase tracking-[0.3em] mb-4">Humanity Ledger™ KYC</h1>
-            <p className="text-[10px] text-white/50 leading-relaxed mb-12 uppercase tracking-widest">
+            <p className="text-[10px] text-black/50 leading-relaxed mb-12 uppercase tracking-widest">
               Establish a secure zero-knowledge connection. Access to camera and accelerometer is required for algorithmic liveness detection.
             </p>
-            <button onClick={startTelemetry} className="w-full py-5 bg-emerald-500 text-black text-[11px] font-black uppercase tracking-[0.3em] rounded-none hover:bg-emerald-400 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+            <button onClick={startTelemetry} className="w-full py-5 bg-black text-white text-[11px] font-black uppercase tracking-[0.3em] rounded-none hover:bg-black/80 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,0,0,0.1)]">
               Initialize Sensors
             </button>
           </motion.div>
@@ -184,7 +195,7 @@ export default function MobileKYCPage() {
           <motion.div key="telemetry" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center relative z-10 w-full">
             
             {/* Header Telemetry */}
-            <div className="absolute top-8 left-0 right-0 flex justify-between px-8 text-[9px] text-emerald-500/80 uppercase tracking-widest">
+            <div className="absolute top-8 left-0 right-0 flex justify-between px-8 text-[9px] text-[#0a0a0a]/60 uppercase tracking-widest">
               <span>SENSORS: ACTIVE</span>
               <span>E2EE: SECURE</span>
             </div>
@@ -192,7 +203,7 @@ export default function MobileKYCPage() {
             {/* Orbit Camera UI */}
             <div className="relative w-[320px] h-[320px] mb-8">
               {/* Live Video Feed */}
-              <div className="absolute inset-0 rounded-full overflow-hidden border border-emerald-500/20 bg-black">
+              <div className="absolute inset-0 rounded-full overflow-hidden border border-black/10 bg-white">
                 <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1] opacity-70 grayscale contrast-125 brightness-90" />
                 <div className="absolute inset-0 border-[30px] border-black/40 pointer-events-none rounded-full" />
               </div>
@@ -206,7 +217,7 @@ export default function MobileKYCPage() {
                   return (
                     <motion.circle
                       key={i} cx="50" cy="50" r="49" fill="none"
-                      stroke={isActive ? "#10B981" : "rgba(255,255,255,0.05)"}
+                      stroke={isActive ? "#10B981" : "rgba(0,0,0,0.1)"}
                       strokeWidth="2"
                       strokeDasharray={strokeDasharray}
                       strokeDashoffset={strokeDashoffset}
@@ -232,16 +243,16 @@ export default function MobileKYCPage() {
               </div>
             </div>
 
-            <h2 className="text-[12px] font-bold text-white uppercase tracking-[0.2em] mb-2 text-center px-4">
+            <h2 className="text-[12px] font-bold text-[#0a0a0a] uppercase tracking-[0.2em] mb-2 text-center px-4">
               Complete the geometric orbit
             </h2>
-            <p className="text-[10px] text-white/40 uppercase tracking-widest text-center px-6 leading-relaxed max-w-xs">
+            <p className="text-[10px] text-black/40 uppercase tracking-widest text-center px-6 leading-relaxed max-w-xs">
               Tilt your device smoothly in a circular motion to illuminate all green sectors.
             </p>
 
             {/* Live Data Footer */}
             <div className="absolute bottom-8 left-0 right-0 text-center">
-               <p className="text-[8px] text-white/20 uppercase tracking-widest font-mono">
+               <p className="text-[8px] text-black/20 uppercase tracking-widest font-mono">
                  YAW: {orientation.alpha.toFixed(1)}° | PITCH: {orientation.beta.toFixed(1)}° | ROLL: {orientation.gamma.toFixed(1)}°
                </p>
             </div>
@@ -257,11 +268,11 @@ export default function MobileKYCPage() {
 
         {stage === "SUCCESS" && (
           <motion.div key="success" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center text-center px-6">
-            <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.3)] mb-8">
-              <CheckCircle2 size={32} className="text-black" />
+            <div className="w-20 h-20 bg-[#0a0a0a] rounded-full flex items-center justify-center shadow-sm mb-8">
+              <CheckCircle2 size={32} className="text-white" />
             </div>
-            <h2 className="text-lg font-bold text-white uppercase tracking-[0.2em] mb-4">Attestation Secure</h2>
-            <p className="text-[10px] text-white/50 uppercase tracking-widest max-w-xs leading-relaxed">
+            <h2 className="text-lg font-bold text-[#0a0a0a] uppercase tracking-[0.2em] mb-4">Attestation Secure</h2>
+            <p className="text-[10px] text-black/50 uppercase tracking-widest max-w-xs leading-relaxed">
               Zero-knowledge payload delivered. You may close this window and return to your terminal.
             </p>
           </motion.div>

@@ -5,6 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useSignMessage } from 'wagmi';
 import { QRCodeSVG as QRCode } from "qrcode.react";
 import { X, ShieldCheck, Smartphone, CheckCircle2 } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const MobileKYCPage = dynamic(() => import("../../app/mobile-kyc/page"), { ssr: false });
+
 
 // AES-GCM Crypto Helpers for E2EE Decryption
 async function decryptPayload(ciphertextBase64: string, hexKey: string): Promise<string> {
@@ -46,7 +50,7 @@ interface ZKBiometricGateProps {
 }
 
 export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGateProps) {
-  const [stage, setStage] = useState<"IDLE" | "GENERATING_TUNNEL" | "QR_HANDOFF" | "VERIFYING_PAYLOAD" | "SUCCESS" | "ERROR">("IDLE");
+  const [stage, setStage] = useState<"IDLE" | "GENERATING_TUNNEL" | "QR_HANDOFF" | "VERIFYING_PAYLOAD" | "SUCCESS" | "ERROR" | "MOBILE_INLINE">("IDLE");
   const [errorMsg, setErrorMsg] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const { address } = useAccount();
@@ -76,12 +80,8 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
     setStage("GENERATING_TUNNEL");
 
     if (isMobile) {
-      // If already on mobile, just redirect to the mobile KYC flow directly with a local secure tunnel.
-      // But we can also just use the same URL scheme to maintain parity.
-      const sessionId = generateUUID();
-      const ekey = generateEphemeralKey();
-      const origin = window.location.origin;
-      window.location.href = `${origin}/mobile-kyc?session=${sessionId}&ekey=${ekey}`;
+      // If already on mobile, run inline
+      setStage("MOBILE_INLINE");
       return;
     }
 
@@ -93,6 +93,19 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
     
     setSessionData({ id: sessionId, ekey, url });
     setStage("QR_HANDOFF");
+  };
+
+  const handleInlineSuccess = async () => {
+    try {
+      const ts = Date.now();
+      const message = `Humanity Ledger Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: INLINE_MOBILE\nLiveness: Verified`;
+      const signature = await signMessageAsync({ message });
+      setStage("SUCCESS");
+      if (onSuccess) onSuccess(signature);
+    } catch (err: any) {
+      setErrorMsg("Signature Failed.");
+      setStage("ERROR");
+    }
   };
 
   // High-Frequency Polling Effect (Backoff)
@@ -164,19 +177,18 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
   }, [stage, sessionData, address, signMessageAsync, onSuccess]);
 
   return (
-    <div className="w-full h-full bg-[#050505] rounded-[24px] p-8 shadow-2xl font-mono text-[#FAFAFA] relative overflow-hidden flex flex-col items-center justify-center border border-white/5">
+    <div className="w-full h-full bg-white rounded-[24px] p-8 shadow-sm font-mono text-[#0a0a0a] relative overflow-hidden flex flex-col items-center justify-center border border-black/5">
       
       {/* Background Matrix Grid */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-           style={{ backgroundImage: "linear-gradient(#FAFAFA 1px, transparent 1px), linear-gradient(90deg, #FAFAFA 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+           style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
 
       <div className="relative z-10 flex flex-col items-center w-full max-w-sm text-center">
         
         {/* Header */}
         <div className="mb-10 flex flex-col items-center">
-           <ShieldCheck className="w-10 h-10 text-emerald-500 mb-4" />
-           <h2 className="text-[14px] font-bold uppercase tracking-[0.4em] text-white">Humanity Ledger™ KYC</h2>
-           <p className="text-[9px] text-white/40 uppercase tracking-widest mt-2">Zero-Knowledge Biometric Protocol</p>
+           <h2 className="text-[14px] font-bold uppercase tracking-[0.4em] text-[#0a0a0a]">Humanity Ledger™ KYC</h2>
+           <p className="text-[9px] text-black/40 uppercase tracking-widest mt-2">Zero-Knowledge Biometric Protocol</p>
         </div>
 
         <div className="h-64 flex items-center justify-center w-full mb-8">
@@ -184,7 +196,7 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
             
             {stage === "IDLE" && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full">
-                 <p className="text-[11px] text-white/60 leading-relaxed mb-8 uppercase tracking-[0.1em]">
+                 <p className="text-[11px] text-black/60 leading-relaxed mb-8 uppercase tracking-[0.1em]">
                    Absolute privacy guaranteed. Your facial telemetry is processed locally on your hardware and transmitted via E2EE ephemeral tunnels.
                  </p>
                  <button 
@@ -205,22 +217,15 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
 
             {stage === "QR_HANDOFF" && sessionData && (
               <motion.div key="qr" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
-                 <div className="bg-white p-4 rounded-xl shadow-[0_0_40px_rgba(255,255,255,0.1)] relative overflow-hidden group mb-6">
+                 <div className="bg-white p-4 rounded-xl shadow-sm border border-black/5 relative overflow-hidden group mb-6">
                     <QRCode value={sessionData.url} size={180} fgColor="#050505" bgColor="#ffffff" level="H" />
-                    
-                    {/* Visual Cipher Sweep Effect */}
-                    <motion.div 
-                      className="absolute top-0 left-0 right-0 h-1 bg-emerald-500/50 shadow-[0_0_15px_#10B981] blur-[1px]"
-                      animate={{ y: [0, 212, 0] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    />
                  </div>
                  
-                 <div className="flex items-center gap-2 text-emerald-500 mb-2">
+                 <div className="flex items-center gap-2 text-[#0a0a0a] mb-2">
                    <Smartphone size={16} />
                    <p className="text-[10px] uppercase font-bold tracking-[0.2em]">Scan to Verify</p>
                  </div>
-                 <p className="text-[8px] text-white/40 uppercase tracking-widest">Awaiting ZK-Payload Transmission...</p>
+                 <p className="text-[8px] text-black/40 uppercase tracking-widest">Awaiting ZK-Payload Transmission...</p>
               </motion.div>
             )}
 
@@ -234,11 +239,11 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
 
             {stage === "SUCCESS" && (
               <motion.div key="success" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
-                 <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.4)] mb-6">
-                   <CheckCircle2 size={24} className="text-black" />
+                 <div className="w-16 h-16 bg-[#0a0a0a] rounded-full flex items-center justify-center shadow-sm mb-6">
+                   <CheckCircle2 size={24} className="text-white" />
                  </div>
-                 <h3 className="text-[12px] font-bold text-white uppercase tracking-[0.3em] mb-2">Identity Verified</h3>
-                 <p className="text-[9px] text-emerald-500/80 uppercase tracking-widest">Sovereign Terminal Unlocked</p>
+                 <h3 className="text-[12px] font-bold text-[#0a0a0a] uppercase tracking-[0.3em] mb-2">Identity Verified</h3>
+                 <p className="text-[9px] text-black/40 uppercase tracking-widest">Sovereign Terminal Unlocked</p>
               </motion.div>
             )}
 
@@ -248,10 +253,16 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
                    <X size={24} className="text-red-500" />
                  </div>
                  <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest leading-relaxed mb-6">{errorMsg}</p>
-                 <button onClick={() => setStage("IDLE")} className="text-[9px] text-white/50 hover:text-white uppercase tracking-[0.2em] border-b border-white/20 pb-1">
+                 <button onClick={() => setStage("IDLE")} className="text-[9px] text-black/50 hover:text-black uppercase tracking-[0.2em] border-b border-black/20 pb-1">
                    Retry Tunnel
                  </button>
               </motion.div>
+            )}
+
+            {stage === "MOBILE_INLINE" && (
+               <motion.div key="inline-kyc" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 z-50">
+                   <MobileKYCPage isInline={true} onInlineSuccess={handleInlineSuccess} />
+               </motion.div>
             )}
 
           </AnimatePresence>

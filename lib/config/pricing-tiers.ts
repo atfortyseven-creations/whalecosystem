@@ -50,7 +50,7 @@ export const PRICING_TIERS: PricingTier[] = [
   },
   {
     id:           'STANDARD',
-    name:         'Whale Chat Pro',
+    name:         'Whale Alert Network +',
     tagline:      'Unrestricted institutional capacity.',
     priceMonthly: '15',
     priceAnnual:  '150',
