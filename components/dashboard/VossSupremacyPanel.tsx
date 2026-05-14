@@ -252,7 +252,7 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/[0.03]">
             {displayFeed.length === 0 ? (
                <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center text-center p-8">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#888888]">NO INSTITUTIONAL CLEARANCES ISSUED</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#888888]">NO PROFESSIONAL CLEARANCES ISSUED</p>
                   <p className="text-[9px] text-[#A0A0A0] mt-2 tracking-widest uppercase">Awaiting Genesis Ticket Allocations</p>
                </div>
             ) : (
@@ -391,7 +391,7 @@ export function VossSupremacyPanel() {
           await switchChain({ chainId: OPTIMISM_CHAIN_ID });
       }
 
-      const txToast = toast.loading(`Initiating Sovereign Mint Protocol (${MINT_FEE_ETH} ETH)...`, { style: { background: '#050505', color: '#D4AF37', border: '1px solid #D4AF3740' } });
+      const txToast = toast.loading(`Initiating Secure Mint Protocol (${MINT_FEE_ETH} ETH)...`, { style: { background: '#050505', color: '#D4AF37', border: '1px solid #D4AF3740' } });
       const txHash = await sendTransactionAsync({
           to: TREASURY_WALLET,
           value: parseEther(MINT_FEE_ETH)

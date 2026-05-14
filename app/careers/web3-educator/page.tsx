@@ -5,7 +5,7 @@ import { ArrowLeft, MapPin, Clock, DollarSign } from 'lucide-react';
 
 export default function Web3EducatorPage() {
   return (
-    <div className="relative min-h-screen bg-[#FAF9F6] text-[#050505] selection:bg-[#00C076]/30 font-sans antialiased overflow-x-hidden pt-32 pb-32">
+    <div className="relative min-h-screen bg-transparent text-[#050505] selection:bg-[#00C076]/30 font-sans antialiased overflow-x-hidden pt-32 pb-32">
       
       {/* ── Ambient Background Texture ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden flex justify-center z-0">

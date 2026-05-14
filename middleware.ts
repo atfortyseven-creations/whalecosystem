@@ -78,7 +78,7 @@ const HONEYPOT_PATTERNS = [
   '/.svn(.*)',
 ];
 
-const KYC_REQUIRED_PATTERNS = ['/trade(.*)'];
+// KYC completely removed by institutional request
 const GEO_RESTRICTED_PATTERNS = ['/api/polymarket(.*)'];
 const RESTRICTED_COUNTRIES = ['US', 'CU', 'IR', 'KP', 'SY'];
 
@@ -275,32 +275,7 @@ export default async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/', request.url).toString());
       }
 
-      if (matchesPattern(pathname, KYC_REQUIRED_PATTERNS)) {
-        const kycToken = request.cookies.get('kyc_token')?.value;
-        let isApproved = false;
-
-        const KYC_SECRET = process.env.KYC_SECRET;
-        if (!KYC_SECRET) {
-          console.error('[WhaleFortress:CRITICAL] KYC_SECRET environment variable is not configured. Denying all access to protected routes.');
-          return NextResponse.redirect(new URL('/', request.url).toString());
-        }
-
-        if (kycToken) {
-          try {
-            const JWT_SECRET = new TextEncoder().encode(KYC_SECRET);
-            const { jwtVerify } = await import('jose');
-            const { payload } = await jwtVerify(kycToken, JWT_SECRET);
-            if (payload.status === 'APPROVED') isApproved = true;
-          } catch(e) {
-            console.warn(`[WhaleFortress] 🚨 Spoofed/Invalid KYC token intercepted from IP: ${ip}`);
-          }
-        }
-
-        if (!isApproved) {
-          console.warn(`[WhaleFortress] 🛡️ Blocked unauthorized access to KYC route: ${pathname}`);
-          return NextResponse.redirect(new URL('/', request.url).toString());
-        }
-      }
+      // KYC verification permanently bypassed
     }
 
     // 4. Final Header Injection & CSP

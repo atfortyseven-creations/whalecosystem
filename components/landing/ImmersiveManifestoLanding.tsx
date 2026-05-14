@@ -29,99 +29,42 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
   }, []);
 
   return (
-    <div className="relative bg-[#FAFAF8] text-[#0a0a0a] font-sans antialiased overflow-x-hidden selection:bg-black/10">
+    <div className="relative bg-transparent text-[#0a0a0a] font-sans antialiased overflow-x-hidden selection:bg-black/10">
 
-      {/* ── HERO ──────────────────────────────────────────────────────────────── */}
-      <section className="relative w-full min-h-screen flex flex-col lg:flex-row border-b border-black/5 bg-[#FAFAF8]">
-        
-        {/* Full Background Image */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <img
-            src="/peakpx.jpg"
-            alt="Background cubes"
-            className="w-full h-full object-cover object-center opacity-90"
-          />
-        </div>
 
-        {/* Left Side: Institutional Glass Panel perfectly adjusted */}
-        <div className="relative z-10 w-full lg:w-1/2 min-h-screen flex items-center">
-          {/* A much softer, premium gradient background that fades out smoothly instead of a stark white box */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-transparent backdrop-blur-md" />
-          
-          {/* Content inside the panel */}
-          <motion.div 
-            initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-            className="relative z-20 flex flex-col justify-center w-full px-6 sm:px-12 md:px-20 py-24 lg:py-0"
-          >
-            <motion.h1 variants={FADE_UP} className="text-[32px] sm:text-[48px] md:text-[56px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-2xl text-left">
-              Track institutional capital <br />
-              <span className="text-[#0044CC]">before markets react.</span>
-            </motion.h1>
-
-            <motion.p variants={FADE_UP} className="text-[16px] sm:text-[20px] font-medium text-slate-600 leading-relaxed max-w-xl mb-10 text-left">
-              Real-time on-chain intelligence — from mempool to execution.
-            </motion.p>
-
-            {/* Performance Status — Institutional Readout */}
-            <motion.div variants={FADE_UP} className="grid grid-cols-2 gap-6 p-6 bg-[#FAFAF8]/80 border border-black/5 rounded-3xl mb-10 shadow-sm max-w-lg w-full">
-              {[
-                { label: "Network State", val: blockNumber ? `#${blockNumber.toLocaleString()}` : "Operational" },
-                { label: "Gas Topology", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "Nominal" },
-                { label: "Entity Density", val: globalStats?.tokens ?? "Verified" },
-                { label: "Capital Flow", val: globalStats?.cap ?? "Nominal" }
-              ].map((stat, i) => (
-                <div key={stat.label} className="flex flex-col gap-1 items-start">
-                  <span className="font-mono text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 truncate">{stat.label}</span>
-                  <span className="font-mono text-[14px] sm:text-[16px] font-black text-[#0a0a0a] truncate tracking-tight">{stat.val}</span>
-                </div>
-              ))}
-            </motion.div>
-
-            {/* CTA */}
-            <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row gap-4 justify-start">
-              <Link href="/dashboard" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#0a0a0a] text-white rounded-2xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10">
-                Enter the Network <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link href="/pricing" className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white border-2 border-black/5 text-[#0a0a0a] rounded-2xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:border-black/10 hover:bg-slate-50 active:scale-[0.98] transition-all">
-                View Plans
-              </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
 
       {/* ── BENTO BOX: WHY WHALE ALERT NETWORK ──────────────────────────────── */}
-      <section className="w-full py-24 md:py-40 bg-white">
+      <section className="w-full py-24 md:py-40 bg-transparent relative z-10">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 space-y-16">
             <div className="text-center max-w-3xl mx-auto space-y-6 mb-20">
                 <h2 className="text-[40px] sm:text-[56px] font-black tracking-tighter uppercase leading-[0.95] text-[#0a0a0a]">
                     Architectural <span className="text-[#0044CC]">Precision.</span>
                 </h2>
                 <p className="font-serif text-[18px] text-slate-500 leading-relaxed">
-                    Designed for institutional compliance and quantitative research. We eliminate the noise, providing mathematical certainty and actionable intelligence.
+                    Designed for professional compliance and quantitative research. We eliminate the noise, providing mathematical certainty and actionable intelligence.
                 </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 {/* Bento Card 1 */}
-                <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
+                <div className="col-span-1 lg:col-span-2 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
                     <div className="w-full lg:w-1/2 space-y-6">
                         <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
-                            Cryptographic Integrity.
+                            Secure Integrity.
                         </h3>
                         <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
-                            The Whale Alert Network operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your operational identity is mathematically verified via elliptic-curve cryptography, ensuring that your institutional portfolio data remains private.
+                            The Whale Alert Network operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your identity is mathematically verified, ensuring that your professional portfolio data remains private.
                         </p>
                     </div>
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
                         <RemoteLottie path="DeeWork About Blockchain.json" className="w-full h-full scale-125" />
                     </div>
                 </div>
 
                 {/* Bento Card 2 */}
-                <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
-                    <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] rounded-[2rem] border border-black/5 mb-8 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
+                <div className="col-span-1 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
+                    <div className="w-full h-[200px] flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2rem] border border-black/5 mb-8 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
                          <RemoteLottie path="Connected world.json" className="scale-125" />
                     </div>
                     <div className="space-y-6">
@@ -129,38 +72,38 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                             Entity Resolution.
                         </h3>
                         <p className="text-[15px] text-slate-500 leading-relaxed font-serif">
-                            We map complex multi-hop interactions and resolve fragmented on-chain fingerprints into unified institutional entities for absolute regulatory clarity.
+                            We map complex multi-hop interactions and resolve fragmented on-chain fingerprints into unified professional entities for absolute regulatory clarity.
                         </p>
                     </div>
                 </div>
 
                 {/* Bento Card 3 */}
-                <div className="col-span-1 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
+                <div className="col-span-1 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
                     <div className="space-y-6 mb-8">
                         <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
-                            Heuristic Engines.
+                            Analytics Engines.
                         </h3>
                         <p className="text-[15px] text-slate-500 leading-relaxed font-serif">
                             Our deterministic algorithms process vast arrays of raw blockchain state, detecting liquidity patterns and massive accumulations with mathematical precision.
                         </p>
                     </div>
-                    <div className="w-full h-[200px] flex items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
+                    <Link href="/dashboard" target="_blank" rel="noopener noreferrer" className="w-full h-[200px] flex items-center justify-center bg-white/40 backdrop-blur-3xl dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
                          <RemoteLottie path="Isometric data analysis.json" className="w-full h-full scale-110" />
-                    </div>
+                    </Link>
                 </div>
 
                 {/* Bento Card 4 */}
-                <div className="col-span-1 lg:col-span-2 bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-[#FAFAF8] rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
+                <div className="col-span-1 lg:col-span-2 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
+                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
                         <div className="absolute inset-0 bg-[#0044CC]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
                          <RemoteLottie path="Trade.json" className="w-full h-full scale-125" />
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
                         <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
-                            Heuristic Tracking.
+                            Network Tracking.
                         </h3>
                         <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
-                            Relying on block confirmations is insufficient for institutional operations. Our dedicated node mesh directly interfaces with the global mempool, allowing you to intercept and analyze capital flows milliseconds after they are signed.
+                            Relying on block confirmations is insufficient for advanced operations. Our dedicated node mesh directly interfaces with the global mempool, allowing you to intercept and analyze capital flows milliseconds after they are signed.
                         </p>
                     </div>
                 </div>
@@ -170,7 +113,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
       </section>
 
       {/* ── SHOWCASE ────────────────────────────────────────────────────────── */}
-      <section className="w-full py-24 md:py-40 bg-[#FAFAF8] overflow-hidden relative border-t border-black/5">
+      <section className="w-full py-24 md:py-40 bg-transparent overflow-hidden relative border-t border-black/5">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 mb-16 md:mb-24">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={FADE_UP} className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
             <div className="relative">
@@ -179,7 +122,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
               </h2>
             </div>
             <p className="font-serif text-[16px] sm:text-[18px] text-slate-500 max-w-lg leading-relaxed">
-              A comprehensive and intuitive dashboard designed to provide a clear overview of the platform, combining powerful forensic tools with an elegant, institutional aesthetic.
+              A comprehensive and intuitive dashboard designed to provide a clear overview of the platform, combining powerful analytical tools with an elegant, professional aesthetic.
             </p>
           </motion.div>
         </div>
@@ -192,7 +135,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
               "/system-shots/Captura de pantalla 2026-05-10 002811.png",
               "/system-shots/Captura de pantalla 2026-05-10 002900.png"
             ].map((src, idx) => (
-              <img key={idx} src={src} className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" alt={`Terminal view ${idx + 1}`} />
+              <img key={idx} src={src} className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" alt={`Platform view ${idx + 1}`} />
             ))}
           </StackableCarousel>
         </div>
@@ -213,15 +156,14 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         </div>
       </section>
 
-      {/* ── CLOSING ───────────────────────────────────────────────────────────── */}
-      <section className="w-full py-32 md:py-48 bg-white border-t border-black/5">
+      <section className="w-full py-32 md:py-48 bg-transparent border-t border-black/5">
         <div className="max-w-[850px] mx-auto px-6 text-center flex flex-col items-center">
           <h2 className="text-[36px] md:text-[56px] font-serif text-[#0a0a0a] leading-tight tracking-tight mb-8">
             In the pursuit of <br /><span className="italic font-light text-slate-500">absolute transparency</span>.
           </h2>
           <p className="font-serif text-[15px] md:text-[18px] text-slate-500 max-w-2xl mx-auto leading-relaxed">
-            Foundational document on pure mathematical abstraction, zero-knowledge cryptographic mechanisms,
-            and deterministic heuristic paradigms that cement the immutable global infrastructure.
+            Foundational document on pure mathematical abstraction, zero-knowledge security,
+            and deterministic analytical paradigms that cement the immutable global infrastructure.
           </p>
         </div>
       </section>

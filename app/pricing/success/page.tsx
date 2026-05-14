@@ -86,7 +86,7 @@ function SuccessContent() {
                         </div>
 
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#050505] mb-4">
-                            Institutional License Activated
+                            Professional License Activated
                         </h1>
                         
                         <p className="text-[#050505]/60 text-sm md:text-base font-medium leading-relaxed mb-6">
@@ -103,7 +103,7 @@ function SuccessContent() {
                         <div className="grid gap-4 w-full">
                             <Link href="/dashboard" className="w-full">
                                 <button className="w-full h-14 rounded-2xl bg-[#050505] hover:bg-black/80 text-white font-bold uppercase tracking-widest text-xs flex justify-between items-center px-8 transition-all shadow-lg hover:shadow-xl">
-                                    Access Terminal
+                                    Access Dashboard
                                     <ArrowRight size={18} />
                                 </button>
                             </Link>

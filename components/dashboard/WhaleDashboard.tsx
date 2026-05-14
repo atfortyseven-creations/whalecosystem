@@ -204,28 +204,14 @@ export default function WhaleDashboard() {
         return () => document.removeEventListener('visibilitychange', handleVisibility);
     }, []);
 
-    // [SOVEREIGN-ENFORCER] Mandatory KYC Gate Redirect
-    React.useEffect(() => {
-        if (!isCheckingZK && isConnected && !hasPassedZK && activeTab !== 'zk-identity') {
-            setActiveTab('zk-identity');
-            window.history.pushState(null, '', `?tab=zk-identity`);
-        }
-    }, [isCheckingZK, isConnected, hasPassedZK, activeTab]);
+    // KYC permanently disabled per institutional request
 
     // Also increment refreshKey on every tab change to guarantee fresh mounts
     const handleTabChange = React.useCallback((id: string) => {
-        // [GATE-CHECK] Do not allow switching if KYC is missing
-        if (isConnected && !hasPassedZK && id !== 'zk-identity') {
-            toast.error("Identity Verification Required", {
-                description: "You must pass the 3D Biometric scan to unlock the terminal modules.",
-                style: { background: '#050505', color: '#10B981', border: '1px solid #10B98140' }
-            });
-            return;
-        }
         setActiveTab(id);
         setRefreshKey(k => k + 1);
         window.history.pushState(null, '', `?tab=${id}`);
-    }, [isConnected, hasPassedZK]);
+    }, []);
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -253,7 +239,7 @@ export default function WhaleDashboard() {
                 return <div className="flex-1 min-h-[850px] shrink-0 relative"><DashboardErrorBoundary key={`zk-shield-${refreshKey}`}><AztecMempoolSpace /></DashboardErrorBoundary></div>;
 
             case 'zk-identity':
-                return <div className="flex flex-col gap-6 w-full min-h-[950px] shrink-0"><DashboardErrorBoundary key={`zk-identity-${refreshKey}`}><div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full"><div className="flex flex-col gap-6"><ZKBiometricGate /><SovereignAMLOracle /></div><ZkKYBVault /></div></DashboardErrorBoundary></div>;
+                return <div className="flex flex-col gap-6 w-full min-h-[950px] shrink-0"><DashboardErrorBoundary key={`zk-identity-${refreshKey}`}><div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full"><div className="flex flex-col gap-6"><SovereignAMLOracle /></div><ZkKYBVault /></div></DashboardErrorBoundary></div>;
 
             case 'news':
                 return <div className="h-[750px] shrink-0"><DashboardErrorBoundary key={`news-${refreshKey}`}><NewsOfToday /></DashboardErrorBoundary></div>;
@@ -331,20 +317,7 @@ export default function WhaleDashboard() {
         );
     }
 
-    if (!hasPassedZK) {
-        return (
-            <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center">
-                <div className="w-full max-w-4xl px-4">
-                    <InstitutionalErrorBoundary moduleName="ZK-Biometric Identity Gate">
-                        <ZKBiometricGate onSuccess={() => window.location.reload()} />
-                    </InstitutionalErrorBoundary>
-                    <p className="mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 text-center">
-                        Institutional Access Requires 3D ZK-Liveness Attestation
-                    </p>
-                </div>
-            </div>
-        );
-    }
+    // ZK gate bypass
 
     return (
         <WhaleProShell

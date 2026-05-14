@@ -41,10 +41,10 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'Whale Alert Network | Institutional Identity Layer',
+    default: 'Whale Alert Network | Professional Identity Layer',
     template: '%s | Whale Alert Network'
   },
-  description: 'The definitive Whale Alert Network for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+  description: 'The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
   keywords: [
     'Whale Alert Network', 'Whale Alert', 'Institutional Identity', 'ZK-Biometrics', 'On-chain Intelligence', 'Zero-Knowledge Proofs'
   ],
@@ -75,8 +75,8 @@ export const metadata = {
     title: 'HumanID',
   },
   openGraph: {
-    title: 'Whale Alert Network | Institutional Identity Layer',
-    description: 'The definitive Whale Alert Network for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+    title: 'Whale Alert Network | Professional Identity Layer',
+    description: 'The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
     url: 'https://www.humanidfi.com',
     siteName: 'Whale Alert Network',
     images: [
@@ -92,8 +92,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Whale Alert Network | Institutional Identity Layer',
-    description: 'The definitive Whale Alert Network for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+    title: 'Whale Alert Network | Professional Identity Layer',
+    description: 'The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
     images: ['/humanid_protocol_logo_1778714491433.png'],
   },
 }
@@ -124,7 +124,7 @@ export default async function RootLayout({
         "@type": "WebSite",
         "url": "https://www.humanidfi.com/",
         "name": "Whale Alert Network",
-        "description": "The definitive Whale Alert Network for institutional-grade on-chain identity, cryptographic attestation, and real-time intelligence.",
+        "description": "The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.",
         "publisher": {
           "@id": "https://www.humanidfi.com/#organization"
         }
@@ -141,34 +141,34 @@ export default async function RootLayout({
       },
       {
         "@type": "SoftwareApplication",
-        "name": "HumanID Terminal",
+        "name": "HumanID Dashboard",
         "operatingSystem": "Web",
         "applicationCategory": "FinanceApplication",
         "creator": {
           "@id": "https://www.humanidfi.com/#organization"
         },
-        "description": "HumanID Terminal for real-time institutional on-chain identity and intelligence.",
+        "description": "HumanID Dashboard for real-time professional on-chain identity and intelligence.",
         "url": "https://www.humanidfi.com/dashboard",
         "featureList": [
-          "HumanID Terminal (Zero-Trust Forensic Suite)",
+          "HumanID Dashboard (Zero-Trust Analytics Suite)",
           "ZK-Biometric Identity Attestation",
           "Aztec Network L2 Privacy Integration",
-          "Protocol Ledger Heuristics"
+          "Network Ledger Analytics"
         ]
       },
       {
         "@type": "SoftwareSourceCode",
-        "name": "HumanID Protocol Architecture",
+        "name": "HumanID Network Architecture",
         "codeRepository": "https://github.com/atfortyseven-creations/Humanity-Ledger",
         "programmingLanguage": ["TypeScript", "Solidity", "PostgreSQL", "Neo4j", "React", "Next.js"],
-        "description": "Institutional-grade identity layer running Next.js 15 App router over a sterilized Ivory-and-Ink UI."
+        "description": "Professional-grade identity layer running Next.js 15 App router over a sterilized Ivory-and-Ink UI."
       },
       {
         "@type": "DataFeed",
-        "name": "Live Institutional Identity Feed",
+        "name": "Live Professional Identity Feed",
         "dataFeedElement": {
           "@type": "DataFeedItem",
-          "name": "Protocol Identity Matrix",
+          "name": "Network Identity Matrix",
           "description": "Real-time cryptographic attestation of network participants via local Node daemon."
         }
       }

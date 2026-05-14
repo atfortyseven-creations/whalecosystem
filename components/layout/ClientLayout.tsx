@@ -312,11 +312,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     <>
 
       <TitaniumGate>
-        {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}
+        <UniversalEliteWallpaper />
 
         <div className={rootClass}>
           {/* Optional top header for select standalone routes */}
-          <div className="flex-none w-full z-50">
+          <div className="flex-none w-full z-50 sticky top-0">
             {showInstitutionalHeader && <InstitutionalHeader />}
           </div>
 

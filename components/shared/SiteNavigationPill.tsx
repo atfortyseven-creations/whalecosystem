@@ -32,6 +32,8 @@ export function SiteNavigationPill() {
             <div className="w-px h-4 bg-black/5" />
             <Link 
                 href="/dashboard" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 ${
                     pathname.startsWith('/dashboard') ? 'text-[var(--aztec-orchid)]' : 'text-[var(--aztec-ink)]/40 hover:text-[var(--aztec-orchid)]'
                 }`}

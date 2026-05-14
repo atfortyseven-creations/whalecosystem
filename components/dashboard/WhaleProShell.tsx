@@ -389,7 +389,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         <div className="px-4 py-6 mt-4">
                             <div className="w-full h-px bg-black/10 mb-4" />
                             <p className="text-[9px] font-serif leading-relaxed text-[#888] text-justify opacity-80">
-                                Foundational document on pure mathematical abstraction, zero-knowledge cryptographic mechanisms, and deterministic heuristic paradigms that cement the immutable global infrastructure.
+                                Documentation on cryptographic mechanisms and data paradigms that secure the global infrastructure.
                             </p>
                         </div>
                     )}
@@ -518,7 +518,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                                     className="w-full flex-1 flex flex-col"
                                 >
-                                    <InstitutionalErrorBoundary moduleName="Processing Execution Node">
+                                    <InstitutionalErrorBoundary moduleName="Loading Module">
                                         {children}
                                     </InstitutionalErrorBoundary>
                                 </motion.div>
@@ -574,7 +574,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         <span className="flex items-center gap-1.5">Nodes: <span className="text-[#050505]">{nodeStatus}</span></span>
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5">Protocol: ACTIVE</span>
+                        <span className="flex items-center gap-1.5">Network: ACTIVE</span>
                         <span className="text-[#888888]">© 2026 HUMANID KYC</span>
                     </div>
                 </footer>

@@ -21,7 +21,7 @@ const FEATURES = [
   {
     lottie: 'Business Analysis.json',
     title: 'KYC Identity Attestation',
-    desc: 'Verify institutional actors via zero-knowledge biometric proofs. Our protocol ensures that no personal data is stored, while guaranteeing the humanity of every network participant.',
+    desc: 'Verify professional actors via zero-knowledge biometric proofs. Our protocol ensures that no personal data is stored, while guaranteeing the humanity of every network participant.',
   },
   {
     lottie: 'Isometric data analysis.json',
@@ -31,7 +31,7 @@ const FEATURES = [
   {
     lottie: 'Earth globe rotating with Seamless loop animation.json',
     title: 'Global Resolution',
-    desc: 'Map multi-hop interactions across global chains. We de-obfuscate mixer outputs and group fragmented wallets into unified institutional entities.',
+    desc: 'Map multi-hop interactions across global chains. We de-obfuscate mixer outputs and group fragmented wallets into unified professional entities.',
   },
 ];
 
@@ -234,7 +234,7 @@ export default function PricingPage() {
               className="mb-24"
             >
               <h2 className="text-[36px] md:text-[56px] font-black uppercase tracking-tighter text-[#0a0a0a] mb-6">
-                Institutional <span className="text-black/10">Rigour.</span>
+                Professional <span className="text-black/10">Rigour.</span>
               </h2>
               <p className="text-[18px] font-serif text-[#0a0a0a]/50 max-w-2xl">
                 In the sovereign DeFi landscape, mathematical identity and zero-trust communications are the only true protections.
@@ -243,7 +243,7 @@ export default function PricingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               <ProFeatureCard title="Biometric Binding" desc="Every identity is cryptographically bound to a physical biometric template via zero-knowledge proofs, eliminating synthetic identity risk." />
-              <ProFeatureCard title="Protocol Transparency" desc="Direct, un-mediated access to the deepest layers of blockchain state, providing sub-millisecond telemetry for institutional decision making." />
+              <ProFeatureCard title="Network Transparency" desc="Direct, un-mediated access to the deepest layers of blockchain state, providing sub-millisecond telemetry for professional decision making." />
               <ProFeatureCard title="Encrypted Flow" desc="All communications and analytical requests are processed through our proprietary p2p encryption mesh, ensuring zero protocol-level leakage." />
             </div>
           </div>

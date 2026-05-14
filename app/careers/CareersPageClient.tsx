@@ -10,12 +10,12 @@ import { OPEN_ROLES, BENEFITS } from './data';
 
 export function CareersPageClient() {
   return (
-    <div className="relative min-h-screen bg-[#FAFAF8] text-[#0a0a0a] font-sans antialiased overflow-x-hidden selection:bg-black/10">
+    <div className="relative min-h-screen bg-transparent text-[#0a0a0a] font-sans antialiased overflow-x-hidden selection:bg-black/10">
 
       {/* ── NESTR HERO ── */}
-      <header className="w-full bg-[#FAFAF8] pt-32 pb-16 px-6 lg:px-12">
+      <header className="w-full bg-transparent pt-32 pb-16 px-6 lg:px-12">
         <div className="max-w-[1400px] mx-auto">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
                 
                 <div className="w-full lg:w-1/2 relative z-10 space-y-6 lg:space-y-8 text-center lg:text-left">
                     <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#FAFAF8] border border-black/5 rounded-full shadow-sm mx-auto lg:mx-0">
@@ -27,11 +27,10 @@ export function CareersPageClient() {
                     </h1>
                     
                     <p className="font-serif text-[16px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                        We track the largest capital flows in the world, in real time, with cryptographic precision. Join our engineering and intelligence teams to build the tools that give institutional traders a forensic edge over the market.
+                        We track the largest capital flows in the world, in real time, with cryptographic precision. Join our engineering and intelligence teams to build the tools that give professional traders a forensic edge over the market.
                     </p>
 
                     <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3 pt-4">
-                        {['Remote-First', 'High Autonomy', 'Institutional Scale', 'Async Culture'].map(tag => (
                         <div key={tag} className="px-5 py-2.5 bg-slate-50 border border-black/5 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-600 shadow-sm">
                             {tag}
                         </div>
@@ -39,7 +38,7 @@ export function CareersPageClient() {
                     </div>
                 </div>
 
-                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 shadow-sm p-6 overflow-hidden">
+                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 shadow-sm p-6 overflow-hidden">
                     <RemoteLottie path="Manufacturing Industry Working Staff.json" className="scale-[1.15] w-full h-full object-contain" />
                 </div>
 
@@ -66,7 +65,7 @@ export function CareersPageClient() {
               <Link
                 key={role.id}
                 href={`/careers/${role.id}`}
-                className="group block bg-white border border-black/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-black/30 hover:shadow-xl hover:shadow-black/5 transition-all duration-300 transform hover:-translate-y-1"
+                className="group block bg-white/40 backdrop-blur-3xl border border-black/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-black/30 hover:shadow-xl hover:shadow-black/5 transition-all duration-300 transform hover:-translate-y-1"
               >
                 <div className="p-6 sm:p-8 md:p-10">
                   <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 md:gap-8 mb-6 md:mb-8">
@@ -148,7 +147,7 @@ export function CareersPageClient() {
                   Your work becomes the market consensus.
                 </p>
                 <p className="text-[15px] sm:text-[16px] text-white/60 leading-relaxed">
-                  Every algorithm deployed, every interface refined, directly influences how traders, hedge funds, and sovereign entities interpret on-chain reality. We are not building another analytics dashboard — we are building the forensic layer of global finance.
+                  Every algorithm deployed, every interface refined, directly influences how traders, hedge funds, and professional entities interpret on-chain reality. We are not building another analytics dashboard — we are building the forensic layer of global finance.
                 </p>
               </div>
               <div className="shrink-0 flex items-center gap-3 px-6 py-3 bg-white/10 border border-white/10 rounded-full w-fit">
@@ -176,8 +175,8 @@ export function CareersPageClient() {
             <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-black/10">
               {[
                 { icon: Shield, title: 'Cryptographic Integrity', body: 'We build systems where trust is mathematically guaranteed, not promised. Our culture reflects this: transparency, verifiable results, and absolute intellectual honesty above all else.' },
-                { icon: Cpu, title: 'High-Velocity Execution', body: 'Small, autonomous units. No bureaucratic friction. We deploy institutional-grade infrastructure rapidly by trusting our engineers to make executive decisions without redundant oversight.' },
-                { icon: Globe, title: 'Sovereign Operations', body: 'Globally distributed by design. Work asynchronously from anywhere. We compensate competitively in fiat or stablecoins to respect your financial sovereignty.' },
+                { icon: Cpu, title: 'High-Velocity Execution', body: 'Small, autonomous units. No bureaucratic friction. We deploy professional-grade infrastructure rapidly by trusting our engineers to make executive decisions without redundant oversight.' },
+                { icon: Globe, title: 'Global Operations', body: 'Globally distributed by design. Work asynchronously from anywhere. We compensate competitively in fiat or stablecoins to respect your financial privacy.' },
               ].map((p, i) => (
                 <div key={i} className="p-8 sm:p-12 flex flex-col gap-5 hover:bg-slate-50 transition-colors">
                   <div className="w-12 h-12 rounded-xl bg-black/5 border border-black/10 flex items-center justify-center">
@@ -202,7 +201,7 @@ export function CareersPageClient() {
             </div>
             <h3 className="text-[28px] sm:text-[36px] font-black tracking-tight text-[#0a0a0a] mb-4">Don't see your specific expertise?</h3>
             <p className="text-[15px] sm:text-[16px] text-slate-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-              We are constantly expanding our cryptographic, engineering, and intelligence teams. If you are an elite operator with a deep specialisation in on-chain systems, ZK proofs, or institutional finance, we want to hear from you.
+              We are constantly expanding our cryptographic, engineering, and intelligence teams. If you are an elite operator with a deep specialisation in on-chain systems, ZK proofs, or professional finance, we want to hear from you.
             </p>
             <a
               href="mailto:careers@humanidfi.com"

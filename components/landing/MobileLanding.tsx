@@ -103,7 +103,7 @@ function buildSovereignMessage(address: string): string {
   return [
     '═══════════════════════════════',
     '  Whale Alert Network',
-    '  SOVEREIGN ACCESS HANDSHAKE',
+    '  SECURE ACCESS HANDSHAKE',
     '═══════════════════════════════',
     '',
     `Identity: ${address}`,
@@ -193,8 +193,8 @@ function SigningOverlay({
             {error
               ? "Could not cryptographically verify the wallet. Please try again."
               : isSigning
-              ? "Please open your wallet app to approve the signature request. This is required for secure terminal access."
-              : "Establishing encrypted tunnel with the Sovereign Network... Please wait."}
+              ? "Please open your wallet app to approve the signature request. This is required for secure platform access."
+              : "Establishing encrypted tunnel with the Global Network... Please wait."}
           </p>
         </div>
 
@@ -327,9 +327,8 @@ function ConnectedScreen({
   const fmtDate   = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-[#FAFAF8] text-black">
-      {/* Clean ivory background — no globe */}
-      <div className="fixed inset-0 z-0 bg-[#FAFAF8] pointer-events-none" />
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-transparent text-black">
+      {/* Clean ivory background removed to reveal global wallpaper */}
 
       <main className="relative z-10 flex-1 flex flex-col items-center px-6 pt-10 pb-8 gap-5 max-w-[480px] w-full mx-auto">
         
@@ -343,7 +342,7 @@ function ConnectedScreen({
            <WhaleLogo className="h-16 w-auto" />
            <div className="flex flex-col items-center text-center">
              <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">Whale Alert Network</h1>
-             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Institutional Terminal</p>
+             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Professional Platform</p>
            </div>
         </motion.div>
 
@@ -410,7 +409,7 @@ function ConnectedScreen({
         >
           <Scan size={14} className="text-black/40 mt-0.5 shrink-0" />
           <p className="text-[10px] text-[#050505]/50 font-medium leading-relaxed">
-            Scan the <span className="font-black text-black/70">QR Code</span> from the Desktop Terminal to link your session securely — no additional signature required.
+            Scan the <span className="font-black text-black/70">QR Code</span> from the Desktop Platform to link your session securely — no additional signature required.
           </p>
         </motion.div>
 
@@ -427,7 +426,7 @@ function ConnectedScreen({
           <div className="flex flex-col leading-tight">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Scanner Unlocked</span>
             <span className="text-[9px] font-mono text-black/40 mt-0.5 leading-relaxed">
-              You can use the scanner to link the desktop terminal.
+              You can use the scanner to link the desktop platform.
             </span>
           </div>
         </motion.div>
@@ -484,26 +483,7 @@ function ConnectedScreen({
           </Link>
         </motion.div>
 
-        {/* ── [KYC-MANDATE] IDENTITY VERIFICATION GATE ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="w-full"
-        >
-          <button
-            onClick={() => {
-               setShowKyc(true);
-            }}
-            className="w-full flex flex-col items-center justify-center gap-1 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[2px] border-black bg-white hover:bg-black hover:text-white transition-all text-black"
-          >
-            <div className="flex items-center gap-3">
-               <Fingerprint size={18} />
-               <span style={{ fontSize: "11px" }}>Verify ZK-Biometric KYC</span>
-            </div>
-            <span className="text-[8px] font-bold opacity-40 tracking-[0.2em]">MANDATORY 1-MINUTE FORENSIC SCAN</span>
-          </button>
-        </motion.div>
+
 
         {/* ── Disconnect session button ── */}
         {onDisconnect && (
@@ -530,7 +510,7 @@ function ConnectedScreen({
           transition={{ delay: 0.5, duration: 0.5 }}
           className="text-[9px] font-mono text-black/30 text-center leading-relaxed px-4 pb-6"
         >
-          On the Desktop Terminal, click <span className="font-black text-black/50">Direct QR Handshake</span>, then scan the code with this button to link your session.
+          On the Desktop Platform, click <span className="font-black text-black/50">Direct QR Handshake</span>, then scan the code with this button to link your session.
         </motion.p>
       </main>
 
@@ -670,8 +650,6 @@ export function MobileLanding() {
            console.log('[Auth] Existing session valid for:', norm);
            setLinkedAddress(norm);
            setIsLinked(true);
-           if (data.kycVerified) setIsVerified(true);
-           else setShowKyc(true);
            return;
         }
       }
@@ -708,7 +686,6 @@ export function MobileLanding() {
       console.log('[Auth] Handshake successful for:', norm);
       setLinkedAddress(norm);
       setIsLinked(true);
-      setShowKyc(true); // Mandatory KYC after link
       setConnecting(null);
       setShowFallbackBtn(false);
       try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
@@ -939,7 +916,7 @@ export function MobileLanding() {
     if (sessionStorage.getItem(key)) return;
 
     // Sign then fulfill — API requires EIP-191 proof
-    const message = `Authorize Sovereign Terminal Access for session: ${sessionParam}\nAddress: ${address}\nTimestamp: ${Date.now()}`;
+    const message = `Authorize Institutional Platform Access for session: ${sessionParam}\nAddress: ${address}\nTimestamp: ${Date.now()}`;
     signMessageAsync({ message })
       .then((signature) =>
         fetch(`/api/auth/qr-session?id=${sessionParam}`, {
@@ -953,7 +930,7 @@ export function MobileLanding() {
           sessionStorage.setItem(key, 'true');
           const t = document.createElement('div');
           t.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-          t.textContent = '✓ Desktop Terminal Unlocked';
+          t.textContent = '✓ Desktop Platform Unlocked';
           document.body.appendChild(t);
           setTimeout(() => t.remove(), 4000);
         }
@@ -981,29 +958,11 @@ export function MobileLanding() {
   // ── Render: Session exists — show immediately using cookie address ──────────
   // We NEVER wait for wagmi to reconnect. The cookie IS the source of truth.
   // The cookie value IS the wallet address: sovereign_handshake=0xABCD...
-  // This means after signing we never need wagmi to reconnect to show the
-  // ConnectedScreen. Works even if WalletConnect session drops after signing.
-  if (isLinked && effectiveAddress && showKyc && !isVerified) {
-    return (
-      <div className="fixed inset-0 z-[10000] bg-[#FAFAF8] flex flex-col p-6 overflow-auto">
-        <div className="flex-1 flex flex-col items-center justify-center py-10">
-          <div className="w-full max-w-lg">
-            <ZKBiometricGate 
-              uuid={uuidParam}
-              onSuccess={() => {
-                setIsVerified(true);
-                setShowKyc(false);
-              }}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
+
 
   if (isLinked && effectiveAddress) {
     return (
-      <div className="w-full min-h-[100dvh] bg-[#FAF9F6]">
+      <div className="w-full min-h-[100dvh] bg-transparent">
         <ConnectedScreen 
            address={effectiveAddress} 
            onScan={() => setShowScanner(true)} 
@@ -1043,7 +1002,7 @@ export function MobileLanding() {
   // CRITICAL: This block must be AFTER all isLinked guards above.
   if (!showConnectOverlay) {
     return (
-      <div className="w-full min-h-[100dvh] bg-[#FAFAF8] relative">
+      <div className="w-full min-h-[100dvh] bg-transparent relative">
         <motion.header
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1086,7 +1045,7 @@ export function MobileLanding() {
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: '#FAFAF8', color: INK }}>
 
       {/* Pure ivory base — no pattern noise */}
-      <div className="fixed inset-0 z-0 bg-[#FAFAF8] pointer-events-none" />
+      {/* Background layer removed */}
 
       {/* Fixed Header */}
       <motion.header
@@ -1174,7 +1133,7 @@ export function MobileLanding() {
         >
           <Fingerprint size={14} className="text-amber-600 mt-0.5 shrink-0" />
           <p className="text-[10px] text-amber-700/80 font-medium leading-relaxed">
-            <span className="font-black text-amber-700">Have your wallet app open and ready.</span> When you tap a wallet below, a signature request will arrive in your wallet — approve it to access the terminal.
+            <span className="font-black text-amber-700">Have your wallet app open and ready.</span> When you tap a wallet below, a signature request will arrive in your wallet — approve it to access the platform.
           </p>
         </motion.div>
 
@@ -1193,7 +1152,7 @@ export function MobileLanding() {
                 <Fingerprint size={16} className="text-emerald-600 mt-0.5 shrink-0" />
                 <div className="flex flex-col">
                   <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 leading-tight">KYC Identity Verification Flow</span>
-                  <span className="text-[9px] text-emerald-600/80 font-medium mt-1 leading-relaxed">Please connect your wallet on mobile to initiate the mandatory 3D Biometric scan for terminal access.</span>
+                  <span className="text-[9px] text-emerald-600/80 font-medium mt-1 leading-relaxed">Please connect your wallet on mobile to initiate the mandatory 3D Biometric scan for platform access.</span>
                 </div>
               </div>
             );
@@ -1421,7 +1380,7 @@ export function MobileLanding() {
       </main>
 
       {/* ── Minimal Mobile Footer ── */}
-      <div className="relative w-full bg-[#FAFAF8] border-t border-black/5">
+      <div className="relative w-full bg-transparent border-t border-black/5">
         
         <footer className="w-full px-6 py-8 flex flex-col items-center gap-5 pb-[calc(2rem+env(safe-area-inset-bottom))]">
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">

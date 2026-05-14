@@ -248,7 +248,7 @@ export function NewsTerminal() {
               {articles.length === 0 && (
                 <div className="px-6 py-10 flex flex-col items-center text-center opacity-50">
                   <BookOpen size={24} className="mb-3" />
-                  <p className="font-mono text-[10px] uppercase tracking-widest">No intelligence available.</p>
+                  <p className="font-mono text-[10px] uppercase tracking-widest">No news available.</p>
                 </div>
               )}
             </div>
@@ -348,7 +348,7 @@ export function NewsTerminal() {
               <div className="flex items-center justify-between px-6 py-4 border-b border-black/5 bg-white">
                 <div className="flex items-center gap-2">
                   <Mail size={16} className="text-[#0044CC]" />
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black">Distribute Intelligence</span>
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black">Share News</span>
                 </div>
                 <button onClick={() => setShareOpen(false)} className="p-1 hover:bg-black/5 rounded-sm text-black/50 hover:text-black transition-colors"><X size={16} /></button>
               </div>
@@ -356,23 +356,23 @@ export function NewsTerminal() {
               {shareSent ? (
                 <div className="p-12 text-center">
                   <div className="w-12 h-12 bg-[#00C076]/10 rounded-full flex items-center justify-center mx-auto mb-4 text-[#00C076]"><X size={24} className="rotate-45" style={{ display: 'none' }} />✓</div>
-                  <h3 className="font-serif text-xl mb-2 text-black">Transmission Secured</h3>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">The report has been dispatched.</p>
+                  <h3 className="font-serif text-xl mb-2 text-black">Sent</h3>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">The news has been sent.</p>
                 </div>
               ) : (
                 <form onSubmit={handleShare} className="p-6">
                   <div className="mb-5">
-                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold text-black/50 mb-2">Target Address</label>
+                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold text-black/50 mb-2">Email Address</label>
                     <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)} className="w-full px-4 py-3 bg-white border border-black/10 font-mono text-[11px] outline-none focus:border-[#0044CC] transition-colors rounded-sm" placeholder="delegate@institution.com" />
                   </div>
                   <div className="mb-8">
-                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold text-black/50 mb-2">Diplomatic Note (Optional)</label>
-                    <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3} className="w-full px-4 py-3 bg-white border border-black/10 font-serif text-[14px] outline-none focus:border-[#0044CC] transition-colors rounded-sm resize-none" placeholder="Provide context for this transmission..." />
+                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold text-black/50 mb-2">Note (Optional)</label>
+                    <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3} className="w-full px-4 py-3 bg-white border border-black/10 font-serif text-[14px] outline-none focus:border-[#0044CC] transition-colors rounded-sm resize-none" placeholder="Provide context..." />
                   </div>
                   <button type="submit" disabled={isSending} className="w-full py-4 bg-[#0A0A0A] text-white font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-[#222] disabled:opacity-50 transition-colors rounded-sm">
-                    {isSending ? 'Establishing Protocol...' : 'Authorize Transmission'}
+                    {isSending ? 'Sending...' : 'Send'}
                   </button>
-                  <p className="text-center font-mono text-[8px] uppercase tracking-widest text-black/40 mt-4">Restricted access protocol enforced.</p>
+                  <p className="text-center font-mono text-[8px] uppercase tracking-widest text-black/40 mt-4">Private sharing link.</p>
                 </form>
               )}
             </motion.div>
