@@ -92,9 +92,13 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        const crypto = await import('crypto');
+        const hashTarget = `${signature}:${timestamp}`;
+        const deterministicHash = crypto.createHash('sha256').update(hashTarget).digest('hex').toUpperCase().substring(0, 32);
+
         return NextResponse.json({
             success: true,
-            attestationHash: `ZK_SBT_${Math.random().toString(36).substring(7).toUpperCase()}`,
+            attestationHash: `ZK_SBT_${deterministicHash}`,
             timestamp: Date.now(),
             status: 'MOLECULAR_VERIFIED'
         });

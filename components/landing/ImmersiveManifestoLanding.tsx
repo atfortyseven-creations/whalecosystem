@@ -32,75 +32,62 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
     <div className="relative bg-[#FAFAF8] text-[#0a0a0a] font-sans antialiased overflow-x-hidden selection:bg-black/10">
 
       {/* ── HERO ──────────────────────────────────────────────────────────────── */}
-      <section className="relative w-full min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between border-b border-black/5 overflow-hidden">
+      <section className="relative w-full min-h-screen flex flex-col lg:flex-row border-b border-black/5 bg-[#FAFAF8]">
         
-        {/* Right Content */}
-        <motion.div 
-          initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-          className="relative z-10 flex flex-col justify-end lg:items-end flex-1 px-6 sm:px-12 md:px-20 pt-48 pb-20 lg:pb-32 w-full lg:w-1/2 lg:ml-auto min-h-[100dvh] lg:min-h-0 xl:pr-32 lg:text-right"
-        >
+        {/* Full Background Image */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <img
+            src="/peakpx.jpg"
+            alt="Background cubes"
+            className="w-full h-full object-cover object-center opacity-90"
+          />
+        </div>
 
-          <motion.h1 variants={FADE_UP} className="text-[28px] sm:text-[48px] md:text-[64px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-4xl">
-            Track institutional capital <br />
-            <span className="text-[#0044CC]">before markets react.</span>
-          </motion.h1>
+        {/* Left Side: Minimalist White Panel / Button perfectly adjusted */}
+        <div className="relative z-10 w-full lg:w-1/2 min-h-screen flex items-center">
+          {/* The white background layer perfectly occupying the left half with a subtle shadow */}
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-sm lg:rounded-r-[40px] shadow-[20px_0_50px_rgba(0,0,0,0.03)] border-r border-black/5" />
+          
+          {/* Content inside the white panel */}
+          <motion.div 
+            initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+            className="relative z-20 flex flex-col justify-center w-full px-6 sm:px-12 md:px-20 py-24 lg:py-0"
+          >
+            <motion.h1 variants={FADE_UP} className="text-[32px] sm:text-[48px] md:text-[56px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-2xl text-left">
+              Track institutional capital <br />
+              <span className="text-[#0044CC]">before markets react.</span>
+            </motion.h1>
 
-          <motion.p variants={FADE_UP} className="text-[18px] sm:text-[20px] font-medium text-slate-600 leading-relaxed max-w-2xl mb-12">
-            Real-time on-chain intelligence — from mempool to execution.
-          </motion.p>
+            <motion.p variants={FADE_UP} className="text-[16px] sm:text-[20px] font-medium text-slate-600 leading-relaxed max-w-xl mb-10 text-left">
+              Real-time on-chain intelligence — from mempool to execution.
+            </motion.p>
 
-          {/* Performance Status — Institutional Readout */}
-          <motion.div variants={FADE_UP} className="grid grid-cols-2 lg:flex lg:flex-row items-center justify-end gap-6 lg:gap-2 p-6 sm:p-8 bg-white border border-black/5 rounded-[2rem] mb-10 shadow-sm max-w-2xl w-full">
-            {[
-              { label: "Network State", val: blockNumber ? `#${blockNumber.toLocaleString()}` : "Operational" },
-              { label: "Gas Topology", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "Nominal" },
-              { label: "Entity Density", val: globalStats?.tokens ?? "Verified" },
-              { label: "Capital Flow", val: globalStats?.cap ?? "Nominal" }
-            ].map((stat, i) => (
-              <div key={stat.label} className="flex items-center lg:flex-row-reverse">
-                <div className="flex flex-col gap-1 lg:items-end">
-                  <span className="font-mono text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-black/20 truncate">{stat.label}</span>
-                  <span className="font-mono text-[12px] sm:text-[16px] font-black text-[#0a0a0a] truncate tracking-tight">{stat.val}</span>
+            {/* Performance Status — Institutional Readout */}
+            <motion.div variants={FADE_UP} className="grid grid-cols-2 gap-6 p-6 bg-[#FAFAF8]/80 border border-black/5 rounded-3xl mb-10 shadow-sm max-w-lg w-full">
+              {[
+                { label: "Network State", val: blockNumber ? `#${blockNumber.toLocaleString()}` : "Operational" },
+                { label: "Gas Topology", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "Nominal" },
+                { label: "Entity Density", val: globalStats?.tokens ?? "Verified" },
+                { label: "Capital Flow", val: globalStats?.cap ?? "Nominal" }
+              ].map((stat, i) => (
+                <div key={stat.label} className="flex flex-col gap-1 items-start">
+                  <span className="font-mono text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 truncate">{stat.label}</span>
+                  <span className="font-mono text-[14px] sm:text-[16px] font-black text-[#0a0a0a] truncate tracking-tight">{stat.val}</span>
                 </div>
-                {i !== 3 && <div className="hidden lg:block w-px h-8 bg-black/5 mx-2 sm:mx-6" />}
-              </div>
-            ))}
+              ))}
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row gap-4 justify-start">
+              <Link href="/dashboard" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#0a0a0a] text-white rounded-2xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10">
+                Enter the Network <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link href="/pricing" className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white border-2 border-black/5 text-[#0a0a0a] rounded-2xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:border-black/10 hover:bg-slate-50 active:scale-[0.98] transition-all">
+                View Plans
+              </Link>
+            </motion.div>
           </motion.div>
-
-          {/* CTA */}
-          <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row gap-4 mb-10 lg:justify-end">
-            <Link href="/dashboard" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#0a0a0a] text-white rounded-xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10">
-              Enter the Network <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link href="/pricing" className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white border border-black/10 text-[#0a0a0a] rounded-xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:border-black/30 hover:bg-slate-50 active:scale-[0.98] transition-all">
-              View Plans
-            </Link>
-          </motion.div>
-        </motion.div>
-
-        {/* Left 4K Wave */}
-        <div className="hidden lg:block absolute left-0 top-0 w-1/2 h-full z-0 overflow-hidden pointer-events-none">
-          {/* Hard right-edge mask: cream fades cleanly into the wave */}
-          <div className="absolute inset-0 bg-gradient-to-l from-[#FAFAF8] via-[#FAFAF8]/70 to-transparent z-10" style={{ width: '45%', left: '55%' }} />
-          <div className="absolute inset-0 bg-gradient-to-l from-[#FAFAF8] to-transparent z-10" style={{ width: '20%', left: '80%' }} />
-          <img
-            src="/olas-hokusai-4k.png"
-            alt="Wave"
-            className="absolute inset-0 w-full h-full object-cover object-right"
-            style={{ opacity: 0.85, mixBlendMode: 'multiply' }}
-          />
         </div>
-        {/* Mobile: subtle wave behind content */}
-        <div className="lg:hidden absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <img
-            src="/olas-hokusai-4k.png"
-            alt="Wave"
-            className="absolute -left-20 top-0 w-full h-full object-cover object-right"
-            style={{ opacity: 0.45, mixBlendMode: 'multiply' }}
-          />
-        </div>
-        
-
       </section>
 
       {/* ── BENTO BOX: WHY WHALE ALERT NETWORK ──────────────────────────────── */}

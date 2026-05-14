@@ -345,35 +345,43 @@ export interface DistributedRateLimitResult {
 let _upstashWarned = false;
 
 /**
- * Distributed rate limit check (Upstash). Fails OPEN on errors.
- * Use this in middleware.ts for Edge Runtime compatibility.
+ * Distributed rate limit check (Upstash). 
+ * ── INHUMAN OPTIMIZATION: Cascading Fallback ──
+ * If Upstash Redis fails or is unconfigured, it seamlessly routes the request
+ * through the local memory `generalLimiter` instead of failing open.
  */
 export async function checkRateLimit(
   ip: string,
   tier: RateLimitTier = 'FREE'
 ): Promise<DistributedRateLimitResult> {
   const config = TIER_CONFIG[tier];
-  const allow: DistributedRateLimitResult = {
-    success: true,
-    limit: config.requests,
-    remaining: config.requests,
-    reset: Date.now() + 10_000,
-    tier,
+  
+  // Local Memory Fallback Resolver
+  const runLocalFallback = (): DistributedRateLimitResult => {
+    const localRes = generalLimiter.check(ip);
+    return {
+      success: localRes.success,
+      limit: localRes.limit,
+      remaining: localRes.remaining,
+      reset: localRes.reset,
+      tier,
+    };
   };
+
   try {
     const limiter = getDistributedLimiter(tier);
     if (!limiter) {
       if (!_upstashWarned) {
-        console.log('[RateLimiter] Upstash not configured — failing open. Set UPSTASH_REDIS_REST_URL + TOKEN.');
+        console.warn('[RateLimiter:Upstash] Not configured. Cascading to local LRU memory limiter.');
         _upstashWarned = true;
       }
-      return allow;
+      return runLocalFallback();
     }
     const result = await limiter.limit(ip);
     return { success: result.success, limit: result.limit, remaining: result.remaining, reset: result.reset, tier };
   } catch (err: any) {
-    console.warn(`[RateLimiter] Upstash error (failing open): ${err.message}`);
-    return allow;
+    console.warn(`[RateLimiter:Upstash] Error -> Cascading to local memory: ${err.message}`);
+    return runLocalFallback();
   }
 }
 

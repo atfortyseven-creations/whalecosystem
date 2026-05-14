@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createRedisClient } from '@/lib/redis/client';
 import { safeJsonParse } from '@/lib/utils/json';
+import crypto from 'crypto';
 
 const redis = createRedisClient({ name: 'Whale-Webhook' });
 
@@ -9,6 +10,24 @@ const redis = createRedisClient({ name: 'Whale-Webhook' });
 export async function POST(req: Request) {
     try {
         const rawBody = await req.text();
+        
+        // ── INHUMAN OPTIMIZATION: Cryptographic Signature Validation ──
+        const signature = req.headers.get('x-alchemy-signature') || req.headers.get('x-quicknode-signature');
+        const secret = process.env.ALCHEMY_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+        
+        if (secret && signature) {
+            const hmac = crypto.createHmac('sha256', secret);
+            hmac.update(rawBody);
+            const digest = hmac.digest('hex');
+            
+            // Prevent timing attacks
+            const isValid = crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
+            if (!isValid) {
+                console.error('[WEBHOOK ERROR] Cryptographic signature mismatch. Possible spoofing attack.');
+                return NextResponse.json({ success: false, error: 'Unauthorized: Invalid Cryptographic Signature' }, { status: 401 });
+            }
+        }
+
         const body = safeJsonParse(rawBody, null, 'WHALE_WEBHOOK') as any;
         if (!body || typeof body !== 'object') {
             return NextResponse.json({ success: false, error: 'Malformed or empty payload' }, { status: 400 });

@@ -38,6 +38,7 @@ interface Endpoint {
   url: string;
   failures: number;
   lastFailedAt: number | null;
+  backoffFactor: number; // ── INHUMAN OPTIMIZATION: Exponential Backoff Multiplier ──
 }
 
 // Fallbacks públicos por red, usados si el cluster GetBlock está vacío
@@ -102,8 +103,9 @@ export class RpcRelayerManager {
   private static endpoints: Record<string, Endpoint[]> = {};
   private static indices: Record<string, number> = {};
 
-  /** Cooldown de 5 min antes de reintentar un endpoint fallido */
-  private static readonly COOLDOWN_MS = 5 * 60 * 1000;
+  /** Base Cooldown de 1 min antes de reintentar. Se multiplica por backoffFactor */
+  private static readonly BASE_COOLDOWN_MS = 60 * 1000;
+  private static readonly MAX_BACKOFF = 16; // Max 16 mins
 
   static {
     this.initialize();
@@ -261,6 +263,7 @@ export class RpcRelayerManager {
       url,
       failures: 0,
       lastFailedAt: null,
+      backoffFactor: 1,
     }));
     this.indices[key] = 0;
 
@@ -296,14 +299,15 @@ export class RpcRelayerManager {
       const idx = (startIndex + i) % cluster.length;
       const ep = cluster[idx];
 
-      if (ep.lastFailedAt && now - ep.lastFailedAt < this.COOLDOWN_MS) {
-        continue; // Aún en cooldown
+      const currentCooldown = this.BASE_COOLDOWN_MS * ep.backoffFactor;
+
+      if (ep.lastFailedAt && now - ep.lastFailedAt < currentCooldown) {
+        continue; // Aún en cooldown exponencial
       }
 
       if (ep.lastFailedAt) {
-        // Cooldown expirado — recuperar endpoint
+        // Cooldown expirado — recuperar endpoint (mantener backoff para castigar reincidencia lenta)
         ep.lastFailedAt = null;
-        ep.failures = 0;
       }
 
       // Avanzar índice Round-Robin para la próxima llamada
@@ -322,9 +326,6 @@ export class RpcRelayerManager {
     return cluster[0].url;
   }
 
-  /**
-   * Reporta un fallo (429/500/timeout) — pone el endpoint en cooldown.
-   */
   static reportFailure(network: NetworkTag, protocol: ProtocolType, url: string): void {
     const key = `${network}_${protocol}`;
     const cluster = this.endpoints[key];
@@ -334,7 +335,8 @@ export class RpcRelayerManager {
     if (ep) {
       ep.failures += 1;
       ep.lastFailedAt = Date.now();
-      console.warn(`[RpcRelayer] 🔴 COOLDOWN → ${url.slice(0, 50)} | Fails: ${ep.failures}`);
+      ep.backoffFactor = Math.min(ep.backoffFactor * 2, this.MAX_BACKOFF); // Inhuman Optimization
+      console.warn(`[RpcRelayer] 🔴 EXPONENTIAL COOLDOWN → ${url.slice(0, 50)} | Fails: ${ep.failures} | Backoff: ${ep.backoffFactor}x`);
     }
   }
 
@@ -349,7 +351,7 @@ export class RpcRelayerManager {
       const endpoints = cluster.map(ep => ({
         url: ep.url.replace(/\/([a-f0-9]{20,})/, '/****'),
         failures: ep.failures,
-        inCooldown: ep.lastFailedAt !== null && now - ep.lastFailedAt < this.COOLDOWN_MS,
+        inCooldown: ep.lastFailedAt !== null && now - ep.lastFailedAt < (this.BASE_COOLDOWN_MS * ep.backoffFactor),
       }));
       result[key] = {
         total: cluster.length,

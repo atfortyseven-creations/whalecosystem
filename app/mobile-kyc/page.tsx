@@ -123,12 +123,12 @@ export default function MobileKYCPage({ isInline = false, onInlineSuccess }: Mob
 
       if (lastEyeBrightness.current > 0) {
         const delta = lastEyeBrightness.current - avgBright;
-        // Blink: sudden brightness DROP (eyelids close) > 5 units (lowered from 15)
-        if (delta > 5 && !blinkThreshold.current) {
+        // Blink: sudden brightness DROP (eyelids close) > 2.5 units
+        if (delta > 2.5 && !blinkThreshold.current) {
           blinkThreshold.current = true;
         }
         // Eye reopens (brightness recovers)
-        if (blinkThreshold.current && delta < -3) {
+        if (blinkThreshold.current && delta < -1.5) {
           // Debounce: prevent single blink double-counting (10 frames = ~160ms)
           if (frameCount.current - lastBlinkFrame.current > 10) {
             blinkCountRef.current++;
@@ -136,7 +136,6 @@ export default function MobileKYCPage({ isInline = false, onInlineSuccess }: Mob
             lastBlinkFrame.current = frameCount.current;
             if (blinkCountRef.current >= 2) {
               setLivenessScore(100);
-              // The useEffect monitor will pick this up and call finalizeKYC()
             }
           }
           blinkThreshold.current = false;
@@ -157,6 +156,15 @@ export default function MobileKYCPage({ isInline = false, onInlineSuccess }: Mob
       const tScore = analyzeTextureFrquency(ctx, Math.floor(W * 0.2), Math.floor(H * 0.45), 64);
       textureScores.current.push(tScore);
       if (textureScores.current.length > 20) textureScores.current.shift();
+
+      // ── Update Scanning Progress based on REAL frames ──
+      if (frameCount.current <= 120) {
+        const realProgress = Math.min(100, Math.floor((frameCount.current / 120) * 100));
+        setScanProgress(realProgress);
+        if (realProgress === 100 && frameCount.current === 120) {
+          setStage("BLINK");
+        }
+      }
 
       // ── Compute liveness every 10 frames ──
       if (frameCount.current % 10 === 0 && frameCount.current > 30) {
@@ -198,18 +206,6 @@ export default function MobileKYCPage({ isInline = false, onInlineSuccess }: Mob
     textureScores.current = [];
     analysisRef.current = true;
     setStage("SCANNING");
-
-    // After 4s scanning phase → blink challenge
-    let prog = 0;
-    const iv = setInterval(() => {
-      prog += 2;
-      setScanProgress(prog);
-      if (prog >= 100) {
-        clearInterval(iv);
-        setStage("BLINK");
-        runAnalysis();
-      }
-    }, 80);
     runAnalysis();
   };
 
