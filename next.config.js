@@ -109,7 +109,7 @@ const nextConfig = {
     env: {
         // ⚠️  No localhost fallback — if NEXT_PUBLIC_APP_URL is missing the build
         //     must fail loudly rather than silently shipping localhost to the client.
-        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://humanidfi.com',
+        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://whalealert.network',
         // Injected at build time so the client bundle never sees 'undefined'
         NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
         NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',

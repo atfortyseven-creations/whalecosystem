@@ -25,19 +25,19 @@ const AZTEC_PILLARS = [
     index: "04",
     label: "Note Encryption & UTXO Model",
     protocol: "AZTEC NOTES · HYBRID ENCRYPTION · NULLIFIER TREE",
-    body: "Private state in Aztec is modeled as encrypted notes: discrete value commitments appended to an append-only Merkle tree. Each note is encrypted under the recipient's public key using hybrid encryption (ECDH key exchange + symmetric cipher). Expenditure is proven via nullifiers — one-way hash derivatives that prevent double-spending without revealing which note was consumed. HumanID Terminal exploits this architecture to establish private channels that are cryptographically verifiable yet computationally opaque to external forensic analysis."
+    body: "Private state in Aztec is modeled as encrypted notes: discrete value commitments appended to an append-only Merkle tree. Each note is encrypted under the recipient's public key using hybrid encryption (ECDH key exchange + symmetric cipher). Expenditure is proven via nullifiers — one-way hash derivatives that prevent double-spending without revealing which note was consumed. Whale Chat exploits this architecture to establish private channels that are cryptographically verifiable yet computationally opaque to external forensic analysis."
   },
   {
     index: "05",
-    label: "HumanID Integration Architecture",
+    label: "Whale Chat Integration Architecture",
     protocol: "AZTEC.JS SDK · PRIVATE FUNCTION CALLS · FEE ABSTRACTION",
-    body: "The HumanID Terminal's cryptographic authentication pipeline is designed for native Aztec.js SDK compatibility. Session establishment initiates a private function call circuit that commits the operator's ECDSA public key into an Aztec contract state without broadcasting the identity on-chain in readable form. Fee abstraction allows relayers to submit proofs on behalf of operators, preserving network-level anonymity at the transport layer while maintaining cryptographic accountability at the proof layer."
+    body: "The Whale Chat's cryptographic authentication pipeline is designed for native Aztec.js SDK compatibility. Session establishment initiates a private function call circuit that commits the operator's ECDSA public key into an Aztec contract state without broadcasting the identity on-chain in readable form. Fee abstraction allows relayers to submit proofs on behalf of operators, preserving network-level anonymity at the transport layer while maintaining cryptographic accountability at the proof layer."
   },
   {
     index: "06",
     label: "Zero-Knowledge Surveillance Proofs",
     protocol: "ZK-ATTESTATIONS · RANGE PROOFS · MEMBERSHIP CIRCUITS",
-    body: "The most fundamental operational requirement of the HumanID Terminal is the ability to prove knowledge of on-chain events without revealing the methodology of surveillance. Through Aztec-compatible ZK-attestation circuits, the system generates membership proofs demonstrating that a given wallet address is part of a classified watchlist, and range proofs certifying that a transfer volume exceeds institutional thresholds — all without disclosing the watchlist contents, the threshold parameters, or the surveillance history to any party, including the infrastructure layer itself."
+    body: "The most fundamental operational requirement of the Whale Chat is the ability to prove knowledge of on-chain events without revealing the methodology of surveillance. Through Aztec-compatible ZK-attestation circuits, the system generates membership proofs demonstrating that a given wallet address is part of a classified watchlist, and range proofs certifying that a transfer volume exceeds institutional thresholds — all without disclosing the watchlist contents, the threshold parameters, or the surveillance history to any party, including the infrastructure layer itself."
   }
 ];
 
@@ -81,7 +81,7 @@ export function AztecArchitectureSection() {
           {/* Academic abstract */}
           <div className="flex flex-col gap-4 font-serif text-[13px] text-[#222] leading-relaxed text-justify">
             <p>
-              The HumanID Terminal's cryptographic substrate is anchored to{" "}
+              The Whale Chat's cryptographic substrate is anchored to{" "}
               <strong>Aztec Network</strong> — the first general-purpose zero-knowledge Layer 2 on
               Ethereum with native programmable privacy. The selection of Aztec as the foundational
               cryptographic layer is not a commercial alignment; it is a precise engineering decision
