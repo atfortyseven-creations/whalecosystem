@@ -280,9 +280,11 @@ export default function MobileKYCPage({ isInline, onInlineSuccess }: { isInline?
 
         {stage === "ERROR" && (
           <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center text-center px-6 max-w-sm">
-            <ShieldAlert size={48} className="text-red-500 mb-6" />
+            <div className="w-16 h-16 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-6">
+              <span className="text-red-500 text-2xl font-black">✕</span>
+            </div>
             <p className="text-[11px] font-bold text-red-500 uppercase tracking-widest leading-relaxed mb-8">{errorMsg}</p>
-            <button onClick={() => window.location.reload()} className="text-[9px] text-white/50 hover:text-white uppercase tracking-[0.2em] border-b border-white/20 pb-1">
+            <button onClick={() => window.location.reload()} className="text-[9px] text-black/50 hover:text-black uppercase tracking-[0.2em] border-b border-black/20 pb-1">
               Restart Sequence
             </button>
           </motion.div>
