@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useSignMessage } from 'wagmi';
 import { QRCodeSVG as QRCode } from "qrcode.react";
-import { X, ShieldCheck, Smartphone, CheckCircle2 } from "lucide-react";
+import { X, Smartphone, CheckCircle2 } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const MobileKYCPage = dynamic(() => import("../../app/mobile-kyc/page"), { ssr: false });
@@ -269,14 +269,14 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
         </div>
 
         {/* E2EE Footer */}
-        <div className="w-full pt-6 border-t border-white/10 flex flex-col gap-2">
+        <div className="w-full pt-6 border-t border-black/10 flex flex-col gap-2">
           <div className="flex justify-between w-full">
-             <span className="text-[8px] text-white/30 uppercase tracking-widest">Encryption</span>
-             <span className="text-[8px] text-emerald-500/60 uppercase tracking-widest font-bold">AES-GCM-256</span>
+             <span className="text-[8px] text-black/30 uppercase tracking-widest">Encryption</span>
+             <span className="text-[8px] text-black/50 uppercase tracking-widest font-bold">AES-GCM-256</span>
           </div>
           <div className="flex justify-between w-full">
-             <span className="text-[8px] text-white/30 uppercase tracking-widest">Telemetry</span>
-             <span className="text-[8px] text-emerald-500/60 uppercase tracking-widest font-bold">Liveness Edge</span>
+             <span className="text-[8px] text-black/30 uppercase tracking-widest">Telemetry</span>
+             <span className="text-[8px] text-black/50 uppercase tracking-widest font-bold">Liveness Edge</span>
           </div>
         </div>
 

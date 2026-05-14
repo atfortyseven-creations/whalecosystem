@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { X, ShieldAlert, Lock, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 // AES-GCM Crypto Helpers for E2EE
 async function encryptPayload(text: string, hexKey: string): Promise<string> {
