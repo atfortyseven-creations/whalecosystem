@@ -230,36 +230,69 @@ export function SovereignFooter() {
             <div className="w-full h-px bg-black/5" />
             <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
 
-              {/* GDPR COMPLIANT — Typographic Seal */}
-              <div className="flex items-center gap-2.5 opacity-50 hover:opacity-100 transition-opacity group cursor-default">
-                <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[8px] font-black">EU</div>
+              {/* GDPR COMPLIANT — EU Stars Badge */}
+              <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
+                <div className="w-10 h-10 rounded-full bg-[#003399] flex items-center justify-center shrink-0">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                    {/* 12 EU stars in circle */}
+                    {Array.from({length:12}).map((_,i) => {
+                      const angle = (i * 30 - 90) * (Math.PI / 180);
+                      const cx = 11 + 7.5 * Math.cos(angle);
+                      const cy = 11 + 7.5 * Math.sin(angle);
+                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#FFCC00" />;
+                    })}
+                  </svg>
+                </div>
                 <div className="flex flex-col gap-0">
                   <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">GDPR</span>
                   <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Compliant</span>
                 </div>
               </div>
 
-              {/* ZK VERIFIED — Typographic Seal */}
-              <div className="flex items-center gap-2.5 opacity-50 hover:opacity-100 transition-opacity group cursor-default">
-                <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[8px] font-black">ZK</div>
+              {/* KYC/AML VERIFIED — Shield Eye Badge */}
+              <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
+                <div className="w-10 h-10 rounded-[10px] bg-[#1A56DB] flex items-center justify-center shrink-0">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2Z" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
+                    <circle cx="12" cy="12" r="3" fill="white"/>
+                    <ellipse cx="12" cy="12" rx="6" ry="3.5" stroke="white" strokeWidth="1.2" fill="none"/>
+                  </svg>
+                </div>
                 <div className="flex flex-col gap-0">
-                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">ZK-IDENTITY</span>
-                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Attested</span>
+                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">KYC/AML</span>
+                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Verified</span>
                 </div>
               </div>
 
-              {/* MiCA REGULATED — Typographic Seal */}
-              <div className="flex items-center gap-2.5 opacity-50 hover:opacity-100 transition-opacity group cursor-default">
-                <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[8px] font-black">Mi</div>
+              {/* MiCA REGULATED — EU Stars Square Badge */}
+              <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
+                <div className="w-10 h-10 rounded-[10px] bg-[#003399] flex items-center justify-center shrink-0">
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                    {Array.from({length:12}).map((_,i) => {
+                      const angle = (i * 30 - 90) * (Math.PI / 180);
+                      const cx = 11 + 7.5 * Math.cos(angle);
+                      const cy = 11 + 7.5 * Math.sin(angle);
+                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#FFCC00" />;
+                    })}
+                  </svg>
+                </div>
                 <div className="flex flex-col gap-0">
-                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">MiCA</span>
+                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">MICA</span>
                   <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Regulated</span>
                 </div>
               </div>
 
-              {/* ISO 27001 — Typographic Seal */}
-              <div className="flex items-center gap-2.5 opacity-50 hover:opacity-100 transition-opacity group cursor-default">
-                <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-[8px] font-black">ISO</div>
+              {/* ISO 27001 — Globe Grid Badge */}
+              <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
+                <div className="w-10 h-10 rounded-full border-2 border-[#4A90D9] bg-white flex items-center justify-center shrink-0">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="#4A90D9" strokeWidth="1.5" fill="none"/>
+                    <ellipse cx="12" cy="12" rx="4.5" ry="9" stroke="#4A90D9" strokeWidth="1.2" fill="none"/>
+                    <line x1="3" y1="9" x2="21" y2="9" stroke="#4A90D9" strokeWidth="1.2"/>
+                    <line x1="3" y1="15" x2="21" y2="15" stroke="#4A90D9" strokeWidth="1.2"/>
+                    <text x="12" y="14" textAnchor="middle" fontSize="4" fontWeight="900" fill="#4A90D9">ISO</text>
+                  </svg>
+                </div>
                 <div className="flex flex-col gap-0">
                   <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">ISO 27001</span>
                   <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Secure</span>

@@ -216,12 +216,19 @@ function SigningOverlay({
             <RefreshCw size={16} />
             Retry Connection
           </button>
-        ) : !isSigning ? (
+        ) : isSigning ? (
+          <button
+            onClick={onRetry}
+            className="w-full py-4 rounded-2xl bg-black text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all"
+          >
+            Open Wallet To Sign
+          </button>
+        ) : (
           <div className="w-full px-4 py-3 rounded-2xl border border-[#E5E5E5] bg-white flex items-center justify-center gap-3">
             <Loader2 size={16} className="animate-spin text-[#050505]/60" />
             <span className="text-[#050505] font-black uppercase tracking-widest text-[11px]">Validating...</span>
           </div>
-        ) : null}
+        )}
       </div>
     </motion.div>
   );

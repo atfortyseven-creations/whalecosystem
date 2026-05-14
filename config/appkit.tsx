@@ -228,10 +228,14 @@ try {
 }
 
 export function Web3ModalProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
-    // initialState: parse the wagmi cookie so the WagmiProvider can hydrate
-    // synchronously on the server. Without this, wagmi starts in an empty state
-    // on every page load and has to reconnect async from IndexedDB (1-3s delay).
-    const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, cookies);
+    let initialState;
+    try {
+        initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, cookies);
+    } catch (error) {
+        console.warn('[AppKit] Failed to parse wagmi cookie state:', error);
+        initialState = undefined;
+    }
+
     return (
         <WagmiProvider config={wagmiAdapter.wagmiConfig as any} initialState={initialState}>
             <QueryClientProvider client={queryClient}>

@@ -494,10 +494,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       const hasVault = typeof localStorage !== 'undefined' && !!localStorage.getItem("sovereign_vault_v1");
       const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
       
-      // On mobile, ONLY auto-init if we already have the deterministic seed/vault.
-      // If we don't, auto-init will trigger a wallet signature prompt without a user gesture,
+      // On mobile, ONLY auto-init if we already have the deterministic seed/vault,
+      // OR if this is a QR-linked sovereign handshake session (no extra wallet prompt needed).
+      // If none of the above, auto-init will trigger a wallet signature prompt without a user gesture,
       // which iOS and Android aggressively block, leading to false 'connection lost' errors.
-      if (hasSeed || hasVault || !isTouch || forceAutoInit) {
+      if (hasSeed || hasVault || !isTouch || forceAutoInit || isSovereignHandshake) {
         initClient();
       }
     }

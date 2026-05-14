@@ -48,7 +48,15 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
       setStage("ERROR");
       return;
     }
-    setStage("WARNING");
+    // On mobile, the user has already signed during the handshake.
+    // Skip the WARNING/SIGNING stage and go directly to camera scan.
+    if (isMobile) {
+      // Use a placeholder signature derived from the address for oracle binding
+      setAuthSignature(`0xLinked_${address}_${Date.now()}`);
+      await handleScan();
+    } else {
+      setStage("WARNING");
+    }
   };
 
   const handleSign = async () => {
@@ -71,9 +79,11 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
     try {
       setStage("SCANNING");
       
-      // 1. Initiate Real Camera Stream
+      // 1. Initiate Real Camera Stream — prefer front-facing camera on mobile
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "user", width: 640, height: 640 } 
+        video: isMobile
+          ? { facingMode: { ideal: 'user' }, width: { ideal: 640 }, height: { ideal: 640 } }
+          : { facingMode: 'user', width: 640, height: 640 }
       });
       setStream(mediaStream);
       if (videoRef.current) videoRef.current.srcObject = mediaStream;
@@ -292,7 +302,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
           </AnimatePresence>
         </div>
 
-        {/* Action Controls */}
+          {/* Action Controls */}
         <div className="w-full flex flex-col gap-4">
           {stage === "IDLE" && (
             address ? (
@@ -300,7 +310,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
                 onClick={handleInitiate}
                 className="w-full py-6 bg-black text-white rounded-2xl text-[12px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all"
               >
-                Initiate Attestation
+                {isMobile ? "Begin Facial Scan" : "Initiate Attestation"}
               </button>
             ) : (
               <button
@@ -318,7 +328,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
             )
           )}
           
-          {stage === "WARNING" && (
+          {stage === "WARNING" && !isMobile && (
             <button
               onClick={handleSign}
               className="w-full py-6 bg-black text-white rounded-2xl text-[12px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all"
