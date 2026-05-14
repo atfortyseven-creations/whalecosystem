@@ -50,7 +50,7 @@ interface ZKBiometricGateProps {
 }
 
 export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGateProps) {
-  const [stage, setStage] = useState<"IDLE" | "GENERATING_TUNNEL" | "QR_HANDOFF" | "VERIFYING_PAYLOAD" | "SUCCESS" | "ERROR" | "MOBILE_INLINE">("IDLE");
+  const [stage, setStage] = useState<"IDLE" | "GENERATING_TUNNEL" | "QR_HANDOFF" | "VERIFYING_PAYLOAD" | "SUCCESS" | "ERROR" | "MOBILE_INLINE" | "ENCRYPTING">("IDLE");
   const [errorMsg, setErrorMsg] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const { address } = useAccount();
@@ -100,10 +100,21 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
       const ts = Date.now();
       const message = `Humanity Ledger Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: INLINE_MOBILE\nLiveness: Verified`;
       const signature = await signMessageAsync({ message });
+      
+      setStage("ENCRYPTING");
+      const verifyRes = await fetch('/api/auth/kyc-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, signature, message })
+      });
+
+      if (!verifyRes.ok) throw new Error("Server-side verification failed");
+
       setStage("SUCCESS");
       if (onSuccess) onSuccess(signature);
     } catch (err: any) {
-      setErrorMsg("Signature Failed.");
+      console.error(err);
+      setErrorMsg("Verification Failed.");
       setStage("ERROR");
     }
   };
@@ -139,15 +150,25 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
              const proofObj = JSON.parse(decryptedStr);
              
              if (proofObj.verified) {
-               // 2. Final Signature Binding
-               const ts = Date.now();
-               const message = `Humanity Ledger Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: ${sessionData.id}\nLiveness: Verified`;
-               const signature = await signMessageAsync({ message });
-               
-               setStage("SUCCESS");
-               if (onSuccess) onSuccess(signature);
+                // 2. Final Signature Binding
+                const ts = Date.now();
+                const message = `Humanity Ledger Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: ${sessionData.id}\nLiveness: Verified`;
+                const signature = await signMessageAsync({ message });
+                
+                // 3. Finalize Verification on Server
+                setStage("ENCRYPTING");
+                const verifyRes = await fetch('/api/auth/kyc-verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address, signature, message })
+                });
+
+                if (!verifyRes.ok) throw new Error("Server-side verification failed");
+
+                setStage("SUCCESS");
+                if (onSuccess) onSuccess(signature);
              } else {
-               throw new Error("Payload verification failed.");
+                throw new Error("Payload verification failed.");
              }
            } catch (decErr) {
              console.error(decErr);
@@ -233,7 +254,14 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
               <motion.div key="verifying" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
                  <div className="w-10 h-10 border-2 border-emerald-500/20 border-l-emerald-500 rounded-full animate-spin mb-4" />
                  <p className="text-[9px] text-emerald-500 uppercase tracking-widest font-bold">Decrypting Payload...</p>
-                 <p className="text-[7px] text-white/30 uppercase tracking-widest mt-2">Finalizing EIP-191 Signature</p>
+                 <p className="text-[7px] text-black/30 uppercase tracking-widest mt-2">Finalizing EIP-191 Signature</p>
+              </motion.div>
+            )}
+
+            {stage === "ENCRYPTING" && (
+              <motion.div key="encrypting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
+                 <div className="w-10 h-10 border-2 border-emerald-500/20 border-l-emerald-500 rounded-full animate-spin mb-4" />
+                 <p className="text-[9px] text-emerald-500 uppercase tracking-widest font-bold">Persisting Identity Proof...</p>
               </motion.div>
             )}
 

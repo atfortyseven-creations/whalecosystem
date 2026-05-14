@@ -1,0 +1,88 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyMessage } from 'viem';
+import { prisma } from '@/lib/prisma';
+import { mintJWT } from '@/lib/jwt';
+
+/**
+ * POST /api/auth/kyc-verify
+ * 
+ * Finalizes the Zero-Knowledge KYC process by verifying the signature
+ * and updating the user's verification status in the database.
+ */
+export async function POST(req: NextRequest) {
+    try {
+        const { address, signature, message } = await req.json();
+
+        if (!address || !signature || !message) {
+            return NextResponse.json({ error: 'Missing verification data' }, { status: 400 });
+        }
+
+        // 1. Cryptographic Verification of the Attestation
+        const isValid = await verifyMessage({
+            address: address as `0x${string}`,
+            message,
+            signature: signature as `0x${string}`
+        });
+
+        if (!isValid) {
+            console.warn(`[KYC:Reject] Invalid signature for ${address}`);
+            return NextResponse.json({ error: 'Cryptographic proof failed' }, { status: 401 });
+        }
+
+        // 2. Persist Verification State
+        const normalizedAddress = address.toLowerCase();
+        const user = await prisma.user.upsert({
+            where: { walletAddress: normalizedAddress },
+            update: { 
+                isZkVerified: true,
+                humanityScore: { increment: 100 },
+                lastActive: new Date()
+            },
+            create: {
+                walletAddress: normalizedAddress,
+                isZkVerified: true,
+                humanityScore: 100,
+                tier: 'INITIATE',
+                lastActive: new Date()
+            }
+        });
+
+        // 3. Issue Updated Sovereign JWT
+        const jwt = await mintJWT({
+            sub: normalizedAddress,
+            address: normalizedAddress,
+            clearance: 'SOVEREIGN',
+            tier: user.tier || 'FREE',
+            kycStatus: 'VERIFIED',
+            isZkVerified: true,
+            humanityScore: user.humanityScore || 100,
+            iss: 'whale-alert-network',
+            issuedAt: new Date().toISOString()
+        });
+
+        // 4. Response with cookies
+        const response = NextResponse.json({ 
+            success: true,
+            status: 'VERIFIED',
+            user: {
+                address: normalizedAddress,
+                isZkVerified: true
+            }
+        });
+
+        response.cookies.set('whale_session', jwt, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 604800, // 7 days
+            path: '/',
+        });
+
+        console.log(`[KYC:Success] Identity verified and persisted for ${normalizedAddress}`);
+        return response;
+
+    } catch (error: any) {
+        console.error('[KYC:Fatal]', error);
+        return NextResponse.json({ error: 'Identity Engine Failure' }, { status: 500 });
+    }
+}
