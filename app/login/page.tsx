@@ -161,132 +161,134 @@ function ConnectPanel() {
   };
 
   return (
-    <section
-      className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20"
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-md"
+    <>
+      <section
+        className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20"
       >
-        {/* Card */}
-        <div
-          className="rounded-[2.5rem] p-10 flex flex-col items-center text-center gap-8"
-          style={{
-            background: "rgba(255,255,255,0.07)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            backdropFilter: "blur(40px)",
-            WebkitBackdropFilter: "blur(40px)",
-            boxShadow: "0 32px 80px rgba(0,0,0,0.4)",
-          }}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-md"
         >
-          {/* Logo */}
+          {/* Card */}
           <div
-            className="w-20 h-20 rounded-[1.8rem] flex items-center justify-center"
+            className="rounded-[2.5rem] p-10 flex flex-col items-center text-center gap-8"
             style={{
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.2)",
+              background: "rgba(255,255,255,0.07)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              backdropFilter: "blur(40px)",
+              WebkitBackdropFilter: "blur(40px)",
+              boxShadow: "0 32px 80px rgba(0,0,0,0.4)",
             }}
           >
-            <img
-              src="/official-whale-monochrome.png"
-              alt="Whale Alert"
-              className="w-12 h-12 object-contain brightness-0 invert drop-shadow-lg"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-            />
-          </div>
-
-          {/* Text */}
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-white/35 mb-3">
-              Sovereign Terminal
-            </p>
-            <h2 className="text-3xl font-black text-white tracking-tighter leading-tight mb-3">
-              Conecta tu Wallet
-            </h2>
-            <p className="text-white/50 text-[13px] leading-relaxed">
-              Autenticación no custodial. Tu firma criptográfica es tu identidad — sin contraseñas, sin cuentas.
-            </p>
-          </div>
-
-          {/* Connect button */}
-          {isConnected ? (
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              className="w-full flex flex-col items-center gap-3"
-            >
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-                <CheckCircle2 size={32} className="text-emerald-400" />
-              </div>
-              <p className="font-black text-white uppercase tracking-widest text-sm">
-                ¡Conectado!
-              </p>
-              <p className="font-mono text-white/40 text-[11px]">
-                {address?.slice(0, 10)}…{address?.slice(-8)}
-              </p>
-              {!kycDone ? (
-                <p className="font-mono text-[9px] uppercase tracking-widest text-amber-400/70 animate-pulse">
-                  Verificación KYC requerida…
-                </p>
-              ) : (
-                <p className="font-mono text-[9px] uppercase tracking-widest text-emerald-400/60">
-                  KYC verificado · Accediendo…
-                </p>
-              )}
-            </motion.div>
-          ) : (
-            <button
-              onClick={() => openConnectModal?.()}
-              className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-3 group shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)] hover:scale-[1.02]"
+            {/* Logo */}
+            <div
+              className="w-20 h-20 rounded-[1.8rem] flex items-center justify-center"
               style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(230,230,230,0.9) 100%)",
-                color: "#050505",
+                background: "rgba(255,255,255,0.12)",
+                border: "1px solid rgba(255,255,255,0.2)",
               }}
             >
-              <Wallet size={18} />
-              Conectar Wallet
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          )}
+              <img
+                src="/official-whale-monochrome.png"
+                alt="Whale Alert"
+                className="w-12 h-12 object-contain brightness-0 invert drop-shadow-lg"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            </div>
 
-          {/* Security note */}
-          <div className="flex items-start gap-3 pt-2 border-t border-white/10 w-full text-left">
-            <Lock size={13} className="text-white/30 mt-0.5 shrink-0" />
-            <p className="text-white/30 text-[10px] leading-relaxed">
-              Autenticación ECDSA. Tus claves privadas nunca salen de tu dispositivo. Compatible con MetaMask, Rainbow, Coinbase Wallet y cualquier wallet injected o WalletConnect.
-            </p>
-          </div>
+            {/* Text */}
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-white/35 mb-3">
+                Sovereign Terminal
+              </p>
+              <h2 className="text-3xl font-black text-white tracking-tighter leading-tight mb-3">
+                Conecta tu Wallet
+              </h2>
+              <p className="text-white/50 text-[13px] leading-relaxed">
+                Autenticación no custodial. Tu firma criptográfica es tu identidad — sin contraseñas, sin cuentas.
+              </p>
+            </div>
 
-          {/* Supported networks */}
-          <div className="flex items-center gap-2 flex-wrap justify-center">
-            {["ETH", "BASE", "ARB", "OP", "POL"].map((n) => (
-              <span
-                key={n}
-                className="font-mono text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
+            {/* Connect button */}
+            {isConnected ? (
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                className="w-full flex flex-col items-center gap-3"
+              >
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+                  <CheckCircle2 size={32} className="text-emerald-400" />
+                </div>
+                <p className="font-black text-white uppercase tracking-widest text-sm">
+                  ¡Conectado!
+                </p>
+                <p className="font-mono text-white/40 text-[11px]">
+                  {address?.slice(0, 10)}…{address?.slice(-8)}
+                </p>
+                {!kycDone ? (
+                  <p className="font-mono text-[9px] uppercase tracking-widest text-amber-400/70 animate-pulse">
+                    Verificación KYC requerida…
+                  </p>
+                ) : (
+                  <p className="font-mono text-[9px] uppercase tracking-widest text-emerald-400/60">
+                    KYC verificado · Accediendo…
+                  </p>
+                )}
+              </motion.div>
+            ) : (
+              <button
+                onClick={() => openConnectModal?.()}
+                className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-3 group shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)] hover:scale-[1.02]"
                 style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  color: "rgba(255,255,255,0.4)",
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(230,230,230,0.9) 100%)",
+                  color: "#050505",
                 }}
               >
-                {n}
-              </span>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-    </section>
+                <Wallet size={18} />
+                Conectar Wallet
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            )}
 
-    {/* PC KYC Gate — full screen overlay after wallet connect */}
-    {kycRequired && address && (
-      <PCKYCGate
-        walletAddress={address}
-        onVerified={handleKYCVerified}
-      />
-    )}
+            {/* Security note */}
+            <div className="flex items-start gap-3 pt-2 border-t border-white/10 w-full text-left">
+              <Lock size={13} className="text-white/30 mt-0.5 shrink-0" />
+              <p className="text-white/30 text-[10px] leading-relaxed">
+                Autenticación ECDSA. Tus claves privadas nunca salen de tu dispositivo. Compatible con MetaMask, Rainbow, Coinbase Wallet y cualquier wallet injected o WalletConnect.
+              </p>
+            </div>
+
+            {/* Supported networks */}
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              {["ETH", "BASE", "ARB", "OP", "POL"].map((n) => (
+                <span
+                  key={n}
+                  className="font-mono text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
+                  style={{
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    color: "rgba(255,255,255,0.4)",
+                  }}
+                >
+                  {n}
+                </span>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* PC KYC Gate — full screen overlay after wallet connect */}
+      {kycRequired && address && (
+        <PCKYCGate
+          walletAddress={address}
+          onVerified={handleKYCVerified}
+        />
+      )}
+    </>
   );
 }
 
