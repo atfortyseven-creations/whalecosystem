@@ -690,16 +690,6 @@ export function MobileLanding() {
         throw new Error('Verification rejected by Sovereign Node');
       }
 
-      // [ZERO-SIGNATURE] Derive and cache XMTP seed from this first signature so Whale Chat is 1-click
-      try {
-          const { keccak256 } = await import('viem');
-          const seed = keccak256(signature as `0x${string}`);
-          localStorage.setItem(`whale_chat_seed_${norm}`, seed);
-          console.log('[XMTP] Chat seed derived and cached for zero-click access.');
-      } catch (seedErr) {
-          console.warn('[XMTP] Failed to derive chat seed:', seedErr);
-      }
-
       console.log('[Auth] Handshake successful for:', norm);
       setLinkedAddress(norm);
       setIsLinked(true);

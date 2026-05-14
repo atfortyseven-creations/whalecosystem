@@ -152,7 +152,7 @@ export default function ConnectPage() {
       const sessId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('') + '-' + Date.now().toString(36);
       setQrSession(sessId);
 
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.humanidprotocol.com';
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://whalealert.network';
       const expiresAt = Date.now() + 300000;
       const qrUrl = new URL('/connect', origin);
       qrUrl.searchParams.set('uuid', sessId);
@@ -298,14 +298,6 @@ export default function ConnectPage() {
 
       signMessageAsync({ message })
         .then(async (signature) => {
-          try {
-            const { keccak256 } = await import('viem');
-            const seed = keccak256(signature as `0x${string}`);
-            localStorage.setItem(`whale_chat_seed_${norm}`, seed);
-          } catch (e) {
-            console.warn('[ConnectPage] Seed derivation error:', e);
-          }
-
           document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
           try {
             localStorage.setItem('sovereign_session_v2', JSON.stringify({

@@ -13,7 +13,7 @@ async function main() {
         update: {},
         create: {
             walletAddress: '0x1234567890abcdef1234567890abcdef12345678',
-            email: 'admin@humanidfi.com',
+            email: 'admin@whalealert.network',
             tier: IdentityTier.SOVEREIGN, // Maximum tier
             reputation: 9000,
         },
@@ -68,9 +68,9 @@ async function main() {
     await prisma.intelItem.create({
         data: {
             source: 'Bloomberg AI',
-            title: 'Regulatory Approval for Human-Fi likely in Q2',
+            title: 'Regulatory Approval for Whale Alert Network likely in Q2',
             category: 'Regulation',
-            url: 'https://bloomberg.com/crypto/human-fi',
+            url: 'https://bloomberg.com/crypto/whale-alert',
             publishedAt: new Date(),
             sentimentScore: 0.85, // Muy positivo
             aiSummary: 'Fuentes internas confirman que la SEC ve con buenos ojos el modelo de identidad.',

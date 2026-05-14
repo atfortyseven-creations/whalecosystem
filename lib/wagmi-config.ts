@@ -23,14 +23,14 @@ export const config = createConfig({
         walletConnect({
             projectId,
             metadata: {
-                name: 'WhaleAlert ID.fi',
+                name: 'Whale Alert Network',
                 description: 'The Sovereign Identity & Prediction Market Suite',
-                url: 'https://humanidfi.com',
-                icons: ['https://humanidfi.com/official-whale-legendary.png'],
+                url: 'https://whalealert.network',
+                icons: ['https://whalealert.network/official-whale-legendary.png'],
             }
         }),
         coinbaseWallet({ 
-            appName: 'WhaleAlert ID.fi',
+            appName: 'Whale Alert Network',
             // 'smartWalletOnly' requires passkeys — unavailable on iOS < 16.
             // 'all' shows both classic and smart wallet — safe for all devices.
             preference: 'all'

@@ -1,14 +1,14 @@
 {
-    "name": "Humanid.fi Governance",
+    "name": "Whale Alert Network Governance",
     "about": "Sovereign Intelligence & Decentralized Identity Protocol on Base.",
     "network": "8453",
-    "symbol": "HMND",
+    "symbol": "WHALE",
     "strategies": [
         {
             "name": "erc20-balance-of",
             "params": {
                 "address": "0xYourTokenAddressHere",
-                "symbol": "HMND",
+                "symbol": "WHALE",
                 "decimals": 18
             }
         },
@@ -32,8 +32,8 @@
     "admins": [
         "0xAdminWalletAddress"
     ],
-    "domain": "humanidfi.com",
-    "skin": "humanid-v1",
-    "website": "https://www.humanidfi.com",
-    "twitter": "Humanid_fi"
+    "domain": "whalealert.network",
+    "skin": "whale-v1",
+    "website": "https://whalealert.network",
+    "twitter": "WhaleAlert"
 }
