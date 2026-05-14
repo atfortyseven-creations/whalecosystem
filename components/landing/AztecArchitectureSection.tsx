@@ -183,8 +183,6 @@ export function AztecArchitectureSection() {
             Network is the only production-grade system that provides this guarantee through verified
             cryptographic proofs rather than policy, jurisdiction, or trust.
           </p>
-        </div> rather than policy, jurisdiction, or trust.
-          </p>
         </div>
 
       </div>
