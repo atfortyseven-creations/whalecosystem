@@ -84,6 +84,9 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    const crypto = await import('crypto');
+    const cryptographicNonce = crypto.randomBytes(32).toString('hex');
+
     const jwt = await mintJWT({
       sub: walletAddress,
       address: walletAddress,
@@ -93,6 +96,7 @@ export async function POST(req: NextRequest) {
       humanityScore: existingUser?.humanityScore || 0,
       iss: 'whale-alert-network',
       source: 'qr-mobile-handshake',
+      nonce: cryptographicNonce, // ── INHUMAN OPTIMIZATION: Replay Prevention
       issuedAt: new Date().toISOString()
     });
 

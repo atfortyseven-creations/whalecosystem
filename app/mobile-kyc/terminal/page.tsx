@@ -169,7 +169,7 @@ export default function MobileTerminalPage() {
     });
     localStorage.clear();
     sessionStorage.clear();
-    window.location.href = "/";
+    window.location.href = "/connect";
   };
 
   // If not connected, show connect prompt

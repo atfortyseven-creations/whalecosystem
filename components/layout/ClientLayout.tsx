@@ -171,6 +171,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const ctx = new AudioContext();
 
     const playTick = () => {
+      try {
         if (ctx.state === 'suspended') ctx.resume();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -183,6 +184,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
         osc.start();
         osc.stop(ctx.currentTime + 0.05);
+      } catch (e) {
+        // Silent catch for locked audio states
+      }
     };
 
     const handleAudioClick = (e: MouseEvent) => {
@@ -192,7 +196,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     };
 
     document.addEventListener('mousedown', handleAudioClick, { passive: true });
-    return () => document.removeEventListener('mousedown', handleAudioClick);
+    
+    // ── INHUMAN OPTIMIZATION: AudioContext Memory Leak Fix ──
+    return () => {
+      document.removeEventListener('mousedown', handleAudioClick);
+      if (ctx.state !== 'closed') {
+        ctx.close().catch(() => {});
+      }
+    };
   }, [settings?.soundEffects]);
 
   // ── Sovereign Interaction Telemetry (independent of sound settings) ─────────

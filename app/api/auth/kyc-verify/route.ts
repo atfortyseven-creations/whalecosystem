@@ -12,17 +12,18 @@ import { mintJWT } from '@/lib/jwt';
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { address } = body;
+        const { address, signature, message } = body;
         
-        if (!address) {
-            return NextResponse.json({ error: 'Missing verification data' }, { status: 400 });
+        if (!address || !signature || !message) {
+            return NextResponse.json({ error: 'Missing cryptographic verification data' }, { status: 400 });
         }
 
-        // 1. Skip Cryptographic Verification of the Attestation (already verified at login)
-        // We trust the authenticated endpoint for the ZK proof flow.
-
-
-        // 2. Persist Verification State
+        // 1. Strict Cryptographic Verification of the Attestation
+        const isValid = await verifyMessage({ address, message, signature });
+        if (!isValid) {
+            console.error(`[KYC:SECURITY] ❌ Invalid biometric signature attempted for ${address}`);
+            return NextResponse.json({ error: 'Cryptographic binding failed' }, { status: 401 });
+        }
         const normalizedAddress = address.toLowerCase();
         const user = await prisma.user.upsert({
             where: { walletAddress: normalizedAddress },

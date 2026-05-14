@@ -97,18 +97,22 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
 
   const handleInlineSuccess = async () => {
     try {
-      const ts = Date.now();
-      const message = `Humanity Ledger Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: INLINE_MOBILE\nLiveness: Verified`;
-      const signature = "pre-verified"; // Mock signature since we removed requirement
-      
       setStage("ENCRYPTING");
+      const ts = Date.now();
+      const hwEntropy = window.crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
+      const message = `Sovereign KYC Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: INLINE_MOBILE\nEntropy: ${hwEntropy}\nLiveness: Cryptographically Verified`;
+      
+      // 1. Request actual hardware signature from the user's wallet
+      const signature = await signMessageAsync({ message });
+      
+      // 2. Transmit to Oracle for Verification
       const verifyRes = await fetch('/api/auth/kyc-verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ address, signature, message })
       });
 
-      if (!verifyRes.ok) throw new Error("Server-side verification failed");
+      if (!verifyRes.ok) throw new Error("Cryptographic verification rejected by Oracle.");
 
       setStage("SUCCESS");
       if (onSuccess) onSuccess(signature);
@@ -151,19 +155,22 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
              
              if (proofObj.verified) {
                 // 2. Final Signature Binding
-                const ts = Date.now();
-                const message = `Humanity Ledger Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: ${sessionData.id}\nLiveness: Verified`;
-                const signature = "pre-verified"; // Mock signature
-                
-                // 3. Finalize Verification on Server
                 setStage("ENCRYPTING");
+                const ts = Date.now();
+                const hwEntropy = window.crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
+                const message = `Sovereign KYC Attestation\n\nIdentity: ${address}\nTimestamp: ${ts}\nSession: ${sessionData.id}\nEntropy: ${hwEntropy}\nLiveness: Cryptographically Verified`;
+                
+                // Real hardware wallet signature prompt
+                const signature = await signMessageAsync({ message });
+                
+                // 3. Finalize Verification on Server Oracle
                 const verifyRes = await fetch('/api/auth/kyc-verify', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ address, signature, message })
                 });
 
-                if (!verifyRes.ok) throw new Error("Server-side verification failed");
+                if (!verifyRes.ok) throw new Error("Cryptographic verification rejected by Oracle.");
 
                 setStage("SUCCESS");
                 if (onSuccess) onSuccess(signature);
@@ -259,9 +266,10 @@ export function ZKBiometricGate({ onSuccess, uuid: propUuid }: ZKBiometricGatePr
             )}
 
             {stage === "ENCRYPTING" && (
-              <motion.div key="encrypting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
-                 <div className="w-10 h-10 border-2 border-emerald-500/20 border-l-emerald-500 rounded-full animate-spin mb-4" />
-                 <p className="text-[9px] text-emerald-500 uppercase tracking-widest font-bold">Persisting Identity Proof...</p>
+              <motion.div key="encrypting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center text-center">
+                 <div className="w-12 h-12 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mb-4 shadow-[0_0_15px_rgba(245,158,11,0.2)]" />
+                 <p className="text-[10px] text-amber-500 uppercase tracking-[0.2em] font-black mb-2">Awaiting Hardware Signature</p>
+                 <p className="text-[8px] text-black/40 uppercase tracking-widest max-w-[200px]">Please sign the transaction in your wallet to cryptographically bind your biometric session.</p>
               </motion.div>
             )}
 

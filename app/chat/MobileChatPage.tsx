@@ -47,19 +47,15 @@ export default function MobileChatPage() {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => {
         setViewportHeight(vv.height);
+        // We do NOT fight the browser with window.scrollTo(0,0) anymore.
+        // We just let the visual viewport top dictate the fixed offset cleanly.
         setViewportOffset(vv.offsetTop);
-        
-        // CRITICAL: Force window scroll to 0 to prevent browser from 
-        // "helping" us by pushing the layout up when keyboard opens.
-        if (vv.offsetTop > 0) {
-            window.scrollTo(0, 0);
-        }
       });
     };
 
     update();
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
+    vv.addEventListener("resize", update, { passive: true });
+    vv.addEventListener("scroll", update, { passive: true });
 
     return () => {
       vv.removeEventListener("resize", update);
@@ -72,6 +68,7 @@ export default function MobileChatPage() {
       document.body.style.width = '';
       document.body.style.height = '';
       document.body.style.overscrollBehavior = '';
+      document.body.style.touchAction = '';
     };
   }, []);
 
@@ -88,6 +85,7 @@ export default function MobileChatPage() {
     overflow: 'hidden',
     backgroundColor: '#FAFAFA',
     zIndex: 1000,
+    touchAction: 'none', // Prevent bounce at container level
   };
 
   return (

@@ -37,7 +37,18 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             const isTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
             const isSmallScreen  = window.screen.width < 768;
             
-            setIsMobile(isUaMobile || (isTouchScreen && isSmallScreen));
+            const mobileDetected = isUaMobile || (isTouchScreen && isSmallScreen);
+            setIsMobile(mobileDetected);
+
+            // ── INHUMAN OPTIMIZATION: Sterile Layout Constraints ──
+            // If mobile is detected, immediately enforce sterile viewport physics
+            // directly onto the root DOM before React finishes hydration.
+            if (mobileDetected) {
+                document.documentElement.style.setProperty('--mobile-sterile-enforcer', 'active');
+                if (document.body) {
+                    document.body.classList.add('mobile-sterile-lock');
+                }
+            }
         };
 
         checkMobile();

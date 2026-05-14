@@ -104,6 +104,14 @@ function writeSessionAll(addr: string) {
   sessionStorage.setItem(`sovereign_signed_${norm}`, 'true');
 }
 
+function usePrevious<T>(value: T): T | undefined {
+  const ref = useRef<T>(undefined);
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
+
 // ─── MAIN GATE COMPONENT ────────────────────────────────────────────────────
 export function LinkedGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -113,6 +121,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   const { disconnect } = useDisconnect();
   
   const [isMounted, setIsMounted] = useState(false);
+  const prevWalletConnected = usePrevious(isWalletConnected);
 
   // ── Read session from ALL 3 layers on mount ──────────────────────────────
   useEffect(() => {
@@ -126,6 +135,13 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   // ── Auto-Link Wallet WITHOUT secondary signature ────────────────────────
   useEffect(() => {
     if (!isMounted) return;
+
+    // ── INHUMAN OPTIMIZATION: Nuclear Guard State Transition Fix ──
+    // If the wallet transitions from disconnected to connected, the user intentionally
+    // re-authenticated. We MUST purge the __disconnected__ flag to resume auto-routing.
+    if (prevWalletConnected === false && isWalletConnected) {
+        sessionStorage.removeItem('__disconnected__');
+    }
 
     // Nuclear Logout Guard: If the user just manually disconnected in this tab session,
     // do NOT auto-link them back immediately even if the wallet is still connected.
@@ -145,7 +161,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
       setLinked(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isWalletConnected, isLinked, isMounted, address]);
+  }, [isWalletConnected, isLinked, isMounted, address, prevWalletConnected]);
 
 
   // ── Body scroll lockdown when gate is active ──────────────────────────────
