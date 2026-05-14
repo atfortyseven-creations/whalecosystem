@@ -12,12 +12,12 @@ const CARDS = [
     icon: <Database size={18} />,
     title: 'Documentation',
     desc: 'Platform architecture, SIWE authentication, Neo4j Akashic Ledger, smart contracts, and node deployment.',
-    href: '/docs/intro',
+    href: '/docs/overview',
     cta: 'Read docs',
     links: [
-      { label: 'Core Concepts', href: '/docs/intro' },
+      { label: 'Core Concepts', href: '/docs/core-concepts' },
       { label: 'Architecture', href: '/docs/platform/architecture' },
-      { label: 'Authentication', href: '/docs/platform/auth' },
+      { label: 'Authentication', href: '/docs/platform/authentication' },
     ],
   },
   {
@@ -28,7 +28,7 @@ const CARDS = [
     href: '/docs/developer/overview',
     cta: 'API reference',
     links: [
-      { label: 'REST API', href: '/docs/developer/api/overview' },
+      { label: 'REST API', href: '/docs/developer/rest/overview' },
       { label: 'WebSocket API', href: '/docs/developer/ws/connection' },
       { label: 'TypeScript SDK', href: '/docs/developer/sdk/typescript' },
     ],
@@ -43,7 +43,7 @@ const CARDS = [
     links: [
       { label: 'Prerequisites', href: '/docs/operator/prerequisites' },
       { label: 'Running a Node', href: '/docs/operator/setup/node' },
-      { label: 'Monitoring', href: '/docs/operator/monitoring' },
+      { label: 'Monitoring', href: '/docs/operator/operation/monitoring' },
     ],
   },
   {
@@ -51,20 +51,20 @@ const CARDS = [
     icon: <Scale size={18} />,
     title: 'Legal',
     desc: 'Terms of service, privacy policy, cookie policy, risk disclosure, and the Whale Code of conduct.',
-    href: '/docs/terms-of-service',
+    href: '/docs/legal/terms-of-service',
     cta: 'View legal',
     links: [
-      { label: 'Terms of Service', href: '/docs/terms-of-service' },
-      { label: 'Privacy Policy', href: '/docs/privacy-policy' },
-      { label: 'Risk Disclosure', href: '/docs/risk-disclosure' },
+      { label: 'Terms of Service', href: '/docs/legal/terms-of-service' },
+      { label: 'Privacy Policy', href: '/docs/legal/privacy-policy' },
+      { label: 'Risk Disclosure', href: '/docs/legal/risk-disclosure' },
     ],
   },
 ];
 
 const QUICK = [
   { label: 'Quickstart (5 min)', href: '/docs/quickstart', badge: 'START HERE', icon: <Zap size={14} /> },
-  { label: 'Authentication guide', href: '/docs/platform/auth', icon: <Shield size={14} /> },
-  { label: 'API reference', href: '/docs/developer/api/overview', icon: <Code size={14} /> },
+  { label: 'Authentication guide', href: '/docs/platform/authentication', icon: <Shield size={14} /> },
+  { label: 'API reference', href: '/docs/developer/rest/overview', icon: <Code size={14} /> },
   { label: 'Run a full node', href: '/docs/operator/setup/node', icon: <Terminal size={14} /> },
 ];
 

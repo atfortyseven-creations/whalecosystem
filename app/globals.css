@@ -177,6 +177,7 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     /* Lenis (SmoothScroll.tsx) manages the smoothing. */
     -webkit-tap-highlight-color: transparent;
     touch-action: pan-x pan-y;
+    zoom: 0.7;
 
     /* === STRATOSPHERIC GPU RENDERING === */
     text-rendering: optimizeLegibility;

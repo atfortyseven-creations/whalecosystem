@@ -11,6 +11,9 @@ import { mintJWT } from '@/lib/jwt';
  */
 export async function POST(req: NextRequest) {
     try {
+        const body = await req.json();
+        const { address } = body;
+        
         if (!address) {
             return NextResponse.json({ error: 'Missing verification data' }, { status: 400 });
         }
@@ -60,7 +63,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        response.cookies.set('whale_session', jwt, {
+        response.cookies.set('human_session', jwt, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',

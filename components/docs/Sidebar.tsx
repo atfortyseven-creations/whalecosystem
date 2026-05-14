@@ -19,9 +19,9 @@ const NAV: NavSection[] = [
     title: 'Getting Started',
     tab: 'docs',
     items: [
-      { label: 'Overview', href: '/docs' },
+      { label: 'Overview', href: '/docs/overview' },
       { label: 'Quickstart', href: '/docs/quickstart' },
-      { label: 'Core Concepts', href: '/docs/intro' },
+      { label: 'Core Concepts', href: '/docs/core-concepts' },
       { label: 'Whale Code', href: '/docs/whale-code', badge: '↗' },
     ]
   },
@@ -30,11 +30,12 @@ const NAV: NavSection[] = [
     tab: 'docs',
     items: [
       { label: 'Architecture', href: '/docs/platform/architecture' },
-      { label: 'Authentication (SIWE)', href: '/docs/platform/auth' },
-      { label: 'Neo4j Akashic Ledger', href: '/docs/platform/ledger' },
-      { label: 'Smart Contracts', href: '/docs/platform/contracts' },
-      { label: 'Node Deployment', href: '/docs/platform/deployment' },
-      { label: 'WebSocket Streams', href: '/docs/platform/websockets' },
+      { label: 'Authentication (SIWE)', href: '/docs/platform/authentication' },
+      { label: 'Neo4j Akashic Ledger', href: '/docs/platform/neo4j' },
+      { label: 'Smart Contracts', href: '/docs/platform/smart-contracts' },
+      { label: 'Node Deployment', href: '/docs/platform/node-deployment' },
+      { label: 'WebSocket Streams', href: '/docs/platform/websocket-streams' },
+      { label: 'Whale Chat Forum', href: '/docs/platform/whale-chat' },
     ]
   },
   {
@@ -64,13 +65,13 @@ const NAV: NavSection[] = [
     title: 'REST API',
     tab: 'developer',
     items: [
-      { label: 'Reference Overview', href: '/docs/developer/api/overview' },
-      { label: 'Whale Alerts', href: '/docs/developer/api/alerts' },
-      { label: 'Market Data', href: '/docs/developer/api/market' },
-      { label: 'Wallets & Entities', href: '/docs/developer/api/wallets' },
-      { label: 'Forum Posts', href: '/docs/developer/api/forum' },
-      { label: 'Subscriptions', href: '/docs/developer/api/subscriptions' },
-      { label: 'Transactions', href: '/docs/developer/api/transactions' },
+      { label: 'Reference Overview', href: '/docs/developer/rest/overview' },
+      { label: 'Whale Alerts', href: '/docs/developer/rest/whale-alerts' },
+      { label: 'Market Data', href: '/docs/developer/rest/market-data' },
+      { label: 'Wallets & Entities', href: '/docs/developer/rest/wallets' },
+      { label: 'Forum Posts', href: '/docs/developer/rest/forum' },
+      { label: 'Subscriptions', href: '/docs/developer/rest/subscriptions' },
+      { label: 'Transactions', href: '/docs/developer/rest/transactions' },
     ]
   },
   {
@@ -89,7 +90,7 @@ const NAV: NavSection[] = [
       { label: 'TypeScript SDK', href: '/docs/developer/sdk/typescript' },
       { label: 'Python SDK', href: '/docs/developer/sdk/python' },
       { label: 'Webhook Guide', href: '/docs/developer/sdk/webhooks' },
-      { label: 'Changelog', href: '/docs/developer/changelog', badge: 'v2' },
+      { label: 'Changelog', href: '/docs/developer/sdk/changelog' },
     ]
   },
 
@@ -117,10 +118,10 @@ const NAV: NavSection[] = [
     title: 'Operation',
     tab: 'operator',
     items: [
-      { label: 'Monitoring', href: '/docs/operator/monitoring' },
-      { label: 'Keystore Management', href: '/docs/operator/keystore' },
-      { label: 'Sequencer Management', href: '/docs/operator/sequencer-mgmt' },
-      { label: 'FAQs & Common Issues', href: '/docs/operator/faq' },
+      { label: 'Monitoring', href: '/docs/operator/operation/monitoring' },
+      { label: 'Keystore Management', href: '/docs/operator/operation/keystore' },
+      { label: 'Sequencer Management', href: '/docs/operator/operation/sequencer' },
+      { label: 'FAQs & Common Issues', href: '/docs/operator/operation/faq' },
     ]
   },
   {
@@ -139,12 +140,12 @@ const NAV: NavSection[] = [
     title: 'Legal',
     tab: 'legal',
     items: [
-      { label: 'Terms of Service', href: '/docs/terms-of-service' },
-      { label: 'Privacy Policy', href: '/docs/privacy-policy' },
-      { label: 'Cookie Policy', href: '/docs/cookie-policy' },
-      { label: 'Risk Disclosure', href: '/docs/risk-disclosure' },
-      { label: 'Whale Code', href: '/docs/whale-code' },
-      { label: 'Whitepaper', href: '/docs/whitepaper' },
+      { label: 'Terms of Service', href: '/docs/legal/terms-of-service' },
+      { label: 'Privacy Policy', href: '/docs/legal/privacy-policy' },
+      { label: 'Cookie Policy', href: '/docs/legal/cookie-policy' },
+      { label: 'Risk Disclosure', href: '/docs/legal/risk-disclosure' },
+      { label: 'Whale Code', href: '/docs/legal/whale-code' },
+      { label: 'Whitepaper', href: '/docs/legal/whitepaper' },
     ]
   },
 ];
@@ -153,22 +154,15 @@ const NAV: NavSection[] = [
 function getActiveTab(path: string): string {
   if (path.startsWith('/docs/developer')) return 'developer';
   if (path.startsWith('/docs/operator'))  return 'operator';
-  if (
-    path.startsWith('/docs/terms') ||
-    path.startsWith('/docs/privacy') ||
-    path.startsWith('/docs/cookie') ||
-    path.startsWith('/docs/risk') ||
-    path.startsWith('/docs/whale-code') ||
-    path.startsWith('/docs/whitepaper')
-  ) return 'legal';
+  if (path.startsWith('/docs/legal'))     return 'legal';
   return 'docs';
 }
 
 const TABS = [
-  { id: 'docs',      label: 'Docs',      href: '/docs' },
+  { id: 'docs',      label: 'Docs',      href: '/docs/overview' },
   { id: 'developer', label: 'Developer', href: '/docs/developer/overview' },
   { id: 'operator',  label: 'Operator',  href: '/docs/operator/overview' },
-  { id: 'legal',     label: 'Legal',     href: '/docs/terms-of-service' },
+  { id: 'legal',     label: 'Legal',     href: '/docs/legal/terms-of-service' },
 ];
 
 interface SidebarProps { theme: 'light' | 'dark'; currentPath: string; }
@@ -214,7 +208,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
         {TABS.map(tab => (
           <Link
             key={tab.id}
-            href={tab.id === 'docs' ? '/docs' : tab.id === 'developer' ? '/docs/developer/overview' : tab.id === 'operator' ? '/docs/operator/overview' : '/docs/terms-of-service'}
+            href={tab.id === 'docs' ? '/docs/overview' : tab.id === 'developer' ? '/docs/developer/overview' : tab.id === 'operator' ? '/docs/operator/overview' : '/docs/legal/terms-of-service'}
             onClick={() => {
               setActiveTab(tab.id);
               setOpenSections(new Set(NAV.filter(s => s.tab === tab.id).map(s => s.title + s.tab)));

@@ -492,10 +492,12 @@ export default function ConnectPage() {
 
                   <div className="flex flex-col items-center text-center space-y-5 max-w-md">
                     <h2 className="text-5xl font-black uppercase tracking-tighter leading-none text-[#050505]">
-                      Session<br/><span className="text-black/30">Verified.</span>
+                      {isLinked ? "Session Verified" : "Awaiting Signature"}
                     </h2>
                     <p className="font-serif text-[15px] leading-relaxed text-[#050505]/60 font-medium">
-                      Cryptographic attestation perfectly resolved. Your session is now verified. Welcome to the Sovereign Terminal.
+                      {isLinked 
+                        ? "Cryptographic attestation perfectly resolved. Your session is now verified. Welcome to the Sovereign Terminal."
+                        : "Your wallet is connected. Please sign the cryptographic attestation in your wallet to verify your session."}
                     </p>
                   </div>
 
@@ -509,23 +511,34 @@ export default function ConnectPage() {
                   </div>
 
                   <div className="mt-6 flex flex-col items-center gap-4 w-full max-w-[320px] min-h-[100px] justify-center">
-                    <div className="flex items-center gap-3">
-                      <motion.div
-                        className="w-2 h-2 rounded-full bg-black/60"
-                        animate={{ y: [0, -6, 0] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-                      />
-                      <motion.div
-                        className="w-2 h-2 rounded-full bg-black/60"
-                        animate={{ y: [0, -6, 0] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
-                      />
-                      <motion.div
-                        className="w-2 h-2 rounded-full bg-black/60"
-                        animate={{ y: [0, -6, 0] }}
-                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
-                      />
-                    </div>
+                    {!isLinked ? (
+                      <button
+                        onClick={() => {
+                          setIsSigning(false); // Reset to re-trigger auto sign
+                        }}
+                        className="px-8 py-4 bg-black text-white font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-colors w-full"
+                      >
+                        Sign Message
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <motion.div
+                          className="w-2 h-2 rounded-full bg-black/60"
+                          animate={{ y: [0, -6, 0] }}
+                          transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                        />
+                        <motion.div
+                          className="w-2 h-2 rounded-full bg-black/60"
+                          animate={{ y: [0, -6, 0] }}
+                          transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                        />
+                        <motion.div
+                          className="w-2 h-2 rounded-full bg-black/60"
+                          animate={{ y: [0, -6, 0] }}
+                          transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {isMobile && (

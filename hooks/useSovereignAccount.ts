@@ -42,10 +42,14 @@ export function useSovereignAccount() {
             } catch {}
         };
 
+        const init = async () => {
+            checkHandshake();
+            await checkZkStatus();
+            setIsChecking(false);
+        };
+
         // Run immediately
-        checkHandshake();
-        checkZkStatus();
-        setIsChecking(false);
+        init();
         
         // Polling is only necessary for QR/Mobile handshakes where Wagmi isn't active.
         let pollHandshake: any = null;

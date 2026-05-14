@@ -58,6 +58,7 @@ export default function MobileKYCPage({ isInline = false, onInlineSuccess }: Mob
   const blinkCountRef = useRef(0);
   const lastEyeBrightness = useRef(0);
   const blinkThreshold = useRef(false);
+  const lastBlinkFrame = useRef(0);
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach(t => t.stop());
@@ -122,14 +123,22 @@ export default function MobileKYCPage({ isInline = false, onInlineSuccess }: Mob
 
       if (lastEyeBrightness.current > 0) {
         const delta = lastEyeBrightness.current - avgBright;
-        // Blink: sudden brightness DROP (eyelids close) > 15 units
-        if (delta > 15 && !blinkThreshold.current) {
+        // Blink: sudden brightness DROP (eyelids close) > 5 units (lowered from 15)
+        if (delta > 5 && !blinkThreshold.current) {
           blinkThreshold.current = true;
         }
         // Eye reopens (brightness recovers)
-        if (blinkThreshold.current && delta < -8) {
-          blinkCountRef.current++;
-          setBlinkCount(blinkCountRef.current);
+        if (blinkThreshold.current && delta < -3) {
+          // Debounce: prevent single blink double-counting (10 frames = ~160ms)
+          if (frameCount.current - lastBlinkFrame.current > 10) {
+            blinkCountRef.current++;
+            setBlinkCount(blinkCountRef.current);
+            lastBlinkFrame.current = frameCount.current;
+            if (blinkCountRef.current >= 2) {
+              setLivenessScore(100);
+              // The useEffect monitor will pick this up and call finalizeKYC()
+            }
+          }
           blinkThreshold.current = false;
         }
       }

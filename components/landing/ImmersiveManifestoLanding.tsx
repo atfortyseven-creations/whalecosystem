@@ -34,10 +34,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
       {/* ── HERO ──────────────────────────────────────────────────────────────── */}
       <section className="relative w-full min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between border-b border-black/5 overflow-hidden">
         
-        {/* Left Content */}
+        {/* Right Content */}
         <motion.div 
           initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-          className="relative z-10 flex flex-col justify-center flex-1 px-6 sm:px-12 md:px-20 pt-32 pb-20 lg:py-0 w-full lg:w-1/2 min-h-[100dvh] lg:min-h-0 xl:pl-32"
+          className="relative z-10 flex flex-col justify-end lg:items-end flex-1 px-6 sm:px-12 md:px-20 pt-48 pb-20 lg:pb-32 w-full lg:w-1/2 lg:ml-auto min-h-[100dvh] lg:min-h-0 xl:pr-32 lg:text-right"
         >
 
           <motion.h1 variants={FADE_UP} className="text-[28px] sm:text-[48px] md:text-[64px] xl:text-[72px] font-black tracking-tighter leading-[1.05] text-[#0a0a0a] mb-6 drop-shadow-sm max-w-4xl">
@@ -50,15 +50,15 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.p>
 
           {/* Performance Status — Institutional Readout */}
-          <motion.div variants={FADE_UP} className="grid grid-cols-2 lg:flex lg:flex-row items-center justify-between gap-6 lg:gap-2 p-6 sm:p-8 bg-white border border-black/5 rounded-[2rem] mb-10 shadow-sm max-w-2xl w-full">
+          <motion.div variants={FADE_UP} className="grid grid-cols-2 lg:flex lg:flex-row items-center justify-end gap-6 lg:gap-2 p-6 sm:p-8 bg-white border border-black/5 rounded-[2rem] mb-10 shadow-sm max-w-2xl w-full">
             {[
               { label: "Network State", val: blockNumber ? `#${blockNumber.toLocaleString()}` : "Operational" },
               { label: "Gas Topology", val: baseFeeGwei ? `${baseFeeGwei} Gwei` : "Nominal" },
               { label: "Entity Density", val: globalStats?.tokens ?? "Verified" },
               { label: "Capital Flow", val: globalStats?.cap ?? "Nominal" }
             ].map((stat, i) => (
-              <div key={stat.label} className="flex items-center">
-                <div className="flex flex-col gap-1">
+              <div key={stat.label} className="flex items-center lg:flex-row-reverse">
+                <div className="flex flex-col gap-1 lg:items-end">
                   <span className="font-mono text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-black/20 truncate">{stat.label}</span>
                   <span className="font-mono text-[12px] sm:text-[16px] font-black text-[#0a0a0a] truncate tracking-tight">{stat.val}</span>
                 </div>
@@ -68,7 +68,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.div>
 
           {/* CTA */}
-          <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row gap-4 mb-10">
+          <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row gap-4 mb-10 lg:justify-end">
             <Link href="/dashboard" className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#0a0a0a] text-white rounded-xl font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/80 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10">
               Enter the Network <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -78,15 +78,15 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.div>
         </motion.div>
 
-        {/* Right 4K Wave — strictly right half, never bleeds over text */}
-        <div className="hidden lg:block absolute right-0 top-0 w-1/2 h-full z-0 overflow-hidden pointer-events-none">
-          {/* Hard left-edge mask: cream fades cleanly into the wave */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-[#FAFAF8]/70 to-transparent z-10" style={{ width: '45%' }} />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] to-transparent z-10" style={{ width: '20%' }} />
+        {/* Left 4K Wave */}
+        <div className="hidden lg:block absolute left-0 top-0 w-1/2 h-full z-0 overflow-hidden pointer-events-none">
+          {/* Hard right-edge mask: cream fades cleanly into the wave */}
+          <div className="absolute inset-0 bg-gradient-to-l from-[#FAFAF8] via-[#FAFAF8]/70 to-transparent z-10" style={{ width: '45%', left: '55%' }} />
+          <div className="absolute inset-0 bg-gradient-to-l from-[#FAFAF8] to-transparent z-10" style={{ width: '20%', left: '80%' }} />
           <img
             src="/olas-hokusai-4k.png"
             alt="Wave"
-            className="absolute inset-0 w-full h-full object-cover object-left"
+            className="absolute inset-0 w-full h-full object-cover object-right"
             style={{ opacity: 0.85, mixBlendMode: 'multiply' }}
           />
         </div>
@@ -95,7 +95,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           <img
             src="/olas-hokusai-4k.png"
             alt="Wave"
-            className="absolute -right-20 top-0 w-full h-full object-cover object-left"
+            className="absolute -left-20 top-0 w-full h-full object-cover object-right"
             style={{ opacity: 0.45, mixBlendMode: 'multiply' }}
           />
         </div>

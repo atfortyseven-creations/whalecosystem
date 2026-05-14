@@ -323,6 +323,29 @@ export default function WhaleDashboard() {
         }
     };
 
+    if (isCheckingZK) {
+        return (
+            <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
+
+    if (!hasPassedZK) {
+        return (
+            <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center">
+                <div className="w-full max-w-4xl px-4">
+                    <InstitutionalErrorBoundary moduleName="ZK-Biometric Identity Gate">
+                        <ZKBiometricGate onSuccess={() => window.location.reload()} />
+                    </InstitutionalErrorBoundary>
+                    <p className="mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 text-center">
+                        Institutional Access Requires 3D ZK-Liveness Attestation
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <WhaleProShell
             activeTab={activeTab}
@@ -331,20 +354,7 @@ export default function WhaleDashboard() {
             isZkVerified={hasPassedZK}
         >
             <div className="flex flex-col gap-6 w-full pb-12 h-full scrollbar-hide pt-4">
-                {!hasPassedZK ? (
-                    <div className="flex flex-col items-center justify-center min-h-[600px] w-full max-w-4xl mx-auto px-4">
-                        <div className="w-full">
-                           <InstitutionalErrorBoundary moduleName="ZK-Biometric Identity Gate">
-                            <ZKBiometricGate onSuccess={() => window.location.reload()} />
-                        </InstitutionalErrorBoundary>
-                        </div>
-                        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-black/20 text-center">
-                            Institutional Access Requires 3D ZK-Liveness Attestation
-                        </p>
-                    </div>
-                ) : (
-                    renderTabContent()
-                )}
+                {renderTabContent()}
             </div>
         </WhaleProShell>
     );
