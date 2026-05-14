@@ -51,8 +51,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   const isDark = theme === 'dark';
   const activeTab = getActiveTopTab(pathname || '');
 
-  const bg      = isDark ? 'bg-[#0A0A0A] text-white'   : 'bg-white text-black';
-  const hdrBg   = isDark ? 'bg-[#0A0A0A] border-white/8' : 'bg-white border-black/8';
+  const bg      = isDark ? 'bg-transparent text-white'   : 'bg-transparent text-black';
+  const hdrBg   = isDark ? 'bg-[#0A0A0A]/40 border-white/8' : 'bg-white/40 border-black/8';
   const tabBase = isDark ? 'text-white/35 hover:text-white/70' : 'text-black/35 hover:text-black/70';
   const tabAct  = isDark ? 'text-white border-b-2 border-white' : 'text-black border-b-2 border-black';
 

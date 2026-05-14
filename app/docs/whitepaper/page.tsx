@@ -30,7 +30,7 @@ export default async function WhitepaperPage() {
     .replace(/_End of Manuscript_/gim, '<p class="font-mono text-[10px] uppercase tracking-widest text-black/40 mt-16 text-center">End of Manuscript</p>');
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] selection:bg-[#FBC9C2]/30">
+    <div className="min-h-screen bg-transparent selection:bg-[#FBC9C2]/30">
       <div className="max-w-3xl mx-auto px-6 py-32">
         <div className="mb-12">
             <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-black/10 text-[10px] font-mono uppercase tracking-[0.2em] font-semibold text-black/60 mb-6 bg-white/50">

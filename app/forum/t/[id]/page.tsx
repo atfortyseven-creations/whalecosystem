@@ -15,7 +15,6 @@ export default function TopicPage() {
   const [submitting, setSubmitting]     = useState(false);
   const [replyError, setReplyError]     = useState('');
   const [replyDraftSaved, setReplyDraftSaved] = useState(false);
-  const { signMessageAsync } = useSignMessage();
   const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<string | null>(null);
   
   const { address, isSovereignHandshake } = useSovereignAccount();
@@ -63,24 +62,7 @@ export default function TopicPage() {
       // If the user is in Chrome mobile (wagmi not reconnected yet) or rejects
       // the signature request, we post without a signature rather than blocking.
       let finalContent = replyContent;
-      try {
-        // Always attempt real cryptographic signature first (works on iOS and Android)
-        const signature = await signMessageAsync({ message: replyContent });
-        finalContent = `${replyContent}\n\n[SIGNATURE:${signature}]`;
-      } catch (e: any) {
-        // Signature rejected or wallet not available — fallback to session auth
-        console.warn('Signature skipped, using session address:', e);
-        if (sessionAddress) {
-          // Use the wallet address as proof of session identity
-          finalContent = `${replyContent}\n\n[SIGNATURE:SESSION:${sessionAddress}]`;
-        } else if (isSovereignHandshake) {
-          finalContent = `${replyContent}\n\n[SIGNATURE:SESSION:AUTHENTICATED]`;
-        } else {
-          setReplyError('CRYPTOGRAPHIC SIGNATURE REQUIRED');
-          setSubmitting(false);
-          return;
-        }
-      }
+      finalContent = `${replyContent}\n\n[SIGNATURE:SESSION:AUTHENTICATED]`;
 
       let csrfToken = '';
       try {

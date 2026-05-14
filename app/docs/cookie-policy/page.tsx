@@ -4,7 +4,7 @@ import { ArrowLeft, Cookie } from 'lucide-react';
 
 export default function CookiePolicyPage() {
     return (
-        <div className="min-h-screen bg-[#FAF9F6] text-[#050505] selection:bg-black selection:text-white font-sans">
+        <div className="min-h-screen bg-transparent text-[#050505] selection:bg-black selection:text-white font-sans">
             <div className="max-w-3xl mx-auto px-6 pt-16 pb-12">
                 <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#888888] hover:text-[#050505] transition-colors mb-16">
                     <ArrowLeft size={14} /> Return to Network

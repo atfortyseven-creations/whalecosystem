@@ -157,7 +157,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                 disabled={!saved}
                 className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Proceed to Terminal <MoveRight size={16} />
+                Proceed to Dashboard <MoveRight size={16} />
               </button>
             </motion.div>
           )}
@@ -181,7 +181,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                 onClick={() => onComplete(wallet.privateKey, wallet.address)}
                 className="w-full h-14 bg-emerald-500 text-white rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
               >
-                Enter Sovereign State
+                Enter Dashboard
               </button>
             </motion.div>
           )}

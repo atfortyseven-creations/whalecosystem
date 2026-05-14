@@ -190,19 +190,19 @@ export function SovereignFooter() {
             {/* ─── Clusters ─── */}
             <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 pt-4">
               <div className="flex flex-col gap-6">
-                <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/20">Protocol / Dev</span>
+                <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/20">Network</span>
                 <div className="flex flex-col gap-3">
                   {LEGAL_LINKS.map(l => (
-                    <FooterLink key={l.label} href={l.href}>{l.label}</FooterLink>
+                    <FooterLink key={l.label} href={l.href} external={true}>{l.label}</FooterLink>
                   ))}
                 </div>
               </div>
 
               <div className="flex flex-col gap-6">
-                <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/20">Operational</span>
+                <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/20">Platform</span>
                 <div className="flex flex-col gap-3">
                   {CORE_LINKS.map(l => (
-                    <FooterLink key={l.label} href={l.href}>{l.label}</FooterLink>
+                    <FooterLink key={l.label} href={l.href} external={true}>{l.label}</FooterLink>
                   ))}
                 </div>
               </div>
@@ -211,7 +211,7 @@ export function SovereignFooter() {
                 <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/20">Academy</span>
                 <div className="flex flex-col gap-3">
                   {COMMUNITY_LINKS.map(l => (
-                    <FooterLink key={l.label} href={l.href}>{l.label}</FooterLink>
+                    <FooterLink key={l.label} href={l.href} external={true}>{l.label}</FooterLink>
                   ))}
                 </div>
               </div>
@@ -220,7 +220,7 @@ export function SovereignFooter() {
                 <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/20">Careers</span>
                 <div className="flex flex-col gap-3">
                   {INTEL_LINKS.map(l => (
-                    <FooterLink key={l.label} href={l.href}>{l.label}</FooterLink>
+                    <FooterLink key={l.label} href={l.href} external={true}>{l.label}</FooterLink>
                   ))}
                 </div>
               </div>

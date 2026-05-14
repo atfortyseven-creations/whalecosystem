@@ -36,11 +36,11 @@ function ForumHomeContent() {
   }, [filter]);
 
   return (
-    <div className="w-full min-h-screen bg-[#FAFAF8] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#FAFAF8] selection:bg-[#0044CC]/20 py-20 px-6 font-sans relative transition-colors duration-300 overflow-x-hidden">
+    <div className="w-full min-h-screen bg-transparent dark:bg-transparent text-[#0A0A0A] dark:text-[#FAFAF8] selection:bg-[#0044CC]/20 py-20 px-6 font-sans relative transition-colors duration-300 overflow-x-hidden">
       
       <div className="max-w-[1200px] mx-auto mb-20">
         {/* ── ACADEMIC WELCOME HERO ── */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white dark:bg-[#111] rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-10 md:p-20 flex flex-col items-start justify-center overflow-hidden relative">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white/40 backdrop-blur-3xl dark:bg-[#111]/40 rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-10 md:p-20 flex flex-col items-start justify-center overflow-hidden relative">
             <div className="w-full max-w-3xl relative z-10 space-y-6 md:space-y-8 text-left">
                 
                 <h2 className="text-[40px] md:text-[64px] lg:text-[72px] font-black uppercase text-[#0A0A0A] dark:text-white leading-[1] md:leading-[0.95] tracking-tighter">
@@ -50,7 +50,7 @@ function ForumHomeContent() {
                     Presenting FORUM P2P by Humanity Ledger
                 </p>
                 <p className="font-serif text-[16px] md:text-[20px] text-slate-500 leading-relaxed max-w-2xl font-medium">
-                    A secure perimeter for institutional discourse. All interactions are cryptographically signed, ensuring absolute authenticity. This eliminates the noise of public networks and fosters a highly focused, academic environment strictly for authenticated participants.
+                    A secure perimeter for professional discourse. All interactions are cryptographically signed, ensuring absolute authenticity. This eliminates the noise of public networks and fosters a highly focused, academic environment strictly for authenticated participants.
                 </p>
             </div>
             

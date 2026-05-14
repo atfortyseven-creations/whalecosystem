@@ -88,17 +88,16 @@ export default function DocsPage() {
             </div>
             
             <h1 className="text-[48px] md:text-[64px] font-black tracking-tighter uppercase leading-[0.95] mb-6">
-                Institutional <br />
+                Professional <br />
                 <span className="text-[#0044CC] dark:text-[#4d88ff]">Documentation.</span>
             </h1>
             
             <p className="text-[16px] leading-relaxed font-serif opacity-70 max-w-lg">
-                Everything you need to integrate, operate, and build atop the Sovereign Protocol. Architected for quantitative teams requiring absolute mathematical precision.
+                Everything you need to integrate, operate, and build atop the Network Core. Architected for quantitative teams requiring absolute mathematical precision.
             </p>
         </motion.div>
 
-        {/* Right Side: High-Vis Lottie Bento */}
-        <motion.div variants={FADE_UP} className="w-full lg:w-1/2 aspect-square max-h-[400px] bg-[#FAFAF8] dark:bg-[#111] rounded-[2.5rem] border border-black/5 dark:border-white/5 flex items-center justify-center p-8 shadow-sm">
+        <motion.div variants={FADE_UP} className="w-full lg:w-1/2 aspect-square max-h-[400px] bg-white/40 backdrop-blur-3xl dark:bg-[#111]/40 rounded-[2.5rem] border border-black/5 dark:border-white/5 flex items-center justify-center p-8 shadow-sm">
             <RemoteLottie path="DeeWork About Blockchain.json" className="scale-125" />
         </motion.div>
 
@@ -112,7 +111,7 @@ export default function DocsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {QUICK.map((q, i) => (
             <Link key={i} href={q.href}
-              className="flex items-center justify-between p-6 rounded-2xl bg-[#FAFAF8] dark:bg-[#111] border border-black/5 dark:border-white/5 hover:border-[#0044CC]/30 dark:hover:border-[#4d88ff]/30 transition-all group shadow-sm hover:shadow-md">
+              className="flex items-center justify-between p-6 rounded-2xl bg-white/40 backdrop-blur-3xl dark:bg-[#111]/40 border border-black/5 dark:border-white/5 hover:border-[#0044CC]/30 dark:hover:border-[#4d88ff]/30 transition-all group shadow-sm hover:shadow-md">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#222] border border-black/5 dark:border-white/5 flex items-center justify-center text-[#0044CC] dark:text-[#4d88ff]">
                     {q.icon}
@@ -137,7 +136,7 @@ export default function DocsPage() {
         </p>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
           {CARDS.map((card, i) => (
-            <div key={i} className="p-10 rounded-[2rem] bg-[#FAFAF8] dark:bg-[#111] border border-black/5 dark:border-white/5 hover:shadow-xl transition-all duration-300 flex flex-col gap-6 group">
+            <div key={i} className="p-10 rounded-[2rem] bg-white/40 backdrop-blur-3xl dark:bg-[#111]/40 border border-black/5 dark:border-white/5 hover:shadow-xl transition-all duration-300 flex flex-col gap-6 group">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-white dark:bg-[#222] border border-black/5 dark:border-white/5 flex items-center justify-center text-[#0044CC] dark:text-[#4d88ff] shadow-sm">
@@ -171,7 +170,7 @@ export default function DocsPage() {
       <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="border-t border-black/10 dark:border-white/10 pt-16 pb-24 grid grid-cols-1 sm:grid-cols-3 gap-12 text-center">
         {[
           { value: '14+', label: 'Networks Supported' },
-          { value: 'v3.0', label: 'Sovereign Engine' },
+          { value: 'v3.0', label: 'Core Engine' },
           { value: '< 100ms', label: 'Telemetry Latency' },
         ].map((s, i) => (
           <div key={i} className="flex flex-col items-center gap-2">

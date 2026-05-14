@@ -26,7 +26,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ i
   }
 
   return (
-    <div className="relative min-h-screen bg-[#FAFAF8] text-[#0a0a0a] selection:bg-black/10 font-sans antialiased overflow-x-hidden">
+    <div className="relative min-h-screen bg-transparent text-[#0a0a0a] selection:bg-black/10 font-sans antialiased overflow-x-hidden">
       
       {/* ── Ambient Background Texture ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden flex justify-center z-0">

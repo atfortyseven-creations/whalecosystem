@@ -42,19 +42,19 @@ function MegaMenuItem({ item }: { item: any }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-[100%] left-0 w-[240px] bg-white border border-black/10 shadow-2xl z-50 p-1 rounded-sm mt-1"
+            className="absolute top-[100%] left-0 w-[240px] bg-white/40 backdrop-blur-3xl border border-black/10 shadow-2xl z-50 p-1 rounded-sm mt-1"
           >
             {item.subItems ? (
               <div className="flex flex-col">
                 {item.subItems.map((sub: any, idx: number) => (
-                  <Link key={idx} href={sub.href} className="flex flex-col p-3 hover:bg-black/5 transition-colors rounded-sm">
+                  <Link key={idx} href={sub.href} target="_blank" rel="noopener noreferrer" className="flex flex-col p-3 hover:bg-black/5 transition-colors rounded-sm">
                     <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">{sub.label}</span>
                     <span className="font-sans text-[11px] text-[#555] leading-tight mt-1 opacity-80">{sub.description}</span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <Link href={item.href} className="block p-3 hover:bg-black/5 transition-colors rounded-sm">
+              <Link href={item.href} target="_blank" rel="noopener noreferrer" className="block p-3 hover:bg-black/5 transition-colors rounded-sm">
                 <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] block mb-1">{item.label}</span>
                 <span className="font-sans text-[11px] text-[#555] leading-tight opacity-80">{item.description}</span>
               </Link>
@@ -71,8 +71,8 @@ export function InstitutionalHeader() {
 
     return (
         <header
-            className="relative flex items-center justify-between px-6 lg:px-10 w-full border-b sticky top-0 z-[100] transition-colors duration-300 shadow-sm"
-            style={{ minHeight: '68px', backgroundColor: '#FAF9F6', borderColor: 'rgba(5,5,5,0.08)' }}
+            className="relative flex items-center justify-between px-6 lg:px-10 w-full border-b sticky top-0 z-[100] transition-colors duration-300 shadow-sm bg-white/40 backdrop-blur-3xl"
+            style={{ minHeight: '68px', borderColor: 'rgba(5,5,5,0.08)' }}
         >
             {/* Paper grain texture overlay */}
             <div className="absolute inset-0 opacity-[0.035] pointer-events-none noise-bg" />
@@ -138,8 +138,8 @@ export function InstitutionalHeader() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 right-0 z-[90] p-6 shadow-2xl"
-                        style={{ backgroundColor: '#FAF9F6', borderBottom: '1px solid rgba(5,5,5,0.08)' }}
+                        className="absolute top-full left-0 right-0 z-[90] p-6 shadow-2xl bg-white/40 backdrop-blur-3xl"
+                        style={{ borderBottom: '1px solid rgba(5,5,5,0.08)' }}
                     >
                         <div className="flex flex-col items-center w-full pt-2">
                             <div className="w-full flex flex-col gap-2 mb-6 pb-6 border-b border-black/10">

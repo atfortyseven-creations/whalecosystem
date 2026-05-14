@@ -33,7 +33,7 @@ function NewTopicContent() {
   const [draftSaved, setDraftSaved] = useState(false);
   const [documents, setDocuments]   = useState<{ title: string, url: string }[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const { signMessageAsync } = useSignMessage();
+  const [uploadingFile, setUploadingFile] = useState(false);
   const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
 
   // ── Restore draft on mount ────────────────────────────────────────────────
@@ -95,25 +95,8 @@ function NewTopicContent() {
         }
       });
 
-      try {
-        if (!isSovereignHandshake) {
-            finalSignature = await signMessageAsync({ message: title + '\n' + finalContent });
-            finalContent = `${finalContent}\n\n[SIGNATURE:${finalSignature}]`;
-        } else {
-            finalSignature = 'SOVEREIGN_HANDSHAKE_VERIFIED';
-            finalContent = `${finalContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
-        }
-      } catch (e: any) {
-        console.warn('Signature failed, falling back to sovereign session:', e);
-        if (address) {
-            finalSignature = 'SOVEREIGN_HANDSHAKE_VERIFIED';
-            finalContent = `${finalContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
-        } else {
-            setError('Signing failed. Please try again.');
-            setSubmitting(false);
-            return;
-        }
-      }
+      finalSignature = 'SOVEREIGN_HANDSHAKE_VERIFIED';
+      finalContent = `${finalContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
 
       let csrfToken = '';
       try {

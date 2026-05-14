@@ -13,7 +13,7 @@ const FADE_UP: any = {
 
 export default function TermsPage() {
     return (
-        <div className="w-full overflow-x-hidden font-sans selection:bg-[#0044CC]/20" style={{ backgroundColor: "#FAFAF8", color: "#0A0A0A", minHeight: "100vh" }}>
+        <div className="w-full overflow-x-hidden font-sans selection:bg-[#0044CC]/20" style={{ color: "#0A0A0A", minHeight: "100vh" }}>
             
             {/* ── HERO & BENTO BOX ── */}
             <div className="w-full max-w-[1400px] mx-auto pt-32 pb-24 px-6 lg:px-12 flex flex-col items-center">
@@ -40,8 +40,8 @@ export default function TermsPage() {
                 <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-[1200px] mx-auto mb-32">
                     
                     {/* Bento 1 */}
-                    <div className="bg-white border border-black/5 p-10 rounded-[2.5rem] shadow-sm flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
-                        <div className="w-full h-[180px] bg-[#FAFAF8] rounded-3xl border border-black/5 mb-8 flex items-center justify-center overflow-hidden">
+                    <div className="bg-white/40 backdrop-blur-3xl border border-black/5 p-10 rounded-[2.5rem] shadow-sm flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
+                        <div className="w-full h-[180px] bg-white/40 backdrop-blur-3xl rounded-3xl border border-black/5 mb-8 flex items-center justify-center overflow-hidden">
                             <RemoteLottie path="File Loading.json" className="scale-125 transition-transform duration-700 group-hover:scale-150" />
                         </div>
                         <div>
@@ -58,8 +58,8 @@ export default function TermsPage() {
                     </div>
 
                     {/* Bento 2 */}
-                    <div className="bg-white border border-black/5 p-10 rounded-[2.5rem] shadow-sm flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
-                        <div className="w-full h-[180px] bg-[#FAFAF8] rounded-3xl border border-black/5 mb-8 flex items-center justify-center overflow-hidden">
+                    <div className="bg-white/40 backdrop-blur-3xl border border-black/5 p-10 rounded-[2.5rem] shadow-sm flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
+                        <div className="w-full h-[180px] bg-white/40 backdrop-blur-3xl rounded-3xl border border-black/5 mb-8 flex items-center justify-center overflow-hidden">
                             <RemoteLottie path="Business Analysis.json" className="scale-[1.6] transition-transform duration-700 group-hover:scale-[1.8]" />
                         </div>
                         <div>

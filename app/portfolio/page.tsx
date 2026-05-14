@@ -21,11 +21,11 @@ import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 // ── Palette ──────────────────────────────────────────────────────────────────
-const BG   = "#FAF9F6";
+const BG   = "transparent";
 const INK  = "#050505";
 const MUTED = "rgba(5,5,5,0.45)";
 const BORDER = "rgba(5,5,5,0.08)";
-const CARD  = "#FFFFFF";
+const CARD  = "rgba(255, 255, 255, 0.4)";
 
 // ── Chain color map ──────────────────────────────────────────────────────────
 const CHAIN_COLORS: Record<string, string> = {
@@ -317,7 +317,7 @@ export default function PortfolioPage() {
 
         {/* ── EMPTY STATE / WELCOME HERO (NESTR STYLE) ── */}
         {!userAddress && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-[#FAFAF8] rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 mb-10 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 mb-10 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
                 <div className="w-full lg:w-1/2 relative z-10 space-y-6 md:space-y-8">
                     <div className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm">
                         <Activity size={14} className="text-[#0044CC]" />
@@ -326,13 +326,13 @@ export default function PortfolioPage() {
                         Track liquidity. <br /><span className="text-[#0044CC]">Zero noise.</span>
                     </h2>
                     <p className="font-serif text-[16px] md:text-[18px] text-slate-500 leading-relaxed">
-                        Connect your wallet to instantiate the Sovereign Dashboard. Our heuristic engine will map your holdings across 14 networks instantly, computing your exposure profile and aggregating stablecoin dominance.
+                        Connect your wallet to instantiate the Dashboard. Our heuristic engine will map your holdings across 14 networks instantly, computing your exposure profile and aggregating stablecoin dominance.
                     </p>
                     <button onClick={() => openAppKit()} className="px-8 py-4 bg-[#0A0A0A] text-white rounded-xl font-mono text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/80 transition-colors shadow-lg flex items-center justify-center gap-3 w-full sm:w-auto">
-                        Connect Terminal <ArrowUpRight size={16} />
+                        Connect Dashboard <ArrowUpRight size={16} />
                     </button>
                 </div>
-                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white rounded-3xl border border-black/5 shadow-sm p-6 overflow-hidden">
+                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-3xl border border-black/5 shadow-sm p-6 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent z-10 hidden lg:block" />
                     <RemoteLottie path="Isometric data analysis.json" className="scale-125 w-full h-full object-contain" />
                 </div>
@@ -343,7 +343,7 @@ export default function PortfolioPage() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl border overflow-hidden"
+          className="rounded-3xl border overflow-hidden backdrop-blur-3xl"
           style={{ borderColor: BORDER, background: CARD }}
         >
           <div className="p-8">
@@ -425,7 +425,7 @@ export default function PortfolioPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="rounded-3xl border overflow-hidden"
+              className="rounded-3xl border overflow-hidden backdrop-blur-3xl"
               style={{ borderColor: BORDER, background: CARD }}
             >
               <div className="px-6 py-5 border-b flex items-center justify-between" style={{ borderColor: BORDER }}>
@@ -485,7 +485,7 @@ export default function PortfolioPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="rounded-3xl border overflow-hidden"
+              className="rounded-3xl border overflow-hidden backdrop-blur-3xl"
               style={{ borderColor: BORDER, background: CARD }}
             >
               <div className="px-6 py-5 border-b flex items-center justify-between" style={{ borderColor: BORDER }}>
@@ -557,7 +557,7 @@ export default function PortfolioPage() {
                     </div>
 
                     <p className="mt-5 text-[9px] font-mono uppercase tracking-widest text-center" style={{ color: MUTED }}>
-                      Non-custodial · Institutional Grade · Zero server access
+                      Non-custodial · Professional Grade · Zero server access
                     </p>
                   </>
                 )}
@@ -571,7 +571,7 @@ export default function PortfolioPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="rounded-3xl border overflow-hidden"
+          className="rounded-3xl border overflow-hidden backdrop-blur-3xl"
           style={{ borderColor: BORDER, background: "transparent" }}
         >
           {/* Header */}
@@ -651,7 +651,7 @@ export default function PortfolioPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.22 }}
-            className="rounded-3xl border overflow-hidden"
+            className="rounded-3xl border overflow-hidden backdrop-blur-3xl"
             style={{ borderColor: BORDER, background: CARD }}
           >
             <div className="px-6 py-5 border-b flex items-center gap-3" style={{ borderColor: BORDER }}>
@@ -698,7 +698,7 @@ export default function PortfolioPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.24 }}
-            className="rounded-3xl border overflow-hidden"
+            className="rounded-3xl border overflow-hidden backdrop-blur-3xl"
             style={{ borderColor: BORDER, background: CARD }}
           >
             <div className="px-6 py-5 border-b flex items-center gap-3" style={{ borderColor: BORDER }}>

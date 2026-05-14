@@ -140,11 +140,11 @@ export function AcademyInteractiveEngine({
                     </div>
                     
                     <h1 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-[0.95]">
-                        Sovereign <br /><span className="text-[#0044CC]">Curriculum.</span>
+                        Network <br /><span className="text-[#0044CC]">Curriculum.</span>
                     </h1>
                     
                     <p className="font-serif text-[16px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                        Institutional pedagogy with deterministic auditing. Every interactive module transmits telemetry towards the immutable tables of your academic profile. Proof of Work required.
+                        Professional pedagogy with deterministic auditing. Every interactive module transmits telemetry towards the immutable tables of your academic profile. Proof of Work required.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-4">

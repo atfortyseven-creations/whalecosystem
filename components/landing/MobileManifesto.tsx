@@ -82,7 +82,7 @@ export function MobileManifesto() {
   }, []);
 
   return (
-    <div className="relative bg-[#FAFAF8] text-[#0A0A0A] font-sans antialiased overflow-x-hidden min-h-screen selection:bg-black/10">
+    <div className="relative bg-transparent text-[#0A0A0A] font-sans antialiased overflow-x-hidden min-h-screen selection:bg-black/10">
 
       {/* ── 1. HERO ───────────────────────────────────────────────────────────── */}
       <section className="px-6 pb-16 pt-safe border-b border-black/5 bg-white relative overflow-hidden" style={{ paddingTop: "max(6rem, env(safe-area-inset-top, 6rem))" }}>
@@ -182,7 +182,7 @@ export function MobileManifesto() {
       </section>
 
       {/* ── 3. MANIFESTO (CLEAN TEXT) ─────────────────────────────────────────── */}
-      <section className="px-6 py-20 border-b border-black/5 bg-[#FAFAF8]">
+      <section className="px-6 py-20 border-b border-black/5 bg-transparent">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP}>
           <div className="space-y-6 font-serif text-[17px] text-[#0A0A0A] leading-[1.8] font-medium">
             <p>
