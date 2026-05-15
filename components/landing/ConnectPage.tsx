@@ -273,12 +273,9 @@ export default function ConnectPage() {
   useEffect(() => {
     if (!mounted) return;
 
-    if (isLinked) {
-      setPendingId(null);
-      // Immediate redirect for production-grade speed
-      window.location.replace("/dashboard");
-      return;
-    }
+    // NOTE: We intentionally do NOT auto-redirect when isLinked is true on mount.
+    // That was causing the page to skip the landing page on every reload.
+    // Redirect to /dashboard only happens below, after a FRESH wallet signature.
 
     if (!isConnected || !address) return;
     try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
@@ -306,10 +303,15 @@ export default function ConnectPage() {
       ].join('\n');
 
       let signaturePromise;
+      let isFreshSign = false;
       const cachedSignature = localStorage.getItem(`sovereign_sig_${norm}`);
       if (cachedSignature) {
+        // Cached signature — this is a silent reload reconnect, not a fresh user sign
         signaturePromise = Promise.resolve(cachedSignature);
+        isFreshSign = false;
       } else {
+        // User explicitly signing — fresh handshake
+        isFreshSign = true;
         signaturePromise = signMessageAsync({ message }).then(sig => {
            localStorage.setItem(`sovereign_sig_${norm}`, sig);
            return sig;
@@ -337,8 +339,14 @@ export default function ConnectPage() {
           setLinked(true);
           setIsSigning(false);
           
-          // ── Instant Redirect (No manual reload required) ──
-          window.location.replace("/dashboard");
+          // ── Smart Redirect ──
+          // Fresh sign (user explicitly connected) → go to dashboard
+          // Cached sign (page reload / auto-reconnect) → go to landing page
+          if (isFreshSign) {
+            window.location.replace("/dashboard");
+          } else {
+            window.location.replace("/");
+          }
         })
         .catch((err) => {
           console.error("Handshake failed", err);
@@ -366,7 +374,7 @@ export default function ConnectPage() {
   }, [openAppKit]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-mono overflow-auto bg-[#FDFCF8] text-[#050505] selection:bg-[#050505] selection:text-white relative">
+    <div className="min-h-screen w-full flex flex-col font-mono overflow-auto bg-[#FDFCF8] text-[#050505] selection:bg-[#050505] selection:text-white relative" style={{ position: 'relative' }}>
       
       {/* ── Immersive Light Mode Architectural Background ── */}
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
@@ -377,7 +385,7 @@ export default function ConnectPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#FDFCF8_100%)] z-10 opacity-80" />
       </div>
 
-      <main className="flex-1 relative z-10 flex flex-col justify-center items-center px-4 py-10 sm:p-8 lg:p-12 min-h-0">
+      <main className="flex-1 relative z-10 flex flex-col justify-center items-center px-4 py-10 sm:p-8 lg:p-12 min-h-0" style={{ minHeight: '100dvh' }}>
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}

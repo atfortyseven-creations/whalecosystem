@@ -34,9 +34,27 @@ function RealDeviceRouter() {
     // session, so we MUST stay on this page to let MobileLanding handle the sync.
     const urlParams = new URLSearchParams(window.location.search);
     const hasUuid = urlParams.has('uuid');
-    
-    const isAlreadyLinked = document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
+
+    // ── Session detection: check both cookie AND localStorage ──────────────
+    // The cookie (sovereign_handshake) expires in 7 days.
+    // The localStorage session (sovereign_session_v2) lasts 30 days.
+    // If either is valid → user is already authenticated → go to landing page.
+    const hasCookie = document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
+
+    let hasLocalSession = false;
+    try {
+      const stored = localStorage.getItem('sovereign_session_v2');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        hasLocalSession = !!(parsed?.exp && parsed.exp > Date.now());
+      }
+    } catch {}
+
+    const isAlreadyLinked = hasCookie || hasLocalSession;
     if (isAlreadyLinked && !hasUuid) {
+      // Redirect to the 'next' param if present, otherwise the landing page.
+      // IMPORTANT: goes to '/' (landing page), NOT '/dashboard', so the user
+      // is always in control of when to enter the terminal.
       const next = urlParams.get('next') || '/';
       window.location.replace(next);
       return;

@@ -169,17 +169,16 @@ export function SovereignFooter() {
   };
 
   return (
-    <footer className="relative w-full overflow-hidden bg-black/30 backdrop-blur-2xl border-t border-white/5 flex flex-col items-center">
+    <footer className="relative w-full bg-[#060606] border-t border-white/5 flex flex-col items-center">
 
       {/* ═══ Wave Banner ═══════════════════════════════════════════════════ */}
-      <div className="w-full relative z-10 border-t border-black/8">
+      <div className="w-full relative" style={{ height: isMobile ? '260px' : '380px' }}>
         <div
           ref={containerRef}
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="relative w-full overflow-hidden bg-transparent group"
-          style={{ height: isMobile ? "260px" : "380px" }}
+          className="absolute inset-0 overflow-hidden bg-transparent group"
         >
           {/* Wave image — natural scale, anchored to bottom */}
           <Image
@@ -214,20 +213,20 @@ export function SovereignFooter() {
                   translateX: "-50%", translateY: "-50%",
                   width: 20, height: 20,
                   opacity: isHovered ? 1 : 0,
-                  border: "1px solid rgba(0,0,0,0.25)",
+                  border: "1px solid rgba(255,255,255,0.4)",
                   borderRadius: "50%",
                   transition: "opacity 0.3s",
                 }}
                 animate={{ scale: isHovered ? [1, 1.2, 1] : 1 }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
-                <div className="w-1.5 h-1.5 bg-black rounded-full" />
+                <div className="w-1.5 h-1.5 bg-white rounded-full" />
               </motion.div>
             </>
           )}
 
-          {/* Fog fade from bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/40 via-black/20 to-transparent pointer-events-none z-10" />
+          {/* Gradient fade into the dark footer body below */}
+          <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#060606] via-[#060606]/60 to-transparent pointer-events-none z-10" />
         </div>
       </div>
 
