@@ -90,7 +90,7 @@ export function AztecArchitectureSection() {
       className="w-full bg-[#FAFAF8] border-t border-black/8"
       aria-label="Institutional Security Architecture"
     >
-      <div className="w-full max-w-[2560px] mx-auto px-5 sm:px-8 py-24 flex flex-col gap-16 items-start">
+      <div className="w-full max-w-[2560px] mx-auto px-5 sm:px-8 py-24 flex flex-col gap-16 items-center">
 
         {/* ── Section Header ── */}
         <div className="w-full max-w-[850px] flex flex-col gap-6 text-left">

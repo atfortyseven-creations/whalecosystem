@@ -80,7 +80,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       </header>
 
       {/* ── BODY ── */}
-      <div className="flex max-w-[1800px] mx-auto">
+      <div className="flex w-full max-w-[2560px] mx-auto">
 
         {/* Left sidebar */}
         <Sidebar theme="dark" currentPath={pathname || ''} />

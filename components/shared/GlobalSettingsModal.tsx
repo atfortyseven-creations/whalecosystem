@@ -31,7 +31,7 @@ export function GlobalSettingsModal() {
                     <motion.div
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         onClick={() => setSettingsOpen(false)}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99998]"
                     />
 
                     <motion.div
@@ -39,7 +39,7 @@ export function GlobalSettingsModal() {
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}
                         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="fixed inset-0 m-auto h-[85vh] w-[95vw] max-w-6xl bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 z-[101] shadow-2xl rounded-[32px] flex flex-col overflow-hidden transition-colors duration-300"
+                        className="fixed inset-0 m-auto h-[85vh] w-[95vw] max-w-6xl bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 z-[99999] shadow-2xl rounded-[32px] flex flex-col overflow-hidden transition-colors duration-300"
                     >
                         <div className="flex items-center justify-between px-6 py-4 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#111111]">
                              <div className="flex items-center gap-3">

@@ -537,7 +537,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
                 {/* Only renders on real mobile hardware (screen.width < 1024).  */}
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
-                <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} h-16 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] items-center justify-around px-1 shrink-0 z-50 transition-colors`} style={{ minHeight: '64px', maxHeight: '64px' }}>
+                <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                      {[
                         { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Markets' },
                         { id: 'newpairs',    icon: <PlusCircle size={18} />,    label: 'Listings' },
@@ -549,7 +549,11 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         return (
                             <button
                                 key={tab.id}
-                                onClick={() => tab.id === 'menu' ? setIsPaletteOpen(true) : handleTabChange(tab.id)}
+                                onClick={() => {
+                                    if (tab.id === 'menu') setIsPaletteOpen(true);
+                                    else if (tab.id === 'chat') router.push('/chat');
+                                    else handleTabChange(tab.id);
+                                }}
                                 style={{ minHeight: 0, minWidth: 0 }}
                                 className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors ${
                                     isActive ? 'text-black dark:text-white' : 'text-[#888888] hover:text-black dark:hover:text-white'

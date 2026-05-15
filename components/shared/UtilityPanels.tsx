@@ -53,7 +53,7 @@ export function UtilityPanels() {
     const panels = {
         notifications: (
             <div className="space-y-4">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-6 pr-12">
                     <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[#050505]">Log Session</h3>
                     <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${sessionsLoading ? 'bg-black/20' : 'bg-black animate-pulse shadow-sm'}`} />
@@ -122,7 +122,7 @@ export function UtilityPanels() {
         ),
         history: (
             <div className="space-y-4">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-6 pr-12">
                     <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[#050505]">Global Ledger</h3>
                     <div className="flex items-center gap-2">
                         {address && <span className="px-2 py-0.5 bg-black/5 text-black font-mono text-[9px] font-black rounded-sm border border-black/10 tracking-widest uppercase shadow-sm">Connected</span>}
@@ -171,7 +171,7 @@ export function UtilityPanels() {
         ),
         privacy: (
             <div className="space-y-6">
-                <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[#050505] flex items-center gap-2">
+                <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[#050505] flex items-center gap-2 pr-12">
                     <ShieldAlert size={16} /> UI Privacy Settings
                 </h3>
                 
@@ -210,7 +210,7 @@ export function UtilityPanels() {
         ),
         settings: (
             <div className="space-y-6">
-                <div className="flex items-center justify-between mb-4 pb-4 border-b border-black/5">
+                <div className="flex items-center justify-between mb-4 pb-4 border-b border-black/5 pr-12">
                     <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[#050505]">System Core</h3>
                     <Settings size={16} className="text-black/30 animate-spin-slow" />
                 </div>

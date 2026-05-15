@@ -2,23 +2,28 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
     try {
-        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr', {
+        // Using CoinCap to bypass Binance geo-blocking (HTTP 451) on US-hosted servers
+        const res = await fetch('https://api.coincap.io/v2/assets?limit=100', {
             next: { revalidate: 10 }, // Cache for 10 seconds
             headers: {
+                'Accept': 'application/json',
                 'User-Agent': 'Mozilla/5.0'
             }
         });
         
         if (!res.ok) {
-            throw new Error(`Binance API responded with status: ${res.status}`);
+            throw new Error(`Market Data API responded with status: ${res.status}`);
         }
         
-        const data = await res.json();
+        const json = await res.json();
         
-        // Return only USDT pairs with high volume to save bandwidth
-        const validData = data
-            .filter((d: any) => d.symbol.endsWith('USDT') && parseFloat(d.quoteVolume) > 10000000)
-            .slice(0, 100);
+        // Map to Binance payload structure so the client doesn't need to change
+        const validData = json.data.map((asset: any) => ({
+            symbol: `${asset.symbol}USDT`,
+            lastPrice: asset.priceUsd || "0",
+            priceChangePercent: asset.changePercent24Hr || "0",
+            quoteVolume: asset.volumeUsd24Hr || "0"
+        }));
             
         return NextResponse.json(validData);
     } catch (error) {

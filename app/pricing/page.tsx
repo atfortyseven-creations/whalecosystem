@@ -102,14 +102,11 @@ export default function PricingPage() {
               initial="hidden" animate="visible" variants={FADE_UP}
               className="flex flex-col items-center gap-8"
             >
-              <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/70 backdrop-blur-md border border-white/60 rounded-full shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]">Network Access Plans</span>
-              </div>
+
 
               <h1 className="text-[64px] md:text-[100px] font-black uppercase tracking-tighter leading-[0.85] text-[#0a0a0a]">
-                Terminal<br />
-                <span className="text-black/30">Access.</span>
+                Whale Alert Network<br />
+                <span className="text-black/30">Donations.</span>
               </h1>
 
               <p className="text-[18px] md:text-[22px] font-serif text-slate-600 max-w-3xl leading-relaxed mt-4 mx-auto">
@@ -232,7 +229,7 @@ export default function PricingPage() {
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}
               variants={FADE_UP}
-              className="mb-16"
+              className="mb-16 flex flex-col items-center text-center"
             >
               <h2 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0a0a0a] mb-6 leading-none">
                 Professional <span className="text-black/30">Standards.</span>

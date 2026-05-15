@@ -102,7 +102,7 @@ export default function MobileChatPage() {
           </Link>
 
           <div className="flex items-center gap-2.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <img src="/official-whale-monochrome.png" alt="Whale" className="w-4 h-4 opacity-80" style={{ filter: 'invert(var(--dark-invert, 0))' }} />
             <span className="font-mono text-[11px] font-black uppercase tracking-[0.25em] text-[#050505] dark:text-white">Whale Chat</span>
           </div>
 

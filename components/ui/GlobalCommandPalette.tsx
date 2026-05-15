@@ -11,32 +11,29 @@ const PAGES = [
   // ── Overview ──
   { id: "gold",          label: "Ticket Mint",     group: "Overview",       icon: null },
   { id: "portfolio",     label: "Main Portfolio",  group: "Overview",       icon: null },
+  { id: "billing",       label: "Billing & Plan",  group: "Overview",       icon: null },
 
-  // ── Intelligence ──
-  { id: "market-data",   label: "Market Data",     group: "Intelligence",   icon: null },
-  { id: "markets",       label: "Pre-Execution Tracking",     group: "Intelligence",   icon: null },
-  { id: "newpairs",      label: "New Listings",    group: "Intelligence",   icon: null },
+  // ── Markets ──
+  { id: "markets",       label: "Top Markets",     group: "Markets",        icon: null },
+  { id: "newpairs",      label: "New Listings",    group: "Markets",        icon: null },
 
-  // ── On-Chain Intel ──
-  { id: "inst-ledger",   label: "Entity Resolution",    group: "On-Chain Intel", icon: null },
-  { id: "mass-transfer", label: "Mass Transfers",  group: "On-Chain Intel", icon: null },
-  { id: "omniexplorer",  label: "Block Explorer",  group: "On-Chain Intel", icon: null },
-  { id: "defi",          label: "DeFi Yields",     group: "On-Chain Intel", icon: null },
-  { id: "morpho",        label: "Morpho Base",     group: "On-Chain Intel", icon: null },
+  // ── On-Chain ──
+  { id: "inst-ledger",   label: "Whale Ledger",    group: "On-Chain Data",  icon: null },
+  { id: "mass-transfer", label: "Mass Transfers",  group: "On-Chain Data",  icon: null },
+  { id: "omniexplorer",  label: "Block Explorer",  group: "On-Chain Data",  icon: null },
 
-  // ── ZK Layer ──
-  { id: "zk",            label: "Cryptographic Integrity",  group: "ZK Layer",       icon: null },
-  { id: "zk-identity",   label: "KYC",    group: "ZK Layer",       icon: null },
+  // ── Network State ──
+  { id: "zk",            label: "Aztec Network",   group: "Network State",  icon: null },
 
   // ── Communications ──
   { id: "chat",          label: "Whale Chat",      group: "Communications", icon: null },
 
   // ── System ──
-  { id: "logs",          label: "Activity Logs",   group: "System",         icon: null },
+  { id: "logs",          label: "Session Logs",    group: "System",         icon: null },
   { id: "support",       label: "Support",         group: "System",         icon: null },
 ];
 
-const GROUPS = ["Overview", "Intelligence", "On-Chain Intel", "ZK Layer", "Communications", "System"];
+const GROUPS = ["Overview", "Markets", "On-Chain Data", "Network State", "Communications", "System"];
 
 export function GlobalCommandPalette({
   isOpen,
