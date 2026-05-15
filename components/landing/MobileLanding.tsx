@@ -342,7 +342,13 @@ function ConnectedScreen({
            <WhaleLogo className="h-16 w-auto" />
            <div className="flex flex-col items-center text-center">
              <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">Whale Alert Network</h1>
-             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2">Professional Platform</p>
+             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2 mb-4">Professional Platform</p>
+             <div className="flex items-center gap-2 px-3 py-1.5 bg-black/5 rounded-full border border-black/10 mt-2">
+                <MessageCircle size={14} className="text-black" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">
+                  Available now, Whale Chat !
+                </span>
+             </div>
            </div>
         </motion.div>
 

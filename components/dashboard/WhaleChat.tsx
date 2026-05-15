@@ -726,6 +726,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         // fire a stop_typing signal to flush it before the next polling cycle.
         stopTypingSignal();
 
+        playAudioPing('send');
         // Send to XMTP network (includes dm.sync() after send)
         await sendMessage(client, activePeer, content);
         // Fetch authoritative state immediately after send
@@ -765,6 +766,53 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       setSending(false);
     }
   };
+
+  const playAudioPing = (type: 'send' | 'receive') => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const makeNote = (freq: number, startTime: number, duration: number, volume: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(volume, startTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+
+      if (type === 'send') {
+        // Ascending two-tone send chime — clean, positive
+        makeNote(880, ctx.currentTime, 0.12, 0.08);
+        makeNote(1320, ctx.currentTime + 0.09, 0.14, 0.06);
+      } else {
+        // Descending three-tone receive notification — softer, distinct
+        makeNote(1046, ctx.currentTime, 0.1, 0.07);
+        makeNote(880, ctx.currentTime + 0.08, 0.1, 0.06);
+        makeNote(698, ctx.currentTime + 0.16, 0.15, 0.05);
+      }
+    } catch(e) {}
+  };
+
+  const [prevMsgCount, setPrevMsgCount] = useState<number>(0);
+  useEffect(() => {
+    if (messages.length > prevMsgCount && messages.length > 0) {
+        const lastMsg = messages[messages.length - 1];
+        const isMe = lastMsg.senderInboxId?.toLowerCase() === client?.inboxId?.toLowerCase();
+        // If it's a new message and I didn't send it, play receive ping
+        if (!isMe && prevMsgCount > 0) {
+            playAudioPing('receive');
+        }
+    }
+    setPrevMsgCount(messages.length);
+  }, [messages.length, client?.inboxId, prevMsgCount]);
 
   if (!isConnected) {
     return (
@@ -901,11 +949,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const shortAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
   return (
-    // ✔️ position:relative required for absolute scanner overlays
-    // h-full fills the parent (MobileChatPage flex-1 min-h-0), NO minHeight override
-    <div className="relative flex w-full h-full bg-white dark:bg-[#0A0A0A] overflow-hidden" style={{ borderRadius: isMobile ? 0 : '1rem', border: isMobile ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+    // Transparent container — wallpaper shows through via parent backdrop
+    <div className="relative flex w-full h-full overflow-hidden" style={{ borderRadius: isMobile ? 0 : '1rem', border: isMobile ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
       {/* ── Sidebar: Conversation List ── */}
-      <div className={`${showList ? 'flex' : 'hidden md:flex'} w-full md:w-72 flex-col border-r border-black/6 dark:border-white/5 bg-[#FAFAFA] dark:bg-[#111111]`}>
+      <div className={`${showList ? 'flex' : 'hidden md:flex'} w-full md:w-72 flex-col border-r border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/50 backdrop-blur-[40px]`}>
         <div className="p-4 border-b border-black/6 dark:border-white/5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -981,7 +1028,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       <div className={`${!showList ? 'flex' : 'hidden md:flex'} flex-1 flex-col min-w-0`}>
         {activePeer ? (
           <>
-            <div className="h-14 px-4 border-b border-black/6 dark:border-white/5 flex items-center justify-between bg-white dark:bg-[#111111] shrink-0">
+            <div className="h-12 px-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-white/50 dark:bg-black/50 backdrop-blur-[40px] shrink-0">
               <div className="flex items-center gap-3">
                 <button onClick={() => setShowList(true)} className="md:hidden p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-black/50 dark:text-white/50 text-[10px] font-black">
                   BACK
@@ -1004,7 +1051,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0 bg-[#FAFAFA] dark:bg-[#0A0A0A]">
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0 bg-white/30 dark:bg-black/30 backdrop-blur-sm">
               {(() => {
                 // Filter messages for the current active conversation only
                 const convId = `dm-${activePeer!.toLowerCase()}`;
@@ -1077,7 +1124,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             </div>
 
             <div
-              className="shrink-0 bg-white dark:bg-[#111111] border-t border-black/6 dark:border-white/5"
+              className="shrink-0 bg-white/60 dark:bg-black/60 backdrop-blur-[60px] border-t border-black/5 dark:border-white/5"
               style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
             >
               {/* ── Audio recording indicator ── */}
@@ -1127,7 +1174,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] relative overflow-hidden p-6">
+          <div className="flex-1 flex flex-col items-center justify-center bg-transparent relative overflow-hidden p-6">
             <div className="flex flex-col items-center gap-6 max-w-2xl text-center select-none relative z-10">
               
               <div className="w-24 h-24 mb-4 flex items-center justify-center bg-white dark:bg-[#1A1A1A] rounded-full border border-black/5 dark:border-white/5 shadow-sm">

@@ -27,6 +27,7 @@ export function OmniExplorer() {
     const [fallbackBlock, setFallbackBlock] = useState<bigint | null>(null);
 
     useEffect(() => {
+        let interval: NodeJS.Timeout;
         if (!wagmiClient) {
             import('viem').then(({ createPublicClient, http }) => {
                 const client = createPublicClient({
@@ -35,8 +36,12 @@ export function OmniExplorer() {
                 });
                 setFallbackClient(client);
                 client.getBlockNumber().then(setFallbackBlock);
+                interval = setInterval(() => {
+                    client.getBlockNumber().then(setFallbackBlock).catch(() => {});
+                }, 12000);
             });
         }
+        return () => clearInterval(interval);
     }, [wagmiClient]);
 
     const publicClient = wagmiClient || fallbackClient;

@@ -74,6 +74,9 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
               {n.label}
             </Link>
           ))}
+          <Link href="/forum/settings" className="shrink-0 text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
+            Forum Settings
+          </Link>
         </div>
       </div>
     </>

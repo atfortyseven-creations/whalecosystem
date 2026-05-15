@@ -37,8 +37,32 @@ interface SequencerBlock {
 }
 
 export default function AztecMempoolSpace() {
-    const publicClient = usePublicClient();
-    const { data: blockNumber } = useBlockNumber({ watch: true });
+    const wagmiClient = usePublicClient();
+    const { data: wagmiBlock } = useBlockNumber({ watch: true });
+
+    const [fallbackClient, setFallbackClient] = useState<any>(null);
+    const [fallbackBlock, setFallbackBlock] = useState<bigint | null>(null);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (!wagmiClient) {
+            import('viem').then(({ createPublicClient, http }) => {
+                const client = createPublicClient({
+                    chain: { id: 1, name: 'Ethereum', nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 }, rpcUrls: { default: { http: ['https://eth.llamarpc.com'] }, public: { http: ['https://eth.llamarpc.com'] } } } as any,
+                    transport: http()
+                });
+                setFallbackClient(client);
+                client.getBlockNumber().then(setFallbackBlock);
+                interval = setInterval(() => {
+                    client.getBlockNumber().then(setFallbackBlock).catch(() => {});
+                }, 12000);
+            });
+        }
+        return () => clearInterval(interval);
+    }, [wagmiClient]);
+
+    const publicClient = wagmiClient || fallbackClient;
+    const blockNumber = wagmiBlock || fallbackBlock;
 
     const [transactions, setTransactions] = useState<ZkTransaction[]>([]);
     const [blocks, setBlocks] = useState<SequencerBlock[]>([]);

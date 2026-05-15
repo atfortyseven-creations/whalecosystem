@@ -42,13 +42,13 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'markets',       label: 'Top Markets',    icon: null, dividerBefore: 'Markets', requiresZK: true },
     { id: 'newpairs',      label: 'New Listings',   icon: null, requiresZK: true },
 
-    // ── On-Chain Intel ────────────────────────────────────────────
+    // ── On-Chain Data ─────────────────────────────────────────────
     { id: 'inst-ledger',   label: 'Whale Ledger',   icon: null, dividerBefore: 'On-Chain', requiresZK: true },
     { id: 'mass-transfer', label: 'Mass Transfers', icon: null, requiresZK: true, minTier: 'STANDARD' },
     { id: 'omniexplorer',  label: 'Block Explorer', icon: null, requiresZK: true },
 
-    // ── ZK Layer ──────────────────────────────────────────────────
-    { id: 'zk',            label: 'Aztec Pipeline',  icon: null, dividerBefore: 'ZK Layer', requiresZK: true },
+    // ── Network State ─────────────────────────────────────────────
+    { id: 'zk',            label: 'Aztec Network',  icon: null, dividerBefore: 'Network State', requiresZK: true },
 
     // ── System ────────────────────────────────────────────────────
     { id: 'logs',          label: 'Session Logs',   icon: null, dividerBefore: 'System' },
@@ -56,7 +56,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
 ];
 
 const RESTRICTED_TABS = [
-    'mass-transfer', 'defi'
+    'mass-transfer'
 ];
 
 

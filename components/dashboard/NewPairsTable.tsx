@@ -28,7 +28,33 @@ export function NewPairsTable() {
     // INJECTED DATA HOOK
     // Enforcing strict on-chain reality. Waiting for endpoint assignment.
     // =========================================================================
-    const { data: rawData, isLoading: loading, error, refetch } = useMarketData('newPairs');
+    const [rawData, setRawData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const fetchRealPairs = React.useCallback(async () => {
+        try {
+            setLoading(true);
+            // Fetch real hot pairs from DexScreener
+            const res = await fetch('https://api.dexscreener.com/latest/dex/search?q=usd');
+            const data = await res.json();
+            setRawData(data);
+            setError(false);
+        } catch (err) {
+            console.error(err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        fetchRealPairs();
+        const interval = setInterval(fetchRealPairs, 15000); // 15 seconds
+        return () => clearInterval(interval);
+    }, [fetchRealPairs]);
+
+    const refetch = fetchRealPairs;
     const pairs = rawData?.pairs || [];
 
     const [search, setSearch]     = useState('');

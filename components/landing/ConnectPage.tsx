@@ -7,12 +7,12 @@ import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { useUIStore } from "@/lib/store/ui-store";
 import { toast } from "sonner";
+import { UniversalEliteWallpaper } from "@/components/shared/UniversalEliteWallpaper";
 
 import {
   ArrowRight,
   Loader2,
   Twitter,
-  Fingerprint,
   Github,
   CheckCircle,
   ExternalLink,
@@ -20,8 +20,8 @@ import {
   Monitor,
   ScanLine,
   Lock,
-  Cpu,
-  Activity
+  MessageCircle,
+  Shield
 } from "lucide-react";
 import { QRCodeSVG as QRCode } from "qrcode.react";
 
@@ -67,27 +67,27 @@ function WalletButton({
       transition={{ delay, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       onClick={loading ? undefined : onClick}
       disabled={loading}
-      className="group relative w-full flex items-center gap-4 p-5 rounded-[20px] transition-all duration-500 ease-[0.16,1,0.3,1] text-[#050505] disabled:opacity-50 disabled:cursor-not-allowed bg-white border border-[#E5E5E5] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 hover:border-black/20 overflow-hidden"
+      className="group relative w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 ease-[0.16,1,0.3,1] text-[#050505] dark:text-white disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 shadow-sm hover:shadow-md hover:-translate-y-0.5 overflow-hidden"
     >
-      <div className="absolute inset-0 bg-[#FAFAF8] translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
-      <div className="relative z-10 w-11 h-11 rounded-xl bg-white border border-[#E5E5E5] shadow-sm flex items-center justify-center p-2 group-hover:scale-105 group-hover:border-black/10 transition-all duration-500 shrink-0">
+      <div className="absolute inset-0 bg-[#FAFAF8] dark:bg-[#1A1A1A] translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
+      <div className="relative z-10 w-10 h-10 rounded-xl bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-white/10 shadow-sm flex items-center justify-center p-2 group-hover:scale-105 transition-all duration-500 shrink-0">
         <img src={logo} alt={name} className="w-full h-full object-contain filter group-hover:drop-shadow-md transition-all duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
       </div>
       <div className="relative z-10 flex-1 text-left min-w-0">
-        <p className="text-[13px] font-black uppercase tracking-widest truncate text-[#050505] group-hover:text-black transition-colors duration-300">
+        <p className="text-[12px] font-black uppercase tracking-widest truncate text-[#050505] dark:text-white transition-colors duration-300">
           {loading ? "Connecting…" : name}
         </p>
-        <p className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-[0.2em] mt-1 truncate group-hover:text-[#050505]/60 transition-colors duration-300">
+        <p className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] mt-0.5 truncate transition-colors duration-300">
           {badge}
         </p>
       </div>
       <div className="relative z-10">
         {loading ? (
-          <Loader2 size={16} className="animate-spin text-black shrink-0" />
+          <Loader2 size={16} className="animate-spin text-black dark:text-white shrink-0" />
         ) : extraIcon ? (
-          <span className="text-black/30 group-hover:text-black transition-colors duration-300 shrink-0">{extraIcon}</span>
+          <span className="text-black/30 dark:text-white/30 group-hover:text-black dark:group-hover:text-white transition-colors duration-300 shrink-0">{extraIcon}</span>
         ) : (
-          <ArrowRight size={16} className="text-black/30 group-hover:text-black group-hover:translate-x-1 transition-all duration-300 shrink-0" />
+          <ArrowRight size={16} className="text-black/30 dark:text-white/30 group-hover:text-black dark:group-hover:text-white group-hover:translate-x-1 transition-all duration-300 shrink-0" />
         )}
       </div>
     </motion.button>
@@ -203,8 +203,6 @@ export default function ConnectPage() {
                 const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, isECDHFlag);
 
                 // ── [EXPERT-SYNC] Push Identity & Vault to Mobile ─────────────────
-                // We push both the XMTP seed and the Sovereign Vault (if they exist)
-                // to allow the mobile device to operate with zero signatures.
                 const addressToUse = jwt ? address : (isConnected ? address : null);
                 if (addressToUse) {
                   const seedKey = `whale_chat_seed_${addressToUse.toLowerCase()}`;
@@ -213,7 +211,6 @@ export default function ConnectPage() {
                   const localVault = localStorage.getItem(VAULT_KEY);
 
                   if (localSeed || localVault) {
-                    console.log("[Sovereign:Sync] Pushing identity & vault to mobile...");
                     const { encryptAESGCM } = await import('@/lib/web-crypto');
                     
                     const syncPayload = {
@@ -255,9 +252,7 @@ export default function ConnectPage() {
           if (!jwt) { setSyncStatus("ERROR"); return; }
           
           // [KYC-SYNC-WAIT]
-          // We wait for kycVerified to be true in the session data before final redirection.
           if (!data.kycVerified) {
-            console.log("[Sovereign:Sync] Wallet synced. Awaiting biometric attestation...");
             return;
           }
 
@@ -273,16 +268,11 @@ export default function ConnectPage() {
   useEffect(() => {
     if (!mounted) return;
 
-    // NOTE: We intentionally do NOT auto-redirect when isLinked is true on mount.
-    // That was causing the page to skip the landing page on every reload.
-    // Redirect to /dashboard only happens below, after a FRESH wallet signature.
-
     if (!isConnected || !address) return;
     try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
 
-    // Enforce cryptographic handshake on desktop to match mobile and derive seed
+    // Enforce cryptographic handshake on desktop
     if (!isSigning) {
-      console.log("[Sovereign] Initiating desktop handshake...");
       setIsSigning(true);
       const norm = address.toLowerCase();
       const message = [
@@ -306,11 +296,9 @@ export default function ConnectPage() {
       let isFreshSign = false;
       const cachedSignature = localStorage.getItem(`sovereign_sig_${norm}`);
       if (cachedSignature) {
-        // Cached signature — this is a silent reload reconnect, not a fresh user sign
         signaturePromise = Promise.resolve(cachedSignature);
         isFreshSign = false;
       } else {
-        // User explicitly signing — fresh handshake
         isFreshSign = true;
         signaturePromise = signMessageAsync({ message }).then(sig => {
            localStorage.setItem(`sovereign_sig_${norm}`, sig);
@@ -339,9 +327,6 @@ export default function ConnectPage() {
           setLinked(true);
           setIsSigning(false);
           
-          // ── Smart Redirect ──
-          // Fresh sign (user explicitly connected) → go to dashboard
-          // Cached sign (page reload / auto-reconnect) → go to landing page
           if (isFreshSign) {
             window.location.replace("/dashboard");
           } else {
@@ -374,119 +359,67 @@ export default function ConnectPage() {
   }, [openAppKit]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-mono overflow-auto bg-[#FDFCF8] text-[#050505] selection:bg-[#050505] selection:text-white relative" style={{ position: 'relative' }}>
-      
-      {/* ── Immersive Light Mode Architectural Background ── */}
-      <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
-        {/* Precision Blueprint Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-        
-        {/* Vignette & Soft lighting */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#FDFCF8_100%)] z-10 opacity-80" />
-      </div>
+    <div className="min-h-screen w-full flex flex-col font-mono overflow-auto bg-transparent relative" style={{ position: 'relative' }}>
+      <UniversalEliteWallpaper />
 
       <main className="flex-1 relative z-10 flex flex-col justify-center items-center px-4 py-10 sm:p-8 lg:p-12 min-h-0" style={{ minHeight: '100dvh' }}>
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className={`w-full my-auto ${mounted && isConnected ? 'max-w-lg' : 'max-w-lg lg:max-w-4xl lg:grid lg:grid-cols-2'} rounded-[28px] sm:rounded-[40px] overflow-hidden bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[0_30px_80px_rgba(0,0,0,0.06)] relative`}
+          className={`w-full max-w-7xl mx-auto rounded-[32px] overflow-hidden bg-white/70 dark:bg-[#0A0A0A]/70 backdrop-blur-[40px] border border-black/5 dark:border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.06)] dark:shadow-none flex flex-col lg:flex-row relative`}
         >
           {/* Subtle reflection lines for frosted glass effect */}
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
-          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-black/5 to-transparent opacity-30" />
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white dark:via-white/20 to-transparent opacity-80" />
 
-          {/* ── LEFT: QR Matrix ── */}
-          {!(mounted && isConnected) && (
-          <div className="relative p-6 sm:p-10 lg:p-14 flex flex-col overflow-hidden border-b lg:border-b-0 lg:border-r border-black/5 bg-[#FAFAF8]/50">
-            <div className="relative z-10 flex flex-col h-full">
-              <div className="inline-flex self-center lg:self-start mb-6">
-                <h2 className="text-[26px] sm:text-[32px] font-black uppercase tracking-tighter leading-[0.9] text-[#050505] text-center lg:text-left">
-                  Secure <br/><span className="text-black/30">Sync</span>
-                </h2>
-              </div>
-              <p className="text-[9px] font-mono text-[#050505]/40 uppercase tracking-[0.4em] mb-8 sm:mb-12 border-l border-black/20 pl-4 py-1 self-center lg:self-start">
-                Encrypted Session Synchronization
-              </p>
-
-              <div className="flex flex-col items-center gap-8 flex-1 justify-center">
-                <div className="p-8 bg-white rounded-[32px] shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-black/5 flex flex-col items-center relative group">
-                  <div className="relative z-10">
-                    <AnimatePresence mode="wait">
-                      {syncStatus === "ERROR" ? (
-                        <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-[180px] h-[180px] flex flex-col items-center justify-center text-red-500 text-center">
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-2">Decryption Failure</span>
-                          <span className="text-[9px] font-mono leading-tight opacity-70">{errorMessage}</span>
-                        </motion.div>
-                      ) : qrSession && mounted ? (
-                        <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="bg-white">
-                          <QRCode value={qrData} size={180} level="H" bgColor="#FFFFFF" fgColor="#050505" />
-                        </motion.div>
-                      ) : (
-                        <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-[180px] h-[180px] flex items-center justify-center">
-                          <Loader2 size={32} className="animate-spin text-black/20" />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  
-                  {qrSession && mounted && (
-                    <div className="mt-8 flex flex-col items-center text-center gap-1 z-10 w-full">
-                      <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#050505]/50">
-                        Scan with native camera
-                      </span>
-                      <div className="mt-6 flex flex-col items-start text-left gap-4 w-full max-w-[280px]">
-                        <div className="flex items-center gap-4 group/item w-full p-2 rounded-xl hover:bg-black/5 transition-colors">
-                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] w-6 h-6 flex items-center justify-center rounded-full border border-black/10 group-hover/item:bg-black group-hover/item:text-white transition-colors">1</span>
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]/70">Activate native camera</span>
-                        </div>
-                        <div className="flex items-center gap-4 group/item w-full p-2 rounded-xl hover:bg-black/5 transition-colors">
-                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] w-6 h-6 flex items-center justify-center rounded-full border border-black/10 group-hover/item:bg-black group-hover/item:text-white transition-colors">2</span>
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]/70">Scan QR code</span>
-                        </div>
-                        <div className="flex items-center gap-4 group/item w-full p-2 rounded-xl hover:bg-black/5 transition-colors">
-                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] w-6 h-6 flex items-center justify-center rounded-full border border-black/10 group-hover/item:bg-black group-hover/item:text-white transition-colors">3</span>
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]/70">Acknowledge signature</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+          {/* ── LEFT: Whale Chat Marketing ── */}
+          <div className="flex-1 p-8 sm:p-14 lg:p-20 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-black/5 dark:border-white/10 bg-[#FAFAF8]/50 dark:bg-[#111111]/50 relative overflow-hidden group">
+            {/* Soft decorative background element */}
+            <div className="absolute top-[-20%] left-[-10%] w-[120%] h-[120%] bg-[radial-gradient(ellipse_at_center,rgba(0,192,118,0.05)_0%,transparent_60%)] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            
+            <div className="relative z-10">
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-black/10 dark:border-white/10 bg-white/50 dark:bg-black/50 backdrop-blur-md shadow-sm mb-8">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#050505] dark:text-white flex items-center gap-2">
+                        <MessageCircle size={14} className="text-[#050505] dark:text-white" />
+                        Available now, Whale Chat !
+                    </span>
                 </div>
 
-                <div className="flex items-center gap-2.5 h-6">
-                  <AnimatePresence mode="wait">
-                    {syncStatus === "SYNCED" && (
-                      <motion.div key="ok" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-2">
-                        <CheckCircle size={14} className="text-emerald-500" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Synced — Entering Terminal</span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-[0.9] text-[#050505] dark:text-white mb-6">
+                    Encrypted <br/><span className="text-black/30 dark:text-white/30">P2P Network</span>
+                </h1>
+                
+                <p className="text-sm font-medium text-[#050505]/60 dark:text-[#AAAAAA] leading-relaxed max-w-md">
+                    Connect securely through the immutable Whale Chat protocol. E2E encryption powered by XMTP, ensuring perfect secrecy and zero central points of failure.
+                </p>
+            </div>
 
-                {qrSession && (
-                  <button onClick={() => { setQrSession(null); setSyncStatus("IDLE"); }}
-                    className="text-[9px] font-mono text-[#050505]/30 hover:text-[#050505] uppercase tracking-[0.4em] transition-colors">
-                    Refresh QR
-                  </button>
-                )}
-              </div>
+            <div className="relative z-10 mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-5 rounded-2xl bg-white/60 dark:bg-[#1A1A1A]/60 border border-black/5 dark:border-white/5 backdrop-blur-sm shadow-sm hover:shadow-md hover:bg-white dark:hover:bg-[#222] transition-all">
+                    <Shield size={18} className="text-[#050505] dark:text-white mb-3" />
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-[#050505] dark:text-white mb-1">Zero-Knowledge</h3>
+                    <p className="text-[10px] font-mono text-[#888888] leading-relaxed">Cryptographic proof without revealing the underlying data.</p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white/60 dark:bg-[#1A1A1A]/60 border border-black/5 dark:border-white/5 backdrop-blur-sm shadow-sm hover:shadow-md hover:bg-white dark:hover:bg-[#222] transition-all">
+                    <MessageCircle size={18} className="text-[#050505] dark:text-white mb-3" />
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-[#050505] dark:text-white mb-1">XMTP Native</h3>
+                    <p className="text-[10px] font-mono text-[#888888] leading-relaxed">Cross-chain persistent messaging secured by wallet identity.</p>
+                </div>
             </div>
           </div>
-          )}
 
           {/* ── RIGHT: Injection Portal ── */}
-          <div className="relative p-6 sm:p-10 lg:p-14 flex flex-col bg-white/40">
-            <div className="relative z-10 flex flex-col h-full">
-
-              <h2 className="text-[26px] sm:text-[32px] font-black uppercase tracking-tighter leading-[0.9] mb-4 text-[#050505] text-center lg:text-left">
-                Authentication <br/><span className="text-black/30">Portal</span>
+          <div className="flex-1 max-w-[500px] p-8 sm:p-14 lg:p-20 flex flex-col bg-white/40 dark:bg-black/40 items-center justify-center relative">
+            <div className="w-full flex flex-col h-full max-w-sm mx-auto">
+              <h2 className="text-[26px] sm:text-[32px] font-black uppercase tracking-tighter leading-[0.9] mb-4 text-[#050505] dark:text-white text-center">
+                Access <br/><span className="text-black/30 dark:text-white/30">Portal</span>
               </h2>
 
               {mounted && !isConnected && (
-                <div className="flex items-center gap-3 mb-10 border-b border-black/5 pb-6">
-                  {isMobile ? <Smartphone size={14} className="text-[#050505]/40" /> : <Monitor size={14} className="text-[#050505]/40" />}
-                  <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-[#050505]/40">
+                <div className="flex items-center justify-center gap-3 mb-10 border-b border-black/5 dark:border-white/10 pb-6">
+                  {isMobile ? <Smartphone size={14} className="text-[#050505]/40 dark:text-white/40" /> : <Monitor size={14} className="text-[#050505]/40 dark:text-white/40" />}
+                  <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-[#050505]/40 dark:text-white/40 text-center">
                     {isMobile ? "Mobile Native Injection" : "Desktop Extension Gateway"}
                   </span>
                 </div>
@@ -501,102 +434,83 @@ export default function ConnectPage() {
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col items-center justify-center gap-10 flex-1 py-8 px-4"
+                  className="flex flex-col items-center justify-center gap-8 flex-1 py-4"
                 >
-                  <div className="w-full max-w-[120px] aspect-square rounded-full border border-black/5 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.05)] flex items-center justify-center overflow-hidden mb-2 relative group">
-                    <div className="absolute inset-0 bg-[#FAFAF8] opacity-50" />
-                    <CheckCircle size={48} className="text-emerald-500 z-10" />
+                  <div className="w-full max-w-[100px] aspect-square rounded-full border border-black/5 dark:border-white/10 bg-white dark:bg-[#111111] shadow-[0_20px_60px_rgba(0,0,0,0.05)] dark:shadow-none flex items-center justify-center overflow-hidden mb-2 relative group">
+                    <div className="absolute inset-0 bg-[#FAFAF8] dark:bg-[#1A1A1A] opacity-50" />
+                    <CheckCircle size={40} className="text-emerald-500 z-10" />
                     <div className="absolute inset-0 border-[2px] border-emerald-500/20 rounded-full [border-style:dashed]" />
                   </div>
 
-                  <div className="flex flex-col items-center text-center space-y-5 max-w-md">
-                    <h2 className="text-5xl font-black uppercase tracking-tighter leading-none text-[#050505]">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <h2 className="text-3xl font-black uppercase tracking-tighter leading-none text-[#050505] dark:text-white">
                       {isLinked ? "Session Verified" : "Awaiting Signature"}
                     </h2>
-                    <p className="font-serif text-[15px] leading-relaxed text-[#050505]/60 font-medium">
+                    <p className="text-[12px] font-medium text-[#050505]/60 dark:text-[#AAAAAA] leading-relaxed max-w-[280px]">
                       {isLinked 
-                        ? "Cryptographic attestation perfectly resolved. Your session is now verified. Welcome to the Sovereign Terminal."
-                        : "Your wallet is connected. Please sign the cryptographic attestation in your wallet to verify your session."}
+                        ? "Cryptographic attestation resolved. Welcome to the Terminal."
+                        : "Your wallet is connected. Please sign the attestation in your wallet."}
                     </p>
                   </div>
 
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="flex items-center gap-3 px-6 py-4 bg-white border border-black/5 rounded-2xl shadow-sm">
-                       <CheckCircle size={16} className="text-emerald-500" />
-                       <span className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-[#050505]">
-                         {address?.slice(0,6)}...{address?.slice(-4)} Verified
-                       </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex flex-col items-center gap-4 w-full max-w-[320px] min-h-[100px] justify-center">
+                  <div className="flex flex-col items-center gap-3 w-full mt-4">
                     {!isLinked ? (
                       <button
                         onClick={() => {
                           setIsSigning(false); // Reset to re-trigger auto sign
                         }}
-                        className="px-8 py-4 bg-black text-white font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-colors w-full"
+                        className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest rounded-xl hover:bg-black/80 dark:hover:bg-white/80 transition-colors w-full shadow-md"
                       >
                         Sign Message
                       </button>
                     ) : (
                       <div className="flex items-center gap-3">
                         <motion.div
-                          className="w-2 h-2 rounded-full bg-black/60"
+                          className="w-2 h-2 rounded-full bg-black/60 dark:bg-white/60"
                           animate={{ y: [0, -6, 0] }}
                           transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
                         />
                         <motion.div
-                          className="w-2 h-2 rounded-full bg-black/60"
+                          className="w-2 h-2 rounded-full bg-black/60 dark:bg-white/60"
                           animate={{ y: [0, -6, 0] }}
                           transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
                         />
                         <motion.div
-                          className="w-2 h-2 rounded-full bg-black/60"
+                          className="w-2 h-2 rounded-full bg-black/60 dark:bg-white/60"
                           animate={{ y: [0, -6, 0] }}
                           transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
                         />
                       </div>
                     )}
                   </div>
-
-                  {isMobile && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4, duration: 0.6 }}
-                      className="mt-6 pt-6 border-t border-black/5 w-full flex flex-col items-center gap-4"
-                    >
-                      <button
-                        onClick={() => setShowMobileScanner(true)}
-                        className="w-full flex items-center justify-center gap-3 py-4 rounded-xl border border-black/10 bg-white shadow-sm font-black uppercase tracking-[0.2em] text-[11px] text-[#050505] active:scale-[0.97] transition-all hover:border-black/30"
-                      >
-                        <ScanLine size={16} />
-                        Scan QR to Sync
-                      </button>
-                    </motion.div>
-                  )}
                 </motion.div>
 
               ) : !mounted ? (
                 /* ── SKELETON ── */
-                <div className="flex flex-col gap-4 flex-1 mt-4">
-                  {[0, 1, 2, 3].map((i) => (
-                    <div key={i} className="w-full h-[84px] rounded-[20px] bg-black/5" />
+                <div className="flex flex-col gap-4 flex-1">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="w-full h-[72px] rounded-2xl bg-black/5 dark:bg-white/5 animate-pulse" />
                   ))}
                 </div>
 
               ) : isMobile ? (
                 /* ── MOBILE CONNECT ── */
-                <div className="flex flex-col gap-4 flex-1 mt-4">
+                <div className="flex flex-col gap-4 flex-1">
                   {MOBILE_WALLETS.map((w) => (
                     <WalletButton key={w.id} logo={w.logo} name={w.name} badge={w.badge} onClick={handleMobileWallet} loading={isPending && pendingId === w.id} delay={w.delay} extraIcon={<ExternalLink size={16} />} />
                   ))}
+                  <button
+                    onClick={() => setShowMobileScanner(true)}
+                    className="w-full flex items-center justify-center gap-3 py-4 mt-2 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] shadow-sm font-black uppercase tracking-[0.2em] text-[11px] text-[#050505] dark:text-white active:scale-[0.97] transition-all hover:border-black/30 dark:hover:border-white/30"
+                  >
+                    <ScanLine size={16} />
+                    Scan QR
+                  </button>
                 </div>
 
               ) : (
                 /* ── DESKTOP CONNECT ── */
-                <div className="flex flex-col gap-4 flex-1 mt-4">
+                <div className="flex flex-col gap-4 flex-1">
                   {DESKTOP_WALLETS.map((w) => (
                     <WalletButton key={w.id} logo={w.logo} name={w.name} badge={w.badge} onClick={() => handleDesktopWallet(w.id, w.rdns, w.installUrl)} loading={isPending && pendingId === w.id} delay={w.delay} />
                   ))}
@@ -605,10 +519,10 @@ export default function ConnectPage() {
 
               {/* Security note */}
               {mounted && !isConnected && (
-                <div className="mt-10 p-6 rounded-[24px] flex items-start gap-4 bg-[#FAFAF8] border border-black/5">
-                  <Lock size={20} className="text-[#050505]/30 mt-0.5 shrink-0" />
-                  <p className="text-[10px] text-[#050505]/50 font-mono leading-relaxed uppercase tracking-[0.15em]">
-                    Secure architecture. Identity attested via strictly verified ECDSA. No local passwords. Direct cryptographic sovereignty.
+                <div className="mt-10 p-5 rounded-2xl flex items-start gap-4 bg-[#FAFAF8] dark:bg-[#1A1A1A] border border-black/5 dark:border-white/10">
+                  <Lock size={16} className="text-[#050505]/30 dark:text-white/30 shrink-0" />
+                  <p className="text-[9px] text-[#050505]/50 dark:text-[#AAAAAA] font-mono leading-relaxed uppercase tracking-[0.15em]">
+                    Identity attested via verified ECDSA. No passwords. Direct cryptographic sovereignty.
                   </p>
                 </div>
               )}

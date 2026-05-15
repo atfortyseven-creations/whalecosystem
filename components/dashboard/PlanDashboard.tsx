@@ -91,31 +91,31 @@ export function PlanDashboard() {
     }
   }
 
-  return (
-    <div className="flex flex-col gap-8 w-full mx-auto p-4 md:p-10 font-sans">
+    return (
+    <div className="flex flex-col gap-8 w-full mx-auto p-6 md:p-12 font-sans bg-[#FAF9F6] text-[#050505] min-h-full rounded-3xl border border-black/[0.04]">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/[0.04] pb-8">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
-            Billing
+          <h1 className="text-4xl font-black tracking-tight text-[#050505] flex items-center gap-3 uppercase">
+            Billing & Plan
           </h1>
-          <p className="text-[15px] text-white/40 mt-2 font-medium">Manage your subscription, email preferences, and payment history.</p>
+          <p className="text-[12px] text-black/50 mt-2 font-black uppercase tracking-[0.2em]">Manage your subscription, identity attestation, and payment history.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Main Plan Card (Vercel/Stripe style) */}
-        <div className="lg:col-span-2 bg-[#0A0A0A] rounded-2xl border border-white/[0.08] relative overflow-hidden flex flex-col justify-between">
-          <div className="p-8 border-b border-white/[0.08]">
-            <div className="flex justify-between items-start mb-6">
+        {/* Main Plan Card */}
+        <div className="lg:col-span-2 bg-white rounded-[2rem] border border-black/[0.06] relative overflow-hidden flex flex-col justify-between shadow-xl">
+          <div className="p-10 border-b border-black/[0.04]">
+            <div className="flex justify-between items-start mb-8">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-2">Current Plan</p>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-3xl font-black text-white">{formattedTier}</h2>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-3">Current Active Plan</p>
+                <div className="flex items-center gap-4">
+                  <h2 className="text-4xl font-black text-[#050505] uppercase tracking-tighter">{formattedTier}</h2>
                   {!isFree && (
-                    <span className="px-2.5 py-1 bg-white/5 text-white/60 text-[10px] font-bold uppercase tracking-[0.1em] rounded-md border border-white/10">
+                    <span className="px-3 py-1.5 bg-black/5 text-[#050505] text-[10px] font-black uppercase tracking-[0.2em] rounded-lg border border-black/10">
                       {cycle}
                     </span>
                   )}
@@ -123,72 +123,72 @@ export function PlanDashboard() {
               </div>
               <div className="text-right">
                 {isPending ? (
-                  <div className="px-4 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-500 font-bold text-xs rounded-xl flex items-center gap-2">
-                    <Loader2 size={16} className="animate-spin" />
-                    Awaiting SEPA Transfer
+                  <div className="px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-600 font-black uppercase tracking-widest text-[10px] rounded-xl flex items-center gap-2">
+                    <Loader2 size={14} className="animate-spin" />
+                    Awaiting SEPA
                   </div>
                 ) : isFree || isExpired ? (
                   <button 
                     onClick={() => router.push('/pricing')}
-                    className="px-5 py-2.5 bg-white text-black font-bold text-sm rounded-xl hover:bg-white/90 transition-all shadow-sm"
+                    className="px-8 py-3.5 bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] rounded-2xl hover:bg-black/80 transition-all shadow-lg hover:scale-105 active:scale-95"
                   >
-                    {isExpired ? 'Renew Subscription' : 'Upgrade Plan'}
+                    {isExpired ? 'Renew Access' : 'Upgrade Protocol'}
                   </button>
                 ) : (
-                  <div className="px-4 py-2 bg-[#00C076]/10 border border-[#00C076]/20 text-[#00C076] font-bold text-xs rounded-xl flex items-center gap-2">
-                    <CheckCircle2 size={16} />
-                    Active
+                  <div className="px-5 py-2.5 bg-[#00C076]/10 border border-[#00C076]/20 text-[#00C076] font-black uppercase tracking-widest text-[10px] rounded-xl flex items-center gap-2">
+                    <CheckCircle2 size={14} />
+                    Verified Active
                   </div>
                 )}
               </div>
             </div>
 
             {!isFree && !isPending && (
-              <p className="text-sm text-white/50 flex items-center gap-2 font-medium">
-                <CalendarClock size={16} className="text-white/30" />
-                Your plan {isExpired ? 'expired on' : 'will automatically renew on'} <span className="text-white font-semibold">{expiresString}</span>
+              <p className="text-[11px] font-black uppercase tracking-widest text-black/40 flex items-center gap-2">
+                <CalendarClock size={14} className="text-black/30" />
+                Plan {isExpired ? 'expired on' : 'renews on'} <span className="text-[#050505]">{expiresString}</span>
               </p>
             )}
             {isPending && (
-              <p className="text-sm text-amber-500/70 font-medium max-w-md mt-2 flex items-center gap-2">
-                <AlertCircle size={16} />
-                Your plan upgrade is pending manual bank confirmation. It will activate automatically once the transfer is received.
+              <p className="text-[11px] font-black uppercase tracking-widest text-amber-600/70 max-w-md mt-2 flex items-center gap-2">
+                <AlertCircle size={14} />
+                Pending manual bank confirmation.
               </p>
             )}
             {isFree && !isPending && (
-              <p className="text-sm text-white/50 font-medium max-w-md">
-                You are currently on the Free tier. Upgrade to unlock full on-chain intelligence, predictive models, and infinite API access.
+              <p className="text-[11px] font-black uppercase tracking-widest text-black/40 max-w-lg leading-relaxed">
+                Currently on the free tier. Upgrade to unlock full on-chain intelligence, predictive models, and infinite API access.
               </p>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 p-6 gap-6 bg-black/40">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 flex items-center gap-1.5"><Mail size={12}/> Registered Email</span>
-              <span className="text-sm font-semibold text-white/90">{userData.email || 'No email configured'}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 p-8 gap-8 bg-[#FAF9F6]">
+            <div className="flex flex-col gap-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 flex items-center gap-2"><Mail size={12}/> Registered Contact</span>
+              <span className="text-[13px] font-black text-[#050505]">{userData.email || 'NO_EMAIL_CONFIGURED'}</span>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 flex items-center gap-1.5"><Shield size={12}/> Connected Wallet</span>
-              <span className="text-sm font-mono font-medium text-white/90 truncate">{address}</span>
+            <div className="flex flex-col gap-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 flex items-center gap-2"><Shield size={12}/> Connected Wallet</span>
+              <span className="text-[13px] font-black font-mono text-[#050505] truncate">{address}</span>
             </div>
           </div>
         </div>
 
         {/* Humanity Score / Perks */}
-        <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl p-8 flex flex-col justify-between">
+        <div className="bg-white border border-black/[0.06] rounded-[2rem] p-10 flex flex-col justify-between shadow-xl">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">Cryptographic Score</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-4">Identity Attestation</p>
             <div className="flex items-baseline gap-2 mb-4">
-              <span className="text-5xl font-black text-white">{userData.humanityScore}</span>
+              <span className="text-6xl font-black font-mono tracking-tighter text-[#050505]">{userData.humanityScore}</span>
             </div>
-            <p className="text-xs text-white/50 leading-relaxed font-medium">
-              Your account score represents your on-chain reputation. Premium users accumulate score 10x faster.
+            <p className="text-[11px] font-black uppercase tracking-widest text-black/40 leading-relaxed">
+              Your cryptographic score represents your on-chain reputation. Premium users accumulate score 10x faster.
             </p>
           </div>
 
-          <div className="space-y-4 pt-6 border-t border-white/[0.08] mt-6">
-             <button className="w-full py-2.5 border border-white/10 rounded-xl text-xs font-bold text-white hover:bg-white/5 transition-colors">
-                View Account Profile
+          <div className="space-y-4 pt-8 border-t border-black/[0.04] mt-8">
+             <button className="w-full py-3.5 border border-black/10 bg-[#FAF9F6] rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] hover:bg-black/5 hover:border-black/20 transition-all">
+                View Entity Profile
              </button>
           </div>
         </div>
@@ -196,62 +196,62 @@ export function PlanDashboard() {
       </div>
 
       {/* Transaction History */}
-      <div className="mt-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <h3 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            Invoices
+      <div className="mt-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <h3 className="text-2xl font-black uppercase tracking-tighter text-[#050505] flex items-center gap-2">
+            Invoices & Billing
           </h3>
-          <span className="text-xs font-medium text-white/40">
-            Securely processed via SEPA Euro Transfers
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">
+            Securely processed via SEPA
           </span>
         </div>
         
-        <div className="bg-[#0A0A0A] border border-white/[0.08] rounded-2xl overflow-hidden">
+        <div className="bg-white border border-black/[0.06] rounded-[2rem] overflow-hidden shadow-xl">
           {!userData.transactions || userData.transactions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <CreditCard size={32} className="text-white/10 mb-4" />
-              <p className="text-sm font-bold text-white/60">No invoices found</p>
-              <p className="text-xs font-medium text-white/30 mt-1">When you purchase a plan, your invoices will appear here.</p>
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <CreditCard size={48} className="text-black/10 mb-6" />
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-black/60">No invoices generated</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/30 mt-2">Purchase history will securely anchor here.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.08] bg-white/[0.02] text-[11px] uppercase tracking-[0.15em] text-white/40 font-bold">
-                    <th className="py-4 pl-6 pr-4">Amount</th>
-                    <th className="py-4 px-4">Status</th>
-                    <th className="py-4 px-4">Date</th>
-                    <th className="py-4 px-4">Reference</th>
-                    <th className="py-4 pr-6 pl-4 text-right">Receipt</th>
+                  <tr className="border-b border-black/[0.04] bg-[#FAF9F6] text-[10px] uppercase tracking-[0.2em] text-black/40 font-black">
+                    <th className="py-5 pl-8 pr-4">Amount</th>
+                    <th className="py-5 px-4">Status</th>
+                    <th className="py-5 px-4">Date</th>
+                    <th className="py-5 px-4">Reference</th>
+                    <th className="py-5 pr-8 pl-4 text-right">Receipt</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.05]">
+                <tbody className="divide-y divide-black/[0.04]">
                   {userData.transactions.map((tx, idx) => (
-                    <tr key={tx.id || idx} className="hover:bg-white/[0.02] transition-colors">
-                      <td className="py-4 pl-6 pr-4 font-bold text-white">
-                        €{tx.amount} <span className="text-white/30 font-medium text-xs ml-0.5">EUR</span>
+                    <tr key={tx.id || idx} className="hover:bg-[#FAF9F6] transition-colors group">
+                      <td className="py-5 pl-8 pr-4 font-black font-mono text-[#050505]">
+                        €{tx.amount} <span className="text-black/30 text-[10px]">EUR</span>
                       </td>
-                      <td className="py-4 px-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] rounded-md border ${
+                      <td className="py-5 px-4">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded-md border ${
                           tx.status === 'PROCESSING' || tx.status === 'PENDING'
-                            ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' 
+                            ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' 
                             : tx.status === 'CONFIRMED' || tx.status === 'ACTIVE'
                             ? 'bg-[#00C076]/10 text-[#00C076] border-[#00C076]/20'
-                            : 'bg-white/10 text-white/60 border-white/10'
+                            : 'bg-black/5 text-black/60 border-black/10'
                         }`}>
                           {(tx.status === 'PROCESSING' || tx.status === 'PENDING') && <Loader2 size={10} className="animate-spin" />}
                           {tx.status}
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-xs font-medium text-white/70">
+                      <td className="py-5 px-4 text-[11px] font-black uppercase tracking-widest text-black/60">
                         {new Date(tx.timestamp || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </td>
-                      <td className="py-4 px-4 font-mono text-[11px] font-semibold text-white/50">
+                      <td className="py-5 px-4 font-mono text-[10px] font-black text-black/40 group-hover:text-[#050505] transition-colors">
                         {tx.txHash}
                       </td>
-                      <td className="py-4 pr-6 pl-4 text-right">
-                        <button className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.1em] text-white/40 hover:text-white transition-colors">
-                          <Download size={14} /> Download
+                      <td className="py-5 pr-8 pl-4 text-right">
+                        <button className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black/40 hover:text-[#050505] transition-colors">
+                          <Download size={12} /> Download
                         </button>
                       </td>
                     </tr>
@@ -260,7 +260,6 @@ export function PlanDashboard() {
               </table>
             </div>
           )}
-        </div>
       </div>
 
     </div>

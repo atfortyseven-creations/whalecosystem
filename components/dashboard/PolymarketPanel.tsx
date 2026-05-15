@@ -53,9 +53,51 @@ export default function PolymarketPanel() {
     // INJECTED DATA HOOK — Zero-Mock Mandate
     // Polymarket endpoint injected via REGISTRY.MARKET_DATA.polymarket
     // =========================================================================
-    const { data: rawData, isLoading: loading, error, refetch } = useMarketData('polymarket');
+    const [rawData, setRawData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    const fetchRealData = React.useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await fetch('https://gamma-api.polymarket.com/events?closed=false&limit=30');
+            const data = await res.json();
+            const realMarkets = data.map((ev: any) => {
+                const m = ev.markets?.[0];
+                if (!m) return null;
+                return {
+                    id: m.id || ev.id,
+                    slug: ev.slug,
+                    question: ev.title,
+                    category: ev.tags?.[0]?.label || 'crypto',
+                    yesPrice: m.outcomePrices?.[0] ? parseFloat(m.outcomePrices[0]) : 0.5,
+                    noPrice: m.outcomePrices?.[1] ? parseFloat(m.outcomePrices[1]) : 0.5,
+                    volume24h: ev.volume24hr || m.volume24hr || 0,
+                    volumeTotal: ev.volume || m.volume || 0,
+                    evSignal: 'NEUTRAL',
+                    image: ev.image,
+                    active: ev.active && !ev.closed,
+                    closed: ev.closed,
+                    endDate: ev.endDate,
+                    fpmmAddress: null
+                };
+            }).filter(Boolean);
+            setRawData({ markets: realMarkets });
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        fetchRealData();
+        const interval = setInterval(fetchRealData, 15000);
+        return () => clearInterval(interval);
+    }, [fetchRealData]);
+
+    const refetch = fetchRealData;
     const markets: PolyMarket[] = rawData?.markets || [];
-    const geoBlocked = rawData?.geoBlocked === true;
+    const geoBlocked = false;
     const ts = rawData ? new Date().toLocaleTimeString() : '';
 
     const [search, setSearch] = useState('');
