@@ -93,6 +93,60 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 }
 
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   SOVEREIGN LAYOUT SYSTEM — LEFT-ALIGNED CONTENT · BITCOIN WALLPAPER VISIBLE
+   ══════════════════════════════════════════════════════════════════════════════
+   The Bitcoin logo sits perfectly centered on screen at natural size.
+   All non-landing, non-dashboard content lives in the left 55% of the screen,
+   leaving the right side transparent so the logo is always visible.
+
+   This is achieved through:
+   1. CSS max-width + margin constraints (not a hard visual division)
+   2. Background transparency overrides so opaque page containers don't cover
+      the wallpaper. The wallpaper's own gradient handles white fusion on left.
+   3. LANDING PAGE: full-width, no override — immersive.
+   4. DASHBOARD: full-width, WhaleProShell owns its own fixed viewport shell.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── BOUNDED PAGE CONTENT RESTRUCTURE ─────────────────────────────────────── */
+/* Applied to the scroll container (main) in bounded mode.                      */
+/* We cap the scroll area to 58% of the viewport width on desktop,             */
+/* so content sits left and Bitcoin logo is visible on the right.              */
+/* On mobile (< 1024px): full width — no restriction.                          */
+@media (min-width: 1024px) {
+  main[class*="overflow-y-auto"] {
+    max-width: 58vw;
+    /* Left-align: no centering margin */
+    margin-right: auto;
+    margin-left: 0;
+  }
+}
+
+/* ── TRANSPARENT BACKGROUND FUSION ────────────────────────────────────────── */
+/* Override opaque white/cream backgrounds on page root containers that live   */
+/* inside the bounded scroll area. This exposes the wallpaper through them.    */
+/* The wallpaper's left-side gradient provides the visual white background     */
+/* for text readability — these pages are literally fused to the wallpaper.    */
+/* We target the first-child div inside the bounded main (the page root).      */
+@media (min-width: 1024px) {
+  main[class*="overflow-y-auto"] > * > [class*="min-h-screen"],
+  main[class*="overflow-y-auto"] > [class*="min-h-screen"],
+  main[class*="overflow-y-auto"] > * {
+    background-color: transparent !important;
+    background: transparent !important;
+  }
+}
+
+/* Preserve dark-mode specific pages (careers, clearance, mobile-kyc) */
+main[class*="overflow-y-auto"] > [class*="bg-[#02"],
+main[class*="overflow-y-auto"] > [class*="bg-[#05"],
+main[class*="overflow-y-auto"] > * > [class*="bg-[#02"],
+main[class*="overflow-y-auto"] > * > [class*="bg-[#05"] {
+  background-color: revert !important;
+  background: revert !important;
+}
+
+
 /* iOS Safari: Prevent 16px font auto-zoom on input focus
    Full rule with appearance reset is defined below at the * block.
    This stub is intentionally kept as a placeholder comment. */
@@ -175,7 +229,6 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     /* Lenis (SmoothScroll.tsx) manages the smoothing. */
     -webkit-tap-highlight-color: transparent;
     touch-action: pan-x pan-y;
-    zoom: 0.7;
 
     /* === STRATOSPHERIC GPU RENDERING === */
     text-rendering: optimizeLegibility;
@@ -186,7 +239,7 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 
     /* Prevent horizontal layout overflow */
     overflow-x: hidden;
-    width: 100%;
+    width: 100vw;
     
     /* Let only the body or the master container scroll */
     min-height: 100%;

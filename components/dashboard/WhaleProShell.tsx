@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, ChevronRight, Search,
-    X, ArrowUpRight, Globe, Info
+    X, ArrowUpRight, Globe, Info, Lock
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -15,7 +15,7 @@ import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useEthMetrics } from '@/hooks/useEthMetrics';
-import { getTierById } from '@/lib/config/pricing-tiers';
+import { getTierById, hasAccess } from '@/lib/config/pricing-tiers';
 import { toast } from 'sonner';
 import { useDisconnect } from 'wagmi';
 
@@ -28,6 +28,7 @@ interface NavItem {
     dividerBefore?: string;
     externalUrl?: string;
     requiresZK?: boolean;
+    minTier?: 'FREE' | 'STANDARD';
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
@@ -39,9 +40,9 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'newpairs',     label: 'New Listings',      icon: null, requiresZK: true },
 
     { id: 'inst-ledger',  label: 'Entity Resolution',      icon: null,      dividerBefore: 'On-Chain Intel', requiresZK: true },
-    { id: 'mass-transfer',label: 'Mass Transfers',    icon: null, requiresZK: true },
+    { id: 'mass-transfer',label: 'Mass Transfers',    icon: null, requiresZK: true, minTier: 'STANDARD' },
     { id: 'omniexplorer', label: 'Block Explorer',    icon: null, requiresZK: true },
-    { id: 'defi',         label: 'DeFi Yields',       icon: null, requiresZK: true },
+    { id: 'defi',         label: 'DeFi Yields',       icon: null, requiresZK: true, minTier: 'STANDARD' },
     { id: 'morpho',       label: 'Morpho Base',       icon: null, requiresZK: true },
 
     { id: 'zk',           label: 'Cryptographic Integrity',    icon: null,    dividerBefore: 'ZK Layer', requiresZK: true },
@@ -68,7 +69,7 @@ function timerToMs(t: '15m' | '1h' | '24h' | 'never'): number | null {
     return null; // 'never'
 }
 
-function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavItem, isActive: boolean, isCollapsed: boolean, onClick: () => void }) {
+function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { item: NavItem, isActive: boolean, isCollapsed: boolean, onClick: () => void, isLocked?: boolean }) {
     return (
         <button
             onClick={onClick}
@@ -76,7 +77,7 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavI
                 isActive 
                     ? 'bg-[#050505] shadow-lg border border-[#1A1A1A]' 
                     : 'bg-transparent border border-transparent hover:bg-black/[0.03]'
-            }`}
+            } ${isLocked ? 'opacity-70 grayscale' : ''}`}
         >
             <div className="relative flex items-center w-full">
                 {isActive && (
@@ -95,7 +96,11 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavI
                     </span>
                 )}
 
-                {!isCollapsed && item.badge && (
+                {!isCollapsed && isLocked && (
+                    <Lock size={12} className="ml-2 text-black/30 shrink-0" />
+                )}
+
+                {!isCollapsed && !isLocked && item.badge && (
                     <span
                         className="ml-2 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[4px] border shrink-0 transition-colors"
                         style={isActive
@@ -264,6 +269,18 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             return;
         }
 
+        if (item?.minTier) {
+            const hasClearance = isTierLoaded && tier && hasAccess(tier, item.minTier);
+            if (!hasClearance) {
+                toast.error("Premium Access Required", {
+                    description: `This module requires the ${item.minTier} plan or higher.`,
+                    duration: 4000
+                });
+                router.push('/dashboard?tab=billing');
+                return;
+            }
+        }
+
         if (RESTRICTED_TABS.includes(id)) {
             if (!isWalletConnected) {
                 toast.error("Connection Required", {
@@ -273,27 +290,25 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 router.push('/connect');
                 return;
             }
-            if (isTierLoaded && tier !== 'STANDARD' && tier !== 'PRO' && tier !== 'ELITE') {
-                toast.error("Whale Alert Pro Required", {
-                    description: "This module requires the Whale Alert Pro tier.",
-                    duration: 4000
-                });
-                router.push('/pricing');
-                return;
-            }
         }
         onTabChange(id);
     };
 
     // Active clearance ejection monitor
     useEffect(() => {
+        const item = SIDEBAR_ITEMS.find(i => i.id === activeTab);
+        if (item?.minTier) {
+             const hasClearance = isTierLoaded && tier && hasAccess(tier, item.minTier);
+             if (!hasClearance) {
+                 onTabChange('gold');
+                 toast.error("Premium Access Required", { description: "You do not have clearance for this module." });
+             }
+        }
+
         if (RESTRICTED_TABS.includes(activeTab)) {
             if (!isWalletConnected) {
                 onTabChange('gold');
                 toast.error("Session Lost", { description: "You have been disconnected." });
-            } else if (isTierLoaded && tier !== 'STANDARD' && tier !== 'PRO' && tier !== 'ELITE') {
-                onTabChange('gold');
-                toast.error("Whale Alert Pro Required", { description: "You do not have clearance for this module." });
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -368,6 +383,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         .filter(item => !item.requiresZK || isZkVerified)
                         .map((item, index) => {
                         const isActive = activeTab === item.id;
+                        const isLocked = item.minTier && isTierLoaded && tier ? !hasAccess(tier, item.minTier) : false;
                         return (
                             <div key={item.id} style={{ perspective: 1200 }}>
                                 {item.dividerBefore && !isCollapsed && (
@@ -380,7 +396,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                 {item.dividerBefore && isCollapsed && (
                                     <div className="my-3 mx-3 h-px bg-black/10"/>
                                 )}
-                                <AztecSidebarItem item={item} isActive={isActive} isCollapsed={isCollapsed} onClick={() => handleTabChange(item.id)} />
+                                <AztecSidebarItem item={item} isActive={isActive} isCollapsed={isCollapsed} isLocked={isLocked} onClick={() => handleTabChange(item.id)} />
                             </div>
                         );
                     })}

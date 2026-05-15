@@ -305,7 +305,18 @@ export default function ConnectPage() {
         '═══════════════════════════════',
       ].join('\n');
 
-      signMessageAsync({ message })
+      let signaturePromise;
+      const cachedSignature = localStorage.getItem(`sovereign_sig_${norm}`);
+      if (cachedSignature) {
+        signaturePromise = Promise.resolve(cachedSignature);
+      } else {
+        signaturePromise = signMessageAsync({ message }).then(sig => {
+           localStorage.setItem(`sovereign_sig_${norm}`, sig);
+           return sig;
+        });
+      }
+
+      signaturePromise
         .then(async (signature) => {
           document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
           try {

@@ -9,10 +9,10 @@ import Image from 'next/image';
 import { SplashContainer } from '@/components/shared/SplashContainer';
 
 const MENU_ITEMS = [
-  { label: "Home", href: "/" },
-  { label: "Blockchain", href: "#", subItems: [{ label: "Portfolio", description: "Track and manage your on-chain assets.", href: "/portfolio" }] },
-  { label: "Forum", href: "/forum" },
-  { label: "Ecosystem", href: "#", subItems: [{ label: "News", description: "Global intel.", href: "/news" }, { label: "Academy", description: "Learn.", href: "/academy" }, { label: "Careers", description: "Join us.", href: "/careers" }] },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Whale Chat", href: "/chat" },
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Ecosystem", href: "#", subItems: [{ label: "News", description: "Global updates.", href: "/news" }, { label: "Academy", description: "Learn.", href: "/academy" }, { label: "Forum", description: "Discuss.", href: "/forum" }, { label: "Careers", description: "Join us.", href: "/careers" }] },
   { label: "Pricing", href: "/pricing" }
 ];
 
@@ -99,7 +99,7 @@ export function InstitutionalHeader() {
                     </motion.div>
                     <div className="flex flex-col leading-none text-[#050505] justify-center">
                         <span className="font-aztec-serif text-[18px] font-black uppercase tracking-tighter leading-none">
-                            Whale Alert Network
+                            Global Network
                         </span>
                     </div>
                 </Link>

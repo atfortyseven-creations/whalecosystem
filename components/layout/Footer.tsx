@@ -6,23 +6,6 @@ import { Twitter, Github, Lock, Database, ArrowUpRight, Globe, Code } from 'luci
 import Link from 'next/link';
 
 export const Footer = () => {
-    // Custom immersive cursor bounded only to the footer domain
-    const footerRef = useRef<HTMLElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
-    
-    const cursorX = useSpring(0, { stiffness: 150, damping: 20 });
-    const cursorY = useSpring(0, { stiffness: 150, damping: 20 });
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-        if (!footerRef.current) return;
-        const rect = footerRef.current.getBoundingClientRect();
-        cursorX.set(e.clientX - rect.left);
-        cursorY.set(e.clientY - rect.top);
-    };
-
-    const handleMouseEnter = () => setIsHovered(true);
-    const handleMouseLeave = () => setIsHovered(false);
-
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
         setIsMobile(window.innerWidth < 768);
@@ -30,42 +13,8 @@ export const Footer = () => {
 
     return (
         <footer 
-            ref={footerRef} 
-            onMouseMove={handleMouseMove}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
             className="relative z-10 bg-[#050505] border-t border-white/5 overflow-hidden text-white/80 pb-12 pt-28 font-sans"
         >
-            {/* Immersive Cursor */}
-            {!isMobile && (
-                <motion.div
-                    className="pointer-events-none absolute w-96 h-96 rounded-full mix-blend-screen z-0 opacity-0 transition-opacity duration-300"
-                    style={{
-                        x: cursorX,
-                        y: cursorY,
-                        translateX: '-50%',
-                        translateY: '-50%',
-                        opacity: isHovered ? 1 : 0,
-                        background: 'radial-gradient(circle, rgba(147,51,234,0.15) 0%, rgba(147,51,234,0) 70%)'
-                    }}
-                />
-            )}
-            {!isMobile && (
-                <motion.div
-                    className="pointer-events-none absolute w-10 h-10 border border-white/20 rounded-full mix-blend-screen z-50 flex items-center justify-center transition-opacity duration-300"
-                    style={{
-                        x: cursorX,
-                        y: cursorY,
-                        translateX: '-50%',
-                        translateY: '-50%',
-                        opacity: isHovered ? 1 : 0,
-                    }}
-                    animate={{ scale: isHovered ? [1, 1.1, 1] : 1 }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                >
-                    <div className="w-1.5 h-1.5 bg-[var(--aztec-orchid)] rounded-full shadow-[0_0_10px_var(--aztec-orchid)]" />
-                </motion.div>
-            )}
 
             {/* Atmosphere Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-30" />
@@ -78,10 +27,10 @@ export const Footer = () => {
                     <div className="md:col-span-5 flex flex-col items-start">
                         <div className="flex items-center gap-3 mb-6 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full backdrop-blur-md shadow-2xl">
                             <span className="text-xl pb-1">🐋</span>
-                            <span className="text-[12px] font-aztec-mono font-black tracking-[0.25em] uppercase text-white">Whale Alert Network</span>
+                            <span className="text-[12px] font-aztec-mono font-black tracking-[0.25em] uppercase text-white">Global Network</span>
                         </div>
                         <p className="text-[13px] font-sans text-white/40 leading-relaxed max-w-sm tracking-wide">
-                            Advanced on-chain analytics and sovereign privacy infrastructure. Built exclusively for global financial institutions and elite market makers.
+                            Advanced market insights and privacy infrastructure. Built to be simple, fast, and accessible for everyone in the world.
                         </p>
                     </div>
 
@@ -90,14 +39,14 @@ export const Footer = () => {
                         {/* Platform */}
                         <div className="flex flex-col gap-8">
                             <h4 className="text-[10px] font-aztec-mono font-black uppercase tracking-[0.3em] text-[var(--aztec-orchid)] flex items-center gap-3">
-                                <span className="w-4 h-[1px] bg-[var(--aztec-orchid)]" /> Platform
+                                <span className="w-4 h-[1px] bg-[var(--aztec-orchid)]" /> Access
                             </h4>
                             <div className="flex flex-col gap-5">
-                                <FooterLink href="/network" icon={<Globe size={15} />}>System Terminal</FooterLink>
-                                <FooterLink href="/academy" icon={<Database size={15} />}>Sovereign Academy</FooterLink>
-                                <FooterLink href="/api-marketplace" icon={<Code size={15} />}>API Marketplace</FooterLink>
-                                <FooterLink href="/docs/whitepaper" icon={<Lock size={15} />}>Institutional Whitepaper</FooterLink>
-                                <FooterLink href="/docs" icon={<Code size={15} />}>Technical Docs</FooterLink>
+                                <FooterLink href="/dashboard" icon={<Globe size={15} />}>Platform</FooterLink>
+                                <FooterLink href="/portfolio" icon={<Database size={15} />}>Portfolio</FooterLink>
+                                <FooterLink href="/academy" icon={<Code size={15} />}>Academy</FooterLink>
+                                <FooterLink href="/forum" icon={<Lock size={15} />}>Forum</FooterLink>
+                                <FooterLink href="/news" icon={<Globe size={15} />}>News</FooterLink>
                             </div>
                         </div>
 
@@ -107,10 +56,11 @@ export const Footer = () => {
                                 <span className="w-4 h-[1px] bg-[var(--aztec-chartreuse)]" /> Connect
                             </h4>
                             <div className="flex flex-col gap-5">
-                                <FooterLink href="https://twitter.com/whalecosystem" external icon={<Twitter size={15} />}>Twitter / X</FooterLink>
-                                <FooterLink href="https://github.com/atfortyseven-creations/whalecosystem" external icon={<Github size={15} />}>Github Repository</FooterLink>
-                                <FooterLink href="/llms.txt" external icon={<Code size={15} />}>LLM / AI Instructions</FooterLink>
-                                <FooterLink href="/privacy" icon={<Lock size={15} />}>Privacy Policy</FooterLink>
+                                <FooterLink href="/careers" icon={<Code size={15} />}>Careers</FooterLink>
+                                <FooterLink href="/developer" icon={<Code size={15} />}>Developer</FooterLink>
+                                <FooterLink href="/docs" icon={<Code size={15} />}>Docs</FooterLink>
+                                <FooterLink href="/privacy" icon={<Lock size={15} />}>Privacy</FooterLink>
+                                <FooterLink href="/terms" icon={<Lock size={15} />}>Terms</FooterLink>
                             </div>
                         </div>
                     </div>

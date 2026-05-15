@@ -663,7 +663,13 @@ export function MobileLanding() {
 
     try {
       const message = buildSovereignMessage(norm);
-      const signature = await signMessageAsync({ message });
+      
+      // FIX: Check for locally cached signature to prevent 4x signature loops on mobile
+      let signature = localStorage.getItem(`sovereign_sig_${norm}`);
+      if (!signature) {
+        signature = await signMessageAsync({ message }) as string;
+        localStorage.setItem(`sovereign_sig_${norm}`, signature);
+      }
 
       try {
          const { keccak256 } = await import('viem');

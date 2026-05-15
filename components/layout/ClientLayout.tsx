@@ -62,7 +62,7 @@ const BOUNDED_PREFIXES = [
   '/ticket', '/settings', '/docs', '/privacy', '/terms', '/legal',
   '/connect', '/sign-up', '/login', '/admin', '/clearance',
   '/api-marketplace', '/directory', '/company', '/infrastructure',
-  '/forum',
+  '/forum', '/pricing', '/careers',
 ];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -123,9 +123,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
   }, [pathname]);
 
-  const isPublicPath = pathname === '/' || PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
-  const content = !isPublicPath ? <LinkedGate>{children}</LinkedGate> : children;
-
   // ── Layout mode ───────────────────────────────────────────────────────────
   // DASHBOARD  → fixed inset-0 overflow-hidden   (WhaleProShell owns scroll)
   // BOUNDED    → h-[100dvh] overflow-hidden       (header + inner scroll box)
@@ -133,6 +130,18 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const isDashboard = pathname.startsWith('/dashboard');
   const isBounded = !isDashboard && BOUNDED_PREFIXES.some(p => pathname.startsWith(p));
   const isLanding = pathname === '/';
+
+  const isPublicPath = pathname === '/' || PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
+  const content = !isPublicPath ? <LinkedGate>{children}</LinkedGate> : children;
+
+  // For non-landing, non-dashboard pages: content is constrained to the left
+  // portion of the screen. There is NO hard visual border — the wallpaper's
+  // gradient overlay handles the fusion seamlessly.
+  // `isLanding` — full width immersive layout
+  // `isDashboard` — WhaleProShell owns the full viewport (its own shell)
+  // everything else — content max-width left-aligned with transparent bg
+  const displayContent = content;
+
 
   // Strict body trap for PC/Desktop — completely block document-level scrolling on bounded modules
   React.useEffect(() => {
@@ -338,7 +347,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                   touchAction: 'pan-y',
                 } : undefined}
               >
-                {content}
+                {displayContent}
               </main>
             </ZoomWrapper>
           </div>
