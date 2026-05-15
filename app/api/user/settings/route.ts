@@ -2,23 +2,59 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateSecureRequest } from '@/lib/security/premium-security';
 
-// ── Field name bridge: store key → DB column ──────────────────────────────────
+// ── Complete store key → DB column map ────────────────────────────────────────
+// Every key in SovereignSettings is mapped here.
 const STORE_TO_DB: Record<string, string> = {
+    // General
     theme:                  'theme',
+    language:               'language',
     currency:               'currency',
+    timeFormat:             'timeFormat',
+    dateFormat:             'dateFormat',
+    addressFormat:          'addressFormat',
+
+    // Display & Hardware
+    density:                'layoutDensity',
+    defaultTimeframe:       'defaultTimeframe',
+    displayUnit:            'displayUnit',
     showBalances:           'showBalances',
-    stealthMode:            'stealthMode',
-    allowAnalytics:         'allowAnalytics',
-    testnetMode:            'testnetMode',
-    audioAlerts:            'soundEffects',
-    autoDisconnectTimer:    'autoDisconnectTimer',
-    layoutDensity:          'layoutDensity',
+    soundEffects:           'soundEffects',
     hardwareAcceleration:   'hardwareAcceleration',
+
+    // Network & RPC
+    customRpcUrl:           'customRpcUrl',
+    testnetMode:            'testnetMode',
+
+    // Execution Rules
+    gasPreset:              'gasPreset',
+    maxSlippage:            'maxSlippage',
+    mevProtection:          'mevProtection',
+
+    // Sonar Alerts
+    emailAlerts:            'emailAlerts',
+    telegramAlerts:         'telegramAlerts',
+    audioAlerts:            'soundEffects',   // maps to soundEffects in DB
+    whaleAlertThreshold:    'whaleAlertThreshold',
+    email:                  'email',
+
+    // Privacy & Security
+    inactivityLockMinutes:  'inactivityLockMinutes',
+    autoDisconnectTimer:    'autoDisconnectTimer',
+    stealthMode:            'stealthMode',
+    requireSignForExports:  'requireSignForExports',
+    allowAnalytics:         'allowAnalytics',
+
+    // Whale Chat
+    chatName:               'chatName',
+    chatBio:                'chatBio',
+    qrLabel:                'qrLabel',
+    hiddenAssets:           'hiddenAssets',
 };
 
-// ── DB column → store key (reverse map for GET) ───────────────────────────────
+// ── DB column → store key (for reverse mapping on GET) ──────────────────────
 const DB_TO_STORE: Record<string, string> = {
-    soundEffects:        'audioAlerts',
+    layoutDensity: 'density',
+    // soundEffects is returned as-is — audioAlerts is a store alias
 };
 
 function mapDbToStore(data: Record<string, any>): Record<string, any> {
@@ -27,13 +63,52 @@ function mapDbToStore(data: Record<string, any>): Record<string, any> {
         const storeKey = DB_TO_STORE[dbKey] ?? dbKey;
         out[storeKey] = val;
     }
+    // Duplicate soundEffects → audioAlerts for store compatibility
+    if ('soundEffects' in out) {
+        out['audioAlerts'] = out['soundEffects'];
+    }
     return out;
 }
 
-// ── Safe columns guaranteed to exist in every DB schema version ──────────────
-const SAFE_COLUMNS = [
-    'theme', 'currency'
-];
+// ── Full column select for GET ────────────────────────────────────────────────
+const FULL_SELECT = {
+    theme: true,
+    language: true,
+    currency: true,
+    timeFormat: true,
+    dateFormat: true,
+    addressFormat: true,
+    layoutDensity: true,
+    defaultTimeframe: true,
+    displayUnit: true,
+    showBalances: true,
+    soundEffects: true,
+    hardwareAcceleration: true,
+    customRpcUrl: true,
+    testnetMode: true,
+    gasPreset: true,
+    maxSlippage: true,
+    mevProtection: true,
+    emailAlerts: true,
+    telegramAlerts: true,
+    whaleAlertThreshold: true,
+    email: true,
+    inactivityLockMinutes: true,
+    autoDisconnectTimer: true,
+    stealthMode: true,
+    requireSignForExports: true,
+    allowAnalytics: true,
+    chatName: true,
+    chatBio: true,
+    qrLabel: true,
+    hiddenAssets: true,
+};
+
+// ── Columns guaranteed to exist in every DB schema version ───────────────────
+const SAFE_COLUMNS = ['theme', 'currency', 'showBalances', 'stealthMode', 'allowAnalytics'];
+
+// ── Minimal fallback select ───────────────────────────────────────────────────
+const MINIMAL_SELECT = { theme: true, currency: true };
 
 export async function GET(req: any) {
     try {
@@ -44,36 +119,28 @@ export async function GET(req: any) {
         const address = validation.userId;
 
         let user: any = null;
+
+        // Try full select first, degrade gracefully if columns are missing
         try {
             user = await (prisma as any).user.findUnique({
                 where: { walletAddress: address },
-                select: {
-                    theme: true, currency: true,
-                    showBalances: true, stealthMode: true, allowAnalytics: true,
-                    testnetMode: true, soundEffects: true,
-                    autoDisconnectTimer: true, layoutDensity: true,
-                    hardwareAcceleration: true,
-                },
+                select: FULL_SELECT,
             });
         } catch {
-            // Extended columns not yet in schema — try with core settings columns only
             try {
                 user = await prisma.user.findUnique({
                     where: { walletAddress: address },
                     select: {
-                        theme: true, currency: true,
+                        theme: true, currency: true, language: true,
                         showBalances: true, stealthMode: true,
-                        allowAnalytics: true,
+                        allowAnalytics: true, soundEffects: true,
+                        testnetMode: true, hardwareAcceleration: true,
                     },
                 });
             } catch {
-                // Absolute minimum — original schema guaranteed columns only
                 user = await prisma.user.findUnique({
                     where: { walletAddress: address },
-                    select: {
-                        theme: true,
-                        currency: true,
-                    },
+                    select: MINIMAL_SELECT,
                 });
             }
         }
@@ -99,7 +166,10 @@ export async function PATCH(req: any) {
         const updateData: Record<string, any> = {};
         for (const storeKey of Object.keys(body)) {
             const dbKey = STORE_TO_DB[storeKey];
-            if (!dbKey) continue;
+            if (!dbKey) continue; // silently skip unknown keys
+            // Prevent duplicate: if both audioAlerts and soundEffects come in,
+            // only write once to the soundEffects column
+            if (dbKey in updateData) continue;
             updateData[dbKey] = body[storeKey];
         }
 
@@ -114,7 +184,7 @@ export async function PATCH(req: any) {
                 data: updateData,
             });
         } catch {
-            // New columns not yet in schema — only write safe columns
+            // Extended columns not yet migrated — write only safe columns
             const safeData: Record<string, any> = {};
             for (const k of Object.keys(updateData)) {
                 if (SAFE_COLUMNS.includes(k)) safeData[k] = updateData[k];
@@ -127,6 +197,7 @@ export async function PATCH(req: any) {
             }
         }
 
+        // Non-blocking audit log
         if (updatedUser) {
             try {
                 await prisma.auditLog.create({
