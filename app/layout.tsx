@@ -71,9 +71,7 @@ export const metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'HumanID',
-  },
+    title: 'Dashboard',
   openGraph: {
     title: 'Whale Alert Network | Professional Identity Layer',
     description: 'The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
@@ -139,18 +137,14 @@ export default async function RootLayout({
           "https://github.com/atfortyseven-creations/Humanity-Ledger"
         ]
       },
-      {
-        "@type": "SoftwareApplication",
-        "name": "HumanID Dashboard",
-        "operatingSystem": "Web",
+        "name": "Professional Dashboard",
         "applicationCategory": "FinanceApplication",
         "creator": {
           "@id": "https://www.humanidfi.com/#organization"
         },
-        "description": "HumanID Dashboard for real-time professional on-chain identity and intelligence.",
-        "url": "https://www.humanidfi.com/dashboard",
+        "description": "Professional Dashboard for real-time on-chain identity and intelligence.",
         "featureList": [
-          "HumanID Dashboard (Zero-Trust Analytics Suite)",
+          "Professional Dashboard (Zero-Trust Analytics Suite)",
           "ZK-Biometric Identity Attestation",
           "Aztec Network L2 Privacy Integration",
           "Network Ledger Analytics"

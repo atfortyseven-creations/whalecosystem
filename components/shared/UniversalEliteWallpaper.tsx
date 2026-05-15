@@ -21,30 +21,16 @@ export function UniversalEliteWallpaper() {
                     backgroundImage: "url('/system-shots/WALLPAPER%20GLOBAL.jpg')",
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center center',
-                    // bg-size: auto = renders at natural image size (no zoom, no distortion)
-                    backgroundSize: 'auto',
+                    // Set to cover to fill the screen exactly without unnatural zoom or distortion.
+                    backgroundSize: 'cover',
                 }}
             />
 
             {/*
-             * CONTENT FUSION GRADIENT
-             * On non-landing pages: white covers the left portion where content lives.
-             * This is NOT a hard division — it fades smoothly from solid white →
-             * transparent, so the content background fuses perfectly with the page
-             * white, and the Bitcoin logo appears naturally on the right.
-             *
-             * On landing page: no overlay — full immersive wallpaper shows through.
-             * On dashboard: no overlay — dashboard has its own shell.
+             * CONTENT BACKGROUND
+             * The pages are now full width. The background of the individual pages
+             * will naturally cover the wallpaper where needed.
              */}
-            {!isLanding && !isDashboard && (
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        // Gradient: solid white on left → transparent around center → completely clear on right
-                        background: 'linear-gradient(to right, #FAF9F6 0%, #FAF9F6 42%, rgba(250,249,246,0.85) 55%, rgba(250,249,246,0.3) 68%, transparent 82%)',
-                    }}
-                />
-            )}
 
             {/* Landing page: subtle bottom-white fade so content doesn't float on logo */}
             {isLanding && (

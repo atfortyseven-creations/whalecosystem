@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { PieChart, Users, Settings, X, Gift, CreditCard, Wifi, Shield, Zap, Network, BarChart2 } from 'lucide-react';
+import { PieChart, Users, Settings, X, Gift, CreditCard, Wifi, Shield, Zap, Network, BarChart2, Activity, Search, FileText, LifeBuoy } from 'lucide-react';
 
 import ReceiveHub from '@/components/wallet/ReceiveHub';
 import QRScannerModal from '@/components/wallet/QRScannerModal';
@@ -44,7 +44,7 @@ export default function SuperWallet({ recentNews = [] }: { recentNews?: NewsItem
 
 function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
     const { t } = useLanguage();
-    const [activeView, setActiveView] = useState<'portfolio' | 'analytics' | 'activity' | 'contacts' | 'settings' | 'referrals' | 'cards' | 'vault' | 'nfc' | 'network'>('portfolio');
+    const [activeView, setActiveView] = useState<'ticket_mint' | 'portfolio' | 'billing' | 'top_markets' | 'new_listings' | 'whale_ledger' | 'mass_transfers' | 'block_explorer' | 'aztec_pipeline' | 'session_logs' | 'support'>('portfolio');
     const [showWatchInput, setShowWatchInput] = useState(false);
     const [accounts, setAccounts] = useState<WalletAccount[]>([]);
     const [currentAddress, setCurrentAddress] = useState<string>('');
@@ -364,13 +364,18 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
                 </div>
                 
                 {/* Center Tabs - ABSOLUTELY CENTERED FOR PERFECT ALIGNMENT WITH CARD */}
-                <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 bg-white/50 rounded-full p-1.5 border border-[#1F1F1F]/5 shadow-sm overflow-x-auto max-w-[600px] scrollbar-hide">
-                    <ViewTab icon={<PieChart size={18}/>} label="Portfolio" active={activeView==='portfolio'} onClick={()=>setActiveView('portfolio')} />
-                    <ViewTab icon={<BarChart2 size={18}/>} label="Analytics" active={activeView==='analytics'} onClick={()=>setActiveView('analytics')} />
-                    <ViewTab icon={<Network size={18} className={activeView === 'network' ? 'text-[#00f2ea]' : ''} />} label="Network" active={activeView==='network'} onClick={()=>setActiveView('network')} />
-                    <ViewTab icon={<Zap size={18}/>} label="Activity" active={activeView==='activity'} onClick={()=>setActiveView('activity')} />
-                    <ViewTab icon={<Gift size={18}/>} label="Referrals" active={activeView==='referrals'} onClick={()=>setActiveView('referrals')} />
-                    <ViewTab icon={<Settings size={18}/>} label="Settings" active={activeView==='settings'} onClick={()=>setActiveView('settings')} />
+                <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 bg-white/50 rounded-full p-1 border border-[#1F1F1F]/5 shadow-sm overflow-x-auto max-w-[1800px] w-max scrollbar-hide">
+                    <ViewTab icon={<Gift size={18}/>} label="Ticket Mint" active={activeView==='ticket_mint'} onClick={()=>setActiveView('ticket_mint')} />
+                    <ViewTab icon={<PieChart size={18}/>} label="Main Portfolio" active={activeView==='portfolio'} onClick={()=>setActiveView('portfolio')} />
+                    <ViewTab icon={<CreditCard size={18}/>} label="Billing & Plan" active={activeView==='billing'} onClick={()=>setActiveView('billing')} />
+                    <ViewTab icon={<BarChart2 size={18}/>} label="Top Markets" active={activeView==='top_markets'} onClick={()=>setActiveView('top_markets')} />
+                    <ViewTab icon={<Activity size={18}/>} label="New Listings" active={activeView==='new_listings'} onClick={()=>setActiveView('new_listings')} />
+                    <ViewTab icon={<Zap size={18}/>} label="Whale Ledger" active={activeView==='whale_ledger'} onClick={()=>setActiveView('whale_ledger')} />
+                    <ViewTab icon={<Network size={18}/>} label="Mass Transfers" active={activeView==='mass_transfers'} onClick={()=>setActiveView('mass_transfers')} />
+                    <ViewTab icon={<Search size={18}/>} label="Block Explorer" active={activeView==='block_explorer'} onClick={()=>setActiveView('block_explorer')} />
+                    <ViewTab icon={<Shield size={18}/>} label="Aztec Pipeline" active={activeView==='aztec_pipeline'} onClick={()=>setActiveView('aztec_pipeline')} />
+                    <ViewTab icon={<FileText size={18}/>} label="Session Logs" active={activeView==='session_logs'} onClick={()=>setActiveView('session_logs')} />
+                    <ViewTab icon={<LifeBuoy size={18}/>} label="Support" active={activeView==='support'} onClick={()=>setActiveView('support')} />
                 </div>
 
                 {/* Right Actions */}
@@ -380,11 +385,12 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
             </header>
 
              {/* Mobile Tab Bar (Bottom) */}
-             <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white/90 backdrop-blur-lg border border-[#1F1F1F]/5 shadow-2xl rounded-full p-2 flex gap-1">
-                 <ViewTab icon={<PieChart size={20}/>} label="" active={activeView==='portfolio'} onClick={()=>setActiveView('portfolio')} />
-                 <ViewTab icon={<Network size={20} className={activeView === 'network' ? 'text-[#00f2ea]' : ''} />} label="" active={activeView==='network'} onClick={()=>setActiveView('network')} />
-                 <ViewTab icon={<Gift size={20}/>} label="" active={activeView==='referrals'} onClick={()=>setActiveView('referrals')} />
-                 <ViewTab icon={<Settings size={20}/>} label="" active={activeView==='settings'} onClick={()=>setActiveView('settings')} />
+             <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white/90 backdrop-blur-lg border border-[#1F1F1F]/5 shadow-2xl rounded-full p-2 flex gap-1 overflow-x-auto w-[90vw] scrollbar-hide">
+                 <ViewTab icon={<PieChart size={20}/>} label="Portfolio" active={activeView==='portfolio'} onClick={()=>setActiveView('portfolio')} />
+                 <ViewTab icon={<Zap size={20}/>} label="Ledger" active={activeView==='whale_ledger'} onClick={()=>setActiveView('whale_ledger')} />
+                 <ViewTab icon={<Shield size={20}/>} label="Aztec" active={activeView==='aztec_pipeline'} onClick={()=>setActiveView('aztec_pipeline')} />
+                 <ViewTab icon={<CreditCard size={20}/>} label="Billing" active={activeView==='billing'} onClick={()=>setActiveView('billing')} />
+                 <ViewTab icon={<LifeBuoy size={20}/>} label="Support" active={activeView==='support'} onClick={()=>setActiveView('support')} />
             </div>
 
             <main className="max-w-[2560px] text-left mx-auto p-4 space-y-4 relative z-10 min-h-[80vh]">

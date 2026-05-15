@@ -448,6 +448,24 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     } catch (e) { console.warn('[Chat] persist failed', e); }
   };
 
+  const syncToAddressBook = async (peerAddr: string) => {
+    try {
+      // Graceful upsert to user's address book
+      await fetch('/api/wallet/address-book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `Chat: ${peerAddr.slice(0, 6)}...${peerAddr.slice(-4)}`,
+          address: peerAddr,
+          label: 'Whale Chat',
+          isFavorite: false
+        })
+      });
+    } catch (err) {
+      console.error('[WhaleChat] Failed to sync address book:', err);
+    }
+  };
+
   // Load messages when active peer changes (handled by loadConversations but filtered in render)
   useEffect(() => {
     if (!client || !activePeer) return;
@@ -488,6 +506,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               }));
 
             if (!toAdd.length) return prev;
+            
+            // Auto-sync discovered peers to Address Book
+            toAdd.forEach(c => syncToAddressBook(c.peerAddress));
+            
             const updated = [...toAdd, ...prev];
             persistToLocal(updated);
             return updated;
@@ -635,6 +657,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         setConversations(prev => {
             const exists = prev.find(c => c.peerAddress.toLowerCase() === peer.toLowerCase());
             if (exists) return prev;
+            
+            // Auto-sync manual new chat to Address Book
+            syncToAddressBook(peer);
+            
             const updated = [newConv, ...prev];
             persistToLocal(updated);
             return updated;

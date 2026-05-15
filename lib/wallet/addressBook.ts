@@ -41,8 +41,18 @@ export async function addToAddressBook(data: CreateAddressBookEntry): Promise<Ad
     ensName = await reverseResolveENS(data.address) || undefined;
   }
 
-  return (prisma as any).addressBookEntry.create({
-    data: {
+  return (prisma as any).addressBookEntry.upsert({
+    where: {
+      authUserId_address: {
+        authUserId: data.authUserId,
+        address: data.address.toLowerCase(),
+      }
+    },
+    update: {
+      // Just update last seen/interacted via updatedAt internally, or maybe update name if provided?
+      // Let's not overwrite their custom labels if it already exists, just return it.
+    },
+    create: {
       authUserId: data.authUserId,
       name: data.name,
       address: data.address.toLowerCase(),
@@ -84,7 +94,7 @@ export async function getAddressBook(
     ];
   }
 
-  return prisma.addressBookEntry.findMany({
+  return (prisma as any).addressBookEntry.findMany({
     where,
     orderBy: [
       { isFavorite: 'desc' },
@@ -100,7 +110,7 @@ export async function getAddressBookEntry(
   authUserId: string,
   address: string
 ): Promise<AddressBookEntry | null> {
-  return prisma.addressBookEntry.findUnique({
+  return (prisma as any).addressBookEntry.findUnique({
     where: {
       authUserId_address: {
         authUserId,
@@ -117,7 +127,7 @@ export async function updateAddressBookEntry(
   id: string,
   updates: Partial<Omit<AddressBookEntry, 'id' | 'authUserId' | 'address' | 'createdAt' | 'updatedAt'>>
 ): Promise<AddressBookEntry> {
-  return prisma.addressBookEntry.update({
+  return (prisma as any).addressBookEntry.update({
     where: { id },
     data: updates,
   });
@@ -127,7 +137,7 @@ export async function updateAddressBookEntry(
  * Delete address book entry
  */
 export async function deleteAddressBookEntry(id: string): Promise<void> {
-  await prisma.addressBookEntry.delete({
+  await (prisma as any).addressBookEntry.delete({
     where: { id },
   });
 }
@@ -136,13 +146,13 @@ export async function deleteAddressBookEntry(id: string): Promise<void> {
  * Toggle favorite status
  */
 export async function toggleFavorite(id: string): Promise<AddressBookEntry> {
-  const entry = await prisma.addressBookEntry.findUnique({ where: { id } });
+  const entry = await (prisma as any).addressBookEntry.findUnique({ where: { id } });
   
   if (!entry) {
     throw new Error('Address book entry not found');
   }
 
-  return prisma.addressBookEntry.update({
+  return (prisma as any).addressBookEntry.update({
     where: { id },
     data: { isFavorite: !entry.isFavorite },
   });
