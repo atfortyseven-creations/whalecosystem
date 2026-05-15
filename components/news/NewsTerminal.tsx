@@ -242,10 +242,16 @@ export function NewsTerminal() {
                   </button>
                 );
               })}
-              {articles.length === 0 && (
+              {!loading && articles.length === 0 && (
                 <div className="px-6 py-10 flex flex-col items-center text-center opacity-50 text-[#0A0A0A] dark:text-white">
                   <BookOpen size={24} className="mb-3" />
                   <p className="font-mono text-[10px] uppercase tracking-widest">No news available.</p>
+                </div>
+              )}
+              {loading && articles.length === 0 && (
+                <div className="px-6 py-10 flex flex-col items-center justify-center opacity-50 text-[#0A0A0A] dark:text-white gap-4">
+                  <div className="w-6 h-6 border-2 border-black/10 dark:border-white/10 border-t-black dark:border-t-white rounded-full animate-spin" />
+                  <p className="font-mono text-[10px] uppercase tracking-widest">Loading Report...</p>
                 </div>
               )}
             </div>

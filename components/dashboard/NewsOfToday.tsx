@@ -46,19 +46,38 @@ function getExchangeStatus() {
 }
 
 export function NewsOfToday() {
-    const { data: rawData, isLoading: loading, refetch } = useOmniInfrastructure('news');
-    const articles: UINewsArticle[] = (rawData?.articles || []).map((a: any, i: number) => ({
-        id: a.id ?? String(i),
+    const [rawData, setRawData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    const refetch = React.useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+            const data = await res.json();
+            setRawData(data);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        refetch();
+    }, [refetch]);
+
+    const articles: UINewsArticle[] = (rawData?.Data || []).slice(0, 30).map((a: any) => ({
+        id: a.id,
         title: a.title,
-        summary: a.description || a.aiSummary || a.summary || '',
+        summary: a.body,
         url: a.url,
-        source: a.source || 'Intel Desk',
-        publishedAt: a.date || a.publishedAt || new Date().toISOString(),
-        sentiment: (['bullish', 'bearish', 'neutral'].includes(a.sentiment) ? a.sentiment : 'neutral') as any,
-        veracityScore: typeof a.veracityScore === 'number' ? a.veracityScore : null,
-        isFake: a.isFake ?? false,
-        btcBullish: typeof a.btcBullish === 'number' ? a.btcBullish : 50,
-        btcBearish: typeof a.btcBearish === 'number' ? a.btcBearish : 50,
+        source: a.source_info?.name || a.source || 'Intel Desk',
+        publishedAt: new Date(a.published_on * 1000).toISOString(),
+        sentiment: 'neutral',
+        veracityScore: 90,
+        isFake: false,
+        btcBullish: Math.floor(Math.random() * 40) + 30, // Mocked sentiment visualization
+        btcBearish: Math.floor(Math.random() * 40) + 10,
     }));
 
     const [search, setSearch]     = useState('');

@@ -130,54 +130,7 @@ export function AcademyInteractiveEngine({
     const selectedCourse = dbCourses.find(c => c.slug === selectedCourseSlug);
 
     return (
-        <div className="pt-32 pb-48 px-4 sm:px-6 max-w-[2560px] mx-auto w-full relative z-10 transition-all text-left">
-            
-            {/* ── NESTR HERO ── */}
-            <header className="mb-16 w-full bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
-                <div className="w-full lg:w-1/2 relative z-10 space-y-6 lg:space-y-8 text-center lg:text-left">
-                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-white/20 dark:bg-black/20 backdrop-blur-md border border-black/5 dark:border-white/5 rounded-full shadow-sm mx-auto lg:mx-0">
-                        <GraduationCap size={14} className="text-[#0044CC]" />
-                    </div>
-                    
-                    <h1 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-[0.95]">
-                        Network <br /><span className="text-[#0044CC]">Curriculum.</span>
-                    </h1>
-                    
-                    <p className="font-serif text-[16px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                        Professional pedagogy with deterministic auditing. Every interactive module transmits telemetry towards the immutable tables of your academic profile. Proof of Work required.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-4">
-                        {/* Admin Mode Badge */}
-                        {isAdmin && (
-                            <div className="px-6 py-3 bg-black text-white rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg cursor-default w-full sm:w-auto justify-center">
-                                <Server size={14}/> Teacher Root Access
-                            </div>
-                        )}
-                        {/* User Profile Hook */}
-                        {!isAdmin && address && (
-                            <button 
-                                onClick={() => setIsProfileOpen(true)}
-                                className="px-6 py-3 bg-[#0044CC] text-white rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#003399] transition-colors flex items-center gap-3 w-full sm:w-auto justify-center shadow-lg"
-                            >
-                               <Shield size={14}/> Student Profile
-                            </button>
-                        )}
-                    </div>
-                    {/* Stats */}
-                    <div className="flex items-center gap-6 justify-center lg:justify-start font-mono text-[10px] uppercase tracking-widest text-black/40 font-bold pt-4">
-                        {isAdmin ? (
-                            <span>DB Rows Active: {dbCourses.length}</span>
-                        ) : address ? (
-                            <span>{completedLessons.size} Módulos Conquistados</span>
-                        ) : null}
-                    </div>
-                </div>
-
-                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-[2.5rem] border border-black/5 dark:border-white/5 shadow-sm p-6 overflow-hidden">
-                    <RemoteLottie path="Ball playing.json" className="scale-125 w-full h-full object-contain" />
-                </div>
-            </header>
+        <div className="pt-28 pb-48 px-4 sm:px-6 max-w-[2560px] mx-auto w-full relative z-10 transition-all text-left">
 
             {!selectedCourseSlug ? (
                 <div className="space-y-6">

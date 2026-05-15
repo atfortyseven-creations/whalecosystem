@@ -50,12 +50,30 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
     const [currentAddress, setCurrentAddress] = useState<string>('');
     const [accountBalances, setAccountBalances] = useState<Record<string, string>>({});
 
-    // =========================================================================
-    // INJECTED DATA HOOK — Zero-Mock Mandate
-    // News endpoint injected via REGISTRY.OMNI_INFRA.news
-    // =========================================================================
-    const { data: newsData } = useOmniInfrastructure('news');
-    const news: NewsItem[] = newsData?.news || newsData?.articles || recentNews;
+    const [liveNews, setLiveNews] = useState<NewsItem[]>([]);
+
+    useEffect(() => {
+        const fetchNews = async () => {
+            try {
+                const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+                const data = await res.json();
+                const realNews = (data?.Data || []).slice(0, 10).map((a: any) => ({
+                    id: a.id,
+                    title: a.title,
+                    summary: a.body,
+                    url: a.url,
+                    source: a.source_info?.name || 'Intel Desk',
+                    publishedAt: new Date(a.published_on * 1000).toISOString(),
+                }));
+                setLiveNews(realNews);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchNews();
+    }, []);
+
+    const news: NewsItem[] = liveNews.length > 0 ? liveNews : recentNews;
 
 
     const {

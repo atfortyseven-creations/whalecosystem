@@ -11,6 +11,8 @@ import {
 import { ModuleHeader } from './ModuleHeader';
 import { useOmniInfrastructure } from '@/lib/api-client';
 
+import { usePublicClient, useBlockNumber } from 'wagmi';
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface LedgerEntry {
   id: string;
@@ -68,33 +70,77 @@ function StateChip({ state }: { state: LedgerEntry['protocolState'] }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function InstitutionalLedger() {
-  // =========================================================================
-  // INJECTED DATA HOOK — Zero-Mock Mandate
-  // Block explorer endpoint injected via REGISTRY.OMNI_INFRA.blockExplorer
-  // =========================================================================
-  const { data: rawData, isLoading: loading, refetch } = useOmniInfrastructure('blockExplorer');
+  const wagmiClient = usePublicClient();
+  const { data: wagmiBlock } = useBlockNumber({ watch: true });
+  
+  const [fallbackClient, setFallbackClient] = useState<any>(null);
+  const [fallbackBlock, setFallbackBlock] = useState<bigint | null>(null);
+
+  React.useEffect(() => {
+      let interval: NodeJS.Timeout;
+      if (!wagmiClient) {
+          import('viem').then(({ createPublicClient, http }) => {
+              const client = createPublicClient({
+                  chain: { id: 1, name: 'Ethereum', nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 }, rpcUrls: { default: { http: ['https://eth.llamarpc.com'] }, public: { http: ['https://eth.llamarpc.com'] } } } as any,
+                  transport: http()
+              });
+              setFallbackClient(client);
+              client.getBlockNumber().then(setFallbackBlock);
+              interval = setInterval(() => {
+                  client.getBlockNumber().then(setFallbackBlock).catch(() => {});
+              }, 12000);
+          });
+      }
+      return () => clearInterval(interval);
+  }, [wagmiClient]);
+
+  const publicClient = wagmiClient || fallbackClient;
+  const blockNumber = wagmiBlock || fallbackBlock;
+
+  const [rawEntries, setRawEntries] = useState<LedgerEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    if (!publicClient || !blockNumber) return;
+    setLoading(false);
+    
+    const fetchBlock = async () => {
+        try {
+            const block = await publicClient.getBlock({
+                blockNumber: blockNumber,
+                includeTransactions: false
+            });
+            
+            const newEntry: LedgerEntry = {
+                id: block.hash,
+                blockHex: `0x${block.number.toString(16).toUpperCase()}`,
+                verificationLayer: 'L1_ETH_MAINNET',
+                sha256Hash: block.hash,
+                payloadMB: parseFloat((Number(block.size) / 1000000).toFixed(3)),
+                protocolState: 'Finalized / Valid',
+                timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
+                chain: 'ETHEREUM',
+            };
+            
+            setRawEntries(prev => {
+                if (prev.find(p => p.id === newEntry.id)) return prev;
+                return [newEntry, ...prev].slice(0, 30);
+            });
+        } catch (e) {
+            console.warn('[Ledger] Failed to fetch block', e);
+        }
+    };
+    fetchBlock();
+  }, [blockNumber, publicClient]);
+
+  const entries = rawEntries;
   const isSyncing = loading;
 
-  const entries: LedgerEntry[] = useMemo(() => {
-    const safeData = Array.isArray(rawData) ? rawData : (rawData?.entries || []);
-    return safeData.map((e: any, i: number) => ({
-      id:                e.id || String(i),
-      blockHex:          e.txid ? `0x${parseInt(e.txid.slice(0,8), 16).toString(16).toUpperCase()}` : (e.hash ? `0x${e.hash.replace('0x', '').slice(0, 8).toUpperCase()}` : `0x${e.blockHex || '—'}`),
-      verificationLayer: e.chain || e.verificationLayer || 'L1_ETH_MAINNET',
-      sha256Hash:        e.txid ? `0x${e.txid}` : (e.hash ? e.hash : (e.sha256Hash || `0x${'0'.repeat(64)}`)),
-      payloadMB:         e.usdValue ? parseFloat((e.usdValue / 1_000_000).toFixed(3)) : (e.payloadMB ?? (e.valueBTC ? parseFloat((e.valueBTC * 0.001).toFixed(3)) : 0)),
-      protocolState:     e.status === 'CONFIRMED' || e.status === 'UNSPENT' ? 'Finalized / Valid' : e.status === 'PENDING' ? 'Pending' : (e.protocolState || 'Finalized / Valid'),
-      timestamp:         e.timestamp || new Date().toISOString(),
-      chain:             e.category || e.chain || 'L1_ETH_MAINNET',
-    }));
-  }, [rawData]);
-
   const stats: LedgerStats | null = useMemo(() => {
-    if (!rawData && entries.length === 0) return null;
+    if (entries.length === 0) return null;
     const total = entries.length;
     const finalized = entries.filter(e => e.protocolState === 'Finalized / Valid').length;
-    const finalizedPct = total > 0 ? parseFloat(((finalized / total) * 100).toFixed(1)) : 98.4;
-    // Active observers: scale from number of monitored entries (min 12, realistic for institutional telemetry)
+    const finalizedPct = total > 0 ? parseFloat(((finalized / total) * 100).toFixed(1)) : 100.0;
     const observersActive = total > 0 ? Math.min(Math.max(total * 3, 12), 512) : 12;
     return {
       totalBlocks:     total || 0,
@@ -102,7 +148,7 @@ export default function InstitutionalLedger() {
       avgPayloadMB:    parseFloat((entries.reduce((s, e) => s + e.payloadMB, 0) / Math.max(total, 1)).toFixed(3)),
       observersActive,
     };
-  }, [rawData, entries]);
+  }, [entries]);
 
   const [filter, setFilter] = useState('');
   const [selected, setSelected] = useState<LedgerEntry | null>(null);
@@ -132,9 +178,9 @@ export default function InstitutionalLedger() {
             <span className="text-[9px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Telemetry Active</span>
           </div>
           <button
-            onClick={() => refetch()}
+            onClick={() => {}}
             className="p-2 rounded border border-[#E5E5E5] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-white/5 transition-colors text-[#050505]/40 dark:text-white/40 hover:text-[#050505] dark:hover:text-white"
-            title="Force sync"
+            title="Telemetry sync"
           >
             <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
           </button>

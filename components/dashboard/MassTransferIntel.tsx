@@ -215,8 +215,9 @@ export function MassTransferIntel() {
   const audioCtxRef    = useRef<AudioContext | null>(null);
   const prevCountRef   = useRef<number>(0);
 
-  const { data: rawData, isLoading, error, refetch } = useSovereignIntel("massTransfers");
-  const events: any[] = rawData?.events || [];
+  const [events, setEvents] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   // ── Sonar ping ─────────────────────────────────────────────────────────────
   const playPing = useCallback(() => {
@@ -247,22 +248,70 @@ export function MassTransferIntel() {
     prevCountRef.current = events.length;
   }, [events.length, isSonarActive, playPing]);
 
-  // ── Sync handler — bypasses server cache with ?bust=1 ──────────────────────
-  const handleSync = async () => {
+  // ── Sync handler — Real On-Chain L1 Fetch ──────────────────────
+  const handleSync = useCallback(async () => {
     setSyncing(true);
+    setIsLoading(true);
     try {
-      // Force-fetch bypassing the 30s server cache
-      await fetch("/api/intelligence/mass-transfers?bust=1");
-      // Then invalidate React Query cache so the hook re-fetches fresh
-      await queryClient.invalidateQueries({ queryKey: ["intel", "massTransfers"] });
-      await refetch();
-      toast.success("Ledger synchronized");
-    } catch {
+      const { createPublicClient, http, formatEther } = await import('viem');
+      const { mainnet } = await import('viem/chains');
+      
+      const client = createPublicClient({
+        chain: mainnet,
+        transport: http('https://eth-mainnet.g.alchemy.com/v2/demo')
+      });
+      
+      const block = await client.getBlock({ includeTransactions: true });
+      const currentEthPrice = 3500; // Approximate for USD value
+      
+      const liveTransfers = block.transactions
+        .filter((tx: any) => tx.value > 0n)
+        .map((tx: any) => {
+           const ethValue = parseFloat(formatEther(tx.value));
+           const usdValue = ethValue * currentEthPrice;
+           let tier = "MICRO_TRANSFER";
+           if (usdValue > 1000000) tier = "ULTRA_CAPITAL_FLOW";
+           else if (usdValue > 100000) tier = "ENTERPRISE_TRANSFER";
+           else if (usdValue > 10000) tier = "STANDARD_FLOW";
+           else if (usdValue > 1000) tier = "RETAIL_PRO";
+           
+           return {
+             hash: tx.hash,
+             from: tx.from,
+             to: tx.to || 'Contract Creation',
+             amount: ethValue.toString(),
+             usdValue: usdValue.toString(),
+             token: "ETH",
+             chain: "ETH",
+             timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
+             tier,
+             action: "NATIVE_TRANSFER",
+             confirmations: 1,
+             gasPriceGwei: tx.gasPrice ? (Number(tx.gasPrice) / 1e9).toFixed(2) : "0",
+             method: "Native Transfer"
+           };
+        })
+        .sort((a, b) => Number(b.usdValue) - Number(a.usdValue))
+        .slice(0, 50);
+
+      setEvents(liveTransfers);
+      setError(false);
+      toast.success("Ledger synchronized with L1");
+    } catch (e) {
+      console.error(e);
+      setError(true);
       toast.error("Sync failed — RPC unreachable");
     } finally {
       setSyncing(false);
+      setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    handleSync();
+    const interval = setInterval(handleSync, 12000); // New block every ~12s
+    return () => clearInterval(interval);
+  }, [handleSync]);
 
   // ── Filter + sort ──────────────────────────────────────────────────────────
   const availableChains = useMemo(

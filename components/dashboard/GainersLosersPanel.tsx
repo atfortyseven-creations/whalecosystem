@@ -157,8 +157,37 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
 
 // ── Main Panel ────────────────────────────────────────────────────────────────
 export function GainersLosersPanel() {
-    const { data: rawData, isLoading, error } = useMarketData('gainersLosers');
-    const markets = Array.isArray(rawData) ? rawData : rawData?.data || [];
+    const [rawData, setRawData] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+        let isMounted = true;
+        const fetchRealData = async () => {
+            try {
+                const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+                const data = await res.json();
+                if (isMounted) {
+                    // Filter for top volume USDT pairs
+                    const validData = data
+                        .filter((d: any) => d.symbol.endsWith('USDT') && parseFloat(d.quoteVolume) > 10000000)
+                        .slice(0, 100);
+                    setRawData(validData);
+                    setIsLoading(false);
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError(true);
+                    setIsLoading(false);
+                }
+            }
+        };
+        fetchRealData();
+        const interval = setInterval(fetchRealData, 10000); // 10s updates
+        return () => { isMounted = false; clearInterval(interval); };
+    }, []);
+
+    const markets = rawData || [];
 
     const isConnected = !isLoading && !error;
     const lastUpdate = new Date();

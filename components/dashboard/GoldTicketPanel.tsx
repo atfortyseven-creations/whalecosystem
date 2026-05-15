@@ -275,17 +275,34 @@ export function GoldTicketPanel() {
 
   const fetchStats = useCallback(async (isMounted: boolean = true) => {
     try {
-      const q = address ? `?address=${address}` : '';
-      const res = await fetch(`/api/golden-ticket/claim${q}`);
-      const json = await res.json();
-      if (isMounted) setDbStats(json);
-    } catch {}
-  }, [address]);
+      // ── Zero-Mock Mandate: Fetch real on-chain data for Treasury Wallet ──
+      const { createPublicClient, http, formatEther } = await import('viem');
+      const { optimism } = await import('viem/chains');
+      const client = createPublicClient({
+        chain: optimism,
+        transport: http()
+      });
+      
+      const balanceWei = await client.getBalance({ address: TREASURY_WALLET });
+      const balanceEth = parseFloat(formatEther(balanceWei));
+      const ticketsSold = Math.floor(balanceEth / parseFloat(MINT_FEE_ETH));
+
+      if (isMounted) {
+          setDbStats({
+              totalClaimed: ticketsSold,
+              feed: [], // No longer showing fake mocked feed
+              ticket: null // Will be populated dynamically if user successfully mints in session
+          });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
     fetchStats(isMounted);
-    const id = setInterval(() => fetchStats(isMounted), 5000);
+    const id = setInterval(() => fetchStats(isMounted), 15000); // 15s for optimism
     return () => {
       isMounted = false;
       clearInterval(id);

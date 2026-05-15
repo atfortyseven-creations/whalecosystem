@@ -1,9 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { ArrowLeft, Shield, Lock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { UniversalEliteWallpaper } from "@/components/shared/UniversalEliteWallpaper";
 
 // SSR-unsafe — XMTP uses browser WASM
 const WhaleChat = dynamic(
@@ -14,7 +15,7 @@ const WhaleChat = dynamic(
       <div className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-[#9945FF] border-t-transparent animate-spin" />
-          <p className="text-[10px] font-mono uppercase tracking-widest text-black/40">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-white/40">
             Loading Secure Channel…
           </p>
         </div>
@@ -83,34 +84,40 @@ export default function MobileChatPage() {
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    backgroundColor: '#FAFAFA',
+    backgroundColor: 'transparent',
     zIndex: 1000,
     touchAction: 'none', // Prevent bounce at container level
   };
 
   return (
-    <div style={containerStyle} className="text-[#050505]">
-      {/* ── Top Navigation Bar ── */}
-      <header className="shrink-0 h-14 flex items-center justify-between px-4 bg-white border-b border-black/8 z-10">
-        <Link
-          href="/"
-          className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 text-black/40 transition-colors"
-          aria-label="Back to home"
-        >
-          <ArrowLeft size={20} />
-        </Link>
+    <>
+      <UniversalEliteWallpaper />
+      <div style={containerStyle} className="text-[#050505] dark:text-white">
+        {/* ── Top Navigation Bar ── */}
+        <header className="shrink-0 h-14 flex items-center justify-between px-5 bg-white/60 dark:bg-black/60 backdrop-blur-[60px] border-b border-black/5 dark:border-white/5 z-10">
+          <Link
+            href="/"
+            className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-[#050505]/50 dark:text-white/50 transition-colors"
+            aria-label="Back to home"
+          >
+            <ArrowLeft size={18} />
+          </Link>
 
-        <div className="flex items-center gap-2">
-          <img src="/official-whale-monochrome.png" alt="Whale Chat" className="w-8 h-8 opacity-90 mix-blend-multiply" />
-          <span className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-black">Whale Chat</span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-mono text-[11px] font-black uppercase tracking-[0.25em] text-[#050505] dark:text-white">Whale Chat</span>
+          </div>
+
+          <div className="w-9 flex items-center justify-center">
+            <span className="font-mono text-[9px] font-black uppercase tracking-widest text-black/20 dark:text-white/20">P2P</span>
+          </div>
+        </header>
+
+        {/* Chat fills the remainder transparently — wallpaper shows through */}
+        <div className="flex-1 min-h-0 overflow-hidden relative">
+          <WhaleChat forceAutoInit={false} />
         </div>
-
-        <div className="w-10" />
-      </header>
-
-      <div className="flex-1 min-h-0 overflow-hidden relative">
-        <WhaleChat forceAutoInit={false} />
       </div>
-    </div>
+    </>
   );
 }
