@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { Shield, CreditCard, Mail, CheckCircle2, LayoutDashboard, AlertCircle, Loader2, CalendarClock, Building2, Download, ArrowUpRight } from 'lucide-react';
+import { Shield, CreditCard, Mail, CheckCircle2, AlertCircle, Loader2, CalendarClock, Download } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface SubscriptionData {
@@ -23,7 +23,7 @@ interface UserData {
 export function PlanDashboard() {
   const { isConnected, address, isSovereignHandshake } = useSovereignAccount();
   const router = useRouter();
-  
+
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -69,7 +69,7 @@ export function PlanDashboard() {
 
   const isFree = userData.tier === 'FREE';
   const sub = userData.subscription;
-  
+
   let formattedTier = userData.tier;
   let cycle = 'Lifetime';
   let expiresString = 'Never';
@@ -78,12 +78,12 @@ export function PlanDashboard() {
 
   if (sub) {
     if (sub.status === 'PENDING_SEPA') {
-        isPending = true;
+      isPending = true;
     }
     const parts = sub.tier.split('_');
     formattedTier = parts[0] || userData.tier;
     cycle = parts[1] ? (parts[1].toLowerCase() === 'annual' ? 'Annually' : 'Monthly') : 'N/A';
-    
+
     if (sub.expiresAt) {
       const expirationDate = new Date(sub.expiresAt);
       expiresString = expirationDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -91,21 +91,24 @@ export function PlanDashboard() {
     }
   }
 
-    return (
+  return (
     <div className="flex flex-col gap-8 w-full mx-auto p-6 md:p-12 font-sans bg-[#FAF9F6] text-[#050505] min-h-full rounded-3xl border border-black/[0.04]">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/[0.04] pb-8">
         <div>
           <h1 className="text-4xl font-black tracking-tight text-[#050505] flex items-center gap-3 uppercase">
-            Billing & Plan
+            Billing &amp; Plan
           </h1>
-          <p className="text-[12px] text-black/50 mt-2 font-black uppercase tracking-[0.2em]">Manage your subscription, identity attestation, and payment history.</p>
+          <p className="text-[12px] text-black/50 mt-2 font-black uppercase tracking-[0.2em]">
+            Manage your subscription, identity attestation, and payment history.
+          </p>
         </div>
       </div>
 
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Main Plan Card */}
         <div className="lg:col-span-2 bg-white rounded-[2rem] border border-black/[0.06] relative overflow-hidden flex flex-col justify-between shadow-xl">
           <div className="p-10 border-b border-black/[0.04]">
@@ -128,7 +131,7 @@ export function PlanDashboard() {
                     Awaiting SEPA
                   </div>
                 ) : isFree || isExpired ? (
-                  <button 
+                  <button
                     onClick={() => router.push('/pricing')}
                     className="px-8 py-3.5 bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] rounded-2xl hover:bg-black/80 transition-all shadow-lg hover:scale-105 active:scale-95"
                   >
@@ -164,17 +167,21 @@ export function PlanDashboard() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 p-8 gap-8 bg-[#FAF9F6]">
             <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 flex items-center gap-2"><Mail size={12}/> Registered Contact</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 flex items-center gap-2">
+                <Mail size={12} /> Registered Contact
+              </span>
               <span className="text-[13px] font-black text-[#050505]">{userData.email || 'NO_EMAIL_CONFIGURED'}</span>
             </div>
             <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 flex items-center gap-2"><Shield size={12}/> Connected Wallet</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 flex items-center gap-2">
+                <Shield size={12} /> Connected Wallet
+              </span>
               <span className="text-[13px] font-black font-mono text-[#050505] truncate">{address}</span>
             </div>
           </div>
         </div>
 
-        {/* Humanity Score / Perks */}
+        {/* Humanity Score */}
         <div className="bg-white border border-black/[0.06] rounded-[2rem] p-10 flex flex-col justify-between shadow-xl">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-4">Identity Attestation</p>
@@ -185,11 +192,10 @@ export function PlanDashboard() {
               Your cryptographic score represents your on-chain reputation. Premium users accumulate score 10x faster.
             </p>
           </div>
-
           <div className="space-y-4 pt-8 border-t border-black/[0.04] mt-8">
-             <button className="w-full py-3.5 border border-black/10 bg-[#FAF9F6] rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] hover:bg-black/5 hover:border-black/20 transition-all">
-                View Entity Profile
-             </button>
+            <button className="w-full py-3.5 border border-black/10 bg-[#FAF9F6] rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] hover:bg-black/5 hover:border-black/20 transition-all">
+              View Entity Profile
+            </button>
           </div>
         </div>
 
@@ -199,13 +205,13 @@ export function PlanDashboard() {
       <div className="mt-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <h3 className="text-2xl font-black uppercase tracking-tighter text-[#050505] flex items-center gap-2">
-            Invoices & Billing
+            Invoices &amp; Billing
           </h3>
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">
             Securely processed via SEPA
           </span>
         </div>
-        
+
         <div className="bg-white border border-black/[0.06] rounded-[2rem] overflow-hidden shadow-xl">
           {!userData.transactions || userData.transactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -229,12 +235,12 @@ export function PlanDashboard() {
                   {userData.transactions.map((tx, idx) => (
                     <tr key={tx.id || idx} className="hover:bg-[#FAF9F6] transition-colors group">
                       <td className="py-5 pl-8 pr-4 font-black font-mono text-[#050505]">
-                        €{tx.amount} <span className="text-black/30 text-[10px]">EUR</span>
+                        &euro;{tx.amount} <span className="text-black/30 text-[10px]">EUR</span>
                       </td>
                       <td className="py-5 px-4">
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded-md border ${
                           tx.status === 'PROCESSING' || tx.status === 'PENDING'
-                            ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' 
+                            ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
                             : tx.status === 'CONFIRMED' || tx.status === 'ACTIVE'
                             ? 'bg-[#00C076]/10 text-[#00C076] border-[#00C076]/20'
                             : 'bg-black/5 text-black/60 border-black/10'
@@ -260,6 +266,7 @@ export function PlanDashboard() {
               </table>
             </div>
           )}
+        </div>
       </div>
 
     </div>
