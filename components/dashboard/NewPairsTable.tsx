@@ -101,7 +101,7 @@ export function NewPairsTable() {
     const chains: Chain[] = NETWORKS;
 
     return (
-        <div className="w-full h-full min-h-0 p-4 flex flex-col overflow-hidden text-[#050505] font-sans">
+        <div className="w-full h-full min-h-0 p-0 flex flex-col overflow-hidden text-[#050505] font-sans">
             <div className="flex-1 w-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm flex flex-col min-h-0">
 
             {/* ── Toolbar ── */}

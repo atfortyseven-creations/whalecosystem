@@ -284,7 +284,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     ? 'fixed inset-0 w-full h-full overflow-hidden flex flex-col bg-transparent z-0'
     : isBounded
       ? 'fixed inset-0 w-full h-full overflow-hidden flex flex-col bg-transparent z-0'
-      : 'min-h-screen w-full relative z-0 flex flex-col bg-transparent overflow-x-hidden';
+      : 'min-h-screen w-full relative z-0 flex flex-col bg-transparent';
 
   // Inner wrapper (below header)
   const innerClass = isDashboard
@@ -294,11 +294,13 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       : 'flex-1 flex flex-col relative w-full';
 
   // <main> element
+  const isCenteredPage = ['/connect', '/pricing', '/login', '/sign-up', '/clearance'].some(p => pathname.startsWith(p));
+
   const mainClass = isDashboard
     ? 'relative z-10 w-full flex-1 flex flex-col min-h-0 overflow-hidden'
     : isBounded
       // Scroll is fully contained here — no empty page-level void zones
-      ? 'relative z-10 w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain'
+      ? `relative z-10 w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain flex flex-col ${isCenteredPage ? 'items-center justify-center' : ''}`
       : 'relative z-10 w-full flex-1 flex flex-col overscroll-none';
 
   const showInstitutionalHeader =

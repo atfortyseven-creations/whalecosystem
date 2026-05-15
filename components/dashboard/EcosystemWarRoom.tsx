@@ -70,7 +70,7 @@ export function EcosystemWarRoom() {
   const totalTvlGlobal = data.reduce((acc, curr) => acc + curr.tvl, 0);
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col bg-[#FFFFFF] p-8 rounded-2xl border border-[#E5E5E5] text-[#050505] shadow-sm relative overflow-hidden">
+    <div className="w-full h-full min-h-0 flex flex-col bg-[#FFFFFF] p-0 rounded-2xl border border-[#E5E5E5] text-[#050505] shadow-sm relative overflow-hidden">
       {/* Background Matrix Effect */}
       <div className="absolute inset-0 opacity-[0.03] pattern-grid-lg pointer-events-none filter invert" />
       

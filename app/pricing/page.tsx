@@ -91,9 +91,8 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-white font-sans overflow-x-hidden selection:bg-white/10">
-
-      <main className="relative z-10 w-full">
+    <div className="w-full flex-1 flex flex-col bg-transparent text-white font-sans selection:bg-white/10">
+      <div className="relative z-10 w-full">
 
         {/* ── HERO ──────────────────────────────────────────── */}
         <section className="w-full pt-36 pb-24 px-6 border-b border-white/10 relative z-10 flex flex-col justify-center items-center">
@@ -247,7 +246,7 @@ export default function PricingPage() {
           </div>
         </section>
 
-      </main>
+      </div>
 
       <SovereignFooter />
     </div>

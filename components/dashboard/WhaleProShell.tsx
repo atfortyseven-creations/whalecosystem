@@ -514,16 +514,16 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                             touchAction: 'pan-y',
                         }}
                     >
-                        {/* pb-20 on mobile = clears the 64px bottom nav + safe area */}
-                        <div className="p-4 md:p-5 pb-20 md:pb-5 w-full flex-1 flex flex-col relative z-10">
+                        {/* pb-20 on mobile = clears the 64px bottom nav + safe area, no padding on desktop for edge-to-edge */}
+                        <div className="pb-20 md:pb-0 w-full h-full flex-1 flex flex-col relative z-10">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
-                                    initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-                                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                    exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                                    initial={{ opacity: 0, filter: 'blur(4px)' }}
+                                    animate={{ opacity: 1, filter: 'blur(0px)' }}
+                                    exit={{ opacity: 0, filter: 'blur(4px)' }}
                                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                                    className="w-full flex-1 flex flex-col"
+                                    className="w-full h-full flex-1 flex flex-col"
                                 >
                                     <InstitutionalErrorBoundary moduleName="Loading Module">
                                         {children}

@@ -36,14 +36,13 @@ function ForumHomeContent() {
   }, [filter]);
 
   return (
-    <div className="w-full min-h-screen bg-transparent dark:bg-transparent text-[#0A0A0A] dark:text-[#FAFAF8] selection:bg-[#0044CC]/20 py-20 px-6 font-sans relative transition-colors duration-300 overflow-x-hidden">
+    <div className="w-full flex-1 flex flex-col bg-transparent text-white selection:bg-white/10 py-24 px-6 md:px-12 font-sans relative transition-colors duration-300">
       
-      <div className="max-w-[2560px] mx-auto">
-      <div className="flex flex-col gap-[60px]">
+      <div className="w-full flex flex-col gap-[60px]">
         
         {/* Categories List (Full Width) */}
         <div className="w-full flex flex-col gap-0 pt-4 border-t border-white/10">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-[#555]">Categories</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-white/40">Categories</h2>
           {categories.length === 0 ? (
              <div className="py-4 text-[13px] text-black/40 dark:text-white/30 font-sans">Loading categories...</div>
           ) : categories.map(cat => (
@@ -67,7 +66,7 @@ function ForumHomeContent() {
         {/* Latest Activity (Full Width) */}
         <div className="w-full flex flex-col">
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#555]">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
               {filter === 'latest' ? 'Categories Overview' : filter}
             </h2>
           </div>
@@ -146,7 +145,6 @@ function ForumHomeContent() {
           </div>
           )}
         </div>
-      </div>
       </div>
       <SovereignFooter />
     </div>

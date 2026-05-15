@@ -83,33 +83,33 @@ export default function LedgerPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#FDFCF8] text-[#111111] font-sans selection:bg-black/10 pb-40 overflow-x-hidden">
+    <div className="w-full flex-1 flex flex-col bg-transparent text-white font-sans selection:bg-white/10 pb-40">
         {/* Subtle grid background */}
         <div className="fixed inset-0 pointer-events-none opacity-[0.03]"
             style={{ backgroundImage: 'repeating-linear-gradient(0deg,#000 0,#000 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#000 0,#000 1px,transparent 1px,transparent 40px)' }} />
 
         {/* Minimal Navbar */}
-        <header className="sticky top-0 z-50 px-8 py-6 border-b border-black/[0.05] backdrop-blur-xl bg-[#FDFCF8]/90 flex items-center justify-between">
+        <header className="sticky top-0 z-50 px-8 py-6 border-b border-white/[0.05] backdrop-blur-xl bg-black/20 flex items-center justify-between w-full">
             <Link href="/" className="group flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-[#111] group-hover:text-white transition-colors duration-300">
+                <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors duration-300">
                     <MoveRight size={14} className="rotate-180" />
                 </div>
                 <div className="flex flex-col">
-                    <span className="font-mono text-[10px] uppercase font-bold tracking-[0.2em] text-[#111]">Ledger Central</span>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-black/40">Read-Only Access</span>
+                    <span className="font-mono text-[10px] uppercase font-bold tracking-[0.2em] text-white">Ledger Central</span>
+                    <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-white/40">Read-Only Access</span>
                 </div>
             </Link>
         </header>
 
-        <main className="max-w-[1200px] mx-auto px-8 pt-24">
+        <div className="w-full px-8 md:px-12 pt-24 space-y-12">
             
             {/* HERO SECTION: Minimal Academic Presentation */}
-            <div className="max-w-3xl mb-24">
-                <h1 className="text-5xl md:text-7xl font-serif tracking-tight leading-[0.9] text-[#111] mb-8">
+            <div className="max-w-4xl">
+                <h1 className="text-5xl md:text-8xl font-serif tracking-tight leading-[0.9] text-white mb-8 uppercase font-black">
                     State Records.
                 </h1>
                 
-                <p className="text-lg text-black/60 leading-relaxed font-light max-w-xl">
+                <p className="text-lg md:text-xl text-white/60 leading-relaxed font-light max-w-2xl">
                     Every state change and verifiable event is mathematically guaranteed. Displaying direct synchronization with physical node infrastructure to eliminate systemic tampering.
                 </p>
             </div>
@@ -125,36 +125,36 @@ export default function LedgerPage() {
                     </div>
                 </div>
 
-                <div className="w-full border border-black/10 rounded-2xl overflow-hidden bg-white shadow-[0_4px_24px_rgb(0,0,0,0.02)] relative">
+                <div className="w-full border border-white/10 rounded-3xl overflow-hidden bg-black/10 backdrop-blur-3xl shadow-2xl relative">
                     <div className="w-full overflow-x-auto">
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
-                                <tr className="border-b border-black/[0.05] bg-[#FAFAFA]">
-                                    <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40">Block No.</th>
-                                    <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40">Cryptographic Hash</th>
-                                    <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40 text-right">Txns</th>
-                                    <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40 text-right">Gas Consumed</th>
-                                    <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40">Entropy</th>
-                                    <th className="px-6 py-5 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-black/40 whitespace-nowrap">Condition</th>
+                                <tr className="border-b border-white/[0.05] bg-white/[0.02]">
+                                    <th className="px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-white/40">Block No.</th>
+                                    <th className="px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-white/40">Cryptographic Hash</th>
+                                    <th className="px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-white/40 text-right">Txns</th>
+                                    <th className="px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-white/40 text-right">Gas Consumed</th>
+                                    <th className="px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-white/40">Entropy</th>
+                                    <th className="px-8 py-6 text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-white/40 whitespace-nowrap">Condition</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-black/[0.05]">
+                            <tbody className="divide-y divide-white/[0.05]">
                                 {hashes.map((row, idx) => (
                                     <motion.tr 
                                         initial={{ opacity: 0, y: 5 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.02, duration: 0.4 }}
                                         key={row.hash + idx} 
-                                        className="hover:bg-[#FAFAFA] transition-colors group cursor-default"
+                                        className="hover:bg-white/5 transition-colors group cursor-default"
                                     >
-                                        <td className="px-6 py-5 align-middle border-r border-black/[0.02]">
-                                            <span className="text-[12px] font-mono font-semibold text-[#111]">
+                                        <td className="px-6 py-5 align-middle border-r border-white/[0.05]">
+                                            <span className="text-[12px] font-mono font-semibold text-white">
                                                 {row.id}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-5 align-middle relative border-r border-black/[0.02]">
+                                        <td className="px-6 py-5 align-middle relative border-r border-white/[0.05]">
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[11px] font-mono text-black/50 truncate max-w-[300px]">
+                                                <span className="text-[11px] font-mono text-white/50 truncate max-w-[300px]">
                                                     {row.hash}
                                                 </span>
                                                 <button 
@@ -162,34 +162,34 @@ export default function LedgerPage() {
                                                         navigator.clipboard.writeText(row.hash);
                                                         toast.success("Signature copied.");
                                                     }}
-                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-black/40 hover:text-black"
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-white"
                                                     title="Copy Signature"
                                                 >
                                                     <Copy size={12}/>
                                                 </button>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-5 align-middle border-r border-black/[0.02]">
-                                            <div className="text-[11px] font-mono flex items-center justify-end gap-2 text-[#111]">
+                                        <td className="px-6 py-5 align-middle border-r border-white/[0.05]">
+                                            <div className="text-[11px] font-mono flex items-center justify-end gap-2 text-white">
                                                 {row.txCount}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-5 align-middle border-r border-black/[0.02]">
+                                        <td className="px-6 py-5 align-middle border-r border-white/[0.05]">
                                             <div className="flex items-center justify-end gap-2">
-                                                <div className="text-[11px] font-mono font-bold text-[#111]">{row.gasUsedPct.toFixed(2)}%</div>
-                                                <div className="w-12 h-1 bg-black/5 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-black/30" style={{ width: `${Math.min(row.gasUsedPct, 100)}%` }} />
+                                                <div className="text-[11px] font-mono font-bold text-white">{row.gasUsedPct.toFixed(2)}%</div>
+                                                <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-white/30" style={{ width: `${Math.min(row.gasUsedPct, 100)}%` }} />
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-5 align-middle border-r border-black/[0.02]">
-                                            <span className="text-[11px] font-mono flex items-center gap-2 text-black/60">
+                                        <td className="px-6 py-5 align-middle border-r border-white/[0.05]">
+                                            <span className="text-[11px] font-mono flex items-center gap-2 text-white/60">
                                                 {row.size}
                                             </span>
                                         </td>
                                         <td className="px-6 py-5 align-middle">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F4F4F5] border border-black/5 text-[9px] font-bold font-mono uppercase tracking-widest text-[#111]">
-                                                <CheckCircle2 size={10} className="text-black" />
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[9px] font-bold font-mono uppercase tracking-widest text-white">
+                                                <CheckCircle2 size={10} className="text-white" />
                                                 Valid
                                             </span>
                                         </td>
@@ -202,7 +202,7 @@ export default function LedgerPage() {
             </div>
             
             {/* Minimal Footer Info */}
-            <div className="mt-32 pt-10 border-t border-black/5 flex flex-col md:flex-row justify-between gap-8 text-[10px] font-mono uppercase tracking-widest text-black/40">
+            <div className="mt-32 pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between gap-8 text-[10px] font-mono uppercase tracking-widest text-white/40">
                 <p className="max-w-md leading-relaxed">
                     Sovereign Layer synchronizes transparent state without custodial routing. Records are mirrored directly from local state.
                 </p>
@@ -217,7 +217,7 @@ export default function LedgerPage() {
                      </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
   );
 }

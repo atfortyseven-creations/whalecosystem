@@ -101,9 +101,11 @@ export default function WhaleDashboard() {
         window.history.pushState(null, '', `?tab=${id}`);
     }, []);
 
+    const PANEL = "flex-1 w-full h-full min-h-0 flex flex-col";
+
     const renderTabContent = () => {
         switch (activeTab) {
-            // Legacy redirects → Ticket Mint
+            // Legacy redirects → Gold Ticket
             case 'dashboard':
             case 'watchlist':
             case 'firehose':
@@ -116,44 +118,44 @@ export default function WhaleDashboard() {
             case 'forensics':
             case 'reputation':
             case 'scanner':
-            case 'zk-identity': // KYC permanently removed
-                return <div className="flex-1 min-h-[950px] shrink-0"><DashboardErrorBoundary key={`gold-redirect-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
+            case 'zk-identity':
+                return <div className={PANEL}><DashboardErrorBoundary key={`gold-redirect-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
 
             case 'gold':
-                return <div className="flex-1 min-h-[950px] shrink-0"><DashboardErrorBoundary key={`gold-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`gold-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
 
             case 'portfolio':
-                return <div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`human-port-${refreshKey}`}><PortfolioDashboard /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`human-port-${refreshKey}`}><PortfolioDashboard /></DashboardErrorBoundary></div>;
 
             case 'billing':
-                return <div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`billing-${refreshKey}`}><PlanDashboard /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`billing-${refreshKey}`}><PlanDashboard /></DashboardErrorBoundary></div>;
 
             case 'markets':
-                return <div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`markets-${refreshKey}`}><GainersLosersPanel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`markets-${refreshKey}`}><GainersLosersPanel /></DashboardErrorBoundary></div>;
 
             case 'newpairs':
-                return <div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`newpairs-${refreshKey}`}><NewPairsTable /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`newpairs-${refreshKey}`}><NewPairsTable /></DashboardErrorBoundary></div>;
 
             case 'inst-ledger':
-                return <div className="h-[700px] shrink-0"><DashboardErrorBoundary key={`inst-ledger-${refreshKey}`}><InstitutionalLedger /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`inst-ledger-${refreshKey}`}><InstitutionalLedger /></DashboardErrorBoundary></div>;
 
             case 'mass-transfer':
-                return <div className="h-[700px] shrink-0"><DashboardErrorBoundary key={`mass-transfer-${refreshKey}`}><MassTransferIntel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`mass-transfer-${refreshKey}`}><MassTransferIntel /></DashboardErrorBoundary></div>;
 
             case 'omniexplorer':
-                return <div className="flex-1 min-h-[750px] shrink-0"><DashboardErrorBoundary key={`omni-explorer-${refreshKey}`}><OmniExplorer /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`omni-explorer-${refreshKey}`}><OmniExplorer /></DashboardErrorBoundary></div>;
 
             case 'zk':
-                return <div className="flex-1 min-h-[850px] shrink-0 relative"><DashboardErrorBoundary key={`zk-shield-${refreshKey}`}><AztecMempoolSpace /></DashboardErrorBoundary></div>;
+                return <div className={PANEL + " relative"}><DashboardErrorBoundary key={`zk-shield-${refreshKey}`}><AztecMempoolSpace /></DashboardErrorBoundary></div>;
 
             case 'logs':
-                return <div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`session-logs-${refreshKey}`}><SessionLogsPanel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`session-logs-${refreshKey}`}><SessionLogsPanel /></DashboardErrorBoundary></div>;
 
             case 'support':
-                return <div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key={`support-${refreshKey}`}><WhaleSupport /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`support-${refreshKey}`}><WhaleSupport /></DashboardErrorBoundary></div>;
 
             default:
-                return <div className="flex-1 min-h-[950px] shrink-0"><DashboardErrorBoundary key={`gold-default-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`gold-default-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
         }
     };
 
@@ -174,7 +176,7 @@ export default function WhaleDashboard() {
             isExternalEmbed={false}
             isZkVerified={true}
         >
-            <div className="flex flex-col gap-6 w-full pb-12 h-full scrollbar-hide pt-4">
+            <div className="flex flex-col w-full h-full min-h-0">
                 {renderTabContent()}
             </div>
         </WhaleProShell>

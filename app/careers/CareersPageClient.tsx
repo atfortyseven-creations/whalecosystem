@@ -10,10 +10,10 @@ import { OPEN_ROLES, BENEFITS } from './data';
 
 export function CareersPageClient() {
   return (
-    <div className="relative min-h-screen bg-transparent text-white font-sans antialiased overflow-x-hidden selection:bg-white/10">
+    <div className="w-full flex-1 flex flex-col bg-transparent text-white font-sans antialiased selection:bg-white/10">
 
       {/* ── PAGE HEADER ── */}
-      <header className="w-full max-w-[2560px] mx-auto bg-transparent pt-32 pb-10 px-5 sm:px-8 border-b border-black/10 dark:border-white/10">
+      <header className="w-full bg-transparent pt-32 pb-10 px-6 md:px-12 border-b border-black/10 dark:border-white/10">
         <div className="flex flex-col gap-5 max-w-4xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/5 dark:bg-white/5 rounded-sm border border-black/10 dark:border-white/10 w-fit">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/60 dark:text-white/60">Open Positions</span>
@@ -27,7 +27,7 @@ export function CareersPageClient() {
         </div>
       </header>
 
-      <main className="max-w-[2560px] mx-auto px-5 sm:px-8 py-16 md:py-28 flex flex-col gap-20 md:gap-32 text-left items-start">
+      <div className="w-full px-6 md:px-12 py-16 md:py-28 flex flex-col gap-20 md:gap-32 text-left items-start">
 
         {/* Open Positions */}
         <section>
@@ -195,7 +195,7 @@ export function CareersPageClient() {
             <p className="mt-6 text-[11px] text-slate-400 font-bold uppercase tracking-widest">careers@humanidfi.com</p>
           </div>
         </section>
-      </main>
+      </div>
       <SovereignFooter />
     </div>
   );

@@ -12,11 +12,11 @@ import { toast } from 'sonner';
 import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
-const BG     = "#FAF9F6";
-const INK    = "#050505";
-const MUTED  = "rgba(5,5,5,0.45)";
-const BORDER = "rgba(5,5,5,0.08)";
-const CARD   = "#FFFFFF";
+const BG     = "transparent";
+const INK    = "#F5F5F5";
+const MUTED  = "rgba(255,255,255,0.45)";
+const BORDER = "rgba(255,255,255,0.08)";
+const CARD   = "rgba(255,255,255,0.04)";
 
 // ── FAQ ────────────────────────────────────────────────────────────────────────
 const FAQ_ITEMS = [
@@ -89,9 +89,9 @@ const CHANNELS = [
 
 // ── Input style helper ────────────────────────────────────────────────────────
 const inputClass = `
-  w-full px-4 py-3 text-sm bg-white border rounded-xl text-[#050505]
-  placeholder:text-black/30 focus:outline-none transition-colors
-  focus:border-black/30
+  w-full px-4 py-3 text-sm bg-white/5 border rounded-xl text-white
+  placeholder:text-white/30 focus:outline-none transition-colors
+  focus:border-white/30
 `.replace(/\s+/g, ' ').trim();
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
@@ -367,7 +367,7 @@ function ContactForm() {
           type="submit"
           disabled={isSending}
           className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-mono text-[10px] font-black uppercase tracking-widest transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-40"
-          style={{ background: INK, color: '#FFF' }}
+          style={{ background: INK, color: '#000' }}
         >
           <Send size={12} />
           {isSending ? 'Sending…' : 'Submit Inquiry'}
@@ -426,11 +426,11 @@ function ChannelsSection() {
 export default function SupportPage() {
   return (
     <InstitutionalShell title="Support — Whale Alert Network" badge="SUPPORT" badgeVariant="emerald">
-      <div style={{ background: BG, color: INK }}>
+      <div className="w-full flex-1 flex flex-col bg-transparent text-white">
         <SupportHero />
         <StatsRow />
 
-        <div className="max-w-[2560px] mx-auto px-6 py-16 space-y-8 text-left">
+        <div className="w-full px-6 md:px-12 py-16 space-y-8 text-left">
 
           {/* System Status */}
           <motion.div
@@ -486,7 +486,7 @@ export default function SupportPage() {
             <a
               href="/connect"
               className="shrink-0 flex items-center gap-1.5 px-5 py-3 rounded-xl font-mono text-[10px] font-black uppercase tracking-widest transition-all hover:opacity-80"
-              style={{ background: INK, color: '#FFF' }}
+              style={{ background: INK, color: '#000' }}
             >
               Connect Wallet
               <ArrowUpRight size={12} />

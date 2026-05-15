@@ -451,7 +451,7 @@ export function VossSupremacyPanel() {
   const hasTicket = dbStats?.ticket || false;
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col gap-6 overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#050505] dark:text-white p-0 md:p-6 lg:p-8">
+    <div className="w-full h-full min-h-0 flex flex-col gap-6 overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#050505] dark:text-white p-0">
       
       {/* ── FORMAL HERO HEADER ── */}
       <ModuleHeader moduleId="gold" />

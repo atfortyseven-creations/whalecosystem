@@ -267,7 +267,7 @@ export function GainersLosersPanel() {
         [...allRows].sort((a, b) => a.pct - b.pct).slice(0, 3), [allRows]);
 
     return (
-        <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-6 space-y-6 overflow-hidden text-[#050505] dark:text-[#FAF9F6] font-sans">
+        <div className="w-full h-full min-h-0 flex flex-col p-0 space-y-6 overflow-hidden text-[#050505] dark:text-[#FAF9F6] font-sans">
             <ModuleHeader moduleId="markets" />
             
             {/* ── Summary Cards ── */}

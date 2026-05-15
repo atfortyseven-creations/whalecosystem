@@ -96,7 +96,7 @@ function WalletButton({
 
 export default function ConnectPage() {
   const isMobile = useIsMobile();
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, connector } = useAccount();
   const { connect, connectors, isPending, isError, error } = useConnect();
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
@@ -300,10 +300,13 @@ export default function ConnectPage() {
         isFreshSign = false;
       } else {
         isFreshSign = true;
-        signaturePromise = signMessageAsync({ message }).then(sig => {
-           localStorage.setItem(`sovereign_sig_${norm}`, sig);
-           return sig;
-        });
+        // Delay signature request slightly to allow wallet provider to settle after connection
+        signaturePromise = new Promise(resolve => setTimeout(resolve, 500))
+          .then(() => signMessageAsync({ message }))
+          .then(sig => {
+             localStorage.setItem(`sovereign_sig_${norm}`, sig);
+             return sig;
+          });
       }
 
       signaturePromise
@@ -340,7 +343,7 @@ export default function ConnectPage() {
         });
       return;
     }
-  }, [isConnected, address, mounted, isLinked, setLinked, isSigning, signMessageAsync, disconnect]);
+  }, [isConnected, address, connector, mounted, isLinked, setLinked, isSigning, signMessageAsync, disconnect]);
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
     setPendingId(walletId);
@@ -359,15 +362,13 @@ export default function ConnectPage() {
   }, [openAppKit]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col font-mono overflow-auto bg-transparent relative" style={{ position: 'relative' }}>
-      <UniversalEliteWallpaper />
-
-      <main className="flex-1 relative z-10 flex flex-col justify-center items-center px-4 py-10 sm:p-8 lg:p-12 min-h-0" style={{ minHeight: '100dvh' }}>
+    <div className="w-full flex-1 flex flex-col items-center justify-center bg-transparent relative">
+      <div className="relative z-10 w-full flex flex-col justify-center items-center px-4 py-8 sm:p-12 min-h-0">
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className={`w-full max-w-7xl mx-auto rounded-[32px] overflow-hidden bg-white/70 dark:bg-[#0A0A0A]/70 backdrop-blur-[40px] border border-black/5 dark:border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.06)] dark:shadow-none flex flex-col lg:flex-row relative`}
+          className={`w-full max-w-6xl mx-auto rounded-[32px] overflow-hidden bg-white/70 dark:bg-[#0A0A0A]/70 backdrop-blur-[40px] border border-black/5 dark:border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.06)] dark:shadow-none flex flex-col lg:flex-row relative`}
         >
           {/* Subtle reflection lines for frosted glass effect */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white dark:via-white/20 to-transparent opacity-80" />
@@ -410,7 +411,7 @@ export default function ConnectPage() {
           </div>
 
           {/* ── RIGHT: Injection Portal ── */}
-          <div className="flex-1 max-w-[500px] p-8 sm:p-14 lg:p-20 flex flex-col bg-white/40 dark:bg-black/40 items-center justify-center relative">
+          <div className="flex-1 p-8 sm:p-14 lg:p-20 flex flex-col bg-white/40 dark:bg-black/40 items-center justify-center relative">
             <div className="w-full flex flex-col h-full max-w-sm mx-auto">
               <h2 className="text-[26px] sm:text-[32px] font-black uppercase tracking-tighter leading-[0.9] mb-4 text-[#050505] dark:text-white text-center">
                 Access <br/><span className="text-black/30 dark:text-white/30">Portal</span>
@@ -458,10 +459,12 @@ export default function ConnectPage() {
                       <button
                         onClick={() => {
                           setIsSigning(false); // Reset to re-trigger auto sign
+                          toast.info("Retrying handshake...");
                         }}
-                        className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest rounded-xl hover:bg-black/80 dark:hover:bg-white/80 transition-colors w-full shadow-md"
+                        className="px-8 py-5 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest rounded-[20px] hover:scale-[1.02] active:scale-[0.98] transition-all w-full shadow-[0_20px_40px_rgba(0,0,0,0.1)] flex items-center justify-center gap-3"
                       >
-                        Sign Message
+                        <Shield size={18} />
+                        Retry Handshake
                       </button>
                     ) : (
                       <div className="flex items-center gap-3">
@@ -510,10 +513,27 @@ export default function ConnectPage() {
 
               ) : (
                 /* ── DESKTOP CONNECT ── */
-                <div className="flex flex-col gap-4 flex-1">
+                <div className="flex flex-col gap-3 flex-1 w-full">
+                  {qrData && syncStatus === "AWAITING" && (
+                    <div className="flex justify-center mb-4">
+                      <div className="p-3 bg-white dark:bg-black rounded-2xl border border-black/10 dark:border-white/10 shadow-sm flex flex-col items-center">
+                        <QRCode value={qrData} size={140} fgColor="#050505" bgColor="transparent" className="dark:hidden mb-2" />
+                        <QRCode value={qrData} size={140} fgColor="#ffffff" bgColor="transparent" className="hidden dark:block mb-2" />
+                        <span className="text-[8px] font-mono uppercase tracking-[0.2em] text-[#050505]/40 dark:text-white/40 text-center">Sync Whale Mobile</span>
+                      </div>
+                    </div>
+                  )}
                   {DESKTOP_WALLETS.map((w) => (
                     <WalletButton key={w.id} logo={w.logo} name={w.name} badge={w.badge} onClick={() => handleDesktopWallet(w.id, w.rdns, w.installUrl)} loading={isPending && pendingId === w.id} delay={w.delay} />
                   ))}
+                  
+                  <button
+                    onClick={() => openAppKit({ view: 'Connect' })}
+                    className="w-full flex items-center justify-center gap-3 py-4 mt-1 rounded-2xl border border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02] font-black uppercase tracking-[0.2em] text-[10px] text-[#050505]/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                  >
+                    <ScanLine size={14} />
+                    WalletConnect / QR Scan
+                  </button>
                 </div>
               )}
 
@@ -529,7 +549,7 @@ export default function ConnectPage() {
             </div>
           </div>
         </motion.div>
-      </main>
+      </div>
 
       {/* ── Mobile QR Scanner Modal ── */}
       {isMobile && mounted && (

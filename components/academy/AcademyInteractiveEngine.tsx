@@ -130,7 +130,7 @@ export function AcademyInteractiveEngine({
     const selectedCourse = dbCourses.find(c => c.slug === selectedCourseSlug);
 
     return (
-        <div className="pt-28 pb-48 px-4 sm:px-6 max-w-[2560px] mx-auto w-full relative z-10 transition-all text-left">
+        <div className="w-full h-full flex-1 flex flex-col p-0 relative z-10 transition-all text-left">
 
             {!selectedCourseSlug ? (
                 <div className="space-y-6">

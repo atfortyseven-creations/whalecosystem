@@ -260,11 +260,11 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div style={{ background: BG, color: INK }}>
+    <div className="w-full flex-1 flex flex-col bg-transparent text-[#F5F5F5]">
 
       {/* ── HEADER ── */}
       <header
-        className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b"
+        className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b w-full"
         style={{
           background: "rgba(0, 0, 0, 0.60)",
           backdropFilter: "blur(20px)",
@@ -313,7 +313,7 @@ export default function PortfolioPage() {
         </div>
       </header>
 
-      <main className="max-w-[2560px] mx-auto px-4 pb-8 pt-8 space-y-5 text-left items-start">
+      <div className="w-full px-6 md:px-12 pb-24 pt-8 space-y-6 text-left items-start">
 
         {/* ── EMPTY STATE / WELCOME HERO (NESTR STYLE) ── */}
         {!userAddress && (
@@ -770,7 +770,7 @@ export default function PortfolioPage() {
             <ChainActivityPanel address={userAddress} />
           </motion.div>
         )}
-      </main>
+      </div>
 
       {/* ── MODALS ── */}
       <LegendaryTransactionModal
