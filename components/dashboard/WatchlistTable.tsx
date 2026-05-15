@@ -78,7 +78,24 @@ export function WatchlistTable() {
     const { settings } = useSettingsStore();
     const { formatMoney, formatLargeMoney } = useSovereignFormatter();
     
-    const serverWallets = [];
+    type WalletEntity = {
+        address: string;
+        label?: string;
+        isWhale?: boolean;
+        isSmart?: boolean;
+        alertsEnabled?: boolean;
+        analytics?: {
+            netWorthUSD?: number;
+            pnl30d?: number;
+            winRate?: number;
+            dexCexRatio?: number;
+            topProtocol?: string;
+            alphaScore?: number;
+            lastActiveMinsAgo?: number;
+        };
+    };
+
+    const serverWallets: WalletEntity[] = [];
     
     const [search, setSearch]   = useState('');
     const [view, setView]       = useState<'TOKENS' | 'WALLETS'>('TOKENS');
