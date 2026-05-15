@@ -165,15 +165,14 @@ export function GainersLosersPanel() {
         let isMounted = true;
         const fetchRealData = async () => {
             try {
-                const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+                const res = await fetch('/api/market/binance');
                 const data = await res.json();
-                if (isMounted) {
-                    // Filter for top volume USDT pairs
-                    const validData = data
-                        .filter((d: any) => d.symbol.endsWith('USDT') && parseFloat(d.quoteVolume) > 10000000)
-                        .slice(0, 100);
-                    setRawData(validData);
+                if (isMounted && res.ok) {
+                    setRawData(data);
                     setIsLoading(false);
+                    setError(false);
+                } else if (isMounted) {
+                    throw new Error("Invalid telemetry stream");
                 }
             } catch (err) {
                 if (isMounted) {
