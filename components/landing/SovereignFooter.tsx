@@ -88,13 +88,13 @@ export function SovereignFooter() {
       style={{ marginTop: "0", paddingTop: 0 }}
     >
       {/* ═══ 4K Wave Banner (Interactive Protruding Button) ═══ */}
-      <div className="w-full px-4 md:px-12 lg:px-16 mt-6 md:mt-16 mb-0 relative z-10 font-sans">
-        <motion.div
+      <div className="w-full mt-0 relative z-10 font-sans border-t border-black/10">
+        <div
            ref={containerRef as React.Ref<HTMLDivElement>}
            onMouseMove={handleMouseMove}
            onMouseEnter={() => setIsHovered(true)}
            onMouseLeave={() => setIsHovered(false)}
-           className="relative w-full h-[720px] sm:h-[650px] md:h-[700px] lg:h-[760px] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-[#E5E5E5] flex flex-col items-center justify-end group transition-shadow duration-700 hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)]"
+           className="relative w-full h-[auto] min-h-[500px] md:min-h-[600px] overflow-hidden bg-white flex flex-col items-center justify-end group"
         >
           {/* Wave Wallpaper 4K */}
           <Image
@@ -142,10 +142,10 @@ export function SovereignFooter() {
           )}
 
           {/* Fog gradient */}
-          <div className="absolute inset-x-0 bottom-0 h-[65%] sm:h-[75%] bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/80 to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none z-10" />
 
           {/* ═══ Footer Inner Body ═════════════════════════════════════════════ */}
-          <div className="relative z-40 w-full max-w-[2560px] mx-auto px-6 pb-12 flex flex-col items-start gap-12 text-left">
+          <div className="relative z-40 w-full max-w-[2560px] mx-auto px-6 md:px-12 lg:px-20 pb-12 pt-20 flex flex-col items-start gap-12 text-left">
 
             {/* ─── HumanID Logo ─── */}
             <motion.div
@@ -322,9 +322,8 @@ export function SovereignFooter() {
 
           </div>
           
-          {/* Subtle Inner Edge Highlight */}
-          <div className="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5),inset_0_0_40px_rgba(0,0,0,0.02)] rounded-[2.5rem] pointer-events-none z-50" />
-        </motion.div>
+          {/* Removed inner edge highlight */}
+        </div>
       </div>
     </footer>
   );

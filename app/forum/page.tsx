@@ -38,32 +38,11 @@ function ForumHomeContent() {
   return (
     <div className="w-full min-h-screen bg-transparent dark:bg-transparent text-[#0A0A0A] dark:text-[#FAFAF8] selection:bg-[#0044CC]/20 py-20 px-6 font-sans relative transition-colors duration-300 overflow-x-hidden">
       
-      <div className="max-w-[1200px] mx-auto mb-20">
-        {/* ── ACADEMIC WELCOME HERO ── */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white/40 backdrop-blur-3xl dark:bg-[#111]/40 rounded-[2rem] md:rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-10 md:p-20 flex flex-col items-start justify-center overflow-hidden relative">
-            <div className="w-full max-w-3xl relative z-10 space-y-6 md:space-y-8 text-left">
-                
-                <h2 className="text-[40px] md:text-[64px] lg:text-[72px] font-black uppercase text-[#0A0A0A] dark:text-white leading-[1] md:leading-[0.95] tracking-tighter">
-                    Whale Alert <br className="hidden md:block" /><span className="text-[#0044CC] dark:text-[#4d88ff]">Network.</span>
-                </h2>
-                <p className="font-sans text-[14px] md:text-[16px] text-[#0044CC] dark:text-[#4d88ff] leading-relaxed max-w-2xl font-black tracking-[0.3em] uppercase">
-                    Presenting FORUM P2P by Humanity Ledger
-                </p>
-                <p className="font-serif text-[16px] md:text-[20px] text-slate-500 leading-relaxed max-w-2xl font-medium">
-                    A secure perimeter for professional discourse. All interactions are cryptographically signed, ensuring absolute authenticity. This eliminates the noise of public networks and fosters a highly focused, academic environment strictly for authenticated participants.
-                </p>
-            </div>
-            
-            {/* Ambient Background Elements to balance the left-alignment */}
-            <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 dark:opacity-5 pointer-events-none" style={{ background: 'radial-gradient(circle at center right, #0044CC 0%, transparent 70%)' }} />
-        </motion.div>
-      </div>
-      
-      <div className="max-w-[1200px] mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-[60px]">
+      <div className="max-w-[2560px] mx-auto">
+      <div className="flex flex-col gap-[60px]">
         
-        {/* Left Column: Categories (35% -> col-span-4) */}
-        <div className="lg:col-span-4 flex flex-col gap-0 pt-4 border-t border-white/10">
+        {/* Categories List (Full Width) */}
+        <div className="w-full flex flex-col gap-0 pt-4 border-t border-white/10">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-[#555]">Categories</h2>
           {categories.length === 0 ? (
              <div className="py-4 text-[13px] text-black/40 dark:text-white/30 font-sans">Loading categories...</div>
@@ -85,8 +64,8 @@ function ForumHomeContent() {
           ))}
         </div>
 
-        {/* Right Column: Latest Activity (65% -> col-span-8) */}
-        <div className="lg:col-span-8 flex flex-col">
+        {/* Latest Activity (Full Width) */}
+        <div className="w-full flex flex-col">
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#555]">
               {filter === 'latest' ? 'Categories Overview' : filter}

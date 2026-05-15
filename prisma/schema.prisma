@@ -278,6 +278,24 @@ model WatchedWallet {
   @@index([address])
 }
 
+model AddressBookEntry {
+  id         String   @id @default(uuid())
+  authUserId String
+  name       String
+  address    String
+  ensName    String?
+  label      String?
+  notes      String?  @db.Text
+  isFavorite Boolean  @default(false)
+  chainId    Int?     @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([authUserId, address])
+  @@index([authUserId])
+  @@index([address])
+}
+
 model ExchangePosition {
   id            String   @id @default(uuid())
   userId        String

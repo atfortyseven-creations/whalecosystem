@@ -325,7 +325,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
         <div className={rootClass}>
           {/* Optional top header for select standalone routes */}
-          <div className="flex-none w-full z-50 sticky top-0">
+          <div className="flex-none w-full z-50 sticky top-0 hidden lg:block">
+            <InstitutionalHeader />
+          </div>
+          <div className="flex-none w-full z-50 sticky top-0 lg:hidden">
             {showInstitutionalHeader && <InstitutionalHeader />}
           </div>
 

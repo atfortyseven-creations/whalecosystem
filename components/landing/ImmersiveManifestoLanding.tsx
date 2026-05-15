@@ -127,32 +127,109 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.div>
         </div>
         
-        <div className="w-full relative py-12 md:py-20 flex justify-center">
-          <StackableCarousel className="w-full relative z-10" itemClassName="w-[85vw] md:w-[900px] lg:w-[1100px] hover:scale-[1.01] transition-transform duration-700 cursor-grab active:cursor-grabbing">
+        {/* Image Display - Replaced StackableCarousel with full-visibility vertical stack */}
+        <div className="w-full relative py-12 flex justify-center">
+          <div className="w-full max-w-[2560px] mx-auto px-6 md:px-12 xl:px-20 flex flex-col gap-12 md:gap-24 relative z-10">
             {[
               "/system-shots/Captura de pantalla 2026-05-07 012904.png",
               "/system-shots/Captura de pantalla 2026-05-07 032204.png",
               "/system-shots/Captura de pantalla 2026-05-10 002811.png",
-              "/system-shots/Captura de pantalla 2026-05-10 002900.png"
-            ].map((src, idx) => (
-              <img key={idx} src={src} className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" alt={`Platform view ${idx + 1}`} />
-            ))}
-          </StackableCarousel>
-        </div>
-
-        {/* Second Screenshot Strip: Protocol Handshake & Execution */}
-        <div className="w-full relative py-12 md:py-20 flex justify-center bg-white">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/50 to-transparent pointer-events-none" />
-          <StackableCarousel className="w-full relative z-10" itemClassName="w-[85vw] md:w-[900px] lg:w-[1100px] hover:scale-[1.01] transition-transform duration-700 cursor-grab active:cursor-grabbing">
-            {[
+              "/system-shots/Captura de pantalla 2026-05-10 002900.png",
               "/system-shots/Captura de pantalla 2026-05-13 191540.png",
               "/system-shots/Captura de pantalla 2026-05-13 191728.png",
               "/system-shots/Captura de pantalla 2026-05-13 191813.png",
               "/system-shots/Captura de pantalla 2026-05-13 192204.png"
             ].map((src, idx) => (
-              <img key={idx} src={src} className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" alt={`Protocol view ${idx + 1}`} />
+              <motion.div 
+                key={idx} 
+                initial="hidden" 
+                whileInView="visible" 
+                viewport={{ once: true, margin: "-100px" }} 
+                variants={FADE_UP}
+                className="w-full"
+              >
+                <img 
+                  src={src} 
+                  className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" 
+                  alt={`Platform view ${idx + 1}`} 
+                />
+              </motion.div>
             ))}
-          </StackableCarousel>
+          </div>
+        </div>
+      </section>
+
+      {/* ── WHALE CHAT MARKETING SECTION ──────────────────────────────────────── */}
+      <section className="w-full py-24 md:py-40 bg-white relative z-10 flex justify-center border-t border-black/5">
+        <div className="w-full max-w-[2560px] mx-auto px-6 md:px-12 xl:px-20">
+            <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+                {/* Text Side */}
+                <div className="w-full lg:w-5/12 space-y-8 text-left">
+                    <div className="inline-block px-3 py-1 bg-black/5 rounded-full border border-black/10">
+                        <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black">XMTP Protocol Integration</span>
+                    </div>
+                    <h2 className="text-[40px] sm:text-[56px] font-black tracking-tighter uppercase leading-[0.95] text-[#0a0a0a]">
+                        Whale Chat.<br />
+                        <span className="text-black/30">P2P Secure Terminal.</span>
+                    </h2>
+                    <p className="font-serif text-[18px] text-slate-500 leading-relaxed">
+                        A sovereign messaging layer built directly into the institutional interface. Engage in cryptographically secure, peer-to-peer conversations without compromising your zero-knowledge identity.
+                    </p>
+                    <ul className="space-y-4 pt-4">
+                        <li className="flex items-center gap-4 text-[14px] font-mono tracking-tight uppercase text-[#555]">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#00C076]" />
+                            End-to-End Encryption
+                        </li>
+                        <li className="flex items-center gap-4 text-[14px] font-mono tracking-tight uppercase text-[#555]">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#00C076]" />
+                            No Central Servers
+                        </li>
+                        <li className="flex items-center gap-4 text-[14px] font-mono tracking-tight uppercase text-[#555]">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#00C076]" />
+                            Automated Contact Persistence
+                        </li>
+                    </ul>
+                    <div className="pt-8">
+                        <Link href="/chat" className="inline-flex items-center gap-3 px-8 py-4 bg-[#0a0a0a] text-white rounded-full font-mono text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black/80 transition-colors">
+                            Initialize Terminal <ArrowRight size={14} />
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Visual Side */}
+                <div className="w-full lg:w-7/12">
+                    <div className="w-full relative bg-[#FAF9F6] rounded-[2.5rem] border border-black/5 p-6 md:p-12 shadow-xl overflow-hidden group">
+                        {/* Abstract representations of chat lines */}
+                        <div className="w-full space-y-6 opacity-80 transition-transform duration-700 group-hover:scale-105">
+                            <div className="flex justify-start">
+                                <div className="max-w-[70%] bg-white border border-black/5 rounded-2xl rounded-tl-sm p-5 shadow-sm">
+                                    <div className="h-2 bg-black/10 rounded w-24 mb-3"></div>
+                                    <div className="h-2 bg-black/10 rounded w-48 mb-2"></div>
+                                    <div className="h-2 bg-black/10 rounded w-32"></div>
+                                </div>
+                            </div>
+                            <div className="flex justify-end">
+                                <div className="max-w-[70%] bg-[#0a0a0a] rounded-2xl rounded-tr-sm p-5 shadow-sm">
+                                    <div className="h-2 bg-white/20 rounded w-20 mb-3"></div>
+                                    <div className="h-2 bg-white/20 rounded w-56 mb-2"></div>
+                                    <div className="h-2 bg-white/20 rounded w-40"></div>
+                                </div>
+                            </div>
+                            <div className="flex justify-start">
+                                <div className="max-w-[70%] bg-white border border-black/5 rounded-2xl rounded-tl-sm p-5 shadow-sm">
+                                    <div className="h-2 bg-black/10 rounded w-16 mb-3"></div>
+                                    <div className="h-2 bg-black/10 rounded w-40"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Overlay to give it a terminal feel */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-transparent to-transparent opacity-80 pointer-events-none" />
+                        <div className="absolute top-6 left-6 font-mono text-[9px] uppercase tracking-[0.3em] text-black/30 font-bold">
+                            WHALE CHAT // XMTP 
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
       </section>
 
