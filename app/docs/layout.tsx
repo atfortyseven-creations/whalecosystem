@@ -109,7 +109,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         .doc-content pre { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; font-family: monospace; font-size: 0.8125rem; overflow-x: auto; margin: 1.5rem 0; color: #E2E8F0; border-radius: 4px; }
         .doc-content code { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); padding: 0.15em 0.45em; font-family: monospace; font-size: 0.8125rem; color: #A5D8FF; border-radius: 3px; }
         .doc-content li { margin-bottom: 0.5rem; color: rgba(245,245,245,0.75); font-size: 0.9375rem; line-height: 1.7; padding-left: 1.25rem; position: relative; }
-        .doc-content li::before { content: '\2014'; position: absolute; left: 0; color: rgba(255,255,255,0.3); }
+        .doc-content li::before { content: "—"; position: absolute; left: 0; color: rgba(255,255,255,0.3); }
         .doc-content .callout { border-left: 2px solid rgba(255,255,255,0.5); padding: 1rem 1.25rem; margin: 1.5rem 0; background: rgba(255,255,255,0.04); }
         .doc-content .callout p { margin: 0; color: rgba(245,245,245,0.9); font-size: 0.875rem; }
         .doc-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.875rem; }
