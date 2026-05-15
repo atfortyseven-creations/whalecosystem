@@ -21,7 +21,7 @@ export function ZKInfrastructureSection() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15)_0%,transparent_70%)]" />
       </div>
 
-      <motion.div style={{ opacity, scale }} className="relative z-10 max-w-7xl mx-auto">
+      <motion.div style={{ opacity, scale }} className="relative z-10 max-w-[2560px] mx-auto text-left">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div>
             <motion.div 

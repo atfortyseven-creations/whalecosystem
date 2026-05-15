@@ -41,7 +41,7 @@ export function LandingHero({ onStart }: LandingHeroProps) {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.1)_0%,black_100%)] opacity-90 pointer-events-none" />
             </div>
 
-            <div className="relative z-10 w-full max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-screen pt-20 pb-10">
+            <div className="relative z-10 w-full max-w-[2560px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-screen pt-20 pb-10 text-left">
                 
                 {/* LEFT COLUMN - MARKETING CONTENT */}
                 <motion.div

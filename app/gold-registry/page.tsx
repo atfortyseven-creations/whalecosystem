@@ -36,7 +36,7 @@ export default function GoldRegistryPage() {
          </p>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 max-w-5xl">
+      <div className="grid grid-cols-1 gap-6 max-w-[2560px] text-left">
          {GOLD_CANDIDATES.map((node) => {
            const isVerified = verifiedList[node.id];
            const isSimulating = verifying === node.id;

@@ -37,7 +37,7 @@ export default function NodesOverview() {
                 <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90" />
             </div>
 
-            <main className="relative z-10 pt-32 pb-20 px-6 max-w-7xl mx-auto space-y-20">
+            <main className="relative z-10 pt-32 pb-20 px-6 max-w-[2560px] mx-auto space-y-20 text-left">
                 
                 {/* Hero Block */}
                 <div className="text-center space-y-6 max-w-4xl mx-auto">

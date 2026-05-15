@@ -149,7 +149,7 @@ export function EcosystemSection() {
   );
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-32">
+    <div className="w-full max-w-[2560px] mx-auto px-4 py-32 text-left">
       {/* Header */}
       <div className="text-center mb-20">
         <motion.h2 

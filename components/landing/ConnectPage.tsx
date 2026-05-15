@@ -382,7 +382,7 @@ export default function ConnectPage() {
           initial={{ opacity: 0, y: 40, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className={`w-full my-auto ${mounted && isConnected ? 'max-w-2xl grid grid-cols-1' : 'max-w-5xl grid grid-cols-1 lg:grid-cols-2'} rounded-[40px] overflow-hidden bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[0_30px_80px_rgba(0,0,0,0.06)] relative`}
+          className={`w-full my-auto ${mounted && isConnected ? 'max-w-[2560px] grid grid-cols-1' : 'max-w-[2560px] grid grid-cols-1 lg:grid-cols-2 text-left'} rounded-[40px] overflow-hidden bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[0_30px_80px_rgba(0,0,0,0.06)] relative`}
         >
           {/* Subtle reflection lines for frosted glass effect */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />

@@ -37,7 +37,7 @@ export function HistoricalForensicSection() {
 
   return (
     <section className="relative py-32 px-6 bg-white overflow-hidden">
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-[2560px] mx-auto relative z-10 text-left">
         <div className="mb-20 text-center">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 mb-6 uppercase">
                 Forensic <span className="text-slate-200">Case Studies</span>

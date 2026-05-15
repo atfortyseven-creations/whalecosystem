@@ -28,7 +28,7 @@ export const TacticalWhaleDatabase: React.FC<{ onClose: () => void }> = ({ onClo
             <motion.div 
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
-                className="w-full max-w-7xl h-full bg-slate-950 border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                className="w-full max-w-[2560px] mx-auto text-left h-full bg-slate-950 border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
             >
                 {/* Header */}
                 <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/2">

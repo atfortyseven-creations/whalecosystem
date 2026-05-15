@@ -125,7 +125,7 @@ export function WhaleAlertProLanding() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-20 text-center px-6 max-w-5xl mt-[-10vh]">
+        <div className="relative z-20 text-left px-6 max-w-[2560px] mt-[-10vh]">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -180,7 +180,7 @@ export function WhaleAlertProLanding() {
 
       {/* --- SECTION: THE ENGINE (SCROLLYTELLING) --- */}
       <section className="relative py-48 px-6 bg-black">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[2560px] mx-auto text-left">
           {/* Step 1: Detection */}
           <div className="grid lg:grid-cols-2 gap-24 items-center mb-64">
              <div className="relative order-2 lg:order-1">
@@ -379,7 +379,7 @@ export function WhaleAlertProLanding() {
 
       {/* --- FOOTER --- */}
       <footer className="py-20 px-12 border-t border-white/5 bg-black/90 relative z-50">
-        <div className="max-w-7xl mx-auto flex flex-col md:row items-center justify-between gap-12">
+        <div className="max-w-[2560px] mx-auto flex flex-col md:row items-start justify-between gap-12 text-left">
            <div className="text-left">
               <div className="text-2xl font-black tracking-tighter mb-4">Whale Alert Network <span className="text-cyan-500">PRO</span></div>
               <div className="text-[10px] font-mono text-white/20 uppercase tracking-[0.4em]">© 2026 Whale Alert Network Access</div>

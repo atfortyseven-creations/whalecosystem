@@ -90,7 +90,7 @@ export default function PublicStatusTerminal() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-8 py-12 flex flex-col gap-10">
+      <main className="max-w-[2560px] mx-auto px-8 py-12 flex flex-col gap-10 text-left items-start">
         
         {/* ── ERROR STATE ── */}
         {error && (

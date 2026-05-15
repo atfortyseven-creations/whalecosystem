@@ -35,7 +35,7 @@ export function SearchAnalyticsView({ result, onClose }: SearchAnalyticsViewProp
                     initial={{ scale: 0.9, y: 30, opacity: 0 }}
                     animate={{ scale: 1, y: 0, opacity: 1 }}
                     exit={{ scale: 0.9, y: 30, opacity: 0 }}
-                    className="w-full max-w-6xl h-[85vh] bg-[#0a0a0f] border border-white/10 rounded-[3rem] overflow-hidden flex flex-col shadow-[0_0_100px_rgba(0,0,0,1)]"
+                    className="w-full max-w-[2560px] mx-auto text-left h-[85vh] bg-[#0a0a0f] border border-white/10 rounded-[3rem] overflow-hidden flex flex-col shadow-[0_0_100px_rgba(0,0,0,1)]"
                 >
                     {/* Header */}
                     <div className="flex flex-wrap items-center justify-between p-8 lg:p-10 border-b border-white/5 gap-6">

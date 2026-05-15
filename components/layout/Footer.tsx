@@ -20,14 +20,14 @@ export const Footer = () => {
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-30" />
             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[var(--aztec-orchid)]/30 to-transparent pointer-events-none" />
 
-            <div className="relative z-10 max-w-7xl mx-auto px-8 md:px-12">
+            <div className="relative z-10 max-w-[2560px] mx-auto px-8 md:px-12 text-left">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-24">
                     
                     {/* Brand Identity */}
                     <div className="md:col-span-5 flex flex-col items-start">
                         <div className="flex items-center gap-3 mb-6 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full backdrop-blur-md shadow-2xl">
                             <span className="text-xl pb-1">🐋</span>
-                            <span className="text-[12px] font-aztec-mono font-black tracking-[0.25em] uppercase text-white">Global Network</span>
+                            <span className="text-[12px] font-aztec-mono font-black tracking-[0.25em] uppercase text-white">Whale Alert Network</span>
                         </div>
                         <p className="text-[13px] font-sans text-white/40 leading-relaxed max-w-sm tracking-wide">
                             Advanced market insights and privacy infrastructure. Built to be simple, fast, and accessible for everyone in the world.
@@ -38,8 +38,8 @@ export const Footer = () => {
                     <div className="md:col-span-7 grid grid-cols-2 gap-12 md:pl-16">
                         {/* Platform */}
                         <div className="flex flex-col gap-8">
-                            <h4 className="text-[10px] font-aztec-mono font-black uppercase tracking-[0.3em] text-[var(--aztec-orchid)] flex items-center gap-3">
-                                <span className="w-4 h-[1px] bg-[var(--aztec-orchid)]" /> Access
+                            <h4 className="text-[10px] font-aztec-mono font-black uppercase tracking-[0.3em] text-white/50 flex items-center gap-3">
+                                <span className="w-4 h-[1px] bg-white/30" /> Access
                             </h4>
                             <div className="flex flex-col gap-5">
                                 <FooterLink href="/dashboard" icon={<Globe size={15} />}>Platform</FooterLink>
@@ -52,8 +52,8 @@ export const Footer = () => {
 
                         {/* Connect */}
                         <div className="flex flex-col gap-8">
-                            <h4 className="text-[10px] font-aztec-mono font-black uppercase tracking-[0.3em] text-[var(--aztec-chartreuse)] flex items-center gap-3">
-                                <span className="w-4 h-[1px] bg-[var(--aztec-chartreuse)]" /> Connect
+                            <h4 className="text-[10px] font-aztec-mono font-black uppercase tracking-[0.3em] text-white/50 flex items-center gap-3">
+                                <span className="w-4 h-[1px] bg-white/30" /> Connect
                             </h4>
                             <div className="flex flex-col gap-5">
                                 <FooterLink href="/careers" icon={<Code size={15} />}>Careers</FooterLink>
@@ -101,7 +101,7 @@ const FooterLink = ({ href, children, external = false, icon }: FooterLinkProps)
         
         <ArrowUpRight 
             size={12} 
-            className="opacity-0 -translate-y-2 translate-x-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all duration-300 text-[var(--aztec-orchid)]" 
+            className="opacity-0 -translate-y-2 translate-x-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all duration-300 text-white/60" 
         />
     </Link>
 );

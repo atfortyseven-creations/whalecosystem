@@ -8,7 +8,7 @@ export const metadata = {
 export default function VossSupremacyPage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#1A1A1A] font-sans selection:bg-[#EAE5D9] p-8 md:p-16">
-      <div className="max-w-6xl mx-auto space-y-12">
+      <div className="max-w-[2560px] mx-auto space-y-12 text-left">
         <header className="border-b-[1px] border-[#EAE5D9] pb-8 mb-16">
           <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#8C8C8C] mb-4">
             CONFIDENTIAL // SYSTEM ARCHITECTURE V4.2.0 EXTENSION
@@ -41,8 +41,8 @@ export default function VossSupremacyPage() {
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-sm font-mono text-[#8C8C8C]">#{item.id}</span>
                         <span className={`text-xs font-mono px-2 py-1 uppercase tracking-wider ${
-                          item.priority === 'Crítica' ? 'bg-red-100 text-red-800' :
-                          item.priority === 'Alta' ? 'bg-orange-100 text-orange-800' :
+                          item.priority === 'Critical' ? 'bg-red-100 text-red-800' :
+                          item.priority === 'High' ? 'bg-orange-100 text-orange-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
                           Prio: {item.priority}

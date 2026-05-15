@@ -146,7 +146,7 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                 </header>
 
                 {/* 3. Contenido Principal */}
-                <main className="relative z-10 pt-24 px-4 pb-12 w-full max-w-7xl mx-auto">
+                <main className="relative z-10 pt-24 px-4 pb-12 w-full max-w-[2560px] mx-auto text-left">
                     {children}
                 </main>
 

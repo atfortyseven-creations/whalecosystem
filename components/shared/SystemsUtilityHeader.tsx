@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Eye, User } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useDisconnect } from 'wagmi';
@@ -20,7 +20,6 @@ export function SystemsUtilityHeader() {
 
     const icons = [
         { id: 'notifications', icon: Bell, label: 'Notifications' },
-        { id: 'privacy',       icon: Eye,  label: 'Privacy'        },
     ];
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;

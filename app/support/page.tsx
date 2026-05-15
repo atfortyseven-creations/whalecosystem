@@ -430,7 +430,7 @@ export default function SupportPage() {
         <SupportHero />
         <StatsRow />
 
-        <div className="max-w-6xl mx-auto px-6 py-16 space-y-8">
+        <div className="max-w-[2560px] mx-auto px-6 py-16 space-y-8 text-left">
 
           {/* System Status */}
           <motion.div

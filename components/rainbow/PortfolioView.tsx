@@ -578,7 +578,7 @@ export default function PortfolioView({
       {/* ══════════════════════════════════════════════════════
           MAIN CONTENT
           ══════════════════════════════════════════════════════ */}
-      <main className="relative z-10 max-w-7xl mx-auto min-h-screen flex flex-col pt-8 px-4 pb-32">
+      <main className="relative z-10 max-w-[2560px] mx-auto min-h-screen flex flex-col pt-8 px-4 pb-32 text-left items-start">
 
         {/* NOT CONNECTED → Rainbow Wallet Onboarding */}
         {!isConnected ? (

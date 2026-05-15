@@ -68,7 +68,7 @@ export default function DilutionTracker() {
 
     return (
         <section className="relative py-32 px-6">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-[2560px] mx-auto text-left">
                 {/* TITLE & HEADER (ONLY TITLE AND TOOL AS REQUESTED) */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
                     <div>

@@ -119,13 +119,13 @@ export function SovereignFooter() {
                         translateX: '-50%',
                         translateY: '-50%',
                         opacity: isHovered ? 1 : 0,
-                        background: 'radial-gradient(circle, rgba(0,102,255,0.25) 0%, rgba(0,102,255,0) 70%)',
+                        background: 'radial-gradient(circle, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 70%)',
                         mixBlendMode: 'multiply'
                     }}
                 />
                 
                 <motion.div
-                    className="pointer-events-none absolute w-5 h-5 border border-[#0066FF]/30 rounded-full z-30 flex items-center justify-center transition-opacity duration-300"
+                    className="pointer-events-none absolute w-5 h-5 border border-black/30 rounded-full z-30 flex items-center justify-center transition-opacity duration-300"
                     style={{
                         x: cursorX,
                         y: cursorY,
@@ -136,7 +136,7 @@ export function SovereignFooter() {
                     animate={{ scale: isHovered ? [1, 1.2, 1] : 1 }}
                     transition={{ repeat: Infinity, duration: 2 }}
                 >
-                    <div className="w-1.5 h-1.5 bg-[#0066FF] rounded-full shadow-[0_0_8px_#0066FF]" />
+                    <div className="w-1.5 h-1.5 bg-black rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)]" />
                 </motion.div>
             </>
           )}
@@ -145,13 +145,13 @@ export function SovereignFooter() {
           <div className="absolute inset-x-0 bottom-0 h-[65%] sm:h-[75%] bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/80 to-transparent pointer-events-none z-10" />
 
           {/* ═══ Footer Inner Body ═════════════════════════════════════════════ */}
-          <div className="relative z-40 w-full max-w-[1000px] mx-auto px-6 pb-12 flex flex-col items-center gap-12">
+          <div className="relative z-40 w-full max-w-[2560px] mx-auto px-6 pb-12 flex flex-col items-start gap-12 text-left">
 
             {/* ─── HumanID Logo ─── */}
             <motion.div
               animate={{ y: [0, -4, 0] }}
               transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-              className="flex flex-col items-center gap-6"
+              className="flex flex-col items-start gap-6"
             >
               <img
                 src="/official-whale-monochrome.png"
@@ -232,14 +232,14 @@ export function SovereignFooter() {
 
               {/* GDPR COMPLIANT — EU Stars Badge */}
               <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
-                <div className="w-10 h-10 rounded-full bg-[#003399] flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0">
                   <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                     {/* 12 EU stars in circle */}
                     {Array.from({length:12}).map((_,i) => {
                       const angle = (i * 30 - 90) * (Math.PI / 180);
                       const cx = 11 + 7.5 * Math.cos(angle);
                       const cy = 11 + 7.5 * Math.sin(angle);
-                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#FFCC00" />;
+                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#333333" />;
                     })}
                   </svg>
                 </div>
@@ -251,11 +251,11 @@ export function SovereignFooter() {
 
               {/* KYC/AML VERIFIED — Shield Eye Badge */}
               <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
-                <div className="w-10 h-10 rounded-[10px] bg-[#1A56DB] flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-[10px] bg-black/10 flex items-center justify-center shrink-0">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2Z" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
-                    <circle cx="12" cy="12" r="3" fill="white"/>
-                    <ellipse cx="12" cy="12" rx="6" ry="3.5" stroke="white" strokeWidth="1.2" fill="none"/>
+                    <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2Z" fill="#333333" fillOpacity="0.15" stroke="#333333" strokeWidth="1.5"/>
+                    <circle cx="12" cy="12" r="3" fill="#333333"/>
+                    <ellipse cx="12" cy="12" rx="6" ry="3.5" stroke="#333333" strokeWidth="1.2" fill="none"/>
                   </svg>
                 </div>
                 <div className="flex flex-col gap-0">
@@ -266,13 +266,13 @@ export function SovereignFooter() {
 
               {/* MiCA REGULATED — EU Stars Square Badge */}
               <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
-                <div className="w-10 h-10 rounded-[10px] bg-[#003399] flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-[10px] bg-black/10 flex items-center justify-center shrink-0">
                   <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                     {Array.from({length:12}).map((_,i) => {
                       const angle = (i * 30 - 90) * (Math.PI / 180);
                       const cx = 11 + 7.5 * Math.cos(angle);
                       const cy = 11 + 7.5 * Math.sin(angle);
-                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#FFCC00" />;
+                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#333333" />;
                     })}
                   </svg>
                 </div>
@@ -284,13 +284,13 @@ export function SovereignFooter() {
 
               {/* ISO 27001 — Globe Grid Badge */}
               <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
-                <div className="w-10 h-10 rounded-full border-2 border-[#4A90D9] bg-white flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-full border-2 border-black/20 bg-white flex items-center justify-center shrink-0">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9" stroke="#4A90D9" strokeWidth="1.5" fill="none"/>
-                    <ellipse cx="12" cy="12" rx="4.5" ry="9" stroke="#4A90D9" strokeWidth="1.2" fill="none"/>
-                    <line x1="3" y1="9" x2="21" y2="9" stroke="#4A90D9" strokeWidth="1.2"/>
-                    <line x1="3" y1="15" x2="21" y2="15" stroke="#4A90D9" strokeWidth="1.2"/>
-                    <text x="12" y="14" textAnchor="middle" fontSize="4" fontWeight="900" fill="#4A90D9">ISO</text>
+                    <circle cx="12" cy="12" r="9" stroke="#333333" strokeWidth="1.5" fill="none"/>
+                    <ellipse cx="12" cy="12" rx="4.5" ry="9" stroke="#333333" strokeWidth="1.2" fill="none"/>
+                    <line x1="3" y1="9" x2="21" y2="9" stroke="#333333" strokeWidth="1.2"/>
+                    <line x1="3" y1="15" x2="21" y2="15" stroke="#333333" strokeWidth="1.2"/>
+                    <text x="12" y="14" textAnchor="middle" fontSize="4" fontWeight="900" fill="#333333">ISO</text>
                   </svg>
                 </div>
                 <div className="flex flex-col gap-0">
@@ -302,12 +302,12 @@ export function SovereignFooter() {
             </div>
 
             {/* ─── Copyright & Powered By ─── */}
-            <div className="flex flex-col items-center gap-6 pt-4">
+            <div className="flex flex-col items-start gap-6 pt-4">
               <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">
                 © 2026 Whale Alert Network. Pure Mathematics.
               </span>
               
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-start gap-3">
                 <span className="font-mono text-[9px] font-bold uppercase tracking-[0.35em] text-black/40">Powered by</span>
                 <a href="https://aztec.network" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 opacity-60 hover:opacity-100 transition-all">
                   <svg width="20" height="20" viewBox="0 0 32 32" fill="none" className="group-hover:scale-110 transition-transform">

@@ -130,7 +130,7 @@ export function AcademyInteractiveEngine({
     const selectedCourse = dbCourses.find(c => c.slug === selectedCourseSlug);
 
     return (
-        <div className="pt-32 pb-48 px-4 sm:px-6 max-w-5xl mx-auto w-full relative z-10 transition-all">
+        <div className="pt-32 pb-48 px-4 sm:px-6 max-w-[2560px] mx-auto w-full relative z-10 transition-all text-left">
             
             {/* ── NESTR HERO ── */}
             <header className="mb-16 w-full bg-white rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">

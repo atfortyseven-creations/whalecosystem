@@ -75,7 +75,7 @@ export function AddressDashboard({ address }: AddressDashboardProps) {
                 <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
             </div>
 
-            <div className="max-w-6xl mx-auto space-y-20 relative z-10">
+            <div className="max-w-[2560px] mx-auto space-y-20 relative z-10 text-left">
                  {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-12 border-b border-slate-100">
                     <div className="space-y-6 flex-1 min-w-0">

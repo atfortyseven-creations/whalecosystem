@@ -313,7 +313,7 @@ export default function PortfolioPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 pb-8 pt-8 space-y-5">
+      <main className="max-w-[2560px] mx-auto px-4 pb-8 pt-8 space-y-5 text-left items-start">
 
         {/* ── EMPTY STATE / WELCOME HERO (NESTR STYLE) ── */}
         {!userAddress && (

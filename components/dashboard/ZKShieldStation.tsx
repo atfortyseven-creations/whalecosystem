@@ -69,7 +69,7 @@ export function ZKShieldStation() {
 
             <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center">
                 
-                <div className="w-full max-w-2xl space-y-12 py-12">
+                <div className="w-full max-w-[2560px] mx-auto space-y-12 py-12 text-left">
                    
                    <div className="space-y-4">
                       <label className="text-[10px] text-[#888888] font-black uppercase tracking-[0.2em] block text-center">Entity Isolation Target</label>

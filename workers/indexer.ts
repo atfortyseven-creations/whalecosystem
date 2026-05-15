@@ -2,7 +2,7 @@
 import { Worker } from 'bullmq';
 import { createPublicClient, webSocket } from 'viem';
 import { mainnet, base } from 'viem/chains';
-import { createClient } from 'redis';
+import Redis from 'ioredis';
 import { neuralSegregator } from '../lib/neural-segregator';
 
 /**
@@ -11,21 +11,21 @@ import { neuralSegregator } from '../lib/neural-segregator';
  */
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-const redis = createClient({ url: REDIS_URL });
+const redis = new Redis(REDIS_URL);
 
 const wssClients = [
   {
     chain: mainnet,
-    url: 'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a'  // GetBlock ETH WS primary
+    url: process.env.GB_ETH_WSS_1 || 'wss://shared.us-east-1.getblock.io/d53ccda1da9f451999b60cd4e0871a27'
   },
   {
     chain: mainnet,
-    url: 'wss://go.getblock.io/36eed0bdbb894920b7eff3516a90f131'  // GetBlock ETH WS backup
+    url: process.env.GB_ETH_WSS_2 || 'wss://shared.us-east-1.getblock.io/acb3b84538ba4ae89f076303fcd036c9'
   }
 ];
 
 async function startSiphons() {
-  await redis.connect();
+
   console.log('[Siphon] Redis connected. Initializing RPC Node Connections...');
 
   wssClients.forEach(({ chain, url }) => {
@@ -47,7 +47,7 @@ async function startSiphons() {
           volumeContext: block.transactions.length * 1500
         };
 
-        await redis.set(`pulse:${chain.name}:latest`, JSON.stringify(pulsePayload), { EX: 60 });
+        await redis.set(`pulse:${chain.name}:latest`, JSON.stringify(pulsePayload), 'EX', 60);
 
         neuralSegregator.ingestPulse({
           symbol: chain.nativeCurrency.symbol,

@@ -60,7 +60,7 @@ export function StackedFeatureCards() {
 
   return (
     <div className="relative w-full py-24 flex items-center justify-center overflow-visible bg-black">
-      <div className="w-full max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+      <div className="w-full max-w-[2560px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start text-left">
         
         {/* LEFT SIDE - Stacked Feature Cards */}
         <div className="relative w-full max-w-[420px] h-[550px] mx-auto lg:mx-0 lg:sticky lg:top-24">

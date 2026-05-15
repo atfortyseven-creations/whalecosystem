@@ -37,7 +37,7 @@ export function LightningDashboard() {
                 <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
             </div>
 
-            <div className="relative z-10 pt-32 pb-32 px-6 max-w-7xl mx-auto space-y-24">
+            <div className="relative z-10 pt-32 pb-32 px-6 max-w-[2560px] mx-auto space-y-24 text-left">
                 <NetworkTabs />
 
                 {/* Centered Editorial Header */}

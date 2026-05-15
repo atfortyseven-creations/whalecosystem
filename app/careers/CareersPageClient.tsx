@@ -47,7 +47,7 @@ export function CareersPageClient() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-5 sm:px-8 py-16 md:py-28 flex flex-col gap-20 md:gap-32">
+      <main className="max-w-[2560px] mx-auto px-5 sm:px-8 py-16 md:py-28 flex flex-col gap-20 md:gap-32 text-left items-start">
 
         {/* Open Positions */}
         <section>

@@ -101,7 +101,7 @@ export default function PricingPage() {
 
         {/* ── HERO (Nestr Style) ──────────────────────────────────────────── */}
         <section className="w-full pt-32 pb-20 px-6 border-b border-black/10">
-          <div className="max-w-5xl mx-auto flex flex-col items-start gap-8">
+          <div className="max-w-[2560px] mx-auto flex flex-col items-start gap-8 text-left">
             <motion.div
               initial="hidden" animate="visible" variants={FADE_UP}
               className="flex flex-col items-start gap-8"
@@ -157,7 +157,7 @@ export default function PricingPage() {
               </h2>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-black/10 border border-black/10 max-w-6xl mx-auto overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-black/10 border border-black/10 max-w-[2560px] mx-auto overflow-hidden text-left">
               {PRICING_TIERS.map((tier, index) => {
                 return (
                   <motion.div

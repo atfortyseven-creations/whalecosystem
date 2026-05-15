@@ -10,7 +10,7 @@ export default function InstitutionalFooter() {
       <div className="absolute inset-0 pointer-events-none opacity-20 mix-blend-multiply" 
            style={{ backgroundImage: 'radial-gradient(#1a1a1a 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 relative z-10">
+      <div className="max-w-[2560px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 relative z-10 text-left">
         
         {/* Brand Section */}
         <div className="lg:col-span-2 space-y-6">
@@ -87,7 +87,7 @@ export default function InstitutionalFooter() {
 
       </div>
 
-      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-mono font-bold text-black/40 tracking-widest uppercase">
+      <div className="max-w-[2560px] mx-auto mt-20 pt-8 border-t border-black/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-[10px] font-mono font-bold text-black/40 tracking-widest uppercase">
         <div>© 2026 Whale Protocol</div>
       </div>
     </footer>

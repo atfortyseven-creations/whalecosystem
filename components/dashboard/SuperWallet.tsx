@@ -387,7 +387,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
                  <ViewTab icon={<Settings size={20}/>} label="" active={activeView==='settings'} onClick={()=>setActiveView('settings')} />
             </div>
 
-            <main className="max-w-xl mx-auto p-4 space-y-4 relative z-10 min-h-[80vh]">
+            <main className="max-w-[2560px] text-left mx-auto p-4 space-y-4 relative z-10 min-h-[80vh]">
 
                 {activeView === 'portfolio' && displayAddress && (
                     <div className="animate-fade-in space-y-12">

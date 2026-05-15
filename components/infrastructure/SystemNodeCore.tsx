@@ -61,7 +61,7 @@ export default function SystemNodeCore() {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(239,68,68,0.05)_0%,_transparent_70%)]" />
             </div>
 
-            <main className="relative z-10 pt-24 pb-20 px-6 max-w-7xl mx-auto space-y-16">
+            <main className="relative z-10 pt-24 pb-20 px-6 max-w-[2560px] mx-auto space-y-16 text-left">
                 
                 {/* Header Block */}
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-10">

@@ -18,7 +18,7 @@ export function DevFeatureSection({ title, description, details, lottieSrc, alig
 
     return (
         <section className="py-24 px-6 relative overflow-hidden">
-            <div className={`max-w-7xl mx-auto flex flex-col ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-16`}>
+            <div className={`max-w-[2560px] mx-auto flex flex-col ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} items-start gap-16 text-left`}>
                 
                 {/* TEXT CONTENT */}
                 <motion.div 

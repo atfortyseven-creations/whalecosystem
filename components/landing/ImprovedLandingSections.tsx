@@ -11,7 +11,7 @@ export function WalletShowcaseSection() {
 
     return (
         <section className="relative w-full py-32 overflow-hidden">
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="max-w-[2560px] mx-auto px-6 text-left">
                 <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -87,7 +87,7 @@ function FeatureCard({ icon, title, description, delay }: {
 export function NotificationsSection() {
     return (
         <section className="relative w-full py-32 bg-gradient-to-b from-transparent to-[#1F1F1F]/5">
-            <div className="max-w-6xl mx-auto px-6">
+            <div className="max-w-[2560px] mx-auto px-6 text-left">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}

@@ -86,7 +86,7 @@ export function LaunchCountdown() {
             </div>
 
             {/* 3. CONTENT AREA */}
-            <div className="relative z-20 w-full max-w-7xl mx-auto px-6 text-center text-white pt-60 pb-40">
+            <div className="relative z-20 w-full max-w-[2560px] mx-auto px-6 text-left text-white pt-60 pb-40">
                 
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9, filter: 'blur(20px)' }}

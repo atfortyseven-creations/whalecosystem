@@ -25,7 +25,7 @@ export const DownheadSection = () => {
       {/* Decorative Background Grid */}
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-      <div className="max-w-7xl mx-auto px-12 relative z-10">
+      <div className="max-w-[2560px] mx-auto px-12 relative z-10 text-left">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
           
           <div className="space-y-12">

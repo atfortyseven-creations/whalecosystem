@@ -100,7 +100,7 @@ export function WhaleAlertFooter() {
 
     return (
         <footer className="w-full bg-transparent py-16 opacity-40">
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-[2560px] mx-auto px-4 text-left">
                 {/* Purposely empty to maintain clean black aesthetic as requested */}
             </div>
         </footer>

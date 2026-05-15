@@ -16,7 +16,7 @@ export function IntentMasterySection() {
   return (
     <section ref={containerRef} className="relative py-40 px-6 bg-white overflow-hidden">
       
-      <motion.div style={{ opacity }} className="relative z-10 max-w-7xl mx-auto">
+      <motion.div style={{ opacity }} className="relative z-10 max-w-[2560px] mx-auto text-left">
         <div className="text-center mb-32">
           <motion.div 
              initial={{ opacity: 0, scale: 0.9 }}

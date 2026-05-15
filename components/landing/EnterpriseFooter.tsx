@@ -61,7 +61,7 @@ export function EnterpriseFooter() {
             <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 opacity-95" />
             <div className="absolute inset-0 bg-[url('/patterns/grid.svg')] opacity-10" />
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6">
+            <div className="relative z-10 max-w-[2560px] mx-auto px-6 text-left">
                 {/* Download Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}

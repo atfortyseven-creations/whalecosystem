@@ -9,7 +9,7 @@ export function SecurityGrowthSection() {
     const { t } = useLanguage();
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 pb-32">
+        <div className="w-full max-w-[2560px] mx-auto px-4 pb-32 text-left">
             
             {/* Center Text Interlude with Background */}
             <div className="py-32 flex flex-col items-center justify-center text-center relative rounded-[3rem] overflow-hidden my-24 shadow-2xl">

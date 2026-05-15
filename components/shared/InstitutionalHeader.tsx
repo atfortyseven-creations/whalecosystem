@@ -71,9 +71,11 @@ export function InstitutionalHeader() {
 
     return (
         <header
-            className="relative flex items-center justify-between px-6 lg:px-10 w-full border-b sticky top-0 z-[100] transition-colors duration-300 shadow-sm bg-white/40 backdrop-blur-3xl"
-            style={{ minHeight: '68px', borderColor: 'rgba(5,5,5,0.08)' }}
+            className="relative flex items-center justify-between w-full border-b sticky top-0 z-[100] transition-colors duration-300"
+            style={{ minHeight: '68px', borderColor: 'rgba(5,5,5,0.10)', background: '#FFFFFF', boxShadow: '0 1px 0 rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04)' }}
         >
+            {/* Inner container — centred, full-width up to 4K */}
+            <div className="w-full max-w-[2560px] mx-auto px-6 lg:px-10 flex items-center justify-between h-full">
             {/* Paper grain texture overlay */}
             <div className="absolute inset-0 opacity-[0.035] pointer-events-none noise-bg" />
 
@@ -99,7 +101,7 @@ export function InstitutionalHeader() {
                     </motion.div>
                     <div className="flex flex-col leading-none text-[#050505] justify-center">
                         <span className="font-aztec-serif text-[18px] font-black uppercase tracking-tighter leading-none">
-                            Global Network
+                            Whale Alert Network
                         </span>
                     </div>
                 </Link>
@@ -159,6 +161,7 @@ export function InstitutionalHeader() {
                     </motion.div>
                 )}
             </AnimatePresence>
+            </div>{/* end inner container */}
         </header>
     );
 }

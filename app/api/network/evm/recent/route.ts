@@ -79,9 +79,7 @@ function getChains(): ChainConfig[] {
       chainId: 56,
       rpcUrls: [
         // Priority 1: institutional GetBlock endpoint (keyed, highest reliability)
-        process.env.GETBLOCK_BSC_RPC
-          ? `https://go.getblock.io/${process.env.GETBLOCK_BSC_RPC}/bsc/mainnet/`
-          : null,
+        process.env.GB_BSC_RPC_1 || null,
         // Priority 2: env override
         process.env.BSC_RPC_URL || null,
         // Priority 3: RpcRelayerManager (multi-account rotation)

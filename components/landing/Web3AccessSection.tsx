@@ -13,7 +13,7 @@ export function Web3AccessSection() {
     const { t } = useLanguage();
 
     return (
-        <div className="w-full max-w-6xl mx-auto px-4 py-24 flex flex-col gap-16">
+        <div className="w-full max-w-[2560px] mx-auto px-4 py-24 flex flex-col gap-16 text-left">
             
             {/* 1. New to Web3? Card (Blue Style) */}
             <div className="w-full bg-[#Dbf1ff] rounded-3xl p-10 md:p-14 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10 shadow-lg group">

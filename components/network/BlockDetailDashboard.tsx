@@ -33,7 +33,7 @@ export function BlockDetailDashboard({ hash }: BlockDetailDashboardProps) {
 
     return (
         <div className="min-h-screen bg-[#0D0D12] pt-24 pb-12 px-6">
-            <div className="max-w-5xl mx-auto space-y-8">
+            <div className="max-w-[2560px] mx-auto space-y-8 text-left">
                  {/* Header */}
                 <div className="flex items-center gap-4">
                     <Link href="/network/blocks" className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors">

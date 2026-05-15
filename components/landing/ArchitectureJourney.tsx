@@ -37,7 +37,7 @@ export function ArchitectureJourney() {
 
   return (
     <div ref={containerRef} className="relative py-40 bg-white overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6 mb-32 text-center">
+      <div className="max-w-[2560px] mx-auto px-6 mb-32 text-left">
         <motion.div
            initial={{ opacity: 0, y: 30 }}
            whileInView={{ opacity: 1, y: 0 }}

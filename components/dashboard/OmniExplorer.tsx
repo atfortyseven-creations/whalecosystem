@@ -127,7 +127,7 @@ export function OmniExplorer() {
             
             <div className="relative z-10 w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col gap-12">
                 {/* Header / Search Area */}
-                <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto pt-16 pb-12 gap-8">
+                <div className="flex flex-col items-start w-full max-w-[2560px] mx-auto pt-16 pb-12 gap-8 text-left">
                     <div className="text-center space-y-4 border-b border-[#E5E5E5] pb-8 w-full">
                         <div className="flex items-center justify-center gap-3 mb-2">
                              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#888888]">TRANSACTION & ADDRESS SEARCH</span>

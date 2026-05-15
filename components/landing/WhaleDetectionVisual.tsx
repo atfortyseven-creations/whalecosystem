@@ -47,7 +47,7 @@ export function WhaleDetectionVisual() {
                 }`} />
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col lg:grid lg:grid-cols-2 gap-12 items-center">
+            <div className="relative z-10 max-w-[2560px] mx-auto w-full flex flex-col lg:grid lg:grid-cols-2 gap-12 items-start text-left">
                 
                 {/* 1. Content Area */}
                 <div className="space-y-8 text-center lg:text-left">

@@ -36,7 +36,7 @@ export function SystemCore() {
     return (
         <section className="relative w-full min-h-screen bg-[#030303] py-32 px-6 flex items-center">
             
-            <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            <div className="max-w-[2560px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start text-left">
                 
                 {/* Left Side: Dynamic Accordeon / Selector */}
                 <div className="space-y-4">

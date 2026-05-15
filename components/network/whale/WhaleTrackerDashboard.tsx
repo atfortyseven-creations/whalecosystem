@@ -264,7 +264,7 @@ export function WhaleTrackerDashboard() {
                     )}
                 </AnimatePresence>
 
-                <main className="flex-1 max-w-7xl mx-auto w-full pt-32 pb-16 px-8 space-y-32">
+                <main className="flex-1 max-w-[2560px] mx-auto w-full pt-32 pb-16 px-8 space-y-32 text-left">
                     <div className="flex flex-col items-center text-center space-y-16">
                         <div className="space-y-6">
                             <motion.div 

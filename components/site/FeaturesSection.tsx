@@ -42,7 +42,7 @@ function FeatureCard({ icon: Icon, title, description, delay = 0 }: FeatureCardP
 export function FeaturesSection() {
     return (
         <section className="relative py-24 px-4 sm:px-6 lg:px-8 z-10 bg-black/50 backdrop-blur-sm">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-[2560px] mx-auto text-left">
                 <div className="text-center mb-16">
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}

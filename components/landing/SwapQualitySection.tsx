@@ -62,7 +62,7 @@ export function SwapQualitySection() {
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/10 blur-[150px] rounded-full" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <div className="relative z-10 max-w-[2560px] mx-auto text-left">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           
           {/* Left: Whale Visual Mockup */}

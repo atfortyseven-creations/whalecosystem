@@ -123,7 +123,7 @@ export function GlobalMarketSessions() {
         <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-6xl mx-auto px-6 py-20"
+            className="w-full max-w-[2560px] mx-auto px-6 py-20 text-left"
         >
             <div className="flex flex-col items-center justify-center text-center space-y-12 mb-20">
                 <div className="space-y-4">

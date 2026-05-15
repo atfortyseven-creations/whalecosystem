@@ -49,7 +49,7 @@ export function CosmicForgePanel() {
 
   return (
     <div className="w-full h-full p-4 lg:p-8 overflow-y-auto">
-      <div className="flex flex-col gap-8 max-w-6xl mx-auto">
+      <div className="flex flex-col gap-8 max-w-[2560px] mx-auto text-left">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-2">

@@ -16,7 +16,7 @@ export function OmniChainMatrixSection() {
 
   return (
     <section ref={containerRef} className="relative py-40 px-6 bg-slate-50 overflow-hidden">
-      <motion.div style={{ opacity }} className="relative z-10 max-w-7xl mx-auto">
+      <motion.div style={{ opacity }} className="relative z-10 max-w-[2560px] mx-auto text-left">
         <div className="text-center mb-32">
           <div className="text-xs font-black uppercase tracking-[0.5em] text-indigo-600 mb-8">Global Security Matrix</div>
           <h2 className="text-5xl md:text-8xl font-black tracking-tighter text-slate-950 mb-10 leading-[0.9] uppercase">

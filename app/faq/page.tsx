@@ -127,7 +127,7 @@ export default function FAQPage() {
       
       {/* Hero */}
       <div className="w-full border-b border-black/6 bg-white">
-        <div className="max-w-5xl mx-auto px-6 pt-32 pb-20">
+        <div className="max-w-[2560px] mx-auto px-6 pt-32 pb-20 text-left">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Knowledge Base</span>
@@ -142,7 +142,7 @@ export default function FAQPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-[2560px] mx-auto px-6 py-16 text-left">
         
         {/* Category Tabs */}
         <div className="flex flex-wrap gap-3 mb-12">

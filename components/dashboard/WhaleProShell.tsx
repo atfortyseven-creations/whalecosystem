@@ -32,25 +32,26 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'gold',          label: 'Ticket Mint',       icon: null,    dividerBefore: 'Overview' },
-    { id: 'portfolio',     label: 'Main Portfolio',    icon: null, requiresZK: true },
-    { id: 'billing',       label: 'Billing & Plan',    icon: null },
+    // ── Overview ──────────────────────────────────────────────────
+    { id: 'gold',          label: 'Ticket Mint',    icon: null, dividerBefore: 'Overview' },
+    { id: 'portfolio',     label: 'Main Portfolio', icon: null, requiresZK: true },
+    { id: 'billing',       label: 'Billing & Plan', icon: null },
 
-    { id: 'markets',      label: 'Pre-Execution Tracking',       icon: null, dividerBefore: 'Intelligence', requiresZK: true },
-    { id: 'newpairs',     label: 'New Listings',      icon: null, requiresZK: true },
+    // ── Markets ───────────────────────────────────────────────────
+    { id: 'markets',       label: 'Top Markets',    icon: null, dividerBefore: 'Markets', requiresZK: true },
+    { id: 'newpairs',      label: 'New Listings',   icon: null, requiresZK: true },
 
-    { id: 'inst-ledger',  label: 'Entity Resolution',      icon: null,      dividerBefore: 'On-Chain Intel', requiresZK: true },
-    { id: 'mass-transfer',label: 'Mass Transfers',    icon: null, requiresZK: true, minTier: 'STANDARD' },
-    { id: 'omniexplorer', label: 'Block Explorer',    icon: null, requiresZK: true },
-    { id: 'defi',         label: 'DeFi Yields',       icon: null, requiresZK: true, minTier: 'STANDARD' },
-    { id: 'morpho',       label: 'Morpho Base',       icon: null, requiresZK: true },
+    // ── On-Chain Intel ────────────────────────────────────────────
+    { id: 'inst-ledger',   label: 'Whale Ledger',   icon: null, dividerBefore: 'On-Chain', requiresZK: true },
+    { id: 'mass-transfer', label: 'Mass Transfers', icon: null, requiresZK: true, minTier: 'STANDARD' },
+    { id: 'omniexplorer',  label: 'Block Explorer', icon: null, requiresZK: true },
 
-    { id: 'zk',           label: 'Cryptographic Integrity',    icon: null,    dividerBefore: 'ZK Layer', requiresZK: true },
-    { id: 'zk-identity',  label: 'KYC',      icon: null, badge: 'ZK', badgeColor: '#10B981' },
+    // ── ZK Layer ──────────────────────────────────────────────────
+    { id: 'zk',            label: 'Aztec Pipeline',  icon: null, dividerBefore: 'ZK Layer', requiresZK: true },
 
-    { id: 'chat',         label: 'Whale Chat',       icon: null, dividerBefore: 'Communications', badge: 'E2E', badgeColor: '#9945FF', requiresZK: true },
-    { id: 'logs',         label: 'Session Logs',      icon: null,  dividerBefore: 'System' },
-    { id: 'support',      label: 'Support',           icon: null },
+    // ── System ────────────────────────────────────────────────────
+    { id: 'logs',          label: 'Session Logs',   icon: null, dividerBefore: 'System' },
+    { id: 'support',       label: 'Support',        icon: null },
 ];
 
 const RESTRICTED_TABS = [
@@ -368,7 +369,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                             <img src="/official-whale-monochrome.png" className="w-6 h-6 shrink-0" alt="WAN" />
                             <div className="flex flex-col leading-tight">
                                 <span className="text-[11px] font-black uppercase tracking-tighter text-[#050505]">HumanID</span>
-                                <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30">KYC GATE</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30">TERMINAL</span>
                             </div>
                         </div>
                     </div>
@@ -591,7 +592,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5">Network: ACTIVE</span>
-                        <span className="text-[#888888]">© 2026 HUMANID KYC</span>
+                        <span className="text-[#888888]">© 2026 SOVEREIGN TERMINAL</span>
                     </div>
                 </footer>
             </div>

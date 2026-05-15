@@ -90,17 +90,17 @@ export function AztecArchitectureSection() {
       className="w-full bg-[#FAFAF8] border-t border-black/8"
       aria-label="Institutional Security Architecture"
     >
-      <div className="w-full max-w-[1750px] mx-auto px-5 sm:px-8 py-24 flex flex-col gap-16">
+      <div className="w-full max-w-[2560px] mx-auto px-5 sm:px-8 py-24 flex flex-col gap-16 items-start">
 
         {/* ── Section Header ── */}
-        <div className="w-full max-w-[850px] mx-auto flex flex-col gap-6">
+        <div className="w-full max-w-[850px] flex flex-col gap-6 text-left">
           <div className="border-b-[1.5px] border-black pb-3 flex items-end justify-between">
             <h2 className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-black">
               Security Infrastructure — Zero-Trust Protocol
             </h2>
           </div>
 
-          <div className="flex flex-col gap-4 font-serif text-[15px] sm:text-[16px] text-[#222] leading-relaxed text-justify">
+          <div className="flex flex-col gap-4 font-serif text-[15px] sm:text-[16px] text-[#222] leading-relaxed text-left">
             <p>
               In the modern era of on-chain intelligence, raw data is only half of the equation. 
               The true advantage lies in <strong>operational secrecy</strong>. Our infrastructure is built 
@@ -116,7 +116,7 @@ export function AztecArchitectureSection() {
         </div>
 
         {/* ── Security Pillars ── */}
-        <div className="w-full max-w-[850px] mx-auto">
+        <div className="w-full max-w-[850px]">
           <div className="flex flex-col gap-[1px] bg-black border border-black shadow-sm">
             {SECURITY_PILLARS.map((pillar) => {
               const isOpen = expanded === pillar.index;
@@ -150,7 +150,7 @@ export function AztecArchitectureSection() {
                     </div>
 
                     {isOpen && (
-                      <p className="font-serif text-[14px] sm:text-[15px] text-[#333] leading-[1.75] text-justify border-t border-black/8 pt-4 mt-2">
+                      <p className="font-serif text-[14px] sm:text-[15px] text-[#333] leading-[1.75] text-left border-t border-black/8 pt-4 mt-2">
                         {pillar.body}
                       </p>
                     )}
@@ -162,7 +162,7 @@ export function AztecArchitectureSection() {
         </div>
 
         {/* ── Technical Highlights ── */}
-        <div className="w-full max-w-[850px] mx-auto flex flex-col gap-0">
+        <div className="w-full max-w-[850px] flex flex-col gap-0">
           <div className="border-b border-black pb-2 mb-0">
             <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/50 font-bold">
               Infrastructure Highlights
@@ -187,13 +187,13 @@ export function AztecArchitectureSection() {
         </div>
 
         {/* ── Extended Aztec Integration ── */}
-        <div className="w-full max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-12 mt-12 border-t border-black pb-12 pt-16">
+        <div className="w-full max-w-[1200px] flex flex-col lg:flex-row gap-12 mt-12 border-t border-black pb-12 pt-16">
           
           <div className="w-full lg:w-[35%] flex flex-col gap-6">
             <h3 className="font-mono text-[14px] font-bold uppercase tracking-[0.2em] text-black">
               Deep Integration Substrate
             </h3>
-            <p className="font-serif text-[15px] text-[#444] leading-relaxed text-justify">
+            <p className="font-serif text-[15px] text-[#444] leading-relaxed text-left">
               The fusion of the Whale Alert Network and Aztec Network creates an impenetrable cryptographic shield. This integration relies on specialized primitives operating in perfect synchrony, designed strictly for entities requiring institutional-grade execution without compromising strategic opacity.
             </p>
             <div className="w-full aspect-square bg-white rounded-[2rem] border border-black/10 shadow-sm flex items-center justify-center p-8 overflow-hidden relative mt-4">
@@ -208,7 +208,7 @@ export function AztecArchitectureSection() {
                 <span className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-black mb-3 block">
                   {pt.title}
                 </span>
-                <p className="font-serif text-[14px] text-[#555] leading-[1.65] text-justify">
+                <p className="font-serif text-[14px] text-[#555] leading-[1.65] text-left">
                   {pt.desc}
                 </p>
               </div>
@@ -217,11 +217,11 @@ export function AztecArchitectureSection() {
         </div>
 
         {/* ── Closing Statement ── */}
-        <div className="w-full max-w-[850px] mx-auto border-l-2 border-black pl-5 flex flex-col gap-2">
+        <div className="w-full max-w-[850px] border-l-2 border-black pl-5 flex flex-col gap-2">
           <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/35 font-bold">
             The Institutional Edge
           </span>
-          <p className="font-serif text-[14px] text-[#444] leading-relaxed text-justify">
+          <p className="font-serif text-[14px] text-[#444] leading-relaxed text-left">
             Your intelligence is only as valuable as your ability to protect it. 
             Whale Alert Network provides the definitive shield, allowing you to intercept, 
             analyze, and execute upon the flow of global capital without ever becoming the target.

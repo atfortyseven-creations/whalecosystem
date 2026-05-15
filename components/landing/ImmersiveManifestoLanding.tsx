@@ -34,11 +34,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
 
 
       {/* ── BENTO BOX: WHY WHALE ALERT NETWORK ──────────────────────────────── */}
-      <section className="w-full py-24 md:py-40 bg-transparent relative z-10">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 space-y-16">
-            <div className="text-center max-w-3xl mx-auto space-y-6 mb-20">
+      <section className="w-full py-24 md:py-40 bg-transparent relative z-10 flex justify-center">
+        <div className="w-full max-w-[2560px] mx-auto px-6 md:px-12 xl:px-20 space-y-16">
+            <div className="text-left max-w-3xl space-y-6 mb-20">
                 <h2 className="text-[40px] sm:text-[56px] font-black tracking-tighter uppercase leading-[0.95] text-[#0a0a0a]">
-                    Architectural <span className="text-[#0044CC]">Precision.</span>
+                    Architectural <span className="text-[#050505]">Precision.</span>
                 </h2>
                 <p className="font-serif text-[18px] text-slate-500 leading-relaxed">
                     Designed for professional compliance and quantitative research. We eliminate the noise, providing mathematical certainty and actionable intelligence.
@@ -95,7 +95,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
                 {/* Bento Card 4 */}
                 <div className="col-span-1 lg:col-span-2 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
                     <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
-                        <div className="absolute inset-0 bg-[#0044CC]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
+                        <div className="absolute inset-0 bg-[#050505]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
                          <RemoteLottie path="Trade.json" className="w-full h-full scale-125" />
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
@@ -113,15 +113,15 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
       </section>
 
       {/* ── SHOWCASE ────────────────────────────────────────────────────────── */}
-      <section className="w-full py-24 md:py-40 bg-transparent overflow-hidden relative border-t border-black/5">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 mb-16 md:mb-24">
+      <section className="w-full py-24 md:py-40 bg-transparent overflow-hidden relative border-t border-black/5 flex justify-center">
+        <div className="w-full max-w-[2560px] mx-auto px-6 md:px-12 xl:px-20 mb-16 md:mb-24">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={FADE_UP} className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
-            <div className="relative">
+            <div className="relative text-left">
               <h2 className="text-[40px] sm:text-[56px] md:text-[72px] font-black tracking-tighter uppercase leading-[0.95]">
                 Clean design.<br /><span className="text-black/20">Expert execution.</span>
               </h2>
             </div>
-            <p className="font-serif text-[16px] sm:text-[18px] text-slate-500 max-w-lg leading-relaxed">
+            <p className="font-serif text-[16px] sm:text-[18px] text-slate-500 max-w-lg leading-relaxed text-left">
               A comprehensive and intuitive dashboard designed to provide a clear overview of the platform, combining powerful analytical tools with an elegant, professional aesthetic.
             </p>
           </motion.div>
@@ -156,12 +156,12 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         </div>
       </section>
 
-      <section className="w-full py-32 md:py-48 bg-transparent border-t border-black/5">
-        <div className="max-w-[850px] mx-auto px-6 text-center flex flex-col items-center">
+      <section className="w-full py-32 md:py-48 bg-transparent border-t border-black/5 flex justify-center">
+        <div className="w-full max-w-[2560px] mx-auto px-6 text-left flex flex-col items-start">
           <h2 className="text-[36px] md:text-[56px] font-serif text-[#0a0a0a] leading-tight tracking-tight mb-8">
             In the pursuit of <br /><span className="italic font-light text-slate-500">absolute transparency</span>.
           </h2>
-          <p className="font-serif text-[15px] md:text-[18px] text-slate-500 max-w-2xl mx-auto leading-relaxed">
+          <p className="font-serif text-[15px] md:text-[18px] text-slate-500 max-w-2xl leading-relaxed text-left">
             Foundational document on pure mathematical abstraction, zero-knowledge security,
             and deterministic analytical paradigms that cement the immutable global infrastructure.
           </p>

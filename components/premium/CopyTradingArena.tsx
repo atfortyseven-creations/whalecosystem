@@ -198,7 +198,7 @@ export function CopyTradingArena() {
     }
 
     return (
-        <div className="max-w-5xl mx-auto py-8 px-4">
+        <div className="max-w-[2560px] mx-auto py-8 px-4 text-left">
             <div className="mb-8 pl-4 border-l-4 border-[#111111]">
                 <h2 className="text-3xl font-black text-[#111111] uppercase tracking-tighter flex items-center gap-3">
                     <ShieldCheck size={28} className="text-[#00FFAA]" />
