@@ -15,32 +15,35 @@ export function CareersPageClient() {
       {/* ── NESTR HERO ── */}
       <header className="w-full bg-transparent pt-32 pb-16 px-6 lg:px-12">
         <div className="max-w-[1400px] mx-auto">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
                 
                 <div className="w-full lg:w-1/2 relative z-10 space-y-6 lg:space-y-8 text-center lg:text-left">
-                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#FAFAF8] border border-black/5 rounded-full shadow-sm mx-auto lg:mx-0">
-                        <Code size={14} className="text-[#0044CC]" />
+                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-white/20 dark:bg-black/20 backdrop-blur-md border border-black/5 dark:border-white/5 rounded-full shadow-sm mx-auto lg:mx-0">
+                        <Code size={14} className="text-[#0a0a0a] dark:text-white" />
                     </div>
                     
-                    <h1 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-[0.95]">
-                        Build the <br /><span className="text-[#0044CC]">Protocol.</span>
+                    <h1 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-[#0A0A0A] dark:text-white leading-[0.95]">
+                        Build the <br /><span className="text-black/30 dark:text-white/30">Protocol.</span>
                     </h1>
                     
-                    <p className="font-serif text-[16px] md:text-[18px] text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                    <p className="font-sans text-[16px] md:text-[18px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-lg mx-auto lg:mx-0">
                         We track the largest capital flows in the world, in real time, with cryptographic precision. Join our engineering and intelligence teams to build the tools that give professional traders a forensic edge over the market.
                     </p>
 
                     <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3 pt-4">
                         {['Engineering', 'Cryptography', 'Intelligence', 'Design'].map(tag => (
-                        <div key={tag} className="px-5 py-2.5 bg-slate-50 border border-black/5 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-600 shadow-sm">
+                        <div key={tag} className="px-5 py-2.5 bg-slate-50 dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400 shadow-sm">
                             {tag}
                         </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 shadow-sm p-6 overflow-hidden">
-                    <RemoteLottie path="Manufacturing Industry Working Staff.json" className="scale-[1.15] w-full h-full object-contain" />
+                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/40 dark:bg-[#050505]/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 dark:border-white/5 shadow-sm p-6 overflow-hidden">
+                    <div className="flex flex-col items-center justify-center gap-4 text-[#0a0a0a] dark:text-white opacity-20">
+                        <Users size={64} strokeWidth={1} />
+                        <span className="font-mono text-sm tracking-widest uppercase font-bold">Global Operations</span>
+                    </div>
                 </div>
 
             </motion.div>

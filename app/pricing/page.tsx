@@ -16,20 +16,20 @@ const FADE_UP: any = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
 };
 
-// ── Lottie Feature Cards (Institutional Palette) ────────────────────────────────
+// ── Clean Institutional Feature Cards ────────────────────────────────────────────────
 const FEATURES = [
   {
-    lottie: 'Business Analysis.json',
+    icon: <Lock size={32} className="text-[#0a0a0a] dark:text-white mb-6" strokeWidth={1} />,
     title: 'KYC Identity Attestation',
     desc: 'Verify professional actors via zero-knowledge biometric proofs. Our protocol ensures that no personal data is stored, while guaranteeing the humanity of every network participant.',
   },
   {
-    lottie: 'Isometric data analysis.json',
+    icon: <Activity size={32} className="text-[#0a0a0a] dark:text-white mb-6" strokeWidth={1} />,
     title: 'Protocol Transparency',
     desc: 'Gain visibility into the cryptographic layers of the network. We provide mathematical certainty for every transaction and identity claim within the HumanID ecosystem.',
   },
   {
-    lottie: 'Earth globe rotating with Seamless loop animation.json',
+    icon: <Globe size={32} className="text-[#0a0a0a] dark:text-white mb-6" strokeWidth={1} />,
     title: 'Global Resolution',
     desc: 'Map multi-hop interactions across global chains. We de-obfuscate mixer outputs and group fragmented wallets into unified professional entities.',
   },
@@ -95,48 +95,46 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] text-[#0a0a0a] font-sans overflow-x-hidden selection:bg-black/10">
+    <div className="min-h-screen bg-transparent text-[#0a0a0a] font-sans overflow-x-hidden selection:bg-black/10">
 
       <main className="relative z-10 w-full">
 
-        {/* ── HERO (Nestr Style) ──────────────────────────────────────────── */}
-        <section className="w-full pt-32 pb-20 px-6 border-b border-black/10">
+        {/* ── HERO ──────────────────────────────────────────── */}
+        <section className="w-full pt-32 pb-20 px-6 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#0A0A0A]">
           <div className="max-w-[2560px] mx-auto flex flex-col items-start gap-8 text-left">
             <motion.div
               initial="hidden" animate="visible" variants={FADE_UP}
               className="flex flex-col items-start gap-8"
             >
-              <h1 className="text-[52px] md:text-[96px] font-black uppercase tracking-tighter leading-[0.88] text-[#0a0a0a]">
-                WAKE<br />
-                <span className="text-black/20">UP.</span>
+              <h1 className="text-[52px] md:text-[84px] font-black uppercase tracking-tighter leading-[0.88] text-[#0a0a0a] dark:text-white">
+                Institutional<br />
+                <span className="text-black/30 dark:text-white/30">Access.</span>
               </h1>
 
-              <p className="text-[20px] md:text-[24px] font-serif text-[#0a0a0a]/60 max-w-2xl leading-tight">
-                The definitive cryptographic identity and intelligence layer for the sovereign institution.
+              <p className="text-[20px] md:text-[24px] font-sans text-[#0a0a0a]/60 dark:text-white/60 max-w-2xl leading-tight">
+                Select your service tier to access the network's cryptographic identity and real-time intelligence layers.
               </p>
             </motion.div>
           </div>
         </section>
 
         {/* ── FEATURES GRID ────────────────────────────────────────────────── */}
-        <section className="w-full py-24 md:py-36 bg-white border-b border-black/10">
+        <section className="w-full py-24 md:py-36 bg-[#FAF9F6] dark:bg-[#050505] border-b border-black/10 dark:border-white/10">
           <div className="max-w-[1400px] mx-auto px-6">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
               variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-0 border-t border-l border-black/10"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-0 border-t border-l border-black/10 dark:border-white/10"
             >
               {FEATURES.map((f, i) => (
                 <motion.div
                   key={i} variants={FADE_UP}
-                  className="flex flex-col border-r border-b border-black/10 p-12 bg-white hover:bg-slate-50/50 transition-colors duration-500 group"
+                  className="flex flex-col border-r border-b border-black/10 dark:border-white/10 p-12 bg-white dark:bg-[#0A0A0A] hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors duration-500 group"
                 >
-                  <div className="w-full h-[240px] flex items-center justify-center mb-10 overflow-hidden">
-                    <RemoteLottie path={f.lottie} className="w-full h-full scale-125" />
-                  </div>
+                  {f.icon}
                   <div className="flex flex-col gap-4">
-                    <h3 className="text-[20px] font-black uppercase tracking-tight text-[#0a0a0a]">{f.title}</h3>
-                    <p className="text-[15px] text-[#0a0a0a]/50 leading-relaxed font-serif">{f.desc}</p>
+                    <h3 className="text-[18px] font-black uppercase tracking-tight text-[#0a0a0a] dark:text-white">{f.title}</h3>
+                    <p className="text-[15px] text-[#0a0a0a]/50 dark:text-white/50 leading-relaxed font-sans">{f.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -145,19 +143,19 @@ export default function PricingPage() {
         </section>
 
         {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
-        <section className="w-full py-24 md:py-48 bg-[#FAFAF8]">
+        <section className="w-full py-24 md:py-36 bg-white dark:bg-[#0A0A0A]">
           <div className="px-6 max-w-[1400px] mx-auto">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
               variants={FADE_UP}
-              className="mb-24"
+              className="mb-16"
             >
-              <h2 className="text-[40px] md:text-[72px] font-black uppercase tracking-tighter text-[#0a0a0a] leading-none">
-                Identity <br /><span className="text-black/10">Acquisition.</span>
+              <h2 className="text-[40px] md:text-[64px] font-black uppercase tracking-tighter text-[#0a0a0a] dark:text-white leading-none">
+                Pricing <br /><span className="text-black/20 dark:text-white/20">Plans.</span>
               </h2>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-black/10 border border-black/10 max-w-[2560px] mx-auto overflow-hidden text-left">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10 max-w-[2560px] mx-auto overflow-hidden text-left">
               {PRICING_TIERS.map((tier, index) => {
                 return (
                   <motion.div
@@ -166,34 +164,34 @@ export default function PricingPage() {
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="relative flex flex-col bg-white p-12 md:p-16"
+                    className="relative flex flex-col bg-[#FAF9F6] dark:bg-[#111111] p-12 md:p-16"
                   >
                     <div className="flex-1 flex flex-col">
                       <div className="mb-12">
-                        <h2 className="text-[36px] md:text-[48px] font-black uppercase tracking-tighter leading-none mb-4 text-[#0a0a0a]">
+                        <h2 className="text-[32px] md:text-[40px] font-black uppercase tracking-tighter leading-none mb-3 text-[#0a0a0a] dark:text-white">
                           {tier.name}
                         </h2>
-                        <p className="font-mono text-[11px] text-[#0a0a0a]/40 uppercase tracking-[0.2em] leading-relaxed max-w-sm">
+                        <p className="font-mono text-[11px] text-[#0a0a0a]/50 dark:text-white/50 uppercase tracking-[0.2em] leading-relaxed max-w-sm">
                           {tier.tagline}
                         </p>
                       </div>
 
                       <div className="mb-12">
                         <div className="flex items-baseline gap-2">
-                          <span className="text-[64px] md:text-[84px] font-black tracking-tighter leading-none text-[#0a0a0a]">
+                          <span className="text-[56px] md:text-[72px] font-black tracking-tighter leading-none text-[#0a0a0a] dark:text-white">
                             {tier.priceMonthly}€
                           </span>
-                          <span className="text-[13px] font-bold uppercase tracking-widest text-[#0a0a0a]/20">
+                          <span className="text-[12px] font-bold uppercase tracking-widest text-[#0a0a0a]/30 dark:text-white/30">
                             / month
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex-1 space-y-5 mb-16">
+                      <div className="flex-1 space-y-4 mb-16">
                         {tier.features.map((feature, fIdx) => (
-                          <div key={fIdx} className="flex items-start gap-4">
-                            <div className="mt-1 w-1.5 h-1.5 bg-black rounded-full shrink-0" />
-                            <span className="text-[15px] leading-tight text-[#0a0a0a]/60 font-serif">
+                          <div key={fIdx} className="flex items-start gap-3">
+                            <div className="mt-1.5 w-1.5 h-1.5 bg-[#0a0a0a] dark:bg-white rounded-full shrink-0" />
+                            <span className="text-[14px] leading-tight text-[#0a0a0a]/70 dark:text-white/70 font-sans">
                               {feature.text}
                             </span>
                           </div>
@@ -203,18 +201,18 @@ export default function PricingPage() {
                       <button
                         onClick={() => handleSubscribeClick(tier.id)}
                         disabled={loadingTier === tier.id || (!isTierLoaded && isConnected)}
-                        className={`w-full py-6 text-[10px] sm:text-[12px] text-center whitespace-nowrap font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 border ${
+                        className={`w-full py-5 text-[11px] sm:text-[12px] text-center whitespace-nowrap font-bold transition-all flex items-center justify-center gap-2 sm:gap-3 border rounded-xl ${
                           tier.id === 'STANDARD'
-                            ? 'bg-black text-white hover:bg-white hover:text-black border-black'
-                            : 'bg-white text-black hover:bg-black hover:text-white border-black'
-                        } disabled:opacity-20 disabled:cursor-not-allowed`}
+                            ? 'bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 border-transparent'
+                            : 'bg-transparent text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 border-black/10 dark:border-white/10'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         {loadingTier === tier.id ? (
                           <Loader2 size={16} className="animate-spin" />
                         ) : tier.id === 'FREE' ? (
-                          isConnected ? 'ACTIVE SESSION' : 'INITIALIZE ACCESS'
+                          isConnected ? 'Current Plan' : 'Connect Wallet'
                         ) : (
-                          'ACQUIRE LICENSE'
+                          'Select Plan'
                         )}
                       </button>
                     </div>
@@ -226,18 +224,18 @@ export default function PricingPage() {
         </section>
 
         {/* ── WHY KYC ──────────────────────────────────────────────────── */}
-        <section className="w-full py-24 md:py-48 bg-white border-t border-black/10">
+        <section className="w-full py-24 md:py-36 bg-[#FAF9F6] dark:bg-[#050505] border-t border-black/10 dark:border-white/10">
           <div className="max-w-[1400px] mx-auto px-6">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}
               variants={FADE_UP}
-              className="mb-24"
+              className="mb-16"
             >
-              <h2 className="text-[36px] md:text-[56px] font-black uppercase tracking-tighter text-[#0a0a0a] mb-6">
-                Professional <span className="text-black/10">Rigour.</span>
+              <h2 className="text-[32px] md:text-[48px] font-black uppercase tracking-tighter text-[#0a0a0a] dark:text-white mb-6">
+                Professional <span className="text-black/30 dark:text-white/30">Standards.</span>
               </h2>
-              <p className="text-[18px] font-serif text-[#0a0a0a]/50 max-w-2xl">
-                In the sovereign DeFi landscape, mathematical identity and zero-trust communications are the only true protections.
+              <p className="text-[16px] font-sans text-[#0a0a0a]/60 dark:text-white/60 max-w-2xl">
+                Identity and zero-trust communications protect your operations in a decentralized landscape.
               </p>
             </motion.div>
 
@@ -258,10 +256,10 @@ export default function PricingPage() {
 
 function ProFeatureCard({ title, desc }: { title: string; desc: string }) {
   return (
-    <div className="flex flex-col gap-6 p-0 group">
-      <div className="w-12 h-px bg-black transition-all group-hover:w-full duration-700" />
-      <h3 className="text-[18px] font-black uppercase tracking-tight text-[#0a0a0a]">{title}</h3>
-      <p className="text-[14px] text-[#0a0a0a]/50 leading-relaxed font-serif">{desc}</p>
+    <div className="flex flex-col gap-4 p-0 group">
+      <div className="w-12 h-px bg-black dark:bg-white transition-all group-hover:w-full duration-700" />
+      <h3 className="text-[16px] font-black uppercase tracking-tight text-[#0a0a0a] dark:text-white">{title}</h3>
+      <p className="text-[14px] text-[#0a0a0a]/60 dark:text-white/60 leading-relaxed font-sans">{desc}</p>
     </div>
   );
 }

@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default function CosmicForgePage() {
     return (
-        <div className="bg-[#FAF9F6] w-full min-h-full">
+        <div className="bg-transparent text-[#050505] dark:text-[#FAF9F6] w-full min-h-full">
             <CosmicForgePanel />
         </div>
     );

@@ -132,7 +132,7 @@ function FullReportContent() {
 
   if (notFound) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center bg-[#FAF9F6]">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center bg-transparent">
         <ShieldCheck size={48} className="text-black/20 mb-6" />
         <h1 className="font-sans text-2xl font-bold tracking-tight mb-2">Classified Dossier Unavailable</h1>
         <p className="font-mono text-[11px] uppercase tracking-widest text-black/50 mb-8">The requested intelligence report cannot be located in current archives.</p>
@@ -145,7 +145,7 @@ function FullReportContent() {
 
   if (!article) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-[#FAF9F6]">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-transparent">
         <div className="w-8 h-8 border-2 border-black/10 border-t-black rounded-full animate-spin mb-4" />
         <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">Decrypting Intelligence Protocol...</p>
       </div>
@@ -153,10 +153,10 @@ function FullReportContent() {
   }
 
   return (
-    <article className="min-h-screen bg-[#FAF9F6] text-[#0A0A0A] pb-32">
+    <article className="min-h-screen bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] pb-32">
       
       {/* Top Navigation Bar */}
-      <nav className="sticky top-0 z-30 w-full bg-[#FAF9F6]/95 backdrop-blur-md border-b border-black/5 px-6 md:px-12 py-4 flex items-center justify-between">
+      <nav className="sticky top-0 z-30 w-full bg-white/20 dark:bg-black/20 backdrop-blur-3xl border-b border-black/5 dark:border-white/5 px-6 md:px-12 py-4 flex items-center justify-between">
         <Link href="/news" className="flex items-center gap-3 group">
           <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-black/5 transition-colors">
             <ArrowLeft size={14} className="text-black/60 group-hover:text-black transition-colors" />
@@ -228,7 +228,7 @@ function FullReportContent() {
           <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest mb-8 pb-4 border-b border-black/10">Supplemental Briefings</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {allArticles.map(rel => (
-              <Link key={rel.id} href={`/whalepost/full-report?id=${encodeURIComponent(rel.id)}`} className="group block bg-white border border-black/10 p-6 hover:shadow-xl transition-all duration-300 rounded-sm">
+              <Link key={rel.id} href={`/whalepost/full-report?id=${encodeURIComponent(rel.id)}`} className="group block bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-black/10 dark:border-white/10 p-6 hover:shadow-xl transition-all duration-300 rounded-sm">
                 <span className="block font-mono text-[9px] font-bold uppercase tracking-widest text-black/40 mb-3">{formatFullDate(rel.date)}</span>
                 <h4 className="font-serif text-[17px] leading-[1.4] text-[#0A0A0A] group-hover:text-[#0044CC] transition-colors line-clamp-3">
                   {rel.title}
@@ -246,7 +246,7 @@ function FullReportContent() {
 export default function FullReportPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center">
         <div className="w-8 h-8 border-2 border-black/10 border-t-black rounded-full animate-spin mb-4" />
         <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">Establishing Secure Connection...</p>
       </div>

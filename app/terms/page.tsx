@@ -41,8 +41,9 @@ export default function TermsPage() {
                     
                     {/* Bento 1 */}
                     <div className="bg-white/40 backdrop-blur-3xl border border-black/5 p-10 rounded-[2.5rem] shadow-sm flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
-                        <div className="w-full h-[180px] bg-white/40 backdrop-blur-3xl rounded-3xl border border-black/5 mb-8 flex items-center justify-center overflow-hidden">
-                            <RemoteLottie path="File Loading.json" className="scale-125 transition-transform duration-700 group-hover:scale-150" />
+                        <div className="w-full h-[180px] bg-white/40 dark:bg-[#050505]/40 backdrop-blur-3xl rounded-3xl border border-black/5 dark:border-white/5 mb-8 flex flex-col items-center justify-center overflow-hidden gap-4 text-black/20 dark:text-white/20">
+                            <Scale size={48} strokeWidth={1} />
+                            <span className="font-mono text-[10px] font-bold uppercase tracking-widest">Protocol Law</span>
                         </div>
                         <div>
                             <div className="flex items-center gap-4 mb-4">
@@ -59,8 +60,9 @@ export default function TermsPage() {
 
                     {/* Bento 2 */}
                     <div className="bg-white/40 backdrop-blur-3xl border border-black/5 p-10 rounded-[2.5rem] shadow-sm flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
-                        <div className="w-full h-[180px] bg-white/40 backdrop-blur-3xl rounded-3xl border border-black/5 mb-8 flex items-center justify-center overflow-hidden">
-                            <RemoteLottie path="Business Analysis.json" className="scale-[1.6] transition-transform duration-700 group-hover:scale-[1.8]" />
+                        <div className="w-full h-[180px] bg-white/40 dark:bg-[#050505]/40 backdrop-blur-3xl rounded-3xl border border-black/5 dark:border-white/5 mb-8 flex flex-col items-center justify-center overflow-hidden gap-4 text-black/20 dark:text-white/20">
+                            <Database size={48} strokeWidth={1} />
+                            <span className="font-mono text-[10px] font-bold uppercase tracking-widest">Immutable Records</span>
                         </div>
                         <div>
                             <div className="flex items-center gap-4 mb-4">

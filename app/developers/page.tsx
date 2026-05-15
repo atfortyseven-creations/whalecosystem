@@ -77,7 +77,7 @@ const BuilderAnnouncements = () => {
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
                transition={{ duration: 0.6, delay: i * 0.1 }}
-               className="group relative bg-white p-8 md:p-12 border border-black/10 hover:border-[#0044CC]/30 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,68,204,0.08)] rounded-sm min-h-[480px] flex flex-col justify-between"
+               className="group relative bg-white/20 dark:bg-black/20 backdrop-blur-md p-8 md:p-12 border border-black/10 dark:border-white/10 hover:border-[#0044CC]/30 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,68,204,0.08)] rounded-sm min-h-[480px] flex flex-col justify-between"
             >
                <div className="relative z-10">
                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-black/40 mb-8 flex items-center justify-between gap-2">
@@ -157,7 +157,7 @@ const FullStack = () => {
 // 3. Tools and Libraries Grid
 const ToolsAndLibraries = () => {
   return (
-    <div className="bg-white text-[#0A0A0A] py-40 px-6 border-y border-black/5">
+    <div className="bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] py-40 px-6 border-y border-black/5 dark:border-white/5">
        <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-20">
           <div className="lg:w-1/3">
              <div className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold text-[#0044CC] mb-8">Tools and Repositories</div>
@@ -247,7 +247,7 @@ const SandboxSection = () => {
                { title: "Invoke EdDSA Auth", sub: "Test session minting locally", icon: ShieldCheck },
                { title: "Query Endpoint Latency", sub: "Benchmark API Performance", icon: Activity }
              ].map((item, i) => (
-                <div key={i} className="group p-8 bg-white border border-black/10 flex items-center justify-between cursor-pointer hover:border-[#0044CC]/40 hover:shadow-lg transition-all rounded-sm">
+                <div key={i} className="group p-8 bg-white/20 dark:bg-black/20 backdrop-blur-md border border-black/10 dark:border-white/10 flex items-center justify-between cursor-pointer hover:border-[#0044CC]/40 hover:shadow-lg transition-all rounded-sm">
                    <div className="flex items-center gap-8">
                       <div className="w-14 h-14 bg-[#FAF9F6] border border-black/10 text-[#0A0A0A] rounded-full flex items-center justify-center group-hover:bg-[#0044CC] group-hover:text-white transition-colors">
                          <item.icon size={22} strokeWidth={1.5} />
@@ -435,7 +435,7 @@ const FAQs = () => {
   ];
 
   return (
-    <div className="w-full bg-white text-[#0A0A0A] py-40 px-6">
+    <div className="w-full bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] py-40 px-6">
        <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-24">
           <div className="lg:w-1/3">
              <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#0044CC] mb-8">Documentation</div>
@@ -484,10 +484,10 @@ const FAQs = () => {
 // ─── MAIN PAGE COMPONENT ───
 export default function DevelopersPage() {
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#0A0A0A] overflow-x-hidden font-sans selection:bg-black/10 selection:text-[#0A0A0A]">
+    <div className="min-h-screen bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] overflow-x-hidden font-sans selection:bg-black/10 selection:text-[#0A0A0A]">
       
       {/* ── TOP NAV SPACER ── */}
-      <div className="fixed top-0 left-0 right-0 z-50 px-8 py-6 pointer-events-none flex justify-center backdrop-blur-md bg-[#FAF9F6]/80 border-b border-black/5">
+      <div className="fixed top-0 left-0 right-0 z-50 px-8 py-6 pointer-events-none flex justify-center backdrop-blur-md bg-white/20 dark:bg-black/20 border-b border-black/5 dark:border-white/5">
          <Link href="/" className="pointer-events-auto font-mono text-[10px] font-bold uppercase tracking-widest text-black/40 hover:text-black transition-colors flex items-center gap-2">
             <ArrowRight size={12} className="rotate-180" /> Return to Terminal
          </Link>
@@ -500,7 +500,7 @@ export default function DevelopersPage() {
             <motion.div 
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
-               className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-black/60 mb-12 border border-black/10 rounded-full px-6 py-2 bg-white shadow-sm"
+               className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-black/60 dark:text-white/60 mb-12 border border-black/10 dark:border-white/10 rounded-full px-6 py-2 bg-white/20 dark:bg-black/20 backdrop-blur-md shadow-sm"
             >
                Developer Resources
             </motion.div>

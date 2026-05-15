@@ -133,9 +133,9 @@ export function AcademyInteractiveEngine({
         <div className="pt-32 pb-48 px-4 sm:px-6 max-w-[2560px] mx-auto w-full relative z-10 transition-all text-left">
             
             {/* ── NESTR HERO ── */}
-            <header className="mb-16 w-full bg-white rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
+            <header className="mb-16 w-full bg-white/40 dark:bg-black/40 backdrop-blur-3xl rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
                 <div className="w-full lg:w-1/2 relative z-10 space-y-6 lg:space-y-8 text-center lg:text-left">
-                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#FAFAF8] border border-black/5 rounded-full shadow-sm mx-auto lg:mx-0">
+                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-white/20 dark:bg-black/20 backdrop-blur-md border border-black/5 dark:border-white/5 rounded-full shadow-sm mx-auto lg:mx-0">
                         <GraduationCap size={14} className="text-[#0044CC]" />
                     </div>
                     
@@ -174,7 +174,7 @@ export function AcademyInteractiveEngine({
                     </div>
                 </div>
 
-                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 shadow-sm p-6 overflow-hidden">
+                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-[2.5rem] border border-black/5 dark:border-white/5 shadow-sm p-6 overflow-hidden">
                     <RemoteLottie path="Ball playing.json" className="scale-125 w-full h-full object-contain" />
                 </div>
             </header>
@@ -192,7 +192,7 @@ export function AcademyInteractiveEngine({
                                 <button
                                     key={course.id}
                                     onClick={() => setSelectedCourseSlug(course.slug)}
-                                    className="p-6 border border-black/10 bg-white hover:border-black/30 transition-all text-left group relative overflow-hidden"
+                                    className="p-6 border border-black/10 dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-xl hover:border-black/30 dark:hover:border-white/30 transition-all text-left group relative overflow-hidden"
                                 >
                                     <div className="absolute inset-x-0 bottom-0 h-1 bg-black/5">
                                         <div className="h-full bg-black/60 transition-all duration-1000" style={{ width: `${progressPct}%` }} />
@@ -229,7 +229,7 @@ export function AcademyInteractiveEngine({
                             const submission = submissions[lesson.id];
 
                             return (
-                                <div key={lesson.id} className={`border transition-all duration-300 ${isExpanded ? 'border-black/30 bg-white shadow-xl' : 'border-black/10 bg-white/40 hover:bg-white'}`}>
+                                <div key={lesson.id} className={`border backdrop-blur-xl transition-all duration-300 ${isExpanded ? 'border-black/30 dark:border-white/30 bg-white/60 dark:bg-black/60 shadow-xl' : 'border-black/10 dark:border-white/10 bg-white/20 dark:bg-black/20 hover:bg-white/40 dark:hover:bg-black/40'}`}>
                                     <button 
                                         onClick={() => setExpandedLessonId(isExpanded ? null : lesson.id)}
                                         className="w-full text-left p-6 flex justify-between items-center outline-none gap-4"
@@ -251,7 +251,7 @@ export function AcademyInteractiveEngine({
                                     <AnimatePresence>
                                         {isExpanded && (
                                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                                                <div className="p-6 md:p-8 pt-0 border-t border-black/5 flex flex-col md:flex-row gap-8 bg-[#FAF9F5]">
+                                                <div className="p-6 md:p-8 pt-0 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row gap-8 bg-transparent">
                                                     <div className="flex-1">
                                                         <h5 className="font-mono text-[10px] uppercase tracking-widest text-[#666] mb-4 flex items-center gap-2">
                                                             <BookOpen size={13}/> Contenido Extendido
@@ -265,7 +265,7 @@ export function AcademyInteractiveEngine({
                                                         </a>
                                                     </div>
 
-                                                    <div className="w-full md:w-[320px] shrink-0 border border-black/10 bg-white p-6 relative">
+                                                    <div className="w-full md:w-[320px] shrink-0 border border-black/10 dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-xl p-6 relative">
                                                         <h5 className="font-mono text-[10px] uppercase font-bold tracking-widest border-b border-black/10 pb-3 mb-4">
                                                             Laboratorio / Proof of Work
                                                         </h5>

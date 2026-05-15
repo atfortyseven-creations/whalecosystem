@@ -86,17 +86,21 @@ const applyDOMClasses = (state: Partial<SovereignSettings>) => {
 
     // ── Theme Enforcement ───────────────────────────────────────────────────
     if (state.theme) {
-        if (state.theme === 'dark') {
+        const resolvedDark =
+            state.theme === 'dark' ||
+            (state.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        if (resolvedDark) {
             html.classList.add('dark');
-        } else if (state.theme === 'light') {
-            html.classList.remove('dark');
+            html.setAttribute('data-theme', 'dark');
+            // Immediate background flush — prevents flash-of-wrong-color
+            html.style.backgroundColor = '#0A0A0A';
+            html.style.color = '#F5F5F5';
         } else {
-            // System fallback
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
+            html.classList.remove('dark');
+            html.setAttribute('data-theme', 'light');
+            html.style.backgroundColor = '#FAF9F6';
+            html.style.color = '#1C1917';
         }
     }
 

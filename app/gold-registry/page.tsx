@@ -27,7 +27,7 @@ export default function GoldRegistryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#050505] p-12">
+    <div className="min-h-screen bg-transparent text-[#050505] dark:text-[#FAF9F6] p-12">
       <header className="mb-14">
          <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 text-indigo-600 block mb-3">Sovereign Authority Hub</span>
          <h1 className="text-5xl font-black tracking-tighter uppercase italic">Sovereign Gold Registry</h1>
@@ -47,7 +47,7 @@ export default function GoldRegistryPage() {
                    
                    {/* Info Block */}
                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 bg-[#FAF9F6] border border-black/5 rounded-2xl flex items-center justify-center">
+                      <div className="w-16 h-16 bg-white/20 dark:bg-black/20 backdrop-blur-md border border-black/5 dark:border-white/5 rounded-2xl flex items-center justify-center">
                          <Building size={24} className="opacity-30" />
                       </div>
                       <div>
@@ -69,7 +69,7 @@ export default function GoldRegistryPage() {
                    {/* Verification Action Block */}
                    <div className="flex flex-col items-end gap-3 min-w-[200px]">
                       {isVerified ? (
-                        <div className="w-full bg-green-50 border border-green-200 p-4 rounded-xl text-center">
+                        <div className="w-full lg:w-1/3 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-3xl p-8 flex flex-col justify-between">
                            <span className="text-[9px] font-black uppercase tracking-widest text-green-600 block mb-1">
                              ✓ Solvency Verified
                            </span>
@@ -110,7 +110,7 @@ export default function GoldRegistryPage() {
                           href={`https://bridge.sovereign.network/go/${node.id}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="block w-full text-center py-4 bg-[#FAF9F6] hover:bg-[#F0F0F0] border border-black/5 text-[#050505] font-black uppercase text-[11px] tracking-[0.3em] rounded-xl transition-colors"
+                          className="block w-full text-center py-4 bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 border border-black/5 dark:border-white/5 text-[#050505] dark:text-[#FAF9F6] font-black uppercase text-[11px] tracking-[0.3em] rounded-xl transition-colors"
                         >
                            ENTER VIA SOVEREIGN BRIDGE →
                         </a>

@@ -101,8 +101,8 @@ export const viewport = {
   themeColor: '#FAFAF8',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: 'cover',
   interactiveWidget: 'resizes-content',
 }
@@ -222,7 +222,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className="bg-[#FAFAF8] text-[#0A0A0A] antialiased selection:bg-black/10 selection:text-black transition-colors duration-300"
+        className="bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] antialiased selection:bg-black/10 selection:text-black transition-colors duration-300"
         suppressHydrationWarning
       >
 

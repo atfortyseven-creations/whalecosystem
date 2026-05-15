@@ -17,9 +17,9 @@ export default async function AcademyModulePage({ params }: { params: Promise<{ 
     }
 
     return (
-        <div className="min-h-screen bg-[#FAF9F6] dark:bg-[#050505] flex flex-col">
+        <div className="min-h-screen bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] flex flex-col">
             {/* Header / Navigation */}
-            <header className="sticky top-0 z-50 px-6 py-4 border-b border-black/5 dark:border-white/5 bg-[#FAF9F6]/80 dark:bg-[#050505]/80 backdrop-blur-xl flex items-center justify-between">
+            <header className="sticky top-0 z-50 px-6 py-4 border-b border-black/5 dark:border-white/5 bg-white/20 dark:bg-black/20 backdrop-blur-3xl flex items-center justify-between">
                 <Link href="/academy" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
                     <ArrowLeft size={14} />
                     Back to Curriculum
@@ -144,7 +144,7 @@ export default async function AcademyModulePage({ params }: { params: Promise<{ 
                                 </ul>
                             </div>
 
-                            <div className="p-6 rounded-3xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 flex flex-col gap-4 shadow-inner">
+                            <div className="p-6 rounded-3xl bg-white/20 dark:bg-black/20 backdrop-blur-xl border border-black/5 dark:border-white/5 flex flex-col gap-4 shadow-inner">
                                 <h4 className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Requirements</h4>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-black dark:bg-white flex items-center justify-center text-white dark:text-black font-black text-sm">

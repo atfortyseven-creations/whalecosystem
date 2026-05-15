@@ -66,7 +66,7 @@ function SuccessContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-lg w-full bg-white border border-[#050505]/10 rounded-[3rem] p-10 md:p-14 text-center relative z-10 shadow-2xl"
+                className="max-w-lg w-full bg-white/40 dark:bg-black/40 backdrop-blur-3xl border border-[#050505]/10 dark:border-white/10 rounded-[3rem] p-10 md:p-14 text-center relative z-10 shadow-2xl"
             >
                 {isHydrating ? (
                     <div className="flex flex-col items-center justify-center min-h-[200px] gap-6">

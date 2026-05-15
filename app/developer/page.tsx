@@ -73,7 +73,7 @@ const BuilderAnnouncements = () => {
                     {desc}
                  </p>
                </div>
-               <a href={c.html_url} target="_blank" rel="noopener noreferrer" className="relative z-10 w-full flex justify-center items-center gap-3 px-6 py-4 bg-[#FAFAF8] rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] text-[#0A0A0A] hover:bg-[#0044CC] hover:text-white transition-all group-hover:shadow-md cursor-pointer">
+               <a href={c.html_url} target="_blank" rel="noopener noreferrer" className="relative z-10 w-full flex justify-center items-center gap-3 px-6 py-4 bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] text-[#0A0A0A] dark:text-white hover:bg-[#0044CC] hover:text-white transition-all group-hover:shadow-md cursor-pointer">
                   Inspect Diff <ArrowRight size={14} />
                </a>
             </motion.div>
@@ -86,7 +86,7 @@ const BuilderAnnouncements = () => {
 
 export default function DeveloperLanding() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] font-sans selection:bg-[#0044CC]/20 overflow-x-hidden">
+    <div className="min-h-screen bg-transparent font-sans selection:bg-[#0044CC]/20 overflow-x-hidden">
 
       {/* ── MASSIVE NESTR HERO ── */}
       <section className="pt-40 pb-20 px-6 lg:px-12 max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
@@ -113,8 +113,11 @@ export default function DeveloperLanding() {
           </motion.div>
         </div>
         
-        <div className="w-full lg:w-1/2 relative aspect-square flex items-center justify-center bg-white rounded-[3rem] border border-black/5 shadow-sm p-12">
-            <RemoteLottie path="DeeWork About Blockchain.json" className="scale-110 w-full" />
+        <div className="w-full lg:w-1/2 relative aspect-square flex items-center justify-center bg-white dark:bg-[#0A0A0A] rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-12 overflow-hidden">
+            <div className="flex flex-col items-center justify-center gap-4 text-[#0a0a0a] dark:text-white opacity-20">
+                <Terminal size={64} strokeWidth={1} />
+                <span className="font-mono text-sm tracking-widest uppercase font-bold">Protocol Interface</span>
+            </div>
         </div>
 
       </section>
@@ -128,14 +131,17 @@ export default function DeveloperLanding() {
                     Core <span className="text-[#0044CC]">Infrastructure.</span>
                 </h2>
                 <p className="font-serif text-[18px] text-slate-500 leading-relaxed">
-                    Designed for maximum throughput and minimum latency. The Sovereign Protocol is built using state-of-the-art Rust indexers and distributed Kafka streams.
+                    Designed for maximum throughput and minimum latency. The Protocol is built using state-of-the-art Rust indexers and distributed Kafka streams.
                 </p>
             </div>
 
             {/* Block 1 */}
             <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-                <div className="w-full lg:w-1/2 order-2 lg:order-1 bg-[#FAFAF8] rounded-[3rem] border border-black/5 shadow-sm p-12 flex items-center justify-center aspect-square">
-                    <RemoteLottie path="Connected world.json" className="scale-125 w-full max-w-[500px]" />
+                <div className="w-full lg:w-1/2 order-2 lg:order-1 bg-white/20 dark:bg-black/20 backdrop-blur-xl rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-12 flex items-center justify-center aspect-square">
+                    <div className="flex flex-col items-center justify-center gap-4 text-[#0a0a0a] dark:text-white opacity-20">
+                        <Globe size={64} strokeWidth={1} />
+                        <span className="font-mono text-sm tracking-widest uppercase font-bold">Distributed Memory</span>
+                    </div>
                 </div>
                 <div className="w-full lg:w-1/2 order-1 lg:order-2 space-y-8">
                     <div className="w-12 h-12 rounded-2xl bg-[#0044CC]/10 flex items-center justify-center">
@@ -163,8 +169,11 @@ export default function DeveloperLanding() {
                         Data is not just transmitted; it is mathematically verified. Every WebSocket payload is signed using your unique API Key derived from your Ethereum wallet signature. We employ strict mutual TLS (mTLS) for all institutional data streams.
                     </p>
                 </div>
-                <div className="w-full lg:w-1/2 bg-[#FAFAF8] rounded-[3rem] border border-black/5 shadow-sm p-12 flex items-center justify-center aspect-square">
-                    <RemoteLottie path="/BlockChain.json" className="scale-125 w-full max-w-[500px]" />
+                <div className="w-full lg:w-1/2 bg-white/20 dark:bg-black/20 backdrop-blur-xl rounded-[3rem] border border-black/5 dark:border-white/5 shadow-sm p-12 flex items-center justify-center aspect-square">
+                    <div className="flex flex-col items-center justify-center gap-4 text-[#0a0a0a] dark:text-white opacity-20">
+                        <Lock size={64} strokeWidth={1} />
+                        <span className="font-mono text-sm tracking-widest uppercase font-bold">E2E Security</span>
+                    </div>
                 </div>
             </div>
 
@@ -172,7 +181,7 @@ export default function DeveloperLanding() {
       </section>
 
       {/* ── BUILDER ANNOUNCEMENTS ── */}
-      <section id="releases" className="bg-[#FAFAF8] border-t border-black/5">
+      <section id="releases" className="bg-transparent border-t border-black/5 dark:border-white/5">
         <BuilderAnnouncements />
       </section>
       

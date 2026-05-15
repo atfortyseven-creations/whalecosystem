@@ -162,13 +162,13 @@ export function NewsTerminal() {
 
   return (
     <>
-      <div className="w-full h-full flex-1 relative flex flex-col min-h-0 font-serif bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#FAF9F6]">
+      <div className="w-full h-full flex-1 relative flex flex-col min-h-0 font-serif bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6]">
         <div className="flex flex-1 w-full h-full min-h-0 overflow-hidden">
           {/* LEFT PANEL */}
           <div
-            className={`flex-col shrink-0 w-full md:w-[32%] md:min-w-[340px] lg:min-w-[380px] ${selected ? 'hidden md:flex' : 'flex'} border-r border-black/[0.08] dark:border-white/10 bg-[#F4F3EE] dark:bg-[#111111] overflow-y-auto`}
+            className={`flex-col shrink-0 w-full md:w-[32%] md:min-w-[340px] lg:min-w-[380px] ${selected ? 'hidden md:flex' : 'flex'} border-r border-black/[0.08] dark:border-white/10 bg-white/10 dark:bg-black/10 backdrop-blur-xl overflow-y-auto`}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-black/[0.08] dark:border-white/10 bg-[#F4F3EE] dark:bg-[#111111]">
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-black/[0.08] dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-xl">
               <div className="flex items-center gap-4 flex-wrap">
                 {marketTimes.map(t => (
                   <div key={t.name} className="flex items-center gap-1.5 shrink-0">
@@ -192,7 +192,7 @@ export function NewsTerminal() {
             </div>
 
             {showArchive && archiveDates.length > 0 && (
-              <div className="border-b border-black dark:border-white/20 bg-[#EAE9E4] dark:bg-[#1A1A1A]">
+              <div className="border-b border-black dark:border-white/20 bg-black/5 dark:bg-white/5">
                 <p className="px-6 pt-5 pb-3 font-mono text-[9px] uppercase tracking-[0.25em] font-bold text-black/45 dark:text-white/45">Archive ({archiveDates.length})</p>
                 {archiveDates.map(date => {
                   const count = archive[date]?.length ?? 0;
@@ -220,7 +220,7 @@ export function NewsTerminal() {
                 const isActive = selected?.id === art.id;
                 return (
                   <button key={art.id} onClick={() => setSelected(art)}
-                    className={`text-left w-full px-6 py-5 relative group transition-colors ${isActive ? 'bg-white dark:bg-[#1A1A1A]' : 'bg-transparent'}`}>
+                    className={`text-left w-full px-6 py-5 relative group transition-colors ${isActive ? 'bg-white/40 dark:bg-black/40' : 'bg-transparent hover:bg-white/10 dark:hover:bg-white/5'}`}>
                     {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-black dark:bg-white" />}
                     {!isActive && <div className="absolute bottom-0 left-6 right-6 h-[1px] bg-black/[0.08] dark:bg-white/10" />}
                     
@@ -252,13 +252,13 @@ export function NewsTerminal() {
           </div>
 
           {/* RIGHT PANEL */}
-          <div ref={rightRef} className={`flex-1 overflow-y-auto ${selected ? 'flex' : 'hidden md:flex'} flex-col relative bg-[#FAF9F6] dark:bg-[#0A0A0A]`}>
+          <div ref={rightRef} className={`flex-1 overflow-y-auto ${selected ? 'flex' : 'hidden md:flex'} flex-col relative bg-transparent`}>
             <AnimatePresence mode="wait">
               {selected && (
                 <motion.article key={selected.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                   
                   {/* Top Bar */}
-                  <div className="sticky top-0 z-20 flex items-center justify-between px-6 md:px-12 py-5 border-b border-black/10 dark:border-white/10 bg-[#FAF9F6]/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md">
+                  <div className="sticky top-0 z-20 flex items-center justify-between px-6 md:px-12 py-5 border-b border-black/10 dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-md">
                     <div className="flex items-center gap-4">
                       <button onClick={() => setSelected(null)} className="md:hidden p-1.5 -ml-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors">
                         <ChevronLeft size={18} className="text-[#0A0A0A] dark:text-white" />
@@ -315,7 +315,7 @@ export function NewsTerminal() {
                       }) : <p className="text-black/40 dark:text-white/40 italic">Analysis unavailable.</p>}
                     </div>
                     
-                    <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#FAF9F6] dark:from-[#0A0A0A] to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white/40 dark:from-black/40 to-transparent pointer-events-none" />
                   </div>
 
                   {/* Call to Action */}

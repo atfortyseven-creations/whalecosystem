@@ -8,7 +8,7 @@ import { ReactNode } from 'react';
 export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
     <div
-      className="bg-[#FAF9F6] dark:bg-[#0A0A0A] flex flex-col overflow-hidden"
+      className="bg-transparent flex flex-col overflow-hidden"
       style={{
         height: '100dvh'
       }}

@@ -35,6 +35,9 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   // Force strict light mode typography for absolute contrast
   useEffect(() => {
       document.documentElement.classList.add('light');
+      return () => {
+        document.documentElement.classList.remove('light');
+      };
   }, []);
 
   const bg      = 'bg-transparent text-black';

@@ -17,7 +17,7 @@ export default function ErrorPage({
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[75vh] space-y-8 text-center bg-[#FAF9F6]">
+    <div className="flex flex-col items-center justify-center min-h-[75vh] space-y-8 text-center bg-transparent">
       {/* Background Texture */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.03]"

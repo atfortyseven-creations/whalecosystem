@@ -355,68 +355,72 @@ export function SovereignFooter() {
         <div className="w-full h-px bg-black/5" />
 
         {/* ─── Compliance Badges ─── */}
-        <div className="flex flex-wrap justify-center gap-x-10 gap-y-6">
+        <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 pt-8 pb-4">
 
           {/* GDPR */}
-          <div className="flex items-center gap-2.5 opacity-80 hover:opacity-100 transition-opacity">
-            <div className="w-9 h-9 rounded-full bg-[#003399]/8 border border-[#003399]/15 flex items-center justify-center shrink-0">
-              <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-                {Array.from({ length: 12 }).map((_, i) => {
-                  const angle = (i * 30 - 90) * (Math.PI / 180);
-                  return <circle key={i} cx={11 + 7 * Math.cos(angle)} cy={11 + 7 * Math.sin(angle)} r="1.1" fill="#FFCC00" />;
-                })}
-              </svg>
-            </div>
-            <div>
-              <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#003399]">GDPR</p>
-              <p className="font-mono text-[7px] uppercase tracking-[0.15em] text-[#003399]/50">Compliant</p>
-            </div>
+          <div className="flex flex-col items-center justify-center opacity-80 hover:opacity-100 transition-opacity shrink-0">
+             <div className="w-[100px] h-[100px] relative flex flex-col items-center justify-center bg-[#FDFCF8]">
+               <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" fill="none">
+                  {Array.from({ length: 12 }).map((_, i) => {
+                    const angle = (i * 30 - 90) * (Math.PI / 180);
+                    const cx = 50 + 40 * Math.cos(angle);
+                    const cy = 50 + 40 * Math.sin(angle);
+                    return (
+                      <polygon key={i} points={`${cx},${cy-6} ${cx+2},${cy-2} ${cx+6},${cy-2} ${cx+3},${cy+1} ${cx+4},${cy+5} ${cx},${cy+3} ${cx-4},${cy+5} ${cx-3},${cy+1} ${cx-6},${cy-2} ${cx-2},${cy-2}`} fill="#C9A355" />
+                    );
+                  })}
+                  {/* Padlock */}
+                  <path d="M42 45V38C42 33.5817 45.5817 30 50 30C54.4183 30 58 33.5817 58 38V45H60C61.1046 45 62 45.8954 62 47V65C62 66.1046 61.1046 67 60 67H40C38.8954 67 38 66.1046 38 65V47C38 45.8954 38.8954 45 40 45H42ZM46 45H54V38C54 35.7909 52.2091 34 50 34C47.7909 34 46 35.7909 46 38V45ZM50 58C51.1046 58 52 57.1046 52 56C52 54.8954 51.1046 54 50 54C48.8954 54 48 54.8954 48 56C48 57.1046 48.8954 58 50 58Z" fill="#1C4B82"/>
+               </svg>
+               <span className="font-sans text-[14px] font-black tracking-widest text-[#1C4B82] absolute bottom-1">GDPR</span>
+             </div>
           </div>
 
-          {/* KYC / AML */}
-          <div className="flex items-center gap-2.5 opacity-80 hover:opacity-100 transition-opacity">
-            <div className="w-9 h-9 rounded-[8px] bg-[#10B981]/8 border border-[#10B981]/15 flex items-center justify-center shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2Z" fill="#10B981" fillOpacity="0.2" stroke="#10B981" strokeWidth="1.5"/>
-                <circle cx="12" cy="12" r="2.5" fill="#10B981"/>
-                <ellipse cx="12" cy="12" rx="5.5" ry="3.2" stroke="#10B981" strokeWidth="1.1" fill="none"/>
+          {/* SOC 2 */}
+          <div className="flex flex-col items-center justify-center opacity-80 hover:opacity-100 transition-opacity shrink-0">
+            <div className="w-[100px] h-[100px] rounded-full border-[3.5px] border-[#2267A8] bg-white relative flex flex-col items-center justify-center shadow-sm overflow-hidden">
+              <div className="absolute top-0 inset-x-0 h-1/2 flex flex-col items-center justify-end pb-[2px] bg-white z-10 border-b-[1.5px] border-[#2267A8]/20">
+                <span className="text-[#2267A8] font-sans text-[12px] font-medium leading-none tracking-wide">AICPA</span>
+                <span className="text-black font-sans text-[19px] font-black leading-none mt-1">SOC 2</span>
+              </div>
+              <div className="absolute bottom-0 inset-x-0 h-1/2 bg-black flex flex-col items-center justify-start pt-2 z-10">
+                 <span className="text-white font-sans text-[6px] tracking-widest uppercase">Formerly SAS 70 Reports</span>
+              </div>
+              {/* Outer text arc */}
+              <svg className="absolute inset-0 w-full h-full z-0" viewBox="0 0 100 100">
+                <path id="soc2Arc" d="M 12 50 A 38 38 0 1 1 88 50" fill="none" />
+                <text fontSize="5.5" fill="#2267A8" fontWeight="bold">
+                  <textPath href="#soc2Arc" startOffset="50%" textAnchor="middle">AICPA Service Organization Control Reports</textPath>
+                </text>
               </svg>
-            </div>
-            <div>
-              <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#10B981]">KYC / AML</p>
-              <p className="font-mono text-[7px] uppercase tracking-[0.15em] text-[#10B981]/50">Verified</p>
-            </div>
-          </div>
-
-          {/* MiCA */}
-          <div className="flex items-center gap-2.5 opacity-80 hover:opacity-100 transition-opacity">
-            <div className="w-9 h-9 rounded-[8px] bg-[#003399]/8 border border-[#003399]/15 flex items-center justify-center shrink-0">
-              <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-                {Array.from({ length: 12 }).map((_, i) => {
-                  const angle = (i * 30 - 90) * (Math.PI / 180);
-                  return <circle key={i} cx={11 + 7 * Math.cos(angle)} cy={11 + 7 * Math.sin(angle)} r="1.1" fill="#FFCC00" />;
-                })}
-              </svg>
-            </div>
-            <div>
-              <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#003399]">MiCA</p>
-              <p className="font-mono text-[7px] uppercase tracking-[0.15em] text-[#003399]/50">Regulated</p>
             </div>
           </div>
 
           {/* ISO 27001 */}
-          <div className="flex items-center gap-2.5 opacity-80 hover:opacity-100 transition-opacity">
-            <div className="w-9 h-9 rounded-full border border-[#2563EB]/15 bg-[#2563EB]/5 flex items-center justify-center shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="8.5" stroke="#2563EB" strokeWidth="1.4" fill="none"/>
-                <ellipse cx="12" cy="12" rx="4" ry="8.5" stroke="#2563EB" strokeWidth="1.1" fill="none"/>
-                <line x1="3.5" y1="9" x2="20.5" y2="9" stroke="#2563EB" strokeWidth="1.1"/>
-                <line x1="3.5" y1="15" x2="20.5" y2="15" stroke="#2563EB" strokeWidth="1.1"/>
+          <div className="flex flex-col items-center justify-center opacity-80 hover:opacity-100 transition-opacity shrink-0">
+            <div className="w-[100px] h-[100px] rounded-full border-[3px] border-[#254585] bg-white relative flex items-center justify-center shadow-sm">
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+                <path id="isoArc" d="M 15 50 A 35 35 0 1 1 85 50" fill="none" />
+                <text fontSize="5.5" fill="#254585" fontWeight="bold">
+                  <textPath href="#isoArc" startOffset="50%" textAnchor="middle">Information Security Management System</textPath>
+                </text>
               </svg>
-            </div>
-            <div>
-              <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#2563EB]">ISO 27001</p>
-              <p className="font-mono text-[7px] uppercase tracking-[0.15em] text-[#2563EB]/50">Secure</p>
+              <div className="w-[66px] h-[66px] rounded-full bg-[#B2B5B8] flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+                 {/* Globe Grid */}
+                 <svg className="absolute inset-0 w-full h-full opacity-40" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="48" fill="none" stroke="white" strokeWidth="2.5"/>
+                    <ellipse cx="50" cy="50" rx="20" ry="48" fill="none" stroke="white" strokeWidth="2.5"/>
+                    <ellipse cx="50" cy="50" rx="40" ry="48" fill="none" stroke="white" strokeWidth="2.5"/>
+                    <line x1="2" y1="50" x2="98" y2="50" stroke="white" strokeWidth="2.5"/>
+                    <line x1="12" y1="25" x2="88" y2="25" stroke="white" strokeWidth="2.5"/>
+                    <line x1="12" y1="75" x2="88" y2="75" stroke="white" strokeWidth="2.5"/>
+                 </svg>
+                 <span className="text-white font-sans text-[20px] font-black leading-none z-10 tracking-tight text-shadow-sm">ISO</span>
+                 <span className="text-[#254585] font-sans text-[13px] font-black leading-none z-10 bg-white px-1 mt-0.5 rounded-sm shadow-sm">27001</span>
+              </div>
+              <div className="absolute bottom-2 inset-x-0 flex justify-center z-20">
+                  <span className="text-[#254585] font-sans text-[8px] font-bold tracking-widest bg-white px-1 shadow-sm rounded-sm">Certified</span>
+              </div>
             </div>
           </div>
 

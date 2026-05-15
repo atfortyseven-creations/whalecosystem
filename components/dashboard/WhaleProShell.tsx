@@ -342,7 +342,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
 
         </AnimatePresence>
 
-        <div className={`flex fixed inset-0 bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#050505] dark:text-[#FAF9F6] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''}`}>
+        <div className={`flex fixed inset-0 bg-transparent text-[#050505] dark:text-[#FAF9F6] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''}`}>
 
             
             {/* ─── Persistent Pro Sidebar (True Desktop Only) ─── */}
@@ -351,7 +351,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 240 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className={`${isTrueDesktop ? 'flex' : 'hidden'} sticky top-0 h-full border-r border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] flex-col z-50 shrink-0`}
+                className={`${isTrueDesktop ? 'flex' : 'hidden'} sticky top-0 h-full border-r border-[#E5E5E5] dark:border-white/10 bg-white/70 dark:bg-[#0A0A0A]/70 backdrop-blur-2xl flex-col z-50 shrink-0`}
             >
                 {/* Logo area */}
                 {!isCollapsed && (
@@ -455,7 +455,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             <div className="flex-1 flex flex-col min-w-0 relative h-full">
                 
                 {/* ─── Top Master Bar ─── */}
-                <header className="sticky top-0 h-[56px] border-b border-black/[0.06] dark:border-white/10 bg-white/70 dark:bg-[#111111]/70 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300">
+                <header className="sticky top-0 h-[56px] border-b border-black/[0.06] dark:border-white/10 bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300">
                     <button
                         onClick={() => setIsPaletteOpen(true)}
                         className="group flex items-center gap-2.5 h-8 px-3 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0A0A0A] hover:bg-black/[0.02] dark:hover:bg-white/5 hover:border-black/20 dark:hover:border-white/20 hover:shadow-sm transition-all duration-200 cursor-pointer shrink-0"

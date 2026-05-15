@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 // scroll bleed from WhaleProShell's internal h-[100dvh] container.
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="h-[100dvh] overflow-hidden bg-[#FAF9F6] text-[#050505]">
+    <div className="h-[100dvh] overflow-hidden bg-transparent text-[#050505] dark:text-[#FAF9F6]">
       {children}
     </div>
   );

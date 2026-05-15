@@ -12,7 +12,7 @@ const MENU_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Whale Chat", href: "/chat" },
   { label: "Portfolio", href: "/portfolio" },
-  { label: "Ecosystem", href: "#", subItems: [{ label: "News", description: "Global updates.", href: "/news" }, { label: "Academy", description: "Learn.", href: "/academy" }, { label: "Forum", description: "Discuss.", href: "/forum" }, { label: "Careers", description: "Join us.", href: "/careers" }] },
+  { label: "System Ecosystem", href: "#", subItems: [{ label: "News", href: "/news" }, { label: "Academy", href: "/academy" }, { label: "Forum", href: "/forum" }, { label: "Careers", href: "/careers" }] },
   { label: "Pricing", href: "/pricing" }
 ];
 
@@ -44,16 +44,14 @@ function MegaMenuItem({ item }: { item: any }) {
               {item.subItems ? (
               <div className="flex flex-col">
                 {item.subItems.map((sub: any, idx: number) => (
-                  <Link key={idx} href={sub.href} className="flex flex-col p-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm">
+                  <Link key={idx} href={sub.href} className="flex flex-col px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm">
                     <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white">{sub.label}</span>
-                    <span className="font-sans text-[11px] text-[#555] dark:text-[#AAAAAA] leading-tight mt-1 opacity-80">{sub.description}</span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <Link href={item.href} className="block p-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm">
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white block mb-1">{item.label}</span>
-                <span className="font-sans text-[11px] text-[#555] dark:text-[#AAAAAA] leading-tight opacity-80">{item.description}</span>
+              <Link href={item.href} className="block px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm">
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white block">{item.label}</span>
               </Link>
             )}
           </motion.div>

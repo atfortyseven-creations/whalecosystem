@@ -123,7 +123,7 @@ export default function FAQPage() {
   const activeData = FAQ_CATEGORIES.find(c => c.id === activeCategory)!;
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] text-[#0a0a0a] font-sans antialiased">
+    <div className="min-h-screen bg-transparent text-[#0a0a0a] dark:text-[#FAF9F6] font-sans antialiased">
       
       {/* Hero */}
       <div className="w-full border-b border-black/6 bg-white">

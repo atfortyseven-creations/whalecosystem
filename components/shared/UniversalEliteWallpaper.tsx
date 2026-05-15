@@ -1,46 +1,61 @@
 "use client";
 
 import React from 'react';
-import { usePathname } from 'next/navigation';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
+/**
+ * UniversalEliteWallpaper — Global fixed background layer
+ * 
+ * - Renders behind ALL pages at z-index -1 (always visible)
+ * - The global wallpaper (WALLPAPER GLOBAL.png) covers the entire screen
+ * - Responds to the theme setting from useSettingsStore:
+ *   • light → cream/white overlay, wallpaper subtly visible
+ *   • dark  → dark overlay, wallpaper visible at reduced opacity
+ * - Never re-renders on route change (no pathname dependency)
+ */
 export function UniversalEliteWallpaper() {
-    const pathname = usePathname();
-    const isDashboard = pathname.startsWith('/dashboard');
-    const isLanding = pathname === '/';
+    const theme = useSettingsStore((s) => s.theme);
+
+    // Determine effective theme (handle 'system')
+    const isDark = theme === 'dark' || (
+        theme === 'system' &&
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+    );
 
     return (
-        <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden select-none">
-            {/* Pure white base — content side will fuse with this */}
-            <div className="absolute inset-0 bg-[#FAF9F6]" />
-
-            {/* Bitcoin logo — fixed at natural size, perfectly anchored to center of screen */}
-            {/* No background-size scaling — it sits at its natural pixel dimensions */}
+        <div
+            className="fixed inset-0 pointer-events-none select-none overflow-hidden"
+            style={{ zIndex: -1 }}
+            aria-hidden="true"
+        >
+            {/* ── Base background colour — responds to theme ────────────────── */}
             <div
-                className="absolute inset-0"
+                className="absolute inset-0 transition-colors duration-700"
+                style={{ background: isDark ? '#0A0A0A' : '#FAF9F6' }}
+            />
+
+            {/* ── Global Wallpaper image — always cover, perfectly centred ──── */}
+            <div
+                className="absolute inset-0 transition-opacity duration-700"
                 style={{
-                    backgroundImage: "url('/system-shots/WALLPAPER%20GLOBAL.jpg')",
+                    backgroundImage: "url('/system-shots/WALLPAPER%20GLOBAL.png')",
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center center',
-                    /* 'auto' = native pixel resolution — zero zoom, zero distortion.
-                       The #FAF9F6 base layer fills the surrounding space cleanly. */
-                    backgroundSize: 'auto',
-                    /* crisp-edges: maximum sharpness on Retina / 4K / HiDPI displays */
+                    backgroundSize: 'contain',
                     imageRendering: 'crisp-edges',
+                    // Light mode: wallpaper at full visibility
+                    // Dark mode: slight dim so text stays readable
+                    opacity: isDark ? 0.08 : 1,
                 }}
             />
 
-            {/*
-             * CONTENT BACKGROUND
-             * The pages are now full width. The background of the individual pages
-             * will naturally cover the wallpaper where needed.
-             */}
-
-            {/* Landing page: subtle bottom-white fade so content doesn't float on logo */}
-            {isLanding && (
+            {/* ── Dark mode overlay — deepens the dark background ───────────── */}
+            {isDark && (
                 <div
                     className="absolute inset-0"
                     style={{
-                        background: 'radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(250,249,246,0.15) 100%)',
+                        background: 'rgba(0,0,0,0.72)',
                     }}
                 />
             )}

@@ -332,9 +332,12 @@ export default function PortfolioPage() {
                         Connect Dashboard <ArrowUpRight size={16} />
                     </button>
                 </div>
-                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-3xl border border-black/5 shadow-sm p-6 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent z-10 hidden lg:block" />
-                    <RemoteLottie path="Isometric data analysis.json" className="scale-125 w-full h-full object-contain" />
+                <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/40 dark:bg-[#050505]/40 backdrop-blur-3xl rounded-3xl border border-black/5 dark:border-white/5 shadow-sm p-6 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] dark:from-[#050505] via-transparent to-transparent z-10 hidden lg:block" />
+                    <div className="flex flex-col items-center justify-center gap-4 text-[#0a0a0a] dark:text-white opacity-20 relative z-0">
+                        <PieChart size={64} strokeWidth={1} />
+                        <span className="font-mono text-sm tracking-widest uppercase font-bold">Liquidity Matrix</span>
+                    </div>
                 </div>
             </motion.div>
         )}

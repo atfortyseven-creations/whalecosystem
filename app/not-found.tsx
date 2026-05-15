@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen space-y-8 text-center bg-[#FAF9F6]">
+        <div className="flex flex-col items-center justify-center min-h-screen space-y-8 text-center bg-transparent">
             {/* Background Texture */}
             <div 
                 className="absolute inset-0 pointer-events-none opacity-20"
@@ -18,7 +18,7 @@ export default function NotFound() {
                     <h1 className="text-[140px] font-black text-black/5 leading-none tracking-tighter mix-blend-multiply">
                         404
                     </h1>
-                    <h2 className="text-3xl font-black text-black uppercase tracking-widest mt-[-20px] bg-[#FAF9F6] px-4">
+                    <h2 className="text-3xl font-black text-black dark:text-white uppercase tracking-widest mt-[-20px] bg-transparent px-4">
                         Void Protocol
                     </h2>
                 </div>

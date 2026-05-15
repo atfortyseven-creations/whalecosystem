@@ -202,7 +202,7 @@ function NewTopicContent() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#FFFDF8] dark:bg-[#050505] text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
+    <div className="w-full min-h-screen bg-transparent dark:bg-transparent text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
       {/* Background Volumetric Lighting */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#00C076]/10 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
       

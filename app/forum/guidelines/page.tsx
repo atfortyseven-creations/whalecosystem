@@ -67,7 +67,7 @@ const RULES = [
 
 export default function ForumGuidelinesPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] text-[#0a0a0a] font-sans antialiased">
+    <div className="min-h-screen bg-transparent text-[#0a0a0a] dark:text-[#FAF9F6] font-sans antialiased">
 
       {/* Top nav breadcrumb */}
       <div className="w-full border-b border-black/6 bg-white sticky top-0 z-50 backdrop-blur-xl bg-white/90">
