@@ -139,6 +139,23 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
     const [isTierLoaded, setIsTierLoaded] = useState(false);
     const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    const { setSettingsOpen, autoDisconnectTimer, stealthMode } = useSettingsStore();
+    const router = useRouter();
+    const { disconnect } = useDisconnect();
+
+    const { latency, isConnected: streamConnected, mode } = useMarketStream();
+    const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
+
+    // ── UX-18: Live ETH metrics (shared hook, DRY with landing) ─────────────
+    const { blockNumber, baseFeeGwei, utcTime, syncing: ethSyncing } = useEthMetrics();
+
+    const currentExplanation = MODULE_EXPLANATIONS[activeTab] || {
+        title: 'MODULE IN DEVELOPMENT',
+        subtitle: 'BETA RELEASE',
+        overview: 'This module is under active deployment. Full telemetry and analytical functions will be detailed once production-grade stability is achieved.',
+        features: []
+    };
+
     // Load Tier + subscription for access control — single consolidated fetch
     useEffect(() => {
         fetch('/api/auth/session', { cache: 'no-store' })
@@ -171,23 +188,6 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
         window.addEventListener('resize', check);
         return () => window.removeEventListener('resize', check);
     }, []);
-
-    const { setSettingsOpen, autoDisconnectTimer, stealthMode } = useSettingsStore();
-    const router = useRouter();
-    const { disconnect } = useDisconnect();
-
-    const currentExplanation = MODULE_EXPLANATIONS[activeTab] || {
-        title: 'MODULE IN DEVELOPMENT',
-        subtitle: 'BETA RELEASE',
-        overview: 'This module is under active deployment. Full telemetry and analytical functions will be detailed once production-grade stability is achieved.',
-        features: []
-    };
-
-    const { latency, isConnected: streamConnected, mode } = useMarketStream();
-    const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
-
-    // ── UX-18: Live ETH metrics (shared hook, DRY with landing) ─────────────
-    const { blockNumber, baseFeeGwei, utcTime, syncing: ethSyncing } = useEthMetrics();
 
     // ── UX-19: Real node health — polled every 60s ──────────────────────────
     const [nodeStatus, setNodeStatus] = useState<'OPERATIONAL' | 'DEGRADED' | 'OFFLINE'>('OPERATIONAL');

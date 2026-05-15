@@ -102,12 +102,20 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
       </section>
 
       {/* ── SHOWCASE ────────────────────────────────────────────────────────── */}
-      <section className="w-full py-24 md:py-40 bg-transparent overflow-hidden relative border-t border-black/5 flex justify-center">
-        <div className="w-full max-w-[2560px] mx-auto px-6 md:px-12 xl:px-20 mb-16 md:mb-24">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={FADE_UP} className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+      <section className="w-full py-24 md:py-40 bg-transparent overflow-hidden relative border-t border-black/5">
+        {/* Section Header */}
+        <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 mb-16 md:mb-24">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={FADE_UP}
+            className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8"
+          >
             <div className="relative text-left">
-              <h2 className="text-[40px] sm:text-[56px] md:text-[72px] font-black tracking-tighter uppercase leading-[0.95]">
-                Clean design.<br /><span className="text-black/20">Expert execution.</span>
+              <h2 className="text-[40px] sm:text-[56px] md:text-[64px] font-black tracking-tighter uppercase leading-[0.95] text-[#0a0a0a]">
+                Clean design.<br />
+                <span className="text-black/20">Expert execution.</span>
               </h2>
             </div>
             <p className="font-serif text-[16px] sm:text-[18px] text-slate-500 max-w-lg leading-relaxed text-left">
@@ -115,48 +123,49 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
             </p>
           </motion.div>
         </div>
-        
-        {/* Image Display — Centred, mobile-optimised */}
-        <div className="w-full relative py-12 flex justify-center">
-          <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-12 xl:px-20 flex flex-col items-center gap-10 md:gap-20 relative z-10">
-            {[
-              "/system-shots/Captura de pantalla 2026-05-07 012904.png",
-              "/system-shots/Captura de pantalla 2026-05-07 032204.png",
-              "/system-shots/Captura de pantalla 2026-05-10 002811.png",
-              "/system-shots/Captura de pantalla 2026-05-10 002900.png",
-              "/system-shots/Captura de pantalla 2026-05-13 191540.png",
-              "/system-shots/Captura de pantalla 2026-05-13 191728.png",
-              "/system-shots/Captura de pantalla 2026-05-13 191813.png",
-              "/system-shots/Captura de pantalla 2026-05-13 192204.png"
-            ].map((src, idx) => (
-              <motion.div
-                key={idx}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-80px" }}
-                variants={FADE_UP}
-                className="w-full flex justify-center"
-              >
-                {/* Frame wrapper */}
-                <div className="w-full relative group">
-                  {/* Subtle outer glow on hover */}
-                  <div className="absolute -inset-[2px] rounded-[24px] md:rounded-[32px] bg-gradient-to-b from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-sm pointer-events-none" />
-                  {/* Screen-number badge */}
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
-                    <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-white/60">
-                      {String(idx + 1).padStart(2, "0")} / 08
-                    </span>
-                  </div>
-                  <img
-                    src={src}
-                    className="w-full h-auto rounded-2xl md:rounded-[28px] shadow-[0_12px_60px_rgba(0,0,0,0.12)] border border-black/8 object-contain bg-[#F5F5F0] block mx-auto transition-transform duration-700 group-hover:-translate-y-1"
-                    alt={`Platform screenshot ${idx + 1}`}
-                    loading={idx < 2 ? "eager" : "lazy"}
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+
+        {/* Image Gallery — perfectly centred, no overlays, no zoom, full quality */}
+        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-12 xl:px-20 flex flex-col items-center gap-12 md:gap-20">
+          {[
+            "/system-shots/Captura de pantalla 2026-05-07 012904.png",
+            "/system-shots/Captura de pantalla 2026-05-07 032204.png",
+            "/system-shots/Captura de pantalla 2026-05-10 002811.png",
+            "/system-shots/Captura de pantalla 2026-05-10 002900.png",
+            "/system-shots/Captura de pantalla 2026-05-10 002953.png",
+            "/system-shots/Captura de pantalla 2026-05-13 191540.png",
+            "/system-shots/Captura de pantalla 2026-05-13 191728.png",
+            "/system-shots/Captura de pantalla 2026-05-13 191813.png",
+            "/system-shots/Captura de pantalla 2026-05-13 192204.png",
+            "/system-shots/Captura de pantalla 2026-05-15 042315.png",
+          ].map((src, idx) => (
+            <motion.div
+              key={idx}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={FADE_UP}
+              className="w-full flex justify-center"
+            >
+              <div className="w-full relative group">
+                {/* Subtle hover glow — no overlay labels */}
+                <div className="absolute -inset-[1px] rounded-[20px] md:rounded-[28px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                  style={{ boxShadow: '0 0 60px rgba(0,0,0,0.08)' }}
+                />
+                <img
+                  src={src}
+                  className="w-full h-auto block mx-auto rounded-[16px] md:rounded-[24px] object-contain transition-transform duration-700 group-hover:-translate-y-1"
+                  style={{
+                    boxShadow: '0 8px 48px rgba(0,0,0,0.10)',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                    background: '#F7F7F5',
+                    imageRendering: 'auto',
+                  }}
+                  alt={`Platform view ${idx + 1}`}
+                  loading={idx < 2 ? "eager" : "lazy"}
+                />
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 

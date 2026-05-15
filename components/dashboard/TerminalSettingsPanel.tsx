@@ -16,14 +16,51 @@ const CATEGORIES = [
 ];
 
 export function TerminalSettingsPanel() {
-  const { settings, isLoading, updateSetting, fetchSettings } = useSettingsStore();
+  // Read directly from top-level store state (always has defaults / localStorage values)
+  const store = useSettingsStore();
+  const { isLoading, updateSetting, fetchSettings } = store;
   const [activeTab, setActiveTab] = useState('general');
 
   useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
 
-  if (isLoading || !settings) {
+  // Build a settings proxy from the top-level store state
+  const settings: SovereignSettings = {
+    theme:                store.theme,
+    language:             store.language,
+    currency:             store.currency,
+    timeFormat:           store.timeFormat,
+    dateFormat:           store.dateFormat,
+    addressFormat:        store.addressFormat,
+    density:              store.density,
+    defaultTimeframe:     store.defaultTimeframe,
+    displayUnit:          store.displayUnit,
+    showBalances:         store.showBalances,
+    soundEffects:         store.soundEffects,
+    hardwareAcceleration: store.hardwareAcceleration,
+    gasPreset:            store.gasPreset,
+    maxSlippage:          store.maxSlippage,
+    customRpcUrl:         store.customRpcUrl,
+    mevProtection:        store.mevProtection,
+    testnetMode:          store.testnetMode,
+    emailAlerts:          store.emailAlerts,
+    telegramAlerts:       store.telegramAlerts,
+    audioAlerts:          store.audioAlerts,
+    whaleAlertThreshold:  store.whaleAlertThreshold,
+    email:                store.email,
+    inactivityLockMinutes: store.inactivityLockMinutes,
+    autoDisconnectTimer:  store.autoDisconnectTimer,
+    stealthMode:          store.stealthMode,
+    requireSignForExports: store.requireSignForExports,
+    allowAnalytics:       store.allowAnalytics,
+    chatName:             store.chatName,
+    chatBio:              store.chatBio,
+    qrLabel:              store.qrLabel,
+    hiddenAssets:         store.hiddenAssets,
+  };
+
+  if (isLoading) {
     return (
       <div className="w-full h-full min-h-[400px] flex items-center justify-center">
         <Loader2 className="animate-spin text-black/20" size={32} />
@@ -103,7 +140,7 @@ export function TerminalSettingsPanel() {
             </div>
             <div className="flex flex-col">
                <span className="text-[13px] font-black uppercase tracking-tighter dark:text-white">Settings</span>
-               <span className="text-[9px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">Terminal Variables</span>
+               <span className="text-[9px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">Preferences</span>
             </div>
          </div>
 
@@ -133,7 +170,7 @@ export function TerminalSettingsPanel() {
                {CATEGORIES.find(c => c.id === activeTab)?.label}
             </h2>
             <p className="text-[11px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">
-               Control the terminal's physical rendering and local memory parameters.
+               Manage your terminal configuration and personal preferences.
             </p>
          </div>
 
@@ -149,114 +186,114 @@ export function TerminalSettingsPanel() {
                {activeTab === 'general' && (
                   <>
                      {/* Aesthetics & UI */}
-                     {renderSelect('theme', 'Terminal Aesthetic', 'System-wide visual processing matrix.', [
-                        {value: 'light', label: 'Ivory Matrix'},
-                        {value: 'dark', label: 'Obsidian Void'},
-                        {value: 'system', label: 'System Sync'}
+                     {renderSelect('theme', 'Appearance', 'System-wide visual theme.', [
+                        {value: 'light', label: 'Light Mode'},
+                        {value: 'dark', label: 'Dark Mode'},
+                        {value: 'system', label: 'Use System Default'}
                      ])}
-                     {renderSelect('language', 'Base Dialect', 'Core linguistic output localization.', [
+                     {renderSelect('language', 'Language', 'Interface display language.', [
                         {value: 'en', label: 'English'},
                         {value: 'es-ES', label: 'Español (ES)'},
                      ])}
-                     {renderSelect('currency', 'Fiat Anchor', 'Base denominator for balance valuations.', [
+                     {renderSelect('currency', 'Base Currency', 'Default currency for balance display.', [
                         {value: 'USD', label: 'USD - Dollar'},
                         {value: 'EUR', label: 'EUR - Euro'},
                         {value: 'GBP', label: 'GBP - Pound'},
                         {value: 'JPY', label: 'JPY - Yen'}
                      ])}
-                     {renderSelect('timeFormat', 'Chronological Format', '12-hour or 24-hour military time representation.', [
+                     {renderSelect('timeFormat', 'Time Format', '12-hour or 24-hour time display.', [
                         {value: '12h', label: '12-Hour (AM/PM)'},
-                        {value: '24h', label: '24-Hour (Military)'}
+                        {value: '24h', label: '24-Hour'}
                      ])}
-                     {renderSelect('dateFormat', 'Date Sequencing', 'Ordering of days and months.', [
+                     {renderSelect('dateFormat', 'Date Format', 'Order of day, month and year.', [
                         {value: 'DD/MM/YYYY', label: 'DD/MM/YYYY'},
                         {value: 'MM/DD/YYYY', label: 'MM/DD/YYYY'}
                      ])}
-                     {renderSelect('addressFormat', 'Address Truncation', 'Visual rendering length of public keys.', [
-                        {value: 'truncated', label: 'Truncated (0x1...ABCD)'},
-                        {value: 'full', label: 'Full Length'}
+                     {renderSelect('addressFormat', 'Address Display', 'How wallet addresses are shown on screen.', [
+                        {value: 'truncated', label: 'Shortened (0x1...ABCD)'},
+                        {value: 'full', label: 'Full Address'}
                      ])}
                   </>
                )}
 
                {activeTab === 'display' && (
                   <>
-                     {/* Portfolio Visuals */}
-                     {renderSelect('density', 'Interface Density', 'Padding and spacing physics engine.', [
+                     {/* Display settings */}
+                     {renderSelect('density', 'Interface Density', 'Amount of spacing and padding in the layout.', [
                         {value: 'relaxed', label: 'Relaxed'},
                         {value: 'compact', label: 'Compact'},
                         {value: 'dense', label: 'Dense'}
                      ])}
-                     {renderSelect('defaultTimeframe', 'Telemetry Range', 'Default horizon for analytics charting.', [
+                     {renderSelect('defaultTimeframe', 'Default Timeframe', 'Default time range for charts and analytics.', [
                         {value: '1D', label: '24 Hours'},
                         {value: '1W', label: '7 Days'},
                         {value: '1M', label: '30 Days'},
-                        {value: 'ALL', label: 'Genesis'}
+                        {value: 'ALL', label: 'All Time'}
                      ])}
-                     {renderSelect('displayUnit', 'Absolute Reference Unit', 'Valuation rendered in native asset or fiat.', [
+                     {renderSelect('displayUnit', 'Display Unit', 'Show values in fiat or native crypto units.', [
                         {value: 'FIAT', label: 'Fiat Currency'},
                         {value: 'BTC', label: 'Bitcoin (sats)'},
-                        {value: 'ETH', label: 'Ethereum (wei)'}
+                        {value: 'ETH', label: 'Ethereum (gwei)'}
                      ])}
-                     {renderToggle('showBalances', 'Hydrate Balances', 'Render absolute balance integers on-screen.')}
-                     {renderToggle('soundEffects', 'Haptic Audio', 'Tactile UI sounds on execution events.')}
-                     {renderToggle('hardwareAcceleration', 'GPU Acceleration', 'Offload intensive DOM rendering to the GPU for fluid 120fps.')}
+                     {renderToggle('showBalances', 'Show Balances', 'Display wallet and portfolio balances on screen.')}
+                     {renderToggle('soundEffects', 'Sound Effects', 'Play sounds on UI interactions and alerts.')}
+                     {renderToggle('hardwareAcceleration', 'GPU Acceleration', 'Use GPU rendering for smoother animations.')}
                   </>
                )}
 
                {activeTab === 'network' && (
                   <>
-                     {/* Execution params */}
-                     {renderInput('customRpcUrl', 'Sovereign RPC Node', 'Direct endpoint override for JSON-RPC egress.', 'text')}
-                     {renderToggle('testnetMode', 'Testnet Dimensional Bridge', 'Inject Sepolia and Holesky streams into main views.')}
+                     {/* Network settings */}
+                     {renderInput('customRpcUrl', 'Custom RPC Node', 'Override the default JSON-RPC endpoint.', 'text')}
+                     {renderToggle('testnetMode', 'Testnet Mode', 'Enable Sepolia and Holesky test networks.')}
                   </>
                )}
 
                {activeTab === 'execution' && (
                   <>
-                     {renderSelect('gasPreset', 'Inclusion Thermodynamics', 'Gwei priority layer settings for mainnet.', [
+                     {renderSelect('gasPreset', 'Gas Priority', 'Transaction fee tier for on-chain submissions.', [
                         {value: 'ECONOMY', label: 'Economy'},
                         {value: 'STANDARD', label: 'Standard'},
                         {value: 'FAST', label: 'Fast'},
                         {value: 'INSTANT', label: 'Instant'}
                      ])}
-                     {renderInput('maxSlippage', 'Max Tolerable Deflection', 'Slippage threshold percentage for automatic DEX routing.', 'number', '%')}
-                     {renderToggle('mevProtection', 'MEV Cloaking (Dark Pool)', 'Route transactions through private relays (e.g. Flashbots) to evade sandwich attacks.')}
+                     {renderInput('maxSlippage', 'Max Slippage', 'Maximum allowed slippage percentage for DEX trades.', 'number', '%')}
+                     {renderToggle('mevProtection', 'MEV Protection', 'Route transactions through private relays to prevent sandwich attacks.')}
                   </>
                )}
 
                {activeTab === 'sonar' && (
                   <>
                      {/* Alerts */}
-                     {renderToggle('emailAlerts', 'SMTP Ingress', 'Receive catastrophic system reports via registered email.')}
-                     {renderToggle('telegramAlerts', 'Telegram Vector', 'Direct pulse notifications to the sovereign Telegram bot.')}
-                     {renderToggle('audioAlerts', 'Acoustic Alarms', 'Audible klaxon triggers for leviathan movements.')}
-                     {renderInput('whaleAlertThreshold', 'Leviathan Threshold', 'Minimum USD volume required to trigger a terminal-wide global alert.', 'number', 'USD')}
-                     {renderInput('email', 'Emergency Egress Mail', 'Registered destination for mission-critical notifications.', 'text')}
+                     {renderToggle('emailAlerts', 'Email Alerts', 'Receive system alerts via your registered email.')}
+                     {renderToggle('telegramAlerts', 'Telegram Alerts', 'Send alerts to your Telegram bot.')}
+                     {renderToggle('audioAlerts', 'Audio Alerts', 'Play a sound for large whale movement alerts.')}
+                     {renderInput('whaleAlertThreshold', 'Alert Threshold', 'Minimum USD volume to trigger a whale alert.', 'number', 'USD')}
+                     {renderInput('email', 'Notification Email', 'Email address for important system notifications.', 'text')}
                   </>
                )}
 
                {activeTab === 'privacy' && (
                   <>
                      {/* Security */}
-                     {renderInput('inactivityLockMinutes', 'Dead Man\'s Lock', 'Idle time required before the terminal requests ECDSA re-validation.', 'number', 'MIN')}
-                     {renderSelect('autoDisconnectTimer', 'Auto-Sever Duration', 'Force wallet disconnect after fixed period of time.', [
+                     {renderInput('inactivityLockMinutes', 'Inactivity Lock', 'Minutes of inactivity before the session is locked.', 'number', 'MIN')}
+                     {renderSelect('autoDisconnectTimer', 'Auto Disconnect', 'Automatically disconnect wallet after a set period.', [
                         {value: '15m', label: '15 Minutes'},
                         {value: '1h', label: '1 Hour'},
                         {value: '24h', label: '24 Hours'},
                         {value: 'never', label: 'Never'}
                      ])}
-                     {renderToggle('stealthMode', 'Visual Cryptography', 'Scramble all on-screen hexadecimal addresses to prevent shoulder-surfing.')}
-                     {renderToggle('requireSignForExports', 'Export Sealing', 'Demand cryptographic signature before exporting CSV ledgers to physical disk.')}
-                     {renderToggle('allowAnalytics', 'Telemetry Contribution', 'Allow anonymized metadata shipping to refine the Global Hive intelligence.')}
+                     {renderToggle('stealthMode', 'Stealth Mode', 'Blur all wallet addresses visible on screen.')}
+                     {renderToggle('requireSignForExports', 'Sign Before Export', 'Require wallet signature before exporting CSV data.')}
+                     {renderToggle('allowAnalytics', 'Allow Analytics', 'Share anonymized usage data to improve the platform.')}
                   </>
                )}
 
                {activeTab === 'whalechat' && (
                   <>
-                     {renderInput('chatName', 'Alias Identifier', 'Your cryptographic moniker visible to active conversational peers.', 'text')}
-                     {renderInput('chatBio', 'Operative Biography', 'A short thesis or description embedded into your identity matrix.', 'text')}
-                     {renderInput('qrLabel', 'QR Scan Label', 'The physical text appended to your Sovereign Identity Code when projected.', 'text')}
+                     {renderInput('chatName', 'Display Name', 'Your name visible to other users in Whale Chat.', 'text')}
+                     {renderInput('chatBio', 'Bio', 'Short description shown on your chat profile.', 'text')}
+                     {renderInput('qrLabel', 'QR Code Label', 'Text displayed below your wallet QR code.', 'text')}
                   </>
                )}
             </motion.div>

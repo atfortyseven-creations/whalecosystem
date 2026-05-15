@@ -1209,3 +1209,30 @@ html.no-hw-accel * {
    (lines ~1141–1185). Duplicate declarations removed here to prevent
    CSS specificity conflicts.
    ────────────────────────────────────────────────────────────────────────── */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   GLOBAL PC SCALE SYSTEM — 50% ZOOM-OUT FOR DESKTOP
+   Applies a 50% zoom to the <html> element on screens >= 1024px wide.
+   This makes the entire UI appear "farther away" / more zoomed-out on PC
+   while keeping the browser zoom at 100%. Mobile is unaffected.
+   
+   HOW IT WORKS:
+   • `zoom: 0.5` on html scales the entire rendering tree to 50%.
+   • The browser still interprets the page as 100% zoom — no browser UI is affected.
+   • width: 200vw + height: 200vh compensates the coordinate space so the
+     zoomed content fills the full physical screen area without scroll gaps.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media screen and (min-width: 1024px) {
+  html {
+    zoom: 0.5;
+    /* Compensate: at zoom:0.5 the layout's logical viewport is 200% of physical */
+    width: 200vw;
+    min-height: 200vh;
+  }
+
+  /* Ensure body fills the compensated coordinate space */
+  body {
+    width: 100%;
+    min-height: 200vh;
+  }
+}

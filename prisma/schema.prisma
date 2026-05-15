@@ -107,31 +107,46 @@ model User {
 
   worldIdNullifierHash String? @unique
 
-  theme    String @default("light")
-  currency String @default("USD")
-  language String @default("es-ES")
+  // ── General Settings ────────────────────────────────────────────────────────
+  theme         String @default("light")
+  currency      String @default("USD")
+  language      String @default("en")
+  timeFormat    String @default("24h")       // "12h" | "24h"
+  dateFormat    String @default("DD/MM/YYYY") // "DD/MM/YYYY" | "MM/DD/YYYY"
+  addressFormat String @default("truncated")  // "truncated" | "full"
 
-  showBalances     Boolean  @default(true)
-  hiddenAssets     String[] @default([])
-  defaultTimeframe String   @default("1W") // "1D", "1W", "1M", "ALL"
-  displayUnit      String   @default("FIAT") // "FIAT", "BTC", "ETH"
+  // ── Display & Hardware ───────────────────────────────────────────────────────
+  showBalances        Boolean  @default(true)
+  hiddenAssets        String[] @default([])
+  defaultTimeframe    String   @default("1W")    // "1D", "1W", "1M", "ALL"
+  displayUnit         String   @default("FIAT")  // "FIAT", "BTC", "ETH"
+  layoutDensity       String   @default("compact") // "relaxed" | "compact" | "dense"
+  hardwareAcceleration Boolean @default(true)
 
-  gasPreset     String  @default("STANDARD") // "ECONOMY", "STANDARD", "FAST", "INSTANT"
+  // ── Network & RPC ────────────────────────────────────────────────────────────
+  gasPreset     String  @default("STANDARD") // "ECONOMY" | "STANDARD" | "FAST" | "INSTANT"
   customRpcUrl  String?
   mevProtection Boolean @default(false)
   maxSlippage   Float   @default(0.5)
+  testnetMode   Boolean @default(false)
 
+  // ── Privacy & Security ───────────────────────────────────────────────────────
   inactivityLockMinutes Int     @default(60)
+  autoDisconnectTimer   String  @default("1h") // "15m" | "1h" | "24h" | "never"
   stealthMode           Boolean @default(false)
   requireSignForExports Boolean @default(true)
   allowAnalytics        Boolean @default(true)
 
+  // ── Sonar Alerts ─────────────────────────────────────────────────────────────
   emailAlerts         Boolean @default(false)
   telegramAlerts      Boolean @default(false)
   whaleAlertThreshold Float   @default(1000000)
   soundEffects        Boolean @default(true)
 
-  testnetMode Boolean @default(false)
+  // ── Whale Chat ───────────────────────────────────────────────────────────────
+  chatName String @default("Whale User")
+  chatBio  String @default("")
+  qrLabel  String @default("Scan My Wallet")
 
   // Forum-specific settings
   isAdmin          Boolean @default(false)
