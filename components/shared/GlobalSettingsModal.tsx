@@ -87,7 +87,7 @@ export function GlobalSettingsModal() {
                             </nav>
                             <div className="p-4 border-t border-[#E5E5E5] bg-[#FAF9F6]">
                                 <span className="text-[9px] font-bold text-[#888888] uppercase tracking-widest leading-relaxed">
-                                    Sovereign Version 3.1.5<br/>Connected to Core Network
+                                    Version 3.1.5<br/>Connected to Core Network
                                 </span>
                             </div>
                         </div>
@@ -109,7 +109,7 @@ export function GlobalSettingsModal() {
                                                     <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">Theme System (Locked)</label>
                                                     <div className="flex items-center gap-2 px-3 py-2 bg-[#FAF9F6] border border-[#E5E5E5] rounded-lg">
                                                         <Shield size={12} className="text-black/40" />
-                                                        <span className="text-[11px] font-bold uppercase tracking-wider text-black opacity-50">Sovereign Ivory Mode Only</span>
+                                                        <span className="text-[11px] font-bold uppercase tracking-wider text-black opacity-50">Ivory Mode Only</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-4">

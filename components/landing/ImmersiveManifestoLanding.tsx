@@ -48,61 +48,61 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 {/* Bento Card 1 */}
-                <div className="col-span-1 lg:col-span-2 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
+                <div className="col-span-1 lg:col-span-2 bg-white/70 backdrop-blur-[40px] rounded-[3rem] border border-white/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.06)] p-12 flex flex-col lg:flex-row items-center gap-12 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-500 overflow-hidden group">
                     <div className="w-full lg:w-1/2 space-y-6">
-                        <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
+                        <h3 className="text-[32px] font-black uppercase tracking-tight text-[#050505]">
                             Secure Integrity.
                         </h3>
-                        <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
+                        <p className="text-[17px] text-slate-500/90 leading-relaxed font-serif">
                             The Whale Alert Network operates on a strict zero-knowledge architecture. There are no passwords to compromise. Your identity is mathematically verified, ensuring that your professional portfolio data remains private.
                         </p>
                     </div>
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
+                    <div className="w-full lg:w-1/2 h-full min-h-[340px] flex items-center justify-center bg-black/[0.02] rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-black/[0.04] transition-colors">
                         <RemoteLottie path="DeeWork About Blockchain.json" className="w-full h-full scale-125" />
                     </div>
                 </div>
 
                 {/* Bento Card 2 */}
-                <div className="col-span-1 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
-                    <div className="w-full h-[200px] flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2rem] border border-black/5 mb-8 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
+                <div className="col-span-1 bg-white/70 backdrop-blur-[40px] rounded-[3rem] border border-white/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.06)] p-12 flex flex-col justify-between hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-500 group">
+                    <div className="w-full h-[220px] flex items-center justify-center bg-black/[0.02] rounded-[2rem] border border-black/5 mb-10 overflow-hidden p-4 relative group-hover:bg-black/[0.04] transition-colors">
                          <RemoteLottie path="Connected world.json" className="scale-125" />
                     </div>
                     <div className="space-y-6">
-                        <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
+                        <h3 className="text-[28px] font-black uppercase tracking-tight text-[#050505]">
                             Entity Resolution.
                         </h3>
-                        <p className="text-[15px] text-slate-500 leading-relaxed font-serif">
+                        <p className="text-[16px] text-slate-500/90 leading-relaxed font-serif">
                             We map complex multi-hop interactions and resolve fragmented on-chain fingerprints into unified professional entities for absolute regulatory clarity.
                         </p>
                     </div>
                 </div>
 
                 {/* Bento Card 3 */}
-                <div className="col-span-1 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 group">
-                    <div className="space-y-6 mb-8">
-                        <h3 className="text-[24px] font-black uppercase tracking-tight text-[#0a0a0a]">
+                <div className="col-span-1 bg-white/70 backdrop-blur-[40px] rounded-[3rem] border border-white/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.06)] p-12 flex flex-col justify-between hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-500 group">
+                    <div className="space-y-6 mb-10">
+                        <h3 className="text-[28px] font-black uppercase tracking-tight text-[#050505]">
                             Analytics Engines.
                         </h3>
-                        <p className="text-[15px] text-slate-500 leading-relaxed font-serif">
+                        <p className="text-[16px] text-slate-500/90 leading-relaxed font-serif">
                             Our deterministic algorithms process vast arrays of raw blockchain state, detecting liquidity patterns and massive accumulations with mathematical precision.
                         </p>
                     </div>
-                    <Link href="/dashboard" target="_blank" rel="noopener noreferrer" className="w-full h-[200px] flex items-center justify-center bg-white/40 backdrop-blur-3xl dark:bg-[#0A0A0A] rounded-[2rem] border border-black/5 dark:border-white/5 overflow-hidden p-4 relative group-hover:bg-slate-50 transition-colors">
+                    <Link href="/dashboard" target="_blank" rel="noopener noreferrer" className="w-full h-[220px] flex items-center justify-center bg-black/[0.02] rounded-[2rem] border border-black/5 overflow-hidden p-4 relative group-hover:bg-black/[0.04] transition-colors">
                          <RemoteLottie path="Isometric data analysis.json" className="w-full h-full scale-110" />
                     </Link>
                 </div>
 
                 {/* Bento Card 4 */}
-                <div className="col-span-1 lg:col-span-2 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 p-10 flex flex-col lg:flex-row items-center gap-10 hover:shadow-xl transition-all duration-500 overflow-hidden group">
-                    <div className="w-full lg:w-1/2 h-full min-h-[300px] flex items-center justify-center bg-white/40 backdrop-blur-3xl rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-slate-50 transition-colors">
+                <div className="col-span-1 lg:col-span-2 bg-white/70 backdrop-blur-[40px] rounded-[3rem] border border-white/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.06)] p-12 flex flex-col lg:flex-row items-center gap-12 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-500 overflow-hidden group">
+                    <div className="w-full lg:w-1/2 h-full min-h-[340px] flex items-center justify-center bg-black/[0.02] rounded-[2rem] border border-black/5 overflow-hidden p-6 relative group-hover:bg-black/[0.04] transition-colors">
                         <div className="absolute inset-0 bg-[#050505]/5 pointer-events-none mix-blend-multiply transition-opacity duration-700 group-hover:opacity-50" />
                          <RemoteLottie path="Trade.json" className="w-full h-full scale-125" />
                     </div>
                     <div className="w-full lg:w-1/2 space-y-6">
-                        <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0a0a0a]">
+                        <h3 className="text-[32px] font-black uppercase tracking-tight text-[#050505]">
                             Network Tracking.
                         </h3>
-                        <p className="text-[16px] text-slate-500 leading-relaxed font-serif">
+                        <p className="text-[17px] text-slate-500/90 leading-relaxed font-serif">
                             Relying on block confirmations is insufficient for advanced operations. Our dedicated node mesh directly interfaces with the global mempool, allowing you to intercept and analyze capital flows milliseconds after they are signed.
                         </p>
                     </div>

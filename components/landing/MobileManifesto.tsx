@@ -133,15 +133,15 @@ export function MobileManifesto() {
 
         {/* Block 1 */}
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="flex flex-col gap-8">
-            <div className="w-full aspect-square bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 flex items-center justify-center p-8 shadow-sm">
+            <div className="w-full aspect-square bg-white/70 backdrop-blur-[40px] rounded-[3rem] border border-white/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.06)] flex items-center justify-center p-10 overflow-hidden">
                 <RemoteLottie path="Connected world.json" className="scale-125" />
             </div>
-            <div className="space-y-4">
-                <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center mb-2">
-                    <Globe size={20} className="text-black/40" />
+            <div className="space-y-4 px-2">
+                <div className="w-12 h-12 rounded-2xl bg-black/[0.04] flex items-center justify-center mb-2 border border-black/5">
+                    <Globe size={22} className="text-black/60" />
                 </div>
-                <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0A0A0A] leading-none">Global Ledger.</h3>
-                <p className="font-serif text-[16px] text-slate-500 leading-relaxed font-medium">
+                <h3 className="text-[32px] font-black uppercase tracking-tight text-[#050505] leading-none">Global Ledger.</h3>
+                <p className="font-serif text-[17px] text-slate-500/90 leading-relaxed font-medium">
                     The ledger is public, but retail only sees historical states. Our infrastructure intercepts capital flows directly from network mempools.
                 </p>
             </div>
@@ -149,15 +149,15 @@ export function MobileManifesto() {
 
         {/* Block 2 */}
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="flex flex-col gap-8">
-            <div className="w-full aspect-square bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 flex items-center justify-center p-8 shadow-sm overflow-hidden">
+            <div className="w-full aspect-square bg-white/70 backdrop-blur-[40px] rounded-[3rem] border border-white/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.06)] flex items-center justify-center p-10 overflow-hidden">
                 <RemoteLottie path="Business Analysis.json" className="w-full h-full object-contain scale-[1.5]" />
             </div>
-            <div className="space-y-4">
-                <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center mb-2">
-                    <LineChart size={20} className="text-black/40" />
+            <div className="space-y-4 px-2">
+                <div className="w-12 h-12 rounded-2xl bg-black/[0.04] flex items-center justify-center mb-2 border border-black/5">
+                    <LineChart size={22} className="text-black/60" />
                 </div>
-                <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0A0A0A] leading-none">Entity Resolution.</h3>
-                <p className="font-serif text-[16px] text-slate-500 leading-relaxed font-medium">
+                <h3 className="text-[32px] font-black uppercase tracking-tight text-[#050505] leading-none">Entity Resolution.</h3>
+                <p className="font-serif text-[17px] text-slate-500/90 leading-relaxed font-medium">
                     We resolve complex multi-hop interactions and de-obfuscate mixer outputs, grouping fragmented fingerprints into unified institutional entities.
                 </p>
             </div>
@@ -165,15 +165,15 @@ export function MobileManifesto() {
 
         {/* Block 3 */}
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="flex flex-col gap-8">
-            <div className="w-full aspect-square bg-[#FAFAF8] rounded-[2.5rem] border border-black/5 flex items-center justify-center p-8 shadow-sm overflow-hidden">
+            <div className="w-full aspect-square bg-white/70 backdrop-blur-[40px] rounded-[3rem] border border-white/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.06)] flex items-center justify-center p-10 overflow-hidden">
                 <RemoteLottie path="Trade.json" className="w-full h-full object-contain scale-[1.3]" />
             </div>
-            <div className="space-y-4">
-                <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center mb-2">
-                    <Zap size={20} className="text-black/40" />
+            <div className="space-y-4 px-2">
+                <div className="w-12 h-12 rounded-2xl bg-black/[0.04] flex items-center justify-center mb-2 border border-black/5">
+                    <Zap size={22} className="text-black/60" />
                 </div>
-                <h3 className="text-[28px] font-black uppercase tracking-tight text-[#0A0A0A] leading-none">Heuristic Tracking.</h3>
-                <p className="font-serif text-[16px] text-slate-500 leading-relaxed font-medium">
+                <h3 className="text-[32px] font-black uppercase tracking-tight text-[#050505] leading-none">Heuristic Tracking.</h3>
+                <p className="font-serif text-[17px] text-slate-500/90 leading-relaxed font-medium">
                     Our deterministic algorithms process vast arrays of raw blockchain state, detecting massive accumulations milliseconds after they are signed.
                 </p>
             </div>

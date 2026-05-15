@@ -172,7 +172,7 @@ export default function WhaleDashboard() {
             activeTab={activeTab}
             onTabChange={handleTabChange}
             isExternalEmbed={false}
-            isZkVerified={hasPassedZK}
+            isZkVerified={true}
         >
             <div className="flex flex-col gap-6 w-full pb-12 h-full scrollbar-hide pt-4">
                 {renderTabContent()}

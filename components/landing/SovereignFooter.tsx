@@ -62,24 +62,25 @@ export function SovereignFooter() {
   };
 
   const LEGAL_LINKS = [
-    { label: 'Terms', href: '/terms' },
-    { label: 'Privacy', href: '/privacy' },
     { label: 'Docs', href: '/docs' },
     { label: 'Developer', href: '/developer' },
+    { label: 'Operator', href: '/operator' },
+    { label: 'Legal', href: '/legal' },
   ];
 
   const CORE_LINKS = [
+    { label: 'Platform', href: '/platform' },
     { label: 'Portfolio', href: '/portfolio' },
   ];
 
   const COMMUNITY_LINKS = [
-    { label: 'Forum', href: '/forum' },
     { label: 'Academy', href: '/academy' },
+    { label: 'Forum', href: '/forum' },
   ];
 
   const INTEL_LINKS = [
-    { label: 'News', href: '/news' },
     { label: 'Careers', href: '/careers' },
+    { label: 'News', href: '/news' },
   ];
 
   return (
@@ -94,14 +95,14 @@ export function SovereignFooter() {
            onMouseMove={handleMouseMove}
            onMouseEnter={() => setIsHovered(true)}
            onMouseLeave={() => setIsHovered(false)}
-           className="relative w-full h-[auto] min-h-[500px] md:min-h-[600px] overflow-hidden bg-white flex flex-col items-center justify-end group"
+           className="relative w-full h-[auto] min-h-[300px] md:min-h-[450px] overflow-hidden bg-white flex flex-col items-center justify-end group"
         >
           {/* Wave Wallpaper 4K */}
           <Image
             src="/olas-hokusai-4k.png"
             alt="Hokusai Waves 4K"
             fill
-            className="object-cover object-center sm:object-bottom opacity-100 pointer-events-none transition-transform duration-1000 group-hover:scale-[1.02]"
+            className="object-cover md:object-contain object-bottom opacity-100 pointer-events-none transition-transform duration-1000 group-hover:scale-[1.01]"
             sizes="100vw"
             quality={100}
             unoptimized
@@ -167,20 +168,20 @@ export function SovereignFooter() {
             <div className="flex items-center gap-6">
               {/* Telegram — official paper-plane logo */}
               <a href="https://t.me/WhaleAlert" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 group">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black/5 group-hover:bg-black">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-[#229ED9]/10 group-hover:bg-[#229ED9] border border-[#229ED9]/20">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" className="fill-black/20 group-hover:fill-white transition-colors"/>
-                    <path d="M5.491 11.74 17.094 7.24c.539-.194 1.01.131.835.951l-1.97 9.28c-.147.664-.537.825-1.087.513l-3.004-2.213-1.45 1.394c-.16.16-.295.295-.606.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.08 14.348l-2.951-.924c-.641-.2-.656-.641.136-.951z" className="fill-white group-hover:fill-black transition-colors"/>
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" className="fill-[#229ED9] group-hover:fill-[#229ED9] transition-colors"/>
+                    <path d="M5.491 11.74 17.094 7.24c.539-.194 1.01.131.835.951l-1.97 9.28c-.147.664-.537.825-1.087.513l-3.004-2.213-1.45 1.394c-.16.16-.295.295-.606.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.08 14.348l-2.951-.924c-.641-.2-.656-.641.136-.951z" className="fill-white transition-colors"/>
                   </svg>
                 </div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-black/40 group-hover:text-black transition-colors">Telegram</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#229ED9]/70 group-hover:text-[#229ED9] transition-colors">Telegram</span>
               </a>
 
               {/* X (Twitter) — official X logo */}
               <a href="https://x.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 group">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black/5 group-hover:bg-black">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black/5 group-hover:bg-black border border-black/10">
                   <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.26 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z" className="fill-black/40 group-hover:fill-white transition-colors"/>
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.26 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z" className="fill-black/60 group-hover:fill-white transition-colors"/>
                   </svg>
                 </div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-black/40 group-hover:text-black transition-colors">X / Network</span>
@@ -190,7 +191,7 @@ export function SovereignFooter() {
             {/* ─── Clusters ─── */}
             <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 pt-4">
               <div className="flex flex-col gap-6">
-                <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/20">Network</span>
+                <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/20">Documentation v2.0</span>
                 <div className="flex flex-col gap-3">
                   {LEGAL_LINKS.map(l => (
                     <FooterLink key={l.label} href={l.href} external={true}>{l.label}</FooterLink>
@@ -231,71 +232,71 @@ export function SovereignFooter() {
             <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
 
               {/* GDPR COMPLIANT — EU Stars Badge */}
-              <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
-                <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity cursor-default">
+                <div className="w-10 h-10 rounded-full bg-[#003399]/10 flex items-center justify-center shrink-0 border border-[#003399]/20">
                   <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                     {/* 12 EU stars in circle */}
                     {Array.from({length:12}).map((_,i) => {
                       const angle = (i * 30 - 90) * (Math.PI / 180);
                       const cx = 11 + 7.5 * Math.cos(angle);
                       const cy = 11 + 7.5 * Math.sin(angle);
-                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#333333" />;
+                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#FFCC00" />;
                     })}
                   </svg>
                 </div>
                 <div className="flex flex-col gap-0">
-                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">GDPR</span>
-                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Compliant</span>
+                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#003399]">GDPR</span>
+                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-[#003399]/60">Compliant</span>
                 </div>
               </div>
 
               {/* KYC/AML VERIFIED — Shield Eye Badge */}
-              <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
-                <div className="w-10 h-10 rounded-[10px] bg-black/10 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity cursor-default">
+                <div className="w-10 h-10 rounded-[10px] bg-[#10B981]/10 flex items-center justify-center shrink-0 border border-[#10B981]/20">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2Z" fill="#333333" fillOpacity="0.15" stroke="#333333" strokeWidth="1.5"/>
-                    <circle cx="12" cy="12" r="3" fill="#333333"/>
-                    <ellipse cx="12" cy="12" rx="6" ry="3.5" stroke="#333333" strokeWidth="1.2" fill="none"/>
+                    <path d="M12 2L4 5v6c0 5.25 3.5 10.15 8 11.35C16.5 21.15 20 16.25 20 11V5L12 2Z" fill="#10B981" fillOpacity="0.2" stroke="#10B981" strokeWidth="1.5"/>
+                    <circle cx="12" cy="12" r="3" fill="#10B981"/>
+                    <ellipse cx="12" cy="12" rx="6" ry="3.5" stroke="#10B981" strokeWidth="1.2" fill="none"/>
                   </svg>
                 </div>
                 <div className="flex flex-col gap-0">
-                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">KYC/AML</span>
-                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Verified</span>
+                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#10B981]">KYC/AML</span>
+                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-[#10B981]/60">Verified</span>
                 </div>
               </div>
 
               {/* MiCA REGULATED — EU Stars Square Badge */}
-              <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
-                <div className="w-10 h-10 rounded-[10px] bg-black/10 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity cursor-default">
+                <div className="w-10 h-10 rounded-[10px] bg-[#003399]/10 flex items-center justify-center shrink-0 border border-[#003399]/20">
                   <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                     {Array.from({length:12}).map((_,i) => {
                       const angle = (i * 30 - 90) * (Math.PI / 180);
                       const cx = 11 + 7.5 * Math.cos(angle);
                       const cy = 11 + 7.5 * Math.sin(angle);
-                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#333333" />;
+                      return <circle key={i} cx={cx} cy={cy} r="1.2" fill="#FFCC00" />;
                     })}
                   </svg>
                 </div>
                 <div className="flex flex-col gap-0">
-                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">MICA</span>
-                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Regulated</span>
+                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#003399]">MICA</span>
+                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-[#003399]/60">Regulated</span>
                 </div>
               </div>
 
               {/* ISO 27001 — Globe Grid Badge */}
-              <div className="flex items-center gap-3 opacity-55 hover:opacity-100 transition-opacity cursor-default">
-                <div className="w-10 h-10 rounded-full border-2 border-black/20 bg-white flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity cursor-default">
+                <div className="w-10 h-10 rounded-full border-2 border-[#2563EB]/20 bg-[#2563EB]/5 flex items-center justify-center shrink-0">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9" stroke="#333333" strokeWidth="1.5" fill="none"/>
-                    <ellipse cx="12" cy="12" rx="4.5" ry="9" stroke="#333333" strokeWidth="1.2" fill="none"/>
-                    <line x1="3" y1="9" x2="21" y2="9" stroke="#333333" strokeWidth="1.2"/>
-                    <line x1="3" y1="15" x2="21" y2="15" stroke="#333333" strokeWidth="1.2"/>
-                    <text x="12" y="14" textAnchor="middle" fontSize="4" fontWeight="900" fill="#333333">ISO</text>
+                    <circle cx="12" cy="12" r="9" stroke="#2563EB" strokeWidth="1.5" fill="none"/>
+                    <ellipse cx="12" cy="12" rx="4.5" ry="9" stroke="#2563EB" strokeWidth="1.2" fill="none"/>
+                    <line x1="3" y1="9" x2="21" y2="9" stroke="#2563EB" strokeWidth="1.2"/>
+                    <line x1="3" y1="15" x2="21" y2="15" stroke="#2563EB" strokeWidth="1.2"/>
+                    <text x="12" y="14" textAnchor="middle" fontSize="4" fontWeight="900" fill="#2563EB">ISO</text>
                   </svg>
                 </div>
                 <div className="flex flex-col gap-0">
-                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/80">ISO 27001</span>
-                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-black/40">Secure</span>
+                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#2563EB]">ISO 27001</span>
+                  <span className="font-mono text-[7px] uppercase tracking-[0.15em] text-[#2563EB]/60">Secure</span>
                 </div>
               </div>
 
