@@ -72,6 +72,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     title: 'Dashboard',
+  },
   openGraph: {
     title: 'Whale Alert Network | Professional Identity Layer',
     description: 'The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
@@ -137,6 +138,8 @@ export default async function RootLayout({
           "https://github.com/atfortyseven-creations/Humanity-Ledger"
         ]
       },
+      {
+        "@type": "WebApplication",
         "name": "Professional Dashboard",
         "applicationCategory": "FinanceApplication",
         "creator": {
