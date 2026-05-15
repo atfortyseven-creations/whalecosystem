@@ -69,7 +69,6 @@ export default function MobileChatPage() {
       document.body.style.width = '';
       document.body.style.height = '';
       document.body.style.overscrollBehavior = '';
-      document.body.style.touchAction = '';
     };
   }, []);
 
@@ -86,7 +85,6 @@ export default function MobileChatPage() {
     overflow: 'hidden',
     backgroundColor: 'transparent',
     zIndex: 1000,
-    touchAction: 'none', // Prevent bounce at container level
   };
 
   return (

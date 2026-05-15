@@ -397,6 +397,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       // ── Step 2: Initialize client (Direct Execution) ───────────────
       const realClient = await getXMTPClient(wagmiSigner);
       setClient(realClient);
+      if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('whale_xmtp_initialized', 'true');
+      }
       await loadConversations();
     } catch (err: any) {
       console.error('[WhaleChat] Init Error:', err);
@@ -428,12 +431,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     // Aggressive Auto-Init: Trigger for all connected users.
     if (isConnected && address && !client && !initInFlight.current && !initError) {
       const hasVault = typeof localStorage !== 'undefined' && !!localStorage.getItem("sovereign_vault_v1");
+      const hasInit = typeof localStorage !== 'undefined' && !!localStorage.getItem("whale_xmtp_initialized");
       const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
       
       // On mobile, auto-init can trigger unwanted wallet app switches if the keys aren't in IndexedDB.
       // However, if forceAutoInit is true or it's a handshake session, we proceed.
       // For returning users with IndexedDB keys, the auto-init is completely silent!
-      if (hasVault || !isTouch || forceAutoInit || isSovereignHandshake) {
+      if (hasVault || hasInit || !isTouch || forceAutoInit || isSovereignHandshake) {
         initClient();
       }
     }

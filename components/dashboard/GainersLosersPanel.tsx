@@ -438,7 +438,7 @@ export function GainersLosersPanel() {
                         <div className="h-full flex flex-col items-center justify-center p-12">
                             <AlertTriangle size={32} className="text-black/20 dark:text-white/20 mb-4" />
                             <p className="text-[12px] font-black text-[#050505]/40 dark:text-white/40 uppercase tracking-[0.3em]">
-                                Telemetry Disconnected
+                                Market Data Unavailable
                             </p>
                         </div>
                     ) : filtered.length === 0 ? (

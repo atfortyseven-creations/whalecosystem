@@ -108,12 +108,12 @@ export default function PricingPage() {
               </div>
 
               <h1 className="text-[64px] md:text-[100px] font-black uppercase tracking-tighter leading-[0.85] text-[#0a0a0a]">
-                Institutional<br />
+                Terminal<br />
                 <span className="text-black/30">Access.</span>
               </h1>
 
               <p className="text-[18px] md:text-[22px] font-serif text-slate-600 max-w-3xl leading-relaxed mt-4 mx-auto">
-                Select your designated service tier to initialize secure access to the global terminal. Unlock zero-knowledge identity attestation and deploy real-time on-chain intelligence layers.
+                Select your service plan to access the dashboard. Unlock secure identity verification and real-time on-chain data.
               </p>
             </motion.div>
           </div>
