@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * SovereignFooter — Rebuilt
+ * NetworkFooter — Rebuilt
  * ═══════════════════════════════════════════════════════════════
  * • Hokusai wave banner at natural scale (object-cover from bottom, no zoom).
  * • Full ecosystem logo row: MetaMask · Coinbase · Rainbow · WalletConnect
@@ -30,10 +30,10 @@ function FooterLink({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="group relative font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-black/50 hover:text-black transition-colors duration-300 py-1 whitespace-nowrap"
+      className="group relative font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-white/50 hover:text-white transition-colors duration-300 py-1 whitespace-nowrap"
     >
       {children}
-      <span className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[1px] bg-black/60 transition-all duration-300" />
+      <span className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[1px] bg-white/60 transition-all duration-300" />
     </Link>
   );
 }
@@ -169,7 +169,7 @@ export function SovereignFooter() {
   };
 
   return (
-    <footer className="relative w-full overflow-hidden bg-[#FDFCF8] flex flex-col items-center">
+    <footer className="relative w-full overflow-hidden bg-black/30 backdrop-blur-2xl border-t border-white/5 flex flex-col items-center">
 
       {/* ═══ Wave Banner ═══════════════════════════════════════════════════ */}
       <div className="w-full relative z-10 border-t border-black/8">
@@ -178,7 +178,7 @@ export function SovereignFooter() {
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="relative w-full overflow-hidden bg-[#FDFCF8] group"
+          className="relative w-full overflow-hidden bg-transparent group"
           style={{ height: isMobile ? "260px" : "380px" }}
         >
           {/* Wave image — natural scale, anchored to bottom */}
@@ -227,7 +227,7 @@ export function SovereignFooter() {
           )}
 
           {/* Fog fade from bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/80 to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/40 via-black/20 to-transparent pointer-events-none z-10" />
         </div>
       </div>
 
@@ -248,10 +248,10 @@ export function SovereignFooter() {
               alt="Whale Alert Network"
               className="w-16 h-16 object-contain"
             />
-            <span className="font-mono text-[10px] font-black uppercase tracking-[0.35em] text-black/70 text-center sm:text-left">
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.35em] text-white/80 text-center sm:text-left">
               Whale Alert Network
             </span>
-            <p className="font-mono text-[9px] text-black/40 tracking-wider max-w-[220px] text-center sm:text-left leading-relaxed">
+            <p className="font-mono text-[9px] text-white/40 tracking-wider max-w-[220px] text-center sm:text-left leading-relaxed">
               Professional on-chain intelligence &amp; identity layer.
             </p>
           </motion.div>
@@ -291,7 +291,7 @@ export function SovereignFooter() {
         <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-10">
           {NAV_CLUSTERS.map((cluster) => (
             <div key={cluster.label} className="flex flex-col gap-5">
-              <span className="font-mono text-[8px] font-black uppercase tracking-[0.3em] text-black/25">
+              <span className="font-mono text-[8px] font-black uppercase tracking-[0.3em] text-white/30">
                 {cluster.label}
               </span>
               <div className="flex flex-col gap-3">
@@ -306,11 +306,11 @@ export function SovereignFooter() {
         </div>
 
         {/* ─── Divider ─── */}
-        <div className="w-full h-px bg-black/5" />
+        <div className="w-full h-px bg-white/8" />
 
         {/* ─── Ecosystem Logos ─── */}
         <div className="flex flex-col gap-6">
-          <span className="font-mono text-[8px] font-black uppercase tracking-[0.3em] text-black/25 text-center">
+          <span className="font-mono text-[8px] font-black uppercase tracking-[0.3em] text-white/30 text-center">
             Powered By · Integrated With
           </span>
 
@@ -359,7 +359,7 @@ export function SovereignFooter() {
 
           {/* GDPR */}
           <div className="flex flex-col items-center justify-center opacity-80 hover:opacity-100 transition-opacity shrink-0">
-             <div className="w-[100px] h-[100px] relative flex flex-col items-center justify-center bg-[#FDFCF8]">
+             <div className="w-[100px] h-[100px] relative flex flex-col items-center justify-center bg-white/10 backdrop-blur-sm rounded-full">
                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" fill="none">
                   {Array.from({ length: 12 }).map((_, i) => {
                     const angle = (i * 30 - 90) * (Math.PI / 180);
@@ -428,12 +428,12 @@ export function SovereignFooter() {
 
         {/* ─── Copyright ─── */}
         <div className="flex flex-col items-center gap-2 pt-2">
-          <span className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/25 text-center">
+          <span className="font-mono text-[8px] uppercase tracking-[0.25em] text-white/30 text-center">
             © 2026 Whale Alert Network. All rights reserved.
           </span>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-1">
             {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Cookies", "/legal"]].map(([l, h]) => (
-              <a key={l} href={h} className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/25 hover:text-black/60 transition-colors">
+              <a key={l} href={h} className="font-mono text-[8px] uppercase tracking-[0.2em] text-white/30 hover:text-white/70 transition-colors">
                 {l}
               </a>
             ))}

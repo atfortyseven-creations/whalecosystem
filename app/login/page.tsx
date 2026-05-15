@@ -20,11 +20,6 @@ import {
   Zap,
 } from "lucide-react";
 
-// Dynamically import PCKYCGate to avoid SSR issues
-const PCKYCGate = dynamic(
-  () => import("@/components/auth/PCKYCGate").then(m => m.PCKYCGate),
-  { ssr: false }
-);
 
 // ── Wave Background using olas-hokusai-4k.png ──────────────────────────────────
 function WaveBackground() {
@@ -133,32 +128,13 @@ function ConnectPanel() {
   const { openConnectModal } = useConnectModal();
   const { isConnected, address } = useAccount();
   const router = useRouter();
-  const [kycRequired, setKycRequired] = useState(false);
-  const [kycDone, setKycDone] = useState(false);
 
-  // Check if KYC already completed (cookie present)
+  // When wallet connects → redirect directly to dashboard (no KYC)
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const alreadyVerified =
-      document.cookie.includes("whale_session=") ||
-      document.cookie.includes("kyc_verified=true");
-    if (alreadyVerified) setKycDone(true);
-  }, []);
-
-  // When wallet connects AND kyc not done → show KYC gate
-  useEffect(() => {
-    if (isConnected && !kycDone) {
-      setKycRequired(true);
+    if (isConnected) {
+      setTimeout(() => router.replace("/"), 1200);
     }
-  }, [isConnected, kycDone]);
-
-  // When KYC completes → redirect
-  const handleKYCVerified = () => {
-    setKycRequired(false);
-    setKycDone(true);
-    // Small delay for success animation
-    setTimeout(() => router.replace("/"), 2800);
-  };
+  }, [isConnected, router]);
 
   return (
     <>
@@ -202,7 +178,7 @@ function ConnectPanel() {
             {/* Text */}
             <div>
               <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-white/35 mb-3">
-                Sovereign Terminal
+                Whale Alert Network
               </p>
               <h2 className="text-3xl font-black text-white tracking-tighter leading-tight mb-3">
                 Conecta tu Wallet
@@ -228,15 +204,9 @@ function ConnectPanel() {
                 <p className="font-mono text-white/40 text-[11px]">
                   {address?.slice(0, 10)}…{address?.slice(-8)}
                 </p>
-                {!kycDone ? (
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-amber-400/70 animate-pulse">
-                    Verificación KYC requerida…
-                  </p>
-                ) : (
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-emerald-400/60">
-                    KYC verificado · Accediendo…
-                  </p>
-                )}
+                <p className="font-mono text-[9px] uppercase tracking-widest text-emerald-400/60 animate-pulse">
+                  Accediendo al terminal…
+                </p>
               </motion.div>
             ) : (
               <button
@@ -257,7 +227,7 @@ function ConnectPanel() {
             <div className="flex items-start gap-3 pt-2 border-t border-white/10 w-full text-left">
               <Lock size={13} className="text-white/30 mt-0.5 shrink-0" />
               <p className="text-white/30 text-[10px] leading-relaxed">
-                Autenticación ECDSA. Tus claves privadas nunca salen de tu dispositivo. Compatible con MetaMask, Rainbow, Coinbase Wallet y cualquier wallet injected o WalletConnect.
+                Autenticación ECDSA. Tus claves privadas nunca salen de tu dispositivo. Compatible con MetaMask, Rainbow, Coinbase Wallet y cualquier wallet WalletConnect.
               </p>
             </div>
 
@@ -280,14 +250,6 @@ function ConnectPanel() {
           </div>
         </motion.div>
       </section>
-
-      {/* PC KYC Gate — full screen overlay after wallet connect */}
-      {kycRequired && address && (
-        <PCKYCGate
-          walletAddress={address}
-          onVerified={handleKYCVerified}
-        />
-      )}
     </>
   );
 }
@@ -342,7 +304,7 @@ export default function LoginPage() {
           className="mb-12"
         >
           <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-white/35 mb-5">
-            Guía de Acceso · Sovereign Terminal
+            Acceso · Whale Alert Network
           </p>
           <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-[1.05] mb-5">
             Cómo conectar
@@ -350,7 +312,7 @@ export default function LoginPage() {
             <span className="text-white/50">tu wallet</span>
           </h1>
           <p className="text-white/50 text-[14px] leading-relaxed max-w-lg">
-            El Sovereign Terminal usa autenticación <span className="text-white/80 font-bold">Web3 pura</span> — sin email, sin contraseñas, sin cuentas. Solo tu wallet y tu firma criptográfica.
+            El terminal usa autenticación <span className="text-white/80 font-bold">Web3 pura</span> — sin email, sin contraseñas, sin cuentas. Solo tu wallet y tu firma criptográfica.
           </p>
         </motion.div>
 
@@ -459,7 +421,7 @@ export default function LoginPage() {
         <div className="flex items-center gap-3">
           <img src="/official-whale-monochrome.png" className="w-4 h-4 brightness-0 invert opacity-25" alt="" />
           <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">
-            Whale Alert Network · Sovereign Terminal
+            Whale Alert Network
           </span>
         </div>
         <div className="flex items-center gap-4">

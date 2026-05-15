@@ -20,12 +20,12 @@ import { ChainActivityPanel } from '@/components/portfolio/ChainActivityPanel';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
-// ── Palette ──────────────────────────────────────────────────────────────────
+// ── Palette — dark-mode first (wallpaper is black) ─────────────────────────
 const BG   = "transparent";
-const INK  = "#050505";
-const MUTED = "rgba(5,5,5,0.45)";
-const BORDER = "rgba(5,5,5,0.08)";
-const CARD  = "rgba(255, 255, 255, 0.4)";
+const INK  = "#F5F5F5";         // white text on dark bg
+const MUTED = "rgba(255,255,255,0.45)";
+const BORDER = "rgba(255,255,255,0.08)";
+const CARD  = "rgba(255, 255, 255, 0.05)";
 
 // ── Chain color map ──────────────────────────────────────────────────────────
 const CHAIN_COLORS: Record<string, string> = {
@@ -266,7 +266,7 @@ export default function PortfolioPage() {
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b"
         style={{
-          background: "rgba(250,249,246,0.92)",
+          background: "rgba(0, 0, 0, 0.60)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
           borderColor: BORDER
@@ -372,7 +372,7 @@ export default function PortfolioPage() {
               {/* 24h pill */}
               <div
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-black text-sm border ${
-                  isPositive ? "text-emerald-700 bg-emerald-50 border-emerald-200" : "text-rose-600 bg-rose-50 border-rose-200"
+                  isPositive ? "text-emerald-400 bg-emerald-950/60 border-emerald-700/40" : "text-rose-400 bg-rose-950/60 border-rose-700/40"
                 }`}
               >
                 {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
@@ -727,20 +727,20 @@ export default function PortfolioPage() {
 
                   return (
                     <>
-                      <div className="space-y-2 border-r border-black/5 last:border-0 pr-4">
-                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
+                      <div className="space-y-2 border-r border-white/5 last:border-0 pr-4">
+                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-white/40">
                            <Activity size={12} /> Dominance
                         </div>
-                        <div className="text-xl font-black font-mono text-black">
+                        <div className="text-xl font-black font-mono text-white">
                            {safeToFixed(topPct, 1)}% <span className="text-[11px] uppercase ml-1 opacity-50">{topAsset?.symbol || 'N/A'}</span>
                         </div>
                       </div>
                       
-                      <div className="space-y-2 border-r border-black/5 last:border-0 pr-4">
-                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
+                      <div className="space-y-2 border-r border-white/5 last:border-0 pr-4">
+                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-white/40">
                            <ShieldCheck size={12} /> Stablecoin Hedge
                         </div>
-                        <div className="text-xl font-black font-mono text-black">
+                        <div className="text-xl font-black font-mono text-white">
                            {safeToFixed(stablePct, 1)}%
                         </div>
                       </div>

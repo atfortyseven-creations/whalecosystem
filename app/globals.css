@@ -1252,3 +1252,40 @@ html.no-hw-accel * {
     zoom: 0.5;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   UNIVERSAL DARK MODE — Glass Surface System
+   Applied globally when html.dark is active (default theme = dark).
+   Ensures text is always readable over the black wallpaper.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Force all generic solid-white page shells to transparent in dark mode */
+html.dark [class*="bg-white"]:not([class*="bg-white/"]):not(button):not(a):not(input):not(textarea):not(select):not(img):not(svg):not(span):not(p):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+  background-color: transparent !important;
+}
+
+/* Text contrast enforcement — dark mode primary text is white */
+html.dark body {
+  color: #F5F5F5;
+}
+
+/* Ensure all min-h-screen wrappers are transparent, not white */
+html.dark .min-h-screen:not([class*="bg-[#"]):not([class*="bg-black"]):not([class*="bg-white/"]):not([class*="bg-slate"]):not([class*="bg-transparent"]) {
+  background-color: transparent !important;
+}
+
+/* Section blend overlays: in dark mode they should fade to transparent/black */
+html.dark .section-blend-top {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%) !important;
+}
+html.dark .section-blend-bottom {
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%) !important;
+}
+
+/* Remove remaining cream/ivory hardcoded backgrounds in dark mode */
+html.dark [style*="#FDFCF8"],
+html.dark [style*="#FAF9F6"],
+html.dark [style*="#FFFDF8"] {
+  background-color: transparent !important;
+}
+

@@ -35,7 +35,7 @@ function renderBody(description: string) {
   return rawParagraphs.map((para, i) => {
     if (para.startsWith('## ')) {
       return (
-        <h2 key={i} className="font-sans text-2xl font-bold tracking-tight text-[#0A0A0A] mt-12 mb-6 pb-2 border-b border-black/5">
+        <h2 key={i} className="font-sans text-2xl font-bold tracking-tight text-[#0A0A0A] dark:text-white mt-12 mb-6 pb-2 border-b border-black/5 dark:border-white/10">
           {para.replace(/^##\s+/, '')}
         </h2>
       );
@@ -49,7 +49,7 @@ function renderBody(description: string) {
     }
     if (para.startsWith('> ')) {
       return (
-        <blockquote key={i} className="pl-6 border-l-2 border-[#0044CC] my-8 font-serif text-[20px] italic leading-[1.7] text-[#222]">
+        <blockquote key={i} className="pl-6 border-l-2 border-[#0044CC] my-8 font-serif text-[20px] italic leading-[1.7] text-[#222] dark:text-white/80">
           {para.replace(/^>\s+/, '')}
         </blockquote>
       );
@@ -57,7 +57,7 @@ function renderBody(description: string) {
     if (/^[-•]\s/.test(para)) {
       const items = para.split('\n').map(l => l.replace(/^[-•]\s+/, '').trim()).filter(Boolean);
       return (
-        <ul key={i} className="list-none pl-4 my-6 space-y-3 font-serif text-[18px] leading-[1.8] text-[#111]">
+        <ul key={i} className="list-none pl-4 my-6 space-y-3 font-serif text-[18px] leading-[1.8] text-[#111] dark:text-white/85">
           {items.map((item, j) => (
             <li key={j} className="relative pl-6">
               <span className="absolute left-0 top-[0.6em] w-1.5 h-1.5 bg-[#0044CC] opacity-60 rounded-sm"></span>
@@ -68,7 +68,7 @@ function renderBody(description: string) {
       );
     }
     return (
-      <p key={i} className={`${i === 0 ? 'text-[21px] leading-[1.8] font-normal text-[#000]' : 'text-[18px] leading-[1.85] text-[#1a1a1a]'} mb-6 tracking-[0.01em]`}>
+      <p key={i} className={`${i === 0 ? 'text-[21px] leading-[1.8] font-normal text-[#000] dark:text-white' : 'text-[18px] leading-[1.85] text-[#1a1a1a] dark:text-white/85'} mb-6 tracking-[0.01em]`}>
         {para}
       </p>
     );
@@ -134,8 +134,8 @@ function FullReportContent() {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center bg-transparent">
         <ShieldCheck size={48} className="text-black/20 mb-6" />
-        <h1 className="font-sans text-2xl font-bold tracking-tight mb-2">Classified Dossier Unavailable</h1>
-        <p className="font-mono text-[11px] uppercase tracking-widest text-black/50 mb-8">The requested intelligence report cannot be located in current archives.</p>
+        <h1 className="font-sans text-2xl font-bold tracking-tight dark:text-white mb-2">Analysis Unavailable</h1>
+        <p className="font-mono text-[11px] uppercase tracking-widest text-black/50 dark:text-white/50 mb-8">The requested report cannot be located in current archives.</p>
         <Link href="/news" className="inline-flex items-center gap-2 px-6 py-3 bg-[#0A0A0A] text-white font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-[#222] transition-colors">
           <ArrowLeft size={14} /> Return to Terminal
         </Link>
@@ -146,8 +146,8 @@ function FullReportContent() {
   if (!article) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 bg-transparent">
-        <div className="w-8 h-8 border-2 border-black/10 border-t-black rounded-full animate-spin mb-4" />
-        <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">Decrypting Intelligence Protocol...</p>
+        <div className="w-8 h-8 border-2 border-white/10 border-t-white/60 rounded-full animate-spin mb-4" />
+        <p className="font-mono text-[10px] uppercase tracking-widest text-white/50">Loading Report...</p>
       </div>
     );
   }
@@ -158,10 +158,10 @@ function FullReportContent() {
       {/* Top Navigation Bar */}
       <nav className="sticky top-0 z-30 w-full bg-white/20 dark:bg-black/20 backdrop-blur-3xl border-b border-black/5 dark:border-white/5 px-6 md:px-12 py-4 flex items-center justify-between">
         <Link href="/news" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-black/5 transition-colors">
-            <ArrowLeft size={14} className="text-black/60 group-hover:text-black transition-colors" />
+          <div className="w-8 h-8 rounded-full border border-black/10 dark:border-white/10 flex items-center justify-center group-hover:bg-black/5 dark:group-hover:bg-white/5 transition-colors">
+            <ArrowLeft size={14} className="text-black/60 dark:text-white/60 group-hover:text-black dark:group-hover:text-white transition-colors" />
           </div>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/60 group-hover:text-black transition-colors">Return</span>
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/60 dark:text-white/60 group-hover:text-black dark:group-hover:text-white transition-colors">Return</span>
         </Link>
         <div className="flex items-center gap-2 text-black/40">
           {/* Verified Secure End-to-End - Removed for minimalism */}
@@ -171,24 +171,24 @@ function FullReportContent() {
       {/* Hero Header Area (No Image) */}
       <header className="max-w-[900px] mx-auto px-6 md:px-12 pt-20 pb-12">
         <div className="flex items-center gap-4 mb-8">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-black/40 flex items-center gap-1.5">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40 flex items-center gap-1.5">
             <Globe size={11} /> {article.source}
           </span>
         </div>
 
-        <h1 className="font-serif text-4xl md:text-5xl lg:text-[54px] leading-[1.1] font-normal tracking-tight text-[#0A0A0A] mb-8" style={{ textWrap: 'balance' as any }}>
+        <h1 className="font-serif text-4xl md:text-5xl lg:text-[54px] leading-[1.1] font-normal tracking-tight text-[#0A0A0A] dark:text-white mb-8" style={{ textWrap: 'balance' as any }}>
           {article.title}
         </h1>
 
         <div className="flex flex-wrap items-center gap-6 py-6 border-y border-black/10">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/60">
-            <Calendar size={14} className="text-black/40" /> {formatFullDate(article.date)}
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/60 dark:text-white/60">
+            <Calendar size={14} className="text-black/40 dark:text-white/40" /> {formatFullDate(article.date)}
           </div>
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/60">
-            <Clock size={14} className="text-black/40" /> {formatTime(article.date)}
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/60 dark:text-white/60">
+            <Clock size={14} className="text-black/40 dark:text-white/40" /> {formatTime(article.date)}
           </div>
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/60">
-            <BookOpen size={14} className="text-black/40" /> {readTime} min analysis
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-black/60 dark:text-white/60">
+            <BookOpen size={14} className="text-black/40 dark:text-white/40" /> {readTime} min analysis
           </div>
           {article.url && article.url.startsWith('http') && (
             <a href={article.url} target="_blank" rel="noopener noreferrer" className="ml-auto flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-widest text-[#0044CC] hover:text-[#002266] transition-colors">
@@ -201,7 +201,7 @@ function FullReportContent() {
       {/* Executive Intelligence Brief - Removed for minimalism */}
 
       {/* Main Content Body */}
-      <main className="max-w-[800px] mx-auto px-6 md:px-12 font-serif text-[#111]">
+      <main className="max-w-[800px] mx-auto px-6 md:px-12 font-serif text-[#111] dark:text-white/90">
         {renderBody(article.description ?? '')}
       </main>
 
@@ -216,8 +216,8 @@ function FullReportContent() {
               ID: {article.id.substring(0, 16)}
             </div>
           </div>
-          <p className="font-mono text-[9px] leading-[1.8] uppercase tracking-[0.05em] text-black/30 text-justify">
-            The documentation presented herein constitutes comprehensive analytical research intended strictly for macro-educational and institutional review purposes. Under no jurisdiction should this compilation be interpreted as bespoke financial instruction, legal consultation, or definitive market foresight. Engaging with digital sovereignty frameworks and volatile market paradigms inherently carries profound capital risk. Data encapsulated reflects synchronized snapshots at the exact moment of protocol formulation. Extrapolating historical metrics to forecast future viability remains empirically unverified. Discretion is absolute.
+          <p className="font-mono text-[9px] leading-[1.8] uppercase tracking-[0.05em] text-black/30 dark:text-white/30 text-justify">
+            Research presented here is for educational and informational purposes only. Not financial advice. Digital asset markets carry significant risk. Data reflects information at time of publication.
           </p>
         </div>
       </footer>
@@ -230,7 +230,7 @@ function FullReportContent() {
             {allArticles.map(rel => (
               <Link key={rel.id} href={`/whalepost/full-report?id=${encodeURIComponent(rel.id)}`} className="group block bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-black/10 dark:border-white/10 p-6 hover:shadow-xl transition-all duration-300 rounded-sm">
                 <span className="block font-mono text-[9px] font-bold uppercase tracking-widest text-black/40 mb-3">{formatFullDate(rel.date)}</span>
-                <h4 className="font-serif text-[17px] leading-[1.4] text-[#0A0A0A] group-hover:text-[#0044CC] transition-colors line-clamp-3">
+                <h4 className="font-serif text-[17px] leading-[1.4] text-[#0A0A0A] dark:text-white group-hover:text-[#0044CC] dark:group-hover:text-blue-400 transition-colors line-clamp-3">
                   {rel.title}
                 </h4>
               </Link>
