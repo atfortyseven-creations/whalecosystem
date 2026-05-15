@@ -12,7 +12,7 @@ export const useSanitizer = (content: string) => {
         if (typeof window === 'undefined') return content; // SSR passthrough (rely on client hydration for cleanup)
 
         return DOMPurify.sanitize(content, {
-            ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'span'],
+            ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'br', 'hr'],
             ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
             FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input'],
         });

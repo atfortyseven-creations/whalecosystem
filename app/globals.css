@@ -229,8 +229,9 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 
 
   ::selection {
-    background-color: rgba(209, 37, 199, 0.3); /* #D125C7 with 30% opacity */
-    color: var(--aztec-ink);
+    /* Institutional neutral — no brand-mismatched magenta */
+    background-color: rgba(0, 0, 0, 0.10);
+    color: #050505;
   }
 
    /* input/select/textarea: iOS auto-zoom prevention (16px minimum)
@@ -448,26 +449,19 @@ body,
     scroll-behavior: smooth !important;
   }
 
-  /* Hardware acceleration removed from massive columns to prevent GPU texture memory overflow (black squares on scroll) */
-
-  /* Disable absolutely all expensive backdrop-filters on mobile.
+  /* Disable expensive backdrop-filters on mobile.
      This is the #1 cause of 60fps drops on mobile WebKit.
-     IMPORTANT: fallback must be white/transparent — NOT dark — to avoid
-     making white landing cards appear black on mobile. */
-  .backdrop-blur-sm, 
-  .backdrop-blur-md, 
-  .glass-vault, 
-  .glass-premium, 
+     Components define their own solid background fallbacks. */
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .glass-vault,
+  .glass-premium,
   .glass-sovereign {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    /* No forced background-color here — components define their own solid fallbacks */
   }
-
-  /* Disable expensive box shadows on mobile */
-  * {
-    box-shadow: none !important;
-  }
+  /* NOTE: box-shadow intentionally NOT removed — shadows are critical
+     for visual depth on cards, modals and buttons on mobile. */
 }
 
   .font-aztec-serif {
@@ -938,11 +932,13 @@ html.forum-light-mode {
 
 /* Minimum touch target size for buttons on mobile */
 @media (max-width: 1023px) {
-  button, a, [role="button"] {
+  /* WCAG 2.5.5 minimum touch target — applied only to non-icon buttons/links.
+     Icon-only controls use .icon-btn class and are excluded. */
+  button:not(.icon-btn),
+  a:not(.icon-link),
+  [role="button"]:not(.icon-btn) {
     min-height: 44px;
-    min-width: 44px;
   }
-  /* Slightly larger tap targets on very small phones */
 }
 
 /* Reduce blur on mobile for GPU budget */
@@ -1209,19 +1205,7 @@ html.no-hw-accel * {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   SOVEREIGN DYNAMIC SETTINGS CLASSES
+   NOTE: html.hide-balances and html.no-hw-accel rules are defined above
+   (lines ~1141–1185). Duplicate declarations removed here to prevent
+   CSS specificity conflicts.
    ────────────────────────────────────────────────────────────────────────── */
-
-/* Show Balances: hide-balances class */
-html.hide-balances .balance-value,
-html.hide-balances [data-balance],
-html.hide-balances .privacy-sensitive {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-/* Hardware Acceleration: disable GPU compositing hints */
-html.no-hw-accel * {
-  will-change: auto !important;
-}

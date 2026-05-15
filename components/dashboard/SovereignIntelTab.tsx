@@ -37,13 +37,13 @@ const SovereignIntelTab: React.FC = () => {
     );
 
     return (
-        <div className="w-full h-full min-h-0 flex flex-col p-4 overflow-hidden bg-[#FAF9F6]">
+        <div className="w-full h-full min-h-0 flex flex-col p-4 overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A]">
             {/* Header */}
-            <div className="px-6 py-5 border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0">
+            <div className="px-6 py-5 border border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0">
                 <div>
                     <div className="flex items-center gap-3 mb-1">
-                        <Layers className="text-[#050505]" size={20} />
-                        <h1 className="text-xl md:text-2xl font-black tracking-tighter text-[#050505] uppercase">
+                        <Layers className="text-[#050505] dark:text-white" size={20} />
+                        <h1 className="text-xl md:text-2xl font-black tracking-tighter text-[#050505] dark:text-white uppercase">
                             Sovereign Intel
                         </h1>
                     </div>
@@ -55,9 +55,9 @@ const SovereignIntelTab: React.FC = () => {
                 <div className="flex items-center gap-4">
                     <div className="text-right">
                         <p className="text-[9px] uppercase tracking-widest text-[#888888] mb-1">Network Identity</p>
-                        <p className="text-[11px] font-black text-[#050505]">SAL-GENESIS-NODE-01</p>
+                        <p className="text-[11px] font-black text-[#050505] dark:text-white">SAL-GENESIS-NODE-01</p>
                     </div>
-                    <div className={`w-2.5 h-2.5 rounded-full ${isNodeActive ? 'bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.5)]' : 'bg-[#E5E5E5]'} transition-all`} />
+                    <div className={`w-2.5 h-2.5 rounded-full ${isNodeActive ? 'bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.5)]' : 'bg-[#E5E5E5] dark:bg-white/10'} transition-all`} />
                 </div>
             </div>
 
@@ -107,17 +107,17 @@ const SovereignIntelTab: React.FC = () => {
                         {/* Node Control / Network Map row */}
                         <div className="shrink-0 grid grid-cols-1 lg:grid-cols-3 gap-4">
                             {/* Node Control Center */}
-                            <Card className="lg:col-span-2 border-[#E5E5E5] bg-[#FFFFFF] shadow-sm relative overflow-hidden rounded-2xl">
-                                <CardHeader className="flex flex-row items-center justify-between border-b border-[#F0F0F0] pb-4">
+                            <Card className="lg:col-span-2 border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] shadow-sm relative overflow-hidden rounded-2xl">
+                                <CardHeader className="flex flex-row items-center justify-between border-b border-[#F0F0F0] dark:border-white/10 pb-4">
                                     <div className="space-y-0.5">
-                                        <CardTitle className="text-[#050505] tracking-widest text-[11px] uppercase font-black">
+                                        <CardTitle className="text-[#050505] dark:text-white tracking-widest text-[11px] uppercase font-black">
                                             Eternal Node Configuration
                                         </CardTitle>
                                         <p className="text-[9px] text-[#888888] uppercase tracking-widest font-bold">
                                             Browser-Based Gossip Propagation Hub
                                         </p>
                                     </div>
-                                    <Badge variant={isNodeActive ? "default" : "outline"} className={`px-3 py-1 uppercase tracking-widest text-[9px] font-black ${isNodeActive ? 'bg-[#00C076] hover:bg-[#00C076]/90 text-white border-transparent' : 'text-[#888888] border-[#E5E5E5]'}`}>
+                                    <Badge variant={isNodeActive ? "default" : "outline"} className={`px-3 py-1 uppercase tracking-widest text-[9px] font-black ${isNodeActive ? 'bg-[#00C076] hover:bg-[#00C076]/90 text-white border-transparent' : 'text-[#888888] border-[#E5E5E5] dark:border-white/10'}`}>
                                         {isNodeActive ? 'Active • Gossiping' : 'Dormant'}
                                     </Badge>
                                 </CardHeader>
@@ -132,9 +132,9 @@ const SovereignIntelTab: React.FC = () => {
                                                         setIsNodeActive(val);
                                                         addLog(val ? 'Requesting Node Bootstrap...' : 'Deactivating Node...', val ? 'info' : 'warning');
                                                     }}
-                                                    className="data-[state=checked]:bg-[#050505]"
+                                                    className="data-[state=checked]:bg-[#050505] dark:data-[state=checked]:bg-white"
                                                 />
-                                                <label htmlFor="node-toggle" className="text-sm font-black text-[#050505] cursor-pointer">
+                                                <label htmlFor="node-toggle" className="text-sm font-black text-[#050505] dark:text-white cursor-pointer">
                                                     {isNodeActive ? 'Autonomous Status: ACTIVE' : 'Activate Eternal Node'}
                                                 </label>
                                             </div>
@@ -144,11 +144,11 @@ const SovereignIntelTab: React.FC = () => {
                                         </div>
                                         
                                         <div className="grid grid-cols-2 gap-3 w-full md:w-auto">
-                                            <div className="p-4 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] text-center">
+                                            <div className="p-4 rounded-xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-center">
                                                 <p className="text-[9px] text-[#888888] uppercase tracking-widest mb-1 font-bold">Active Peers</p>
-                                                <p className="text-xl font-black text-[#050505]">{nodeMetrics.peers}</p>
+                                                <p className="text-xl font-black text-[#050505] dark:text-white">{nodeMetrics.peers}</p>
                                             </div>
-                                            <div className="p-4 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] text-center">
+                                            <div className="p-4 rounded-xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-center">
                                                 <p className="text-[9px] text-[#888888] uppercase tracking-widest mb-1 font-bold">Latency</p>
                                                 <p className="text-xl font-black text-[#00C076]">{isNodeActive ? 'Active' : '--'}</p>
                                             </div>
@@ -158,18 +158,18 @@ const SovereignIntelTab: React.FC = () => {
                             </Card>
 
                             <div className="space-y-4">
-                                <Suspense fallback={<div className="h-44 rounded-2xl bg-[#E5E5E5]" />}>
+                                <Suspense fallback={<div className="h-44 rounded-2xl bg-[#E5E5E5] dark:bg-[#1A1A1A]" />}>
                                     <WalkawayPanel />
                                 </Suspense>
                             </div>
                         </div>
 
                         {/* MATRIX DIRECTIVES */}
-                        <div className="flex-1 min-h-0 w-full flex flex-col border border-[#E5E5E5] rounded-2xl bg-[#FFFFFF] overflow-hidden shadow-sm">
-                            <div className="px-5 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between shrink-0">
+                        <div className="flex-1 min-h-0 w-full flex flex-col border border-[#E5E5E5] dark:border-white/10 rounded-2xl bg-[#FFFFFF] dark:bg-[#111111] overflow-hidden shadow-sm">
+                            <div className="px-5 py-3 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#1A1A1A] flex items-center justify-between shrink-0">
                                 <div className="flex items-center gap-2">
-                                    <Zap className="text-[#050505]" size={14} />
-                                    <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]">
+                                    <Zap className="text-[#050505] dark:text-white" size={14} />
+                                    <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white">
                                         Intelligence Directives
                                     </h2>
                                 </div>
@@ -178,13 +178,13 @@ const SovereignIntelTab: React.FC = () => {
                                         value={vossSearch}
                                         onChange={e => setVossSearch(e.target.value)}
                                         placeholder="Filter directives..."
-                                        className="bg-[#FFFFFF] border border-[#E5E5E5] px-3 py-1.5 rounded-lg text-[10px] font-medium outline-none focus:border-[#050505] transition-colors w-64 placeholder:text-[#888888] text-[#050505]"
+                                        className="bg-[#FFFFFF] dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 px-3 py-1.5 rounded-lg text-[10px] font-medium outline-none focus:border-[#050505] dark:focus:border-white transition-colors w-64 placeholder:text-[#888888] text-[#050505] dark:text-white"
                                     />
                                 </div>
                             </div>
                             
                             {/* The list header */}
-                            <div className="grid grid-cols-12 gap-4 px-5 py-2.5 bg-[#FAF9F6] border-b border-[#F0F0F0] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em] shrink-0">
+                            <div className="grid grid-cols-12 gap-4 px-5 py-2.5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#F0F0F0] dark:border-white/10 text-[9px] font-black text-[#888888] uppercase tracking-[0.18em] shrink-0">
                                 <div className="col-span-1">ID</div>
                                 <div className="col-span-3">Directive</div>
                                 <div className="col-span-4">Description</div>
@@ -194,18 +194,18 @@ const SovereignIntelTab: React.FC = () => {
 
                             <div className="flex-1 overflow-y-auto custom-scrollbar">
                                 {filteredVoss.map(item => (
-                                    <div key={item.id} className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors items-start">
+                                    <div key={item.id} className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-[#F0F0F0] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-colors items-start">
                                         <div className="col-span-1 text-[10px] font-black text-[#888888] pt-0.5">
                                             #{item.id}
                                         </div>
                                         <div className="col-span-3 space-y-0.5">
-                                            <div className="text-[11px] font-black text-[#050505]">{item.title}</div>
+                                            <div className="text-[11px] font-black text-[#050505] dark:text-white">{item.title}</div>
                                             <div className="text-[8px] text-[#888888] font-bold uppercase tracking-widest">{item.categoryName}</div>
                                         </div>
                                         <div className="col-span-4 text-[10px] text-[#888888] leading-relaxed font-medium">
                                             {item.description}
                                         </div>
-                                        <div className="col-span-2 text-[10px] text-[#050505] font-bold leading-relaxed pt-0.5">
+                                        <div className="col-span-2 text-[10px] text-[#050505] dark:text-white font-bold leading-relaxed pt-0.5">
                                             {item.competitiveEdge}
                                         </div>
                                         <div className="col-span-2 flex items-center justify-end">
@@ -239,19 +239,19 @@ const MetricCard = ({ title, value, subtitle, icon, accent }: {
         green: 'text-[#00C076]',
         amber: 'text-[#FF9500]',
         red: 'text-[#FF3B30]',
-        black: 'text-[#050505]'
+        black: 'text-[#050505] dark:text-white'
     };
     
     return (
-        <Card className="border-[#E5E5E5] bg-[#FFFFFF] shadow-sm rounded-2xl group hover:border-[#050505]/20 transition-all flex flex-col justify-between p-4">
+        <Card className="border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] shadow-sm rounded-2xl group hover:border-[#050505]/20 dark:hover:border-white/20 transition-all flex flex-col justify-between p-4">
             <div>
                 <div className="flex items-center justify-between mb-3">
                     <span className="text-[9px] uppercase tracking-[0.15em] text-[#888888] font-black">{title}</span>
-                    <span className="text-[#888888] group-hover:text-[#050505] transition-colors">{icon}</span>
+                    <span className="text-[#888888] group-hover:text-[#050505] dark:group-hover:text-white transition-colors">{icon}</span>
                 </div>
                 <div className={`text-2xl lg:text-3xl font-black ${colors[accent]} tracking-tighter`}>{value}</div>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#F0F0F0]">
+            <div className="mt-4 pt-3 border-t border-[#F0F0F0] dark:border-white/10">
                 <p className="text-[9px] uppercase tracking-widest text-[#888888] font-bold">{subtitle}</p>
             </div>
         </Card>

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Clock as ClockIcon, Search, Hash, Target, ChevronRight } from 'lucide-react';
 import { ACADEMY_MODULES } from '@/lib/data/academy-data';
+import { safeHTML } from '@/hooks/useSanitizer';
 
 // ─── CORPORATE MINI LOGO ───
 function AcademyLogo() {
@@ -61,7 +62,7 @@ const ArticleBlock = memo(function ArticleBlock({
                 prose-a:text-[#06b6d4] prose-a:font-bold hover:prose-a:text-[#00FFAA]
                 prose-blockquote:border-l-4 prose-blockquote:border-[#111111] prose-blockquote:bg-[#111111]/[0.02] prose-blockquote:p-6 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-blockquote:text-[#333333] prose-blockquote:font-medium
                 prose-code:bg-[#111111]/5 prose-code:text-[#111111] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none"
-                dangerouslySetInnerHTML={{ __html: article.content }}
+                dangerouslySetInnerHTML={safeHTML(article.content)}
             />
         </article>
     );

@@ -36,11 +36,11 @@ function Skeleton({ count = 6 }) {
     return (
         <div className="flex flex-col gap-3 p-6">
             {Array.from({ length: count }).map((_, i) => (
-                <div key={i} className="flex gap-4 p-5 border border-[#E5E5E5] bg-[#FAF9F6] rounded-2xl">
-                    <div className="w-12 h-12 bg-[#E5E5E5] rounded-xl animate-pulse" />
+                <div key={i} className="flex gap-4 p-5 border border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#1A1A1A] rounded-2xl">
+                    <div className="w-12 h-12 bg-[#E5E5E5] dark:bg-[#222222] rounded-xl animate-pulse" />
                     <div className="flex-1 space-y-3">
-                        <div className="h-5 bg-[#E5E5E5] rounded w-3/4 animate-pulse" />
-                        <div className="h-3 bg-[#E5E5E5] rounded w-1/4 animate-pulse" />
+                        <div className="h-5 bg-[#E5E5E5] dark:bg-[#222222] rounded w-3/4 animate-pulse" />
+                        <div className="h-3 bg-[#E5E5E5] dark:bg-[#222222] rounded w-1/4 animate-pulse" />
                     </div>
                 </div>
             ))}
@@ -151,32 +151,32 @@ export default function PolymarketPanel() {
     };
 
     if (!mounted) {
-        return <div className="flex flex-col h-[calc(100vh-105px)] bg-[#FFFFFF] items-center justify-center"><Loader2 size={32} className="animate-spin text-[#E5E5E5]" /></div>;
+        return <div className="flex flex-col h-[calc(100vh-105px)] bg-[#FFFFFF] dark:bg-[#0A0A0A] items-center justify-center"><Loader2 size={32} className="animate-spin text-[#E5E5E5] dark:text-white/20" /></div>;
     }
 
     return (
-        <div className="flex flex-col flex-1 h-full min-h-0 bg-[#FFFFFF] text-[#111111] font-sans">
+        <div className="flex flex-col flex-1 h-full min-h-0 bg-[#FFFFFF] dark:bg-[#0A0A0A] text-[#111111] dark:text-white font-sans">
             {/* Controls */}
-            <div className="flex flex-wrap items-center gap-4 p-6 border-b border-[#E5E5E5] bg-[#FAF9F6]">
+            <div className="flex flex-wrap items-center gap-4 p-6 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111]">
                 <div className="relative flex-1 min-w-[250px] max-w-md">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888]" />
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888] dark:text-white/40" />
                     <input 
                         value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="Search institutional markets..." 
-                        className="w-full bg-white border border-[#E5E5E5] rounded-xl pl-11 pr-4 py-3 text-xs font-bold text-[#050505] outline-none focus:border-[#050505] transition-all shadow-sm"
+                        className="w-full bg-white dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-xl pl-11 pr-4 py-3 text-xs font-bold text-[#050505] dark:text-white outline-none focus:border-[#050505] dark:focus:border-white transition-all shadow-sm"
                     />
                 </div>
-                <div className="flex bg-[#E5E5E5]/40 p-1.5 rounded-xl border border-[#E5E5E5]">
+                <div className="flex bg-[#E5E5E5]/40 dark:bg-white/5 p-1.5 rounded-xl border border-[#E5E5E5] dark:border-white/10">
                     {['all', 'crypto', 'politics', 'sports', 'business'].map(c => (
                         <button 
                             key={c} onClick={() => setCategory(c)}
-                            className={`px-4 py-2 rounded-lg text-xs font-bold tracking-widest uppercase transition-all shadow-sm ${category === c ? 'bg-[#FFFFFF] text-[#111111] border border-[#E5E5E5]' : 'text-[#888888] hover:text-[#111111] border border-transparent hover:bg-white/50'}`}
+                            className={`px-4 py-2 rounded-lg text-xs font-bold tracking-widest uppercase transition-all shadow-sm ${category === c ? 'bg-[#FFFFFF] dark:bg-[#0A0A0A] text-[#111111] dark:text-white border border-[#E5E5E5] dark:border-white/10' : 'text-[#888888] dark:text-white/60 hover:text-[#111111] dark:hover:text-white border border-transparent hover:bg-white/50 dark:hover:bg-white/10'}`}
                         >
                             {c}
                         </button>
                     ))}
                 </div>
-                <button onClick={() => refetch()} className="ml-auto text-[#888888] hover:text-[#111111] flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border border-[#E5E5E5] rounded-xl px-4 py-3 bg-[#FFFFFF] shadow-sm hover:border-[#111111]/20 transition-all">
+                <button onClick={() => refetch()} className="ml-auto text-[#888888] dark:text-white/60 hover:text-[#111111] dark:hover:text-white flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border border-[#E5E5E5] dark:border-white/10 rounded-xl px-4 py-3 bg-[#FFFFFF] dark:bg-[#1A1A1A] shadow-sm hover:border-[#111111]/20 dark:hover:border-white/20 transition-all">
                     <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> SYNC
                 </button>
             </div>
@@ -184,14 +184,14 @@ export default function PolymarketPanel() {
             {/* Markets List */}
             <div className="flex flex-1 overflow-hidden relative">
                 {geoBlocked && (
-                    <div className="absolute inset-0 z-50 flex items-center justify-center p-8 bg-[#FAF9F6] backdrop-blur-sm">
-                        <div className="max-w-md w-full p-10 border border-red-200 bg-red-50 rounded-[2rem] text-center flex flex-col items-center">
+                    <div className="absolute inset-0 z-50 flex items-center justify-center p-8 bg-[#FAF9F6]/80 dark:bg-[#000000]/80 backdrop-blur-sm">
+                        <div className="max-w-md w-full p-10 border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 rounded-[2rem] text-center flex flex-col items-center">
                             <ShieldCheck size={64} className="text-red-500 mb-6 opacity-80" />
-                            <h3 className="text-2xl font-black text-[#111111] uppercase tracking-tighter mb-3">GEO-RESTRICTED AREA</h3>
-                            <p className="text-xs font-bold font-mono text-red-800 uppercase tracking-widest leading-relaxed">
+                            <h3 className="text-2xl font-black text-[#111111] dark:text-white uppercase tracking-tighter mb-3">GEO-RESTRICTED AREA</h3>
+                            <p className="text-xs font-bold font-mono text-red-800 dark:text-red-400 uppercase tracking-widest leading-relaxed">
                                 Market data and trading features are blocked for your jurisdiction due to regulatory constraints (CFTC/OFAC).
                             </p>
-                            <a href="/docs/legal/TERMS_OF_SERVICE.md" target="_blank" className="mt-8 text-[10px] font-black uppercase text-red-900 border border-red-300 px-6 py-3 rounded-full hover:bg-red-200 transition-colors inline-block">
+                            <a href="/docs/legal/TERMS_OF_SERVICE.md" target="_blank" className="mt-8 text-[10px] font-black uppercase text-red-900 dark:text-red-300 border border-red-300 dark:border-red-800 px-6 py-3 rounded-full hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors inline-block">
                                 Review Terms of Service
                             </a>
                         </div>
@@ -205,15 +205,15 @@ export default function PolymarketPanel() {
                             key={m.id}
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                             onClick={() => setSelected(selected?.id === m.id ? null : m)}
-                            className={`flex gap-5 p-5 rounded-[1.5rem] border cursor-pointer transition-all ${selected?.id === m.id ? 'bg-[#FAF9F6] border-[#111111]/20 shadow-md' : 'bg-[#FFFFFF] border-[#E5E5E5] hover:border-[#111111]/10 hover:shadow-sm'}`}
+                            className={`flex gap-5 p-5 rounded-[1.5rem] border cursor-pointer transition-all ${selected?.id === m.id ? 'bg-[#FAF9F6] dark:bg-[#1A1A1A] border-[#111111]/20 dark:border-white/20 shadow-md' : 'bg-[#FFFFFF] dark:bg-[#111111] border-[#E5E5E5] dark:border-white/10 hover:border-[#111111]/10 dark:hover:border-white/20 hover:shadow-sm'}`}
                         >
-                            <div className="w-14 h-14 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                            <div className="w-14 h-14 rounded-xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                                 {m.image ? <img src={m.image} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.querySelector('svg')?.setAttribute('style', 'display: block'); }} /> : null}
-                                <Banknote size={24} className="text-[#888888] scale-110" style={{ display: m.image ? 'none' : 'block' }} />
+                                <Banknote size={24} className="text-[#888888] dark:text-white/40 scale-110" style={{ display: m.image ? 'none' : 'block' }} />
                             </div>
                             <div className="flex-1 overflow-hidden">
-                                <h3 className="text-base font-black text-[#111111] tracking-tight leading-snug mb-2 truncate max-w-[90%]">{m.question}</h3>
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-[#888888] uppercase tracking-widest flex-wrap">
+                                <h3 className="text-base font-black text-[#111111] dark:text-white tracking-tight leading-snug mb-2 truncate max-w-[90%]">{m.question}</h3>
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-[#888888] dark:text-white/60 uppercase tracking-widest flex-wrap">
                                     {m.active && !m.closed ? (
                                         <span className="bg-[#00ffa8]/10 text-[#00dda8] px-2 py-0.5 rounded border border-[#00dda8]/20 flex items-center gap-1">
                                             <span className="w-1.5 h-1.5 rounded-full bg-[#00dda8] animate-pulse"/> OPEN
@@ -223,7 +223,7 @@ export default function PolymarketPanel() {
                                             CLOSED
                                         </span>
                                     )}
-                                    <span className="bg-[#E5E5E5]/50 px-2 py-0.5 rounded text-[#111111]">{m.category}</span>
+                                    <span className="bg-[#E5E5E5]/50 dark:bg-white/10 px-2 py-0.5 rounded text-[#111111] dark:text-white">{m.category}</span>
                                     <span>•</span>
                                     <span>VOL: {fmtUsd(m.volume24h)}</span>
                                     {m.endDate && (
@@ -268,45 +268,45 @@ export default function PolymarketPanel() {
                             animate={{ x: 0, opacity: 1 }} 
                             exit={{ x: '100%', opacity: 0 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="w-[420px] shrink-0 border-l border-[#E5E5E5] bg-[#FFFFFF] flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.03)] h-full z-20"
+                            className="w-[420px] shrink-0 border-l border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#0A0A0A] flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.03)] h-full z-20"
                         >
-                            <div className="p-8 border-b border-[#E5E5E5] bg-[#FAF9F6]">
+                            <div className="p-8 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111]">
                                 <div className="flex justify-between items-start mb-6">
-                                    <div className="w-16 h-16 rounded-2xl bg-white border border-[#E5E5E5] overflow-hidden shrink-0 shadow-sm p-1">
-                                        <div className="w-full h-full rounded-xl overflow-hidden relative bg-[#FAF9F6]">
+                                    <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 overflow-hidden shrink-0 shadow-sm p-1">
+                                        <div className="w-full h-full rounded-xl overflow-hidden relative bg-[#FAF9F6] dark:bg-[#111111]">
                                             {selected.image ? <img src={selected.image} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.querySelector('svg')?.setAttribute('style', 'display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);'); }} /> : null}
-                                            <Banknote size={24} className="text-[#888888] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ display: selected.image ? 'none' : 'block' }} />
+                                            <Banknote size={24} className="text-[#888888] dark:text-white/40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ display: selected.image ? 'none' : 'block' }} />
                                         </div>
                                     </div>
                                     <button 
                                         onClick={() => setSelected(null)}
-                                        className="text-[#888888] hover:text-[#111111] p-1 border border-transparent rounded hover:border-[#E5E5E5]"
+                                        className="text-[#888888] dark:text-white/60 hover:text-[#111111] dark:hover:text-white p-1 border border-transparent rounded hover:border-[#E5E5E5] dark:hover:border-white/10"
                                     >
                                         ✕
                                     </button>
                                 </div>
-                                <div className="flex items-center gap-1.5 text-[9px] font-black bg-[#E5E5E5]/50 text-[#888888] tracking-widest px-2.5 py-1 rounded inline-flex mb-3">
+                                <div className="flex items-center gap-1.5 text-[9px] font-black bg-[#E5E5E5]/50 dark:bg-white/10 text-[#888888] dark:text-white/60 tracking-widest px-2.5 py-1 rounded inline-flex mb-3">
                                     <ShieldCheck size={11} /> {isPolygon ? 'ON-CHAIN CTF EXECUTION' : 'CROSS-CHAIN ROUTING (ENSO)'}
                                 </div>
-                                <h2 className="text-xl font-black text-[#111111] leading-tight tracking-tight">{selected.question}</h2>
+                                <h2 className="text-xl font-black text-[#111111] dark:text-white leading-tight tracking-tight">{selected.question}</h2>
                             </div>
 
                             <div className="flex-1 p-8 space-y-8 overflow-y-auto">
                                 
                                 {/* ODDS IMPLICADAS REPLICA */}
-                                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-6 text-center shadow-sm">
-                                    <div className="flex items-center justify-center gap-2 text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] mb-6">
+                                <div className="bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-[2rem] p-6 text-center shadow-sm">
+                                    <div className="flex items-center justify-center gap-2 text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] dark:text-white/60 mb-6">
                                         IMPLIED ODDS
                                     </div>
                                     <div className="flex justify-between items-center px-4">
                                         <div className="flex-1 text-center">
                                             <div className="text-5xl font-black font-sans text-[#00e699] tracking-tighter mb-2">{Math.round(selected.yesPrice * 100)}%</div>
-                                            <div className="text-[10px] font-mono font-bold text-[#888888] uppercase tracking-widest">YES</div>
+                                            <div className="text-[10px] font-mono font-bold text-[#888888] dark:text-white/60 uppercase tracking-widest">YES</div>
                                         </div>
-                                        <div className="w-px h-16 bg-[#E5E5E5]" />
+                                        <div className="w-px h-16 bg-[#E5E5E5] dark:bg-white/10" />
                                         <div className="flex-1 text-center">
                                             <div className="text-5xl font-black font-sans text-[#f43f5e] tracking-tighter mb-2">{Math.round((1 - selected.yesPrice) * 100)}%</div>
-                                            <div className="text-[10px] font-mono font-bold text-[#888888] uppercase tracking-widest">NO</div>
+                                            <div className="text-[10px] font-mono font-bold text-[#888888] dark:text-white/60 uppercase tracking-widest">NO</div>
                                         </div>
                                     </div>
                                 </div>
@@ -314,41 +314,41 @@ export default function PolymarketPanel() {
                                 {/* INPUT REPLICA */}
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-center px-1">
-                                        <label className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] uppercase">POSITION SIZE (USDC)</label>
+                                        <label className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] dark:text-white/60 uppercase">POSITION SIZE (USDC)</label>
                                     </div>
                                     <div className="relative">
                                         <input 
                                             type="number" 
                                             value={tradeAmount} 
                                             onChange={e => setTradeAmount(e.target.value)}
-                                            className="w-full bg-[#FFFFFF] border-2 border-[#E5E5E5] rounded-2xl py-4 pl-6 pr-20 text-[#111111] font-mono font-black text-2xl outline-none focus:border-[#111111] transition-all"
+                                            className="w-full bg-[#FFFFFF] dark:bg-[#111111] border-2 border-[#E5E5E5] dark:border-white/10 rounded-2xl py-4 pl-6 pr-20 text-[#111111] dark:text-white font-mono font-black text-2xl outline-none focus:border-[#111111] dark:focus:border-white transition-all"
                                             placeholder="0"
                                         />
                                         <button 
                                             onClick={() => setTradeAmount(usdcBalance || '1000')} 
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-sans font-black bg-[#E5E5E5]/50 hover:bg-[#111111] hover:text-[#FFFFFF] text-[#111111] px-4 py-2 rounded-xl transition-all"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-sans font-black bg-[#E5E5E5]/50 dark:bg-white/10 hover:bg-[#111111] dark:hover:bg-white hover:text-[#FFFFFF] dark:hover:text-black text-[#111111] dark:text-white px-4 py-2 rounded-xl transition-all"
                                         >
                                             MAX
                                         </button>
                                     </div>
-                                    <div className="flex justify-end text-[10px] font-mono text-[#888888] font-bold px-1">
+                                    <div className="flex justify-end text-[10px] font-mono text-[#888888] dark:text-white/60 font-bold px-1">
                                         Bal: ${usdcBalance}
                                     </div>
                                 </div>
 
                                 {/* PAYOUT REPLICA */}
                                 <div className="space-y-3 pt-2">
-                                    <div className="flex justify-between items-center text-[12px] font-mono font-bold text-[#888888]">
+                                    <div className="flex justify-between items-center text-[12px] font-mono font-bold text-[#888888] dark:text-white/60">
                                         <span>Potential Payout (YES):</span>
                                         <span className="text-[#00e699] font-black">{fmtUsd(Number(tradeAmount) / selected.yesPrice)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-[12px] font-mono font-bold text-[#888888]">
+                                    <div className="flex justify-between items-center text-[12px] font-mono font-bold text-[#888888] dark:text-white/60">
                                         <span>Potential Payout (NO):</span>
                                         <span className="text-[#f43f5e] font-black">{fmtUsd(Number(tradeAmount) / (1 - selected.yesPrice))}</span>
                                     </div>
                                 </div>
                                 {/* BUY BUTTONS REPLICA */}
-                                <div className="p-6 border-t border-[#E5E5E5] bg-white flex gap-4">
+                                <div className="p-6 border-t border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] flex gap-4">
                                     <button 
                                         onClick={() => handleTrade('YES')}
                                         disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
@@ -367,7 +367,7 @@ export default function PolymarketPanel() {
                             </div>
                             
                             {!isPolygon && isConnected && (
-                                <div className="px-6 pb-6 bg-[#FFFFFF]">
+                                <div className="px-6 pb-6 bg-[#FFFFFF] dark:bg-[#111111]">
                                     <div className="w-full bg-[#0055ff]/5 text-[#0055ff] font-black uppercase tracking-widest text-[10px] py-3 px-4 rounded-xl flex justify-between items-center gap-2 border border-[#0055ff]/10">
                                         <span className="flex items-center gap-2"><AlertTriangle size={12} /> ROUTE: L2 ➔ POLYGON (~45s)</span>
                                         <button onClick={() => switchChain?.({ chainId: 137 })} className="underline hover:opacity-70 text-[9px]">SWITCH NATIVE</button>
@@ -379,7 +379,7 @@ export default function PolymarketPanel() {
                     )}
                 </AnimatePresence>
             </div>
-            {ts && <div className="text-[9px] font-mono font-black text-[#888888] p-3 border-t border-[#E5E5E5] bg-[#FAF9F6] text-center uppercase tracking-widest">
+            {ts && <div className="text-[9px] font-mono font-black text-[#888888] dark:text-white/60 p-3 border-t border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] text-center uppercase tracking-widest">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00FFAA] mr-2" />
                 CTF ROUTER SYNC: {ts}
             </div>}

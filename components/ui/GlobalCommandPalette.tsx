@@ -113,21 +113,21 @@ export function GlobalCommandPalette({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.97, y: -10 }}
               transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-auto w-full max-w-md bg-white border border-[#E8E8E8] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12),0_4px_16px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col"
+              className="pointer-events-auto w-full max-w-md bg-white dark:bg-[#111111] border border-[#E8E8E8] dark:border-white/10 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12),0_4px_16px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col"
               onClick={e => e.stopPropagation()}
               style={{ maxHeight: "72vh" }}
             >
               {/* Search Input */}
-              <div className="flex items-center px-4 py-3 border-b border-[#F0F0F0] gap-3 shrink-0">
-                <Search size={14} className="text-[#050505]/25 shrink-0" />
+              <div className="flex items-center px-4 py-3 border-b border-[#F0F0F0] dark:border-white/10 gap-3 shrink-0">
+                <Search size={14} className="text-[#050505]/25 dark:text-white/25 shrink-0" />
                 <input
                   autoFocus
-                  className="flex-1 bg-transparent border-none outline-none text-[#050505] placeholder:text-[#050505]/25 text-[13px] font-medium"
+                  className="flex-1 bg-transparent border-none outline-none text-[#050505] dark:text-white placeholder:text-[#050505]/25 dark:placeholder:text-white/25 text-[13px] font-medium"
                   placeholder="Go to..."
                   value={query}
                   onChange={e => { setQuery(e.target.value); setCursor(0); }}
                 />
-                <kbd className="text-[9px] font-black font-mono text-[#050505]/20 bg-[#050505]/[0.04] border border-[#050505]/[0.07] rounded px-1.5 py-0.5 leading-none shrink-0">
+                <kbd className="text-[9px] font-black font-mono text-[#050505]/20 dark:text-white/20 bg-[#050505]/[0.04] dark:bg-white/5 border border-[#050505]/[0.07] dark:border-white/5 rounded px-1.5 py-0.5 leading-none shrink-0">
                   ESC
                 </kbd>
               </div>
@@ -141,7 +141,7 @@ export function GlobalCommandPalette({
                     return (
                       <div key={group} className="mb-0.5">
                         <div className="px-4 pt-3 pb-1">
-                          <span className="text-[9px] font-black uppercase tracking-[0.22em] text-[#050505]/20">
+                          <span className="text-[9px] font-black uppercase tracking-[0.22em] text-[#050505]/20 dark:text-white/20">
                             {group}
                           </span>
                         </div>
@@ -149,15 +149,15 @@ export function GlobalCommandPalette({
                           <button
                             key={page.id}
                             onClick={() => { onTabChange(page.id); setIsOpen(false); }}
-                            className="w-full flex items-center justify-between px-4 py-2 hover:bg-[#050505]/[0.03] text-left transition-colors group"
+                            className="w-full flex items-center justify-between px-4 py-2 hover:bg-[#050505]/[0.03] dark:hover:bg-white/5 text-left transition-colors group"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="text-[12.5px] font-medium text-[#050505]/65 group-hover:text-[#050505] transition-colors">
+                              <span className="text-[12.5px] font-medium text-[#050505]/65 dark:text-white/65 group-hover:text-[#050505] dark:group-hover:text-white transition-colors">
                                 {page.label}
                               </span>
                             </div>
                             {(page as any).external && (
-                              <span className="text-[9px] text-[#050505]/15 mr-1">↗</span>
+                              <span className="text-[9px] text-[#050505]/15 dark:text-white/15 mr-1">↗</span>
                             )}
                           </button>
                         ))}
@@ -171,14 +171,14 @@ export function GlobalCommandPalette({
                         key={page.id}
                         onClick={() => { onTabChange(page.id); setIsOpen(false); }}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                          i === cursor ? "bg-[#050505]/[0.05]" : "hover:bg-[#050505]/[0.03]"
+                          i === cursor ? "bg-[#050505]/[0.05] dark:bg-white/10" : "hover:bg-[#050505]/[0.03] dark:hover:bg-white/5"
                         }`}
                       >
                         <div className="flex flex-col gap-0.5 min-w-0">
-                          <span className="text-[12.5px] font-medium text-[#050505]/80 truncate">
+                          <span className="text-[12.5px] font-medium text-[#050505]/80 dark:text-white/80 truncate">
                             {page.label}
                           </span>
-                          <span className="text-[8.5px] font-black uppercase tracking-widest text-[#050505]/20">
+                          <span className="text-[8.5px] font-black uppercase tracking-widest text-[#050505]/20 dark:text-white/20">
                             {page.group}
                           </span>
                         </div>
@@ -186,7 +186,7 @@ export function GlobalCommandPalette({
                     ))
                   ) : (
                     <div className="px-4 py-10 text-center">
-                      <span className="text-[11px] font-medium text-[#050505]/25">
+                      <span className="text-[11px] font-medium text-[#050505]/25 dark:text-white/25">
                         No results for &ldquo;{query}&rdquo;
                       </span>
                     </div>
@@ -195,18 +195,18 @@ export function GlobalCommandPalette({
               </div>
 
               {/* Footer hints */}
-              <div className="shrink-0 px-4 py-2 border-t border-[#F0F0F0] flex items-center justify-between bg-[#FAFAFA]">
-                <div className="flex items-center gap-3 text-[8px] font-black uppercase tracking-widest text-[#050505]/20">
+              <div className="shrink-0 px-4 py-2 border-t border-[#F0F0F0] dark:border-white/10 flex items-center justify-between bg-[#FAFAFA] dark:bg-[#1A1A1A]">
+                <div className="flex items-center gap-3 text-[8px] font-black uppercase tracking-widest text-[#050505]/20 dark:text-white/20">
                   <span className="flex items-center gap-1">
-                    <kbd className="bg-white border border-[#E5E5E5] rounded px-1 py-0.5 text-[7.5px] leading-none">↑↓</kbd>
+                    <kbd className="bg-white dark:bg-[#333] border border-[#E5E5E5] dark:border-white/10 rounded px-1 py-0.5 text-[7.5px] leading-none">↑↓</kbd>
                     Navigate
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="bg-white border border-[#E5E5E5] rounded px-1 py-0.5 text-[7.5px] leading-none">↵</kbd>
+                    <kbd className="bg-white dark:bg-[#333] border border-[#E5E5E5] dark:border-white/10 rounded px-1 py-0.5 text-[7.5px] leading-none">↵</kbd>
                     Open
                   </span>
                 </div>
-                <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-[#050505]/15">
+                <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-[#050505]/15 dark:text-white/15">
                   <Command size={9} />
                   <span>K</span>
                 </div>

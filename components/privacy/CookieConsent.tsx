@@ -34,47 +34,91 @@ export function CookieConsent() {
     return (
         <AnimatePresence>
             <motion.div
-                initial={{ y: 100, opacity: 0 }}
+                initial={{ y: 120, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 100, opacity: 0, transition: { duration: 0.5, ease: "anticipate" } }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="fixed bottom-0 left-0 right-0 z-[99999] p-4 sm:p-6 pointer-events-none"
+                exit={{ y: 120, opacity: 0, transition: { duration: 0.4, ease: 'easeIn' } }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="fixed bottom-0 left-0 right-0 z-[99999] p-3 sm:p-5 pointer-events-none"
             >
-                <div className="w-full max-w-4xl mx-auto bg-[#FDFCF8] text-[#0a0a0a] border border-black/10 rounded-[24px] shadow-[0_30px_60px_rgba(0,0,0,0.1)] p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-12 pointer-events-auto backdrop-blur-2xl relative overflow-hidden">
-                    
-                    {/* Ambient Background Matrix */}
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-                         style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+                {/* ── Outer glow halo ── */}
+                <div className="w-full max-w-3xl mx-auto pointer-events-auto relative">
 
-                    <div className="flex-1 relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6">
-                        <div className="w-12 h-12 rounded-full border border-black/10 bg-white shadow-sm flex items-center justify-center shrink-0">
-                            <img src="/official-whale-monochrome.png" alt="Whale Logo" className="w-6 h-6 object-contain opacity-80" />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <h3 className="text-[13px] md:text-[14px] font-black uppercase tracking-[0.25em] text-[#0a0a0a]">
-                                Institutional Telemetry & Privacy
-                            </h3>
-                            <p className="text-[10px] md:text-[11px] text-black/50 leading-relaxed font-mono uppercase tracking-[0.1em] max-w-2xl">
-                                Whale Alert Network utilizes cryptographic local storage to maintain Sovereign identity sessions (Zero-Knowledge) and standard cookies for platform functionality. You must authorize data retention policies before operating the terminal.
-                            </p>
+                    {/* Ambient glow ring */}
+                    <div className="absolute -inset-[1px] rounded-[22px] bg-gradient-to-r from-[#00f5ff]/20 via-[#9f00ff]/20 to-[#00f5ff]/20 blur-sm pointer-events-none" />
+
+                    {/* Card */}
+                    <div
+                        className="relative rounded-[20px] overflow-hidden"
+                        style={{
+                            background: 'rgba(10, 10, 10, 0.90)',
+                            backdropFilter: 'blur(40px)',
+                            WebkitBackdropFilter: 'blur(40px)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            boxShadow: '0 24px 64px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)',
+                        }}
+                    >
+                        {/* Top accent line */}
+                        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00f5ff]/60 to-transparent" />
+
+                        {/* Grid texture */}
+                        <div
+                            className="absolute inset-0 pointer-events-none opacity-[0.025]"
+                            style={{
+                                backgroundImage: 'linear-gradient(rgba(0,245,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,245,255,1) 1px, transparent 1px)',
+                                backgroundSize: '32px 32px'
+                            }}
+                        />
+
+                        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 sm:p-6">
+
+                            {/* Icon */}
+                            <div className="shrink-0 w-10 h-10 rounded-xl bg-[#00f5ff]/10 border border-[#00f5ff]/20 flex items-center justify-center">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00f5ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    <path d="M9 12l2 2 4-4"/>
+                                </svg>
+                            </div>
+
+                            {/* Text */}
+                            <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-black uppercase tracking-[0.25em] text-white mb-1">
+                                    Data &amp; Privacy Protocol
+                                </p>
+                                <p className="text-[10px] text-white/40 leading-relaxed font-mono tracking-wide">
+                                    We use essential cookies for session integrity and optional analytics to improve the platform. Your identity data is never sold or shared.
+                                </p>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
+                                <button
+                                    onClick={handleEssential}
+                                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.97]"
+                                    style={{
+                                        background: 'rgba(255,255,255,0.06)',
+                                        border: '1px solid rgba(255,255,255,0.10)',
+                                        color: 'rgba(255,255,255,0.50)',
+                                    }}
+                                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.10)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.80)'; }}
+                                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.50)'; }}
+                                >
+                                    Essential
+                                </button>
+                                <button
+                                    onClick={handleAcceptAll}
+                                    className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-[0.97] relative overflow-hidden group"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #00f5ff, #9f00ff)',
+                                        color: '#fff',
+                                        boxShadow: '0 0 20px rgba(0,245,255,0.25)',
+                                    }}
+                                >
+                                    <span className="relative z-10">Accept All</span>
+                                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                </button>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto relative z-10 shrink-0">
-                        <button
-                            onClick={handleEssential}
-                            className="w-full sm:w-auto px-6 py-4 rounded-xl bg-black/5 border border-black/10 text-black/60 text-[10px] font-black uppercase tracking-widest hover:bg-black/10 hover:text-black transition-all active:scale-[0.98]"
-                        >
-                            Essential Only
-                        </button>
-                        <button
-                            onClick={handleAcceptAll}
-                            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(0,0,0,0.1)] hover:bg-black/80 hover:shadow-[0_0_30px_rgba(0,0,0,0.2)] transition-all active:scale-[0.98]"
-                        >
-                            Accept All
-                        </button>
-                    </div>
-
                 </div>
             </motion.div>
         </AnimatePresence>

@@ -123,16 +123,16 @@ export function OmniExplorer() {
     };
 
     return (
-        <div className="relative h-full w-full min-h-0 font-sans p-4 md:p-12 flex flex-col selection:bg-[#050505]/20 selection:text-[#050505] overflow-hidden bg-[#FAF9F6]">
+        <div className="relative h-full w-full min-h-0 font-sans p-4 md:p-12 flex flex-col selection:bg-[#050505]/20 dark:selection:bg-white/20 selection:text-[#050505] dark:selection:text-white overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A]">
             
             <div className="relative z-10 w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col gap-12">
                 {/* Header / Search Area */}
                 <div className="flex flex-col items-start w-full max-w-[2560px] mx-auto pt-16 pb-12 gap-8 text-left">
-                    <div className="text-center space-y-4 border-b border-[#E5E5E5] pb-8 w-full">
+                    <div className="text-center space-y-4 border-b border-[#E5E5E5] dark:border-white/10 pb-8 w-full">
                         <div className="flex items-center justify-center gap-3 mb-2">
-                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#888888]">TRANSACTION & ADDRESS SEARCH</span>
+                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#888888] dark:text-[#AAAAAA]">TRANSACTION & ADDRESS SEARCH</span>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-[0.05em] text-[#050505] leading-none">
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-[0.05em] text-[#050505] dark:text-white leading-none">
                             GLOBAL SEARCH
                         </h1>
                     </div>
@@ -140,21 +140,21 @@ export function OmniExplorer() {
                     <div className="w-full relative group mt-4">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
                             {isSearching
-                                ? <Loader2 size={18} className="text-[#050505] animate-spin" />
-                                : <Search size={18} className="text-[#888888] group-focus-within:text-[#050505] transition-colors" />}
+                                ? <Loader2 size={18} className="text-[#050505] dark:text-white animate-spin" />
+                                : <Search size={18} className="text-[#888888] dark:text-[#AAAAAA] group-focus-within:text-[#050505] dark:group-focus-within:text-white transition-colors" />}
                         </div>
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                            className="w-full bg-white border border-[#E5E5E5] focus:border-[#050505] text-[#050505] p-5 pl-14 outline-none transition-all text-[11px] font-mono uppercase tracking-[0.1em] placeholder:text-[#A0A0A0] rounded shadow-sm"
+                            className="w-full bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 focus:border-[#050505] dark:focus:border-white text-[#050505] dark:text-white p-5 pl-14 outline-none transition-all text-[11px] font-mono uppercase tracking-[0.1em] placeholder:text-[#A0A0A0] dark:placeholder:text-white/40 rounded shadow-sm"
                             placeholder="INPUT ADDRESS / TX HASH / ENS"
                         />
                         <button
                             onClick={handleSearch}
                             disabled={isSearching}
-                            className="absolute inset-y-2 right-2 bg-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] hover:border-[#050505] border border-transparent text-white px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded"
+                            className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] hover:text-[#050505] dark:hover:text-white hover:border-[#050505] dark:hover:border-white/10 border border-transparent text-white dark:text-black px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded"
                         >
                             {isSearching ? 'INDEXING...' : 'INITIATE'}
                         </button>
@@ -162,17 +162,17 @@ export function OmniExplorer() {
 
                     {/* Search Results / Errors */}
                     {searchError && (
-                        <div className="w-full border border-[#FF3B30]/30 bg-white p-5 rounded flex items-center gap-4 text-[#FF3B30]">
+                        <div className="w-full border border-[#FF3B30]/30 bg-white dark:bg-[#111111] p-5 rounded flex items-center gap-4 text-[#FF3B30]">
                             <AlertCircle size={16} className="shrink-0" />
                             <span className="text-[10px] font-bold uppercase tracking-[0.1em]">{searchError}</span>
                         </div>
                     )}
 
                     {searchResults !== null && (
-                        <div className="w-full border border-[#E5E5E5] bg-white rounded overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
-                            <div className="flex items-center justify-between p-5 bg-[#FAF9F6] border-b border-[#E5E5E5]">
+                        <div className="w-full border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] rounded overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+                            <div className="flex items-center justify-between p-5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
                                 <div className="flex items-center gap-3">
-                                    <Zap size={14} className="text-[#050505]" />
+                                    <Zap size={14} className="text-[#050505] dark:text-white" />
                                     <h2 className="text-[10px] font-bold uppercase tracking-[0.1em]">QUERY RESULTS</h2>
                                 </div>
                                 <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">
@@ -180,25 +180,25 @@ export function OmniExplorer() {
                                 </span>
                             </div>
                             {searchResults.length === 0 ? (
-                                <div className="p-10 text-center text-[10px] font-mono font-bold text-[#888888] uppercase tracking-[0.2em]">
+                                <div className="p-10 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em]">
                                     Graph index return null for &quot;{searchQuery}&quot;
                                 </div>
                             ) : (
-                                <div className="flex flex-col divide-y divide-[#E5E5E5]">
+                                <div className="flex flex-col divide-y divide-[#E5E5E5] dark:divide-white/10">
                                     {searchResults.map((result: any, i: number) => {
                                         const entity = result.node || result.n || result;
                                         const label = result.label || entity._labels?.[0] || 'Entity';
                                         const name = entity.name || entity.address || entity.symbol || entity.id || 'Unknown';
                                         return (
-                                            <div key={i} className="flex items-center justify-between p-5 hover:bg-[#FAF9F6] transition-colors group cursor-pointer">
+                                            <div key={i} className="flex items-center justify-between p-5 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="text-[13px] text-[#050505] font-mono font-bold group-hover:text-[#888888] transition-colors">{name}</span>
+                                                    <span className="text-[13px] text-[#050505] dark:text-white font-mono font-bold group-hover:text-[#888888] dark:group-hover:text-white/60 transition-colors">{name}</span>
                                                     {entity.description && (
-                                                        <span className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">{entity.description}</span>
+                                                        <span className="text-[9px] text-[#888888] dark:text-[#AAAAAA] font-bold uppercase tracking-widest">{entity.description}</span>
                                                     )}
                                                 </div>
                                                 <div className="flex items-center gap-4">
-                                                    <span className="px-2.5 py-1 bg-[#FAF9F6] border border-[#E5E5E5] text-[9px] font-black text-[#888888] rounded-md uppercase tracking-widest">{label}</span>
+                                                    <span className="px-2.5 py-1 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-[#AAAAAA] rounded-md uppercase tracking-widest">{label}</span>
                                                     <ChevronRight size={14} className="text-[#888888] group-hover:translate-x-1 transition-all" />
                                                 </div>
                                             </div>
@@ -214,58 +214,58 @@ export function OmniExplorer() {
                 <div className="w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 pb-20">
                     
                     {/* BLOCKS PANEL */}
-                    <div className="border border-[#E5E5E5] bg-white rounded overflow-hidden shadow-sm">
-                        <div className="flex items-center justify-between p-6 bg-[#FAF9F6] border-b border-[#E5E5E5]">
+                    <div className="border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] rounded overflow-hidden shadow-sm">
+                        <div className="flex items-center justify-between p-6 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
                             <div className="flex items-center gap-3">
-                                <Box size={14} className="text-[#050505]" />
-                                <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505]">BLOCK TELEMETRY</h2>
+                                <Box size={14} className="text-[#050505] dark:text-white" />
+                                <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">BLOCK TELEMETRY</h2>
                             </div>
                             <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">LIVE STREAMING</span>
                         </div>
 
                         <div className="flex flex-col">
                             {blocks.length === 0 && (
-                                <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] uppercase tracking-[0.2em] animate-pulse">Establishing Peer Link...</div>
+                                <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Establishing Peer Link...</div>
                             )}
                             <AnimatePresence>
                                 {blocks.map((block, i) => (
                                     <motion.button 
                                         key={block.height} 
                                         layout
-                                        initial={{ opacity: 0, y: -20, backgroundColor: "#E8F5E9" }}
-                                        animate={{ opacity: 1, y: 0, backgroundColor: "#FFFFFF" }}
+                                        initial={{ opacity: 0, y: -20 }}
+                                        animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.8 }}
                                         onClick={() => setSelectedBlock(block)}
-                                        className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-all gap-4 group relative overflow-hidden"
+                                        className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-all gap-4 group relative overflow-hidden"
                                     >
                                         {/* Animation: Mined pulse effect on mount */}
                                         <motion.div
                                             initial={{ opacity: 0.8, scale: 0.9 }}
                                             animate={{ opacity: [0.8, 0, 0], scale: [0.9, 1.05, 1] }}
                                             transition={{ duration: 1.5, ease: "easeOut" }}
-                                            className="absolute inset-0 bg-[#E8F5E9] z-0 pointer-events-none"
+                                            className="absolute inset-0 bg-[#E8F5E9] dark:bg-white/10 z-0 pointer-events-none"
                                         />
 
                                         <div className="flex items-center gap-4 relative z-10">
-                                            <div className="w-12 h-12 bg-[#FAF9F6] rounded-xl flex items-center justify-center border border-[#E5E5E5] group-hover:bg-[#050505] group-hover:text-white transition-all">
+                                            <div className="w-12 h-12 bg-[#FAF9F6] dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:bg-[#050505] dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black transition-all">
                                                 <Box size={16} />
                                             </div>
                                             <div className="flex flex-col gap-1 text-left">
-                                                <span className="text-lg font-mono font-black text-[#050505] group-hover:text-[#888888] transition-colors">{block.height}</span>
-                                                <span className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center gap-2">
+                                                <span className="text-lg font-mono font-black text-[#050505] dark:text-white group-hover:text-[#888888] dark:group-hover:text-white/80 transition-colors">{block.height}</span>
+                                                <span className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center gap-2">
                                                     <Clock size={10} /> {block.age}
                                                 </span>
                                             </div>
                                         </div>
 
                                         <div className="flex flex-col gap-1.5 sm:text-right relative z-10">
-                                            <div className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center sm:justify-end gap-2">
-                                                <ShieldCheck size={10} className="text-[#050505]" /> 
-                                                VALIDATOR: <span className="text-[#050505] font-bold">{block.validator}</span>
+                                            <div className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-2">
+                                                <ShieldCheck size={10} className="text-[#050505] dark:text-white" /> 
+                                                VALIDATOR: <span className="text-[#050505] dark:text-white font-bold">{block.validator}</span>
                                             </div>
-                                            <div className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center sm:justify-end gap-3">
+                                            <div className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-3">
                                                 <span>{block.txs} TXS</span>
-                                                <span className="h-2 w-[1px] bg-[#E5E5E5]" />
+                                                <span className="h-2 w-[1px] bg-[#E5E5E5] dark:bg-white/10" />
                                                 <span>{block.size}</span>
                                             </div>
                                         </div>
@@ -276,32 +276,32 @@ export function OmniExplorer() {
                     </div>
 
                     {/* TRANSACTIONS PANEL */}
-                    <div className="border border-[#E5E5E5] bg-white rounded overflow-hidden shadow-sm">
-                        <div className="flex items-center justify-between p-6 bg-[#FAF9F6] border-b border-[#E5E5E5]">
+                    <div className="border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] rounded overflow-hidden shadow-sm">
+                        <div className="flex items-center justify-between p-6 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
                             <div className="flex items-center gap-3">
-                                <Activity size={14} className="text-[#050505]" />
-                                <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505]">TRANSACTION FLOWS</h2>
+                                <Activity size={14} className="text-[#050505] dark:text-white" />
+                                <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">TRANSACTION FLOWS</h2>
                             </div>
                             <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">MEMPOOL MONITOR</span>
                         </div>
 
                         <div className="flex flex-col">
                             {massiveTxs.length === 0 && (
-                                <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] uppercase tracking-[0.2em] animate-pulse">Syncing Mempool Hub...</div>
+                                <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Syncing Mempool Hub...</div>
                             )}
                             {massiveTxs.map((tx, i) => (
                                 <button 
                                     key={i} 
                                     onClick={() => setSelectedTx(tx)}
-                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-all gap-4 group"
+                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-all gap-4 group"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-[#FAF9F6] rounded-xl flex items-center justify-center border border-[#E5E5E5] group-hover:border-[#050505] transition-all">
-                                            <AlignLeft size={16} className="text-[#888888] group-hover:text-[#050505]" />
+                                        <div className="w-12 h-12 bg-[#FAF9F6] dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:border-[#050505] dark:group-hover:border-white transition-all">
+                                            <AlignLeft size={16} className="text-[#888888] dark:text-[#AAAAAA] group-hover:text-[#050505] dark:group-hover:text-white" />
                                         </div>
                                         <div className="flex flex-col gap-1 text-left min-w-0">
-                                            <span className="text-[11px] font-mono font-bold text-[#050505] truncate group-hover:text-[#888888] transition-colors">{tx.hash}</span>
-                                            <span className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center gap-2">
+                                            <span className="text-[11px] font-mono font-bold text-[#050505] dark:text-white truncate group-hover:text-[#888888] dark:group-hover:text-white/80 transition-colors">{tx.hash}</span>
+                                            <span className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center gap-2">
                                                 <Clock size={10} /> {tx.age}
                                             </span>
                                         </div>
@@ -309,13 +309,13 @@ export function OmniExplorer() {
 
                                     <div className="flex flex-col gap-2 sm:text-right mt-2 sm:mt-0">
                                         <div className="flex items-center sm:justify-end gap-2 text-[9px] font-mono font-bold text-[#888888] uppercase tracking-widest">
-                                            <span className="text-[#888888]">{tx.from}</span>
-                                            <ArrowRight size={10} className="text-[#E5E5E5]" />
-                                            <span className="text-[#050505]">{tx.to}</span>
+                                            <span className="text-[#888888] dark:text-[#AAAAAA]">{tx.from}</span>
+                                            <ArrowRight size={10} className="text-[#E5E5E5] dark:text-white/10" />
+                                            <span className="text-[#050505] dark:text-white">{tx.to}</span>
                                         </div>
                                         <div className="flex items-center sm:justify-end gap-3">
-                                            <span className="px-2 py-0.5 bg-[#FAF9F6] border border-[#E5E5E5] text-[8px] font-black text-[#888888] rounded-md uppercase tracking-widest">{tx.type}</span>
-                                            <span className="text-sm font-mono font-black text-[#050505] tracking-tighter">{tx.value}</span>
+                                            <span className="px-2 py-0.5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-[8px] font-black text-[#888888] dark:text-[#AAAAAA] rounded-md uppercase tracking-widest">{tx.type}</span>
+                                            <span className="text-sm font-mono font-black text-[#050505] dark:text-white tracking-tighter">{tx.value}</span>
                                         </div>
                                     </div>
                                 </button>
@@ -326,22 +326,22 @@ export function OmniExplorer() {
 
                  {/* INSPECTION MODALS */}
                  {(selectedBlock || selectedTx) && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 backdrop-blur-md">
-                        <div className="w-full max-w-2xl bg-white border border-[#E5E5E5] rounded shadow-xl overflow-hidden relative">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 dark:bg-black/90 backdrop-blur-md">
+                        <div className="w-full max-w-2xl bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded shadow-xl overflow-hidden relative">
                             <button 
                                 onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
-                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] hover:text-[#050505] hover:bg-[#FAF9F6] transition-all"
+                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] dark:text-[#AAAAAA] hover:text-[#050505] dark:hover:text-white hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-all"
                             >
                                 <X size={18} />
                             </button>
 
                             <div className="p-8 md:p-10">
-                                <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5]">
-                                    <div className="w-12 h-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded flex items-center justify-center">
-                                        {selectedBlock ? <Box size={20} className="text-[#050505]" /> : <Activity size={20} className="text-[#050505]" />}
+                                <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] dark:border-white/10">
+                                    <div className="w-12 h-12 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded flex items-center justify-center">
+                                        {selectedBlock ? <Box size={20} className="text-[#050505] dark:text-white" /> : <Activity size={20} className="text-[#050505] dark:text-white" />}
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505]">
+                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">
                                             {selectedBlock ? 'BLOCK DETAILS' : 'TRANSACTION DETAILS'}
                                         </h3>
                                     </div>
@@ -369,7 +369,7 @@ export function OmniExplorer() {
 
                                 <button
                                     onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
-                                    className="w-full mt-10 py-3 bg-[#050505] text-white rounded font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#A0A0A0] transition-colors"
+                                    className="w-full mt-10 py-3 bg-[#050505] dark:bg-white text-white dark:text-black rounded font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#A0A0A0] dark:hover:bg-[#CCC] transition-colors"
                                 >
                                     CLOSE
                                 </button>
@@ -389,14 +389,14 @@ export function OmniExplorer() {
 
 function DetailRow({ label, value, copy, highlight, green }: any) {
     return (
-        <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5]">
-            <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888]">{label}</span>
+        <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5] dark:border-white/10">
+            <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888] dark:text-[#AAAAAA]">{label}</span>
             <div className="flex items-center gap-3">
-                <span className={`text-[12px] font-mono ${highlight ? 'text-[#050505] font-bold' : green ? 'text-[#00C076]' : 'text-[#050505]'}`}>
+                <span className={`text-[12px] font-mono ${highlight ? 'text-[#050505] dark:text-white font-bold' : green ? 'text-[#00C076]' : 'text-[#050505] dark:text-white'}`}>
                     {value}
                 </span>
                 {copy && (
-                    <button className="p-2 hover:bg-black/5 rounded-xl transition-all text-black/10 hover:text-black">
+                    <button className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-all text-black/10 dark:text-white/10 hover:text-black dark:hover:text-white">
                         <ShieldCheck size={14} />
                     </button>
                 )}

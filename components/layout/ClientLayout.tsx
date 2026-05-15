@@ -8,7 +8,6 @@ import { useAccount } from 'wagmi';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { useSovereignSessionLock } from '@/hooks/useSovereignSessionLock';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
-import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 
 import { ZoomWrapper } from './ZoomWrapper';
@@ -302,9 +301,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       ? 'relative z-10 w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain'
       : 'relative z-10 w-full flex-1 flex flex-col overscroll-none';
 
-  const showDownhead = pathname !== '/' &&
-    !NO_DOWNHEAD_PREFIXES.some(p => pathname.startsWith(p));
-
   const showInstitutionalHeader =
     pathname === '/ledger' ||
     pathname === '/portfolio' ||
@@ -355,8 +351,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             </ZoomWrapper>
           </div>
 
-          {/* Legacy dark footer — only on routes that still need it */}
-          {showDownhead && <Downhead />}
         </div>
       </TitaniumGate>
     </>

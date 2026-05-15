@@ -769,9 +769,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   if (!isConnected) {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[500px] gap-4">
-        <h3 className="text-sm font-black uppercase tracking-widest text-[#050505]">Whale Chat</h3>
-        <p className="text-xs text-black/40 text-center max-w-xs">Connect your wallet to access maximum security decentralized messaging.</p>
-        <button onClick={() => openAppKit()} className="px-8 py-4 bg-black text-white rounded-xl text-[11px] font-black uppercase tracking-widest active:scale-95 transition-transform shadow-xl">Connect Wallet</button>
+        <h3 className="text-sm font-black uppercase tracking-widest text-[#050505] dark:text-white">Whale Chat</h3>
+        <p className="text-xs text-black/40 dark:text-white/40 text-center max-w-xs">Connect your wallet to access maximum security decentralized messaging.</p>
+        <button onClick={() => openAppKit()} className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-xl text-[11px] font-black uppercase tracking-widest active:scale-95 transition-transform shadow-xl">Connect Wallet</button>
       </div>
     );
   }
@@ -783,9 +783,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // On first-time sessions, a single gasless wallet signature derives the keys.
   if (!client) {
     return (
-      <div className="flex flex-col h-full min-h-[500px] bg-white rounded-2xl border border-black/5 shadow-sm overflow-y-auto">
+      <div className="flex flex-col h-full min-h-[500px] bg-white dark:bg-[#0A0A0A] rounded-2xl border border-black/5 dark:border-white/5 shadow-sm overflow-y-auto">
         {/* Minimalist Protocol Header */}
-        <div className="flex items-center justify-between px-8 py-6 border-b border-black/5 bg-[#FAFAF8] shrink-0">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-black/5 dark:border-white/5 bg-[#FAFAF8] dark:bg-[#111111] shrink-0">
           <div className="flex items-center gap-3">
           </div>
           <div className="w-4" />
@@ -795,50 +795,50 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         <div className="flex-1 px-8 py-16 flex flex-col items-center justify-center text-center gap-10">
           <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
             {isInitializing ? (
-              <div className="w-16 h-16 rounded-full border-2 border-black/5 border-t-black animate-spin" />
+              <div className="w-16 h-16 rounded-full border-2 border-black/5 dark:border-white/5 border-t-black dark:border-t-white animate-spin" />
             ) : (
-              <div className="w-48 h-48 rounded-full border border-black/5 flex flex-col items-center justify-center bg-white shadow-sm gap-4">
-                <img src="/official-whale-monochrome.png" alt="Whale" className="w-16 h-16 opacity-80" />
-                <div className="text-[10px] font-black tracking-[0.2em] uppercase text-black/20">Sensors Initialized</div>
+              <div className="w-48 h-48 rounded-full border border-black/5 dark:border-white/5 flex flex-col items-center justify-center bg-white dark:bg-[#1A1A1A] shadow-sm gap-4">
+                <img src="/official-whale-monochrome.png" alt="Whale" className="w-16 h-16 opacity-80" style={{ filter: 'invert(var(--dark-invert, 0))' }} />
+                <div className="text-[10px] font-black tracking-[0.2em] uppercase text-black/20 dark:text-white/20">Sensors Initialized</div>
               </div>
             )}
           </div>
 
           <div className="space-y-4 max-w-2xl">
-            <h2 className="text-[#050505] text-[24px] sm:text-[32px] md:text-[44px] font-black uppercase tracking-tighter leading-tight">
-                Whale Chat <br /> <span className="text-black/30">Secure Terminal.</span>
+            <h2 className="text-[#050505] dark:text-white text-[24px] sm:text-[32px] md:text-[44px] font-black uppercase tracking-tighter leading-tight">
+                Whale Chat <br /> <span className="text-black/30 dark:text-white/30">Secure Terminal.</span>
             </h2>
-            <div className="w-12 h-px bg-black/10 mx-auto my-6" />
+            <div className="w-12 h-px bg-black/10 dark:bg-white/10 mx-auto my-6" />
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-xl mx-auto mb-10">
               <div className="space-y-2">
-                <span className="text-[10px] font-black text-black/20 uppercase tracking-widest">01</span>
-                <p className="text-[11px] font-black uppercase text-black/60">Connect Wallet</p>
-                <p className="text-[10px] text-black/30 font-serif">Authorize browser session via AppKit.</p>
+                <span className="text-[10px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">01</span>
+                <p className="text-[11px] font-black uppercase text-black/60 dark:text-white/60">Connect Wallet</p>
+                <p className="text-[10px] text-black/30 dark:text-white/30 font-serif">Authorize browser session via AppKit.</p>
               </div>
               <div className="space-y-2">
-                <span className="text-[10px] font-black text-black/20 uppercase tracking-widest">02</span>
-                <p className={`text-[11px] font-black uppercase ${isZkVerified ? 'text-[#00C076]' : 'text-black/60'}`}>Whale Identity</p>
-                <p className="text-[10px] text-black/30 font-serif">Sovereign identity verified via sensors.</p>
+                <span className="text-[10px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">02</span>
+                <p className={`text-[11px] font-black uppercase ${isZkVerified ? 'text-[#00C076]' : 'text-black/60 dark:text-white/60'}`}>Whale Identity</p>
+                <p className="text-[10px] text-black/30 dark:text-white/30 font-serif">Sovereign identity verified via sensors.</p>
               </div>
               <div className="space-y-2">
-                <span className="text-[10px] font-black text-black/20 uppercase tracking-widest">03</span>
-                <p className="text-[11px] font-black uppercase text-black/60">Sensors Secured</p>
-                <p className="text-[10px] text-black/30 font-serif">Persistent encryption across all devices.</p>
+                <span className="text-[10px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">03</span>
+                <p className="text-[11px] font-black uppercase text-black/60 dark:text-white/60">Sensors Secured</p>
+                <p className="text-[10px] text-black/30 dark:text-white/30 font-serif">Persistent encryption across all devices.</p>
               </div>
             </div>
 
-            <p className="text-[#050505]/40 text-[13px] md:text-[15px] font-serif leading-relaxed px-6 max-w-sm mx-auto text-center">
+            <p className="text-[#050505]/40 dark:text-white/40 text-[13px] md:text-[15px] font-serif leading-relaxed px-6 max-w-sm mx-auto text-center">
               Mathematical identity. Sovereign communication.
             </p>
           </div>
         </div>
 
         {/* Action Area */}
-        <div className="bg-[#FAFAF8] p-8 md:p-12 border-t border-black/5 flex flex-col items-center">
+        <div className="bg-[#FAFAF8] dark:bg-[#111111] p-8 md:p-12 border-t border-black/5 dark:border-white/5 flex flex-col items-center">
           {initError ? (
             <div className="flex flex-col items-center gap-6 w-full max-w-md">
-              <div className="w-full bg-red-50 text-red-700 text-[12px] font-mono p-5 rounded-xl border border-red-100 text-center leading-relaxed">
+              <div className="w-full bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-400 text-[12px] font-mono p-5 rounded-xl border border-red-100 dark:border-red-900/50 text-center leading-relaxed">
                 {initError}
               </div>
               
@@ -847,13 +847,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <div className="flex flex-col gap-3 w-full">
                   <button
                     onClick={() => openAppKit()}
-                    className="w-full py-5 rounded-xl bg-[#050505] text-white text-[12px] font-black uppercase tracking-widest hover:bg-black/80 transition-all flex items-center justify-center gap-3 active:scale-[0.97]"
+                    className="w-full py-5 rounded-xl bg-[#050505] dark:bg-white text-white dark:text-black text-[12px] font-black uppercase tracking-widest hover:bg-black/80 dark:hover:bg-white/80 transition-all flex items-center justify-center gap-3 active:scale-[0.97]"
                   >
                     Reconnect Wallet
                   </button>
                   <button
                     onClick={() => { reconnect(); initClient(); }}
-                    className="w-full py-4 rounded-xl bg-white border border-black/10 text-black/60 text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.02] transition-all"
+                    className="w-full py-4 rounded-xl bg-white dark:bg-[#1A1A1A] border border-black/10 dark:border-white/10 text-black/60 dark:text-white/60 text-[10px] font-black uppercase tracking-widest hover:bg-black/[0.02] dark:hover:bg-white/5 transition-all"
                   >
                     Refresh Session
                   </button>
@@ -874,9 +874,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             </div>
           ) : isInitializing ? (
             <div className="flex flex-col items-center gap-5">
-              <p className="text-[12px] text-black/40 font-mono uppercase tracking-[0.2em] font-black">Establishing Secure Tunnel...</p>
+              <p className="text-[12px] text-black/40 dark:text-white/40 font-mono uppercase tracking-[0.2em] font-black">Establishing Secure Tunnel...</p>
               {isMobile && (
-                <p className="text-[10px] text-black font-black uppercase max-w-[260px] leading-relaxed mx-auto text-center">
+                <p className="text-[10px] text-black dark:text-white font-black uppercase max-w-[260px] leading-relaxed mx-auto text-center">
                   Action Required: Confirm identity in wallet.
                 </p>
               )}
@@ -886,11 +886,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               <button
                 onClick={initClient}
                 disabled={isInitializing}
-                className="w-full max-w-md py-6 rounded-xl bg-[#050505] text-white text-[13px] font-black uppercase tracking-[0.2em] hover:bg-black/80 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                className="w-full max-w-md py-6 rounded-xl bg-[#050505] dark:bg-white text-white dark:text-black text-[13px] font-black uppercase tracking-[0.2em] hover:bg-black/80 dark:hover:bg-white/80 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
               >
                 Activate Identity
               </button>
-              <p className="text-[9px] font-mono uppercase tracking-widest text-black/30">Protocol-level cryptographic activation</p>
+              <p className="text-[9px] font-mono uppercase tracking-widest text-black/30 dark:text-white/30">Protocol-level cryptographic activation</p>
             </div>
           )}
         </div>
@@ -903,22 +903,22 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   return (
     // ✔️ position:relative required for absolute scanner overlays
     // h-full fills the parent (MobileChatPage flex-1 min-h-0), NO minHeight override
-    <div className="relative flex w-full h-full bg-white overflow-hidden" style={{ borderRadius: isMobile ? 0 : '1rem', border: isMobile ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+    <div className="relative flex w-full h-full bg-white dark:bg-[#0A0A0A] overflow-hidden" style={{ borderRadius: isMobile ? 0 : '1rem', border: isMobile ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
       {/* ── Sidebar: Conversation List ── */}
-      <div className={`${showList ? 'flex' : 'hidden md:flex'} w-full md:w-72 flex-col border-r border-black/6 bg-[#FAFAFA]`}>
-        <div className="p-4 border-b border-black/6">
+      <div className={`${showList ? 'flex' : 'hidden md:flex'} w-full md:w-72 flex-col border-r border-black/6 dark:border-white/5 bg-[#FAFAFA] dark:bg-[#111111]`}>
+        <div className="p-4 border-b border-black/6 dark:border-white/5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowScanner(true)}
-                className="p-2.5 rounded-xl bg-black text-white hover:bg-black/80 transition-all text-[10px] font-black uppercase tracking-widest"
+                className="p-2.5 rounded-xl bg-black dark:bg-white text-white dark:text-black hover:bg-black/80 dark:hover:bg-white/80 transition-all text-[10px] font-black uppercase tracking-widest"
                 title="Scan Identity QR"
               >
                 SCAN
               </button>
               <button
                 onClick={() => setShowMyQR(true)}
-                className="p-2.5 rounded-xl bg-black/[0.03] text-black/40 hover:bg-black/5 transition-all text-[10px] font-black uppercase"
+                className="p-2.5 rounded-xl bg-black/[0.03] dark:bg-white/5 text-black/40 dark:text-white/40 hover:bg-black/5 dark:hover:bg-white/10 transition-all text-[10px] font-black uppercase"
                 title="Show My QR"
               >
                 QR
@@ -933,12 +933,12 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               value={peerInput}
               onChange={e => setPeerInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleStartConversation()}
-              className="flex-1 bg-white border border-black/10 rounded-lg px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-[#9945FF]/40 placeholder:text-black/25 text-[#050505]"
+              className="flex-1 bg-white dark:bg-[#1A1A1A] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-[11px] font-mono focus:outline-none focus:border-[#9945FF]/40 dark:focus:border-white/40 placeholder:text-black/25 dark:placeholder:text-white/25 text-[#050505] dark:text-white"
             />
             <button
               onClick={handleStartConversation}
               disabled={sending}
-              className="w-9 h-9 bg-[#050505] rounded-lg flex items-center justify-center text-white hover:bg-black/80 transition-colors active:scale-95 disabled:opacity-50 text-[18px] font-light"
+              className="w-9 h-9 bg-[#050505] dark:bg-white rounded-lg flex items-center justify-center text-white dark:text-black hover:bg-black/80 dark:hover:bg-white/80 transition-colors active:scale-95 disabled:opacity-50 text-[18px] font-light"
             >
               +
             </button>
@@ -948,7 +948,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         <div className="flex-1 overflow-y-auto">
           {conversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-3 p-6 text-center">
-              <p className="text-[10px] text-black/30 font-medium uppercase tracking-widest">Vault is Empty</p>
+              <p className="text-[10px] text-black/30 dark:text-white/30 font-medium uppercase tracking-widest">Vault is Empty</p>
             </div>
           ) : (
             conversations.map((conv, i) => {
@@ -957,16 +957,16 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <button
                   key={i}
                   onClick={() => { setActivePeer(conv.peerAddress); setShowList(false); }}
-                  className={`w-full text-left p-3.5 border-b border-black/4 transition-all ${
-                    isActive ? 'bg-black/[0.03] border-l-2 border-l-black' : 'hover:bg-black/[0.02]'
+                  className={`w-full text-left p-3.5 border-b border-black/4 dark:border-white/5 transition-all ${
+                    isActive ? 'bg-black/[0.03] dark:bg-white/5 border-l-2 border-l-black dark:border-l-white' : 'hover:bg-black/[0.02] dark:hover:bg-white/5'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <Avatar address={conv.peerAddress} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-bold text-[#050505] font-mono truncate">{shortAddr(conv.peerAddress)}</p>
+                      <p className="text-[11px] font-bold text-[#050505] dark:text-white font-mono truncate">{shortAddr(conv.peerAddress)}</p>
                       {conv.lastMessage && (
-                        <p className="text-[10px] text-black/40 truncate mt-0.5">{conv.lastMessage}</p>
+                        <p className="text-[10px] text-black/40 dark:text-white/40 truncate mt-0.5">{conv.lastMessage}</p>
                       )}
                     </div>
                   </div>
@@ -981,30 +981,30 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       <div className={`${!showList ? 'flex' : 'hidden md:flex'} flex-1 flex-col min-w-0`}>
         {activePeer ? (
           <>
-            <div className="h-14 px-4 border-b border-black/6 flex items-center justify-between bg-white shrink-0">
+            <div className="h-14 px-4 border-b border-black/6 dark:border-white/5 flex items-center justify-between bg-white dark:bg-[#111111] shrink-0">
               <div className="flex items-center gap-3">
-                <button onClick={() => setShowList(true)} className="md:hidden p-1.5 rounded-lg hover:bg-black/5 text-black/50 text-[10px] font-black">
+                <button onClick={() => setShowList(true)} className="md:hidden p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-black/50 dark:text-white/50 text-[10px] font-black">
                   BACK
                 </button>
                 <Avatar address={activePeer!} />
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-[#050505] font-mono flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold text-[#050505] dark:text-white font-mono flex items-center gap-1.5">
                     {shortAddr(activePeer!)}
                   </span>
-                  <span className="text-[8px] font-black text-black/20 uppercase tracking-widest">End-to-End Encrypted</span>
+                  <span className="text-[8px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">End-to-End Encrypted</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => setShowScanner(true)}
-                  className="lg:hidden px-3 py-2 bg-black text-white rounded-lg text-[9px] font-black uppercase tracking-widest"
+                  className="lg:hidden px-3 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-[9px] font-black uppercase tracking-widest"
                 >
                   SCAN
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0 bg-[#FAFAFA]">
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0 bg-[#FAFAFA] dark:bg-[#0A0A0A]">
               {(() => {
                 // Filter messages for the current active conversation only
                 const convId = `dm-${activePeer!.toLowerCase()}`;
@@ -1016,7 +1016,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   <div className="flex-1 flex flex-col items-center justify-center">
                     <div className="flex flex-col items-center max-w-[280px] text-center gap-6">
                       <div className="flex flex-col items-center opacity-40">
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]">Tunnel Established</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505] dark:text-white">Tunnel Established</p>
                       </div>
                     </div>
                   </div>
@@ -1035,29 +1035,29 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                       {isAudio && audioSrc ? (
                         <div className={`px-3 py-2.5 rounded-2xl ${
                           isMe
-                            ? 'bg-[#050505] rounded-br-sm'
-                            : 'bg-white rounded-bl-sm border border-black/8 shadow-sm'
+                            ? 'bg-[#050505] dark:bg-white rounded-br-sm'
+                            : 'bg-white dark:bg-[#1A1A1A] rounded-bl-sm border border-black/8 dark:border-white/10 shadow-sm'
                         }`}>
-                          <div className={`flex items-center gap-2 mb-1.5 ${isMe ? 'text-white/60' : 'text-black/40'}`}>
+                          <div className={`flex items-center gap-2 mb-1.5 ${isMe ? 'text-white/60 dark:text-black/60' : 'text-black/40 dark:text-white/40'}`}>
                             <span className="text-[9px] font-black uppercase tracking-widest">AUDIO</span>
                           </div>
                           <audio
                             controls
                             src={audioSrc}
                             className="h-8 max-w-[200px]"
-                            style={{ filter: isMe ? 'invert(1) brightness(0.8)' : 'none' }}
+                            style={{ filter: isMe ? 'invert(1) brightness(0.8)' : 'invert(var(--dark-invert, 0))' }}
                           />
                         </div>
                       ) : (
                         <div className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed break-words ${
                           isMe
-                            ? 'bg-[#050505] text-white rounded-br-sm'
-                            : 'bg-white text-[#050505] rounded-bl-sm border border-black/8 shadow-sm'
+                            ? 'bg-[#050505] dark:bg-white text-white dark:text-black rounded-br-sm'
+                            : 'bg-white dark:bg-[#1A1A1A] text-[#050505] dark:text-white rounded-bl-sm border border-black/8 dark:border-white/10 shadow-sm'
                         }`}>
                           {content}
                         </div>
                       )}
-                      <span className="text-[9px] text-black/25 mt-1 px-1 font-mono">
+                      <span className="text-[9px] text-black/25 dark:text-white/25 mt-1 px-1 font-mono">
                         {new Date(sentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
@@ -1066,10 +1066,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               })()}
               {peerStatus.isTyping && (
                   <div className="flex self-start items-start max-w-[78%]">
-                      <div className="px-3.5 py-2 rounded-2xl bg-white border border-black/10 shadow-sm flex items-center gap-1.5 rounded-bl-sm">
-                          <span className="w-1 h-1 rounded-full bg-black/20 animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="w-1 h-1 rounded-full bg-black/20 animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="w-1 h-1 rounded-full bg-black/20 animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <div className="px-3.5 py-2 rounded-2xl bg-white dark:bg-[#1A1A1A] border border-black/10 dark:border-white/10 shadow-sm flex items-center gap-1.5 rounded-bl-sm">
+                          <span className="w-1 h-1 rounded-full bg-black/20 dark:bg-white/20 animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-1 h-1 rounded-full bg-black/20 dark:bg-white/20 animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-1 h-1 rounded-full bg-black/20 dark:bg-white/20 animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
                   </div>
               )}
@@ -1077,15 +1077,15 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             </div>
 
             <div
-              className="shrink-0 bg-white border-t border-black/6"
+              className="shrink-0 bg-white dark:bg-[#111111] border-t border-black/6 dark:border-white/5"
               style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
             >
               {/* ── Audio recording indicator ── */}
               {isRecording && (
                 <div className="flex items-center gap-2 px-4 pt-3 pb-1">
-                    <div className="flex items-center gap-1.5 bg-[#FAF9F6] border border-black/5 px-2 py-1 rounded-md">
-                        <span className="text-[10px] font-mono text-black uppercase font-black">REC</span>
-                        <span className="text-[9px] font-mono text-black/40">{recordingSeconds}s</span>
+                    <div className="flex items-center gap-1.5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 px-2 py-1 rounded-md">
+                        <span className="text-[10px] font-mono text-black dark:text-white uppercase font-black">REC</span>
+                        <span className="text-[9px] font-mono text-black/40 dark:text-white/40">{recordingSeconds}s</span>
                     </div>
                 </div>
               )}
@@ -1097,8 +1097,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   onPointerLeave={stopRecording}
                   className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-95 shrink-0 ${
                     isRecording
-                      ? 'bg-black text-white shadow-xl'
-                      : 'bg-black/[0.05] text-black/50 hover:bg-black/10'
+                      ? 'bg-black dark:bg-white text-white dark:text-black shadow-xl'
+                      : 'bg-black/[0.05] dark:bg-white/5 text-black/50 dark:text-white/50 hover:bg-black/10 dark:hover:bg-white/10'
                   }`}
                   style={{ touchAction: 'none' }}
                   title={isRecording ? 'Release to send audio' : 'Hold to record voice'}
@@ -1113,13 +1113,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
                   placeholder="Encrypted transmission..."
-                  className="flex-1 bg-black/[0.03] border border-black/8 rounded-xl px-4 py-3 text-[#050505] focus:outline-none focus:border-black/20 placeholder:text-black/30"
+                  className="flex-1 bg-black/[0.03] dark:bg-white/5 border border-black/8 dark:border-white/10 rounded-xl px-4 py-3 text-[#050505] dark:text-white focus:outline-none focus:border-black/20 dark:focus:border-white/20 placeholder:text-black/30 dark:placeholder:text-white/30"
                   style={{ WebkitAppearance: 'none', fontSize: '16px', lineHeight: '1.4' }}
                 />
                 <button
                   type="submit"
                   disabled={(!inputText.trim() && !isRecording) || sending}
-                  className="w-11 h-11 rounded-xl bg-[#050505] flex items-center justify-center text-white disabled:opacity-30 hover:bg-black/80 transition-all active:scale-95 shrink-0 text-[10px] font-black uppercase"
+                  className="w-11 h-11 rounded-xl bg-[#050505] dark:bg-white flex items-center justify-center text-white dark:text-black disabled:opacity-30 hover:bg-black/80 dark:hover:bg-white/80 transition-all active:scale-95 shrink-0 text-[10px] font-black uppercase"
                 >
                   SEND
                 </button>
@@ -1127,27 +1127,27 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-[#FAFAF8] relative overflow-hidden p-6">
+          <div className="flex-1 flex flex-col items-center justify-center bg-[#FAFAF8] dark:bg-[#0A0A0A] relative overflow-hidden p-6">
             <div className="flex flex-col items-center gap-6 max-w-2xl text-center select-none relative z-10">
               
-              <div className="w-24 h-24 mb-4 flex items-center justify-center bg-white rounded-full border border-black/5 shadow-sm">
-                 <img src="/official-whale-monochrome.png" alt="Whale" className="w-12 h-12 opacity-80" />
+              <div className="w-24 h-24 mb-4 flex items-center justify-center bg-white dark:bg-[#1A1A1A] rounded-full border border-black/5 dark:border-white/5 shadow-sm">
+                 <img src="/official-whale-monochrome.png" alt="Whale" className="w-12 h-12 opacity-80" style={{ filter: 'invert(var(--dark-invert, 0))' }} />
               </div>
 
-              <div className="inline-flex items-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full shadow-sm">
+              <div className="inline-flex items-center gap-3 px-5 py-2 bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 rounded-full shadow-sm">
                   <span className="text-[9px] font-black uppercase tracking-widest text-[#00C076]">Sensors Secured</span>
               </div>
 
-              <h2 className="text-[32px] md:text-[40px] font-black uppercase tracking-tighter text-[#0A0A0A] leading-none mt-2">
-                <span className="text-black/20 block text-[12px] tracking-[0.4em] mb-3">Welcome to</span>
+              <h2 className="text-[32px] md:text-[40px] font-black uppercase tracking-tighter text-[#0A0A0A] dark:text-white leading-none mt-2">
+                <span className="text-black/20 dark:text-white/20 block text-[12px] tracking-[0.4em] mb-3">Welcome to</span>
                 Whale Chat.
               </h2>
               
-              <p className="font-sans text-[13px] text-slate-400 leading-relaxed max-w-xl mx-auto mt-4 font-black tracking-widest uppercase">
+              <p className="font-sans text-[13px] text-slate-400 dark:text-slate-500 leading-relaxed max-w-xl mx-auto mt-4 font-black tracking-widest uppercase">
                 Peer-to-Peer Secure Terminal
               </p>
 
-              <p className="font-mono text-[10px] text-black/10 uppercase tracking-[0.2em] mt-8">
+              <p className="font-mono text-[10px] text-black/10 dark:text-white/10 uppercase tracking-[0.2em] mt-8">
                 Awaiting connection initialization...
               </p>
             </div>
@@ -1158,16 +1158,16 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
       {/* ── Overlays ── */}
       {showScanner && (
-        <div className="absolute inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
+        <div className="absolute inset-0 z-[100] bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
            <div className="w-full max-w-sm">
                <div className="flex justify-between items-center mb-8">
-                   <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505]">Scan Peer QR</h3>
-                   <button onClick={() => setShowScanner(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors text-[11px] font-black uppercase">
+                   <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505] dark:text-white">Scan Peer QR</h3>
+                   <button onClick={() => setShowScanner(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[11px] font-black uppercase text-[#050505] dark:text-white">
                      X
                    </button>
                </div>
                <div className="mb-8">
-                 <p className="text-[10px] text-black/40 text-center font-mono leading-relaxed px-4">
+                 <p className="text-[10px] text-black/40 dark:text-white/40 text-center font-mono leading-relaxed px-4">
                    Establish a cryptographically secured P2P channel by scanning a peer&apos;s Sovereign QR identity.
                  </p>
                </div>
@@ -1177,11 +1177,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       )}
 
       {showMyQR && (
-        <div className="absolute inset-0 z-[100] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
+        <div className="absolute inset-0 z-[100] bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
            <div className="w-full max-w-sm">
                <div className="flex justify-between items-center mb-8">
-                   <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505]">My Identity QR</h3>
-                   <button onClick={() => setShowMyQR(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors text-[11px] font-black uppercase">
+                   <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505] dark:text-white">My Identity QR</h3>
+                   <button onClick={() => setShowMyQR(false)} className="w-10 h-10 flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[11px] font-black uppercase text-[#050505] dark:text-white">
                      X
                    </button>
                </div>

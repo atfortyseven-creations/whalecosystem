@@ -159,7 +159,7 @@ export default function WhaleDashboard() {
 
     if (isCheckingZK) {
         return (
-            <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center">
+            <div className="min-h-screen bg-[#FDFCF8] dark:bg-[#0A0A0A] flex items-center justify-center">
                 <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
             </div>
         );

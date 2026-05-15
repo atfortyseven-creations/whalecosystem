@@ -377,12 +377,12 @@ export default function ConnectPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#FDFCF8_100%)] z-10 opacity-80" />
       </div>
 
-      <main className="flex-1 relative z-10 flex flex-col justify-center items-center p-4 py-12 md:p-8 lg:p-12">
+      <main className="flex-1 relative z-10 flex flex-col justify-center items-center px-4 py-10 sm:p-8 lg:p-12 min-h-0">
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className={`w-full my-auto ${mounted && isConnected ? 'max-w-[2560px] grid grid-cols-1' : 'max-w-[2560px] grid grid-cols-1 lg:grid-cols-2 text-left'} rounded-[40px] overflow-hidden bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[0_30px_80px_rgba(0,0,0,0.06)] relative`}
+          className={`w-full my-auto ${mounted && isConnected ? 'max-w-lg' : 'max-w-lg lg:max-w-4xl lg:grid lg:grid-cols-2'} rounded-[28px] sm:rounded-[40px] overflow-hidden bg-white/70 backdrop-blur-3xl border border-black/5 shadow-[0_30px_80px_rgba(0,0,0,0.06)] relative`}
         >
           {/* Subtle reflection lines for frosted glass effect */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
@@ -390,14 +390,14 @@ export default function ConnectPage() {
 
           {/* ── LEFT: QR Matrix ── */}
           {!(mounted && isConnected) && (
-          <div className="relative p-10 lg:p-16 flex flex-col overflow-hidden border-b lg:border-b-0 lg:border-r border-black/5 bg-[#FAFAF8]/50">
+          <div className="relative p-6 sm:p-10 lg:p-14 flex flex-col overflow-hidden border-b lg:border-b-0 lg:border-r border-black/5 bg-[#FAFAF8]/50">
             <div className="relative z-10 flex flex-col h-full">
-              <div className="inline-flex self-start mb-6">
-                <h2 className="text-[32px] font-black uppercase tracking-tighter leading-[0.9] text-[#050505]">
+              <div className="inline-flex self-center lg:self-start mb-6">
+                <h2 className="text-[26px] sm:text-[32px] font-black uppercase tracking-tighter leading-[0.9] text-[#050505] text-center lg:text-left">
                   Secure <br/><span className="text-black/30">Sync</span>
                 </h2>
               </div>
-              <p className="text-[9px] font-mono text-[#050505]/40 uppercase tracking-[0.4em] mb-12 border-l border-black/20 pl-4 py-1">
+              <p className="text-[9px] font-mono text-[#050505]/40 uppercase tracking-[0.4em] mb-8 sm:mb-12 border-l border-black/20 pl-4 py-1 self-center lg:self-start">
                 Encrypted Session Synchronization
               </p>
 
@@ -468,10 +468,10 @@ export default function ConnectPage() {
           )}
 
           {/* ── RIGHT: Injection Portal ── */}
-          <div className="relative p-10 lg:p-16 flex flex-col bg-white/40">
+          <div className="relative p-6 sm:p-10 lg:p-14 flex flex-col bg-white/40">
             <div className="relative z-10 flex flex-col h-full">
 
-              <h2 className="text-[32px] font-black uppercase tracking-tighter leading-[0.9] mb-4 text-[#050505]">
+              <h2 className="text-[26px] sm:text-[32px] font-black uppercase tracking-tighter leading-[0.9] mb-4 text-[#050505] text-center lg:text-left">
                 Authentication <br/><span className="text-black/30">Portal</span>
               </h2>
 
@@ -627,26 +627,26 @@ export default function ConnectPage() {
       )}
 
       {/* Footer */}
-      <footer className="relative z-[100] px-8 py-6 border-t border-black/5 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 bg-[#FDFCF8]/80 backdrop-blur-md">
-        <div className="flex items-center gap-4">
+      <footer className="relative z-[100] px-5 sm:px-8 py-5 border-t border-black/5 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 bg-[#FDFCF8]/90 backdrop-blur-md">
+        <div className="flex items-center gap-3">
           <img
             src="/official-whale-monochrome.png"
-            className="w-5 h-5 opacity-40 grayscale"
+            className="w-4 h-4 opacity-30 grayscale"
             alt=""
             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
-          <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#050505]/40">© 2026 Whale Alert Network</span>
+          <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#050505]/35">© 2026 Whale Alert Network</span>
         </div>
-        <div className="flex items-center gap-8">
-          <a href="https://twitter.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="text-[#050505]/40 hover:text-[#050505] transition-colors">
-            <Twitter size={18} />
+        <div className="flex items-center gap-5">
+          <a href="https://twitter.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="text-[#050505]/30 hover:text-[#050505] transition-colors">
+            <Twitter size={15} />
           </a>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-[#050505]/40 hover:text-[#050505] transition-colors">
-            <Github size={18} />
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-[#050505]/30 hover:text-[#050505] transition-colors">
+            <Github size={15} />
           </a>
-          <div className="flex flex-col items-end">
-            <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#050505]/40">Status: Operational</span>
-            <span className="text-[8px] font-mono text-emerald-600 uppercase tracking-[0.3em] font-bold">L1/L2 Ingress Active</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-[8px] font-mono text-emerald-600 uppercase tracking-[0.25em] font-bold">Operational</span>
           </div>
         </div>
       </footer>

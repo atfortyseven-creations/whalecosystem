@@ -41,23 +41,23 @@ const AllocationTelemetryBar = React.memo(function AllocationTelemetryBar({ mint
         <div className="flex flex-col">
           <span className="text-[10px] text-[#A0A0A0] font-bold uppercase tracking-[0.2em] mb-1">Issued Tickets</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-5xl md:text-6xl font-medium font-mono text-[#FAF9F6] tracking-tighter leading-none">
+            <span className="text-5xl md:text-6xl font-medium font-mono text-[#050505] dark:text-white tracking-tighter leading-none">
               {String(minted).padStart(3, '0')}
             </span>
-            <span className="text-xl font-medium font-mono text-black/50">/ {max}</span>
+            <span className="text-xl font-medium font-mono text-black/50 dark:text-white/50">/ {max}</span>
            </div>
         </div>
         <div className="flex flex-col items-end">
           <span className="text-[10px] text-[#A0A0A0] font-bold uppercase tracking-[0.2em] mb-1">Available Allocation</span>
-          <span className="text-3xl font-medium font-mono tracking-tighter text-black">
+          <span className="text-3xl font-medium font-mono tracking-tighter text-black dark:text-white">
             {String(remaining).padStart(2, '0')}
           </span>
         </div>
       </div>
 
-      <div className="relative h-2 w-full bg-[#E5E5E5] overflow-hidden rounded-full border border-black/5">
+      <div className="relative h-2 w-full bg-[#E5E5E5] dark:bg-[#222] overflow-hidden rounded-full border border-black/5 dark:border-white/5">
         <motion.div
-          className="absolute inset-y-0 left-0 bg-black shadow-[0_0_15px_rgba(0,0,0,0.6)]"
+          className="absolute inset-y-0 left-0 bg-black dark:bg-white shadow-[0_0_15px_rgba(0,0,0,0.6)] dark:shadow-[0_0_15px_rgba(255,255,255,0.6)]"
           initial={{ width: 0 }}
           animate={{ width: `${fill}%` }}
           transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
@@ -71,14 +71,14 @@ const AllocationTelemetryBar = React.memo(function AllocationTelemetryBar({ mint
 
       <div className="flex flex-wrap items-center justify-between text-[10px] font-bold uppercase tracking-[0.1em] pt-1 pt-2">
         <span className="text-[#A0A0A0] flex items-center gap-2">
-          CAPACITY REACHED <span className="text-black font-mono font-medium">{fill}%</span>
+          CAPACITY REACHED <span className="text-black dark:text-white font-mono font-medium">{fill}%</span>
         </span>
         {isAlmostFull ? (
-          <motion.span className="flex items-center gap-2 text-black font-bold">
+          <motion.span className="flex items-center gap-2 text-black dark:text-white font-bold">
              NEARING CAPACITY LIMIT
           </motion.span>
         ) : (
-          <span className="flex items-center gap-2 text-black/80">
+          <span className="flex items-center gap-2 text-black/80 dark:text-white/80">
             L2 PROVISIONING ACTIVE
           </span>
          )}
@@ -89,14 +89,14 @@ const AllocationTelemetryBar = React.memo(function AllocationTelemetryBar({ mint
 
 function AcademicStatCard({ label, value, isApex = false }: { label: string; value: string; isApex?: boolean }) {
   return (
-    <div className={`relative flex flex-col justify-between p-5 md:p-6 overflow-hidden border transition-all ${isApex ? 'bg-black text-white border-black shadow-none' : 'bg-white border-[#E5E5E5]'}`}>
+    <div className={`relative flex flex-col justify-between p-5 md:p-6 overflow-hidden border transition-all ${isApex ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white shadow-none' : 'bg-white dark:bg-[#111111] border-[#E5E5E5] dark:border-white/10'}`}>
         {isApex && (
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[50px] -z-10 rounded-full" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 dark:bg-black/5 blur-[50px] -z-10 rounded-full" />
         )}
         <div className="flex items-center justify-between mb-4 z-10">
            <p className="text-[10px] font-black text-[#A0A0A0] uppercase tracking-[0.2em]">{label}</p>
         </div>
-        <p className={`text-sm md:text-base lg:text-lg font-black font-mono tracking-tighter truncate z-10 ${isApex ? 'text-white' : 'text-[#050505]'}`}>
+        <p className={`text-sm md:text-base lg:text-lg font-black font-mono tracking-tighter truncate z-10 ${isApex ? 'text-white dark:text-black' : 'text-[#050505] dark:text-white'}`}>
             {value}
         </p>
     </div>
@@ -181,7 +181,7 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
     <div className="flex flex-col gap-4 h-full relative z-10 w-full mb-2">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
          <div className="space-y-1">
-             <label className="text-[10px] font-bold uppercase text-black tracking-[0.2em] flex items-center gap-2">
+             <label className="text-[10px] font-bold uppercase text-black dark:text-white tracking-[0.2em] flex items-center gap-2">
                CRYPTOGRAPHIC AUTHORIZATION
              </label>
              <p className="text-[9px] text-[#A0A0A0] uppercase tracking-widest font-normal max-w-[280px]">
@@ -195,29 +195,29 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
                 ctx?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
                 setHasDrawn(false);
                 onSignature("");
-              }} className="text-[10px] font-bold uppercase tracking-widest text-[#A0A0A0] hover:text-black transition-colors bg-black/5 hover:bg-black/10 px-4 py-2 flex items-center gap-2 rounded-md">
+              }} className="text-[10px] font-bold uppercase tracking-widest text-[#A0A0A0] hover:text-black dark:hover:text-white transition-colors bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 px-4 py-2 flex items-center gap-2 rounded-md">
                 CLEAR
               </button>
            )}
            <button
              onClick={onMint}
              disabled={disabled}
-             className="px-6 py-2 bg-black text-white hover:bg-[#222] transition-all font-bold uppercase tracking-widest text-[10px] disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(0,0,0,0.2)] hover:shadow-[0_0_30px_rgba(0,0,0,0.4)] whitespace-nowrap outline-none rounded-md"
+             className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black hover:bg-[#222] dark:hover:bg-[#ddd] transition-all font-bold uppercase tracking-widest text-[10px] disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(0,0,0,0.2)] hover:shadow-[0_0_30px_rgba(0,0,0,0.4)] whitespace-nowrap outline-none rounded-md"
            >
              {mintLabel}
            </button>
          </div>
       </div>
 
-      <div className={`relative w-full h-[180px] bg-white rounded-xl overflow-hidden transition-all ${hasDrawn ? 'border border-black/50 shadow-[0_0_30px_rgba(0,0,0,0.1)]' : 'border border-[#E5E5E5]'}`}>
+      <div className={`relative w-full h-[180px] bg-white dark:bg-[#111111] rounded-xl overflow-hidden transition-all ${hasDrawn ? 'border border-black/50 dark:border-white/50 shadow-[0_0_30px_rgba(0,0,0,0.1)]' : 'border border-[#E5E5E5] dark:border-white/10'}`}>
         {/* Subtle academic grid */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(#000000 1px, transparent 1px), linear-gradient(90deg, #000000 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.05] dark:opacity-[0.1]" style={{ backgroundImage: 'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
         
-        <canvas ref={canvasRef} className="absolute inset-0 z-10 w-full h-full cursor-crosshair touch-none" onPointerDown={start} onPointerMove={draw} onPointerUp={stop} onPointerLeave={stop} />
+        <canvas ref={canvasRef} className="absolute inset-0 z-10 w-full h-full cursor-crosshair touch-none dark:invert" onPointerDown={start} onPointerMove={draw} onPointerUp={stop} onPointerLeave={stop} />
         
         {!hasDrawn && !disabled && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-40 z-0">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">AWAITING SIGNATURE INPUT</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 dark:text-white/40">AWAITING SIGNATURE INPUT</p>
           </div>
         )}
       </div>
@@ -229,17 +229,17 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
   const displayFeed = feed || [];
 
   return (
-      <div className="w-full h-full flex flex-col bg-[#FAF9F6] overflow-hidden">
-         <div className="px-6 py-5 border-b border-[#E5E5E5] bg-white shrink-0 flex items-center justify-between z-10 relative">
+      <div className="w-full h-full flex flex-col bg-[#FAF9F6] dark:bg-[#0A0A0A] overflow-hidden">
+         <div className="px-6 py-5 border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] shrink-0 flex items-center justify-between z-10 relative">
              <div className="flex items-center gap-4">
-                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">VERIFIED LEDGER</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white">VERIFIED LEDGER</span>
              </div>
-             <span className="text-[9px] font-bold text-black uppercase tracking-[0.2em] bg-black/5 px-3 py-1 rounded-[4px] border border-black/10 flex items-center gap-2">
+             <span className="text-[9px] font-bold text-black dark:text-white uppercase tracking-[0.2em] bg-black/5 dark:bg-white/5 px-3 py-1 rounded-[4px] border border-black/10 dark:border-white/10 flex items-center gap-2">
                  REGIONAL: OPTIMISM MAINNET
              </span>
          </div>
          {/* Formal Academic Header */}
-         <div className="grid text-[9px] font-black text-[#888888] uppercase tracking-[0.15em] bg-white border-b border-[#E5E5E5] shrink-0"
+         <div className="grid text-[9px] font-black text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.15em] bg-white dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 shrink-0"
               style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 200px' }}>
               <div className="px-6 py-4">INDEX</div>
               <div className="px-6 py-4">WALLET ADDRESS</div>
@@ -269,30 +269,30 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
                     const isOldBlackJpeg = displaySig?.startsWith('data:image/jpeg') && f.claimedAt && new Date(f.claimedAt).getTime() < 1713955000000;
                     
                     return (
-                        <div key={i} className="grid items-center hover:bg-[#FAF9F6] bg-white border-b border-[#F0F0F0] transition-colors" style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 200px' }}>
+                        <div key={i} className="grid items-center hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] bg-white dark:bg-[#111111] border-b border-[#F0F0F0] dark:border-white/10 transition-colors" style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 200px' }}>
                             {/* Index */}
-                            <div className="px-6 py-5 text-black font-black font-mono text-[11px]">
+                            <div className="px-6 py-5 text-black dark:text-white font-black font-mono text-[11px]">
                                 {String(i+1).padStart(3, '0')}
                             </div>
                             {/* Identity */}
                              <div className="px-6 py-5 flex items-center gap-3">
-                                  <span className="text-[13px] font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
+                                  <span className="text-[13px] font-black font-mono text-black dark:text-white">{truncAddr(f.userAddress)}</span>
                              </div>
                             {/* Clearance */}
                             <div className="px-6 py-5">
-                                 <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-[#111111] text-white border border-white/20 whitespace-nowrap rounded-md shadow-sm">
+                                 <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-[#111111] dark:bg-white text-white dark:text-black border border-white/20 dark:border-black/20 whitespace-nowrap rounded-md shadow-sm">
                                      {tier} {(f.serialCode?.split('-').pop() || '0000').slice(-4)}
                                  </span>
                             </div>
                             {/* L2 Eligbility */}
                             <div className="px-6 py-5">
-                                 <span className={`text-[10px] font-bold uppercase tracking-[0.1em] flex items-center gap-1.5 ${f.networkLaunchEligible ? 'text-black' : 'text-[#888888]'}`}>
+                                 <span className={`text-[10px] font-bold uppercase tracking-[0.1em] flex items-center gap-1.5 ${f.networkLaunchEligible ? 'text-black dark:text-white' : 'text-[#888888] dark:text-[#AAAAAA]'}`}>
                                      {f.networkLaunchEligible ? 'WHITELISTED L2' : 'PENDING'}
                                  </span>
                             </div>
                             {/* Social Resolution */}
                             <div className="px-6 py-5">
-                                 <span className="text-[10px] font-mono text-black font-bold uppercase">{f.twitterHandle || 'HIDDEN'}</span>
+                                 <span className="text-[10px] font-mono text-black dark:text-white font-bold uppercase">{f.twitterHandle || 'HIDDEN'}</span>
                             </div>
                             {/* Signature ID */}
                             <div className="px-6 py-5">
@@ -302,22 +302,22 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
                             </div>
                             {/* Temporal Ingestion */}
                             <div className="px-6 py-5 text-[11px] sm:text-[12px] font-black font-mono flex flex-col gap-0.5">
-                                 <span className="text-black">{new Date(f.claimedAt).toLocaleDateString()}</span>
-                                 <span className="text-[#888888]">{new Date(f.claimedAt).toISOString().split('T')[1].replace('Z', '')}</span>
+                                 <span className="text-black dark:text-white">{new Date(f.claimedAt).toLocaleDateString()}</span>
+                                 <span className="text-[#888888] dark:text-[#AAAAAA]">{new Date(f.claimedAt).toISOString().split('T')[1].replace('Z', '')}</span>
                             </div>
                             {/* Signature */}
                              <div className="px-6 py-3 flex justify-end">
                                   {displaySig?.startsWith('data:image') ? (
-                                     <div className="bg-white border border-[#E5E5E5] rounded-lg overflow-hidden w-[140px] h-[50px] flex items-center justify-center">
+                                     <div className="bg-white dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-lg overflow-hidden w-[140px] h-[50px] flex items-center justify-center">
                                         <img 
                                           src={displaySig} 
-                                          className="w-full h-full object-contain scale-[1.1] transition-transform duration-300" 
+                                          className="w-full h-full object-contain scale-[1.1] transition-transform duration-300 dark:invert" 
                                           style={isOldBlackJpeg ? { filter: 'invert(1) grayscale(1) contrast(1.5) brightness(1.2)' } : { mixBlendMode: 'darken' }} 
                                           alt="Signature" 
                                         />
                                      </div>
                                   ) : (
-                                     <span className="font-mono text-[10px] font-black text-[#A0A0A0] bg-[#050505]/5 px-2 py-1 rounded">
+                                     <span className="font-mono text-[10px] font-black text-[#A0A0A0] bg-[#050505]/5 dark:bg-white/5 px-2 py-1 rounded">
                                          {displaySig && displaySig.length > 5 ? truncAddr(displaySig) : (displaySig || '—')}
                                      </span>
                                   )}
@@ -451,37 +451,37 @@ export function VossSupremacyPanel() {
   const hasTicket = dbStats?.ticket || false;
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col gap-6 overflow-hidden bg-[#FAF9F6] text-[#050505] p-0 md:p-6 lg:p-8">
+    <div className="w-full h-full min-h-0 flex flex-col gap-6 overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#050505] dark:text-white p-0 md:p-6 lg:p-8">
       
       {/* ── FORMAL HERO HEADER ── */}
       <ModuleHeader moduleId="gold" />
 
       <div className="grid lg:grid-cols-2 gap-6 shrink-0 px-4 md:px-0">
           {/* OVERVIEW COMPONENT */}
-          <div className="bg-white border border-[#E5E5E5] rounded-xl flex flex-col justify-center p-6 lg:p-10 relative overflow-hidden group shadow-sm">
+          <div className="bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-xl flex flex-col justify-center p-6 lg:p-10 relative overflow-hidden group shadow-sm">
                {/* Minimal Academic Lines */}
-               <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-l from-[#050505]/5 to-transparent" />
-               <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-[#050505]/5 to-transparent" />
+               <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-l from-[#050505]/5 dark:from-white/5 to-transparent" />
+               <div className="absolute top-0 right-0 w-[1px] h-full bg-gradient-to-b from-[#050505]/5 dark:from-white/5 to-transparent" />
                
                <div className="w-full mb-8">
                   <AllocationTelemetryBar minted={dbStats?.totalClaimed || 0} max={MAX_SUPPLY} />
                </div>
                
                <div className="grid grid-cols-2 gap-4 w-full">
-                  <div className="border-t border-[#E5E5E5] pt-4 flex flex-col gap-1">
+                  <div className="border-t border-[#E5E5E5] dark:border-white/10 pt-4 flex flex-col gap-1">
                      <span className="text-[10px] text-[#A0A0A0] uppercase tracking-[0.1em] font-black">Smart Contract</span>
-                     <span className="text-[11px] font-mono font-black text-[#050505]">0x7883...7b4a</span>
+                     <span className="text-[11px] font-mono font-black text-[#050505] dark:text-white">0x7883...7b4a</span>
                   </div>
-                  <div className="border-t border-[#E5E5E5] pt-4 flex flex-col gap-1">
+                  <div className="border-t border-[#E5E5E5] dark:border-white/10 pt-4 flex flex-col gap-1">
                      <span className="text-[10px] text-[#A0A0A0] uppercase tracking-[0.1em] font-black">Network Status</span>
-                     <span className="text-[11px] font-mono font-black text-[#050505] flex items-center gap-2"> ACTIVE</span>
+                     <span className="text-[11px] font-mono font-black text-[#050505] dark:text-white flex items-center gap-2"> ACTIVE</span>
                   </div>
                </div>
           </div>
 
           {/* ACTION/CLEARANCE COMPONENT */}
           {!hasTicket ? (
-            <div className="bg-white border border-[#E5E5E5] rounded-xl p-6 lg:p-8 flex flex-col relative overflow-hidden group shadow-sm">
+            <div className="bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-xl p-6 lg:p-8 flex flex-col relative overflow-hidden group shadow-sm">
                 <div className="flex-1 mt-2">
                     <AuthorizationSignaturePad 
                       onSignature={setSignatureData} 
@@ -493,10 +493,10 @@ export function VossSupremacyPanel() {
                       }
                     />
                  </div>
-                 <p className="text-[9px] text-[#A0A0A0] uppercase tracking-widest text-center mt-3 pt-3 border-t border-[#E5E5E5] font-black">By signing, I formally authorize the minting process within the protocol.</p>
+                 <p className="text-[9px] text-[#A0A0A0] uppercase tracking-widest text-center mt-3 pt-3 border-t border-[#E5E5E5] dark:border-white/10 font-black">By signing, I formally authorize the minting process within the protocol.</p>
             </div>
           ) : (
-            <div className="bg-white border border-[#E5E5E5] rounded-xl p-6 lg:p-8 grid grid-cols-2 gap-px bg-[#E5E5E5] overflow-hidden relative shadow-sm">
+            <div className="bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-xl p-6 lg:p-8 grid grid-cols-2 gap-px bg-[#E5E5E5] dark:bg-[#222] overflow-hidden relative shadow-sm">
                <AcademicStatCard label="SERIAL IDENTIFIER" value={dbStats.ticket.serialCode} isApex />
                <AcademicStatCard label="WALLET ADDRESS" value={truncAddr(address!)} />
                <AcademicStatCard label="NETWORK LAYER" value="Optimism L2" />
@@ -507,7 +507,7 @@ export function VossSupremacyPanel() {
 
       {/* ── CRYPTOGRAPHIC METADATA INJECTION ── */}
       {hasTicket && (
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-px bg-[#E5E5E5] border border-[#E5E5E5] rounded-xl overflow-hidden shadow-sm mx-4 md:mx-0">
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-px bg-[#E5E5E5] dark:bg-[#222] border border-[#E5E5E5] dark:border-white/10 rounded-xl overflow-hidden shadow-sm mx-4 md:mx-0">
           <AcademicStatCard label="ZKP ENTROPY HASH" value={`0x${getDeterministicHash(address + 'zkp1')}${getDeterministicHash(address + 'zkp2')}...${getDeterministicHash(address + 'zkp3').slice(0,4)}`} />
           <AcademicStatCard label="STATE ROOT PATH" value={`ROOT-${getDeterministicHash(address + 'root').toUpperCase()}`} />
           <AcademicStatCard label="EXECUTION LATENCY" value={`${(0.3 + (parseInt(getDeterministicHash(address || '').slice(0, 2), 16) % 120) / 100).toFixed(3)} ms`} />
@@ -516,7 +516,7 @@ export function VossSupremacyPanel() {
       )}
 
       {/* ── MASSIVE LEDGER GRID ── */}
-      <div className="flex-1 bg-white border border-[#E5E5E5] overflow-hidden flex flex-col relative mx-4 md:mx-0 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] min-h-[400px] mb-6">
+      <div className="flex-1 bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 overflow-hidden flex flex-col relative mx-4 md:mx-0 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] min-h-[400px] mb-6">
          <VerifiedLedger feed={dbStats?.feed || []} />
       </div>
 

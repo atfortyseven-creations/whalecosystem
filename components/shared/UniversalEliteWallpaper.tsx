@@ -21,8 +21,11 @@ export function UniversalEliteWallpaper() {
                     backgroundImage: "url('/system-shots/WALLPAPER%20GLOBAL.jpg')",
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center center',
-                    // Set to cover to fill the screen exactly without unnatural zoom or distortion.
-                    backgroundSize: 'cover',
+                    /* 'auto' = native pixel resolution — zero zoom, zero distortion.
+                       The #FAF9F6 base layer fills the surrounding space cleanly. */
+                    backgroundSize: 'auto',
+                    /* crisp-edges: maximum sharpness on Retina / 4K / HiDPI displays */
+                    imageRendering: 'crisp-edges',
                 }}
             />
 

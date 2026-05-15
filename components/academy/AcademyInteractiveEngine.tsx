@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, CheckCircle2, ChevronDown, GraduationCap, Folder, Upload, Send, Lock, BookOpen, Shield } from "lucide-react";
+import { Server, CheckCircle2, ChevronDown, GraduationCap, Folder, Upload, Send, Lock, BookOpen, Shield, Terminal } from "lucide-react";
 import { syncAcademySyllabusToDB, getUserProgressAndSubmissions, toggleLessonProgress, submitProofOfWork } from "@/app/actions/academy-actions";
 import { SovereignProfileModal } from "./SovereignProfileModal";
 import { RemoteLottie } from "@/components/ui/RemoteLottie";
@@ -256,10 +256,13 @@ export function AcademyInteractiveEngine({
                                                         <h5 className="font-mono text-[10px] uppercase tracking-widest text-[#666] mb-4 flex items-center gap-2">
                                                             <BookOpen size={13}/> Contenido Extendido
                                                         </h5>
-                                                        <p className="font-serif text-[13px] text-[#333] leading-[1.8] text-justify max-w-2xl">
+                                                        <p className="font-serif text-[13px] text-[#333] leading-[1.8] text-justify max-w-2xl mb-6">
                                                             {lesson.description}
-                                                            {/* El contenido completo estará aquí migrado */}
                                                         </p>
+                                                        <a href={`/academy/${lesson.id}`} className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-[10px] font-black uppercase tracking-widest hover:bg-black/80 transition-all rounded-xl shadow-md">
+                                                            <Terminal size={14} />
+                                                            Enter Module Terminal
+                                                        </a>
                                                     </div>
 
                                                     <div className="w-full md:w-[320px] shrink-0 border border-black/10 bg-white p-6 relative">

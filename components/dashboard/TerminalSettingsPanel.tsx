@@ -3,13 +3,16 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettingsStore, SovereignSettings } from '@/lib/store/useSettingsStore';
-import { Sliders, Network, ShieldAlert, Key, Loader2, Check } from 'lucide-react';
+import { Sliders, Network, ShieldAlert, Key, Loader2, Check, Zap, Monitor, MessageSquare } from 'lucide-react';
 
 const CATEGORIES = [
   { id: 'general', label: 'GENERAL SETTINGS', icon: Sliders },
-  { id: 'network', label: 'NETWORK & EXECUTION', icon: Network },
+  { id: 'network', label: 'NETWORK & RPC', icon: Network },
   { id: 'sonar', label: 'SONAR ALERTS', icon: ShieldAlert },
   { id: 'privacy', label: 'PRIVACY & SECURITY', icon: Key },
+  { id: 'execution', label: 'EXECUTION RULES', icon: Zap },
+  { id: 'display', label: 'DISPLAY & HARDWARE', icon: Monitor },
+  { id: 'whalechat', label: 'WHALE CHAT ACCOUNT', icon: MessageSquare },
 ];
 
 export function TerminalSettingsPanel() {
@@ -31,13 +34,13 @@ export function TerminalSettingsPanel() {
   const renderToggle = (key: keyof SovereignSettings, label: string, desc: string) => {
     const isActive = !!settings[key];
     return (
-      <div className="flex items-center justify-between p-4 bg-white border border-black/5 rounded-2xl hover:border-black/20 transition-all cursor-pointer select-none" onClick={() => updateSetting(key, !isActive as never)}>
+      <div className="flex items-center justify-between p-4 bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 rounded-2xl hover:border-black/20 dark:hover:border-white/20 transition-all cursor-pointer select-none" onClick={() => updateSetting(key, !isActive as never)}>
          <div className="flex flex-col pr-4">
-            <span className="text-[12px] font-black uppercase tracking-widest text-[#050505]">{label}</span>
-            <span className="text-[10px] text-black/40 font-mono mt-1 leading-relaxed">{desc}</span>
+            <span className="text-[12px] font-black uppercase tracking-widest text-[#050505] dark:text-white">{label}</span>
+            <span className="text-[10px] text-black/40 dark:text-white/40 font-mono mt-1 leading-relaxed">{desc}</span>
          </div>
-         <div className={`w-11 h-6 rounded-full flex items-center p-1 transition-colors duration-300 ${isActive ? 'bg-black' : 'bg-black/10'}`}>
-            <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-300 ${isActive ? 'translate-x-5' : 'translate-x-0'}`} />
+         <div className={`w-11 h-6 rounded-full flex items-center p-1 transition-colors duration-300 ${isActive ? 'bg-black dark:bg-white' : 'bg-black/10 dark:bg-white/10'}`}>
+            <div className={`w-4 h-4 rounded-full bg-white dark:bg-[#111111] shadow-sm transition-transform duration-300 ${isActive ? 'translate-x-5' : 'translate-x-0'}`} />
          </div>
       </div>
     );
@@ -46,9 +49,9 @@ export function TerminalSettingsPanel() {
   const renderSelect = (key: keyof SovereignSettings, label: string, desc: string, options: {value: string, label: string}[]) => {
     const currentValue = settings[key] as string;
     return (
-      <div className="flex flex-col p-4 bg-white border border-black/5 rounded-2xl">
-         <span className="text-[12px] font-black uppercase tracking-widest text-[#050505] mb-1">{label}</span>
-         <span className="text-[10px] text-black/40 font-mono mb-4">{desc}</span>
+      <div className="flex flex-col p-4 bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 rounded-2xl">
+         <span className="text-[12px] font-black uppercase tracking-widest text-[#050505] dark:text-white mb-1">{label}</span>
+         <span className="text-[10px] text-black/40 dark:text-white/40 font-mono mb-4">{desc}</span>
          <div className="flex flex-wrap gap-2">
             {options.map(opt => {
                const isSelected = currentValue === opt.value;
@@ -56,7 +59,7 @@ export function TerminalSettingsPanel() {
                   <button 
                     key={opt.value}
                     onClick={() => updateSetting(key, opt.value as never)}
-                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${isSelected ? 'bg-black text-white border-black' : 'bg-transparent text-black/50 border-black/10 hover:border-black/30'}`}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${isSelected ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white' : 'bg-transparent text-black/50 dark:text-white/50 border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30'}`}
                   >
                      {opt.label}
                   </button>
@@ -69,9 +72,9 @@ export function TerminalSettingsPanel() {
 
   const renderInput = (key: keyof SovereignSettings, label: string, desc: string, type: 'number' | 'text' = 'text', suffix?: string) => {
     return (
-      <div className="flex flex-col p-4 bg-white border border-black/5 rounded-2xl">
-         <span className="text-[12px] font-black uppercase tracking-widest text-[#050505] mb-1">{label}</span>
-         <span className="text-[10px] text-black/40 font-mono mb-3">{desc}</span>
+      <div className="flex flex-col p-4 bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 rounded-2xl">
+         <span className="text-[12px] font-black uppercase tracking-widest text-[#050505] dark:text-white mb-1">{label}</span>
+         <span className="text-[10px] text-black/40 dark:text-white/40 font-mono mb-3">{desc}</span>
          <div className="relative">
             <input 
               type={type}
@@ -81,26 +84,26 @@ export function TerminalSettingsPanel() {
                  if (type === 'number') val = parseFloat(val) || 0;
                  updateSetting(key, val as never);
               }}
-              className="w-full bg-[#FAF9F6] border border-black/10 rounded-xl px-4 py-3 text-[12px] font-mono focus:border-black focus:outline-none transition-colors"
+              className="w-full bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-[12px] font-mono text-black dark:text-white focus:border-black dark:focus:border-white focus:outline-none transition-colors"
             />
-            {suffix && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-black/30 pointer-events-none">{suffix}</span>}
+            {suffix && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-black/30 dark:text-white/30 pointer-events-none">{suffix}</span>}
          </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col md:flex-row w-full bg-[#FAF9F6] min-h-[70vh] border border-black/10 rounded-3xl overflow-hidden shadow-sm">
+    <div className="flex flex-col md:flex-row w-full bg-[#FAF9F6] dark:bg-[#0A0A0A] min-h-[70vh] border border-black/10 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm">
       
       {/* Sidebar */}
-      <div className="w-full md:w-[280px] border-b md:border-b-0 md:border-r border-black/10 flex flex-col p-6 bg-white shrink-0">
+      <div className="w-full md:w-[280px] border-b md:border-b-0 md:border-r border-black/10 dark:border-white/10 flex flex-col p-6 bg-white dark:bg-[#111111] shrink-0">
          <div className="flex items-center gap-3 mb-8 px-2">
-            <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center text-white dark:text-black shrink-0">
                <Sliders size={14} />
             </div>
             <div className="flex flex-col">
-               <span className="text-[13px] font-black uppercase tracking-tighter">Settings</span>
-               <span className="text-[9px] font-mono text-black/40 uppercase tracking-widest">Terminal Variables</span>
+               <span className="text-[13px] font-black uppercase tracking-tighter dark:text-white">Settings</span>
+               <span className="text-[9px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">Terminal Variables</span>
             </div>
          </div>
 
@@ -112,9 +115,9 @@ export function TerminalSettingsPanel() {
                  <button 
                    key={c.id} 
                    onClick={() => setActiveTab(c.id)}
-                   className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-black text-white' : 'bg-transparent text-black/50 hover:bg-black/5 hover:text-black'}`}
+                   className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-black dark:bg-white text-white dark:text-black shadow-sm' : 'bg-transparent text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white'}`}
                  >
-                    <Icon size={14} className={isActive ? 'text-white' : 'text-black/40'} />
+                    <Icon size={14} className={isActive ? 'text-white dark:text-black' : 'text-black/40 dark:text-white/40'} />
                     {c.label}
                  </button>
                )
@@ -123,13 +126,13 @@ export function TerminalSettingsPanel() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 p-6 md:p-10 bg-[#FAF9F6] overflow-y-auto max-h-[80vh] custom-scrollbar">
+      <div className="flex-1 p-6 md:p-10 bg-[#FAF9F6] dark:bg-[#0A0A0A] overflow-y-auto max-h-[80vh] custom-scrollbar">
          
          <div className="mb-8">
-            <h2 className="text-2xl font-black uppercase tracking-tighter mb-2">
+            <h2 className="text-2xl font-black uppercase tracking-tighter mb-2 dark:text-white">
                {CATEGORIES.find(c => c.id === activeTab)?.label}
             </h2>
-            <p className="text-[11px] font-mono text-black/40 uppercase tracking-widest">
+            <p className="text-[11px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">
                Control the terminal's physical rendering and local memory parameters.
             </p>
          </div>
@@ -148,12 +151,8 @@ export function TerminalSettingsPanel() {
                      {/* Aesthetics & UI */}
                      {renderSelect('theme', 'Terminal Aesthetic', 'System-wide visual processing matrix.', [
                         {value: 'light', label: 'Ivory Matrix'},
-                        {value: 'dark', label: 'Obsidian Void'}
-                     ])}
-                     {renderSelect('density', 'Interface Density', 'Padding and spacing physics engine.', [
-                        {value: 'relaxed', label: 'Relaxed'},
-                        {value: 'compact', label: 'Compact'},
-                        {value: 'dense', label: 'Dense'}
+                        {value: 'dark', label: 'Obsidian Void'},
+                        {value: 'system', label: 'System Sync'}
                      ])}
                      {renderSelect('language', 'Base Dialect', 'Core linguistic output localization.', [
                         {value: 'en', label: 'English'},
@@ -165,8 +164,29 @@ export function TerminalSettingsPanel() {
                         {value: 'GBP', label: 'GBP - Pound'},
                         {value: 'JPY', label: 'JPY - Yen'}
                      ])}
+                     {renderSelect('timeFormat', 'Chronological Format', '12-hour or 24-hour military time representation.', [
+                        {value: '12h', label: '12-Hour (AM/PM)'},
+                        {value: '24h', label: '24-Hour (Military)'}
+                     ])}
+                     {renderSelect('dateFormat', 'Date Sequencing', 'Ordering of days and months.', [
+                        {value: 'DD/MM/YYYY', label: 'DD/MM/YYYY'},
+                        {value: 'MM/DD/YYYY', label: 'MM/DD/YYYY'}
+                     ])}
+                     {renderSelect('addressFormat', 'Address Truncation', 'Visual rendering length of public keys.', [
+                        {value: 'truncated', label: 'Truncated (0x1...ABCD)'},
+                        {value: 'full', label: 'Full Length'}
+                     ])}
+                  </>
+               )}
 
+               {activeTab === 'display' && (
+                  <>
                      {/* Portfolio Visuals */}
+                     {renderSelect('density', 'Interface Density', 'Padding and spacing physics engine.', [
+                        {value: 'relaxed', label: 'Relaxed'},
+                        {value: 'compact', label: 'Compact'},
+                        {value: 'dense', label: 'Dense'}
+                     ])}
                      {renderSelect('defaultTimeframe', 'Telemetry Range', 'Default horizon for analytics charting.', [
                         {value: '1D', label: '24 Hours'},
                         {value: '1W', label: '7 Days'},
@@ -180,12 +200,20 @@ export function TerminalSettingsPanel() {
                      ])}
                      {renderToggle('showBalances', 'Hydrate Balances', 'Render absolute balance integers on-screen.')}
                      {renderToggle('soundEffects', 'Haptic Audio', 'Tactile UI sounds on execution events.')}
+                     {renderToggle('hardwareAcceleration', 'GPU Acceleration', 'Offload intensive DOM rendering to the GPU for fluid 120fps.')}
                   </>
                )}
 
                {activeTab === 'network' && (
                   <>
                      {/* Execution params */}
+                     {renderInput('customRpcUrl', 'Sovereign RPC Node', 'Direct endpoint override for JSON-RPC egress.', 'text')}
+                     {renderToggle('testnetMode', 'Testnet Dimensional Bridge', 'Inject Sepolia and Holesky streams into main views.')}
+                  </>
+               )}
+
+               {activeTab === 'execution' && (
+                  <>
                      {renderSelect('gasPreset', 'Inclusion Thermodynamics', 'Gwei priority layer settings for mainnet.', [
                         {value: 'ECONOMY', label: 'Economy'},
                         {value: 'STANDARD', label: 'Standard'},
@@ -193,9 +221,7 @@ export function TerminalSettingsPanel() {
                         {value: 'INSTANT', label: 'Instant'}
                      ])}
                      {renderInput('maxSlippage', 'Max Tolerable Deflection', 'Slippage threshold percentage for automatic DEX routing.', 'number', '%')}
-                     {renderInput('customRpcUrl', 'Sovereign RPC Node', 'Direct endpoint override for JSON-RPC egress.', 'text')}
                      {renderToggle('mevProtection', 'MEV Cloaking (Dark Pool)', 'Route transactions through private relays (e.g. Flashbots) to evade sandwich attacks.')}
-                     {renderToggle('testnetMode', 'Testnet Dimensional Bridge', 'Inject Sepolia and Holesky streams into main views.')}
                   </>
                )}
 
@@ -204,7 +230,9 @@ export function TerminalSettingsPanel() {
                      {/* Alerts */}
                      {renderToggle('emailAlerts', 'SMTP Ingress', 'Receive catastrophic system reports via registered email.')}
                      {renderToggle('telegramAlerts', 'Telegram Vector', 'Direct pulse notifications to the sovereign Telegram bot.')}
+                     {renderToggle('audioAlerts', 'Acoustic Alarms', 'Audible klaxon triggers for leviathan movements.')}
                      {renderInput('whaleAlertThreshold', 'Leviathan Threshold', 'Minimum USD volume required to trigger a terminal-wide global alert.', 'number', 'USD')}
+                     {renderInput('email', 'Emergency Egress Mail', 'Registered destination for mission-critical notifications.', 'text')}
                   </>
                )}
 
@@ -212,9 +240,23 @@ export function TerminalSettingsPanel() {
                   <>
                      {/* Security */}
                      {renderInput('inactivityLockMinutes', 'Dead Man\'s Lock', 'Idle time required before the terminal requests ECDSA re-validation.', 'number', 'MIN')}
+                     {renderSelect('autoDisconnectTimer', 'Auto-Sever Duration', 'Force wallet disconnect after fixed period of time.', [
+                        {value: '15m', label: '15 Minutes'},
+                        {value: '1h', label: '1 Hour'},
+                        {value: '24h', label: '24 Hours'},
+                        {value: 'never', label: 'Never'}
+                     ])}
                      {renderToggle('stealthMode', 'Visual Cryptography', 'Scramble all on-screen hexadecimal addresses to prevent shoulder-surfing.')}
                      {renderToggle('requireSignForExports', 'Export Sealing', 'Demand cryptographic signature before exporting CSV ledgers to physical disk.')}
                      {renderToggle('allowAnalytics', 'Telemetry Contribution', 'Allow anonymized metadata shipping to refine the Global Hive intelligence.')}
+                  </>
+               )}
+
+               {activeTab === 'whalechat' && (
+                  <>
+                     {renderInput('chatName', 'Alias Identifier', 'Your cryptographic moniker visible to active conversational peers.', 'text')}
+                     {renderInput('chatBio', 'Operative Biography', 'A short thesis or description embedded into your identity matrix.', 'text')}
+                     {renderInput('qrLabel', 'QR Scan Label', 'The physical text appended to your Sovereign Identity Code when projected.', 'text')}
                   </>
                )}
             </motion.div>

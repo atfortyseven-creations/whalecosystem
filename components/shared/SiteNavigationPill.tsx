@@ -9,9 +9,9 @@ export function SiteNavigationPill() {
     const pathname = usePathname();
 
     const navLinks = [
-        { href: '/#pricing', label: 'Pricing', icon: Tag, active: false },
-        { href: '/#faq', label: 'FAQ', icon: HelpCircle, active: false },
-        { href: '/ledger', label: 'Ledger', icon: Globe, active: pathname.startsWith('/ledger') },
+        { href: '/pricing',   label: 'Pricing',   icon: Tag,           active: pathname.startsWith('/pricing') },
+        { href: '/docs',      label: 'Docs',      icon: HelpCircle,    active: pathname.startsWith('/docs') },
+        { href: '/ledger',    label: 'Ledger',    icon: Globe,         active: pathname.startsWith('/ledger') },
         { href: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, active: pathname.startsWith('/portfolio') },
     ];
 
@@ -22,10 +22,10 @@ export function SiteNavigationPill() {
                     key={link.href} 
                     href={link.href} 
                     className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
-                        link.active ? 'text-[var(--aztec-ink)]' : 'text-[var(--aztec-ink)]/40 hover:text-[var(--aztec-ink)]'
+                        link.active ? 'text-[#050505]' : 'text-[#050505]/40 hover:text-[#050505]'
                     }`}
                 >
-                    <link.icon size={12} className={link.active ? 'text-[var(--aztec-orchid)]' : 'text-[var(--aztec-ink)]/20'} />
+                    <link.icon size={12} className={link.active ? 'text-[#8B5CF6]' : 'text-[#050505]/20'} />
                     {link.label}
                 </Link>
             ))}

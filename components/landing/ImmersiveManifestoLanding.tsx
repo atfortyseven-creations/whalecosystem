@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { ArrowRight, Scan } from "lucide-react";
-import { useEthMetrics } from "@/hooks/useEthMetrics";
-import { StackableCarousel } from "@/components/ui/StackableCarousel";
+import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { RemoteLottie } from "@/components/ui/RemoteLottie";
-import { SovereignFooter } from "@/components/landing/SovereignFooter";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -19,14 +16,6 @@ const FADE_UP: any = {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { onOpenScanner?: () => void; hideMap?: boolean; }) {
-  const { blockNumber, baseFeeGwei, syncing } = useEthMetrics();
-  const [globalStats, setGlobalStats] = useState<{ tokens: string; cap: string } | null>(null);
-
-  useEffect(() => {
-    fetch("/api/market/global").then((r) => r.json()).then((data) => {
-      if (data?.data) setGlobalStats({ tokens: data.data.active_cryptocurrencies.toLocaleString(), cap: "$" + (data.data.total_market_cap.usd / 1e12).toFixed(2) + "T" });
-    }).catch(() => {});
-  }, []);
 
   return (
     <div className="relative bg-transparent text-[#0a0a0a] font-sans antialiased overflow-x-hidden selection:bg-black/10">
@@ -35,7 +24,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
 
       {/* ── BENTO BOX: WHY WHALE ALERT NETWORK ──────────────────────────────── */}
       <section className="w-full py-24 md:py-40 bg-transparent relative z-10 flex justify-center">
-        <div className="w-full max-w-[2560px] mx-auto px-6 md:px-12 xl:px-20 space-y-16">
+        <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12 xl:px-20 space-y-16">
             <div className="text-left max-w-3xl space-y-6 mb-20">
                 <h2 className="text-[40px] sm:text-[56px] font-black tracking-tighter uppercase leading-[0.95] text-[#0a0a0a]">
                     Architectural <span className="text-[#050505]">Precision.</span>
@@ -127,9 +116,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
           </motion.div>
         </div>
         
-        {/* Image Display - Replaced StackableCarousel with full-visibility vertical stack */}
+        {/* Image Display — Centred, mobile-optimised */}
         <div className="w-full relative py-12 flex justify-center">
-          <div className="w-full max-w-[2560px] mx-auto px-6 md:px-12 xl:px-20 flex flex-col gap-12 md:gap-24 relative z-10">
+          <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 md:px-12 xl:px-20 flex flex-col items-center gap-10 md:gap-20 relative z-10">
             {[
               "/system-shots/Captura de pantalla 2026-05-07 012904.png",
               "/system-shots/Captura de pantalla 2026-05-07 032204.png",
@@ -140,19 +129,31 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
               "/system-shots/Captura de pantalla 2026-05-13 191813.png",
               "/system-shots/Captura de pantalla 2026-05-13 192204.png"
             ].map((src, idx) => (
-              <motion.div 
-                key={idx} 
-                initial="hidden" 
-                whileInView="visible" 
-                viewport={{ once: true, margin: "-100px" }} 
+              <motion.div
+                key={idx}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-80px" }}
                 variants={FADE_UP}
-                className="w-full"
+                className="w-full flex justify-center"
               >
-                <img 
-                  src={src} 
-                  className="w-full h-auto rounded-2xl md:rounded-[2rem] shadow-2xl border border-black/5 object-cover bg-white" 
-                  alt={`Platform view ${idx + 1}`} 
-                />
+                {/* Frame wrapper */}
+                <div className="w-full relative group">
+                  {/* Subtle outer glow on hover */}
+                  <div className="absolute -inset-[2px] rounded-[24px] md:rounded-[32px] bg-gradient-to-b from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-sm pointer-events-none" />
+                  {/* Screen-number badge */}
+                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                    <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-white/60">
+                      {String(idx + 1).padStart(2, "0")} / 08
+                    </span>
+                  </div>
+                  <img
+                    src={src}
+                    className="w-full h-auto rounded-2xl md:rounded-[28px] shadow-[0_12px_60px_rgba(0,0,0,0.12)] border border-black/8 object-contain bg-[#F5F5F0] block mx-auto transition-transform duration-700 group-hover:-translate-y-1"
+                    alt={`Platform screenshot ${idx + 1}`}
+                    loading={idx < 2 ? "eager" : "lazy"}
+                  />
+                </div>
               </motion.div>
             ))}
           </div>

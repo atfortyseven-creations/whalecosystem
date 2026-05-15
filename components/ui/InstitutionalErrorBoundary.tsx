@@ -72,24 +72,20 @@ export class InstitutionalErrorBoundary extends Component<Props, State> {
           </div>
           
           <h2 className="text-[14px] font-black uppercase tracking-[0.2em] text-[#050505] mb-2 text-center">
-            Critical Module Decoupling Detected
+            Something went wrong
           </h2>
           <p className="text-[10px] font-mono text-[#888888] uppercase tracking-widest mb-6 text-center max-w-sm leading-relaxed">
-            The {this.props.moduleName || 'active'} intelligence node has encountered an unhandled exception. Parity check failed.
+            {this.props.moduleName
+              ? `The "${this.props.moduleName}" module failed to load.`
+              : 'This module failed to load.'} Please try again.
           </p>
           
           <button
             onClick={this.handleReset}
             className="flex items-center gap-2.5 px-6 py-3 bg-[#050505] text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-black/10"
           >
-            <RefreshCw size={14} /> Re-initialize Protocol
+            <RefreshCw size={14} /> Try Again
           </button>
-          
-          <div className="mt-8 pt-8 border-t border-black/5 w-full flex justify-center">
-             <span className="text-[8px] font-mono text-[#CCCCCC] uppercase tracking-widest italic">
-               ID Code: {this.state.error?.name || 'ERR_NODE_UNKNOWN'} // Clearance Redacted
-             </span>
-          </div>
         </div>
       );
     }

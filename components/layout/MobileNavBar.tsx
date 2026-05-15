@@ -10,18 +10,18 @@ export function MobileNavBar() {
     const pathname = usePathname();
 
     const navItems = [
-        { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/network', label: 'Intelligence', icon: Globe },
-        { href: '/', label: 'Home', icon: Home },
-        { href: '/portfolio', label: 'Portfolio', icon: LineChart },
-        { href: '/support', label: 'Support', icon: Target },
+        { href: '/dashboard', label: 'Dashboard',     icon: LayoutDashboard },
+        { href: '/news',      label: 'Intelligence',  icon: Globe },
+        { href: '/',          label: 'Home',          icon: Home },
+        { href: '/portfolio', label: 'Portfolio',     icon: LineChart },
+        { href: '/support',   label: 'Support',       icon: Target },
     ];
 
     return (
         <motion.nav 
             initial={{ y: 100 }}
             animate={{ y: 0 }}
-            className="fixed bottom-0 left-0 right-0 z-[100] md:hidden bg-white dark:bg-[#050505] backdrop-blur-3xl border-t border-black/5 dark:border-white/5 pb-[env(safe-area-inset-bottom)] transform-gpu"
+            className="fixed bottom-0 left-0 right-0 z-[100] md:hidden bg-white dark:bg-[#0A0A0A] backdrop-blur-3xl border-t border-black/5 dark:border-white/10 pb-[env(safe-area-inset-bottom)] transform-gpu transition-colors duration-300"
         >
             <div className="flex justify-evenly items-center px-2 py-2">
                 {navItems.map((item, index) => {
