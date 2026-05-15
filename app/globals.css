@@ -1238,25 +1238,25 @@ html.no-hw-accel * {
    ────────────────────────────────────────────────────────────────────────── */
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   GLOBAL PC SCALE SYSTEM — 50% ZOOM-OUT FOR DESKTOP
+   GLOBAL PC SCALE SYSTEM — 40% ZOOM-OUT FOR DESKTOP (zoom: 0.6)
    ──────────────────────────────────────────────────────────────────────────────
    HOW IT WORKS:
-   • `zoom: 0.5` on <html> scales the entire rendering tree to 50%.
-   • The browser automatically creates a 200vw × 200vh logical coordinate space
-     to fill the physical viewport — NO width/height overrides needed.
-   • Adding width:200vw at zoom:0.5 would make it 400vw (double-counted) — WRONG.
+   • `zoom: 0.6` on <html> scales the entire rendering tree to 60% of original.
+   • This achieves a 40% zoom-out effect — content is closer than 0.5 but still
+     scaled down for 4K/ultrawide displays.
+   • The browser automatically creates the logical coordinate space.
    • Mobile (< 1024px physical hardware screen) is completely unaffected.
    ══════════════════════════════════════════════════════════════════════════════ */
 @media screen and (min-width: 1024px) {
   html {
-    zoom: 0.5;
+    zoom: 0.6;
   }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    UNIVERSAL DARK MODE — Glass Surface System
    Applied globally when html.dark is active (default theme = dark).
-   Ensures text is always readable over the black wallpaper.
+   Ensures text is ALWAYS readable over the black wallpaper.
    ══════════════════════════════════════════════════════════════════════════════ */
 
 /* Force all generic solid-white page shells to transparent in dark mode */
@@ -1264,9 +1264,47 @@ html.dark [class*="bg-white"]:not([class*="bg-white/"]):not(button):not(a):not(i
   background-color: transparent !important;
 }
 
-/* Text contrast enforcement — dark mode primary text is white */
+/* ── UNIVERSAL TEXT CONTRAST — DARK MODE ABSOLUTE ENFORCEMENT ── */
+/* Every text element in dark mode must be white/light — zero exceptions */
+html.dark body,
+html.dark body * {
+  color: inherit;
+}
+
 html.dark body {
+  color: #F5F5F5 !important;
+}
+
+/* Force white on ALL common text elements in dark mode */
+html.dark p,
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6,
+html.dark span:not([class*="text-"]):not([class*="opacity-"]),
+html.dark li,
+html.dark label,
+html.dark td,
+html.dark th {
   color: #F5F5F5;
+}
+
+/* Fix text-black / text-[#050505] classes that render dark text on dark bg */
+html.dark .text-black,
+html.dark [class*="text-black"],
+html.dark [class*="text-[#050505]"],
+html.dark [class*="text-[#0A0A0A]"],
+html.dark [class*="text-slate-900"],
+html.dark [class*="text-gray-900"],
+html.dark [class*="text-zinc-900"] {
+  color: #F5F5F5 !important;
+}
+
+/* Fix opacity-based dark text — make them light-opacity white instead */
+html.dark [class*="text-black/"] {
+  color: rgba(245, 245, 245, 0.85) !important;
 }
 
 /* Ensure all min-h-screen wrappers are transparent, not white */
@@ -1287,5 +1325,58 @@ html.dark [style*="#FDFCF8"],
 html.dark [style*="#FAF9F6"],
 html.dark [style*="#FFFDF8"] {
   background-color: transparent !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   UNIVERSAL NAV / TABS CENTERING SYSTEM
+   All navigation headers, tab bars, and pill navs must be perfectly centered.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Ensure header inner containers are always max-width centered */
+header > div,
+nav > div {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tab navigation perfect centering for all doc/app tab rows */
+.tab-row,
+[role="tablist"],
+nav[class*="flex"] {
+  display: flex;
+  align-items: center;
+}
+
+/* Center the absolute-positioned nav in the InstitutionalHeader */
+header .absolute.left-\[50\%\] {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* ── DOCS LAYOUT: force dark-readable text in the docs panel ── */
+/* The docs sidebar and content must have white text in dark mode */
+html.dark .doc-content h1,
+html.dark .doc-content h2,
+html.dark .doc-content h3,
+html.dark .doc-content h4,
+html.dark .doc-content p,
+html.dark .doc-content li,
+html.dark .doc-content td,
+html.dark .doc-content th,
+html.dark .doc-content span {
+  color: #F5F5F5 !important;
+  opacity: 1 !important;
+}
+
+html.dark .doc-content pre,
+html.dark .doc-content code {
+  background: rgba(255,255,255,0.05) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #E2E8F0 !important;
+}
+
+html.dark .doc-content .callout {
+  background: rgba(255,255,255,0.04) !important;
+  border-left-color: rgba(255,255,255,0.4) !important;
 }
 

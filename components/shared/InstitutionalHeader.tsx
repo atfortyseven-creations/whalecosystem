@@ -102,9 +102,9 @@ export function InstitutionalHeader() {
                 </Link>
             </div>
 
-            {/* CENTER: Tronscan Inspired Navigation Menu */}
-            <div className="hidden lg:flex items-center justify-center absolute left-[50%] translate-x-[-50%] h-full z-20">
-                <nav className="flex items-center gap-1 h-full">
+            {/* CENTER: Tronscan Inspired Navigation Menu — perfectly centered */}
+            <div className="hidden lg:flex items-center justify-center absolute left-1/2 -translate-x-1/2 top-0 bottom-0 z-20 pointer-events-none">
+                <nav className="flex items-center gap-1 h-full pointer-events-auto">
                     {MENU_ITEMS.map((item, index) => (
                         <MegaMenuItem key={index} item={item} />
                     ))}
