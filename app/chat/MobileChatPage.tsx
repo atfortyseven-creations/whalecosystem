@@ -24,7 +24,21 @@ const WhaleChat = dynamic(
   }
 );
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
+
 export default function MobileChatPage() {
+  const isMobile = useIsMobile();
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const [viewportOffset, setViewportOffset] = useState<number>(0);
   const rafRef = useRef<number | null>(null);
@@ -33,47 +47,81 @@ export default function MobileChatPage() {
     if (typeof window === "undefined") return;
 
     // ── Body Scroll Lock ───────────────────────────────────────────────────
-    // Prevent the entire page from bouncing or scrolling on mobile
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
     document.body.style.height = '100%';
     document.body.style.overscrollBehavior = 'none';
 
-    if (!window.visualViewport) return;
-
-    const vv = window.visualViewport!;
-
-    const update = () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        setViewportHeight(vv.height);
-        // We do NOT fight the browser with window.scrollTo(0,0) anymore.
-        // We just let the visual viewport top dictate the fixed offset cleanly.
-        setViewportOffset(vv.offsetTop);
-      });
-    };
-
-    update();
-    vv.addEventListener("resize", update, { passive: true });
-    vv.addEventListener("scroll", update, { passive: true });
+    if (isMobile && window.visualViewport) {
+      const vv = window.visualViewport!;
+      const update = () => {
+        if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => {
+          setViewportHeight(vv.height);
+          setViewportOffset(vv.offsetTop);
+        });
+      };
+      update();
+      vv.addEventListener("resize", update, { passive: true });
+      vv.addEventListener("scroll", update, { passive: true });
+      return () => {
+        vv.removeEventListener("resize", update);
+        vv.removeEventListener("scroll", update);
+        if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
+        document.body.style.overscrollBehavior = '';
+      };
+    }
 
     return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-      
-      // Cleanup body styles
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.width = '';
       document.body.style.height = '';
       document.body.style.overscrollBehavior = '';
     };
-  }, []);
+  }, [isMobile]);
 
-  // Use fixed positioning to occupy exactly the visual viewport space.
-  // This is the "Master" solution for mobile messaging apps in the browser.
+  // ── Desktop: simple flex-col filling the full viewport ──────────────────
+  if (!isMobile) {
+    return (
+      <>
+        <UniversalEliteWallpaper />
+        <div className="flex-1 flex flex-col h-screen w-full relative z-10 bg-transparent">
+          {/* ── Top Navigation Bar ── */}
+          <header className="shrink-0 h-14 flex items-center justify-between px-6 bg-black/60 backdrop-blur-[60px] border-b border-white/5 relative z-10 w-full">
+            <Link
+              href="/dashboard"
+              className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/5 text-white/50 transition-colors"
+              aria-label="Back to dashboard"
+            >
+              <ArrowLeft size={18} />
+            </Link>
+
+            <div className="flex items-center gap-2.5">
+              <img src="/official-whale-monochrome.png" alt="Whale" className="w-4 h-4 opacity-80 filter invert" />
+              <span className="font-mono text-[11px] font-black uppercase tracking-[0.25em] text-white">Whale Chat</span>
+            </div>
+
+            <div className="w-9 flex items-center justify-center">
+              <span className="font-mono text-[9px] font-black uppercase tracking-widest text-white/20">P2P</span>
+            </div>
+          </header>
+
+          {/* Chat fills the remainder — 100% width, all remaining height */}
+          <div className="flex-1 min-h-0 w-full overflow-hidden relative">
+            <WhaleChat forceAutoInit={false} />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // ── Mobile: visual-viewport-anchored fixed positioning ──────────────────
   const containerStyle: React.CSSProperties = {
     position: 'fixed',
     top: `${viewportOffset}px`,
@@ -92,22 +140,22 @@ export default function MobileChatPage() {
       <UniversalEliteWallpaper />
       <div style={containerStyle} className="text-[#050505] dark:text-white">
         {/* ── Top Navigation Bar ── */}
-        <header className="shrink-0 h-14 flex items-center justify-between px-5 bg-white/60 dark:bg-black/60 backdrop-blur-[60px] border-b border-black/5 dark:border-white/5 z-10">
+        <header className="shrink-0 h-14 flex items-center justify-between px-5 bg-black/60 backdrop-blur-[60px] border-b border-white/5 z-10">
           <Link
             href="/"
-            className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-[#050505]/50 dark:text-white/50 transition-colors"
+            className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/5 text-white/50 transition-colors"
             aria-label="Back to home"
           >
             <ArrowLeft size={18} />
           </Link>
 
           <div className="flex items-center gap-2.5">
-            <img src="/official-whale-monochrome.png" alt="Whale" className="w-4 h-4 opacity-80" style={{ filter: 'invert(var(--dark-invert, 0))' }} />
-            <span className="font-mono text-[11px] font-black uppercase tracking-[0.25em] text-[#050505] dark:text-white">Whale Chat</span>
+            <img src="/official-whale-monochrome.png" alt="Whale" className="w-4 h-4 opacity-80 filter invert" />
+            <span className="font-mono text-[11px] font-black uppercase tracking-[0.25em] text-white">Whale Chat</span>
           </div>
 
           <div className="w-9 flex items-center justify-center">
-            <span className="font-mono text-[9px] font-black uppercase tracking-widest text-black/20 dark:text-white/20">P2P</span>
+            <span className="font-mono text-[9px] font-black uppercase tracking-widest text-white/20">P2P</span>
           </div>
         </header>
 

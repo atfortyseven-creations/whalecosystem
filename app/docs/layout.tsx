@@ -43,7 +43,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     <div className={`min-h-screen ${bg} transition-colors duration-200 font-sans`}>
 
       {/* ── TOP BAR ── */}
-      <header className={`sticky top-0 z-50 h-[56px] border-b ${hdrBg} px-5 flex items-center backdrop-blur-xl`}>
+      <header className={`sticky top-0 z-50 h-[56px] border-b ${hdrBg} w-full flex items-center px-6 backdrop-blur-xl`}>
 
         {/* Logo */}
         <Link href="/docs" className="font-mono text-[11px] font-black uppercase tracking-[0.25em] mr-8 text-white shrink-0 hover:text-white/80 transition-colors">
@@ -57,7 +57,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         </span>
 
         {/* Tab navigation — perfectly centered in the header */}
-        <nav className="flex items-stretch h-full gap-0 flex-1 justify-start">
+        <nav className="flex items-stretch h-full gap-0 flex-1 justify-center">
           {TOP_TABS.map(tab => (
             <Link
               key={tab.id}
@@ -80,14 +80,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       </header>
 
       {/* ── BODY ── */}
-      <div className="flex w-full max-w-[2560px] mx-auto">
+      <div className="flex w-full">
 
         {/* Left sidebar */}
         <Sidebar theme="dark" currentPath={pathname || ''} />
 
         {/* Main content */}
         <main className={`flex-1 min-w-0 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar flex flex-col`}>
-          <div className="max-w-[780px] mx-auto py-16 px-6 lg:px-12 flex-1">
+          <div className="w-full max-w-[860px] mx-auto py-16 px-8 lg:px-16 flex-1">
             {children}
           </div>
         </main>

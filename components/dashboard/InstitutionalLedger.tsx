@@ -16,20 +16,18 @@ import { usePublicClient, useBlockNumber } from 'wagmi';
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface LedgerEntry {
   id: string;
-  blockHex: string;
-  verificationLayer: string;
-  sha256Hash: string;
-  payloadMB: number;
-  protocolState: 'Finalized / Valid' | 'Pending' | 'Orphaned';
+  blockNumber: number;
+  miner: string;
+  hash: string;
+  sizeKb: number;
+  txCount: number;
   timestamp: string;
-  chain: string;
 }
 
 interface LedgerStats {
   totalBlocks: number;
-  finalizedPct: number;
-  avgPayloadMB: number;
-  observersActive: number;
+  avgSizeKb: number;
+  avgTxs: number;
 }
 
 // ── Utility ───────────────────────────────────────────────────────────────────
@@ -55,18 +53,7 @@ function StatCard({
   );
 }
 
-function StateChip({ state }: { state: LedgerEntry['protocolState'] }) {
-  const cfg = {
-    'Finalized / Valid': { bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-500' },
-    'Pending':           { bg: 'bg-amber-50 dark:bg-amber-500/10',   border: 'border-amber-200 dark:border-amber-500/20',   text: 'text-amber-700 dark:text-amber-400',   dot: 'bg-amber-400 animate-pulse' },
-    'Orphaned':          { bg: 'bg-rose-50 dark:bg-rose-500/10',    border: 'border-rose-200 dark:border-rose-500/20',    text: 'text-rose-700 dark:text-rose-400',    dot: 'bg-rose-500' },
-  }[state];
-  return (
-    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded border text-[9px] font-bold uppercase tracking-widest ${cfg.bg} ${cfg.border} ${cfg.text}`}>
-      {state}
-    </div>
-  );
-}
+// Removed StateChip
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function InstitutionalLedger() {
@@ -108,18 +95,17 @@ export default function InstitutionalLedger() {
         try {
             const block = await publicClient.getBlock({
                 blockNumber: blockNumber,
-                includeTransactions: false
+                includeTransactions: true
             });
             
             const newEntry: LedgerEntry = {
                 id: block.hash,
-                blockHex: `0x${block.number.toString(16).toUpperCase()}`,
-                verificationLayer: 'L1_ETH_MAINNET',
-                sha256Hash: block.hash,
-                payloadMB: parseFloat((Number(block.size) / 1000000).toFixed(3)),
-                protocolState: 'Finalized / Valid',
+                blockNumber: Number(block.number),
+                miner: block.miner || '0xUnknown',
+                hash: block.hash,
+                sizeKb: parseFloat((Number(block.size) / 1024).toFixed(2)),
+                txCount: block.transactions?.length || 0,
                 timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
-                chain: 'ETHEREUM',
             };
             
             setRawEntries(prev => {
@@ -139,14 +125,10 @@ export default function InstitutionalLedger() {
   const stats: LedgerStats | null = useMemo(() => {
     if (entries.length === 0) return null;
     const total = entries.length;
-    const finalized = entries.filter(e => e.protocolState === 'Finalized / Valid').length;
-    const finalizedPct = total > 0 ? parseFloat(((finalized / total) * 100).toFixed(1)) : 100.0;
-    const observersActive = total > 0 ? Math.min(Math.max(total * 3, 12), 512) : 12;
     return {
-      totalBlocks:     total || 0,
-      finalizedPct,
-      avgPayloadMB:    parseFloat((entries.reduce((s, e) => s + e.payloadMB, 0) / Math.max(total, 1)).toFixed(3)),
-      observersActive,
+      totalBlocks: total || 0,
+      avgSizeKb: parseFloat((entries.reduce((s, e) => s + e.sizeKb, 0) / Math.max(total, 1)).toFixed(2)),
+      avgTxs: Math.floor(entries.reduce((s, e) => s + e.txCount, 0) / Math.max(total, 1)),
     };
   }, [entries]);
 
@@ -157,10 +139,9 @@ export default function InstitutionalLedger() {
     if (!filter) return entries;
     const q = filter.toLowerCase();
     return entries.filter(e =>
-      e.blockHex.toLowerCase().includes(q) ||
-      e.sha256Hash.toLowerCase().includes(q) ||
-      e.verificationLayer.toLowerCase().includes(q) ||
-      e.chain.toLowerCase().includes(q)
+      e.blockNumber.toString().includes(q) ||
+      e.hash.toLowerCase().includes(q) ||
+      e.miner.toLowerCase().includes(q)
     );
   }, [entries, filter]);
 
@@ -194,17 +175,17 @@ export default function InstitutionalLedger() {
           value={stats ? stats.totalBlocks.toLocaleString() : '—'}
         />
         <StatCard
-          label="FINALIZATION YIELD"
-          value={stats ? `${stats.finalizedPct.toFixed(1)}%` : '—'}
+          label="AVG TRANSACTIONS"
+          value={stats ? `${stats.avgTxs}` : '—'}
           accent
         />
         <StatCard
-          label="AVERAGE ENTROPY"
-          value={stats ? `${stats.avgPayloadMB} MB` : '—'}
+          label="AVG SIZE (KB)"
+          value={stats ? `${stats.avgSizeKb} KB` : '—'}
         />
         <StatCard
-          label="ACTIVE OBSERVERS"
-          value={stats ? `${stats.observersActive}` : '—'}
+          label="NETWORK"
+          value="ETHEREUM L1"
         />
       </div>
 
@@ -231,7 +212,7 @@ export default function InstitutionalLedger() {
         <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar">
           {/* Column Headers */}
           <div className="sticky top-0 z-10 bg-white dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 grid grid-cols-12 gap-4 px-6 py-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
-            {['ENTRY ID', 'LAYER', 'SHA-256 SIGNATURE', 'ENTROPY', 'STATE'].map((h, i) => (
+            {['BLOCK HEIGHT', 'MINER', 'BLOCK HASH', 'TX COUNT', 'SIZE (KB)'].map((h, i) => (
               <span key={i} className={`text-[9px] font-black uppercase tracking-widest text-[#050505]/40 dark:text-white/40 ${
                 i === 0 ? 'col-span-2' : i === 1 ? 'col-span-2' : i === 2 ? 'col-span-4' : i === 3 ? 'col-span-2' : 'col-span-2'
               }`}>
@@ -272,21 +253,21 @@ export default function InstitutionalLedger() {
                 >
                   {/* Block ID */}
                   <div className="col-span-2 flex items-center gap-2">
-                    <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white">{entry.blockHex}</span>
+                    <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white">{entry.blockNumber}</span>
                   </div>
 
-                  {/* Verification Layer */}
+                  {/* Miner */}
                   <div className="col-span-2 flex items-center">
                     <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50 dark:text-white/50 bg-[#050505]/5 dark:bg-white/5 px-2 py-1 rounded">
-                      {entry.verificationLayer}
+                      {shortHash(entry.miner)}
                     </span>
                   </div>
 
-                  {/* SHA-256 Hash */}
+                  {/* Block Hash */}
                   <div className="col-span-4 flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-[#050505]/50 dark:text-[#AAAAAA] truncate">{shortHash(entry.sha256Hash)}</span>
+                    <span className="text-[10px] font-mono text-[#050505]/50 dark:text-[#AAAAAA] truncate">{shortHash(entry.hash)}</span>
                     <a
-                      href={`https://etherscan.io/block/${parseInt(entry.blockHex, 16)}`}
+                      href={`https://etherscan.io/block/${entry.blockNumber}`}
                       target="_blank"
                       rel="noreferrer"
                       onClick={e => e.stopPropagation()}
@@ -296,14 +277,14 @@ export default function InstitutionalLedger() {
                     </a>
                   </div>
 
-                  {/* Payload */}
+                  {/* Tx Count */}
                   <div className="col-span-2 flex items-center">
-                    <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white">{entry.payloadMB} MB</span>
+                    <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white">{entry.txCount} txs</span>
                   </div>
 
-                  {/* State */}
+                  {/* Size */}
                   <div className="col-span-2 flex items-center">
-                    <StateChip state={entry.protocolState} />
+                    <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white">{entry.sizeKb} KB</span>
                   </div>
                 </motion.div>
               );
@@ -345,17 +326,17 @@ export default function InstitutionalLedger() {
 
                 {/* Block ID pill */}
                 <div className="p-4 rounded-2xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-center">
-                  <div className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30 dark:text-white/30 mb-2">Block ID</div>
-                  <div className="text-2xl font-black font-mono text-[#050505] dark:text-white">{selected.blockHex}</div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30 dark:text-white/30 mb-2">Block Height</div>
+                  <div className="text-2xl font-black font-mono text-[#050505] dark:text-white">{selected.blockNumber}</div>
                 </div>
 
                 {/* Fields */}
                 {[
-                  { label: 'Verification Layer', value: selected.verificationLayer, mono: false },
-                  { label: 'SHA-256 Hash Signature', value: selected.sha256Hash.slice(0, 42) + '...', mono: true },
-                  { label: 'Payload Entropy', value: `${selected.payloadMB} MB`, mono: true },
+                  { label: 'Miner / Validator', value: selected.miner, mono: true },
+                  { label: 'Block Hash', value: selected.hash.slice(0, 42) + '...', mono: true },
+                  { label: 'Transactions', value: `${selected.txCount}`, mono: true },
+                  { label: 'Size', value: `${selected.sizeKb} KB`, mono: true },
                   { label: 'Timestamp', value: new Date(selected.timestamp).toLocaleString(), mono: false },
-                  { label: 'Chain', value: selected.chain, mono: false },
                 ].map(f => (
                   <div key={f.label} className="flex flex-col gap-1">
                     <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30 dark:text-white/30">{f.label}</span>
@@ -363,15 +344,9 @@ export default function InstitutionalLedger() {
                   </div>
                 ))}
 
-                {/* State */}
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30 dark:text-white/30">Protocol State</span>
-                  <StateChip state={selected.protocolState} />
-                </div>
-
                 {/* Etherscan link */}
                 <a
-                  href={`https://etherscan.io/block/${parseInt(selected.blockHex, 16)}`}
+                  href={`https://etherscan.io/block/${selected.blockNumber}`}
                   target="_blank"
                   rel="noreferrer"
                   className="w-full text-center py-3 rounded-xl bg-[#050505] dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest hover:bg-[#050505]/80 dark:hover:bg-white/80 transition-colors flex items-center justify-center gap-2 mt-auto"

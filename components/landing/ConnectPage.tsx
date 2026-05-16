@@ -134,8 +134,17 @@ export default function ConnectPage() {
 
   useEffect(() => {
     if (typeof document !== "undefined") {
+      // Check for an active session cookie (session-scoped, cleared on browser close)
       const hasCookie = document.cookie.split("; ").some((r) => r.startsWith("sovereign_handshake="));
-      const hasLocal = localStorage.getItem("sovereign_session_v2");
+      // Also check localStorage for a valid, non-expired session token
+      const hasLocal = (() => {
+        try {
+          const raw = localStorage.getItem("sovereign_session_v2");
+          if (!raw) return false;
+          const parsed = JSON.parse(raw);
+          return parsed && parsed.exp && parsed.exp > Date.now();
+        } catch { return false; }
+      })();
       if (hasCookie || hasLocal) setLinked(true);
     }
   }, [setLinked]);
@@ -271,79 +280,17 @@ export default function ConnectPage() {
     if (!isConnected || !address) return;
     try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
 
-    // Enforce cryptographic handshake on desktop
     if (!isSigning) {
       setIsSigning(true);
       const norm = address.toLowerCase();
-      const message = [
-        '═══════════════════════════════',
-        '  Whale Alert Network',
-        '  SOVEREIGN ACCESS HANDSHAKE',
-        '═══════════════════════════════',
-        '',
-        `Identity: ${norm}`,
-        `Nonce: ${Date.now()}`,
-        `Network: WHALE_ALERT_NETWORK_V1`,
-        '',
-        'By signing you confirm that',
-        'you are the sole owner of this',
-        'address and authorize access',
-        'to the secure dashboard.',
-        '═══════════════════════════════',
-      ].join('\n');
-
-      let signaturePromise;
-      let isFreshSign = false;
-      const cachedSignature = localStorage.getItem(`sovereign_sig_${norm}`);
-      if (cachedSignature) {
-        signaturePromise = Promise.resolve(cachedSignature);
-        isFreshSign = false;
-      } else {
-        isFreshSign = true;
-        // Delay signature request slightly to allow wallet provider to settle after connection
-        signaturePromise = new Promise(resolve => setTimeout(resolve, 500))
-          .then(() => signMessageAsync({ message }))
-          .then(sig => {
-             localStorage.setItem(`sovereign_sig_${norm}`, sig);
-             return sig;
-          });
-      }
-
-      signaturePromise
-        .then(async (signature) => {
-          document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-          try {
-            localStorage.setItem('sovereign_session_v2', JSON.stringify({
-              address: norm,
-              exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
-            }));
-            
-            // ── [1-SIGNATURE BRIDGE] Derive XMTP Seed from Handshake ──
-            const { keccak256 } = await import('viem');
-            const seed = keccak256(signature as `0x${string}`);
-            localStorage.setItem(`whale_chat_seed_${norm}`, seed);
-            
-          } catch (e) {
-            console.error("Failed to store session artifacts", e);
-          }
-          
-          setLinked(true);
-          setIsSigning(false);
-          
-          if (isFreshSign) {
-            window.location.replace("/dashboard");
-          } else {
-            window.location.replace("/");
-          }
-        })
-        .catch((err) => {
-          console.error("Handshake failed", err);
-          setIsSigning(false);
-          disconnect();
-        });
-      return;
+      
+      // DISABLED: We no longer force a signature on connect. 
+      // User will only sign ONCE when they enter XMTP Chat.
+      setLinked(true);
+      setIsSigning(false);
+      window.location.replace("/dashboard");
     }
-  }, [isConnected, address, connector, mounted, isLinked, setLinked, isSigning, signMessageAsync, disconnect]);
+  }, [isConnected, address, isSigning, setLinked]);
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
     setPendingId(walletId);
