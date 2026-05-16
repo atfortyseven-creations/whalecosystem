@@ -349,7 +349,7 @@ export default function ConnectPage() {
                   {qrData && syncStatus === "AWAITING" && (
                     <div className="flex justify-center mb-3">
                       <div className="p-3 bg-[#FAFAF8] rounded-xl border border-black/5 flex flex-col items-center gap-2 shadow-sm">
-                        <QRCode value={qrData} size={130} fgColor="#0A0A0A" bgColor="transparent" />
+                        <QRCode value={qrData} size={200} fgColor="#0A0A0A" bgColor="transparent" />
                         <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/30 text-center">Connect Whale Mobile</span>
                       </div>
                     </div>
@@ -387,10 +387,7 @@ export default function ConnectPage() {
       {/* Footer */}
       <footer className="relative z-[100] px-5 sm:px-8 py-4 border-t border-[#EBEBEB] flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 bg-white w-full">
         <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#BBBBBB]">© 2026 Whale Alert Network</span>
-        <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-[#AAAAAA]">Systems Operational</span>
-        </div>
+
       </footer>
     </div>
   );

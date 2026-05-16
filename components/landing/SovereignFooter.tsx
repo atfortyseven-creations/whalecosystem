@@ -30,10 +30,10 @@ function FooterLink({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="group relative font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-white/50 hover:text-white transition-colors duration-300 py-1 whitespace-nowrap"
+      className="group relative font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-white/80 hover:text-white transition-colors duration-300 py-1 whitespace-nowrap font-bold"
     >
       {children}
-      <span className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[1px] bg-white/60 transition-all duration-300" />
+      <span className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[1px] bg-white transition-all duration-300" />
     </Link>
   );
 }
@@ -242,15 +242,21 @@ export function SovereignFooter() {
             transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
             className="flex flex-col items-center sm:items-start gap-4"
           >
-            <img
-              src="/official-whale-monochrome.png"
-              alt="Whale Alert Network"
-              className="w-16 h-16 object-contain"
-            />
-            <span className="font-mono text-[10px] font-black uppercase tracking-[0.35em] text-white/80 text-center sm:text-left">
-              Whale Alert Network
-            </span>
-            <p className="font-mono text-[9px] text-white/40 tracking-wider max-w-[220px] text-center sm:text-left leading-relaxed">
+            <div className="flex items-center gap-3.5">
+                <div className="relative flex items-center justify-center rounded-xl border border-white/10 bg-white/5 overflow-hidden w-[58px] h-[36px]">
+                    <img
+                        src="/official-whale-monochrome.png"
+                        alt="Whale Alert Network Logo"
+                        className="object-contain w-full h-full p-1 opacity-90"
+                    />
+                </div>
+                <div className="flex flex-col leading-none text-white justify-center">
+                    <span className="font-aztec-serif text-[18px] font-black uppercase tracking-tighter leading-none">
+                        Whale Alert Network
+                    </span>
+                </div>
+            </div>
+            <p className="font-mono text-[9px] text-white/40 tracking-wider max-w-[220px] text-center sm:text-left leading-relaxed mt-1">
               Professional on-chain intelligence &amp; identity layer.
             </p>
           </motion.div>

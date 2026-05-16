@@ -287,11 +287,11 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                             <div className="space-y-1">
                                 <div className="text-black/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <Activity size={12} />
-                                    SYNC STATUS
+                                    ON-CHAIN STATUS
                                 </div>
-                                <div className="text-4xl font-black text-[#00C076] font-mono flex items-center gap-3">
+                                <div className="text-3xl font-black text-[#00C076] font-mono flex items-center gap-3">
                                     <div className="w-2.5 h-2.5 rounded-full bg-[#00C076] animate-pulse" />
-                                    SYNCED
+                                    ALL ON-CHAIN
                                 </div>
                             </div>
                         </div>

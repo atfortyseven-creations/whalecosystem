@@ -5,6 +5,7 @@ import { RefreshCw, Search, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 
 import { ModuleHeader } from './ModuleHeader';
 import { useMarketData } from '@/lib/api-client';
 import { TokenInfoModal, TokenInfoPayload } from '@/components/ui/TokenInfoModal';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 const fmt = (n: number) => {
@@ -157,6 +158,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
 
 // ── Main Panel ────────────────────────────────────────────────────────────────
 export function GainersLosersPanel() {
+    const isMobile = useIsMobile();
     const [rawData, setRawData] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -241,7 +243,7 @@ export function GainersLosersPanel() {
     const totalVolume = useMemo(() => allRows.reduce((sum, r) => sum + r.vol, 0), [allRows]);
 
     const filtered = useMemo(() => {
-        return allRows
+        let res = allRows
             .filter(r => network === 'all' || r.meta.network === network)
             .filter(r => {
                 const ticker = (r.symbol ? stripUSDT(r.symbol) : '').toLowerCase();
@@ -259,7 +261,12 @@ export function GainersLosersPanel() {
                 if (view === 'losers')  return a.pct - b.pct;
                 return a.meta.mcapRankHint - b.meta.mcapRankHint;
             });
-    }, [allRows, view, network, search]);
+            
+        if (isMobile) {
+            res = res.slice(0, 100);
+        }
+        return res;
+    }, [allRows, view, network, search, isMobile]);
 
     const topGainers = useMemo(() =>
         [...allRows].sort((a, b) => b.pct - a.pct).slice(0, 3), [allRows]);

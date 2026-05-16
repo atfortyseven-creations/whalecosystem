@@ -13,38 +13,35 @@ interface QRScannerModalProps {
   initialScanData?: string | null;
 }
 
-// ─── css injected once into <head> so it never re-runs ───────────────────────
-const QR_STYLES = `
-  #qr-reader { border: none !important; width: 100% !important; height: 100% !important; background: #000; overflow: hidden; }
-  #qr-reader video {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-  }
-`;
-
-// ── inject styles once ────────────────────────────────────────────────────────
-let stylesInjected = false;
-function injectStyles() {
-  if (stylesInjected || typeof document === 'undefined') return;
-  const style = document.createElement('style');
-  style.textContent = QR_STYLES;
-  document.head.appendChild(style);
-  stylesInjected = true;
-}
+import jsQR from 'jsqr';
+import { useSecureCamera } from '@/hooks/useSecureCamera';
 
 // ── File/gallery scanner (fallback for restricted camera environments) ────────
 async function scanFileForQR(file: File): Promise<string> {
-  const { Html5Qrcode } = await import('html5-qrcode');
-  const reader = new Html5Qrcode('qr-reader-file-tmp');
-  try {
-    const result = await reader.scanFile(file, true);
-    return result;
-  } finally {
-    try { reader.clear(); } catch {}
-    const tmp = document.getElementById('qr-reader-file-tmp');
-    if (tmp) tmp.remove();
-  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error('No context'));
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "attemptBoth",
+        });
+        if (code) resolve(code.data);
+        else reject(new Error('No QR code found'));
+      };
+      img.onerror = () => reject(new Error('Image load error'));
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => reject(new Error('File read error'));
+    reader.readAsDataURL(file);
+  });
 }
 
 // ─── Perimeter scan-line animation ───────────────────────────────────────────
@@ -227,29 +224,42 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
   useEffect(() => { onCloseRef.current = onClose; },  [onClose]);
   useEffect(() => { onScanRef.current  = onScan;  },  [onScan]);
 
-  // ── Scanner instance ref ───────────────────────────────────────────────────
-  const scannerRef    = useRef<any>(null);
   const initTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitingRef  = useRef(false);
-  // CRITICAL LOCK: prevents handleSuccess from firing multiple times at 4fps
-  // html5-qrcode fires the success callback on every frame that contains a valid
-  // QR code. Without this guard, the user receives 3-4 signature prompts before
-  // destroyScanner() resolves asynchronously and stops the camera loop.
   const hasScannedRef = useRef(false);
+  const handleSuccessRef = useRef<any>(null);
+
+  // ─── useSecureCamera Integration ─────────────────────────────────────────
+  const { videoRef, canvasRef, hasPermission, isInitializing, error: camError, startCamera, stopCamera } = useSecureCamera({
+    facingMode: 'environment',
+    onFrame: useCallback((canvas: HTMLCanvasElement) => {
+      if (hasScannedRef.current || !handleSuccessRef.current) return;
+      try {
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        if (!ctx) return;
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+        if (code && code.data) {
+          handleSuccessRef.current(code.data);
+        }
+      } catch (e) {
+        // ignore frame errors
+      }
+    }, [])
+  });
 
   // ─── Core cleanup ─────────────────────────────────────────────────────────
   const destroyScanner = useCallback(async () => {
     isInitingRef.current = false;
-    hasScannedRef.current = false; // reset so scanner can be reused after closing and reopening
+    hasScannedRef.current = false;
     if (initTimerRef.current) {
       clearTimeout(initTimerRef.current);
       initTimerRef.current = null;
     }
-    if (scannerRef.current) {
-      try { await scannerRef.current.clear(); } catch {}
-      scannerRef.current = null;
-    }
-  }, []);
+    stopCamera();
+  }, [stopCamera]);
 
   // ─── Successful scan handler ───────────────────────────────────────────────
   const handleSuccess = useCallback(async (decodedText: string) => {
@@ -445,93 +455,31 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
 
   // ─── Initialize camera scanner ────────────────────────────────────────────
   const initScanner = useCallback(async () => {
-    if (isInitingRef.current || scannerRef.current) return;
+    if (isInitingRef.current) return;
     isInitingRef.current = true;
-
-    // ── CRITICAL iOS FIX: Use built-in camera request ────────────
     try {
-      const { Html5Qrcode } = await import('html5-qrcode');
-      const cameras = await Html5Qrcode.getCameras();
-      if (!cameras || cameras.length === 0) {
-        throw new Error('NotFoundError');
-      }
-    } catch (permErr: any) {
-      isInitingRef.current = false;
-      if (permErr?.name === 'NotAllowedError' || permErr?.name === 'PermissionDeniedError' || permErr?.message?.includes('denied')) {
-        setErrMsg('Camera permission denied. Please allow camera access in your browser settings and try again.');
-      } else if (permErr?.name === 'NotFoundError' || permErr?.message === 'NotFoundError') {
-        setErrMsg('No camera found on this device. Use the Gallery tab to upload a QR image.');
-      } else {
-        setErrMsg('Unable to access camera. Try the Gallery tab to upload a QR screenshot.');
-      }
-      setStatus('error');
-      return;
-    }
-
-    // ── Start html5-qrcode with optimal settings ──────────────────────────────
-    let attempts = 0;
-    const MAX_ATTEMPTS = 3;
-
-    const tryStart = async (facingMode: 'environment' | 'user'): Promise<boolean> => {
-      try {
-        const { Html5Qrcode } = await import('html5-qrcode');
-        // Ensure the container DOM node exists before starting
-        const container = document.getElementById('qr-reader');
-        if (!container) return false;
-
-        const scanner = new Html5Qrcode('qr-reader');
-        scannerRef.current = scanner;
-
-        await scanner.start(
-          {
-            facingMode,
-          },
-          {
-            fps: 8,               // Higher fps for faster detection on modern phones
-            qrbox: { width: 240, height: 240 }, // Fixed viewfinder — matches ScanLine SVG
-            aspectRatio: 1.0,
-            disableFlip: false,   // Allow mirrored QR codes (some screens invert)
-            formatsToSupport: [0], // QR_CODE only — faster than scanning all barcode types
-          } as any,
-          (text: string) => { handleSuccess(text); },
-          (_err: unknown) => { /* per-frame decode errors are expected and ignored */ }
-        );
-        return true;
-      } catch {
-        return false;
-      }
-    };
-
-    // Attempt 1: rear camera (environment)
-    let started = await tryStart('environment');
-
-    // Attempt 2: front camera fallback (user)
-    if (!started) {
-      if (scannerRef.current) {
-        try { await scannerRef.current.clear(); } catch {}
-        scannerRef.current = null;
-      }
-      started = await tryStart('user');
-    }
-
-    if (started) {
+      await startCamera();
       setStatus('scanning');
-      isInitingRef.current = false;
-    } else {
-      // Both camera modes failed — last resort: show error
-      if (scannerRef.current) {
-        try { await scannerRef.current.clear(); } catch {}
-        scannerRef.current = null;
-      }
-      setErrMsg('Could not start camera. Try the Gallery tab to upload a QR screenshot instead.');
-      setStatus('error');
+    } catch (e) {
+      // handled by useEffect watching camError
+    } finally {
       isInitingRef.current = false;
     }
+  }, [startCamera]);
+
+  useEffect(() => {
+    if (camError && tab === 'camera') {
+      setErrMsg(camError);
+      setStatus('error');
+    }
+  }, [camError, tab]);
+
+  useEffect(() => {
+    handleSuccessRef.current = handleSuccess;
   }, [handleSuccess]);
 
   // ─── Effect: reacts to isOpen only ───────────────────────────────────────
   useEffect(() => {
-    injectStyles();
 
     if (!isOpen) {
       destroyScanner();
@@ -666,11 +614,14 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
               {tab === 'camera' && (
                 <>
                   <div className="relative w-full h-[320px] rounded-[20px] overflow-hidden bg-black flex items-center justify-center shadow-inner">
-                      <div
-                      id="qr-reader"
-                      className="absolute inset-0 w-full h-full"
+                    <video
+                      ref={videoRef}
+                      className="absolute inset-0 w-full h-full object-cover"
                       style={{ display: status === 'error' || status === 'success' || status === 'signing' ? 'none' : 'block' }}
+                      playsInline
+                      muted
                     />
+                    <canvas ref={canvasRef} className="hidden" />
 
                     {/* Animated perimeter scan line */}
                     <ScanLine active={status === 'scanning'} />

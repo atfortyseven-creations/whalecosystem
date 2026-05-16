@@ -195,10 +195,6 @@ export function EnterpriseFooter() {
                         © 2026 Whale Alert Network. All rights reserved.
                     </div>
                     <div className="flex items-center gap-6 text-sm text-white/70">
-                        <span className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                            All Systems Operational
-                        </span>
                         <span>v4.0.0</span>
                     </div>
                 </div>

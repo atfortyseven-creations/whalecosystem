@@ -62,13 +62,7 @@ export function LivePortfolio() {
         <div className="w-full max-w-4xl mx-auto space-y-6 shrink-0 pb-10">
             
             <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] p-10 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-6">
-                    <span className="flex items-center gap-1.5 text-[8.5px] font-mono font-black text-[#888888] uppercase tracking-[0.2em]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#050505] opacity-70" />
-                        SYSTEMS OPERATIONAL
-                    </span>
-                </div>
-                
+
                 <h2 className="text-[11px] font-black text-[#888888] uppercase tracking-[0.2em] mb-3">Institutional Net Worth (USDC + Assets)</h2>
                 <div className="flex items-end gap-6">
                     <h1 className="text-6xl font-black text-[#050505] font-mono tracking-tighter shadow-sm">

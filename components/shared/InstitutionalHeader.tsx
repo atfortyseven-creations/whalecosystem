@@ -76,7 +76,7 @@ export function InstitutionalHeader() {
             <div className="absolute inset-0 opacity-[0.035] pointer-events-none noise-bg" />
 
             {/* LEFT: Brand Identity */}
-            <div className="flex items-center gap-5 relative z-10 flex-shrink-0 mr-auto">
+            <div className="flex items-center gap-5 relative z-10 flex-shrink-0 lg:flex-1">
                 <Link href="/" className="flex items-center gap-3.5 group">
                     <motion.div
                         whileHover={{ scale: 1.05 }}
@@ -101,7 +101,7 @@ export function InstitutionalHeader() {
             </div>
 
             {/* CENTER: Tronscan Inspired Navigation Menu — perfectly centered */}
-            <div className="hidden lg:flex items-center justify-center absolute left-1/2 -translate-x-1/2 top-0 bottom-0 z-20 pointer-events-none">
+            <div className="hidden lg:flex items-center justify-center relative z-20 pointer-events-none lg:flex-[2]">
                 <nav className="flex items-center gap-1 h-full pointer-events-auto">
                     {MENU_ITEMS.map((item, index) => (
                         <MegaMenuItem key={index} item={item} />
@@ -110,7 +110,7 @@ export function InstitutionalHeader() {
             </div>
 
             {/* RIGHT: Utility area */}
-            <div className="flex items-center gap-4 relative z-10 flex-shrink-0">
+            <div className="flex items-center justify-end gap-4 relative z-10 flex-shrink-0 lg:flex-1">
                 <div className="hidden lg:block">
                     <SystemsUtilityHeader />
                 </div>

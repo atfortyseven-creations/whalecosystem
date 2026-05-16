@@ -48,7 +48,6 @@ export function GlobalSettingsModal() {
                                  </div>
                                  <div className="flex flex-col">
                                     <h2 className="text-[13px] font-black text-black dark:text-white uppercase tracking-widest">Global Terminal Parameters</h2>
-                                    <p className="text-[9px] text-neutral-500 font-mono tracking-widest uppercase">System Control Matrix</p>
                                  </div>
                              </div>
                              <div className="flex items-center gap-4">
