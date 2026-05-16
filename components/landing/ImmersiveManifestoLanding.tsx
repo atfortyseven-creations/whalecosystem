@@ -38,7 +38,7 @@ export function ImmersiveManifestoLanding({
         {/* ══════════════════════════════════════════════════════════════════════
             1. HERO: FULLY CENTERED AND EXTENDED
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="w-full min-h-screen md:min-h-[calc(100vh-64px)] flex flex-col items-center justify-center text-center relative overflow-hidden" style={{paddingLeft:'clamp(1.5rem,5vw,10rem)',paddingRight:'clamp(1.5rem,5vw,10rem)'}}>
+        <section className="w-full min-h-screen md:min-h-[calc(100vh-64px)] flex flex-col items-center justify-center text-center relative overflow-hidden px-6 md:px-12">
           {/* Desktop Video Background */}
           <div className="hidden md:block absolute inset-0 z-0">
             <video 
@@ -56,25 +56,25 @@ export function ImmersiveManifestoLanding({
             initial="hidden"
             animate="visible"
             variants={STAGGER}
-            className="flex flex-col items-center justify-center gap-10 w-full max-w-[1600px] mx-auto relative z-10 py-32"
+            className="flex flex-col items-center justify-center gap-10 w-full max-w-[1400px] mx-auto relative z-10 py-32"
           >
             {/* Introduction to the System */}
             <motion.div variants={FADE_UP} className="flex flex-col items-center gap-4">
-               <h1 className="text-[48px] sm:text-[72px] lg:text-[100px] font-black tracking-tighter uppercase leading-[0.85] text-black md:text-white">
+               <h1 className="text-[48px] sm:text-[72px] lg:text-[100px] font-black tracking-tighter uppercase leading-[0.85] text-black md:text-white drop-shadow-2xl">
                  The Whale Alert<br />
-                 <span className="text-black/20 md:text-white/60">System Registry.</span>
+                 <span className="text-black/20 md:text-white/80">System Registry.</span>
                </h1>
             </motion.div>
 
             {/* Explanation of the Hospital */}
-            <motion.div variants={FADE_UP} className="bg-black md:bg-white/10 md:backdrop-blur-md px-12 py-4 rounded-full mt-4 border border-transparent md:border-white/20">
+            <motion.div variants={FADE_UP} className="bg-black md:bg-black/40 md:backdrop-blur-xl px-12 py-4 rounded-full mt-4 border border-transparent md:border-white/20 shadow-2xl">
                <h2 className="text-[14px] sm:text-[18px] font-black uppercase tracking-[0.25em] text-white">
                  The First Hospital In History To Secure Records On-Chain
                </h2>
             </motion.div>
 
             {/* Subtitle / Extended Text */}
-            <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[24px] text-black/60 md:text-white/80 leading-relaxed max-w-[900px] mt-6">
+            <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[24px] text-black/60 md:text-white leading-relaxed max-w-[900px] mt-6 drop-shadow-xl font-medium">
               The Whale Alert Network provides the definitive infrastructure for the high-integrity management of institutional documentation. Our protocol ensures that sensitive records remain immutable and verifiable without compromising confidentiality.
               <br /><br />
               At the heart of our implementation lies the Spitalul Clinic Colțea, Romania's premier medical institution. By integrating centuries of medical excellence with advanced cryptographic verifications, we have established a new standard for record preservation. Every discharge summary is now secured on-chain, providing mathematical certainty and absolute data integrity for the digital age.
