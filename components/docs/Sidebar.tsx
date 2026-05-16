@@ -201,7 +201,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
   const visibleSections = NAV.filter(s => s.tab === activeTab);
 
   return (
-    <aside className={`w-72 h-[calc(100vh-56px)] hidden lg:flex flex-col ${bg} border-r ${border} sticky top-14 overflow-hidden`}>
+    <aside className={`w-72 h-full hidden lg:flex flex-col ${bg} border-r ${border} overflow-hidden flex-shrink-0`}>
       {/* Tab bar */}
       <div className={`flex border-b ${border} px-2 shrink-0`}>
         {TABS.map(tab => (

@@ -26,19 +26,19 @@ export function ImmersiveManifestoLanding({
   hideMap?: boolean;
 } = {}) {
   return (
-    <div className="relative min-h-screen text-black font-sans antialiased overflow-x-hidden w-full flex flex-col selection:bg-black/10">
+    <div className="relative min-h-screen text-black font-sans antialiased overflow-x-hidden w-full flex flex-col selection:bg-black/10" style={{width:'100%',maxWidth:'100%'}}>
 
       {/* ══════════════════════════════════════════════════════════════════════
           0. GLOBAL VIDEO BACKGROUND
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="fixed inset-0 z-0 bg-[#FAFAF8]" />
 
-      <div className="relative z-10 w-full flex flex-col items-center">
+      <div className="relative z-10 w-full flex flex-col items-center" style={{width:'100%',maxWidth:'100vw'}}>
         
         {/* ══════════════════════════════════════════════════════════════════════
             1. HERO: FULLY CENTERED AND EXTENDED
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="w-full min-h-screen md:min-h-[calc(100vh-64px)] flex flex-col items-center justify-center text-center px-6 md:px-12 xl:px-20 relative overflow-hidden">
+        <section className="w-full min-h-screen md:min-h-[calc(100vh-64px)] flex flex-col items-center justify-center text-center relative overflow-hidden" style={{paddingLeft:'clamp(1.5rem,5vw,10rem)',paddingRight:'clamp(1.5rem,5vw,10rem)'}}>
           {/* Desktop Video Background */}
           <div className="hidden md:block absolute inset-0 z-0">
             <video 
@@ -50,8 +50,6 @@ export function ImmersiveManifestoLanding({
             >
               <source src="/Coltea-video-2025-v2.mp4" type="video/mp4" />
             </video>
-            {/* Dark overlay for desktop to make white text readable */}
-            <div className="absolute inset-0 bg-black/60" />
           </div>
 
           <motion.div
@@ -229,7 +227,7 @@ export function ImmersiveManifestoLanding({
         {/* ══════════════════════════════════════════════════════════════════════
             5. INSTITUTIONAL VISION (PHOTOS) - MOVED TO BOTTOM
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="w-full py-32 flex flex-col items-center bg-white border-t border-black/5 pb-64">
+        <section className="w-full py-32 flex flex-col items-center bg-white border-t border-black/5 pb-16">
           <div className="w-full max-w-[1600px] mx-auto px-6 md:px-12 xl:px-20">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={STAGGER} className="flex flex-col items-center text-center mb-16">
               <h2 className="text-[40px] md:text-[64px] font-black tracking-tighter uppercase leading-[0.95] text-black mb-6">
@@ -265,7 +263,7 @@ export function ImmersiveManifestoLanding({
         {/* ══════════════════════════════════════════════════════════════════════
             6. DOCUMENTATION & SYSTEM ACCESS
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="w-full py-32 flex flex-col items-center bg-black text-white pb-64 overflow-visible">
+        <section className="w-full py-32 flex flex-col items-center bg-black text-white pb-20 overflow-visible">
           <div className="w-full max-w-[1200px] mx-auto px-6 text-center">
             <motion.div
               initial="hidden" 
