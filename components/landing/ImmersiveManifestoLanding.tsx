@@ -26,62 +26,63 @@ export function ImmersiveManifestoLanding({
   hideMap?: boolean;
 } = {}) {
   return (
-    <div className="relative min-h-screen text-black font-sans antialiased overflow-x-hidden w-full flex flex-col selection:bg-black/10" style={{width:'100%',maxWidth:'100%'}}>
+    <div className="relative text-black font-sans antialiased overflow-x-hidden w-full flex flex-col selection:bg-black/10">
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          0. GLOBAL VIDEO BACKGROUND
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div className="fixed inset-0 z-0 bg-[#FAFAF8]" />
-
-      <div className="relative z-10 w-full flex flex-col items-center" style={{width:'100%',maxWidth:'100vw'}}>
+      <div className="relative z-10 w-full flex flex-col items-center">
         
         {/* ══════════════════════════════════════════════════════════════════════
-            1. HERO: FULLY CENTERED AND EXTENDED
+            1. HERO: FULL-BLEED VIDEO + WHITE CONTENT CARD
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="w-full min-h-screen md:min-h-[calc(100vh-64px)] flex flex-col items-center justify-center text-center relative overflow-hidden px-6 md:px-12">
-          {/* Desktop Video Background */}
-          <div className="hidden md:block absolute inset-0 z-0">
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline 
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src="/Coltea-video-2025-v2.mp4" type="video/mp4" />
-            </video>
-          </div>
+        <section className="w-full min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6 md:px-12">
 
+          {/* ── Full-bleed Coltea video background ── */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ zIndex: 0 }}
+          >
+            <source src="/Coltea-video-2025-v2.mp4" type="video/mp4" />
+          </video>
+
+          {/* ── Subtle overlay so card edges blend with video ── */}
+          <div className="absolute inset-0 bg-black/20" style={{ zIndex: 1 }} />
+
+          {/* ── White content card — same aesthetic as sections below ── */}
           <motion.div
             initial="hidden"
             animate="visible"
             variants={STAGGER}
-            className="flex flex-col items-center justify-center gap-10 w-full max-w-[1400px] mx-auto relative z-10 py-32"
+            className="relative flex flex-col items-center justify-center gap-10 w-full max-w-[1100px] mx-auto py-20 md:py-24 px-10 md:px-16 bg-white rounded-[40px] border border-black/5 shadow-2xl"
+            style={{ zIndex: 2 }}
           >
-            {/* Introduction to the System */}
-            <motion.div variants={FADE_UP} className="flex flex-col items-center gap-4">
-               <h1 className="text-[48px] sm:text-[72px] lg:text-[100px] font-black tracking-tighter uppercase leading-[0.85] text-black md:text-white drop-shadow-2xl">
-                 The Whale Alert<br />
-                 <span className="text-black/20 md:text-white/80">System Registry.</span>
-               </h1>
+            {/* Title */}
+            <motion.div variants={FADE_UP} className="flex flex-col items-center gap-4 text-center">
+              <h1 className="text-[48px] sm:text-[72px] lg:text-[96px] font-black tracking-tighter uppercase leading-[0.85] text-black">
+                The Whale Alert<br />
+                <span className="text-black/20">System Registry.</span>
+              </h1>
             </motion.div>
 
-            {/* Explanation of the Hospital */}
-            <motion.div variants={FADE_UP} className="bg-black md:bg-black/40 md:backdrop-blur-xl px-12 py-4 rounded-full mt-4 border border-transparent md:border-white/20 shadow-2xl">
-               <h2 className="text-[14px] sm:text-[18px] font-black uppercase tracking-[0.25em] text-white">
-                 The First Hospital In History To Secure Records On-Chain
-               </h2>
+            {/* Badge */}
+            <motion.div variants={FADE_UP} className="bg-black px-10 py-4 rounded-full border border-transparent shadow-xl">
+              <h2 className="text-[13px] sm:text-[16px] font-black uppercase tracking-[0.25em] text-white text-center">
+                The First Hospital In History To Secure Records On-Chain
+              </h2>
             </motion.div>
 
-            {/* Subtitle / Extended Text */}
-            <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[24px] text-black/60 md:text-white leading-relaxed max-w-[900px] mt-6 drop-shadow-xl font-medium">
+            {/* Body text */}
+            <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[22px] text-black/60 leading-relaxed max-w-[860px] text-center font-medium">
               The Whale Alert Network provides the definitive infrastructure for the high-integrity management of institutional documentation. Our protocol ensures that sensitive records remain immutable and verifiable without compromising confidentiality.
               <br /><br />
               At the heart of our implementation lies the Spitalul Clinic Colțea, Romania's premier medical institution. By integrating centuries of medical excellence with advanced cryptographic verifications, we have established a new standard for record preservation. Every discharge summary is now secured on-chain, providing mathematical certainty and absolute data integrity for the digital age.
             </motion.p>
-            
-            <motion.div variants={FADE_UP} className="mt-10">
-              <Link href="/connect" className="inline-flex items-center justify-center px-12 py-5 bg-black md:bg-white hover:bg-black/80 md:hover:bg-white/90 text-white md:text-black rounded-2xl font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-all shadow-xl">
+
+            {/* CTA */}
+            <motion.div variants={FADE_UP} className="mt-4">
+              <Link href="/connect" className="inline-flex items-center justify-center px-12 py-5 bg-black hover:bg-black/80 text-white rounded-2xl font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-all shadow-xl">
                 Initialize Connection
               </Link>
             </motion.div>

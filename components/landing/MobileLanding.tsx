@@ -704,9 +704,9 @@ export function MobileLanding() {
       try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
       setShowManualReconnectRaw(false);
 
-      // REDIRECT TO DASHBOARD / NEXT PARAM
+      // REDIRECT TO SCANNER (ConnectedScreen) — never to /dashboard directly on mobile
       const params = new URLSearchParams(window.location.search);
-      const next = params.get('next') || '/dashboard';
+      const next = params.get('next') || '/connect';
       console.log('[Auth] Redirecting to:', next);
       window.location.replace(next);
     } catch (err: any) {
