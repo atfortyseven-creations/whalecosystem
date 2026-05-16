@@ -8,10 +8,37 @@ import { useState, useEffect } from 'react';
  * Provides a unified address state that respects either a local wagmi connection
  * or a verified QR Handshake cookie.
  */
+
+// Global State to prevent DDoS on /api/auth/session
+let globalIsPolling = false;
+let globalIsZkVerified = false;
+const listeners = new Set<(v: boolean) => void>();
+
+const startGlobalPolling = () => {
+    if (typeof window === 'undefined' || globalIsPolling || globalIsZkVerified) return;
+    globalIsPolling = true;
+
+    const check = async () => {
+        if (globalIsZkVerified) return; // Stop checking once verified
+        try {
+            const res = await fetch('/api/auth/session');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data?.user?.isZkVerified) {
+                globalIsZkVerified = true;
+                listeners.forEach(fn => fn(true));
+            }
+        } catch {}
+    };
+
+    check();
+    setInterval(check, 15000); // 15s to safely respect 20req/60s limit
+};
+
 export function useSovereignAccount() {
     const wagmiAccount = useAccount();
     const [handshakeAddress, setHandshakeAddress] = useState<string | null>(null);
-    const [isZkVerified, setIsZkVerified] = useState(false);
+    const [isZkVerified, setIsZkVerified] = useState(globalIsZkVerified);
     const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
@@ -32,36 +59,24 @@ export function useSovereignAccount() {
             }
         };
 
-        const checkZkStatus = async () => {
-            try {
-                const res = await fetch('/api/auth/session');
-                const data = await res.json();
-                if (data?.user?.isZkVerified) {
-                    setIsZkVerified(true);
-                }
-            } catch {}
-        };
-
-        const init = async () => {
-            checkHandshake();
-            await checkZkStatus();
-            setIsChecking(false);
-        };
-
-        // Run immediately
-        init();
+        checkHandshake();
         
+        const listener = (verified: boolean) => setIsZkVerified(verified);
+        listeners.add(listener);
+        
+        // Start the global polling if not already started
+        startGlobalPolling();
+        setIsChecking(false);
+
         // Polling is only necessary for QR/Mobile handshakes where Wagmi isn't active.
         let pollHandshake: any = null;
         if (!wagmiAccount.isConnected) {
-          pollHandshake = setInterval(checkHandshake, 500);
+          pollHandshake = setInterval(checkHandshake, 1000);
         }
-        
-        const pollZk = setInterval(checkZkStatus, 3000); // Check ZK status every 3s
         
         return () => {
             if (pollHandshake) clearInterval(pollHandshake);
-            clearInterval(pollZk);
+            listeners.delete(listener);
         };
     }, [wagmiAccount.isConnected]);
 

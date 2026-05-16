@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, ChevronRight, Search, ChevronDown,
     X, ArrowUpRight, Globe, Info, Lock,
-    BarChart2, PlusCircle, Wallet, MessageSquare, Menu
+    BarChart2, PlusCircle, Wallet, MessageSquare, Menu, PieChart
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -580,7 +580,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                      {[
                         { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
-                        { id: 'newpairs',    icon: <PlusCircle size={18} />,    label: 'Monitors' },
+                        { id: 'portfolio',   icon: <PieChart size={18} />,      label: 'Portfolio' },
                         { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
                         { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
                     ].map(tab => {
@@ -591,6 +591,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                 onClick={() => {
                                     if (tab.id === 'menu') setIsPaletteOpen(true);
                                     else if (tab.id === 'chat') router.push('/chat');
+                                    else if (tab.id === 'portfolio') router.push('/portfolio');
                                     else handleTabChange(tab.id);
                                 }}
                                 style={{ minHeight: 0, minWidth: 0 }}

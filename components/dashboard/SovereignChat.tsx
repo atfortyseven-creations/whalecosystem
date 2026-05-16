@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
 import { QrCode, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import SidebarNavigation from '@/components/chat/SidebarNavigation';
 import MessageEngine from '@/components/chat/MessageEngine';
@@ -153,12 +154,18 @@ export default function SovereignChat() {
   const [pinnedIds, setPinnedIds]         = useState<Set<string>>(new Set());
   const [newPeer, setNewPeer]             = useState('');
   const [sending, setSending]             = useState(false);
+  const [isUploading, setIsUploading]     = useState(false);
   const [xmtpReady, setXmtpReady]        = useState(false);
   const [xmtpError, setXmtpError]        = useState<string | null>(null);
 
   const bottomRef  = useRef<HTMLDivElement>(null);
   const xmtpClient = useRef<any>(null);
-  const streamStop = useRef<(() => void) | null>(null);
+  
+  const activeConvRef = useRef<Conversation | null>(null);
+  useEffect(() => { activeConvRef.current = activeConv; }, [activeConv]);
+
+  const settingsRef = useRef<ChatSettings>(settings);
+  useEffect(() => { settingsRef.current = settings; }, [settings]);
 
   // Load conversations on mount / address change
   useEffect(() => {
@@ -226,66 +233,42 @@ export default function SovereignChat() {
     return () => { cancelled = true; };
   }, [isConnected, walletClient, address]);
 
-  // ── Load messages when conversation changes ───────────────────────────────
+  // ── Global XMTP Stream ───────────────────────────────────────────────────
   useEffect(() => {
-    if (!xmtpClient.current || !activeConv) { setMessages([]); return; }
-
+    if (!xmtpReady || !xmtpClient.current) return;
+    
     let cancelled = false;
     const selfInboxId = (xmtpClient.current as any).inboxId ?? '';
 
     (async () => {
       try {
-        const raw = await getMessages(xmtpClient.current, activeConv.peerAddress);
-        if (cancelled) return;
-        const rendered = raw.map((m: any) => xmtpToRenderable(m, selfInboxId)).sort((a, b) => a.sentAt - b.sentAt);
-        setMessages(rendered);
-      } catch (e) {
-        console.warn('[Chat] load messages failed:', e);
-      }
-    })();
-
-    // ── Start streaming new messages ──────────────────────────────────────
-    (async () => {
-      try {
-        let active = true;
         const gen = streamMessages(xmtpClient.current);
-        const stop = () => { active = false; };
-        streamStop.current = stop;
-
         for await (const msg of gen) {
-          if (!active || cancelled) break;
+          if (cancelled) break;
           
           const rendered = xmtpToRenderable(msg, selfInboxId);
           const fromPeer = msg.senderInboxId !== selfInboxId;
+          const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
+          const currentActivePeer = activeConvRef.current?.peerAddress.toLowerCase();
           
           // Verify if message belongs to the current conversation
-          let belongsToActive = false;
-          try {
-            const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
-            if (msgConvPeer === activeConv.peerAddress.toLowerCase()) {
-              belongsToActive = true;
-            }
-          } catch {
-            // fallback
-            belongsToActive = true; 
-          }
+          const belongsToActive = (msgConvPeer === currentActivePeer) || (!msgConvPeer && currentActivePeer);
 
           if (belongsToActive) {
-            if (fromPeer && settings.soundEnabled) playMessageSound();
+            if (fromPeer && settingsRef.current.soundEnabled) playMessageSound();
             setMessages(prev => {
               if (prev.some(m => m.id === rendered.id)) return prev;
               return [...prev, rendered].sort((a, b) => a.sentAt - b.sentAt);
             });
             // Update last message in conv list
             setConversations(prev => prev.map(c => 
-              c.peerAddress.toLowerCase() === activeConv.peerAddress.toLowerCase() 
+              c.peerAddress.toLowerCase() === currentActivePeer 
                 ? { ...c, lastMessage: rendered.content.slice(0, 30) } 
                 : c
             ));
           } else if (fromPeer) {
             // If it belongs to another conversation, update its unread count
             setConversations(prev => {
-               const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
                if (!msgConvPeer) return prev;
                
                const exists = prev.some(c => c.peerAddress.toLowerCase() === msgConvPeer);
@@ -306,20 +289,52 @@ export default function SovereignChat() {
                  }];
                }
             });
-            if (settings.soundEnabled) playMessageSound();
+            if (settingsRef.current.soundEnabled) playMessageSound();
           }
         }
       } catch (e) {
-        console.warn('[Chat] stream failed:', e);
+        console.warn('[Chat] global stream failed:', e);
       }
     })();
 
+    return () => { cancelled = true; };
+  }, [xmtpReady]);
+
+  // ── Load messages when conversation changes ───────────────────────────────
+  useEffect(() => {
+    if (!xmtpClient.current || !activeConv) { setMessages([]); return; }
+
+    let cancelled = false;
+    const selfInboxId = (xmtpClient.current as any).inboxId ?? '';
+
+    const fetchHistorical = async () => {
+      try {
+        const raw = await getMessages(xmtpClient.current, activeConv.peerAddress);
+        if (cancelled) return;
+        const rendered = raw.map((m: any) => xmtpToRenderable(m, selfInboxId)).sort((a, b) => a.sentAt - b.sentAt);
+        
+        // Merge with optimistic local messages safely
+        setMessages(prev => {
+          const optimistic = prev.filter(m => m.id.startsWith('opt-'));
+          const renderedIds = new Set(rendered.map(r => r.id));
+          return [...rendered, ...optimistic.filter(o => !renderedIds.has(o.id))].sort((a, b) => a.sentAt - b.sentAt);
+        });
+      } catch (e) {
+        console.warn('[Chat] load messages failed:', e);
+      }
+    };
+
+    fetchHistorical();
+
+    // Fallback polling for the active conversation
+    const pollId = setInterval(fetchHistorical, 5000);
+
     return () => {
       cancelled = true;
-      streamStop.current?.();
+      clearInterval(pollId);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeConv, xmtpReady]);
+  }, [activeConv?.peerAddress, xmtpReady]);
 
   // ── Send via XMTP ─────────────────────────────────────────────────────────
   const sendXmtp = useCallback(async (content: string) => {
@@ -368,8 +383,33 @@ export default function SovereignChat() {
   // ── Emoji / Voice / File senders ─────────────────────────────────────────
   const handleSendText  = (text: string) => sendXmtp(text);
   const handleSendEmoji = (emoji: string) => sendXmtp(emoji);
-  const handleSendVoice = (_blob: Blob, dur: number) => sendXmtp(`[🎤 Voice · ${(dur / 1000).toFixed(1)}s]`);
-  const handleSendFile  = (file: File) => sendXmtp(`[📎 ${file.name} · ${(file.size / 1024).toFixed(0)} KB]`);
+
+  const uploadAttachment = async (fileOrBlob: Blob, filename: string): Promise<string | null> => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', fileOrBlob, filename);
+      const res = await fetch('/api/chat/attachments', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      return `[ATTACHMENT:${data.type}]${data.url}|${data.name}`;
+    } catch (err: any) {
+      toast.error('Attachment failed', { description: err.message });
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSendVoice = async (blob: Blob, dur: number) => {
+    const payload = await uploadAttachment(blob, `voice-${Date.now()}.webm`);
+    if (payload) await sendXmtp(payload);
+  };
+
+  const handleSendFile = async (file: File) => {
+    const payload = await uploadAttachment(file, file.name);
+    if (payload) await sendXmtp(payload);
+  };
 
   // ── Reactions / Pin / Delete / Reply ────────────────────────────────────
   const handleReact = (messageId: string, emoji: string) => {
@@ -582,6 +622,7 @@ export default function SovereignChat() {
                 <p className="font-mono text-[10px] text-black/35 mt-0.5">
                   E2EE · ML-KEM-1024 · ε={settings.differentialNoiseEpsilon}
                   {sending && ' · Sending…'}
+                  {isUploading && ' · Uploading securely…'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -616,7 +657,7 @@ export default function SovereignChat() {
                   replyingTo={replyingTo}
                   onCancelReply={() => setReplyingTo(undefined)}
                   autoDestruct={settings.autoDestruct}
-                  disabled={!xmtpReady || sending}
+                  disabled={!xmtpReady || sending || isUploading}
                 />
               </div>
 

@@ -9,28 +9,36 @@ import { useSovereignAccount }    from '@/hooks/useSovereignAccount';
 import dynamic                    from 'next/dynamic';
 
 // ── Static imports (lightweight) ──────────────────────────────────────────────
-import { NewPairsTable }     from '@/components/dashboard/NewPairsTable';
-import { OmniExplorer }      from '@/components/dashboard/OmniExplorer';
 import { GoldTicketPanel }    from '@/components/dashboard/GoldTicketPanel';
-import { WhaleSupport }      from '@/components/dashboard/WhaleSupport';
-import InstitutionalLedger   from '@/components/dashboard/InstitutionalLedger';
-import { MassTransferIntel } from '@/components/dashboard/MassTransferIntel';
-import { SessionLogsPanel }  from '@/components/dashboard/SessionLogsPanel';
-import { PlanDashboard }     from '@/components/dashboard/PlanDashboard';
+
+// ── Dynamic imports (Heavy tabs, mounted only when clicked) ────────────────────
+const LoadingPanel = () => (
+  <div className="w-full h-full min-h-[400px] flex items-center justify-center bg-transparent">
+    <div className="w-6 h-6 border-2 border-[#050505] dark:border-white border-t-transparent rounded-full animate-spin" />
+  </div>
+);
+
+const NewPairsTable = dynamic(() => import('@/components/dashboard/NewPairsTable').then(m => ({ default: m.NewPairsTable })), { ssr: false, loading: LoadingPanel });
+const OmniExplorer = dynamic(() => import('@/components/dashboard/OmniExplorer').then(m => ({ default: m.OmniExplorer })), { ssr: false, loading: LoadingPanel });
+const WhaleSupport = dynamic(() => import('@/components/dashboard/WhaleSupport').then(m => ({ default: m.WhaleSupport })), { ssr: false, loading: LoadingPanel });
+const InstitutionalLedger = dynamic(() => import('@/components/dashboard/InstitutionalLedger'), { ssr: false, loading: LoadingPanel });
+const MassTransferIntel = dynamic(() => import('@/components/dashboard/MassTransferIntel').then(m => ({ default: m.MassTransferIntel })), { ssr: false, loading: LoadingPanel });
+const SessionLogsPanel = dynamic(() => import('@/components/dashboard/SessionLogsPanel').then(m => ({ default: m.SessionLogsPanel })), { ssr: false, loading: LoadingPanel });
+const PlanDashboard = dynamic(() => import('@/components/dashboard/PlanDashboard').then(m => ({ default: m.PlanDashboard })), { ssr: false, loading: LoadingPanel });
 
 const AztecMempoolSpace = dynamic(
   () => import('@/components/premium/AztecMempoolSpace'),
-  { ssr: false }
+  { ssr: false, loading: LoadingPanel }
 );
 
 // Dynamic imports (SSR-unsafe or heavy)
 const PortfolioDashboard = dynamic(
   () => import('@/components/dashboard/PortfolioDashboard'),
-  { ssr: false }
+  { ssr: false, loading: LoadingPanel }
 );
 const GainersLosersPanel = dynamic(
   () => import('@/components/dashboard/GainersLosersPanel').then(m => ({ default: m.GainersLosersPanel })),
-  { ssr: false }
+  { ssr: false, loading: LoadingPanel }
 );
 
 import "@/app/dashboard/dashboard.css";

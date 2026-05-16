@@ -3,7 +3,8 @@
 import React, { useRef, useState, useCallback } from 'react';
 import {
   Pin, Trash2, Copy, Reply, Forward, Timer,
-  CheckCheck, Check, ShieldCheck, Flame
+  CheckCheck, Check, ShieldCheck, Flame,
+  FileText, Download, Image as ImageIcon, Video, Music, Paperclip
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -92,6 +93,9 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
   const now = Date.now();
   const secondsLeft = msg.destructsAt ? Math.max(0, Math.round((msg.destructsAt - now) / 1000)) : null;
 
+  const match = msg.content.match(/^\[ATTACHMENT:([^\]]+)\](.*?)\|(.*)$/);
+  const attachment = match ? { mime: match[1], url: match[2], name: match[3] } : null;
+
   return (
     <div className={`flex flex-col max-w-[75%] ${msg.isMine ? 'self-end items-end ml-auto' : 'self-start items-start'}`}>
 
@@ -118,7 +122,11 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
           </div>
         )}
 
-        <p className="text-[14px] leading-relaxed break-words whitespace-pre-wrap font-mono">{msg.content}</p>
+        {attachment ? (
+          <AttachmentRenderer attachment={attachment} isMine={msg.isMine} />
+        ) : (
+          <p className="text-[14px] leading-relaxed break-words whitespace-pre-wrap font-mono">{msg.content}</p>
+        )}
 
         {secondsLeft !== null && (
           <div className="flex items-center gap-1 mt-2 text-[9px] font-mono text-red-400">
@@ -156,6 +164,66 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
         )}
       </div>
     </div>
+  );
+}
+
+// ── AttachmentRenderer ──────────────────────────────────────────────────────
+
+function AttachmentRenderer({ attachment, isMine }: { attachment: { mime: string, url: string, name: string }, isMine: boolean }) {
+  const { mime, url, name } = attachment;
+  const isImg = mime.startsWith('image/');
+  const isVid = mime.startsWith('video/');
+  const isAud = mime.startsWith('audio/');
+
+  if (isImg) {
+    return (
+      <div className="mt-1">
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={url} alt={name} className="max-w-[240px] md:max-w-[320px] max-h-[300px] rounded-xl object-contain border border-white/10 shadow-sm" />
+        </a>
+      </div>
+    );
+  }
+
+  if (isVid) {
+    return (
+      <div className="mt-1 max-w-[240px] md:max-w-[320px]">
+        <video src={url} controls className="w-full rounded-xl border border-white/10 shadow-sm" />
+      </div>
+    );
+  }
+
+  if (isAud) {
+    return (
+      <div className="mt-1 w-full max-w-[280px]">
+        <audio src={url} controls className="w-full h-10" />
+      </div>
+    );
+  }
+
+  // Generic document (PDF, Word, etc.)
+  return (
+    <a
+      href={url}
+      download={name}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`flex items-center gap-3 p-3 mt-1 rounded-xl border transition-all hover:opacity-80 ${
+        isMine ? 'bg-white/10 border-white/20' : 'bg-black/5 border-black/10'
+      }`}
+    >
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isMine ? 'bg-white/20' : 'bg-black/10'}`}>
+        <FileText size={18} className={isMine ? 'text-white' : 'text-black'} />
+      </div>
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <p className="font-mono text-[12px] font-bold truncate" title={name}>{name}</p>
+        <p className={`font-mono text-[9px] uppercase mt-0.5 ${isMine ? 'text-white/60' : 'text-black/50'}`}>
+          {mime.split('/')[1]?.toUpperCase() || 'DOCUMENT'}
+        </p>
+      </div>
+      <Download size={16} className={isMine ? 'text-white/70' : 'text-black/50'} />
+    </a>
   );
 }
 

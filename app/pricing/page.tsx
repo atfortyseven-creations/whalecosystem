@@ -199,7 +199,7 @@ export default function PricingPage() {
 
                       <button
                         onClick={() => handleSubscribeClick(tier.id)}
-                        disabled={loadingTier === tier.id || (!isTierLoaded && isConnected)}
+                        disabled={loadingTier === tier.id || (!isTierLoaded && isConnected) || currentTierLevel >= (TIER_RANK[tier.id as keyof typeof TIER_RANK] ?? 0)}
                         className={`w-full py-6 text-[12px] text-center font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-3 rounded-[2rem] shadow-sm ${
                           tier.id === 'STANDARD'
                             ? 'bg-black text-white hover:bg-black/80 shadow-xl'
@@ -208,6 +208,10 @@ export default function PricingPage() {
                       >
                         {loadingTier === tier.id ? (
                           <Loader2 size={18} className="animate-spin" />
+                        ) : !isTierLoaded ? (
+                          <div className="flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> SYNCING...</div>
+                        ) : currentTierLevel >= (TIER_RANK[tier.id as keyof typeof TIER_RANK] ?? 0) ? (
+                          'ACCESS LEVEL GRANTED'
                         ) : tier.id === 'FREE' ? (
                           isConnected ? 'Current Access Level' : 'Initialize Connection'
                         ) : (

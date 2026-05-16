@@ -4,7 +4,7 @@ import { AcademyInteractiveEngine } from "@/components/academy/AcademyInteractiv
 import { TOPIC_CATEGORIES } from "@/lib/data/academy-curriculum";
 import { SovereignFooter } from "@/components/landing/SovereignFooter";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function AcademyPage() {
     // Phase 2: Ultimate Zero-Mock Fetcher
