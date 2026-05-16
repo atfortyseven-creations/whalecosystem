@@ -33,25 +33,25 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    // ── Overview ──────────────────────────────────────────────────
-    { id: 'gold',          label: 'Ticket Mint',    icon: null, dividerBefore: 'Overview' },
-    { id: 'portfolio',     label: 'Main Portfolio', icon: null, requiresZK: true },
-    { id: 'billing',       label: 'Billing & Plan', icon: null },
+    // ── Access ──────────────────────────────────────────────────
+    { id: 'gold',          label: 'Identity Provisioning', icon: null, dividerBefore: 'Access' },
+    { id: 'portfolio',     label: 'Encrypted Portfolio', icon: null, requiresZK: true },
+    { id: 'billing',       label: 'Subscription Status', icon: null },
 
-    // ── Markets ───────────────────────────────────────────────────
-    { id: 'markets',       label: 'Top Markets',    icon: null, dividerBefore: 'Markets', requiresZK: true },
-    { id: 'newpairs',      label: 'New Listings',   icon: null, requiresZK: true },
+    // ── Telemetry ───────────────────────────────────────────────────
+    { id: 'markets',       label: 'Network Telemetry',    icon: null, dividerBefore: 'Telemetry', requiresZK: true },
+    { id: 'newpairs',      label: 'Contract Monitors',   icon: null, requiresZK: true },
 
-    // ── On-Chain Data ─────────────────────────────────────────────
-    { id: 'inst-ledger',   label: 'Whale Ledger',   icon: null, dividerBefore: 'On-Chain', requiresZK: true },
-    { id: 'mass-transfer', label: 'Mass Transfers', icon: null, requiresZK: true, minTier: 'STANDARD' },
-    { id: 'omniexplorer',  label: 'Block Explorer', icon: null, requiresZK: true },
+    // ── Ledger ─────────────────────────────────────────────
+    { id: 'inst-ledger',   label: 'Entity Index',   icon: null, dividerBefore: 'Ledger', requiresZK: true },
+    { id: 'mass-transfer', label: 'Bulk Record Sync', icon: null, requiresZK: true, minTier: 'STANDARD' },
+    { id: 'omniexplorer',  label: 'On-Chain Explorer', icon: null, requiresZK: true },
 
-    // ── Network State ─────────────────────────────────────────────
-    { id: 'zk',            label: 'Aztec Network',  icon: null, dividerBefore: 'Network State', requiresZK: true },
+    // ── Security ─────────────────────────────────────────────
+    { id: 'zk',            label: 'Aztec Network',  icon: null, dividerBefore: 'Security', requiresZK: true },
 
     // ── System ────────────────────────────────────────────────────
-    { id: 'logs',          label: 'Session Logs',   icon: null, dividerBefore: 'System' },
+    { id: 'logs',          label: 'Session Audit',   icon: null, dividerBefore: 'System' },
     { id: 'support',       label: 'Support',        icon: null },
 ];
 
@@ -539,8 +539,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
                 <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                      {[
-                        { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Markets' },
-                        { id: 'newpairs',    icon: <PlusCircle size={18} />,    label: 'Listings' },
+                        { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
+                        { id: 'newpairs',    icon: <PlusCircle size={18} />,    label: 'Monitors' },
                         { id: 'portfolio',   icon: <Wallet size={18} />,        label: 'Portfolio' },
                         { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
                         { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
