@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
+import { QrCode, X } from 'lucide-react';
 
 import SidebarNavigation from '@/components/chat/SidebarNavigation';
 import MessageEngine from '@/components/chat/MessageEngine';
@@ -11,6 +12,7 @@ import AttestationEngine from '@/components/dashboard/AttestationEngine';
 import WhaleRadar from '@/components/dashboard/WhaleRadar';
 import AICoPilot from '@/components/dashboard/AICoPilot';
 import AtomicPortfolioShare from '@/components/dashboard/AtomicPortfolioShare';
+import { QrScanner } from '@/components/dashboard/QrScanner';
 
 import type { RenderableMessage, Reaction } from '@/components/chat/MessageEngine';
 import type { ChatSettings } from '@/components/chat/AdvancedSettingsModal';
@@ -75,6 +77,22 @@ function saveSettings(s: ChatSettings) {
   localStorage.setItem('sovereign_chat_settings', JSON.stringify(s));
 }
 
+// ── Persist conversations to localStorage ────────────────────────────────
+
+function loadConversations(selfAddress: string): Conversation[] {
+  if (typeof window === 'undefined' || !selfAddress) return [];
+  try {
+    const raw = localStorage.getItem(`sovereign_chat_convs_${selfAddress.toLowerCase()}`);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
+}
+
+function saveConversations(selfAddress: string, convs: Conversation[]) {
+  if (typeof window === 'undefined' || !selfAddress) return;
+  localStorage.setItem(`sovereign_chat_convs_${selfAddress.toLowerCase()}`, JSON.stringify(convs));
+}
+
 // ── XMTP message → RenderableMessage ────────────────────────────────────
 
 function xmtpToRenderable(msg: any, selfInboxId: string): RenderableMessage {
@@ -98,7 +116,7 @@ function xmtpToRenderable(msg: any, selfInboxId: string): RenderableMessage {
 function playMessageSound() {
   if (typeof window === 'undefined') return;
   try {
-    const ctx = new AudioContext();
+    const ctx = new window.AudioContext();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
@@ -124,6 +142,7 @@ export default function SovereignChat() {
   // ── UI State ─────────────────────────────────────────────────────────────
   const [showSettings, setShowSettings] = useState(false);
   const [showRadar, setShowRadar]       = useState(false);
+  const [showScanner, setShowScanner]   = useState(false);
   const [activeFolder, setActiveFolder] = useState('all');
 
   // ── Conversations & Messages ─────────────────────────────────────────────
@@ -140,6 +159,24 @@ export default function SovereignChat() {
   const bottomRef  = useRef<HTMLDivElement>(null);
   const xmtpClient = useRef<any>(null);
   const streamStop = useRef<(() => void) | null>(null);
+
+  // Load conversations on mount / address change
+  useEffect(() => {
+    if (address) {
+      setConversations(loadConversations(address));
+    } else {
+      setConversations([]);
+    }
+    setActiveConv(null);
+    setMessages([]);
+  }, [address]);
+
+  // Save conversations on change
+  useEffect(() => {
+    if (address && conversations.length > 0) {
+      saveConversations(address, conversations);
+    }
+  }, [conversations, address]);
 
   // ── Auto-scroll ─────────────────────────────────────────────────────────
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
@@ -217,16 +254,60 @@ export default function SovereignChat() {
 
         for await (const msg of gen) {
           if (!active || cancelled) break;
+          
           const rendered = xmtpToRenderable(msg, selfInboxId);
-
-          // Only show messages belonging to active conversation
           const fromPeer = msg.senderInboxId !== selfInboxId;
-          if (fromPeer && settings.soundEnabled) playMessageSound();
+          
+          // Verify if message belongs to the current conversation
+          let belongsToActive = false;
+          try {
+            const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
+            if (msgConvPeer === activeConv.peerAddress.toLowerCase()) {
+              belongsToActive = true;
+            }
+          } catch {
+            // fallback
+            belongsToActive = true; 
+          }
 
-          setMessages(prev => {
-            if (prev.some(m => m.id === rendered.id)) return prev;
-            return [...prev, rendered].sort((a, b) => a.sentAt - b.sentAt);
-          });
+          if (belongsToActive) {
+            if (fromPeer && settings.soundEnabled) playMessageSound();
+            setMessages(prev => {
+              if (prev.some(m => m.id === rendered.id)) return prev;
+              return [...prev, rendered].sort((a, b) => a.sentAt - b.sentAt);
+            });
+            // Update last message in conv list
+            setConversations(prev => prev.map(c => 
+              c.peerAddress.toLowerCase() === activeConv.peerAddress.toLowerCase() 
+                ? { ...c, lastMessage: rendered.content.slice(0, 30) } 
+                : c
+            ));
+          } else if (fromPeer) {
+            // If it belongs to another conversation, update its unread count
+            setConversations(prev => {
+               const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
+               if (!msgConvPeer) return prev;
+               
+               const exists = prev.some(c => c.peerAddress.toLowerCase() === msgConvPeer);
+               if (exists) {
+                 return prev.map(c => 
+                   c.peerAddress.toLowerCase() === msgConvPeer 
+                     ? { ...c, unread: c.unread + 1, lastMessage: rendered.content.slice(0, 30) } 
+                     : c
+                 );
+               } else {
+                 // Auto-add new conversation
+                 return [...prev, {
+                    peerAddress: msg.conversation.peerAddress,
+                    displayName: msg.conversation.peerAddress.slice(0, 6) + '...' + msg.conversation.peerAddress.slice(-4),
+                    folder: 'all',
+                    unread: 1,
+                    lastMessage: rendered.content.slice(0, 30)
+                 }];
+               }
+            });
+            if (settings.soundEnabled) playMessageSound();
+          }
         }
       } catch (e) {
         console.warn('[Chat] stream failed:', e);
@@ -262,6 +343,13 @@ export default function SovereignChat() {
 
     setMessages(prev => [...prev, optimistic]);
     setReplyingTo(undefined);
+    
+    // Update last message locally
+    setConversations(prev => prev.map(c => 
+      c.peerAddress.toLowerCase() === activeConv.peerAddress.toLowerCase() 
+        ? { ...c, lastMessage: content.slice(0, 30) } 
+        : c
+    ));
 
     try {
       await xmtpSend(xmtpClient.current, activeConv.peerAddress, content);
@@ -271,6 +359,7 @@ export default function SovereignChat() {
       // Remove optimistic on failure
       setMessages(prev => prev.filter(m => m.id !== optimistic.id));
       console.error('[Chat] send failed:', e);
+      alert('Failed to send message.');
     } finally {
       setSending(false);
     }
@@ -312,8 +401,8 @@ export default function SovereignChat() {
   };
 
   // ── Start new conversation ────────────────────────────────────────────────
-  const startConversation = () => {
-    const addr = newPeer.trim();
+  const startConversation = (addressOverride?: string) => {
+    const addr = (addressOverride ?? newPeer).trim();
     if (!addr) return;
     if (!addr.startsWith('0x') || addr.length !== 42) {
       alert('Please enter a valid Ethereum address (0x...)');
@@ -329,7 +418,14 @@ export default function SovereignChat() {
       if (prev.some(c => c.peerAddress.toLowerCase() === addr.toLowerCase())) return prev;
       return [...prev, conv];
     });
-    setActiveConv(conv);
+    
+    // Select the existing or new conversation
+    setConversations(prev => {
+       const existing = prev.find(c => c.peerAddress.toLowerCase() === addr.toLowerCase());
+       setActiveConv(existing || conv);
+       return prev;
+    });
+    
     setNewPeer('');
   };
 
@@ -341,7 +437,7 @@ export default function SovereignChat() {
   // ── Guards ─────────────────────────────────────────────────────────────────
   if (!isConnected) {
     return (
-      <div className="flex h-screen bg-white items-center justify-center">
+      <div className="flex flex-1 w-full h-full bg-white items-center justify-center">
         <p className="font-mono text-[12px] tracking-widest text-black/30 uppercase">
           Connect wallet to access Sovereign Chat
         </p>
@@ -351,7 +447,7 @@ export default function SovereignChat() {
 
   if (xmtpError) {
     return (
-      <div className="flex h-screen bg-white items-center justify-center flex-col gap-4">
+      <div className="flex flex-1 w-full h-full bg-white items-center justify-center flex-col gap-4">
         <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">XMTP Error</p>
         <p className="font-mono text-[10px] text-black/40 max-w-md text-center">{xmtpError}</p>
         <button onClick={() => window.location.reload()} className="px-6 py-2.5 bg-black text-white font-mono text-[10px] uppercase tracking-widest rounded-xl">
@@ -363,7 +459,7 @@ export default function SovereignChat() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-screen text-black overflow-hidden" style={{ background: bg }}>
+    <div className="flex flex-1 w-full h-full text-black overflow-hidden" style={{ background: bg }}>
 
       {/* Settings overlay */}
       {showSettings && (
@@ -372,6 +468,25 @@ export default function SovereignChat() {
           onSettingsChange={handleSettingsChange}
           onClose={() => setShowSettings(false)}
         />
+      )}
+
+      {/* Scanner overlay */}
+      {showScanner && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white p-6 rounded-3xl w-full max-w-md relative shadow-2xl border border-black/10">
+            <button onClick={() => setShowScanner(false)} className="absolute top-4 right-4 text-black/50 hover:text-black z-10">
+              <X size={20} />
+            </button>
+            <h3 className="font-mono text-lg font-bold mb-4 uppercase tracking-widest text-center">Scan Wallet QR</h3>
+            <QrScanner 
+              mode="scan" 
+              onScanSuccess={(scannedAddr) => {
+                setShowScanner(false);
+                startConversation(scannedAddr);
+              }} 
+            />
+          </div>
+        </div>
       )}
 
       {/* 1 – Folders Rail */}
@@ -396,27 +511,43 @@ export default function SovereignChat() {
               onChange={e => setNewPeer(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && startConversation()}
               placeholder="0x address…"
-              className="flex-1 bg-black/[0.03] border border-black/10 rounded-xl px-3 py-2.5 text-[12px] font-mono text-black placeholder:text-black/25 focus:outline-none focus:border-black/30 transition-colors"
+              className="flex-1 min-w-0 bg-black/[0.03] border border-black/10 rounded-xl px-3 py-2.5 text-[12px] font-mono text-black placeholder:text-black/25 focus:outline-none focus:border-black/30 transition-colors"
             />
             <button
-              onClick={startConversation}
-              className="px-3 py-2.5 rounded-xl bg-black text-white hover:bg-black/80 font-bold text-[16px] transition-all"
-            >+</button>
+              onClick={() => setShowScanner(true)}
+              className="px-3 py-2.5 rounded-xl bg-black/[0.03] border border-black/10 text-black hover:bg-black/10 transition-all shrink-0 flex items-center justify-center"
+              title="Scan QR Code"
+            >
+              <QrCode size={18} />
+            </button>
+            <button
+              onClick={() => startConversation()}
+              className="px-3 py-2.5 rounded-xl bg-black text-white hover:bg-black/80 font-bold text-[16px] transition-all shrink-0 flex items-center justify-center"
+              title="Add Address"
+            >
+              +
+            </button>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           {filteredConvs.length === 0 && (
             <div className="flex flex-col items-center justify-center h-40 text-black/25 font-mono text-[10px] px-4 text-center">
-              Add a wallet address above to start a conversation
+              Add a wallet address or scan a QR to start a conversation
             </div>
           )}
           {filteredConvs.map(conv => (
             <button
               key={conv.peerAddress}
-              onClick={() => setActiveConv(conv)}
+              onClick={() => {
+                // Clear unread on click
+                setConversations(prev => prev.map(c => 
+                  c.peerAddress === conv.peerAddress ? { ...c, unread: 0 } : c
+                ));
+                setActiveConv(conv);
+              }}
               className={`w-full text-left px-4 py-4 border-b border-black/4 transition-all ${
-                activeConv?.peerAddress === conv.peerAddress
+                activeConv?.peerAddress.toLowerCase() === conv.peerAddress.toLowerCase()
                   ? 'bg-black/[0.04] border-l-2 border-l-black'
                   : 'hover:bg-black/[0.02] border-l-2 border-l-transparent'
               }`}
