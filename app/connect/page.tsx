@@ -67,10 +67,10 @@ function RealDeviceRouter() {
 
     const isAlreadyLinked = hasCookie || hasLocalSession;
     if (isAlreadyLinked && !hasUuid) {
-      // Redirect to the 'next' param if present, otherwise the landing page.
-      // IMPORTANT: goes to '/' (landing page), NOT '/dashboard', so the user
-      // is always in control of when to enter the terminal.
-      const next = urlParams.get('next') || '/';
+      // Redirect to the 'next' param if present, otherwise the connect/scanner page.
+      // NOTE: Goes to '/connect' so the user lands on the ConnectedScreen (scanner + info),
+      // NOT the landing page and NOT the dashboard directly.
+      const next = urlParams.get('next') || '/connect';
       window.location.replace(next);
       return;
     }

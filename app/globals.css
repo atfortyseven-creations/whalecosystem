@@ -207,9 +207,11 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
 
-    /* Prevent horizontal layout overflow */
+    /* Prevent horizontal layout overflow — use 100% NOT 100vw.
+       On Windows, 100vw includes the scrollbar width, which creates
+       phantom horizontal overflow that cuts the layout at half-screen. */
     overflow-x: hidden;
-    width: 100vw;
+    width: 100%;
     
     /* Let only the body or the master container scroll */
     min-height: 100%;

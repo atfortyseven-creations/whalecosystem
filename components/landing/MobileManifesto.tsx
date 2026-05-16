@@ -64,7 +64,7 @@ export function MobileManifesto() {
           </motion.p>
 
           <motion.div variants={FADE_UP} className="w-full max-w-[300px] mx-auto">
-            <Link href={hasSession ? "/dashboard" : "/connect"} className="flex items-center justify-center w-full h-[60px] bg-[#0A0A0A] text-white rounded-2xl font-mono text-[12px] font-black tracking-[0.2em] uppercase active:scale-[0.98] transition-transform shadow-xl">
+            <Link href={hasSession ? "/connect" : "/connect"} className="flex items-center justify-center w-full h-[60px] bg-[#0A0A0A] text-white rounded-2xl font-mono text-[12px] font-black tracking-[0.2em] uppercase active:scale-[0.98] transition-transform shadow-xl">
               Partner With Us
             </Link>
           </motion.div>
