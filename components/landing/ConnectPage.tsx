@@ -232,8 +232,8 @@ export default function ConnectPage() {
   const isVerified = mounted && (isConnected || isLinked);
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center bg-[#FAFAF8] relative">
-      <div className="relative z-10 w-full flex flex-col justify-center items-center px-4 py-8 sm:p-12 min-h-0">
+    <div className="w-full flex-1 flex flex-col items-center bg-[#FAFAF8] relative">
+      <div className="relative z-10 w-full flex-1 flex flex-col justify-center items-center px-4 py-8 sm:p-12 min-h-0">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
