@@ -35,7 +35,7 @@ interface NavItem {
 const SIDEBAR_ITEMS: NavItem[] = [
     // ── Access ──────────────────────────────────────────────────
     { id: 'gold',          label: 'Identity Provisioning', icon: null, dividerBefore: 'Access' },
-    { id: 'portfolio',     label: 'Encrypted Portfolio', icon: null, requiresZK: true },
+
     { id: 'billing',       label: 'Subscription Status', icon: null },
 
     // ── Telemetry ───────────────────────────────────────────────────
@@ -581,7 +581,6 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                      {[
                         { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
                         { id: 'newpairs',    icon: <PlusCircle size={18} />,    label: 'Monitors' },
-                        { id: 'portfolio',   icon: <Wallet size={18} />,        label: 'Portfolio' },
                         { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
                         { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
                     ].map(tab => {
