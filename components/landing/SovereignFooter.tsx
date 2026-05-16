@@ -171,64 +171,7 @@ export function SovereignFooter() {
   return (
     <footer className="relative w-full bg-[#060606] border-t border-white/5 flex flex-col items-center">
 
-      {/* ═══ Wave Banner ═══════════════════════════════════════════════════ */}
-      <div className="w-full relative" style={{ height: isMobile ? '260px' : '380px' }}>
-        <div
-          ref={containerRef}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="absolute inset-0 overflow-hidden bg-transparent group"
-        >
-          {/* Wave image — natural scale, anchored to bottom */}
-          <Image
-            src="/olas-hokusai-4k.png"
-            alt="Hokusai Waves"
-            fill
-            className="object-cover object-bottom pointer-events-none transition-transform duration-[1400ms] ease-out group-hover:scale-[1.015]"
-            sizes="100vw"
-            quality={90}
-            priority
-          />
 
-          {/* Interactive cursor (desktop only) */}
-          {!isMobile && (
-            <>
-              <motion.div
-                className="pointer-events-none absolute rounded-full z-20"
-                style={{
-                  x: cursorX, y: cursorY,
-                  translateX: "-50%", translateY: "-50%",
-                  width: 160, height: 160,
-                  opacity: isHovered ? 1 : 0,
-                  background: "radial-gradient(circle, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0) 70%)",
-                  mixBlendMode: "multiply",
-                  transition: "opacity 0.3s",
-                }}
-              />
-              <motion.div
-                className="pointer-events-none absolute z-30 flex items-center justify-center"
-                style={{
-                  x: cursorX, y: cursorY,
-                  translateX: "-50%", translateY: "-50%",
-                  width: 20, height: 20,
-                  opacity: isHovered ? 1 : 0,
-                  border: "1px solid rgba(255,255,255,0.4)",
-                  borderRadius: "50%",
-                  transition: "opacity 0.3s",
-                }}
-                animate={{ scale: isHovered ? [1, 1.2, 1] : 1 }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
-                <div className="w-1.5 h-1.5 bg-white rounded-full" />
-              </motion.div>
-            </>
-          )}
-
-          {/* Gradient fade into the dark footer body below */}
-          <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#060606] via-[#060606]/60 to-transparent pointer-events-none z-10" />
-        </div>
-      </div>
 
       {/* ═══ Footer Body ═══════════════════════════════════════════════════ */}
       <div className="relative z-20 w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 pt-16 pb-16 flex flex-col gap-16">
@@ -445,6 +388,65 @@ export function SovereignFooter() {
           </div>
         </div>
 
+      </div>
+
+      {/* ═══ Wave Banner ═══════════════════════════════════════════════════ */}
+      <div className="w-full relative mt-[-2px]" style={{ height: isMobile ? '260px' : '380px' }}>
+        <div
+          ref={containerRef}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="absolute inset-0 overflow-hidden bg-transparent group"
+        >
+          {/* Wave image — natural scale, anchored to bottom */}
+          <Image
+            src="/olas-hokusai-4k.png"
+            alt="Hokusai Waves"
+            fill
+            className="object-cover object-bottom pointer-events-none transition-transform duration-[1400ms] ease-out group-hover:scale-[1.015]"
+            sizes="100vw"
+            quality={90}
+            priority
+          />
+
+          {/* Interactive cursor (desktop only) */}
+          {!isMobile && (
+            <>
+              <motion.div
+                className="pointer-events-none absolute rounded-full z-20"
+                style={{
+                  x: cursorX, y: cursorY,
+                  translateX: "-50%", translateY: "-50%",
+                  width: 160, height: 160,
+                  opacity: isHovered ? 1 : 0,
+                  background: "radial-gradient(circle, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0) 70%)",
+                  mixBlendMode: "multiply",
+                  transition: "opacity 0.3s",
+                }}
+              />
+              <motion.div
+                className="pointer-events-none absolute z-30 flex items-center justify-center"
+                style={{
+                  x: cursorX, y: cursorY,
+                  translateX: "-50%", translateY: "-50%",
+                  width: 20, height: 20,
+                  opacity: isHovered ? 1 : 0,
+                  border: "1px solid rgba(255,255,255,0.4)",
+                  borderRadius: "50%",
+                  transition: "opacity 0.3s",
+                }}
+                animate={{ scale: isHovered ? [1, 1.2, 1] : 1 }}
+                transition={{ repeat: Infinity, duration: 2 }}
+              >
+                <div className="w-1.5 h-1.5 bg-white rounded-full" />
+              </motion.div>
+            </>
+          )}
+
+          {/* Gradient fade from the dark footer body ABOVE */}
+          <div className="absolute inset-x-0 top-0 h-[60%] bg-gradient-to-b from-[#060606] via-[#060606]/60 to-transparent pointer-events-none z-10" />
+        </div>
       </div>
     </footer>
   );

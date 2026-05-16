@@ -91,30 +91,32 @@ export default function MobileChatPage() {
     return (
       <>
         <UniversalEliteWallpaper />
-        <div className="flex-1 flex flex-col h-screen w-full relative z-10 bg-transparent">
-          {/* ── Top Navigation Bar ── */}
-          <header className="shrink-0 h-14 flex items-center justify-between px-6 bg-black/60 backdrop-blur-[60px] border-b border-white/5 relative z-10 w-full">
-            <Link
-              href="/dashboard"
-              className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/5 text-white/50 transition-colors"
-              aria-label="Back to dashboard"
-            >
-              <ArrowLeft size={18} />
-            </Link>
+        <div className="flex-1 flex flex-col h-screen w-full relative z-10 bg-transparent items-center">
+          <div className="w-full max-w-[1400px] mx-auto flex flex-col h-full border-x border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl overflow-hidden relative">
+            {/* ── Top Navigation Bar ── */}
+            <header className="shrink-0 h-14 flex items-center justify-between px-8 bg-black/60 backdrop-blur-[60px] border-b border-white/5 relative z-10 w-full">
+              <Link
+                href="/dashboard"
+                className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-colors"
+                aria-label="Back to dashboard"
+              >
+                <ArrowLeft size={18} />
+              </Link>
 
-            <div className="flex items-center gap-2.5">
-              <img src="/official-whale-monochrome.png" alt="Whale" className="w-4 h-4 opacity-80 filter invert" />
-              <span className="font-mono text-[11px] font-black uppercase tracking-[0.25em] text-white">Whale Chat</span>
+              <div className="flex items-center gap-3">
+                <img src="/official-whale-monochrome.png" alt="Whale" className="w-5 h-5 opacity-90 filter invert" />
+                <span className="font-mono text-[12px] font-black uppercase tracking-[0.25em] text-white">Whale Chat</span>
+              </div>
+
+              <div className="w-9 flex items-center justify-center">
+                <span className="font-mono text-[10px] font-black uppercase tracking-widest text-white/30">P2P</span>
+              </div>
+            </header>
+
+            {/* Chat fills the remainder — perfectly centered */}
+            <div className="flex-1 min-h-0 w-full overflow-hidden relative bg-transparent">
+              <WhaleChat forceAutoInit={false} />
             </div>
-
-            <div className="w-9 flex items-center justify-center">
-              <span className="font-mono text-[9px] font-black uppercase tracking-widest text-white/20">P2P</span>
-            </div>
-          </header>
-
-          {/* Chat fills the remainder — 100% width, all remaining height */}
-          <div className="flex-1 min-h-0 w-full overflow-hidden relative">
-            <WhaleChat forceAutoInit={false} />
           </div>
         </div>
       </>

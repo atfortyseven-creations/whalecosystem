@@ -66,13 +66,15 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
         return () => { if (clearTimer) clearTimeout(clearTimer); };
     }, [assets]);
 
+    const displayAssets = isMobile ? assets.slice(0, 100) : assets;
+
     const isProfit = totalChange24h >= 0;
 
     if (!mounted) return null;
     
     if (!isConnected) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[600px] text-center space-y-12 relative overflow-hidden rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 bg-white/40 dark:bg-[#0A0A0A]/40 backdrop-blur-3xl shadow-xl">
+            <div className="flex flex-col items-center justify-center min-h-[600px] text-center space-y-12 relative overflow-hidden rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 bg-white/80 dark:bg-[#0A0A0A]/40 backdrop-blur-3xl shadow-xl">
                 <img
                     src="/api/checkpoint-image?name=olas-hokusai-4k.png"
                     alt="Hokusai Waves"
@@ -81,7 +83,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                 />
                 
                 <div className="relative z-10">
-                    <div className="relative p-10 rounded-full bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40 border border-black/[0.06] dark:border-white/10">
+                    <div className="relative p-10 rounded-full bg-black/5 dark:bg-white/5 text-black/70 dark:text-white/40 border border-black/[0.06] dark:border-white/10">
                         <Wallet size={80} strokeWidth={1.5} />
                     </div>
                 </div>
@@ -138,11 +140,11 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                             <div className="text-[10px] font-black text-black tracking-tight truncate max-w-[100px]">
                                 {accounts.find(a => a.address.toLowerCase() === effectiveAddress.toLowerCase())?.label || 'External Wallet'}
                             </div>
-                            <div className="text-[8px] font-mono text-black/30 truncate max-w-[80px]">
+                            <div className="text-[8px] font-mono text-black/60 truncate max-w-[80px]">
                                 {effectiveAddress.slice(0, 6)}...{effectiveAddress.slice(-4)}
                             </div>
                         </div>
-                        <ChevronDown size={14} className={cn("text-black/20 transition-transform", isSwitcherOpen && "rotate-180")} />
+                        <ChevronDown size={14} className={cn("text-black/50 transition-transform", isSwitcherOpen && "rotate-180")} />
                     </button>
 
                     <AnimatePresence>
@@ -173,10 +175,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                             </div>
                                             <div className="text-left">
                                                 <div className="text-[10px] font-bold text-black uppercase">{acc.label}</div>
-                                                <div className="text-[8px] font-mono text-black/30">{acc.address.slice(0, 6)}...{acc.address.slice(-4)}</div>
+                                                <div className="text-[8px] font-mono text-black/60">{acc.address.slice(0, 6)}...{acc.address.slice(-4)}</div>
                                             </div>
                                         </div>
-                                        {effectiveAddress.toLowerCase() === acc.address.toLowerCase() && <Check size={14} className="text-black/40" />}
+                                        {effectiveAddress.toLowerCase() === acc.address.toLowerCase() && <Check size={14} className="text-black/70" />}
                                     </button>
                                 ))}
                                 <div className="h-px bg-black/[0.05] my-1" />
@@ -200,7 +202,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative p-12 rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 overflow-hidden group bg-white/40 dark:bg-[#111111]/40 backdrop-blur-3xl shadow-xl"
+                className="relative p-12 rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 overflow-hidden group bg-white/80 dark:bg-[#111111]/40 backdrop-blur-3xl shadow-xl"
             >
                 <div className="relative z-10 flex justify-between items-start">
                     <div className="space-y-8">
@@ -209,13 +211,13 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 <div className="p-2.5 rounded-xl bg-black/5 border border-black/[0.06]">
                                     <TrendingUp size={16} className="text-black" strokeWidth={2.5} />
                                 </div>
-                                <h3 className="text-[11px] font-bold text-black/40 uppercase tracking-[0.2em]">
+                                <h3 className="text-[11px] font-bold text-black/70 uppercase tracking-[0.2em]">
                                     LIQUID CAPITAL
                                 </h3>
                             </div>
                             <button 
                                 onClick={() => setIsEyesOff(!isEyesOff)}
-                                className="text-black/20 hover:text-black/60 transition-colors"
+                                className="text-black/50 hover:text-black/60 transition-colors"
                             >
                                 <Eye size={16} />
                             </button>
@@ -254,9 +256,37 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                             </motion.div>
                         </div>
 
+                        {/* 🔥 ON-CHAIN ACTION BUTTONS */}
+                        <div className="flex flex-wrap items-center gap-3 mt-4 pt-2">
+                            <button 
+                                onClick={() => alert("Transfer module activating...")}
+                                className="flex items-center gap-2 px-6 py-3 bg-[#050505] dark:bg-white text-white dark:text-[#050505] rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform"
+                            >
+                                <ArrowUpRight size={14} /> Send
+                            </button>
+                            <button 
+                                onClick={() => alert("Receive module activating...")}
+                                className="flex items-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/10 border border-black/[0.06] dark:border-white/10 text-[#050505] dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black/10 dark:hover:bg-white/20 transition-all"
+                            >
+                                <ArrowDownRight size={14} /> Receive
+                            </button>
+                            <button 
+                                onClick={() => alert("Swap module activating...")}
+                                className="flex items-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/10 border border-black/[0.06] dark:border-white/10 text-[#050505] dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black/10 dark:hover:bg-white/20 transition-all"
+                            >
+                                <RefreshCcw size={14} /> Swap
+                            </button>
+                            <button 
+                                onClick={() => alert("Bridge module activating...")}
+                                className="flex items-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/10 border border-black/[0.06] dark:border-white/10 text-[#050505] dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black/10 dark:hover:bg-white/20 transition-all"
+                            >
+                                <Globe size={14} /> Bridge
+                            </button>
+                        </div>
+
                         <div className="flex gap-10 mt-10">
                             <div className="space-y-1">
-                                <div className="text-black/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                <div className="text-black/60 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <PieChart size={12} />
                                     ACTIVE ASSETS
                                 </div>
@@ -275,7 +305,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                             <div className="w-px bg-black/[0.06]" />
                             
                             <div className="space-y-1">
-                                <div className="text-black/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                <div className="text-black/60 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <Globe size={12} />
                                     NETWORK NODES
                                 </div>
@@ -285,7 +315,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                             <div className="w-px bg-black/[0.06]" />
                             
                             <div className="space-y-1">
-                                <div className="text-black/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                <div className="text-black/60 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <Activity size={12} />
                                     ON-CHAIN STATUS
                                 </div>
@@ -299,7 +329,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
 
                     <button
                         onClick={() => window.location.reload()}
-                        className="p-5 hover:bg-black/5 rounded-[1.5rem] transition-all text-black/20 hover:text-black border border-transparent hover:border-black/[0.06] group"
+                        className="p-5 hover:bg-black/5 rounded-[1.5rem] transition-all text-black/50 hover:text-black border border-transparent hover:border-black/[0.06] group"
                     >
                         <RefreshCcw size={24} className={cn(isLoading && "animate-spin")} strokeWidth={2.5} />
                     </button>
@@ -307,7 +337,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             </motion.div>
 
             {/* 🔥 ASSET LIST */}
-            <div className="relative rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 bg-white/40 dark:bg-[#111111]/40 backdrop-blur-3xl shadow-xl overflow-hidden">
+            <div className="relative rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 bg-white/80 dark:bg-[#111111]/40 backdrop-blur-3xl shadow-xl overflow-hidden">
                 <div className="px-10 py-8 border-b border-black/[0.06] dark:border-white/10 flex justify-between items-center">
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-3">
@@ -315,18 +345,18 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                             <h4 className="text-lg font-bold text-[#050505] dark:text-white uppercase tracking-[0.1em]">ON-CHAIN HOLDINGS</h4>
                         </div>
                     </div>
-                    <span className="text-[10px] font-black text-black/20 uppercase tracking-[0.3em]">Institutional Feed // Live</span>
+                    <span className="text-[10px] font-black text-black/50 uppercase tracking-[0.3em]">Institutional Feed // Live</span>
                 </div>
                 
                 <div className="divide-y divide-black/[0.03]">
-                    {isLoading && assets.length === 0 ? (
+                    {isLoading && displayAssets.length === 0 ? (
                         <div className="p-8">
                             <PortfolioSkeleton />
                         </div>
                     ) : (
                         <>
                         <AnimatePresence mode="popLayout">
-                        {assets.map((asset, idx) => {
+                        {displayAssets.map((asset, idx) => {
                             const assetId = `${asset.symbol}-${asset.network}`;
                             const isNew = newAssetIds.has(assetId);
                             
@@ -344,7 +374,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                         </div>
                                         <div className="space-y-1">
                                             <div className="text-lg font-black text-[#050505] dark:text-white tracking-tight">{asset.symbol || 'Unknown'}</div>
-                                            <div className="text-[10px] text-black/40 dark:text-white/40 font-bold uppercase tracking-widest">{asset.network}</div>
+                                            <div className="text-[10px] text-black/70 dark:text-white/40 font-bold uppercase tracking-widest">{asset.network}</div>
                                         </div>
                                         <ArrowRight size={18} className="text-black/10 dark:text-white/10 ml-auto mr-6 group-hover:text-[#00F2EA] transition-all" strokeWidth={2.5} />
                                     </div>
@@ -353,19 +383,19 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                         <div className="text-[#050505] dark:text-white font-mono font-black text-3xl tracking-tighter">
                                             {isEyesOff ? "***.**" : `$${safeToLocaleString(asset.valueUSD || 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </div>
-                                        <div className="text-[10px] text-black/30 font-bold uppercase tracking-widest mt-1">
+                                        <div className="text-[10px] text-black/60 font-bold uppercase tracking-widest mt-1">
                                             {isEyesOff ? "**" : safeToFixed(asset.balanceNumeric || asset.balance || 0, 6)} {asset.symbol}
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-6 relative z-10">
                                         <div className="text-right">
-                                            <div className="text-black/40 font-black text-[10px] uppercase tracking-widest">
+                                            <div className="text-black/70 font-black text-[10px] uppercase tracking-widest">
                                                 {formatTXO(effectiveAddress, asset.symbol)}
                                             </div>
                                         </div>
                                         <div className="w-12 h-12 rounded-2xl bg-black/5 border border-black/[0.06] flex items-center justify-center group-hover:border-[#D4AF37]/40 transition-all">
-                                            <span className="text-black/30 font-black text-xs group-hover:text-[#D4AF37]">{idx + 1}</span>
+                                            <span className="text-black/60 font-black text-xs group-hover:text-[#D4AF37]">{idx + 1}</span>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -373,10 +403,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         })}
                     </AnimatePresence>
                     
-                    {assets.length === 0 && !isLoading && (
+                    {displayAssets.length === 0 && !isLoading && (
                         <div className="py-24 text-center space-y-4">
                             <Eye size={48} className="text-black/10 mx-auto" strokeWidth={1.5} />
-                            <p className="text-black/30 text-sm font-bold uppercase tracking-widest">
+                            <p className="text-black/60 text-sm font-bold uppercase tracking-widest">
                                 No assets detected for this identity
                             </p>
                         </div>
@@ -401,7 +431,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                 
                 {/* Footer Real Estate */}
                 <footer className="relative z-10 w-full pb-12 pt-32 mt-auto">
-                    <div className="max-w-[840px] mx-auto px-8 flex flex-col items-center gap-8 bg-white/40 backdrop-blur-md rounded-3xl py-8 border border-white/40 shadow-2xl">
+                    <div className="max-w-[840px] mx-auto px-8 flex flex-col items-center gap-8 bg-white/80 backdrop-blur-md rounded-3xl py-8 border border-white/40 shadow-2xl">
                         {/* Social and Central Whale */}
                         <div className="flex items-center justify-center gap-8">
                             <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/50 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
