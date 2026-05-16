@@ -8,13 +8,13 @@ const SECURITY_PILLARS = [
     index: "01",
     label: "Aztec Network Substrate",
     protocol: "PRIVACY-FIRST L2 ZK-ROLLUP",
-    body: "The Sovereign Terminal's core cryptographic layer is anchored to the Aztec Network. Rather than relying on transparent EVM execution, our system leverages Aztec's privacy-preserving virtual machine. By executing private functions directly on the user's device and managing encrypted UTXOs, we guarantee that all smart contract logic, capital flows, and state transitions remain strictly confidential before settling securely on Ethereum."
+    body: "The Whale Alert Network's core cryptographic layer is anchored to the Aztec Network. Rather than relying on transparent EVM execution, our system leverages Aztec's privacy-preserving virtual machine. By executing private functions directly on the user's device and managing encrypted UTXOs, we guarantee that all smart contract logic, capital flows, and state transitions remain strictly confidential before settling securely on Ethereum."
   },
   {
     index: "02",
     label: "Absolute Privacy",
     protocol: "ZERO-KNOWLEDGE ARCHITECTURE",
-    body: "Whale Alert Network ensures that your identity, portfolio, and strategic operations remain completely invisible. Our infrastructure guarantees that your intelligence gathering leaves no trace, operating with absolute discretion at all times."
+    body: "Whale Alert Network ensures that your identity, portfolio, and strategic operations remain secure and private. Our infrastructure guarantees that your intelligence gathering remains confidential, operating with complete discretion at all times."
   },
   {
     index: "03",
@@ -26,7 +26,7 @@ const SECURITY_PILLARS = [
     index: "04",
     label: "Untraceable Operations",
     protocol: "E2EE ENCRYPTED TUNNELS",
-    body: "Every action you take within the Sovereign Terminal, from market queries to direct communications, is routed through secure, end-to-end encrypted tunnels. Your strategy is your edge; we make sure it never becomes public knowledge."
+    body: "Every action you take within the Network, from market queries to direct communications, is routed through secure, end-to-end encrypted tunnels. Your strategy is your edge; we make sure it remains protected."
   }
 ];
 
@@ -62,7 +62,7 @@ const AZTEC_EXTENDED_POINTS = [
   },
   {
     title: "L1 ↔ L2 Messaging",
-    desc: "A secure, trustless message-passing protocol between Ethereum Mainnet and the Sovereign Terminal's Rollup, eliminating reliance on vulnerable third-party bridging infrastructure."
+    desc: "A secure, trustless message-passing protocol between Ethereum Mainnet and the Whale Alert Network's Rollup, eliminating reliance on vulnerable third-party bridging infrastructure."
   },
   {
     title: "Client-Side Proving",
@@ -108,9 +108,9 @@ export function AztecArchitectureSection() {
               movements and analytical queries are never exposed.
             </p>
             <p>
-              Unlike conventional analytics platforms that transparently track your behavior, 
-              the Sovereign Terminal separates the act of gathering intelligence from the act of revealing it. 
-              You gain total visibility over the market, while remaining completely invisible to it.
+              Unlike conventional analytics platforms that track your behavior, 
+              Whale Alert Network separates the act of gathering intelligence from the act of revealing it. 
+              You gain total visibility over the market while maintaining operational privacy.
             </p>
           </div>
         </div>
@@ -224,7 +224,7 @@ export function AztecArchitectureSection() {
           <p className="font-serif text-[14px] text-[#444] leading-relaxed text-left">
             Your intelligence is only as valuable as your ability to protect it. 
             Whale Alert Network provides the definitive shield, allowing you to intercept, 
-            analyze, and execute upon the flow of global capital without ever becoming the target.
+            analyze, and execute upon the flow of global capital with rigorous security.
           </p>
         </div>
 

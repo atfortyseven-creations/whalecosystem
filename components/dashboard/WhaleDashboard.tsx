@@ -11,7 +11,7 @@ import dynamic                    from 'next/dynamic';
 // ── Static imports (lightweight) ──────────────────────────────────────────────
 import { NewPairsTable }     from '@/components/dashboard/NewPairsTable';
 import { OmniExplorer }      from '@/components/dashboard/OmniExplorer';
-import { VossSupremacyPanel } from '@/components/dashboard/VossSupremacyPanel';
+import { GoldTicketPanel }    from '@/components/dashboard/GoldTicketPanel';
 import { WhaleSupport }      from '@/components/dashboard/WhaleSupport';
 import InstitutionalLedger   from '@/components/dashboard/InstitutionalLedger';
 import { MassTransferIntel } from '@/components/dashboard/MassTransferIntel';
@@ -106,23 +106,11 @@ export default function WhaleDashboard() {
     const renderTabContent = () => {
         switch (activeTab) {
             // Legacy redirects → Gold Ticket
-            case 'dashboard':
-            case 'watchlist':
-            case 'firehose':
-            case 'sov-intel':
-            case 'live-port':
-            case 'whale-port':
-            case 'graph':
-            case 'vault':
-            case 'trade':
-            case 'forensics':
-            case 'reputation':
-            case 'scanner':
             case 'zk-identity':
-                return <div className={PANEL}><DashboardErrorBoundary key={`gold-redirect-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`gold-redirect-${refreshKey}`}><GoldTicketPanel /></DashboardErrorBoundary></div>;
 
             case 'gold':
-                return <div className={PANEL}><DashboardErrorBoundary key={`gold-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`gold-${refreshKey}`}><GoldTicketPanel /></DashboardErrorBoundary></div>;
 
             case 'portfolio':
                 return <div className={PANEL}><DashboardErrorBoundary key={`human-port-${refreshKey}`}><PortfolioDashboard /></DashboardErrorBoundary></div>;
@@ -155,7 +143,7 @@ export default function WhaleDashboard() {
                 return <div className={PANEL}><DashboardErrorBoundary key={`support-${refreshKey}`}><WhaleSupport /></DashboardErrorBoundary></div>;
 
             default:
-                return <div className={PANEL}><DashboardErrorBoundary key={`gold-default-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`gold-default-${refreshKey}`}><GoldTicketPanel /></DashboardErrorBoundary></div>;
         }
     };
 

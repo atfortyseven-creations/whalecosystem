@@ -10,6 +10,8 @@ const MobileLanding = dynamic(
   { ssr: false }
 );
 
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+
 /**
  * RealDeviceRouter — detects the PHYSICAL device, not the User-Agent string.
  *
@@ -27,6 +29,19 @@ const MobileLanding = dynamic(
  */
 function RealDeviceRouter() {
   const [view, setView] = useState<'loading' | 'mobile' | 'desktop'>('loading');
+  const { isConnected } = useSovereignAccount();
+
+  // Dynamic Redirection Watcher (Triggers instantly when wallet connects)
+  useEffect(() => {
+    if (isConnected) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasUuid = urlParams.has('uuid');
+      if (!hasUuid) {
+        const next = urlParams.get('next') || '/';
+        window.location.replace(next);
+      }
+    }
+  }, [isConnected]);
 
   useEffect(() => {
     // If already authenticated, redirect to root immediately — no connect needed.

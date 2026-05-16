@@ -703,6 +703,12 @@ export function MobileLanding() {
       try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
       try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
       setShowManualReconnectRaw(false);
+
+      // REDIRECT TO DASHBOARD / NEXT PARAM
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next') || '/dashboard';
+      console.log('[Auth] Redirecting to:', next);
+      window.location.replace(next);
     } catch (err: any) {
       console.error('[Auth] Handshake failed:', err);
       setSigningError(err.message || 'Verification failed');
@@ -1023,8 +1029,8 @@ export function MobileLanding() {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-          style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(0,0,0,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.03)" }}
+          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 transform-gpu"
+          style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(0,0,0,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.03)", willChange: "transform, opacity" }}
         >
           <div className="flex items-center gap-3">
             <div
@@ -1129,7 +1135,8 @@ export function MobileLanding() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center"
+          className="text-center transform-gpu"
+          style={{ willChange: "transform, opacity" }}
         >
           <h1 className="text-[2.2rem] sm:text-[2.8rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
             Track institutional capital

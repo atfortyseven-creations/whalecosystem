@@ -68,10 +68,10 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
-  manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    title: 'Dashboard',
+    title: 'Whale Alert',
+    statusBarStyle: 'default',
   },
   openGraph: {
     title: 'Whale Alert Network | Professional Identity Layer',
@@ -222,7 +222,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className="bg-transparent text-white dark:text-[#FAF9F6] antialiased selection:bg-white/10 selection:text-white transition-colors duration-300"
+        className="bg-[#FAFAF8] text-black antialiased selection:bg-black/10 selection:text-black transition-colors duration-300"
         suppressHydrationWarning
       >
 
@@ -230,7 +230,7 @@ export default async function RootLayout({
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-black text-white px-4 py-2 rounded-lg font-bold text-sm">
           Skip to absolute content
         </a>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false}>
           <ScrollProgressBar />
           <Providers cookies={cookies}>
             <GlobalErrorBoundary>
@@ -244,7 +244,6 @@ export default async function RootLayout({
                     <Toaster richColors position="top-right" />
                     <CookieConsent />
                     <ClientOverlays />
-                    <InteractiveFluidGrid />
                   </CookieProvider>
                 </ClientLayout>
               </MobileEnforcer>

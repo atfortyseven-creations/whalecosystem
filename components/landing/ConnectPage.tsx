@@ -71,7 +71,7 @@ function WalletButton({ logo, name, badge, onClick, loading = false, delay = 0, 
         <p className="text-[12px] font-black uppercase tracking-widest text-[#0A0A0A] truncate">
           {loading ? "Connecting..." : name}
         </p>
-        <p className="text-[9px] font-mono text-[#999] uppercase tracking-[0.2em] mt-0.5 truncate">
+        <p className="text-[10px] font-mono text-black/40 uppercase tracking-[0.2em] mt-0.5 truncate">
           {badge}
         </p>
       </div>
@@ -232,7 +232,7 @@ export default function ConnectPage() {
   const isVerified = mounted && (isConnected || isLinked);
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center bg-[#F9F8F6] relative">
+    <div className="w-full flex-1 flex flex-col items-center justify-center bg-[#FAFAF8] relative">
       <div className="relative z-10 w-full flex flex-col justify-center items-center px-4 py-8 sm:p-12 min-h-0">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -244,31 +244,31 @@ export default function ConnectPage() {
           <div className="flex-1 p-8 sm:p-12 lg:p-16 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#F0F0F0] bg-[#FAFAF8]">
             <div>
               <div className="flex items-center gap-2 mb-10">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-[#999]">Whale Alert Network</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-black/40">Whale Alert Network</span>
               </div>
 
               <h1 className="text-[36px] sm:text-[44px] font-black tracking-tighter leading-[1.0] text-[#0A0A0A] mb-6">
-                Colțea Secure<br />
-                <span className="text-[#CCCCCC]">Access</span>
+                Whale Alert<br />
+                <span className="text-[#CCCCCC]">Network Access</span>
               </h1>
 
-              <p className="text-[15px] text-[#666] leading-relaxed mb-10 max-w-sm font-serif">
-                Authenticate to access the private Whale Alert Network infrastructure.
+              <p className="text-[15px] text-black/60 leading-relaxed mb-10 max-w-sm font-serif">
+                Establish a secure connection to the Whale Alert Network infrastructure. Professional identity management and institutional record preservation.
               </p>
 
               <div className="grid grid-cols-1 gap-3">
-                <div className="p-4 rounded-xl bg-white border border-[#F0F0F0]">
-                  <Shield size={16} className="text-[#0A0A0A] mb-3 opacity-60" />
-                  <p className="text-[11px] font-black uppercase tracking-wider text-[#0A0A0A] mb-1">Cryptographic Authentication</p>
-                  <p className="text-[11px] text-[#999] leading-relaxed">GDPR / HIPAA Compliant Identity Verification.</p>
+                <div className="p-4 rounded-xl bg-white border border-black/5 shadow-sm">
+                  <Shield size={16} className="text-black mb-3 opacity-40" />
+                  <p className="text-[11px] font-black uppercase tracking-wider text-black mb-1">Cryptographic Authentication</p>
+                  <p className="text-[11px] text-black/40 leading-relaxed font-mono uppercase tracking-tighter">GDPR / HIPAA Compliant Identity Verification.</p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-10 pt-8 border-t border-[#F0F0F0] flex items-start gap-3">
-              <Lock size={14} className="text-[#CCC] shrink-0 mt-0.5" />
-              <p className="text-[10px] text-[#BBB] font-mono leading-relaxed uppercase tracking-[0.12em]">
+            <div className="mt-10 pt-8 border-t border-black/5 flex items-start gap-3">
+              <Lock size={14} className="text-black/20 shrink-0 mt-0.5" />
+              <p className="text-[10px] text-black/30 font-mono leading-relaxed uppercase tracking-[0.12em]">
                 Authorized personnel only. Sessions are cryptographically bound to your hardware identity.
               </p>
             </div>
@@ -279,9 +279,9 @@ export default function ConnectPage() {
             <div className="w-full flex flex-col h-full max-w-sm mx-auto">
 
               {mounted && !isVerified && (
-                <div className="flex items-center gap-2 mb-8 pb-6 border-b border-[#F5F5F5]">
-                  {isMobile ? <Smartphone size={13} className="text-[#BBB]" /> : <Monitor size={13} className="text-[#BBB]" />}
-                  <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#BBB]">
+                <div className="flex items-center gap-2 mb-8 pb-6 border-b border-black/5">
+                  {isMobile ? <Smartphone size={13} className="text-black/20" /> : <Monitor size={13} className="text-black/20" />}
+                  <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-black/30">
                     {isMobile ? "Mobile connection" : "Desktop connection"}
                   </span>
                 </div>
@@ -348,9 +348,9 @@ export default function ConnectPage() {
                 <div className="flex flex-col gap-3 flex-1 w-full">
                   {qrData && syncStatus === "AWAITING" && (
                     <div className="flex justify-center mb-3">
-                      <div className="p-3 bg-[#FAFAF8] rounded-xl border border-[#F0F0F0] flex flex-col items-center gap-2">
+                      <div className="p-3 bg-[#FAFAF8] rounded-xl border border-black/5 flex flex-col items-center gap-2 shadow-sm">
                         <QRCode value={qrData} size={130} fgColor="#0A0A0A" bgColor="transparent" />
-                        <span className="text-[8px] font-mono uppercase tracking-[0.2em] text-[#BBB] text-center">Connect Whale Mobile</span>
+                        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/30 text-center">Connect Whale Mobile</span>
                       </div>
                     </div>
                   )}
@@ -359,7 +359,7 @@ export default function ConnectPage() {
                   ))}
                   <button
                     onClick={() => openAppKit({ view: 'Connect' })}
-                    className="w-full flex items-center justify-center gap-3 py-3.5 mt-1 rounded-xl border border-[#F0F0F0] bg-[#FAFAF8] font-black uppercase tracking-[0.2em] text-[10px] text-[#BBB] hover:bg-[#F5F5F3] hover:text-[#888] transition-all"
+                    className="w-full flex items-center justify-center gap-3 py-3.5 mt-1 rounded-xl border border-black/5 bg-[#FAFAF8] font-black uppercase tracking-[0.2em] text-[10px] text-black/40 hover:bg-black/5 hover:text-black/60 transition-all"
                   >
                     <ScanLine size={14} />
                     WalletConnect / QR Scan

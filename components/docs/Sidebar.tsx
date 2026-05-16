@@ -189,14 +189,14 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
     });
   };
 
-  const bg     = 'bg-black/30 backdrop-blur-3xl';
-  const border  = 'border-white/8';
-  const tabTextInactive = 'text-white/30 hover:text-white/70';
-  const tabTextActive   = 'text-white border-b-2 border-white';
-  const catColor        = 'text-white/25';
-  const itemInactive    = 'text-white/50 hover:text-white';
-  const itemActive      = 'text-white font-bold border-l-2 border-white pl-3';
-  const sectionTitle    = 'text-white/50';
+  const bg     = 'bg-[#FAFAF8]';
+  const border  = 'border-black/10';
+  const tabTextInactive = 'text-black/30 hover:text-black/70';
+  const tabTextActive   = 'text-black border-b-2 border-black font-black';
+  const catColor        = 'text-black/25';
+  const itemInactive    = 'text-black/50 hover:text-black hover:bg-black/5';
+  const itemActive      = 'text-black font-black border-l-2 border-black pl-3 bg-black/5';
+  const sectionTitle    = 'text-black/40';
 
   const visibleSections = NAV.filter(s => s.tab === activeTab);
 
@@ -260,8 +260,8 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
                       >
                         <span>{item.label}</span>
                         <span className="flex items-center gap-1">
-                          {item.badge && <span className={`font-mono text-[9px] text-white/25`}>{item.badge}</span>}
-                          {item.external && <ExternalLink size={9} className="opacity-30" />}
+                          {item.badge && <span className={`font-mono text-[9px] text-black/25`}>{item.badge}</span>}
+                          {item.external && <ExternalLink size={9} className="opacity-20" />}
                         </span>
                       </Link>
                     );

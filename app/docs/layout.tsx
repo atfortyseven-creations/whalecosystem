@@ -36,8 +36,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   // be respected so the docs text is white over the black wallpaper background.
   // The docs sidebar and content use dark-mode-aware classes.
 
-  const bg    = 'bg-transparent text-white dark:text-white';
-  const hdrBg = 'bg-black/60 dark:bg-black/70 border-white/10';
+  const bg    = 'bg-[#FAFAF8] text-black';
+  const hdrBg = 'bg-white border-black/10';
 
   return (
     <div className={`min-h-screen ${bg} transition-colors duration-200 font-sans`}>
@@ -46,13 +46,13 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <header className={`sticky top-0 z-50 h-[56px] border-b ${hdrBg} w-full flex items-center px-6 backdrop-blur-xl`}>
 
         {/* Logo */}
-        <Link href="/docs" className="font-mono text-[11px] font-black uppercase tracking-[0.25em] mr-8 text-white shrink-0 hover:text-white/80 transition-colors">
+        <Link href="/docs" className="font-mono text-[11px] font-black uppercase tracking-[0.25em] mr-8 text-black shrink-0 hover:text-black/80 transition-colors">
           Whale Alert
           <span className="ml-1 opacity-40 font-normal">/ docs</span>
         </Link>
 
         {/* Version badge */}
-        <span className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 border rounded-full mr-6 border-white/20 text-white/40 shrink-0">
+        <span className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 border rounded-full mr-6 border-black/10 text-black/40 shrink-0">
           v2.0
         </span>
 
@@ -64,8 +64,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               href={tab.href}
               className={`flex items-center justify-center px-5 font-mono text-[10px] uppercase tracking-[0.18em] transition-all h-full border-b-2 whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'text-white border-white font-black'
-                  : 'text-white/40 border-transparent hover:text-white/80 hover:border-white/30'
+                  ? 'text-black border-black font-black'
+                  : 'text-black/40 border-transparent hover:text-black/80 hover:border-black/30'
               }`}
             >
               {tab.label}
@@ -75,7 +75,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
         {/* Right controls */}
         <div className="flex items-center gap-4 shrink-0 ml-auto">
-          <Search theme="dark" />
+          <Search theme="light" />
         </div>
       </header>
 
@@ -83,40 +83,63 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <div className="flex w-full">
 
         {/* Left sidebar */}
-        <Sidebar theme="dark" currentPath={pathname || ''} />
+        <Sidebar theme="light" currentPath={pathname || ''} />
 
         {/* Main content */}
-        <main className={`flex-1 min-w-0 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar flex flex-col`}>
-          <div className="w-full max-w-[860px] mx-auto py-16 px-8 lg:px-16 flex-1">
+        <main className={`flex-1 min-w-0 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar flex flex-col bg-white`}>
+          <div className="w-full max-w-[900px] mx-auto py-16 px-8 lg:px-16 flex-1 pb-32">
             {children}
           </div>
         </main>
       </div>
 
       <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 2px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255,255,255,0.15);
-          border-radius: 0;
+          background: rgba(0,0,0,0.1);
+          border-radius: 10px;
         }
 
-        /* Doc typography — dark mode */
-        .doc-content { color: #F5F5F5; }
-        .doc-content h1 { font-size: 2.4rem; font-weight: 900; letter-spacing: -0.04em; text-transform: uppercase; line-height: 1.1; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); color: #FFFFFF; }
-        .doc-content h2 { font-size: 1.2rem; font-weight: 900; letter-spacing: -0.02em; text-transform: uppercase; margin-top: 3rem; margin-bottom: 1rem; color: #FFFFFF; }
-        .doc-content h3 { font-size: 0.75rem; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 2rem; margin-bottom: 0.75rem; color: rgba(255,255,255,0.5); }
-        .doc-content p { line-height: 1.8; font-size: 0.9375rem; color: rgba(245,245,245,0.8); margin-bottom: 1.25rem; }
-        .doc-content pre { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; font-family: monospace; font-size: 0.8125rem; overflow-x: auto; margin: 1.5rem 0; color: #E2E8F0; border-radius: 4px; }
-        .doc-content code { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); padding: 0.15em 0.45em; font-family: monospace; font-size: 0.8125rem; color: #A5D8FF; border-radius: 3px; }
-        .doc-content li { margin-bottom: 0.5rem; color: rgba(245,245,245,0.75); font-size: 0.9375rem; line-height: 1.7; padding-left: 1.25rem; position: relative; }
-        .doc-content li::before { content: "—"; position: absolute; left: 0; color: rgba(255,255,255,0.3); }
-        .doc-content .callout { border-left: 2px solid rgba(255,255,255,0.5); padding: 1rem 1.25rem; margin: 1.5rem 0; background: rgba(255,255,255,0.04); }
-        .doc-content .callout p { margin: 0; color: rgba(245,245,245,0.9); font-size: 0.875rem; }
-        .doc-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.875rem; }
-        .doc-content th { text-align: left; font-weight: 900; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.75rem 1rem; border-bottom: 2px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.5); }
-        .doc-content td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(245,245,245,0.75); }
-        .doc-content a { color: #60A5FA; text-decoration: underline; }
-        .doc-content a:hover { color: #93C5FD; }
+        /* Doc typography — Light mode with "White Titles / Black Text" */
+        .doc-content { color: #111111; }
+        .doc-content h1 { 
+          font-size: 2.2rem; 
+          font-weight: 900; 
+          letter-spacing: -0.04em; 
+          text-transform: uppercase; 
+          line-height: 1.1; 
+          margin-bottom: 2rem; 
+          padding: 1.5rem 2rem;
+          background: #000000;
+          color: #FFFFFF;
+          border-radius: 4px;
+        }
+        .doc-content h2 { 
+          font-size: 1.1rem; 
+          font-weight: 900; 
+          letter-spacing: 0.1em; 
+          text-transform: uppercase; 
+          margin-top: 4rem; 
+          margin-bottom: 1.5rem; 
+          padding: 0.75rem 1.5rem;
+          background: #111111;
+          color: #FFFFFF;
+          border-radius: 4px;
+          display: inline-block;
+        }
+        .doc-content h3 { font-size: 0.75rem; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 2.5rem; margin-bottom: 1rem; color: rgba(0,0,0,0.4); }
+        .doc-content p { line-height: 1.9; font-size: 1rem; color: #333333; margin-bottom: 1.5rem; }
+        .doc-content pre { background: #F8F8F8; border: 1px solid #EEEEEE; padding: 1.5rem; font-family: monospace; font-size: 0.8125rem; overflow-x: auto; margin: 1.5rem 0; color: #111111; border-radius: 8px; }
+        .doc-content code { background: #F0F0F0; border: 1px solid #E0E0E0; padding: 0.15em 0.45em; font-family: monospace; font-size: 0.8125rem; color: #0056B3; border-radius: 3px; }
+        .doc-content li { margin-bottom: 0.75rem; color: #333333; font-size: 1rem; line-height: 1.8; padding-left: 1.5rem; position: relative; }
+        .doc-content li::before { content: "•"; position: absolute; left: 0; color: rgba(0,0,0,0.2); }
+        .doc-content .callout { border-left: 3px solid #000000; padding: 1.25rem 1.5rem; margin: 2rem 0; background: #F9F9F9; border-radius: 0 8px 8px 0; }
+        .doc-content .callout p { margin: 0; color: #111111; font-size: 0.9375rem; }
+        .doc-content table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.9375rem; }
+        .doc-content th { text-align: left; font-weight: 900; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 1rem; border-bottom: 2px solid #000000; color: #000000; }
+        .doc-content td { padding: 1rem; border-bottom: 1px solid #EEEEEE; color: #333333; }
+        .doc-content a { color: #0070F3; text-decoration: none; border-bottom: 1px solid #0070F3; }
+        .doc-content a:hover { opacity: 0.7; }
       `}</style>
     </div>
   );

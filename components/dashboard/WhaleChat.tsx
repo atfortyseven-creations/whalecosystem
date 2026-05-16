@@ -6,7 +6,7 @@ import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useSignMessage, useReconnect } from 'wagmi';
 
 import { useAppKit } from '@reown/appkit/react';
-import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate, discoverNewPeers } from '@/lib/xmtp/client';
+import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMTPClient, nsToDate, discoverNewPeers, streamMessages } from '@/lib/xmtp/client';
 import { QrScanner } from '@/components/dashboard/QrScanner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import type { Client } from '@xmtp/browser-sdk';
@@ -553,14 +553,13 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     return () => { cancelled = true; clearInterval(globalPoll); };
   }, [client, address]);
 
-  // ── Real-time incoming message polling (REAL XMTP NETWORK) ──────────────
-  // Every 5 seconds, sync with the decentralized network to fetch new messages.
-  // The global sync loop (above) ensures the receiver discovers new DM invites.
-  // GUARD: isFetching prevents concurrent calls from stacking on slow networks.
+  // ── Real-time incoming message polling & STREAMING (REAL XMTP NETWORK) ──────────────
+  // We use streaming for instant zero-latency delivery, and a 10s polling fallback.
   useEffect(() => {
     if (!client || !activePeer || !address) return;
     let isMounted = true;
     let isFetching = false;
+    let streamInstance: any = null;
     
     // Ignore the institutional support mock for network requests
     if (activePeer.toLowerCase() === '0xinstitutionalsupport_0000') {
@@ -597,14 +596,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         setMessages(prev => {
             const activeId = `dm-${activePeer.toLowerCase()}`;
             const others = prev.filter(p => p.conversationId !== activeId);
-            const mappedIds = new Set(mappedMsgs.map(m => m.id));
+            const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
             
-            const myMappedContents = new Set(mappedMsgs.filter(m => {
+            const myMappedContents = new Set(mappedMsgs.filter((m: any) => {
                 const isMe = m.senderInboxId
                     ? m.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
                     : false;
                 return isMe;
-            }).map(m => typeof m.content === 'string' ? m.content.trim() : ''));
+            }).map((m: any) => typeof m.content === 'string' ? m.content.trim() : ''));
 
             // Keep optimistic messages only until the network confirms them (15s TTL)
             const optimistic = prev.filter(p => {
@@ -623,8 +622,30 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     };
 
     fetchMessages();
-    const poll = setInterval(fetchMessages, 5000);
-    return () => { isMounted = false; clearInterval(poll); };
+    const poll = setInterval(fetchMessages, 10000); // 10s fallback polling
+    
+    // XMTP Streaming Optimizer: Instant 0-latency sync
+    const startStream = async () => {
+      try {
+        const stream = streamMessages(client);
+        streamInstance = stream;
+        for await (const msg of stream as any) {
+           if (!isMounted) break;
+           fetchMessages(); // instantly sync active chat when network emits message
+        }
+      } catch (e) {
+        console.warn('[XMTP] Stream failed:', e);
+      }
+    };
+    startStream();
+
+    return () => { 
+        isMounted = false; 
+        clearInterval(poll); 
+        if (streamInstance && typeof streamInstance.return === 'function') {
+            streamInstance.return();
+        }
+    };
   }, [client, activePeer, address]);
 
   const handleStartConversationWithPeer = async (peerAddr: string) => {
@@ -746,7 +767,23 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             setMessages(prev => {
                 const activeId = `dm-${activePeer.toLowerCase()}`;
                 const others = prev.filter(p => p.conversationId !== activeId);
-                return [...others, ...mappedMsgs].sort((a, b) => a.sentAtNs - b.sentAtNs);
+                const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
+                
+                const myMappedContents = new Set(mappedMsgs.filter((m: any) => {
+                    const isMe = m.senderInboxId
+                        ? m.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
+                        : false;
+                    return isMe;
+                }).map((m: any) => typeof m.content === 'string' ? m.content.trim() : ''));
+
+                // FIX: Keep optimistic messages so the sent message doesn't vanish instantly
+                const optimistic = prev.filter(p => {
+                    if (p.conversationId !== activeId || mappedIds.has(p.id) || p.id.length >= 20) return false;
+                    if (myMappedContents.has(typeof p.content === 'string' ? p.content.trim() : '')) return false;
+                    if (Date.now() - parseInt(p.id) > 15000) return false;
+                    return true;
+                });
+                return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
             });
         } catch (syncErr) {
             console.warn('[XMTP] Post-send sync failed:', syncErr);

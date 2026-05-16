@@ -199,8 +199,8 @@ function ScannedOverlay() {
           <p className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-600">
             Scanned!
           </p>
-          <p className="text-[9px] font-medium uppercase tracking-widest text-black/30">
-            Syncing terminal…
+          <p className="text-[9px] font-black uppercase tracking-widest text-black/50">
+            Syncing session…
           </p>
         </motion.div>
       </motion.div>
@@ -625,7 +625,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
             animate={{ scale: 1,    opacity: 1, y: 0  }}
             exit={{   scale: 0.95, opacity: 0, y: 20  }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-sm flex flex-col items-center px-6 relative"
+            className="w-full max-w-sm flex flex-col items-center px-6 relative will-change-transform"
           >
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
@@ -672,19 +672,33 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                       style={{ display: status === 'error' || status === 'success' || status === 'signing' ? 'none' : 'block' }}
                     />
 
-                    {/* Animated perimeter scan line — perfectly centered now */}
+                    {/* Animated perimeter scan line */}
                     <ScanLine active={status === 'scanning'} />
 
                     {/* Loading state absolute centering */}
                     {status === 'idle' && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-10">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md z-10">
                         <Loader2 size={28} className="animate-spin text-white/40 mb-3" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-white/50">
                           Initializing camera...
                         </span>
                       </div>
                     )}
+
+                    {/* Address Badge Over Camera (Visibility Fix) */}
+                    {addressRef.current && status === 'scanning' && (
+                      <div className="absolute bottom-4 left-4 right-4 z-20">
+                        <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2.5 flex items-center justify-center gap-3 shadow-2xl">
+                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                           <span className="font-mono text-[11px] font-black text-white uppercase tracking-widest">
+                             {addressRef.current.slice(0, 8)}...{addressRef.current.slice(-6)}
+                           </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+
 
                   {/* Success overlay */}
                   <AnimatePresence>
@@ -694,13 +708,13 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                   {/* Error overlay */}
                   {status === 'error' && (
                     <div className="absolute inset-0 bg-white z-10 flex flex-col p-8 text-center justify-center gap-4">
-                      <Shield size={30} className="mx-auto text-red-400 opacity-60" />
+                      <Shield size={30} className="mx-auto text-red-500" />
                       <p className="text-red-500 text-[11px] font-black uppercase tracking-widest leading-relaxed">
                         {errMsg}
                       </p>
                       <button
                         onClick={handleRetry}
-                        className="text-[9px] font-black uppercase tracking-[0.2em] px-5 py-2.5 bg-black text-white rounded-full mx-auto mt-2 hover:bg-black/80 transition-colors"
+                        className="text-[9px] font-black uppercase tracking-[0.2em] px-6 py-3 bg-black text-white rounded-full mx-auto mt-2 hover:bg-black/80 transition-colors shadow-lg"
                       >
                         Retry
                       </button>

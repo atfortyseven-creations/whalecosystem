@@ -264,7 +264,7 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-[60] bg-black/10 backdrop-blur-sm"
                     />
 
                     <motion.div
@@ -273,14 +273,14 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none p-4"
                     >
-                        <div className="w-full max-w-md bg-[#1a1b23]/95 border border-white/10 rounded-3xl shadow-2xl backdrop-blur-xl pointer-events-auto overflow-hidden">
+                        <div className="w-full max-w-md bg-white border border-black/10 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] pointer-events-auto overflow-hidden">
                             {/* Header */}
-                            <div className="flex items-center justify-between p-6 border-b border-white/5">
-                                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                    <Send className="w-5 h-5 text-indigo-400" />
+                            <div className="flex items-center justify-between p-6 border-b border-black/5 bg-[#FAFAF8]">
+                                <h2 className="text-xl font-black text-black tracking-tighter uppercase flex items-center gap-2">
+                                    <Send className="w-5 h-5 text-black" />
                                     Send Assets
                                 </h2>
-                                <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full text-white/50 hover:text-white transition-colors">
+                                <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full text-black/30 hover:text-black transition-colors">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
@@ -288,27 +288,27 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                             <div className="p-6 space-y-6">
                                 {/* Asset Selector */}
                                 <div className="space-y-2 relative z-30">
-                                    <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Select Asset</label>
+                                    <label className="text-[10px] font-black text-black/40 uppercase tracking-widest pl-1">Select Asset</label>
                                     <button 
                                         onClick={() => setShowAssetDropdown(!showAssetDropdown)}
-                                        className="w-full flex items-center justify-between bg-black/30 hover:bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white transition-all"
+                                        className="w-full flex items-center justify-between bg-black/5 hover:bg-black/10 border border-black/5 rounded-xl px-4 py-3 text-black transition-all"
                                     >
                                         <div className="flex items-center gap-3">
                                             {selectedAsset.logo ? (
                                                 <img src={selectedAsset.logo} className="w-6 h-6 rounded-full" />
                                             ) : (
-                                                <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black">
+                                                <div className="w-6 h-6 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-black">
                                                     {selectedAsset.visibleSymbol.slice(0, 2)}
                                                 </div>
                                             )}
                                             <div className="text-left">
-                                                <div className="font-bold flex items-center gap-2">
+                                                <div className="font-black text-sm uppercase tracking-tight flex items-center gap-2">
                                                     {selectedAsset.visibleSymbol}
                                                     {selectedAsset.address === 'native' && (
-                                                        <span className="text-[10px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded uppercase font-black tracking-tighter">Native</span>
+                                                        <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded uppercase font-black tracking-tighter">Native</span>
                                                     )}
                                                 </div>
-                                                <div className="text-[10px] text-white/30 font-medium truncate max-w-[150px]">{selectedAsset.name}</div>
+                                                <div className="text-[10px] text-black/30 font-medium truncate max-w-[150px] uppercase tracking-widest">{selectedAsset.name}</div>
                                             </div>
                                         </div>
                                         <ChevronDown className={`w-4 h-4 transition-transform ${showAssetDropdown ? 'rotate-180' : ''}`} />
@@ -321,26 +321,26 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                                                 initial={{ opacity: 0, y: -10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, y: -10 }}
-                                                className="absolute top-full left-0 right-0 mt-2 bg-[#1e202b] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-40 p-1 max-h-[400px] flex flex-col"
+                                                className="absolute top-full left-0 right-0 mt-2 bg-white border border-black/10 rounded-2xl shadow-2xl overflow-hidden z-40 p-1 max-h-[400px] flex flex-col"
                                             >
                                                 {/* Search Bar */}
-                                                <div className="p-2 border-b border-white/5 mb-2">
+                                                <div className="p-2 border-b border-black/5 mb-2">
                                                     <div className="relative">
-                                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
+                                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-black/20" />
                                                         <input 
                                                             autoFocus
-                                                            placeholder="Search by name or address..."
+                                                            placeholder="Search..."
                                                             value={searchQuery}
                                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                                            className="w-full bg-black/40 border border-white/5 rounded-lg py-2 pl-9 pr-3 text-xs text-white outline-none focus:border-indigo-500/30 transition-all font-medium"
+                                                            className="w-full bg-black/5 border border-black/5 rounded-lg py-2 pl-9 pr-3 text-xs text-black outline-none focus:border-black/20 transition-all font-black uppercase tracking-tight"
                                                         />
                                                     </div>
                                                 </div>
 
-                                                <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1">
+                                                <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-black/10 flex-1">
                                                     {/* Section: My Assets */}
                                                     {!searchQuery && (
-                                                        <div className="px-3 py-1 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">My Assets</div>
+                                                        <div className="px-3 py-1 text-[10px] font-black text-black/20 uppercase tracking-[0.2em]">My Assets</div>
                                                     )}
                                                     
                                                     {availableAssets.filter(a => 
@@ -352,21 +352,21 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                                                                 setSelectedAsset(asset);
                                                                 setShowAssetDropdown(false);
                                                             }}
-                                                            className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors flex items-center justify-between group"
+                                                            className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-black/5 transition-colors flex items-center justify-between group"
                                                         >
                                                             <div className="flex items-center gap-3">
                                                                 {asset.logo ? (
                                                                     <img src={asset.logo} className="w-7 h-7 rounded-full" />
                                                                 ) : (
-                                                                    <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black">{asset.visibleSymbol.slice(0, 2)}</div>
+                                                                    <div className="w-7 h-7 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-black uppercase">{asset.visibleSymbol.slice(0, 2)}</div>
                                                                 )}
                                                                 <div>
-                                                                    <div className="text-white font-bold text-sm tracking-tight">{asset.visibleSymbol}</div>
-                                                                    <div className="text-white/30 text-[10px] font-medium">{asset.name}</div>
+                                                                    <div className="text-black font-black text-sm uppercase tracking-tight">{asset.visibleSymbol}</div>
+                                                                    <div className="text-black/30 text-[10px] font-mono uppercase tracking-widest">{asset.name}</div>
                                                                 </div>
                                                             </div>
                                                             <div className="text-right">
-                                                                <div className="text-xs font-mono font-bold text-white/50">{parseFloat(asset.balanceFormatted || '0').toFixed(4)}</div>
+                                                                <div className="text-xs font-mono font-black text-black/60">{parseFloat(asset.balanceFormatted || '0').toFixed(4)}</div>
                                                                 {asset.valueUSD > 0 && <div className="text-[10px] text-emerald-500/60 font-medium">${safeToFixed(asset.valueUSD, 2)}</div>}
                                                             </div>
                                                         </button>
@@ -415,16 +415,16 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
 
                                 {/* Recipient */}
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/50 uppercase tracking-wider pl-1">Destination Address</label>
+                                    <label className="text-[10px] font-black text-black/40 uppercase tracking-widest pl-1">Destination Address</label>
                                     <div className="relative">
                                         <input
                                             value={recipient}
                                             onChange={(e) => setRecipient(e.target.value)}
                                             placeholder="0x..."
-                                            className="w-full bg-black/20 border border-white/10 rounded-xl py-4 pl-4 pr-10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 transition-all font-mono text-sm"
+                                            className="w-full bg-black/5 border border-black/5 rounded-xl py-4 pl-4 pr-10 text-black placeholder:text-black/20 focus:outline-none focus:border-black/20 transition-all font-mono text-sm"
                                         />
                                         {recipient && isAddress(recipient) && (
-                                            <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                                            <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-600" />
                                         )}
                                     </div>
                                 </div>
@@ -432,10 +432,10 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                                 {/* Amount */}
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center pl-1">
-                                        <label className="text-xs font-bold text-white/50 uppercase tracking-wider">Amount</label>
-                                        <span className="text-[10px] text-white/40 font-bold">
+                                        <label className="text-[10px] font-black text-black/40 uppercase tracking-widest">Amount</label>
+                                        <span className="text-[9px] text-black/30 font-black uppercase tracking-widest">
                                             Balance: 
-                                            <span className="text-white font-mono ml-1">
+                                            <span className="text-black font-mono ml-1">
                                                 {currentBalance ? parseFloat(currentBalance.formatted).toFixed(6) : "0.000000"}
                                             </span>
                                         </span>
@@ -446,16 +446,16 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
                                             placeholder="0.00"
-                                            className="w-full bg-black/20 border border-white/10 rounded-xl py-5 pl-4 pr-24 text-3xl font-black text-white placeholder:text-white/10 focus:outline-none focus:border-indigo-500/50 transition-all tabular-nums"
+                                            className="w-full bg-black/5 border border-black/5 rounded-xl py-5 pl-4 pr-24 text-4xl font-black text-black placeholder:text-black/5 focus:outline-none focus:border-black/20 transition-all tabular-nums"
                                         />
                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
                                             <button
                                                 onClick={handleMax}
-                                                className="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-[9px] font-black text-indigo-300 transition-colors uppercase tracking-widest"
+                                                className="px-2.5 py-1.5 bg-black text-white rounded-lg text-[9px] font-black transition-colors uppercase tracking-widest active:scale-95"
                                             >
                                                 MAX
                                             </button>
-                                            <span className="font-black text-white/40 text-xs pr-2">
+                                            <span className="font-black text-black/40 text-xs pr-2 uppercase tracking-tight">
                                                 {selectedAsset.visibleSymbol}
                                             </span>
                                         </div>
@@ -466,9 +466,9 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                                 <button
                                     disabled={status === "SIGNING" || status === "SENDING" || !amount || !recipient || !address}
                                     onClick={handleSend}
-                                    className="w-full py-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-30 disabled:grayscale rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-white shadow-xl shadow-indigo-500/10 transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
+                                    className="w-full py-5 bg-black hover:bg-black/90 disabled:opacity-10 rounded-2xl font-black text-[11px] uppercase tracking-[0.25em] text-white shadow-xl shadow-black/10 transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
                                 >
-                                    {!address ? t('nav.wallet_settings') :
+                                    {!address ? "Connect Wallet" :
                                         (
                                             <>
                                                 Send {selectedAsset.visibleSymbol} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

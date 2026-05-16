@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    ChevronLeft, ChevronRight, Search,
+    ChevronLeft, ChevronRight, Search, ChevronDown,
     X, ArrowUpRight, Globe, Info, Lock,
     BarChart2, PlusCircle, Wallet, MessageSquare, Menu
 } from 'lucide-react';
@@ -137,6 +137,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
     const [tier, setTier] = useState<string | null>(null);
     const [subStatus, setSubStatus] = useState<string | null>(null);
     const [isTierLoaded, setIsTierLoaded] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const { setSettingsOpen, autoDisconnectTimer, stealthMode } = useSettingsStore();
@@ -361,9 +362,9 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     <div className="px-4 pt-4 pb-2 shrink-0">
                         <div className="flex items-center gap-2.5 px-3 py-2">
                             <img src="/official-whale-monochrome.png" className="w-6 h-6 shrink-0" alt="WAN" />
-                            <div className="flex flex-col leading-tight">
-                                <span className="text-[11px] font-black uppercase tracking-tighter text-[#050505] dark:text-white">W.A.N.</span>
-                                <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30 dark:text-white/30">TERMINAL</span>
+                            <div className="flex flex-col leading-none">
+                                <span className="text-[11px] font-black uppercase tracking-tight text-[#050505] dark:text-white">Whale Alert</span>
+                                <span className="text-[11px] font-black uppercase tracking-tight text-[#050505] dark:text-white">Network</span>
                             </div>
                         </div>
                     </div>
@@ -479,9 +480,45 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         ].map((m) => (
                             <div key={m.label} className="flex flex-col items-start px-4 py-1 min-w-[100px]">
                                 <span className="font-mono text-[7px] uppercase tracking-[0.25em] text-black/30">{m.label}</span>
-                                <span className="font-mono text-[10px] font-black text-[#050505] dark:text-white tabular-nums leading-tight">{m.value}</span>
+                                <span className="font-mono text-[10px] font-black text-[#050505] tabular-nums leading-tight">{m.value}</span>
                             </div>
                         ))}
+                    </div>
+
+                    {/* Mobile Quick Dropdown */}
+                    <div className="lg:hidden flex-1 flex justify-center mx-4 relative">
+                        <button
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="flex items-center gap-2 px-4 py-2 bg-black/5 rounded-full text-[11px] font-black uppercase tracking-widest text-[#050505] active:scale-95 transition-transform"
+                        >
+                            {SIDEBAR_ITEMS.find(i => i.id === activeTab)?.label || 'Menu'}
+                            <ChevronDown size={12} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        <AnimatePresence>
+                            {isDropdownOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute top-full mt-2 w-[240px] bg-white border border-black/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col py-2"
+                                    style={{ willChange: 'transform, opacity' }}
+                                >
+                                    {SIDEBAR_ITEMS.filter(item => !item.requiresZK || isZkVerified).map(item => (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => {
+                                                handleTabChange(item.id);
+                                                setIsDropdownOpen(false);
+                                            }}
+                                            className={`px-4 py-3 text-left text-[11px] font-black uppercase tracking-widest transition-colors ${activeTab === item.id ? 'bg-black text-white' : 'text-[#050505]/60 hover:bg-black/5 hover:text-[#050505]'}`}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     <div className="flex items-center gap-2">

@@ -81,20 +81,18 @@ export function InstitutionalHeader() {
                     <motion.div
                         whileHover={{ scale: 1.05 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                        className="relative flex items-center justify-center rounded-xl border border-black/5 dark:border-white/10 bg-black/5 dark:bg-white/5 overflow-hidden w-[58px] h-[36px]"
+                        className="relative flex items-center justify-center rounded-xl border border-black/5 bg-black/5 overflow-hidden w-[58px] h-[36px]"
                     >
-                        <SplashContainer className="w-full h-full flex items-center justify-center">
-                            <Image
-                                src="/official-whale-monochrome.png"
-                                alt="Whale Alert Network Logo"
-                                width={52}
-                                height={32}
-                                className="object-contain w-full h-full p-1 opacity-80 mix-blend-multiply dark:mix-blend-normal dark:invert dark:opacity-100"
-                                unoptimized={true}
-                            />
-                        </SplashContainer>
+                        <Image
+                            src="/official-whale-monochrome.png"
+                            alt="Whale Alert Network Logo"
+                            width={52}
+                            height={32}
+                            className="object-contain w-full h-full p-1 opacity-80 mix-blend-multiply"
+                            unoptimized={true}
+                        />
                     </motion.div>
-                    <div className="flex flex-col leading-none text-[#050505] dark:text-white justify-center">
+                    <div className="flex flex-col leading-none text-[#050505] justify-center">
                         <span className="font-aztec-serif text-[18px] font-black uppercase tracking-tighter leading-none">
                             Whale Alert Network
                         </span>
@@ -121,7 +119,7 @@ export function InstitutionalHeader() {
                 <motion.button
                     whileTap={{ scale: 0.93 }}
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="xl:hidden flex items-center justify-center w-9 h-9 rounded-xl border border-black/10 dark:border-white/10 transition-all bg-transparent text-black dark:text-white"
+                    className="xl:hidden flex items-center justify-center w-9 h-9 rounded-xl border border-black/10 transition-all bg-transparent text-black"
                 >
                     {isMenuOpen ? <X size={16} /> : <Menu size={16} />}
                 </motion.button>

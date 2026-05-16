@@ -18,16 +18,16 @@ const FADE_UP: any = {
 // ── Feature Cards ────────────────────────────────────────────────────────────
 const FEATURES = [
   {
-    title: 'Quantum-Resistant Hash Integrity',
-    desc: 'Every document, medical record, or data point is secured utilizing post-quantum cryptography. We process trillions of security parameters to ensure your data remains completely sovereign and immutable for eternity.',
+    title: 'High-Fidelity Document Integrity',
+    desc: 'Every medical record and institutional document is secured using advanced cryptographic hashing. We provide a definitive proof of authenticity, ensuring data remains immutable and verified on-chain.',
   },
   {
-    title: 'Zero-Knowledge Global Attestation',
-    desc: 'Verify identity and documentation instantly anywhere in the world without exposing underlying personal data. The architecture mathematically proves truth without centralized vulnerability.',
+    title: 'Zero-Knowledge Privacy Layer',
+    desc: 'Verify identity and sensitive documentation without exposing underlying personal data. Our architecture provides mathematical proof of validity without creating centralized vulnerabilities.',
   },
   {
-    title: 'Unmediated On-Chain Resolution',
-    desc: 'Direct access to the deepest layers of blockchain state. Our proprietary heuristic engines execute millions of verifications per second, forging a future where truth is absolute and mathematically guaranteed.',
+    title: 'On-Chain Verification Engine',
+    desc: 'Direct access to decentralized ledger states. Our high-performance engines execute millions of cryptographic verifications per second, providing a secure foundation for institutional data management.',
   },
 ];
 
@@ -91,36 +91,36 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="w-full flex-1 flex flex-col bg-transparent text-white font-sans selection:bg-emerald-500/30">
-      <div className="relative z-10 w-full">
+    <div className="w-full min-h-screen flex flex-col bg-[#FAFAF8] text-black font-sans selection:bg-black/10">
+      <div className="relative z-10 w-full flex flex-col items-center">
 
         {/* ── HERO ──────────────────────────────────────────── */}
-        <section className="w-full pt-36 pb-24 px-6 border-b border-white/10 relative z-10 flex flex-col justify-center items-center">
-          <div className="w-full max-w-[1400px] mx-auto text-center space-y-8">
+        <section className="w-full pt-36 pb-24 px-6 border-b border-black/5 relative z-10 flex flex-col justify-center items-center text-center">
+          <div className="w-full max-w-[1400px] mx-auto space-y-10">
             <motion.div
               initial="hidden" animate="visible" variants={FADE_UP}
               className="flex flex-col items-center gap-8"
             >
-              <div className="flex items-center gap-4 px-5 py-2.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Trillions of Parameters. One Truth.</span>
+              <div className="flex items-center gap-4 px-5 py-2.5 rounded-full border border-black/5 bg-white shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-black animate-pulse" />
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-black/40">Verified System Infrastructure</span>
               </div>
 
-              <h1 className="text-[64px] md:text-[100px] font-black uppercase tracking-tighter leading-[0.85] text-white">
-                The Future of<br />
-                <span className="text-white/20">Absolute Truth.</span>
+              <h1 className="text-[64px] md:text-[100px] font-black uppercase tracking-tighter leading-[0.85] text-[#050505]">
+                System <br />
+                <span className="text-black/20">Access Plans.</span>
               </h1>
 
-              <p className="text-[18px] md:text-[22px] font-serif text-white/50 max-w-3xl leading-relaxed mt-4 mx-auto">
-                Secure your sovereign identity and access the most advanced cryptographic infrastructure ever deployed. We process trillions of security parameters to guarantee a future built on undeniable reality.
+              <p className="text-[18px] md:text-[24px] font-serif text-black/60 max-w-3xl leading-relaxed mt-4 mx-auto">
+                Establish your institutional identity and access the core infrastructure of the Whale Alert Network. We provide high-integrity cryptographic verifications to guarantee data authenticity and operational security.
               </p>
             </motion.div>
           </div>
         </section>
 
         {/* ── FEATURES GRID ────────────────────────────────────────────────── */}
-        <section className="w-full py-24 relative z-10">
-          <div className="max-w-[1400px] mx-auto px-6">
+        <section className="w-full py-24 relative z-10 flex flex-col items-center">
+          <div className="max-w-[1400px] mx-auto px-6 w-full">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
               variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
@@ -129,14 +129,14 @@ export default function PricingPage() {
               {FEATURES.map((f, i) => (
                 <motion.div
                   key={i} variants={FADE_UP}
-                  className="bg-white/[0.03] backdrop-blur-[40px] rounded-[3rem] border border-white/10 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5)] p-12 flex flex-col justify-between hover:border-white/20 hover:bg-white/[0.05] hover:-translate-y-1 transition-all duration-500 group"
+                  className="bg-white rounded-[3rem] border border-black/5 shadow-sm p-12 flex flex-col justify-between hover:border-black/20 hover:bg-[#F8F8F8] hover:-translate-y-1 transition-all duration-500 group"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-10 group-hover:bg-emerald-500/20 transition-colors duration-500 border border-white/10">
-                    <span className="font-mono text-[14px] font-black text-white/50 group-hover:text-emerald-400 transition-colors duration-500">0{i+1}</span>
+                  <div className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center mb-10 group-hover:bg-black group-hover:text-white transition-colors duration-500 border border-black/5">
+                    <span className="font-mono text-[14px] font-black text-black/20 group-hover:text-white transition-colors duration-500">0{i+1}</span>
                   </div>
                   <div className="flex flex-col gap-5">
-                    <h3 className="text-[24px] font-black uppercase tracking-tight text-white">{f.title}</h3>
-                    <p className="text-[16px] text-white/40 leading-relaxed font-serif">{f.desc}</p>
+                    <h3 className="text-[24px] font-black uppercase tracking-tight text-[#050505]">{f.title}</h3>
+                    <p className="text-[16px] text-black/50 leading-relaxed font-serif">{f.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -145,19 +145,19 @@ export default function PricingPage() {
         </section>
 
         {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
-        <section className="w-full py-24 bg-transparent relative z-10">
-          <div className="px-6 max-w-[1400px] mx-auto">
+        <section className="w-full py-24 bg-transparent relative z-10 flex flex-col items-center">
+          <div className="px-6 max-w-[1400px] mx-auto w-full">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
               variants={FADE_UP}
-              className="mb-16 text-center"
+              className="mb-20 text-center"
             >
-              <h2 className="text-[40px] md:text-[64px] font-black uppercase tracking-tighter text-white leading-none">
-                Sovereign <br /><span className="text-white/20">Access.</span>
+              <h2 className="text-[40px] md:text-[80px] font-black uppercase tracking-tighter text-[#050505] leading-none">
+                Access <br /><span className="text-black/20">Structure.</span>
               </h2>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 text-left">
               {PRICING_TIERS.map((tier, index) => {
                 return (
                   <motion.div
@@ -166,34 +166,34 @@ export default function PricingPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="relative flex flex-col bg-white/[0.02] backdrop-blur-[40px] rounded-[3rem] border border-white/10 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.5)] p-12 md:p-16 hover:border-white/30 hover:bg-white/[0.05] hover:-translate-y-1 transition-all duration-500"
+                    className="relative flex flex-col bg-white rounded-[3rem] border border-black/5 shadow-sm p-12 md:p-16 hover:border-black/20 hover:-translate-y-2 transition-all duration-500"
                   >
                     <div className="flex-1 flex flex-col">
-                      <div className="mb-12 border-b border-white/10 pb-10">
-                        <h2 className="text-[40px] font-black uppercase tracking-tighter leading-none mb-4 text-white">
+                      <div className="mb-12 border-b border-black/5 pb-10">
+                        <h2 className="text-[48px] font-black uppercase tracking-tighter leading-none mb-4 text-[#050505]">
                           {tier.name}
                         </h2>
-                        <p className="font-mono text-[11px] text-emerald-400 uppercase tracking-[0.2em] leading-relaxed max-w-sm font-bold">
+                        <p className="font-mono text-[11px] text-black/40 uppercase tracking-[0.2em] leading-relaxed max-w-sm font-bold">
                           {tier.tagline}
                         </p>
                       </div>
 
                       <div className="mb-12">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-[56px] md:text-[72px] font-black tracking-tighter leading-none text-white">
+                        <div className="flex items-baseline gap-3">
+                          <span className="text-[64px] md:text-[80px] font-black tracking-tighter leading-none text-[#050505]">
                             {tier.priceMonthly}€
                           </span>
-                          <span className="text-[12px] font-black uppercase tracking-widest text-white/30">
+                          <span className="text-[12px] font-black uppercase tracking-widest text-black/30">
                             / month
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex-1 space-y-5 mb-16">
+                      <div className="flex-1 space-y-6 mb-16">
                         {tier.features.map((feature, fIdx) => (
                           <div key={fIdx} className="flex items-start gap-4">
-                            <div className="mt-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
-                            <span className="text-[15px] leading-relaxed text-white/60 font-serif font-medium">
+                            <div className="mt-2 w-2 h-2 bg-black rounded-full shrink-0" />
+                            <span className="text-[16px] leading-relaxed text-black/60 font-serif font-medium">
                               {feature.text}
                             </span>
                           </div>
@@ -203,18 +203,18 @@ export default function PricingPage() {
                       <button
                         onClick={() => handleSubscribeClick(tier.id)}
                         disabled={loadingTier === tier.id || (!isTierLoaded && isConnected)}
-                        className={`w-full py-5 text-[11px] sm:text-[12px] text-center whitespace-nowrap font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 rounded-[1.5rem] shadow-sm ${
+                        className={`w-full py-6 text-[12px] text-center font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-3 rounded-[2rem] shadow-sm ${
                           tier.id === 'STANDARD'
-                            ? 'bg-emerald-500 text-black hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)]'
-                            : 'bg-white/5 border border-white/20 text-white hover:bg-white/10'
+                            ? 'bg-black text-white hover:bg-black/80 shadow-xl'
+                            : 'bg-black/5 border border-black/5 text-black hover:bg-black/10'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         {loadingTier === tier.id ? (
-                          <Loader2 size={16} className="animate-spin" />
+                          <Loader2 size={18} className="animate-spin" />
                         ) : tier.id === 'FREE' ? (
-                          isConnected ? 'Current Plan' : 'Connect Wallet'
+                          isConnected ? 'Current Access Level' : 'Initialize Connection'
                         ) : (
-                          'Initialize Access'
+                          'Request Access'
                         )}
                       </button>
                     </div>
@@ -225,26 +225,26 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── WHY OUR NETWORK ─────────────────────────────────────────────── */}
-        <section className="w-full py-24 md:py-36 border-t border-white/10 relative z-10 bg-transparent">
-          <div className="max-w-[1400px] mx-auto px-6">
+        {/* ── SYSTEM INTEGRITY ─────────────────────────────────────────────── */}
+        <section className="w-full py-24 md:py-48 border-t border-black/5 relative z-10 bg-transparent flex flex-col items-center">
+          <div className="max-w-[1400px] mx-auto px-6 w-full text-center">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}
               variants={FADE_UP}
-              className="mb-16 flex flex-col items-center text-center"
+              className="mb-20 flex flex-col items-center"
             >
-              <h2 className="text-[40px] md:text-[56px] font-black uppercase tracking-tighter text-white mb-6 leading-none">
-                Inhuman <span className="text-white/30">Precision.</span>
+              <h2 className="text-[40px] md:text-[80px] font-black uppercase tracking-tighter text-[#050505] mb-8 leading-none">
+                System <span className="text-black/20">Integrity.</span>
               </h2>
-              <p className="text-[18px] font-serif text-white/50 max-w-2xl leading-relaxed">
-                We engineered a future where billions of security calculations happen invisibly, securing your identity and health against any adversary.
+              <p className="text-[20px] md:text-[24px] font-serif text-black/50 max-w-3xl leading-relaxed mx-auto">
+                We have engineered an environment where mathematical verifications happen seamlessly, securing institutional identity and data against unauthorized access.
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <ProFeatureCard title="Quantum Resistance" desc="Mathematical certainty that outpaces even the theoretical limits of next-generation quantum decryption computers." />
-              <TrillionsFeatureCard title="Trillion-Parameter Engine" desc="Our verification core analyzes an unprecedented matrix of data points to confirm authenticity with zero human error." />
-              <ProFeatureCard title="Post-State Sovereignty" desc="No central authority owns your data. You hold the ultimate cryptographic key to your health and financial reality." />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              <ProFeatureCard title="System Verification" desc="Cryptographic certainty that ensures the integrity of records against tampering or unauthorized modification." />
+              <InstitutionalFeatureCard title="Verification Engine" desc="Our core infrastructure analyzes data matrices to confirm authenticity with zero margin for error." />
+              <ProFeatureCard title="Data Autonomy" desc="No central authority owns your data. You hold the ultimate cryptographic control over your records." />
             </div>
           </div>
         </section>
@@ -255,23 +255,22 @@ export default function PricingPage() {
     </div>
   );
 }
-
-function ProFeatureCard({ title, desc }: { title: string; desc: string }) {
+function InstitutionalFeatureCard({ title, desc }: { title: string; desc: string }) {
   return (
-    <div className="flex flex-col gap-4 p-8 bg-white/[0.03] backdrop-blur-[40px] rounded-[2.5rem] border border-white/10 shadow-sm hover:border-white/20 hover:bg-white/[0.05] hover:-translate-y-1 transition-all duration-500 group">
-      <div className="w-12 h-[2px] bg-white/20 transition-all group-hover:bg-emerald-500 group-hover:w-full duration-700 rounded-full shadow-[0_0_10px_rgba(16,185,129,0)] group-hover:shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-      <h3 className="text-[20px] font-black uppercase tracking-tight text-white">{title}</h3>
-      <p className="text-[15px] text-white/50 leading-relaxed font-serif">{desc}</p>
+    <div className="flex flex-col gap-4 p-8 bg-black/5 rounded-[2.5rem] border border-black/5 shadow-sm hover:border-black/10 hover:bg-black/10 hover:-translate-y-1 transition-all duration-500 group">
+      <div className="w-12 h-[2px] bg-black transition-all group-hover:w-full duration-700 rounded-full" />
+      <h3 className="text-[20px] font-black uppercase tracking-tight text-black">{title}</h3>
+      <p className="text-[15px] text-black/40 leading-relaxed font-serif">{desc}</p>
     </div>
   );
 }
 
-function TrillionsFeatureCard({ title, desc }: { title: string; desc: string }) {
+function ProFeatureCard({ title, desc }: { title: string; desc: string }) {
   return (
-    <div className="flex flex-col gap-4 p-8 bg-emerald-500/5 backdrop-blur-[40px] rounded-[2.5rem] border border-emerald-500/20 shadow-sm hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:-translate-y-1 transition-all duration-500 group">
-      <div className="w-12 h-[2px] bg-emerald-500 transition-all group-hover:w-full duration-700 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-      <h3 className="text-[20px] font-black uppercase tracking-tight text-emerald-400">{title}</h3>
-      <p className="text-[15px] text-white/50 leading-relaxed font-serif">{desc}</p>
+    <div className="flex flex-col gap-4 p-8 bg-white rounded-[2.5rem] border border-black/5 shadow-sm hover:border-black/10 hover:bg-[#F8F8F8] hover:-translate-y-1 transition-all duration-500 group">
+      <div className="w-12 h-[2px] bg-black/20 transition-all group-hover:bg-black group-hover:w-full duration-700 rounded-full" />
+      <h3 className="text-[20px] font-black uppercase tracking-tight text-black">{title}</h3>
+      <p className="text-[15px] text-black/40 leading-relaxed font-serif">{desc}</p>
     </div>
   );
 }

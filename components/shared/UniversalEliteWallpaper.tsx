@@ -25,8 +25,8 @@ export function UniversalEliteWallpaper() {
             style={{ zIndex: -1 }}
             aria-hidden="true"
         >
-            {/* ── Base: pure black matches wallpaper edges perfectly ─────────────── */}
-            <div className="absolute inset-0" style={{ background: '#050505' }} />
+            {/* ── Base: light background ─────────────── */}
+            <div className="absolute inset-0 bg-[#FAFAF8]" />
 
             {/* ── Wallpaper: cover = no bands, crisp-edges = max quality ─────────── */}
             <div
@@ -37,15 +37,15 @@ export function UniversalEliteWallpaper() {
                     backgroundPosition: 'center center',
                     backgroundSize: 'cover',
                     imageRendering: 'crisp-edges',
-                    opacity: 1,
+                    opacity: 0.15, // Reduced opacity for professional light look
                 }}
             />
 
-            {/* ── Light mode: translucent cream so dark text stays readable ──────── */}
+            {/* ── Light mode: translucent overlay ──────── */}
             {!isDark && (
                 <div
                     className="absolute inset-0 transition-opacity duration-700"
-                    style={{ background: 'rgba(253, 252, 248, 0.88)' }}
+                    style={{ background: 'rgba(250, 250, 248, 0.92)' }}
                 />
             )}
 

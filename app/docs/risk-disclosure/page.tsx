@@ -15,31 +15,31 @@ export default function RiskDisclosurePage() {
                         <div className="p-3 bg-black text-white rounded-xl">
                             <AlertTriangle size={20} />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#888888]">Legal Framework</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">Legal Framework</span>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-6">
-                        Risk <span className="text-[#888888]">Disclosure</span>
+                        Risk <span className="text-black/20">Disclosure</span>
                     </h1>
-                    <p className="text-sm font-bold uppercase tracking-widest text-[#888888]">Last Updated: Q2 2026</p>
+                    <p className="text-sm font-bold uppercase tracking-widest text-black/40">Last Updated: Q2 2026</p>
                 </header>
 
-                <div className="space-y-12 text-sm leading-relaxed text-[#555555]">
+                <div className="space-y-12 text-sm leading-relaxed text-black/60">
                     <section>
-                        <h2 className="text-xl font-black uppercase tracking-tight text-[#050505] mb-4">1. High-Volatility Warning</h2>
+                        <h2 className="text-xl font-black uppercase tracking-tight text-black mb-4">1. Asset Volatility</h2>
                         <p className="mb-4">
-                            Cryptographic assets and on-chain liquidity metrics are hyper-volatile. Whale tracking, meme-pool analytics, and mempool radar intelligence do not guarantee future trajectory. Absolute loss of capital is a statistically probable outcome when trading on-chain.
+                            Cryptographic assets and on-chain records are subject to market volatility. Data analytics and network intelligence do not guarantee future outcomes. Users should be aware of the inherent risks associated with decentralized protocols.
                         </p>
                     </section>
                     <section>
-                        <h2 className="text-xl font-black uppercase tracking-tight text-[#050505] mb-4">2. Technological Obsolescence</h2>
+                        <h2 className="text-xl font-black uppercase tracking-tight text-black mb-4">2. Technological Risk</h2>
                         <p className="mb-4">
-                            Smart contracts present inherent risks of zero-day exploits, logical vulnerabilities, and consensus collapse. The Sovereign Terminal visualizes the blockchain topography; it cannot insure or recover burnt tokens resulting from decentralized protocol failure.
+                            Smart contracts present inherent risks of exploits or protocol failure. The Whale Alert Network provides an infrastructure layer for record management; it does not provide insurance against decentralized protocol vulnerabilities.
                         </p>
                     </section>
                     <section>
-                        <h2 className="text-xl font-black uppercase tracking-tight text-[#050505] mb-4">3. Oracle Desync</h2>
+                        <h2 className="text-xl font-black uppercase tracking-tight text-black mb-4">3. Data Integrity</h2>
                         <p className="mb-4">
-                            Data ingested from RPC pools or third-party indexes natively suffers from theoretical latency or node forks. While Sovereign Intelligence utilizes multi-endpoint redundancy, false positives related to massive entity clustering can occur. You deploy capital entirely at your discretion.
+                            Data ingested from decentralized sources may suffer from node latency or forks. While the network utilizes redundant endpoints to maintain accuracy, users should verify critical information through independent means.
                         </p>
                     </section>
                 </div>
