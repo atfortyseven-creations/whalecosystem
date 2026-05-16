@@ -620,7 +620,6 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                 {latency > 0 ? `${latency}ms` : '12ms'}
                             </span>
                         </span>
-                        {/* UX-19: Real node status from /api/network/getblock-health */}
                         <span className="flex items-center gap-1.5">Nodes: <span className="text-[#050505]">{nodeStatus}</span></span>
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
@@ -631,68 +630,59 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             </div>
         </div>
 
-        {/* INFO MODAL ENHANCED MULTIDIMENSIONAL */}
+        {/* ─── INFO MODAL — Noble Institutional ─── */}
         <AnimatePresence>
         {showInfoModal && (
             <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] bg-black/40 backdrop-blur-md flex items-center justify-center p-5"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-5"
+            onClick={() => setShowInfoModal(false)}
             >
-            <motion.div 
-                initial={{ scale: 0.95, opacity: 0, y: 15 }}
+            <motion.div
+                initial={{ scale: 0.97, opacity: 0, y: 14 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: 15 }}
-                className="w-full max-w-3xl bg-[#FAF9F6] dark:bg-[#0A0A0A] rounded-[24px] shadow-2xl overflow-hidden flex flex-col border border-black/10 dark:border-white/10"
+                exit={{ scale: 0.97, opacity: 0, y: 14 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_32px_80px_-12px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col border border-black/8"
+                onClick={e => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between px-8 py-6 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#111111]">
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-black text-[#FAF9F6] flex items-center justify-center mb-2">
-                            <Info size={22} />
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <h3 className="text-[18px] font-black uppercase tracking-widest text-[#050505] dark:text-white leading-none mb-2">{currentExplanation.title}</h3>
-                            <p className="text-[10px] font-black text-black/40 dark:text-white/40 uppercase tracking-[0.25em]">{currentExplanation.subtitle}</p>
-                        </div>
-                    </div>
-                    <button onClick={() => setShowInfoModal(false)} className="p-2.5 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-black/40 hover:text-black">
-                        <X size={18} />
-                    </button>
-                </div>
-                
-                <div className="px-8 py-8 flex flex-col gap-6 overflow-y-auto max-h-[75vh] custom-scrollbar">
-                    <div className="bg-white dark:bg-[#111111] p-6 border border-black/10 dark:border-white/10 rounded-xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/5 rounded-bl-full -z-0 pointer-events-none" />
-                        <p className="text-[14px] text-[#050505] dark:text-white/80 leading-relaxed font-medium relative z-10 text-center max-w-2xl mx-auto">
-                            {currentExplanation.overview}
+                <div className="flex items-center justify-between px-8 pt-8 pb-6 border-b border-black/6">
+                    <div>
+                        <h3 className="text-[16px] font-black uppercase tracking-[0.15em] text-black leading-none mb-1.5">
+                            {currentExplanation.title}
+                        </h3>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-black/30">
+                            {currentExplanation.subtitle}
                         </p>
                     </div>
-
-                    {currentExplanation.features.length > 0 && (
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-black/30 mb-4 px-1">Technical Capabilities & Implementation</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {currentExplanation.features.map((feat, idx) => (
-                                    <div key={idx} className="bg-white dark:bg-[#1A1A1A] border border-black/10 dark:border-white/10 rounded-xl p-4 flex flex-col gap-2 hover:border-black/30 dark:hover:border-white/30 transition-colors">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-4 h-4 rounded-full bg-black/5 dark:bg-white/5 flex justify-center items-center shrink-0">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white" />
-                                            </div>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white flex-1 line-clamp-1">{feat.title}</span>
-                                        </div>
-                                        <p className="text-[11px] text-black/60 dark:text-white/60 leading-relaxed font-mono">
-                                            {feat.desc}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    <button onClick={() => setShowInfoModal(false)} className="w-8 h-8 rounded-full hover:bg-black/5 flex items-center justify-center transition-colors">
+                        <X size={15} className="text-black/40" />
+                    </button>
                 </div>
-                
-                <div className="p-6 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] flex justify-end">
-                    <button onClick={() => setShowInfoModal(false)} className="px-8 py-3.5 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#1A1A1A] text-[#050505] dark:text-white text-[11px] font-black uppercase tracking-widest hover:bg-black/5 dark:hover:bg-white/5 hover:border-black/30 dark:hover:border-white/30 transition-all shadow-none active:scale-[0.98] duration-200">
+                <div className="px-8 py-6 border-b border-black/6 bg-black/[0.015]">
+                    <p className="text-[14px] leading-[1.75] text-black/70 font-medium">
+                        {currentExplanation.overview}
+                    </p>
+                </div>
+                {currentExplanation.features.length > 0 && (
+                    <div className="px-8 py-6 overflow-y-auto max-h-[45vh]">
+                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/25 mb-4">Technical Capabilities</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {currentExplanation.features.map((feat, idx) => (
+                                <div key={idx} className="border border-black/8 rounded-xl p-4 hover:bg-black/[0.02] hover:border-black/15 transition-all">
+                                    <div className="flex items-center gap-2.5 mb-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-black">{feat.title}</span>
+                                    </div>
+                                    <p className="text-[11px] text-black/50 leading-relaxed font-mono pl-4">{feat.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                <div className="px-8 py-5 border-t border-black/6 flex justify-end">
+                    <button onClick={() => setShowInfoModal(false)} className="px-7 py-2.5 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-[0.15em] hover:bg-black/80 transition-colors active:scale-[0.98]">
                         Return to Terminal
                     </button>
                 </div>
