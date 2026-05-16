@@ -60,14 +60,7 @@ function ForumHomeContent() {
           variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.12 } } }}
           className="relative z-10 flex flex-col items-center max-w-3xl mx-auto"
         >
-          {/* Identity badge */}
-          <motion.div variants={FADE_UP}
-            className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-black/10 bg-black/5 backdrop-blur-md mb-10">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-black/60">
-              Whale Alert Network — Open Forum
-            </span>
-          </motion.div>
+
 
           {/* Title */}
           <motion.h1 variants={FADE_UP}
