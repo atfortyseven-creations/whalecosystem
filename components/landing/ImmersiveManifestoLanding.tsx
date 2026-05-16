@@ -44,7 +44,7 @@ export function ImmersiveManifestoLanding({
             className="absolute inset-0 w-full h-full object-cover"
             style={{ zIndex: 0 }}
           >
-            <source src="/Coltea-video-2025-v2.mp4" type="video/mp4" />
+            <source src="/system-shots/Coltea-video-2025-v2.mp4" type="video/mp4" />
           </video>
 
           {/* ── Subtle overlay so card edges blend with video ── */}
