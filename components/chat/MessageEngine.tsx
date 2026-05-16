@@ -97,7 +97,7 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
 
       {/* Pin indicator */}
       {msg.isPinned && (
-        <div className="flex items-center gap-1 text-[9px] font-mono text-white/30 mb-1 px-1">
+        <div className="flex items-center gap-1 text-[9px] font-mono text-black/30 mb-1 px-1">
           <Pin size={9} /> Pinned
         </div>
       )}
@@ -107,20 +107,19 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
         onContextMenu={onContextMenu}
         className={`relative group px-4 py-3 rounded-2xl cursor-default select-text transition-all ${
           msg.isMine
-            ? 'bg-[#00C076]/10 border border-[#00C076]/20 rounded-br-sm text-white'
-            : 'bg-white/5 border border-white/8 rounded-bl-sm text-white'
+            ? 'bg-black text-white rounded-br-sm'
+            : 'bg-black/[0.04] border border-black/8 text-black rounded-bl-sm'
         } ${msg.isDestructing ? 'opacity-60' : ''}`}
       >
         {/* Attestation badge */}
         {msg.attestationScore && msg.attestationScore >= 95 && (
-          <div className="flex items-center gap-1 text-[9px] font-mono text-[#00C076]/70 mb-2">
-            <ShieldCheck size={10} /> ZK-VERIFIED · SCORE {msg.attestationScore}
+          <div className="flex items-center gap-1 text-[9px] font-mono text-white/50 mb-2">
+            <ShieldCheck size={10} /> ZK-VERIFIED · {msg.attestationScore}
           </div>
         )}
 
         <p className="text-[14px] leading-relaxed break-words whitespace-pre-wrap font-mono">{msg.content}</p>
 
-        {/* Self-destruct countdown */}
         {secondsLeft !== null && (
           <div className="flex items-center gap-1 mt-2 text-[9px] font-mono text-red-400">
             <Flame size={10} /> {secondsLeft}s
@@ -137,8 +136,8 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
               onClick={() => onReact(msg.id, r.emoji)}
               className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] border transition-all ${
                 r.reacted
-                  ? 'bg-[#00C076]/10 border-[#00C076]/30 text-[#00C076]'
-                  : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'
+                  ? 'bg-black/8 border-black/20 text-black'
+                  : 'bg-black/[0.02] border-black/8 text-black/50 hover:border-black/20'
               }`}
             >
               {r.emoji} <span className="font-mono text-[10px]">{r.count}</span>
@@ -148,12 +147,12 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
       )}
 
       {/* Timestamp + read receipt */}
-      <div className={`flex items-center gap-1.5 mt-1 px-1 text-[9px] font-mono text-white/30`}>
+      <div className="flex items-center gap-1.5 mt-1 px-1 text-[9px] font-mono text-black/30">
         {new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         {msg.isMine && (
           msg.readAt
-            ? <CheckCheck size={11} className="text-[#00C076]" />
-            : <Check size={11} className="text-white/30" />
+            ? <CheckCheck size={11} className="text-black/50" />
+            : <Check size={11} className="text-black/25" />
         )}
       </div>
     </div>
@@ -173,17 +172,17 @@ function ContextMenu({ messageId, x, y, onReact, onPin, onDelete, onReply, onClo
 }) {
   return (
     <div
-      className="fixed z-[300] bg-[#111] border border-white/10 rounded-2xl shadow-2xl p-3 w-[260px] flex flex-col gap-1"
+      className="fixed z-[300] bg-white border border-black/8 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-3 w-[260px] flex flex-col gap-1"
       style={{ top: Math.min(y, window.innerHeight - 280), left: Math.min(x, window.innerWidth - 280) }}
       onClick={e => e.stopPropagation()}
     >
       {/* Quick reactions */}
-      <div className="flex gap-1 flex-wrap pb-3 border-b border-white/5 mb-1">
+      <div className="flex gap-1 flex-wrap pb-3 border-b border-black/6 mb-1">
         {QUICK_REACTIONS.map(e => (
           <button
             key={e}
             onClick={() => onReact(e)}
-            className="w-9 h-9 rounded-xl text-[18px] hover:bg-white/10 flex items-center justify-center transition-colors"
+            className="w-9 h-9 rounded-xl text-[18px] hover:bg-black/5 flex items-center justify-center transition-colors"
           >
             {e}
           </button>
@@ -201,7 +200,7 @@ function ContextMenu({ messageId, x, y, onReact, onPin, onDelete, onReply, onClo
           key={label}
           onClick={action}
           className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[12px] font-mono transition-all ${
-            danger ? 'text-red-400 hover:bg-red-500/10' : 'text-white/70 hover:bg-white/5 hover:text-white'
+            danger ? 'text-red-500 hover:bg-red-50' : 'text-black/60 hover:bg-black/[0.04] hover:text-black'
           }`}
         >
           <Icon size={15} />{label}
