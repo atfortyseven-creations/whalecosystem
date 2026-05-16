@@ -48,14 +48,14 @@ export function ImmersiveManifestoLanding({
           </video>
 
           {/* ── Subtle overlay so card edges blend with video ── */}
-          <div className="absolute inset-0 bg-black/20" style={{ zIndex: 1 }} />
+          <div className="absolute inset-0 bg-black/5" style={{ zIndex: 1 }} />
 
           {/* ── White content card — same aesthetic as sections below ── */}
           <motion.div
             initial="hidden"
             animate="visible"
             variants={STAGGER}
-            className="relative flex flex-col items-center justify-center gap-10 w-full max-w-[1100px] mx-auto py-20 md:py-24 px-10 md:px-16 bg-white rounded-[40px] border border-black/5 shadow-2xl"
+            className="relative flex flex-col items-center justify-center gap-10 w-full max-w-[1100px] mx-auto mt-32 py-20 md:py-24 px-10 md:px-16 bg-white/90 backdrop-blur-2xl rounded-[40px] border border-black/5 shadow-2xl"
             style={{ zIndex: 2 }}
           >
             {/* Title */}
@@ -66,12 +66,7 @@ export function ImmersiveManifestoLanding({
               </h1>
             </motion.div>
 
-            {/* Badge */}
-            <motion.div variants={FADE_UP} className="bg-black px-10 py-4 rounded-full border border-transparent shadow-xl">
-              <h2 className="text-[13px] sm:text-[16px] font-black uppercase tracking-[0.25em] text-white text-center">
-                The First Hospital In History To Secure Records On-Chain
-              </h2>
-            </motion.div>
+
 
             {/* Body text */}
             <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[22px] text-black/60 leading-relaxed max-w-[860px] text-center font-medium">
@@ -82,8 +77,8 @@ export function ImmersiveManifestoLanding({
 
             {/* CTA */}
             <motion.div variants={FADE_UP} className="mt-4">
-              <Link href="/connect" className="inline-flex items-center justify-center px-12 py-5 bg-black hover:bg-black/80 text-white rounded-2xl font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-all shadow-xl">
-                Initialize Connection
+              <Link href="/docs" className="inline-flex items-center justify-center px-12 py-5 bg-black hover:bg-black/80 text-white rounded-2xl font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-all shadow-xl">
+                READ DOCS
               </Link>
             </motion.div>
           </motion.div>
@@ -169,7 +164,7 @@ export function ImmersiveManifestoLanding({
               </div>
 
               <div className="w-full xl:w-7/12 space-y-6 flex flex-col items-center">
-                <p className="font-mono text-[13px] font-black uppercase tracking-[0.3em] text-black/40 mb-2 text-center bg-white px-6 py-2 rounded-full border border-black/5 shadow-sm">Institutional Day-to-Day Utility</p>
+
                 {[
                   {
                     scenario: 'Inter-Departmental Coordination',

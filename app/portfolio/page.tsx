@@ -25,7 +25,7 @@ const BG   = "transparent";
 const INK  = "#F5F5F5";         // white text on dark bg
 const MUTED = "rgba(255,255,255,0.45)";
 const BORDER = "rgba(255,255,255,0.08)";
-const CARD  = "rgba(255, 255, 255, 0.05)";
+const CARD  = "rgba(0, 0, 0, 0.65)";
 
 // ── Chain color map ──────────────────────────────────────────────────────────
 const CHAIN_COLORS: Record<string, string> = {
@@ -260,7 +260,7 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="w-full flex-1 flex flex-col bg-transparent text-[#F5F5F5]">
+    <div className="w-full flex-1 flex flex-col bg-black/40 text-[#F5F5F5]">
 
       {/* ── HEADER ── */}
       <header

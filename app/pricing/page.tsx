@@ -101,10 +101,7 @@ export default function PricingPage() {
               initial="hidden" animate="visible" variants={FADE_UP}
               className="flex flex-col items-center gap-8"
             >
-              <div className="flex items-center gap-4 px-5 py-2.5 rounded-full border border-black/5 bg-white shadow-sm">
-                <div className="w-2 h-2 rounded-full bg-black animate-pulse" />
-                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-black/40">Verified System Infrastructure</span>
-              </div>
+
 
               <h1 className="text-[64px] md:text-[100px] font-black uppercase tracking-tighter leading-[0.85] text-[#050505]">
                 System <br />

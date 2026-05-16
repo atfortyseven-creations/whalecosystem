@@ -159,16 +159,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
             { title: 'Extensibility', desc: 'Designed to support future secure integrations.' }
         ]
     },
-    'portfolio': {
-        title: 'Encrypted Portfolio',
-        subtitle: 'Comprehensive Asset Overview',
-        overview: 'The central dashboard for your connected assets. It provides a complete, private view of your holdings securely stored on-device.',
-        features: [
-            { title: 'Secure Integration', desc: 'Read-only connection that keeps keys completely secure.' },
-            { title: 'Asset Distribution', desc: 'Clear visual breakdowns of your cryptographic allocation.' },
-            { title: 'Exposure Tracking', desc: 'Holistic monitoring of your capital.' }
-        ]
-    },
+
     'live-port': {
         title: 'Quick Portfolio',
         subtitle: 'Background Balance Monitor',

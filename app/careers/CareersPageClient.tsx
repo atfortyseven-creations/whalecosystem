@@ -83,7 +83,7 @@ export function CareersPageClient() {
                         </div>
                       </div>
                       
-                      <p className="text-[14px] sm:text-[15px] text-white/50 leading-relaxed font-medium max-w-3xl">
+                      <p className="text-[14px] sm:text-[15px] text-black/50 leading-relaxed font-medium max-w-3xl">
                         {role.description}
                       </p>
                     </div>

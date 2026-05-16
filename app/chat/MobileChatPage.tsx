@@ -92,7 +92,7 @@ export default function MobileChatPage() {
       <>
         <UniversalEliteWallpaper />
         <div className="flex-1 flex flex-col h-screen w-full relative z-10 bg-transparent items-center">
-          <div className="w-full max-w-[1400px] mx-auto flex flex-col h-full border-x border-white/5 bg-black/40 backdrop-blur-3xl shadow-2xl overflow-hidden relative">
+          <div className="w-full flex flex-col h-full bg-black/40 backdrop-blur-3xl shadow-2xl overflow-hidden relative">
             {/* ── Top Navigation Bar ── */}
             <header className="shrink-0 h-14 flex items-center justify-between px-8 bg-black/60 backdrop-blur-[60px] border-b border-white/5 relative z-10 w-full">
               <Link
