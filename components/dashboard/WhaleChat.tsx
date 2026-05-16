@@ -417,7 +417,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
            setInitError('Active wallet connection lost or not detected. Please ensure your wallet app is open and connected directly to this browser.');
         }
       } else if (errorMsg.includes('WASM') || errorMsg.includes('wasm')) {
-        setInitError('Cryptographic Whale WASM engine failure. This is often caused by browser security settings or incompatible device architectures.');
+        setInitError('Cryptographic Engine Failure. Hardware architecture error or restricted browser security settings.');
       } else {
         setInitError(`Whale Alert Network handshake failure: ${errorMsg.slice(0, 80) || 'Unknown Protocol Error'}. Please retry.`);
       }
@@ -851,7 +851,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             ) : (
               <div className="w-48 h-48 rounded-full border border-black/5 dark:border-white/5 flex flex-col items-center justify-center bg-white dark:bg-[#1A1A1A] shadow-sm gap-4">
                 <img src="/official-whale-monochrome.png" alt="Whale" className="w-16 h-16 opacity-80" style={{ filter: 'invert(var(--dark-invert, 0))' }} />
-                <div className="text-[10px] font-black tracking-[0.2em] uppercase text-black/20 dark:text-white/20">Sensors Initialized</div>
+                <div className="text-[10px] font-black tracking-[0.2em] uppercase text-black/20 dark:text-white/20">Protocol Initialized</div>
               </div>
             )}
           </div>
@@ -871,11 +871,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               <div className="space-y-2">
                 <span className="text-[10px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">02</span>
                 <p className={`text-[11px] font-black uppercase ${isZkVerified ? 'text-[#00C076]' : 'text-black/60 dark:text-white/60'}`}>Whale Identity</p>
-                <p className="text-[10px] text-black/30 dark:text-white/30 font-serif">Sovereign identity verified via sensors.</p>
+                <p className="text-[10px] text-black/30 dark:text-white/30 font-serif">Sovereign identity verified via cryptographic handshake.</p>
               </div>
               <div className="space-y-2">
                 <span className="text-[10px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">03</span>
-                <p className="text-[11px] font-black uppercase text-black/60 dark:text-white/60">Sensors Secured</p>
+                <p className="text-[11px] font-black uppercase text-black/60 dark:text-white/60">Connection Secured</p>
                 <p className="text-[10px] text-black/30 dark:text-white/30 font-serif">Persistent encryption across all devices.</p>
               </div>
             </div>
@@ -1186,7 +1186,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               </div>
 
               <div className="inline-flex items-center gap-3 px-5 py-2 bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 rounded-full shadow-sm">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-[#00C076]">Sensors Secured</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#00C076]">Tunnel Established</span>
               </div>
 
               <h2 className="text-[32px] md:text-[40px] font-black uppercase tracking-tighter text-[#0A0A0A] dark:text-white leading-none mt-2">

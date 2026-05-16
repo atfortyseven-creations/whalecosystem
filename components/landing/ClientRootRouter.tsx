@@ -34,15 +34,12 @@ export function ClientRootRouter() {
   }, [isConnected]);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full flex-1 bg-[#F9F8F6]">
 
       {/* Session Navigation Bar removed — Now handled by the Unified Master InstitutionalHeader */}
 
       {/* ── Main Manifesto Landing ── */}
       <ImmersiveManifestoLanding />
-
-      {/* ── Aztec Architecture Academic Section ── */}
-      <AztecArchitectureSection />
 
       {/* ── Footer ── */}
       <SovereignFooter />

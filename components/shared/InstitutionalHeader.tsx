@@ -12,7 +12,7 @@ const MENU_ITEMS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Whale Chat", href: "/chat" },
   { label: "Portfolio", href: "/portfolio" },
-  { label: "System Ecosystem", href: "#", subItems: [{ label: "News", href: "/news" }, { label: "Academy", href: "/academy" }, { label: "Forum", href: "/forum" }, { label: "Careers", href: "/careers" }] },
+  { label: "Community", href: "#", subItems: [{ label: "News", href: "/news" }, { label: "Academy", href: "/academy" }, { label: "Forum", href: "/forum" }, { label: "Careers", href: "/careers" }] },
   { label: "Pricing", href: "/pricing" }
 ];
 
@@ -26,10 +26,10 @@ function MegaMenuItem({ item }: { item: any }) {
     >
       <Link
         href={item.href}
-        className="font-mono text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-[#050505]/85 dark:text-white/85 hover:text-[#050505] dark:hover:text-white"
+        className="font-mono text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-black/5 text-[#050505]/80 hover:text-[#050505]"
       >
         <span>{item.label}</span>
-        {item.subItems && <span className="opacity-40 text-[7px] mt-[1px]">▼</span>}
+        {item.subItems && <span className="opacity-30 text-[8px] mt-[1px]">+</span>}
       </Link>
       
       <AnimatePresence>
@@ -39,19 +39,19 @@ function MegaMenuItem({ item }: { item: any }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-[100%] left-0 w-[240px] bg-white/40 dark:bg-[#0A0A0A]/80 backdrop-blur-3xl border border-black/10 dark:border-white/10 shadow-2xl z-50 p-1 rounded-sm mt-1"
+            className="absolute top-[100%] left-0 w-[220px] bg-white border border-[#EBEBEB] shadow-lg z-50 p-1 rounded-lg mt-2"
           >
               {item.subItems ? (
               <div className="flex flex-col">
                 {item.subItems.map((sub: any, idx: number) => (
-                  <Link key={idx} href={sub.href} className="flex flex-col px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm">
-                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white">{sub.label}</span>
+                  <Link key={idx} href={sub.href} className="flex flex-col px-4 py-3 hover:bg-[#F8F8F8] transition-colors rounded-md">
+                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#0A0A0A]">{sub.label}</span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <Link href={item.href} className="block px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm">
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white block">{item.label}</span>
+              <Link href={item.href} className="block px-4 py-3 hover:bg-[#F8F8F8] transition-colors rounded-md">
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#0A0A0A] block">{item.label}</span>
               </Link>
             )}
           </motion.div>
@@ -67,8 +67,8 @@ export function InstitutionalHeader() {
     return (
         <header
             role="banner"
-            className="relative flex items-center justify-between w-full border-b border-black/10 dark:border-white/10 sticky top-0 z-[100] transition-colors duration-300 bg-white dark:bg-[#0A0A0A] shadow-[0_1px_0_rgba(0,0,0,0.06),0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-none"
-            style={{ minHeight: '68px' }}
+            className="relative flex items-center justify-between w-full border-b border-[#EBEBEB] sticky top-0 z-[100] bg-white shadow-[0_1px_0_rgba(0,0,0,0.05)]"
+            style={{ minHeight: '64px' }}
         >
             {/* Inner container — centred, full-width up to 4K */}
             <div className="w-full max-w-[2560px] mx-auto px-6 lg:px-10 flex items-center justify-between h-full">
@@ -131,25 +131,23 @@ export function InstitutionalHeader() {
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -10 }}
+                        initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
+                        exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 right-0 z-[90] p-6 shadow-2xl bg-white/40 dark:bg-black/60 backdrop-blur-3xl border-b border-black/10 dark:border-white/10"
+                        className="absolute top-full left-0 right-0 z-[90] p-4 shadow-lg bg-white border-b border-[#EBEBEB]"
                     >
-                        <div className="flex flex-col items-center w-full pt-2">
-                            <div className="w-full flex flex-col gap-2 pb-4">
-                                {MENU_ITEMS.map((item, index) => (
-                                    <Link 
-                                        key={index} 
-                                        href={item.href} 
-                                        onClick={() => setIsMenuOpen(false)}
-                                        className="font-mono text-[11px] font-black uppercase tracking-[0.2em] py-3 text-center text-[#050505] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
-                                    >
-                                        {item.label}
-                                    </Link>
-                                ))}
-                            </div>
+                        <div className="flex flex-col gap-1">
+                            {MENU_ITEMS.map((item, index) => (
+                                <Link 
+                                    key={index} 
+                                    href={item.href} 
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="font-mono text-[11px] font-black uppercase tracking-[0.2em] py-3 px-4 text-[#0A0A0A] hover:bg-[#F8F8F8] rounded-lg transition-colors"
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
                         </div>
                     </motion.div>
                 )}

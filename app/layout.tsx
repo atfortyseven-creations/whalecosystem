@@ -41,12 +41,12 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'Whale Alert Network | Professional Identity Layer',
+    default: 'Whale Alert Network | Secure Institutional Infrastructure',
     template: '%s | Whale Alert Network'
   },
-  description: 'The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+  description: 'The definitive Whale Alert Network for secure institutional architecture, cryptographic attestation, and data compliance.',
   keywords: [
-    'Whale Alert Network', 'Whale Alert', 'Institutional Identity', 'ZK-Biometrics', 'On-chain Intelligence', 'Zero-Knowledge Proofs'
+    'Whale Alert Network', 'Secure Architecture', 'Cryptographic Attestation', 'Healthcare Integrity', 'Spitalul Colțea Alliance'
   ],
   authors: [{ name: 'Whale Alert Network Foundation' }],
   creator: 'Whale Alert Network Foundation',
@@ -123,7 +123,7 @@ export default async function RootLayout({
         "@type": "WebSite",
         "url": "https://www.humanidfi.com/",
         "name": "Whale Alert Network",
-        "description": "The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.",
+        "description": "The definitive Whale Alert Network for secure institutional architecture and cryptographic attestation.",
         "publisher": {
           "@id": "https://www.humanidfi.com/#organization"
         }
@@ -140,33 +140,33 @@ export default async function RootLayout({
       },
       {
         "@type": "WebApplication",
-        "name": "Professional Dashboard",
-        "applicationCategory": "FinanceApplication",
+        "name": "Secure Access Terminal",
+        "applicationCategory": "SecurityApplication",
         "creator": {
           "@id": "https://www.humanidfi.com/#organization"
         },
-        "description": "Professional Dashboard for real-time on-chain identity and intelligence.",
+        "description": "Secure Terminal for cryptographic data attestation and E2E communication.",
         "featureList": [
-          "Professional Dashboard (Zero-Trust Analytics Suite)",
-          "ZK-Biometric Identity Attestation",
+          "End-to-End Encrypted Telemetry",
+          "Cryptographic Identity Verification",
           "Aztec Network L2 Privacy Integration",
-          "Network Ledger Analytics"
+          "Decentralized Data Integrity"
         ]
       },
       {
         "@type": "SoftwareSourceCode",
-        "name": "HumanID Network Architecture",
+        "name": "Whale Alert Network Architecture",
         "codeRepository": "https://github.com/atfortyseven-creations/Humanity-Ledger",
-        "programmingLanguage": ["TypeScript", "Solidity", "PostgreSQL", "Neo4j", "React", "Next.js"],
-        "description": "Professional-grade identity layer running Next.js 15 App router over a sterilized Ivory-and-Ink UI."
+        "programmingLanguage": ["TypeScript", "Solidity", "React", "Next.js"],
+        "description": "Secure identity layer running over an optimized cryptographic UI."
       },
       {
         "@type": "DataFeed",
-        "name": "Live Professional Identity Feed",
+        "name": "Encrypted Telemetry Stream",
         "dataFeedElement": {
           "@type": "DataFeedItem",
-          "name": "Network Identity Matrix",
-          "description": "Real-time cryptographic attestation of network participants via local Node daemon."
+          "name": "Secure Handshake Verification",
+          "description": "Real-time cryptographic attestation via local peer nodes."
         }
       }
     ]
