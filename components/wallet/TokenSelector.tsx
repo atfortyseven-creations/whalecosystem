@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Search, ChevronDown, Check, Loader2, Shield } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBalance } from "wagmi";
+import { TokenLogo } from '@/components/ui/TokenLogo';
 
 interface Token {
     symbol: string;
@@ -164,13 +165,13 @@ export function TokenSelector({
                 className="bg-black/5 border border-black/10 rounded-xl px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-black/10 transition-all select-none min-w-[120px] justify-between"
             >
                 <div className="flex items-center gap-2">
-                    {selectedToken?.logoURI ? (
-                        <img src={selectedToken.logoURI} className="w-5 h-5 rounded-full" />
-                    ) : (
-                        <div className="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[8px] font-black text-[#050505]">
-                            {selectedToken?.symbol?.slice(0, 2) || '??'}
-                        </div>
-                    )}
+                    <TokenLogo 
+                        symbol={selectedToken?.symbol || ''} 
+                        address={selectedToken?.address} 
+                        logoURI={selectedToken?.logoURI} 
+                        className="w-5 h-5 rounded-full" 
+                        fallbackClassName="w-5 h-5 rounded-full text-[8px]"
+                    />
                     <span className="font-black tracking-tight text-[#050505]">{selectedToken?.symbol || 'Select'}</span>
                 </div>
                 <ChevronDown size={14} className={`text-black/40 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -217,11 +218,13 @@ export function TokenSelector({
                                                 }}
                                                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/[0.02] hover:bg-black/[0.05] transition-all border border-black/5 hover:border-black/10 group"
                                             >
-                                                {asset.logoURI ? (
-                                                    <img src={asset.logoURI} className="w-4 h-4 rounded-full" />
-                                                ) : (
-                                                    <div className="w-4 h-4 rounded-full bg-black/5 flex items-center justify-center text-[8px] font-black text-[#050505]">{asset.symbol.slice(0, 2)}</div>
-                                                )}
+                                                <TokenLogo 
+                                                    symbol={asset.symbol} 
+                                                    address={asset.address} 
+                                                    logoURI={asset.logoURI} 
+                                                    className="w-4 h-4 rounded-full" 
+                                                    fallbackClassName="w-4 h-4 rounded-full text-[8px]"
+                                                />
                                                 <span className="text-[10px] font-bold text-[#050505]/70 group-hover:text-[#050505] uppercase">{asset.symbol}</span>
                                             </button>
                                         ))}
@@ -253,11 +256,13 @@ export function TokenSelector({
                                     className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-black/5 transition-colors flex items-center justify-between group"
                                 >
                                     <div className="flex items-center gap-3">
-                                        {asset.logoURI ? (
-                                            <img src={asset.logoURI} className="w-7 h-7 rounded-full" />
-                                        ) : (
-                                            <div className="w-7 h-7 rounded-full bg-black/5 flex items-center justify-center text-[10px] font-black text-[#050505]">{asset.symbol.slice(0, 2)}</div>
-                                        )}
+                                        <TokenLogo 
+                                            symbol={asset.symbol} 
+                                            address={asset.address} 
+                                            logoURI={asset.logoURI} 
+                                            className="w-7 h-7 rounded-full" 
+                                            fallbackClassName="w-7 h-7 rounded-full text-[10px]"
+                                        />
                                         <div>
                                             <div className="text-[#050505] font-black text-sm tracking-tight">{asset.symbol}</div>
                                             <div className="text-black/40 text-[10px] font-bold max-w-[120px] truncate">{asset.name}</div>
@@ -289,11 +294,13 @@ export function TokenSelector({
                                                 }}
                                                 className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-black/5 transition-colors flex items-center gap-3"
                                             >
-                                                {asset.logoURI ? (
-                                                    <img src={asset.logoURI} className="w-7 h-7 rounded-full" />
-                                                ) : (
-                                                    <div className="w-7 h-7 rounded-full bg-black/5 flex items-center justify-center text-[10px] font-black text-[#050505]">{asset.symbol.slice(0, 2)}</div>
-                                                )}
+                                                <TokenLogo 
+                                                    symbol={asset.symbol} 
+                                                    address={asset.address} 
+                                                    logoURI={asset.logoURI} 
+                                                    className="w-7 h-7 rounded-full" 
+                                                    fallbackClassName="w-7 h-7 rounded-full text-[10px]"
+                                                />
                                                 <div className="flex-1">
                                                     <div className="flex justify-between">
                                                         <div className="text-[#050505] font-black text-sm tracking-tight">{asset.symbol}</div>

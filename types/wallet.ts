@@ -66,14 +66,21 @@ export interface Asset {
     chainId: number;
     network?: string;
     logoURI?: string;
+    address?: string;
+    decimals?: number;
+    change24h?: number;
+    usdPrice?: number;
+    value?: number;
 }
 
 export interface Transaction {
     id: string;
     type: 'DEPOSIT' | 'WITHDRAW' | 'BUY' | 'SELL' | 'WINNINGS' | 'TRANSFER' | 'SWAP' | 'BRIDGE';
     amount: string | number;
+    value?: string | number;
     asset: string;
     date: string;
+    timestamp?: string | number;
     status: 'COMPLETED' | 'PENDING' | 'FAILED';
     hash?: string;
     chainId?: number;
@@ -84,6 +91,7 @@ export interface Transaction {
         headline: string;
         impactLabel: string;
     };
+    platform?: string;
 }
 
 export interface WalletState {
@@ -96,10 +104,25 @@ export interface WalletState {
 
 export interface EnrichedPortfolio extends WalletState {
     address: string;
-    totalValueUSD: number;
+    totalValueUSD?: number;
+    totalBalance?: string;
+    usdcBalance?: string;
+    portfolioValue?: string;
+    isConnected?: boolean;
     assets: Asset[];
     perps: PerpPosition[];
     predictions: PredictionPosition[];
     claimables: ClaimableAsset[];
     nfts: any[]; // Or specific NFT type
+    positions?: Position[];
+    transactions?: Transaction[];
+    stats?: any;
+    isAssetsLoading?: boolean;
+    isHistoryLoading?: boolean;
+    isLoading?: boolean;
+    change24hUSD?: number;
+    change24hPercent?: number;
+    legendaryScore?: number;
+    strategicInsight?: string;
+    backendAccounts?: any[];
 }

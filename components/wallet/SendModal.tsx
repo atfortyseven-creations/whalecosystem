@@ -11,6 +11,7 @@ import { TransactionStatusModal } from "@/components/ui/TransactionStatusModal";
 import { safeToFixed } from '@/lib/utils/number-format';
 import { ERC20_ABI } from "@/lib/wallet/erc20";
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { TokenLogo } from '@/components/ui/TokenLogo';
 
 interface SendModalProps {
     isOpen: boolean;
@@ -294,13 +295,13 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                                         className="w-full flex items-center justify-between bg-black/5 hover:bg-black/10 border border-black/5 rounded-xl px-4 py-3 text-black transition-all"
                                     >
                                         <div className="flex items-center gap-3">
-                                            {selectedAsset.logo ? (
-                                                <img src={selectedAsset.logo} className="w-6 h-6 rounded-full" />
-                                            ) : (
-                                                <div className="w-6 h-6 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-black">
-                                                    {selectedAsset.visibleSymbol.slice(0, 2)}
-                                                </div>
-                                            )}
+                                            <TokenLogo 
+                                                symbol={selectedAsset.visibleSymbol} 
+                                                address={selectedAsset.address} 
+                                                logoURI={selectedAsset.logo} 
+                                                className="w-6 h-6 rounded-full" 
+                                                fallbackClassName="w-6 h-6 rounded-full text-[10px]"
+                                            />
                                             <div className="text-left">
                                                 <div className="font-black text-sm uppercase tracking-tight flex items-center gap-2">
                                                     {selectedAsset.visibleSymbol}
@@ -355,11 +356,13 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                                                             className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-black/5 transition-colors flex items-center justify-between group"
                                                         >
                                                             <div className="flex items-center gap-3">
-                                                                {asset.logo ? (
-                                                                    <img src={asset.logo} className="w-7 h-7 rounded-full" />
-                                                                ) : (
-                                                                    <div className="w-7 h-7 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-black uppercase">{asset.visibleSymbol.slice(0, 2)}</div>
-                                                                )}
+                                                                <TokenLogo 
+                                                                    symbol={asset.visibleSymbol} 
+                                                                    address={asset.address} 
+                                                                    logoURI={asset.logo} 
+                                                                    className="w-7 h-7 rounded-full" 
+                                                                    fallbackClassName="w-7 h-7 rounded-full text-[10px]"
+                                                                />
                                                                 <div>
                                                                     <div className="text-black font-black text-sm uppercase tracking-tight">{asset.visibleSymbol}</div>
                                                                     <div className="text-black/30 text-[10px] font-mono uppercase tracking-widest">{asset.name}</div>
@@ -391,11 +394,13 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                                                                         }}
                                                                         className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-3"
                                                                     >
-                                                                        {asset.logoURI ? (
-                                                                            <img src={asset.logoURI} className="w-7 h-7 rounded-full" />
-                                                                        ) : (
-                                                                            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black">{asset.symbol.slice(0, 2)}</div>
-                                                                        )}
+                                                                        <TokenLogo 
+                                                                            symbol={asset.symbol} 
+                                                                            address={asset.address} 
+                                                                            logoURI={asset.logoURI} 
+                                                                            className="w-7 h-7 rounded-full" 
+                                                                            fallbackClassName="w-7 h-7 rounded-full text-[10px]"
+                                                                        />
                                                                         <div>
                                                                             <div className="text-white font-bold text-sm tracking-tight">{asset.symbol}</div>
                                                                             <div className="text-white/30 text-[10px] font-medium truncate max-w-[200px]">{asset.name}</div>

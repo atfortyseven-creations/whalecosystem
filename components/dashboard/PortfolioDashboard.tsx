@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, ArrowDownRight, RefreshCcw, TrendingUp, Wallet, Loader2, PieChart, Activity, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus, Github, Twitter } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, RefreshCcw, TrendingUp, Wallet, Loader2, PieChart, Activity, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus, Github, Twitter, Copy, ExternalLink, ArrowDownLeft, ArrowLeftRight } from 'lucide-react';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,11 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { PortfolioSkeleton } from '@/components/ui/skeleton-loader';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { useRealWalletData } from '@/hooks/useRealWalletData';
+import SendModal from '@/components/wallet/SendModal';
+import ReceiveModal from '@/components/wallet/ReceiveModal';
+import SwapModal from '@/components/wallet/SwapModal';
+import { TokenLogo } from '@/components/ui/TokenLogo';
+import TransactionHistory from '@/components/wallet/TransactionHistory';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
@@ -48,6 +53,22 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const [mounted, setMounted] = useState(false);
     const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
     const [isEyesOff, setIsEyesOff] = useState(false);
+    
+    // Modal states
+    const [isSendOpen, setIsSendOpen] = useState(false);
+    const [isReceiveOpen, setIsReceiveOpen] = useState(false);
+    const [isSwapOpen, setIsSwapOpen] = useState(false);
+
+    // MetaMask Parity States
+    const [activeTab, setActiveTab] = useState<'tokens' | 'activity'>('tokens');
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(effectiveAddress || '');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     useEffect(() => { setMounted(true); }, []);
 
@@ -116,19 +137,15 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     return (
         <div className="w-full relative space-y-8">
             {/* 🔥 DASHBOARD HEADER & ACCOUNT SWITCHER */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 border border-black/[0.08] dark:border-white/10 flex items-center justify-center text-[#050505] dark:text-white">
-                        <PieChart size={24} />
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-[#050505] dark:text-white tracking-tight uppercase">PORTFOLIO LEDGER</h2>
-                        <p className="text-[10px] font-bold text-[#050505]/60 dark:text-white/60 uppercase tracking-[0.2em]">Active Entity Monitoring</p>
-                    </div>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-2">
+                <div className="flex items-center gap-3 bg-white/50 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-black/[0.05] shadow-sm">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
+                    <span className="text-sm font-black text-[#050505] dark:text-white uppercase tracking-tight">Ethereum Mainnet</span>
+                    <ChevronDown size={14} className="text-black/40" />
                 </div>
 
                 {/* Account Switcher Pill */}
-                <div className="relative">
+                <div className="relative z-50">
                     <button 
                         onClick={() => setIsSwitcherOpen(!isSwitcherOpen)}
                         className="flex items-center gap-3 px-4 py-2.5 bg-black/[0.04] border border-black/[0.08] rounded-2xl hover:bg-black/[0.07] transition-all group"
@@ -144,7 +161,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 {effectiveAddress.slice(0, 6)}...{effectiveAddress.slice(-4)}
                             </div>
                         </div>
-                        <ChevronDown size={14} className={cn("text-black/50 transition-transform", isSwitcherOpen && "rotate-180")} />
+                        <ChevronDown size={14} className={cn("text-black/50 transition-transform ml-2", isSwitcherOpen && "rotate-180")} />
                     </button>
 
                     <AnimatePresence>
@@ -153,10 +170,12 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                className="absolute top-full right-0 mt-2 w-64 bg-white border border-black/[0.08] rounded-2xl shadow-2xl z-50 p-2 space-y-1"
+                                className="absolute top-full right-0 mt-2 w-72 bg-white border border-black/[0.08] rounded-3xl shadow-2xl z-50 p-3 space-y-1 overflow-hidden"
                                 style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}
                             >
-                                <div className="px-3 py-1.5 text-[8px] font-black text-black/25 uppercase tracking-widest">Switch Identity</div>
+                                <div className="flex items-center justify-between px-3 py-2">
+                                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Select Account</span>
+                                </div>
                                 {accounts.map((acc) => (
                                     <button
                                         key={acc.address}
@@ -165,33 +184,43 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                             setIsSwitcherOpen(false);
                                         }}
                                         className={cn(
-                                            "w-full flex items-center justify-between p-2.5 rounded-xl transition-all group",
-                                            effectiveAddress.toLowerCase() === acc.address.toLowerCase() ? "bg-black/[0.05] border border-black/[0.08]" : "hover:bg-black/[0.03] border border-transparent"
+                                            "w-full flex items-center justify-between p-3 rounded-2xl transition-all group",
+                                            effectiveAddress.toLowerCase() === acc.address.toLowerCase() ? "bg-black/[0.05] border border-black/[0.08] shadow-sm" : "hover:bg-black/[0.03] border border-transparent"
                                         )}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-[10px] font-black text-black/60">
+                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1F1F1F] to-black flex items-center justify-center text-xs font-black text-white shadow-inner">
                                                 {acc.address.slice(2, 4).toUpperCase()}
                                             </div>
                                             <div className="text-left">
-                                                <div className="text-[10px] font-bold text-black uppercase">{acc.label}</div>
-                                                <div className="text-[8px] font-mono text-black/60">{acc.address.slice(0, 6)}...{acc.address.slice(-4)}</div>
+                                                <div className="text-sm font-black text-black tracking-tight">{acc.label}</div>
+                                                <div className="text-[10px] font-mono text-black/50 font-bold">{acc.address.slice(0, 6)}...{acc.address.slice(-4)}</div>
                                             </div>
                                         </div>
-                                        {effectiveAddress.toLowerCase() === acc.address.toLowerCase() && <Check size={14} className="text-black/70" />}
+                                        {effectiveAddress.toLowerCase() === acc.address.toLowerCase() && <Check size={16} className="text-[#00C076]" />}
                                     </button>
                                 ))}
-                                <div className="h-px bg-black/[0.05] my-1" />
-                                <button 
-                                    onClick={() => {
-                                        useWalletStore.getState().createWallet();
-                                        setIsSwitcherOpen(false);
-                                    }}
-                                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#00C076]/5 text-[#00C076] transition-all border border-transparent hover:border-[#00C076]/20"
-                                >
-                                    <UserPlus size={16} />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">New Identity</span>
-                                </button>
+                                
+                                <div className="h-px bg-black/[0.05] my-2 mx-2" />
+                                
+                                <div className="grid grid-cols-2 gap-2 p-1">
+                                    <button 
+                                        onClick={handleCopy}
+                                        className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl hover:bg-black/5 text-black/60 hover:text-black transition-all"
+                                    >
+                                        {copied ? <Check size={16} className="text-[#00C076]" /> : <Copy size={16} />}
+                                        <span className="text-[9px] font-black uppercase tracking-widest">{copied ? 'Copied' : 'Copy'}</span>
+                                    </button>
+                                    <a 
+                                        href={`https://etherscan.io/address/${effectiveAddress}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl hover:bg-black/5 text-black/60 hover:text-black transition-all"
+                                    >
+                                        <ExternalLink size={16} />
+                                        <span className="text-[9px] font-black uppercase tracking-widest">Explorer</span>
+                                    </a>
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -255,89 +284,68 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 {isEyesOff ? "****" : safeToFixed(Math.abs(totalChange24h), 2)}%
                             </motion.div>
                         </div>
-
-                        {/* 🔥 ON-CHAIN ACTION BUTTONS */}
-                        <div className="flex flex-wrap items-center gap-3 mt-4 pt-2">
-                            <button 
-                                onClick={() => alert("Transfer module activating...")}
-                                className="flex items-center gap-2 px-6 py-3 bg-[#050505] dark:bg-white text-white dark:text-[#050505] rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform"
-                            >
-                                <ArrowUpRight size={14} /> Send
-                            </button>
-                            <button 
-                                onClick={() => alert("Receive module activating...")}
-                                className="flex items-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/10 border border-black/[0.06] dark:border-white/10 text-[#050505] dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black/10 dark:hover:bg-white/20 transition-all"
-                            >
-                                <ArrowDownRight size={14} /> Receive
-                            </button>
-                            <button 
-                                onClick={() => alert("Swap module activating...")}
-                                className="flex items-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/10 border border-black/[0.06] dark:border-white/10 text-[#050505] dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black/10 dark:hover:bg-white/20 transition-all"
-                            >
-                                <RefreshCcw size={14} /> Swap
-                            </button>
-                            <button 
-                                onClick={() => alert("Bridge module activating...")}
-                                className="flex items-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/10 border border-black/[0.06] dark:border-white/10 text-[#050505] dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black/10 dark:hover:bg-white/20 transition-all"
-                            >
-                                <Globe size={14} /> Bridge
-                            </button>
-                        </div>
-
-                        <div className="flex gap-10 mt-10">
-                            <div className="space-y-1">
-                                <div className="text-black/60 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                    <PieChart size={12} />
-                                    ACTIVE ASSETS
-                                </div>
-                                <div className="text-4xl font-black text-black font-mono flex items-center justify-between gap-4">
-                                    {isEyesOff ? "***" : <AnimatedCounter value={assets.length} />}
-                                    <div className="w-10 h-10 opacity-30 mt-1">
-                                        <svg viewBox="0 0 32 32" className="w-full h-full -rotate-90">
-                                            <circle r="16" cx="16" cy="16" fill="#e5e5e5" />
-                                            <circle r="16" cx="16" cy="16" fill="black" strokeDasharray="60 100" strokeWidth="32" />
-                                            <circle r="16" cx="16" cy="16" fill="#00C076" strokeDasharray="15 100" strokeDashoffset="-60" strokeWidth="32" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="w-px bg-black/[0.06]" />
-                            
-                            <div className="space-y-1">
-                                <div className="text-black/60 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                    <Globe size={12} />
-                                    NETWORK NODES
-                                </div>
-                                <div className="text-4xl font-black text-black font-mono">14</div>
-                            </div>
-                            
-                            <div className="w-px bg-black/[0.06]" />
-                            
-                            <div className="space-y-1">
-                                <div className="text-black/60 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                    <Activity size={12} />
-                                    ON-CHAIN STATUS
-                                </div>
-                                <div className="text-3xl font-black text-[#00C076] font-mono flex items-center gap-3">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-[#00C076] animate-pulse" />
-                                    ALL ON-CHAIN
-                                </div>
-                            </div>
-                        </div>
                     </div>
+                </div>
 
-                    <button
-                        onClick={() => window.location.reload()}
-                        className="p-5 hover:bg-black/5 rounded-[1.5rem] transition-all text-black/50 hover:text-black border border-transparent hover:border-black/[0.06] group"
-                    >
-                        <RefreshCcw size={24} className={cn(isLoading && "animate-spin")} strokeWidth={2.5} />
-                    </button>
+                {/* 🔥 ON-CHAIN ACTION BUTTONS - METAMASK GRID STYLE */}
+                <div className="flex justify-center items-center gap-4 md:gap-8 mt-12 relative z-10 w-full">
+                    <ActionButton 
+                        icon={<ArrowUpRight size={20} />} 
+                        label="Send" 
+                        onClick={() => setIsSendOpen(true)} 
+                        primary
+                    />
+                    <ActionButton 
+                        icon={<ArrowDownRight size={20} />} 
+                        label="Receive" 
+                        onClick={() => setIsReceiveOpen(true)} 
+                    />
+                    <ActionButton 
+                        icon={<RefreshCcw size={20} />} 
+                        label="Swap" 
+                        onClick={() => setIsSwapOpen(true)} 
+                    />
+                    <ActionButton 
+                        icon={<Globe size={20} />} 
+                        label="Bridge" 
+                        onClick={() => alert("Bridge module optimizing cross-chain liquidity paths.")} 
+                    />
                 </div>
             </motion.div>
 
-            {/* 🔥 ASSET LIST */}
-            <div className="relative rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 bg-white/80 dark:bg-[#111111]/40 backdrop-blur-3xl shadow-xl overflow-hidden">
+            {/* 🔥 TABS: TOKENS | ACTIVITY */}
+            <div className="w-full max-w-[1400px] mx-auto px-2">
+                <div className="flex items-center gap-8 border-b border-black/[0.06] dark:border-white/10 mb-6">
+                    <button
+                        onClick={() => setActiveTab('tokens')}
+                        className={cn(
+                            "pb-4 text-sm font-black uppercase tracking-widest transition-all border-b-2",
+                            activeTab === 'tokens' ? "text-[#050505] border-[#050505]" : "text-black/40 border-transparent hover:text-black/70"
+                        )}
+                    >
+                        Tokens
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('activity')}
+                        className={cn(
+                            "pb-4 text-sm font-black uppercase tracking-widest transition-all border-b-2",
+                            activeTab === 'activity' ? "text-[#050505] border-[#050505]" : "text-black/40 border-transparent hover:text-black/70"
+                        )}
+                    >
+                        Activity
+                    </button>
+                </div>
+
+                <AnimatePresence mode="wait">
+                    {activeTab === 'tokens' ? (
+                        <motion.div
+                            key="tokens"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-white/80 dark:bg-[#111111]/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 shadow-xl overflow-hidden"
+                        >
                 <div className="px-10 py-8 border-b border-black/[0.06] dark:border-white/10 flex justify-between items-center">
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-3">
@@ -369,8 +377,14 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                     className="px-10 py-8 flex items-center justify-between hover:bg-black/[0.01] transition-all group relative cursor-pointer"
                                 >
                                     <div className="flex items-center gap-6 relative z-10 flex-1">
-                                        <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg border bg-black/5 dark:bg-white/5 border-black/[0.06] dark:border-white/10 text-[#050505]/60 dark:text-white/60 group-hover:bg-[#050505] group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-[#050505] transition-all">
-                                            {typeof asset.symbol === 'string' ? asset.symbol.slice(0, 3) : '?'}
+                                        <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center border bg-black/5 dark:bg-white/5 border-black/[0.06] dark:border-white/10 group-hover:bg-[#050505] group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-[#050505] transition-all overflow-hidden">
+                                            <TokenLogo 
+                                                symbol={asset.symbol || ''} 
+                                                address={asset.address} 
+                                                logoURI={asset.logoURI} 
+                                                className="w-8 h-8 rounded-full" 
+                                                fallbackClassName="w-full h-full rounded-none"
+                                            />
                                         </div>
                                         <div className="space-y-1">
                                             <div className="text-lg font-black text-[#050505] dark:text-white tracking-tight">{asset.symbol || 'Unknown'}</div>
@@ -414,6 +428,20 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         </>
                     )}
                 </div>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="activity"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-white/80 dark:bg-[#111111]/40 backdrop-blur-3xl rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 shadow-xl overflow-hidden min-h-[600px] p-6"
+                        >
+                            <TransactionHistory authUserId={effectiveAddress} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* ── UNIFIED WAVE & DOWNHEAD FOOTER ── */}
@@ -460,6 +488,32 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     </div>
                 </footer>
             </div>
+            
+            {/* Modal Integrations */}
+            <SendModal isOpen={isSendOpen} onClose={() => setIsSendOpen(false)} />
+            <ReceiveModal isOpen={isReceiveOpen} onClose={() => setIsReceiveOpen(false)} />
+            <SwapModal isOpen={isSwapOpen} onClose={() => setIsSwapOpen(false)} />
+        </div>
+    );
+}
+
+function ActionButton({ icon, label, onClick, primary = false }: { icon: React.ReactNode, label: string, onClick: () => void, primary?: boolean }) {
+    return (
+        <div className="flex flex-col items-center gap-3">
+            <button
+                onClick={onClick}
+                className={cn(
+                    "w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center transition-all shadow-md active:scale-95 group",
+                    primary 
+                        ? "bg-[#050505] text-white hover:bg-black/80" 
+                        : "bg-white/90 text-[#050505] hover:bg-white border border-black/[0.05]"
+                )}
+            >
+                <div className="group-hover:scale-110 transition-transform duration-300 flex items-center justify-center">
+                    {icon}
+                </div>
+            </button>
+            <span className="text-[11px] font-black text-[#050505] uppercase tracking-widest">{label}</span>
         </div>
     );
 }

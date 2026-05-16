@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Plus, TrendingUp, TrendingDown, Eye, EyeOff, X, RefreshCw } from 'lucide-react';
 import { type Token, type TokenMetadata } from '@/lib/wallet/tokens';
+import { TokenLogo } from '@/components/ui/TokenLogo';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 interface TokenManagerProps {
@@ -197,13 +198,13 @@ function TokenCard({
       <div className="flex items-center justify-between">
         {/* Token Info */}
         <div className="flex items-center gap-3">
-          {token.logoURI ? (
-            <img src={token.logoURI} alt={token.symbol} className="w-10 h-10 rounded-full" />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-[#1F1F1F] flex items-center justify-center">
-              <span className="text-[#EAEADF] font-bold text-sm">{token.symbol[0]}</span>
-            </div>
-          )}
+          <TokenLogo 
+            symbol={token.symbol} 
+            address={token.address} 
+            logoURI={token.logoURI} 
+            className="w-10 h-10 rounded-full" 
+            fallbackClassName="w-10 h-10 rounded-full text-sm"
+          />
 
           <div>
             <div className="font-bold text-[#1F1F1F]">{token.symbol}</div>

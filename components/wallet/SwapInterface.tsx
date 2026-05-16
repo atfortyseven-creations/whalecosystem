@@ -8,6 +8,7 @@ import { type GasEstimate } from '@/lib/wallet/gas';
 import { type TokenMetadata } from '@/lib/wallet/tokens';
 import { useAccount } from 'wagmi';
 import { useTransactionHandler } from '@/hooks/useTransactionHandler';
+import { TokenLogo } from '@/components/ui/TokenLogo';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 interface SwapInterfaceProps {
@@ -281,11 +282,13 @@ function SelectTokenButton({
         {token ? (
           <>
             <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center overflow-hidden">
-               {token.logoURI ? (
-                 <img src={token.logoURI} alt={token.symbol} className="w-full h-full object-contain" />
-               ) : (
-                 <span className="text-[10px] font-black text-black">{token.symbol.slice(0, 2)}</span>
-               )}
+               <TokenLogo 
+                 symbol={token.symbol} 
+                 address={token.address} 
+                 logoURI={token.logoURI} 
+                 className="w-full h-full" 
+                 fallbackClassName="w-full h-full text-[10px]"
+               />
             </div>
             <span className="font-black text-sm tracking-tighter">{token.symbol}</span>
           </>
@@ -490,11 +493,13 @@ function TokenSelectDialog({
                     >
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-[#f8f8f8] flex items-center justify-center overflow-hidden border border-[#1F1F1F]/5">
-                                {t.logoURI ? (
-                                    <img src={t.logoURI} alt={t.symbol} className="w-full h-full object-contain" />
-                                ) : (
-                                    <span className="text-xs font-black text-[#1F1F1F]/40">{t.symbol.slice(0, 2)}</span>
-                                )}
+                                <TokenLogo 
+                                    symbol={t.symbol} 
+                                    address={t.address} 
+                                    logoURI={t.logoURI} 
+                                    className="w-full h-full" 
+                                    fallbackClassName="w-full h-full text-xs"
+                                />
                             </div>
                             <div className="text-left">
                                 <div className="text-sm font-black text-[#1F1F1F] tracking-tighter">{t.symbol}</div>
