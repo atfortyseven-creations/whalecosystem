@@ -315,6 +315,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname.startsWith('/forum') ||
     pathname === '/';
 
+  // /chat has its own full-screen header — never show the global one there
+  const isChat = pathname.startsWith('/chat');
+
   return (
     <>
 
@@ -324,10 +327,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         <div className={rootClass}>
           {/* Optional top header for select standalone routes */}
           <div className="flex-none w-full z-50 sticky top-0 hidden lg:block">
-            <InstitutionalHeader />
+            {!isChat && <InstitutionalHeader />}
           </div>
           <div className="flex-none w-full z-50 sticky top-0 lg:hidden">
-            {showInstitutionalHeader && <InstitutionalHeader />}
+            {showInstitutionalHeader && !isChat && <InstitutionalHeader />}
           </div>
 
           <div className={innerClass}>

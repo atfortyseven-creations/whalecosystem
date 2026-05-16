@@ -715,7 +715,10 @@ export function MobileLanding() {
   const onFocusRecheck = useCallback(() => {
     if (isLinked) return;
     // Fast path: wagmi already resolved the address
-    if (wagmiAddressRef.current) { establishSession(wagmiAddressRef.current); return; }
+    if (wagmiAddressRef.current) { 
+      // establishSession(wagmiAddressRef.current); // DISABLED
+      return; 
+    }
     // Cancel any in-flight poll before starting a new one
     if (pollIntervalRef.current) { clearInterval(pollIntervalRef.current); pollIntervalRef.current = null; }
     let attempts = 0;
@@ -724,7 +727,8 @@ export function MobileLanding() {
       // Check 1: wagmi ref
       if (wagmiAddressRef.current) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
-        establishSession(wagmiAddressRef.current); return;
+        // establishSession(wagmiAddressRef.current); // DISABLED: We no longer auto-handshake to preserve single-signature flow
+        return;
       }
       // Check 2: All cookies (Corrected parsing)
       try {
@@ -739,7 +743,8 @@ export function MobileLanding() {
             if (addr) { 
               console.log('[Sovereign:Sync] Found address in cookies:', addr);
               clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 
-              establishSession(addr); return; 
+              // establishSession(addr); // DISABLED: We no longer auto-handshake to preserve single-signature flow
+              return; 
             }
           }
         }
@@ -760,11 +765,12 @@ export function MobileLanding() {
               
               const hasHandshake = document.cookie.includes('sovereign_handshake=');
               if (!hasHandshake) {
-                console.log('[Sovereign:Sync] Missing session cookie, proceeding to handshake...');
+                console.log('[Sovereign:Sync] Missing session cookie, skipping automatic handshake...');
               }
 
               clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 
-              establishSession(addr); return; 
+              // establishSession(addr); // DISABLED: We no longer auto-handshake to preserve single-signature flow
+              return; 
             }
           }
         }
@@ -775,13 +781,11 @@ export function MobileLanding() {
       if (attempts >= 120) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
         // ── LAST RESORT: check if sovereign_handshake cookie was set this session ──
-        // This covers the case where establishSession ran but wagmi didn't
-        // reconnect fast enough for the poll to catch the wagmiAddressRef update.
         try {
           const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
           if (cookieMatch?.[1]) {
             console.log('[Sovereign:Recovery] Cookie found after poll timeout — using it:', cookieMatch[1]);
-            establishSession(cookieMatch[1]);
+            // establishSession(cookieMatch[1]); // DISABLED: We no longer auto-handshake to preserve single-signature flow
             return;
           }
         } catch {}
@@ -795,7 +799,7 @@ export function MobileLanding() {
         } catch {}
       }
     }, 500);
-  }, [isLinked, establishSession]);
+  }, [isLinked]);
 
   useEffect(() => {
     if (!mounted || isLinked) return;
@@ -1390,6 +1394,11 @@ export function MobileLanding() {
           </div>
         </motion.div>
       </main>
+
+      {/* ── Immersive Manifesto Content for Mobile ── */}
+      <div className="w-full relative z-0">
+        <ImmersiveManifestoLanding hideMap={true} />
+      </div>
 
       {/* ── Minimal Mobile Footer ── */}
       <div className="relative w-full bg-transparent border-t border-black/5">
