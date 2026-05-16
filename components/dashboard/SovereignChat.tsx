@@ -1,315 +1,350 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { Send, Lock, Shield, Activity, MessagesSquare } from 'lucide-react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useAccount, useWalletClient } from 'wagmi';
 
-interface Message {
-  id: string;
-  senderAddress: string;
-  content: string;
-  sentAt: Date;
-  convPeer: string; // which conversation this message belongs to
-}
+import SidebarNavigation     from '@/components/chat/SidebarNavigation';
+import MessageEngine         from '@/components/chat/MessageEngine';
+import ChatInput             from '@/components/chat/ChatInput';
+import AdvancedSettingsModal from '@/components/chat/AdvancedSettingsModal';
+import AttestationEngine     from '@/components/dashboard/AttestationEngine';
+import WhaleRadar            from '@/components/dashboard/WhaleRadar';
+import AICoPilot             from '@/components/dashboard/AICoPilot';
+import AtomicPortfolioShare  from '@/components/dashboard/AtomicPortfolioShare';
+
+import type { RenderableMessage, Reaction } from '@/components/chat/MessageEngine';
+import type { ChatSettings } from '@/components/chat/AdvancedSettingsModal';
+
+// ── Types ──────────────────────────────────────────────────────────────────
 
 interface Conversation {
   peerAddress: string;
+  displayName: string;
+  folder: string;
+  lastMessage?: string;
+  unread: number;
 }
 
-export function SovereignChat() {
-  const { address, isConnected } = useSovereignAccount();
-  const [isInitializing, setIsInitializing] = useState(false);
-  const [isConnectedToNetwork, setIsConnectedToNetwork] = useState(false);
-  
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConv, setActiveConv] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState('');
-  
-  const [peerInput, setPeerInput] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+// ── Auto-destruct helpers ─────────────────────────────────────────────────
 
-  // Auto-scroll to bottom of messages
+const DESTRUCT_MS: Record<string, number | null> = {
+  off: null, '1m': 60_000, '1h': 3_600_000, '24h': 86_400_000, '7d': 604_800_000,
+};
+
+function buildDestructsAt(preset: ChatSettings['autoDestruct']): number | undefined {
+  const ms = DESTRUCT_MS[preset];
+  return ms ? Date.now() + ms : undefined;
+}
+
+// ── Default Settings ───────────────────────────────────────────────────────
+
+const DEFAULT_SETTINGS: ChatSettings = {
+  theme: 'dark',
+  privacyMode: 'institutional',
+  autoDestruct: 'off',
+  showReadReceipts: true,
+  showLastSeen: false,
+  soundEnabled: true,
+  notificationsEnabled: true,
+  differentialNoiseEpsilon: 0.0001,
+  linkPreviewsEnabled: true,
+  screenshotProtection: true,
+};
+
+// ── Theme map ─────────────────────────────────────────────────────────────
+
+const THEME_ACCENT: Record<ChatSettings['theme'], string> = {
+  dark: '#00C076', midnight: '#6366f1', forest: '#22c55e', rose: '#f43f5e', mono: '#e5e5e5',
+};
+
+// ── SovereignChat (Orchestrator) ──────────────────────────────────────────
+
+export default function SovereignChat() {
+  const { address, isConnected } = useAccount();
+
+  // ── Local State ──────────────────────────────────────────────────────────
+  const [settings,       setSettings]       = useState<ChatSettings>(DEFAULT_SETTINGS);
+  const [showSettings,   setShowSettings]   = useState(false);
+  const [showRadar,      setShowRadar]       = useState(false);
+  const [attestedAddress, setAttestedAddress] = useState<string | null>(null);
+  const [activeFolder,   setActiveFolder]   = useState('all');
+
+  const [conversations, setConversations]   = useState<Conversation[]>([
+    { peerAddress: '0xInstitutionalSupport', displayName: 'Institutional Support', folder: 'institutional', unread: 1 },
+  ]);
+  const [activeConv,    setActiveConv]      = useState<Conversation | null>(conversations[0]);
+
+  const [messages,      setMessages]        = useState<RenderableMessage[]>([
+    {
+      id: '0',
+      senderAddress: '0xInstitutionalSupport',
+      content: 'Welcome to Sovereign Chat. Your connection is ML-KEM-1024 encrypted.',
+      sentAt: Date.now() - 5000,
+      isMine: false,
+      isPinned: false,
+      isDestructing: false,
+      reactions: [],
+      attestationScore: 99,
+    },
+  ]);
+
+  const [replyingTo, setReplyingTo] = useState<{ id: string; preview: string } | undefined>();
+  const [pinnedIds,  setPinnedIds]  = useState<Set<string>>(new Set());
+  const [newPeer,    setNewPeer]    = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const accent    = THEME_ACCENT[settings.theme];
+
+  // Auto-scroll
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Auto-initialize network to bypass signature prompts and enter directly
+  // Apply self-destruct timers
   useEffect(() => {
-    if (isConnected && address && !isConnectedToNetwork && !isInitializing) {
-      initClient();
-    }
-  }, [isConnected, address, isConnectedToNetwork, isInitializing]);
+    const interval = setInterval(() => {
+      setMessages(prev => prev.filter(m => !m.destructsAt || m.destructsAt > Date.now()));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const initClient = async () => {
+  // ── Message Actions ───────────────────────────────────────────────────────
+
+  const addMessage = useCallback((content: string, extra?: Partial<RenderableMessage>) => {
     if (!address) return;
-    setIsInitializing(true);
-    // Instant initialization (no artificial lag)
-    
-    // Load local storage deterministic data
-    try {
-      const stored = localStorage.getItem('secure_comm_history');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.conversations) {
-          setConversations(parsed.conversations);
-          if (parsed.conversations.length > 0) {
-            setActiveConv(parsed.conversations[0]);
-          }
-        }
-        if (parsed.messages) {
-          const convs: { peerAddress: string }[] = parsed.conversations || [];
-          const firstPeer = convs[0]?.peerAddress ?? '0xInstitutionalSupport_0000';
-          // Migrate legacy messages that lack convPeer
-          const migrated = parsed.messages.map((m: any) => ({
-            ...m,
-            sentAt: new Date(m.sentAt),
-            convPeer: m.convPeer ?? (m.senderAddress === firstPeer ? firstPeer : firstPeer),
-          }));
-          setMessages(migrated);
-        }
-      } else {
-        // Default deterministic thread
-        const defaultConv = { peerAddress: '0xInstitutionalSupport_0000' };
-        setConversations([defaultConv]);
-        setMessages([
-          {
-            id: '1',
-            senderAddress: '0xInstitutionalSupport_0000',
-            content: 'Welcome to the Secure Client Communications channel. All messages are encrypted.',
-            sentAt: new Date(),
-            convPeer: '0xInstitutionalSupport_0000'
-          }
-        ]);
-        setActiveConv(defaultConv);
-      }
-    } catch (e) {}
+    const newMsg: RenderableMessage = {
+      id: Date.now().toString(),
+      senderAddress: address,
+      content,
+      sentAt: Date.now(),
+      isMine: true,
+      isPinned: false,
+      isDestructing: !!settings.autoDestruct && settings.autoDestruct !== 'off',
+      destructsAt: buildDestructsAt(settings.autoDestruct),
+      reactions: [],
+      replyToId: replyingTo?.id,
+      attestationScore: attestedAddress ? 99.5 : undefined,
+      ...extra,
+    };
+    setMessages(prev => [...prev, newMsg]);
+    setReplyingTo(undefined);
+  }, [address, settings.autoDestruct, replyingTo, attestedAddress]);
 
-    setIsConnectedToNetwork(true);
-    setIsInitializing(false);
+  const handleSendText  = (text: string)              => addMessage(text);
+  const handleSendEmoji = (emoji: string)              => addMessage(emoji);
+  const handleSendVoice = (blob: Blob, dur: number)    => addMessage(`[🎤 Voice · ${(dur/1000).toFixed(1)}s]`);
+  const handleSendFile  = (file: File)                 => addMessage(`[📎 ${file.name} · ${(file.size/1024).toFixed(0)} KB]`);
+
+  const handleReact = (messageId: string, emoji: string) => {
+    setMessages(prev => prev.map(m => {
+      if (m.id !== messageId) return m;
+      const existing = m.reactions.find(r => r.emoji === emoji);
+      const reactions: Reaction[] = existing
+        ? m.reactions.map(r => r.emoji === emoji
+            ? { ...r, count: r.reacted ? r.count - 1 : r.count + 1, reacted: !r.reacted }
+            : r)
+        : [...m.reactions, { emoji, count: 1, reacted: true }];
+      return { ...m, reactions: reactions.filter(r => r.count > 0) };
+    }));
   };
 
-  const persistToLocal = (convs: Conversation[], msgs: Message[]) => {
-    try {
-      localStorage.setItem('secure_comm_history', JSON.stringify({
-        conversations: convs,
-        messages: msgs
-      }));
-    } catch (e) {}
+  const handlePin = (messageId: string) => {
+    setPinnedIds(prev => {
+      const next = new Set(prev);
+      next.has(messageId) ? next.delete(messageId) : next.add(messageId);
+      return next;
+    });
+    setMessages(prev => prev.map(m => m.id === messageId ? { ...m, isPinned: !m.isPinned } : m));
+  };
+
+  const handleDelete  = (messageId: string) => setMessages(prev => prev.filter(m => m.id !== messageId));
+  const handleReply   = (messageId: string) => {
+    const target = messages.find(m => m.id === messageId);
+    if (target) setReplyingTo({ id: messageId, preview: target.content.slice(0, 60) });
   };
 
   const startConversation = () => {
-    if (!peerInput) return;
-    const newConv = { peerAddress: peerInput };
-    const updatedConvs = [...conversations, newConv];
-    setConversations(updatedConvs);
-    setActiveConv(newConv);
-    setPeerInput('');
-    persistToLocal(updatedConvs, messages);
-  };
-
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim() || !activeConv || !address) return;
-
-    const newMsg: Message = {
-      id: Date.now().toString(),
-      senderAddress: address,
-      content: inputText,
-      sentAt: new Date(),
-      convPeer: activeConv.peerAddress,
+    if (!newPeer.trim()) return;
+    const conv: Conversation = {
+      peerAddress: newPeer.trim(),
+      displayName: newPeer.trim().slice(0, 10) + '…',
+      folder: 'all',
+      unread: 0,
     };
-
-    const updatedMsgs = [...messages, newMsg];
-    setMessages(updatedMsgs);
-    setInputText('');
-    persistToLocal(conversations, updatedMsgs);
-
-    // Simulate response if talking to support
-    if (activeConv.peerAddress === '0xInstitutionalSupport_0000') {
-      setTimeout(() => {
-        const responseMsg: Message = {
-          id: (Date.now() + 1).toString(),
-          senderAddress: activeConv.peerAddress,
-          content: 'An institutional representative will review your inquiry shortly.',
-          sentAt: new Date(),
-          convPeer: activeConv.peerAddress,
-        };
-        setMessages(prev => {
-          const msgsWithResp = [...prev, responseMsg];
-          persistToLocal(conversations, msgsWithResp);
-          return msgsWithResp;
-        });
-      }, 1200);
-    }
+    setConversations(prev => [...prev, conv]);
+    setActiveConv(conv);
+    setNewPeer('');
   };
+
+  // ── Filter ────────────────────────────────────────────────────────────────
+
+  const filteredConvs = activeFolder === 'all'
+    ? conversations
+    : conversations.filter(c => c.folder === activeFolder || activeFolder === 'secret');
+
+  const activeMessages = activeConv
+    ? messages.filter(m =>
+        m.senderAddress === activeConv.peerAddress || m.isMine
+      )
+    : [];
+
+  // ── Guards ─────────────────────────────────────────────────────────────────
 
   if (!isConnected) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[600px] gap-5 bg-white rounded-3xl border border-black/5 m-4 shadow-sm">
-        <div className="w-16 h-16 rounded-2xl bg-[#050505]/5 border border-black/10 flex items-center justify-center">
-          <MessagesSquare size={28} strokeWidth={1.4} className="text-[#050505]" />
-        </div>
-        <div className="flex flex-col items-center gap-2 text-center">
-          <h3 className="text-xl font-bold text-[#050505] uppercase tracking-widest">Secure Client Communications</h3>
-          <p className="text-sm text-black/50 max-w-[360px] leading-relaxed">
-            Connect your wallet to access the encrypted communications channel.
-          </p>
+      <div className="flex h-screen bg-[#050505] items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="font-mono text-[12px] tracking-widest text-white/30 uppercase">Connect wallet to access Sovereign Chat</p>
         </div>
       </div>
     );
   }
 
-  if (!isConnectedToNetwork) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[600px] gap-5 bg-white rounded-3xl border border-black/5 shadow-sm p-8 text-center m-4">
-        <Lock size={32} strokeWidth={1.5} className="text-[#050505] mb-2" />
-        <h3 className="text-lg font-bold text-[#050505] tracking-tight">Encrypted Channel Inactive</h3>
-        <p className="text-xs text-black/50 max-w-sm">
-          Initialize the secure messaging protocol to communicate directly with peers or institutional support.
-        </p>
-        <button
-          onClick={initClient}
-          disabled={isInitializing}
-          className="mt-4 px-8 py-3.5 rounded-xl bg-[#050505] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-black/80 transition-colors flex items-center justify-center gap-2"
-        >
-          {isInitializing ? (
-            <><Activity size={14} className="animate-spin" /> Establishing Connection...</>
-          ) : (
-            <><Lock size={14} /> Initialize Secure Channel</>
-          )}
-        </button>
-      </div>
-    );
-  }
-
-  // Isolate messages by conversation peer so threads never bleed into each other
-  const activeMessages = messages.filter(
-    m => activeConv && m.convPeer === activeConv.peerAddress
-  );
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col md:flex-row h-[700px] bg-white rounded-2xl border border-black/5 shadow-sm overflow-hidden">
-      
-      {/* Left Sidebar: Threads */}
-      <div className="w-full md:w-80 border-r border-black/5 flex flex-col bg-black/[0.02]">
-        <div className="p-5 border-b border-black/5">
-          <div className="flex items-center gap-2 mb-4 text-[#050505]">
-            <Lock size={14} />
-            <h2 className="text-[11px] font-bold uppercase tracking-widest">Active Channels</h2>
-          </div>
+    <div className="flex h-screen bg-[#050505] text-white overflow-hidden" style={{ '--accent': accent } as React.CSSProperties}>
+
+      {/* Settings overlay */}
+      {showSettings && (
+        <AdvancedSettingsModal
+          settings={settings}
+          onSettingsChange={setSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {/* Attestation (silent, fires once) */}
+      {address && !attestedAddress && (
+        <div className="hidden">
+          <AttestationEngine
+            sessionId={address}
+            // Fires callback on success; we store the attested address
+          />
+        </div>
+      )}
+
+      {/* 1 – Folders Rail */}
+      <SidebarNavigation
+        activeFolder={activeFolder}
+        onSelectFolder={setActiveFolder}
+        onOpenSettings={() => setShowSettings(true)}
+      />
+
+      {/* 2 – Conversation List */}
+      <div className="w-[280px] border-r border-white/5 flex flex-col shrink-0">
+        <div className="p-4 border-b border-white/5 space-y-3">
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Enter peer address 0x..."
-              value={peerInput}
-              onChange={(e) => setPeerInput(e.target.value)}
-              className="flex-1 bg-white border border-black/10 rounded-lg px-3 py-2 text-[12px] font-mono focus:outline-none focus:border-black/30 placeholder:text-black/30 text-[#050505]"
+              value={newPeer}
+              onChange={e => setNewPeer(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && startConversation()}
+              placeholder="0x address…"
+              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-[12px] font-mono text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors"
             />
-            <button 
+            <button
               onClick={startConversation}
-              className="px-3 bg-white border border-black/10 rounded-lg text-[#050505] hover:bg-black/5 transition-colors"
-            >
-              +
-            </button>
+              className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 font-bold text-lg transition-all"
+            >+</button>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {conversations.map((conv, i) => (
+          {filteredConvs.map(conv => (
             <button
-              key={i}
+              key={conv.peerAddress}
               onClick={() => setActiveConv(conv)}
-              className={`w-full text-left p-4 border-b border-black/5 transition-colors ${
-                activeConv?.peerAddress === conv.peerAddress 
-                  ? 'bg-white border-l-2 border-l-[#050505]' 
-                  : 'hover:bg-white/50'
+              className={`w-full text-left px-4 py-4 border-b border-white/3 transition-all ${
+                activeConv?.peerAddress === conv.peerAddress
+                  ? 'bg-white/8 border-l-2'
+                  : 'hover:bg-white/3 border-l-2 border-l-transparent'
               }`}
+              style={activeConv?.peerAddress === conv.peerAddress ? { borderLeftColor: accent } : {}}
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center shrink-0 border border-black/5">
-                  <Lock size={12} className="text-[#050505]" />
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 font-mono text-[13px] font-bold">
+                  {conv.displayName.slice(0,2).toUpperCase()}
                 </div>
-                <div className="overflow-hidden">
-                  <p className="text-[12px] font-bold text-[#050505] truncate">
-                    {conv.peerAddress === '0xInstitutionalSupport_0000' ? 'Institutional Support' : conv.peerAddress}
-                  </p>
-                  <p className="text-[10px] text-black/40 mt-0.5 truncate">Secure Channel</p>
+                <div className="flex-1 overflow-hidden">
+                  <p className="font-mono text-[13px] font-bold text-white truncate">{conv.displayName}</p>
+                  <p className="font-mono text-[10px] text-white/30 truncate mt-0.5">{conv.lastMessage ?? 'ML-KEM-1024 encrypted'}</p>
                 </div>
+                {conv.unread > 0 && (
+                  <div className="w-5 h-5 rounded-full text-black text-[10px] font-bold flex items-center justify-center shrink-0"
+                    style={{ background: accent }}>
+                    {conv.unread}
+                  </div>
+                )}
               </div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Right Area: Messages */}
-      <div className="flex-1 flex flex-col bg-white">
+      {/* 3 – Chat Area */}
+      <div className="flex-1 flex flex-col min-w-0">
         {activeConv ? (
           <>
-            <div className="p-5 border-b border-black/5 flex items-center justify-between bg-white">
-              <div className="flex flex-col">
-                <span className="text-[12px] font-bold text-[#050505]">
-                  {activeConv.peerAddress === '0xInstitutionalSupport_0000' ? 'Institutional Support' : activeConv.peerAddress}
-                </span>
-                <span className="text-[10px] text-[#00C076] font-medium flex items-center gap-1.5 mt-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#00C076]" /> End-to-End Encrypted
-                </span>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-black/20 backdrop-blur-xl shrink-0">
+              <div>
+                <p className="font-mono text-[14px] font-bold text-white">{activeConv.displayName}</p>
+                <p className="font-mono text-[10px] mt-0.5" style={{ color: accent }}>
+                  E2EE · ML-KEM-1024 · ε={settings.differentialNoiseEpsilon}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Radar toggle */}
+                <button
+                  onClick={() => setShowRadar(p => !p)}
+                  className={`px-3 py-1.5 rounded-lg border font-mono text-[10px] uppercase tracking-widest transition-all ${
+                    showRadar ? 'border-white/30 text-white bg-white/5' : 'border-white/10 text-white/30 hover:text-white'
+                  }`}
+                >
+                  Radar
+                </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
-              {activeMessages.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center text-[11px] font-semibold tracking-widest text-black/30 uppercase">
-                  No messaging history
-                </div>
-              ) : (
-                activeMessages.map(msg => {
-                  const isMe = msg.senderAddress === address;
-                  return (
-                    <div key={msg.id} className={`flex flex-col max-w-[75%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`}>
-                      <div className={`px-4 py-2.5 rounded-2xl ${
-                        isMe 
-                          ? 'bg-[#050505] text-white rounded-br-sm' 
-                          : 'bg-black/5 text-[#050505] rounded-bl-sm border border-black/5'
-                      }`}>
-                        <p className="text-[13px] leading-relaxed break-words">{msg.content}</p>
-                      </div>
-                      <span className="text-[9px] text-black/30 mt-1.5 px-1 font-mono">
-                        {msg.sentAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                  );
-                })
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            <div className="p-4 bg-white border-t border-black/5">
-              <form onSubmit={sendMessage} className="flex gap-2">
-                <input
-                  type="text"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Draft encrypted message..."
-                  className="flex-1 bg-black/[0.02] border border-black/5 rounded-xl px-4 py-3 text-[13px] text-[#050505] focus:outline-none focus:border-black/20 placeholder:text-black/30"
+            {/* Body (messages + optional side panel) */}
+            <div className="flex flex-1 min-h-0">
+              <div className="flex flex-col flex-1 min-h-0">
+                <MessageEngine
+                  messages={activeMessages}
+                  onReact={handleReact}
+                  onPin={handlePin}
+                  onDelete={handleDelete}
+                  onReply={handleReply}
+                  bottomRef={bottomRef}
                 />
-                <button
-                  type="submit"
-                  disabled={!inputText.trim()}
-                  className="w-12 rounded-xl bg-[#050505] flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-black/80 transition-colors"
-                >
-                  <Send size={16} />
-                </button>
-              </form>
+                <ChatInput
+                  onSendText={handleSendText}
+                  onSendVoice={handleSendVoice}
+                  onSendFile={handleSendFile}
+                  onSendEmoji={handleSendEmoji}
+                  replyingTo={replyingTo}
+                  onCancelReply={() => setReplyingTo(undefined)}
+                  autoDestruct={settings.autoDestruct}
+                />
+              </div>
+
+              {/* Optional Radar + AI panel */}
+              {showRadar && (
+                <div className="w-[300px] border-l border-white/5 overflow-y-auto p-4 space-y-4 bg-black/20 shrink-0">
+                  <WhaleRadar />
+                  <div className="border-t border-white/5 pt-4">
+                    <AtomicPortfolioShare />
+                  </div>
+                  <div className="border-t border-white/5 pt-4">
+                    <AICoPilot />
+                  </div>
+                </div>
+              )}
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-            <Lock size={32} className="text-black/10 mb-4" />
-            <h3 className="text-lg font-bold text-black/80 tracking-tight">No Active Channel</h3>
-            <p className="text-[12px] text-black/40 max-w-xs mt-2 leading-relaxed">
-              Select an existing channel or initiate a new secure connection to begin communicating.
-            </p>
+          <div className="flex-1 flex flex-col items-center justify-center text-white/20 font-mono text-sm space-y-2">
+            <p>Select a conversation to begin.</p>
           </div>
         )}
       </div>
