@@ -93,7 +93,7 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
   const now = Date.now();
   const secondsLeft = msg.destructsAt ? Math.max(0, Math.round((msg.destructsAt - now) / 1000)) : null;
 
-  const match = msg.content.match(/^\[ATTACHMENT:([^\]]+)\](.*?)\|(.*)$/);
+  const match = msg.content.match(/^\[ATTACHMENT:([^\]]+)\](.*?)\|(.*)$/s);
   const attachment = match ? { mime: match[1], url: match[2], name: match[3] } : null;
 
   return (
@@ -177,10 +177,10 @@ function AttachmentRenderer({ attachment, isMine }: { attachment: { mime: string
 
   if (isImg) {
     return (
-      <div className="mt-1">
-        <a href={url} target="_blank" rel="noopener noreferrer">
+      <div className="mt-1 relative group cursor-pointer overflow-hidden rounded-xl border border-white/10 shadow-sm">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={url} alt={name} className="max-w-[240px] md:max-w-[320px] max-h-[300px] rounded-xl object-contain border border-white/10 shadow-sm" />
+          <img src={url} alt={name} className="max-w-[240px] md:max-w-[320px] max-h-[300px] object-cover transition-transform duration-300 group-hover:scale-105" />
         </a>
       </div>
     );
@@ -188,16 +188,16 @@ function AttachmentRenderer({ attachment, isMine }: { attachment: { mime: string
 
   if (isVid) {
     return (
-      <div className="mt-1 max-w-[240px] md:max-w-[320px]">
-        <video src={url} controls className="w-full rounded-xl border border-white/10 shadow-sm" />
+      <div className="mt-1 relative w-full max-w-[260px] md:max-w-[320px] overflow-hidden rounded-xl border border-white/10 shadow-sm bg-black">
+        <video src={url} controls controlsList="nodownload" playsInline className="w-full max-h-[300px] object-contain" />
       </div>
     );
   }
 
   if (isAud) {
     return (
-      <div className="mt-1 w-full max-w-[280px]">
-        <audio src={url} controls className="w-full h-10" />
+      <div className={`mt-1 flex items-center p-2 rounded-xl shadow-sm border ${isMine ? 'bg-white/10 border-white/20' : 'bg-black/5 border-black/10'}`}>
+        <audio src={url} controls className="h-10 w-[200px] md:w-[260px]" />
       </div>
     );
   }

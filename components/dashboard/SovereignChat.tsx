@@ -10,10 +10,8 @@ import MessageEngine from '@/components/chat/MessageEngine';
 import ChatInput from '@/components/chat/ChatInput';
 import AdvancedSettingsModal from '@/components/chat/AdvancedSettingsModal';
 import AttestationEngine from '@/components/dashboard/AttestationEngine';
-import WhaleRadar from '@/components/dashboard/WhaleRadar';
-import AICoPilot from '@/components/dashboard/AICoPilot';
-import AtomicPortfolioShare from '@/components/dashboard/AtomicPortfolioShare';
 import { QrScanner } from '@/components/dashboard/QrScanner';
+import { QRCodeSVG } from 'qrcode.react';
 
 import type { RenderableMessage, Reaction } from '@/components/chat/MessageEngine';
 import type { ChatSettings } from '@/components/chat/AdvancedSettingsModal';
@@ -142,8 +140,8 @@ export default function SovereignChat() {
 
   // ── UI State ─────────────────────────────────────────────────────────────
   const [showSettings, setShowSettings] = useState(false);
-  const [showRadar, setShowRadar]       = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
+  const [scannerTab, setScannerTab]     = useState<'scan' | 'my-qr'>('scan');
   const [activeFolder, setActiveFolder] = useState('all');
 
   // ── Conversations & Messages ─────────────────────────────────────────────
@@ -258,6 +256,17 @@ export default function SovereignChat() {
             if (fromPeer && settingsRef.current.soundEnabled) playMessageSound();
             setMessages(prev => {
               if (prev.some(m => m.id === rendered.id)) return prev;
+              
+              if (!fromPeer) {
+                // Deduplicate own optimistic messages
+                const optIndex = prev.findIndex(m => m.id.startsWith('opt-') && m.content === rendered.content);
+                if (optIndex !== -1) {
+                  const next = [...prev];
+                  next[optIndex] = rendered;
+                  return next.sort((a, b) => a.sentAt - b.sentAt);
+                }
+              }
+              
               return [...prev, rendered].sort((a, b) => a.sentAt - b.sentAt);
             });
             // Update last message in conv list
@@ -513,18 +522,58 @@ export default function SovereignChat() {
       {/* Scanner overlay */}
       {showScanner && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-3xl w-full max-w-md relative shadow-2xl border border-black/10">
+          <div className="bg-white p-6 rounded-3xl w-full max-w-md relative shadow-2xl border border-black/10 flex flex-col items-center">
             <button onClick={() => setShowScanner(false)} className="absolute top-4 right-4 text-black/50 hover:text-black z-10">
               <X size={20} />
             </button>
-            <h3 className="font-mono text-lg font-bold mb-4 uppercase tracking-widest text-center">Scan Wallet QR</h3>
-            <QrScanner 
-              mode="scan" 
-              onScanSuccess={(scannedAddr) => {
-                setShowScanner(false);
-                startConversation(scannedAddr);
-              }} 
-            />
+            <h3 className="font-mono text-lg font-bold mb-4 uppercase tracking-widest text-center">Wallet QR</h3>
+            
+            <div className="flex bg-black/[0.04] p-1 rounded-xl w-full mb-6 relative">
+              <button
+                onClick={() => setScannerTab('scan')}
+                className={`flex-1 py-2 font-mono text-[11px] font-bold uppercase tracking-widest rounded-lg transition-all ${
+                  scannerTab === 'scan' ? 'bg-white shadow-sm text-black' : 'text-black/40 hover:text-black/80'
+                }`}
+              >
+                Scan QR
+              </button>
+              <button
+                onClick={() => setScannerTab('my-qr')}
+                className={`flex-1 py-2 font-mono text-[11px] font-bold uppercase tracking-widest rounded-lg transition-all ${
+                  scannerTab === 'my-qr' ? 'bg-white shadow-sm text-black' : 'text-black/40 hover:text-black/80'
+                }`}
+              >
+                My QR
+              </button>
+            </div>
+
+            {scannerTab === 'scan' ? (
+              <div className="w-full">
+                <QrScanner 
+                  mode="scan" 
+                  onScanSuccess={(scannedAddr) => {
+                    setShowScanner(false);
+                    startConversation(scannedAddr);
+                  }} 
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-6 py-4">
+                <div className="p-6 bg-white rounded-3xl border border-black/10 shadow-xl">
+                  {address ? (
+                    <QRCodeSVG value={address} size={220} level="H" includeMargin={false} />
+                  ) : (
+                    <div className="w-[220px] h-[220px] flex items-center justify-center bg-black/5 rounded-2xl">
+                      <p className="text-[10px] font-mono text-black/40">No wallet connected</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col items-center text-center gap-1">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-black/40">Your Wallet Address</p>
+                  <p className="font-mono text-[11px] font-bold text-black break-all max-w-[250px]">{address}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -626,16 +675,7 @@ export default function SovereignChat() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowRadar(p => !p)}
-                  className={`px-3 py-1.5 rounded-lg border font-mono text-[10px] uppercase tracking-widest transition-all ${
-                    showRadar
-                      ? 'border-black/30 text-black bg-black/5'
-                      : 'border-black/10 text-black/35 hover:text-black'
-                  }`}
-                >
-                  Radar
-                </button>
+                {/* Radar Removed */}
               </div>
             </div>
 
@@ -660,14 +700,6 @@ export default function SovereignChat() {
                   disabled={!xmtpReady || sending || isUploading}
                 />
               </div>
-
-              {showRadar && (
-                <div className="w-[300px] border-l border-black/6 overflow-y-auto p-4 space-y-4 bg-white shrink-0">
-                  <WhaleRadar />
-                  <div className="border-t border-black/6 pt-4"><AtomicPortfolioShare /></div>
-                  <div className="border-t border-black/6 pt-4"><AICoPilot /></div>
-                </div>
-              )}
             </div>
           </>
         ) : (
