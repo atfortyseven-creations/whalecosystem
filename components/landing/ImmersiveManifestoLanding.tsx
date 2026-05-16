@@ -55,7 +55,7 @@ export function ImmersiveManifestoLanding({
             initial="hidden"
             animate="visible"
             variants={STAGGER}
-            className="relative flex flex-col items-center justify-center gap-10 w-full max-w-[1100px] mx-auto mt-32 py-20 md:py-24 px-10 md:px-16 bg-white/90 backdrop-blur-2xl rounded-[40px] border border-black/5 shadow-2xl"
+            className="relative flex flex-col items-center justify-center gap-12 w-full max-w-[1200px] mx-auto mt-32 py-24 md:py-32 px-10 md:px-16 backdrop-blur-sm rounded-[40px]"
             style={{ zIndex: 2 }}
           >
             {/* Title */}

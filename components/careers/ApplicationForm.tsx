@@ -53,24 +53,24 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
         <div className="w-16 h-16 rounded-full bg-[#00C076]/10 flex items-center justify-center mb-6">
            <CheckCircle2 size={32} className="text-[#00C076]" />
         </div>
-        <h3 className="font-sans text-[28px] font-black tracking-tight text-white mb-4">Application Received</h3>
-        <p className="font-serif text-[15px] text-white/60 max-w-md mx-auto leading-relaxed">
-          Your application for the <strong className="font-sans font-bold text-white">{role}</strong> position has been received. Our team will review your profile and reach out shortly.
+        <h3 className="font-sans text-[28px] font-black tracking-tight text-black mb-4">Application Received</h3>
+        <p className="font-serif text-[15px] text-black/60 max-w-md mx-auto leading-relaxed">
+          Your application for the <strong className="font-sans font-bold text-black">{role}</strong> position has been received. Our team will review your profile and reach out shortly.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col w-full bg-white/5 backdrop-blur-xl border border-white/10 p-8 sm:p-12 rounded-[32px]">
+    <div className="flex flex-col w-full bg-white/40 backdrop-blur-3xl border border-black/5 p-8 sm:p-12 rounded-[32px]">
       <div className="mb-10 flex flex-col gap-2">
         <div className="flex items-center gap-2 text-[#00C076] mb-2">
            <ShieldCheck size={16} />
            <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em]">Secure Submission</span>
         </div>
-        <h2 className="text-[28px] font-black tracking-tight text-white">Submit Application</h2>
-        <p className="font-serif text-[15px] text-white/50 max-w-lg">
-          Submit your profile for the <strong className="font-sans font-bold text-white">{role}</strong> position.
+        <h2 className="text-[28px] font-black tracking-tight text-black">Submit Application</h2>
+        <p className="font-serif text-[15px] text-black/50 max-w-lg">
+          Submit your profile for the <strong className="font-sans font-bold text-black">{role}</strong> position.
         </p>
       </div>
 
@@ -85,7 +85,7 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           <div className="flex flex-col gap-2.5">
-            <label htmlFor="name" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Full Name</label>
+            <label htmlFor="name" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Full Name</label>
             <input
               required
               id="name"
@@ -94,11 +94,11 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
               value={formData.name}
               onChange={handleChange}
               placeholder="e.g. Satoshi Nakamoto"
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 font-sans text-[14px] text-white placeholder:text-white/30 outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+              className="w-full bg-black/5 border border-black/10 rounded-xl p-4 font-sans text-[14px] text-black placeholder:text-black/30 outline-none focus:border-black/30 focus:bg-black/10 transition-all"
             />
           </div>
           <div className="flex flex-col gap-2.5">
-            <label htmlFor="email" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Email Address</label>
+            <label htmlFor="email" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Email Address</label>
             <input
               required
               id="email"
@@ -107,13 +107,13 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
               value={formData.email}
               onChange={handleChange}
               placeholder="satoshi@genesis.block"
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 font-sans text-[14px] text-white placeholder:text-white/30 outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+              className="w-full bg-black/5 border border-black/10 rounded-xl p-4 font-sans text-[14px] text-black placeholder:text-black/30 outline-none focus:border-black/30 focus:bg-black/10 transition-all"
             />
           </div>
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <label htmlFor="portfolio" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Portfolio / GitHub URL</label>
+          <label htmlFor="portfolio" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Portfolio / GitHub URL</label>
           <input
             required
             id="portfolio"
@@ -122,12 +122,12 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
             value={formData.portfolio}
             onChange={handleChange}
             placeholder="https://github.com/..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 font-sans text-[14px] text-white placeholder:text-white/30 outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+            className="w-full bg-black/5 border border-black/10 rounded-xl p-4 font-sans text-[14px] text-black placeholder:text-black/30 outline-none focus:border-black/30 focus:bg-black/10 transition-all"
           />
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <label htmlFor="motivation" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Cover Letter</label>
+          <label htmlFor="motivation" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Cover Letter</label>
           <textarea
             required
             id="motivation"
@@ -136,7 +136,7 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
             value={formData.motivation}
             onChange={handleChange}
             placeholder="Detail your experience in Web3 and why you align with the Whale Alert Network mission..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 font-sans text-[14px] text-white placeholder:text-white/30 outline-none focus:border-white/30 focus:bg-white/10 transition-all resize-y min-h-[140px] leading-relaxed"
+            className="w-full bg-black/5 border border-black/10 rounded-xl p-4 font-sans text-[14px] text-black placeholder:text-black/30 outline-none focus:border-black/30 focus:bg-black/10 transition-all resize-y min-h-[140px] leading-relaxed"
           />
         </div>
 

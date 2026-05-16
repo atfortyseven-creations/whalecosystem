@@ -157,20 +157,19 @@ export default function AztecMempoolSpace() {
     return (
         <div className="absolute inset-0 flex flex-col bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#050505] dark:text-[#FAF9F6] font-sans overflow-hidden">
             <div className="shrink-0 pt-4 px-2 bg-white dark:bg-[#111111]">
-                <ModuleHeader moduleId="zk" />
+                <ModuleHeader moduleId="markets" />
             </div>
-            <div className="flex items-end justify-between px-8 pb-8 border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] shrink-0 -mt-8">
-                <div>
-                </div>
+            <div className="flex items-center justify-center px-8 pb-8 border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] shrink-0 -mt-8">
 
-                <div className="flex items-center gap-4">
+
+                <div className="flex items-center justify-center gap-8 w-full max-w-4xl">
                     {[
                         { label: 'Network TPS', val: globalStats.tps, unit: 'tx/s', isNum: true, format: (v: number) => v.toFixed(2) },
                         { label: 'Avg Base Fee', val: globalStats.avgGasPrice, unit: 'GWEI', isNum: true, format: (v: number) => v.toFixed(2) },
                         { label: 'Blocks Tracked', val: globalStats.blocksTracked, unit: 'blk', isNum: true },
                         { label: 'Vol (Session)', val: globalStats.totalEthMoved, unit: 'ETH', isNum: true, format: (v: number) => `${v.toFixed(1)} ETH` },
                     ].map((stat, i) => (
-                        <div key={i} className="flex flex-col items-end mr-4">
+                        <div key={i} className="flex flex-col items-center">
                             <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] dark:text-[#AAAAAA] mb-1.5">{stat.label}</span>
                             <div className="flex items-end gap-1">
                                 <AnimatedCounter 

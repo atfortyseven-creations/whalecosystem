@@ -647,13 +647,13 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 className="w-full max-w-3xl bg-[#FAF9F6] dark:bg-[#0A0A0A] rounded-[24px] shadow-2xl overflow-hidden flex flex-col border border-black/10 dark:border-white/10"
             >
                 <div className="flex items-center justify-between px-8 py-6 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#111111]">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-black text-[#FAF9F6] flex items-center justify-center">
-                            <Info size={18} />
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-black text-[#FAF9F6] flex items-center justify-center mb-2">
+                            <Info size={22} />
                         </div>
-                        <div>
-                            <h3 className="text-[15px] font-black uppercase tracking-widest text-[#050505] leading-none mb-1">{currentExplanation.title}</h3>
-                            <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em]">{currentExplanation.subtitle}</p>
+                        <div className="flex flex-col items-center">
+                            <h3 className="text-[18px] font-black uppercase tracking-widest text-[#050505] dark:text-white leading-none mb-2">{currentExplanation.title}</h3>
+                            <p className="text-[10px] font-black text-black/40 dark:text-white/40 uppercase tracking-[0.25em]">{currentExplanation.subtitle}</p>
                         </div>
                     </div>
                     <button onClick={() => setShowInfoModal(false)} className="p-2.5 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-black/40 hover:text-black">
@@ -664,7 +664,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 <div className="px-8 py-8 flex flex-col gap-6 overflow-y-auto max-h-[75vh] custom-scrollbar">
                     <div className="bg-white dark:bg-[#111111] p-6 border border-black/10 dark:border-white/10 rounded-xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/5 rounded-bl-full -z-0 pointer-events-none" />
-                        <p className="text-[13px] text-[#050505] dark:text-white/80 leading-relaxed font-medium relative z-10 text-justify">
+                        <p className="text-[14px] text-[#050505] dark:text-white/80 leading-relaxed font-medium relative z-10 text-center max-w-2xl mx-auto">
                             {currentExplanation.overview}
                         </p>
                     </div>
