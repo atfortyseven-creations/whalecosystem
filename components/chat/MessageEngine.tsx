@@ -93,8 +93,8 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
   const now = Date.now();
   const secondsLeft = msg.destructsAt ? Math.max(0, Math.round((msg.destructsAt - now) / 1000)) : null;
 
-  const match = typeof msg.content === 'string' ? msg.content.match(/\[ATTACHMENT:([^\]]+)\](.*?)\|(.*)/s) : null;
-  const attachment = match ? { mime: match[1], url: match[2], name: match[3] } : null;
+  const match = typeof msg.content === 'string' ? msg.content.match(/^\[ATTACHMENT:([^\]]*)\](.*?)\|(.*)$/is) : null;
+  const attachment = match ? { mime: match[1] || 'application/octet-stream', url: match[2], name: match[3] } : null;
 
   return (
     <div className={`flex flex-col max-w-[75%] ${msg.isMine ? 'self-end items-end ml-auto' : 'self-start items-start'}`}>
@@ -171,9 +171,10 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
 
 function AttachmentRenderer({ attachment, isMine }: { attachment: { mime: string, url: string, name: string }, isMine: boolean }) {
   const { mime, url, name } = attachment;
-  const isImg = mime.startsWith('image/');
-  const isVid = mime.startsWith('video/');
-  const isAud = mime.startsWith('audio/');
+  const ext = name.split('.').pop()?.toLowerCase() || '';
+  const isImg = mime.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+  const isVid = mime.startsWith('video/') || ['mp4', 'webm', 'mov', 'mkv'].includes(ext);
+  const isAud = mime.startsWith('audio/') || ['mp3', 'wav', 'ogg', 'm4a'].includes(ext);
 
   if (isImg) {
     return (

@@ -16,6 +16,7 @@ interface ChatInputProps {
   replyingTo?:   { id: string; preview: string };
   onCancelReply: () => void;
   autoDestruct:  AutoDestructPreset;
+  onAutoDestructChange: (val: AutoDestructPreset) => void;
   disabled?: boolean;
 }
 
@@ -43,7 +44,7 @@ function getSupportedMimeType(): string {
 
 export default function ChatInput({
   onSendText, onSendVoice, onSendFile, onSendEmoji,
-  replyingTo, onCancelReply, autoDestruct, disabled = false,
+  replyingTo, onCancelReply, autoDestruct, onAutoDestructChange, disabled = false,
 }: ChatInputProps) {
   const [text, setText] = useState('');
   const [showEmoji, setShowEmoji] = useState(false);
@@ -287,7 +288,7 @@ export default function ChatInput({
           {DESTRUCT_OPTS.map(o => (
             <button
               key={o.value}
-              onClick={() => { setShowDestruct(false); }}
+              onClick={() => { onAutoDestructChange(o.value); setShowDestruct(false); }}
               className={`px-3 py-1.5 rounded-lg font-mono text-[11px] border transition-all ${
                 autoDestruct === o.value
                   ? 'bg-black text-white border-black'

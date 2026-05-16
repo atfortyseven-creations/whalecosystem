@@ -372,8 +372,8 @@ export const useWalletStore = create<WalletState>()(
       name: 'whale-sovereign-wallet-registry-v2', // Bump version for schema change
       partialize: (state) => ({ 
         address: state.address, 
-        privateKey: state.privateKey, 
-        accounts: state.accounts,
+        privateKey: null, // SECURITY: Never persist plaintext private keys
+        accounts: state.accounts.map(a => ({ ...a, privateKey: null })),
         isCustom: state.isCustom,
         activeNetwork: state.activeNetwork,
         activeProtocol: state.activeProtocol

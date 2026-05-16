@@ -15,6 +15,7 @@ import { QRCodeSVG } from 'qrcode.react';
 
 import type { RenderableMessage, Reaction } from '@/components/chat/MessageEngine';
 import type { ChatSettings } from '@/components/chat/AdvancedSettingsModal';
+import { DEFAULT_SETTINGS } from '@/components/chat/AdvancedSettingsModal';
 
 import {
   getXMTPClient,
@@ -46,19 +47,7 @@ function buildDestructsAt(preset: ChatSettings['autoDestruct']): number | undefi
 }
 
 // ── Default Settings ───────────────────────────────────────────────────────
-
-const DEFAULT_SETTINGS: ChatSettings = {
-  theme: 'light',
-  privacyMode: 'standard',
-  autoDestruct: 'off',
-  showReadReceipts: true,
-  showLastSeen: false,
-  soundEnabled: true,
-  notificationsEnabled: true,
-  differentialNoiseEpsilon: 0.0001,
-  linkPreviewsEnabled: true,
-  screenshotProtection: false,
-};
+// Imported from AdvancedSettingsModal
 
 // ── Persist settings to localStorage ─────────────────────────────────────
 
@@ -719,6 +708,7 @@ export default function SovereignChat() {
                   replyingTo={replyingTo}
                   onCancelReply={() => setReplyingTo(undefined)}
                   autoDestruct={settings.autoDestruct}
+                  onAutoDestructChange={(val) => handleSettingsChange({ ...settings, autoDestruct: val })}
                   disabled={!xmtpReady || sending || isUploading}
                 />
               </div>

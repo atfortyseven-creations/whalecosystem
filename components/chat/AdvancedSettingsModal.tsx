@@ -17,9 +17,19 @@ export interface ChatSettings {
   differentialNoiseEpsilon: number;
   linkPreviewsEnabled: boolean;
   screenshotProtection: boolean;
+  textSize: number;
+  autoDownloadCellular: boolean;
+  autoDownloadWifi: boolean;
+  keepMedia: string;
+  powerSavingMode: boolean;
+  enableAnimations: boolean;
+  backgroundSync: boolean;
+  language: string;
+  useProxy: boolean;
+  connectionType: string;
 }
 
-const DEFAULT_SETTINGS: ChatSettings = {
+export const DEFAULT_SETTINGS: ChatSettings = {
   theme: 'light',
   privacyMode: 'standard',
   autoDestruct: 'off',
@@ -30,6 +40,16 @@ const DEFAULT_SETTINGS: ChatSettings = {
   differentialNoiseEpsilon: 0.0001,
   linkPreviewsEnabled: true,
   screenshotProtection: true,
+  textSize: 4,
+  autoDownloadCellular: true,
+  autoDownloadWifi: true,
+  keepMedia: 'Forever',
+  powerSavingMode: false,
+  enableAnimations: true,
+  backgroundSync: true,
+  language: 'English',
+  useProxy: false,
+  connectionType: 'Default',
 };
 
 interface AdvancedSettingsModalProps {
@@ -127,7 +147,12 @@ export default function AdvancedSettingsModal({
                   </Section>
                   <Section title="TEXT SIZE">
                     <div className="px-4 py-3">
-                      <input type="range" min="1" max="7" defaultValue="4" className="w-full accent-[#007AFF]" />
+                      <input 
+                        type="range" min="1" max="7" 
+                        value={settings.textSize} 
+                        onChange={e => update('textSize', parseInt(e.target.value))}
+                        className="w-full accent-[#007AFF]" 
+                      />
                       <div className="flex justify-between text-[11px] text-[#8e8e93] mt-2 font-sans">
                         <span>Small</span><span>Large</span>
                       </div>
@@ -198,12 +223,12 @@ export default function AdvancedSettingsModal({
               {tab === 'data' && (
                 <>
                   <Section title="AUTO-DOWNLOAD MEDIA">
-                    <ToggleRow label="Using Cellular" value={true} onChange={() => {}} />
-                    <ToggleRow label="Using Wi-Fi" value={true} onChange={() => {}} isLast />
+                    <ToggleRow label="Using Cellular" value={settings.autoDownloadCellular} onChange={v => update('autoDownloadCellular', v)} />
+                    <ToggleRow label="Using Wi-Fi" value={settings.autoDownloadWifi} onChange={v => update('autoDownloadWifi', v)} isLast />
                   </Section>
                   <Section title="STORAGE USAGE" footer="Clear cache to free up space.">
-                    <ActionRow label="Clear Cache" onClick={() => {}} rightText="1.2 GB" />
-                    <ActionRow label="Keep Media" onClick={() => {}} rightText="Forever" isLast />
+                    <ActionRow label="Clear Cache" onClick={() => alert('Cache cleared')} rightText="1.2 GB" />
+                    <ActionRow label="Keep Media" onClick={() => update('keepMedia', settings.keepMedia === 'Forever' ? '1 Year' : 'Forever')} rightText={settings.keepMedia} isLast />
                   </Section>
                 </>
               )}
@@ -224,31 +249,36 @@ export default function AdvancedSettingsModal({
 
               {tab === 'power' && (
                 <Section title="POWER SAVING OPTIONS" footer="Disabling animations will save battery but reduce visual fidelity.">
-                  <ToggleRow label="Power Saving Mode" value={false} onChange={() => {}} />
-                  <ToggleRow label="Enable Animations" value={true} onChange={() => {}} />
-                  <ToggleRow label="Background Sync" value={true} onChange={() => {}} isLast />
+                  <ToggleRow label="Power Saving Mode" value={settings.powerSavingMode} onChange={v => update('powerSavingMode', v)} />
+                  <ToggleRow label="Enable Animations" value={settings.enableAnimations} onChange={v => update('enableAnimations', v)} />
+                  <ToggleRow label="Background Sync" value={settings.backgroundSync} onChange={v => update('backgroundSync', v)} isLast />
                 </Section>
               )}
 
               {tab === 'folders' && (
                 <Section title="FOLDERS" footer="Organize your chats into custom folders.">
-                  <ActionRow label="Create New Folder" onClick={() => {}} className="text-[#007AFF]" isLast />
+                  <ActionRow label="Create New Folder" onClick={() => alert('Folder creation coming soon')} className="text-[#007AFF]" isLast />
                 </Section>
               )}
 
               {tab === 'language' && (
                 <Section title="APP LANGUAGE">
-                  <ActionRow label="English" onClick={() => {}} rightText="✓" />
-                  <ActionRow label="Spanish" onClick={() => {}} />
-                  <ActionRow label="French" onClick={() => {}} />
-                  <ActionRow label="German" onClick={() => {}} isLast />
+                  {['English', 'Spanish', 'French', 'German'].map((lang, idx) => (
+                    <ActionRow 
+                      key={lang}
+                      label={lang} 
+                      onClick={() => update('language', lang)} 
+                      rightText={settings.language === lang ? '✓' : ''} 
+                      isLast={idx === 3} 
+                    />
+                  ))}
                 </Section>
               )}
 
               {tab === 'network' && (
                 <Section title="CONNECTION">
-                  <ToggleRow label="Use Proxy" value={false} onChange={() => {}} />
-                  <ActionRow label="Connection Type" onClick={() => {}} rightText="Default" />
+                  <ToggleRow label="Use Proxy" value={settings.useProxy} onChange={v => update('useProxy', v)} />
+                  <ActionRow label="Connection Type" onClick={() => update('connectionType', settings.connectionType === 'Default' ? 'TCP' : 'Default')} rightText={settings.connectionType} />
                   <ActionRow label="Data Usage" onClick={() => {}} rightText="42 MB" isLast />
                 </Section>
               )}

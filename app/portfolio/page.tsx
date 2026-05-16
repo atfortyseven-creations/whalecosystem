@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { useAccount, useSwitchChain, useConnect } from 'wagmi';
+import { useWalletStore } from '@/lib/store/wallet-store';
 import { mainnet, base, optimism, arbitrum, polygon } from 'wagmi/chains';
 import { useAppKit } from '@reown/appkit/react';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
@@ -19,6 +20,7 @@ import { toast } from 'sonner';
 import { ChainActivityPanel } from '@/components/portfolio/ChainActivityPanel';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { QuantumAuthGate } from '@/components/auth/QuantumAuthGate';
 
 // ── Palette — dark-mode first (wallpaper is black) ─────────────────────────
 const BG   = "transparent";
@@ -178,8 +180,9 @@ export default function PortfolioPage() {
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
 
-  const { totalPnl, assets, change24hUSD, change24hPercent, isLoading } = useLivePortfolio();
-  const { address: userAddress, isConnected, chain } = useAccount();
+  const { totalPnl, assets, change24hUSD, change24hPercent, isLoading, isConnected: isLiveConnected, address: userAddress } = useLivePortfolio();
+  const { chain, isConnected: wagmiConnected } = useAccount();
+  const { privateKey } = useWalletStore();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { open: openAppKit } = useAppKit();
   const { connect, connectors } = useConnect();
@@ -215,46 +218,15 @@ export default function PortfolioPage() {
     }
   };
 
-  // ── Not connected ──
-  if (!isConnected) {
+  // ── Session Security Check ──
+  const hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('sovereign_keystore') : false;
+  const needsUnlock = hasKeystore && !privateKey && !wagmiConnected;
+
+  // ── Not connected / Unauthenticated ──
+  if (!isLiveConnected || needsUnlock) {
     return (
-      <div
-        className="flex items-center justify-center px-6"
-        style={{ background: BG, minHeight: '100%' }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-sm text-center space-y-8"
-        >
-          <div
-            className="w-20 h-20 mx-auto rounded-3xl border flex items-center justify-center"
-            style={{ borderColor: BORDER, background: CARD }}
-          >
-            <Wallet size={32} style={{ color: MUTED }} strokeWidth={1.5} />
-          </div>
-
-          <div className="space-y-3">
-            <h1 className="text-4xl font-black tracking-tighter uppercase" style={{ color: INK }}>Portfolio</h1>
-            <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-              Connect your wallet to view your on-chain holdings, track performance, and manage assets.
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center gap-3">
-            <button
-              onClick={() => openAppKit()}
-              className="px-8 py-3 rounded-2xl font-black text-[13px] uppercase tracking-widest transition-all hover:opacity-80 active:scale-95 shadow-lg"
-              style={{ background: INK, color: '#fff' }}
-            >
-              Connect Wallet
-            </button>
-          </div>
-
-          <p className="text-[10px] uppercase tracking-widest" style={{ color: MUTED }}>
-            Non-custodial · On-chain · Real-time
-          </p>
-        </motion.div>
+      <div className="w-full flex-1 flex flex-col bg-black/40 text-[#F5F5F5] min-h-[100vh]">
+        <QuantumAuthGate onComplete={() => refresh()} />
       </div>
     );
   }
