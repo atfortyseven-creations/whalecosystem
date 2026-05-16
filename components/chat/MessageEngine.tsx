@@ -93,7 +93,7 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
   const now = Date.now();
   const secondsLeft = msg.destructsAt ? Math.max(0, Math.round((msg.destructsAt - now) / 1000)) : null;
 
-  const match = msg.content.match(/^\[ATTACHMENT:([^\]]+)\](.*?)\|(.*)$/s);
+  const match = typeof msg.content === 'string' ? msg.content.match(/\[ATTACHMENT:([^\]]+)\](.*?)\|(.*)/s) : null;
   const attachment = match ? { mime: match[1], url: match[2], name: match[3] } : null;
 
   return (

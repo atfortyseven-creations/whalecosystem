@@ -165,9 +165,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
         if (mode === 'project') {
             generateQr();
         } else if (mode === 'scan') {
-            // Auto-start camera on mobile for 'scan' mode
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            if (isMobile && state === 'idle') {
+            if (state === 'idle') {
                 startCamera();
             }
         }

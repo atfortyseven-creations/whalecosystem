@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
-import { QrCode, X } from 'lucide-react';
+import { QrCode, X, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 import SidebarNavigation from '@/components/chat/SidebarNavigation';
@@ -205,13 +205,17 @@ export default function SovereignChat() {
   }, [settings.screenshotProtection]);
 
   // ── XMTP Client Init ─────────────────────────────────────────────────────
-  useEffect(() => {
+  const initXmtpClient = useCallback(async () => {
     if (!isConnected || !walletClient || !address) return;
 
-    let cancelled = false;
-    (async () => {
+    setXmtpError(null);
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (attempts < maxAttempts) {
       try {
-        setXmtpError(null);
+        if (attempts > 0) await new Promise(resolve => setTimeout(resolve, 2000 * Math.pow(1.5, attempts)));
+
         const signer = {
           getAddress: async () => address,
           signMessage: async (msg: string | Uint8Array) => {
@@ -220,16 +224,29 @@ export default function SovereignChat() {
           },
         };
         const client = await getXMTPClient(signer);
-        if (cancelled) return;
         xmtpClient.current = client;
         setXmtpReady(true);
+        return; // Success
       } catch (e: any) {
-        if (!cancelled) setXmtpError(e?.message ?? 'XMTP init failed');
+        attempts++;
+        const msg = (e?.message || '').toLowerCase();
+        // If user actively rejected, don't retry automatically
+        if (msg.includes('reject') || msg.includes('deny') || msg.includes('user denied')) {
+           setXmtpError('Signature rejected. Please approve the prompt in your wallet.');
+           return;
+        }
+        if (attempts >= maxAttempts) {
+           setXmtpError(e?.message ?? 'XMTP init failed after retries due to network inactivity.');
+        } else {
+           console.warn(`[XMTP] Init attempt ${attempts} failed, retrying...`, e);
+        }
       }
-    })();
-
-    return () => { cancelled = true; };
+    }
   }, [isConnected, walletClient, address]);
+
+  useEffect(() => {
+    initXmtpClient();
+  }, [initXmtpClient]);
 
   // ── Global XMTP Stream ───────────────────────────────────────────────────
   useEffect(() => {
@@ -497,10 +514,10 @@ export default function SovereignChat() {
   if (xmtpError) {
     return (
       <div className="flex flex-1 w-full h-full bg-white items-center justify-center flex-col gap-4">
-        <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">XMTP Error</p>
+        <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">XMTP Synchronization Error</p>
         <p className="font-mono text-[10px] text-black/40 max-w-md text-center">{xmtpError}</p>
-        <button onClick={() => window.location.reload()} className="px-6 py-2.5 bg-black text-white font-mono text-[10px] uppercase tracking-widest rounded-xl">
-          Retry
+        <button onClick={() => initXmtpClient()} className="px-6 py-2.5 bg-black text-white font-mono text-[10px] uppercase tracking-widest rounded-xl">
+          Retry Sync
         </button>
       </div>
     );
@@ -579,14 +596,16 @@ export default function SovereignChat() {
       )}
 
       {/* 1 – Folders Rail */}
-      <SidebarNavigation
-        activeFolder={activeFolder}
-        onSelectFolder={setActiveFolder}
-        onOpenSettings={() => setShowSettings(true)}
-      />
+      <div className="hidden md:flex">
+        <SidebarNavigation
+          activeFolder={activeFolder}
+          onSelectFolder={setActiveFolder}
+          onOpenSettings={() => setShowSettings(true)}
+        />
+      </div>
 
       {/* 2 – Conversation List */}
-      <div className="w-[280px] border-r border-black/8 flex flex-col shrink-0 bg-white">
+      <div className={`w-full md:w-[280px] border-r border-black/8 flex-col shrink-0 bg-white ${activeConv ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-black/6 space-y-3">
           {!xmtpReady && (
             <div className="text-[10px] font-mono text-black/40 animate-pulse text-center py-2">
@@ -661,18 +680,21 @@ export default function SovereignChat() {
       </div>
 
       {/* 3 – Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white">
+      <div className={`flex-1 flex-col min-w-0 bg-white ${activeConv ? 'flex' : 'hidden md:flex'}`}>
         {activeConv ? (
           <>
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-black/6 bg-white shrink-0">
-              <div>
-                <p className="font-mono text-[14px] font-bold text-black">{activeConv.displayName}</p>
-                <p className="font-mono text-[10px] text-black/35 mt-0.5">
-                  E2EE · ML-KEM-1024 · ε={settings.differentialNoiseEpsilon}
-                  {sending && ' · Sending…'}
-                  {isUploading && ' · Uploading securely…'}
-                </p>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setActiveConv(null)} className="md:hidden p-2 -ml-3 text-black/50 hover:text-black transition-colors rounded-full hover:bg-black/5">
+                  <ChevronLeft size={24} />
+                </button>
+                <div>
+                  <p className="font-mono text-[14px] font-bold text-black">{activeConv.displayName}</p>
+                  <p className="font-mono text-[10px] text-black/35 mt-0.5">
+                    CON RECOPILACION DE TELEMETRIA · {sending || isUploading ? 'ESCRIBIENDO...' : 'EN LÍNEA'} · E2EE · ML-KEM-1024 · ε=0.0001
+                  </p>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {/* Radar Removed */}

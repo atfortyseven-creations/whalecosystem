@@ -156,10 +156,10 @@ function WalletOption({
 
 // ── Signing overlay ───────────────────────────────────────────────────────────
 function SigningOverlay({
-  address, onSigned, onRetry, error, isSigning,
+  address, onSigned, onRetry, error, isSigning, wcDeepLink,
 }: {
   address: string; onSigned: () => void; onRetry: () => void;
-  error: string | null; isSigning: boolean;
+  error: string | null; isSigning: boolean; wcDeepLink?: string | null;
 }) {
   return (
     <motion.div
@@ -217,12 +217,27 @@ function SigningOverlay({
             Retry Connection
           </button>
         ) : isSigning ? (
-          <button
-            onClick={onRetry}
-            className="w-full py-4 rounded-2xl bg-black text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all"
-          >
-            Open Wallet To Sign
-          </button>
+          <div className="w-full flex flex-col gap-3">
+             <div className="w-full py-3 rounded-2xl bg-black/5 border border-black/10 text-black/60 font-black uppercase tracking-widest text-[10px] flex items-center justify-center text-center px-4">
+               Approve signature in your wallet app
+             </div>
+             {wcDeepLink ? (
+               <a
+                  href={wcDeepLink}
+                  rel="noopener noreferrer"
+                  className="w-full py-4 rounded-2xl bg-black text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-transform select-none"
+               >
+                 Open Wallet App
+               </a>
+             ) : (
+                <button
+                  onClick={onRetry}
+                  className="w-full py-4 rounded-2xl bg-black text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all"
+                >
+                  Open Wallet To Sign
+                </button>
+             )}
+          </div>
         ) : (
           <div className="w-full px-4 py-3 rounded-2xl border border-[#E5E5E5] bg-white flex items-center justify-center gap-3">
             <Loader2 size={16} className="animate-spin text-[#050505]/60" />
@@ -668,13 +683,22 @@ export function MobileLanding() {
     setSigningError(null);
 
     try {
-      const message = buildSovereignMessage(norm);
+      let signature, message;
       
-      // FIX: Check for locally cached signature to prevent 4x signature loops on mobile
-      let signature = localStorage.getItem(`sovereign_sig_${norm}`);
-      if (!signature) {
+      // FIX: Check for locally cached signature AND message to prevent mismatch failures
+      let cached = localStorage.getItem(`sovereign_auth_${norm}`);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          signature = parsed.signature;
+          message = parsed.message;
+        } catch (e) {}
+      }
+
+      if (!signature || !message) {
+        message = buildSovereignMessage(norm);
         signature = await signMessageAsync({ message }) as string;
-        localStorage.setItem(`sovereign_sig_${norm}`, signature);
+        localStorage.setItem(`sovereign_auth_${norm}`, JSON.stringify({ signature, message }));
       }
 
       try {
@@ -1011,6 +1035,7 @@ export function MobileLanding() {
           address={address || effectiveAddress || '0x...'}
           isSigning={isActuallySigning}
           error={signingError}
+          wcDeepLink={wcDeepLink}
           onSigned={() => {}}
           onRetry={() => {
             if (address) establishSession(address);

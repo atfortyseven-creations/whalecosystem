@@ -371,59 +371,81 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     initInFlight.current = true;
     setIsInitializing(true);
     setInitError('');
-    try {
-      // ── Step 1: Use standard wagmi signer ────────────────
-      // XMTP SDK automatically caches keys in IndexedDB, so returning users are not prompted.
-      
-      const wagmiSigner = {
-        getAddress: async () => address as string,
-        signMessage: async (msg: string | Uint8Array) => {
-          try {
-            return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
-          } catch (sigErr: any) {
-            const msg = sigErr?.message || '';
-            if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector') || msg.includes('signMessage')) {
-                const hasVault = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_vault');
-                if (isSovereignHandshake && !hasVault) {
-                  console.warn('[WhaleChat:Mobile] Signature requested on linked session without Vault.');
-                }
-                throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this terminal.');
-            }
-            throw sigErr;
-          }
-        }
-      };
 
-      // ── Step 2: Initialize client (Direct Execution) ───────────────
-      const realClient = await getXMTPClient(wagmiSigner);
-      setClient(realClient);
-      if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('whale_xmtp_initialized', 'true');
-      }
-      await loadConversations();
-    } catch (err: any) {
-      console.error('[WhaleChat] Init Error:', err);
-      
-      const errorMsg = err?.message || '';
-      
-      if (err?.name === 'ChunkLoadError' || errorMsg.includes('Loading chunk')) {
-        setInitError('Whale Alert Network module failed to load. Please check your network connection and reload the terminal.');
-      } else if (err?.code === 4001 || errorMsg.toLowerCase().includes('reject')) {
-        setInitError('Identity authorization rejected. You must approve the Whale Chat signature to proceed.');
-      } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector') || errorMsg.includes('signMessage') || errorMsg.toLowerCase().includes('unknown signer')) {
-        if (isSovereignHandshake) {
-           setInitError('Whale identity not yet synchronized from desktop. Please keep this browser open while the desktop terminal finishes the handshake.');
-        } else {
-           setInitError('Active wallet connection lost or not detected. Please ensure your wallet app is open and connected directly to this browser.');
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (attempts < maxAttempts) {
+      try {
+        if (attempts > 0) await new Promise(resolve => setTimeout(resolve, 2000 * Math.pow(1.5, attempts)));
+
+        // ── Step 1: Use standard wagmi signer ────────────────
+        // XMTP SDK automatically caches keys in IndexedDB, so returning users are not prompted.
+        
+        const wagmiSigner = {
+          getAddress: async () => address as string,
+          signMessage: async (msg: string | Uint8Array) => {
+            try {
+              return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
+            } catch (sigErr: any) {
+              const msg = sigErr?.message || '';
+              if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector') || msg.includes('signMessage')) {
+                  const hasVault = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_vault');
+                  if (isSovereignHandshake && !hasVault) {
+                    console.warn('[WhaleChat:Mobile] Signature requested on linked session without Vault.');
+                  }
+                  throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this terminal.');
+              }
+              throw sigErr;
+            }
+          }
+        };
+
+        // ── Step 2: Initialize client (Direct Execution) ───────────────
+        const realClient = await getXMTPClient(wagmiSigner);
+        setClient(realClient);
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('whale_xmtp_initialized', 'true');
         }
-      } else if (errorMsg.includes('WASM') || errorMsg.includes('wasm')) {
-        setInitError('Cryptographic Engine Failure. Hardware architecture error or restricted browser security settings.');
-      } else {
-        setInitError(`Whale Alert Network handshake failure: ${errorMsg.slice(0, 80) || 'Unknown Protocol Error'}. Please retry.`);
+        await loadConversations();
+        
+        setIsInitializing(false);
+        initInFlight.current = false;
+        return; // Success
+      } catch (err: any) {
+        attempts++;
+        const errorMsg = err?.message || '';
+        const isReject = err?.code === 4001 || errorMsg.toLowerCase().includes('reject') || errorMsg.toLowerCase().includes('deny');
+
+        // Immediately stop retrying if user actively rejected the prompt
+        if (isReject) {
+          setInitError('Identity authorization rejected. You must approve the Whale Chat signature to proceed.');
+          setIsInitializing(false);
+          initInFlight.current = false;
+          return;
+        }
+
+        if (attempts >= maxAttempts) {
+          console.error('[WhaleChat] Init Error:', err);
+          if (err?.name === 'ChunkLoadError' || errorMsg.includes('Loading chunk')) {
+            setInitError('Whale Alert Network module failed to load. Please check your network connection and reload the terminal.');
+          } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector') || errorMsg.includes('signMessage') || errorMsg.toLowerCase().includes('unknown signer')) {
+            if (isSovereignHandshake) {
+               setInitError('Whale identity not yet synchronized from desktop. Please keep this browser open while the desktop terminal finishes the handshake.');
+            } else {
+               setInitError('Active wallet connection lost or not detected. Please ensure your wallet app is open and connected directly to this browser.');
+            }
+          } else if (errorMsg.includes('WASM') || errorMsg.includes('wasm')) {
+            setInitError('Cryptographic Engine Failure. Hardware architecture error or restricted browser security settings.');
+          } else {
+            setInitError(`Whale Alert Network handshake failure: ${errorMsg.slice(0, 80) || 'Unknown Protocol Error'}. Please retry.`);
+          }
+          setIsInitializing(false);
+          initInFlight.current = false;
+        } else {
+          console.warn(`[WhaleChat] Init attempt ${attempts} failed due to inactivity/network timeout, retrying...`, err);
+        }
       }
-    } finally {
-      setIsInitializing(false);
-      initInFlight.current = false;
     }
   }, [address, isMobile, signMessageAsync, isSovereignHandshake, loadConversations]);
 
@@ -480,22 +502,19 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     convIdToPeer.current.set(activePeerDmIdRef.current, activePeer);
   }, [client, activePeer]);
 
-  // ── Global Conversation Sync Loop ──────────────────────────────────────────────────────
-  // Runs every 6 seconds. Uses discoverNewPeers() to find incoming DMs
-  // initiated by remote peers without needing the receiver to manually add them.
-  // Also refreshes active-peer messages on every cycle.
-  // FIX: knownPeersRef is a persistent ref — not rebuilt on every render — so
-  // newly discovered peers are remembered across cycles (fixes mobile-to-mobile).
+  // ── Global XMTP Stream ───────────────────────────────────────────────────
   useEffect(() => {
     if (!client || !address) return;
+    
     let cancelled = false;
+    const selfInboxId = (client as any).inboxId ?? '';
 
-    // Seed the persistent ref with already-known conversations (idempotent)
+    // Seed the persistent ref with already-known conversations
     conversations.forEach(c => knownPeersRef.current.add(c.peerAddress.toLowerCase()));
 
     const syncGlobal = async () => {
       try {
-        // Discover new peers from the XMTP network (uses persistent ref, not stale snapshot)
+        // Discover new peers from the XMTP network
         const newPeerAddrs = await discoverNewPeers(client, address, knownPeersRef.current);
 
         if (newPeerAddrs.length > 0 && !cancelled) {
@@ -510,37 +529,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               }));
 
             if (!toAdd.length) return prev;
-            
-            // Auto-sync discovered peers to Address Book
             toAdd.forEach(c => syncToAddressBook(c.peerAddress));
             
             const updated = [...toAdd, ...prev];
             persistToLocal(updated);
             return updated;
-          });
-        }
-
-        // Also refresh active-peer messages mid-interval
-        if (activePeerRef.current && !cancelled) {
-          const msgs = await getMessages(client, activePeerRef.current);
-          if (cancelled) return;
-          const mappedMsgs = msgs.map((m: any) => ({
-            id: m.id,
-            senderInboxId: m.senderInboxId,
-            content: m.content || m.fallback || 'Encrypted Data',
-            sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(),
-            conversationId: `dm-${activePeerRef.current!.toLowerCase()}`
-          }));
-          setMessages(prev => {
-            const activeId = `dm-${activePeerRef.current!.toLowerCase()}`;
-            const others = prev.filter(p => p.conversationId !== activeId);
-            const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
-            const optimistic = prev.filter(p => {
-              if (p.conversationId !== activeId || mappedIds.has(p.id) || p.id.length >= 20) return false;
-              if (Date.now() - parseInt(p.id) > 15000) return false;
-              return true;
-            });
-            return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
           });
         }
       } catch (e) {
@@ -550,16 +543,99 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
     syncGlobal();
     const globalPoll = setInterval(syncGlobal, 6000);
+
+    // Global Stream
+    (async () => {
+      try {
+        const gen = streamMessages(client);
+        for await (const msg of gen as any) {
+          if (cancelled) break;
+          
+          const fromPeer = msg.senderInboxId !== selfInboxId;
+          const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+          const sentAtNs = nsToDate(msg.sentAtNs ?? msg.sentAt).getTime();
+          const currentActivePeer = activePeerRef.current?.toLowerCase();
+          const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
+          
+          const mappedMsg = {
+             id: msg.id ?? String(sentAtNs),
+             senderInboxId: msg.senderInboxId ?? '',
+             content: content || msg.fallback || 'Encrypted Data',
+             sentAtNs,
+             conversationId: msgConvPeer ? `dm-${msgConvPeer}` : `dm-${currentActivePeer}`
+          };
+
+          const belongsToActive = (msgConvPeer === currentActivePeer) || (!msgConvPeer && currentActivePeer);
+
+          if (belongsToActive) {
+            // @ts-ignore
+            if (fromPeer && typeof playAudioPing === 'function') playAudioPing('receive');
+            setMessages(prev => {
+              if (prev.some(m => m.id === mappedMsg.id)) return prev;
+              
+              if (!fromPeer) {
+                // Deduplicate own optimistic messages
+                const optIndex = prev.findIndex(m => m.id.startsWith('optimistic-') && m.content === mappedMsg.content);
+                if (optIndex !== -1) {
+                  const next = [...prev];
+                  next[optIndex] = mappedMsg;
+                  return next.sort((a, b) => a.sentAtNs - b.sentAtNs);
+                }
+              }
+              
+              return [...prev, mappedMsg].sort((a, b) => a.sentAtNs - b.sentAtNs);
+            });
+            
+            // Update last message in conv list
+            setConversations(prev => {
+                const updated = prev.map(c => 
+                  c.peerAddress.toLowerCase() === currentActivePeer 
+                    ? { ...c, lastMessage: content.slice(0, 30), lastAt: new Date() } 
+                    : c
+                );
+                persistToLocal(updated);
+                return updated;
+            });
+          } else if (fromPeer) {
+            // Belongs to another conversation
+            setConversations(prev => {
+               if (!msgConvPeer) return prev;
+               const exists = prev.some(c => c.peerAddress.toLowerCase() === msgConvPeer);
+               let updated;
+               if (exists) {
+                 updated = prev.map(c => 
+                   c.peerAddress.toLowerCase() === msgConvPeer 
+                     ? { ...c, lastMessage: content.slice(0, 30), lastAt: new Date() } 
+                     : c
+                 );
+               } else {
+                 updated = [{
+                    peerAddress: msg.conversation.peerAddress,
+                    lastMessage: content.slice(0, 30),
+                    lastAt: new Date()
+                 }, ...prev];
+               }
+               persistToLocal(updated);
+               return updated;
+            });
+            // @ts-ignore
+            if (typeof playAudioPing === 'function') playAudioPing('receive');
+          }
+        }
+      } catch (e) {
+        console.warn('[Chat] global stream failed:', e);
+      }
+    })();
+
     return () => { cancelled = true; clearInterval(globalPoll); };
   }, [client, address]);
 
-  // ── Real-time incoming message polling & STREAMING (REAL XMTP NETWORK) ──────────────
-  // We use streaming for instant zero-latency delivery, and a 10s polling fallback.
+  // ── Load messages when active peer changes ───────────────────────────────
   useEffect(() => {
-    if (!client || !activePeer || !address) return;
-    let isMounted = true;
+    if (!client || !activePeer) return;
+
+    let cancelled = false;
     let isFetching = false;
-    let streamInstance: any = null;
     
     // Ignore the institutional support mock for network requests
     if (activePeer.toLowerCase() === '0xinstitutionalsupport_0000') {
@@ -574,17 +650,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       return;
     }
 
-    const fetchMessages = async () => {
-      // Skip if a fetch is already in-flight (prevents stacking on slow network)
-      if (isFetching || !isMounted) return;
+    const fetchHistorical = async () => {
+      if (isFetching || cancelled) return;
       isFetching = true;
       try {
-        // getMessages handles conversations.sync() internally before listing
-        const msgs = await getMessages(client, activePeer);
-        if (!isMounted) return;
+        const raw = await getMessages(client, activePeer);
+        if (cancelled) return;
         
-        // Map decoded real XMTP messages to our UI shape
-        const mappedMsgs = msgs.map((m: any) => ({
+        const mappedMsgs = raw.map((m: any) => ({
           id: m.id,
           senderInboxId: m.senderInboxId,
           content: m.content || m.fallback || 'Encrypted Data',
@@ -592,59 +665,31 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           conversationId: `dm-${activePeer.toLowerCase()}`
         }));
         
-        if (!isMounted) return;
         setMessages(prev => {
-            const activeId = `dm-${activePeer.toLowerCase()}`;
-            const others = prev.filter(p => p.conversationId !== activeId);
-            const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
-            
-            const myMappedContents = new Set(mappedMsgs.filter((m: any) => {
-                const isMe = m.senderInboxId
-                    ? m.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
-                    : false;
-                return isMe;
-            }).map((m: any) => typeof m.content === 'string' ? m.content.trim() : ''));
-
-            // Keep optimistic messages only until the network confirms them (15s TTL)
-            const optimistic = prev.filter(p => {
-                if (p.conversationId !== activeId || mappedIds.has(p.id) || p.id.length >= 20) return false;
-                if (myMappedContents.has(typeof p.content === 'string' ? p.content.trim() : '')) return false;
-                if (Date.now() - parseInt(p.id) > 15000) return false;
-                return true;
-            });
-            return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
+          const activeId = `dm-${activePeer.toLowerCase()}`;
+          const others = prev.filter(p => p.conversationId !== activeId);
+          
+          // Merge with optimistic local messages safely
+          const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
+          const optimistic = prev.filter(m => m.conversationId === activeId && m.id.startsWith('optimistic-') && !mappedIds.has(m.id));
+          
+          return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
         });
-      } catch (err) {
-        console.warn('[XMTP] Network sync error:', err);
+      } catch (e) {
+        console.warn('[Chat] load messages failed:', e);
       } finally {
         isFetching = false;
       }
     };
 
-    fetchMessages();
-    const poll = setInterval(fetchMessages, 10000); // 10s fallback polling
-    
-    // XMTP Streaming Optimizer: Instant 0-latency sync
-    const startStream = async () => {
-      try {
-        const stream = streamMessages(client);
-        streamInstance = stream;
-        for await (const msg of stream as any) {
-           if (!isMounted) break;
-           fetchMessages(); // instantly sync active chat when network emits message
-        }
-      } catch (e) {
-        console.warn('[XMTP] Stream failed:', e);
-      }
-    };
-    startStream();
+    fetchHistorical();
 
-    return () => { 
-        isMounted = false; 
-        clearInterval(poll); 
-        if (streamInstance && typeof streamInstance.return === 'function') {
-            streamInstance.return();
-        }
+    // Fallback polling for the active conversation history
+    const pollId = setInterval(fetchHistorical, 5000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(pollId);
     };
   }, [client, activePeer, address]);
 
@@ -736,7 +781,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         }
 
         // Optimistic local message so the sender sees it immediately
-        const optimisticId = Date.now().toString();
+        const optimisticId = `optimistic-${Date.now()}`;
         const optimisticMsg = {
           id: optimisticId,
           senderInboxId: client?.inboxId || '',
@@ -751,43 +796,12 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         // fire a stop_typing signal to flush it before the next polling cycle.
         stopTypingSignal();
 
-        playAudioPing('send');
+        // @ts-ignore
+        if (typeof playAudioPing === 'function') playAudioPing('send');
         // Send to XMTP network (includes dm.sync() after send)
         await sendMessage(client, activePeer, content);
-        // Fetch authoritative state immediately after send
-      try {
-            const msgs = await getMessages(client, activePeer);
-            const mappedMsgs = msgs.map((m: any) => ({
-                id: m.id,
-                senderInboxId: m.senderInboxId,
-                content: m.content || m.fallback || 'Encrypted Data',
-                sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(),
-                conversationId: `dm-${activePeer.toLowerCase()}`
-            }));
-            setMessages(prev => {
-                const activeId = `dm-${activePeer.toLowerCase()}`;
-                const others = prev.filter(p => p.conversationId !== activeId);
-                const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
-                
-                const myMappedContents = new Set(mappedMsgs.filter((m: any) => {
-                    const isMe = m.senderInboxId
-                        ? m.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
-                        : false;
-                    return isMe;
-                }).map((m: any) => typeof m.content === 'string' ? m.content.trim() : ''));
-
-                // FIX: Keep optimistic messages so the sent message doesn't vanish instantly
-                const optimistic = prev.filter(p => {
-                    if (p.conversationId !== activeId || mappedIds.has(p.id) || p.id.length >= 20) return false;
-                    if (myMappedContents.has(typeof p.content === 'string' ? p.content.trim() : '')) return false;
-                    if (Date.now() - parseInt(p.id) > 15000) return false;
-                    return true;
-                });
-                return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
-            });
-        } catch (syncErr) {
-            console.warn('[XMTP] Post-send sync failed:', syncErr);
-        }
+        // We do not eagerly refetch messages here anymore.
+        // The global stream or fallback historical poll handles UI sync effortlessly without duplicates.
       }
 
       // ── 2. UPDATE LOCAL ADDRESS BOOK ──────────────────────────────────────────────
