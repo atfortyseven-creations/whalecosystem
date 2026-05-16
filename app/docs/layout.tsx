@@ -40,7 +40,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   const hdrBg = 'bg-white border-black/10';
 
   return (
-    <div className={`min-h-screen ${bg} transition-colors duration-200 font-sans`}>
+    <div className={`h-full flex flex-col ${bg} transition-colors duration-200 font-sans overflow-hidden`}>
 
       {/* ── TOP BAR ── */}
       <header className={`sticky top-0 z-50 h-[56px] border-b ${hdrBg} w-full flex items-center px-6 backdrop-blur-xl`}>
@@ -80,13 +80,13 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       </header>
 
       {/* ── BODY ── */}
-      <div className="flex w-full">
+      <div className="flex flex-1 w-full min-h-0 overflow-hidden">
 
         {/* Left sidebar */}
         <Sidebar theme="light" currentPath={pathname || ''} />
 
         {/* Main content */}
-        <main className={`flex-1 min-w-0 h-[calc(100vh-56px)] overflow-y-auto custom-scrollbar flex flex-col bg-white`}>
+        <main className={`flex-1 min-w-0 overflow-y-auto overflow-x-hidden custom-scrollbar flex flex-col bg-white`}>
           <div className="w-full max-w-[900px] mx-auto py-16 px-8 lg:px-16 flex-1 pb-32">
             {children}
           </div>

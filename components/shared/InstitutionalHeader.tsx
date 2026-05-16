@@ -68,7 +68,7 @@ export function InstitutionalHeader() {
         <header
             role="banner"
             className="relative flex items-center justify-between w-full border-b border-[#EBEBEB] sticky top-0 z-[100] bg-white shadow-[0_1px_0_rgba(0,0,0,0.05)]"
-            style={{ minHeight: '64px' }}
+            style={{ minHeight: '64px', width: '100%', maxWidth: '100vw' }}
         >
             {/* Inner container — centred, full-width up to 4K */}
             <div className="w-full max-w-[2560px] mx-auto px-6 lg:px-10 flex items-center justify-between h-full">

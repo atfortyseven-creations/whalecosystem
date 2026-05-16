@@ -10,10 +10,10 @@ export default async function Home() {
   const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
 
   return (
-    <main>
+    <div className="w-full flex-1 flex flex-col">
       <Suspense fallback={null}>
         <SmartLandingRouter isMobileUserAgent={isMobile} />
       </Suspense>
-    </main>
+    </div>
   );
 }
