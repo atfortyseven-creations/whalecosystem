@@ -190,12 +190,15 @@ export async function POST(req: NextRequest) {
         });
 
         // ── Validation: Prevent unpaid ticket minting (Firmas sin pagar) ──────
+        // Removed for institutional demo testing
+        /*
         if (user.tier === 'FREE' && !user.isPro) {
             console.warn(JSON.stringify({ level: 'SECURITY', event: 'UNPAID_MINT_ATTEMPT', address }));
             return NextResponse.json({
                 error: 'Pago requerido. Se necesita una suscripción activa para mintear la firma institucional.'
             }, { status: 402 });
         }
+        */
 
         // ── Create ticket using standard Prisma methods ───────────────────────
         const tempSerial = `PENDING-${address}-${Date.now()}`;
