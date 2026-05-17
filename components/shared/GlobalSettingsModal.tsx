@@ -35,11 +35,11 @@ export function GlobalSettingsModal() {
                     />
 
                     <motion.div
-                        initial={{ scale: 0.95, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.95, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="fixed inset-0 m-auto h-[85vh] w-[95vw] max-w-6xl bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 z-[99999] shadow-2xl rounded-[32px] flex flex-col overflow-hidden transition-colors duration-300"
+                        initial={{ x: "100%" }}
+                        animate={{ x: 0 }}
+                        exit={{ x: "100%" }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        className="fixed top-0 right-0 h-full w-full sm:w-[90vw] max-w-[800px] bg-white dark:bg-[#0A0A0A] border-l border-black/10 dark:border-white/10 z-[99999] shadow-2xl flex flex-col overflow-hidden transition-colors duration-300"
                     >
                         <div className="flex items-center justify-between px-6 py-4 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#111111]">
                              <div className="flex items-center gap-3">
@@ -66,7 +66,7 @@ export function GlobalSettingsModal() {
                              </div>
                         </div>
 
-                        <div className="flex-1 overflow-hidden relative bg-[#FAF9F6] dark:bg-[#0A0A0A]">
+                        <div className="flex-1 overflow-y-auto relative bg-[#FAF9F6] dark:bg-[#0A0A0A]">
                              {/* Render the full comprehensive Terminal Settings Panel perfectly inside the modal */}
                              <TerminalSettingsPanel />
                         </div>

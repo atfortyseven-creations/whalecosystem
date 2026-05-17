@@ -10,6 +10,8 @@ import { getXMTPClient, canReceiveMessages, sendMessage, getMessages, destroyXMT
 import { QrScanner } from '@/components/dashboard/QrScanner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import type { Client } from '@xmtp/browser-sdk';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
+import { Paperclip, Loader2 } from 'lucide-react';
 
 interface ConversationMeta {
   peerAddress: string;
@@ -40,6 +42,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const { signMessageAsync } = useSignMessage();
   const { reconnect } = useReconnect();
   const { open: openAppKit } = useAppKit();
+  const { chatName, chatBio, soundEffects } = useSettingsStore();
 
   // MASTER RECOVERY: If wallet is connected but connector is missing (common on mobile redirects)
   useEffect(() => {
@@ -76,6 +79,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // ── Playing audio messages ─────────────────────────────────────────────────
   const [playingId, setPlayingId] = useState<string | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+
+  const [isUploading, setIsUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -565,11 +571,16 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
              conversationId: msgConvPeer ? `dm-${msgConvPeer}` : `dm-${currentActivePeer}`
           };
 
+          // Filter out system messages (e.g. metadata field changes, inbox additions)
+          if (typeof mappedMsg.content === 'string' && mappedMsg.content.includes('initiatedByInboxId')) {
+             continue;
+          }
+
           const belongsToActive = (msgConvPeer === currentActivePeer) || (!msgConvPeer && currentActivePeer);
 
           if (belongsToActive) {
             // @ts-ignore
-            if (fromPeer && typeof playAudioPing === 'function') playAudioPing('receive');
+            if (fromPeer && typeof playAudioPing === 'function' && soundEffects) playAudioPing('receive');
             setMessages(prev => {
               if (prev.some(m => m.id === mappedMsg.id)) return prev;
               
@@ -657,13 +668,15 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         const raw = await getMessages(client, activePeer);
         if (cancelled) return;
         
-        const mappedMsgs = raw.map((m: any) => ({
-          id: m.id,
-          senderInboxId: m.senderInboxId,
-          content: m.content || m.fallback || 'Encrypted Data',
-          sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(),
-          conversationId: `dm-${activePeer.toLowerCase()}`
-        }));
+        const mappedMsgs = raw
+          .map((m: any) => ({
+            id: m.id,
+            senderInboxId: m.senderInboxId,
+            content: m.content || m.fallback || 'Encrypted Data',
+            sentAtNs: nsToDate(m.sentAtNs ?? m.sentAt).getTime(),
+            conversationId: `dm-${activePeer.toLowerCase()}`
+          }))
+          .filter((m: any) => !(typeof m.content === 'string' && m.content.includes('initiatedByInboxId')));
         
         setMessages(prev => {
           const activeId = `dm-${activePeer.toLowerCase()}`;
@@ -754,12 +767,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
   const handleStartConversation = async () => handleStartConversationWithPeer(peerInput);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!client || !activePeer || !inputText.trim() || sending || !address) return;
+  const executeSend = async (content: string) => {
+    if (!client || !activePeer || !content.trim() || sending || !address) return;
     setSending(true);
-    const content = inputText.trim();
-    setInputText(''); 
     
     if (address) {
         localStorage.removeItem(`whale_draft_${address.toLowerCase()}_${activePeer.toLowerCase()}`);
@@ -797,7 +807,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         stopTypingSignal();
 
         // @ts-ignore
-        if (typeof playAudioPing === 'function') playAudioPing('send');
+        if (typeof playAudioPing === 'function' && soundEffects) playAudioPing('send');
         // Send to XMTP network (includes dm.sync() after send)
         await sendMessage(client, activePeer, content);
         // We do not eagerly refetch messages here anymore.
@@ -813,12 +823,45 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         return updated;
       });
 
-
     } catch (err) {
-      console.error('[Chat] handleSend failed:', err);
-      setInputText(content); // restore on failure
+      console.error('[Chat] executeSend failed:', err);
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputText.trim()) return;
+    const txt = inputText.trim();
+    setInputText(''); 
+    await executeSend(txt);
+  };
+  
+  const uploadAttachment = async (fileOrBlob: Blob, filename: string): Promise<string | null> => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', fileOrBlob, filename);
+      const res = await fetch('/api/chat/attachments', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      return `[ATTACHMENT:${data.type}]${data.url}|${data.name}`;
+    } catch (err: any) {
+      alert('Attachment failed: ' + err.message);
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !client || !activePeer || !address) return;
+    const payload = await uploadAttachment(file, file.name);
+    if (payload) {
+      await executeSend(payload);
     }
   };
 
@@ -1130,6 +1173,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   const content = typeof msg.content === 'string' ? msg.content : (msg.fallback || 'Encrypted Data');
                   const isAudio = content.startsWith('__AUDIO__');
                   const audioSrc = isAudio ? content.slice('__AUDIO__'.length) : null;
+                  
+                  const attachmentMatch = typeof content === 'string' ? content.match(/^\[ATTACHMENT:([^\]]*)\](.*?)\|(.*)$/is) : null;
+                  const attachment = attachmentMatch ? { mime: attachmentMatch[1] || 'application/octet-stream', url: attachmentMatch[2], name: attachmentMatch[3] } : null;
+                  
                   // sentAtNs is now a plain number (ms), not BigInt
                   const sentTime = typeof msg.sentAtNs === 'number' ? new Date(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
                   return (
@@ -1149,6 +1196,20 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                             className="h-8 max-w-[200px]"
                             style={{ filter: isMe ? 'invert(1) brightness(0.8)' : 'invert(var(--dark-invert, 0))' }}
                           />
+                        </div>
+                      ) : attachment ? (
+                        <div className={`mt-1 overflow-hidden rounded-xl border ${isMe ? 'border-black/10 dark:border-white/10 shadow-sm bg-black/5 dark:bg-white/5' : 'border-black/10 dark:border-white/10 shadow-sm bg-white dark:bg-[#1A1A1A]'}`}>
+                          {attachment.mime.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(attachment.name.split('.').pop()?.toLowerCase() || '') ? (
+                            <a href={attachment.url} target="_blank" rel="noopener noreferrer">
+                              <img src={attachment.url} alt={attachment.name} className="max-w-[240px] max-h-[300px] object-cover" />
+                            </a>
+                          ) : attachment.mime.startsWith('video/') || ['mp4', 'webm', 'mov'].includes(attachment.name.split('.').pop()?.toLowerCase() || '') ? (
+                            <video src={attachment.url} controls className="max-w-[260px] max-h-[300px] object-contain bg-black" />
+                          ) : (
+                            <a href={attachment.url} download={attachment.name} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 px-4 py-3 ${isMe ? 'text-[#050505] dark:text-white' : 'text-[#050505] dark:text-white'}`}>
+                               <span className="font-mono text-[11px] underline break-all line-clamp-2">{attachment.name}</span>
+                            </a>
+                          )}
                         </div>
                       ) : (
                         <div className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed break-words ${
@@ -1208,19 +1269,32 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   <span className="text-[9px] font-black uppercase tracking-widest">{isRecording ? 'OFF' : 'REC'}</span>
                 </button>
 
+                <input type="file" ref={fileRef} onChange={handleFileChange} className="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.txt" />
+                
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  disabled={isUploading || sending}
+                  className="w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-95 shrink-0 bg-black/[0.05] dark:bg-white/5 text-black/50 dark:text-white/50 hover:bg-black/10 dark:hover:bg-white/10"
+                  title="Attach File"
+                >
+                  {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Paperclip size={18} />}
+                </button>
+
                 <input
                   ref={inputRef}
                   type="text"
                   inputMode="text"
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
-                  placeholder="Encrypted transmission..."
-                  className="flex-1 bg-black/[0.03] dark:bg-white/5 border border-black/8 dark:border-white/10 rounded-xl px-4 py-3 text-[#050505] dark:text-white focus:outline-none focus:border-black/20 dark:focus:border-white/20 placeholder:text-black/30 dark:placeholder:text-white/30"
+                  disabled={isUploading}
+                  placeholder={isUploading ? "Uploading..." : "Encrypted transmission..."}
+                  className="flex-1 bg-black/[0.03] dark:bg-white/5 border border-black/8 dark:border-white/10 rounded-xl px-4 py-3 text-[#050505] dark:text-white focus:outline-none focus:border-black/20 dark:focus:border-white/20 placeholder:text-black/30 dark:placeholder:text-white/30 disabled:opacity-50"
                   style={{ WebkitAppearance: 'none', fontSize: '16px', lineHeight: '1.4' }}
                 />
                 <button
                   type="submit"
-                  disabled={(!inputText.trim() && !isRecording) || sending}
+                  disabled={(!inputText.trim() && !isRecording) || sending || isUploading}
                   className="w-11 h-11 rounded-xl bg-[#050505] dark:bg-white flex items-center justify-center text-white dark:text-black disabled:opacity-30 hover:bg-black/80 dark:hover:bg-white/80 transition-all active:scale-95 shrink-0 text-[10px] font-black uppercase"
                 >
                   SEND
@@ -1290,8 +1364,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                <QrScanner 
                    mode="project" 
                    projectValue={address} 
-                   projectTitle="KYC Identity" 
-                   projectDescription="Present this code to a peer. Once scanned, a zero-knowledge encrypted tunnel will be initialized between your identities." 
+                   projectTitle={chatName || "KYC Identity"} 
+                   projectDescription={chatBio || "Present this code to a peer. Once scanned, a zero-knowledge encrypted tunnel will be initialized between your identities."} 
                />
            </div>
         </div>

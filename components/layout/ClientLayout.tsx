@@ -61,7 +61,7 @@ const BOUNDED_PREFIXES = [
   '/ticket', '/settings', '/docs', '/privacy', '/terms', '/legal',
   '/connect', '/sign-up', '/login', '/admin', '/clearance',
   '/api-marketplace', '/directory', '/company', '/infrastructure',
-  '/forum', '/pricing', '/careers',
+  '/forum', '/pricing', '/careers', '/chat',
 ];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {

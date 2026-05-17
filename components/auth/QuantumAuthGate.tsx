@@ -29,7 +29,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     const ks = localStorage.getItem('sovereign_keystore');
     if (ks) {
       setHasKeystore(true);
-      setStep('login');
+      // We no longer automatically go to 'login' here.
+      // We let the user choose on the 'home' screen.
     }
   }, []);
 
@@ -75,7 +76,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     // Allow UI to update before blocking thread
     setTimeout(async () => {
       try {
-        // High security standard encryption (scrypt)
+        // High security standard encryption.
         const encryptedJson = await wallet.encrypt(password);
         localStorage.setItem('sovereign_keystore', encryptedJson);
         importWallet(wallet.privateKey, "Sovereign Main");
@@ -85,7 +86,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         toast.error('Encryption failed', { description: e.message });
         setStep('verify');
       }
-    }, 100);
+    }, 500); // give UI more time to show "Encrypting..."
   };
 
   const handleLogin = async () => {
@@ -137,6 +138,24 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
                 </div>
                 <ArrowRight size={18} />
               </button>
+
+              {hasKeystore && (
+                <button 
+                  onClick={() => setStep('login')}
+                  className="w-full flex items-center justify-between p-5 rounded-2xl bg-[#0044CC] text-white hover:bg-blue-700 transition-colors shadow-lg font-bold"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                      <Lock size={18} className="text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-[15px]">Unlock Existing Wallet</div>
+                      <div className="text-[12px] opacity-70 font-normal">Enter your password to unlock</div>
+                    </div>
+                  </div>
+                  <ArrowRight size={18} />
+                </button>
+              )}
 
               <button 
                 onClick={() => open()}

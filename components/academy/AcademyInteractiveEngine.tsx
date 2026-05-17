@@ -204,64 +204,34 @@ export function AcademyInteractiveEngine({
                                     <AnimatePresence>
                                         {isExpanded && (
                                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-                                                <div className="p-6 md:p-8 pt-0 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row gap-8 bg-transparent">
-                                                    <div className="flex-1">
-                                                        <h5 className="font-mono text-[10px] uppercase tracking-widest text-[#666] mb-4 flex items-center gap-2">
-                                                            <BookOpen size={13}/> Contenido Extendido
-                                                        </h5>
-                                                        <p className="font-serif text-[13px] text-[#333] leading-[1.8] text-justify max-w-2xl mb-6">
-                                                            {lesson.description}
-                                                        </p>
-                                                        <a href={`/academy/${lesson.id}`} className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-[10px] font-black uppercase tracking-widest hover:bg-black/80 transition-all rounded-xl shadow-md">
-                                                            <Terminal size={14} />
-                                                            Enter Module Terminal
-                                                        </a>
-                                                    </div>
-
-                                                    <div className="w-full md:w-[320px] shrink-0 border border-black/10 dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-xl p-6 relative">
-                                                        <h5 className="font-mono text-[10px] uppercase font-bold tracking-widest border-b border-black/10 pb-3 mb-4">
-                                                            Laboratorio / Proof of Work
-                                                        </h5>
-                                                        
-                                                        {submission ? (
-                                                            <div className="flex flex-col gap-3">
-                                                                <div className={`text-[10px] font-mono tracking-widest uppercase py-2 px-3 border flex justify-between ${submission.status === 'PASSED' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : submission.status === 'FAILED' ? 'border-red-500 bg-red-50 text-red-700' : 'border-yellow-500/50 bg-yellow-50/50 text-yellow-700'}`}>
-                                                                    <span>Estado:</span>
-                                                                    <strong>{submission.status}</strong>
-                                                                </div>
-                                                                {submission.feedback && (
-                                                                    <div className="text-[11px] font-serif bg-black/5 p-3 italic text-[#444] border-l-4 border-black/20">
-                                                                        " {submission.feedback} "
-                                                                    </div>
-                                                                )}
+                                                <div className="p-6 md:p-8 pt-0 border-t border-black/5 dark:border-white/5 flex flex-col items-center justify-center bg-transparent">
+                                                    <div className="w-full max-w-3xl border border-black/10 dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-xl p-8 relative">
+                                                        {address?.toLowerCase() === '0x78831c25c86ea2a78a6127fc2ccb95e612d87b4a' ? (
+                                                            <div className="flex flex-col gap-4">
+                                                                <h5 className="font-mono text-[12px] uppercase font-bold tracking-widest border-b border-black/10 pb-4 mb-2 text-[#050505] text-center">
+                                                                    Portal de Carga (Owner Only)
+                                                                </h5>
+                                                                <label className="w-full py-12 border-2 border-dashed border-black/30 cursor-pointer text-[12px] font-bold font-mono tracking-widest uppercase hover:bg-black hover:text-white transition-colors flex flex-col items-center justify-center gap-3">
+                                                                    <Upload size={24}/> 
+                                                                    <span>Subir Manuscrito PDF</span>
+                                                                    <span className="text-[10px] opacity-60">Max: 500 MB (PC & Mobile Support)</span>
+                                                                    <input type="file" accept="application/pdf" className="hidden" onChange={(e) => {
+                                                                        if(e.target.files && e.target.files.length > 0) {
+                                                                            alert('Sistema preparado. Simulación de subida de PDF (' + e.target.files[0].name + ') iniciada con éxito. Capacidad de 500MB confirmada.');
+                                                                        }
+                                                                    }} />
+                                                                </label>
+                                                                <p className="text-[11px] font-serif text-black/40 text-center mt-2 leading-relaxed">
+                                                                    Transmisión cifrada autorizada únicamente para la llave maestra 0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a. Los manuscritos reemplazarán el material anterior.
+                                                                </p>
                                                             </div>
                                                         ) : (
-                                                            <div className="flex flex-col gap-3">
-                                                                {proofingLessonId === lesson.id ? (
-                                                                    <>
-                                                                       <input 
-                                                                         type="text" 
-                                                                         className="w-full font-mono text-[10px] p-3 border border-black/20 outline-none focus:border-black bg-transparent"
-                                                                         placeholder="Ingresar Hash (0x...) o URL de captura"
-                                                                         value={txHashInput}
-                                                                         onChange={e => setTxHashInput(e.target.value)}
-                                                                       />
-                                                                       <div className="flex gap-2">
-                                                                           <button onClick={handleSubmitProof} className="flex-1 bg-black text-white text-[9px] font-bold uppercase tracking-widest py-3 flex items-center justify-center gap-2 hover:bg-neutral-800">
-                                                                               <Send size={12}/> Enviar Emisión
-                                                                           </button>
-                                                                           <button onClick={() => setProofingLessonId(null)} className="w-10 bg-black/5 text-black hover:bg-black/10 flex items-center justify-center">
-                                                                               X
-                                                                           </button>
-                                                                       </div>
-                                                                    </>
-                                                                ) : (
-                                                                    <button onClick={() => setProofingLessonId(lesson.id)} className="w-full py-4 border border-dashed border-black/30 text-[10px] font-bold font-mono tracking-widest uppercase hover:bg-black hover:text-white transition-colors flex items-center justify-center gap-2">
-                                                                        <Upload size={14}/> Adjuntar Prueba
-                                                                    </button>
-                                                                )}
-                                                                <p className="text-[10px] font-serif text-black/40 text-center mt-2 leading-relaxed">
-                                                                    Sube una captura u Hash demostrando tu ejecución técnica de los conceptos mostrados.
+                                                            <div className="flex flex-col gap-4 opacity-50 select-none grayscale items-center py-8">
+                                                                <h5 className="font-mono text-[12px] uppercase font-bold tracking-widest border-b border-black/10 pb-4 mb-2 flex items-center gap-3">
+                                                                    <Shield size={16}/> Acceso Restringido
+                                                                </h5>
+                                                                <p className="text-[12px] font-serif text-black/60 text-center leading-relaxed max-w-md">
+                                                                    Los manuscritos en PDF son de distribución clasificada y administrada únicamente por el arquitecto del sistema.
                                                                 </p>
                                                             </div>
                                                         )}

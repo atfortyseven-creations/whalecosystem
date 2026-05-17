@@ -7,6 +7,7 @@ import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { useUIStore } from "@/lib/store/ui-store";
 import { toast } from "sonner";
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 import {
   ArrowRight,
@@ -232,7 +233,10 @@ export default function ConnectPage() {
   const isVerified = mounted && (isConnected || isLinked);
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center bg-[#FAFAF8] relative">
+    <div className="w-full flex-1 flex flex-col items-center bg-[#FAFAF8] relative overflow-hidden">
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+         <RemoteLottie path="Whale Mission.json" className="w-full h-full object-cover" />
+      </div>
       <div className="relative z-10 w-full flex-1 flex flex-col justify-center items-center px-4 py-8 sm:p-12 min-h-0">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -243,11 +247,6 @@ export default function ConnectPage() {
           {/* LEFT: Information panel */}
           <div className="flex-1 p-8 sm:p-12 lg:p-16 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#F0F0F0] bg-[#FAFAF8]">
             <div>
-              <div className="flex items-center gap-2 mb-10">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-black/40">Whale Alert Network</span>
-              </div>
-
               <h1 className="text-[36px] sm:text-[44px] font-black tracking-tighter leading-[1.0] text-[#0A0A0A] mb-6">
                 Whale Alert<br />
                 <span className="text-[#CCCCCC]">Network Access</span>
@@ -257,12 +256,12 @@ export default function ConnectPage() {
                 Establish a secure connection to the Whale Alert Network infrastructure. Professional identity management and institutional record preservation.
               </p>
 
+              <div className="w-full max-w-[280px] h-[180px] -mt-4 mb-4">
+                 <RemoteLottie path="block abstract.json" className="w-full h-full object-contain opacity-80" />
+              </div>
+
               <div className="grid grid-cols-1 gap-3">
-                <div className="p-4 rounded-xl bg-white border border-black/5 shadow-sm">
-                  <Shield size={16} className="text-black mb-3 opacity-40" />
-                  <p className="text-[11px] font-black uppercase tracking-wider text-black mb-1">Cryptographic Authentication</p>
-                  <p className="text-[11px] text-black/40 leading-relaxed font-mono uppercase tracking-tighter">GDPR / HIPAA Compliant Identity Verification.</p>
-                </div>
+                {/* Removed Authentication Block */}
               </div>
             </div>
 
@@ -296,8 +295,8 @@ export default function ConnectPage() {
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   className="flex flex-col items-center justify-center gap-6 flex-1 py-4 text-center"
                 >
-                  <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                    <CheckCircle size={32} className="text-emerald-500" />
+                  <div className="w-32 h-32 flex items-center justify-center -mb-4">
+                    <RemoteLottie path="Transaction Complete.json" loop={false} className="w-full h-full object-contain" />
                   </div>
 
                   <div>

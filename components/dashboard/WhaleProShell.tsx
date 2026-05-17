@@ -34,25 +34,25 @@ interface NavItem {
 
 const SIDEBAR_ITEMS: NavItem[] = [
     // ── Access ──────────────────────────────────────────────────
-    { id: 'gold',          label: 'Identity Provisioning', icon: null, dividerBefore: 'Access' },
+    { id: 'gold',          label: 'IDENTITY PROVISIONING', icon: null, dividerBefore: 'Acceso' },
 
-    { id: 'billing',       label: 'Subscription Status', icon: null },
+    { id: 'billing',       label: 'SUSCRIPTION STATUS', icon: null },
 
     // ── Telemetry ───────────────────────────────────────────────────
-    { id: 'markets',       label: 'Network Telemetry',    icon: null, dividerBefore: 'Telemetry', requiresZK: true },
-    { id: 'newpairs',      label: 'Contract Monitors',   icon: null, requiresZK: true },
+    { id: 'markets',       label: 'NETWORK TELEMETRY',    icon: null, dividerBefore: 'Telemetría', requiresZK: true },
+    { id: 'newpairs',      label: 'CONTRACT MONITORS',   icon: null, requiresZK: true },
 
     // ── Ledger ─────────────────────────────────────────────
-    { id: 'inst-ledger',   label: 'Entity Index',   icon: null, dividerBefore: 'Ledger', requiresZK: true },
-    { id: 'mass-transfer', label: 'Bulk Record Sync', icon: null, requiresZK: true, minTier: 'STANDARD' },
-    { id: 'omniexplorer',  label: 'On-Chain Explorer', icon: null, requiresZK: true },
+    { id: 'inst-ledger',   label: 'ENTITY INDEX',   icon: null, dividerBefore: 'Libro mayor', requiresZK: true },
+    { id: 'mass-transfer', label: 'BULK RECORD SYNC', icon: null, requiresZK: true, minTier: 'STANDARD' },
+    { id: 'omniexplorer',  label: 'ON CHAIN EXPLORER', icon: null, requiresZK: true },
 
     // ── Security ─────────────────────────────────────────────
-    { id: 'zk',            label: 'Aztec Network',  icon: null, dividerBefore: 'Security', requiresZK: true },
+    { id: 'zk',            label: 'AZTEC EXPLORER',  icon: null, dividerBefore: 'Seguridad', requiresZK: true },
 
     // ── System ────────────────────────────────────────────────────
-    { id: 'logs',          label: 'Session Audit',   icon: null, dividerBefore: 'System' },
-    { id: 'support',       label: 'Support',        icon: null },
+    { id: 'logs',          label: 'SESSION AUDIT',   icon: null, dividerBefore: 'Sistema' },
+    { id: 'support',       label: 'SUPPORT',        icon: null },
 ];
 
 const RESTRICTED_TABS = [
@@ -83,11 +83,11 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
         >
             <div className="relative flex items-center w-full">
                 {isActive && (
-                    <div className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-[#00C076] rounded-r-full" />
+                    <div className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-[#FAF9F6] rounded-r-full" />
                 )}
 
                 {item.icon && (
-                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#00C076]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
+                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#FAF9F6]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
                         {item.icon}
                     </span>
                 )}
@@ -99,22 +99,22 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
                 )}
 
                 {!isCollapsed && isLocked && (
-                    <Lock size={12} className="ml-2 text-black/30 shrink-0" />
+                    <Lock size={12} className="ml-2 text-white/30 shrink-0" />
                 )}
 
                 {!isCollapsed && !isLocked && item.badge && (
                     <span
                         className="ml-2 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[4px] border shrink-0 transition-colors"
                         style={isActive
-                            ? { background: 'rgba(0,192,118,0.15)', color: '#00C076', borderColor: 'rgba(0,192,118,0.3)' }
-                            : { background: `${item.badgeColor ?? '#00C076'}15`, color: item.badgeColor ?? '#00C076', borderColor: `${item.badgeColor ?? '#00C076'}30` }
+                            ? { background: 'rgba(255,255,255,0.15)', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.3)' }
+                            : { background: `${item.badgeColor ?? '#050505'}15`, color: item.badgeColor ?? '#050505', borderColor: `${item.badgeColor ?? '#050505'}30` }
                         }
                     >
                         {item.badge}
                     </span>
                 )}
                 {!isCollapsed && item.externalUrl && (
-                    <ArrowUpRight size={12} className={`ml-2 transition-colors ${isActive ? 'text-[#00C076]' : 'text-[#A0A0A0] group-hover:text-[#050505]'}`} />
+                    <ArrowUpRight size={12} className={`ml-2 transition-colors ${isActive ? 'text-[#FAF9F6]' : 'text-[#A0A0A0] group-hover:text-[#050505]'}`} />
                 )}
             </div>
         </button>
