@@ -1138,81 +1138,78 @@ export function MobileLanding() {
           <div className="w-full flex flex-col gap-3">
             {(() => {
               // Helper: open the correct wallet flow
-              const openWalletModal = async (walletId: string) => {
-                if (isLinked && effectiveAddress) return;
+                const openWalletModal = async (walletId: string) => {
+                  if (isLinked && effectiveAddress) return;
 
-                setConnecting(walletId);
-                setWcTargetWallet(walletId);
-                setWcDeepLink(null);
-                setShowFallbackBtn(false);
+                  setConnecting(walletId);
+                  setWcTargetWallet(walletId);
+                  setWcDeepLink(null);
+                  setShowFallbackBtn(false);
 
-                // Clear any stale Wagmi/AppKit state before connecting
-                // This fixes the "ERROR SIMULATION UNAVAILABLE" on Rainbow's second login
-                // by forcing a clean WalletConnect session request.
-                if (isConnected || address) {
-                  try {
-                    await disconnectAsync();
-                  } catch (e) {
-                    disconnect();
+                  const host = typeof window !== 'undefined' ? window.location.host : 'whalealert.network';
+                  const currentUrl = `https://${host}/connect`;
+
+                  if (walletId === 'metamask') {
+                      window.location.href = `https://metamask.app.link/dapp/${host}/connect`;
+                      return;
                   }
-                }
+                  
+                  if (walletId === 'coinbase') {
+                      window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(currentUrl)}`;
+                      return;
+                  }
 
-                // Set wakeup flags before switching to wallet app
-                try {
-                  localStorage.setItem('sovereign_pending_wakeup', '1');
-                  sessionStorage.setItem('sovereign_show_reconnect', '1');
-                } catch {}
+                  if (walletId === 'rainbow') {
+                      window.location.href = `https://rnbwapp.com/dapp/${host}/connect`;
+                      return;
+                  }
 
-                if (walletId === 'metamask') {
-                    // Try to connect using injected connector directly to bypass AppKit hang
-                    const mm = connectors.find(c => c.id === 'metaMaskSDK' || c.id === 'metaMask' || c.name === 'MetaMask' || c.id === 'injected');
-                    if (mm) {
-                        try {
-                            await connectAsync({ connector: mm });
-                            setConnecting(null);
-                            return;
-                        } catch (e) {
-                            console.warn('MetaMask direct connect failed, falling back to AppKit', e);
-                        }
-                    }
-                }
-
-                // Pure AppKit usage to avoid deep-link hangs
-                rkOpenModal({ view: 'Connect' });
-                setTimeout(() => setConnecting(null), 10000);
-              };
+                  // Pure AppKit usage for other wallets
+                  rkOpenModal({ view: 'Connect' });
+                  setTimeout(() => setConnecting(null), 10000);
+                };
 
 
               return (
                 <>
-                  {/* MetaMask — iOS Safari + Android Chrome deep-link */}
+                  {/* MetaMask */}
                   <WalletOption
                     logo="/wallets/metamask.svg"
                     name="MetaMask"
-                    badge="iOS · Android · WalletConnect v2"
+                    badge="Tap to open app"
                     loading={connecting === 'metamask'}
                     onClick={() => openWalletModal('metamask')}
                     delay={0.1}
                   />
 
-                  {/* Coinbase Wallet — native iOS/Android SDK */}
+                  {/* Coinbase Wallet */}
                   <WalletOption
                     logo="/wallets/coinbase.png"
                     name="Coinbase Wallet"
-                    badge="iOS · Android · Smart Wallet"
+                    badge="Tap to open app"
                     loading={connecting === 'coinbase'}
                     onClick={() => openWalletModal('coinbase')}
                     delay={0.15}
                   />
 
-                  {/* Rainbow & All — universal WC v2 */}
+                  {/* Rainbow */}
                   <WalletOption
                     logo="/wallets/rainbow.png"
-                    name="Rainbow & 550+ Wallets"
-                    badge="iOS · Android · Universal WC v2"
+                    name="Rainbow Wallet"
+                    badge="Tap to open app"
+                    loading={connecting === 'rainbow'}
+                    onClick={() => openWalletModal('rainbow')}
+                    delay={0.2}
+                  />
+
+                  {/* Universal WC v2 */}
+                  <WalletOption
+                    logo="/official-whale-monochrome.png"
+                    name="WalletConnect"
+                    badge="Other Wallets (QR / AppKit)"
                     loading={connecting === 'wc'}
                     onClick={() => openWalletModal('wc')}
-                    delay={0.2}
+                    delay={0.25}
                   />
                 </>
               );

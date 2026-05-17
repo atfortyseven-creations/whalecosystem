@@ -66,6 +66,7 @@ const BOUNDED_PREFIXES = [
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { isConnected } = useAccount();
   const { fetchSettings, settings } = useSettingsStore();
 
   useSovereignSessionLock();
@@ -295,8 +296,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   // <main> element
   const isCenteredPage = ['/connect', '/pricing', '/login', '/sign-up', '/clearance'].some(p => pathname.startsWith(p));
+  const isChat = pathname.startsWith('/chat');
 
-  const mainClass = isDashboard
+  const mainClass = isDashboard || isChat
     ? 'relative z-10 w-full flex-1 flex flex-col min-h-0 overflow-hidden'
     : isBounded
       // Scroll is fully contained here — no empty page-level void zones
@@ -305,7 +307,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   const showInstitutionalHeader =
     pathname === '/ledger' ||
-    pathname === '/portfolio' ||
+    (pathname === '/portfolio' && isConnected) ||
     pathname === '/support' ||
     pathname === '/academy' ||
     pathname === '/vip' ||
@@ -316,7 +318,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname === '/';
 
   // /chat has its own full-screen header — never show the global one there
-  const isChat = pathname.startsWith('/chat');
 
   return (
     <>
