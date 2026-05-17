@@ -8,6 +8,7 @@ import { ethers } from 'ethers';
 import { QrCode, X, ChevronLeft, Menu, Settings, LogOut, ArrowLeft } from 'lucide-react';
 import { useDisconnect } from 'wagmi';
 import { toast } from 'sonner';
+import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 
 import SidebarNavigation from '@/components/chat/SidebarNavigation';
 import MessageEngine from '@/components/chat/MessageEngine';
@@ -127,15 +128,58 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   const { data: walletClient } = useWalletClient();
   const { privateKey: storePrivateKey } = useWalletStore();
   const { disconnect } = useDisconnect();
+  const { nuclearDisconnect } = useSovereignSignOut();
 
   const handleFullDisconnect = () => {
-    try { disconnect(); } catch {}
-    localStorage.removeItem('sovereign_keystore');
-    document.cookie = 'whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
-    document.cookie = 'sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
     toast.success('Session disconnected.');
-    window.location.replace('/connect');
+    nuclearDisconnect();
   };
+
+  // ── Metadata Hydration Engine (Reactions, Pins, Deletions, Replies) ─────────
+  const hydrateMessages = useCallback((msgs: RenderableMessage[]) => {
+    if (!address) return msgs;
+    const normAddr = address.toLowerCase();
+
+    let deletedIds: string[] = [];
+    let pinnedIdsList: string[] = [];
+    try {
+      const delRaw = localStorage.getItem(`whale_chat_deleted_${normAddr}`);
+      if (delRaw) deletedIds = JSON.parse(delRaw);
+    } catch {}
+    try {
+      const pinRaw = localStorage.getItem(`whale_chat_pins_${normAddr}`);
+      if (pinRaw) pinnedIdsList = JSON.parse(pinRaw);
+    } catch {}
+
+    const deletedSet = new Set(deletedIds);
+    const pinnedSet = new Set(pinnedIdsList);
+
+    return msgs
+      .filter(m => !deletedSet.has(m.id))
+      .map(m => {
+        let content = m.content;
+        let replyToId = m.replyToId;
+        const replyMatch = typeof content === 'string' ? content.match(/^\[REPLY:([^\]]+)\](.*)$/s) : null;
+        if (replyMatch) {
+          replyToId = replyMatch[1];
+          content = replyMatch[2];
+        }
+
+        let reactions = m.reactions || [];
+        try {
+          const rxRaw = localStorage.getItem(`whale_chat_reactions_${normAddr}_${m.id}`);
+          if (rxRaw) reactions = JSON.parse(rxRaw);
+        } catch {}
+
+        return {
+          ...m,
+          content,
+          replyToId,
+          isPinned: pinnedSet.has(m.id),
+          reactions,
+        };
+      });
+  }, [address]);
 
   // ── Settings (persisted) ─────────────────────────────────────────────────
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS);
@@ -285,6 +329,10 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
           if (typeof rendered.content === 'string' && rendered.content.includes('initiatedByInboxId')) {
              continue;
           }
+          const hydratedList = hydrateMessages([rendered]);
+          if (hydratedList.length === 0) continue;
+          const hydrated = hydratedList[0];
+
           const fromPeer = msg.senderInboxId !== selfInboxId;
           const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
           const currentActivePeer = activeConvRef.current?.peerAddress.toLowerCase();
@@ -295,24 +343,24 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
           if (belongsToActive) {
             if (fromPeer && settingsRef.current.soundEnabled) playMessageSound();
             setMessages(prev => {
-              if (prev.some(m => m.id === rendered.id)) return prev;
+              if (prev.some(m => m.id === hydrated.id)) return prev;
               
               if (!fromPeer) {
                 // Deduplicate own optimistic messages
-                const optIndex = prev.findIndex(m => m.id.startsWith('opt-') && m.content === rendered.content);
+                const optIndex = prev.findIndex(m => m.id.startsWith('opt-') && m.content === hydrated.content);
                 if (optIndex !== -1) {
                   const next = [...prev];
-                  next[optIndex] = rendered;
+                  next[optIndex] = hydrated;
                   return next.sort((a, b) => a.sentAt - b.sentAt);
                 }
               }
               
-              return [...prev, rendered].sort((a, b) => a.sentAt - b.sentAt);
+              return [...prev, hydrated].sort((a, b) => a.sentAt - b.sentAt);
             });
             // Update last message in conv list
             setConversations(prev => prev.map(c => 
               c.peerAddress.toLowerCase() === currentActivePeer 
-                ? { ...c, lastMessage: rendered.content.slice(0, 30) } 
+                ? { ...c, lastMessage: hydrated.content.slice(0, 30) } 
                 : c
             ));
           } else if (fromPeer) {
@@ -324,7 +372,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                if (exists) {
                  return prev.map(c => 
                    c.peerAddress.toLowerCase() === msgConvPeer 
-                     ? { ...c, unread: c.unread + 1, lastMessage: rendered.content.slice(0, 30) } 
+                     ? { ...c, unread: c.unread + 1, lastMessage: hydrated.content.slice(0, 30) } 
                      : c
                  );
                } else {
@@ -334,7 +382,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                     displayName: msg.conversation.peerAddress.slice(0, 6) + '...' + msg.conversation.peerAddress.slice(-4),
                     folder: 'all',
                     unread: 1,
-                    lastMessage: rendered.content.slice(0, 30)
+                    lastMessage: hydrated.content.slice(0, 30)
                  }];
                }
             });
@@ -365,11 +413,13 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
           .filter((m: any) => !(typeof m.content === 'string' && m.content.includes('initiatedByInboxId')))
           .sort((a, b) => a.sentAt - b.sentAt);
         
+        const hydrated = hydrateMessages(rendered);
+        
         // Merge with optimistic local messages safely
         setMessages(prev => {
           const optimistic = prev.filter(m => m.id.startsWith('opt-'));
-          const renderedIds = new Set(rendered.map(r => r.id));
-          return [...rendered, ...optimistic.filter(o => !renderedIds.has(o.id))].sort((a, b) => a.sentAt - b.sentAt);
+          const renderedIds = new Set(hydrated.map(r => r.id));
+          return [...hydrated, ...optimistic.filter(o => !renderedIds.has(o.id))].sort((a, b) => a.sentAt - b.sentAt);
         });
       } catch (e) {
         console.warn('[Chat] load messages failed:', e);
@@ -393,6 +443,8 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     if (!xmtpClient.current || !activeConv) return;
     setSending(true);
     const selfInboxId = (xmtpClient.current as any).inboxId ?? '';
+
+    const finalContent = replyingTo ? `[REPLY:${replyingTo.id}]${content}` : content;
 
     // Optimistic update
     const optimistic: RenderableMessage = {
@@ -419,7 +471,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     ));
 
     try {
-      await xmtpSend(xmtpClient.current, activeConv.peerAddress, content);
+      await xmtpSend(xmtpClient.current, activeConv.peerAddress, finalContent);
       // Mark as sent (remove optimistic tag)
       setMessages(prev => prev.map(m => m.id === optimistic.id ? { ...m, readAt: undefined } : m));
     } catch (e: any) {
@@ -465,6 +517,9 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
 
   // ── Reactions / Pin / Delete / Reply ────────────────────────────────────
   const handleReact = (messageId: string, emoji: string) => {
+    if (!address) return;
+    const normAddr = address.toLowerCase();
+
     setMessages(prev => prev.map(m => {
       if (m.id !== messageId) return m;
       const existing = m.reactions.find(r => r.emoji === emoji);
@@ -473,20 +528,56 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
             ? { ...r, count: r.reacted ? r.count - 1 : r.count + 1, reacted: !r.reacted }
             : r)
         : [...m.reactions, { emoji, count: 1, reacted: true }];
-      return { ...m, reactions: reactions.filter(r => r.count > 0) };
+      
+      const nextReactions = reactions.filter(r => r.count > 0);
+
+      try {
+        localStorage.setItem(`whale_chat_reactions_${normAddr}_${messageId}`, JSON.stringify(nextReactions));
+      } catch {}
+
+      return { ...m, reactions: nextReactions };
     }));
   };
 
   const handlePin = (messageId: string) => {
-    setPinnedIds(prev => {
-      const next = new Set(prev);
-      next.has(messageId) ? next.delete(messageId) : next.add(messageId);
-      return next;
-    });
-    setMessages(prev => prev.map(m => m.id === messageId ? { ...m, isPinned: !m.isPinned } : m));
+    if (!address) return;
+    const normAddr = address.toLowerCase();
+
+    setMessages(prev => prev.map(m => {
+      if (m.id !== messageId) return m;
+      const nextPinned = !m.isPinned;
+
+      try {
+        const pinRaw = localStorage.getItem(`whale_chat_pins_${normAddr}`);
+        let pins: string[] = pinRaw ? JSON.parse(pinRaw) : [];
+        if (nextPinned) {
+          if (!pins.includes(messageId)) pins.push(messageId);
+        } else {
+          pins = pins.filter(id => id !== messageId);
+        }
+        localStorage.setItem(`whale_chat_pins_${normAddr}`, JSON.stringify(pins));
+      } catch {}
+
+      return { ...m, isPinned: nextPinned };
+    }));
   };
 
-  const handleDelete = (messageId: string) => setMessages(prev => prev.filter(m => m.id !== messageId));
+  const handleDelete = (messageId: string) => {
+    if (!address) return;
+    const normAddr = address.toLowerCase();
+
+    try {
+      const delRaw = localStorage.getItem(`whale_chat_deleted_${normAddr}`);
+      const deleted: string[] = delRaw ? JSON.parse(delRaw) : [];
+      if (!deleted.includes(messageId)) {
+        deleted.push(messageId);
+        localStorage.setItem(`whale_chat_deleted_${normAddr}`, JSON.stringify(deleted));
+      }
+    } catch {}
+
+    setMessages(prev => prev.filter(m => m.id !== messageId));
+  };
+
   const handleReply  = (messageId: string) => {
     const target = messages.find(m => m.id === messageId);
     if (target) setReplyingTo({ id: messageId, preview: target.content.slice(0, 60) });

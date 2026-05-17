@@ -90,7 +90,12 @@ function CinematicVideoSection({
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
-export function ImmersiveManifestoLanding() {
+export interface ImmersiveManifestoLandingProps {
+  onOpenScanner?: () => void;
+  hideMap?: boolean;
+}
+
+export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveManifestoLandingProps = {}) {
   
   // Ref for the Hospital Hero parallax
   const heroRef = useRef<HTMLElement>(null);

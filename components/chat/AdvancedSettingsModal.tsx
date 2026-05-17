@@ -97,7 +97,7 @@ export default function AdvancedSettingsModal({
           </button>
         </div>
 
-        <div className="flex flex-1 min-h-0">
+        <div className="flex flex-col md:flex-row flex-1 min-h-0">
           {/* Sidebar */}
           <div className="w-[240px] bg-[#f2f2f7] border-r border-black/10 overflow-y-auto hidden md:block">
             <div className="p-4">
@@ -121,12 +121,12 @@ export default function AdvancedSettingsModal({
           </div>
 
           {/* Mobile Tab Selector (Fallback) */}
-          <div className="md:hidden w-full bg-white px-4 py-2 border-b border-black/10 overflow-x-auto whitespace-nowrap hide-scrollbar flex gap-2">
+          <div className="md:hidden w-full bg-white px-4 py-2 border-b border-black/10 overflow-x-auto whitespace-nowrap hide-scrollbar flex gap-2 shrink-0">
              {TABS.map(t => (
                <button
                  key={t.id}
                  onClick={() => setTab(t.id)}
-                 className={`px-3 py-1.5 rounded-full text-[13px] font-sans ${
+                 className={`px-3 py-1.5 rounded-full text-[13px] font-sans transition-all duration-200 active:scale-95 ${
                    tab === t.id ? 'bg-[#007AFF] text-white' : 'bg-[#f2f2f7] text-black'
                  }`}
                >

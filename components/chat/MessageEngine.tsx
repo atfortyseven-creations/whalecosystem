@@ -6,6 +6,7 @@ import {
   CheckCheck, Check, ShieldCheck, Flame,
   FileText, Download, Image as ImageIcon, Video, Music, Paperclip
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -44,12 +45,12 @@ const QUICK_REACTIONS = ['👍', '🔥', '🐳', '🚀', '💎', '❤️', '🤯
 export default function MessageEngine({
   messages, onReact, onPin, onDelete, onReply, bottomRef,
 }: MessageEngineProps) {
-  const [menuState, setMenuState] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [menuState, setMenuState] = useState<{ id: string; content: string; x: number; y: number } | null>(null);
 
-  const openMenu = useCallback((e: React.MouseEvent | React.TouchEvent, id: string) => {
+  const openMenu = useCallback((e: React.MouseEvent | React.TouchEvent, id: string, content: string) => {
     e.preventDefault();
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setMenuState({ id, x: rect.left, y: rect.top });
+    setMenuState({ id, content, x: rect.left, y: rect.top });
   }, []);
 
   const closeMenu = () => setMenuState(null);
@@ -58,20 +59,25 @@ export default function MessageEngine({
     <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1 scroll-smooth" onClick={closeMenu}>
       {messages
         .filter(msg => !(typeof msg.content === 'string' && msg.content.includes('initiatedByInboxId')))
-        .map(msg => (
-          <MessageBubble
-            key={msg.id}
-            msg={msg}
-            onContextMenu={(e) => openMenu(e, msg.id)}
-            onReact={onReact}
-          />
-        ))}
+        .map(msg => {
+          const replyToMsg = msg.replyToId ? messages.find(m => m.id === msg.replyToId) : undefined;
+          return (
+            <MessageBubble
+              key={msg.id}
+              msg={msg}
+              replyToMsg={replyToMsg}
+              onContextMenu={(e) => openMenu(e, msg.id, msg.content)}
+              onReact={onReact}
+            />
+          );
+        })}
       <div ref={bottomRef} />
 
       {/* Floating Context Menu */}
       {menuState && (
         <ContextMenu
           messageId={menuState.id}
+          content={menuState.content}
           x={menuState.x}
           y={menuState.y}
           onReact={(emoji) => { onReact(menuState.id, emoji); closeMenu(); }}
@@ -87,8 +93,9 @@ export default function MessageEngine({
 
 // ── MessageBubble ──────────────────────────────────────────────────────────
 
-function MessageBubble({ msg, onContextMenu, onReact }: {
+function MessageBubble({ msg, replyToMsg, onContextMenu, onReact }: {
   msg: RenderableMessage;
+  replyToMsg?: RenderableMessage;
   onContextMenu: (e: React.MouseEvent) => void;
   onReact: (id: string, emoji: string) => void;
 }) {
@@ -117,6 +124,22 @@ function MessageBubble({ msg, onContextMenu, onReact }: {
             : 'bg-black/[0.04] border border-black/8 text-black rounded-bl-sm'
         } ${msg.isDestructing ? 'opacity-60' : ''}`}
       >
+        {/* Reply Quote preview inside bubble */}
+        {replyToMsg && (
+          <div className={`mb-2 pl-2 border-l-2 text-[11px] font-mono leading-snug rounded p-1.5 flex flex-col gap-0.5 max-w-[280px] ${
+            msg.isMine 
+              ? 'border-white/30 text-white/75 bg-white/10' 
+              : 'border-black/20 text-black/60 bg-black/[0.03]'
+          }`}>
+            <span className="font-bold text-[9px] uppercase tracking-wider opacity-60">
+              {replyToMsg.isMine ? 'You' : 'Peer Address'}
+            </span>
+            <span className="truncate block">
+              {replyToMsg.content.includes('[ATTACHMENT:') ? '📎 Attachment' : replyToMsg.content}
+            </span>
+          </div>
+        )}
+
         {/* Attestation badge */}
         {msg.attestationScore && msg.attestationScore >= 95 && (
           <div className="flex items-center gap-1 text-[9px] font-mono text-white/50 mb-2">
@@ -232,8 +255,9 @@ function AttachmentRenderer({ attachment, isMine }: { attachment: { mime: string
 
 // ── ContextMenu ────────────────────────────────────────────────────────────
 
-function ContextMenu({ messageId, x, y, onReact, onPin, onDelete, onReply, onClose }: {
+function ContextMenu({ messageId, content, x, y, onReact, onPin, onDelete, onReply, onClose }: {
   messageId: string;
+  content: string;
   x: number; y: number;
   onReact: (emoji: string) => void;
   onPin: () => void;
@@ -263,8 +287,19 @@ function ContextMenu({ messageId, x, y, onReact, onPin, onDelete, onReply, onClo
       {[
         { icon: Reply,   label: 'Reply',        action: onReply  },
         { icon: Pin,     label: 'Pin Message',  action: onPin    },
-        { icon: Copy,    label: 'Copy Text',    action: () => {} },
-        { icon: Forward, label: 'Forward',      action: () => {} },
+        { icon: Copy,    label: 'Copy Text',    action: () => {
+          try {
+            navigator.clipboard.writeText(content);
+            toast.success('Message text copied to clipboard.');
+          } catch (err) {
+            toast.error('Failed to copy message text.');
+          }
+          onClose();
+        } },
+        { icon: Forward, label: 'Forward',      action: () => {
+          toast.info('Forwarding is disabled for secure end-to-end encrypted ZK messages.');
+          onClose();
+        } },
         { icon: Trash2,  label: 'Delete',       action: onDelete, danger: true },
       ].map(({ icon: Icon, label, action, danger }) => (
         <button

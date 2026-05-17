@@ -9,6 +9,7 @@ import { useUIStore } from "@/lib/store/ui-store";
 import { toast } from "sonner";
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { QRCodeSVG } from 'qrcode.react';
+import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 
 import {
   ArrowRight,
@@ -96,6 +97,7 @@ export default function ConnectPage() {
   const { signMessageAsync } = useSignMessage();
   const { open: openAppKit } = useAppKit();
   const { isLinked, setLinked } = useUIStore();
+  const { nuclearDisconnect } = useSovereignSignOut();
 
   const [mounted, setMounted] = useState(false);
   const [qrSession, setQrSession] = useState<string | null>(null);
@@ -205,30 +207,28 @@ export default function ConnectPage() {
   const { disconnect } = useDisconnect();
 
   const handleTotalDisconnect = useCallback(() => {
-    try {
-      disconnect();
-    } catch {}
-    
-    // Purge cookies
-    document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    
-    // Purge storage
-    localStorage.clear();
-    sessionStorage.clear();
-    setLinked(false);
-    
     toast.success("Disconnected & purged all sessions.");
-    window.location.replace("/connect");
-  }, [disconnect, setLinked]);
+    nuclearDisconnect();
+  }, [nuclearDisconnect]);
+
+  // Wallet state transition tracking to clear __disconnected__ ONLY on new user connection
+  const prevConnectedRef = useRef(isConnected);
+  useEffect(() => {
+    if (isConnected && !prevConnectedRef.current) {
+      try { sessionStorage.removeItem("__disconnected__"); } catch {}
+    }
+    prevConnectedRef.current = isConnected;
+  }, [isConnected]);
 
   // Wallet connect → redirect (fixed: use ref to prevent double-fire)
   useEffect(() => {
     if (!mounted || !isConnected || !address) return;
     if (redirectingRef.current) return;
-    try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
+    try {
+      if (sessionStorage.getItem("__disconnected__") === "1") {
+        return;
+      }
+    } catch {}
     redirectingRef.current = true;
 
     // Purge cookies to ensure fresh connection handshake without stale sessions
@@ -242,6 +242,7 @@ export default function ConnectPage() {
   }, [isConnected, address, mounted, setLinked]);
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
+    try { sessionStorage.removeItem("__disconnected__"); } catch {}
     setPendingId(walletId);
     if (!rdns) { openAppKit(); setPendingId(null); return; }
     const connector = connectors.find((c: any) => c.id === rdns)
@@ -255,6 +256,7 @@ export default function ConnectPage() {
   }, [connect, connectors, openAppKit]);
 
   const handleMobileWallet = useCallback((walletId: string) => {
+    try { sessionStorage.removeItem("__disconnected__"); } catch {}
     try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {}
     
     const host = typeof window !== 'undefined' ? window.location.host : 'whalealert.network';

@@ -230,8 +230,11 @@ export function Web3ModalProvider({ children, cookies }: { children: ReactNode; 
     let initialState;
     try {
         initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, cookies);
-    } catch (error) {
-        console.warn('[AppKit] Failed to parse wagmi cookie state:', error);
+    } catch (error: any) {
+        // Safe silent fallback: cookie state parsing failed (common with URLEncoded cookies).
+        // Wagmi automatically recovers and falls back to client-side localStorage state.
+        // We log a clean, single-line stdout message to prevent scary PM2 stderr/[err] stack traces.
+        console.log('[AppKit] Wagmi cookie state fallback active (Client-side state will be used)');
         initialState = undefined;
     }
 

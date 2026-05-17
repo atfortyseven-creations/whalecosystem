@@ -8,6 +8,7 @@ import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { ArrowLeft, Delete, LogOut, RefreshCw, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Storage keys
@@ -125,6 +126,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
   const { open } = useAppKit();
   const { disconnect } = useDisconnect();
   const { clearWallet } = useWalletStore();
+  const { nuclearDisconnect } = useSovereignSignOut();
 
   const [phase, setPhase] = useState<Phase>('confirm');
   const [pin, setPin] = useState('');
@@ -212,13 +214,8 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
   // ── Disconnect ────────────────────────────────────────────────────────────
 
   function handleDisconnect() {
-    try { disconnect(); } catch {}
-    try { clearWallet?.(); } catch {}
-    localStorage.removeItem('sovereign_keystore');
-    document.cookie = 'whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = 'sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     toast.success('Session disconnected.');
-    window.location.replace('/connect');
+    nuclearDisconnect();
   }
 
   // ── Phase labels ─────────────────────────────────────────────────────────

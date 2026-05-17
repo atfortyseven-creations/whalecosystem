@@ -834,8 +834,22 @@ export function MobileLanding() {
     }, 500);
   }, [isLinked]);
 
+  // Wallet state transition tracking to clear __disconnected__ ONLY on new user connection
+  const prevConnectedRef = useRef(isConnected);
+  useEffect(() => {
+    if (isConnected && !prevConnectedRef.current) {
+      try { sessionStorage.removeItem("__disconnected__"); } catch {}
+    }
+    prevConnectedRef.current = isConnected;
+  }, [isConnected]);
+
   useEffect(() => {
     if (!mounted || isLinked || isActuallySigning || signingInProgressRef.current || signingError) return;
+    try {
+      if (sessionStorage.getItem("__disconnected__") === "1") {
+        return;
+      }
+    } catch {}
     if (isConnected && address) {
       establishSession(address);
     }
@@ -843,6 +857,7 @@ export function MobileLanding() {
 
   // ── forceFullReconnect — Manual sync trigger for Android Chrome ────────────
   const forceFullReconnect = useCallback(() => {
+    try { sessionStorage.removeItem("__disconnected__"); } catch {}
     setFallbackStatus('checking');
     try {
       // Wagmi automatically reconnects via AppKit. Manually calling reconnect()
@@ -1140,6 +1155,7 @@ export function MobileLanding() {
               // Helper: open the correct wallet flow
                 const openWalletModal = async (walletId: string) => {
                   if (isLinked && effectiveAddress) return;
+                  try { sessionStorage.removeItem("__disconnected__"); } catch {}
 
                   setConnecting(walletId);
                   setWcTargetWallet(walletId);
