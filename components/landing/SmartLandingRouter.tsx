@@ -17,8 +17,9 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
         setMounted(true);
     }, []);
 
-    // Render nothing at all while hydrating — avoids any flash/loader
-    if (!mounted) return null;
+    // Fast-path: server already told us it's mobile — render immediately
+    // without waiting for JS hydration (eliminates ~3s blank white screen).
+    if (!mounted && isMobileUserAgent) return <ClientMobileLanding />;
 
     // Always show the landing page — never auto-redirect to /dashboard.
     // The dashboard redirect is handled exclusively by ConnectPage after

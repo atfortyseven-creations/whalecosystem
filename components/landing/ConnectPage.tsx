@@ -8,6 +8,7 @@ import { useAppKit } from "@reown/appkit/react";
 import { useUIStore } from "@/lib/store/ui-store";
 import { toast } from "sonner";
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { QRCodeSVG } from 'qrcode.react';
 
 import {
   ArrowRight,
@@ -380,14 +381,65 @@ export default function ConnectPage() {
 
               ) : (
                 <div className="flex flex-col gap-3 flex-1 w-full">
-                  {qrData && syncStatus === "AWAITING" && (
+                  {/* QR Panel — local qrcode.react, zero external API dependency */}
+                  {syncStatus === "AWAITING" && qrData ? (
+                    <motion.div
+                      key="qr-ready"
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      className="flex justify-center mb-3"
+                    >
+                      <div className="p-4 bg-white rounded-2xl border border-black/8 flex flex-col items-center gap-3 shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
+                        style={{ boxShadow: '0 0 0 1px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.08)' }}
+                      >
+                        <QRCodeSVG
+                          value={qrData}
+                          size={200}
+                          fgColor="#0A0A0A"
+                          bgColor="#FFFFFF"
+                          level="M"
+                          includeMargin={false}
+                        />
+                        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/30 text-center">
+                          Connect Whale Mobile
+                        </span>
+                      </div>
+                    </motion.div>
+                  ) : syncStatus === "IDLE" || (syncStatus === "AWAITING" && !qrData) ? (
+                    // Loading skeleton while ephemeral key pair is generating
                     <div className="flex justify-center mb-3">
-                      <div className="p-3 bg-[#FAFAF8] rounded-xl border border-black/5 flex flex-col items-center gap-2 shadow-sm">
-                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}&color=0a0a0a&bgcolor=FAFAF8`} alt="Connection QR" className="w-[200px] h-[200px] object-contain" />
-                        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/30 text-center">Connect Whale Mobile</span>
+                      <div className="p-4 bg-[#FAFAF8] rounded-2xl border border-black/5 flex flex-col items-center gap-3">
+                        <div className="w-[200px] h-[200px] bg-[#F0F0F0] rounded-xl animate-pulse flex items-center justify-center">
+                          <Loader2 size={24} className="animate-spin text-black/20" />
+                        </div>
+                        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/20 text-center">
+                          Generating secure link...
+                        </span>
                       </div>
                     </div>
-                  )}
+                  ) : syncStatus === "ERROR" ? (
+                    // Error + retry
+                    <div className="flex justify-center mb-3">
+                      <div className="p-4 bg-rose-50 rounded-2xl border border-rose-100 flex flex-col items-center gap-3">
+                        <div className="w-[200px] h-[200px] rounded-xl bg-rose-50 flex flex-col items-center justify-center gap-3">
+                          <Shield size={28} className="text-rose-300" />
+                          <p className="text-[11px] font-mono text-rose-400 text-center leading-relaxed max-w-[160px]">
+                            QR generation failed
+                          </p>
+                          <button
+                            onClick={() => { setSyncStatus("IDLE"); setQrSession(null); setQrData(''); }}
+                            className="px-4 py-2 rounded-xl bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 transition-colors active:scale-[0.97]"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                        <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-rose-300 text-center">
+                          Tap retry to regenerate
+                        </span>
+                      </div>
+                    </div>
+                  ) : null}
                   {DESKTOP_WALLETS.map((w) => (
                     <WalletButton key={w.id} logo={w.logo} name={w.name} badge={w.badge} onClick={() => handleDesktopWallet(w.id, w.rdns, w.installUrl)} loading={isPending && pendingId === w.id} delay={w.delay} />
                   ))}

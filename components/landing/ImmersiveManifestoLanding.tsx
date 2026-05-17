@@ -101,9 +101,10 @@ export function ImmersiveManifestoLanding() {
   // Ref for the Screenshot Gallery parallax
   const galleryRef = useRef<HTMLElement>(null);
   const { scrollYProgress: galleryProgress } = useScroll({ target: galleryRef, offset: ["start end", "end start"] });
-  const col1Y = useTransform(galleryProgress, [0, 1], ["10%", "-20%"]);
-  const col2Y = useTransform(galleryProgress, [0, 1], ["30%", "-40%"]);
-  const col3Y = useTransform(galleryProgress, [0, 1], ["0%", "-10%"]);
+  const heroImgY   = useTransform(galleryProgress, [0, 1], ["8%",  "-8%"]);
+  const col1Y      = useTransform(galleryProgress, [0, 1], ["12%", "-18%"]);
+  const col2Y      = useTransform(galleryProgress, [0, 1], ["20%", "-28%"]);
+  const col3Y      = useTransform(galleryProgress, [0, 1], ["4%",  "-12%"]);
 
   const SCREENSHOTS = [
     "/system-shots/Captura de pantalla 2026-05-17 081424.png",
@@ -166,50 +167,72 @@ export function ImmersiveManifestoLanding() {
       {/* ══════════════════════════════════════════════════════════════════════
           2. THE PLATFORM GALLERY (Screenshots Parallax Grid)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section ref={galleryRef} className="w-full py-32 md:py-48 flex flex-col items-center bg-[#FAF9F6] relative overflow-hidden">
-        <div className="w-full max-w-[1600px] mx-auto px-6 md:px-12 lg:px-20">
-          
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={STAGGER} className="flex flex-col items-center text-center mb-24 md:mb-32">
-            <h2 className="text-[44px] md:text-[80px] font-black tracking-tighter uppercase leading-[0.9] text-[#050505] mb-8">
+      <section ref={galleryRef} className="w-full py-24 md:py-36 flex flex-col items-center bg-[#FAF9F6] relative overflow-hidden">
+
+        {/* ── Header: constrained ── */}
+        <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 mb-16 md:mb-24">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={STAGGER} className="flex flex-col items-center text-center">
+            <h2 className="text-[44px] md:text-[80px] font-black tracking-tighter uppercase leading-[0.9] text-[#050505] mb-6">
               Experience<br />
               <span className="text-[#050505]/20">Absolute Control.</span>
             </h2>
-            <p className="font-serif text-[18px] md:text-[24px] text-[#050505]/60 leading-relaxed max-w-[800px]">
-              Our interface is designed for professionals who demand clarity, speed, and precision. Every detail has been engineered to provide you with a flawless, unified command center for your entire operation.
+            <p className="font-serif text-[18px] md:text-[22px] text-[#050505]/60 leading-relaxed max-w-[700px]">
+              Our interface is designed for professionals who demand clarity, speed, and precision.
             </p>
           </motion.div>
+        </div>
 
-          {/* 3-Column Parallax Masonry Grid for 6 Screenshots */}
-          <div className="hidden md:grid grid-cols-3 gap-8 relative h-[1200px] w-full">
-             {/* Column 1 */}
-             <motion.div style={{ y: col1Y, willChange: "transform" }} className="flex flex-col gap-8 pt-10">
-                <img src={SCREENSHOTS[0]} alt="Platform Interface 1" className="w-full rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-[#050505]/5 object-cover" />
-                <img src={SCREENSHOTS[3]} alt="Platform Interface 4" className="w-full rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-[#050505]/5 object-cover" />
-             </motion.div>
-             {/* Column 2 */}
-             <motion.div style={{ y: col2Y, willChange: "transform" }} className="flex flex-col gap-8 pt-40">
-                <img src={SCREENSHOTS[1]} alt="Platform Interface 2" className="w-full rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-[#050505]/5 object-cover" />
-                <img src={SCREENSHOTS[4]} alt="Platform Interface 5" className="w-full rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-[#050505]/5 object-cover" />
-             </motion.div>
-             {/* Column 3 */}
-             <motion.div style={{ y: col3Y, willChange: "transform" }} className="flex flex-col gap-8 pt-0">
-                <img src={SCREENSHOTS[2]} alt="Platform Interface 3" className="w-full rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-[#050505]/5 object-cover" />
-                <img src={SCREENSHOTS[5]} alt="Platform Interface 6" className="w-full rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-[#050505]/5 object-cover" />
-             </motion.div>
+        {/* ── PC Bento Gallery — FULL BLEED, no max-w ── */}
+        <div className="hidden md:flex flex-col w-full gap-4 px-4 lg:px-6 pb-8">
+
+          {/* Row 1: Hero image (60%) + 2 stacked (40%) */}
+          <div className="grid grid-cols-[60fr_40fr] gap-4 w-full">
+
+            {/* Hero screenshot — tallest, most impactful */}
+            <motion.div
+              style={{ y: heroImgY, willChange: "transform" }}
+              className="relative overflow-hidden rounded-3xl shadow-[0_40px_100px_rgba(0,0,0,0.18)] border border-[#050505]/5"
+            >
+              <img
+                src={SCREENSHOTS[0]}
+                alt="Platform Dashboard"
+                className="w-full aspect-[16/10] object-cover object-top"
+                loading="eager"
+              />
+            </motion.div>
+
+            {/* Right column: 2 stacked */}
+            <div className="flex flex-col gap-4">
+              <motion.div style={{ y: col1Y, willChange: "transform" }} className="relative overflow-hidden rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.14)] border border-[#050505]/5 flex-1">
+                <img src={SCREENSHOTS[1]} alt="Platform Interface 2" className="w-full h-full aspect-[16/10] object-cover" loading="eager" />
+              </motion.div>
+              <motion.div style={{ y: col2Y, willChange: "transform" }} className="relative overflow-hidden rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.14)] border border-[#050505]/5 flex-1">
+                <img src={SCREENSHOTS[2]} alt="Platform Interface 3" className="w-full h-full aspect-[16/10] object-cover" loading="eager" />
+              </motion.div>
+            </div>
           </div>
 
-          {/* Mobile Fallback: Simple staggered list */}
-          <div className="flex md:hidden flex-col gap-8 w-full">
-            {SCREENSHOTS.map((src, i) => (
-              <motion.img 
-                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true, margin: "-50px" }}
-                key={i} src={src} alt={`Platform View ${i+1}`} 
-                className="w-full rounded-2xl shadow-xl border border-[#050505]/5 object-cover" 
-              />
+          {/* Row 2: 3 equal screenshots */}
+          <div className="grid grid-cols-3 gap-4 w-full">
+            {[SCREENSHOTS[3], SCREENSHOTS[4], SCREENSHOTS[5]].map((src, i) => (
+              <motion.div
+                key={i}
+                style={{ y: col3Y, willChange: "transform" }}
+                className="relative overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[#050505]/5"
+              >
+                <img
+                  src={src}
+                  alt={`Platform Interface ${i + 4}`}
+                  className="w-full aspect-[16/10] object-cover"
+                  loading="lazy"
+                />
+              </motion.div>
             ))}
           </div>
-
         </div>
+
+        {/* ── Mobile: NOT rendered — mobile users get MobileManifesto (no heavy images) ── */}
+
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
