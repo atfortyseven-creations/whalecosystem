@@ -326,14 +326,14 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                             <div className="absolute inset-0 bg-[#020202]/80" />
                         </div>
                         {/* LEFT SIDEBAR (Menu) */}
-                        <div className="relative z-10 w-full md:w-64 bg-black/30 border-r border-white/10 backdrop-blur-sm flex flex-col">
+                        <div className="relative z-10 w-full md:w-64 bg-black/30 border-b md:border-b-0 md:border-r border-white/10 backdrop-blur-sm flex flex-col shrink-0">
                             <div className="p-6 border-b border-white/5 hidden md:block">
                                 <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
                                     <Settings className="text-[#00f2ea]" size={20} /> {t('settings_title')}
                                 </h2>
                             </div>
 
-                            <div className="flex-1 overflow-x-auto md:overflow-y-auto py-2 scrollbar-hide flex md:flex-col">
+                            <div className="shrink-0 md:flex-1 overflow-x-auto md:overflow-y-auto py-2 scrollbar-hide flex md:flex-col">
                                 {SECTIONS.map((item) => (
                                     <button
                                         key={item.id}

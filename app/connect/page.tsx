@@ -11,6 +11,7 @@ const MobileLanding = dynamic(
 );
 
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 /**
  * RealDeviceRouter — detects the PHYSICAL device, not the User-Agent string.
@@ -89,8 +90,13 @@ function RealDeviceRouter() {
 
   if (view === 'loading') {
     return (
-      <div className="min-h-screen bg-transparent flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-[#050505]/40">
-        Initializing Whale Alert Network Handshake...
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center gap-4">
+        <div className="w-48 h-48 sm:w-64 sm:h-64 opacity-90 mix-blend-multiply dark:mix-blend-screen">
+          <RemoteLottie path="block abstract.json" className="w-full h-full object-contain" />
+        </div>
+        <div className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-[#050505]/50 animate-pulse font-bold">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -101,8 +107,13 @@ function RealDeviceRouter() {
 export default function Page() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-transparent flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-[#050505]/40">
-        Initializing Whale Alert Network Handshake...
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center gap-4">
+        <div className="w-48 h-48 sm:w-64 sm:h-64 opacity-90 mix-blend-multiply dark:mix-blend-screen">
+          <RemoteLottie path="block abstract.json" className="w-full h-full object-contain" />
+        </div>
+        <div className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.2em] text-[#050505]/50 animate-pulse font-bold">
+          Loading...
+        </div>
       </div>
     }>
       <RealDeviceRouter />

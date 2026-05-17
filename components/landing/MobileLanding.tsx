@@ -17,6 +17,7 @@ import {
   Fingerprint, ChevronDown, CheckCircle, Zap, Shield, Menu,
   ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X 
 } from 'lucide-react';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 // ── Reown AppKit + WagmiAdapter localStorage key patterns ─────────────────
 // These are ALL the keys that Reown AppKit v1/v2 and its WagmiAdapter write
@@ -1188,36 +1189,6 @@ export function MobileLanding() {
 
               return (
                 <>
-                  {/* MetaMask */}
-                  <WalletOption
-                    logo="/wallets/metamask.svg"
-                    name="MetaMask"
-                    badge="Tap to open app"
-                    loading={connecting === 'metamask'}
-                    onClick={() => openWalletModal('metamask')}
-                    delay={0.1}
-                  />
-
-                  {/* Coinbase Wallet */}
-                  <WalletOption
-                    logo="/wallets/coinbase.png"
-                    name="Coinbase Wallet"
-                    badge="Tap to open app"
-                    loading={connecting === 'coinbase'}
-                    onClick={() => openWalletModal('coinbase')}
-                    delay={0.15}
-                  />
-
-                  {/* Rainbow */}
-                  <WalletOption
-                    logo="/wallets/rainbow.png"
-                    name="Rainbow Wallet"
-                    badge="Tap to open app"
-                    loading={connecting === 'rainbow'}
-                    onClick={() => openWalletModal('rainbow')}
-                    delay={0.2}
-                  />
-
                   {/* Universal WC v2 */}
                   <WalletOption
                     logo="/official-whale-monochrome.png"
@@ -1225,8 +1196,11 @@ export function MobileLanding() {
                     badge="Other Wallets (QR / AppKit)"
                     loading={connecting === 'wc'}
                     onClick={() => openWalletModal('wc')}
-                    delay={0.25}
+                    delay={0.1}
                   />
+                  <div className="w-full flex justify-center mt-4 mb-2">
+                    <RemoteLottie path="system-shots/Paper airplane.json" className="w-full max-w-[200px] h-[120px] object-contain" />
+                  </div>
                 </>
               );
             })()}
