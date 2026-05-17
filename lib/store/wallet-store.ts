@@ -130,10 +130,27 @@ export const useWalletStore = create<WalletState>()(
           const formattedPk = pk.startsWith('0x') ? pk : `0x${pk}`;
           const wallet = new ethers.Wallet(formattedPk);
           
-          const existing = get().accounts.find(a => a.address.toLowerCase() === wallet.address.toLowerCase());
-          if (existing) {
-            toast.info("Identity already exists", { description: "Switching to existing account." });
-            get().switchAccount(wallet.address);
+          const existingIndex = get().accounts.findIndex(a => a.address.toLowerCase() === wallet.address.toLowerCase());
+          if (existingIndex !== -1) {
+            set(state => {
+              const updatedAccounts = [...state.accounts];
+              updatedAccounts[existingIndex] = {
+                ...updatedAccounts[existingIndex],
+                privateKey: wallet.privateKey
+              };
+              return {
+                accounts: updatedAccounts,
+                address: wallet.address,
+                privateKey: wallet.privateKey,
+                isCustom: updatedAccounts[existingIndex].isCustom,
+                balance: "0.0"
+              };
+            });
+            get().updateBalance();
+            toast.success("Identity Unlocked", {
+              description: `Active: ${get().accounts[existingIndex].label}`
+            });
+            get().cloudSync();
             return true;
           }
 

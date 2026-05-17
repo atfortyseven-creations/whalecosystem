@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useWalletClient } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useWalletStore } from '@/lib/store/wallet-store';
+import { ethers } from 'ethers';
 import { QrCode, X, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -119,8 +122,9 @@ function playMessageSound() {
 // ── SovereignChat (Orchestrator) ──────────────────────────────────────────
 
 export default function SovereignChat() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, isLocalSovereignWallet } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const { privateKey: storePrivateKey } = useWalletStore();
 
   // ── Settings (persisted) ─────────────────────────────────────────────────
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS);
@@ -195,7 +199,9 @@ export default function SovereignChat() {
 
   // ── XMTP Client Init ─────────────────────────────────────────────────────
   const initXmtpClient = useCallback(async () => {
-    if (!isConnected || !walletClient || !address) return;
+    if (!isConnected || !address) return;
+    const hasLocalWallet = isLocalSovereignWallet && storePrivateKey;
+    if (!walletClient && !hasLocalWallet) return;
 
     setXmtpError(null);
     let attempts = 0;
@@ -205,13 +211,26 @@ export default function SovereignChat() {
       try {
         if (attempts > 0) await new Promise(resolve => setTimeout(resolve, 2000 * Math.pow(1.5, attempts)));
 
-        const signer = {
-          getAddress: async () => address,
-          signMessage: async (msg: string | Uint8Array) => {
-            const text = typeof msg === 'string' ? msg : new TextDecoder().decode(msg);
-            return walletClient.signMessage({ message: text });
-          },
-        };
+        let signer: any;
+        if (hasLocalWallet) {
+          const ethersWallet = new ethers.Wallet(storePrivateKey);
+          signer = {
+            getAddress: async () => address,
+            signMessage: async (msg: string | Uint8Array) => {
+              return ethersWallet.signMessage(msg);
+            },
+          };
+        } else if (walletClient) {
+          signer = {
+            getAddress: async () => address,
+            signMessage: async (msg: string | Uint8Array) => {
+              const text = typeof msg === 'string' ? msg : new TextDecoder().decode(msg);
+              return walletClient.signMessage({ message: text });
+            },
+          };
+        } else {
+          return;
+        }
         const client = await getXMTPClient(signer);
         xmtpClient.current = client;
         setXmtpReady(true);
@@ -231,7 +250,7 @@ export default function SovereignChat() {
         }
       }
     }
-  }, [isConnected, walletClient, address]);
+  }, [isConnected, walletClient, address, isLocalSovereignWallet, storePrivateKey]);
 
   useEffect(() => {
     initXmtpClient();

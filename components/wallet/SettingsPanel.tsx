@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DollarSign, Globe, Smartphone, Bell, Shield, Moon, ChevronRight, Key, ShieldCheck, Loader2 } from 'lucide-react';
+import { DollarSign, Globe, Smartphone, Bell, Shield, Moon, ChevronRight, Key, ShieldCheck, Loader2, LogOut } from 'lucide-react';
 import { WalletConnectSessions } from '@/components/wallet/WalletConnectSessions';
 import BiometricGuard from '@/components/wallet/BiometricGuard';
 import { startRegistration } from '@simplewebauthn/browser';
 import { toast } from 'sonner';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 
 export default function SettingsPanel() {
   const { address: authUserId, isConnected } = useSovereignAccount();
+  const { nuclearDisconnect } = useSovereignSignOut();
   const [currency, setCurrency] = useState('USD');
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState('Light');
@@ -176,6 +178,23 @@ export default function SettingsPanel() {
                 </div>
             </div>
         )}
+      </section>
+
+      {/* Session Connection */}
+      <section className="bg-red-500/5 rounded-3xl p-6 border-2 border-red-500/10">
+        <h3 className="text-sm font-bold text-red-600 uppercase mb-4 tracking-wider">Session Connection</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h4 className="font-bold text-[#1F1F1F]">Active Sovereign Session</h4>
+            <p className="text-xs text-[#1F1F1F]/50">Log out and clear all secure keys and wallet registries from local cache.</p>
+          </div>
+          <button 
+            onClick={nuclearDisconnect}
+            className="px-5 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-colors shadow-lg shadow-red-500/10 flex items-center justify-center gap-2"
+          >
+            <LogOut size={14} /> Disconnect Session
+          </button>
+        </div>
       </section>
 
       <div className="text-center text-xs text-[#1F1F1F]/30 pt-4">
