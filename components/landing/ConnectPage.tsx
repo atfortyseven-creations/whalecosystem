@@ -254,8 +254,27 @@ export default function ConnectPage() {
     }
   }, [connect, connectors, openAppKit]);
 
-  const handleMobileWallet = useCallback(() => {
+  const handleMobileWallet = useCallback((walletId: string) => {
     try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {}
+    
+    const host = typeof window !== 'undefined' ? window.location.host : 'whalealert.network';
+    const currentUrl = `https://${host}/connect`;
+
+    if (walletId === 'metamask-mobile') {
+        window.location.href = `https://metamask.app.link/dapp/${host}/connect`;
+        return;
+    }
+    
+    if (walletId === 'coinbase-mobile') {
+        window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(currentUrl)}`;
+        return;
+    }
+
+    if (walletId === 'rainbow-mobile') {
+        window.location.href = `https://rnbwapp.com/dapp/${host}/connect`;
+        return;
+    }
+
     openAppKit();
   }, [openAppKit]);
 
@@ -368,7 +387,7 @@ export default function ConnectPage() {
               ) : isMobile ? (
                 <div className="flex flex-col gap-3 flex-1">
                   {MOBILE_WALLETS.map((w) => (
-                    <WalletButton key={w.id} logo={w.logo} name={w.name} badge={w.badge} onClick={handleMobileWallet} loading={isPending && pendingId === w.id} delay={w.delay} extraIcon={<ExternalLink size={16} />} />
+                    <WalletButton key={w.id} logo={w.logo} name={w.name} badge={w.badge} onClick={() => handleMobileWallet(w.id)} loading={isPending && pendingId === w.id} delay={w.delay} extraIcon={<ExternalLink size={16} />} />
                   ))}
                   <button
                     onClick={() => setShowMobileScanner(true)}

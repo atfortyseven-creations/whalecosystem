@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import { Shield, Key, Eye, EyeOff, Check, ArrowRight, Loader2, Lock, AlertTriangle, ChevronLeft, ChevronRight, Copy, Wallet, Activity } from 'lucide-react';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { useAppKit } from '@reown/appkit/react';
+import { useAccount } from 'wagmi';
 import { toast } from 'sonner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
@@ -22,9 +23,17 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [verifyIndices, setVerifyIndices] = useState<number[]>([]);
   const [verifyInputs, setVerifyInputs] = useState<string[]>(['', '', '']);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [clickedMint, setClickedMint] = useState(false);
   
   const { open } = useAppKit();
+  const { isConnected } = useAccount();
   const { importWallet } = useWalletStore();
+
+  useEffect(() => {
+    if (clickedMint && isConnected) {
+      onComplete();
+    }
+  }, [clickedMint, isConnected, onComplete]);
 
   useEffect(() => {
     const ks = localStorage.getItem('sovereign_keystore');
@@ -175,7 +184,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
               )}
 
               <button 
-                onClick={() => open()}
+                onClick={() => { setClickedMint(true); open(); }}
                 className="group w-full flex items-center justify-between p-5 rounded-[22px] bg-transparent border border-transparent hover:bg-black/5 transition-all active:scale-[0.98]"
               >
                 <div className="flex items-center gap-4">

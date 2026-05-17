@@ -8,10 +8,10 @@ import {
   Eye, EyeOff, PieChart, Globe, Copy, Search,
   ArrowDownLeft, Repeat, CreditCard, Plus, ChevronDown,
   Check, Loader2, ShieldCheck, ExternalLink, Activity, ShieldAlert,
-  BarChart2, MessageSquare, Menu
+  BarChart2, MessageSquare, Menu, X, LogOut
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
-import { useAccount, useSwitchChain, useConnect } from 'wagmi';
+import { useAccount, useSwitchChain, useConnect, useDisconnect } from 'wagmi';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { mainnet, base, optimism, arbitrum, polygon } from 'wagmi/chains';
 import { useAppKit } from '@reown/appkit/react';
@@ -182,6 +182,13 @@ export default function PortfolioPage() {
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
+  const [sessionUnlocked, setSessionUnlocked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('portfolio_unlocked') === 'true') {
+      setSessionUnlocked(true);
+    }
+  }, []);
 
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading, isConnected: isLiveConnected, address: userAddress } = useLivePortfolio();
   const { chain, isConnected: wagmiConnected } = useAccount();
@@ -189,6 +196,7 @@ export default function PortfolioPage() {
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { open: openAppKit } = useAppKit();
   const { connect, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = () => setRefreshKey(k => k + 1);
 
@@ -221,22 +229,29 @@ export default function PortfolioPage() {
     }
   };
 
-  // ── Session Security Check ──
   const hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('sovereign_keystore') : false;
   const isQuantumUnlocked = !!privateKey;
   
-  // If they don't have a keystore, they MUST create one or at least interact with the gate.
-  // If they have one but it's locked, they must unlock it.
-  const needsGate = !isQuantumUnlocked && !wagmiConnected;
+  const needsGate = !isQuantumUnlocked && (!wagmiConnected || !sessionUnlocked);
 
-  // ── Not connected / Unauthenticated ──
   if (needsGate) {
     return (
-      <div className="w-full flex-1 flex flex-col bg-black/40 text-[#F5F5F5] h-full min-h-0 overflow-hidden">
-        <QuantumAuthGate onComplete={() => refresh()} />
+      <div className="w-full flex-1 flex flex-col bg-[#FAFAF8] text-[#0A0A0A] h-full min-h-0 overflow-hidden">
+        <QuantumAuthGate onComplete={() => {
+          sessionStorage.setItem('portfolio_unlocked', 'true');
+          setSessionUnlocked(true);
+          refresh();
+        }} />
       </div>
     );
   }
+
+  const handleDisconnect = () => {
+    disconnect();
+    sessionStorage.removeItem('portfolio_unlocked');
+    setSessionUnlocked(false);
+    refresh();
+  };
 
   return (
     <div className="w-full flex-1 flex flex-col bg-black/40 text-[#F5F5F5]">
@@ -397,6 +412,7 @@ export default function PortfolioPage() {
             <WalletAction icon={CreditCard}     label="Buy"    onClick={() => openMode("buy")}    />
             <WalletAction icon={Globe}          label="Network" onClick={() => setShowNetworkSwitch(s => !s)} />
             <WalletAction icon={Plus}           label="New Account" onClick={() => setShowCreateAccount(s => !s)} />
+            <WalletAction icon={LogOut}         label="Disconnect" onClick={handleDisconnect} />
           </div>
         </motion.div>
 
@@ -477,7 +493,7 @@ export default function PortfolioPage() {
                 </div>
                 <button onClick={() => { setShowCreateAccount(false); setAccountCreated(false); }} style={{ color: MUTED }} className="text-[10px] font-mono font-black uppercase tracking-widest hover:opacity-100 opacity-50 transition-opacity">Close</button>
               </div>
-              <div className="p-6">
+              <div className="p-8 flex flex-col gap-8 max-w-xl mx-auto items-center">
                 {accountCreated ? (
                   <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center gap-4 py-8">
                     <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
@@ -491,56 +507,38 @@ export default function PortfolioPage() {
                   </motion.div>
                 ) : (
                   <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Coinbase Smart Wallet */}
-                      <div className="rounded-2xl border p-5 flex flex-col justify-between hover:shadow-md transition-shadow" style={{ borderColor: BORDER, background: CARD }}>
-                        <div className="flex items-start gap-4 mb-6">
-                          <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 overflow-hidden" style={{ borderColor: BORDER, background: "#FAF9F6" }}>
-                            <img src="https://avatars.githubusercontent.com/u/18060234?s=200&v=4" alt="Coinbase" className="w-8 h-8 object-contain rounded-md" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-black text-sm" style={{ color: INK }}>Smart Wallet</div>
-                            <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: MUTED }}>Passkeys · No Seed</div>
-                            <p className="text-[11px] mt-2 leading-relaxed" style={{ color: MUTED }}>Free on-chain account powered by Account Abstraction. Sign in effortlessly with passkeys.</p>
-                          </div>
+                    <div className="text-center space-y-2">
+                       <h3 className="text-2xl font-black uppercase tracking-tight" style={{ color: INK }}>Select Account Type</h3>
+                       <p className="text-xs max-w-sm" style={{ color: MUTED }}>Deploy a smart account or connect a universal EOA. Both options give you full cryptographic ownership.</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                      {/* Smart Wallet */}
+                      <button
+                        onClick={handleCreateOnChainAccount}
+                        disabled={creatingAccount}
+                        className="group relative flex flex-col items-center text-center p-6 rounded-3xl border transition-all hover:border-blue-500/50 hover:bg-blue-500/5 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ borderColor: BORDER, background: CARD }}
+                      >
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-lg group-hover:scale-105 transition-transform">
+                          {creatingAccount ? <Loader2 size={24} className="animate-spin" /> : <ShieldCheck size={24} />}
                         </div>
-                        <button
-                          onClick={handleCreateOnChainAccount}
-                          disabled={creatingAccount}
-                          className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
-                          style={{ background: "#0052FF", color: '#FFFFFF' }}
-                        >
-                          {creatingAccount ? <><Loader2 size={14} className="animate-spin" /> Creating...</> : <><Plus size={14} /> Create Account</>}
-                        </button>
-                      </div>
+                        <div className="font-black text-sm uppercase tracking-widest mb-1" style={{ color: INK }}>Smart Wallet</div>
+                        <p className="text-[10px] font-mono leading-relaxed" style={{ color: MUTED }}>Passkey-enabled, gasless deployment, multi-chain compatibility.</p>
+                      </button>
 
                       {/* Universal Connect */}
-                      <div className="rounded-2xl border p-5 flex flex-col justify-between hover:shadow-md transition-shadow" style={{ borderColor: BORDER, background: CARD }}>
-                        <div className="flex items-start gap-4 mb-6">
-                          <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0" style={{ borderColor: BORDER, background: "#FAF9F6" }}>
-                            <Globe size={22} style={{ color: MUTED }} strokeWidth={1.5} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-black text-sm" style={{ color: INK }}>Universal Account</div>
-                            <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: MUTED }}>Web3 Standard</div>
-                            <p className="text-[11px] mt-2 leading-relaxed" style={{ color: MUTED }}>Connect or create a new account using any supported Web3 provider via WalletConnect.</p>
-                          </div>
+                      <button
+                         onClick={() => openAppKit()}
+                         className="group relative flex flex-col items-center text-center p-6 rounded-3xl border transition-all hover:border-[#F5F5F5]/30 hover:bg-[#F5F5F5]/5 overflow-hidden"
+                         style={{ borderColor: BORDER, background: CARD }}
+                      >
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-[#F5F5F5] text-black shadow-lg group-hover:scale-105 transition-transform">
+                          <Wallet size={24} />
                         </div>
-                        <div className="w-full flex justify-center scale-90">
-                           <button
-                             onClick={() => openAppKit()}
-                             className="px-6 py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all hover:opacity-80 shadow-sm"
-                             style={{ background: INK, color: '#fff' }}
-                           >
-                             Connect Wallet
-                           </button>
-                        </div>
-                      </div>
+                        <div className="font-black text-sm uppercase tracking-widest mb-1" style={{ color: INK }}>Universal Wallet</div>
+                        <p className="text-[10px] font-mono leading-relaxed" style={{ color: MUTED }}>Connect via MetaMask, Phantom, or WalletConnect standard.</p>
+                      </button>
                     </div>
-
-                    <p className="mt-5 text-[9px] font-mono uppercase tracking-widest text-center" style={{ color: MUTED }}>
-                      Non-custodial · Professional Grade · Zero server access
-                    </p>
                   </>
                 )}
               </div>
