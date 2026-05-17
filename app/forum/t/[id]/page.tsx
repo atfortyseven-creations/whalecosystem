@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNowStrict, format } from 'date-fns';
+import { BarChart2, PieChart, MessageSquare, Menu } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
@@ -270,7 +271,7 @@ export default function TopicPage() {
                     <span className="text-[13px] font-bold text-black dark:text-white transition-colors">{topic.views || 0}</span>
                  </div>
               </div>
-              <div className="mt-10 pt-8 border-t border-white/10 flex gap-2">
+               <div className="mt-10 pt-8 border-t border-white/10 flex gap-2">
                   <button 
                     onClick={() => document.getElementById('reply-composer')?.scrollIntoView({ behavior: 'smooth' })}
                     className="flex-1 text-center py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors bg-black/5 dark:bg-white/5 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10"
@@ -283,6 +284,41 @@ export default function TopicPage() {
 
       </div>
       </div>
+      
+      {/* Semantic spacer so the content is not hidden behind the fixed mobile bottom nav */}
+      <div className="lg:hidden w-full" style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))' }} />
+
+      {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
+      <nav className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 border-t border-black/10 bg-white/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+           {[
+              { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
+              { id: 'portfolio',   icon: <PieChart size={18} />,      label: 'Portfolio' },
+              { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
+              { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
+          ].map(tab => {
+              const isActive = false;
+              return (
+                  <button
+                      key={tab.id}
+                      onClick={() => {
+                          if (tab.id === 'menu') {
+                              router.push('/dashboard?tab=menu');
+                          }
+                          else if (tab.id === 'chat') router.push('/chat');
+                          else if (tab.id === 'portfolio') router.push('/portfolio');
+                          else router.push('/dashboard?tab=markets');
+                      }}
+                      style={{ minHeight: 0, minWidth: 0 }}
+                      className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors text-[#888888] hover:text-black`}
+                  >
+                      <span className="transition-transform">
+                          {tab.icon}
+                      </span>
+                      <span className="text-[10px] font-bold opacity-60">{tab.label}</span>
+                  </button>
+              );
+          })}
+      </nav>
     </div>
   );
 }
@@ -548,6 +584,7 @@ function PostRow({
               )}
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

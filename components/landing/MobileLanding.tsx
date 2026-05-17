@@ -15,7 +15,7 @@ import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 import { 
   Scan, MessageSquare, LogOut, MessageCircle, ScanLine, 
   Fingerprint, ChevronDown, CheckCircle, Zap, Shield, Menu,
-  ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X 
+  ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, PieChart 
 } from 'lucide-react';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
@@ -343,9 +343,7 @@ function ConnectedScreen({
   const fmtDate   = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-[#050505] text-[#FAF9F6]">
-      {/* Clean ivory background removed to reveal global wallpaper */}
-
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-[#FAF9F6] text-[#050505]">
       <main className="relative z-10 flex-1 flex flex-col items-center px-6 pt-10 pb-8 gap-5 max-w-[480px] w-full mx-auto">
         
         {/* Header & Logo */}
@@ -355,13 +353,13 @@ function ConnectedScreen({
            transition={{ duration: 0.6 }}
            className="w-full flex flex-col items-center justify-center gap-5 mb-4 mt-2"
         >
-           <WhaleLogo className="h-16 w-auto" />
+           <WhaleLogo className="h-16 w-auto text-[#050505]" />
            <div className="flex flex-col items-center text-center">
-             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-[#FAF9F6] leading-none">Whale Alert Network</h1>
-             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#FAF9F6]/40 mt-2 mb-4">Professional Platform</p>
-             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10 mt-2">
-                <MessageCircle size={14} className="text-[#FAF9F6]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]">
+             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-[#050505] leading-none">Whale Alert Network</h1>
+             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#050505]/40 mt-2 mb-4">Professional Platform</p>
+             <div className="flex items-center gap-2 px-3 py-1.5 bg-[#050505]/5 rounded-full border border-[#050505]/10 mt-2">
+                <MessageCircle size={14} className="text-[#050505]" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">
                   Available now, Whale Chat !
                 </span>
              </div>
@@ -373,47 +371,47 @@ function ConnectedScreen({
            initial={{ opacity: 0, scale: 0.98 }}
            animate={{ opacity: 1, scale: 1 }}
            transition={{ delay: 0.1, duration: 0.6 }}
-           className="w-full bg-[#0B0B0B] rounded-[32px] border-[3px] border-[#FAF9F6] shadow-[0_12px_40px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col"
+           className="w-full bg-white rounded-[32px] border border-[#050505]/10 shadow-xl overflow-hidden flex flex-col"
         >
-          {/* Identity card header — dark/grey bg with time */}
-          <div className="bg-[#121212] px-6 py-8 flex flex-col items-center text-center gap-2 border-b border-[#FAF9F6]/10">
-            <p className="text-[44px] font-black tracking-tighter text-[#FAF9F6] leading-none tabular-nums">
+          {/* Identity card header */}
+          <div className="bg-[#FAF9F6] px-6 py-8 flex flex-col items-center text-center gap-2 border-b border-[#050505]/5">
+            <p className="text-[44px] font-black tracking-tighter text-[#050505] leading-none tabular-nums">
               {fmtTime(now)}
             </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#FAF9F6]/40">{fmtDate(now)}</p>
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#050505]/40">{fmtDate(now)}</p>
           </div>
 
           {/* On-chain data row */}
-          <div className="grid grid-cols-2 gap-px bg-[#FAF9F6]/10">
-            <div className="bg-[#0B0B0B] px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-1.5">Network</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-[#FAF9F6] truncate">{chainName(chainId)}</p>
+          <div className="grid grid-cols-2 gap-px bg-[#050505]/5">
+            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1.5">Network</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-[#050505] truncate">{chainName(chainId)}</p>
             </div>
-            <div className="bg-[#0B0B0B] px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-1.5">Balance</p>
-              <p className="text-[13px] font-black font-mono tracking-wider text-[#FAF9F6] truncate">
-                {fmtBalance() ?? <span className="text-[#FAF9F6]/25">—</span>}
+            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1.5">Balance</p>
+              <p className="text-[13px] font-black font-mono tracking-wider text-[#050505] truncate">
+                {fmtBalance() ?? <span className="text-[#050505]/25">—</span>}
               </p>
             </div>
           </div>
 
           {/* Wallet / identity row */}
-          <div className="grid grid-cols-2 gap-px bg-[#FAF9F6]/10 border-t border-[#FAF9F6]/10">
-            <div className="bg-[#0B0B0B] px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-1.5">Provider</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-[#FAF9F6] truncate">{connectorName || 'Secure Wallet'}</p>
+          <div className="grid grid-cols-2 gap-px bg-[#050505]/5 border-t border-[#050505]/5">
+            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1.5">Provider</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-[#050505] truncate">{connectorName || 'Secure Wallet'}</p>
             </div>
-            <div className="bg-[#0B0B0B] px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-1.5">Identity</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-[#FAF9F6] truncate">{ensName ?? checksumAddr(address)}</p>
+            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1.5">Identity</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-[#050505] truncate">{ensName ?? checksumAddr(address)}</p>
             </div>
           </div>
 
           {/* Full address */}
-          <div className="px-6 py-6 bg-[#0B0B0B] border-t border-[#FAF9F6]/10 flex flex-col items-center text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-3">Verified On-Chain Address</p>
-            <div className="flex items-center justify-center gap-2 bg-[#FAF9F6]/5 border border-[#FAF9F6]/10 rounded-2xl px-5 py-4 w-full">
-              <p className="text-[12px] font-mono text-[#FAF9F6] font-bold tracking-tight break-all leading-relaxed">
+          <div className="px-6 py-6 bg-white border-t border-[#050505]/5 flex flex-col items-center text-center">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-3">Verified On-Chain Address</p>
+            <div className="flex items-center justify-center gap-2 bg-[#FAF9F6] border border-[#050505]/5 rounded-2xl px-5 py-4 w-full">
+              <p className="text-[12px] font-mono text-[#050505] font-bold tracking-tight break-all leading-relaxed">
                 {address}
               </p>
             </div>
@@ -427,11 +425,11 @@ function ConnectedScreen({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.5 }}
-          className="w-full flex items-start gap-3 px-5 py-4 rounded-[20px] bg-[#FAF9F6]/5 border border-white/10"
+          className="w-full flex items-start gap-3 px-5 py-4 rounded-[20px] bg-white border border-[#050505]/10 shadow-sm"
         >
-          <Scan size={14} className="text-[#FAF9F6]/60 mt-0.5 shrink-0" />
-          <p className="text-[10px] text-[#FAF9F6]/60 font-medium leading-relaxed">
-            Scan the <span className="font-black text-[#FAF9F6]/85">QR Code</span> from the Desktop Platform to link your session securely — no additional signature required.
+          <Scan size={14} className="text-[#050505]/60 mt-0.5 shrink-0" />
+          <p className="text-[10px] text-[#050505]/60 font-medium leading-relaxed">
+            Scan the <span className="font-black text-[#050505]/85">QR Code</span> from the Desktop Platform to link your session securely — no additional signature required.
           </p>
         </motion.div>
 
@@ -440,14 +438,14 @@ function ConnectedScreen({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="w-full flex items-center gap-3 px-5 py-4 rounded-[20px] bg-[#FAF9F6]/5 border border-[#FAF9F6]/10"
+          className="w-full flex items-center gap-3 px-5 py-4 rounded-[20px] bg-[#00C076]/10 border border-[#00C076]/20"
         >
-          <div className="w-8 h-8 rounded-full bg-[#FAF9F6]/5 flex items-center justify-center shrink-0">
-            <Scan size={16} className="text-[#FAF9F6]/60" />
+          <div className="w-8 h-8 rounded-full bg-[#00C076]/20 flex items-center justify-center shrink-0">
+            <Scan size={16} className="text-[#00C076]" />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]">Scanner Unlocked</span>
-            <span className="text-[9px] font-mono text-[#FAF9F6]/40 mt-0.5 leading-relaxed">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Scanner Unlocked</span>
+            <span className="text-[9px] font-mono text-[#00C076]/70 mt-0.5 leading-relaxed">
               You can use the scanner to link the desktop platform.
             </span>
           </div>
@@ -463,7 +461,7 @@ function ConnectedScreen({
           <button
             id="open-qr-scanner-btn"
             onClick={onScan}
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] bg-[#FAF9F6] hover:bg-[#FAF9F6]/90 active:scale-[0.97] transition-all text-[#050505] shadow-lg"
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] bg-[#050505] hover:bg-[#050505]/90 active:scale-[0.97] transition-all text-white shadow-lg"
             style={{ fontSize: "11px" }}
           >
             <ScanLine size={18} />
@@ -480,10 +478,10 @@ function ConnectedScreen({
         >
           <Link
             href="/forum"
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-[#FAF9F6]/20 bg-transparent hover:bg-[#FAF9F6]/5 transition-all group"
-            style={{ fontSize: "11px", color: "#FAF9F6" }}
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-[#050505]/10 bg-white hover:bg-[#050505]/5 transition-all group shadow-sm"
+            style={{ fontSize: "11px", color: "#050505" }}
           >
-            <MessageSquare size={18} className="group-hover:text-white transition-colors" />
+            <MessageSquare size={18} className="group-hover:text-[#050505] transition-colors" />
             Access Whale Alert Forum
           </Link>
         </motion.div>
@@ -497,7 +495,7 @@ function ConnectedScreen({
         >
           <Link
             href="/chat"
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all text-purple-400"
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 transition-all text-purple-600 shadow-sm"
             style={{ fontSize: "11px" }}
           >
             <MessageCircle size={18} />
@@ -505,7 +503,22 @@ function ConnectedScreen({
           </Link>
         </motion.div>
 
-
+        {/* ── Portfolio CTA ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.38, duration: 0.5 }}
+          className="w-full mt-2"
+        >
+          <Link
+            href="/portfolio"
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-[#050505]/10 bg-white hover:bg-[#050505]/5 transition-all text-[#050505] shadow-sm"
+            style={{ fontSize: "11px" }}
+          >
+            <PieChart size={18} />
+            Access Portfolio
+          </Link>
+        </motion.div>
 
         {/* ── Disconnect session button ── */}
         {onDisconnect && (
@@ -517,7 +530,7 @@ function ConnectedScreen({
             whileTap={{ scale: 0.97 }}
             onClick={onDisconnect}
             disabled={false}
-            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-[#FAF9F6]/5 transition-all mt-2 text-red-400/80 hover:text-red-400 active:scale-95"
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-[#050505]/5 transition-all mt-2 text-red-500/80 hover:text-red-600 active:scale-95"
             style={{ fontSize: "10px" }}
           >
             <LogOut size={16} />
@@ -530,9 +543,9 @@ function ConnectedScreen({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-[9px] font-mono text-[#FAF9F6]/30 text-center leading-relaxed px-4 pb-6"
+          className="text-[9px] font-mono text-[#050505]/40 text-center leading-relaxed px-4 pb-6"
         >
-          On the Desktop Platform, click <span className="font-black text-[#FAF9F6]/55">Direct QR Handshake</span>, then scan the code with this button to link your session.
+          On the Desktop Platform, click <span className="font-black text-[#050505]/80">Direct QR Handshake</span>, then scan the code with this button to link your session.
         </motion.p>
       </main>
 
