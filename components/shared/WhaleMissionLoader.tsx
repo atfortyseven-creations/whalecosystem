@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RemoteLottie } from '@/components/shared/RemoteLottie';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 interface WhaleMissionLoaderProps {
   children: React.ReactNode;
