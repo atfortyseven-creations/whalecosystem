@@ -59,15 +59,13 @@ export default function MobileChatPage() {
         if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
         rafRef.current = requestAnimationFrame(() => {
           setViewportHeight(vv.height);
-          setViewportOffset(vv.offsetTop);
+          // Removed buggy viewportOffset which causes keyboard misalignment
         });
       };
       update();
       vv.addEventListener("resize", update, { passive: true });
-      vv.addEventListener("scroll", update, { passive: true });
       return () => {
         vv.removeEventListener("resize", update);
-        vv.removeEventListener("scroll", update);
         if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
         document.body.style.overflow = '';
         document.body.style.position = '';
@@ -126,7 +124,7 @@ export default function MobileChatPage() {
   // ── Mobile: visual-viewport-anchored fixed positioning ──────────────────
   const containerStyle: React.CSSProperties = {
     position: 'fixed',
-    top: `${viewportOffset}px`,
+    top: 0,
     left: 0,
     right: 0,
     height: viewportHeight ? `${viewportHeight}px` : '100dvh',

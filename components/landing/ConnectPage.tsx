@@ -231,12 +231,7 @@ export default function ConnectPage() {
     } catch {}
     redirectingRef.current = true;
 
-    // Purge cookies to ensure fresh connection handshake without stale sessions
-    document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
+    // Removed cookie purging to prevent destroying valid sessions
     setLinked(true);
     window.location.replace("/dashboard");
   }, [isConnected, address, mounted, setLinked]);
@@ -259,24 +254,8 @@ export default function ConnectPage() {
     try { sessionStorage.removeItem("__disconnected__"); } catch {}
     try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {}
     
-    const host = typeof window !== 'undefined' ? window.location.host : 'whalealert.network';
-    const currentUrl = `https://${host}/connect`;
-
-    if (walletId === 'metamask-mobile') {
-        window.location.href = `https://metamask.app.link/dapp/${host}/connect`;
-        return;
-    }
-    
-    if (walletId === 'coinbase-mobile') {
-        window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(currentUrl)}`;
-        return;
-    }
-
-    if (walletId === 'rainbow-mobile') {
-        window.location.href = `https://rnbwapp.com/dapp/${host}/connect`;
-        return;
-    }
-
+    // Instead of forcing the user into the dapp browser with metamask.app.link/dapp,
+    // we use AppKit which correctly uses standard Universal Links to sign and return to Chrome.
     openAppKit();
   }, [openAppKit]);
 

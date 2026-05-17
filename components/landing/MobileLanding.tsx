@@ -1163,25 +1163,8 @@ export function MobileLanding() {
                   setWcDeepLink(null);
                   setShowFallbackBtn(false);
 
-                  const host = typeof window !== 'undefined' ? window.location.host : 'whalealert.network';
-                  const currentUrl = `https://${host}/connect`;
-
-                  if (walletId === 'metamask') {
-                      window.location.href = `https://metamask.app.link/dapp/${host}/connect`;
-                      return;
-                  }
-                  
-                  if (walletId === 'coinbase') {
-                      window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(currentUrl)}`;
-                      return;
-                  }
-
-                  if (walletId === 'rainbow') {
-                      window.location.href = `https://rnbwapp.com/dapp/${host}/connect`;
-                      return;
-                  }
-
-                  // Pure AppKit usage for other wallets
+                  // Pure AppKit usage to avoid forcing the dapp browser
+                  // AppKit native connection correctly uses standard Universal Links to sign and return to Chrome.
                   rkOpenModal({ view: 'Connect' });
                   setTimeout(() => setConnecting(null), 10000);
                 };

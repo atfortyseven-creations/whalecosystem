@@ -1240,8 +1240,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             </div>
 
             <div
-              className="shrink-0 bg-white/60 dark:bg-black/60 backdrop-blur-[60px] border-t border-black/5 dark:border-white/5"
-              style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+              className="shrink-0 bg-white/60 dark:bg-black/60 backdrop-blur-[60px] border-t border-black/5 dark:border-white/5 pb-2"
             >
               {/* ── Audio recording indicator ── */}
               {isRecording && (

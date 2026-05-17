@@ -111,8 +111,7 @@ const metadata = {
     url: CANONICAL_APP_URL,
     icons: [`${CANONICAL_APP_URL}/official-whale-monochrome.png`],
     redirect: {
-        // [INSTITUTIONAL PERFECTION] For web apps, ONLY universal (HTTPS) should be set.
-        // native redirects ('wc://') cause app-switching loops on some Android/iOS wallet implementations.
+        native: 'humanidfi://',
         universal: CANONICAL_APP_URL,
     }
 }
