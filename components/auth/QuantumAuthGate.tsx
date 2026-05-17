@@ -74,6 +74,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
 
     setStep('encrypting');
     
+    const startTime = Date.now();
+    
     // Allow UI to update before blocking thread
     setTimeout(async () => {
       try {
@@ -84,8 +86,14 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         }, password, { scrypt: { N: 1024 } });
         localStorage.setItem('sovereign_keystore', encryptedJson);
         importWallet(wallet.privateKey, "Sovereign Main");
-        toast.success('Wallet created and secured successfully.');
-        onComplete();
+        
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(8000 - elapsedTime, 0);
+
+        setTimeout(() => {
+          toast.success('Wallet created and secured successfully.');
+          onComplete();
+        }, remainingTime);
       } catch (e: any) {
         toast.error('Encryption failed', { description: e.message });
         setStep('verify');

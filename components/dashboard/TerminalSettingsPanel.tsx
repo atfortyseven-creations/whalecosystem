@@ -4,11 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettingsStore, SovereignSettings } from '@/lib/store/useSettingsStore';
 import { Sliders, Network, ShieldAlert, Key, Loader2, Check, Zap, Monitor, MessageSquare } from 'lucide-react';
+import { useDisconnect } from 'wagmi';
+import { toast } from 'sonner';
 
 const CATEGORIES = [
-  { id: 'general', label: 'AJUSTES GENERALES' },
-  { id: 'display', label: 'APARIENCIA' },
-  { id: 'privacy', label: 'PRIVACIDAD Y SEGURIDAD' },
+  { id: 'general', label: 'GENERAL SETTINGS' },
+  { id: 'display', label: 'APPEARANCE' },
+  { id: 'privacy', label: 'PRIVACY & SECURITY' },
 ];
 
 export function TerminalSettingsPanel() {
@@ -16,6 +18,26 @@ export function TerminalSettingsPanel() {
   const store = useSettingsStore();
   const { isLoading, updateSetting, fetchSettings } = store;
   const [activeTab, setActiveTab] = useState('general');
+  const { disconnect } = useDisconnect();
+
+  const handleTotalDisconnect = () => {
+    try {
+      disconnect();
+    } catch {}
+    
+    // Purge cookies
+    document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    
+    // Purge storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    toast.success("All sessions terminated & cookies purged.");
+    window.location.replace("/connect");
+  };
 
   useEffect(() => {
     fetchSettings();
@@ -129,10 +151,10 @@ export function TerminalSettingsPanel() {
     <div className="flex flex-col md:flex-row w-full h-full bg-[#FAF9F6] dark:bg-[#0A0A0A] overflow-hidden">
       
       {/* Sidebar */}
-      <div className="w-full md:w-[280px] border-b md:border-b-0 md:border-r border-black/10 dark:border-white/10 flex flex-col p-6 bg-white dark:bg-[#111111] shrink-0">
+      <div className="w-full md:w-[280px] border-b md:border-b-0 md:border-r border-black/10 dark:border-white/10 flex flex-col p-6 bg-white dark:bg-[#111111] shrink-0 min-h-[400px]">
          <div className="flex flex-col mb-8 px-2">
-            <span className="text-[13px] font-black uppercase tracking-tighter dark:text-white">Ajustes</span>
-            <span className="text-[9px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">Preferencias</span>
+            <span className="text-[13px] font-black uppercase tracking-tighter dark:text-white">Settings</span>
+            <span className="text-[9px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">Preferences</span>
          </div>
 
          <div className="flex flex-col gap-2">
@@ -148,6 +170,16 @@ export function TerminalSettingsPanel() {
                  </button>
                )
             })}
+         </div>
+
+         <div className="flex-1 flex flex-col justify-end mt-8">
+            <button
+              onClick={handleTotalDisconnect}
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-600 transition-all border border-rose-500/20 active:scale-[0.98]"
+            >
+              <ShieldAlert size={14} />
+              Total Disconnect
+            </button>
          </div>
       </div>
 
@@ -174,53 +206,53 @@ export function TerminalSettingsPanel() {
             >
                {activeTab === 'general' && (
                   <>
-                     {renderSelect('language', 'Idioma', 'Idioma de visualización de la interfaz.', [
-                        {value: 'en', label: 'Inglés'},
-                        {value: 'es-ES', label: 'Español (ES)'},
+                     {renderSelect('language', 'Language', 'Interface display language.', [
+                        {value: 'en', label: 'English'},
+                        {value: 'es-ES', label: 'Spanish (ES)'},
                      ])}
-                     {renderSelect('currency', 'Moneda Base', 'Moneda predeterminada para el balance.', [
-                        {value: 'USD', label: 'USD - Dólar'},
+                     {renderSelect('currency', 'Base Currency', 'Default currency for balances.', [
+                        {value: 'USD', label: 'USD - Dollar'},
                         {value: 'EUR', label: 'EUR - Euro'},
-                        {value: 'GBP', label: 'GBP - Libra'},
+                        {value: 'GBP', label: 'GBP - Pound'},
                         {value: 'JPY', label: 'JPY - Yen'}
                      ])}
-                     {renderSelect('timeFormat', 'Formato de Tiempo', 'Visualización de la hora.', [
-                        {value: '12h', label: '12 Horas (AM/PM)'},
-                        {value: '24h', label: '24 Horas'}
+                     {renderSelect('timeFormat', 'Time Format', 'Time display layout.', [
+                        {value: '12h', label: '12 Hours (AM/PM)'},
+                        {value: '24h', label: '24 Hours'}
                      ])}
-                     {renderSelect('dateFormat', 'Formato de Fecha', 'Orden de día, mes y año.', [
+                     {renderSelect('dateFormat', 'Date Format', 'Day, month, and year ordering.', [
                         {value: 'DD/MM/YYYY', label: 'DD/MM/YYYY'},
                         {value: 'MM/DD/YYYY', label: 'MM/DD/YYYY'}
                      ])}
-                     {renderSelect('addressFormat', 'Formato de Dirección', 'Cómo se muestran las direcciones.', [
-                        {value: 'truncated', label: 'Abreviada (0x1...ABCD)'},
-                        {value: 'full', label: 'Dirección Completa'}
+                     {renderSelect('addressFormat', 'Address Format', 'How cryptographic addresses are rendered.', [
+                        {value: 'truncated', label: 'Abbreviated (0x1...ABCD)'},
+                        {value: 'full', label: 'Full Address'}
                      ])}
                   </>
                )}
 
                {activeTab === 'display' && (
                   <>
-                     {renderSelect('theme', 'Apariencia', 'Tema visual general.', [
-                        {value: 'light', label: 'Modo Claro'},
-                        {value: 'dark', label: 'Modo Oscuro'},
-                        {value: 'system', label: 'Usar Configuración del Sistema'}
+                     {renderSelect('theme', 'Appearance', 'Overall visual theme.', [
+                        {value: 'light', label: 'Light Mode'},
+                        {value: 'dark', label: 'Dark Mode'},
+                        {value: 'system', label: 'System Default'}
                      ])}
-                     {renderSelect('density', 'Densidad', 'Espaciado de la interfaz.', [
-                        {value: 'relaxed', label: 'Relajado'},
-                        {value: 'compact', label: 'Compacto'},
-                        {value: 'dense', label: 'Denso'}
+                     {renderSelect('density', 'Density', 'Spacing density of the interface.', [
+                        {value: 'relaxed', label: 'Relaxed'},
+                        {value: 'compact', label: 'Compact'},
+                        {value: 'dense', label: 'Dense'}
                      ])}
-                     {renderToggle('showBalances', 'Mostrar Balances', 'Visualizar balances en pantalla.')}
-                     {renderToggle('hardwareAcceleration', 'Aceleración de Hardware', 'Mejor rendimiento visual.')}
+                     {renderToggle('showBalances', 'Show Balances', 'Display portfolio balances on-screen.')}
+                     {renderToggle('hardwareAcceleration', 'Hardware Acceleration', 'Enables high-performance GPU-accelerated rendering.')}
                   </>
                )}
 
                {activeTab === 'privacy' && (
                   <>
-                     {renderInput('inactivityLockMinutes', 'Bloqueo por inactividad', 'Minutos de inactividad antes del bloqueo.', 'number', 'MIN')}
-                     {renderToggle('stealthMode', 'Modo Sigiloso', 'Desenfoca todas las direcciones visibles.')}
-                     {renderToggle('requireSignForExports', 'Firma para exportar', 'Requiere firma antes de exportar.')}
+                     {renderInput('inactivityLockMinutes', 'Inactivity Timeout', 'Minutes of inactivity before auto-locking.', 'number', 'MIN')}
+                     {renderToggle('stealthMode', 'Stealth Mode', 'Obfuscates all visible wallet and contract addresses.')}
+                     {renderToggle('requireSignForExports', 'Export Authorization', 'Requires cryptographic signature validation before exporting ledger data.')}
                   </>
                )}
             </motion.div>

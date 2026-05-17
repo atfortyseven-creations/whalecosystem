@@ -287,8 +287,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     </div>
                 </div>
 
-                {/* 🔥 ON-CHAIN ACTION BUTTONS - METAMASK GRID STYLE */}
-                <div className="flex justify-center items-center gap-4 md:gap-8 mt-12 relative z-10 w-full">
+                {/* 🔥 ON-CHAIN ACTION BUTTONS - CENTER WRAP RESPONSIVE GRID STYLE */}
+                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 mt-12 relative z-10 w-full py-2">
                     <ActionButton 
                         icon={<ArrowUpRight size={20} />} 
                         label="Send" 
@@ -296,12 +296,12 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         primary
                     />
                     <ActionButton 
-                        icon={<ArrowDownRight size={20} />} 
+                        icon={<ArrowDownLeft size={20} />} 
                         label="Receive" 
                         onClick={() => setIsReceiveOpen(true)} 
                     />
                     <ActionButton 
-                        icon={<RefreshCcw size={20} />} 
+                        icon={<ArrowLeftRight size={20} />} 
                         label="Swap" 
                         onClick={() => setIsSwapOpen(true)} 
                     />
@@ -309,6 +309,21 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         icon={<Globe size={20} />} 
                         label="Bridge" 
                         onClick={() => alert("Bridge module optimizing cross-chain liquidity paths.")} 
+                    />
+                    <ActionButton 
+                        icon={<Zap size={20} />} 
+                        label="Buy" 
+                        onClick={() => alert("Buy crypto service powering direct on-ramps.")} 
+                    />
+                    <ActionButton 
+                        icon={<Globe size={20} />} 
+                        label="Network" 
+                        onClick={() => alert("Network settings config is available via bottom status or main command console.")} 
+                    />
+                    <ActionButton 
+                        icon={<UserPlus size={20} />} 
+                        label="New Account" 
+                        onClick={() => alert("Vault account creation triggered. Non-custodial ledger active.")} 
                     />
                 </div>
             </motion.div>
