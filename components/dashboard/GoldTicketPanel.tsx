@@ -430,8 +430,7 @@ export function GoldTicketPanel() {
                       disabled={hasTicket}
                       onMint={handleMint}
                       mintLabel={
-                        isMinting || isSigning ? 'SIGNING...' :
-                        !isConnected || !isWagmiConnected ? 'CONNECT WALLET' : `MINT FOR ${MINT_FEE_ETH} ETH`
+                        isMinting || isSigning ? 'SIGNING...' : `MINT FOR ${MINT_FEE_ETH} ETH`
                       }
                     />
                  </div>

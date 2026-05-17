@@ -229,7 +229,7 @@ export default function PortfolioPage() {
   // ── Not connected / Unauthenticated ──
   if (needsGate) {
     return (
-      <div className="w-full flex-1 flex flex-col bg-black/40 text-[#F5F5F5] min-h-[100vh]">
+      <div className="w-full flex-1 flex flex-col bg-black/40 text-[#F5F5F5] h-full min-h-0 overflow-hidden">
         <QuantumAuthGate onComplete={() => refresh()} />
       </div>
     );
