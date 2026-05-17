@@ -1200,6 +1200,8 @@ export function MobileLanding() {
                   ECDSA Verification · Non-custodial · Private keys never leave your device.
                 </p>
               </div>
+            </div>
+          </div>
             </motion.div>
           </motion.div>
         )}
