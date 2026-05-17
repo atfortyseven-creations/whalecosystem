@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Missing request body' }, { status: 400 });
     }
 
-    const { walletAddress, twitterHandle, signatureData, cryptoSignature } = body;
+    const { walletAddress, twitterHandle, signatureData, cryptoSignature, txHash } = body;
 
     // ── Field-level validation ────────────────────────────────────────────────
     if (!walletAddress || typeof walletAddress !== 'string') {
@@ -202,6 +202,25 @@ export async function POST(req: NextRequest) {
 
         // ── Create ticket using standard Prisma methods ───────────────────────
         const tempSerial = `PENDING-${address}-${Date.now()}`;
+        // Pack on-chain mint details into signatureData JSON
+        let packedSignatureData = safeSignatureData;
+        try {
+            const parsed = JSON.parse(signatureData);
+            packedSignatureData = JSON.stringify({
+                signature: parsed.signature || signatureData,
+                timestamp: parsed.timestamp || new Date().toISOString(),
+                txHash: txHash || parsed.txHash || null,
+                cryptoSignature: cryptoSignature || parsed.cryptoSignature || null
+            });
+        } catch {
+            packedSignatureData = JSON.stringify({
+                signature: signatureData,
+                timestamp: new Date().toISOString(),
+                txHash: txHash || null,
+                cryptoSignature: cryptoSignature || null
+            });
+        }
+
         const initialTicket = await (prisma as any).goldenTicket.create({
             data: {
                 userAddress: address,
@@ -210,7 +229,7 @@ export async function POST(req: NextRequest) {
                 badgeColor: 'GOLD',
                 networkLaunchEligible: true,
                 twitterHandle: safeHandle,
-                signatureData: safeSignatureData,
+                signatureData: packedSignatureData,
                 isActive: true
             }
         });
@@ -271,7 +290,27 @@ export async function POST(req: NextRequest) {
 // ─────────────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
     try {
-        const address      = req.nextUrl.searchParams.get('address')?.toLowerCase();
+        const address = req.nextUrl.searchParams.get('address')?.toLowerCase();
+
+        // ── Clean up legacy off-chain mock records ──────────────────────────────
+        // Deletes any ticket that is off-chain (does not have a real txHash recorded).
+        // This ensures only real on-chain minted tickets remain in the system ledger.
+        const allTickets = await (prisma as any).goldenTicket.findMany();
+        for (const t of allTickets) {
+            let isOffchain = true;
+            if (t.signatureData) {
+                try {
+                    const parsed = JSON.parse(t.signatureData);
+                    if (parsed && parsed.txHash) {
+                        isOffchain = false;
+                    }
+                } catch {}
+            }
+            if (isOffchain) {
+                await (prisma as any).goldenTicket.delete({ where: { id: t.id } });
+            }
+        }
+
         const totalClaimed = await (prisma as any).goldenTicket.count();
         const remaining    = Math.max(0, MAX_SUPPLY - totalClaimed);
 

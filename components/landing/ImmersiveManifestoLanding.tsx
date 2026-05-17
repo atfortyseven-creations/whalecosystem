@@ -108,7 +108,6 @@ export function ImmersiveManifestoLanding() {
 
   const SCREENSHOTS = [
     "/system-shots/Captura de pantalla 2026-05-17 081424.png",
-    "/system-shots/Captura de pantalla 2026-05-17 081558.png",
     "/system-shots/Captura de pantalla 2026-05-17 081640.png",
     "/system-shots/Captura de pantalla 2026-05-17 081511.png",
     "/system-shots/Captura de pantalla 2026-05-17 081726.png",
@@ -204,17 +203,17 @@ export function ImmersiveManifestoLanding() {
             {/* Right column: 2 stacked */}
             <div className="flex flex-col gap-4">
               <motion.div style={{ y: col1Y, willChange: "transform" }} className="relative overflow-hidden rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.14)] border border-[#050505]/5 flex-1">
-                <img src={SCREENSHOTS[1]} alt="Platform Interface 2" className="w-full h-full aspect-[16/10] object-cover" loading="eager" />
+                <img src={SCREENSHOTS[1]} alt="Platform Interface 2" className="w-full h-full aspect-[16/10] object-cover object-top" loading="eager" />
               </motion.div>
               <motion.div style={{ y: col2Y, willChange: "transform" }} className="relative overflow-hidden rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.14)] border border-[#050505]/5 flex-1">
-                <img src={SCREENSHOTS[2]} alt="Platform Interface 3" className="w-full h-full aspect-[16/10] object-cover" loading="eager" />
+                <img src={SCREENSHOTS[2]} alt="Platform Interface 3" className="w-full h-full aspect-[16/10] object-cover object-top" loading="eager" />
               </motion.div>
             </div>
           </div>
 
           {/* Row 2: 3 equal screenshots */}
           <div className="grid grid-cols-3 gap-4 w-full">
-            {[SCREENSHOTS[3], SCREENSHOTS[4], SCREENSHOTS[5]].map((src, i) => (
+            {[SCREENSHOTS[3], SCREENSHOTS[4]].map((src, i) => (
               <motion.div
                 key={i}
                 style={{ y: col3Y, willChange: "transform" }}
@@ -223,15 +222,78 @@ export function ImmersiveManifestoLanding() {
                 <img
                   src={src}
                   alt={`Platform Interface ${i + 4}`}
-                  className="w-full aspect-[16/10] object-cover"
+                  className="w-full aspect-[16/10] object-cover object-top"
                   loading="lazy"
                 />
               </motion.div>
             ))}
+            {/* Coltea video preview card */}
+            <motion.div
+              style={{ y: col3Y, willChange: "transform" }}
+              className="relative overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[#050505]/5 bg-black"
+            >
+              <video
+                src="/system-shots/Coltea-video-2025-v2.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full aspect-[16/10] object-cover"
+                style={{ willChange: "transform" }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4">
+                <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/80 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                  Spitalul Colțea · 1704
+                </span>
+              </div>
+            </motion.div>
           </div>
         </div>
 
-        {/* ── Mobile: NOT rendered — mobile users get MobileManifesto (no heavy images) ── */}
+        {/* ── Mobile: Screenshot carousel ── */}
+        <div className="flex md:hidden flex-col w-full gap-3 px-4 pb-6">
+          {SCREENSHOTS.map((src, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+              className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.10)] border border-[#050505]/5"
+            >
+              <img
+                src={src}
+                alt={`Platform Interface ${i + 1}`}
+                className="w-full aspect-[16/10] object-cover object-top"
+                loading={i < 2 ? "eager" : "lazy"}
+              />
+            </motion.div>
+          ))}
+          {/* Coltea video mobile */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#050505]/5 bg-black"
+          >
+            <video
+              src="/system-shots/Coltea-video-2025-v2.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full aspect-video object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute bottom-3 left-3">
+              <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/80 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                Spitalul Colțea · 1704
+              </span>
+            </div>
+          </motion.div>
+        </div>
 
       </section>
 

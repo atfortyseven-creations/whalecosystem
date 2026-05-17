@@ -172,12 +172,11 @@ const MEGA_CLUSTERS = [
 
 export function SovereignFooter() {
   const containerRef = useRef<HTMLElement>(null);
-  const [cracks, setCracks] = useState<{id: number, x: number, y: number}[]>([]);
+  const [dots, setDots] = useState<{id: number, x: number, y: number}[]>([]);
   const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
 
   useEffect(() => {
     return () => {
-      // Cleanup all pending timeouts on unmount to prevent React state updates on unmounted component
       timeoutsRef.current.forEach(clearTimeout);
     };
   }, []);
@@ -187,61 +186,54 @@ export function SovereignFooter() {
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const newCrack = { id: Date.now(), x, y };
-    setCracks(prev => [...prev, newCrack]);
-    
-    // Purge crack after animation completes
+    // Spawn a cluster of 5 small purple dots around the click point
+    const newDots = Array.from({ length: 5 }, (_, i) => ({
+      id: Date.now() + i,
+      x: x + (Math.random() - 0.5) * 28,
+      y: y + (Math.random() - 0.5) * 28,
+    }));
+    setDots(prev => [...prev, ...newDots]);
     const timer = setTimeout(() => {
-        setCracks(prev => prev.filter(c => c.id !== newCrack.id));
-    }, 1200);
+      const ids = new Set(newDots.map(d => d.id));
+      setDots(prev => prev.filter(d => !ids.has(d.id)));
+    }, 700);
     timeoutsRef.current.push(timer);
   };
 
-  // Complex jagged path for the shattering effect
-  const CRACK_PATH = "M50,50 L58,35 L52,25 L65,10 M50,50 L40,65 L48,75 L35,90 M50,50 L70,55 L80,45 L95,50 M50,50 L30,40 L20,50 L5,45 M50,50 L60,70 L55,85 L65,95 M50,50 L45,30 L30,20 L25,5 M50,50 L35,60 L20,70 L10,65 M50,50 L65,40 L80,30 L90,20";
-
   return (
-    <footer 
+    <footer
         ref={containerRef}
         onClick={handleClick}
         className="relative w-full bg-[#FAF9F6] border-t border-[#050505]/5 flex flex-col items-center overflow-hidden selection:bg-[#7C3AED]/20 group/footer"
-        style={{ cursor: "crosshair" }}
     >
-      {/* Dynamic Cracking Interaction */}
+      {/* Small purple dots on click */}
       <AnimatePresence>
-          {cracks.map((crack) => (
-              <motion.svg
-                  key={crack.id}
-                  width="140" height="140" viewBox="0 0 100 100"
-                  style={{ 
-                      position: 'absolute', 
-                      left: crack.x - 70, 
-                      top: crack.y - 70, 
-                      pointerEvents: 'none', 
-                      zIndex: 50, 
-                      filter: "drop-shadow(0 0 4px rgba(124,58,237,0.8))" 
-                  }}
-              >
-                 <motion.path
-                     d={CRACK_PATH}
-                     stroke="#9333ea"
-                     strokeWidth="1.2"
-                     fill="none"
-                     initial={{ pathLength: 0, opacity: 1, scale: 0.9 }}
-                     animate={{ pathLength: 1, opacity: [1, 1, 0], scale: 1.05 }}
-                     transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                     strokeLinecap="square"
-                     strokeLinejoin="miter"
-                 />
-                 {/* High energy impact core */}
-                 <motion.circle 
-                    cx="50" cy="50" r="1.5" fill="#d8b4fe"
-                    initial={{ scale: 0, opacity: 1 }}
-                    animate={{ scale: [0, 5, 0], opacity: [1, 0] }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                 />
-              </motion.svg>
-          ))}
+        {dots.map((dot) => (
+          <motion.div
+            key={dot.id}
+            style={{
+              position: 'absolute',
+              left: dot.x - 3,
+              top: dot.y - 3,
+              pointerEvents: 'none',
+              zIndex: 50,
+            }}
+            initial={{ opacity: 1, scale: 0 }}
+            animate={{ opacity: 0, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: '#7C3AED',
+                boxShadow: '0 0 6px rgba(124,58,237,0.7)',
+              }}
+            />
+          </motion.div>
+        ))}
       </AnimatePresence>
 
       <div className="relative z-20 w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 pt-24 pb-16 flex flex-col gap-16">
