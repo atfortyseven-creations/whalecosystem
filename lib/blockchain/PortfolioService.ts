@@ -264,9 +264,9 @@ export class PortfolioService {
       };
 
     } catch (error: any) {
-      const isQuotaHit = error.message.includes('401') || error.message.includes('Quota') || error.message.includes('consumed');
+      const isQuotaHit = error.message.includes('MORALIS_QUOTA_EXHAUSTED') || error.message.includes('401') || error.message.includes('Quota') || error.message.includes('consumed');
       if (isQuotaHit) {
-        console.warn(`[Portfolio-Moralis] 🛡️ Quota Limit Detected for ${chainId}. Triggering High-Fidelity Fallback.`);
+        console.warn(`[Portfolio-Moralis] 🛡️ Quota Limit Detected for chain ${chainId} (${chain}). Triggering High-Fidelity Fallback.`);
       } else {
         console.error(`[Portfolio-Moralis] ❌ ERROR for chain ${chainId}:`, error.message);
       }
@@ -281,6 +281,8 @@ export class PortfolioService {
           }
 
           // Generic RPC Fallback (Worldchain, Base, etc.)
+          // 🚨 [QUORUM FIX] Use a SINGLE direct JsonRpcProvider to avoid ethers v6 FallbackProvider
+          // quorum-not-met errors when only one RPC endpoint is reachable per chain.
           const { blockchainService } = await import('./BlockchainService');
           
           // Scan for common tokens on this chain

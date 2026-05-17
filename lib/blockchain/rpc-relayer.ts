@@ -103,9 +103,9 @@ export class RpcRelayerManager {
   private static endpoints: Record<string, Endpoint[]> = {};
   private static indices: Record<string, number> = {};
 
-  /** Base Cooldown de 1 min antes de reintentar. Se multiplica por backoffFactor */
-  private static readonly BASE_COOLDOWN_MS = 60 * 1000;
-  private static readonly MAX_BACKOFF = 16; // Max 16 mins
+  /** Base Cooldown de 5 min antes de reintentar. Se multiplica por backoffFactor */
+  private static readonly BASE_COOLDOWN_MS = 5 * 60 * 1000;
+  private static readonly MAX_BACKOFF = 16; // Max 16 × 5min = ~80 min
 
   static {
     this.initialize();
@@ -113,10 +113,12 @@ export class RpcRelayerManager {
 
   private static initialize() {
     // ── ETH ────────────────────────────────────────────────────────────────────────
-    // Primarios (cuentas 1-3) → Backup (cuentas 12-14). RR natural.
+    // Primarios (cuentas 1-3): RPC_1, RPC_2, RPC_3, RPC_4 → Backup (cuentas 12-14). RR natural.
     this.loadCluster('ETH_RPC', [
       process.env.GB_ETH_RPC_1,
       process.env.GB_ETH_RPC_2,
+      process.env.GB_ETH_RPC_3,    // cuenta 3 — 2x HTTP
+      process.env.GB_ETH_RPC_4,    // cuenta 3 — slot adicional
       process.env.RPC_CLUSTER_ETH_RPC,  // legacy comma-separated
       // — backups (cuentas 12–14) — solo entran si primarios en cooldown
       process.env.GB_ETH_RPC_B1,
@@ -200,6 +202,7 @@ export class RpcRelayerManager {
     ]);
     this.loadCluster('BSC_WSS', [
       process.env.GB_BSC_WSS_1,
+      process.env.GB_BSC_WSS_2,
       process.env.RPC_CLUSTER_BSC_WSS,
       // — backup —
       process.env.GB_BSC_WSS_B1,

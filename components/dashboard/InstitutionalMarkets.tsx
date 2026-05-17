@@ -235,9 +235,6 @@ export function InstitutionalMarkets() {
                 </div>
             </div>
             
-            <div className="text-center mt-4 text-[9px] text-[#888888] dark:text-white/30 uppercase tracking-[0.2em] font-black">
-                INSTITUTIONAL GRADE REAL-TIME ON-CHAIN DATA
-            </div>
         </div>
     );
 }

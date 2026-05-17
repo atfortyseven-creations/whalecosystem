@@ -132,23 +132,23 @@ function WalletOption({
       transition={{ delay, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
       onClick={onClick}
       disabled={loading}
-      className="group w-full flex items-center gap-4 p-4 rounded-2xl border border-[#E5E5E5] bg-white hover:bg-[#FAF9F6] hover:border-black/20 active:scale-[0.97] transition-all duration-200 shadow-sm disabled:opacity-60"
+      className="group w-full flex items-center gap-4 p-4 rounded-2xl border border-white/10 bg-[#0B0B0B] hover:bg-[#FAF9F6]/5 hover:border-white/20 active:scale-[0.97] transition-all duration-200 shadow-sm disabled:opacity-60"
     >
-      <div className="w-11 h-11 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center p-2 overflow-hidden shrink-0">
+      <div className="w-11 h-11 rounded-xl bg-[#FAF9F6]/5 border border-white/10 flex items-center justify-center p-2 overflow-hidden shrink-0">
         {loading ? (
-          <Loader2 size={20} className="animate-spin text-black/40" />
+          <Loader2 size={20} className="animate-spin text-white/40" />
         ) : (
           <img src={logo} alt={name} className="w-full h-full object-contain" />
         )}
       </div>
       <div className="flex-1 text-left">
-        <p className="text-[13px] font-black uppercase tracking-tight text-[#050505]">{name}</p>
-        <p className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-widest mt-0.5">
+        <p className="text-[13px] font-black uppercase tracking-tight text-[#FAF9F6]">{name}</p>
+        <p className="text-[10px] font-mono text-[#FAF9F6]/40 uppercase tracking-widest mt-0.5">
           {loading ? "Opening app…" : badge}
         </p>
       </div>
       {!loading && (
-        <ArrowRight size={14} className="text-[#050505]/20 group-hover:text-[#050505] group-hover:translate-x-0.5 transition-all shrink-0" />
+        <ArrowRight size={14} className="text-[#FAF9F6]/20 group-hover:text-[#FAF9F6] group-hover:translate-x-0.5 transition-all shrink-0" />
       )}
     </motion.button>
   );
@@ -166,30 +166,30 @@ function SigningOverlay({
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       className="fixed inset-0 z-[9999] flex items-center justify-center p-6"
-      style={{ background: "rgba(250,249,246,0.97)", backdropFilter: "blur(24px)" }}
+      style={{ background: "rgba(5,5,5,0.98)", backdropFilter: "blur(24px)" }}
     >
       <div className="w-full max-w-sm flex flex-col items-center gap-5 text-center">
-        <div className="w-20 h-20 rounded-[2rem] bg-white border border-black/8 shadow-lg flex items-center justify-center">
+        <div className="w-20 h-20 rounded-[2rem] bg-[#0B0B0B] border border-white/10 shadow-lg flex items-center justify-center">
           {isSigning ? (
-            <RefreshCw size={28} className="text-black/60 animate-spin" />
+            <RefreshCw size={28} className="text-white/60 animate-spin" />
           ) : error ? (
             <AlertCircle size={28} className="text-red-500" />
           ) : (
-            <Fingerprint size={28} className="text-[#050505]" />
+            <Fingerprint size={28} className="text-[#FAF9F6]" />
           )}
         </div>
 
-        <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/8 rounded-full shadow-sm">
-          <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/60 font-mono">
+        <div className="flex items-center gap-2 px-4 py-2 bg-[#0B0B0B] border border-white/10 rounded-full shadow-sm">
+          <span className="text-[11px] font-black uppercase tracking-widest text-[#FAF9F6]/60 font-mono">
             {address.slice(0, 8)}…{address.slice(-6)}
           </span>
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-[24px] font-black tracking-tighter text-[#050505] leading-none">
+          <h2 className="text-[24px] font-black tracking-tighter text-[#FAF9F6] leading-none">
           {isSigning ? "Action Required" : error ? "Connection Failed" : "Connecting..."}
           </h2>
-          <p className="text-[12px] text-[#050505]/50 leading-relaxed">
+          <p className="text-[12px] text-[#FAF9F6]/50 leading-relaxed">
             {error
               ? "Could not cryptographically verify the wallet. Please try again."
               : isSigning
@@ -202,7 +202,7 @@ function SigningOverlay({
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-[11px] font-black uppercase tracking-widest"
+            className="w-full px-4 py-3 bg-red-950/20 border border-red-900/30 rounded-2xl text-red-400 text-[11px] font-black uppercase tracking-widest"
           >
             {error}
           </motion.div>
@@ -211,37 +211,37 @@ function SigningOverlay({
         {error ? (
           <button
             onClick={onRetry}
-            className="w-full py-4 rounded-2xl bg-[#2D0A59] text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all"
+            className="w-full py-4 rounded-2xl bg-[#FAF9F6] text-[#050505] font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all hover:bg-[#FAF9F6]/90"
           >
             <RefreshCw size={16} />
             Retry Connection
           </button>
         ) : isSigning ? (
           <div className="w-full flex flex-col gap-3">
-             <div className="w-full py-3 rounded-2xl bg-black/5 border border-black/10 text-black/60 font-black uppercase tracking-widest text-[10px] flex items-center justify-center text-center px-4">
+             <div className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/60 font-black uppercase tracking-widest text-[10px] flex items-center justify-center text-center px-4">
                Approve signature in your wallet app
              </div>
              {wcDeepLink ? (
                <a
                   href={wcDeepLink}
                   rel="noopener noreferrer"
-                  className="w-full py-4 rounded-2xl bg-black text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-transform select-none"
+                  className="w-full py-4 rounded-2xl bg-[#FAF9F6] text-[#050505] font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-transform select-none hover:bg-[#FAF9F6]/90"
                >
                  Open Wallet App
                </a>
              ) : (
                 <button
                   onClick={onRetry}
-                  className="w-full py-4 rounded-2xl bg-black text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all"
+                  className="w-full py-4 rounded-2xl bg-[#FAF9F6] text-[#050505] font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all hover:bg-[#FAF9F6]/90"
                 >
                   Open Wallet To Sign
                 </button>
              )}
           </div>
         ) : (
-          <div className="w-full px-4 py-3 rounded-2xl border border-[#E5E5E5] bg-white flex items-center justify-center gap-3">
-            <Loader2 size={16} className="animate-spin text-[#050505]/60" />
-            <span className="text-[#050505] font-black uppercase tracking-widest text-[11px]">Validating...</span>
+          <div className="w-full px-4 py-3 rounded-2xl border border-white/10 bg-[#0B0B0B] flex items-center justify-center gap-3">
+            <Loader2 size={16} className="animate-spin text-white/60" />
+            <span className="text-[#FAF9F6] font-black uppercase tracking-widest text-[11px]">Validating...</span>
           </div>
         )}
       </div>
@@ -342,7 +342,7 @@ function ConnectedScreen({
   const fmtDate   = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-transparent text-black">
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-[#050505] text-[#FAF9F6]">
       {/* Clean ivory background removed to reveal global wallpaper */}
 
       <main className="relative z-10 flex-1 flex flex-col items-center px-6 pt-10 pb-8 gap-5 max-w-[480px] w-full mx-auto">
@@ -356,11 +356,11 @@ function ConnectedScreen({
         >
            <WhaleLogo className="h-16 w-auto" />
            <div className="flex flex-col items-center text-center">
-             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-black leading-none">Whale Alert Network</h1>
-             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-black/50 mt-2 mb-4">Professional Platform</p>
-             <div className="flex items-center gap-2 px-3 py-1.5 bg-black/5 rounded-full border border-black/10 mt-2">
-                <MessageCircle size={14} className="text-black" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">
+             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-[#FAF9F6] leading-none">Whale Alert Network</h1>
+             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#FAF9F6]/40 mt-2 mb-4">Professional Platform</p>
+             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10 mt-2">
+                <MessageCircle size={14} className="text-[#FAF9F6]" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]">
                   Available now, Whale Chat !
                 </span>
              </div>
@@ -372,47 +372,47 @@ function ConnectedScreen({
            initial={{ opacity: 0, scale: 0.98 }}
            animate={{ opacity: 1, scale: 1 }}
            transition={{ delay: 0.1, duration: 0.6 }}
-           className="w-full bg-white rounded-[32px] border-[3px] border-black shadow-[0_12px_40px_rgb(0,0,0,0.12)] overflow-hidden flex flex-col"
+           className="w-full bg-[#0B0B0B] rounded-[32px] border-[3px] border-[#FAF9F6] shadow-[0_12px_40px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col"
         >
-          {/* Identity card header — black bg with time */}
-          <div className="bg-black px-6 py-8 flex flex-col items-center text-center gap-2">
-            <p className="text-[44px] font-black tracking-tighter text-white leading-none tabular-nums">
+          {/* Identity card header — dark/grey bg with time */}
+          <div className="bg-[#121212] px-6 py-8 flex flex-col items-center text-center gap-2 border-b border-[#FAF9F6]/10">
+            <p className="text-[44px] font-black tracking-tighter text-[#FAF9F6] leading-none tabular-nums">
               {fmtTime(now)}
             </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/40">{fmtDate(now)}</p>
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#FAF9F6]/40">{fmtDate(now)}</p>
           </div>
 
           {/* On-chain data row */}
-          <div className="grid grid-cols-2 gap-px bg-black">
-            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Network</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-black truncate">{chainName(chainId)}</p>
+          <div className="grid grid-cols-2 gap-px bg-[#FAF9F6]/10">
+            <div className="bg-[#0B0B0B] px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-1.5">Network</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-[#FAF9F6] truncate">{chainName(chainId)}</p>
             </div>
-            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Balance</p>
-              <p className="text-[13px] font-black font-mono tracking-wider text-black truncate">
-                {fmtBalance() ?? <span className="text-black/25">—</span>}
+            <div className="bg-[#0B0B0B] px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-1.5">Balance</p>
+              <p className="text-[13px] font-black font-mono tracking-wider text-[#FAF9F6] truncate">
+                {fmtBalance() ?? <span className="text-[#FAF9F6]/25">—</span>}
               </p>
             </div>
           </div>
 
           {/* Wallet / identity row */}
-          <div className="grid grid-cols-2 gap-px bg-black border-t border-black">
-            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Provider</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-black truncate">{connectorName || 'Secure Wallet'}</p>
+          <div className="grid grid-cols-2 gap-px bg-[#FAF9F6]/10 border-t border-[#FAF9F6]/10">
+            <div className="bg-[#0B0B0B] px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-1.5">Provider</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-[#FAF9F6] truncate">{connectorName || 'Secure Wallet'}</p>
             </div>
-            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1.5">Identity</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-black truncate">{ensName ?? checksumAddr(address)}</p>
+            <div className="bg-[#0B0B0B] px-5 py-5 flex flex-col items-center text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-1.5">Identity</p>
+              <p className="text-[13px] font-black uppercase tracking-widest text-[#FAF9F6] truncate">{ensName ?? checksumAddr(address)}</p>
             </div>
           </div>
 
           {/* Full address */}
-          <div className="px-6 py-6 bg-white border-t border-black flex flex-col items-center text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-3">Verified On-Chain Address</p>
-            <div className="flex items-center justify-center gap-2 bg-[#f4f4f4] border border-black/10 rounded-2xl px-5 py-4 w-full">
-              <p className="text-[12px] font-mono text-black font-bold tracking-tight break-all leading-relaxed">
+          <div className="px-6 py-6 bg-[#0B0B0B] border-t border-[#FAF9F6]/10 flex flex-col items-center text-center">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]/40 mb-3">Verified On-Chain Address</p>
+            <div className="flex items-center justify-center gap-2 bg-[#FAF9F6]/5 border border-[#FAF9F6]/10 rounded-2xl px-5 py-4 w-full">
+              <p className="text-[12px] font-mono text-[#FAF9F6] font-bold tracking-tight break-all leading-relaxed">
                 {address}
               </p>
             </div>
@@ -426,11 +426,11 @@ function ConnectedScreen({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.5 }}
-          className="w-full flex items-start gap-3 px-5 py-4 rounded-[20px] bg-white border border-black/8"
+          className="w-full flex items-start gap-3 px-5 py-4 rounded-[20px] bg-[#FAF9F6]/5 border border-white/10"
         >
-          <Scan size={14} className="text-black/40 mt-0.5 shrink-0" />
-          <p className="text-[10px] text-[#050505]/50 font-medium leading-relaxed">
-            Scan the <span className="font-black text-black/70">QR Code</span> from the Desktop Platform to link your session securely — no additional signature required.
+          <Scan size={14} className="text-[#FAF9F6]/60 mt-0.5 shrink-0" />
+          <p className="text-[10px] text-[#FAF9F6]/60 font-medium leading-relaxed">
+            Scan the <span className="font-black text-[#FAF9F6]/85">QR Code</span> from the Desktop Platform to link your session securely — no additional signature required.
           </p>
         </motion.div>
 
@@ -439,14 +439,14 @@ function ConnectedScreen({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="w-full flex items-center gap-3 px-5 py-4 rounded-[20px] bg-white border-[3px] border-black/10"
+          className="w-full flex items-center gap-3 px-5 py-4 rounded-[20px] bg-[#FAF9F6]/5 border border-[#FAF9F6]/10"
         >
-          <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center shrink-0">
-            <Scan size={16} className="text-black/60" />
+          <div className="w-8 h-8 rounded-full bg-[#FAF9F6]/5 flex items-center justify-center shrink-0">
+            <Scan size={16} className="text-[#FAF9F6]/60" />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Scanner Unlocked</span>
-            <span className="text-[9px] font-mono text-black/40 mt-0.5 leading-relaxed">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]">Scanner Unlocked</span>
+            <span className="text-[9px] font-mono text-[#FAF9F6]/40 mt-0.5 leading-relaxed">
               You can use the scanner to link the desktop platform.
             </span>
           </div>
@@ -462,7 +462,7 @@ function ConnectedScreen({
           <button
             id="open-qr-scanner-btn"
             onClick={onScan}
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] bg-[#1a0533] hover:bg-[#2D0A59] active:scale-[0.97] transition-all text-white shadow-lg"
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] bg-[#FAF9F6] hover:bg-[#FAF9F6]/90 active:scale-[0.97] transition-all text-[#050505] shadow-lg"
             style={{ fontSize: "11px" }}
           >
             <ScanLine size={18} />
@@ -479,8 +479,8 @@ function ConnectedScreen({
         >
           <Link
             href="/forum"
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[3px] border-black bg-white hover:bg-black hover:text-white transition-all group"
-            style={{ fontSize: "11px", color: "black" }}
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-[#FAF9F6]/20 bg-transparent hover:bg-[#FAF9F6]/5 transition-all group"
+            style={{ fontSize: "11px", color: "#FAF9F6" }}
           >
             <MessageSquare size={18} className="group-hover:text-white transition-colors" />
             Access Whale Alert Forum
@@ -496,7 +496,7 @@ function ConnectedScreen({
         >
           <Link
             href="/chat"
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border-[2px] border-[#9945FF]/30 bg-gradient-to-r from-[#9945FF]/10 to-[#6B2FBB]/10 hover:from-[#9945FF]/20 hover:to-[#6B2FBB]/20 transition-all text-[#7B35CC]"
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all text-purple-400"
             style={{ fontSize: "11px" }}
           >
             <MessageCircle size={18} />
@@ -516,7 +516,7 @@ function ConnectedScreen({
             whileTap={{ scale: 0.97 }}
             onClick={onDisconnect}
             disabled={false}
-            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-red-50 transition-all mt-2 text-red-400/70 hover:text-red-500 active:scale-95"
+            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-[#FAF9F6]/5 transition-all mt-2 text-red-400/80 hover:text-red-400 active:scale-95"
             style={{ fontSize: "10px" }}
           >
             <LogOut size={16} />
@@ -529,9 +529,9 @@ function ConnectedScreen({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-[9px] font-mono text-black/30 text-center leading-relaxed px-4 pb-6"
+          className="text-[9px] font-mono text-[#FAF9F6]/30 text-center leading-relaxed px-4 pb-6"
         >
-          On the Desktop Platform, click <span className="font-black text-black/50">Direct QR Handshake</span>, then scan the code with this button to link your session.
+          On the Desktop Platform, click <span className="font-black text-[#FAF9F6]/55">Direct QR Handshake</span>, then scan the code with this button to link your session.
         </motion.p>
       </main>
 
@@ -626,6 +626,7 @@ export function MobileLanding() {
   }, [isLinked, effectiveAddress, uuidParam, autoSyncStarted]);
 
   const [isActuallySigning, setIsActuallySigning] = useState(false);
+  const signingInProgressRef = useRef(false);
   const [signingError, setSigningError] = useState<string | null>(null);
   const [showKyc, setShowKyc] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
@@ -658,8 +659,9 @@ export function MobileLanding() {
   // SECURE HANDSHAKE: Verifies wallet ownership via cryptographic proof
   // ─────────────────────────────────────────────────────────────────────────────
   const establishSession = useCallback(async (addr: string) => {
-    if (isLinked || isActuallySigning) return;
+    if (isLinked || isActuallySigning || signingInProgressRef.current) return;
 
+    signingInProgressRef.current = true;
     const norm = addr.toLowerCase();
 
     // 1. First, check if we already have a valid server session
@@ -737,6 +739,7 @@ export function MobileLanding() {
       console.error('[Auth] Handshake failed:', err);
       setSigningError(err.message || 'Verification failed');
     } finally {
+      signingInProgressRef.current = false;
       setIsActuallySigning(false);
     }
   }, [isLinked, isActuallySigning, signMessageAsync]);
@@ -832,11 +835,11 @@ export function MobileLanding() {
   }, [isLinked]);
 
   useEffect(() => {
-    if (!mounted || isLinked) return;
+    if (!mounted || isLinked || isActuallySigning || signingInProgressRef.current || signingError) return;
     if (isConnected && address) {
       establishSession(address);
     }
-  }, [mounted, isConnected, address, isLinked, establishSession]);
+  }, [mounted, isConnected, address, isLinked, isActuallySigning, signingError, establishSession]);
 
   // ── forceFullReconnect — Manual sync trigger for Android Chrome ────────────
   const forceFullReconnect = useCallback(() => {
@@ -1089,7 +1092,7 @@ export function MobileLanding() {
 
   // ── Render: Connect Overlay ────────────────────────────────────────────────
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: '#FAFAF8', color: INK }}>
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-[#050505] text-[#FAF9F6]">
 
       {/* Pure ivory base — no pattern noise */}
       {/* Background layer removed */}
@@ -1100,7 +1103,7 @@ export function MobileLanding() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-        style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(0,0,0,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.03)" }}
+        style={{ background: "rgba(5,5,5,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(255,255,255,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
       >
         <div className="flex items-center gap-3">
           <div
@@ -1114,12 +1117,12 @@ export function MobileLanding() {
             <WhaleLogo className="w-6 h-6" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
+            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: '#FAF9F6' }}>Whale Alert Network</span>
           </div>
         </div>
         <button 
           onClick={() => setShowConnectOverlay(false)}
-          className="px-4 py-2 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+          className="px-4 py-2 rounded-xl bg-[#FAF9F6] text-[#050505] text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all hover:bg-[#FAF9F6]/90"
         >
           Explore
         </button>
@@ -1163,11 +1166,11 @@ export function MobileLanding() {
           className="text-center transform-gpu"
           style={{ willChange: "transform, opacity" }}
         >
-          <h1 className="text-[2.2rem] sm:text-[2.8rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
+          <h1 className="text-[2.2rem] sm:text-[2.8rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: '#FAF9F6' }}>
             Track institutional capital
-            <span className="block" style={{ color: '#0044CC' }}>before markets react.</span>
+            <span className="block" style={{ color: '#00F2EA' }}>before markets react.</span>
           </h1>
-          <p className="text-[12px] font-medium leading-relaxed max-w-[280px] mx-auto" style={{ color: MUTED }}>
+          <p className="text-[12px] font-medium leading-relaxed max-w-[280px] mx-auto text-[#FAF9F6]/60">
             Real-time on-chain intelligence — from mempool to execution. Your key never leaves your device.
           </p>
         </motion.div>
@@ -1177,11 +1180,11 @@ export function MobileLanding() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22, duration: 0.5 }}
-          className="w-full flex items-start gap-3 px-4 py-3.5 rounded-2xl bg-amber-50 border border-amber-100/80"
+          className="w-full flex items-start gap-3 px-4 py-3.5 rounded-2xl bg-amber-950/20 border border-amber-900/30 text-amber-300"
         >
-          <Fingerprint size={14} className="text-amber-600 mt-0.5 shrink-0" />
-          <p className="text-[10px] text-amber-700/80 font-medium leading-relaxed">
-            <span className="font-black text-amber-700">Have your wallet app open and ready.</span> When you tap a wallet below, a signature request will arrive in your wallet — approve it to access the platform.
+          <Fingerprint size={14} className="text-amber-400 mt-0.5 shrink-0" />
+          <p className="text-[10px] text-amber-300/80 font-medium leading-relaxed">
+            <span className="font-black text-amber-300">Have your wallet app open and ready.</span> When you tap a wallet below, a signature request will arrive in your wallet — approve it to access the platform.
           </p>
         </motion.div>
 

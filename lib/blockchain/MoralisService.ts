@@ -139,9 +139,18 @@ export class MoralisService {
                 const errorText = await response.text();
                 
                 // 🔥 [LEGENDARY QUOTA SHIELD] If throttled or quota exhausted
-                if (response.status === 429 || response.status === 403 || errorText.toLowerCase().includes('plan') || errorText.toLowerCase().includes('consumed')) {
-                    console.warn(`[Moralis] 🛡️ Quota Limit Hit (${response.status}). Attempting stale fallback for ${endpoint}...`);
-                    this.quotaExhaustedUntil = Date.now() + 5 * 60 * 1000; // 5 minute cooldown
+                // 401 = free-plan daily quota exceeded (Moralis returns 401, NOT 429)
+                // 429 = rate-limit within the plan
+                // 403 = API key blocked
+                const isQuotaError = response.status === 401 || response.status === 429 || response.status === 403
+                    || errorText.toLowerCase().includes('plan')
+                    || errorText.toLowerCase().includes('consumed')
+                    || errorText.toLowerCase().includes('upgrade');
+                if (isQuotaError) {
+                    console.warn(`[Moralis] 🛡️ Quota Limit Hit (${response.status}). Cooling down for 60 minutes.`);
+                    // Free-plan resets daily. 60-min cooldown avoids log spam while allowing
+                    // recovery if the user upgrades their plan mid-session.
+                    this.quotaExhaustedUntil = Date.now() + 60 * 60 * 1000;
                 }
                 throw new Error(`Moralis API Error (${response.status}): ${errorText}`);
             }

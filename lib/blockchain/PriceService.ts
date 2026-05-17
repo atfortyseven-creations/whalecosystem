@@ -172,8 +172,20 @@ export class PriceService {
       const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${address}`, {
         signal: AbortSignal.timeout(8000)
       });
+
+      // 🚨 [HTML GUARD] DexScreener CDN/Cloudflare occasionally returns an HTML error page.
+      // Attempting JSON.parse on HTML produces misleading SyntaxError log spam.
+      // Bail out early if the response is not clean JSON.
+      if (!res.ok) return null;
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json') && !contentType.includes('text/json')) {
+        // Silently skip — this is a known transient CDN degradation, not a code bug.
+        return null;
+      }
+
       const text = await res.text();
-      if (!text) return null;
+      if (!text || text.trimStart().startsWith('<')) return null; // Extra HTML guard
+
       const data = safeJsonParse<any>(text, null, 'PRICE_SERVICE_DEXSCREENER');
       if (!data) return null;
       const pair = data.pairs?.[0]; // Get most liquid pair

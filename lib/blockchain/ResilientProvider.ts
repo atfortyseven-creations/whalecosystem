@@ -127,17 +127,6 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       'https://rpc.ankr.com/base',
     ].filter(Boolean),
   },
-  10: {
-    rpc: [
-      ...getGbAllRpc('op'),                                           // GB slot 10
-      `https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
-      'https://mainnet.optimism.io',
-      'https://rpc.ankr.com/optimism',
-    ].filter(Boolean),
-    wss: [
-      'wss://optimism-rpc.publicnode.com',
-    ].filter(Boolean),
-  },
   42161: {
     rpc: [
       ...getGbAllRpc('arb'),                                          // GB slot 8 (archive)
@@ -150,6 +139,19 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       'wss://arbitrum-one-rpc.publicnode.com',
     ].filter(Boolean),
   },
+  // ── Optimism (chain 10) ───────────────────────────────────────────────────
+  10: {
+    rpc: [
+      ...getGbAllRpc('op'),                                           // GB slot 25 (cuenta única)
+      `https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
+      'https://mainnet.optimism.io',
+      'https://rpc.ankr.com/optimism',
+    ].filter(Boolean),
+    wss: [
+      'wss://optimism-rpc.publicnode.com',
+      'wss://op-mainnet.public.blastapi.io',
+    ].filter(Boolean),
+  },
   43114: {
     rpc: [
       ...getGbAllRpc('avax'),                                         // GB slot 13
@@ -159,7 +161,35 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
     ].filter(Boolean),
     wss: [
       'wss://avalanche-c-chain-rpc.publicnode.com',
+      'wss://avax-mainnet.public.blastapi.io/ext/bc/C/ws',
     ].filter(Boolean),
+  },
+  // ── WorldChain (480) ──────────────────────────────────────────────────────
+  480: {
+    rpc: [
+      ...getGbAllRpc('world'),                                        // GB slot 27
+      `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
+      'https://worldchain-mainnet.g.alchemy.com/public',
+    ].filter(Boolean),
+    wss: [],
+  },
+  // ── HyperEVM (999) ────────────────────────────────────────────────────────
+  999: {
+    rpc: [
+      ...getGbAllRpc('hyperevm'),                                     // GB slot 28
+      'https://rpc.hyperliquid.xyz/evm',
+    ].filter(Boolean),
+    wss: [
+      'wss://rpc.hyperliquid.xyz/evm',
+    ].filter(Boolean),
+  },
+  // ── Berachain (80084) ─────────────────────────────────────────────────────
+  80084: {
+    rpc: [
+      ...getGbAllRpc('bera'),                                         // GB slot 29
+      'https://rpc.berachain.com',
+    ].filter(Boolean),
+    wss: [],
   },
 };
 
@@ -446,8 +476,34 @@ export class ResilientProvider {
   }
 }
 
-// ── Singleton instances ──
-export const ethereumResilientProvider = new ResilientProvider(1);
-export const bscResilientProvider = new ResilientProvider(56);
-export const baseResilientProvider = new ResilientProvider(8453);
-export const polygonResilientProvider = new ResilientProvider(137);
+// ── Singleton instances — todos los chains cubiertos por GetBlock ──
+export const ethereumResilientProvider  = new ResilientProvider(1);
+export const bscResilientProvider       = new ResilientProvider(56);
+export const baseResilientProvider      = new ResilientProvider(8453);
+export const polygonResilientProvider   = new ResilientProvider(137);
+export const arbitrumResilientProvider  = new ResilientProvider(42161);
+export const optimismResilientProvider  = new ResilientProvider(10);
+export const avalancheResilientProvider = new ResilientProvider(43114);
+export const worldchainResilientProvider = new ResilientProvider(480);
+export const hyperevmResilientProvider  = new ResilientProvider(999);
+export const berachainResilientProvider = new ResilientProvider(80084);
+
+/**
+ * Helper: obtener el ResilientProvider correcto por chain ID.
+ * Remplaza la necesidad de un switch() en cada punto de uso.
+ */
+export function getResilientProvider(chainId: number): ResilientProvider {
+  switch (chainId) {
+    case 1:     return ethereumResilientProvider;
+    case 56:    return bscResilientProvider;
+    case 8453:  return baseResilientProvider;
+    case 137:   return polygonResilientProvider;
+    case 42161: return arbitrumResilientProvider;
+    case 10:    return optimismResilientProvider;
+    case 43114: return avalancheResilientProvider;
+    case 480:   return worldchainResilientProvider;
+    case 999:   return hyperevmResilientProvider;
+    case 80084: return berachainResilientProvider;
+    default:    return ethereumResilientProvider; // fallback seguro
+  }
+}

@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, ChevronRight, Search, ChevronDown,
     X, ArrowUpRight, Globe, Info, Lock,
-    BarChart2, PlusCircle, Wallet, MessageSquare, Menu, PieChart
+    BarChart2, PlusCircle, Wallet, MessageSquare, Menu, PieChart,
+    Zap, Activity, Cpu
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -44,6 +45,19 @@ const SIDEBAR_ITEMS: NavItem[] = [
 const RESTRICTED_TABS = [
     'mass-transfer'
 ];
+
+function getModuleIcon(id: string) {
+    switch (id) {
+        case 'gold':          return <Zap size={18} />;
+        case 'billing':       return <Wallet size={18} />;
+        case 'markets':       return <BarChart2 size={18} />;
+        case 'inst-ledger':   return <Globe size={18} />;
+        case 'mass-transfer': return <Cpu size={18} />;
+        case 'logs':          return <Activity size={18} />;
+        case 'support':       return <MessageSquare size={18} />;
+        default:              return <Info size={18} />;
+    }
+}
 
 
 
@@ -118,6 +132,7 @@ interface WhaleProShellProps {
 export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbed = false, isZkVerified = false }: WhaleProShellProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+    const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [isSessionLocked, setIsSessionLocked] = useState(false);
     const [tier, setTier] = useState<string | null>(null);
@@ -553,11 +568,11 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
                 {/* Only renders on real mobile hardware (screen.width < 1024).  */}
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
-                <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+                <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                      {[
+                        { id: 'gold',        icon: <Zap size={18} />,           label: 'Mint' },
                         { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Tokens' },
-                        { id: 'portfolio',   icon: <PieChart size={18} />,      label: 'Portfolio' },
-                        { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
+                        { id: 'inst-ledger', icon: <Globe size={18} />,          label: 'Ledger' },
                         { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
@@ -565,10 +580,11 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                             <button
                                 key={tab.id}
                                 onClick={() => {
-                                    if (tab.id === 'menu') setIsPaletteOpen(true);
-                                    else if (tab.id === 'chat') router.push('/chat');
-                                    else if (tab.id === 'portfolio') router.push('/portfolio');
-                                    else handleTabChange(tab.id);
+                                     if (tab.id === 'menu') {
+                                         setIsMenuDrawerOpen(true);
+                                     } else {
+                                         handleTabChange(tab.id);
+                                     }
                                 }}
                                 style={{ minHeight: 0, minWidth: 0 }}
                                 className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors ${
@@ -664,6 +680,93 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     </button>
                 </div>
             </motion.div>
+            </motion.div>
+        )}
+
+        {/* Mobile slide-up menu sheet drawer */}
+        {isMenuDrawerOpen && (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMenuDrawerOpen(false)}
+                className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-end justify-center lg:hidden"
+            >
+                <motion.div
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "100%" }}
+                    transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full max-w-md bg-white dark:bg-[#0A0A0A] rounded-t-[32px] border-t border-black/10 dark:border-white/10 shadow-[0_-12px_40px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden max-h-[85vh]"
+                >
+                    {/* Header line handle */}
+                    <div className="flex justify-center py-3">
+                        <div className="w-12 h-1 rounded-full bg-black/10 dark:bg-white/10" />
+                    </div>
+
+                    {/* Title */}
+                    <div className="px-6 pb-4 flex justify-between items-center border-b border-black/5 dark:border-white/5">
+                        <div>
+                            <h3 className="text-[14px] font-black uppercase tracking-[0.2em] text-black dark:text-white">Terminal Navigation</h3>
+                            <p className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/40 dark:text-white/40 mt-0.5">Select a Terminal Module</p>
+                        </div>
+                        <button onClick={() => setIsMenuDrawerOpen(false)} className="w-7 h-7 rounded-full hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition-colors">
+                            <X size={14} className="text-black/50 dark:text-white/50" />
+                        </button>
+                    </div>
+
+                    {/* Navigation Items list */}
+                    <div className="px-4 py-5 overflow-y-auto space-y-1.5">
+                        {SIDEBAR_ITEMS.map((item) => {
+                            const isRestricted = RESTRICTED_TABS.includes(item.id);
+                            const isLocked = isRestricted && tier === 'FREE';
+                            const isActive = activeTab === item.id;
+                            const isZkRestricted = item.requiresZK && !isZkVerified;
+
+                            return (
+                                <button
+                                    key={item.id}
+                                    disabled={isZkRestricted || isLocked}
+                                    onClick={() => {
+                                        handleTabChange(item.id);
+                                        setIsMenuDrawerOpen(false);
+                                    }}
+                                    className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${
+                                        isActive 
+                                            ? 'bg-black text-white dark:bg-white dark:text-black font-black uppercase' 
+                                            : 'bg-black/[0.02] hover:bg-black/[0.04] dark:bg-white/[0.02] dark:hover:bg-white/[0.04] text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white font-bold uppercase'
+                                    } disabled:opacity-40 disabled:cursor-not-allowed`}
+                                >
+                                    <div className="flex items-center gap-3.5">
+                                        <div className={isActive ? 'text-white dark:text-black' : 'text-black/40 dark:text-white/40'}>
+                                            {getModuleIcon(item.id)}
+                                        </div>
+                                        <span className="text-[11px] tracking-[0.15em]">{item.label}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {isZkRestricted && (
+                                            <span className="text-[8px] font-black tracking-widest bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded border border-amber-500/30">
+                                                ZK REQUIRED
+                                            </span>
+                                        )}
+                                        {isLocked && (
+                                            <span className="text-[8px] font-black tracking-widest bg-red-500/20 text-red-500 px-2 py-0.5 rounded border border-red-500/30">
+                                                LOCKED
+                                            </span>
+                                        )}
+                                        {!isActive && !isZkRestricted && !isLocked && (
+                                            <ChevronRight size={14} className="opacity-30" />
+                                        )}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Bottom Padding */}
+                    <div className="h-4 bg-transparent shrink-0" />
+                </motion.div>
             </motion.div>
         )}
         </AnimatePresence>
