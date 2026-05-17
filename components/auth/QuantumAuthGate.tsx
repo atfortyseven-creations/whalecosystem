@@ -170,8 +170,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
                     <Key size={18} className="text-[#0A0A0A]" />
                   </div>
                   <div className="text-left">
-                    <div className="text-[15px]">Connect Wallet</div>
-                    <div className="text-[12px] text-slate-500 font-normal">Metamask, Coinbase, WalletConnect</div>
+                    <div className="text-[15px]">Mint Gold Ticket Pass</div>
+                    <div className="text-[12px] text-slate-500 font-normal">0.5 ETH Mint Fee · Governance & Unlimited Terminal Access</div>
                   </div>
                 </div>
                 <ArrowRight size={18} className="text-slate-400" />
@@ -433,8 +433,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <div className="flex items-center justify-center px-6 min-h-[calc(100vh-80px)] w-full relative overflow-hidden">
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+    <div className="flex items-center justify-center px-6 h-full w-full relative overflow-y-auto py-12 md:py-0">
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
          <RemoteLottie path="Whale Mission.json" className="w-full h-full object-cover" />
       </div>
       <motion.div 
@@ -443,7 +443,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="w-full max-w-md bg-white/60 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 shadow-sm p-8 md:p-10"
+        className="w-full max-w-md bg-white/60 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 shadow-sm p-8 md:p-10 relative z-10"
       >
         {renderContent()}
       </motion.div>

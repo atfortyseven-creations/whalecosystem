@@ -346,6 +346,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                   // Belt-and-suspenders scroll containment:
                   // scrollbarWidth and overscroll are set inline as well so
                   // no CSS cascade issue on any browser engine can break them.
+                  height: '100%',
+                  minHeight: '100%',
                   scrollbarWidth: 'thin',
                   overscrollBehavior: 'contain',
                   touchAction: 'pan-y',
