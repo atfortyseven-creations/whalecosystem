@@ -171,6 +171,21 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
         }
     }, [mode, generateQr]);
 
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            setState('validating');
+            await stopCamera();
+            const html5QrCode = new Html5Qrcode(QR_CONTAINER_ID);
+            const decodedText = await html5QrCode.scanFile(file, true);
+            await handleDecode(decodedText);
+        } catch (err) {
+            setState('error');
+            setMessage('Could not detect a valid QR code in the image. Please try another image.');
+        }
+    };
+
     if (mode === 'project') {
         return (
             <div className={`w-full flex flex-col items-center gap-6 ${className ?? ''}`}>
@@ -220,10 +235,16 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                             <Camera size={36} className="text-black/10 mb-2" />
                             <span className="text-[9px] font-mono uppercase tracking-widest text-black/20">Awaiting Activation</span>
                         </div>
-                        <button onClick={startCamera}
-                            className="w-full py-4 rounded-2xl bg-black text-white font-mono text-[11px] uppercase tracking-widest font-black shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-                            <Camera size={16} /> Activate Camera
-                        </button>
+                        <div className="w-full space-y-3">
+                            <button onClick={startCamera}
+                                className="w-full py-4 rounded-2xl bg-black text-white font-mono text-[11px] uppercase tracking-widest font-black shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                                <Camera size={16} /> Activate Camera
+                            </button>
+                            <label className="w-full py-4 rounded-2xl bg-black/5 border border-black/10 text-black font-mono text-[11px] uppercase tracking-widest font-black shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer hover:bg-black/10">
+                                <Camera size={16} /> Upload QR Image
+                                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                            </label>
+                        </div>
                     </motion.div>
                 )}
 
@@ -241,7 +262,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     <motion.div key="validating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-4 py-16">
                         <Loader size={36} className="animate-spin text-black/40" />
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/40">Validating bridge token…</p>
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/40">Validating QR token…</p>
                     </motion.div>
                 )}
 
@@ -265,9 +286,15 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                         <p className="font-mono text-[10px] uppercase tracking-widest text-black/30">
                             Point at the QR code on your PC screen
                         </p>
-                        <button onClick={reset} className="text-black/30 text-xs font-mono uppercase tracking-widest hover:text-black/60 transition-colors">
-                            Cancel
-                        </button>
+                        <div className="w-full space-y-3 pt-2">
+                            <label className="w-full py-3 rounded-xl bg-black/5 border border-black/10 text-black font-mono text-[10px] uppercase tracking-widest font-black shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer hover:bg-black/10">
+                                <Camera size={14} /> Upload QR Image
+                                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                            </label>
+                            <button onClick={reset} className="w-full text-black/30 text-xs font-mono uppercase tracking-widest hover:text-black/60 transition-colors">
+                                Cancel
+                            </button>
+                        </div>
                     </motion.div>
                 )}
 
@@ -295,12 +322,20 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                         <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
                             <XCircle size={40} className="text-red-400" />
                         </div>
-                        <h3 className="font-mono text-xl font-black uppercase text-[#050505] tracking-widest">Link Failed</h3>
+                        <h3 className="font-mono text-xl font-black uppercase text-[#050505] tracking-widest">
+                            {mode === 'scan' ? 'Scan Failed' : 'Link Failed'}
+                        </h3>
                         <p className="text-xs text-black/60 max-w-xs leading-relaxed font-serif">{message}</p>
-                        <button onClick={reset}
-                            className="mt-2 px-6 py-4 rounded-xl bg-black text-white text-[10px] uppercase tracking-widest font-black hover:bg-black/80 transition-colors">
-                            Try Again
-                        </button>
+                        <div className="w-full space-y-3 pt-2">
+                            <button onClick={reset}
+                                className="w-full py-4 rounded-xl bg-black text-white text-[10px] uppercase tracking-widest font-black hover:bg-black/80 transition-colors">
+                                Try Again
+                            </button>
+                            <label className="w-full py-4 rounded-xl bg-black/5 border border-black/10 text-black font-mono text-[10px] uppercase tracking-widest font-black shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer hover:bg-black/10">
+                                <Camera size={14} /> Upload QR Image
+                                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                            </label>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

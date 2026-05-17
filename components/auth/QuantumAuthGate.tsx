@@ -9,6 +9,7 @@ import { useAppKit } from '@reown/appkit/react';
 import { useAccount } from 'wagmi';
 import { toast } from 'sonner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { useSovereignConnect } from '@/hooks/useSovereignConnect';
 
 export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState<'home' | 'login' | 'password' | 'secure' | 'reveal' | 'verify' | 'encrypting'>('home');
@@ -28,6 +29,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const { open } = useAppKit();
   const { isConnected } = useAccount();
   const { importWallet } = useWalletStore();
+  const { activateSovereignVault } = useSovereignConnect();
 
   useEffect(() => {
     if (clickedMint && isConnected) {
@@ -37,7 +39,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     const ks = localStorage.getItem('sovereign_keystore');
-    if (ks) {
+    const vault = localStorage.getItem('sovereign_vault_v1');
+    if (ks || vault) {
       setHasKeystore(true);
     }
   }, []);
@@ -91,9 +94,10 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         }, password, { scrypt: { N: 1024 } });
         localStorage.setItem('sovereign_keystore', encryptedJson);
         importWallet(wallet.privateKey, "Sovereign Main");
+        await activateSovereignVault(wallet.privateKey, wallet.address);
         
         const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(8000 - elapsedTime, 0);
+        const remainingTime = Math.max(2000 - elapsedTime, 0);
 
         setTimeout(() => {
           toast.success('Wallet created and secured successfully.');
@@ -108,23 +112,52 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
 
   const handleLogin = async () => {
     const ks = localStorage.getItem('sovereign_keystore');
-    if (!ks) return;
+    const vault = localStorage.getItem('sovereign_vault_v1');
+    if (!ks && !vault) return;
     setStep('encrypting');
     
     const startTime = Date.now();
     
     setTimeout(async () => {
       try {
-        const decryptedWallet = await ethers.Wallet.fromEncryptedJson(ks, password);
-        importWallet(decryptedWallet.privateKey, "Sovereign Main");
-        
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(8000 - elapsedTime, 0);
+        let pk: string | null = null;
+        let addr: string | null = null;
 
-        setTimeout(() => {
-          toast.success('Decryption successful.');
-          onComplete();
-        }, remainingTime);
+        if (ks) {
+          const decryptedWallet = await ethers.Wallet.fromEncryptedJson(ks, password);
+          pk = decryptedWallet.privateKey;
+          addr = decryptedWallet.address;
+        } else if (vault) {
+          // Fallback: migrate sovereign_vault_v1 to sovereign_keystore
+          const { readStoredVaultKey } = await import('@/hooks/useSovereignConnect');
+          const vaultPk = readStoredVaultKey();
+          if (!vaultPk) throw new Error('Vault corrupted');
+          const walletObj = new ethers.Wallet(vaultPk);
+          pk = walletObj.privateKey;
+          addr = walletObj.address;
+          
+          // Encrypt and save keystore for future logins
+          const encryptedJson = await ethers.encryptKeystoreJson({
+            address: walletObj.address,
+            privateKey: walletObj.privateKey
+          }, password, { scrypt: { N: 1024 } });
+          localStorage.setItem('sovereign_keystore', encryptedJson);
+        }
+
+        if (pk && addr) {
+          importWallet(pk, "Sovereign Main");
+          await activateSovereignVault(pk, addr);
+          
+          const elapsedTime = Date.now() - startTime;
+          const remainingTime = Math.max(1000 - elapsedTime, 0);
+
+          setTimeout(() => {
+            toast.success('Decryption successful.');
+            onComplete();
+          }, remainingTime);
+        } else {
+          throw new Error('Invalid vault');
+        }
       } catch (e) {
         toast.error('Invalid password', { description: 'Please try again.' });
         setStep('login');
