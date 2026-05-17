@@ -220,10 +220,14 @@ export default function PortfolioPage() {
 
   // ── Session Security Check ──
   const hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('sovereign_keystore') : false;
-  const needsUnlock = hasKeystore && !privateKey && !wagmiConnected;
+  const isQuantumUnlocked = !!privateKey;
+  
+  // If they don't have a keystore, they MUST create one or at least interact with the gate.
+  // If they have one but it's locked, they must unlock it.
+  const needsGate = !isQuantumUnlocked && !wagmiConnected;
 
   // ── Not connected / Unauthenticated ──
-  if (!isLiveConnected || needsUnlock) {
+  if (needsGate) {
     return (
       <div className="w-full flex-1 flex flex-col bg-black/40 text-[#F5F5F5] min-h-[100vh]">
         <QuantumAuthGate onComplete={() => refresh()} />

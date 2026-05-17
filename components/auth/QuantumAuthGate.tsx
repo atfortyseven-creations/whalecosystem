@@ -7,6 +7,7 @@ import { Shield, Key, Eye, EyeOff, Check, ArrowRight, Loader2, Lock, AlertTriang
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { useAppKit } from '@reown/appkit/react';
 import { toast } from 'sonner';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState<'home' | 'login' | 'password' | 'secure' | 'reveal' | 'verify' | 'encrypting'>('home');
@@ -410,8 +411,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       case 'encrypting':
         return (
           <div className="flex flex-col items-center justify-center py-24 space-y-8">
-            <div className="relative w-24 h-24 flex items-center justify-center">
-               <Loader2 size={48} className="text-[#0044CC] animate-spin" strokeWidth={1.5} />
+            <div className="relative w-32 h-32 flex items-center justify-center">
+               <RemoteLottie path="block abstract.json" className="w-full h-full object-contain opacity-80" />
             </div>
             <div className="text-center space-y-3">
               <h2 className="text-2xl font-black text-[#0A0A0A] tracking-tighter uppercase">Encrypting...</h2>
@@ -423,7 +424,10 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <div className="flex items-center justify-center px-6 min-h-[calc(100vh-80px)] w-full">
+    <div className="flex items-center justify-center px-6 min-h-[calc(100vh-80px)] w-full relative overflow-hidden">
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+         <RemoteLottie path="Whale Mission.json" className="w-full h-full object-cover" />
+      </div>
       <motion.div 
         key={step}
         initial={{ opacity: 0, y: 20 }}

@@ -233,8 +233,7 @@ function GlobalLedger({ feed }: { feed: any[] }) {
                     <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr' }}>
                         <div className="px-6 py-4 flex flex-col justify-center">
                              <div className="flex items-center gap-2 mb-1">
-                                 <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.4)]" />
-                                 <span className="text-xs font-black font-mono text-black">{f.userAddress.slice(0,8)}...{f.userAddress.slice(-6)}</span>
+                                  <span className="text-xs font-black font-mono text-black">{f.userAddress.slice(0,8)}...{f.userAddress.slice(-6)}</span>
                              </div>
                              {f.twitterHandle && (
                                 <span className="text-[9px] font-black text-black/40 uppercase tracking-[0.1em]">@{f.twitterHandle}</span>

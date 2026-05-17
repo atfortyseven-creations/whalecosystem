@@ -77,16 +77,11 @@ function ForumHomeContent() {
           </motion.p>
 
           {/* CTAs */}
-          <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-center gap-4 mb-16">
+          <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link href="/forum/new"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-[#0A0A0A] text-white font-mono text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_8px_30px_rgba(0,0,0,0.1)]">
               <PenSquare size={14} />
               Start a Discussion
-            </Link>
-            <Link href="/forum?filter=top"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl border border-black/10 bg-black/5 backdrop-blur-md font-mono text-[11px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:border-black/20 hover:bg-black/10 transition-all">
-              <TrendingUp size={14} />
-              Top Discussions
             </Link>
           </motion.div>
 
@@ -104,30 +99,7 @@ function ForumHomeContent() {
         </motion.div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          FILTER TABS
-      ═══════════════════════════════════════════════════════════════ */}
-      <div className="w-full border-b border-black/10 bg-white/80 backdrop-blur-xl sticky top-0 z-20">
-        <div className="w-full max-w-[1100px] mx-auto px-6 md:px-12 flex items-center gap-0 h-12">
-          {[
-            { id: 'latest', label: 'Latest' },
-            { id: 'top', label: 'Top' },
-            { id: 'hot', label: 'Hot' },
-          ].map(tab => (
-            <Link
-              key={tab.id}
-              href={`/forum?filter=${tab.id}`}
-              className={`flex items-center px-5 h-full font-mono text-[10px] uppercase tracking-[0.15em] border-b-2 transition-all ${
-                filter === tab.id
-                  ? 'text-[#0A0A0A] border-[#0A0A0A] font-black'
-                  : 'text-black/40 border-transparent hover:text-black/70 hover:border-black/20'
-              }`}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
-      </div>
+
 
       {/* ═══════════════════════════════════════════════════════════════
           MAIN CONTENT — Categories + Topics
@@ -138,7 +110,7 @@ function ForumHomeContent() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-8">
             <h2 className="font-mono text-[10px] font-black uppercase tracking-[0.25em] text-black/40">
-              {filter === 'latest' ? 'Latest Discussions' : filter === 'top' ? 'Top Discussions' : 'Hot Right Now'}
+              Latest Discussions
             </h2>
             <Link href="/forum/new"
               className="flex items-center gap-2 font-mono text-[10px] font-black uppercase tracking-[0.15em] text-black/40 hover:text-[#0A0A0A] transition-colors">

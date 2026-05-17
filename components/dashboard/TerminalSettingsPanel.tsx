@@ -6,13 +6,9 @@ import { useSettingsStore, SovereignSettings } from '@/lib/store/useSettingsStor
 import { Sliders, Network, ShieldAlert, Key, Loader2, Check, Zap, Monitor, MessageSquare } from 'lucide-react';
 
 const CATEGORIES = [
-  { id: 'general', label: 'GENERAL SETTINGS', icon: Sliders },
-  { id: 'network', label: 'NETWORK & RPC', icon: Network },
-  { id: 'sonar', label: 'SONAR ALERTS', icon: ShieldAlert },
-  { id: 'privacy', label: 'PRIVACY & SECURITY', icon: Key },
-  { id: 'execution', label: 'EXECUTION RULES', icon: Zap },
-  { id: 'display', label: 'DISPLAY & HARDWARE', icon: Monitor },
-  { id: 'whalechat', label: 'WHALE CHAT ACCOUNT', icon: MessageSquare },
+  { id: 'general', label: 'AJUSTES GENERALES' },
+  { id: 'display', label: 'APARIENCIA' },
+  { id: 'privacy', label: 'PRIVACIDAD Y SEGURIDAD' },
 ];
 
 export function TerminalSettingsPanel() {
@@ -130,23 +126,17 @@ export function TerminalSettingsPanel() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row w-full bg-[#FAF9F6] dark:bg-[#0A0A0A] min-h-[70vh] border border-black/10 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm">
+    <div className="flex flex-col md:flex-row w-full h-full bg-[#FAF9F6] dark:bg-[#0A0A0A] overflow-hidden">
       
       {/* Sidebar */}
       <div className="w-full md:w-[280px] border-b md:border-b-0 md:border-r border-black/10 dark:border-white/10 flex flex-col p-6 bg-white dark:bg-[#111111] shrink-0">
-         <div className="flex items-center gap-3 mb-8 px-2">
-            <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center text-white dark:text-black shrink-0">
-               <Sliders size={14} />
-            </div>
-            <div className="flex flex-col">
-               <span className="text-[13px] font-black uppercase tracking-tighter dark:text-white">Settings</span>
-               <span className="text-[9px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">Preferences</span>
-            </div>
+         <div className="flex flex-col mb-8 px-2">
+            <span className="text-[13px] font-black uppercase tracking-tighter dark:text-white">Ajustes</span>
+            <span className="text-[9px] font-mono text-black/40 dark:text-white/40 uppercase tracking-widest">Preferencias</span>
          </div>
 
          <div className="flex flex-col gap-2">
             {CATEGORIES.map(c => {
-               const Icon = c.icon;
                const isActive = activeTab === c.id;
                return (
                  <button 
@@ -154,7 +144,6 @@ export function TerminalSettingsPanel() {
                    onClick={() => setActiveTab(c.id)}
                    className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-black dark:bg-white text-white dark:text-black shadow-sm' : 'bg-transparent text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white'}`}
                  >
-                    <Icon size={14} className={isActive ? 'text-white dark:text-black' : 'text-black/40 dark:text-white/40'} />
                     {c.label}
                  </button>
                )
@@ -163,7 +152,7 @@ export function TerminalSettingsPanel() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 p-6 md:p-10 bg-[#FAF9F6] dark:bg-[#0A0A0A] overflow-y-auto max-h-[80vh] custom-scrollbar">
+      <div className="flex-1 p-6 md:p-10 bg-[#FAF9F6] dark:bg-[#0A0A0A] overflow-y-auto h-full custom-scrollbar">
          
          <div className="mb-8">
             <h2 className="text-2xl font-black uppercase tracking-tighter mb-2 dark:text-white">
@@ -185,115 +174,53 @@ export function TerminalSettingsPanel() {
             >
                {activeTab === 'general' && (
                   <>
-                     {/* Aesthetics & UI */}
-                     {renderSelect('theme', 'Appearance', 'System-wide visual theme.', [
-                        {value: 'light', label: 'Light Mode'},
-                        {value: 'dark', label: 'Dark Mode'},
-                        {value: 'system', label: 'Use System Default'}
-                     ])}
-                     {renderSelect('language', 'Language', 'Interface display language.', [
-                        {value: 'en', label: 'English'},
+                     {renderSelect('language', 'Idioma', 'Idioma de visualización de la interfaz.', [
+                        {value: 'en', label: 'Inglés'},
                         {value: 'es-ES', label: 'Español (ES)'},
                      ])}
-                     {renderSelect('currency', 'Base Currency', 'Default currency for balance display.', [
-                        {value: 'USD', label: 'USD - Dollar'},
+                     {renderSelect('currency', 'Moneda Base', 'Moneda predeterminada para el balance.', [
+                        {value: 'USD', label: 'USD - Dólar'},
                         {value: 'EUR', label: 'EUR - Euro'},
-                        {value: 'GBP', label: 'GBP - Pound'},
+                        {value: 'GBP', label: 'GBP - Libra'},
                         {value: 'JPY', label: 'JPY - Yen'}
                      ])}
-                     {renderSelect('timeFormat', 'Time Format', '12-hour or 24-hour time display.', [
-                        {value: '12h', label: '12-Hour (AM/PM)'},
-                        {value: '24h', label: '24-Hour'}
+                     {renderSelect('timeFormat', 'Formato de Tiempo', 'Visualización de la hora.', [
+                        {value: '12h', label: '12 Horas (AM/PM)'},
+                        {value: '24h', label: '24 Horas'}
                      ])}
-                     {renderSelect('dateFormat', 'Date Format', 'Order of day, month and year.', [
+                     {renderSelect('dateFormat', 'Formato de Fecha', 'Orden de día, mes y año.', [
                         {value: 'DD/MM/YYYY', label: 'DD/MM/YYYY'},
                         {value: 'MM/DD/YYYY', label: 'MM/DD/YYYY'}
                      ])}
-                     {renderSelect('addressFormat', 'Address Display', 'How wallet addresses are shown on screen.', [
-                        {value: 'truncated', label: 'Shortened (0x1...ABCD)'},
-                        {value: 'full', label: 'Full Address'}
+                     {renderSelect('addressFormat', 'Formato de Dirección', 'Cómo se muestran las direcciones.', [
+                        {value: 'truncated', label: 'Abreviada (0x1...ABCD)'},
+                        {value: 'full', label: 'Dirección Completa'}
                      ])}
                   </>
                )}
 
                {activeTab === 'display' && (
                   <>
-                     {/* Display settings */}
-                     {renderSelect('density', 'Interface Density', 'Amount of spacing and padding in the layout.', [
-                        {value: 'relaxed', label: 'Relaxed'},
-                        {value: 'compact', label: 'Compact'},
-                        {value: 'dense', label: 'Dense'}
+                     {renderSelect('theme', 'Apariencia', 'Tema visual general.', [
+                        {value: 'light', label: 'Modo Claro'},
+                        {value: 'dark', label: 'Modo Oscuro'},
+                        {value: 'system', label: 'Usar Configuración del Sistema'}
                      ])}
-                     {renderSelect('defaultTimeframe', 'Default Timeframe', 'Default time range for charts and analytics.', [
-                        {value: '1D', label: '24 Hours'},
-                        {value: '1W', label: '7 Days'},
-                        {value: '1M', label: '30 Days'},
-                        {value: 'ALL', label: 'All Time'}
+                     {renderSelect('density', 'Densidad', 'Espaciado de la interfaz.', [
+                        {value: 'relaxed', label: 'Relajado'},
+                        {value: 'compact', label: 'Compacto'},
+                        {value: 'dense', label: 'Denso'}
                      ])}
-                     {renderSelect('displayUnit', 'Display Unit', 'Show values in fiat or native crypto units.', [
-                        {value: 'FIAT', label: 'Fiat Currency'},
-                        {value: 'BTC', label: 'Bitcoin (sats)'},
-                        {value: 'ETH', label: 'Ethereum (gwei)'}
-                     ])}
-                     {renderToggle('showBalances', 'Show Balances', 'Display wallet and portfolio balances on screen.')}
-                     {renderToggle('soundEffects', 'Sound Effects', 'Play sounds on UI interactions and alerts.')}
-                     {renderToggle('hardwareAcceleration', 'GPU Acceleration', 'Use GPU rendering for smoother animations.')}
-                  </>
-               )}
-
-               {activeTab === 'network' && (
-                  <>
-                     {/* Network settings */}
-                     {renderInput('customRpcUrl', 'Custom RPC Node', 'Override the default JSON-RPC endpoint.', 'text')}
-                     {renderToggle('testnetMode', 'Testnet Mode', 'Enable Sepolia and Holesky test networks.')}
-                  </>
-               )}
-
-               {activeTab === 'execution' && (
-                  <>
-                     {renderSelect('gasPreset', 'Gas Priority', 'Transaction fee tier for on-chain submissions.', [
-                        {value: 'ECONOMY', label: 'Economy'},
-                        {value: 'STANDARD', label: 'Standard'},
-                        {value: 'FAST', label: 'Fast'},
-                        {value: 'INSTANT', label: 'Instant'}
-                     ])}
-                     {renderInput('maxSlippage', 'Max Slippage', 'Maximum allowed slippage percentage for DEX trades.', 'number', '%')}
-                     {renderToggle('mevProtection', 'MEV Protection', 'Route transactions through private relays to prevent sandwich attacks.')}
-                  </>
-               )}
-
-               {activeTab === 'sonar' && (
-                  <>
-                     {/* Alerts */}
-                     {renderToggle('emailAlerts', 'Email Alerts', 'Receive system alerts via your registered email.')}
-                     {renderToggle('telegramAlerts', 'Telegram Alerts', 'Send alerts to your Telegram bot.')}
-                     {renderToggle('audioAlerts', 'Audio Alerts', 'Play a sound for large whale movement alerts.')}
-                     {renderInput('whaleAlertThreshold', 'Alert Threshold', 'Minimum USD volume to trigger a whale alert.', 'number', 'USD')}
-                     {renderInput('email', 'Notification Email', 'Email address for important system notifications.', 'text')}
+                     {renderToggle('showBalances', 'Mostrar Balances', 'Visualizar balances en pantalla.')}
+                     {renderToggle('hardwareAcceleration', 'Aceleración de Hardware', 'Mejor rendimiento visual.')}
                   </>
                )}
 
                {activeTab === 'privacy' && (
                   <>
-                     {/* Security */}
-                     {renderInput('inactivityLockMinutes', 'Inactivity Lock', 'Minutes of inactivity before the session is locked.', 'number', 'MIN')}
-                     {renderSelect('autoDisconnectTimer', 'Auto Disconnect', 'Automatically disconnect wallet after a set period.', [
-                        {value: '15m', label: '15 Minutes'},
-                        {value: '1h', label: '1 Hour'},
-                        {value: '24h', label: '24 Hours'},
-                        {value: 'never', label: 'Never'}
-                     ])}
-                     {renderToggle('stealthMode', 'Stealth Mode', 'Blur all wallet addresses visible on screen.')}
-                     {renderToggle('requireSignForExports', 'Sign Before Export', 'Require wallet signature before exporting CSV data.')}
-                     {renderToggle('allowAnalytics', 'Allow Analytics', 'Share anonymized usage data to improve the platform.')}
-                  </>
-               )}
-
-               {activeTab === 'whalechat' && (
-                  <>
-                     {renderInput('chatName', 'Display Name', 'Your name visible to other users in Whale Chat.', 'text')}
-                     {renderInput('chatBio', 'Bio', 'Short description shown on your chat profile.', 'text')}
-                     {renderInput('qrLabel', 'QR Code Label', 'Text displayed below your wallet QR code.', 'text')}
+                     {renderInput('inactivityLockMinutes', 'Bloqueo por inactividad', 'Minutos de inactividad antes del bloqueo.', 'number', 'MIN')}
+                     {renderToggle('stealthMode', 'Modo Sigiloso', 'Desenfoca todas las direcciones visibles.')}
+                     {renderToggle('requireSignForExports', 'Firma para exportar', 'Requiere firma antes de exportar.')}
                   </>
                )}
             </motion.div>
