@@ -585,7 +585,6 @@ function PostRow({
             </div>
           )}
         </div>
-        </div>
       </div>
     </div>
   );
