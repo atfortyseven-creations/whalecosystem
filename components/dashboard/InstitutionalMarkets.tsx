@@ -91,12 +91,10 @@ export function InstitutionalMarkets() {
     return (
         <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 bg-white dark:bg-[#050505] text-[#050505] dark:text-white font-mono overflow-hidden transition-colors">
             
-            {/* Header section matching screenshot exactly */}
+            {/* Header section — Search & Filter only */}
             <div className="max-w-[1400px] mx-auto w-full flex-shrink-0">
-                <h1 className="text-xl md:text-3xl font-black mb-1 md:mb-2 tracking-tight">Discover thousands of tokens with real-time data on price, market cap, and live transactions</h1>
-                
                 {/* Search and Filter Row */}
-                <div className="flex flex-col md:flex-row gap-4 mt-6 md:mt-8 relative z-20">
+                <div className="flex flex-col md:flex-row gap-4 mt-2 relative z-20">
                     <div className="relative flex-1 group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <Search className="h-4 w-4 text-[#888888]" />

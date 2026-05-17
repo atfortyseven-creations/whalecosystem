@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export default function DashboardPage() {
   return (
-    <WhaleMissionLoader duration={3000}>
+    <WhaleMissionLoader>
       <DashboardClient />
     </WhaleMissionLoader>
   );

@@ -26,33 +26,19 @@ interface NavItem {
     icon: React.ReactNode;
     badge?: string;
     badgeColor?: string;
-    dividerBefore?: string;
     externalUrl?: string;
     requiresZK?: boolean;
     minTier?: 'FREE' | 'STANDARD';
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    // ── Access ──────────────────────────────────────────────────
-    { id: 'gold',          label: 'IDENTITY PROVISIONING', icon: null, dividerBefore: 'Acceso' },
-
-    { id: 'billing',       label: 'SUSCRIPTION STATUS', icon: null },
-
-    // ── Telemetry ───────────────────────────────────────────────────
-    { id: 'markets',       label: 'NETWORK TELEMETRY',    icon: null, dividerBefore: 'Telemetría', requiresZK: true },
-    { id: 'newpairs',      label: 'CONTRACT MONITORS',   icon: null, requiresZK: true },
-
-    // ── Ledger ─────────────────────────────────────────────
-    { id: 'inst-ledger',   label: 'ENTITY INDEX',   icon: null, dividerBefore: 'Libro mayor', requiresZK: true },
-    { id: 'mass-transfer', label: 'BULK RECORD SYNC', icon: null, requiresZK: true, minTier: 'STANDARD' },
-    { id: 'omniexplorer',  label: 'ON CHAIN EXPLORER', icon: null, requiresZK: true },
-
-    // ── Security ─────────────────────────────────────────────
-    { id: 'zk',            label: 'AZTEC EXPLORER',  icon: null, dividerBefore: 'Seguridad', requiresZK: true },
-
-    // ── System ────────────────────────────────────────────────────
-    { id: 'logs',          label: 'SESSION AUDIT',   icon: null, dividerBefore: 'Sistema' },
-    { id: 'support',       label: 'SUPPORT',        icon: null },
+    { id: 'gold',          label: 'SIGNATURE MINT',    icon: null },
+    { id: 'billing',       label: 'SUBSCRIPTION',      icon: null },
+    { id: 'markets',       label: 'TOKENS',             icon: null, requiresZK: true },
+    { id: 'inst-ledger',   label: 'READ THE BLOCK',    icon: null, requiresZK: true },
+    { id: 'mass-transfer', label: 'BULK RECORD SYNC',  icon: null, requiresZK: true, minTier: 'STANDARD' },
+    { id: 'logs',          label: 'SESSION AUDIT',     icon: null },
+    { id: 'support',       label: 'SUPPORT',           icon: null },
 ];
 
 const RESTRICTED_TABS = [
@@ -377,21 +363,11 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pt-1 pb-4 px-2 space-y-0.5 no-scrollbar" style={{ overscrollBehavior: 'contain', touchAction: 'pan-y', contain: 'strict' }}>
                     {SIDEBAR_ITEMS
                         .filter(item => !item.requiresZK || isZkVerified)
-                        .map((item, index) => {
+                        .map((item) => {
                         const isActive = activeTab === item.id;
                         const isLocked = item.minTier && isTierLoaded && tier ? !hasAccess(tier, item.minTier) : false;
                         return (
-                            <div key={item.id} style={{ perspective: 1200 }}>
-                                {item.dividerBefore && !isCollapsed && (
-                                    <div className={`px-3 ${index === 0 ? 'pt-1' : 'pt-5'} pb-2`}>
-                                        <span className="text-[9px] font-black text-[#A0A0A0] uppercase tracking-[0.25em]">
-                                            {item.dividerBefore}
-                                        </span>
-                                    </div>
-                                )}
-                                {item.dividerBefore && isCollapsed && (
-                                    <div className="my-3 mx-3 h-px bg-black/10"/>
-                                )}
+                            <div key={item.id}>
                                 <AztecSidebarItem item={item} isActive={isActive} isCollapsed={isCollapsed} isLocked={isLocked} onClick={() => handleTabChange(item.id)} />
                             </div>
                         );
@@ -579,7 +555,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
                 <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                      {[
-                        { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
+                        { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Tokens' },
                         { id: 'portfolio',   icon: <PieChart size={18} />,      label: 'Portfolio' },
                         { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
                         { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },

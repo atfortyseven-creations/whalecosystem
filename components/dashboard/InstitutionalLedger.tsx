@@ -1,377 +1,475 @@
-// components/dashboard/InstitutionalLedger.tsx
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Clock, RefreshCw, Search,
-  AlertTriangle,
-  ChevronRight
-} from 'lucide-react';
-import { ModuleHeader } from './ModuleHeader';
-import { useOmniInfrastructure } from '@/lib/api-client';
-
 import { usePublicClient, useBlockNumber } from 'wagmi';
+import { formatEther } from 'viem';
+import { Search, Loader2, AlertCircle, Zap, ChevronRight, Box, Activity, Clock, ShieldCheck, AlignLeft, X } from 'lucide-react';
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-interface LedgerEntry {
-  id: string;
-  blockNumber: number;
-  miner: string;
-  hash: string;
-  sizeKb: number;
-  txCount: number;
-  timestamp: string;
+interface RealTransaction {
+    id: string;
+    hash: string;
+    valueEth: number;
+    gasPriceGwei: number;
+    timestamp: number;
+    from: string;
+    to: string;
+    time: string;
+    nonce: number;
+    gasLimit: number;
+    type: string;
 }
 
-interface LedgerStats {
-  totalBlocks: number;
-  avgSizeKb: number;
-  avgTxs: number;
+interface RealBlock {
+    id: number;
+    hash: string;
+    status: 'MINED' | 'CONFIRMED';
+    totalFee: number;
+    gasUsedPct: number;
+    miner: string;
+    sizeKb: string;
+    age: string;
+    txCount: number;
 }
 
-// ── Utility ───────────────────────────────────────────────────────────────────
-function shortHash(h: string) {
-  if (!h || h.length < 16) return h;
-  return `${h.slice(0, 10)}...${h.slice(-6)}`;
-}
-
-function StatCard({
-  label, value, accent = false,
-}: {
-  label: string; value: string; accent?: boolean;
-}) {
-  return (
-    <div className={`bg-white dark:bg-[#111111] shadow-sm rounded-xl border ${accent ? 'border-black/10 dark:border-white/10 shadow-none' : 'border-[#E5E5E5] dark:border-white/10'} p-5 flex flex-col gap-2`}>
-      <div className="flex items-center gap-2">
-        <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50 dark:text-[#AAAAAA]">{label}</span>
-      </div>
-      <span className={`text-xl md:text-2xl font-black font-mono leading-none ${accent ? 'text-[#050505] dark:text-white' : 'text-[#050505] dark:text-white'}`}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-// Removed StateChip
-
-// ── Main Component ────────────────────────────────────────────────────────────
 export default function InstitutionalLedger() {
-  const wagmiClient = usePublicClient();
-  const { data: wagmiBlock } = useBlockNumber({ watch: true });
-  
-  const [fallbackClient, setFallbackClient] = useState<any>(null);
-  const [fallbackBlock, setFallbackBlock] = useState<bigint | null>(null);
+    const wagmiClient = usePublicClient();
+    const { data: wagmiBlock } = useBlockNumber({ watch: true });
 
-  React.useEffect(() => {
-      let interval: NodeJS.Timeout;
-      if (!wagmiClient) {
-          import('viem').then(({ createPublicClient, http }) => {
-              const client = createPublicClient({
-                  chain: { id: 1, name: 'Ethereum', nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 }, rpcUrls: { default: { http: ['https://eth.llamarpc.com'] }, public: { http: ['https://eth.llamarpc.com'] } } } as any,
-                  transport: http()
-              });
-              setFallbackClient(client);
-              client.getBlockNumber().then(setFallbackBlock);
-              interval = setInterval(() => {
-                  client.getBlockNumber().then(setFallbackBlock).catch(() => {});
-              }, 12000);
-          });
-      }
-      return () => clearInterval(interval);
-  }, [wagmiClient]);
+    const [fallbackClient, setFallbackClient] = useState<any>(null);
+    const [fallbackBlock, setFallbackBlock] = useState<bigint | null>(null);
 
-  const publicClient = wagmiClient || fallbackClient;
-  const blockNumber = wagmiBlock || fallbackBlock;
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (!wagmiClient) {
+            import('viem').then(({ createPublicClient, http }) => {
+                const client = createPublicClient({
+                    chain: { id: 1, name: 'Ethereum', nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 }, rpcUrls: { default: { http: ['https://eth.llamarpc.com'] }, public: { http: ['https://eth.llamarpc.com'] } } } as any,
+                    transport: http()
+                });
+                setFallbackClient(client);
+                client.getBlockNumber().then(setFallbackBlock);
+                interval = setInterval(() => {
+                    client.getBlockNumber().then(setFallbackBlock).catch(() => {});
+                }, 12000);
+            });
+        }
+        return () => clearInterval(interval);
+    }, [wagmiClient]);
 
-  const [rawEntries, setRawEntries] = useState<LedgerEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+    const publicClient = wagmiClient || fallbackClient;
+    const blockNumber = wagmiBlock || fallbackBlock;
 
-  React.useEffect(() => {
-    if (!publicClient || !blockNumber) return;
-    setLoading(false);
-    
-    const fetchBlock = async () => {
+    // Data States
+    const [transactions, setTransactions] = useState<RealTransaction[]>([]);
+    const [blocks, setBlocks] = useState<RealBlock[]>([]);
+    const [globalStats, setGlobalStats] = useState({
+        tps: 0,
+        avgGasPrice: 0,
+        totalEthMoved: 0,
+        blocksTracked: 0
+    });
+
+    // Search States
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState<any[] | null>(null);
+    const [searchError, setSearchError] = useState<string | null>(null);
+
+    // Modal States
+    const [selectedBlock, setSelectedBlock] = useState<RealBlock | null>(null);
+    const [selectedTx, setSelectedTx] = useState<RealTransaction | null>(null);
+
+    const handleSearch = async () => {
+        const q = searchQuery.trim();
+        if (!q || q.length < 2) return;
+        setIsSearching(true);
+        setSearchResults(null);
+        setSearchError(null);
         try {
-            const block = await publicClient.getBlock({
-                blockNumber: blockNumber,
-                includeTransactions: true
-            });
-            
-            const newEntry: LedgerEntry = {
-                id: block.hash,
-                blockNumber: Number(block.number),
-                miner: block.miner || '0xUnknown',
-                hash: block.hash,
-                sizeKb: parseFloat((Number(block.size) / 1024).toFixed(2)),
-                txCount: block.transactions?.length || 0,
-                timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
-            };
-            
-            setRawEntries(prev => {
-                if (prev.find(p => p.id === newEntry.id)) return prev;
-                return [newEntry, ...prev].slice(0, 30);
-            });
-        } catch (e) {
-            console.warn('[Ledger] Failed to fetch block', e);
+            const res = await fetch(`/api/graph?q=${encodeURIComponent(q)}`);
+            const data = await res.json();
+            if (data.ok) {
+                setSearchResults(data.data ?? []);
+            } else {
+                setSearchError(data.error || 'No results found');
+            }
+        } catch {
+            setSearchError('Network error — could not reach the graph index.');
+        } finally {
+            setIsSearching(false);
         }
     };
-    fetchBlock();
-  }, [blockNumber, publicClient]);
 
-  const entries = rawEntries;
-  const isSyncing = loading;
+    // Main Polling Effect
+    useEffect(() => {
+        if (!publicClient || !blockNumber) return;
 
-  const stats: LedgerStats | null = useMemo(() => {
-    if (entries.length === 0) return null;
-    const total = entries.length;
-    return {
-      totalBlocks: total || 0,
-      avgSizeKb: parseFloat((entries.reduce((s, e) => s + e.sizeKb, 0) / Math.max(total, 1)).toFixed(2)),
-      avgTxs: Math.floor(entries.reduce((s, e) => s + e.txCount, 0) / Math.max(total, 1)),
-    };
-  }, [entries]);
+        const syncState = async () => {
+            try {
+                const block = await publicClient.getBlock({
+                    blockNumber: blockNumber,
+                    includeTransactions: true
+                });
 
-  const [filter, setFilter] = useState('');
-  const [selected, setSelected] = useState<LedgerEntry | null>(null);
+                const rawTxs = block.transactions as any[];
+                
+                const totalFeeEther = Number(formatEther(block.baseFeePerGas || 0n)) * rawTxs.length * 21000;
+                const fillPercent = block.gasLimit > 0 ? (Number(block.gasUsed) / Number(block.gasLimit)) * 100 : 0;
 
-  const filtered = useMemo(() => {
-    if (!filter) return entries;
-    const q = filter.toLowerCase();
-    return entries.filter(e =>
-      e.blockNumber.toString().includes(q) ||
-      e.hash.toLowerCase().includes(q) ||
-      e.miner.toLowerCase().includes(q)
-    );
-  }, [entries, filter]);
+                const newBlock: RealBlock = {
+                    id: Number(block.number),
+                    hash: block.hash,
+                    status: 'CONFIRMED',
+                    totalFee: totalFeeEther > 0 ? totalFeeEther : 0.054,
+                    gasUsedPct: fillPercent,
+                    miner: block.miner ? (block.miner.substring(0,6) + '...' + block.miner.substring(38)) : '0xUnknown',
+                    sizeKb: (Number(block.size) / 1024).toFixed(2) + ' KB',
+                    age: new Date(Number(block.timestamp) * 1000).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                    txCount: rawTxs.length
+                };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
-  return (
-    <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] dark:bg-[#0A0A0A] overflow-hidden rounded-xl border border-[#E5E5E5] dark:border-white/10">
+                setBlocks(prev => {
+                    const exists = prev.find(p => p.id === newBlock.id);
+                    if (exists) return prev;
+                    return [newBlock, ...prev].slice(0, 10);
+                });
 
-      {/* ── Page Header ── */}
-      <div className="shrink-0 pt-4 px-2">
-        <ModuleHeader moduleId="inst-ledger" />
-      </div>
-      <div className="shrink-0 px-6 pb-4 flex items-center justify-end border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] -mt-10">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-black/5 dark:border-white/5">
-            <span className="text-[9px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">Telemetry Active</span>
-          </div>
-          <button
-            onClick={() => {}}
-            className="p-2 rounded border border-[#E5E5E5] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-white/5 transition-colors text-[#050505]/40 dark:text-white/40 hover:text-[#050505] dark:hover:text-white"
-            title="Telemetry sync"
-          >
-            <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
-          </button>
-        </div>
-      </div>
+                const highValueTxs = rawTxs
+                    .filter((t: any) => t.value && t.value > 0n)
+                    .sort((a,b) => (a.value < b.value ? 1 : -1))
+                    .slice(0, 5); // top 5 transfers per block
 
-      {/* ── Stats Row ── */}
-      <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-4 px-6 py-4 border-b border-[#E5E5E5] dark:border-white/10">
-        <StatCard
-          label="INDEXED BLOCKS"
-          value={stats ? stats.totalBlocks.toLocaleString() : '—'}
-        />
-        <StatCard
-          label="AVG TRANSACTIONS"
-          value={stats ? `${stats.avgTxs}` : '—'}
-          accent
-        />
-        <StatCard
-          label="AVG SIZE (KB)"
-          value={stats ? `${stats.avgSizeKb} KB` : '—'}
-        />
-        <StatCard
-          label="NETWORK"
-          value="ETHEREUM L1"
-        />
-      </div>
+                let ethSum = 0;
 
-      <div className="shrink-0 px-6 py-3 border-b border-[#E5E5E5] dark:border-white/10 flex items-center gap-3 bg-[#FAF9F6] dark:bg-[#0A0A0A]">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#050505]/30 dark:text-white/30" size={12} />
-          <input
-            type="text"
-            placeholder="Filter by hash, layer..."
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-            className="w-full bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-lg px-8 py-2 text-[10px] font-mono text-[#050505] dark:text-white outline-none focus:border-[#050505]/40 dark:focus:border-white/40 transition-colors placeholder:text-[#050505]/25 dark:placeholder:text-white/25"
-          />
-        </div>
-        <span className="text-[9px] font-black text-[#050505]/40 dark:text-white/40 uppercase tracking-widest">
-          {filtered.length} of {entries.length} items
-        </span>
-      </div>
+                if (highValueTxs.length > 0) {
+                    const mappedTxs: RealTransaction[] = highValueTxs.map(t => {
+                        const val = Number(formatEther(t.value));
+                        ethSum += val;
+                        return {
+                            id: t.hash,
+                            hash: t.hash,
+                            valueEth: val,
+                            gasPriceGwei: Number((t.gasPrice || t.maxFeePerGas || 0n)) / 1e9,
+                            timestamp: Date.now(),
+                            from: t.from,
+                            to: t.to || 'Contract Creation',
+                            time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                            nonce: Number(t.nonce),
+                            gasLimit: Number(t.gas),
+                            type: 'TRANSFER'
+                        };
+                    });
+                    
+                    setTransactions(prev => {
+                        const merged = [...mappedTxs, ...prev];
+                        // Deduplicate
+                        const unique = Array.from(new Map(merged.map(item => [item.hash, item])).values());
+                        return unique.slice(0, 30); // keep last 30 whale txs
+                    });
+                }
 
-      {/* ── Table + Detail ── */}
-      <div className="flex-1 min-h-0 flex gap-0">
+                setGlobalStats(prev => ({
+                    tps: rawTxs.length / 12,
+                    avgGasPrice: Number(block.baseFeePerGas || 0n) / 1e9,
+                    totalEthMoved: prev.totalEthMoved + ethSum,
+                    blocksTracked: prev.blocksTracked + 1
+                }));
 
-        {/* List */}
-        <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar">
-          {/* Column Headers */}
-          <div className="sticky top-0 z-10 bg-white dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 grid grid-cols-12 gap-4 px-6 py-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
-            {['BLOCK HEIGHT', 'MINER', 'BLOCK HASH', 'TX COUNT', 'SIZE (KB)'].map((h, i) => (
-              <span key={i} className={`text-[9px] font-black uppercase tracking-widest text-[#050505]/40 dark:text-white/40 ${
-                i === 0 ? 'col-span-2' : i === 1 ? 'col-span-2' : i === 2 ? 'col-span-4' : i === 3 ? 'col-span-2' : 'col-span-2'
-              }`}>
-                {h}
-              </span>
-            ))}
-          </div>
+            } catch (error) {
+                console.warn("L1 Sync Warning:", error);
+            }
+        };
 
-          {/* Loading */}
-          {loading && (
-            <div className="flex flex-col gap-0">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-[#E5E5E5] dark:border-white/10 animate-pulse">
-                  <div className="col-span-2 h-3 bg-[#050505]/5 dark:bg-white/5 rounded" />
-                  <div className="col-span-2 h-3 bg-[#050505]/5 dark:bg-white/5 rounded" />
-                  <div className="col-span-4 h-3 bg-[#050505]/5 dark:bg-white/5 rounded" />
-                  <div className="col-span-2 h-3 bg-[#050505]/5 dark:bg-white/5 rounded" />
-                  <div className="col-span-2 h-3 bg-[#050505]/5 dark:bg-white/5 rounded" />
-                </div>
-              ))}
-            </div>
-          )}
+        syncState();
+    }, [blockNumber, publicClient]);
 
-          {/* Rows */}
-          <AnimatePresence initial={false}>
-            {!loading && filtered.map((entry, idx) => {
-              const isActive = selected?.id === entry.id;
-              return (
-                <motion.div
-                  key={entry.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.12, delay: idx * 0.004 }}
-                  onClick={() => setSelected(isActive ? null : entry)}
-                  className={`grid grid-cols-12 gap-4 px-6 py-4 border-b border-[#E5E5E5] dark:border-white/10 cursor-pointer transition-colors ${
-                    isActive ? 'bg-[#FAF9F6] dark:bg-[#1A1A1A]' : 'hover:bg-white dark:hover:bg-[#222]'
-                  }`}
-                >
-                  {/* Block ID */}
-                  <div className="col-span-2 flex items-center gap-2">
-                    <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white">{entry.blockNumber}</span>
-                  </div>
-
-                  {/* Miner */}
-                  <div className="col-span-2 flex items-center">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50 dark:text-white/50 bg-[#050505]/5 dark:bg-white/5 px-2 py-1 rounded">
-                      {shortHash(entry.miner)}
-                    </span>
-                  </div>
-
-                  {/* Block Hash */}
-                  <div className="col-span-4 flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-[#050505]/50 dark:text-[#AAAAAA] truncate">{shortHash(entry.hash)}</span>
-                    <a
-                      href={`https://etherscan.io/block/${entry.blockNumber}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={e => e.stopPropagation()}
-                      className="shrink-0 text-[#050505]/20 dark:text-white/20 hover:text-[#050505] dark:hover:text-white transition-colors"
+    return (
+        <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 bg-white dark:bg-[#050505] text-[#050505] dark:text-white font-mono overflow-y-auto no-scrollbar transition-colors">
+            
+            {/* Header section */}
+            <div className="max-w-[1400px] mx-auto w-full flex-shrink-0">
+                <div className="w-full relative group mt-4">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+                        {isSearching
+                            ? <Loader2 size={18} className="text-[#050505] dark:text-white animate-spin" />
+                            : <Search size={18} className="text-[#888888] dark:text-[#AAAAAA] group-focus-within:text-[#050505] dark:group-focus-within:text-white transition-colors" />}
+                    </div>
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        className="w-full bg-[#F9F9F9] dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 focus:border-[#050505] dark:focus:border-white text-[#050505] dark:text-white p-5 pl-14 outline-none transition-all text-[11px] font-mono uppercase tracking-[0.1em] placeholder:text-[#A0A0A0] dark:placeholder:text-white/40 rounded-xl shadow-sm"
+                        placeholder="INPUT ADDRESS / TX HASH / ENS"
+                    />
+                    <button
+                        onClick={handleSearch}
+                        disabled={isSearching}
+                        className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FAF9F6] dark:hover:bg-[#E5E5E5] text-white dark:text-black px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
                     >
-                      <ChevronRight size={10} />
-                    </a>
-                  </div>
+                        {isSearching ? 'INDEXING...' : 'INITIATE'}
+                    </button>
+                </div>
 
-                  {/* Tx Count */}
-                  <div className="col-span-2 flex items-center">
-                    <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white">{entry.txCount} txs</span>
-                  </div>
+                {/* Search Results / Errors */}
+                {searchError && (
+                    <div className="w-full mt-4 border border-[#050505]/20 dark:border-white/20 bg-[#F9F9F9] dark:bg-[#111111] p-5 rounded-xl flex items-center gap-4 text-[#050505] dark:text-white">
+                        <AlertCircle size={16} className="shrink-0" />
+                        <span className="text-[10px] font-bold uppercase tracking-[0.1em]">{searchError}</span>
+                    </div>
+                )}
 
-                  {/* Size */}
-                  <div className="col-span-2 flex items-center">
-                    <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white">{entry.sizeKb} KB</span>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-
-          {/* Empty state */}
-          {!loading && filtered.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-              <div className="w-14 h-14 rounded-full bg-[#050505]/5 dark:bg-white/5 flex items-center justify-center">
-                <AlertTriangle size={22} className="text-[#050505]/20 dark:text-white/20" />
-              </div>
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/30 dark:text-white/30">
-                No entries match current filter
-              </span>
+                {searchResults !== null && (
+                    <div className="w-full mt-4 border border-[#E5E5E5] dark:border-white/10 bg-[#F9F9F9] dark:bg-[#111111] rounded-xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="flex items-center justify-between p-5 bg-[#E5E5E5]/50 dark:bg-white/5 border-b border-[#E5E5E5] dark:border-white/10">
+                            <div className="flex items-center gap-3">
+                                <Zap size={14} className="text-[#050505] dark:text-white" />
+                                <h2 className="text-[10px] font-bold uppercase tracking-[0.1em]">QUERY RESULTS</h2>
+                            </div>
+                            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">
+                                {searchResults.length} MATCHES
+                            </span>
+                        </div>
+                        {searchResults.length === 0 ? (
+                            <div className="p-10 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em]">
+                                No results found for "{searchQuery}"
+                            </div>
+                        ) : (
+                            <div className="flex flex-col divide-y divide-[#E5E5E5] dark:divide-white/10">
+                                {searchResults.map((result: any, i: number) => {
+                                    const entity = result.node || result.n || result;
+                                    const label = result.label || entity._labels?.[0] || 'Entity';
+                                    const name = entity.name || entity.address || entity.symbol || entity.id || 'Unknown';
+                                    return (
+                                        <div key={i} className="flex items-center justify-between p-5 hover:bg-white dark:hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-[13px] text-[#050505] dark:text-white font-mono font-bold group-hover:text-[#888888] dark:group-hover:text-white/60 transition-colors">{name}</span>
+                                                {entity.description && (
+                                                    <span className="text-[9px] text-[#888888] dark:text-[#AAAAAA] font-bold uppercase tracking-widest">{entity.description}</span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <span className="px-2.5 py-1 bg-[#E5E5E5] dark:bg-white/10 text-[9px] font-black text-[#050505] dark:text-white rounded-md uppercase tracking-widest">{label}</span>
+                                                <ChevronRight size={14} className="text-[#888888] group-hover:translate-x-1 transition-all" />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
-          )}
-        </div>
 
-        {/* ── Detail Panel ── */}
-        <AnimatePresence>
-          {selected && (
-            <motion.div
-              key="ledger-detail"
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 320, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="shrink-0 border-l border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] overflow-hidden"
-            >
-              <div className="w-[320px] p-6 flex flex-col gap-5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#050505]/40 dark:text-white/40">Block Detail</span>
-                  <button
-                    onClick={() => setSelected(null)}
-                    className="text-[#050505]/30 dark:text-white/30 hover:text-[#050505] dark:hover:text-white transition-colors text-[18px] leading-none"
-                  >×</button>
-                </div>
-
-                {/* Block ID pill */}
-                <div className="p-4 rounded-2xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-center">
-                  <div className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30 dark:text-white/30 mb-2">Block Height</div>
-                  <div className="text-2xl font-black font-mono text-[#050505] dark:text-white">{selected.blockNumber}</div>
-                </div>
-
-                {/* Fields */}
+            {/* Global Stats */}
+            <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between mt-8 border-y border-[#E5E5E5] dark:border-white/10 py-6 overflow-x-auto no-scrollbar">
                 {[
-                  { label: 'Miner / Validator', value: selected.miner, mono: true },
-                  { label: 'Block Hash', value: selected.hash.slice(0, 42) + '...', mono: true },
-                  { label: 'Transactions', value: `${selected.txCount}`, mono: true },
-                  { label: 'Size', value: `${selected.sizeKb} KB`, mono: true },
-                  { label: 'Timestamp', value: new Date(selected.timestamp).toLocaleString(), mono: false },
-                ].map(f => (
-                  <div key={f.label} className="flex flex-col gap-1">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30 dark:text-white/30">{f.label}</span>
-                    <span className={`text-[11px] font-black text-[#050505] dark:text-white ${f.mono ? 'font-mono break-all' : ''}`}>{f.value}</span>
-                  </div>
+                    { label: 'Network TPS', val: globalStats.tps, unit: 'tx/s', format: (v: number) => v.toFixed(2) },
+                    { label: 'Avg Base Fee', val: globalStats.avgGasPrice, unit: 'GWEI', format: (v: number) => v.toFixed(2) },
+                    { label: 'Blocks Indexed', val: globalStats.blocksTracked, unit: 'blk', format: (v: number) => Math.floor(v).toString() },
+                    { label: 'Session Volume', val: globalStats.totalEthMoved, unit: 'ETH', format: (v: number) => `${v.toFixed(1)} ETH` },
+                ].map((stat, i) => (
+                    <div key={i} className="flex flex-col min-w-[140px]">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] dark:text-[#AAAAAA] mb-1">{stat.label}</span>
+                        <div className="flex items-end gap-1">
+                            <AnimatedCounter 
+                                value={stat.val}
+                                format={stat.format}
+                                className="text-xl md:text-2xl font-bold font-mono tracking-tighter text-[#050505] dark:text-white leading-none"
+                            />
+                            <span className="text-[9px] text-[#A0A0A0] dark:text-[#AAAAAA] font-bold uppercase mb-[2px]">{stat.unit}</span>
+                        </div>
+                    </div>
                 ))}
+            </div>
 
-                {/* Etherscan link */}
-                <a
-                  href={`https://etherscan.io/block/${selected.blockNumber}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full text-center py-3 rounded-xl bg-[#050505] dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest hover:bg-[#050505]/80 dark:hover:bg-white/80 transition-colors flex items-center justify-center gap-2 mt-auto"
-                >
-                  Verify External State
-                </a>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            {/* Main Data Grids */}
+            <div className="max-w-[1400px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 pb-10">
+                {/* BLOCKS PANEL */}
+                <div className="border border-[#E5E5E5] dark:border-white/10 bg-[#F9F9F9] dark:bg-[#111111] rounded-2xl overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between p-6 bg-[#E5E5E5]/50 dark:bg-white/5 border-b border-[#E5E5E5] dark:border-white/10">
+                        <div className="flex items-center gap-3">
+                            <Box size={14} className="text-[#050505] dark:text-white" />
+                            <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">BLOCK TELEMETRY</h2>
+                        </div>
+                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">LIVE STREAMING</span>
+                    </div>
+                    <div className="flex flex-col">
+                        {blocks.length === 0 && (
+                            <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Establishing Peer Link...</div>
+                        )}
+                        <AnimatePresence>
+                            {blocks.map((block) => (
+                                <motion.button 
+                                    key={block.id} 
+                                    layout
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8 }}
+                                    onClick={() => setSelectedBlock(block)}
+                                    className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-white dark:hover:bg-[#1A1A1A] transition-all gap-4 group"
+                                >
+                                    <div className="flex items-center gap-4 relative z-10">
+                                        <div className="w-12 h-12 bg-white dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:bg-[#050505] dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black transition-all">
+                                            <Box size={16} />
+                                        </div>
+                                        <div className="flex flex-col gap-1 text-left">
+                                            <span className="text-lg font-mono font-black text-[#050505] dark:text-white group-hover:text-[#888888] dark:group-hover:text-white/80 transition-colors">{block.id}</span>
+                                            <span className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center gap-2">
+                                                <Clock size={10} /> {block.age}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-1.5 sm:text-right relative z-10">
+                                        <div className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-2">
+                                            <ShieldCheck size={10} className="text-[#050505] dark:text-white" /> 
+                                            VALIDATOR: <span className="text-[#050505] dark:text-white font-bold">{block.miner}</span>
+                                        </div>
+                                        <div className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-3">
+                                            <span>{block.txCount} TXS</span>
+                                            <span className="h-2 w-[1px] bg-[#E5E5E5] dark:bg-white/10" />
+                                            <span>{block.sizeKb}</span>
+                                        </div>
+                                    </div>
+                                </motion.button>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                </div>
 
-      <div className="shrink-0 px-6 py-3 border-t border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/40 dark:text-white/40">
-            L1 NETWORK ACTIVE
-          </div>
-          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/40 dark:text-white/40">
-            STATE VERIFIED
-          </div>
+                {/* TRANSACTIONS PANEL */}
+                <div className="border border-[#E5E5E5] dark:border-white/10 bg-[#F9F9F9] dark:bg-[#111111] rounded-2xl overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between p-6 bg-[#E5E5E5]/50 dark:bg-white/5 border-b border-[#E5E5E5] dark:border-white/10">
+                        <div className="flex items-center gap-3">
+                            <Activity size={14} className="text-[#050505] dark:text-white" />
+                            <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">TRANSACTION FLOWS</h2>
+                        </div>
+                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">MEMPOOL MONITOR</span>
+                    </div>
+                    <div className="flex flex-col">
+                        {transactions.length === 0 && (
+                            <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Syncing Mempool Hub...</div>
+                        )}
+                        {transactions.slice(0, 10).map((tx, i) => (
+                            <button 
+                                key={tx.id} 
+                                onClick={() => setSelectedTx(tx)}
+                                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-white dark:hover:bg-[#1A1A1A] transition-all gap-4 group text-left"
+                            >
+                                <div className="flex items-center gap-4 min-w-0">
+                                    <div className="w-12 h-12 bg-white dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:border-[#050505] dark:group-hover:border-white transition-all shrink-0">
+                                        <AlignLeft size={16} className="text-[#888888] dark:text-[#AAAAAA] group-hover:text-[#050505] dark:group-hover:text-white" />
+                                    </div>
+                                    <div className="flex flex-col gap-1 min-w-0">
+                                        <span className="text-[11px] font-mono font-bold text-[#050505] dark:text-white truncate group-hover:text-[#888888] dark:group-hover:text-white/80 transition-colors">{tx.hash.substring(0,6) + '...' + tx.hash.substring(60)}</span>
+                                        <span className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center gap-2">
+                                            <Clock size={10} /> {tx.time}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2 sm:text-right mt-2 sm:mt-0">
+                                    <div className="flex items-center sm:justify-end gap-2 text-[9px] font-mono font-bold text-[#888888] uppercase tracking-widest">
+                                        <span className="text-[#888888] dark:text-[#AAAAAA]">{tx.from.substring(0,6) + '...'}</span>
+                                        <span className="text-[#E5E5E5] dark:text-white/10">→</span>
+                                        <span className="text-[#050505] dark:text-white">{tx.to.substring(0,6) + '...'}</span>
+                                    </div>
+                                    <div className="flex items-center sm:justify-end gap-3">
+                                        <span className="px-2 py-0.5 bg-white dark:bg-white/10 border border-[#E5E5E5] dark:border-white/10 text-[8px] font-black text-[#050505] dark:text-white rounded-md uppercase tracking-widest">{tx.type}</span>
+                                        <span className="text-sm font-mono font-black text-[#050505] dark:text-white tracking-tighter">{tx.valueEth.toFixed(4)} ETH</span>
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* INSPECTION MODALS */}
+            <AnimatePresence>
+                {(selectedBlock || selectedTx) && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 dark:bg-black/90 backdrop-blur-md"
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.95, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.95, y: 20 }}
+                            className="w-full max-w-2xl bg-[#F9F9F9] dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-2xl shadow-xl overflow-hidden relative"
+                        >
+                            <button 
+                                onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
+                                className="absolute top-6 right-6 w-8 h-8 rounded-lg flex items-center justify-center text-[#888888] dark:text-[#AAAAAA] hover:text-[#050505] dark:hover:text-white hover:bg-white dark:hover:bg-white/5 transition-all"
+                            >
+                                <X size={18} />
+                            </button>
+                            <div className="p-8 md:p-10">
+                                <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] dark:border-white/10">
+                                    <div className="w-12 h-12 bg-white dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-xl flex items-center justify-center shadow-sm">
+                                        {selectedBlock ? <Box size={20} className="text-[#050505] dark:text-white" /> : <Activity size={20} className="text-[#050505] dark:text-white" />}
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">
+                                            {selectedBlock ? 'BLOCK DETAILS' : 'TRANSACTION DETAILS'}
+                                        </h3>
+                                        <p className="text-[9px] text-[#A0A0A0] font-bold tracking-[0.2em] uppercase">Verified Execution Layer Data</p>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    {selectedBlock ? (
+                                        <>
+                                            <DetailRow label="Block Height" value={selectedBlock.id} />
+                                            <DetailRow label="Block Hash" value={selectedBlock.hash} />
+                                            <DetailRow label="Miner / Validator" value={selectedBlock.miner} />
+                                            <DetailRow label="Timestamp" value={selectedBlock.age} />
+                                            <DetailRow label="Payload Size" value={selectedBlock.sizeKb} />
+                                            <DetailRow label="Transactions" value={selectedBlock.txCount + ' Txs'} />
+                                            <DetailRow label="Gas Used" value={selectedBlock.gasUsedPct.toFixed(2) + '%'} />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <DetailRow label="Transaction Hash" value={selectedTx?.hash} />
+                                            <DetailRow label="From" value={selectedTx?.from} />
+                                            <DetailRow label="To" value={selectedTx?.to} />
+                                            <DetailRow label="Value" value={(selectedTx?.valueEth || 0).toFixed(4) + ' ETH'} bold />
+                                            <DetailRow label="Gas Limit" value={selectedTx?.gasLimit} />
+                                            <DetailRow label="Gas Price" value={(selectedTx?.gasPriceGwei || 0).toFixed(2) + ' GWEI'} />
+                                            <DetailRow label="Nonce" value={selectedTx?.nonce} />
+                                        </>
+                                    )}
+                                </div>
+                                <div className="mt-10 flex gap-4">
+                                    <a
+                                        href={selectedBlock ? `https://etherscan.io/block/${selectedBlock.id}` : `https://etherscan.io/tx/${selectedTx?.hash}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex-1 py-3 bg-[#050505] dark:bg-white text-white dark:text-black rounded-lg font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#888888] dark:hover:bg-[#E5E5E5] transition-colors text-center"
+                                    >
+                                        VERIFY EXTERNALLY
+                                    </a>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
-        <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/20 dark:text-white/20">
-          WAN SYS v3.1
-        </span>
-      </div>
-    </div>
-  );
+    );
+}
+
+function DetailRow({ label, value, bold }: any) {
+    return (
+        <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5] dark:border-white/10">
+            <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888] dark:text-[#AAAAAA]">{label}</span>
+            <div className="flex items-center gap-3">
+                <span className={`text-[12px] font-mono text-[#050505] dark:text-white ${bold ? 'font-bold' : ''}`}>
+                    {value}
+                </span>
+            </div>
+        </div>
+    );
 }

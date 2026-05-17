@@ -10,7 +10,7 @@ interface WhaleMissionLoaderProps {
   label?: string;
 }
 
-export function WhaleMissionLoader({ children, duration = 3000, label = "INITIALIZING SECURE TERMINAL..." }: WhaleMissionLoaderProps) {
+export function WhaleMissionLoader({ children, duration = 4000, label = "Loading..." }: WhaleMissionLoaderProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -33,8 +33,8 @@ export function WhaleMissionLoader({ children, duration = 3000, label = "INITIAL
             transition={{ duration: 0.5, ease: "easeInOut" }}
             className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white"
           >
-            <div className="relative w-72 h-72 flex flex-col items-center justify-center">
-              <RemoteLottie path="Whale Mission.json" className="w-full h-full object-contain" />
+            <div className="relative w-28 h-28 flex flex-col items-center justify-center">
+              <RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-contain" />
             </div>
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
