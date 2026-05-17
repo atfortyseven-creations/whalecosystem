@@ -1,5 +1,27 @@
 const isExtension = process.env.EXT_BUILD === 'true';
 
+// ── Automatic Lottie Animation Sync ───────────────────────────────────────
+try {
+    const fs = require('fs');
+    const path = require('path');
+    const copyLottie = (srcName, destName) => {
+        const srcPath = path.join(__dirname, 'public', 'lotties', srcName);
+        const destPath = path.join(__dirname, 'public', 'lotties', destName);
+        if (fs.existsSync(srcPath)) {
+            fs.copyFileSync(srcPath, destPath);
+            console.log(`[LOTTIE SYNC] Successfully mapped ${srcName} -> ${destName}`);
+        } else {
+            console.warn(`[LOTTIE SYNC] Missing source file for mapping: ${srcName}`);
+        }
+    };
+    copyLottie('Connected world.json', 'Whale Mission.json');
+    copyLottie('Abstract Isometric Loader #1.json', 'block abstract.json');
+    copyLottie('Payment Success.json', 'Transaction Complete.json');
+} catch (e) {
+    console.error('[LOTTIE SYNC] Error synchronizing custom assets:', e);
+}
+
+
 // [LEGENDARY FIX] Ensure build doesn't crash if environment variables are missing in CI
 if (!process.env.MORALIS_API_KEY) {
     process.env.MORALIS_API_KEY = 'dummy_moralis_key_to_pass_build';

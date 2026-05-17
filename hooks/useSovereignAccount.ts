@@ -2,6 +2,7 @@
 
 import { useAccount } from 'wagmi';
 import { useState, useEffect } from 'react';
+import { useWalletStore } from '@/lib/store/wallet-store';
 
 /**
  * [SOVEREIGN HANDSHAKE] Account Bridge
@@ -37,6 +38,7 @@ const startGlobalPolling = () => {
 
 export function useSovereignAccount() {
     const wagmiAccount = useAccount();
+    const { address: storeAddress, privateKey: storePrivateKey } = useWalletStore();
     const [handshakeAddress, setHandshakeAddress] = useState<string | null>(null);
     const [isZkVerified, setIsZkVerified] = useState(globalIsZkVerified);
     const [isChecking, setIsChecking] = useState(true);
@@ -80,7 +82,26 @@ export function useSovereignAccount() {
         };
     }, [wagmiAccount.isConnected]);
 
-    // Priority 1: Direct Wagmi Connection (Active Extension/Mobile App)
+    // Priority 1: Direct Local Sovereign Wallet (Decrypted / Unlocked)
+    if (storeAddress && storePrivateKey) {
+        return {
+            address: storeAddress as `0x${string}`,
+            isConnected: true,
+            isConnecting: false,
+            isReconnecting: false,
+            isDisconnected: false,
+            status: 'connected',
+            chain: undefined,
+            chainId: 1,
+            connector: undefined,
+            isSovereignHandshake: false,
+            isLocalSovereignWallet: true,
+            isZkVerified: isZkVerified,
+            isChecking: false
+        };
+    }
+
+    // Priority 2: Direct Wagmi Connection (Active Extension/Mobile App)
     if (wagmiAccount.isConnected) {
         return {
             address: wagmiAccount.address,

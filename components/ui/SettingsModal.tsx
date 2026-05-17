@@ -7,8 +7,9 @@ import { LiquidPrismBackground } from '@/components/ui/LiquidPrismBackground';
 import {
     X, Settings, Shield, Zap, Database, Bell, Users,
     CreditCard, Beaker, Link, Info, MessageCircle, Lock,
-    Loader2, Tablet
+    Loader2, Tablet, LogOut
 } from 'lucide-react';
+import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 import { ActiveSessions } from '../settings/ActiveSessions';
 import { CloudSyncManager } from '../settings/CloudSyncManager';
 import { RealPrivacySettings } from '../privacy/RealPrivacySettings';
@@ -17,6 +18,7 @@ import { verifyBiometricOwnership } from '@/src/services/security/BiometricServi
 import { revokeTokenAllowance } from '@/src/services/security/RevokeService';
 
 export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+    const { nuclearDisconnect } = useSovereignSignOut();
     const {
         t, theme, setTheme, currency, setCurrency,
         language, setLanguage, searchEngine, setSearchEngine, lockApp,
@@ -150,6 +152,21 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                                     <option value="DuckDuckGo">DuckDuckGo (Private)</option>
                                     <option value="Brave">Brave Search</option>
                                 </select>
+                            </div>
+                            
+                            <div className="pt-6 border-t border-white/5">
+                                <div className="bg-red-500/5 border border-red-500/10 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div>
+                                        <h4 className="text-white text-sm font-bold mb-1">Active Sovereign Session</h4>
+                                        <p className="text-xs text-gray-500 max-w-[90%] font-serif">Log out and clear all secure keys and wallet registries from memory and local cache.</p>
+                                    </div>
+                                    <button 
+                                        onClick={nuclearDisconnect}
+                                        className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-colors shadow-lg shadow-red-500/10 flex items-center justify-center gap-2"
+                                    >
+                                        <LogOut size={14} /> Disconnect Session
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -338,12 +355,18 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                             </div>
 
                             {/* Actions Footer */}
-                            <div className="p-4 border-t border-white/5 space-y-1 hidden md:block">
+                            <div className="p-4 border-t border-white/5 space-y-2 hidden md:block">
                                 <button
                                     onClick={lockApp}
                                     className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:text-red-300 rounded-lg hover:bg-red-500/10 transition-colors"
                                 >
                                     <Lock size={18} /> {t('btn_lock')}
+                                </button>
+                                <button
+                                    onClick={nuclearDisconnect}
+                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-colors"
+                                >
+                                    <LogOut size={18} /> Disconnect Session
                                 </button>
                             </div>
                         </div>

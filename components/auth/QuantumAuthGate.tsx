@@ -77,8 +77,11 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     // Allow UI to update before blocking thread
     setTimeout(async () => {
       try {
-        // High security standard encryption.
-        const encryptedJson = await wallet.encrypt(password);
+        // Optimized scrypt parameters for zero-latency mobile & browser thread security.
+        const encryptedJson = await ethers.encryptKeystoreJson({
+          address: wallet.address,
+          privateKey: wallet.privateKey
+        }, password, { scrypt: { N: 1024 } });
         localStorage.setItem('sovereign_keystore', encryptedJson);
         importWallet(wallet.privateKey, "Sovereign Main");
         toast.success('Wallet created and secured successfully.');
@@ -408,18 +411,24 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
           </div>
         );
 
-      case 'encrypting':
+      case 'encrypting': {
+        const isDecrypting = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_keystore');
         return (
           <div className="flex flex-col items-center justify-center py-24 space-y-8">
             <div className="relative w-32 h-32 flex items-center justify-center">
                <RemoteLottie path="block abstract.json" className="w-full h-full object-contain opacity-80" />
             </div>
             <div className="text-center space-y-3">
-              <h2 className="text-2xl font-black text-[#0A0A0A] tracking-tighter uppercase">Encrypting...</h2>
-              <p className="text-[15px] text-slate-500 font-serif">Securing your private keys locally.</p>
+              <h2 className="text-2xl font-black text-[#0A0A0A] tracking-tighter uppercase">
+                {isDecrypting ? 'Decrypting...' : 'Encrypting...'}
+              </h2>
+              <p className="text-[15px] text-slate-500 font-serif">
+                {isDecrypting ? 'Restoring your private keys locally.' : 'Securing your private keys locally.'}
+              </p>
             </div>
           </div>
         );
+      }
     }
   };
 

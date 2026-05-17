@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { useDisconnect } from 'wagmi';
 import { signOut } from 'next-auth/react';
+import { useWalletStore } from '@/lib/store/wallet-store';
 
 /**
  * [SOVEREIGN NUCLEAR DISCONNECT]
@@ -19,6 +20,13 @@ export function useSovereignSignOut() {
 
     const nuclearDisconnect = useCallback(async () => {
         console.log('%c[Sovereign] Initiating Nuclear Disconnect...', 'color:#FF3B30;font-weight:bold');
+
+        // 0. Purge local custom wallet Zustand state
+        try {
+            useWalletStore.getState().clearWallet();
+        } catch (e) {
+            console.warn('[Sovereign:Logout] Zustand wallet purge failed:', e);
+        }
 
         // 1. Clear Cookies (Nuclear approach)
         try {
@@ -44,7 +52,8 @@ export function useSovereignSignOut() {
                 'sovereign_handshake',
                 'sovereign_session_v2',
                 'sovereign_vault_v1',
-                'sovereign_pending_wakeup'
+                'sovereign_pending_wakeup',
+                'whale-sovereign-wallet-registry-v2'
             ];
             targets.forEach(t => localStorage.removeItem(t));
 
@@ -59,6 +68,8 @@ export function useSovereignSignOut() {
                     lower.includes('reown') ||
                     lower.includes('whale_chat') ||
                     lower.includes('whale_draft') ||
+                    lower.includes('whale_') ||
+                    lower.includes('whale-') ||
                     lower.includes('sovereign_')
                 ) {
                     localStorage.removeItem(key);
