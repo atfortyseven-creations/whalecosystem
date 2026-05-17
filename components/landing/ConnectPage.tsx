@@ -202,12 +202,41 @@ export default function ConnectPage() {
     return () => clearInterval(poll);
   }, [qrSession, ephemeral, qrData, syncStatus]);
 
+  const { disconnect } = useDisconnect();
+
+  const handleTotalDisconnect = useCallback(() => {
+    try {
+      disconnect();
+    } catch {}
+    
+    // Purge cookies
+    document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    
+    // Purge storage
+    localStorage.clear();
+    sessionStorage.clear();
+    setLinked(false);
+    
+    toast.success("Disconnected & purged all sessions.");
+    window.location.replace("/connect");
+  }, [disconnect, setLinked]);
+
   // Wallet connect → redirect (fixed: use ref to prevent double-fire)
   useEffect(() => {
     if (!mounted || !isConnected || !address) return;
     if (redirectingRef.current) return;
     try { if (sessionStorage.getItem("__disconnected__") === "1") { sessionStorage.removeItem("__disconnected__"); return; } } catch {}
     redirectingRef.current = true;
+
+    // Purge cookies to ensure fresh connection handshake without stale sessions
+    document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
     setLinked(true);
     window.location.replace("/dashboard");
   }, [isConnected, address, mounted, setLinked]);
@@ -320,6 +349,13 @@ export default function ConnectPage() {
                       />
                     ))}
                   </div>
+
+                  <button
+                    onClick={handleTotalDisconnect}
+                    className="mt-2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-600 transition-all border border-rose-500/20 active:scale-[0.98]"
+                  >
+                    Total Disconnect
+                  </button>
                 </motion.div>
 
               ) : !mounted ? (

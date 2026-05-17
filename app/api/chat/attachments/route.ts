@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const filepath = path.join(uploadDir, uniqueFilename);
     await fs.promises.writeFile(filepath, buffer);
 
-    const publicUrl = `/chat-uploads/${uniqueFilename}`;
+    const publicUrl = `/api/chat/attachments?file=${uniqueFilename}`;
 
     return NextResponse.json({
       url: publicUrl,
@@ -46,3 +46,48 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to process attachment' }, { status: 500 });
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const filename = searchParams.get('file');
+    if (!filename) {
+      return NextResponse.json({ error: 'Missing file parameter' }, { status: 400 });
+    }
+
+    // Secure: prevent directory traversal
+    const safeFilename = path.basename(filename);
+    const uploadDir = path.join(process.cwd(), 'public', 'chat-uploads');
+    const filepath = path.join(uploadDir, safeFilename);
+
+    if (!fs.existsSync(filepath)) {
+      return NextResponse.json({ error: 'Attachment not found' }, { status: 404 });
+    }
+
+    const buffer = await fs.promises.readFile(filepath);
+
+    // Determine precise MIME type from file extension
+    const ext = path.extname(safeFilename).toLowerCase();
+    let contentType = 'application/octet-stream';
+    if (ext === '.png') contentType = 'image/png';
+    else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+    else if (ext === '.gif') contentType = 'image/gif';
+    else if (ext === '.webp') contentType = 'image/webp';
+    else if (ext === '.svg') contentType = 'image/svg+xml';
+    else if (ext === '.mp4') contentType = 'video/mp4';
+    else if (ext === '.webm') contentType = 'video/webm';
+    else if (ext === '.mov') contentType = 'video/quicktime';
+    else if (ext === '.pdf') contentType = 'application/pdf';
+
+    return new Response(buffer, {
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    });
+  } catch (error: any) {
+    console.error('[Upload] Error retrieving attachment:', error);
+    return NextResponse.json({ error: 'Failed to retrieve attachment' }, { status: 500 });
+  }
+}
+

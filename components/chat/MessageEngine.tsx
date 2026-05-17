@@ -56,14 +56,16 @@ export default function MessageEngine({
 
   return (
     <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1 scroll-smooth" onClick={closeMenu}>
-      {messages.map(msg => (
-        <MessageBubble
-          key={msg.id}
-          msg={msg}
-          onContextMenu={(e) => openMenu(e, msg.id)}
-          onReact={onReact}
-        />
-      ))}
+      {messages
+        .filter(msg => !(typeof msg.content === 'string' && msg.content.includes('initiatedByInboxId')))
+        .map(msg => (
+          <MessageBubble
+            key={msg.id}
+            msg={msg}
+            onContextMenu={(e) => openMenu(e, msg.id)}
+            onReact={onReact}
+          />
+        ))}
       <div ref={bottomRef} />
 
       {/* Floating Context Menu */}

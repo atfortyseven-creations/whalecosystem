@@ -270,6 +270,9 @@ export default function SovereignChat() {
           if (cancelled) break;
           
           const rendered = xmtpToRenderable(msg, selfInboxId);
+          if (typeof rendered.content === 'string' && rendered.content.includes('initiatedByInboxId')) {
+             continue;
+          }
           const fromPeer = msg.senderInboxId !== selfInboxId;
           const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
           const currentActivePeer = activeConvRef.current?.peerAddress.toLowerCase();
@@ -345,7 +348,10 @@ export default function SovereignChat() {
       try {
         const raw = await getMessages(xmtpClient.current, activeConv.peerAddress);
         if (cancelled) return;
-        const rendered = raw.map((m: any) => xmtpToRenderable(m, selfInboxId)).sort((a, b) => a.sentAt - b.sentAt);
+        const rendered = raw
+          .map((m: any) => xmtpToRenderable(m, selfInboxId))
+          .filter((m: any) => !(typeof m.content === 'string' && m.content.includes('initiatedByInboxId')))
+          .sort((a, b) => a.sentAt - b.sentAt);
         
         // Merge with optimistic local messages safely
         setMessages(prev => {

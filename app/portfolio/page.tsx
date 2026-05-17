@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet, RefreshCw, ArrowUpRight, ArrowDownRight,
   Eye, EyeOff, PieChart, Globe, Copy, Search,
   ArrowDownLeft, Repeat, CreditCard, Plus, ChevronDown,
-  Check, Loader2, ShieldCheck, ExternalLink, Activity, ShieldAlert
+  Check, Loader2, ShieldCheck, ExternalLink, Activity, ShieldAlert,
+  BarChart2, MessageSquare, Menu
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { useAccount, useSwitchChain, useConnect } from 'wagmi';
@@ -168,6 +170,7 @@ function WalletAction({
 
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function PortfolioPage() {
+  const router = useRouter();
   const eurRate = useEURRate();
   const fmt = useCallback((v: number) => formatEUR(v, eurRate), [eurRate]);
   const [hidden, setHidden] = useState(false);
@@ -386,7 +389,7 @@ export default function PortfolioPage() {
           <div className="text-[9px] font-mono font-black uppercase tracking-[0.3em] mb-6" style={{ color: MUTED }}>
             Wallet
           </div>
-          <div className="flex flex-wrap justify-around gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 py-2">
             <WalletAction icon={ArrowUpRight}   label="Send"   onClick={() => openMode("send")}   />
             <WalletAction icon={ArrowDownLeft}  label="Receive" onClick={() => setIsDepositOpen(true)} />
             <WalletAction icon={Repeat}         label="Swap"   onClick={() => openMode("swap")}   />
@@ -762,6 +765,43 @@ export default function PortfolioPage() {
         address={userAddress ?? ""}
       />
       <SovereignFooter />
+
+      {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+           {[
+              { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
+              { id: 'portfolio',   icon: <PieChart size={18} />,      label: 'Portfolio' },
+              { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
+              { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
+          ].map(tab => {
+              const isActive = tab.id === 'portfolio';
+              return (
+                  <button
+                      key={tab.id}
+                      onClick={() => {
+                          if (tab.id === 'menu') {
+                              router.push('/dashboard?tab=menu');
+                          }
+                          else if (tab.id === 'chat') router.push('/chat');
+                          else if (tab.id === 'portfolio') router.push('/portfolio');
+                          else router.push('/dashboard?tab=markets');
+                      }}
+                      style={{ minHeight: 0, minWidth: 0 }}
+                      className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors ${
+                          isActive ? 'text-black dark:text-white' : 'text-[#888888] hover:text-black dark:hover:text-white'
+                      }`}
+                  >
+                      {isActive && (
+                          <span className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#050505] dark:bg-white" />
+                      )}
+                      <span className={isActive ? 'scale-110 transition-transform' : 'transition-transform'}>
+                          {tab.icon}
+                      </span>
+                      <span className={`text-[10px] font-bold ${isActive ? 'opacity-100 font-black' : 'opacity-60'}`}>{tab.label}</span>
+                  </button>
+              );
+          })}
+      </nav>
     </div>
   );
 }
