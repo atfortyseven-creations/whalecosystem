@@ -33,13 +33,13 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'gold',          label: 'SIGNATURE MINT',    icon: null },
-    { id: 'billing',       label: 'SUBSCRIPTION',      icon: null },
-    { id: 'markets',       label: 'TOKENS',             icon: null, requiresZK: true },
-    { id: 'inst-ledger',   label: 'READ THE BLOCK',    icon: null, requiresZK: true },
-    { id: 'mass-transfer', label: 'BULK RECORD SYNC',  icon: null, requiresZK: true, minTier: 'STANDARD' },
-    { id: 'logs',          label: 'SESSION AUDIT',     icon: null },
-    { id: 'support',       label: 'SUPPORT',           icon: null },
+    { id: 'gold',          label: 'Create Badge',    icon: null },
+    { id: 'billing',       label: 'Plans',           icon: null },
+    { id: 'markets',       label: 'Tokens',          icon: null, requiresZK: true },
+    { id: 'inst-ledger',   label: 'Block Explorer',  icon: null, requiresZK: true },
+    { id: 'mass-transfer', label: 'Sync Records',    icon: null, requiresZK: true, minTier: 'STANDARD' },
+    { id: 'logs',          label: 'Activity Log',    icon: null },
+    { id: 'support',       label: 'Help & Support',  icon: null },
 ];
 
 const RESTRICTED_TABS = [
@@ -480,7 +480,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     <div className="lg:hidden flex-1 flex justify-center mx-4 relative">
                         <button
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="flex items-center gap-2 px-4 py-2 bg-black/5 rounded-full text-[11px] font-black uppercase tracking-widest text-[#050505] active:scale-95 transition-transform"
+                            className="flex items-center gap-2 px-4 py-2 bg-black/5 dark:bg-white/10 rounded-full text-[13px] font-semibold text-[#050505] dark:text-white active:scale-95 transition-transform"
                         >
                             {SIDEBAR_ITEMS.find(i => i.id === activeTab)?.label || 'Menu'}
                             <ChevronDown size={12} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -492,7 +492,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute top-full mt-2 w-[240px] bg-white border border-black/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col py-2"
+                                    className="absolute top-full mt-2 w-[220px] bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col py-2"
                                     style={{ willChange: 'transform, opacity' }}
                                 >
                                     {SIDEBAR_ITEMS.filter(item => !item.requiresZK || isZkVerified).map(item => (
@@ -502,7 +502,11 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                                 handleTabChange(item.id);
                                                 setIsDropdownOpen(false);
                                             }}
-                                            className={`px-4 py-3 text-left text-[11px] font-black uppercase tracking-widest transition-colors ${activeTab === item.id ? 'bg-black text-white' : 'text-[#050505]/60 hover:bg-black/5 hover:text-[#050505]'}`}
+                                            className={`px-4 py-3 text-left text-[13px] font-semibold transition-colors ${
+                                                activeTab === item.id
+                                                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                                                    : 'text-[#050505] dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10'
+                                            }`}
                                         >
                                             {item.label}
                                         </button>
@@ -608,15 +612,15 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 <footer className="hidden md:flex h-7 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5 min-w-[120px]">
-                            Global Latency:
+                            Latency:
                             <span className={latency > 150 ? 'text-[#FF3B30]' : 'text-[#00FF55]'}>
                                 {latency > 0 ? `${latency}ms` : '12ms'}
                             </span>
                         </span>
-                        <span className="flex items-center gap-1.5">Nodes: <span className="text-[#050505]">{nodeStatus}</span></span>
+                        <span className="flex items-center gap-1.5">Servers: <span className="text-[#050505] dark:text-white">{nodeStatus}</span></span>
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5">Network: ACTIVE</span>
+                        <span className="flex items-center gap-1.5">Connected</span>
                         <span className="text-[#888888]">© 2026 Whale Alert Network</span>
                     </div>
                 </footer>
@@ -640,12 +644,12 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_32px_80px_-12px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col border border-black/8"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between px-8 pt-8 pb-6 border-b border-black/6">
+                <div className="flex items-center justify-between px-6 pt-6 pb-5 border-b border-black/6">
                     <div>
-                        <h3 className="text-[16px] font-black uppercase tracking-[0.15em] text-black leading-none mb-1.5">
+                        <h3 className="text-[17px] font-bold text-black leading-none mb-1">
                             {currentExplanation.title}
                         </h3>
-                        <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-black/30">
+                        <p className="text-[12px] text-black/40">
                             {currentExplanation.subtitle}
                         </p>
                     </div>
@@ -653,30 +657,30 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         <X size={15} className="text-black/40" />
                     </button>
                 </div>
-                <div className="px-8 py-6 border-b border-black/6 bg-black/[0.015]">
-                    <p className="text-[14px] leading-[1.75] text-black/70 font-medium">
+                <div className="px-6 py-5 border-b border-black/6 bg-black/[0.015]">
+                    <p className="text-[14px] leading-[1.75] text-black/70">
                         {currentExplanation.overview}
                     </p>
                 </div>
                 {currentExplanation.features.length > 0 && (
-                    <div className="px-8 py-6 overflow-y-auto max-h-[45vh]">
-                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/25 mb-4">Technical Capabilities</p>
+                    <div className="px-6 py-5 overflow-y-auto max-h-[40vh]">
+                        <p className="text-[11px] font-semibold text-black/40 mb-3">What's included</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             {currentExplanation.features.map((feat, idx) => (
                                 <div key={idx} className="border border-black/8 rounded-xl p-4 hover:bg-black/[0.02] hover:border-black/15 transition-all">
-                                    <div className="flex items-center gap-2.5 mb-2">
+                                    <div className="flex items-center gap-2.5 mb-1.5">
                                         <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-black">{feat.title}</span>
+                                        <span className="text-[12px] font-semibold text-black">{feat.title}</span>
                                     </div>
-                                    <p className="text-[11px] text-black/50 leading-relaxed font-mono pl-4">{feat.desc}</p>
+                                    <p className="text-[12px] text-black/50 leading-relaxed pl-4">{feat.desc}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 )}
-                <div className="px-8 py-5 border-t border-black/6 flex justify-end">
-                    <button onClick={() => setShowInfoModal(false)} className="px-7 py-2.5 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-[0.15em] hover:bg-black/80 transition-colors active:scale-[0.98]">
-                        Return to Terminal
+                <div className="px-6 py-4 border-t border-black/6 flex justify-end">
+                    <button onClick={() => setShowInfoModal(false)} className="px-6 py-2.5 rounded-xl bg-black text-white text-[13px] font-semibold hover:bg-black/80 transition-colors active:scale-[0.98]">
+                        Close
                     </button>
                 </div>
             </motion.div>
@@ -708,8 +712,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     {/* Title */}
                     <div className="px-6 pb-4 flex justify-between items-center border-b border-black/5 dark:border-white/5">
                         <div>
-                            <h3 className="text-[14px] font-black uppercase tracking-[0.2em] text-black dark:text-white">Terminal Navigation</h3>
-                            <p className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/40 dark:text-white/40 mt-0.5">Select a Terminal Module</p>
+                            <h3 className="text-[16px] font-bold text-black dark:text-white">Navigation</h3>
+                            <p className="text-[12px] text-black/40 dark:text-white/40 mt-0.5">Choose a section</p>
                         </div>
                         <button onClick={() => setIsMenuDrawerOpen(false)} className="w-7 h-7 rounded-full hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition-colors">
                             <X size={14} className="text-black/50 dark:text-white/50" />
@@ -734,25 +738,25 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                     }}
                                     className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${
                                         isActive 
-                                            ? 'bg-black text-white dark:bg-white dark:text-black font-black uppercase' 
-                                            : 'bg-black/[0.02] hover:bg-black/[0.04] dark:bg-white/[0.02] dark:hover:bg-white/[0.04] text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white font-bold uppercase'
+                                            ? 'bg-black text-white dark:bg-white dark:text-black' 
+                                            : 'bg-black/[0.02] hover:bg-black/[0.05] dark:bg-white/[0.02] dark:hover:bg-white/[0.05] text-black dark:text-white'
                                     } disabled:opacity-40 disabled:cursor-not-allowed`}
                                 >
                                     <div className="flex items-center gap-3.5">
-                                        <div className={isActive ? 'text-white dark:text-black' : 'text-black/40 dark:text-white/40'}>
+                                        <div className={isActive ? 'text-white dark:text-black' : 'text-black/50 dark:text-white/50'}>
                                             {getModuleIcon(item.id)}
                                         </div>
-                                        <span className="text-[11px] tracking-[0.15em]">{item.label}</span>
+                                        <span className="text-[14px] font-medium">{item.label}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {isZkRestricted && (
-                                            <span className="text-[8px] font-black tracking-widest bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded border border-amber-500/30">
-                                                ZK REQUIRED
+                                            <span className="text-[10px] font-semibold bg-amber-500/20 text-amber-600 px-2 py-0.5 rounded-full border border-amber-500/30">
+                                                Verify first
                                             </span>
                                         )}
                                         {isLocked && (
-                                            <span className="text-[8px] font-black tracking-widest bg-red-500/20 text-red-500 px-2 py-0.5 rounded border border-red-500/30">
-                                                LOCKED
+                                            <span className="text-[10px] font-semibold bg-red-500/20 text-red-500 px-2 py-0.5 rounded-full border border-red-500/30">
+                                                Upgrade
                                             </span>
                                         )}
                                         {!isActive && !isZkRestricted && !isLocked && (

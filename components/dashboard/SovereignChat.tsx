@@ -5,7 +5,8 @@ import { useWalletClient } from 'wagmi';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { ethers } from 'ethers';
-import { QrCode, X, ChevronLeft, Menu, Settings } from 'lucide-react';
+import { QrCode, X, ChevronLeft, Menu, Settings, LogOut, ArrowLeft } from 'lucide-react';
+import { useDisconnect } from 'wagmi';
 import { toast } from 'sonner';
 
 import SidebarNavigation from '@/components/chat/SidebarNavigation';
@@ -121,10 +122,20 @@ function playMessageSound() {
 
 // ── SovereignChat (Orchestrator) ──────────────────────────────────────────
 
-export default function SovereignChat() {
+export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () => void }) {
   const { address, isConnected, isLocalSovereignWallet } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { privateKey: storePrivateKey } = useWalletStore();
+  const { disconnect } = useDisconnect();
+
+  const handleFullDisconnect = () => {
+    try { disconnect(); } catch {}
+    localStorage.removeItem('sovereign_keystore');
+    document.cookie = 'whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+    document.cookie = 'sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+    toast.success('Session disconnected.');
+    window.location.replace('/connect');
+  };
 
   // ── Settings (persisted) ─────────────────────────────────────────────────
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS);
@@ -649,19 +660,39 @@ export default function SovereignChat() {
       <div className={`w-full md:w-[280px] border-r border-black/8 flex-col shrink-0 bg-white ${activeConv ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-black/6 space-y-3">
           <div className="flex items-center justify-between mb-3 md:hidden">
-            <button
-              onClick={() => setShowMobileSidebar(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-black/[0.04] border border-black/10 rounded-xl font-mono text-[11px] font-bold uppercase tracking-widest text-black hover:bg-black/[0.08] transition-all"
-            >
-              <Menu size={16} />
-              <span>{activeFolder === 'all' ? 'All Chats' : 'Secret ZK'}</span>
-            </button>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="p-1.5 bg-black/[0.04] border border-black/10 rounded-xl text-black hover:bg-black/[0.08] transition-all"
-            >
-              <Settings size={16} />
-            </button>
+            <div className="flex items-center gap-2">
+              {onReturnToGate && (
+                <button
+                  onClick={onReturnToGate}
+                  title="Back to wallet selector"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-black/[0.04] border border-black/10 rounded-xl font-mono text-[11px] font-bold uppercase tracking-widest text-black hover:bg-black/[0.08] transition-all"
+                >
+                  <ArrowLeft size={14} />
+                </button>
+              )}
+              <button
+                onClick={() => setShowMobileSidebar(true)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-black/[0.04] border border-black/10 rounded-xl font-mono text-[11px] font-bold uppercase tracking-widest text-black hover:bg-black/[0.08] transition-all"
+              >
+                <Menu size={16} />
+                <span>{activeFolder === 'all' ? 'All Chats' : 'Secret ZK'}</span>
+              </button>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleFullDisconnect}
+                title="Disconnect session"
+                className="p-1.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-500 hover:bg-rose-100 transition-all"
+              >
+                <LogOut size={15} />
+              </button>
+              <button
+                onClick={() => setShowSettings(true)}
+                className="p-1.5 bg-black/[0.04] border border-black/10 rounded-xl text-black hover:bg-black/[0.08] transition-all"
+              >
+                <Settings size={16} />
+              </button>
+            </div>
           </div>
 
           <div className="flex gap-2">

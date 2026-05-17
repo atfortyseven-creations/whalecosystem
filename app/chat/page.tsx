@@ -1,15 +1,11 @@
-import SovereignChat from '@/components/dashboard/SovereignChat';
-import { WhaleMissionLoader } from '@/components/shared/WhaleMissionLoader';
+import ChatClientPage from '@/components/chat/ChatClientPage';
 
 export const metadata = {
-  title: 'Sovereign Chat · Whale Alert Network',
-  description: 'Post-quantum E2EE encrypted messaging with on-chain intelligence.',
+  title: 'Whale Chat · Whale Alert Network',
+  description: 'End-to-end encrypted messaging with on-chain intelligence.',
 };
 
 export default function ChatPage() {
-  return (
-    <WhaleMissionLoader>
-      <SovereignChat />
-    </WhaleMissionLoader>
-  );
+  return <ChatClientPage />;
 }
+

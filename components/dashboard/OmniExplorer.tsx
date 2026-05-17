@@ -159,9 +159,9 @@ export function OmniExplorer() {
                         <button
                             onClick={handleSearch}
                             disabled={isSearching}
-                            className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] hover:text-[#050505] dark:hover:text-white hover:border-[#050505] dark:hover:border-white/10 border border-transparent text-white dark:text-black px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded"
+                            className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] hover:text-[#050505] dark:hover:text-white hover:border-[#050505] dark:hover:border-white/10 border border-transparent text-white dark:text-black px-8 font-semibold text-[13px] transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded"
                         >
-                            {isSearching ? 'INDEXING...' : 'INITIATE'}
+                            {isSearching ? 'Searching...' : 'Search'}
                         </button>
                     </div>
 
@@ -178,10 +178,10 @@ export function OmniExplorer() {
                             <div className="flex items-center justify-between p-5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
                                 <div className="flex items-center gap-3">
                                     <Zap size={14} className="text-[#050505] dark:text-white" />
-                                    <h2 className="text-[10px] font-bold uppercase tracking-[0.1em]">QUERY RESULTS</h2>
+                                    <h2 className="text-[13px] font-semibold">Search Results</h2>
                                 </div>
-                                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">
-                                    {searchResults.length} NODES MATCHED
+                                <span className="text-[12px] text-[#A0A0A0]">
+                                    {searchResults.length} results found
                                 </span>
                             </div>
                             {searchResults.length === 0 ? (
@@ -230,7 +230,7 @@ export function OmniExplorer() {
 
                         <div className="flex flex-col">
                             {blocks.length === 0 && (
-                                <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Establishing Peer Link...</div>
+                                <div className="p-12 text-center text-[13px] text-[#888888] dark:text-[#AAAAAA] animate-pulse">Loading blocks…</div>
                             )}
                             <AnimatePresence>
                                 {blocks.map((block, i) => (
@@ -264,9 +264,9 @@ export function OmniExplorer() {
                                         </div>
 
                                         <div className="flex flex-col gap-1.5 sm:text-right relative z-10">
-                                            <div className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-2">
+                                            <div className="text-[11px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-2">
                                                 <ShieldCheck size={10} className="text-[#050505] dark:text-white" /> 
-                                                VALIDATOR: <span className="text-[#050505] dark:text-white font-bold">{block.validator}</span>
+                                                Validator: <span className="text-[#050505] dark:text-white font-bold">{block.validator}</span>
                                             </div>
                                             <div className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-3">
                                                 <span>{block.txs} TXS</span>
@@ -292,7 +292,7 @@ export function OmniExplorer() {
 
                         <div className="flex flex-col">
                             {massiveTxs.length === 0 && (
-                                <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Syncing Mempool Hub...</div>
+                                <div className="p-12 text-center text-[13px] text-[#888888] dark:text-[#AAAAAA] animate-pulse">Loading transactions…</div>
                             )}
                             {massiveTxs.map((tx, i) => (
                                 <button 
@@ -346,8 +346,8 @@ export function OmniExplorer() {
                                         {selectedBlock ? <Box size={20} className="text-[#050505] dark:text-white" /> : <Activity size={20} className="text-[#050505] dark:text-white" />}
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">
-                                            {selectedBlock ? 'BLOCK DETAILS' : 'TRANSACTION DETAILS'}
+                                        <h3 className="text-[18px] font-bold uppercase tracking-[0.05em] text-[#050505] dark:text-white">
+                                            {selectedBlock ? 'Block Details' : 'Transaction Details'}
                                         </h3>
                                     </div>
                                 </div>
@@ -355,19 +355,19 @@ export function OmniExplorer() {
                                 <div className="space-y-2">
                                     {selectedBlock ? (
                                         <>
-                                            <DetailRow label="Block Height" value={selectedBlock.height} />
-                                            <DetailRow label="Strategic Miner" value={selectedBlock.validator} copy />
+                                            <DetailRow label="Block Number" value={selectedBlock.height} />
+                                            <DetailRow label="Validator" value={selectedBlock.validator} copy />
                                             <DetailRow label="Timestamp" value={selectedBlock.age} />
-                                            <DetailRow label="Payload Size" value={selectedBlock.size} />
-                                            <DetailRow label="Tx Density" value={selectedBlock.txs + ' Transactions'} />
+                                            <DetailRow label="Block Size" value={selectedBlock.size} />
+                                            <DetailRow label="Transactions" value={selectedBlock.txs + ' Transactions'} />
                                         </>
                                     ) : (
                                         <>
-                                            <DetailRow label="Tx Hash" value={selectedTx.hash} copy />
-                                            <DetailRow label="Origin Source" value={selectedTx.from} copy />
-                                            <DetailRow label="Target Destination" value={selectedTx.to} copy />
-                                            <DetailRow label="Transfer Value" value={selectedTx.value} highlight />
-                                            <DetailRow label="Payload Type" value={selectedTx.type} />
+                                            <DetailRow label="Transaction Hash" value={selectedTx.hash} copy />
+                                            <DetailRow label="From" value={selectedTx.from} copy />
+                                            <DetailRow label="To" value={selectedTx.to} copy />
+                                            <DetailRow label="Amount" value={selectedTx.value} highlight />
+                                            <DetailRow label="Type" value={selectedTx.type} />
                                         </>
                                     )}
                                 </div>
@@ -385,7 +385,7 @@ export function OmniExplorer() {
 
                  {/* Institutional Footer */}
                  <div className="text-center pt-8 pb-4">
-                     <span className="text-[9px] text-[#A0A0A0] font-bold tracking-[0.2em] uppercase">ON-CHAIN VERIFIED DATA LAYER</span>
+                     <span className="text-[11px] text-[#A0A0A0]">Real-time on-chain data</span>
                  </div>
             </div>
         </div>
