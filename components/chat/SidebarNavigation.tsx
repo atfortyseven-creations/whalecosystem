@@ -15,17 +15,17 @@ export default function SidebarNavigation({ onSelectFolder, onOpenSettings, acti
   ];
 
   return (
-    <div className="w-[64px] hover:w-[240px] transition-all duration-300 group border-r border-black/6 bg-white flex flex-col items-center hover:items-start py-6 relative z-50 overflow-hidden shrink-0">
-      <div className="px-4 w-full flex items-center justify-center group-hover:justify-start mb-8 transition-all">
+    <div className="w-[240px] transition-all duration-300 border-r border-black/6 bg-white flex flex-col items-start py-6 relative z-50 overflow-hidden shrink-0">
+      <div className="px-4 w-full flex items-center justify-start mb-8 transition-all">
         <div className="w-10 h-10 rounded-2xl bg-black/[0.04] flex items-center justify-center border border-black/8 shrink-0">
           <Folder className="text-black/50" size={18} />
         </div>
-        <span className="ml-4 font-mono text-[11px] font-bold tracking-widest text-black/40 opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity uppercase">
+        <span className="ml-4 font-mono text-[11px] font-bold tracking-widest text-black/40 whitespace-nowrap transition-opacity uppercase">
           Folders
         </span>
       </div>
 
-      <div className="w-full px-3 mb-6 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="w-full px-3 mb-6 transition-opacity">
         <div className="bg-black/[0.03] rounded-xl flex items-center px-3 py-2 border border-black/8">
           <Search size={13} className="text-black/25 mr-2" />
           <input
@@ -44,12 +44,12 @@ export default function SidebarNavigation({ onSelectFolder, onOpenSettings, acti
             <button
               key={folder.id}
               onClick={() => onSelectFolder(folder.id)}
-              className={`w-full flex items-center justify-center group-hover:justify-start p-3 rounded-xl transition-all ${
+              className={`w-full flex items-center justify-start p-3 rounded-xl transition-all ${
                 isActive ? 'bg-black text-white border border-black' : 'hover:bg-black/5 border border-transparent text-black/40 hover:text-black'
               }`}
             >
               <Icon size={18} />
-              <span className={`ml-3 font-mono text-[11px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity font-bold uppercase tracking-wide ${isActive ? 'text-white' : ''}`}>
+              <span className={`ml-3 font-mono text-[11px] whitespace-nowrap transition-opacity font-bold uppercase tracking-wide ${isActive ? 'text-white' : ''}`}>
                 {folder.name}
               </span>
             </button>
@@ -60,10 +60,10 @@ export default function SidebarNavigation({ onSelectFolder, onOpenSettings, acti
       <div className="w-full px-3 mt-auto">
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center justify-center group-hover:justify-start p-3 rounded-xl hover:bg-black/5 transition-all border border-transparent text-black/40 hover:text-black"
+          className="w-full flex items-center justify-start p-3 rounded-xl hover:bg-black/5 transition-all border border-transparent text-black/40 hover:text-black"
         >
           <Settings size={18} />
-          <span className="ml-3 font-mono text-[11px] text-black/40 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wide font-bold">
+          <span className="ml-3 font-mono text-[11px] text-black/40 whitespace-nowrap transition-opacity uppercase tracking-wide font-bold">
             Settings
           </span>
         </button>

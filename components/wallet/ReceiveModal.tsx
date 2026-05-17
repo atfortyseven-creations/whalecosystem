@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Copy, QrCode as QrIcon, Check, AlertCircle, ChevronDown, Search, ExternalLink } from "lucide-react";
 import { useAccount, useChains, useSwitchChain } from "wagmi";
-import { QRCodeSVG } from "qrcode.react";
+
 import { toast } from "sonner";
 import { TOKENS_BY_CHAIN } from "@/config/tokens";
 import Image from "next/image";
@@ -173,13 +173,7 @@ export default function ReceiveModal({ isOpen, onClose, address: propAddress }: 
                                     
                                     <div className="p-5 bg-white rounded-2xl shadow-xl z-10 border border-black/5">
                                         {address ? (
-                                            <QRCodeSVG
-                                                value={address}
-                                                size={180}
-                                                level="M"
-                                                bgColor="#FFFFFF"
-                                                fgColor="#000000"
-                                            />
+                                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${address}&color=000000&bgcolor=FFFFFF`} alt="QR" className="w-[180px] h-[180px] object-contain rounded-xl" />
                                         ) : (
                                             <div className="w-[180px] h-[180px] bg-black/5 animate-pulse rounded-xl" />
                                         )}

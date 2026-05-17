@@ -30,8 +30,6 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     const ks = localStorage.getItem('sovereign_keystore');
     if (ks) {
       setHasKeystore(true);
-      // We no longer automatically go to 'login' here.
-      // We let the user choose on the 'home' screen.
     }
   }, []);
 
@@ -76,10 +74,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     
     const startTime = Date.now();
     
-    // Allow UI to update before blocking thread
     setTimeout(async () => {
       try {
-        // Optimized scrypt parameters for zero-latency mobile & browser thread security.
         const encryptedJson = await ethers.encryptKeystoreJson({
           address: wallet.address,
           privateKey: wallet.privateKey
@@ -98,7 +94,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         toast.error('Encryption failed', { description: e.message });
         setStep('verify');
       }
-    }, 500); // give UI more time to show "Encrypting..."
+    }, 500);
   };
 
   const handleLogin = async () => {
@@ -106,12 +102,20 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     if (!ks) return;
     setStep('encrypting');
     
+    const startTime = Date.now();
+    
     setTimeout(async () => {
       try {
         const decryptedWallet = await ethers.Wallet.fromEncryptedJson(ks, password);
         importWallet(decryptedWallet.privateKey, "Sovereign Main");
-        toast.success('Decryption successful.');
-        onComplete();
+        
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(8000 - elapsedTime, 0);
+
+        setTimeout(() => {
+          toast.success('Decryption successful.');
+          onComplete();
+        }, remainingTime);
       } catch (e) {
         toast.error('Invalid password', { description: 'Please try again.' });
         setStep('login');
@@ -123,66 +127,67 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     switch (step) {
       case 'home':
         return (
-          <div className="space-y-6">
-            <div className="text-center space-y-4 mb-8">
-              <div className="w-16 h-16 bg-white border border-black/5 shadow-sm rounded-3xl mx-auto flex items-center justify-center">
-                <Wallet size={24} className="text-[#0A0A0A]" strokeWidth={1.5} />
+          <div className="space-y-8">
+            <div className="text-center space-y-4 mb-10">
+              <div className="w-16 h-16 bg-[#FAFAF8] border border-black/5 shadow-sm rounded-[20px] mx-auto flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-transparent" />
+                <Wallet size={24} className="text-[#0A0A0A] relative z-10" strokeWidth={1.5} />
               </div>
-              <h1 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase">Portfolio</h1>
-              <p className="text-[15px] text-slate-500 font-serif leading-relaxed px-4">
-                Connect your wallet or create a new one to track your holdings.
+              <h1 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">Portfolio</h1>
+              <p className="text-[13px] text-[#0A0A0A]/50 font-medium leading-relaxed px-4 max-w-xs mx-auto">
+                Connect your wallet or create a secure local vault to track your holdings.
               </p>
             </div>
 
             <div className="space-y-3">
               <button 
                 onClick={() => setStep('password')}
-                className="w-full flex items-center justify-between p-5 rounded-2xl bg-[#0A0A0A] text-white hover:bg-black/80 transition-colors shadow-lg font-bold"
+                className="group w-full flex items-center justify-between p-5 rounded-[22px] bg-[#050505] text-white hover:bg-[#111] transition-all shadow-[0_8px_30px_rgba(0,0,0,0.12)] active:scale-[0.98] border border-white/10"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
                     <Shield size={18} className="text-white" />
                   </div>
                   <div className="text-left">
-                    <div className="text-[15px]">Create a new wallet</div>
-                    <div className="text-[12px] opacity-70 font-normal">Generate a 12-word recovery phrase</div>
+                    <div className="text-[14px] font-black uppercase tracking-widest">Create Vault</div>
+                    <div className="text-[11px] text-white/50 font-medium mt-0.5 tracking-wide">Generate a 12-word recovery phrase</div>
                   </div>
                 </div>
-                <ArrowRight size={18} />
+                <ArrowRight size={18} className="text-white/40 group-hover:text-white transition-colors group-hover:translate-x-1" />
               </button>
 
               {hasKeystore && (
                 <button 
                   onClick={() => setStep('login')}
-                  className="w-full flex items-center justify-between p-5 rounded-2xl bg-[#0044CC] text-white hover:bg-blue-700 transition-colors shadow-lg font-bold"
+                  className="group w-full flex items-center justify-between p-5 rounded-[22px] bg-white border border-black/10 hover:border-black/20 transition-all shadow-sm active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                      <Lock size={18} className="text-white" />
+                    <div className="w-11 h-11 rounded-full bg-[#FAFAF8] flex items-center justify-center border border-black/5 group-hover:scale-105 transition-transform">
+                      <Lock size={18} className="text-[#050505]" />
                     </div>
                     <div className="text-left">
-                      <div className="text-[15px]">Unlock Existing Wallet</div>
-                      <div className="text-[12px] opacity-70 font-normal">Enter your password to unlock</div>
+                      <div className="text-[14px] font-black uppercase tracking-widest text-[#050505]">Unlock Vault</div>
+                      <div className="text-[11px] text-[#050505]/50 font-medium mt-0.5 tracking-wide">Enter your password to unlock</div>
                     </div>
                   </div>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={18} className="text-[#050505]/40 group-hover:text-[#050505] transition-colors group-hover:translate-x-1" />
                 </button>
               )}
 
               <button 
                 onClick={() => open()}
-                className="w-full flex items-center justify-between p-5 rounded-2xl bg-white border border-black/10 hover:bg-black/5 transition-colors text-[#0A0A0A] font-bold"
+                className="group w-full flex items-center justify-between p-5 rounded-[22px] bg-transparent border border-transparent hover:bg-black/5 transition-all active:scale-[0.98]"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center">
-                    <Key size={18} className="text-[#0A0A0A]" />
+                  <div className="w-11 h-11 rounded-full bg-black/5 flex items-center justify-center border border-black/5 group-hover:scale-105 transition-transform">
+                    <Key size={18} className="text-[#050505]" />
                   </div>
                   <div className="text-left">
-                    <div className="text-[15px]">Mint Gold Ticket Pass</div>
-                    <div className="text-[12px] text-slate-500 font-normal">0.5 ETH Mint Fee · Governance & Unlimited Terminal Access</div>
+                    <div className="text-[14px] font-black uppercase tracking-widest text-[#050505]">Mint Ticket Pass</div>
+                    <div className="text-[11px] text-[#050505]/50 font-medium mt-0.5 tracking-wide">0.5 ETH · Unlimited Access</div>
                   </div>
                 </div>
-                <ArrowRight size={18} className="text-slate-400" />
+                <ArrowRight size={18} className="text-[#050505]/20 group-hover:text-[#050505] transition-colors group-hover:translate-x-1" />
               </button>
             </div>
           </div>
@@ -191,48 +196,55 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       case 'login':
         return (
           <div className="space-y-6">
-            <div className="text-center space-y-4 mb-8">
-              <div className="w-16 h-16 bg-white border border-black/5 shadow-sm rounded-3xl mx-auto flex items-center justify-center">
-                <Lock size={24} className="text-[#0A0A0A]" strokeWidth={1.5} />
+            <div className="text-center space-y-4 mb-10">
+              <div className="w-16 h-16 bg-[#FAFAF8] border border-black/5 shadow-sm rounded-[20px] mx-auto flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-transparent" />
+                <Lock size={24} className="text-[#0A0A0A] relative z-10" strokeWidth={1.5} />
               </div>
-              <h1 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase">Log In</h1>
-              <p className="text-[15px] text-slate-500 font-serif leading-relaxed px-4">
-                Enter your password to unlock your wallet.
+              <h1 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">Unlock Vault</h1>
+              <p className="text-[13px] text-[#0A0A0A]/50 font-medium leading-relaxed px-4">
+                Enter your password to decrypt your session.
               </p>
             </div>
             
             <div className="space-y-4">
-              <input 
-                type="password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleLogin()}
-                placeholder="Password"
-                className="w-full bg-white border border-black/10 shadow-sm rounded-xl px-4 py-4 text-[#0A0A0A] text-[15px] focus:outline-none focus:border-[#0A0A0A] transition-colors"
-                autoFocus
-              />
+              <div className="relative">
+                <input 
+                  type="password" 
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                  placeholder="Enter Password"
+                  className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[18px] px-5 py-5 text-[#0A0A0A] text-[15px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
+                  autoFocus
+                />
+              </div>
               <button 
                 onClick={handleLogin}
                 disabled={!password}
-                className="w-full py-4 rounded-xl bg-[#0A0A0A] hover:bg-black/80 disabled:opacity-50 transition-colors text-white font-black tracking-widest text-[12px] uppercase shadow-md"
+                className="w-full py-5 rounded-[18px] bg-[#050505] hover:bg-[#111] disabled:opacity-50 transition-all text-white font-black tracking-widest text-[12px] uppercase shadow-lg active:scale-[0.98]"
               >
-                Log In
+                Decrypt & Enter
               </button>
             </div>
             
             {showResetConfirm ? (
-              <div className="pt-6 space-y-3">
-                <p className="text-center text-[12px] font-bold text-red-600 px-4">
-                  WARNING: This will permanently delete your wallet from this device. Are you absolutely sure?
-                </p>
-                <div className="flex gap-2">
-                  <button onClick={() => setShowResetConfirm(false)} className="flex-1 py-3 rounded-xl border border-black/10 text-slate-600 text-[12px] font-bold hover:bg-black/5 transition-colors">Cancel</button>
-                  <button onClick={() => { localStorage.removeItem('sovereign_keystore'); setStep('home'); setShowResetConfirm(false); }} className="flex-1 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-[12px] font-bold hover:bg-red-100 transition-colors">Yes, Delete It</button>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-6 space-y-4 bg-red-50/50 p-5 rounded-[22px] border border-red-100">
+                <div className="flex items-center gap-3 text-red-600 mb-2">
+                   <AlertTriangle size={18} />
+                   <p className="text-[12px] font-black uppercase tracking-widest">Danger Zone</p>
                 </div>
-              </div>
+                <p className="text-left text-[11px] font-medium text-red-600/80 leading-relaxed">
+                  This will permanently delete your vault from this device. If you don't have your recovery phrase, your assets will be lost forever.
+                </p>
+                <div className="flex gap-2 pt-2">
+                  <button onClick={() => setShowResetConfirm(false)} className="flex-1 py-3 rounded-xl border border-black/10 bg-white text-[#050505] text-[11px] font-black uppercase tracking-widest hover:bg-black/5 transition-all">Cancel</button>
+                  <button onClick={() => { localStorage.removeItem('sovereign_keystore'); setStep('home'); setShowResetConfirm(false); }} className="flex-1 py-3 rounded-xl bg-red-500 text-white text-[11px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-md">Purge</button>
+                </div>
+              </motion.div>
             ) : (
-              <button onClick={() => setShowResetConfirm(true)} className="w-full text-center text-[12px] font-bold text-slate-500 hover:text-[#0A0A0A] transition-colors pt-4">
-                Forgot password? Reset wallet
+              <button onClick={() => setShowResetConfirm(true)} className="w-full text-center text-[11px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-[#050505] transition-colors pt-6">
+                Forgot password? Reset vault
               </button>
             )}
           </div>
@@ -241,48 +253,51 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       case 'password':
         return (
           <div className="space-y-6">
-            <button onClick={() => setStep('home')} className="text-slate-400 hover:text-[#0A0A0A] transition-colors mb-2"><ChevronLeft size={24}/></button>
+            <button onClick={() => setStep('home')} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
             <div className="space-y-3">
-              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase">Create Password</h2>
-              <p className="text-[15px] text-slate-500 font-serif leading-relaxed">
-                This password will secure your Secret Recovery Phrase on this device.
+              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">Vault Setup</h2>
+              <p className="text-[13px] text-[#0A0A0A]/50 font-medium leading-relaxed">
+                This password will encrypt your Secret Recovery Phrase securely on this device.
               </p>
             </div>
 
-            <div className="space-y-5 pt-2">
+            <div className="space-y-5 pt-4">
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">New Password (8+ chars)</label>
                 <input 
                   type="password" value={password} onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-white border border-black/10 shadow-sm rounded-xl px-4 py-4 text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] transition-colors"
+                  placeholder="New Password (8+ chars)"
+                  className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[18px] px-5 py-5 text-[#0A0A0A] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Confirm Password</label>
                 <input 
                   type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
-                  className="w-full bg-white border border-black/10 shadow-sm rounded-xl px-4 py-4 text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] transition-colors"
+                  placeholder="Confirm Password"
+                  className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[18px] px-5 py-5 text-[#0A0A0A] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
                 />
               </div>
               
-              <label className="flex items-start gap-3 p-5 border border-black/5 bg-black/[0.02] rounded-xl cursor-pointer hover:bg-black/5 transition-colors mt-6">
+              <label className="flex items-start gap-4 p-5 border border-black/5 bg-[#FAFAF8] rounded-[20px] cursor-pointer hover:border-black/10 transition-colors mt-6 group">
                 <div className="pt-0.5">
+                  <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${termsAccepted ? 'bg-[#050505] border-[#050505]' : 'bg-white border-black/20 group-hover:border-black/40'}`}>
+                    {termsAccepted && <Check size={12} className="text-white" strokeWidth={3} />}
+                  </div>
                   <input 
                     type="checkbox" checked={termsAccepted} onChange={e => setTermsAccepted(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 accent-[#0A0A0A]"
+                    className="sr-only"
                   />
                 </div>
-                <span className="text-[13px] text-slate-600 leading-relaxed font-serif">
-                  I understand that this password cannot be recovered for me. If I lose my password and my Secret Recovery Phrase, my assets will be lost forever.
+                <span className="text-[12px] text-[#050505]/60 font-medium leading-relaxed">
+                  I understand that Whale Alert cannot recover this password for me. If I lose it, I will need my Secret Recovery Phrase to access my vault.
                 </span>
               </label>
 
               <button 
                 onClick={handleCreatePassword}
                 disabled={!termsAccepted || password.length < 8 || password !== confirmPassword}
-                className="w-full py-4 mt-2 rounded-xl bg-[#0A0A0A] text-white font-black tracking-widest text-[12px] uppercase disabled:opacity-30 disabled:bg-slate-200 disabled:text-slate-500 transition-colors shadow-md"
+                className="w-full py-5 mt-2 rounded-[18px] bg-[#050505] text-white font-black tracking-widest text-[12px] uppercase disabled:opacity-40 disabled:scale-100 transition-all shadow-lg active:scale-[0.98]"
               >
-                Create a new wallet
+                Create Vault
               </button>
             </div>
           </div>
@@ -291,35 +306,42 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       case 'secure':
         return (
           <div className="space-y-6">
-            <button onClick={() => setStep('password')} className="text-slate-400 hover:text-[#0A0A0A] transition-colors mb-2"><ChevronLeft size={24}/></button>
+            <button onClick={() => setStep('password')} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
             <div className="space-y-3">
-              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase">Secure your wallet</h2>
-              <p className="text-[15px] text-slate-500 font-serif leading-relaxed">
-                Learn about your Secret Recovery Phrase and how to keep your wallet safe.
+              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">Secure Vault</h2>
+              <p className="text-[13px] text-[#0A0A0A]/50 font-medium leading-relaxed">
+                Protect your master key. This phrase is the ultimate access to your assets.
               </p>
             </div>
 
-            <div className="bg-white border border-black/10 shadow-sm rounded-2xl p-6 space-y-4">
-              <div className="flex items-center gap-3 text-[#0044CC]">
-                <Shield size={20} />
-                <span className="font-bold text-sm">Manual Security</span>
+            <div className="bg-[#FAFAF8] border border-black/5 rounded-[24px] p-8 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center">
+                  <Shield size={18} className="text-[#050505]" />
+                </div>
+                <span className="font-black uppercase tracking-widest text-[13px] text-[#050505]">Security Rules</span>
               </div>
-              <p className="text-[14px] text-slate-600 leading-relaxed">
-                Write down your Secret Recovery Phrase on a piece of paper and store it in a safe place. 
-                <br/><br/>
-                <span className="font-bold text-[#0A0A0A]">Important rules:</span>
-                <br/>
-                • Never share it with anyone<br/>
-                • Never store it online<br/>
-                • We will never ask for it
-              </p>
+              <ul className="space-y-3 text-[12px] text-[#050505]/60 font-medium">
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                  <span>Never share this phrase with anyone.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/40 mt-1.5 shrink-0" />
+                  <span>Never store it digitally (e.g., screenshots, notes).</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/40 mt-1.5 shrink-0" />
+                  <span>Write it down on paper and store it securely.</span>
+                </li>
+              </ul>
             </div>
 
             <button 
               onClick={() => setStep('reveal')}
-              className="w-full py-4 rounded-xl bg-[#0A0A0A] text-white font-black tracking-widest text-[12px] uppercase transition-colors shadow-md"
+              className="w-full py-5 rounded-[18px] bg-[#050505] text-white font-black tracking-widest text-[12px] uppercase transition-all shadow-lg active:scale-[0.98]"
             >
-              Start
+              Reveal Master Key
             </button>
           </div>
         );
@@ -327,36 +349,38 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       case 'reveal':
         return (
           <div className="space-y-6">
-            <button onClick={() => setStep('secure')} className="text-slate-400 hover:text-[#0A0A0A] transition-colors mb-2"><ChevronLeft size={24}/></button>
+            <button onClick={() => setStep('secure')} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
             <div className="space-y-3">
-              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase">Recovery Phrase</h2>
-              <p className="text-[15px] text-slate-500 font-serif leading-relaxed">
-                This is the only way you will be able to recover your account. Please write it down somewhere safe.
+              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">Master Key</h2>
+              <p className="text-[13px] text-[#0A0A0A]/50 font-medium leading-relaxed">
+                Write down these 12 words in the exact order shown.
               </p>
             </div>
 
-            <div className="relative border border-black/10 shadow-inner rounded-2xl p-6 bg-black/[0.02] min-h-[240px] flex items-center justify-center">
+            <div className="relative border border-black/5 rounded-[24px] p-6 bg-[#FAFAF8] min-h-[260px] flex items-center justify-center overflow-hidden">
               {!revealed ? (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/90 backdrop-blur-md rounded-2xl p-6 text-center border border-black/5">
-                  <EyeOff size={32} className="text-slate-400 mb-4" />
-                  <p className="text-[15px] text-[#0A0A0A] font-bold mb-2">Tap to reveal your Secret Recovery Phrase</p>
-                  <p className="text-[13px] text-slate-500 font-serif">Make sure nobody is looking at your screen.</p>
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-xl">
+                  <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mb-5">
+                    <EyeOff size={24} className="text-[#050505]" />
+                  </div>
+                  <p className="text-[13px] text-[#050505] font-black uppercase tracking-widest mb-1">Tap to Reveal Key</p>
+                  <p className="text-[11px] text-[#050505]/50 font-medium mb-6">Ensure no one is watching your screen.</p>
                   <button 
                     onClick={() => setRevealed(true)}
-                    className="mt-6 px-8 py-3 rounded-full bg-white border border-black/10 shadow-sm hover:bg-black/5 transition-colors font-black text-[11px] uppercase tracking-widest text-[#0A0A0A]"
+                    className="px-8 py-3.5 rounded-[14px] bg-[#050505] text-white transition-all font-black text-[10px] uppercase tracking-widest active:scale-[0.96] shadow-md"
                   >
-                    Reveal Phrase
+                    Show Words
                   </button>
                 </div>
               ) : null}
               
-              <div className={`grid grid-cols-3 gap-3 w-full transition-opacity duration-500 ${revealed ? 'opacity-100' : 'opacity-0 select-none'}`}>
+              <div className={`grid grid-cols-3 gap-2 w-full transition-all duration-700 ${revealed ? 'opacity-100 scale-100 filter-none' : 'opacity-0 scale-95 blur-md select-none pointer-events-none'}`}>
                 {wallet?.mnemonic?.phrase.split(' ').map((word, i) => (
-                  <div key={i} className="flex bg-white border border-black/10 shadow-sm rounded-xl overflow-hidden">
-                    <div className="w-8 flex items-center justify-center bg-black/[0.02] text-[11px] text-slate-400 font-bold border-r border-black/5">
-                      {i + 1}
+                  <div key={i} className="flex flex-col bg-white border border-black/5 rounded-xl overflow-hidden shadow-sm">
+                    <div className="w-full py-1 bg-black/[0.03] text-[9px] text-[#050505]/40 font-black tracking-widest text-center border-b border-black/5">
+                      {String(i + 1).padStart(2, '0')}
                     </div>
-                    <div className="flex-1 px-3 py-2 text-[14px] text-[#0A0A0A] font-bold tracking-wide text-center">
+                    <div className="flex-1 py-3 text-[13px] text-[#050505] font-bold tracking-wide text-center">
                       {word}
                     </div>
                   </div>
@@ -364,16 +388,16 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-2">
-              <button onClick={() => { navigator.clipboard.writeText(wallet?.mnemonic?.phrase || ''); toast.success('Copied to clipboard'); }} className="text-[#0044CC] text-[13px] font-bold flex items-center gap-2 hover:text-blue-800 transition-colors">
-                <Copy size={14} /> Copy to clipboard
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
+              <button onClick={() => { navigator.clipboard.writeText(wallet?.mnemonic?.phrase || ''); toast.success('Key copied to clipboard'); }} className="text-[#050505]/40 hover:text-[#050505] text-[11px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors">
+                <Copy size={13} /> Copy to clipboard
               </button>
               <button 
                 onClick={() => setStep('verify')}
                 disabled={!revealed}
-                className="px-10 py-3.5 rounded-xl bg-[#0A0A0A] text-white font-black tracking-widest text-[12px] uppercase disabled:opacity-30 disabled:bg-slate-200 transition-colors shadow-md"
+                className="w-full sm:w-auto px-10 py-4 rounded-[16px] bg-[#050505] text-white font-black tracking-widest text-[11px] uppercase disabled:opacity-40 transition-all shadow-md active:scale-[0.98]"
               >
-                Next
+                Proceed
               </button>
             </div>
           </div>
@@ -382,18 +406,20 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       case 'verify':
         return (
           <div className="space-y-6">
-            <button onClick={() => setStep('reveal')} className="text-slate-400 hover:text-[#0A0A0A] transition-colors mb-2"><ChevronLeft size={24}/></button>
+            <button onClick={() => setStep('reveal')} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
             <div className="space-y-3">
-              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase">Confirm Phrase</h2>
-              <p className="text-[15px] text-slate-500 font-serif leading-relaxed">
-                Please confirm the specific words from your secret recovery phrase below.
+              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">Verify Key</h2>
+              <p className="text-[13px] text-[#0A0A0A]/50 font-medium leading-relaxed">
+                Confirm your backup by entering the requested words below.
               </p>
             </div>
 
             <div className="space-y-4 pt-2">
               {verifyIndices.map((wordIndex, i) => (
-                <div key={wordIndex} className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Word #{wordIndex + 1}</label>
+                <div key={wordIndex} className="space-y-2 relative">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-[#050505]/20 pointer-events-none">
+                    Word {String(wordIndex + 1).padStart(2, '0')}
+                  </div>
                   <input
                     type="text"
                     value={verifyInputs[i]}
@@ -402,7 +428,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
                       newInputs[i] = e.target.value.toLowerCase().trim();
                       setVerifyInputs(newInputs);
                     }}
-                    className="w-full bg-white border border-black/10 shadow-sm rounded-xl px-4 py-3.5 text-[#0A0A0A] font-bold focus:outline-none focus:border-[#0A0A0A] transition-colors"
+                    className="w-full bg-[#FAFAF8] border border-black/5 shadow-inner rounded-[18px] pl-5 pr-20 py-4 text-[#0A0A0A] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
                     placeholder="Enter word..."
                   />
                 </div>
@@ -412,9 +438,9 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
             <button 
               onClick={handleVerify}
               disabled={verifyInputs.some(v => v.length < 2)}
-              className="w-full py-4 mt-4 rounded-xl bg-[#0A0A0A] text-white font-black tracking-widest text-[12px] uppercase disabled:opacity-30 disabled:bg-slate-200 disabled:text-slate-500 transition-colors shadow-md"
+              className="w-full py-5 mt-6 rounded-[18px] bg-[#050505] text-white font-black tracking-widest text-[12px] uppercase disabled:opacity-40 transition-all shadow-lg active:scale-[0.98]"
             >
-              Confirm
+              Verify & Encrypt
             </button>
           </div>
         );
@@ -422,16 +448,16 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       case 'encrypting': {
         const isDecrypting = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_keystore');
         return (
-          <div className="flex flex-col items-center justify-center py-24 space-y-8">
-            <div className="relative w-32 h-32 flex items-center justify-center">
-               <RemoteLottie path="block abstract.json" className="w-full h-full object-contain opacity-80" />
+          <div className="flex flex-col items-center justify-center py-20 space-y-10 relative">
+            <div className="relative w-64 h-64 flex items-center justify-center -mt-8">
+               <RemoteLottie path="Whale Mission.json" className="w-full h-full object-contain opacity-100" />
             </div>
             <div className="text-center space-y-3">
-              <h2 className="text-2xl font-black text-[#0A0A0A] tracking-tighter uppercase">
-                {isDecrypting ? 'Decrypting...' : 'Encrypting...'}
+              <h2 className="text-[22px] font-black text-[#0A0A0A] tracking-tighter uppercase">
+                {isDecrypting ? 'Decrypting Vault...' : 'Encrypting Vault...'}
               </h2>
-              <p className="text-[15px] text-slate-500 font-serif">
-                {isDecrypting ? 'Restoring your private keys locally.' : 'Securing your private keys locally.'}
+              <p className="text-[13px] text-[#0A0A0A]/50 font-medium">
+                {isDecrypting ? 'Restoring private keys locally.' : 'Applying high-entropy local encryption.'}
               </p>
             </div>
           </div>
@@ -441,19 +467,29 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <div className="flex items-center justify-center px-6 h-full w-full relative overflow-y-auto py-12 md:py-0">
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
+    <div className="flex items-center justify-center px-4 md:px-6 h-full w-full relative overflow-y-auto py-12 md:py-0">
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
          <RemoteLottie path="Whale Mission.json" className="w-full h-full object-cover" />
       </div>
       <motion.div 
         key={step}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="w-full max-w-md bg-white/60 backdrop-blur-3xl rounded-[2.5rem] border border-black/5 shadow-sm p-8 md:p-10 relative z-10"
+        initial={{ opacity: 0, scale: 0.98, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.98, y: -10 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[420px] bg-white/80 backdrop-blur-[40px] rounded-[32px] border border-black/[0.04] shadow-[0_24px_80px_rgba(0,0,0,0.06)] p-6 sm:p-10 relative z-10 will-change-transform"
       >
-        {renderContent()}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            {renderContent()}
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
     </div>
   );

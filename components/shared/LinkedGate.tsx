@@ -20,7 +20,7 @@ import {
   Database,
 } from 'lucide-react';
 import { useUIStore } from '@/lib/store/ui-store';
-import { QRCodeSVG } from 'qrcode.react';
+
 import { useAccount, useConnect, useSignMessage, useReconnect, useChainId, useSwitchChain, useDisconnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { toast } from 'sonner';

@@ -36,8 +36,8 @@ const PortfolioDashboard = dynamic(
   () => import('@/components/dashboard/PortfolioDashboard'),
   { ssr: false, loading: LoadingPanel }
 );
-const GainersLosersPanel = dynamic(
-  () => import('@/components/dashboard/GainersLosersPanel').then(m => ({ default: m.GainersLosersPanel })),
+const InstitutionalMarkets = dynamic(
+  () => import('@/components/dashboard/InstitutionalMarkets').then(m => ({ default: m.InstitutionalMarkets })),
   { ssr: false, loading: LoadingPanel }
 );
 
@@ -127,7 +127,7 @@ export default function WhaleDashboard() {
                 return <div className={PANEL}><DashboardErrorBoundary key={`billing-${refreshKey}`}><PlanDashboard /></DashboardErrorBoundary></div>;
 
             case 'markets':
-                return <div className={PANEL}><DashboardErrorBoundary key={`markets-${refreshKey}`}><GainersLosersPanel /></DashboardErrorBoundary></div>;
+                return <div className={PANEL}><DashboardErrorBoundary key={`markets-${refreshKey}`}><InstitutionalMarkets /></DashboardErrorBoundary></div>;
 
             case 'newpairs':
                 return <div className={PANEL}><DashboardErrorBoundary key={`newpairs-${refreshKey}`}><NewPairsTable /></DashboardErrorBoundary></div>;

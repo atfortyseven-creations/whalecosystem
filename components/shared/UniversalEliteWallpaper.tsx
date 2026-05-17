@@ -28,18 +28,7 @@ export function UniversalEliteWallpaper() {
             {/* ── Base: light background ─────────────── */}
             <div className="absolute inset-0 bg-[#FAFAF8]" />
 
-            {/* ── Wallpaper: cover = no bands, crisp-edges = max quality ─────────── */}
-            <div
-                className="absolute inset-0"
-                style={{
-                    backgroundImage: "url('/system-shots/WALLPAPER%20GLOBAL.png')",
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center center',
-                    backgroundSize: 'cover',
-                    imageRendering: 'crisp-edges',
-                    opacity: 0.15, // Reduced opacity for professional light look
-                }}
-            />
+
 
             {/* ── Light mode: translucent overlay ──────── */}
             {!isDark && (

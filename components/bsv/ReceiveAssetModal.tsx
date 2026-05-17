@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Download, Share2 } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+
 import { useCWI } from '@/lib/bsv/CWIContext';
 import { toast } from 'sonner';
 
@@ -60,20 +60,7 @@ export const ReceiveAssetModal = ({ isOpen, onClose }: ReceiveAssetModalProps) =
             {/* QR Section */}
             <div className="p-12 flex flex-col items-center space-y-8">
               <div className="p-6 bg-white rounded-[2.5rem] shadow-[0_0_50px_rgba(255,255,255,0.1)]">
-                <QRCodeSVG 
-                  value={address} 
-                  size={240}
-                  level="H"
-                  includeMargin={false}
-                  imageSettings={{
-                    src: "/favicon.ico",
-                    x: undefined,
-                    y: undefined,
-                    height: 48,
-                    width: 48,
-                    excavate: true,
-                  }}
-                />
+                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${address}&color=000000&bgcolor=ffffff`} alt="QR" className="w-[240px] h-[240px] object-contain" />
               </div>
 
               <div className="w-full space-y-4">

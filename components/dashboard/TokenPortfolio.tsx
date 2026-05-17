@@ -9,7 +9,7 @@ import { parseEther, parseUnits, formatEther, formatUnits, erc20Abi, isAddress }
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { getUsdcAddress, WLD_TOKEN_ADDRESS } from '@/config/tokens';
 import { toast } from 'sonner';
-import { QRCodeCanvas } from 'qrcode.react';
+
 
 import { useSettings } from '@/src/context/SettingsContext';
 
@@ -258,14 +258,7 @@ export function TokenPortfolio() {
                             {view === 'receive' && (
                                 <div className="flex flex-col items-center text-center space-y-6">
                                     <div className="p-4 bg-white rounded-xl shadow-lg shadow-white/5">
-                                        <QRCodeCanvas
-                                            value={address}
-                                            size={160}
-                                            bgColor="#ffffff"
-                                            fgColor="#000000"
-                                            level="H"
-                                            includeMargin={false}
-                                        />
+                                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${address}&color=000000&bgcolor=ffffff`} alt="Wallet Address QR" className="w-[160px] h-[160px] object-contain" />
                                     </div>
                                     <div className="space-y-2 w-full">
                                         <p className="text-xs text-gray-500">Your address {selectedToken.network}</p>

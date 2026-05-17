@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Shield, Camera, Upload, Loader2, CheckCircle } from 'lucide-react';
 import { useAccount } from 'wagmi';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 interface QRScannerModalProps {
   isOpen: boolean;
@@ -239,7 +240,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
         if (!ctx) return;
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: "dontInvert",
+          inversionAttempts: "attemptBoth",
         });
         if (code && code.data) {
           handleSuccessRef.current(code.data);
@@ -576,9 +577,11 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
             className="w-full max-w-sm flex flex-col items-center px-6 relative will-change-transform"
           >
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <img src="/official-whale-monochrome.png" className="w-7 h-7 opacity-90" alt="Whale" />
-              <h2 className="font-sans text-lg font-black text-[#050505] tracking-tighter uppercase">
+            <div className="flex flex-col items-center gap-3 mb-6 relative z-10">
+              <div className="w-12 h-12 mb-2">
+                 <RemoteLottie path="block abstract.json" className="w-full h-full object-contain opacity-80" />
+              </div>
+              <h2 className="font-sans text-xl font-black text-[#050505] tracking-tighter uppercase">
                 Link Session
               </h2>
             </div>
@@ -629,8 +632,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                     {/* Loading state absolute centering */}
                     {status === 'idle' && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md z-10">
-                        <Loader2 size={28} className="animate-spin text-white/40 mb-3" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white/50">
+                        <Loader2 size={28} className="animate-spin text-white/80 mb-3" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white/90">
                           Initializing camera...
                         </span>
                       </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { QRCodeSVG } from 'qrcode.react';
+
 import { Copy, ExternalLink, Share2, Check } from 'lucide-react';
 import { getExplorerAddressUrl } from '@/lib/wallet/chains';
 
@@ -79,13 +79,7 @@ export default function ReceiveHub({ addresses = [] }: ReceiveHubProps) {
 
                         {/* QR Display */}
                         <div className="p-4 bg-white rounded-3xl shadow-lg mb-8 border border-[#1F1F1F]/5">
-                            <QRCodeSVG 
-                                value={current.address} 
-                                size={220}
-                                level="H"
-                                includeMargin={true}
-                                className="rounded-xl"
-                            />
+                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${current.address}&color=000000&bgcolor=ffffff`} alt="Wallet Address QR" className="w-[220px] h-[220px] object-contain rounded-xl" />
                         </div>
 
                         {/* Instruction Text */}

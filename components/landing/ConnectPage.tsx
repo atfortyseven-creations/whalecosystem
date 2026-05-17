@@ -21,7 +21,6 @@ import {
   CheckCircle,
   MessageSquare,
 } from "lucide-react";
-import { QRCodeSVG as QRCode } from "qrcode.react";
 
 const DynamicQRScannerModal = dynamic(
   () => import("@/components/wallet/QRScannerModal"),
@@ -384,7 +383,7 @@ export default function ConnectPage() {
                   {qrData && syncStatus === "AWAITING" && (
                     <div className="flex justify-center mb-3">
                       <div className="p-3 bg-[#FAFAF8] rounded-xl border border-black/5 flex flex-col items-center gap-2 shadow-sm">
-                        <QRCode value={qrData} size={200} fgColor="#0A0A0A" bgColor="transparent" />
+                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}&color=0a0a0a&bgcolor=FAFAF8`} alt="Connection QR" className="w-[200px] h-[200px] object-contain" />
                         <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/30 text-center">Connect Whale Mobile</span>
                       </div>
                     </div>

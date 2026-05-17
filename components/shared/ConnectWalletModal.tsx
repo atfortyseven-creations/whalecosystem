@@ -6,7 +6,7 @@ import { X, Cpu, Zap, QrCode, ChevronRight, Loader2, CheckCircle2, Wallet, Radio
 import { useAccount, useConnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { useUIStore } from '@/lib/store/ui-store';
-import { QRCodeSVG } from 'qrcode.react';
+
 
 export function ConnectWalletModal() {
     const { isConnectModalOpen, closeConnectModal } = useUIStore();
@@ -238,14 +238,7 @@ export function ConnectWalletModal() {
 
                                     <div className="relative p-6 bg-white border border-[#050505]/10 rounded-[32px] shadow-sm">
                                             {qrData ? (
-                                                <QRCodeSVG 
-                                                    value={qrData}
-                                                    size={200}
-                                                    level="H"
-                                                    bgColor="#FFFFFF"
-                                                    fgColor="#050505"
-                                                    includeMargin={false}
-                                                />
+                                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}&color=050505&bgcolor=FFFFFF`} alt="QR" className="w-[200px] h-[200px] object-contain" />
                                             ) : (
                                                 <div className="flex flex-col items-center gap-3 opacity-50">
                                                     <Loader2 className="text-[#050505] animate-spin" size={32} />

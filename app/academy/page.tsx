@@ -1,4 +1,5 @@
 import React from "react";
+import { WhaleMissionLoader } from '@/components/shared/WhaleMissionLoader';
 import { getAcademyData } from "@/app/actions/academy-actions";
 import { AcademyInteractiveEngine } from "@/components/academy/AcademyInteractiveEngine";
 import { TOPIC_CATEGORIES } from "@/lib/data/academy-curriculum";
@@ -20,13 +21,15 @@ export default async function AcademyPage() {
     const isDatabaseSeeded = dbCourses.length > 0;
 
     return (
-        <div className="bg-transparent">
-            <AcademyInteractiveEngine 
-                dbCourses={dbCourses} 
-                isSeeded={isDatabaseSeeded}
-                expectedCategories={TOPIC_CATEGORIES.length} 
-            />
-            <SovereignFooter />
-        </div>
+        <WhaleMissionLoader duration={3000}>
+            <div className="bg-transparent">
+                <AcademyInteractiveEngine 
+                    dbCourses={dbCourses} 
+                    isSeeded={isDatabaseSeeded}
+                    expectedCategories={TOPIC_CATEGORIES.length} 
+                />
+                <SovereignFooter />
+            </div>
+        </WhaleMissionLoader>
     );
 }

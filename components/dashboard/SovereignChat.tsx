@@ -14,7 +14,7 @@ import ChatInput from '@/components/chat/ChatInput';
 import AdvancedSettingsModal from '@/components/chat/AdvancedSettingsModal';
 import AttestationEngine from '@/components/dashboard/AttestationEngine';
 import { QrScanner } from '@/components/dashboard/QrScanner';
-import { QRCodeSVG } from 'qrcode.react';
+
 
 import type { RenderableMessage, Reaction } from '@/components/chat/MessageEngine';
 import type { ChatSettings } from '@/components/chat/AdvancedSettingsModal';
@@ -592,7 +592,7 @@ export default function SovereignChat() {
               <div className="flex flex-col items-center gap-6 py-4">
                 <div className="p-6 bg-white rounded-3xl border border-black/10 shadow-xl">
                   {address ? (
-                    <QRCodeSVG value={address} size={220} level="H" includeMargin={false} />
+                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${address}&color=000000&bgcolor=ffffff`} alt="QR" className="w-[220px] h-[220px] object-contain" />
                   ) : (
                     <div className="w-[220px] h-[220px] flex items-center justify-center bg-black/5 rounded-2xl">
                       <p className="text-[10px] font-mono text-black/40">No wallet connected</p>
@@ -621,11 +621,7 @@ export default function SovereignChat() {
       {/* 2 – Conversation List */}
       <div className={`w-full md:w-[280px] border-r border-black/8 flex-col shrink-0 bg-white ${activeConv ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-black/6 space-y-3">
-          {!xmtpReady && (
-            <div className="text-[10px] font-mono text-black/40 animate-pulse text-center py-2">
-              Initialising E2EE…
-            </div>
-          )}
+
           <div className="flex gap-2">
             <input
               type="text"
@@ -705,8 +701,8 @@ export default function SovereignChat() {
                 </button>
                 <div>
                   <p className="font-mono text-[14px] font-bold text-black">{activeConv.displayName}</p>
-                  <p className="font-mono text-[10px] text-black/35 mt-0.5">
-                    CON RECOPILACION DE TELEMETRIA · {sending || isUploading ? 'ESCRIBIENDO...' : 'EN LÍNEA'} · E2EE · ML-KEM-1024 · ε=0.0001
+                  <p className={`font-mono text-[10px] font-bold mt-0.5 uppercase tracking-widest ${sending || isUploading ? 'text-black/50' : 'text-emerald-500'}`}>
+                    {sending || isUploading ? 'Typing...' : 'Online'}
                   </p>
                 </div>
               </div>

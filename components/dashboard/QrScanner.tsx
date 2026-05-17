@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Camera, Loader, RefreshCcw } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 
-import { QRCodeSVG } from 'qrcode.react';
+
 
 type ScanState = 'idle' | 'requesting' | 'scanning' | 'validating' | 'success' | 'error';
 
@@ -187,7 +187,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     </div>
                 ) : projectData ? (
                     <div className="p-6 bg-white rounded-3xl border border-black/10 shadow-xl">
-                        <QRCodeSVG value={projectData.linkUrl} size={220} level="H" includeMargin={false} />
+                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(projectData.linkUrl)}&color=000000&bgcolor=ffffff`} alt="QR" className="w-[220px] h-[220px] object-contain" />
                     </div>
                 ) : (
                     <button onClick={generateQr} className="px-6 py-3 bg-black text-white font-black uppercase tracking-widest text-[11px] rounded-xl active:scale-95 transition-all">

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { QRCodeSVG } from "qrcode.react";
+
 import {
   Shield,
   Smartphone,
@@ -278,13 +278,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
                   boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 20px 60px rgba(0,0,0,0.5)",
                 }}
               >
-                <QRCodeSVG
-                  value={qrUrl}
-                  size={200}
-                  bgColor="#ffffff"
-                  fgColor="#050505"
-                  level="H"
-                />
+                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrUrl)}&color=050505&bgcolor=ffffff`} alt="QR" className="w-[200px] h-[200px] object-contain" />
               </div>
             </QROrbit>
 

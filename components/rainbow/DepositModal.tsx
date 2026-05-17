@@ -65,7 +65,12 @@ export function DepositModal({ isOpen, onClose, address }: DepositModalProps) {
               <div className="flex justify-center mb-8">
                 <div className="w-48 h-48 rounded-3xl flex items-center justify-center border shadow-sm p-4" style={{ borderColor: BORDER, background: CARD }}>
                   {address ? (
-                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${address}&color=050505&bgcolor=FFFFFF`} alt="Wallet QR Code" className="w-full h-full object-contain" />
+                    <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${address}&color=050505&bgcolor=FFFFFF`} 
+                      alt="Wallet QR Code" 
+                      className="w-full h-full object-contain" 
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
                   ) : (
                     <QrCode size={100} style={{ color: MUTED }} />
                   )}

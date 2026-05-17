@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { motion, Variants } from 'framer-motion';
 import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
+import { WhaleMissionLoader } from '@/components/shared/WhaleMissionLoader';
 import { MessageSquare, Users, TrendingUp, Shield, PenSquare, ArrowRight, Hash } from 'lucide-react';
 
 const FADE_UP: Variants = {
@@ -231,8 +232,10 @@ function ForumHomeContent() {
 
 export default function ForumHomePage() {
   return (
-    <Suspense fallback={<WhaleAlertLoader bg="transparent" color="#0A0A0A" />}>
-      <ForumHomeContent />
-    </Suspense>
+    <WhaleMissionLoader duration={3000}>
+      <Suspense fallback={<WhaleAlertLoader bg="transparent" color="#0A0A0A" />}>
+        <ForumHomeContent />
+      </Suspense>
+    </WhaleMissionLoader>
   );
 }

@@ -496,7 +496,7 @@ export default function PortfolioPage() {
                       <div className="rounded-2xl border p-5 flex flex-col justify-between hover:shadow-md transition-shadow" style={{ borderColor: BORDER, background: CARD }}>
                         <div className="flex items-start gap-4 mb-6">
                           <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 overflow-hidden" style={{ borderColor: BORDER, background: "#FAF9F6" }}>
-                            <img src="/wallets/coinbase.png" alt="Coinbase" className="w-8 h-8 object-contain" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                            <img src="https://avatars.githubusercontent.com/u/18060234?s=200&v=4" alt="Coinbase" className="w-8 h-8 object-contain rounded-md" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="font-black text-sm" style={{ color: INK }}>Smart Wallet</div>

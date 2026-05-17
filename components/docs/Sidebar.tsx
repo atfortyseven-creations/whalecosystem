@@ -222,7 +222,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
       </div>
 
       {/* Nav items */}
-      <nav className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+      <nav className="flex-1 flex flex-col overflow-y-auto p-6 space-y-8 custom-scrollbar">
         {visibleSections.map(section => {
           const isOpen = openSections.has(section.title + section.tab);
           return (
@@ -239,7 +239,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
               </button>
 
               {(isOpen || openSections.size === 0) && (
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-1.5">
                   {section.items.map((item, idx) => {
                     if (item.isCategory) {
                       return (
@@ -254,7 +254,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
                         key={idx}
                         href={item.href || '#'}
                         target={item.external ? '_blank' : undefined}
-                        className={`flex items-center justify-between py-1.5 px-2 text-[12px] tracking-tight transition-all rounded-sm ${
+                        className={`flex items-center justify-between py-2 px-3 text-[12px] tracking-tight transition-all rounded-md ${
                           isActive ? itemActive : itemInactive
                         }`}
                       >

@@ -1,4 +1,5 @@
 import SovereignChat from '@/components/dashboard/SovereignChat';
+import { WhaleMissionLoader } from '@/components/shared/WhaleMissionLoader';
 
 export const metadata = {
   title: 'Sovereign Chat · Whale Alert Network',
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function ChatPage() {
-  return <SovereignChat />;
+  return (
+    <WhaleMissionLoader duration={3000}>
+      <SovereignChat />
+    </WhaleMissionLoader>
+  );
 }

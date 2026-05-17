@@ -116,8 +116,20 @@ export async function getXMTPClient(
   // ── Use Standard Wallet Signer ───────────────────────────────────────────
   const signer = buildXmtpSigner(wagmiSigner);
 
+  // ── Retrieve or Generate Local DB Encryption Key ─────────────────────────
+  // Passing this key prevents XMTP from prompting a signature on every reload
+  const storageKey = `whale_xmtp_db_key_${address}`;
+  let dbKeyHex = localStorage.getItem(storageKey);
+  if (!dbKeyHex) {
+    const keyBytes = new Uint8Array(32);
+    crypto.getRandomValues(keyBytes);
+    dbKeyHex = Buffer.from(keyBytes).toString('hex');
+    localStorage.setItem(storageKey, dbKeyHex);
+  }
+  const dbEncryptionKey = new Uint8Array(Buffer.from(dbKeyHex, 'hex'));
+
   // Client.create(signer, options) — v5.3.0 signature
-  const client = await Client.create(signer, { env: XMTP_ENV });
+  const client = await Client.create(signer, { env: XMTP_ENV, dbEncryptionKey });
 
   clientRegistry.set(address, client);
   return client;

@@ -8,11 +8,20 @@ import {
     Globe, Cpu, QrCode as QrIcon,
     AlertTriangle, Key, Lock, Unlock, Send, Trash, CreditCard, ExternalLink
 } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+
 import { toast } from 'sonner';
 import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 import { useVIPStore } from '@/lib/vip-store';
 type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK';
+
+const truncate = (str: string, len: number) => {
+    if (!str) return '';
+    if (str.length <= len) return str;
+    const charsToShow = len - 3;
+    const frontChars = Math.ceil(charsToShow / 2);
+    const backChars = Math.floor(charsToShow / 2);
+    return str.substring(0, frontChars) + '...' + str.substring(str.length - backChars);
+};
 
 export function InstitutionalPortfolioView() {
     const { address, balance, updateBalance, activeNetwork, restoreFromCloud } = useWalletStore();
@@ -359,7 +368,7 @@ function ReceiveView({ address, onBack }: any) {
         <ModalView title="Receive Assets" subtitle="Wallet Interface" icon={<ArrowDownLeft />} onBack={onBack}>
             <div className="flex flex-col items-center gap-10">
                 <div className="p-6 bg-white dark:bg-[#111111] rounded-[2rem] border border-black/10 dark:border-white/10 shadow-sm">
-                    <QRCodeSVG value={address || ''} size={200} level="M" bgColor="#FFFFFF" fgColor="#000000" />
+                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${address || ''}&color=000000&bgcolor=FFFFFF`} alt="QR" className="w-[200px] h-[200px] object-contain" />
                 </div>
                 <div className="w-full text-center">
                     <button onClick={() => { navigator.clipboard.writeText(address); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="w-full group">
