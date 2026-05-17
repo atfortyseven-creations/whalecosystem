@@ -763,9 +763,12 @@ export default function PortfolioPage() {
         address={userAddress ?? ""}
       />
       <SovereignFooter />
+      
+      {/* Semantic spacer so SovereignFooter content is not hidden behind the fixed mobile bottom nav */}
+      <div className="lg:hidden w-full" style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))' }} />
 
       {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <nav className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
            {[
               { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
               { id: 'portfolio',   icon: <PieChart size={18} />,      label: 'Portfolio' },

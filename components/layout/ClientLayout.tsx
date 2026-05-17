@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { useSovereignSessionLock } from '@/hooks/useSovereignSessionLock';
+import { useWalletStore } from '@/lib/store/wallet-store';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 
@@ -223,6 +224,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     if (typeof document === 'undefined') return;
 
     const handleInteractionLog = (e: MouseEvent) => {
+        // Only log telemetry if the user is authenticated (connected)
+        const isConnected = !!useWalletStore.getState().address;
+        if (!isConnected) return;
+
         const target = e.target as HTMLElement;
         const clickable = target.closest('button, a, input[type="submit"], [role="button"], .cursor-pointer');
         if (clickable) {

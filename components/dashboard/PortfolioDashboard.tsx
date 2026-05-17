@@ -231,7 +231,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative p-12 rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 overflow-hidden group bg-white/80 dark:bg-[#111111]/40 backdrop-blur-3xl shadow-xl"
+                className="relative p-6 md:p-12 rounded-[2rem] md:rounded-[2.5rem] border border-black/[0.06] dark:border-white/10 overflow-hidden group bg-white/80 dark:bg-[#111111]/40 backdrop-blur-3xl shadow-xl mx-4 md:mx-0"
             >
                 <div className="relative z-10 flex justify-between items-start">
                     <div className="space-y-8">
@@ -257,7 +257,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 key={isEyesOff ? 'hidden' : totalValue}
                                 initial={{ scale: 1.02 }}
                                 animate={{ scale: 1 }}
-                                className="text-7xl font-bold text-[#050505] dark:text-white tracking-tighter font-mono flex items-center"
+                                className="text-4xl md:text-7xl font-bold text-[#050505] dark:text-white tracking-tighter font-mono flex items-center flex-wrap"
+                                data-balance
                             >
                                 <span className="mr-1 text-[0.8em] text-black/50 dark:text-white/50">$</span>
                                 {isEyesOff ? (
@@ -279,6 +280,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                         ? "bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/20" 
                                         : "bg-[#FF3B30]/10 text-[#FF3B30] border border-[#FF3B30]/20"
                                 )}
+                                data-balance
                             >
                                 {isProfit ? <ArrowUpRight size={20} strokeWidth={3} /> : <ArrowDownRight size={20} strokeWidth={3} />}
                                 {isEyesOff ? "****" : safeToFixed(Math.abs(totalChange24h), 2)}%
@@ -409,10 +411,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                     </div>
                                     
                                     <div className="text-right mx-10 relative z-10">
-                                        <div className="text-[#050505] dark:text-white font-mono font-black text-3xl tracking-tighter">
+                                        <div className="text-[#050505] dark:text-white font-mono font-black text-3xl tracking-tighter" data-balance>
                                             {isEyesOff ? "***.**" : `$${safeToLocaleString(asset.valueUSD || 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </div>
-                                        <div className="text-[10px] text-black/60 font-bold uppercase tracking-widest mt-1">
+                                        <div className="text-[10px] text-black/60 font-bold uppercase tracking-widest mt-1" data-balance>
                                             {isEyesOff ? "**" : safeToFixed(asset.balanceNumeric || asset.balance || 0, 6)} {asset.symbol}
                                         </div>
                                     </div>
@@ -490,10 +492,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
 
                         {/* Legal links */}
                         <div className="flex flex-wrap justify-center gap-8 items-center mt-4">
-                            <a href="/docs/privacy-policy" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Privacy Policy</a>
-                            <a href="/docs/terms-of-service" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Terms of Service</a>
-                            <a href="/docs/risk-disclosure" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Risk Disclosure</a>
-                            <a href="/docs/cookie-policy" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Cookie Policy</a>
+                            <a href="/docs/legal/privacy-policy" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Privacy Policy</a>
+                            <a href="/docs/legal/terms-of-service" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Terms of Service</a>
+                            <a href="/docs/legal/risk-disclosure" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Risk Disclosure</a>
+                            <a href="/docs/legal/cookie-policy" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Cookie Policy</a>
                         </div>
 
                         {/* Copyright */}

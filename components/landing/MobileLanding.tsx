@@ -735,7 +735,9 @@ export function MobileLanding() {
       const params = new URLSearchParams(window.location.search);
       const next = params.get('next') || '/connect';
       console.log('[Auth] Redirecting to:', next);
-      window.location.replace(next);
+      if (next !== window.location.pathname) {
+          window.location.replace(next);
+      }
     } catch (err: any) {
       console.error('[Auth] Handshake failed:', err);
       setSigningError(err.message || 'Verification failed');

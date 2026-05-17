@@ -36,6 +36,9 @@ export function useSovereignSignOut() {
                 const eqPos = cookie.indexOf("=");
                 const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
                 
+                // Keep the persistent PINs
+                if (name.toLowerCase().startsWith('whale_chat_pin_')) continue;
+
                 // Clear for current path, root path, and domain
                 document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
                 document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname};SameSite=Lax`;
@@ -60,6 +63,8 @@ export function useSovereignSignOut() {
             // Full scan for Wagmi, AppKit, WalletConnect, etc.
             Object.keys(localStorage).forEach(key => {
                 const lower = key.toLowerCase();
+                if (lower.startsWith('whale_chat_pin_')) return; // Preserve PIN
+                
                 if (
                     lower.includes('wagmi') || 
                     lower.includes('walletconnect') || 

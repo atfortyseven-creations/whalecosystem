@@ -493,6 +493,114 @@ body,
      for visual depth on cards, modals and buttons on mobile. */
 }
 
+/* ============================================================
+   ANDROID VIRTUAL KEYBOARD MITIGATION
+   When the Android keyboard opens, viewport shrinks.
+   Hide bottom navigation to prevent it from covering inputs.
+   ============================================================ */
+@media (max-height: 450px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   WHALE CHAT — ARTICULATED THEME ENGINE
+   Each data-chat-theme value maps directly to a palette.
+   Settings modal → data-chat-theme attribute → CSS variables.
+   ============================================================ */
+
+.chat-theme-wrapper {
+  --chat-bg:        #FFFFFF;
+  --chat-sidebar:   #F7F7F7;
+  --chat-bubble-me:      #000000;
+  --chat-bubble-me-text: #FFFFFF;
+  --chat-bubble-peer:    rgba(0,0,0,0.04);
+  --chat-bubble-peer-text: #000000;
+  --chat-border:    rgba(0,0,0,0.08);
+  --chat-input-bg:  rgba(0,0,0,0.03);
+  --chat-meta:      rgba(0,0,0,0.30);
+}
+
+/* DARK */
+.chat-theme-wrapper[data-chat-theme="dark"] {
+  --chat-bg:        #111111;
+  --chat-sidebar:   #1A1A1A;
+  --chat-bubble-me:      #E0E0E0;
+  --chat-bubble-me-text: #000000;
+  --chat-bubble-peer:    rgba(255,255,255,0.07);
+  --chat-bubble-peer-text: #EFEFEF;
+  --chat-border:    rgba(255,255,255,0.08);
+  --chat-input-bg:  rgba(255,255,255,0.05);
+  --chat-meta:      rgba(255,255,255,0.30);
+}
+
+/* MIDNIGHT */
+.chat-theme-wrapper[data-chat-theme="midnight"] {
+  --chat-bg:        #0D0D1A;
+  --chat-sidebar:   #12122A;
+  --chat-bubble-me:      #6C63FF;
+  --chat-bubble-me-text: #FFFFFF;
+  --chat-bubble-peer:    rgba(108,99,255,0.12);
+  --chat-bubble-peer-text: #C8C5FF;
+  --chat-border:    rgba(108,99,255,0.20);
+  --chat-input-bg:  rgba(108,99,255,0.08);
+  --chat-meta:      rgba(200,197,255,0.35);
+}
+
+/* FOREST */
+.chat-theme-wrapper[data-chat-theme="forest"] {
+  --chat-bg:        #0F1A14;
+  --chat-sidebar:   #142019;
+  --chat-bubble-me:      #2D7A4F;
+  --chat-bubble-me-text: #FFFFFF;
+  --chat-bubble-peer:    rgba(45,122,79,0.15);
+  --chat-bubble-peer-text: #A8D5B5;
+  --chat-border:    rgba(45,122,79,0.25);
+  --chat-input-bg:  rgba(45,122,79,0.10);
+  --chat-meta:      rgba(168,213,181,0.35);
+}
+
+/* ROSE */
+.chat-theme-wrapper[data-chat-theme="rose"] {
+  --chat-bg:        #1A0D10;
+  --chat-sidebar:   #221218;
+  --chat-bubble-me:      #C2185B;
+  --chat-bubble-me-text: #FFFFFF;
+  --chat-bubble-peer:    rgba(194,24,91,0.12);
+  --chat-bubble-peer-text: #F48FB1;
+  --chat-border:    rgba(194,24,91,0.20);
+  --chat-input-bg:  rgba(194,24,91,0.08);
+  --chat-meta:      rgba(244,143,177,0.35);
+}
+
+/* Wire theme variables to actual elements */
+.chat-theme-wrapper { background-color: var(--chat-bg) !important; color: var(--chat-bubble-peer-text); }
+.chat-theme-wrapper [data-sidebar] { background-color: var(--chat-sidebar) !important; border-color: var(--chat-border) !important; }
+.chat-theme-wrapper [data-bubble-mine] { background-color: var(--chat-bubble-me) !important; color: var(--chat-bubble-me-text) !important; }
+.chat-theme-wrapper [data-bubble-peer] { background-color: var(--chat-bubble-peer) !important; color: var(--chat-bubble-peer-text) !important; border-color: var(--chat-border) !important; }
+.chat-theme-wrapper [data-chat-meta] { color: var(--chat-meta) !important; }
+.chat-theme-wrapper [data-chat-input] { background-color: var(--chat-input-bg) !important; border-color: var(--chat-border) !important; color: var(--chat-bubble-peer-text) !important; }
+.chat-theme-wrapper [data-chat-input]::placeholder { color: var(--chat-meta) !important; }
+
+/* STEALTH mode: timestamps hidden via CSS, metadata blurred */
+.chat-theme-wrapper[data-privacy="stealth"] [data-chat-meta] { filter: blur(4px); opacity: 0.4; }
+
+/* ============================================================
+   HIDE BALANCES MODE
+   ============================================================ */
+html.hide-balances [data-balance] {
+  filter: blur(8px) saturate(0%);
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+html.hide-balances [data-balance]:active {
+  filter: blur(0px) saturate(100%);
+  opacity: 1;
+}
+
   .font-aztec-serif {
     font-family: var(--font-aztec-serif), serif;
   }

@@ -153,7 +153,7 @@ export default function TopicPage() {
   const isTopicAuthor = sessionAddress && topic.author?.walletAddress?.toLowerCase() === sessionAddress;
 
   return (
-    <div className="w-full min-h-screen bg-transparent dark:bg-transparent text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
+    <div className="w-full min-h-[100dvh] bg-transparent dark:bg-transparent text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
       {/* Background Volumetric Lighting */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#00C076]/5 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
       
@@ -217,8 +217,8 @@ export default function TopicPage() {
                     placeholder="Formulate your cryptographic proposal..."
                     className="w-full px-6 py-5 text-[14px] font-serif bg-transparent text-black dark:text-white focus:outline-none resize-none min-h-[160px] leading-relaxed placeholder:text-black/40 dark:placeholder:text-[#555] custom-scrollbar transition-colors"
                   />
-                  <div className="flex items-center justify-between px-6 py-4 border-t border-black/10 dark:border-white/5 bg-black/5 dark:bg-[#050505] transition-colors">
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 border-t border-black/10 dark:border-white/5 bg-black/5 dark:bg-[#050505] transition-colors gap-4">
+                    <div className="flex items-center gap-3 flex-wrap">
                       <button
                         onClick={submitReply}
                         disabled={submitting || !replyContent.trim()}

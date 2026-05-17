@@ -55,6 +55,7 @@ export interface SettingsState extends SovereignSettings {
     
     // API Sync Methods
     fetchSettings: () => Promise<void>;
+    syncDOM: () => void;
     updateSetting: <K extends keyof SovereignSettings>(key: K, value: SovereignSettings[K]) => Promise<void>;
 
     // Individual setters for backwards compatibility
@@ -179,7 +180,14 @@ export const useSettingsStore = create<SettingsState>()(
             isLoading: false,
             isUpdating: false,
 
+            syncDOM: () => {
+                applyDOMClasses(get());
+            },
+
             fetchSettings: async () => {
+                // Apply locally persisted classes immediately on boot
+                get().syncDOM();
+                
                 try {
                     set({ isLoading: true });
                     const res = await fetch('/api/user/settings');

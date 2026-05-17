@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 2. Verify mobile identity exclusively from secure JWT ───────────
-    const humanSession = req.cookies.get('human_session')?.value;
+    const humanSession = req.cookies.get('human_session')?.value || req.cookies.get('whale_session')?.value;
 
     if (!humanSession) {
       console.error(`[QR:Handshake:FAILURE] No secure JWT found for UUID: ${uuid}. IP: ${req.headers.get('x-forwarded-for')}`);

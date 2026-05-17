@@ -22,7 +22,20 @@ function getPINKey(address: string) {
 
 function storedPINHash(address: string): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(getPINKey(address));
+  const key = getPINKey(address);
+  
+  // 1. Try localStorage
+  let hash = localStorage.getItem(key);
+  if (hash) return hash;
+  
+  // 2. Try cookie (survives private browsing restarts)
+  const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
+  if (match) {
+    hash = match[2];
+    localStorage.setItem(key, hash); // restore to localStorage
+    return hash;
+  }
+  return null;
 }
 
 // Simple hash — we XOR-mix the PIN chars with the address chars for uniqueness
@@ -37,13 +50,31 @@ function hashPIN(pin: string, address: string): string {
 }
 
 function savePIN(pin: string, address: string) {
-  localStorage.setItem(getPINKey(address), hashPIN(pin, address));
+  const key = getPINKey(address);
+  const hash = hashPIN(pin, address);
+  localStorage.setItem(key, hash);
+  // Max-age 10 years to ensure it never expires
+  document.cookie = `${key}=${hash}; max-age=315360000; path=/; samesite=lax`;
 }
 
 function verifyPIN(pin: string, address: string): boolean {
   const stored = storedPINHash(address);
   if (!stored) return false;
   return stored === hashPIN(pin, address);
+}
+
+async function wipeXMTPDatabases() {
+  if (typeof indexedDB === 'undefined') return;
+  try {
+    const dbs = await indexedDB.databases();
+    dbs.forEach((db) => {
+      if (db.name && db.name.toLowerCase().includes('xmtp')) {
+        indexedDB.deleteDatabase(db.name);
+      }
+    });
+  } catch (e) {
+    console.error('Failed to wipe XMTP databases', e);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -192,10 +223,14 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           const next = attempts + 1;
           setAttempts(next);
           if (next >= 5) {
-            toast.error('Too many failed attempts. Clearing PIN.');
+            toast.error('Security breach detected. Wiping all chats and locking device.');
+            // Delete the PIN so they can't keep trying
             localStorage.removeItem(getPINKey(address!));
-            setAttempts(0);
-            setPhase('confirm');
+            document.cookie = `${getPINKey(address!)}=; max-age=0; path=/; samesite=lax`;
+            // Wipe XMTP DBs, then disconnect entirely
+            wipeXMTPDatabases().finally(() => {
+              nuclearDisconnect();
+            });
           } else {
             toast.error(`Incorrect PIN (${5 - next} attempts left)`);
           }
@@ -384,6 +419,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
                   <button
                     onClick={() => {
                       localStorage.removeItem(getPINKey(address!));
+                      document.cookie = `${getPINKey(address!)}=; max-age=0; path=/; samesite=lax`;
                       setPin('');
                       setAttempts(0);
                       setPhase('confirm');

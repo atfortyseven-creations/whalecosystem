@@ -450,7 +450,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             <div className="flex-1 flex flex-col min-w-0 relative h-full">
                 
                 {/* ─── Top Master Bar ─── */}
-                <header className="sticky top-0 h-[56px] border-b border-black/[0.06] dark:border-white/10 bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300">
+                <header className="sticky top-0 border-b border-black/[0.06] dark:border-white/10 bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300" style={{ minHeight: 'calc(56px + env(safe-area-inset-top, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
                     <button
                         onClick={() => setIsPaletteOpen(true)}
                         className="group flex items-center gap-2.5 h-8 px-3 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0A0A0A] hover:bg-black/[0.02] dark:hover:bg-white/5 hover:border-black/20 dark:hover:border-white/20 hover:shadow-sm transition-all duration-200 cursor-pointer shrink-0"
@@ -550,7 +550,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         }}
                     >
                         {/* pb-20 on mobile = clears the 64px bottom nav + safe area, no padding on desktop for edge-to-edge */}
-                        <div className="pb-20 md:pb-0 w-full h-full flex-1 flex flex-col relative z-10">
+                        <div className="pb-[calc(80px+env(safe-area-inset-bottom,0px))] md:pb-0 w-full h-full flex-1 flex flex-col relative z-10">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
@@ -572,7 +572,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
                 {/* Only renders on real mobile hardware (screen.width < 1024).  */}
                 {/* Narrowing a PC browser window will NOT show this nav bar.    */}
-                <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+                <nav className={`mobile-bottom-nav ${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                      {[
                         { id: 'gold',        icon: <Zap size={18} />,           label: 'Mint' },
                         { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Tokens' },

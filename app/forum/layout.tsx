@@ -38,7 +38,7 @@ export default async function ForumLayout({
       </main>
       
       {/* ─── Footer ─── */}
-      <footer className="w-full py-8 mt-auto flex flex-col items-center justify-center opacity-60 hover:opacity-100 transition-opacity" style={{ borderTop: '1px solid var(--forum-border)' }}>
+      <footer className="w-full py-8 mt-auto flex flex-col items-center justify-center opacity-60 hover:opacity-100 transition-opacity" style={{ borderTop: '1px solid var(--forum-border)', paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
         <span className="text-[9px] font-sans font-bold uppercase tracking-[0.2em] mb-1" style={{ color: 'var(--forum-text-muted)' }}>
           powered by
         </span>

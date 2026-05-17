@@ -233,8 +233,28 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     }
   }, [conversations, address]);
 
-  // ── Auto-scroll ─────────────────────────────────────────────────────────
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  // ── Auto-scroll & Mobile Keyboard Stability ───────────────────────────────
+  useEffect(() => {
+    const handleResize = () => {
+      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+    };
+    
+    // Initial scroll when messages change
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+    // Handle viewport changes (mobile keyboard open/close)
+    window.addEventListener('resize', handleResize);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+      }
+    };
+  }, [messages]);
 
   // ── Self-destruct ticker ─────────────────────────────────────────────────
   useEffect(() => {
@@ -335,7 +355,27 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
           const hydrated = hydratedList[0];
 
           const fromPeer = msg.senderInboxId !== selfInboxId;
-          const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
+          
+          // Fallback to extract peerAddress from members if not natively provided by SDK v5.3.0
+          let msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() || '';
+          if (!msgConvPeer && msg.conversation) {
+            try {
+              const rawMembers = msg.conversation.members;
+              const members: any[] = typeof rawMembers === 'function' ? await rawMembers() : (rawMembers ?? []);
+              const selfNorm = address?.toLowerCase() ?? '';
+              for (const m of members) {
+                const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
+                const peer = addrs.find((a: string) => a.toLowerCase() !== selfNorm);
+                if (peer) {
+                  msgConvPeer = peer.toLowerCase();
+                  // Attach it to the conversation object so auto-add has it
+                  msg.conversation.peerAddress = peer;
+                  break;
+                }
+              }
+            } catch (e) {}
+          }
+
           const currentActivePeer = activeConvRef.current?.peerAddress.toLowerCase();
           
           // Verify if message belongs to the current conversation
@@ -378,9 +418,10 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                  );
                } else {
                  // Auto-add new conversation
+                 const newPeerAddr = msg.conversation.peerAddress || msgConvPeer;
                  return [...prev, {
-                    peerAddress: msg.conversation.peerAddress,
-                    displayName: msg.conversation.peerAddress.slice(0, 6) + '...' + msg.conversation.peerAddress.slice(-4),
+                    peerAddress: newPeerAddr,
+                    displayName: newPeerAddr.slice(0, 6) + '...' + newPeerAddr.slice(-4),
                     folder: 'all',
                     unread: 1,
                     lastMessage: hydrated.content.slice(0, 30)
@@ -598,25 +639,21 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
       folder: 'all',
       unread: 0,
     };
-    setConversations(prev => {
-      if (prev.some(c => c.peerAddress.toLowerCase() === addr.toLowerCase())) return prev;
-      return [...prev, conv];
-    });
+
+    const existing = conversations.find(c => c.peerAddress.toLowerCase() === addr.toLowerCase());
+    const targetConv = existing || conv;
+
+    if (!existing) {
+      setConversations(prev => [conv, ...prev]);
+    }
     
-    // Select the existing or new conversation
-    setConversations(prev => {
-       const existing = prev.find(c => c.peerAddress.toLowerCase() === addr.toLowerCase());
-       setActiveConv(existing || conv);
-       return prev;
-    });
-    
+    setActiveConv(targetConv);
     setNewPeer('');
   };
 
   const filteredConvs = activeFolder === 'all' ? conversations : conversations.filter(c => c.folder === activeFolder);
 
-  // ── Theme-driven background (forced light — no dark mode in chat) ────────
-  const bg = '#ffffff';
+  // ── Theme-driven background is handled via CSS variables in globals.css ────────
 
   // ── Guards ─────────────────────────────────────────────────────────────────
   if (!isConnected) {
@@ -643,7 +680,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-1 w-full h-full text-black overflow-hidden" style={{ background: bg }}>
+    <div className="flex flex-1 w-full h-full text-black overflow-hidden chat-theme-wrapper" data-chat-theme={settings.theme} data-privacy={settings.privacyMode}>
 
       {/* Settings overlay */}
       {showSettings && (
@@ -756,8 +793,8 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
       </div>
 
       {/* 2 – Conversation List */}
-      <div className={`w-full md:w-[280px] border-r border-black/8 flex-col shrink-0 bg-white ${activeConv ? 'hidden md:flex' : 'flex'}`}>
-        <div className="p-4 border-b border-black/6 space-y-3">
+      <div data-sidebar className={`w-full md:w-[280px] border-r border-black/8 flex-col shrink-0 bg-white ${activeConv ? 'hidden md:flex' : 'flex'}`}>
+        <div className="px-4 py-4 border-b border-black/6 space-y-3 pt-[calc(1rem+env(safe-area-inset-top))]">
           <div className="flex items-center justify-between mb-3 md:hidden">
             <div className="flex items-center gap-2">
               {onReturnToGate && (
@@ -796,6 +833,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
 
           <div className="flex gap-2">
             <input
+              data-chat-input
               type="text"
               value={newPeer}
               onChange={e => setNewPeer(e.target.value)}
@@ -820,7 +858,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]">
           {filteredConvs.length === 0 && (
             <div className="flex flex-col items-center justify-center h-40 text-black/25 font-mono text-[10px] px-4 text-center">
               Add a wallet address or scan a QR to start a conversation
@@ -866,7 +904,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
         {activeConv ? (
           <>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-black/6 bg-white shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-black/6 bg-white shrink-0 pt-[calc(1rem+env(safe-area-inset-top))]">
               <div className="flex items-center gap-3">
                 <button onClick={() => setActiveConv(null)} className="md:hidden p-2 -ml-3 text-black/50 hover:text-black transition-colors rounded-full hover:bg-black/5">
                   <ChevronLeft size={24} />
@@ -892,6 +930,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                   onDelete={handleDelete}
                   onReply={handleReply}
                   bottomRef={bottomRef}
+                  settings={settings}
                 />
                 <ChatInput
                   onSendText={handleSendText}

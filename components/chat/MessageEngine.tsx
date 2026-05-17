@@ -8,9 +8,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-// ── Types ──────────────────────────────────────────────────────────────────
+import type { ChatSettings } from '@/components/chat/AdvancedSettingsModal';
 
-export type Reaction = { emoji: string; count: number; reacted: boolean };
+export interface Reaction { emoji: string; count: number; reacted: boolean };
 
 export interface RenderableMessage {
   id: string;
@@ -34,6 +34,7 @@ export interface MessageEngineProps {
   onDelete: (messageId: string) => void;
   onReply:  (messageId: string) => void;
   bottomRef: React.RefObject<HTMLDivElement | null>;
+  settings?: ChatSettings;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -43,7 +44,7 @@ const QUICK_REACTIONS = ['👍', '🔥', '🐳', '🚀', '💎', '❤️', '🤯
 // ── Component ──────────────────────────────────────────────────────────────
 
 export default function MessageEngine({
-  messages, onReact, onPin, onDelete, onReply, bottomRef,
+  messages, onReact, onPin, onDelete, onReply, bottomRef, settings
 }: MessageEngineProps) {
   const [menuState, setMenuState] = useState<{ id: string; content: string; x: number; y: number } | null>(null);
 
@@ -68,6 +69,7 @@ export default function MessageEngine({
               replyToMsg={replyToMsg}
               onContextMenu={(e) => openMenu(e, msg.id, msg.content)}
               onReact={onReact}
+              settings={settings}
             />
           );
         })}
@@ -93,11 +95,12 @@ export default function MessageEngine({
 
 // ── MessageBubble ──────────────────────────────────────────────────────────
 
-function MessageBubble({ msg, replyToMsg, onContextMenu, onReact }: {
+function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
   msg: RenderableMessage;
   replyToMsg?: RenderableMessage;
   onContextMenu: (e: React.MouseEvent) => void;
   onReact: (id: string, emoji: string) => void;
+  settings?: ChatSettings;
 }) {
   const now = Date.now();
   const secondsLeft = msg.destructsAt ? Math.max(0, Math.round((msg.destructsAt - now) / 1000)) : null;
@@ -118,6 +121,8 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact }: {
       {/* Bubble */}
       <div
         onContextMenu={onContextMenu}
+        data-bubble-mine={msg.isMine ? '' : undefined}
+        data-bubble-peer={!msg.isMine ? '' : undefined}
         className={`relative group px-4 py-3 rounded-2xl cursor-default select-text transition-all ${
           msg.isMine
             ? 'bg-black text-white rounded-br-sm'
@@ -150,7 +155,9 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact }: {
         {attachment ? (
           <AttachmentRenderer attachment={attachment} isMine={msg.isMine} />
         ) : (
-          <p className="text-[14px] leading-relaxed break-words whitespace-pre-wrap font-mono">{msg.content}</p>
+          <p className="leading-relaxed break-words whitespace-pre-wrap font-mono" style={{ fontSize: ((settings?.textSize ?? 4) * 2 + 6) + 'px' }}>
+            {settings?.privacyMode === 'stealth' ? msg.content.replace(/[a-zA-Z0-9]/g, '*') : msg.content}
+          </p>
         )}
 
         {secondsLeft !== null && (
@@ -180,9 +187,9 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact }: {
       )}
 
       {/* Timestamp + read receipt */}
-      <div className="flex items-center gap-1.5 mt-1 px-1 text-[9px] font-mono text-black/30">
-        {new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        {msg.isMine && (
+      <div data-chat-meta className="flex items-center gap-1.5 mt-1 px-1 text-[9px] font-mono text-black/30">
+        {settings?.privacyMode !== 'stealth' && new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        {msg.isMine && settings?.showReadReceipts !== false && (
           msg.readAt
             ? <CheckCheck size={11} className="text-black/50" />
             : <Check size={11} className="text-black/25" />
