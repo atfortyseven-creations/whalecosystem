@@ -132,23 +132,23 @@ function WalletOption({
       transition={{ delay, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
       onClick={onClick}
       disabled={loading}
-      className="group w-full flex items-center gap-4 p-4 rounded-2xl border border-white/10 bg-[#0B0B0B] hover:bg-[#FAF9F6]/5 hover:border-white/20 active:scale-[0.97] transition-all duration-200 shadow-sm disabled:opacity-60"
+      className="group w-full flex items-center gap-4 p-4 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] hover:border-black/20 active:scale-[0.97] transition-all duration-200 shadow-sm disabled:opacity-60"
     >
-      <div className="w-11 h-11 rounded-xl bg-[#FAF9F6]/5 border border-white/10 flex items-center justify-center p-2 overflow-hidden shrink-0">
+      <div className="w-11 h-11 rounded-xl bg-black/[0.03] border border-black/5 flex items-center justify-center p-2 overflow-hidden shrink-0">
         {loading ? (
-          <Loader2 size={20} className="animate-spin text-white/40" />
+          <Loader2 size={20} className="animate-spin text-black/40" />
         ) : (
           <img src={logo} alt={name} className="w-full h-full object-contain" />
         )}
       </div>
       <div className="flex-1 text-left">
-        <p className="text-[13px] font-black uppercase tracking-tight text-[#FAF9F6]">{name}</p>
-        <p className="text-[10px] font-mono text-[#FAF9F6]/40 uppercase tracking-widest mt-0.5">
+        <p className="text-[13px] font-black uppercase tracking-tight text-[#050505]">{name}</p>
+        <p className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-widest mt-0.5">
           {loading ? "Opening app…" : badge}
         </p>
       </div>
       {!loading && (
-        <ArrowRight size={14} className="text-[#FAF9F6]/20 group-hover:text-[#FAF9F6] group-hover:translate-x-0.5 transition-all shrink-0" />
+        <ArrowRight size={14} className="text-[#050505]/20 group-hover:text-[#050505] group-hover:translate-x-0.5 transition-all shrink-0" />
       )}
     </motion.button>
   );
@@ -166,30 +166,30 @@ function SigningOverlay({
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       className="fixed inset-0 z-[9999] flex items-center justify-center p-6"
-      style={{ background: "rgba(5,5,5,0.98)", backdropFilter: "blur(24px)" }}
+      style={{ background: "rgba(255,255,255,0.98)", backdropFilter: "blur(24px)" }}
     >
       <div className="w-full max-w-sm flex flex-col items-center gap-5 text-center">
-        <div className="w-20 h-20 rounded-[2rem] bg-[#0B0B0B] border border-white/10 shadow-lg flex items-center justify-center">
+        <div className="w-20 h-20 rounded-[2rem] bg-white border border-black/10 shadow-lg flex items-center justify-center">
           {isSigning ? (
-            <RefreshCw size={28} className="text-white/60 animate-spin" />
+            <RefreshCw size={28} className="text-black/40 animate-spin" />
           ) : error ? (
             <AlertCircle size={28} className="text-red-500" />
           ) : (
-            <Fingerprint size={28} className="text-[#FAF9F6]" />
+            <Fingerprint size={28} className="text-[#050505]" />
           )}
         </div>
 
-        <div className="flex items-center gap-2 px-4 py-2 bg-[#0B0B0B] border border-white/10 rounded-full shadow-sm">
-          <span className="text-[11px] font-black uppercase tracking-widest text-[#FAF9F6]/60 font-mono">
+        <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full shadow-sm">
+          <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/60 font-mono">
             {address.slice(0, 8)}…{address.slice(-6)}
           </span>
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-[24px] font-black tracking-tighter text-[#FAF9F6] leading-none">
+          <h2 className="text-[24px] font-black tracking-tighter text-[#050505] leading-none">
           {isSigning ? "Action Required" : error ? "Connection Failed" : "Connecting..."}
           </h2>
-          <p className="text-[12px] text-[#FAF9F6]/50 leading-relaxed">
+          <p className="text-[12px] text-[#050505]/50 leading-relaxed">
             {error
               ? "Could not cryptographically verify the wallet. Please try again."
               : isSigning
@@ -202,7 +202,7 @@ function SigningOverlay({
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full px-4 py-3 bg-red-950/20 border border-red-900/30 rounded-2xl text-red-400 text-[11px] font-black uppercase tracking-widest"
+            className="w-full px-4 py-3 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-[11px] font-black uppercase tracking-widest"
           >
             {error}
           </motion.div>
@@ -211,37 +211,37 @@ function SigningOverlay({
         {error ? (
           <button
             onClick={onRetry}
-            className="w-full py-4 rounded-2xl bg-[#FAF9F6] text-[#050505] font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all hover:bg-[#FAF9F6]/90"
+            className="w-full py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all hover:bg-black/90"
           >
             <RefreshCw size={16} />
             Retry Connection
           </button>
         ) : isSigning ? (
           <div className="w-full flex flex-col gap-3">
-             <div className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/60 font-black uppercase tracking-widest text-[10px] flex items-center justify-center text-center px-4">
+             <div className="w-full py-3 rounded-2xl bg-black/5 border border-black/10 text-black/60 font-black uppercase tracking-widest text-[10px] flex items-center justify-center text-center px-4">
                Approve signature in your wallet app
              </div>
              {wcDeepLink ? (
                <a
                   href={wcDeepLink}
                   rel="noopener noreferrer"
-                  className="w-full py-4 rounded-2xl bg-[#FAF9F6] text-[#050505] font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-transform select-none hover:bg-[#FAF9F6]/90"
+                  className="w-full py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-transform select-none hover:bg-black/90"
                >
                  Open Wallet App
                </a>
              ) : (
                 <button
                   onClick={onRetry}
-                  className="w-full py-4 rounded-2xl bg-[#FAF9F6] text-[#050505] font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all hover:bg-[#FAF9F6]/90"
+                  className="w-full py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all hover:bg-black/90"
                 >
                   Open Wallet To Sign
                 </button>
              )}
           </div>
         ) : (
-          <div className="w-full px-4 py-3 rounded-2xl border border-white/10 bg-[#0B0B0B] flex items-center justify-center gap-3">
-            <Loader2 size={16} className="animate-spin text-white/60" />
-            <span className="text-[#FAF9F6] font-black uppercase tracking-widest text-[11px]">Validating...</span>
+          <div className="w-full px-4 py-3 rounded-2xl border border-black/10 bg-white flex items-center justify-center gap-3">
+            <Loader2 size={16} className="animate-spin text-black/40" />
+            <span className="text-[#050505] font-black uppercase tracking-widest text-[11px]">Validating...</span>
           </div>
         )}
       </div>
@@ -1048,62 +1048,18 @@ export function MobileLanding() {
     );
   }
 
-  // ── Render: Default — Not connected — DIRECT connect panel (no manifesto detour) ──
+  // ── Render: Unified Mobile Landing & Login Modal ──
   // CRITICAL: This block must be AFTER all isLinked guards above.
-  if (!showConnectOverlay) {
-    return (
-      <div className="w-full min-h-[100dvh] bg-transparent relative">
-        <motion.header
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 transform-gpu"
-          style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(0,0,0,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.03)", willChange: "transform, opacity" }}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="w-6 h-6 shrink-0 cursor-pointer select-none"
-              onClick={() => {
-                const next = debugTaps + 1;
-                setDebugTaps(next);
-                if (next >= 5) { setShowDebug(s => !s); setDebugTaps(0); }
-              }}
-            >
-              <WhaleLogo className="w-6 h-6" />
-            </div>
-            <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
-          </div>
-          <button
-            onClick={() => setShowConnectOverlay(true)}
-            className="px-4 py-2 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
-          >
-            Connect Wallet
-          </button>
-        </motion.header>
-
-        <div className="flex flex-col w-full">
-          <ImmersiveManifestoLanding onOpenScanner={() => setShowConnectOverlay(true)} hideMap={true} />
-          <AztecArchitectureSection />
-          <SovereignFooter />
-        </div>
-      </div>
-    );
-  }
-
-  // ── Render: Connect Overlay ────────────────────────────────────────────────
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-[#050505] text-[#FAF9F6]">
-
-      {/* Pure ivory base — no pattern noise */}
-      {/* Background layer removed */}
-
-      {/* Fixed Header */}
+    <div className="w-full min-h-[100dvh] bg-[#F9F8F6] relative font-sans text-[#050505]">
+      
+      {/* ── Sticky Header ── */}
       <motion.header
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-        style={{ background: "rgba(5,5,5,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(255,255,255,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
+        className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4 transform-gpu"
+        style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)", borderBottom: `1px solid rgba(0,0,0,0.06)`, boxShadow: "0 2px 20px rgba(0,0,0,0.03)", willChange: "transform, opacity" }}
       >
         <div className="flex items-center gap-3">
           <div
@@ -1116,104 +1072,63 @@ export function MobileLanding() {
           >
             <WhaleLogo className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: '#FAF9F6' }}>Whale Alert Network</span>
-          </div>
+          <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
         </div>
-        <button 
-          onClick={() => setShowConnectOverlay(false)}
-          className="px-4 py-2 rounded-xl bg-[#FAF9F6] text-[#050505] text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all hover:bg-[#FAF9F6]/90"
-        >
-          Explore
-        </button>
+        {!showConnectOverlay && (
+          <button
+            onClick={() => setShowConnectOverlay(true)}
+            className="px-4 py-2 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+          >
+            Connect Wallet
+          </button>
+        )}
       </motion.header>
 
-      {/* ── DEBUG PANEL (tap logo 5x to open) ── */}
-      {showDebug && (
-        <div className="fixed inset-0 z-[99999] bg-black/95 overflow-auto p-4 font-mono text-[10px] text-green-400">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-yellow-400 font-bold text-[11px]">KYC DEBUG</span>
-            <button onClick={() => setShowDebug(false)} className="text-red-400 font-bold px-3 py-1 border border-red-400 rounded">CLOSE</button>
-          </div>
-          <div className="space-y-2">
-            <p>wagmi connected: <span className="text-white">{String(wagmiConnected)}</span></p>
-            <p>wagmi address: <span className="text-white">{wagmiAddress ?? 'undefined'}</span></p>
-            <p>wagmiAddressRef: <span className="text-white">{wagmiAddressRef.current ?? 'undefined'}</span></p>
-            <p>isLinked: <span className="text-white">{String(isLinked)}</span></p>
-            <p>connectors: <span className="text-white">{connectors.map(c=>c.id).join(', ') || 'none'}</span></p>
-            <hr className="border-green-900 my-2" />
-            <p className="text-yellow-400">COOKIES:</p>
-            {document.cookie.split('; ').filter(Boolean).map((c,i) => (
-              <p key={i} className="break-all text-white/80">{c.substring(0, 120)}</p>
-            ))}
-            <hr className="border-green-900 my-2" />
-            <p className="text-yellow-400">LOCALSTORAGE KEYS:</p>
-            {Object.keys(localStorage).map((k,i) => (
-              <p key={i} className="break-all">{k}: <span className="text-white/70">{(localStorage.getItem(k)||'').substring(0,80)}</span></p>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ── Background Landing Page ── */}
+      <div className="flex flex-col w-full relative z-0">
+        <ImmersiveManifestoLanding onOpenScanner={() => setShowConnectOverlay(true)} hideMap={true} />
+        <AztecArchitectureSection />
+        <SovereignFooter />
+      </div>
 
-      {/* Main Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-28 pb-12 gap-6 max-w-[500px] w-full mx-auto">
+      {/* ── Login Modal Overlay (Light Mode) ── */}
+      <AnimatePresence>
+        {showConnectOverlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-md"
+            onClick={() => setShowConnectOverlay(false)}
+          >
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full sm:max-w-md bg-white border-t border-black/10 sm:border sm:rounded-3xl rounded-t-[32px] flex flex-col items-center px-6 pt-8 pb-12 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] relative max-h-[90vh] overflow-y-auto"
+            >
+              <button 
+                onClick={() => setShowConnectOverlay(false)}
+                className="absolute top-5 right-5 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors"
+              >
+                <X size={16} className="text-black/50" />
+              </button>
 
-        {/* Hero */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center transform-gpu"
-          style={{ willChange: "transform, opacity" }}
-        >
-          <h1 className="text-[2.2rem] sm:text-[2.8rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: '#FAF9F6' }}>
-            Track institutional capital
-            <span className="block" style={{ color: '#00F2EA' }}>before markets react.</span>
-          </h1>
-          <p className="text-[12px] font-medium leading-relaxed max-w-[280px] mx-auto text-[#FAF9F6]/60">
-            Real-time on-chain intelligence — from mempool to execution. Your key never leaves your device.
-          </p>
-        </motion.div>
+              <div className="w-12 h-1 rounded-full bg-black/10 absolute top-3 sm:hidden" />
 
-        {/* Wallet app readiness note */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22, duration: 0.5 }}
-          className="w-full flex items-start gap-3 px-4 py-3.5 rounded-2xl bg-amber-950/20 border border-amber-900/30 text-amber-300"
-        >
-          <Fingerprint size={14} className="text-amber-400 mt-0.5 shrink-0" />
-          <p className="text-[10px] text-amber-300/80 font-medium leading-relaxed">
-            <span className="font-black text-amber-300">Have your wallet app open and ready.</span> When you tap a wallet below, a signature request will arrive in your wallet — approve it to access the platform.
-          </p>
-        </motion.div>
+      {/* Main Content (Modal Body) */}
+      <div className="w-full flex flex-col items-center mt-2">
+        <h2 className="text-[1.5rem] font-black tracking-tight leading-[1.0] mb-2 text-[#050505] text-center">
+          Connect Wallet
+        </h2>
+        <p className="text-[11px] font-medium leading-relaxed max-w-[280px] mx-auto text-[#050505]/60 text-center mb-6">
+          Approve the signature request in your wallet to securely access the terminal.
+        </p>
 
         {/* Wallet Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.7 }}
-          className="w-full flex flex-col gap-3"
-        >
-          {(() => {
-            const isZk = searchParams?.get('tab') === 'zk-identity' || searchParams?.get('next')?.includes('zk-identity');
-            if (!isZk) return null;
-            return (
-              <div className="w-full p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-start gap-3 mb-2">
-                <Fingerprint size={16} className="text-emerald-600 mt-0.5 shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 leading-tight">KYC Identity Verification Flow</span>
-                  <span className="text-[9px] text-emerald-600/80 font-medium mt-1 leading-relaxed">Please connect your wallet on mobile to initiate the mandatory 3D Biometric scan for platform access.</span>
-                </div>
-              </div>
-            );
-          })()}
-
-          <div className="flex items-center gap-3 mb-1">
-            <div className="flex-1 h-px bg-[#E5E5E5]" />
-            <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#050505]/30">Connect Wallet</span>
-            <div className="flex-1 h-px bg-[#E5E5E5]" />
-          </div>
+        <div className="w-full flex flex-col gap-3">
 
           {/* ──────────────────────────────────────────────────────────────────
               WALLET BUTTONS — Using Reown AppKit's useAppKit hook.
@@ -1237,107 +1152,9 @@ export function MobileLanding() {
                   sessionStorage.setItem('sovereign_show_reconnect', '1');
                 } catch {}
 
-                const eth = typeof window !== 'undefined' ? (window as any).ethereum : null;
-                const isMetaMaskBrowser = !!(eth?.isMetaMask && !eth?.isCoinbaseWallet);
-                const isCoinbaseBrowser = !!(eth?.isCoinbaseWallet);
-
-                // ── In-app wallet browser: connect directly via injected provider ──
-                if (walletId === 'metamask' && isMetaMaskBrowser) {
-                  const conn = connectors.find(c =>
-                    ['io.metamask','metaMaskSDK','metaMask','injected'].includes(c.id)
-                  );
-                  if (conn) { connect({ connector: conn }); setTimeout(() => setConnecting(null), 8000); return; }
-                }
-                if (walletId === 'coinbase' && isCoinbaseBrowser) {
-                  const conn = connectors.find(c =>
-                    ['coinbaseWalletSDK','coinbaseWallet','injected'].includes(c.id)
-                  );
-                  if (conn) { connect({ connector: conn }); setTimeout(() => setConnecting(null), 8000); return; }
-                }
-
-                // ── Rainbow & 550+ Wallets ─────────────────────────────────────────
-                // Different wallets use different deep-link schemes (rainbow://, trust://,
-                // etc.). Rather than guess, we open the AppKit modal which handles
-                // multi-wallet routing correctly and also provides the QR code fallback.
-                if (walletId === 'wc') {
-                  rkOpenModal({ view: 'Connect' });
-                  setTimeout(() => setConnecting(null), 30000);
-                  return;
-                }
-
-                // ── MetaMask / Coinbase — External mobile browser ─────────────────
-                // ROOT CAUSE FIX: AppKit's "Open" button is inside a Shadow DOM Web
-                // Component. Chrome Android loses the user gesture context as the
-                // click crosses the shadow DOM boundary and silently blocks the
-                // metamask:// / cbwallet:// navigation — so nothing happens.
-                //
-                // Solution: bypass AppKit's modal for these two wallets.
-                // 1. Connect via wagmi walletConnect connector directly.
-                // 2. Subscribe to 'display_uri' to receive the WC pairing URI.
-                // 3. Render OUR OWN <a href="metamask://wc?uri=..."> in plain React DOM.
-                // 4. User taps that anchor → Chrome fires the intent with a clean
-                //    user gesture → MetaMask opens reliably.
-                //
-                // 8-second fallback: if display_uri never fires (e.g., existing WC
-                // session is being reused, in which case wagmi auto-reconnects and
-                // establishSession handles it), open AppKit modal as a safety net.
-                const walletSchemes: Record<string, string> = {
-                  metamask: 'metamask',
-                  coinbase:  'cbwallet',
-                };
-                const scheme = walletSchemes[walletId];
-
-                const wcConnector = connectors.find(
-                  c => c.id === 'walletConnect' || c.type === 'walletConnect'
-                );
-
-                if (!wcConnector || !scheme) {
-                  // Unknown wallet or no WC connector: use AppKit modal
-                  rkOpenModal({ view: 'Connect' });
-                  setTimeout(() => setConnecting(null), 30000);
-                  return;
-                }
-
-                let deepLinkFired = false;
-
-                const handleMsg = ({ type, data }: { type: string; data: unknown }) => {
-                  if (type === 'display_uri' && typeof data === 'string') {
-                    try { (wcConnector as any).emitter?.off?.('message', handleMsg); } catch {}
-                    deepLinkFired = true;
-                    const encoded = encodeURIComponent(data);
-                    setWcDeepLink(`${scheme}://wc?uri=${encoded}`);
-                  }
-                };
-
-                try { (wcConnector as any).emitter?.on?.('message', handleMsg); } catch {}
-
-                try {
-                  connect({ connector: wcConnector });
-                } catch (e) {
-                  // connect() threw synchronously — clean up and use AppKit modal
-                  try { (wcConnector as any).emitter?.off?.('message', handleMsg); } catch {}
-                  rkOpenModal({ view: 'Connect' });
-                  setTimeout(() => setConnecting(null), 30000);
-                  return;
-                }
-
-                // ── 8-second fallback ──────────────────────────────────────────────
-                // If display_uri never fires, the WC connector is likely reusing an
-                // existing session (good — wagmi will auto-establish the session via
-                // the useEffect that watches isConnected+address) OR the connector
-                // doesn't expose its emitter. In either case, open the AppKit modal
-                // so the user always has a clear path forward.
-                setTimeout(() => {
-                  if (!deepLinkFired) {
-                    try { (wcConnector as any).emitter?.off?.('message', handleMsg); } catch {}
-                    if (!isLinked) {
-                      rkOpenModal({ view: 'Connect' });
-                    }
-                  }
-                }, 8000);
-
-                // Auto-reset state after 30s
-                setTimeout(() => { setConnecting(null); setWcDeepLink(null); }, 30000);
+                // Pure AppKit usage to avoid deep-link hangs
+                rkOpenModal({ view: 'Connect' });
+                setTimeout(() => setConnecting(null), 10000);
               };
 
 
@@ -1377,80 +1194,16 @@ export function MobileLanding() {
             })()}
           </div>
 
-          {/* ── Direct deep-link button ─────────────────────────────────────────
-              Appears once wagmi's walletConnect connector emits 'display_uri'.
-              This is a plain React <a> element — NOT inside AppKit's shadow DOM —
-              so Chrome Android correctly recognises the tap as a user gesture and
-              fires the metamask:// / cbwallet:// / wc:// intent.
-          ─────────────────────────────────────────────────────────────────────── */}
-          <AnimatePresence>
-            {wcDeepLink && connecting && (
-              <motion.div
-                key="wc-deeplink"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full"
-              >
-                <a
-                  href={wcDeepLink}
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-[#050505] text-[#FAF9F6] font-black uppercase tracking-widest text-[11px] active:scale-[0.97] transition-transform shadow-lg select-none"
-                  onClick={() => {
-                    // Clear after a moment so the button disappears once the
-                    // user switches to the wallet app
-                    setTimeout(() => setWcDeepLink(null), 1500);
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                    <polyline points="15 3 21 3 21 9"/>
-                    <line x1="10" y1="14" x2="21" y2="3"/>
-                  </svg>
-                  Tap to Open{' '}
-                  {wcTargetWallet === 'metamask' ? 'MetaMask'
-                    : wcTargetWallet === 'coinbase' ? 'Coinbase Wallet'
-                    : 'Your Wallet'}
-                </a>
-                <p className="text-center text-[9px] text-[#050505]/35 font-medium mt-2 tracking-wide">
-                  Connection ready · Tap above to launch the app
+              <div className="flex items-start gap-3 p-4 rounded-2xl bg-black/[0.03] border border-black/5 mt-6 w-full">
+                <Fingerprint size={14} className="text-black/40 mt-0.5 shrink-0" />
+                <p className="text-[10px] text-black/50 font-medium leading-relaxed">
+                  ECDSA Verification · Non-custodial · Private keys never leave your device.
                 </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* ECDSA notice */}
-          <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5] mt-2">
-            <Fingerprint size={14} className="text-[#050505]/25 mt-0.5 shrink-0" />
-            <p className="text-[10px] text-[#050505]/40 font-medium leading-relaxed">
-              ECDSA Verification · Non-custodial · Private keys never leave your device.
-            </p>
-          </div>
-        </motion.div>
-      </main>
-
-      {/* ── Immersive Manifesto Content for Mobile ── */}
-      <div className="w-full relative z-0">
-        <ImmersiveManifestoLanding hideMap={true} />
-      </div>
-
-      {/* ── Minimal Mobile Footer ── */}
-      <div className="relative w-full bg-transparent border-t border-black/5">
-        
-        <footer className="w-full px-6 py-8 flex flex-col items-center gap-5 pb-[calc(2rem+env(safe-area-inset-bottom))]">
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
-            {[['Privacy', '/privacy'], ['Docs', '/docs'], ['Terms', '/terms'], ['Pricing', '/pricing']].map(([label, href]) => (
-              <a key={label} href={href} className="text-[9px] font-mono uppercase tracking-[0.2em] font-medium text-black/30 hover:text-black/70 transition-colors">
-                {label}
-              </a>
-            ))}
-          </div>
-          <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/25 text-center">
-            © 2026 Whale Alert Network. Institutional Grade.
-          </p>
-        </footer>
-      </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
