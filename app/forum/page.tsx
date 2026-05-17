@@ -232,7 +232,7 @@ function ForumHomeContent() {
 
 export default function ForumHomePage() {
   return (
-    <WhaleMissionLoader duration={3000}>
+    <WhaleMissionLoader>
       <Suspense fallback={<WhaleAlertLoader bg="transparent" color="#0A0A0A" />}>
         <ForumHomeContent />
       </Suspense>

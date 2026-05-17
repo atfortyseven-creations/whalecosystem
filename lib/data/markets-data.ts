@@ -4372,11 +4372,186 @@ export const RAW_NETWORKS = [
 "zkSync Era"
 ];
 
-// Quick runtime parser so we don't have to stringify it in node (since powershell is missing)
+// Network-specific native & dominant tokens — ensures every chain has ≥1 representative entry
+export const NETWORK_NATIVE_TOKENS: Record<string, { name: string; ticker: string; price: string; change24h: string; mcap: string; circulation: string }[]> = {
+    "Aptos": [
+        { name: "Aptos", ticker: "APT", price: "5.42", change24h: "-3.11%", mcap: "2.81B", circulation: "518.41M" },
+        { name: "Aries Markets", ticker: "ARIES", price: "0.062", change24h: "+1.20%", mcap: "62.00M", circulation: "1.00B" },
+    ],
+    "Arbitrum One": [
+        { name: "GMX", ticker: "GMX", price: "17.24", change24h: "-2.88%", mcap: "202.40M", circulation: "11.74M" },
+        { name: "Pendle", ticker: "PENDLE", price: "2.11", change24h: "-5.00%", mcap: "310.00M", circulation: "147.00M" },
+    ],
+    "Avalanche": [
+        { name: "Avalanche", ticker: "AVAX", price: "19.34", change24h: "-3.55%", mcap: "8.12B", circulation: "420.00M" },
+        { name: "Trader Joe", ticker: "JOE", price: "0.19", change24h: "-4.10%", mcap: "78.00M", circulation: "410.53M" },
+    ],
+    "Base": [
+        { name: "Moonwell Apollo", ticker: "WELL", price: "0.031", change24h: "-4.50%", mcap: "71.00M", circulation: "2.29B" },
+        { name: "BaseX", ticker: "BASEX", price: "0.0091", change24h: "+8.14%", mcap: "9.10M", circulation: "1.00B" },
+    ],
+    "Beacon Chain": [
+        { name: "Lido Staked Ether", ticker: "STETH", price: "2610.00", change24h: "-2.46%", mcap: "32.00B", circulation: "12.20M" },
+        { name: "Rocket Pool ETH", ticker: "RETH", price: "2880.00", change24h: "-2.30%", mcap: "3.18B", circulation: "1.10M" },
+    ],
+    "Bitcoin": [
+        { name: "Bitcoin", ticker: "BTC", price: "103520", change24h: "+0.82%", mcap: "2.05T", circulation: "19.87M" },
+        { name: "Wrapped Bitcoin", ticker: "WBTC", price: "103440", change24h: "+0.79%", mcap: "11.80B", circulation: "114.13K" },
+        { name: "tBTC", ticker: "TBTC", price: "103100", change24h: "+0.70%", mcap: "421.00M", circulation: "4.09K" },
+    ],
+    "Bitcoin Cash": [
+        { name: "Bitcoin Cash", ticker: "BCH", price: "392.14", change24h: "-1.20%", mcap: "7.75B", circulation: "19.78M" },
+    ],
+    "Blast": [
+        { name: "Blast", ticker: "BLAST", price: "0.0071", change24h: "-5.88%", mcap: "248.00M", circulation: "34.90B" },
+        { name: "Juice Finance", ticker: "JUICE", price: "0.041", change24h: "+2.10%", mcap: "12.30M", circulation: "300.00M" },
+    ],
+    "BNB": [
+        { name: "BNB", ticker: "BNB", price: "607.22", change24h: "-1.33%", mcap: "88.20B", circulation: "145.31M" },
+        { name: "Venus", ticker: "XVS", price: "4.67", change24h: "-3.20%", mcap: "84.00M", circulation: "17.90M" },
+    ],
+    "BOB": [
+        { name: "BOB Token", ticker: "BOB", price: "0.0000012", change24h: "-0.50%", mcap: "120.00M", circulation: "100.00T" },
+        { name: "Spiderchain RBTC", ticker: "RBTC", price: "103200", change24h: "+0.75%", mcap: "88.00M", circulation: "853.00" },
+    ],
+    "Botanix": [
+        { name: "Botanix BTC", ticker: "BTX", price: "103000", change24h: "+0.60%", mcap: "45.00M", circulation: "437.00" },
+    ],
+    "Cardano": [
+        { name: "Cardano", ticker: "ADA", price: "0.71", change24h: "-2.88%", mcap: "25.10B", circulation: "35.45B" },
+        { name: "SNEK", ticker: "SNEK", price: "0.0030", change24h: "+4.00%", mcap: "102.00M", circulation: "34.00B" },
+        { name: "Liqwid Finance", ticker: "LQ", price: "0.31", change24h: "-1.80%", mcap: "22.00M", circulation: "71.00M" },
+    ],
+    "Dash": [
+        { name: "Dash", ticker: "DASH", price: "24.08", change24h: "-2.10%", mcap: "265.00M", circulation: "11.00M" },
+    ],
+    "DigiByte": [
+        { name: "DigiByte", ticker: "DGB", price: "0.0082", change24h: "-1.40%", mcap: "131.00M", circulation: "16.07B" },
+    ],
+    "Dogecoin": [
+        { name: "Dogecoin", ticker: "DOGE", price: "0.172", change24h: "-4.20%", mcap: "25.50B", circulation: "148.24B" },
+    ],
+    "eCash": [
+        { name: "eCash", ticker: "XEC", price: "0.000024", change24h: "-1.10%", mcap: "467.00M", circulation: "19.44T" },
+    ],
+    "Ethereum": [
+        { name: "Ethereum", ticker: "ETH", price: "2612.00", change24h: "-2.44%", mcap: "314.00B", circulation: "120.26M" },
+    ],
+    "Ethereum Classic": [
+        { name: "Ethereum Classic", ticker: "ETC", price: "18.92", change24h: "-3.00%", mcap: "2.80B", circulation: "148.08M" },
+    ],
+    "Fantom": [
+        { name: "Sonic (prev FTM)", ticker: "S", price: "0.51", change24h: "-4.80%", mcap: "1.65B", circulation: "3.24B" },
+        { name: "SpookySwap", ticker: "BOO", price: "0.59", change24h: "-3.10%", mcap: "14.00M", circulation: "23.60M" },
+    ],
+    "Galactica EVM": [
+        { name: "Galactica", ticker: "GNET", price: "0.44", change24h: "+2.30%", mcap: "44.00M", circulation: "100.00M" },
+    ],
+    "Gnosis Chain": [
+        { name: "xDai", ticker: "XDAI", price: "1.00", change24h: "+0.00%", mcap: "120.00M", circulation: "120.00M" },
+    ],
+    "Groestlcoin": [
+        { name: "Groestlcoin", ticker: "GRS", price: "0.41", change24h: "-1.50%", mcap: "22.00M", circulation: "53.69M" },
+    ],
+    "Handshake": [
+        { name: "Handshake", ticker: "HNS", price: "0.012", change24h: "-2.00%", mcap: "30.00M", circulation: "2.50B" },
+    ],
+    "Kusama": [
+        { name: "Kusama", ticker: "KSM", price: "17.82", change24h: "-3.40%", mcap: "192.00M", circulation: "10.79M" },
+    ],
+    "Linea": [
+        { name: "Linea ETH", ticker: "LETH", price: "2612.00", change24h: "-2.44%", mcap: "50.00M", circulation: "19.14K" },
+        { name: "Lynex", ticker: "LYNX", price: "0.0018", change24h: "+5.00%", mcap: "3.60M", circulation: "2.00B" },
+    ],
+    "Liquid Network": [
+        { name: "Liquid BTC", ticker: "LBTC", price: "103400", change24h: "+0.78%", mcap: "95.00M", circulation: "919.00" },
+    ],
+    "Litecoin": [
+        { name: "Litecoin", ticker: "LTC", price: "88.42", change24h: "-2.60%", mcap: "6.65B", circulation: "75.23M" },
+    ],
+    "Mantle": [
+        { name: "Mantle", ticker: "MNT", price: "0.72", change24h: "-3.80%", mcap: "2.36B", circulation: "3.28B" },
+        { name: "Agni Finance", ticker: "AGI", price: "0.011", change24h: "+1.40%", mcap: "11.00M", circulation: "1.00B" },
+    ],
+    "Merlin": [
+        { name: "Merlin Chain", ticker: "MERL", price: "0.099", change24h: "-5.10%", mcap: "98.00M", circulation: "990.00M" },
+    ],
+    "Monero": [
+        { name: "Monero", ticker: "XMR", price: "326.14", change24h: "-1.80%", mcap: "6.01B", circulation: "18.43M" },
+    ],
+    "Moonbeam": [
+        { name: "Moonbeam", ticker: "GLMR", price: "0.088", change24h: "-4.20%", mcap: "168.00M", circulation: "1.91B" },
+    ],
+    "opBNB": [
+        { name: "BNB (opBNB)", ticker: "opBNB", price: "607.22", change24h: "-1.33%", mcap: "45.00M", circulation: "74.12K" },
+    ],
+    "Optimism": [
+        { name: "Optimism", ticker: "OP", price: "0.71", change24h: "-5.20%", mcap: "942.00M", circulation: "1.33B" },
+        { name: "Synthetix", ticker: "SNX", price: "0.52", change24h: "-4.80%", mcap: "175.00M", circulation: "338.00M" },
+    ],
+    "Peercoin": [
+        { name: "Peercoin", ticker: "PPC", price: "0.48", change24h: "-1.00%", mcap: "20.00M", circulation: "41.49M" },
+    ],
+    "Polkadot": [
+        { name: "Polkadot", ticker: "DOT", price: "3.82", change24h: "-3.30%", mcap: "5.73B", circulation: "1.50B" },
+        { name: "Acala", ticker: "ACA", price: "0.053", change24h: "-2.90%", mcap: "50.00M", circulation: "940.00M" },
+    ],
+    "Polygon": [
+        { name: "Quickswap", ticker: "QUICK", price: "0.038", change24h: "-3.50%", mcap: "38.00M", circulation: "1.00B" },
+    ],
+    "Polygon zkEVM": [
+        { name: "Donkey Finance", ticker: "DON", price: "0.022", change24h: "+3.10%", mcap: "4.40M", circulation: "200.00M" },
+    ],
+    "Rootstock": [
+        { name: "Rootstock BTC", ticker: "RBTC", price: "103200", change24h: "+0.75%", mcap: "220.00M", circulation: "2.13K" },
+        { name: "Sovryn", ticker: "SOV", price: "0.68", change24h: "-2.10%", mcap: "68.00M", circulation: "100.00M" },
+    ],
+    "Scroll": [
+        { name: "Scroll ETH", ticker: "SCETH", price: "2612.00", change24h: "-2.44%", mcap: "40.00M", circulation: "15.32K" },
+        { name: "Ambient Finance", ticker: "CANTO", price: "0.012", change24h: "+1.80%", mcap: "8.00M", circulation: "666.00M" },
+    ],
+    "Sei EVM": [
+        { name: "Sei", ticker: "SEI", price: "0.19", change24h: "-4.40%", mcap: "860.00M", circulation: "4.58B" },
+    ],
+    "Solana": [
+        { name: "Solana", ticker: "SOL", price: "168.42", change24h: "-3.11%", mcap: "86.80B", circulation: "516.00M" },
+        { name: "Raydium", ticker: "RAY", price: "2.34", change24h: "-4.80%", mcap: "520.00M", circulation: "222.00M" },
+    ],
+    "Stacks": [
+        { name: "Stacks", ticker: "STX", price: "0.68", change24h: "-4.10%", mcap: "1.00B", circulation: "1.47B" },
+        { name: "ALEX DeFi", ticker: "ALEX", price: "0.033", change24h: "-2.50%", mcap: "33.00M", circulation: "1.00B" },
+    ],
+    "Stellar": [
+        { name: "Stellar", ticker: "XLM", price: "0.25", change24h: "-2.80%", mcap: "7.60B", circulation: "30.38B" },
+        { name: "AQUA", ticker: "AQUA", price: "0.00000090", change24h: "+1.00%", mcap: "90.00M", circulation: "100.00T" },
+    ],
+    "TON": [
+        { name: "Toncoin", ticker: "TON", price: "2.98", change24h: "-3.20%", mcap: "7.50B", circulation: "2.52B" },
+        { name: "Notcoin", ticker: "NOT", price: "0.0038", change24h: "-4.50%", mcap: "380.00M", circulation: "100.00B" },
+        { name: "Dogs", ticker: "DOGS", price: "0.00083", change24h: "-5.00%", mcap: "245.00M", circulation: "296.00B" },
+    ],
+    "TRON": [
+        { name: "TRON", ticker: "TRX", price: "0.245", change24h: "-1.10%", mcap: "22.50B", circulation: "91.90B" },
+    ],
+    "XRP Ledger": [
+        { name: "XRP", ticker: "XRP", price: "2.21", change24h: "-2.40%", mcap: "128.00B", circulation: "57.96B" },
+        { name: "Sologenic", ticker: "SOLO", price: "0.14", change24h: "-3.00%", mcap: "140.00M", circulation: "1.00B" },
+    ],
+    "Zcash": [
+        { name: "Zcash", ticker: "ZEC", price: "38.84", change24h: "-2.60%", mcap: "618.00M", circulation: "15.92M" },
+    ],
+    "zkSync Era": [
+        { name: "ZKsync", ticker: "ZK", price: "0.064", change24h: "-4.80%", mcap: "308.00M", circulation: "4.82B" },
+        { name: "Velocore", ticker: "VC", price: "0.0032", change24h: "+1.20%", mcap: "3.20M", circulation: "1.00B" },
+    ],
+};
+
+// Quick runtime parser — deterministic round-robin network assignment (guarantees every network appears)
 export function getParsedMarkets() {
     const lines = RAW_TOKENS_STRING.trim().split('\n');
-    const tokens = [];
+    const tokens: any[] = [];
     let current: string[] = [];
+    let netIdx = 0;
 
     for (const line of lines) {
         if (line.trim() === '') continue;
@@ -4391,10 +4566,36 @@ export function getParsedMarkets() {
                 mcap: current[5],
                 mcapCurrency: current[6],
                 circulation: current[7],
-                network: RAW_NETWORKS[Math.floor(Math.random() * RAW_NETWORKS.length)] // distribute mock networks
+                // Deterministic round-robin: cycles through all 48 networks in order
+                network: RAW_NETWORKS[netIdx % RAW_NETWORKS.length],
             });
+            netIdx++;
             current = [];
         }
     }
+
+    // Append all network-specific native tokens ensuring full coverage
+    for (const [network, nativeList] of Object.entries(NETWORK_NATIVE_TOKENS)) {
+        for (const t of nativeList) {
+            // Only add if not already present (by ticker+network combo)
+            const alreadyExists = tokens.some(
+                (ex: any) => ex.ticker === t.ticker && ex.network === network
+            );
+            if (!alreadyExists) {
+                tokens.push({
+                    name: t.name,
+                    ticker: t.ticker,
+                    price: t.price,
+                    currencyPrice: 'USD',
+                    change24h: t.change24h,
+                    mcap: t.mcap,
+                    mcapCurrency: 'USD',
+                    circulation: t.circulation,
+                    network,
+                });
+            }
+        }
+    }
+
     return tokens;
 }

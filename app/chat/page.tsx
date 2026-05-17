@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function ChatPage() {
   return (
-    <WhaleMissionLoader duration={3000}>
+    <WhaleMissionLoader>
       <SovereignChat />
     </WhaleMissionLoader>
   );

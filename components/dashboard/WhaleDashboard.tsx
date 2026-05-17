@@ -18,18 +18,11 @@ const LoadingPanel = () => (
   </div>
 );
 
-const NewPairsTable = dynamic(() => import('@/components/dashboard/NewPairsTable').then(m => ({ default: m.NewPairsTable })), { ssr: false, loading: LoadingPanel });
-const OmniExplorer = dynamic(() => import('@/components/dashboard/OmniExplorer').then(m => ({ default: m.OmniExplorer })), { ssr: false, loading: LoadingPanel });
 const WhaleSupport = dynamic(() => import('@/components/dashboard/WhaleSupport').then(m => ({ default: m.WhaleSupport })), { ssr: false, loading: LoadingPanel });
 const InstitutionalLedger = dynamic(() => import('@/components/dashboard/InstitutionalLedger'), { ssr: false, loading: LoadingPanel });
 const MassTransferIntel = dynamic(() => import('@/components/dashboard/MassTransferIntel').then(m => ({ default: m.MassTransferIntel })), { ssr: false, loading: LoadingPanel });
 const SessionLogsPanel = dynamic(() => import('@/components/dashboard/SessionLogsPanel').then(m => ({ default: m.SessionLogsPanel })), { ssr: false, loading: LoadingPanel });
 const PlanDashboard = dynamic(() => import('@/components/dashboard/PlanDashboard').then(m => ({ default: m.PlanDashboard })), { ssr: false, loading: LoadingPanel });
-
-const AztecMempoolSpace = dynamic(
-  () => import('@/components/premium/AztecMempoolSpace'),
-  { ssr: false, loading: LoadingPanel }
-);
 
 // Dynamic imports (SSR-unsafe or heavy)
 const PortfolioDashboard = dynamic(
@@ -129,20 +122,11 @@ export default function WhaleDashboard() {
             case 'markets':
                 return <div className={PANEL}><DashboardErrorBoundary key={`markets-${refreshKey}`}><InstitutionalMarkets /></DashboardErrorBoundary></div>;
 
-            case 'newpairs':
-                return <div className={PANEL}><DashboardErrorBoundary key={`newpairs-${refreshKey}`}><NewPairsTable /></DashboardErrorBoundary></div>;
-
             case 'inst-ledger':
                 return <div className={PANEL}><DashboardErrorBoundary key={`inst-ledger-${refreshKey}`}><InstitutionalLedger /></DashboardErrorBoundary></div>;
 
             case 'mass-transfer':
                 return <div className={PANEL}><DashboardErrorBoundary key={`mass-transfer-${refreshKey}`}><MassTransferIntel /></DashboardErrorBoundary></div>;
-
-            case 'omniexplorer':
-                return <div className={PANEL}><DashboardErrorBoundary key={`omni-explorer-${refreshKey}`}><OmniExplorer /></DashboardErrorBoundary></div>;
-
-            case 'zk':
-                return <div className={PANEL + " relative"}><DashboardErrorBoundary key={`zk-shield-${refreshKey}`}><AztecMempoolSpace /></DashboardErrorBoundary></div>;
 
             case 'logs':
                 return <div className={PANEL}><DashboardErrorBoundary key={`session-logs-${refreshKey}`}><SessionLogsPanel /></DashboardErrorBoundary></div>;
@@ -158,7 +142,7 @@ export default function WhaleDashboard() {
     if (isCheckingZK) {
         return (
             <div className="min-h-screen bg-[#FDFCF8] dark:bg-[#0A0A0A] flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-[#050505] dark:border-white border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }

@@ -21,7 +21,7 @@ export default async function AcademyPage() {
     const isDatabaseSeeded = dbCourses.length > 0;
 
     return (
-        <WhaleMissionLoader duration={3000}>
+        <WhaleMissionLoader>
             <div className="bg-transparent">
                 <AcademyInteractiveEngine 
                     dbCourses={dbCourses} 
