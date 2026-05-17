@@ -62,7 +62,7 @@ export function SovereignBridge({ onClose }: SovereignBridgeProps) {
             const dataUrl = await QRCode.toDataURL(linkUrl, {
                 width: 280,
                 margin: 2,
-                color: { dark: '#ffffff', light: '#00000000' },
+                color: { dark: '#000000', light: '#ffffff' },
                 errorCorrectionLevel: 'H',
             });
 
@@ -138,7 +138,9 @@ export function SovereignBridge({ onClose }: SovereignBridgeProps) {
                     >
                         {/* QR Code */}
                         <div className="relative p-3 bg-[#0d0d0d] rounded-2xl border border-[#a855f7]/25 shadow-[0_0_30px_rgba(168,85,247,0.12)]">
-                            <img src={qrDataUrl} alt="Bridge QR Code" className="w-56 h-56 rounded-xl" />
+                            <div className="p-2 bg-white rounded-xl">
+                                <img src={qrDataUrl} alt="Bridge QR Code" className="w-52 h-52 rounded-lg" />
+                            </div>
                             {/* Corner markers */}
                             {[
                                 'top-1.5 left-1.5 border-t-2 border-l-2 rounded-tl-xl',
