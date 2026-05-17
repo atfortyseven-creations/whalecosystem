@@ -235,6 +235,20 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     facingMode: 'environment',
     onFrame: useCallback((canvas: HTMLCanvasElement) => {
       if (hasScannedRef.current || !handleSuccessRef.current) return;
+      
+      // Native BarcodeDetector (Modern Android/iOS Safari 17+) - high-performance
+      if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+        const barcodeDetector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+        barcodeDetector.detect(canvas)
+          .then((barcodes: any[]) => {
+            if (barcodes.length > 0 && barcodes[0].rawValue && !hasScannedRef.current) {
+              handleSuccessRef.current(barcodes[0].rawValue);
+            }
+          })
+          .catch(() => {});
+      }
+
+      // Fallback: jsQR (highly compatible)
       try {
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         if (!ctx) return;
@@ -242,7 +256,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
           inversionAttempts: "attemptBoth",
         });
-        if (code && code.data) {
+        if (code && code.data && !hasScannedRef.current) {
           handleSuccessRef.current(code.data);
         }
       } catch (e) {

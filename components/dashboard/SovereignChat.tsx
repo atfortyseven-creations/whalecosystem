@@ -16,6 +16,7 @@ import ChatInput from '@/components/chat/ChatInput';
 import AdvancedSettingsModal from '@/components/chat/AdvancedSettingsModal';
 import AttestationEngine from '@/components/dashboard/AttestationEngine';
 import { QrScanner } from '@/components/dashboard/QrScanner';
+import { QRCodeSVG } from 'qrcode.react';
 
 
 import type { RenderableMessage, Reaction } from '@/components/chat/MessageEngine';
@@ -695,7 +696,14 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
               <div className="flex flex-col items-center gap-6 py-4">
                 <div className="p-6 bg-white rounded-3xl border border-black/10 shadow-xl">
                   {address ? (
-                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${address}&color=000000&bgcolor=ffffff`} alt="QR" className="w-[220px] h-[220px] object-contain" />
+                    <QRCodeSVG
+                      value={address}
+                      size={220}
+                      fgColor="#000000"
+                      bgColor="#FFFFFF"
+                      level="H"
+                      includeMargin={false}
+                    />
                   ) : (
                     <div className="w-[220px] h-[220px] flex items-center justify-center bg-black/5 rounded-2xl">
                       <p className="text-[10px] font-mono text-black/40">No wallet connected</p>

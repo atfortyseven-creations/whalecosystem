@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Camera, Loader, RefreshCcw } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
+import { QRCodeSVG } from 'qrcode.react';
 
 
 
@@ -46,10 +47,14 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
 
     const handleDecode = async (decodedText: string) => {
         let extractedText = decodedText.trim();
+        let isBridgeToken = false;
         
         try {
             // Check if it's a URL and extract 'address' or 'token' if present
             const url = new URL(extractedText);
+            if (url.searchParams.has('token') || url.pathname.includes('bridge')) {
+                isBridgeToken = true;
+            }
             extractedText = url.searchParams.get('address') ?? url.searchParams.get('token') ?? extractedText;
         } catch {
             // Not a URL, check for ethereum: prefix
@@ -58,7 +63,12 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
             }
         }
 
-        if (onScanSuccess) {
+        // If the extracted text is a 64-character hex token, it's also a bridge token
+        if (/^[a-fA-F0-9]{64}$/.test(extractedText)) {
+            isBridgeToken = true;
+        }
+
+        if (onScanSuccess && !isBridgeToken) {
             await stopCamera();
             onScanSuccess(extractedText);
             return;
@@ -103,8 +113,16 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 scannerRef.current = scanner;
 
                 const config = {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 }
+                    fps: 20,
+                    qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+                        const min = Math.min(viewfinderWidth, viewfinderHeight);
+                        const size = Math.floor(min * 0.75);
+                        return { width: size, height: size };
+                    },
+                    aspectRatio: 1.0,
+                    experimentalFeatures: {
+                        useBarCodeDetectorIfSupported: true
+                    }
                 };
 
                 await scanner.start(
@@ -202,7 +220,14 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     </div>
                 ) : projectData ? (
                     <div className="p-6 bg-white rounded-3xl border border-black/10 shadow-xl">
-                        <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(projectData.linkUrl)}&color=000000&bgcolor=ffffff`} alt="QR" className="w-[220px] h-[220px] object-contain" />
+                        <QRCodeSVG
+                            value={projectData.linkUrl}
+                            size={220}
+                            fgColor="#000000"
+                            bgColor="#FFFFFF"
+                            level="H"
+                            includeMargin={false}
+                        />
                     </div>
                 ) : (
                     <button onClick={generateQr} className="px-6 py-3 bg-black text-white font-black uppercase tracking-widest text-[11px] rounded-xl active:scale-95 transition-all">
