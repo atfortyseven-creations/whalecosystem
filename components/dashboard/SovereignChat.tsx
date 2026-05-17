@@ -5,7 +5,7 @@ import { useWalletClient } from 'wagmi';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { ethers } from 'ethers';
-import { QrCode, X, ChevronLeft } from 'lucide-react';
+import { QrCode, X, ChevronLeft, Menu, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
 import SidebarNavigation from '@/components/chat/SidebarNavigation';
@@ -136,6 +136,7 @@ export default function SovereignChat() {
   const [showScanner, setShowScanner]   = useState(false);
   const [scannerTab, setScannerTab]     = useState<'scan' | 'my-qr'>('scan');
   const [activeFolder, setActiveFolder] = useState('all');
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   // ── Conversations & Messages ─────────────────────────────────────────────
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -609,6 +610,32 @@ export default function SovereignChat() {
         </div>
       )}
 
+      {/* Mobile Sidebar Drawer */}
+      {showMobileSidebar && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex md:hidden">
+          <div className="bg-white w-[240px] h-full shadow-2xl flex flex-col relative border-r border-black/10">
+            <button
+              onClick={() => setShowMobileSidebar(false)}
+              className="absolute top-4 right-4 text-black/50 hover:text-black z-50 p-1 bg-black/5 rounded-full"
+            >
+              <X size={16} />
+            </button>
+            <SidebarNavigation
+              activeFolder={activeFolder}
+              onSelectFolder={(folder) => {
+                setActiveFolder(folder);
+                setShowMobileSidebar(false);
+              }}
+              onOpenSettings={() => {
+                setShowSettings(true);
+                setShowMobileSidebar(false);
+              }}
+            />
+          </div>
+          <div className="flex-1" onClick={() => setShowMobileSidebar(false)} />
+        </div>
+      )}
+
       {/* 1 – Folders Rail */}
       <div className="hidden md:flex">
         <SidebarNavigation
@@ -621,6 +648,21 @@ export default function SovereignChat() {
       {/* 2 – Conversation List */}
       <div className={`w-full md:w-[280px] border-r border-black/8 flex-col shrink-0 bg-white ${activeConv ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-black/6 space-y-3">
+          <div className="flex items-center justify-between mb-3 md:hidden">
+            <button
+              onClick={() => setShowMobileSidebar(true)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-black/[0.04] border border-black/10 rounded-xl font-mono text-[11px] font-bold uppercase tracking-widest text-black hover:bg-black/[0.08] transition-all"
+            >
+              <Menu size={16} />
+              <span>{activeFolder === 'all' ? 'All Chats' : 'Secret ZK'}</span>
+            </button>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-1.5 bg-black/[0.04] border border-black/10 rounded-xl text-black hover:bg-black/[0.08] transition-all"
+            >
+              <Settings size={16} />
+            </button>
+          </div>
 
           <div className="flex gap-2">
             <input
