@@ -3,16 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Cpu, Zap, QrCode, ChevronRight, Loader2, CheckCircle2, Wallet, Radio, Terminal, Lock } from 'lucide-react';
-import { useAccount, useConnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { useUIStore } from '@/lib/store/ui-store';
 
 
 export function ConnectWalletModal() {
     const { isConnectModalOpen, closeConnectModal } = useUIStore();
-    const { isConnected } = useAccount();
-    const { connect, connectors } = useConnect();
+    const { isConnected, address } = useAccount();
+    const { connect, connectors, connectAsync } = useConnect();
     const { open: openAppKit } = useAppKit();
+    const { disconnect, disconnectAsync } = useDisconnect();
     const [view, setView] = useState<'selection' | 'qr' | 'ledger'>('selection');
     const [qrData, setQrData] = useState<string | null>(null);
     const [isPolling, setIsPolling] = useState(false);
@@ -58,15 +59,29 @@ export function ConnectWalletModal() {
 
     // \u2500\u2500 Smart connector detector \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
     // Priority: exact SDK ID > injected window.ethereum > AppKit fallback
-    const connectViaExtension = (ids: string[]) => {
+    const connectViaExtension = async (ids: string[]) => {
         if (typeof window === 'undefined') return;
+
+        // Clear any stale Wagmi/AppKit state before connecting
+        if (isConnected || address) {
+            try {
+                await disconnectAsync();
+            } catch (e) {
+                disconnect();
+            }
+        }
+
         const hasEthereum = typeof (window as any).ethereum !== 'undefined';
         const found = connectors.find(c => ids.includes(c.id));
-        if (found) { connect({ connector: found }); return; }
+        if (found) { 
+            try { await connectAsync({ connector: found }); return; } catch(e) {}
+        }
         // Try injected if window.ethereum exists (extension active in this tab)
         if (hasEthereum) {
             const injected = connectors.find(c => c.id === 'injected');
-            if (injected) { connect({ connector: injected }); return; }
+            if (injected) { 
+                try { await connectAsync({ connector: injected }); return; } catch(e) {}
+            }
         }
         // Nothing found locally — fall back to AppKit (QR/WalletConnect flow)
         openAppKit({ view: 'Connect' });

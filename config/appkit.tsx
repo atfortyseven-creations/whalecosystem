@@ -205,7 +205,6 @@ try {
                 onramp: true,
                 send: true,
                 receive: true,
-                reownAuthentication: false,
             },
             themeMode: 'dark',
             themeVariables: {
@@ -219,7 +218,7 @@ try {
             enableEIP6963: true, // ⚡ FAST INJECT: Bypass polling by using standard EIP-6963 window events
             enableWalletConnect: true,
             enableCoinbase: true,
-            allWallets: 'HIDE', // ⚡ INSTANT QR: Prevents downloading the 3MB+ Reown Wallet Registry JSON. This makes the modal open instantaneously.
+            allWallets: 'SHOW', // ⚡ fixed to SHOW to prevent MetaMask freeze
             customWallets: []
         });
     }

@@ -561,7 +561,7 @@ export function MobileLanding() {
   const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
   const { connect, connectAsync, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
-  const { disconnect } = useDisconnect();
+  const { disconnect, disconnectAsync } = useDisconnect();
   const { reconnect } = useReconnect();
   const { open: rkOpenModal, close: rkCloseModal } = useAppKit();
 
@@ -1138,7 +1138,7 @@ export function MobileLanding() {
           <div className="w-full flex flex-col gap-3">
             {(() => {
               // Helper: open the correct wallet flow
-              const openWalletModal = (walletId: string) => {
+              const openWalletModal = async (walletId: string) => {
                 if (isLinked && effectiveAddress) return;
 
                 setConnecting(walletId);
@@ -1146,11 +1146,36 @@ export function MobileLanding() {
                 setWcDeepLink(null);
                 setShowFallbackBtn(false);
 
+                // Clear any stale Wagmi/AppKit state before connecting
+                // This fixes the "ERROR SIMULATION UNAVAILABLE" on Rainbow's second login
+                // by forcing a clean WalletConnect session request.
+                if (isConnected || address) {
+                  try {
+                    await disconnectAsync();
+                  } catch (e) {
+                    disconnect();
+                  }
+                }
+
                 // Set wakeup flags before switching to wallet app
                 try {
                   localStorage.setItem('sovereign_pending_wakeup', '1');
                   sessionStorage.setItem('sovereign_show_reconnect', '1');
                 } catch {}
+
+                if (walletId === 'metamask') {
+                    // Try to connect using injected connector directly to bypass AppKit hang
+                    const mm = connectors.find(c => c.id === 'metaMaskSDK' || c.id === 'metaMask' || c.name === 'MetaMask' || c.id === 'injected');
+                    if (mm) {
+                        try {
+                            await connectAsync({ connector: mm });
+                            setConnecting(null);
+                            return;
+                        } catch (e) {
+                            console.warn('MetaMask direct connect failed, falling back to AppKit', e);
+                        }
+                    }
+                }
 
                 // Pure AppKit usage to avoid deep-link hangs
                 rkOpenModal({ view: 'Connect' });
