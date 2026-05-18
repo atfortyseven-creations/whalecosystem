@@ -114,8 +114,12 @@ export function useSovereignAccount() {
     // The privateKey is NOT in memory (not persisted for security), but address is safe.
     // The portfolio can still load data using the address; user will need to re-enter password
     // to sign transactions.
+    // CRITICAL: sessionStorage is not available on the server (SSR). Guard with typeof check.
     const sessionRestoredAddr = sessionAddress || storeAddress;
-    if (sessionRestoredAddr && sessionStorage.getItem('portfolio_unlocked') === 'true') {
+    const isSessionUnlocked = typeof window !== 'undefined'
+        ? sessionStorage.getItem('portfolio_unlocked') === 'true'
+        : false;
+    if (sessionRestoredAddr && isSessionUnlocked) {
         return {
             address: sessionRestoredAddr as `0x${string}`,
             isConnected: true,
