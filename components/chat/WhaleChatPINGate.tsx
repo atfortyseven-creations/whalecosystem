@@ -9,6 +9,7 @@ import { useWalletStore } from '@/lib/store/wallet-store';
 import { ArrowLeft, Delete, LogOut, RefreshCw, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Storage keys
@@ -307,21 +308,32 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
         className="relative z-10 w-full max-w-[420px] mx-auto px-6 flex flex-col items-center"
       >
 
-        {/* ── GIF ── */}
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-6"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/system-shots/original-510ee2686e0287925ae0424ca40901f5.gif"
-            alt="Whale Chat"
-            className="w-40 h-40 object-contain mx-auto rounded-[28px]"
-            draggable={false}
-          />
-        </motion.div>
+        {/* ── LOTTIE & GIF ── */}
+        <div className="relative mb-8 flex flex-col items-center w-full">
+          <motion.div
+            initial={{ y: -20, opacity: 0, scale: 0.8 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            transition={{ delay: 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="z-20 relative -mb-10 bg-white w-24 h-24 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/[0.04]"
+          >
+            <RemoteLottie path="system-shots/Paper airplane.json" className="w-14 h-14" />
+          </motion.div>
+
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 w-full flex justify-center"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/system-shots/original-510ee2686e0287925ae0424ca40901f5.gif"
+              alt="Whale Chat"
+              className="w-72 h-72 object-contain mx-auto rounded-[36px] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-black/[0.04]"
+              draggable={false}
+            />
+          </motion.div>
+        </div>
 
         {/* ── Address pill ── */}
         <motion.div

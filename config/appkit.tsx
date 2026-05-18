@@ -98,7 +98,8 @@ const queryClient = new QueryClient()
 //
 // [MOBILE-HARDENING] Resolve canonical URL dynamically from window location.
 // This prevents 'Domain Mismatch' errors on preview/deployment URLs.
-const CANONICAL_APP_URL = 'https://humanidfi.com';
+const CANONICAL_APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
+
 
 const metadata = {
     name: 'Whale Alert Network',
