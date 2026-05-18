@@ -58,21 +58,36 @@ export default function MessageEngine({
 
   return (
     <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1 scroll-smooth" onClick={closeMenu}>
-      {messages
-        .filter(msg => !(typeof msg.content === 'string' && msg.content.includes('initiatedByInboxId')))
-        .map(msg => {
-          const replyToMsg = msg.replyToId ? messages.find(m => m.id === msg.replyToId) : undefined;
-          return (
-            <MessageBubble
-              key={msg.id}
-              msg={msg}
-              replyToMsg={replyToMsg}
-              onContextMenu={(e) => openMenu(e, msg.id, msg.content)}
-              onReact={onReact}
-              settings={settings}
-            />
-          );
-        })}
+      {(() => {
+        let lastDate = '';
+        return messages
+          .filter(msg => !(typeof msg.content === 'string' && msg.content.includes('initiatedByInboxId')))
+          .map((msg, index) => {
+            const dateObj = new Date(msg.sentAt);
+            const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+            const showDate = dateStr !== lastDate;
+            lastDate = dateStr;
+            const replyToMsg = msg.replyToId ? messages.find(m => m.id === msg.replyToId) : undefined;
+            return (
+              <React.Fragment key={msg.id}>
+                {showDate && (
+                  <div className="flex justify-center my-6">
+                    <div className="bg-black/[0.03] border border-black/[0.06] px-4 py-1.5 rounded-full shadow-sm">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/50">{dateStr}</span>
+                    </div>
+                  </div>
+                )}
+                <MessageBubble
+                  msg={msg}
+                  replyToMsg={replyToMsg}
+                  onContextMenu={(e) => openMenu(e, msg.id, msg.content)}
+                  onReact={onReact}
+                  settings={settings}
+                />
+              </React.Fragment>
+            );
+          });
+      })()}
       <div ref={bottomRef} />
 
       {/* Floating Context Menu */}
@@ -107,6 +122,9 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
 
   const match = typeof msg.content === 'string' ? msg.content.match(/^\[ATTACHMENT:([^\]]*)\](.*?)\|(.*)$/is) : null;
   const attachment = match ? { mime: match[1] || 'application/octet-stream', url: match[2], name: match[3] } : null;
+
+  const locMatch = typeof msg.content === 'string' ? msg.content.match(/^\[LOCATION\](.*)$/) : null;
+  const isLocation = !!locMatch;
 
   return (
     <div className={`flex flex-col max-w-[75%] ${msg.isMine ? 'self-end items-end ml-auto' : 'self-start items-start'}`}>
@@ -154,6 +172,20 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
 
         {attachment ? (
           <AttachmentRenderer attachment={attachment} isMine={msg.isMine} />
+        ) : isLocation && locMatch ? (
+          <div className={`mt-1 relative group cursor-pointer overflow-hidden rounded-xl shadow-sm border ${msg.isMine ? 'border-white/10' : 'border-black/5'}`}>
+             <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locMatch[1])}`} target="_blank" rel="noopener noreferrer" className={`block p-3 transition-colors ${msg.isMine ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
+               <div className="flex items-center gap-3">
+                 <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${msg.isMine ? 'bg-white/20' : 'bg-black/10'}`}>
+                   📍
+                 </div>
+                 <div>
+                   <p className={`font-mono text-[12px] font-bold ${msg.isMine ? 'text-white' : 'text-black'}`}>Ubicación Compartida</p>
+                   <p className={`font-mono text-[9px] uppercase mt-0.5 truncate max-w-[150px] ${msg.isMine ? 'text-white/60' : 'text-black/50'}`}>{locMatch[1]}</p>
+                 </div>
+               </div>
+             </a>
+          </div>
         ) : (
           <p className="leading-relaxed break-words whitespace-pre-wrap font-mono" style={{ fontSize: ((settings?.textSize ?? 4) * 2 + 6) + 'px' }}>
             {settings?.privacyMode === 'stealth' ? msg.content.replace(/[a-zA-Z0-9]/g, '*') : msg.content}

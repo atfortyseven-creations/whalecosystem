@@ -5,7 +5,7 @@ import { useWalletClient } from 'wagmi';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { ethers } from 'ethers';
-import { QrCode, X, ChevronLeft, Menu, Settings, LogOut, ArrowLeft } from 'lucide-react';
+import { QrCode, X, ChevronLeft, Menu, Settings, LogOut, ArrowLeft, UserX, UserCheck, Download, Trash2, UserPlus, User, MoreVertical } from 'lucide-react';
 import { useDisconnect } from 'wagmi';
 import { toast } from 'sonner';
 import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
@@ -39,6 +39,35 @@ interface Conversation {
   folder: string;
   lastMessage?: string;
   unread: number;
+}
+
+// ── Contact/Block helpers ─────────────────────────────────────────────────
+
+function getBlockedList(): string[] {
+  try { return JSON.parse(localStorage.getItem('sovereign_blocked') || '[]'); } catch { return []; }
+}
+function setBlockedList(list: string[]) {
+  localStorage.setItem('sovereign_blocked', JSON.stringify(list));
+}
+function getContacts(): Record<string, string> {
+  try { return JSON.parse(localStorage.getItem('sovereign_contacts') || '{}'); } catch { return {}; }
+}
+function setContacts(contacts: Record<string, string>) {
+  localStorage.setItem('sovereign_contacts', JSON.stringify(contacts));
+}
+function exportChat(messages: RenderableMessage[], peerAddress: string) {
+  const lines = messages.map(m => {
+    const date = new Date(m.sentAt).toLocaleString();
+    const sender = m.isMine ? 'Me' : peerAddress.slice(0, 8) + '...';
+    return `[${date}] ${sender}: ${m.content}`;
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `whale-chat-${peerAddress.slice(0, 8)}-${Date.now()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ── Auto-destruct helpers ─────────────────────────────────────────────────
@@ -193,6 +222,15 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   const [scannerTab, setScannerTab]     = useState<'scan' | 'my-qr'>('scan');
   const [activeFolder, setActiveFolder] = useState('all');
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [showPeerMenu, setShowPeerMenu] = useState(false);
+  const [blockedList, setBlockedListState] = useState<string[]>([]);
+  const [contacts, setContactsState] = useState<Record<string, string>>({});
+
+  // Load blocked + contacts on mount
+  useEffect(() => {
+    setBlockedListState(getBlockedList());
+    setContactsState(getContacts());
+  }, []);
 
   // ── Conversations & Messages ─────────────────────────────────────────────
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -625,6 +663,56 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     if (target) setReplyingTo({ id: messageId, preview: target.content.slice(0, 60) });
   };
 
+  // ── Peer management actions ───────────────────────────────────────────────
+  const toggleBlock = (peerAddr: string) => {
+    const norm = peerAddr.toLowerCase();
+    const current = getBlockedList();
+    const isBlocked = current.includes(norm);
+    const next = isBlocked ? current.filter(a => a !== norm) : [...current, norm];
+    setBlockedList(next);
+    setBlockedListState(next);
+    toast.success(isBlocked ? 'User unblocked.' : 'User blocked. Messages filtered.');
+  };
+
+  const addToContacts = (peerAddr: string) => {
+    const alias = prompt(`Save alias for ${peerAddr.slice(0, 10)}...`, peerAddr.slice(0, 6) + '...' + peerAddr.slice(-4));
+    if (!alias) return;
+    const updated = { ...getContacts(), [peerAddr.toLowerCase()]: alias };
+    setContacts(updated);
+    setContactsState(updated);
+    // Update displayName in conversation list
+    setConversations(prev => prev.map(c =>
+      c.peerAddress.toLowerCase() === peerAddr.toLowerCase() ? { ...c, displayName: alias } : c
+    ));
+    if (activeConv?.peerAddress.toLowerCase() === peerAddr.toLowerCase()) {
+      setActiveConv(prev => prev ? { ...prev, displayName: alias } : null);
+    }
+    toast.success(`Saved as "${alias}"`);
+  };
+
+  const clearChat = (peerAddr: string) => {
+    if (!address) return;
+    const normAddr = address.toLowerCase();
+    // Mark all current messages as deleted
+    const currentIds = messages.map(m => m.id);
+    try {
+      const delRaw = localStorage.getItem(`whale_chat_deleted_${normAddr}`);
+      const deleted: string[] = delRaw ? JSON.parse(delRaw) : [];
+      const combined = Array.from(new Set([...deleted, ...currentIds]));
+      localStorage.setItem(`whale_chat_deleted_${normAddr}`, JSON.stringify(combined));
+    } catch {}
+    setMessages([]);
+    toast.success('Chat cleared locally.');
+  };
+
+  const deleteConversation = (peerAddr: string) => {
+    clearChat(peerAddr);
+    setConversations(prev => prev.filter(c => c.peerAddress.toLowerCase() !== peerAddr.toLowerCase()));
+    setActiveConv(null);
+    setShowPeerMenu(false);
+    toast.success('Conversation removed.');
+  };
+
   // ── Start new conversation ────────────────────────────────────────────────
   const startConversation = (addressOverride?: string) => {
     const addr = (addressOverride ?? newPeer).trim();
@@ -633,9 +721,10 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
       alert('Please enter a valid Ethereum address (0x...)');
       return;
     }
+    const contactAlias = contacts[addr.toLowerCase()];
     const conv: Conversation = {
       peerAddress: addr,
-      displayName: addr.slice(0, 6) + '...' + addr.slice(-4),
+      displayName: contactAlias || addr.slice(0, 6) + '...' + addr.slice(-4),
       folder: 'all',
       unread: 0,
     };
@@ -646,12 +735,14 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     if (!existing) {
       setConversations(prev => [conv, ...prev]);
     }
-    
+
     setActiveConv(targetConv);
     setNewPeer('');
   };
 
-  const filteredConvs = activeFolder === 'all' ? conversations : conversations.filter(c => c.folder === activeFolder);
+  // Filter blocked peers from conversation list incoming messages
+  const filteredConvs = (activeFolder === 'all' ? conversations : conversations.filter(c => c.folder === activeFolder))
+    .filter(c => !blockedList.includes(c.peerAddress.toLowerCase()));
 
   // ── Theme-driven background is handled via CSS variables in globals.css ────────
 
@@ -680,7 +771,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-1 w-full h-full text-black overflow-hidden chat-theme-wrapper" data-chat-theme={settings.theme} data-privacy={settings.privacyMode}>
+    <div className="flex flex-1 w-full h-full text-black overflow-hidden chat-theme-wrapper" data-chat-theme={settings.theme} data-privacy={settings.privacyMode} onClick={() => showPeerMenu && setShowPeerMenu(false)}>
 
       {/* Settings overlay */}
       {showSettings && (
@@ -904,21 +995,54 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
         {activeConv ? (
           <>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-black/6 bg-white shrink-0 pt-[calc(1rem+env(safe-area-inset-top))]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-black/6 bg-white shrink-0 pt-[calc(1rem+env(safe-area-inset-top))] relative">
               <div className="flex items-center gap-3">
                 <button onClick={() => setActiveConv(null)} className="md:hidden p-2 -ml-3 text-black/50 hover:text-black transition-colors rounded-full hover:bg-black/5">
                   <ChevronLeft size={24} />
                 </button>
+                <div className="w-9 h-9 rounded-full bg-black/8 border border-black/10 flex items-center justify-center font-mono text-[13px] font-bold text-black shrink-0">
+                  {activeConv.displayName.slice(0, 2).toUpperCase()}
+                </div>
                 <div>
                   <p className="font-mono text-[14px] font-bold text-black">{activeConv.displayName}</p>
                   <p className={`font-mono text-[10px] font-bold mt-0.5 uppercase tracking-widest ${sending || isUploading ? 'text-black/50' : 'text-emerald-500'}`}>
-                    {sending || isUploading ? 'Typing...' : 'Online'}
+                    {blockedList.includes(activeConv.peerAddress.toLowerCase()) ? <span className="text-red-400">Blocked</span> : sending || isUploading ? 'Typing...' : 'End-to-end encrypted'}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* Radar Removed */}
+                <button
+                  onClick={() => setShowPeerMenu(p => !p)}
+                  className="w-9 h-9 rounded-xl bg-black/[0.03] border border-black/8 flex items-center justify-center text-black/50 hover:text-black hover:bg-black/[0.07] transition-all"
+                  title="Peer options"
+                >
+                  <MoreVertical size={17} />
+                </button>
               </div>
+
+              {/* Peer Profile Dropdown */}
+              {showPeerMenu && (
+                <div className="absolute right-4 top-full mt-2 z-[200] bg-white border border-black/8 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.13)] w-[230px] flex flex-col py-2 overflow-hidden" onClick={e => e.stopPropagation()}>
+                  {/* Address badge */}
+                  <div className="px-4 py-3 border-b border-black/6 mb-1">
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-black/30 mb-0.5">Wallet Address</p>
+                    <p className="font-mono text-[11px] font-bold text-black break-all">{activeConv.peerAddress.slice(0,10)}...{activeConv.peerAddress.slice(-6)}</p>
+                  </div>
+                  {[
+                    { icon: UserPlus, label: contacts[activeConv.peerAddress.toLowerCase()] ? 'Edit Contact' : 'Add to Contacts', action: () => { addToContacts(activeConv.peerAddress); setShowPeerMenu(false); } },
+                    { icon: Download, label: 'Export Chat', action: () => { exportChat(messages, activeConv.peerAddress); setShowPeerMenu(false); toast.success('Chat exported.'); } },
+                    { icon: Trash2, label: 'Clear Chat', action: () => { clearChat(activeConv.peerAddress); setShowPeerMenu(false); } },
+                    { icon: blockedList.includes(activeConv.peerAddress.toLowerCase()) ? UserCheck : UserX, label: blockedList.includes(activeConv.peerAddress.toLowerCase()) ? 'Unblock User' : 'Block User', action: () => { toggleBlock(activeConv.peerAddress); setShowPeerMenu(false); }, warn: true },
+                    { icon: X, label: 'Delete Conversation', action: () => deleteConversation(activeConv.peerAddress), danger: true },
+                  ].map(({ icon: Icon, label, action, warn, danger }) => (
+                    <button key={label} onClick={action} className={`flex items-center gap-3 px-4 py-2.5 text-[12px] font-mono transition-all ${
+                      danger ? 'text-red-500 hover:bg-red-50' : warn ? 'text-amber-600 hover:bg-amber-50' : 'text-black/60 hover:bg-black/[0.04] hover:text-black'
+                    }`}>
+                      <Icon size={14} />{label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-1 min-h-0">
