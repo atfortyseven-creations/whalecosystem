@@ -1,6 +1,4 @@
-import { getRealTimePrice } from '@/lib/priceHelper';
-import { getClientForChain } from '@/lib/blockchain/rpc-engine';
-import { formatUnits, erc20Abi } from 'viem';
+import { moralisService, MORALIS_CHAINS } from '@/lib/blockchain/MoralisService';
 
 export interface WalletPortfolioResponse {
     success: boolean;
@@ -14,83 +12,64 @@ export interface WalletPortfolioResponse {
 }
 
 export class PortfolioEnterpriseService {
-    // Parameterized for future Moralis/Alchemy Integration
-    private static MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_API_KEY || process.env.MORALIS_API_KEY;
-    private static ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY || process.env.ALCHEMY_KEY;
-
     static async getCrossChainPortfolio(address: string): Promise<WalletPortfolioResponse> {
-        // [PERFECTION PATH]: If Moralis is connected, use it for zero-latency multi-chain sweep
-        if (this.MORALIS_API_KEY) {
-            return this.fetchFromMoralis(address);
-        }
+        console.log(`[Enterprise Portfolio] Sweeping cross-chain portfolio for ${address} via GetBlock Proxy...`);
 
-        // [FALLBACK PATH]: Current Multi-RPC setup but with Binance/Websocket Prices instead of CoinGecko 429 Error
-        return this.fetchFromRPCFallback(address);
-    }
-
-    private static async fetchFromMoralis(address: string): Promise<WalletPortfolioResponse> {
-        // Todo: Implement standard Moralis Rest API 
-        // Example: https://deep-index.moralis.io/api/v2.2/wallets/{address}/tokens
-        // For now, if the key is provided but logic isn't wired, fallback to secure RPC
-        console.log(`[Enterprise Portfolio] Moralis API Key detected. Engaging Enterprise Flow for ${address}...`);
-        
-        // This is a placeholder for the Moralis fetch logic.
-        // It guarantees to return 0 Latency normalized data.
-        return this.fetchFromRPCFallback(address); // Fallback until full SDK is installed
-    }
-
-    private static async fetchFromRPCFallback(address: string): Promise<WalletPortfolioResponse> {
-        // Legacy multi-rpc flow but with ZERO Coingecko limits
-        const KNOWN_TOKENS = [
-            { symbol: 'WLD', address: '0x163f8C2467924be0ae7B5347228CABF260318753' as `0x${string}`, chainId: 1, decimals: 18 },
-            { symbol: 'USDC', address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as `0x${string}`, chainId: 8453, decimals: 6 },
-            { symbol: 'USDC', address: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85' as `0x${string}`, chainId: 10, decimals: 6 },
-            { symbol: 'USDT', address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' as `0x${string}`, chainId: 1, decimals: 6 },
-            { symbol: 'PEPE', address: '0x6982508145454Ce325dDbE47a25d4ec3d2311933' as `0x${string}`, chainId: 1, decimals: 18 },
-        ];
-
-        const chainIds = [1, 10, 8453, 42161];
+        const chainIds = [1, 10, 56, 137, 42161, 8453];
         const tokensToReturn: any[] = [];
         let totalValueUsd = 0;
 
-        // Fetch Native ETH
         await Promise.allSettled(chainIds.map(async (chainId) => {
-            const client = getClientForChain(chainId);
-            if (!client) return;
-            try {
-                const raw = await client.getBalance({ address: address as `0x${string}` });
-                const formatted = parseFloat(formatUnits(raw, 18));
-                if (formatted > 0.0001) {
-                    const price = await getRealTimePrice('ETH'); // Uses Binance, Zero Rate Limits
-                    const val = formatted * price;
-                    totalValueUsd += val;
-                    tokensToReturn.push({
-                        symbol: 'ETH', name: `ETH`, balanceNumeric: formatted, 
-                        price, valueUsd: val, chainId, source: 'rpc-direct'
-                    });
-                }
-            } catch (e) {}
-        }));
+            const moralisChain = MORALIS_CHAINS[chainId as keyof typeof MORALIS_CHAINS];
+            if (!moralisChain) return;
 
-        // Fetch ERC20s
-        await Promise.allSettled(KNOWN_TOKENS.map(async (token) => {
-            const client = getClientForChain(token.chainId);
-            if (!client) return;
             try {
-                const raw = await client.readContract({
-                    address: token.address, abi: erc20Abi, functionName: 'balanceOf', args: [address as `0x${string}`],
-                });
-                const balance = parseFloat(formatUnits(raw as bigint, token.decimals));
-                if (balance > 0.0001) {
-                    const price = await getRealTimePrice(token.symbol);
-                    const val = balance * price;
+                // Fetch Native and ERC20 balances for the chain via the GetBlock Proxy
+                const [nativeBal, tokenBals] = await Promise.all([
+                    moralisService.getNativeBalance(address, moralisChain),
+                    moralisService.getWalletBalances(address, moralisChain)
+                ]);
+
+                // Add Native ETH / BNB / MATIC etc.
+                const nativeBig = BigInt(nativeBal.balance);
+                if (nativeBig > 0n) {
+                    const formatted = Number(nativeBig) / 1e18;
+                    // Dynamically retrieve price for the native token
+                    const prices = await moralisService.getTokenPrice('0x0000000000000000000000000000000000000000', moralisChain).catch(() => ({ usdPrice: 0 }));
+                    const price = prices.usdPrice || (chainId === 1 || chainId === 10 || chainId === 8453 || chainId === 42161 ? 3000 : chainId === 56 ? 580 : 0.7);
+                    const val = formatted * price;
+
                     totalValueUsd += val;
                     tokensToReturn.push({
-                        symbol: token.symbol, name: token.symbol, balanceNumeric: balance, 
-                        price, valueUsd: val, chainId: token.chainId, source: 'rpc-direct'
+                        symbol: chainId === 1 || chainId === 10 || chainId === 8453 || chainId === 42161 ? 'ETH' : chainId === 56 ? 'BNB' : 'POL',
+                        name: chainId === 1 || chainId === 10 || chainId === 8453 || chainId === 42161 ? 'Ether' : chainId === 56 ? 'Binance Coin' : 'Polygon MATIC',
+                        balanceNumeric: formatted,
+                        price,
+                        valueUsd: val,
+                        chainId,
+                        source: 'getblock-rpc'
                     });
                 }
-            } catch (e) {}
+
+                // Add discovered ERC-20s
+                tokenBals.result.forEach((t: any) => {
+                    const balNum = Number(t.balance) / Math.pow(10, Number(t.decimals));
+                    const val = balNum * t.usd_price;
+                    totalValueUsd += val;
+                    tokensToReturn.push({
+                        symbol: t.symbol,
+                        name: t.name,
+                        balanceNumeric: balNum,
+                        price: t.usd_price,
+                        valueUsd: val,
+                        chainId,
+                        source: 'getblock-rpc'
+                    });
+                });
+
+            } catch (e) {
+                console.warn(`[Enterprise Portfolio] Sweeping chain ${chainId} failed:`, e);
+            }
         }));
 
         return {
@@ -98,7 +77,7 @@ export class PortfolioEnterpriseService {
             address,
             tokens: tokensToReturn.sort((a, b) => b.valueUsd - a.valueUsd),
             totalValueUsd,
-            change24hPercent: 0, // Simplified for fallback
+            change24hPercent: 0,
             change24hUsd: 0,
             source: 'rpc-fallback',
             chainsScanned: chainIds

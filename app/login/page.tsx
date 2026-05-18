@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -127,7 +127,7 @@ function ScrollHint() {
 
 // ── Connect Panel (Panel 2) ────────────────────────────────────────────────────
 function ConnectPanel() {
-  const { openConnectModal } = useConnectModal();
+  const { open: openConnectModal } = useAppKit();
   const { isConnected, address } = useAccount();
   const router = useRouter();
   const [showLocalLogin, setShowLocalLogin] = useState(false);
@@ -232,7 +232,7 @@ function ConnectPanel() {
             ) : (
               <div className="w-full flex flex-col gap-3">
                 <button
-                  onClick={() => openConnectModal?.()}
+                  onClick={() => openConnectModal()}
                   className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-3 group shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)] hover:scale-[1.02]"
                   style={{
                     background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(230,230,230,0.9) 100%)",

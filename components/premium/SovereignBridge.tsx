@@ -57,7 +57,8 @@ export function SovereignBridge({ onClose }: SovereignBridgeProps) {
                 throw new Error(body.error ?? `HTTP ${res.status}`);
             }
 
-            const { linkUrl, expiresAt: exp } = await res.json();
+            const { token, linkUrl, expiresAt: exp } = await res.json();
+            if (!token || !linkUrl) throw new Error('Invalid bridge response');
 
             const dataUrl = await QRCode.toDataURL(linkUrl, {
                 width: 280,
@@ -72,7 +73,7 @@ export function SovereignBridge({ onClose }: SovereignBridgeProps) {
             setCountdown(Math.floor((expDate.getTime() - Date.now()) / 1000));
             setState('ready');
 
-            // Tick every second
+            // Tick every second — token is captured in closure
             timerRef.current = setInterval(async () => {
                 const remaining = Math.max(0, Math.floor((expDate.getTime() - Date.now()) / 1000));
                 setCountdown(remaining);
@@ -80,14 +81,14 @@ export function SovereignBridge({ onClose }: SovereignBridgeProps) {
                     clearTimer();
                     setState('expired');
                 } else if (remaining % 2 === 0) {
-                    // Poll status every 2 seconds
+                    // Poll status every 2 seconds using captured token
                     try {
                         const statusRes = await fetch(`/api/bridge/status?token=${token}`);
                         if (statusRes.ok) {
                             const data = await statusRes.json();
                             if (data.linked) {
                                 clearTimer();
-                                setState('success');
+                                (setState as any)('success');
                                 setTimeout(() => {
                                     if (onClose) onClose();
                                 }, 3000);

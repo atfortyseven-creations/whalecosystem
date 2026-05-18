@@ -65,7 +65,7 @@ const HONEYPOT_PATTERNS = [
   '/api/env(.*)',
   '/api/keys(.*)',
   '/api/secret(.*)',
-  '/api/internal(.*)',
+  // Note: /api/internal removed — logAuditSafe POSTs to /api/internal/audit; blocking it would self-cancel audit writes.
   '/api/private(.*)',
   '/api/management(.*)',
   '/api/v1/admin(.*)',

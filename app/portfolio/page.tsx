@@ -231,8 +231,12 @@ export default function PortfolioPage() {
 
   const hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('sovereign_keystore') : false;
   const isQuantumUnlocked = !!privateKey;
-  
-  const needsGate = !isQuantumUnlocked && (!wagmiConnected || !sessionUnlocked);
+
+  // Gate logic:
+  // - If user has a live wagmi connection (Chrome/MetaMask/WalletConnect) → no gate needed
+  // - If user has decrypted local wallet → no gate needed  
+  // - If neither → show QuantumAuthGate to allow local wallet login or WalletConnect connect
+  const needsGate = !isQuantumUnlocked && !wagmiConnected;
 
   if (needsGate) {
     return (

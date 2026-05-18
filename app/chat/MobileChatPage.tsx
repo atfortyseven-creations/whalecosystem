@@ -7,8 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { UniversalEliteWallpaper } from "@/components/shared/UniversalEliteWallpaper";
 
 // SSR-unsafe — XMTP uses browser WASM
-const WhaleChat = dynamic(
-  () => import("@/components/dashboard/WhaleChat").then((m) => m.WhaleChat),
+const SovereignChat = dynamic(
+  () => import("@/components/dashboard/SovereignChat"),
   {
     ssr: false,
     loading: () => (
@@ -113,7 +113,7 @@ export default function MobileChatPage() {
 
             {/* Chat fills the remainder — perfectly centered */}
             <div className="flex-1 min-h-0 w-full overflow-hidden relative bg-transparent">
-              <WhaleChat forceAutoInit={false} />
+              <SovereignChat />
             </div>
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function MobileChatPage() {
 
         {/* Chat fills the remainder transparently — wallpaper shows through */}
         <div className="flex-1 min-h-0 overflow-hidden relative">
-          <WhaleChat forceAutoInit={false} />
+          <SovereignChat />
         </div>
       </div>
     </>
