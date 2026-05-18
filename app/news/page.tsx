@@ -4,6 +4,7 @@ import React from 'react';
 import { Globe } from 'lucide-react';
 import { NewsTerminal } from '@/components/news/NewsTerminal';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
 
 export default function WhaleNewsPage() {
   return (
@@ -16,6 +17,7 @@ export default function WhaleNewsPage() {
         <NewsTerminal />
       </div>
       
+      <WhaleChatLink />
       <SovereignFooter />
     </div>
   );

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
 import { motion, Variants } from 'framer-motion';
 import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 import { WhaleMissionLoader } from '@/components/shared/WhaleMissionLoader';
@@ -227,6 +228,7 @@ function ForumHomeContent() {
         </div>
       </div>
 
+      <WhaleChatLink />
       <SovereignFooter />
 
       {/* Semantic spacer so SovereignFooter content is not hidden behind the fixed mobile bottom nav */}

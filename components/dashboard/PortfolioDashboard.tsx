@@ -3,7 +3,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, ArrowDownRight, RefreshCcw, TrendingUp, Wallet, Loader2, PieChart, Activity, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus, Github, Twitter, Copy, ExternalLink, ArrowDownLeft, ArrowLeftRight } from 'lucide-react';
-import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
+import { useAppKit } from '@reown/appkit/react';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -29,14 +30,14 @@ function formatTXO(address: string, symbol: string | undefined): string {
 
 export default function PortfolioDashboard({ walletAddress }: { walletAddress?: string }) {
     const { open } = useAppKit();
-    const { isConnected: isWeb3Connected, address: web3Address } = useAppKitAccount();
+    const { address: web3Address } = useSovereignAccount();
     const isMobile = useIsMobile();
     
     // Integration with Encrypted Managed Identities
-    const { address: sovereignAddress, accounts, switchAccount } = useWalletStore();
+    const { accounts, switchAccount } = useWalletStore();
     
-    // Prioritize: 1. Passed Prop, 2. Web3 Connection, 3. Encrypted Managed Active Account
-    const effectiveAddress = walletAddress || web3Address || sovereignAddress;
+    // Prioritize: 1. Passed Prop, 2. Unified Connection
+    const effectiveAddress = walletAddress || web3Address;
     const isConnected = !!effectiveAddress;
 
     const {

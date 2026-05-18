@@ -2,12 +2,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType, IChartApi, AreaSeries } from 'lightweight-charts';
-import { useAppKitAccount } from '@reown/appkit/react';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 export const PerformanceChart: React.FC = () => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
-    const { address } = useAppKitAccount();
+    const { address } = useSovereignAccount();
     const [mode, setMode] = useState<'wallet' | 'market_index' | 'loading' | 'error'>('loading');
 
     useEffect(() => {

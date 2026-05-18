@@ -225,7 +225,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
     const handleInteractionLog = (e: MouseEvent) => {
         // Only log telemetry if the user is authenticated (connected)
-        const isConnected = !!useWalletStore.getState().address;
+        // Check both local wagmi store AND secure QR session cookies
+        const hasLocalWallet = !!useWalletStore.getState().address;
+        const hasSessionCookie = document.cookie.includes('sovereign_handshake=');
+        const isConnected = hasLocalWallet || hasSessionCookie;
         if (!isConnected) return;
 
         const target = e.target as HTMLElement;

@@ -40,7 +40,8 @@ import {
   X
 } from "lucide-react";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { useChainId, useSwitchChain, useAccount } from "wagmi";
+import { useChainId, useSwitchChain } from "wagmi";
+import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 
 import { useState, useEffect, useCallback } from "react";
 import { LegendaryTransactionModal } from "./LegendaryTransactionModal";
@@ -99,7 +100,7 @@ const SkeletonRow = () => (
 function ChainSelector() {
   const chainId = useChainId();
   const { chains, switchChain, isPending } = useSwitchChain();
-  const { isConnected, address } = useAccount();
+  const { isConnected, address } = useSovereignAccount();
   const [isOpen, setIsOpen] = useState(false);
 
   const current = chains.find((c) => c.id === chainId);
@@ -361,7 +362,7 @@ export default function PortfolioView({
   const [historyLoading, setHistoryLoading] = useState(false);
   const [isDark, setIsDark] = useState(true);
 
-  const { address: userAddress, isConnected } = useAppKitAccount();
+  const { address: userAddress, isConnected } = useSovereignAccount();
   const { mutate } = useSWRConfig();
   const { lastTx, connected: wsConnected } = useSmartWebSockets(userAddress || undefined);
 

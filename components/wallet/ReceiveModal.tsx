@@ -3,7 +3,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Copy, QrCode as QrIcon, Check, AlertCircle, ChevronDown, Search, ExternalLink } from "lucide-react";
-import { useAccount, useChains, useSwitchChain } from "wagmi";
+import { useChains, useSwitchChain } from "wagmi";
+import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 
 import { toast } from "sonner";
 import { TOKENS_BY_CHAIN } from "@/config/tokens";
@@ -17,7 +18,7 @@ interface ReceiveModalProps {
 }
 
 export default function ReceiveModal({ isOpen, onClose, address: propAddress }: ReceiveModalProps) {
-    const { address: wagmiAddress, chainId } = useAccount();
+    const { address: wagmiAddress, chainId } = useSovereignAccount();
     const address = propAddress || wagmiAddress;
     const chains = useChains();
     const { switchChain, isPending: isSwitching, isSuccess: isSwitchSuccess, error: switchError } = useSwitchChain();

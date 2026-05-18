@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, EyeOff, Lock, Network, Zap, Fingerprint, Activity, ChevronRight, RefreshCw, Layers } from 'lucide-react';
-import { useAccount, useBalance } from 'wagmi';
+import { useBalance } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 // Typings for Etherscan response
 interface EtherscanTx {
@@ -34,7 +35,7 @@ function statusFromConfirmations(conf: string): ShieldedNode['status'] {
 }
 
 export default function AztecPrivacyHub() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useSovereignAccount();
   const { data: balance } = useBalance({ address });
 
   const [nodes, setNodes] = useState<ShieldedNode[]>([]);

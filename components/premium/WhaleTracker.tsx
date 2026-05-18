@@ -6,7 +6,8 @@ import { TrendingUp, TrendingDown, Waves, AlertCircle, Star, Eye, Bell, Search, 
 // Sovereign SIWE — No Clerk dependency. Wallet identity via wagmi useAccount.
 import useSWR from 'swr';
 import { useVIPIntelligence } from '@/hooks/useVIPIntelligence';
-import { useAccount, usePublicClient } from 'wagmi';
+import { usePublicClient } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
@@ -87,7 +88,7 @@ export default function WhaleTracker({
   onSelectWallet,
   onTabChange
 }: WhaleTrackerProps) {
-  const { address: web3Address } = useAccount();
+  const { address: web3Address } = useSovereignAccount();
   const { isAuthenticated, isOwner, isPremium: authIsPremium, trialViews, viewedAddresses } = useAuth();
   const publicClient = usePublicClient();
 

@@ -4,6 +4,7 @@ import { getAcademyData } from "@/app/actions/academy-actions";
 import { AcademyInteractiveEngine } from "@/components/academy/AcademyInteractiveEngine";
 import { TOPIC_CATEGORIES } from "@/lib/data/academy-curriculum";
 import { SovereignFooter } from "@/components/landing/SovereignFooter";
+import { WhaleChatLink } from "@/components/shared/WhaleChatLink";
 
 export const revalidate = 60;
 
@@ -28,6 +29,7 @@ export default async function AcademyPage() {
                     isSeeded={isDatabaseSeeded}
                     expectedCategories={TOPIC_CATEGORIES.length} 
                 />
+                <WhaleChatLink />
                 <SovereignFooter />
             </div>
         </WhaleMissionLoader>

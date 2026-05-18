@@ -163,7 +163,7 @@ export default function ConnectPage() {
 
   useEffect(() => { if (!qrSession && mounted) initEphemeral(); }, [qrSession, initEphemeral, mounted]);
 
-  // QR poll
+  // QR poll — desktop side: waits for mobile to complete handshake, then hydrates session
   useEffect(() => {
     if (!qrSession || !ephemeral || syncStatus === "SYNCED") return;
     const poll = setInterval(async () => {
@@ -171,35 +171,70 @@ export default function ConnectPage() {
         const res = await fetch(`/api/auth/qr-poll?uuid=${qrSession}&t=${Date.now()}`, { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
+
+        // Payload received: either ECDH-encrypted or server-minted JWT
         if (data.encryptedPayload || data.serverJwt) {
-          setSyncStatus("SYNCED");
           clearInterval(poll);
           let jwt: string | null = null;
-          if (data.encryptedPayload && data.iv && ephemeral) {
+
+          // PATH A: Try to decrypt ECDH-encrypted JWT from mobile
+          if (data.encryptedPayload && data.iv && ephemeral && data.mobilePub) {
             try {
               const { deriveSharedSecret, decryptAESGCM } = await import('@/lib/web-crypto');
               let isECDHFlag = false;
               try { isECDHFlag = new URL(qrData).searchParams.get('ecdh') === '1'; } catch {}
-              const mobilePub = data.mobilePub;
-              if (mobilePub) {
-                const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, isECDHFlag);
-                if (data.encryptedPayload && data.iv) {
-                  const decrypted = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
-                  if (decrypted && decrypted.split('.').length === 3) jwt = decrypted;
-                }
-              }
-            } catch {}
+              const shared = await deriveSharedSecret(ephemeral.privateKey, data.mobilePub, isECDHFlag);
+              const decrypted = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
+              if (decrypted && decrypted.split('.').length === 3) jwt = decrypted;
+            } catch (decryptErr) {
+              console.warn('[QR:Desktop] ECDH decrypt failed, falling back to serverJwt:', decryptErr);
+            }
           }
+
+          // PATH B: Fall back to server-minted JWT (most common path for first-time mobile scan)
           if (!jwt && data.serverJwt) {
-            try { const { verifyJWT } = await import('@/lib/jwt'); await verifyJWT(data.serverJwt); jwt = data.serverJwt; } catch {}
+            try {
+              const { verifyJWT } = await import('@/lib/jwt');
+              await verifyJWT(data.serverJwt);
+              jwt = data.serverJwt;
+            } catch (verifyErr) {
+              console.warn('[QR:Desktop] serverJwt verification failed:', verifyErr);
+            }
           }
-          if (!jwt) { setSyncStatus("ERROR"); return; }
-          if (!data.kycVerified) return;
-          const hydrateRes = await fetch('/api/auth/qr-hydrate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jwt }) });
-          if (hydrateRes.ok) window.location.replace("/dashboard");
-          else setSyncStatus("ERROR");
+
+          if (!jwt) {
+            console.error('[QR:Desktop] No valid JWT obtained from handshake payload.');
+            setSyncStatus("ERROR");
+            return;
+          }
+
+          // ── CRITICAL FIX: Removed `if (!data.kycVerified) return;` ──
+          // kycVerified is NEVER set in the qr-mobile-link payload —
+          // this guard was silently blocking 100% of QR sessions from hydrating.
+          // The JWT contains the wallet address and clearance level, that's sufficient.
+
+          setSyncStatus("SYNCED");
+
+          // Hydrate desktop session with the JWT from mobile
+          const hydrateRes = await fetch('/api/auth/qr-hydrate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jwt })
+          });
+
+          if (hydrateRes.ok) {
+            // Small delay so the SYNCED animation plays before redirect
+            await new Promise(r => setTimeout(r, 800));
+            window.location.replace("/dashboard");
+          } else {
+            const errData = await hydrateRes.json().catch(() => ({}));
+            console.error('[QR:Desktop] Hydrate failed:', errData);
+            setSyncStatus("ERROR");
+          }
         }
-      } catch {}
+      } catch (pollErr) {
+        console.warn('[QR:Desktop] Poll error (will retry):', pollErr);
+      }
     }, 1000);
     return () => clearInterval(poll);
   }, [qrSession, ephemeral, qrData, syncStatus]);

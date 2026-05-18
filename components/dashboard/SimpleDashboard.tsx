@@ -1,14 +1,15 @@
 "use client";
 import React, { useMemo } from 'react';
 import { LayoutDashboard, TrendingUp, Wallet, Shield, Loader2 } from 'lucide-react';
-import { useAppKitAccount } from '@reown/appkit/react';
+import { useAppKit } from '@reown/appkit/react';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import useSWR from 'swr';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function SimpleDashboard() {
-    const { address, isConnected } = useAppKitAccount();
+    const { address, isConnected } = useSovereignAccount();
 
     const { data: stats, error, isLoading } = useSWR(
         isConnected && address ? `/api/whale/stats?address=${address}` : null,

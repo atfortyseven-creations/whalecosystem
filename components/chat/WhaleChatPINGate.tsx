@@ -323,16 +323,17 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           </motion.div>
 
           <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 w-full flex justify-center"
+            initial={{ y: -20, opacity: 0, scale: 0.9 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
+            className="relative z-10 w-full flex justify-center -mt-16 -mb-12 pointer-events-none"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/system-shots/original-510ee2686e0287925ae0424ca40901f5.gif"
               alt="Whale Chat"
-              className="w-[400px] h-[400px] object-contain mx-auto"
+              className="w-[600px] h-[600px] max-w-none object-contain mx-auto transform scale-125"
+              style={{ imageRendering: 'pixelated' }}
               draggable={false}
             />
           </motion.div>

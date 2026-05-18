@@ -1,5 +1,5 @@
 'use client';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 const OWNER_ADDRESSES = [
   // Map to verified wallet addresses for owner privileges
@@ -12,7 +12,7 @@ const OWNER_EMAILS = [
 ];
 
 export function useAuth() {
-  const { address, isConnected, status } = useAccount();
+  const { address, isConnected, status } = useSovereignAccount();
   
   const isLoaded = status !== 'connecting' && status !== 'reconnecting';
   const isAuthenticated = isConnected && !!address;

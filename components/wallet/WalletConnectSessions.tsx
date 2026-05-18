@@ -1,13 +1,15 @@
 "use client";
 
 import React from 'react';
-import { useAppKitAccount, useAppKitNetwork, useDisconnect } from '@reown/appkit/react';
+import { useAppKitNetwork, useDisconnect } from '@reown/appkit/react';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import NextLink from 'next/link';
 import { Shield, Link, Network, Cpu, LogOut, Activity, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function WalletConnectSessions() {
-    const { isConnected, address, caipAddress } = useAppKitAccount();
+    const { isConnected, address } = useSovereignAccount();
+    const caipAddress = `eip155:1:${address}`;
     const { caipNetwork } = useAppKitNetwork();
     const { disconnect } = useDisconnect();
 

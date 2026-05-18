@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Shield, Camera, Upload, Loader2, CheckCircle } from 'lucide-react';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 interface QRScannerModalProps {
@@ -208,7 +208,7 @@ function ScannedOverlay() {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress, initialScanData }: QRScannerModalProps) {
-  const { address } = useAccount();
+  const { address } = useSovereignAccount();
 
   const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error' | 'signing'>('idle');
   const [errMsg, setErrMsg]   = useState('');

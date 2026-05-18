@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Zap, Wallet, Layers, ChevronRight, Activity, Clock, Rocket, Turtle, Gauge, Cpu, Box } from 'lucide-react';
 import { Tooltip, ResponsiveContainer } from 'recharts';
 import { OMNI_CHAINS } from '@/lib/blockchain/OmniChainConstants';
@@ -235,7 +235,7 @@ function FeesPanel() {
 // PORTFOLIO PANEL
 // ──────────────────────────────────────────────────────────────────────────────
 function PortfolioPanel() {
-    const { address: connectedAddress } = useAccount();
+    const { address: connectedAddress } = useSovereignAccount();
     const [address, setAddress] = useState('');
     const [isScanning, setIsScanning] = useState(false);
     const [hasScanned, setHasScanned] = useState(false);

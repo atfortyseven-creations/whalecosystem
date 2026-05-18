@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Shield, Globe, Cpu, CheckCircle2, Clock, MapPin, DollarSign, Zap, Users, ChevronRight, Mail, Code } from 'lucide-react';
 import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
 import { motion } from 'framer-motion';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { OPEN_ROLES, BENEFITS } from './data';
@@ -195,6 +196,7 @@ export function CareersPageClient() {
           </div>
         </section>
       </div>
+      <WhaleChatLink />
       <SovereignFooter />
     </div>
   );

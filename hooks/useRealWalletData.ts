@@ -1,15 +1,16 @@
-import { useAccount, useBalance } from 'wagmi';
+import { useBalance } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { matchNewsToMarket } from '@/utils/news-matcher';
 import { Asset, NewsItem, Position, Transaction } from '@/types/wallet';
 import { useAuth } from '@/hooks/useAuth';
 import { useWalletStore } from '@/lib/store/wallet-store';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
 export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?: string) => {
-    const { address: web3Address, isConnected: isWeb3Connected } = useAccount();
+    const { address: web3Address, isConnected: isWeb3Connected } = useSovereignAccount();
     const { isAuthenticated } = useAuth();
     
     // Unified connection state
