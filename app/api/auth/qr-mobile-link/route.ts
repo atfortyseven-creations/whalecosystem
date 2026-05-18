@@ -16,6 +16,12 @@ import { isAddress } from 'viem';
  *     cookie (set after wallet sign) and stores the encrypted payload in Redis
  *     so the desktop poll can pick it up immediately.
  *
+ * Auth Resolution (3 layers):
+ *   LAYER 1: human_session / whale_session JWT — standard path for returning users
+ *   LAYER 2: sovereign_handshake cookie — set after wallet.connect() on mobile,
+ *            before any JWT exists. This is the "first QR scan" path.
+ *   LAYER 3: 401 if neither is present.
+ *
  * Flow:
  *   1. Mobile reads QR → parses { uuid, ephemeralPub, isECDH }
  *   2. Mobile generates its own ephemeral keypair
@@ -24,9 +30,6 @@ import { isAddress } from 'viem';
  *   5. Mobile POSTs here: { uuid, encryptedPayload, iv, tag, mobilePub }
  *   6. This endpoint stores the encrypted payload in Redis
  *   7. Desktop poll (/api/auth/qr-poll) returns it → desktop decrypts → hydrates
- *
- * The JWT minted here is equivalent to the one created on desktop login —
- * both identify the wallet address as the authenticated subject.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -46,30 +49,57 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing encrypted payload fields' }, { status: 400 });
     }
 
-    // ── 2. Verify mobile identity exclusively from secure JWT ───────────
+    // ── 2. Verify mobile identity — 3-layer auth resolution ─────────────────
+    // LAYER 1: Secure JWT (human_session / whale_session) — preferred path
+    // LAYER 2: sovereign_handshake cookie — set after wallet connection on mobile.
+    //          No JWT exists yet but the wallet just connected: this is the valid
+    //          "first QR scan" path that was previously returning 401 incorrectly.
+    // LAYER 3: Reject 401 if neither is present.
     const humanSession = req.cookies.get('human_session')?.value || req.cookies.get('whale_session')?.value;
+    const sovereignHandshake = req.cookies.get('sovereign_handshake')?.value;
 
-    if (!humanSession) {
-      console.error(`[QR:Handshake:FAILURE] No secure JWT found for UUID: ${uuid}. IP: ${req.headers.get('x-forwarded-for')}`);
+    if (!humanSession && !sovereignHandshake) {
+      console.error(`[QR:Handshake:FAILURE] No session found for UUID: ${uuid}. IP: ${req.headers.get('x-forwarded-for')}`);
       return NextResponse.json(
-        { error: 'Session expired or unauthenticated. Please re-sign in your mobile wallet.' },
+        { error: 'Session expired or unauthenticated. Connect your wallet first, then scan the QR code.' },
         { status: 401 }
       );
     }
 
     let walletAddress: string | null = null;
-    try {
+
+    // PATH A: Validate via secure JWT
+    if (humanSession) {
+      try {
         const { verifyJWT } = await import('@/lib/jwt');
         const payload = await verifyJWT(humanSession);
         walletAddress = (payload.sub as string) || (payload.address as string) || null;
         if (walletAddress) {
-            console.log(`[QR:Handshake] Resolved wallet from secure session: ${walletAddress}`);
+          console.log(`[QR:Handshake] [JWT] Resolved wallet: ${walletAddress}`);
         } else {
-            throw new Error('JWT payload missing address');
+          throw new Error('JWT payload missing address');
         }
-    } catch (err: any) {
-        console.error(`[QR:Handshake] JWT validation failed: ${err.message}`);
-        return NextResponse.json({ error: 'Invalid security token' }, { status: 401 });
+      } catch (err: any) {
+        // JWT failed — fall through to sovereign_handshake path
+        console.warn(`[QR:Handshake] JWT failed (${err.message}), falling back to sovereign_handshake`);
+        walletAddress = null;
+      }
+    }
+
+    // PATH B: Derive address from sovereign_handshake (wallet-connect first-time flow on mobile)
+    if (!walletAddress && sovereignHandshake) {
+      const normalized = sovereignHandshake.toLowerCase().trim();
+      if (/^0x[0-9a-f]{40}$/.test(normalized)) {
+        walletAddress = normalized;
+        console.log(`[QR:Handshake] [sovereign_handshake] Resolved wallet: ${walletAddress}`);
+      } else {
+        console.error(`[QR:Handshake] sovereign_handshake contains invalid address: ${normalized}`);
+        return NextResponse.json({ error: 'Invalid session token. Please reconnect your wallet.' }, { status: 401 });
+      }
+    }
+
+    if (!walletAddress) {
+      return NextResponse.json({ error: 'Unable to resolve wallet identity. Please reconnect.' }, { status: 401 });
     }
 
     // ── 3. Mint a sovereign JWT for this wallet address ──────────────────

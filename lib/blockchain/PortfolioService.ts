@@ -633,19 +633,27 @@ export class PortfolioService {
     console.log(`[Portfolio-SPEED] Querying ${chainsToQuery.length}/${targetChains.length} active chains in parallel...`);
 
     // 3. standard EVM aggregation
-    // Process chains in parallel with STRICT TIMEOUTS
+    // Process chains in parallel with RESILIENT TIMEOUTS
+    // Timeout raised from 10s to 25s — Moralis P95 latency on cold start can hit 12-15s.
+    // Each chain has a per-attempt guard; the global 30s hard-timeout above is the final net.
     const results = await Promise.all(
       chainsToQuery.map(async (id) => {
-          const fetchPromise = this.getFullPortfolio(id, address, forceRefresh, netWorthData);
-          
-          // 5s timeout per chain — Moralis should always respond within 3s.
-          // If RPC fallback is triggered, 5s is still enough for public nodes.
+          const fetchWithRetry = async () => {
+            try {
+              return await this.getFullPortfolio(id, address, forceRefresh, netWorthData);
+            } catch (e: any) {
+              // First attempt failed — try once more with a fresh request (no cache)
+              console.warn(`[Portfolio-RETRY] Chain ${id} first attempt failed (${e.message}), retrying...`);
+              return await this.getFullPortfolio(id, address, true, netWorthData);
+            }
+          };
+
           const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 10000)
+              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 25000)
           );
 
           try {
-              return await Promise.race([fetchPromise, timeoutPromise]);
+              return await Promise.race([fetchWithRetry(), timeoutPromise]);
           } catch (e: any) {
               console.warn(`[Portfolio-TIMEOUT] Chain ${id} took too long or failed: ${e.message}`);
               return { chainId: id, address, tokens: [], totalValueUsd: 0, error: 'TIMEOUT' };

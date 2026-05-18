@@ -111,13 +111,13 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
       {/* ══════════════════════════════════════════════════════════════════════
           1. HERO: COLTEA HOSPITAL (Normalized, Immersive)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="w-full h-[100dvh] relative flex flex-col items-center justify-center overflow-hidden bg-black">
+      <section ref={heroRef} className="w-full min-h-[120dvh] relative flex flex-col items-center justify-center overflow-hidden bg-black">
         <motion.div 
           style={{ y: heroY, opacity: heroOpacity, willChange: "transform, opacity" }} 
           className="absolute inset-0 w-full h-[120%]"
         >
           <video autoPlay loop muted playsInline className="w-full h-full object-cover">
-            <source src="/system-shots/Coltea-video-2025-v2.mp4" type="video/mp4" />
+            <source src="/system-shots/8783-214159384 (1).mp4" type="video/mp4" />
           </video>
         </motion.div>
         

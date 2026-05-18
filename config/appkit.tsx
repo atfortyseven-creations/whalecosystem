@@ -192,9 +192,9 @@ try {
             ],
             features: {
                 analytics: false, // ⚡ INSTANT BOOT: Disable telemetry to avoid blocking network requests
-                email: false, // Disabled to prevent Reown Auth API freeze
-                socials: [], // Disabled to prevent Reown Auth API freeze
-                emailShowWallets: false,
+                email: true, // Re-enabled for Google login
+                socials: ['google', 'x', 'github', 'discord', 'apple'], // Re-enabled for Google login
+                emailShowWallets: true,
                 swaps: true,
                 onramp: true,
                 send: true,

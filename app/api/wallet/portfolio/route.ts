@@ -35,9 +35,10 @@ export async function GET(req: NextRequest) {
         ChainId.BSC, ChainId.WORLDCHAIN,
       ]) as ChainId[];
 
-  // Hard 12-second global guard — ensures the API always returns before
-  // Next.js serverless function timeout, even if all RPCs are slow.
-  const GLOBAL_TIMEOUT_MS = 12_000;
+  // Hard 28-second global guard — must be LARGER than the per-chain 25s timeout
+  // inside PortfolioService so individual chains can complete before the API cuts them off.
+  // Railway serverless function limit is 60s; 28s gives chains 25s + 3s for aggregation.
+  const GLOBAL_TIMEOUT_MS = 28_000;
 
   const timeoutResult = new Promise<any>((resolve) =>
     setTimeout(() => resolve({
