@@ -171,13 +171,14 @@ function LangSelector({ lang, setLang }: { lang: LangKey; setLang: (l: LangKey) 
 export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [lang, setLang] = useState<LangKey>('en');
   const t = LANGS[lang];
-  const [step, setStep] = useState<'home' | 'login' | 'password' | 'secure' | 'reveal' | 'verify' | 'encrypting'>('home');
+  const [step, setStep] = useState<'home' | 'login' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting'>('home');
   const [hasKeystore, setHasKeystore] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [wallet, setWallet] = useState<ethers.HDNodeWallet | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   
   // Verification state
   const [verifyIndices, setVerifyIndices] = useState<number[]>([]);
@@ -215,17 +216,36 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       toast.error('You must accept the terms');
       return;
     }
+    
+    setStep('generating_wallet');
+    setLoadingProgress(0);
+
+    const duration = 7000;
+    const interval = 50;
+    const stepsCount = duration / interval;
+    let currentStep = 0;
+
     const newWallet = ethers.Wallet.createRandom();
     setWallet(newWallet);
     
-    // Pick 3 random words to verify
     const indices: number[] = [];
     while(indices.length < 3) {
       const r = Math.floor(Math.random() * 12);
       if(!indices.includes(r)) indices.push(r);
     }
     setVerifyIndices(indices.sort((a,b) => a - b));
-    setStep('secure');
+
+    const timer = setInterval(() => {
+      currentStep++;
+      setLoadingProgress((currentStep / stepsCount) * 100);
+      if (currentStep >= stepsCount) {
+        clearInterval(timer);
+        setStep('transaction_complete');
+        setTimeout(() => {
+          setStep('reveal'); // Directly to reveal mnemonic phrase
+        }, 2500);
+      }
+    }, interval);
   };
 
   const handleVerify = async () => {
@@ -322,9 +342,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4 mb-10">
-              <div className="w-20 h-20 bg-[#FAFAF8] border border-black/5 shadow-sm rounded-[24px] mx-auto flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-transparent" />
-                <Wallet size={30} className="text-[#0A0A0A] relative z-10" strokeWidth={1.5} />
+              <div className="w-56 h-56 mx-auto -mt-12 mb-2 pointer-events-none">
+                 <RemoteLottie path="/system-shots/Lock Loading.json" className="scale-[1.2]" />
               </div>
               <h1 className="text-4xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">{t.home_title}</h1>
               <p className="text-[15px] text-[#0A0A0A]/50 font-medium leading-relaxed px-4 max-w-xs mx-auto">{t.home_sub}</p>
@@ -636,6 +655,35 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
           </div>
         );
       }
+      case 'generating_wallet':
+        return (
+          <div className="flex flex-col items-center justify-center py-16 space-y-8 text-center">
+            <div className="w-64 h-64 mx-auto pointer-events-none mb-4">
+              <RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-contain" />
+            </div>
+            <h2 className="text-[14px] font-black uppercase tracking-widest text-[#050505]/50">
+              Forging Institutional Keys...
+            </h2>
+            <div className="w-full max-w-[240px] h-1.5 bg-black/5 rounded-full overflow-hidden mx-auto mt-6">
+              <motion.div
+                className="h-full bg-black rounded-full"
+                style={{ width: `${loadingProgress}%` }}
+              />
+            </div>
+          </div>
+        );
+
+      case 'transaction_complete':
+        return (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-56 h-56 mx-auto mb-6">
+              <RemoteLottie path="/system-shots/Transaction Complete.json" className="w-full h-full object-contain" />
+            </div>
+            <h2 className="text-2xl font-black text-emerald-500 tracking-tighter uppercase">
+              Identity Secured
+            </h2>
+          </div>
+        );
 
     }
   };

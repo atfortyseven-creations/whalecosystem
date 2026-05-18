@@ -314,12 +314,12 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
         {/* ── LOTTIE & GIF ── */}
         <div className="relative mb-8 flex flex-col items-center w-full">
           <motion.div
-            initial={{ y: -20, opacity: 0, scale: 0.8 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            transition={{ delay: 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="z-20 relative -mb-10 bg-white w-24 h-24 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/[0.04]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.05, duration: 0.5 }}
+            className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center"
           >
-            <RemoteLottie path="/system-shots/Paper airplane.json" className="w-14 h-14" />
+            <RemoteLottie path="/system-shots/Airplane Lottie Animation (1).json" className="w-full h-full object-cover opacity-100" />
           </motion.div>
 
           <motion.div

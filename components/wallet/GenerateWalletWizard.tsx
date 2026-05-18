@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Key, Shield, Zap, CheckCircle2, Copy, MoveRight, EyeOff, Lock } from 'lucide-react';
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 interface GenerateWalletWizardProps {
   onComplete: (privateKey: string, address: string) => void;
@@ -15,20 +16,41 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
   const [step, setStep] = useState(1);
   const [wallet, setWallet] = useState<{ address: string, privateKey: string, mnemonic: string } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [showTransactionComplete, setShowTransactionComplete] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const generateIdentity = async () => {
     setIsGenerating(true);
-    // Simulate complex ZK generation for theatrical effect
-    // Wallet generation initialized immediately (Molecular Precision)
-    const newWallet = ethers.Wallet.createRandom();
-    setWallet({
-      address: newWallet.address,
-      privateKey: newWallet.privateKey,
-      mnemonic: newWallet.mnemonic?.phrase || ""
-    });
-    setIsGenerating(false);
-    setStep(2);
+    setLoadingProgress(0);
+
+    const duration = 7000;
+    const interval = 50;
+    const steps = duration / interval;
+    let currentStep = 0;
+
+    const timer = setInterval(() => {
+      currentStep++;
+      setLoadingProgress((currentStep / steps) * 100);
+      
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        const newWallet = ethers.Wallet.createRandom();
+        setWallet({
+          address: newWallet.address,
+          privateKey: newWallet.privateKey,
+          mnemonic: newWallet.mnemonic?.phrase || ""
+        });
+        
+        setIsGenerating(false);
+        setShowTransactionComplete(true);
+
+        setTimeout(() => {
+          setShowTransactionComplete(false);
+          setStep(2);
+        }, 2500);
+      }
+    }, interval);
   };
 
   const copyToClipboard = (text: string, type: string) => {
@@ -61,7 +83,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
         </button>
 
         <AnimatePresence mode="wait">
-          {step === 1 && (
+          {step === 1 && !isGenerating && !showTransactionComplete && (
             <motion.div
               key="step1"
               initial={{ opacity: 0, x: -20 }}
@@ -69,30 +91,60 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               exit={{ opacity: 0, x: 20 }}
               className="flex flex-col items-center text-center pt-4"
             >
-              <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-6 text-indigo-500">
-                <Shield size={28} />
+              <div className="w-full flex justify-center -mb-6 mt-2 relative z-10 pointer-events-none">
+                <div className="w-48 h-48 scale-[1.3] opacity-90">
+                    <RemoteLottie path="/system-shots/Lock Loading.json" />
+                </div>
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tight mb-3">KYC</h2>
+              <h2 className="text-2xl font-black uppercase tracking-tight mb-3 mt-4">KYC</h2>
               <p className="text-sm text-black/50 dark:text-white/50 mb-8 max-w-[280px] leading-relaxed">
                 Generate a fresh, cryptographically secure non-custodial wallet instantly. Mined locally, never leaves your browser.
               </p>
               
               <button
                 onClick={generateIdentity}
-                disabled={isGenerating}
-                className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity"
               >
-                {isGenerating ? (
-                    <>
-                        <div className="w-4 h-4 border-2 border-white/30 dark:border-black/30 border-t-white dark:border-t-black rounded-full animate-spin" />
-                        Forging Keys...
-                    </>
-                ) : (
-                    <>
-                        <Zap size={16} /> Mint KYC
-                    </>
-                )}
+                <Zap size={16} /> Mint KYC
               </button>
+            </motion.div>
+          )}
+
+          {isGenerating && (
+            <motion.div
+              key="generating"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex flex-col items-center text-center py-8"
+            >
+              <div className="w-64 h-64 mb-6">
+                <RemoteLottie path="/system-shots/block abstract.json" />
+              </div>
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50 mb-6">
+                Forging Institutional Keys...
+              </h3>
+              <div className="w-full max-w-[200px] h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-black dark:bg-white rounded-full"
+                  style={{ width: `${loadingProgress}%` }}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {showTransactionComplete && (
+            <motion.div
+              key="complete"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex flex-col items-center text-center py-10"
+            >
+              <div className="w-48 h-48 mb-6">
+                <RemoteLottie path="/system-shots/Transaction Complete.json" />
+              </div>
+              <h3 className="text-xl font-black uppercase tracking-tight text-emerald-500">Identity Secured</h3>
             </motion.div>
           )}
 
