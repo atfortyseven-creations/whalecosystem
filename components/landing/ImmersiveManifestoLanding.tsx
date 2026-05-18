@@ -135,11 +135,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
             A new global standard for institutional security. We provide complete data protection, private communication, and absolute certainty for your most critical operations.
           </motion.p>
           <motion.div variants={FADE_UP} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/docs" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl">
-              Explore the System
+            <Link href="/portfolio" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center">
+              Access Institutional Portfolio
             </Link>
-            <Link href="/platform/architecture" className="w-full sm:w-auto px-10 py-5 bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95">
-              How It Works
+            <Link href="/forum" className="w-full sm:w-auto px-10 py-5 bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center">
+              Enter Secure Whale Chat
             </Link>
           </motion.div>
         </motion.div>

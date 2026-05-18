@@ -317,7 +317,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.05, duration: 0.5 }}
-            className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center"
+            className="fixed inset-0 z-20 pointer-events-none flex items-center justify-center"
           >
             <RemoteLottie path="/system-shots/Airplane Lottie Animation (1).json" className="w-full h-full object-cover opacity-100" />
           </motion.div>
@@ -326,7 +326,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
-            className="relative z-10 w-full flex justify-center -mt-16 -mb-12 pointer-events-none"
+            className="relative z-0 w-full flex justify-center -mt-16 -mb-12 pointer-events-none"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

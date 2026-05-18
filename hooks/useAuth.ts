@@ -24,6 +24,8 @@ export function useAuth() {
     isLoaded,
     isOwner: false, // Validated server-side via /api/subscription/status
     isPremium: false, // Validated server-side via /api/subscription/status
+    trialViews: 0,
+    viewedAddresses: [] as string[],
     walletAddress: address || null,
     authSource: isAuthenticated ? 'siwe' : 'none',
     login: async () => {

@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet, RefreshCw, ArrowUpRight, ArrowDownRight,
   Eye, EyeOff, Globe, Copy, Search,
   ArrowDownLeft, Repeat, CreditCard, Plus,
   Check, Loader2, ShieldCheck, Activity, ShieldAlert,
-  BarChart2, MessageSquare, Menu, X, LogOut
+  BarChart2, MessageSquare, Menu, X, LogOut, ArrowLeft
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { useAccount, useSwitchChain, useConnect, useDisconnect } from 'wagmi';
@@ -245,7 +246,10 @@ export default function PortfolioPage() {
 
   if (needsGate) {
     return (
-      <div className="w-full flex-1 flex flex-col bg-[#FAFAF8] text-[#0A0A0A] h-full min-h-0 overflow-hidden">
+      <div className="w-full flex-1 flex flex-col bg-[#FAFAF8] text-[#0A0A0A] h-full min-h-0 overflow-hidden relative">
+        <Link href="/" className="absolute top-6 left-6 z-50 w-10 h-10 rounded-full bg-white/50 backdrop-blur-md border border-black/10 flex items-center justify-center text-black/40 hover:text-black hover:bg-white transition-all shadow-sm" title="Return to Landing Page">
+          <ArrowLeft size={20} />
+        </Link>
         <QuantumAuthGate onComplete={() => {
           sessionStorage.setItem('portfolio_unlocked', 'true');
           setSessionUnlocked(true);
@@ -276,6 +280,9 @@ export default function PortfolioPage() {
         }}
       >
         <div className="flex items-center gap-3">
+          <Link href="/" className="p-2 rounded-xl border transition-all hover:bg-black/5" style={{ borderColor: BORDER, background: CARD, color: MUTED }} title="Return to Landing Page">
+            <ArrowLeft size={16} />
+          </Link>
           {/* 🔒 Lock Lottie — visible above Portfolio title */}
           <div className="w-10 h-10 shrink-0 pointer-events-none">
             <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
