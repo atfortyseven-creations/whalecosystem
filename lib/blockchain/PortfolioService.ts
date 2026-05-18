@@ -982,10 +982,10 @@ export class PortfolioService {
     const chain = moralisService.getChainName(chainId);
 
     try {
-      // 3s Timeout is now handled at the MoralisService level
       const history = await moralisService.getWalletHistory(address, chain, 100);
+      const resultData = Array.isArray(history) ? history : (history as any).result || [];
 
-      return (history.result || []).map((tx: any) => ({
+      return resultData.map((tx: any) => ({
         hash: tx.hash,
         from: tx.from_address,
         to: tx.to_address,
