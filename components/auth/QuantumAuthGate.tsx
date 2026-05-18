@@ -168,6 +168,53 @@ function LangSelector({ lang, setLang }: { lang: LangKey; setLang: (l: LangKey) 
   );
 }
 
+// ── SecureStepPanel ──────────────────────────────────────────────────────────
+// CRITICAL: This MUST be a separate component so that useState is called at
+// the top level of a React function, not inside a switch-case (Rules of Hooks).
+function SecureStepPanel({ t, onBack, onProceed }: { t: any; onBack: () => void; onProceed: () => void }) {
+  const [openAccordion, setOpenAccordion] = React.useState(false);
+  return (
+    <div className="space-y-6">
+      <button onClick={onBack} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
+      <div className="space-y-3">
+        <h2 className="text-4xl font-black text-[#0A0A0A] tracking-tighter uppercase">{t.secure_title}</h2>
+        <p className="text-[15px] text-[#0A0A0A]/50 font-medium leading-relaxed">{t.secure_sub}</p>
+      </div>
+      <div className="bg-[#FAFAF8] border border-black/5 rounded-[26px] p-7 space-y-5">
+        <span className="font-black uppercase tracking-widest text-[14px] text-[#050505] block">{t.rules_title}</span>
+        <ul className="space-y-4">
+          {[t.rule1, t.rule2, t.rule3, t.rule4, t.rule5].map((rule: string, i: number) => (
+            <li key={i} className="flex items-start gap-3 text-[14px] text-[#050505]/70 font-medium">
+              <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${i === 0 ? 'bg-rose-500' : i === 3 || i === 4 ? 'bg-amber-500' : 'bg-[#050505]/30'}`} />
+              <span>{rule}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="border border-black/5 rounded-[20px] overflow-hidden">
+        <button
+          onClick={() => setOpenAccordion(v => !v)}
+          className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-black/[0.02] transition-colors"
+        >
+          <span className="text-[14px] font-bold text-[#050505]">{t.what_is}</span>
+          <span className={`text-[18px] text-black/30 transition-transform duration-200 ${openAccordion ? 'rotate-45' : ''}`}>+</span>
+        </button>
+        {openAccordion && (
+          <div className="px-5 pb-5 text-[13px] text-[#050505]/60 font-medium leading-relaxed border-t border-black/5">
+            <p className="pt-4">{t.what_is_body}</p>
+          </div>
+        )}
+      </div>
+      <button
+        onClick={onProceed}
+        className="w-full py-5 rounded-[20px] bg-[#050505] text-white font-black tracking-widest text-[14px] uppercase transition-all shadow-lg active:scale-[0.98]"
+      >
+        {t.reveal_btn}
+      </button>
+    </div>
+  );
+}
+
 export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [lang, setLang] = useState<LangKey>('en');
   const t = LANGS[lang];
@@ -511,57 +558,13 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
           </div>
         );
 
-      case 'secure': {
-        const [openAccordion, setOpenAccordion] = React.useState(false);
-        return (
-          <div className="space-y-6">
-            <button onClick={() => setStep('password')} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
-            <div className="space-y-3">
-              <h2 className="text-4xl font-black text-[#0A0A0A] tracking-tighter uppercase">{t.secure_title}</h2>
-              <p className="text-[15px] text-[#0A0A0A]/50 font-medium leading-relaxed">{t.secure_sub}</p>
-            </div>
-
-            <div className="bg-[#FAFAF8] border border-black/5 rounded-[26px] p-7 space-y-5">
-              <span className="font-black uppercase tracking-widest text-[14px] text-[#050505] block">{t.rules_title}</span>
-              <ul className="space-y-4">
-                {[t.rule1, t.rule2, t.rule3, t.rule4, t.rule5].map((rule: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 text-[14px] text-[#050505]/70 font-medium">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${i === 0 ? 'bg-rose-500' : i === 3 || i === 4 ? 'bg-amber-500' : 'bg-[#050505]/30'}`} />
-                    <span>{rule}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="border border-black/5 rounded-[20px] overflow-hidden">
-              <button
-                onClick={() => setOpenAccordion(!openAccordion)}
-                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-black/[0.02] transition-colors"
-              >
-                <span className="text-[14px] font-bold text-[#050505]">{t.what_is}</span>
-                <span className={`text-[18px] text-black/30 transition-transform duration-200 ${openAccordion ? 'rotate-45' : ''}`}>+</span>
-              </button>
-              {openAccordion && (
-                <div className="px-5 pb-5 text-[13px] text-[#050505]/60 font-medium leading-relaxed border-t border-black/5">
-                  <p className="pt-4">{t.what_is_body}</p>
-                </div>
-              )}
-            </div>
-
-            <button 
-              onClick={() => setStep('reveal')}
-              className="w-full py-5 rounded-[20px] bg-[#050505] text-white font-black tracking-widest text-[14px] uppercase transition-all shadow-lg active:scale-[0.98]"
-            >
-              {t.reveal_btn}
-            </button>
-          </div>
-        );
-      }
+      case 'secure':
+        return <SecureStepPanel t={t} onBack={() => setStep('password')} onProceed={() => setStep('reveal')} />;
 
       case 'reveal':
         return (
           <div className="space-y-6">
-            <button onClick={() => setStep('secure')} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
+            <button onClick={() => setStep('password')} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
             <div className="space-y-3">
               <h2 className="text-4xl font-black text-[#0A0A0A] tracking-tighter uppercase">{t.reveal_title}</h2>
               <p className="text-[15px] text-[#0A0A0A]/50 font-medium leading-relaxed">{t.reveal_sub}</p>
@@ -585,7 +588,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
               ) : null}
               
               <div className={`grid grid-cols-3 gap-2 w-full transition-all duration-700 ${revealed ? 'opacity-100 scale-100 filter-none' : 'opacity-0 scale-95 blur-md select-none pointer-events-none'}`}>
-                {wallet?.mnemonic?.phrase.split(' ').map((word, i) => (
+                {wallet?.mnemonic?.phrase?.split(' ')?.map((word, i) => (
                   <div key={i} className="flex flex-col bg-white border border-black/5 rounded-xl overflow-hidden shadow-sm">
                     <div className="w-full py-1 bg-black/[0.03] text-[10px] text-[#050505]/40 font-black tracking-widest text-center border-b border-black/5">
                       {String(i + 1).padStart(2, '0')}
@@ -654,7 +657,10 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         );
 
       case 'encrypting': {
-        const isDecrypting = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_keystore');
+        // Determine mode: if keystore existed BEFORE we started, this is a login decryption.
+        // We pass this info via the step that triggered encrypting.
+        // Heuristic: if the wallet object is null (no new wallet generated), we are decrypting.
+        const isDecryptingMode = wallet === null;
         return (
           <div className="flex flex-col items-center justify-center py-20 space-y-10 relative">
             <div className="relative w-64 h-64 flex items-center justify-center -mt-8">
@@ -662,10 +668,10 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
             </div>
             <div className="text-center space-y-3">
               <h2 className="text-[24px] font-black text-[#0A0A0A] tracking-tighter uppercase">
-                {isDecrypting ? t.decrypting : t.encrypting}
+                {isDecryptingMode ? t.decrypting : t.encrypting}
               </h2>
               <p className="text-[15px] text-[#0A0A0A]/50 font-medium">
-                {isDecrypting ? t.decrypting_sub : t.encrypting_sub}
+                {isDecryptingMode ? t.decrypting_sub : t.encrypting_sub}
               </p>
             </div>
           </div>

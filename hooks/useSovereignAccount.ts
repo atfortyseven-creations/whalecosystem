@@ -114,6 +114,7 @@ export function useSovereignAccount() {
             chainId: wagmiAccount.chainId,
             chain: wagmiAccount.chain,
             isSovereignHandshake: false,
+            isLocalSovereignWallet: false,
             isZkVerified: isZkVerified,
             isChecking: false
         };
