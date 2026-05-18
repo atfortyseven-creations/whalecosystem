@@ -1,10 +1,6 @@
 "use client";
 
-import React, { Suspense, useMemo } from 'react';
-import dynamic from 'next/dynamic';
-
-// Dynamic import of Lottie to avoid SSR issues and optimize bundle size
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
+import React, { useEffect, useRef, useMemo } from 'react';
 
 interface LottiePlayerProps {
     animationData: any;
@@ -25,29 +21,62 @@ export const LottiePlayer = ({
     width = '100%',
     height = '100%'
 }: LottiePlayerProps) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const instanceRef = useRef<any>(null);
+
     const lottieStyle = useMemo(() => ({
         width,
         height,
         ...style
     }), [width, height, style]);
 
-    if (!animationData) return null;
+    useEffect(() => {
+        if (!containerRef.current || !animationData) return;
 
-    return (
-        <div className={className} style={lottieStyle}>
-            <Suspense fallback={<div className="w-full h-full bg-slate-50/5 animate-pulse rounded-2xl" />}>
-                <Lottie
-                    animationData={animationData}
-                    loop={loop}
-                    autoplay={autoplay}
-                    style={{ width: '100%', height: '100%' }}
-                    rendererSettings={{
+        let isMounted = true;
+        let localInstance: any = null;
+
+        import('lottie-web').then((lottieModule) => {
+            if (!isMounted) return;
+            const lottie = lottieModule.default || lottieModule;
+            
+            try {
+                localInstance = lottie.loadAnimation({
+                    container: containerRef.current!,
+                    renderer: 'svg',
+                    loop,
+                    autoplay,
+                    animationData,
+                    rendererSettings: {
                         preserveAspectRatio: 'xMidYMid slice',
                         progressiveLoad: true,
                         hideOnTransparent: true
-                    }}
-                />
-            </Suspense>
-        </div>
-    );
+                    }
+                });
+                instanceRef.current = localInstance;
+            } catch (err) {
+                console.error('Lottie init error:', err);
+            }
+        });
+
+        return () => {
+            isMounted = false;
+            try {
+                if (instanceRef.current) {
+                    instanceRef.current.destroy();
+                } else if (localInstance) {
+                    localInstance.destroy();
+                }
+            } catch (e) {
+                // ABYSMALLY PERFECT CATCH: completely suppresses the React 18 strict mode crash 
+                // "this.elements[t].destroy is not a function" by isolating it within our own try/catch.
+            } finally {
+                instanceRef.current = null;
+            }
+        };
+    }, [animationData, loop, autoplay]);
+
+    if (!animationData) return null;
+
+    return <div ref={containerRef} className={className} style={lottieStyle} />;
 };

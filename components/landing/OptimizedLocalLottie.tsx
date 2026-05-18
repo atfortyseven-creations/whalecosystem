@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
 
 // ─── Global LRU JSON Cache ────────────────────────────────────────────────────
 const JSON_CACHE = new Map<string, any>();
@@ -50,8 +49,6 @@ async function loadLottieJSON(filename: string): Promise<any | null> {
   return pending;
 }
 
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
-
 interface OptimizedLocalLottieProps {
   filename: string;
   className?: string;
@@ -68,7 +65,8 @@ export function OptimizedLocalLottie({
   speed = 1,
 }: OptimizedLocalLottieProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const lottieRef = useRef<any>(null);
+  const lottieContainerRef = useRef<HTMLDivElement>(null);
+  const instanceRef = useRef<any>(null);
   const [data, setData] = useState<any>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [isVisible, setIsVisible] = useState(false);
@@ -101,11 +99,57 @@ export function OptimizedLocalLottie({
     return () => obs.disconnect();
   }, [filename, status]);
 
+  // Handle Lottie instantiation completely manually for 100% crash immunity
+  useEffect(() => {
+    let isMounted = true;
+    let localInstance: any = null;
+
+    if (status === 'ready' && data && isVisible && lottieContainerRef.current) {
+        import('lottie-web').then((lottieModule) => {
+            if (!isMounted) return;
+            const lottie = lottieModule.default || lottieModule;
+            try {
+                localInstance = lottie.loadAnimation({
+                    container: lottieContainerRef.current!,
+                    renderer: 'svg',
+                    loop,
+                    autoplay: isActive,
+                    animationData: data,
+                    rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
+                });
+                localInstance.setSpeed(speed);
+                instanceRef.current = localInstance;
+            } catch (err) {
+                console.error('Lottie init error:', err);
+            }
+        });
+    }
+
+    return () => {
+        isMounted = false;
+        try {
+            if (instanceRef.current) {
+                instanceRef.current.destroy();
+            } else if (localInstance) {
+                localInstance.destroy();
+            }
+        } catch (e) {
+            // ABYSMALLY PERFECT CATCH: isolates lottie-web's infamous React 18 strict mode unmount crash
+        } finally {
+            instanceRef.current = null;
+        }
+    };
+  }, [data, isVisible, status, loop, isActive]);
+
   // Speed and pause control when visible
   useEffect(() => {
-    if (lottieRef.current && status === 'ready' && isVisible) {
-      lottieRef.current.setSpeed(speed);
-      if (!isActive) lottieRef.current.pause();
+    if (instanceRef.current && status === 'ready' && isVisible) {
+      instanceRef.current.setSpeed(speed);
+      if (!isActive) {
+          instanceRef.current.pause();
+      } else {
+          instanceRef.current.play();
+      }
     }
   }, [speed, isActive, status, isVisible]);
 
@@ -113,21 +157,9 @@ export function OptimizedLocalLottie({
     <div
       ref={containerRef}
       className={`relative flex items-center justify-center ${className ?? ''}`}
-      style={{
-         // Austerity mode: removed translateZ to prevent excessive VRAM allocation
-      }}
     >
       {status === 'ready' && data && isVisible && (
-        <Lottie
-          lottieRef={lottieRef}
-          animationData={data}
-          loop={loop}
-          autoplay={isActive}
-          style={{ width: '100%', height: '100%' }}
-          rendererSettings={{
-            preserveAspectRatio: 'xMidYMid meet'
-          }}
-        />
+          <div ref={lottieContainerRef} style={{ width: '100%', height: '100%' }} />
       )}
 
       {/* Loading shimmer */}
