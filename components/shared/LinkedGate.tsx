@@ -184,6 +184,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
     if (!isMounted) return;
     const isPublic = pathname === '/' ||
                      pathname.startsWith('/connect') ||
+                     pathname.startsWith('/login') ||
                      pathname.startsWith('/docs') ||
                      pathname.startsWith('/privacy') ||
                      pathname.startsWith('/terms') ||
@@ -191,8 +192,9 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                      pathname.startsWith('/news') ||
                      pathname.startsWith('/chat') ||
                      (pathname.startsWith('/forum') && !pathname.startsWith('/forum/settings'));
+    const isBot = typeof window !== 'undefined' && /bot|google|grok|crawler|spider|robot|crawling|bing/i.test(navigator.userAgent);
     // Only redirect if NOT connected at all (not just un-signed)
-    if (!isLinked && !isWalletConnected && !isPublic) {
+    if (!isLinked && !isWalletConnected && !isPublic && !isBot) {
       router.replace('/connect');
     }
   }, [isLinked, isWalletConnected, isMounted, pathname, router]);

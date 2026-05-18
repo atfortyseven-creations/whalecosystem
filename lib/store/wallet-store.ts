@@ -399,3 +399,11 @@ export const useWalletStore = create<WalletState>()(
   )
 );
 
+// ── ATOMIC SELECTORS FOR 240Hz MOBILE RENDERING ──
+// Prevents massive React re-renders when only one specific property changes.
+export const useWalletBalance = () => useWalletStore((state) => state.balance);
+export const useWalletAddress = () => useWalletStore((state) => state.address);
+export const useWalletNetwork = () => useWalletStore((state) => state.activeNetwork);
+export const useWalletIsUpdating = () => useWalletStore((state) => state.isUpdatingBalance);
+export const useWalletAccounts = () => useWalletStore((state) => state.accounts);
+

@@ -3,6 +3,8 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
+import { WalletComparisonChart } from "./WalletComparisonChart";
+import { WhaleChatComparison } from "./WhaleChatComparison";
 
 // ─── Constants & Animations ──────────────────────────────────────────────────
 
@@ -103,22 +105,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
   const heroY = useTransform(heroProgress, [0, 1], ["0%", "40%"]);
   const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
 
-  // Ref for the Screenshot Gallery parallax
-  const galleryRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: galleryProgress } = useScroll({ target: galleryRef, offset: ["start end", "end start"] });
-  const heroImgY   = useTransform(galleryProgress, [0, 1], ["8%",  "-8%"]);
-  const col1Y      = useTransform(galleryProgress, [0, 1], ["12%", "-18%"]);
-  const col2Y      = useTransform(galleryProgress, [0, 1], ["20%", "-28%"]);
-  const col3Y      = useTransform(galleryProgress, [0, 1], ["4%",  "-12%"]);
-
-  const SCREENSHOTS = [
-    "/system-shots/Captura de pantalla 2026-05-17 081424.png",
-    "/system-shots/Captura de pantalla 2026-05-17 081640.png",
-    "/system-shots/Captura de pantalla 2026-05-17 081511.png",
-    "/system-shots/Captura de pantalla 2026-05-17 081726.png",
-    "/system-shots/Captura de pantalla 2026-05-17 081803.png"
-  ];
-
   return (
     <div className="relative text-[#050505] font-sans antialiased overflow-x-hidden w-full flex flex-col bg-white">
 
@@ -169,152 +155,14 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          2. THE PLATFORM GALLERY (Screenshots Parallax Grid)
+          2. WALLET COMPARISON
       ══════════════════════════════════════════════════════════════════════ */}
-      <section ref={galleryRef} className="w-full py-24 md:py-36 flex flex-col items-center bg-[#FAF9F6] relative overflow-hidden">
-
-        {/* ── Header: constrained ── */}
-        <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 mb-16 md:mb-24">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={STAGGER} className="flex flex-col items-center text-center">
-            <h2 className="text-[44px] md:text-[80px] font-black tracking-tighter uppercase leading-[0.9] text-[#050505] mb-6">
-              Experience<br />
-              <span className="text-[#050505]/20">Absolute Control.</span>
-            </h2>
-            <p className="font-serif text-[18px] md:text-[22px] text-[#050505]/60 leading-relaxed max-w-[700px]">
-              Our interface is designed for professionals who demand clarity, speed, and precision.
-            </p>
-          </motion.div>
-        </div>
-
-        {/* ── PC Bento Gallery — FULL BLEED, no max-w ── */}
-        <div className="hidden md:flex flex-col w-full gap-4 px-4 lg:px-6 pb-8">
-
-          {/* Row 1: Hero image (60%) + 2 stacked (40%) */}
-          <div className="grid grid-cols-[60fr_40fr] gap-4 w-full">
-
-            {/* Hero screenshot — tallest, most impactful */}
-            <motion.div
-              style={{ y: heroImgY, willChange: "transform" }}
-              className="relative overflow-hidden rounded-3xl shadow-[0_40px_100px_rgba(0,0,0,0.18)] border border-[#050505]/5"
-            >
-              <img
-                src={SCREENSHOTS[0]}
-                alt="Platform Dashboard"
-                className="w-full aspect-[16/10] object-cover object-top"
-                loading="eager"
-              />
-            </motion.div>
-
-            {/* Right column: 2 stacked */}
-            <div className="flex flex-col gap-4">
-              <motion.div style={{ y: col1Y, willChange: "transform" }} className="relative overflow-hidden rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.14)] border border-[#050505]/5 flex-1">
-                <img src={SCREENSHOTS[1]} alt="Platform Interface 2" className="w-full h-full aspect-[16/10] object-cover object-top" loading="eager" />
-              </motion.div>
-              <motion.div style={{ y: col2Y, willChange: "transform" }} className="relative overflow-hidden rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.14)] border border-[#050505]/5 flex-1">
-                <img src={SCREENSHOTS[2]} alt="Platform Interface 3" className="w-full h-full aspect-[16/10] object-cover object-top" loading="eager" />
-              </motion.div>
-            </div>
-          </div>
-
-          {/* Row 2: 3 equal screenshots */}
-          <div className="grid grid-cols-3 gap-4 w-full">
-            {[SCREENSHOTS[3], SCREENSHOTS[4]].map((src, i) => (
-              <motion.div
-                key={i}
-                style={{ y: col3Y, willChange: "transform" }}
-                className="relative overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[#050505]/5"
-              >
-                <img
-                  src={src}
-                  alt={`Platform Interface ${i + 4}`}
-                  className="w-full aspect-[16/10] object-cover object-top"
-                  loading="lazy"
-                />
-              </motion.div>
-            ))}
-            {/* Coltea video preview card */}
-            <motion.div
-              style={{ y: col3Y, willChange: "transform" }}
-              className="relative overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[#050505]/5 bg-black"
-            >
-              <video
-                src="/system-shots/Coltea-video-2025-v2.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full aspect-[16/10] object-cover"
-                style={{ willChange: "transform" }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4">
-                <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/80 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                  Spitalul Colțea · 1704
-                </span>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* ── Mobile: Screenshot carousel ── */}
-        <div className="flex md:hidden flex-col w-full gap-3 px-4 pb-6">
-          {SCREENSHOTS.map((src, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-              className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.10)] border border-[#050505]/5"
-            >
-              <img
-                src={src}
-                alt={`Platform Interface ${i + 1}`}
-                className="w-full aspect-[16/10] object-cover object-top"
-                loading={i < 2 ? "eager" : "lazy"}
-              />
-            </motion.div>
-          ))}
-          {/* Coltea video mobile */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="relative overflow-hidden rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#050505]/5 bg-black"
-          >
-            <video
-              src="/system-shots/Coltea-video-2025-v2.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full aspect-video object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="absolute bottom-3 left-3">
-              <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/80 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                Spitalul Colțea · 1704
-              </span>
-            </div>
-          </motion.div>
-        </div>
-
-      </section>
+      <WalletComparisonChart />
 
       {/* ══════════════════════════════════════════════════════════════════════
-          3. WHALE CHAT MARKETING (Video: 12596112)
+          3. WHALE CHAT COMPARISON
       ══════════════════════════════════════════════════════════════════════ */}
-      <CinematicVideoSection
-        videoSrc="/system-shots/12596112_3840_2160_30fps.mp4"
-        title="Whale Chat."
-        subtitle="Private. Secure."
-        description="Standard messaging apps track your every move. Whale Chat changes everything. Communicate instantly with your team using an application where only you and the recipient can read the messages. No tracking, no data leaks, pure privacy."
-        linkText="Start Chatting Securely"
-        linkHref="/chat"
-        overlay="bg-gradient-to-r from-black/80 via-black/40 to-transparent"
-        align="left"
-      />
+      <WhaleChatComparison />
 
       {/* ══════════════════════════════════════════════════════════════════════
           4. DATA PROTECTION (Video: 8597294)

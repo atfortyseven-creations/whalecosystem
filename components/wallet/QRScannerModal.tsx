@@ -592,7 +592,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           >
             {/* Header */}
             <div className="flex flex-col items-center gap-3 mb-6 relative z-10">
-              <div className="w-12 h-12 mb-2">
+              <div className="w-12 h-12 mb-2" style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
                  <RemoteLottie path="block abstract.json" className="w-full h-full object-contain opacity-80" />
               </div>
               <h2 className="font-sans text-xl font-black text-[#050505] tracking-tighter uppercase">
