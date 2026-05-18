@@ -191,6 +191,8 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                      pathname.startsWith('/developers') ||
                      pathname.startsWith('/news') ||
                      pathname.startsWith('/chat') ||
+                     pathname.startsWith('/portfolio') ||   // ← mobile users can create/login here
+                     pathname.startsWith('/sign-up') ||
                      (pathname.startsWith('/forum') && !pathname.startsWith('/forum/settings'));
     const isBot = typeof window !== 'undefined' && /bot|google|grok|crawler|spider|robot|crawling|bing/i.test(navigator.userAgent);
     // Only redirect if NOT connected at all (not just un-signed)

@@ -268,8 +268,16 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         const encryptedJson = await wallet.encrypt(password);
         localStorage.setItem('sovereign_keystore', encryptedJson);
         importWallet(wallet.privateKey, "Sovereign Main");
-        await activateSovereignVault(wallet.privateKey, wallet.address);
-        
+
+        // Non-fatal: activateSovereignVault uses an injected provider that
+        // may not exist on mobile Chrome (iOS/Android). The keystore is
+        // already saved — proceed to dashboard regardless.
+        try {
+          await activateSovereignVault(wallet.privateKey, wallet.address);
+        } catch (vaultErr: any) {
+          console.warn('[QuantumAuthGate] Vault activation non-fatal:', vaultErr?.message);
+        }
+
         const elapsedTime = Date.now() - startTime;
         const remainingTime = Math.max(2000 - elapsedTime, 0);
 
@@ -302,35 +310,43 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
           pk = decryptedWallet.privateKey;
           addr = decryptedWallet.address;
         } else if (vault) {
-          // Fallback: migrate sovereign_vault_v1 to sovereign_keystore
           const { readStoredVaultKey } = await import('@/hooks/useSovereignConnect');
           const vaultPk = await readStoredVaultKey();
           if (!vaultPk) throw new Error('Vault corrupted');
           const walletObj = new ethers.Wallet(vaultPk);
           pk = walletObj.privateKey;
           addr = walletObj.address;
-          
-          // Encrypt and save keystore for future logins
           const encryptedJson = await walletObj.encrypt(password);
           localStorage.setItem('sovereign_keystore', encryptedJson);
         }
 
         if (pk && addr) {
           importWallet(pk, "Sovereign Main");
-          await activateSovereignVault(pk, addr);
-          
+
+          // Non-fatal on mobile — wagmi injected connector may not exist.
+          try {
+            await activateSovereignVault(pk, addr);
+          } catch (vaultErr: any) {
+            console.warn('[QuantumAuthGate] Login vault activation non-fatal:', vaultErr?.message);
+          }
+
           const elapsedTime = Date.now() - startTime;
           const remainingTime = Math.max(1000 - elapsedTime, 0);
 
           setTimeout(() => {
-            toast.success('Decryption successful.');
+            toast.success('Wallet unlocked successfully.');
             onComplete();
           }, remainingTime);
         } else {
           throw new Error('Invalid vault');
         }
-      } catch (e) {
-        toast.error('Invalid password', { description: 'Please try again.' });
+      } catch (e: any) {
+        // Only show wrong-password error for actual decryption failures
+        const msg = e?.message || '';
+        const isWrongPw = msg.includes('invalid') || msg.includes('password') || msg.includes('decrypt');
+        toast.error(isWrongPw ? 'Invalid password' : 'Unlock failed', {
+          description: isWrongPw ? 'Please try again.' : msg
+        });
         setStep('login');
       }
     }, 100);
@@ -342,8 +358,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4 mb-10">
-              <div className="w-56 h-56 mx-auto -mt-12 mb-2 pointer-events-none">
-                 <RemoteLottie path="/system-shots/Lock Loading.json" className="scale-[1.2]" />
+              <div className="w-80 h-80 mx-auto -mt-16 mb-0 pointer-events-none">
+                 <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
               </div>
               <h1 className="text-4xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">{t.home_title}</h1>
               <p className="text-[15px] text-[#0A0A0A]/50 font-medium leading-relaxed px-4 max-w-xs mx-auto">{t.home_sub}</p>
@@ -691,7 +707,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="flex items-center justify-center px-4 md:px-6 h-full w-full relative overflow-y-auto py-12 md:py-0">
       <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
-         <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-cover" />
+         <RemoteLottie path="/system-shots/Airplane Lottie Animation (1).json" className="w-full h-full object-cover" />
       </div>
       <motion.div 
         key={step}
