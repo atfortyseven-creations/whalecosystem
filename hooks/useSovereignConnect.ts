@@ -81,11 +81,11 @@ export function useSovereignConnect() {
         // 3. Drive Wagmi state machine into "connected"
         // Non-fatal: mobile Chrome (iOS/Android) has no injected provider.
         // The session is stored above; the UI reads privateKey from the store.
-        try {
-          connect({ connector: sovereignConnector() });
-        } catch (connectErr: any) {
-          console.warn('[SovereignVault] Wagmi connect non-fatal (mobile):', connectErr?.message);
-        }
+        // try {
+        //   connect({ connector: sovereignConnector() });
+        // } catch (connectErr: any) {
+        //   console.warn('[SovereignVault] Wagmi connect non-fatal (mobile):', connectErr?.message);
+        // }
 
         toast.success(`Vault Activated — ${address.slice(0, 6)}...${address.slice(-4)}`, {
           id: "vault-connect",

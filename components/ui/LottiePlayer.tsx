@@ -10,6 +10,7 @@ interface LottiePlayerProps {
     style?: React.CSSProperties;
     width?: string | number;
     height?: string | number;
+    speed?: number;
 }
 
 export const LottiePlayer = ({
@@ -19,7 +20,8 @@ export const LottiePlayer = ({
     autoplay = true,
     style,
     width = '100%',
-    height = '100%'
+    height = '100%',
+    speed
 }: LottiePlayerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const instanceRef = useRef<any>(null);
@@ -53,6 +55,11 @@ export const LottiePlayer = ({
                         hideOnTransparent: true
                     }
                 });
+                
+                if (speed !== undefined) {
+                    localInstance.setSpeed(speed);
+                }
+                
                 instanceRef.current = localInstance;
             } catch (err) {
                 console.error('Lottie init error:', err);

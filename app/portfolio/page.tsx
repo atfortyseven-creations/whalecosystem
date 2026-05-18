@@ -25,12 +25,12 @@ import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { QuantumAuthGate } from '@/components/auth/QuantumAuthGate';
 
-// ── Palette — dark-mode first (wallpaper is black) ─────────────────────────
+// ── Palette — Light Mode ─────────────────────────
 const BG   = "transparent";
-const INK  = "#F5F5F5";         // white text on dark bg
-const MUTED = "rgba(255,255,255,0.45)";
-const BORDER = "rgba(255,255,255,0.08)";
-const CARD  = "rgba(0, 0, 0, 0.65)";
+const INK  = "#050505";         // black text on light bg
+const MUTED = "rgba(5,5,5,0.45)";
+const BORDER = "rgba(5,5,5,0.08)";
+const CARD  = "rgba(255, 255, 255, 0.65)";
 
 // ── Chain color map ──────────────────────────────────────────────────────────
 const CHAIN_COLORS: Record<string, string> = {
@@ -271,13 +271,13 @@ export default function PortfolioPage() {
   };
 
   return (
-    <div className="w-full flex-1 flex flex-col bg-black/40 text-[#F5F5F5]">
+    <div className="w-full flex-1 flex flex-col bg-[#FAFAF8] text-[#0A0A0A]">
 
       {/* ── HEADER ── */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b w-full"
         style={{
-          background: "rgba(0, 0, 0, 0.60)",
+          background: "rgba(255, 255, 255, 0.60)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
           borderColor: BORDER
@@ -287,12 +287,11 @@ export default function PortfolioPage() {
           <Link href="/" className="p-2 rounded-xl border transition-all hover:bg-black/5" style={{ borderColor: BORDER, background: CARD, color: MUTED }} title="Return to Landing Page">
             <ArrowLeft size={16} />
           </Link>
-          {/* 🔒 Lock Lottie — visible above Portfolio title */}
-          <div className="w-10 h-10 shrink-0 pointer-events-none">
-            <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
-          </div>
-          <div>
+          <div className="flex flex-col items-start">
             <div className="font-black text-sm uppercase tracking-tight" style={{ color: INK }}>Portfolio</div>
+            <div className="w-8 h-8 shrink-0 pointer-events-none -mt-1 -ml-1">
+              <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
+            </div>
           </div>
         </div>
 

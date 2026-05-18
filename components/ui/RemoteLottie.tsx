@@ -10,6 +10,7 @@ interface RemoteLottieProps {
     width?: string | number;
     height?: string | number;
     loop?: boolean;
+    speed?: number;
 }
 
 /**
@@ -22,7 +23,8 @@ export const RemoteLottie = ({
     style,
     width,
     height,
-    loop = true
+    loop = true,
+    speed
 }: RemoteLottieProps) => {
     const [animationData, setAnimationData] = useState<any>(null);
     const [error, setError] = useState(false);
@@ -54,6 +56,7 @@ export const RemoteLottie = ({
             width={width}
             height={height}
             loop={loop}
+            speed={speed}
         />
     );
 };

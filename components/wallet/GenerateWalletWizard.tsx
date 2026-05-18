@@ -48,7 +48,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
         setTimeout(() => {
           setShowTransactionComplete(false);
           setStep(2);
-        }, 2500);
+        }, 5000);
       }
     }, interval);
   };
@@ -94,16 +94,16 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               <div className="w-52 h-52 mx-auto pointer-events-none mb-2">
                 <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tight mb-3 mt-4">KYC</h2>
+              <h2 className="text-2xl font-black uppercase tracking-tight mb-3 mt-4">Create Wallet</h2>
               <p className="text-sm text-black/50 dark:text-white/50 mb-8 max-w-[280px] leading-relaxed">
-                Generate a fresh, cryptographically secure non-custodial wallet instantly. Mined locally, never leaves your browser.
+                Generate a fresh, secure non-custodial wallet instantly. Created locally, never leaves your browser.
               </p>
               
               <button
                 onClick={generateIdentity}
                 className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity"
               >
-                <Zap size={16} /> Mint KYC
+                <Zap size={16} /> Create Wallet
               </button>
             </motion.div>
           )}
@@ -120,7 +120,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                 <RemoteLottie path="/system-shots/block abstract.json" />
               </div>
               <h3 className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50 mb-6">
-                Forging Institutional Keys...
+                Creating your secure wallet...
               </h3>
               <div className="w-full max-w-[200px] h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                 <motion.div
@@ -140,9 +140,9 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               className="flex flex-col items-center text-center py-10"
             >
               <div className="w-48 h-48 mb-6">
-                <RemoteLottie path="/system-shots/Transaction Complete.json" />
+                <RemoteLottie path="/system-shots/Transaction Complete.json" speed={0.25} />
               </div>
-              <h3 className="text-xl font-black uppercase tracking-tight text-emerald-500">Identity Secured</h3>
+              <h3 className="text-xl font-black uppercase tracking-tight text-emerald-500">Wallet Created</h3>
             </motion.div>
           )}
 
@@ -160,14 +160,14 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                  </div>
                  <div>
                      <h2 className="text-lg font-black uppercase tracking-tight">Backup Required</h2>
-                     <p className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40 font-bold">Absolute Ownership Protocol</p>
+                     <p className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40 font-bold">Absolute Ownership</p>
                  </div>
               </div>
 
               <div className="space-y-4 mb-8">
                   <div className="p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
                       <div className="flex justify-between items-center mb-2">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50">Mnemonic Seed</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50">Recovery Phrase</span>
                           <button onClick={() => copyToClipboard(wallet.mnemonic, 'Seed Phrase')} className="text-indigo-500 flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest hover:opacity-70"><Copy size={12}/> Copy</button>
                       </div>
                       <div className="grid grid-cols-3 gap-2">
@@ -223,7 +223,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               <div className="w-full h-56 pointer-events-none mb-0">
                 <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-contain" />
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tight mt-0 mb-2">KYC Activated</h2>
+              <h2 className="text-2xl font-black uppercase tracking-tight mt-0 mb-2">Wallet Created</h2>
               {/* Address directly below whale — zero gap = "pegada" */}
               <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 px-4 py-2 rounded-2xl border border-black/5 dark:border-white/5 mb-8">
                 <p className="text-[11px] font-mono font-bold text-black/70 dark:text-white/70 break-all">
