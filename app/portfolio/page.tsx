@@ -188,9 +188,11 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== 'undefined' && sessionStorage.getItem('portfolio_unlocked') === 'true') {
-      setSessionUnlocked(true);
-    }
+    try {
+      if (typeof window !== 'undefined' && sessionStorage.getItem('portfolio_unlocked') === 'true') {
+        setSessionUnlocked(true);
+      }
+    } catch(e) {}
   }, []);
 
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading, isConnected: isLiveConnected, address: userAddress } = useLivePortfolio();
@@ -232,7 +234,8 @@ export default function PortfolioPage() {
     }
   };
 
-  const hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('sovereign_keystore') : false;
+  let hasKeystore = false;
+  try { hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('sovereign_keystore') : false; } catch(e) {}
   const isQuantumUnlocked = !!privateKey;
 
   // ── GATE LOGIC ──────────────────────────────────────────────────────────────

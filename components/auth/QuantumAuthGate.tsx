@@ -275,8 +275,15 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     const stepsCount = duration / interval;
     let currentStep = 0;
 
-    const newWallet = ethers.Wallet.createRandom();
-    setWallet(newWallet);
+    let newWallet;
+    try {
+      newWallet = ethers.Wallet.createRandom();
+      setWallet(newWallet);
+    } catch (err: any) {
+      toast.error('Failed to generate secure keys', { description: err.message });
+      setStep('password');
+      return;
+    }
     
     const indices: number[] = [];
     while(indices.length < 3) {
@@ -799,18 +806,27 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       }
       case 'generating_wallet':
         return (
-          <div className="flex flex-col items-center justify-center py-16 space-y-8 text-center">
-            <div className="w-64 h-64 mx-auto pointer-events-none mb-4">
-              <RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-contain" />
+          <div className="flex flex-col items-center justify-center py-20 space-y-10 relative">
+            <div className="relative w-64 h-64 flex items-center justify-center -mt-8">
+               <RemoteLottie path="/system-shots/Block Abstract.json" className="w-full h-full object-contain opacity-100" />
             </div>
-            <h2 className="text-[14px] font-black uppercase tracking-widest text-[#050505]/50">
-              Forging Institutional Keys...
-            </h2>
-            <div className="w-full max-w-[240px] h-1.5 bg-black/5 rounded-full overflow-hidden mx-auto mt-6">
-              <motion.div
-                className="h-full bg-black rounded-full"
-                style={{ width: `${loadingProgress}%` }}
-              />
+            <div className="text-center space-y-4">
+              <h2 className="text-[26px] font-black text-[#0A0A0A] tracking-tighter uppercase">Forging Matrix</h2>
+              <p className="text-[15px] text-[#0A0A0A]/50 font-medium">Establishing local Sovereign identity on device...</p>
+              
+              {/* Terminal Progress Bar */}
+              <div className="w-full max-w-[200px] mx-auto mt-4">
+                <div className="h-[2px] w-full bg-black/10 overflow-hidden rounded-full">
+                   <div 
+                     className="h-full bg-[#050505] transition-all duration-75 ease-linear"
+                     style={{ width: `${loadingProgress}%` }}
+                   />
+                </div>
+                <div className="text-[10px] font-mono text-black/30 mt-2 font-black uppercase tracking-[0.2em] flex justify-between">
+                  <span>Encrypting</span>
+                  <span>{Math.round(loadingProgress)}%</span>
+                </div>
+              </div>
             </div>
           </div>
         );

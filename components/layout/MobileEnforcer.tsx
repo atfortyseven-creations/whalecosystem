@@ -103,8 +103,11 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
         // CRITICAL: check for '0x' prefix so an expired cookie ('sovereign_handshake=; max-age=0')
         // does not falsely register as authenticated.
-        const hasSovereignCookie = typeof document !== 'undefined'
-            && (document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x')) || document.cookie.includes('wallet-auth='));
+        let hasSovereignCookie = false;
+        try {
+            hasSovereignCookie = typeof document !== 'undefined'
+                && (document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x')) || document.cookie.includes('wallet-auth='));
+        } catch(e) {}
 
         if (bypassActive && hasSovereignCookie) {
             setShowNews(true);

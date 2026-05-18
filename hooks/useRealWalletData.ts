@@ -34,9 +34,12 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     const { address: sovereignAddress } = useWalletStore();
     
     // [PERFECTION] Immediate Handshake Resolution (High-Efficiency Cookie Reader)
-    const handshakeAddressFromCookie = typeof document !== 'undefined' 
-        ? document.cookie.split('; ').find(r => r.trim().startsWith('sovereign_handshake=0x'))?.split('=')[1]?.toLowerCase() 
-        : null;
+    let handshakeAddressFromCookie = null;
+    try {
+        handshakeAddressFromCookie = typeof document !== 'undefined' 
+            ? document.cookie.split('; ').find(r => r.trim().startsWith('sovereign_handshake=0x'))?.split('=')[1]?.toLowerCase() 
+            : null;
+    } catch(e) {}
 
     // Priority Hierarchy: 1. Manual override, 2. Web3 Provider, 3. Immediate Handshake, 4. Store Persistence
     const effectiveAddress = overrideAddress || web3Address || handshakeAddressFromCookie || sovereignAddress || managedWallet?.address;

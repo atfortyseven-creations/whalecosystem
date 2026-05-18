@@ -74,11 +74,26 @@ export class InstitutionalErrorBoundary extends Component<Props, State> {
           <h2 className="text-[14px] font-black uppercase tracking-[0.2em] text-[#050505] mb-2 text-center">
             Something went wrong
           </h2>
-          <p className="text-[10px] font-mono text-[#888888] uppercase tracking-widest mb-6 text-center max-w-sm leading-relaxed">
+          <p className="text-[10px] font-mono text-[#888888] uppercase tracking-widest mb-2 text-center max-w-sm leading-relaxed">
             {this.props.moduleName
               ? `The "${this.props.moduleName}" module failed to load.`
               : 'This module failed to load.'} Please try again.
           </p>
+          
+          <div className="w-full max-w-lg mb-6 p-4 bg-[#FF3B30]/5 border border-[#FF3B30]/20 rounded-xl overflow-auto max-h-[200px] text-left">
+            <p className="text-[#FF3B30] font-mono text-[11px] font-bold mb-2">Error Message:</p>
+            <p className="text-[#FF3B30]/80 font-mono text-[10px] whitespace-pre-wrap">
+              {this.state.error?.message || 'Unknown Error'}
+            </p>
+            {this.state.error?.stack && (
+              <>
+                <p className="text-[#FF3B30] font-mono text-[11px] font-bold mt-4 mb-2">Stack Trace:</p>
+                <p className="text-[#FF3B30]/60 font-mono text-[9px] whitespace-pre-wrap break-all">
+                  {this.state.error.stack}
+                </p>
+              </>
+            )}
+          </div>
           
           <button
             onClick={this.handleReset}
