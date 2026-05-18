@@ -151,12 +151,17 @@ export function LegendaryTransactionModal({
     }
 
     const activeFromAsset = fromAsset || balances.find(b => b.symbol === fromAssetSymbol && b.chainId === sourceChain.id);
-    const amountInUnits = parseUnits(amount, activeFromAsset?.decimals || 18);
-    const amountInWei = amountInUnits.toString();
-
     const fetchQuote = async () => {
         try {
             setErrorMsg(null);
+            
+            let amountInUnits;
+            try {
+                amountInUnits = parseUnits(amount, activeFromAsset?.decimals || 18);
+            } catch (err) {
+                return; // Ignore invalid amounts like "."
+            }
+            const amountInWei = amountInUnits.toString();
 
             if (mode === 'buy') {
                 // For buy mode, fetch live ETH/BTC/WLD price in EUR via CoinGecko

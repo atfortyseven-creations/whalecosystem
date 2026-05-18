@@ -39,6 +39,7 @@ type Tx = {
 
 function txType(tx: Tx, address: string): "send" | "receive" | "contract" {
   if (tx.input && tx.input !== "0x") return "contract";
+  if (!address || !tx.from) return "receive"; // Fallback to prevent crash
   if (tx.from.toLowerCase() === address.toLowerCase()) return "send";
   return "receive";
 }
