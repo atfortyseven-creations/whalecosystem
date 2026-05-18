@@ -205,8 +205,8 @@ export default function PortfolioPage() {
   const filteredAssets = (assets ?? [])
     .filter((a: any) =>
       !search ||
-      a.symbol?.toLowerCase().includes(search.toLowerCase()) ||
-      a.network?.toLowerCase().includes(search.toLowerCase())
+      a.symbol?.toLowerCase()?.includes(search.toLowerCase()) ||
+      a.network?.toLowerCase()?.includes(search.toLowerCase())
     )
     .sort((a: any, b: any) => (b.valueUSD ?? 0) - (a.valueUSD ?? 0));
 

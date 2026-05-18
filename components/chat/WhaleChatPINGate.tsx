@@ -301,10 +301,10 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-[#FAFAF8] overflow-y-auto py-8"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-white overflow-y-auto py-8"
     >
       {/* Subtle noise background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-white via-[#F8F7F4] to-[#F0EFE9] pointer-events-none" />
+      <div className="fixed inset-0 bg-white pointer-events-none" />
 
       <motion.div
         layout
@@ -319,7 +319,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
             transition={{ delay: 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="z-20 relative -mb-10 bg-white w-24 h-24 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/[0.04]"
           >
-            <RemoteLottie path="system-shots/Paper airplane.json" className="w-14 h-14" />
+            <RemoteLottie path="/system-shots/Paper airplane.json" className="w-14 h-14" />
           </motion.div>
 
           <motion.div
@@ -332,7 +332,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
             <img
               src="/system-shots/original-510ee2686e0287925ae0424ca40901f5.gif"
               alt="Whale Chat"
-              className="w-72 h-72 object-contain mx-auto rounded-[36px] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-black/[0.04]"
+              className="w-[400px] h-[400px] object-contain mx-auto"
               draggable={false}
             />
           </motion.div>
