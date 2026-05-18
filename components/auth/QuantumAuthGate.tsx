@@ -284,7 +284,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         } else if (vault) {
           // Fallback: migrate sovereign_vault_v1 to sovereign_keystore
           const { readStoredVaultKey } = await import('@/hooks/useSovereignConnect');
-          const vaultPk = readStoredVaultKey();
+          const vaultPk = await readStoredVaultKey();
           if (!vaultPk) throw new Error('Vault corrupted');
           const walletObj = new ethers.Wallet(vaultPk);
           pk = walletObj.privateKey;
@@ -623,7 +623,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         return (
           <div className="flex flex-col items-center justify-center py-20 space-y-10 relative">
             <div className="relative w-64 h-64 flex items-center justify-center -mt-8">
-               <RemoteLottie path="Whale Mission.json" className="w-full h-full object-contain opacity-100" />
+               <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-contain opacity-100" />
             </div>
             <div className="text-center space-y-3">
               <h2 className="text-[24px] font-black text-[#0A0A0A] tracking-tighter uppercase">
@@ -643,7 +643,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="flex items-center justify-center px-4 md:px-6 h-full w-full relative overflow-y-auto py-12 md:py-0">
       <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
-         <RemoteLottie path="Whale Mission.json" className="w-full h-full object-cover" />
+         <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-cover" />
       </div>
       <motion.div 
         key={step}
