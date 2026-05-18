@@ -19,63 +19,31 @@ import { injected } from "wagmi/connectors";
 import { getOrCreateSovereignProvider } from "@/lib/wallet/SovereignProvider";
 import { toast } from "sonner";
 
-const VAULT_STORAGE_KEY = "sovereign_vault_v1";
+import { SecureSessionStorage } from '@/lib/security/secure-storage';
 
-// ── Vault Encoding ────────────────────────────────────────────────────────────
-// BUG-06 FIX: Use hex XOR encoding instead of btoa/atob.
-// btoa() throws InvalidCharacterError for any char > 255 (common with XOR).
-// Hex is always ASCII-safe and works identically on all browsers inc. Safari.
+const VAULT_SESSION_KEY = "sovereign_vault_session";
 
-function deriveObfKey(salt: string): string {
-  return salt.split("").map(c => c.charCodeAt(0).toString(16)).join("").substring(0, 64);
-}
-
-function encodeVault(privateKey: string): string {
-  const salt = typeof window !== "undefined" ? window.location.origin : "sovereign";
-  const key = deriveObfKey(salt);
-  // XOR then encode each byte as 2-digit hex → always valid ASCII
-  let out = "";
-  for (let i = 0; i < privateKey.length; i++) {
-    const xored = privateKey.charCodeAt(i) ^ key.charCodeAt(i % key.length);
-    out += xored.toString(16).padStart(2, "0");
-  }
-  return out;
-}
-
-function decodeVault(encoded: string): string {
-  const salt = typeof window !== "undefined" ? window.location.origin : "sovereign";
-  const key = deriveObfKey(salt);
-  let out = "";
-  for (let i = 0; i < encoded.length; i += 2) {
-    const byte = parseInt(encoded.substring(i, i + 2), 16);
-    out += String.fromCharCode(byte ^ key.charCodeAt((i / 2) % key.length));
-  }
-  return out;
-}
-
-export function readStoredVaultKey(): `0x${string}` | null {
+export async function readStoredVaultKey(): Promise<`0x${string}` | null> {
   try {
-    const stored = localStorage.getItem(VAULT_STORAGE_KEY);
-    if (!stored) return null;
-    const decoded = decodeVault(stored);
-    if (!decoded.startsWith("0x") || decoded.length < 66) return null; // sanity check
-    return decoded as `0x${string}`;
+    const pk = await SecureSessionStorage.getItem<string>(VAULT_SESSION_KEY, true, false);
+    if (!pk || !pk.startsWith("0x") || pk.length < 66) return null;
+    return pk as `0x${string}`;
   } catch {
     return null;
   }
 }
 
-function storeVaultKey(pk: string) {
+async function storeVaultKey(pk: string) {
   try {
-    localStorage.setItem(VAULT_STORAGE_KEY, encodeVault(pk));
+    await SecureSessionStorage.setItem(VAULT_SESSION_KEY, pk, true);
   } catch {
-    // Storage quota exceeded — non-fatal, session will work until page reload
-    console.warn("[SovereignVault] localStorage quota exceeded — vault not persisted");
+    console.warn("[SovereignVault] session storage failed");
   }
 }
 
 export function clearSovereignVault() {
-  try { localStorage.removeItem(VAULT_STORAGE_KEY); } catch {}
+  SecureSessionStorage.removeItem(VAULT_SESSION_KEY);
+  try { localStorage.removeItem("sovereign_vault_v1"); } catch {} // clear legacy
 }
 
 // ── Wagmi Connector ───────────────────────────────────────────────────────────
@@ -107,8 +75,8 @@ export function useSovereignConnect() {
         // 1. Inject the key in the live provider singleton
         getOrCreateSovereignProvider(pk);
 
-        // 2. Persist in hex-encoded localStorage for auto-reconnect
-        storeVaultKey(pk);
+        // 2. Persist in SecureSessionStorage for auto-reconnect on refresh
+        await storeVaultKey(pk);
 
         // 3. Drive Wagmi state machine into "connected"
         connect({ connector: sovereignConnector() });
@@ -143,29 +111,30 @@ export function useSovereignConnect() {
    * Next.js 15 SSR. We retry up to MAX_ATTEMPTS times with doubling delays.
    */
   const autoReconnect = useCallback(() => {
-    const pk = readStoredVaultKey();
-    if (!pk) return;
+    readStoredVaultKey().then((pk) => {
+      if (!pk) return;
 
-    getOrCreateSovereignProvider(pk);
+      getOrCreateSovereignProvider(pk);
 
-    const MAX_ATTEMPTS = 4;
-    const BASE_DELAY_MS = 100;
-    let attempts = 0;
+      const MAX_ATTEMPTS = 4;
+      const BASE_DELAY_MS = 100;
+      let attempts = 0;
 
-    const attemptConnect = () => {
-      try {
-        connect({ connector: sovereignConnector() });
-      } catch (err) {
-        if (attempts < MAX_ATTEMPTS) {
-          attempts++;
-          setTimeout(attemptConnect, BASE_DELAY_MS * attempts); // 100, 200, 300, 400ms
-        } else {
-          console.warn("[SovereignVault] Auto-reconnect failed after", MAX_ATTEMPTS, "attempts");
+      const attemptConnect = () => {
+        try {
+          connect({ connector: sovereignConnector() });
+        } catch (err) {
+          if (attempts < MAX_ATTEMPTS) {
+            attempts++;
+            setTimeout(attemptConnect, BASE_DELAY_MS * attempts); // 100, 200, 300, 400ms
+          } else {
+            console.warn("[SovereignVault] Auto-reconnect failed after", MAX_ATTEMPTS, "attempts");
+          }
         }
-      }
-    };
+      };
 
-    attemptConnect();
+      attemptConnect();
+    });
   }, [connect]);
 
   return { activateSovereignVault, disconnectSovereignVault, autoReconnect };

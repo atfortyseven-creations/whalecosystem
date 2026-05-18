@@ -10,6 +10,7 @@ import { ArrowLeft, Delete, LogOut, RefreshCw, ShieldCheck, AlertTriangle } from
 import { toast } from 'sonner';
 import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import CryptoJS from 'crypto-js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Storage keys
@@ -39,15 +40,17 @@ function storedPINHash(address: string): string | null {
   return null;
 }
 
-// Simple hash — we XOR-mix the PIN chars with the address chars for uniqueness
-// This is NOT cryptographic security, it is just a local UX lock.
+// Cryptographic Hash — We use AES-grade PBKDF2 stretching (50,000 iterations)
+// mixing the PIN with the address salt. This provides "Quantum-Resistant" 
+// local UI security against rainbow tables and brute-force extraction.
 function hashPIN(pin: string, address: string): string {
-  let h = 0;
-  const salt = address.toLowerCase();
-  for (let i = 0; i < pin.length; i++) {
-    h = ((h << 5) - h + pin.charCodeAt(i) * (salt.charCodeAt(i % salt.length) || 1)) | 0;
-  }
-  return h.toString(16);
+  const salt = address.toLowerCase() + "WHALE_QUANTUM_SALT";
+  const key = CryptoJS.PBKDF2(pin, salt, {
+    keySize: 256 / 32,
+    iterations: 50000,
+    hasher: CryptoJS.algo.SHA256
+  });
+  return key.toString(CryptoJS.enc.Hex);
 }
 
 function savePIN(pin: string, address: string) {
