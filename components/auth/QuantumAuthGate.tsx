@@ -19,7 +19,7 @@ const LANGS: Record<LangKey, Record<string, any>> = {
     home_title: 'Portfolio', home_sub: 'Connect your wallet or create a secure local wallet to track your holdings.',
     create_vault: 'Create Wallet', create_vault_sub: 'Generate a 12-word recovery phrase',
     unlock_vault: 'Unlock Wallet', unlock_vault_sub: 'Enter your password to unlock',
-    mint: 'Mint Ticket Pass', mint_sub: '0.5 ETH · Unlimited Access',
+    mint: 'Login Existing Account', mint_sub: 'Access with your password',
     password_title: 'Wallet Setup', password_sub: 'This password encrypts your recovery phrase on this device only. We never see it.',
     pw_placeholder: 'New Password (8+ characters)', pw_confirm: 'Confirm Password',
     terms: 'I understand that Whale Alert cannot recover this password. If I lose it, I need my 12-word phrase to regain access.',
@@ -52,7 +52,7 @@ const LANGS: Record<LangKey, Record<string, any>> = {
     home_title: 'Portafolio', home_sub: 'Conecta tu wallet o crea una wallet local segura para rastrear tus activos.',
     create_vault: 'Crear Wallet', create_vault_sub: 'Genera una frase de recuperación de 12 palabras',
     unlock_vault: 'Desbloquear Wallet', unlock_vault_sub: 'Introduce tu contraseña',
-    mint: 'Mintear Ticket', mint_sub: '0.5 ETH · Acceso ilimitado',
+    mint: 'Login Cuenta Existente', mint_sub: 'Accede con tu contraseña',
     password_title: 'Configurar Wallet', password_sub: 'Esta contraseña cifra tu frase de recuperación en este dispositivo. Nunca la vemos.',
     pw_placeholder: 'Nueva contraseña (mín. 8 caracteres)', pw_confirm: 'Confirmar contraseña',
     terms: 'Entiendo que Whale Alert no puede recuperar esta contraseña. Si la pierdo, necesito mis 12 palabras.',
@@ -85,7 +85,7 @@ const LANGS: Record<LangKey, Record<string, any>> = {
     home_title: '投资组合', home_sub: '连接你的钱包或创建本地安全钱包来追踪资产。',
     create_vault: '创建钱包', create_vault_sub: '生成一个12个单词的恢复短语',
     unlock_vault: '解锁钱包', unlock_vault_sub: '输入密码解锁',
-    mint: '铸造通行证', mint_sub: '0.5 ETH · 无限访问',
+    mint: '登录现有帐户', mint_sub: '使用密码访问',
     password_title: '钱包设置', password_sub: '此密码仅在本设备上加密你的恢复短语，我们永远不会看到它。',
     pw_placeholder: '新密码（至少8个字符）', pw_confirm: '确认密码',
     terms: '我理解Whale Alert无法恢复此密码。如果我忘记密码，需要12个单词恢复访问权限。',
@@ -118,7 +118,7 @@ const LANGS: Record<LangKey, Record<string, any>> = {
     home_title: 'Портфель', home_sub: 'Подключите кошелёк или создайте локальный безопасный кошелёк для отслеживания активов.',
     create_vault: 'Создать кошелёк', create_vault_sub: 'Сгенерировать 12-словную фразу восстановления',
     unlock_vault: 'Разблокировать', unlock_vault_sub: 'Введите пароль для разблокировки',
-    mint: 'Получить пропуск', mint_sub: '0.5 ETH · Неограниченный доступ',
+    mint: 'Войти в аккаунт', mint_sub: 'Вход по паролю',
     password_title: 'Настройка кошелька', password_sub: 'Этот пароль шифрует вашу фразу только на этом устройстве. Мы его никогда не видим.',
     pw_placeholder: 'Новый пароль (мин. 8 символов)', pw_confirm: 'Подтвердите пароль',
     terms: 'Я понимаю, что Whale Alert не может восстановить этот пароль. Если я его потеряю, мне понадобится фраза из 12 слов.',
@@ -248,10 +248,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     
     setTimeout(async () => {
       try {
-        const encryptedJson = await ethers.encryptKeystoreJson({
-          address: wallet.address,
-          privateKey: wallet.privateKey
-        }, password, { scrypt: { N: 1024 } });
+        const encryptedJson = await wallet.encrypt(password);
         localStorage.setItem('sovereign_keystore', encryptedJson);
         importWallet(wallet.privateKey, "Sovereign Main");
         await activateSovereignVault(wallet.privateKey, wallet.address);
@@ -297,10 +294,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
           addr = walletObj.address;
           
           // Encrypt and save keystore for future logins
-          const encryptedJson = await ethers.encryptKeystoreJson({
-            address: walletObj.address,
-            privateKey: walletObj.privateKey
-          }, password, { scrypt: { N: 1024 } });
+          const encryptedJson = await walletObj.encrypt(password);
           localStorage.setItem('sovereign_keystore', encryptedJson);
         }
 
@@ -375,7 +369,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
               )}
 
               <button 
-                onClick={() => { setClickedMint(true); open(); }}
+                onClick={() => setStep('login')}
                 className="group w-full flex items-center justify-between p-6 rounded-[24px] bg-transparent border border-transparent hover:bg-black/5 transition-all active:scale-[0.98]"
               >
                 <div className="flex items-center gap-5">

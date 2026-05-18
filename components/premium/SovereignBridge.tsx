@@ -73,12 +73,29 @@ export function SovereignBridge({ onClose }: SovereignBridgeProps) {
             setState('ready');
 
             // Tick every second
-            timerRef.current = setInterval(() => {
+            timerRef.current = setInterval(async () => {
                 const remaining = Math.max(0, Math.floor((expDate.getTime() - Date.now()) / 1000));
                 setCountdown(remaining);
                 if (remaining === 0) {
                     clearTimer();
                     setState('expired');
+                } else if (remaining % 2 === 0) {
+                    // Poll status every 2 seconds
+                    try {
+                        const statusRes = await fetch(`/api/bridge/status?token=${token}`);
+                        if (statusRes.ok) {
+                            const data = await statusRes.json();
+                            if (data.linked) {
+                                clearTimer();
+                                setState('success');
+                                setTimeout(() => {
+                                    if (onClose) onClose();
+                                }, 3000);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("Poll failed", e);
+                    }
                 }
             }, 1000);
 
@@ -181,6 +198,20 @@ export function SovereignBridge({ onClose }: SovereignBridgeProps) {
                             className="px-4 py-2 rounded-lg bg-[#a855f7]/10 border border-[#a855f7]/20 text-[#a855f7] text-[10px] uppercase tracking-widest font-mono hover:bg-[#a855f7]/20 transition-colors flex items-center gap-2">
                             <RefreshCw size={11} /> New QR
                         </button>
+                    </motion.div>
+                )}
+
+                {/* SUCCESS */}
+                {state === 'success' && (
+                    <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center gap-3 text-center py-6">
+                        <div className="w-16 h-16 rounded-full bg-[#4ade80]/10 border border-[#4ade80]/30 flex items-center justify-center mb-2">
+                            <Smartphone size={28} className="text-[#4ade80]" />
+                        </div>
+                        <h3 className="font-mono text-[14px] font-bold text-white uppercase tracking-widest">Bridge Connected</h3>
+                        <p className="text-[11px] text-white/40 font-mono leading-relaxed max-w-[220px]">
+                            Session successfully linked.
+                        </p>
                     </motion.div>
                 )}
 

@@ -23,7 +23,7 @@ export default function Providers({ children, initialState, cookies }: { childre
 
     return (
         <SessionProvider>
-            <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">
             <AppProvider>
                 <ClientWeb3Provider cookies={cookies || null}>
                     <SettingsProvider>

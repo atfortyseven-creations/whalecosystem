@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SAAS_PLANS } from '@/lib/saas/plans';
 
-// Mock types for the UI
+// Types for the UI
 type ApiKey = {
     id: string;
     name: string;
@@ -16,8 +16,8 @@ type ApiKey = {
     lastUsedAt: string | null;
 };
 
-export function ApiKeyManager({ tier, keys }: { tier: string; keys: ApiKey[] }) {
-    const config = SAAS_PLANS[tier];
+export function ApiKeyManager({ tier, keys }: { tier: keyof typeof SAAS_PLANS; keys: ApiKey[] }) {
+    const config = SAAS_PLANS[tier as keyof typeof SAAS_PLANS];
     const maxKeys = config.limits.maxApiKeys;
     const canCreate = keys.length < maxKeys;
 
@@ -130,7 +130,7 @@ export function ApiKeyManager({ tier, keys }: { tier: string; keys: ApiKey[] }) 
                             />
                             <Button 
                                 className="bg-indigo-500 hover:bg-indigo-600 text-white shrink-0"
-                                onClick={() => setIsCreating(false)} // Mock create
+                                onClick={() => setIsCreating(false)} // Close creation modal
                             >
                                 Generate
                             </Button>

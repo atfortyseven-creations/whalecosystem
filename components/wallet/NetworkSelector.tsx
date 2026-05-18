@@ -75,7 +75,7 @@ export function NetworkSelector() {
                                 `}
                             >
                                 <span className="flex items-center gap-2">
-                                    {/* Mock Icons based on name or generic */}
+                                    {/* Chain Icons */}
                                     <div className={`w-2 h-2 rounded-full ${chain.id === chainId ? 'bg-green-500' : 'bg-neutral-600'}`} />
                                     {chain.name}
                                 </span>

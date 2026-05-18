@@ -30,7 +30,7 @@ export default function WatchOnlyInput({ onAdd, onCancel }: WatchOnlyInputProps)
         if (!isAddress(input) && !input.endsWith('.eth')) {
             throw new Error('Invalid address or ENS');
         }
-        await onAdd(input, input.slice(0, 8)); // Mock add
+        await onAdd(input, input.slice(0, 8));
     } catch (e: any) {
         setError(e.message);
     } finally {

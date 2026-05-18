@@ -11,7 +11,8 @@ import { QrScanner } from '@/components/dashboard/QrScanner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import type { Client } from '@xmtp/browser-sdk';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
-import { Paperclip, Loader2 } from 'lucide-react';
+import { Paperclip, Loader2, MapPin, MoreVertical, Download, Slash, UserPlus, Copy, Trash2, Reply } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ConversationMeta {
   peerAddress: string;
@@ -82,6 +83,70 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
   const [isUploading, setIsUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Telegram-style features
+  const [showProfile, setShowProfile] = useState(false);
+  const [blockedPeers, setBlockedPeers] = useState<Set<string>>(new Set());
+  const [contextMenu, setContextMenu] = useState<{ id: string, content: string, x: number, y: number } | null>(null);
+
+  useEffect(() => {
+    try {
+      const b = localStorage.getItem('whale_blocked');
+      if (b) setBlockedPeers(new Set(JSON.parse(b)));
+    } catch {}
+  }, []);
+
+  const toggleBlock = (peer: string) => {
+    setBlockedPeers(prev => {
+      const next = new Set(prev);
+      if (next.has(peer.toLowerCase())) next.delete(peer.toLowerCase());
+      else next.add(peer.toLowerCase());
+      localStorage.setItem('whale_blocked', JSON.stringify(Array.from(next)));
+      return next;
+    });
+  };
+
+  const exportChat = () => {
+    if (!activePeer) return;
+    const dmId = `dm-${activePeer.toLowerCase()}`;
+    const msgs = messages.filter(m => m.conversationId === dmId);
+    const text = msgs.map(m => {
+      const sender = m.senderInboxId === client?.inboxId ? 'Me' : 'Peer';
+      const sentTime = typeof m.sentAtNs === 'number' ? new Date(m.sentAtNs) : (m.sent || m.sentAt || new Date());
+      return `[${sentTime.toLocaleString()}] ${sender}: ${m.content}`;
+    }).join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Chat_Export_${activePeer.slice(0,6)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowProfile(false);
+  };
+
+  const clearChat = () => {
+    if (!activePeer) return;
+    const dmId = `dm-${activePeer.toLowerCase()}`;
+    setMessages(prev => prev.filter(m => m.conversationId !== dmId));
+    setShowProfile(false);
+  };
+
+  const syncToAddressBook = (peer: string) => {
+    try {
+      const saved = localStorage.getItem('whale_contacts') || '[]';
+      const contacts = new Set<string>(JSON.parse(saved));
+      if (!contacts.has(peer.toLowerCase())) {
+         contacts.add(peer.toLowerCase());
+         localStorage.setItem('whale_contacts', JSON.stringify(Array.from(contacts)));
+         toast.success('Wallet added to Sovereign Contacts');
+      } else {
+         toast.info('Wallet is already in Contacts');
+      }
+    } catch {
+       toast.error('Failed to sync to Address Book');
+    }
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -580,7 +645,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
           if (belongsToActive) {
             // @ts-ignore
-            if (fromPeer && typeof playAudioPing === 'function' && soundEffects) playAudioPing('receive');
+            if (!isMobile && fromPeer && typeof playAudioPing === 'function' && soundEffects) playAudioPing('receive');
             setMessages(prev => {
               if (prev.some(m => m.id === mappedMsg.id)) return prev;
               
@@ -630,7 +695,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                return updated;
             });
             // @ts-ignore
-            if (typeof playAudioPing === 'function') playAudioPing('receive');
+            if (!isMobile && typeof playAudioPing === 'function') playAudioPing('receive');
           }
         }
       } catch (e) {
@@ -807,7 +872,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         stopTypingSignal();
 
         // @ts-ignore
-        if (typeof playAudioPing === 'function' && soundEffects) playAudioPing('send');
+        if (!isMobile && typeof playAudioPing === 'function' && soundEffects) playAudioPing('send');
         // Send to XMTP network (includes dm.sync() after send)
         await sendMessage(client, activePeer, content);
         // We do not eagerly refetch messages here anymore.
@@ -905,7 +970,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         const lastMsg = messages[messages.length - 1];
         const isMe = lastMsg.senderInboxId?.toLowerCase() === client?.inboxId?.toLowerCase();
         // If it's a new message and I didn't send it, play receive ping
-        if (!isMe && prevMsgCount > 0) {
+        if (!isMobile && !isMe && prevMsgCount > 0) {
             playAudioPing('receive');
         }
     }
@@ -1131,13 +1196,15 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                 <button onClick={() => setShowList(true)} className="md:hidden p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-black/50 dark:text-white/50 text-[10px] font-black">
                   BACK
                 </button>
-                <Avatar address={activePeer!} />
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-[#050505] dark:text-white font-mono flex items-center gap-1.5">
-                    {shortAddr(activePeer!)}
-                  </span>
-                  <span className="text-[8px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">End-to-End Encrypted</span>
-                </div>
+                <button onClick={() => setShowProfile(true)} className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity">
+                  <Avatar address={activePeer!} />
+                  <div className="flex flex-col">
+                    <span className="text-[11px] font-bold text-[#050505] dark:text-white font-mono flex items-center gap-1.5">
+                      {shortAddr(activePeer!)}
+                    </span>
+                    <span className="text-[8px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">End-to-End Encrypted</span>
+                  </div>
+                </button>
               </div>
               <div className="flex items-center gap-2">
                 <button 
@@ -1145,6 +1212,9 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   className="lg:hidden px-3 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-[9px] font-black uppercase tracking-widest"
                 >
                   SCAN
+                </button>
+                <button onClick={() => setShowProfile(true)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-black/50 dark:text-white/50">
+                  <MoreVertical size={16} />
                 </button>
               </div>
             </div>
@@ -1166,13 +1236,21 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                     </div>
                   </div>
                 );
+                let lastDate = '';
                 return filteredMsgs.map(msg => {
+                  const sentTime = typeof msg.sentAtNs === 'number' ? new Date(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
+                  const dateStr = new Date(sentTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                  const showDate = dateStr !== lastDate;
+                  lastDate = dateStr;
+
                   const isMe = msg.senderInboxId
                     ? msg.senderInboxId?.toLowerCase() === (client?.inboxId as string)?.toLowerCase()
                     : false;
                   const content = typeof msg.content === 'string' ? msg.content : (msg.fallback || 'Encrypted Data');
                   const isAudio = content.startsWith('__AUDIO__');
+                  const isLocation = content.startsWith('[LOCATION]');
                   const audioSrc = isAudio ? content.slice('__AUDIO__'.length) : null;
+                  const locationCoords = isLocation ? content.slice('[LOCATION]'.length) : null;
                   
                   const attachmentMatch = typeof content === 'string' ? content.match(/^\[ATTACHMENT:([^\]]*)\](.*?)\|(.*)$/is) : null;
                   const attachment = attachmentMatch ? { mime: attachmentMatch[1] || 'application/octet-stream', url: attachmentMatch[2], name: attachmentMatch[3] } : null;
@@ -1180,7 +1258,20 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   // sentAtNs is now a plain number (ms), not BigInt
                   const sentTime = typeof msg.sentAtNs === 'number' ? new Date(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
                   return (
-                    <div key={msg.id} className={`flex flex-col max-w-[80%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`}>
+                    <React.Fragment key={msg.id}>
+                      {showDate && (
+                        <div className="flex justify-center my-3">
+                          <span className="px-3 py-1 bg-black/5 dark:bg-white/5 rounded-full text-[9px] font-mono font-bold text-black/40 dark:text-white/40 uppercase tracking-widest shadow-sm">
+                            {dateStr}
+                          </span>
+                        </div>
+                      )}
+                      <div className={`flex flex-col max-w-[80%] relative ${isMe ? 'self-end items-end' : 'self-start items-start'}`}>
+                        {/* Invisible overlay for tap precision / context menu */}
+                        <div 
+                           className="absolute inset-0 z-10 cursor-pointer"
+                           onContextMenu={(e) => { e.preventDefault(); setContextMenu({ id: msg.id, content, x: e.clientX, y: e.clientY }); }}
+                        />
                       {isAudio && audioSrc ? (
                         <div className={`px-3 py-2.5 rounded-2xl ${
                           isMe
@@ -1196,6 +1287,20 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                             className="h-8 max-w-[200px]"
                             style={{ filter: isMe ? 'invert(1) brightness(0.8)' : 'invert(var(--dark-invert, 0))' }}
                           />
+                        </div>
+                      ) : isLocation && locationCoords ? (
+                        <div className={`px-4 py-3 rounded-2xl flex flex-col gap-2 relative z-20 ${
+                          isMe
+                            ? 'bg-[#050505] dark:bg-white text-white dark:text-black rounded-br-sm'
+                            : 'bg-white dark:bg-[#1A1A1A] text-[#050505] dark:text-white rounded-bl-sm border border-black/8 dark:border-white/10 shadow-sm'
+                        }`}>
+                          <div className="flex items-center gap-2">
+                             <MapPin size={14} className={isMe ? 'text-white/70 dark:text-black/70' : 'text-blue-500'} />
+                             <span className="text-[10px] font-mono uppercase font-bold">Real-time Location</span>
+                          </div>
+                          <a href={`https://www.google.com/maps?q=${locationCoords}`} target="_blank" rel="noopener noreferrer" className={`text-[11px] underline mt-1 font-mono ${isMe ? 'text-white/80 dark:text-black/80' : 'text-blue-500'}`}>
+                            Open in Maps ({locationCoords})
+                          </a>
                         </div>
                       ) : attachment ? (
                         <div className={`mt-1 overflow-hidden rounded-xl border ${isMe ? 'border-black/10 dark:border-white/10 shadow-sm bg-black/5 dark:bg-white/5' : 'border-black/10 dark:border-white/10 shadow-sm bg-white dark:bg-[#1A1A1A]'}`}>
@@ -1224,6 +1329,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                         {new Date(sentTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
+                    </React.Fragment>
                   );
                 });
               })()}
@@ -1268,6 +1374,23 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   <span className="text-[9px] font-black uppercase tracking-widest">{isRecording ? 'OFF' : 'REC'}</span>
                 </button>
 
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(async (pos) => {
+                        const loc = `[LOCATION]${pos.coords.latitude},${pos.coords.longitude}`;
+                        await executeSend(loc);
+                      });
+                    }
+                  }}
+                  disabled={sending}
+                  className="w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-95 shrink-0 bg-black/[0.05] dark:bg-white/5 text-black/50 dark:text-white/50 hover:bg-black/10 dark:hover:bg-white/10"
+                  title="Share Location"
+                >
+                  <MapPin size={16} />
+                </button>
+
                 <input type="file" ref={fileRef} onChange={handleFileChange} className="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.txt" />
                 
                 <button
@@ -1305,8 +1428,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           <div className="flex-1 flex flex-col items-center justify-center bg-transparent relative overflow-hidden p-6">
             <div className="flex flex-col items-center gap-6 max-w-2xl text-center select-none relative z-10">
               
-              <div className="w-24 h-24 mb-4 flex items-center justify-center bg-white dark:bg-[#1A1A1A] rounded-full border border-black/5 dark:border-white/5 shadow-sm">
-                 <img src="/official-whale-monochrome.png" alt="Whale" className="w-12 h-12 opacity-80" style={{ filter: 'invert(var(--dark-invert, 0))' }} />
+              <div className="relative mb-8 flex flex-col items-center justify-center">
+                 <RemoteLottie path="system-shots/Paper airplane.json" className="w-48 h-48 absolute -top-32 pointer-events-none" />
+                 <div className="w-32 h-32 flex items-center justify-center rounded-full border border-black/5 shadow-sm bg-transparent">
+                     <img src="/official-whale-monochrome.png" alt="Whale" className="w-24 h-24 opacity-80" />
+                 </div>
               </div>
 
               <div className="inline-flex items-center gap-3 px-5 py-2 bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 rounded-full shadow-sm">
@@ -1369,6 +1495,65 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
            </div>
         </div>
       )}
-    </div>
-  );
+
+       {/* Context Menu Overlay */}
+       {contextMenu && (
+         <div className="fixed inset-0 z-[200]" onClick={() => setContextMenu(null)}>
+           <div 
+             className="absolute bg-white dark:bg-[#1A1A1A] border border-black/10 dark:border-white/10 rounded-2xl shadow-xl p-2 min-w-[160px] flex flex-col"
+             style={{ top: Math.min(contextMenu.y, window.innerHeight - 150), left: Math.min(contextMenu.x, window.innerWidth - 180) }}
+             onClick={e => e.stopPropagation()}
+           >
+             <button onClick={() => {
+                 navigator.clipboard.writeText(contextMenu.content.replace(/^\[.*?\]/, ''));
+                 setContextMenu(null);
+             }} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-[11px] font-mono text-[#050505] dark:text-white text-left">
+                <Copy size={14} /> Copy Text
+             </button>
+             <button onClick={() => {
+                 setMessages(prev => prev.filter(m => m.id !== contextMenu.id));
+                 setContextMenu(null);
+             }} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-[11px] font-mono text-red-500 text-left">
+                <Trash2 size={14} /> Delete
+             </button>
+           </div>
+         </div>
+       )}
+
+       {/* Profile Popover Overlay */}
+       {showProfile && activePeer && (
+         <div className="absolute inset-0 z-[150] bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300" onClick={() => setShowProfile(false)}>
+           <div className="w-full max-w-sm bg-white dark:bg-[#1A1A1A] p-6 rounded-3xl border border-black/10 dark:border-white/10 shadow-2xl" onClick={e => e.stopPropagation()}>
+               <div className="flex justify-between items-center mb-6">
+                   <h3 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505] dark:text-white">Profile</h3>
+                   <button onClick={() => setShowProfile(false)} className="w-8 h-8 flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[11px] font-black uppercase text-[#050505] dark:text-white">
+                     X
+                   </button>
+               </div>
+               <div className="flex flex-col items-center gap-4 mb-8">
+                   <Avatar address={activePeer} />
+                   <div className="text-center">
+                     <p className="text-[13px] font-mono font-bold text-[#050505] dark:text-white">{activePeer}</p>
+                     <p className="text-[10px] text-[#00C076] font-black uppercase tracking-widest mt-1">End-to-End Encrypted Tunnel</p>
+                   </div>
+               </div>
+               <div className="flex flex-col gap-2">
+                   <button onClick={() => { syncToAddressBook(activePeer); setShowProfile(false); }} className="w-full flex items-center gap-3 px-4 py-3.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-xl transition-colors text-[11px] font-mono font-bold text-[#050505] dark:text-white">
+                       <UserPlus size={16} className="text-black/50 dark:text-white/50" /> Add to Contacts
+                   </button>
+                   <button onClick={exportChat} className="w-full flex items-center gap-3 px-4 py-3.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-xl transition-colors text-[11px] font-mono font-bold text-[#050505] dark:text-white">
+                       <Download size={16} className="text-black/50 dark:text-white/50" /> Export Chat
+                   </button>
+                   <button onClick={() => toggleBlock(activePeer)} className="w-full flex items-center gap-3 px-4 py-3.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-xl transition-colors text-[11px] font-mono font-bold text-orange-500">
+                       <Slash size={16} /> {blockedPeers.has(activePeer.toLowerCase()) ? 'Unblock Wallet' : 'Block Wallet'}
+                   </button>
+                   <button onClick={clearChat} className="w-full flex items-center gap-3 px-4 py-3.5 bg-black/5 dark:bg-white/5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors text-[11px] font-mono font-bold text-red-500">
+                       <Trash2 size={16} /> Clear Chat
+                   </button>
+               </div>
+           </div>
+         </div>
+       )}
+     </div>
+   );
 }

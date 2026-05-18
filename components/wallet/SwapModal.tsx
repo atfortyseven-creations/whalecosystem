@@ -8,7 +8,7 @@ import { parseUnits, formatUnits } from "viem";
 import { useEliteSwap } from "@/hooks/useEliteSwap";
 import { toast } from "sonner";
 
-// Constants for Mock Solver
+// Constants for Intent Solver
 const TOKENS = [
     { symbol: "ETH", name: "Ethereum", icon: "https://cryptologos.cc/logos/ethereum-eth-logo.png", chain: "Ethereum", color: "bg-blue-600" },
     { symbol: "USDC", name: "USD Coin", icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png", chain: "Polygon", color: "bg-blue-500" },

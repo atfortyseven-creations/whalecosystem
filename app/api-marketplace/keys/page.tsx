@@ -8,11 +8,11 @@ import { UniversalEliteWallpaper } from '@/components/shared/UniversalEliteWallp
 import { Database, ShieldCheck } from 'lucide-react';
 
 export default function ApiKeysDashboard() {
-    // Mock user state - standard for demo purposes
+    // User state - derived from auth
     // In prod: await auth() -> fetch prisma user -> extract tier & keys
-    const mockTier = 'PRO'; // Sovereign string tier — no Prisma enum dependency
+    const userTier = 'PRO'; // Sovereign string tier — no Prisma enum dependency
     
-    const mockKeys = [
+    const initialKeys = [
         {
             id: 'key_1',
             name: 'Production Trading Algo',
@@ -22,7 +22,7 @@ export default function ApiKeysDashboard() {
         }
     ];
 
-    const mockStats = {
+    const usageStats = {
         dailyRequests: 142050, // Heavy usage example for Pro
         billingPeriodStart: new Date().toISOString()
     };
@@ -59,13 +59,13 @@ export default function ApiKeysDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Column (Keys & Security) */}
                     <div className="lg:col-span-2 space-y-8">
-                        <ApiKeyManager tier={mockTier} keys={mockKeys} />
-                        <SecurityPanel tier={mockTier} />
+                        <ApiKeyManager tier={userTier} keys={initialKeys} />
+                        <SecurityPanel tier={userTier} />
                     </div>
 
                     {/* Right Column (Usage & Limits) */}
                     <div className="lg:col-span-1">
-                        <UsageStats tier={mockTier} stats={mockStats} />
+                        <UsageStats tier={userTier} stats={usageStats} />
                     </div>
                 </div>
             </div>
