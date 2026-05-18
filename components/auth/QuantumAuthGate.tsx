@@ -218,7 +218,7 @@ function SecureStepPanel({ t, onBack, onProceed }: { t: any; onBack: () => void;
 export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [lang, setLang] = useState<LangKey>('en');
   const t = LANGS[lang];
-  const [step, setStep] = useState<'home' | 'login' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting'>('home');
+  const [step, setStep] = useState<'home' | 'login' | 'mnemonic' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting'>('home');
   const [hasKeystore, setHasKeystore] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -232,6 +232,9 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [verifyInputs, setVerifyInputs] = useState<string[]>(['', '', '']);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [clickedMint, setClickedMint] = useState(false);
+  // Mnemonic recovery state
+  const [mnemonicInput, setMnemonicInput] = useState('');
+  const [mnemonicError, setMnemonicError] = useState('');
   const { isConnected } = useAccount();
   const { importWallet } = useWalletStore();
   const { activateSovereignVault } = useSovereignConnect();
@@ -310,94 +313,163 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     
     const startTime = Date.now();
     
-    setTimeout(async () => {
+    // Small UI delay before heavy crypto work
+    await new Promise(r => setTimeout(r, 200));
+
+    try {
+      const encryptedJson = await wallet.encrypt(password);
+      localStorage.setItem('sovereign_keystore', encryptedJson);
+      importWallet(wallet.privateKey, 'Sovereign Main');
+
+      // Write session flag so portfolio gate unlocks immediately
       try {
-        const encryptedJson = await wallet.encrypt(password);
-        localStorage.setItem('sovereign_keystore', encryptedJson);
-        importWallet(wallet.privateKey, "Sovereign Main");
+        sessionStorage.setItem('portfolio_unlocked', 'true');
+        sessionStorage.setItem('sovereign_wallet_addr', wallet.address.toLowerCase());
+      } catch {}
 
-        // Non-fatal: activateSovereignVault uses an injected provider that
-        // may not exist on mobile Chrome (iOS/Android). The keystore is
-        // already saved — proceed to dashboard regardless.
-        try {
-          await activateSovereignVault(wallet.privateKey, wallet.address);
-        } catch (vaultErr: any) {
-          console.warn('[QuantumAuthGate] Vault activation non-fatal:', vaultErr?.message);
-        }
-
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(2000 - elapsedTime, 0);
-
-        setTimeout(() => {
-          toast.success('Wallet created and secured successfully.');
-          onComplete();
-        }, remainingTime);
-      } catch (e: any) {
-        toast.error('Encryption failed', { description: e.message });
-        setStep('verify');
+      // Non-fatal: activateSovereignVault uses an injected provider that
+      // may not exist on mobile Chrome (iOS/Android). The keystore is
+      // already saved — proceed to dashboard regardless.
+      try {
+        await activateSovereignVault(wallet.privateKey, wallet.address);
+      } catch (vaultErr: any) {
+        console.warn('[QuantumAuthGate] Vault activation non-fatal:', vaultErr?.message);
       }
-    }, 500);
+
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(1500 - elapsedTime, 0);
+
+      await new Promise(r => setTimeout(r, remainingTime));
+      toast.success('Wallet creado y asegurado.');
+      onComplete();
+    } catch (e: any) {
+      toast.error('Error de cifrado', { description: e.message });
+      setStep('verify');
+    }
   };
 
   const handleLogin = async () => {
     const ks = localStorage.getItem('sovereign_keystore');
     const vault = localStorage.getItem('sovereign_vault_v1');
-    if (!ks && !vault) return;
+    if (!ks && !vault) {
+      toast.error('No wallet found', { description: 'Please create a new wallet first.' });
+      setStep('home');
+      return;
+    }
+    if (!password) {
+      toast.error('Password required');
+      return;
+    }
     setStep('encrypting');
     
     const startTime = Date.now();
     
-    setTimeout(async () => {
-      try {
-        let pk: string | null = null;
-        let addr: string | null = null;
+    // Small delay to allow UI to update before heavy crypto work
+    await new Promise(r => setTimeout(r, 120));
 
-        if (ks) {
+    try {
+      let pk: string | null = null;
+      let addr: string | null = null;
+
+      if (ks) {
+        try {
           const decryptedWallet = await ethers.Wallet.fromEncryptedJson(ks, password);
           pk = decryptedWallet.privateKey;
           addr = decryptedWallet.address;
-        } else if (vault) {
-          const { readStoredVaultKey } = await import('@/hooks/useSovereignConnect');
-          const vaultPk = await readStoredVaultKey();
-          if (!vaultPk) throw new Error('Vault corrupted');
-          const walletObj = new ethers.Wallet(vaultPk);
-          pk = walletObj.privateKey;
-          addr = walletObj.address;
+        } catch (decryptErr: any) {
+          // ethers v6 throws 'Error: invalid password' — catch all decryption errors
+          toast.error('Contraseña incorrecta', {
+            description: 'La contraseña no es correcta. Inténtalo de nuevo.'
+          });
+          setStep('login');
+          return;
+        }
+      } else if (vault) {
+        const { readStoredVaultKey } = await import('@/hooks/useSovereignConnect');
+        const vaultPk = await readStoredVaultKey();
+        if (!vaultPk) {
+          toast.error('Vault corrupted', { description: 'Please reset and create a new wallet.' });
+          setStep('login');
+          return;
+        }
+        const walletObj = new ethers.Wallet(vaultPk);
+        pk = walletObj.privateKey;
+        addr = walletObj.address;
+        // Migrate vault_v1 → sovereign_keystore
+        try {
           const encryptedJson = await walletObj.encrypt(password);
           localStorage.setItem('sovereign_keystore', encryptedJson);
-        }
-
-        if (pk && addr) {
-          importWallet(pk, "Sovereign Main");
-
-          // Non-fatal on mobile — wagmi injected connector may not exist.
-          try {
-            await activateSovereignVault(pk, addr);
-          } catch (vaultErr: any) {
-            console.warn('[QuantumAuthGate] Login vault activation non-fatal:', vaultErr?.message);
-          }
-
-          const elapsedTime = Date.now() - startTime;
-          const remainingTime = Math.max(1000 - elapsedTime, 0);
-
-          setTimeout(() => {
-            toast.success('Wallet unlocked successfully.');
-            onComplete();
-          }, remainingTime);
-        } else {
-          throw new Error('Invalid vault');
-        }
-      } catch (e: any) {
-        // Only show wrong-password error for actual decryption failures
-        const msg = e?.message || '';
-        const isWrongPw = msg.includes('invalid') || msg.includes('password') || msg.includes('decrypt');
-        toast.error(isWrongPw ? 'Invalid password' : 'Unlock failed', {
-          description: isWrongPw ? 'Please try again.' : msg
-        });
-        setStep('login');
+        } catch {}
       }
-    }, 100);
+
+      if (pk && addr) {
+        // 1. Import wallet into in-memory store (sets privateKey + address)
+        importWallet(pk, 'Sovereign Main');
+        
+        // 2. Write session flag so portfolio gate unlocks immediately
+        try {
+          sessionStorage.setItem('portfolio_unlocked', 'true');
+          sessionStorage.setItem('sovereign_wallet_addr', addr.toLowerCase());
+        } catch {}
+
+        // 3. Non-fatal: activate Wagmi connector (fails on mobile without injected provider)
+        try {
+          await activateSovereignVault(pk, addr);
+        } catch (vaultErr: any) {
+          console.warn('[QuantumAuthGate] Login vault activation non-fatal:', vaultErr?.message);
+        }
+
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(800 - elapsedTime, 0);
+
+        setTimeout(() => {
+          toast.success('Wallet desbloqueado', { description: `${addr!.slice(0, 6)}...${addr!.slice(-4)}` });
+          onComplete();
+        }, remainingTime);
+      } else {
+        throw new Error('No se pudo obtener la clave privada');
+      }
+    } catch (e: any) {
+      const msg = e?.message || '';
+      toast.error('Error al desbloquear', { description: msg || 'Inténtalo de nuevo.' });
+      setStep('login');
+    }
   };
+
+  const handleMnemonicRestore = async () => {
+    const phrase = mnemonicInput.trim().toLowerCase();
+    const words = phrase.split(/\s+/);
+    if (words.length !== 12 && words.length !== 24) {
+      setMnemonicError('La frase debe tener 12 o 24 palabras.');
+      return;
+    }
+    if (password.length < 8) {
+      setMnemonicError('La contraseña debe tener al menos 8 caracteres.');
+      return;
+    }
+    setMnemonicError('');
+    setStep('encrypting');
+    await new Promise(r => setTimeout(r, 150));
+    try {
+      const restoredWallet = ethers.Wallet.fromPhrase(phrase);
+      const encryptedJson = await restoredWallet.encrypt(password);
+      localStorage.setItem('sovereign_keystore', encryptedJson);
+      importWallet(restoredWallet.privateKey, 'Sovereign Restored');
+      try {
+        sessionStorage.setItem('portfolio_unlocked', 'true');
+        sessionStorage.setItem('sovereign_wallet_addr', restoredWallet.address.toLowerCase());
+      } catch {}
+      try {
+        await activateSovereignVault(restoredWallet.privateKey, restoredWallet.address);
+      } catch {}
+      toast.success('Wallet restaurado', { description: `${restoredWallet.address.slice(0, 6)}...${restoredWallet.address.slice(-4)}` });
+      onComplete();
+    } catch (e: any) {
+      setMnemonicError('Frase mnemónica inválida. Comprueba las palabras e inténtalo de nuevo.');
+      setStep('mnemonic');
+    }
+  };
+
 
   const renderContent = () => {
     switch (step) {
@@ -509,10 +581,58 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
                 </div>
               </motion.div>
             ) : (
-              <button onClick={() => setShowResetConfirm(true)} className="w-full text-center text-[13px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-[#050505] transition-colors pt-6">
-                {t.forgot}
-              </button>
+              <div className="flex flex-col items-center gap-2 pt-4">
+                <button onClick={() => setShowResetConfirm(true)} className="w-full text-center text-[13px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-[#050505] transition-colors">
+                  {t.forgot}
+                </button>
+                <button
+                  onClick={() => { setPassword(''); setMnemonicInput(''); setMnemonicError(''); setStep('mnemonic'); }}
+                  className="w-full text-center text-[12px] font-bold uppercase tracking-widest text-indigo-500/60 hover:text-indigo-500 transition-colors"
+                >
+                  🔑 Restaurar con frase mnemónica
+                </button>
+              </div>
             )}
+          </div>
+        );
+
+      case 'mnemonic':
+        return (
+          <div className="space-y-6">
+            <button onClick={() => setStep('login')} className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-black/40 hover:text-[#0A0A0A] hover:bg-black/10 transition-colors mb-2"><ChevronLeft size={20}/></button>
+            <div className="space-y-3">
+              <h2 className="text-3xl font-black text-[#0A0A0A] tracking-tighter uppercase">Restaurar Wallet</h2>
+              <p className="text-[14px] text-[#0A0A0A]/50 font-medium leading-relaxed">Introduce tu frase de 12 palabras y una nueva contraseña para restaurar el acceso.</p>
+            </div>
+            <div className="space-y-4">
+              <textarea
+                value={mnemonicInput}
+                onChange={e => { setMnemonicInput(e.target.value); setMnemonicError(''); }}
+                placeholder="palabra1 palabra2 palabra3 ... palabra12"
+                rows={4}
+                className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[20px] px-5 py-4 text-[#0A0A0A] text-[14px] font-mono font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/20 resize-none"
+              />
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Nueva contraseña (mín. 8 caracteres)"
+                className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
+              />
+              {mnemonicError && (
+                <div className="flex items-center gap-2 text-rose-600 bg-rose-50 rounded-xl px-4 py-3 text-[13px] font-medium">
+                  <AlertTriangle size={14} className="shrink-0" />
+                  {mnemonicError}
+                </div>
+              )}
+              <button
+                onClick={handleMnemonicRestore}
+                disabled={mnemonicInput.trim().split(/\s+/).length < 12 || password.length < 8}
+                className="w-full py-5 rounded-[20px] bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 transition-all text-white font-black tracking-widest text-[14px] uppercase shadow-lg active:scale-[0.98]"
+              >
+                🔑 Restaurar y Acceder
+              </button>
+            </div>
           </div>
         );
 

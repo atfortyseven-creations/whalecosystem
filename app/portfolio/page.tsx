@@ -195,7 +195,7 @@ export default function PortfolioPage() {
 
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading, isConnected: isLiveConnected, address: userAddress } = useLivePortfolio();
   const { chain, isConnected: wagmiConnected } = useAccount();
-  const { privateKey } = useWalletStore();
+  const { privateKey, address: storeAddress } = useWalletStore();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { open: openAppKit } = useAppKit();
   const { connect, connectors } = useConnect();
@@ -262,6 +262,7 @@ export default function PortfolioPage() {
   const handleDisconnect = () => {
     disconnect();
     sessionStorage.removeItem('portfolio_unlocked');
+    sessionStorage.removeItem('sovereign_wallet_addr');
     setSessionUnlocked(false);
     refresh();
   };

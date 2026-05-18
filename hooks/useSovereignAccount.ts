@@ -40,6 +40,7 @@ export function useSovereignAccount() {
     const wagmiAccount = useAccount();
     const { address: storeAddress, privateKey: storePrivateKey } = useWalletStore();
     const [handshakeAddress, setHandshakeAddress] = useState<string | null>(null);
+    const [sessionAddress, setSessionAddress] = useState<string | null>(null);
     const [isZkVerified, setIsZkVerified] = useState(globalIsZkVerified);
     const [isChecking, setIsChecking] = useState(true);
 
@@ -63,6 +64,14 @@ export function useSovereignAccount() {
 
         checkHandshake();
         
+        // Also read sessionStorage address written by QuantumAuthGate after login
+        try {
+          const sessAddr = sessionStorage.getItem('sovereign_wallet_addr');
+          if (sessAddr && sessAddr.startsWith('0x') && sessAddr.length === 42) {
+            setSessionAddress(sessAddr);
+          }
+        } catch {}
+        
         const listener = (verified: boolean) => setIsZkVerified(verified);
         listeners.add(listener);
         
@@ -82,10 +91,33 @@ export function useSovereignAccount() {
         };
     }, [wagmiAccount.isConnected]);
 
-    // Priority 1: Direct Local Sovereign Wallet (Decrypted / Unlocked)
+    // Priority 1: Direct Local Sovereign Wallet (Decrypted / Unlocked — privateKey in memory)
     if (storeAddress && storePrivateKey) {
         return {
             address: storeAddress as `0x${string}`,
+            isConnected: true,
+            isConnecting: false,
+            isReconnecting: false,
+            isDisconnected: false,
+            status: 'connected',
+            chain: undefined,
+            chainId: 1,
+            connector: undefined,
+            isSovereignHandshake: false,
+            isLocalSovereignWallet: true,
+            isZkVerified: isZkVerified,
+            isChecking: false
+        };
+    }
+
+    // Priority 1b: Session-restored Sovereign Wallet (address from sessionStorage after page reload)
+    // The privateKey is NOT in memory (not persisted for security), but address is safe.
+    // The portfolio can still load data using the address; user will need to re-enter password
+    // to sign transactions.
+    const sessionRestoredAddr = sessionAddress || storeAddress;
+    if (sessionRestoredAddr && sessionStorage.getItem('portfolio_unlocked') === 'true') {
+        return {
+            address: sessionRestoredAddr as `0x${string}`,
             isConnected: true,
             isConnecting: false,
             isReconnecting: false,
