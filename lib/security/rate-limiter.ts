@@ -158,13 +158,13 @@ class RateLimiter {
     }
     
     // Factor 3: Suspicious patterns in requests
-    if (metadata?.path?.includes('admin') || metadata?.path?.includes('wp-')) {
-      score += 30 // Common attack patterns
+    if (metadata?.path?.includes('admin') || metadata?.path?.includes('wp-') || metadata?.path?.includes('.env')) {
+      score += 80 // Paranoia Mode: Immediate extreme penalty
     }
     
     // Factor 4: Rapid sequential requests
-    if (metadata?.timeSinceLastRequest && metadata.timeSinceLastRequest < 100) {
-      score += 25 // Less than 100ms between requests
+    if (metadata?.timeSinceLastRequest && metadata.timeSinceLastRequest < 300) {
+      score += 40 // Less than 300ms between requests
     }
     
     // Decay score over time
@@ -255,8 +255,8 @@ export const apiLimiter = new RateLimiter({
 
 export const authLimiter = new RateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 5,           // 5 login attempts
-  blockDuration: 60 * 60 * 1000 // Block for 1 hour
+  maxRequests: 3,           // PARANOIA MODE: Max 3 login attempts
+  blockDuration: 24 * 60 * 60 * 1000 // PARANOIA MODE: Block for 24 hours
 })
 
 export const swapLimiter = new RateLimiter({

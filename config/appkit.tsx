@@ -98,12 +98,7 @@ const queryClient = new QueryClient()
 //
 // [MOBILE-HARDENING] Resolve canonical URL dynamically from window location.
 // This prevents 'Domain Mismatch' errors on preview/deployment URLs.
-const getCanonicalUrl = () => {
-  if (typeof window === 'undefined') return 'https://humanidfi.com';
-  return window.location.origin;
-};
-
-const CANONICAL_APP_URL = getCanonicalUrl();
+const CANONICAL_APP_URL = 'https://humanidfi.com';
 
 const metadata = {
     name: 'Whale Alert Network',
@@ -197,9 +192,9 @@ try {
             ],
             features: {
                 analytics: false, // ⚡ INSTANT BOOT: Disable telemetry to avoid blocking network requests
-                email: true, // Habilitado para facilitar onboarding
-                socials: ['google', 'x', 'apple', 'discord'],
-                emailShowWallets: true,
+                email: false, // Disabled to prevent Reown Auth API freeze
+                socials: [], // Disabled to prevent Reown Auth API freeze
+                emailShowWallets: false,
                 swaps: true,
                 onramp: true,
                 send: true,
@@ -217,7 +212,6 @@ try {
             enableEIP6963: true, // ⚡ FAST INJECT: Bypass polling by using standard EIP-6963 window events
             enableWalletConnect: true,
             enableCoinbase: true,
-            allWallets: 'SHOW', // ⚡ fixed to SHOW to prevent MetaMask freeze
             customWallets: []
         });
     }

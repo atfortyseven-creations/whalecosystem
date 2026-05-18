@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ethers } from 'ethers';
 import { Key, EyeOff, Check, ArrowRight, Lock, AlertTriangle, ChevronLeft, Copy, Wallet, Globe } from 'lucide-react';
 import { useWalletStore } from '@/lib/store/wallet-store';
-import { useAppKit } from '@reown/appkit/react';
 import { useAccount } from 'wagmi';
 import { toast } from 'sonner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
@@ -185,8 +184,6 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [verifyInputs, setVerifyInputs] = useState<string[]>(['', '', '']);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [clickedMint, setClickedMint] = useState(false);
-  
-  const { open } = useAppKit();
   const { isConnected } = useAccount();
   const { importWallet } = useWalletStore();
   const { activateSovereignVault } = useSovereignConnect();

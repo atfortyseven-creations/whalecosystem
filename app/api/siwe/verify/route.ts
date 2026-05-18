@@ -40,17 +40,12 @@ export async function POST(req: NextRequest) {
     try {
       user = await prisma.user.upsert({
         where:  { walletAddress: fields.address.toLowerCase() },
-        // FIX: Changed 'lastSeenAt' → 'lastActive' (actual schema field name).
-        // Removed 'siweNonce': field does not exist in User model — every SIWE
-        // login was hitting the catch-block silently and skipping DB persistence
-        // entirely, meaning no authenticated user was ever recorded in the DB.
         update:  { lastActive: new Date() },
         create:  { walletAddress: fields.address.toLowerCase(), lastActive: new Date() },
       });
     } catch (dbErr) {
-      // Degraded mode: proceed without DB if Prisma schema mismatch
-      console.warn('[SIWE] DB upsert failed (degraded mode):', dbErr);
-
+      console.error('[SIWE] DB upsert failed (FATAL):', dbErr);
+      return NextResponse.json({ ok: false, error: 'Database synchronization failed. Session rejected.' }, { status: 500 });
     }
 
     // ── Mint Sovereign JWT ────────────────────────────────────────────────────

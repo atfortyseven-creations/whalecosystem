@@ -25,36 +25,68 @@ interface StorageItem {
 const CURRENT_VERSION = 1;
 const ENCRYPTION_KEY_STORAGE = 'encryption_master_key';
 
+import { Buffer } from 'buffer';
+
 /**
- * Generate or retrieve encryption key
+ * Generate or retrieve encryption key securely using WebCrypto HKDF
  */
-function getEncryptionKey(): string {
-  let key = sessionStorage.getItem(ENCRYPTION_KEY_STORAGE);
+async function getEncryptionKey(): Promise<CryptoKey> {
+  let keyString = sessionStorage.getItem(ENCRYPTION_KEY_STORAGE);
+  let rawKey: Uint8Array;
   
-  if (!key) {
-    // Generate new key for this session
-    key = CryptoJS.lib.WordArray.random(256/8).toString();
-    sessionStorage.setItem(ENCRYPTION_KEY_STORAGE, key);
+  if (!keyString) {
+    rawKey = window.crypto.getRandomValues(new Uint8Array(32)); // 256-bit
+    sessionStorage.setItem(ENCRYPTION_KEY_STORAGE, Buffer.from(rawKey).toString('base64'));
+  } else {
+    rawKey = Buffer.from(keyString, 'base64');
   }
   
-  return key;
+  return await window.crypto.subtle.importKey(
+    'raw',
+    rawKey,
+    { name: 'AES-GCM' },
+    false,
+    ['encrypt', 'decrypt']
+  );
 }
 
 /**
- * Encrypt data using AES-256-GCM
+ * Encrypt data using WebCrypto AES-256-GCM
  */
-function encrypt(data: string): string {
-  const key = getEncryptionKey();
-  return CryptoJS.AES.encrypt(data, key).toString();
+async function encrypt(data: string): Promise<string> {
+  if (typeof window === 'undefined') return data;
+  const key = await getEncryptionKey();
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const encoded = new TextEncoder().encode(data);
+  
+  const ciphertext = await window.crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    encoded
+  );
+  
+  const combined = new Uint8Array(iv.length + ciphertext.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(ciphertext), iv.length);
+  return Buffer.from(combined).toString('base64');
 }
 
 /**
- * Decrypt data
+ * Decrypt data using WebCrypto AES-256-GCM
  */
-function decrypt(ciphertext: string): string {
-  const key = getEncryptionKey();
-  const bytes = CryptoJS.AES.decrypt(ciphertext, key);
-  return bytes.toString(CryptoJS.enc.Utf8);
+async function decrypt(encryptedData: string): Promise<string> {
+  if (typeof window === 'undefined') return encryptedData;
+  const key = await getEncryptionKey();
+  const combined = new Uint8Array(Buffer.from(encryptedData, 'base64'));
+  const iv = combined.slice(0, 12);
+  const ciphertext = combined.slice(12);
+  
+  const decrypted = await window.crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    ciphertext
+  );
+  return new TextDecoder().decode(decrypted);
 }
 
 /**
@@ -66,16 +98,16 @@ export class SecureStorage {
   /**
    * Store item securely
    */
-  static setItem(
+  static async setItem(
     key: string,
     value: any,
     options: StorageOptions = { encrypt: true }
-  ): void {
+  ): Promise<void> {
     try {
       const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
       
       const item: StorageItem = {
-        value: options.encrypt ? encrypt(stringValue) : stringValue,
+        value: options.encrypt ? await encrypt(stringValue) : stringValue,
         encrypted: options.encrypt !== false,
         expiresAt: options.expiresIn ? Date.now() + options.expiresIn : undefined,
         version: CURRENT_VERSION
@@ -92,7 +124,7 @@ export class SecureStorage {
   /**
    * Retrieve item securely
    */
-  static getItem<T = any>(key: string, parse = true): T | null {
+  static async getItem<T = any>(key: string, parse = true): Promise<T | null> {
     try {
       const storageKey = this.prefix + key;
       const storedData = localStorage.getItem(storageKey);
@@ -108,7 +140,7 @@ export class SecureStorage {
       }
       
       // Decrypt if needed
-      let value = item.encrypted ? decrypt(item.value) : item.value;
+      let value = item.encrypted ? await decrypt(item.value) : item.value;
       
       // Parse JSON if requested
       if (parse && typeof value === 'string') {
@@ -178,23 +210,23 @@ export class SecureStorage {
 export class SecureSessionStorage {
   private static prefix = 'secure_session_';
   
-  static setItem(key: string, value: any, shouldEncrypt = true): void {
+  static async setItem(key: string, value: any, shouldEncrypt = true): Promise<void> {
     try {
       const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
-      const finalValue = shouldEncrypt ? encrypt(stringValue) : stringValue;
+      const finalValue = shouldEncrypt ? await encrypt(stringValue) : stringValue;
       
-      sessionStorage.setItem(this.prefix + key, finalValue);
+      sessionStorage.setItem(this.prefix + key, finalValue as string);
     } catch (error) {
       console.error('SecureSessionStorage.setItem failed:', error);
     }
   }
   
-  static getItem<T = any>(key: string, encrypted = true, parse = true): T | null {
+  static async getItem<T = any>(key: string, encrypted = true, parse = true): Promise<T | null> {
     try {
       const storedValue = sessionStorage.getItem(this.prefix + key);
       if (!storedValue) return null;
       
-      let value = encrypted ? decrypt(storedValue) : storedValue;
+      let value = encrypted ? await decrypt(storedValue) : storedValue;
       
       if (parse && typeof value === 'string') {
         try {
