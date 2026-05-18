@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet, RefreshCw, ArrowUpRight, ArrowDownRight,
-  Eye, EyeOff, PieChart, Globe, Copy, Search,
-  ArrowDownLeft, Repeat, CreditCard, Plus, ChevronDown,
-  Check, Loader2, ShieldCheck, ExternalLink, Activity, ShieldAlert,
+  Eye, EyeOff, Globe, Copy, Search,
+  ArrowDownLeft, Repeat, CreditCard, Plus,
+  Check, Loader2, ShieldCheck, Activity, ShieldAlert,
   BarChart2, MessageSquare, Menu, X, LogOut
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
@@ -86,7 +86,7 @@ function formatAddr(addr: string | null | undefined) {
 function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hidden: boolean; eurRate: number }) {
   const isPos = (asset.change24h ?? 0) >= 0;
   const chainColor = CHAIN_COLORS[asset.network] ?? "#888";
-  const valueEUR = formatEUR(asset.value ?? 0, eurRate);
+  const valueEUR = formatEUR(asset.valueUSD ?? 0, eurRate);
 
   return (
     <motion.div
@@ -183,8 +183,10 @@ export default function PortfolioPage() {
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
   const [sessionUnlocked, setSessionUnlocked] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== 'undefined' && sessionStorage.getItem('portfolio_unlocked') === 'true') {
       setSessionUnlocked(true);
     }
@@ -232,11 +234,14 @@ export default function PortfolioPage() {
   const hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('sovereign_keystore') : false;
   const isQuantumUnlocked = !!privateKey;
 
-  // Gate logic:
-  // - If user has a live wagmi connection (Chrome/MetaMask/WalletConnect) → no gate needed
-  // - If user has decrypted local wallet → no gate needed  
-  // - If neither → show QuantumAuthGate to allow local wallet login or WalletConnect connect
-  const needsGate = !isQuantumUnlocked && !wagmiConnected;
+  // ── GATE LOGIC ──────────────────────────────────────────────────────────────
+  // Wait for client mount to avoid SSR hydration mismatch (wagmi state is client-only)
+  if (!mounted) return null;
+
+  // sessionUnlocked: user completed QuantumAuthGate this session (stored in sessionStorage)
+  // isQuantumUnlocked: local vault was decrypted and private key is in memory
+  // wagmiConnected: MetaMask / WalletConnect is live
+  const needsGate = !isQuantumUnlocked && !wagmiConnected && !sessionUnlocked;
 
   if (needsGate) {
     return (
@@ -271,8 +276,9 @@ export default function PortfolioPage() {
         }}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ borderColor: BORDER, background: CARD }}>
-            <PieChart size={15} style={{ color: MUTED }} />
+          {/* 🔒 Lock Lottie — visible above Portfolio title */}
+          <div className="w-10 h-10 shrink-0 pointer-events-none">
+            <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
           </div>
           <div>
             <div className="font-black text-sm uppercase tracking-tight" style={{ color: INK }}>Portfolio</div>
@@ -280,16 +286,22 @@ export default function PortfolioPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Address badge */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 border rounded-full" style={{ borderColor: BORDER, background: CARD }}>
-            <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : '—'}</span>
-            <button
-              onClick={() => { navigator.clipboard.writeText(userAddress ?? ''); toast.success('Copied!'); }}
-              style={{ color: MUTED }}
-              className="hover:opacity-100 transition-opacity opacity-50"
-            >
-              <Copy size={10} />
-            </button>
+          {/* 🐳 WHALE 300% — floats above address, perfectly centered & pegada */}
+          <div className="hidden sm:flex flex-col items-center gap-0 relative">
+            <div className="w-24 h-24 pointer-events-none -mb-3">
+              <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-contain" />
+            </div>
+            {/* Address directly below whale — zero gap */}
+            <div className="flex items-center gap-2 px-3 py-1 border rounded-full" style={{ borderColor: BORDER, background: CARD }}>
+              <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : '—'}</span>
+              <button
+                onClick={() => { navigator.clipboard.writeText(userAddress ?? ''); toast.success('Copied!'); }}
+                style={{ color: MUTED }}
+                className="hover:opacity-100 transition-opacity opacity-50"
+              >
+                <Copy size={10} />
+              </button>
+            </div>
           </div>
 
           {/* Refresh */}
@@ -333,7 +345,7 @@ export default function PortfolioPage() {
                 <div className="w-full lg:w-1/2 relative aspect-square md:aspect-video flex items-center justify-center bg-white/40 dark:bg-[#050505]/40 backdrop-blur-3xl rounded-3xl border border-black/5 dark:border-white/5 shadow-sm p-6 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] dark:from-[#050505] via-transparent to-transparent z-10 hidden lg:block" />
                     <div className="flex flex-col items-center justify-center gap-4 text-[#0a0a0a] dark:text-white opacity-20 relative z-0">
-                        <PieChart size={64} strokeWidth={1} />
+                        <BarChart2 size={64} strokeWidth={1} />
                         <span className="font-mono text-sm tracking-widest uppercase font-bold">Liquidity Matrix</span>
                     </div>
                 </div>
@@ -645,7 +657,7 @@ export default function PortfolioPage() {
             <div className="p-6 space-y-3">
               {filteredAssets.slice(0, 8).map((asset: any, i: number) => {
                 const pctTotal = Number(totalPnl);
-                const pct = pctTotal > 0 ? ((asset.value ?? 0) / pctTotal) * 100 : 0;
+                const pct = pctTotal > 0 ? ((asset.valueUSD ?? 0) / pctTotal) * 100 : 0;
                 const chainColor = CHAIN_COLORS[asset.network] ?? "#888";
                 return (
                   <div key={i} className="space-y-1.5">
@@ -698,7 +710,7 @@ export default function PortfolioPage() {
                   const topPct = topAsset ? ((topAsset.valueUSD ?? 0) / total) * 100 : 0;
                   
                   const stablecoins = ['USDC', 'USDT', 'DAI', 'USDe', 'FRAX', 'FDUSD'];
-                  const stableValue = filteredAssets.filter(a => stablecoins.includes(a.symbol?.toUpperCase())).reduce((sum, a) => sum + (a.valueUSD ?? 0), 0);
+                  const stableValue = filteredAssets.filter(a => a.symbol && stablecoins.includes(a.symbol.toUpperCase())).reduce((sum, a) => sum + (a.valueUSD ?? 0), 0);
                   const stablePct = (stableValue / total) * 100;
 
                   let riskClass = "MODERATE";
@@ -775,7 +787,7 @@ export default function PortfolioPage() {
       <nav className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
            {[
               { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
-              { id: 'portfolio',   icon: <PieChart size={18} />,      label: 'Portfolio' },
+              { id: 'portfolio',   icon: <BarChart2 size={18} />,      label: 'Portfolio' },
               { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
               { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
           ].map(tab => {

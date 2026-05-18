@@ -91,10 +91,8 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               exit={{ opacity: 0, x: 20 }}
               className="flex flex-col items-center text-center pt-4"
             >
-              <div className="w-full flex justify-center -mb-6 mt-2 relative z-10 pointer-events-none">
-                <div className="w-48 h-48 scale-[1.3] opacity-90">
-                    <RemoteLottie path="/system-shots/Lock Loading.json" />
-                </div>
+              <div className="w-52 h-52 mx-auto pointer-events-none mb-2">
+                <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
               </div>
               <h2 className="text-2xl font-black uppercase tracking-tight mb-3 mt-4">KYC</h2>
               <p className="text-sm text-black/50 dark:text-white/50 mb-8 max-w-[280px] leading-relaxed">
@@ -219,15 +217,19 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               key="step3"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center text-center pt-8 pb-4"
+              className="flex flex-col items-center text-center pt-4 pb-4"
             >
-              <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6">
-                <CheckCircle2 size={40} />
+              {/* 🐳 WHALE — 300% — centered perfectly above address */}
+              <div className="w-full h-56 pointer-events-none mb-0">
+                <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-contain" />
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tight mb-2">KYC Activated</h2>
-              <p className="text-xs text-black/50 dark:text-white/50 mb-8 font-mono">
-                {wallet.address}
-              </p>
+              <h2 className="text-2xl font-black uppercase tracking-tight mt-0 mb-2">KYC Activated</h2>
+              {/* Address directly below whale — zero gap = "pegada" */}
+              <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 px-4 py-2 rounded-2xl border border-black/5 dark:border-white/5 mb-8">
+                <p className="text-[11px] font-mono font-bold text-black/70 dark:text-white/70 break-all">
+                  {wallet.address}
+                </p>
+              </div>
               
               <button
                 onClick={() => onComplete(wallet.privateKey, wallet.address)}
