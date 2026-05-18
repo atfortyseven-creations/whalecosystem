@@ -1,6 +1,6 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
+
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { State } from "wagmi";
 import { SettingsProvider } from "@/src/context/SettingsContext";
@@ -23,7 +23,6 @@ export default function Providers({ children, initialState, cookies }: { childre
 
     return (
         <SessionProvider>
-            <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">
             <AppProvider>
                 <ClientWeb3Provider cookies={cookies || null}>
                     <SettingsProvider>
@@ -40,7 +39,6 @@ export default function Providers({ children, initialState, cookies }: { childre
                     </SettingsProvider>
                 </ClientWeb3Provider>
             </AppProvider>
-        </ThemeProvider>
         </SessionProvider>
     );
 }

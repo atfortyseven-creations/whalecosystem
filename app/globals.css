@@ -176,19 +176,7 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
   }
 
 
-  /* ── DARK MODE THEME VARIABLES ──────────────────────────────────────────── */
-  html.dark {
-    --bg-page: #0A0A0A;
-    --bg-surface: #111111;
-    --bg-card: #1A1A1A;
-    --text-primary: #F5F5F5;
-    --text-secondary: #A0A0A0;
-    --text-muted: #666666;
-    --border-main: rgba(255, 255, 255, 0.08);
-    --glass-bg: rgba(10, 10, 10, 0.75);
-    --glass-border: rgba(255, 255, 255, 0.05);
-    color-scheme: dark;
-  }
+
 
   /* Light mode (default) */
   html:not(.dark) {
