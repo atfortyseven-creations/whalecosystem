@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Send, Paperclip, Smile, Mic, Timer,
-  X, Reply, Square, Flame
+  X, Reply, Square, Flame, MapPin
 } from 'lucide-react';
 
 export type AutoDestructPreset = 'off' | '1m' | '1h' | '24h' | '7d';
@@ -77,6 +77,22 @@ export default function ChatInput({
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+  };
+
+  const handleSendLocation = () => {
+    if (disabled) return;
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        onSendText(`[LOCATION]${position.coords.latitude},${position.coords.longitude}`);
+      },
+      () => {
+        alert("Unable to retrieve your location");
+      }
+    );
   };
 
   // ── Voice recording ──────────────────────────────────────────────────────
@@ -226,6 +242,14 @@ export default function ChatInput({
             className="w-10 h-10 rounded-xl bg-black/[0.03] border border-black/8 flex items-center justify-center text-black/40 hover:text-black hover:bg-black/[0.06] transition-all shrink-0"
           >
             <Paperclip size={18} />
+          </button>
+          
+          <button
+            onClick={handleSendLocation}
+            title="Share Location"
+            className="w-10 h-10 rounded-xl bg-black/[0.03] border border-black/8 flex items-center justify-center text-black/40 hover:text-black hover:bg-black/[0.06] transition-all shrink-0"
+          >
+            <MapPin size={18} />
           </button>
 
           {/* Textarea */}
