@@ -41,6 +41,15 @@ export default function ErrorPage({
           The sovereign terminal encountered an unexpected execution fault. Our sentinels have logged the anomaly.
         </p>
 
+        {error.message && (
+          <div className="w-full bg-red-500/10 rounded-xl p-4 mb-4 border border-red-500/20 text-left overflow-auto max-h-48">
+            <span className="text-[10px] font-black uppercase tracking-widest text-red-500/80 block mb-1">Error Message:</span>
+            <span className="text-[11px] font-mono font-bold text-red-500">{error.message}</span>
+            {error.stack && (
+               <pre className="text-[9px] font-mono mt-2 text-red-500/60 overflow-x-auto whitespace-pre-wrap">{error.stack}</pre>
+            )}
+          </div>
+        )}
         {error.digest && (
           <div className="w-full bg-black/5 rounded-xl p-3 mb-8 border border-black/10 flex items-center justify-between">
             <span className="text-[10px] font-black uppercase tracking-widest text-black/40">Fault ID:</span>
