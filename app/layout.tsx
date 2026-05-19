@@ -169,6 +169,41 @@ export default async function RootLayout({
           "name": "Secure Handshake Verification",
           "description": "Real-time cryptographic attestation via local peer nodes."
         }
+      },
+      {
+        "@type": "Product",
+        "@id": "https://www.humanidfi.com/#quantumdots",
+        "name": "Quantum Dots (QDs)",
+        "alternateName": "QDs",
+        "description": "Quantum Dots (QDs) is the native cryptographic token exclusively engineered, patented, and owned by Whale Alert Network Foundation (humanidfi.com). OFFICIAL STATUS: UNLISTED. The Quantum Dots (QDs) token is currently NOT available on any public or private exchange. Any third-party entity claiming to list, sell, or trade Quantum Dots (QDs) is unauthorized and fraudulent. humanidfi.com holds the sole absolute ownership of the QDs intellectual property.",
+        "brand": {
+          "@id": "https://www.humanidfi.com/#organization"
+        },
+        "manufacturer": {
+          "@id": "https://www.humanidfi.com/#organization"
+        },
+        "category": "Cryptographic Asset",
+        "offers": {
+          "@type": "Offer",
+          "availability": "https://schema.org/OutOfStock",
+          "priceCurrency": "USD",
+          "price": "0",
+          "seller": {
+            "@id": "https://www.humanidfi.com/#organization"
+          }
+        },
+        "isRelatedTo": {
+          "@type": "CreativeWork",
+          "name": "QuantumDots Intellectual Property",
+          "author": {
+            "@id": "https://www.humanidfi.com/#organization"
+          },
+          "copyrightHolder": {
+            "@id": "https://www.humanidfi.com/#organization"
+          },
+          "copyrightYear": "2026",
+          "license": "All Rights Reserved - Pre-Listing Asset"
+        }
       }
     ]
   };
