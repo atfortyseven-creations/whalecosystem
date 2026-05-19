@@ -145,7 +145,8 @@ export default function ConnectPage() {
       setEphemeral(pair);
       const sessId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36);
       setQrSession(sessId);
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://whalealert.network';
+      // [FIX] Origin fallback updated to humanidfi.com to match WalletConnect Cloud registration
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
       const expiresAt = Date.now() + 300000;
       const qrUrl = new URL('/connect', origin);
       qrUrl.searchParams.set('uuid', sessId);
@@ -255,21 +256,112 @@ export default function ConnectPage() {
     prevConnectedRef.current = isConnected;
   }, [isConnected]);
 
-  // Wallet connect → redirect (fixed: use ref to prevent double-fire)
+  // [CRITICAL FIX] Wallet connect → SIWE sovereign-verify → then redirect.
+  // The old code went directly to /dashboard without calling sovereign-verify,
+  // meaning no whale_session/human_session/sovereign_handshake cookie was set.
+  // Every subsequent API call to a protected route returned 401.
+  const signingRef = useRef(false);
   useEffect(() => {
     if (!mounted || !isConnected || !address) return;
-    if (redirectingRef.current) return;
+    if (redirectingRef.current || signingRef.current) return;
     try {
-      if (sessionStorage.getItem("__disconnected__") === "1") {
-        return;
-      }
+      if (sessionStorage.getItem("__disconnected__") === "1") return;
     } catch {}
-    redirectingRef.current = true;
 
-    // Removed cookie purging to prevent destroying valid sessions
-    setLinked(true);
-    window.location.replace("/dashboard");
-  }, [isConnected, address, mounted, setLinked]);
+    signingRef.current = true;
+
+    const runVerify = async () => {
+      try {
+        // 1. Check if session already valid (returning user)
+        const checkRes = await fetch('/api/auth/verify-session', { cache: 'no-store' });
+        if (checkRes.ok) {
+          const data = await checkRes.json();
+          if (data.authenticated) {
+            setLinked(true);
+            redirectingRef.current = true;
+            window.location.replace("/dashboard");
+            return;
+          }
+        }
+      } catch {}
+
+      // 2. No session — must SIWE-sign
+      try {
+        const norm = address.toLowerCase();
+        // Check cached sig first
+        let signature: string | undefined;
+        let message: string | undefined;
+        try {
+          const cached = localStorage.getItem(`sovereign_auth_${norm}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            signature = parsed.signature;
+            message = parsed.message;
+          }
+        } catch {}
+
+        if (!signature || !message) {
+          // Fallback local builder to generate the SIWE message locally
+          // since the library module is missing
+          const buildLocalSovereignMessage = (address: string) => {
+            const domain = typeof window !== 'undefined' ? window.location.host : 'humanidfi.com';
+            const origin = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
+            return `${domain} wants you to sign in with your Ethereum account:\n${address}\n\nSign this message to authenticate securely.\n\nURI: ${origin}\nVersion: 1\nChain ID: 1\nNonce: ${crypto.randomUUID ? crypto.randomUUID() : Date.now().toString()}\nIssued At: ${new Date().toISOString()}`;
+          };
+          
+          message = buildLocalSovereignMessage(norm);
+          const msgToSign: string = message;
+
+          // [IOS WALLETCONNECT TIMING FIX]
+          // Replicating the MobileLanding fix here: WalletConnect relays on iOS WKWebView
+          // need ~1.5s to stabilize after returning from the wallet app via deep link.
+          // Without this, the signature request is swallowed by the dead socket and hangs forever.
+          try {
+            const isWc = localStorage.getItem('wagmi.wallet')?.toLowerCase().includes('walletconnect') || 
+                         localStorage.getItem('wagmi.wallet')?.toLowerCase().includes('reown');
+            if (isWc) {
+              await new Promise(r => setTimeout(r, 1500));
+            }
+          } catch {}
+
+          const signWithTimeout = (ms: number) => new Promise<string>((resolve, reject) => {
+            const timer = setTimeout(() => reject(new Error('Signature timeout — please tap "Retry Connection" and approve in your wallet')), ms);
+            signMessageAsync({ message: msgToSign })
+              .then(sig => { clearTimeout(timer); resolve(sig as string); })
+              .catch(err => { clearTimeout(timer); reject(err); });
+          });
+
+          signature = await signWithTimeout(30000);
+          localStorage.setItem(`sovereign_auth_${norm}`, JSON.stringify({ signature, message }));
+        }
+
+        const verifyRes = await fetch('/api/auth/sovereign-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: norm, signature, message })
+        });
+
+        if (!verifyRes.ok) {
+          toast.error('Session verification failed', { description: 'Please try connecting again.' });
+          signingRef.current = false;
+          return;
+        }
+
+        setLinked(true);
+        redirectingRef.current = true;
+        window.location.replace("/dashboard");
+      } catch (err: any) {
+        const msg = err?.message || '';
+        // User rejected signing — don't show an error, just reset
+        if (!msg.toLowerCase().includes('rejected') && !msg.toLowerCase().includes('denied')) {
+          toast.error('Authentication failed', { description: msg });
+        }
+        signingRef.current = false;
+      }
+    };
+
+    runVerify();
+  }, [isConnected, address, mounted, setLinked, signMessageAsync]);
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
     try { sessionStorage.removeItem("__disconnected__"); } catch {}

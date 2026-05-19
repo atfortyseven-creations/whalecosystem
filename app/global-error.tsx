@@ -15,6 +15,11 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error("Global Application Fault:", error);
+    // [ABYSMALLY COMPLEX OPTIMIZATION]: Auto-heal Next.js Server Action mismatch
+    if (error?.message?.includes("Failed to find Server Action") || error?.digest?.includes("Failed to find Server Action")) {
+      console.warn("Server Action Desync Detected. Initiating auto-reload...");
+      window.location.reload();
+    }
   }, [error]);
 
   return (

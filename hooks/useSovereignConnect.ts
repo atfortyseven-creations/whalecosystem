@@ -132,7 +132,11 @@ export function useSovereignConnect() {
         } catch (err) {
           if (attempts < MAX_ATTEMPTS) {
             attempts++;
-            setTimeout(attemptConnect, BASE_DELAY_MS * attempts); // 100, 200, 300, 400ms
+            // [ANDROID FIX] True exponential backoff: 100ms, 200ms, 400ms, 800ms.
+            // Was linear (100 * attempts = 100, 200, 300, 400ms). On Android 3G,
+            // WagmiProvider needs up to 800ms to hydrate after SSR. True exponential
+            // gives 1.5s total window vs 1s with linear — significantly better on slow networks.
+            setTimeout(attemptConnect, BASE_DELAY_MS * Math.pow(2, attempts - 1));
           } else {
             console.warn("[SovereignVault] Auto-reconnect failed after", MAX_ATTEMPTS, "attempts");
           }

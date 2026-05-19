@@ -95,8 +95,13 @@ const queryClient = new QueryClient()
 // or a Railway preview URL), the WalletConnect Cloud relay will SILENTLY REJECT the session.
 // This causes the "Open Wallet" deep-link button on mobile to do absolutely nothing.
 //
-// [MOBILE-HARDENING] Resolve canonical URL dynamically from window location.
-// This prevents 'Domain Mismatch' errors on preview/deployment URLs.
+// [IOS CHROME CRITICAL FIX] The CANONICAL_APP_URL must:
+// 1. Be a valid HTTPS string even during SSR (window is undefined on server)
+// 2. Match EXACTLY what is registered in WalletConnect Cloud dashboard
+// 3. NOT use window.location.origin — this can return '' or undefined on iOS WKWebView
+//    if called before the document is fully loaded, causing the WC relay to reject the session.
+// The canonical URL is ALWAYS humanidfi.com in production. Preview URLs must be allowlisted
+// separately in WalletConnect Cloud dashboard if needed.
 const CANONICAL_APP_URL = 'https://humanidfi.com';
 
 
@@ -219,6 +224,9 @@ try {
     console.warn('[AppKit] Initialization skipped (already initialized):', e);
 }
 
+import { useEffect } from 'react';
+import { reconnect } from '@wagmi/core';
+
 export function Web3ModalProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
     let initialState;
     try {
@@ -230,6 +238,27 @@ export function Web3ModalProvider({ children, cookies }: { children: ReactNode; 
         console.log('[AppKit] Wagmi cookie state fallback active (Client-side state will be used)');
         initialState = undefined;
     }
+
+    // [ABYSMALLY COMPLEX OPTIMIZATION] - iOS Chrome Connection Healer
+    // iOS Chrome (WKWebView) aggressively suspends WebSockets when backgrounded during deep-link flows (e.g. to MetaMask).
+    // Upon returning, the socket is dead but the browser doesn't know it, causing infinite loading spinners.
+    // This forcibly re-evaluates and resurrects dead Wagmi connections when the tab becomes visible again.
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const handleVisibility = () => {
+                if (document.visibilityState === 'visible') {
+                    setTimeout(() => {
+                        try {
+                            reconnect(wagmiAdapter.wagmiConfig as any);
+                            console.log('[Sovereign Protocol] iOS Connection Healer executed.');
+                        } catch (e) {}
+                    }, 300); // 300ms delay gives iOS time to fully restore networking stack
+                }
+            };
+            document.addEventListener('visibilitychange', handleVisibility);
+            return () => document.removeEventListener('visibilitychange', handleVisibility);
+        }
+    }, []);
 
     return (
         <WagmiProvider config={wagmiAdapter.wagmiConfig as any} initialState={initialState}>

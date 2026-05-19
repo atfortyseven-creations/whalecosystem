@@ -165,11 +165,17 @@ export default async function middleware(request: NextRequest) {
          const resolvedTier: ValidTier = (VALID_TIERS as readonly string[]).includes(tier)
            ? (tier as ValidTier)
            : 'FREE';
-         const limitCheck = await checkRateLimit(ip, resolvedTier);
+           
+         // [ABYSMALLY COMPLEX OPTIMIZATION]: Defeat NAT overlap in Distributed Rate Limiter
+         const uaHash = request.headers.get('user-agent') ? Array.from(request.headers.get('user-agent')!).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(16) : 'noua';
+         const sessionToken = request.cookies.get('whale_session')?.value || request.cookies.get('sovereign_handshake')?.value;
+         const distributedKey = sessionToken ? `sess:${sessionToken.slice(0, 32)}` : `ip:${ip}:ua:${uaHash}`;
+         
+         const limitCheck = await checkRateLimit(distributedKey, resolvedTier);
         if (!limitCheck.success) {
-          console.log(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
+          console.log(`[WhaleFortress] 🚨 DDoS Protection: Key ${distributedKey} (IP: ${ip}) Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
           // Fire-and-forget audit entry — do not await to avoid adding latency
-          logAuditSafe(request, 'SECURITY_RATE_LIMITED', 'system', ip, { tier, limit: limitCheck.limit, path: pathname });
+          logAuditSafe(request, 'SECURITY_RATE_LIMITED', 'system', ip, { tier, limit: limitCheck.limit, path: pathname, distributedKey });
           return new NextResponse(
             JSON.stringify({ error: 'SYSTEM_BUSY', message: 'Rate limit exceeded. Retry in 10s.' }),
             { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '10' } }
@@ -310,13 +316,22 @@ export default async function middleware(request: NextRequest) {
       `script-src ${scriptSrc}`,
       "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com https://res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://whalealert.network https://*.googleusercontent.com",
+      "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com https://res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://whalealert.network https://*.googleusercontent.com https://*.gstatic.com",
       "font-src 'self' https://fonts.gstatic.com data:",
-      "connect-src 'self' https://api.web3modal.org https://pulse.walletconnect.org https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us https://go.getblock.io wss://go.getblock.io https://cca-lite.coinbase.com https://*.coinbase.com wss://stream.binance.com:9443 https://stream.binance.com https://cdn.jsdelivr.net https://raw.githubusercontent.com https://*.githubusercontent.com https://*.xmtp.network wss://*.xmtp.network https://grpc.xmtp.network wss://grpc.xmtp.network https://production.xmtp.network wss://production.xmtp.network https://dev.xmtp.network wss://dev.xmtp.network",
-      "frame-src 'self' https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com https://*.reown.app https://accounts.google.com",
+      // [IOS CHROME FIX] connect-src expanded with all Reown OAuth + social auth API endpoints.
+      // accounts.reown.com is the Reown Auth service for Google/Apple/GitHub social logins.
+      // Without it, the OAuth token exchange (POST to accounts.reown.com) is blocked by CSP
+      // causing SILENT failures for social logins on iOS WKWebView (Chrome + Safari).
+      "connect-src 'self' https://api.web3modal.org https://pulse.walletconnect.org https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app https://accounts.reown.com https://auth.reown.com wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://relay.walletconnect.com wss://relay.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us https://go.getblock.io wss://go.getblock.io https://cca-lite.coinbase.com https://*.coinbase.com wss://stream.binance.com:9443 https://stream.binance.com https://cdn.jsdelivr.net https://raw.githubusercontent.com https://*.githubusercontent.com https://*.xmtp.network wss://*.xmtp.network https://grpc.xmtp.network wss://grpc.xmtp.network https://production.xmtp.network wss://production.xmtp.network https://dev.xmtp.network wss://dev.xmtp.network https://oauth2.googleapis.com https://accounts.google.com",
+      // [IOS CHROME FIX] frame-src expanded: accounts.reown.com is used as the OAuth redirect
+      // host for Reown social logins. On iOS, AppKit renders the Google Auth flow inside an
+      // iframe which is blocked if accounts.reown.com is not in frame-src.
+      "frame-src 'self' https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com https://*.reown.app https://accounts.reown.com https://auth.reown.com https://accounts.google.com https://*.google.com",
       "object-src 'none'",
       "base-uri 'self'",
-      "form-action 'self'",
+      // [IOS CHROME FIX] form-action must include Reown OAuth redirect domains.
+      // iOS WKWebView enforces form-action when following OAuth redirect chains.
+      "form-action 'self' https://accounts.reown.com https://accounts.google.com",
       "upgrade-insecure-requests",
     ].join('; ');
 
@@ -329,7 +344,7 @@ export default async function middleware(request: NextRequest) {
       'Permissions-Policy': 'camera=(self), microphone=(), geolocation=(), payment=(self)',
       'Expect-CT': 'enforce, max-age=86400',
       'X-Permitted-Cross-Domain-Policies': 'none',
-      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups', // Relaxed to allow WalletConnect popups
+      'Cross-Origin-Opener-Policy': 'unsafe-none', // [IOS CHROME FIX] Relaxed to allow Google Auth/WalletConnect iframes to bridge popups successfully
       // 'Cross-Origin-Embedder-Policy' removed to allow Stripe, MoonPay, and external images to load without strict CORP requirements
     };
 

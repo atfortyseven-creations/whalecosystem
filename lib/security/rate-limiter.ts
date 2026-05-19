@@ -163,8 +163,14 @@ class RateLimiter {
     }
     
     // Factor 4: Rapid sequential requests
-    if (metadata?.timeSinceLastRequest && metadata.timeSinceLastRequest < 300) {
-      score += 40 // Less than 300ms between requests
+    // [ANDROID FIX] Threshold raised from 300ms to 100ms.
+    // Android bfcache restore triggers a burst of concurrent fetches (balance + positions +
+    // assets + history all refetch simultaneously). These arrive at the server within 50-150ms
+    // of each other. At 300ms threshold, ALL of them scored +40 suspicion = instant
+    // adaptive limit reduction to 20% of normal, causing 429s on EVERY page restore.
+    // 100ms is still tight enough to catch true bot burst patterns (bots don't wait).
+    if (metadata?.timeSinceLastRequest && metadata.timeSinceLastRequest < 100) {
+      score += 40 // Less than 100ms between requests
     }
     
     // Decay score over time
@@ -254,9 +260,17 @@ export const apiLimiter = new RateLimiter({
 })
 
 export const authLimiter = new RateLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 3,           // PARANOIA MODE: Max 3 login attempts
-  blockDuration: 24 * 60 * 60 * 1000 // PARANOIA MODE: Block for 24 hours
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  // [ANDROID FIX] Was 3 attempts with 24h block — PARANOIA MODE.
+  // A normal Android/iOS user with WalletConnect relay instability WILL retry 3 times.
+  // Wallet signing errors are user-recoverable (relay timeout, user dismissed, wrong wallet),
+  // NOT attack signals. 3 attempts = any mobile user with bad connectivity = 24h lockout.
+  // Raised to 10 attempts (still robust against brute-force: 10 attempts in 15 min is
+  // effectively impossible for a real attack given the ECDSA signing UX requirement).
+  maxRequests: 10,
+  // [ANDROID FIX] Was 24h block. 30 minutes is sufficient deterrence while allowing
+  // legitimate users to recover without contacting support.
+  blockDuration: 30 * 60 * 1000, // 30 minutes (was 24 hours)
 })
 
 export const swapLimiter = new RateLimiter({

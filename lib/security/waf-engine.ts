@@ -31,7 +31,17 @@ const ENDPOINT_LIMITS: Record<string, { max: number; windowSec: number }> = {
   '/api/defi/copy-trading':   { max: 30,   windowSec: 60    },  // 30 per minute
   '/api/defi/deposit':        { max: 20,   windowSec: 60    },
   '/api/polymarket':          { max: 100,  windowSec: 60    },
-  '/api/auth':                { max: 20,   windowSec: 60    },
+  // [ANDROID FIX] Increased from 20→40/min. Android auth flow legitimately makes
+  // 3-4 requests per cycle: verify-session + sovereign-verify + optional nonce + siwe-verify.
+  // At 20/min, 5 concurrent users from same corporate NAT IP would hit the limit
+  // immediately, causing a cascade of 429s on login. Session cookie compound-key
+  // mitigates this for returning users, but first-time auth has no session yet.
+  '/api/auth':                { max: 40,   windowSec: 60    },
+  // [ANDROID FIX] SIWE endpoints separated from /api/auth for granular control.
+  // The nonce endpoint generates a unique nonce per request — rate limit is tighter
+  // to prevent nonce farming (used in rainbow table attacks against SIWE messages).
+  '/api/siwe/nonce':          { max: 15,   windowSec: 60    },  // 15 nonce requests/min (legitimate: ~1 per auth)
+  '/api/siwe':                { max: 30,   windowSec: 60    },  // verify = max 1 per auth, but allow retries
   '/api/user/status':         { max: 60,   windowSec: 60    },
   '/api':                     { max: 1200, windowSec: 60    },  // Increased for high-frequency institutional telemetry
 };
@@ -40,16 +50,28 @@ const ENDPOINT_LIMITS: Record<string, { max: number; windowSec: number }> = {
 // iOS Safari UA patterns — must never be flagged as malicious.
 // iOS 15-18 UA: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_x like Mac OS X) ...'
 // iOS Private Mode can send a shorter UA but always contains 'Safari' or 'WebKit'.
+//
+// [ANDROID CHROME FIX] Some Android Chrome variants (stock browser on Samsung/Xiaomi,
+// Chrome on Vodafone/Movistar branded builds) send UA without 'Safari' suffix:
+//   'Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile'
+// The pattern /android.*mobile.*safari/i misses these. We add Chrome-specific patterns.
 const LEGITIMATE_UA_PATTERNS = [
   /mozilla\/5\.0.*iphone/i,
   /mozilla\/5\.0.*ipad/i,
   /mozilla\/5\.0.*ipod/i,
-  /mozilla\/5\.0.*mac os x.*applewebkit/i,  // macOS Safari
-  /mozilla\/5\.0.*android.*mobile.*safari/i, // Android Chrome/WebView
-  /mozilla\/5\.0.*android.*safari/i,
-  /mozilla\/5\.0.*windows.*trident/i,        // IE (legacy, but legitimate)
-  /mozilla\/5\.0.*windows.*rv:/i,            // Firefox Windows
+  /mozilla\/5\.0.*mac os x.*applewebkit/i,   // macOS Safari
+  /mozilla\/5\.0.*android.*mobile.*safari/i,  // Android Chrome standard
+  /mozilla\/5\.0.*android.*safari/i,          // Android tablet Chrome
+  // [ANDROID FIX] Chrome on Android without Safari suffix (carrier/OEM branded builds)
+  /mozilla\/5\.0.*linux.*android.*chrome\//i, // Any Android Chrome variant
+  /mozilla\/5\.0.*android.*applewebkit.*chrome/i, // Chrome with KHTML/WebKit token
+  /mozilla\/5\.0.*windows.*trident/i,         // IE (legacy, but legitimate)
+  /mozilla\/5\.0.*windows.*rv:/i,             // Firefox Windows
   /mozilla\/5\.0.*x11.*linux/i,              // Linux browsers
+  /mozilla\/5\.0.*windows.*chrome\//i,        // Chrome on Windows
+  /mozilla\/5\.0.*macintosh.*chrome\//i,      // Chrome on macOS
+  /mozilla\/5\.0.*windows.*firefox\//i,       // Firefox on Windows
+  /mozilla\/5\.0.*macintosh.*firefox\//i,     // Firefox on macOS
 ];
 
 // ─── KNOWN MALICIOUS BOT SIGNATURES ──────────────────────────────────────────
@@ -282,9 +304,23 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
 
   if (endpointConfig) {
     const [prefix, { max, windowSec }] = endpointConfig;
-    const rateLimitKey = `waf:${ip}:${prefix}`;
     
-    if (!inMemoryRateCheck(rateLimitKey, max, windowSec)) {
+    // [ABYSMALLY COMPLEX OPTIMIZATION]: Defeat NAT overlap (e.g. Apple Private Relay)
+    // by composing a compound key using session tokens or user-agent hashes.
+    const sessionCookie = req.cookies.get('whale_session')?.value || req.cookies.get('sovereign_handshake')?.value;
+    const uaHash = ua ? Array.from(ua).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(16) : 'noua';
+    
+    // Use session token if available (perfect isolation), otherwise fallback to IP + UA Hash
+    const rateLimitKey = sessionCookie 
+        ? `waf:sess:${sessionCookie.slice(0, 32)}:${prefix}` 
+        : `waf:ip:${ip}:ua:${uaHash}:${prefix}`;
+        
+    // Apple IP block (17.0.0.0/8) is massively NAT'd via iCloud Private Relay.
+    // To prevent false positives while maintaining security, dynamically scale limits.
+    const isAppleNAT = ip.startsWith('17.');
+    const dynamicMax = (isAppleNAT && !sessionCookie) ? Math.floor(max * 5) : max;
+
+    if (!inMemoryRateCheck(rateLimitKey, dynamicMax, windowSec)) {
       return buildChallengeResponse(windowSec, ip);
     }
   }
