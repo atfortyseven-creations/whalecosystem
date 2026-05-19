@@ -103,7 +103,17 @@ const nextConfig = {
     serverExternalPackages: ['@prisma/client', 'prisma', 'ioredis', 'neo4j-driver', 'snarkjs'],
 
     experimental: {
-        optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber'],
+        optimizePackageImports: [
+            'lucide-react', 
+            'framer-motion', 
+            'three', 
+            '@react-three/fiber',
+            '@react-three/drei',
+            'wagmi',
+            'viem',
+            '@tanstack/react-query',
+            'ethers'
+        ],
         serverActions: {
             bodySizeLimit: '10mb'
         }

@@ -378,6 +378,26 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
   -webkit-font-smoothing: antialiased;
 }
 
+/* [EXTREME GPU OPTIMIZATION] Strict Layout Isolation */
+.perf-isolate {
+  contain: layout style paint;
+  overflow: hidden;
+}
+
+/* Deep 3D Hardware layering for smooth parallax and lists */
+.perf-composited-3d {
+  transform: translate3d(0, 0, 0) scale(1);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+/* Micro-utility to promote individual elements without layout shifts */
+.perf-will-change-transform {
+  will-change: transform;
+}
+
+
 .z-stratosphere {
   z-index: 9999 !important;
 }
