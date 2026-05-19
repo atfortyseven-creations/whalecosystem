@@ -16,18 +16,13 @@ import { InteractiveFluidGrid } from "@/components/landing/InteractiveFluidGrid"
 import { GoogleTagManager } from "@/components/privacy/GoogleTagManager";
 import { ErrorSuppressor } from "@/components/ui/ErrorSuppressor";
 import { ReactNode } from "react";
-import dynamic from 'next/dynamic';
 import { MobileEnforcer } from '@/components/layout/MobileEnforcer';
 import { ClientOverlays } from "@/components/layout/ClientOverlays";
 import { GlobalErrorBoundary } from "@/components/ui/GlobalErrorBoundary";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { AntiTamperCore } from "@/components/security/AntiTamperCore";
 
-// ── Dynamic (client-only) providers ──────────────────────────────────────────
-const WalletConnectProvider = dynamic(
-  () => import('@/components/walletconnect/WalletConnectProvider').then(m => ({ default: m.WalletConnectProvider })),
-  { ssr: false }
-);
+import { WalletConnectProvider } from '@/components/walletconnect/WalletConnectProvider';
 
 
 const inter = Inter({ subsets: ['latin'] })
