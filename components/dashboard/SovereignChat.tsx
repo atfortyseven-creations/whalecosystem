@@ -374,8 +374,17 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
           signer = {
             getAddress: async () => address,
             signMessage: async (msg: string | Uint8Array) => {
-              const text = typeof msg === 'string' ? msg : new TextDecoder().decode(msg);
-              return signMessageAsync({ message: text });
+              try {
+                return await signMessageAsync({
+                  message: typeof msg === 'string' ? msg : { raw: msg } as any
+                });
+              } catch (sigErr: any) {
+                const errMsg = sigErr?.message || '';
+                if (errMsg.includes('connector') || errMsg.includes('not connected') || errMsg.includes('No connector') || errMsg.includes('signMessage')) {
+                  throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected.');
+                }
+                throw sigErr;
+              }
             },
           };
         }
@@ -834,8 +843,8 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
             Whale Chat requiere una firma única para cifrar tus mensajes de extremo a extremo. Revisa tu billetera.
           </p>
         </div>
-        <button onClick={() => initXmtpClient(true)} className="mt-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition-all text-white font-mono text-[11px] font-bold uppercase tracking-widest rounded-xl shadow-md">
-          Toque aquí para Firmar (Móvil)
+        <button onClick={() => initXmtpClient(true)} className="mt-2 px-8 py-3.5 bg-[#000000] text-white hover:bg-black/80 active:scale-95 transition-all font-mono text-[11px] font-bold uppercase tracking-widest rounded-xl shadow-md">
+          Haga clic o toque aquí para Firmar
         </button>
       </div>
     );
