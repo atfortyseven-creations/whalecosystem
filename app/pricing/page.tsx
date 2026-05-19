@@ -4,11 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, Lock, Activity, Globe } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { PRICING_TIERS, TIER_RANK } from '@/lib/config/pricing-tiers';
-import { SovereignFooter } from '@/components/landing/SovereignFooter';
-import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
+
+// Lazy-load heavy components to prevent stale ChunkLoadError on redeployment
+const SovereignFooter = dynamic(() => import('@/components/landing/SovereignFooter').then(m => ({ default: m.SovereignFooter })), { ssr: false, loading: () => <div className="h-24" /> });
+const MotionDiv = dynamic(() => import('framer-motion').then(m => ({ default: m.motion.div })), { ssr: false, loading: () => <div /> });
 
 const FADE_UP: any = {
   hidden: { opacity: 0, y: 10 },
@@ -97,35 +100,28 @@ export default function PricingPage() {
         {/* ── HERO ──────────────────────────────────────────── */}
         <section className="w-full pt-36 pb-24 px-6 border-b border-black/5 relative z-10 flex flex-col justify-center items-center text-center">
           <div className="w-full max-w-[1400px] mx-auto space-y-10">
-            <motion.div
+            <MotionDiv
               initial="hidden" animate="visible" variants={FADE_UP}
               className="flex flex-col items-center gap-8"
             >
-
-
               <h1 className="text-[64px] md:text-[100px] font-black uppercase tracking-tighter leading-[0.85] text-[#050505]">
                 System <br />
                 <span className="text-black/20">Access Plans.</span>
               </h1>
-
               <p className="text-[18px] md:text-[24px] font-serif text-black/60 max-w-3xl leading-relaxed mt-4 mx-auto">
                 Establish your institutional identity and access the core infrastructure of the Whale Alert Network. We provide high-integrity cryptographic verifications to guarantee data authenticity and operational security.
               </p>
-            </motion.div>
+            </MotionDiv>
           </div>
         </section>
 
         {/* ── FEATURES GRID ────────────────────────────────────────────────── */}
         <section className="w-full py-24 relative z-10 flex flex-col items-center">
           <div className="max-w-[1400px] mx-auto px-6 w-full">
-            <motion.div
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
-              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {FEATURES.map((f, i) => (
-                <motion.div
-                  key={i} variants={FADE_UP}
+                <div
+                  key={i}
                   className="bg-white rounded-[3rem] border border-black/5 shadow-sm p-12 flex flex-col justify-between hover:border-black/20 hover:bg-[#F8F8F8] hover:-translate-y-1 transition-all duration-500 group"
                 >
                   <div className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center mb-10 group-hover:bg-black group-hover:text-white transition-colors duration-500 border border-black/5">
@@ -135,24 +131,20 @@ export default function PricingPage() {
                     <h3 className="text-[24px] font-black uppercase tracking-tight text-[#050505]">{f.title}</h3>
                     <p className="text-[16px] text-black/50 leading-relaxed font-serif">{f.desc}</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </section>
 
         {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
         <section className="w-full py-24 bg-transparent relative z-10 flex flex-col items-center">
           <div className="px-6 max-w-[1400px] mx-auto w-full">
-            <motion.div
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
-              variants={FADE_UP}
-              className="mb-20 text-center"
-            >
+            <div className="mb-20 text-center">
               <h2 className="text-[40px] md:text-[80px] font-black uppercase tracking-tighter text-[#050505] leading-none">
                 Access <br /><span className="text-black/20">Structure.</span>
               </h2>
-            </motion.div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 text-left">
               {PRICING_TIERS.map((tier, index) => {

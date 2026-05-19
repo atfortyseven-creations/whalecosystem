@@ -22,16 +22,23 @@ export default function QuantumMinerUI() {
     
     // Fetch Tokenomics Data
     const { data: totalSupply } = useReadContract({
-        address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as \`0x\${string}\`,
+        address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as `0x${string}`,
         abi: parseAbi(['function totalSupply() view returns (uint256)']),
         functionName: 'totalSupply',
     });
     
-    const { data: userBalance } = useReadContract({
-        address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as \`0x\${string}\`,
+    const { data: userBalance, refetch: refetchBalance } = useReadContract({
+        address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as `0x${string}`,
         abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
         functionName: 'balanceOf',
-        args: [(address || "0x") as \`0x\${string}\`],
+        args: [(address || "0x") as `0x${string}`],
+    });
+
+    // Fetch live challenge from QuantumMiner contract
+    const { data: contractChallenge } = useReadContract({
+        address: (process.env.NEXT_PUBLIC_MINER_CONTRACT_ADDRESS || "0x") as `0x${string}`,
+        abi: parseAbi(['function currentChallenge() view returns (bytes32)']),
+        functionName: 'currentChallenge',
     });
 
     const currentSupplyFormatted = totalSupply ? Number(formatEther(totalSupply as bigint)) : 0;
@@ -145,17 +152,24 @@ export default function QuantumMinerUI() {
     }, []);
 
     const toggleMining = () => {
+        if (!address) {
+            toast.error('Conecta tu billetera primero para minar QDs.');
+            return;
+        }
         if (!isMining) {
             setBlockFound(false);
             setTotalHashes(0);
             setIsMining(true);
             toast.info('Iniciando clústeres de minería CPU...');
-            // In a real app, wallet and challenge come from Web3 state/context
+            // Use REAL wallet address and REAL on-chain challenge
+            const realChallenge = contractChallenge
+                ? `0x${Buffer.from(contractChallenge as any).toString('hex')}`
+                : `0x${Date.now().toString(16).padStart(64, '0')}`;
             workerRef.current?.postMessage({ 
                 command: 'start', 
                 difficulty: targetDifficulty,
-                wallet: "0x8888888888888888888888888888888888888888", // To be replaced with real user address
-                challenge: "0x0000000000000000000000000000000000000000000000000000000000000000" // To be replaced with contract state
+                wallet: address,
+                challenge: realChallenge,
             });
         } else {
             setIsMining(false);
@@ -171,23 +185,24 @@ export default function QuantumMinerUI() {
         try {
             const txPromise = async () => {
                 const hash = await writeContractAsync({
-                    address: (process.env.NEXT_PUBLIC_MINER_CONTRACT_ADDRESS || "0x") as \`0x\${string}\`,
+                    address: (process.env.NEXT_PUBLIC_MINER_CONTRACT_ADDRESS || "0x") as `0x${string}`,
                     abi: parseAbi(['function mine(uint256 nonce) external']),
                     functionName: 'mine',
                     args: [BigInt(foundNonce)]
                 });
                 if (publicClient) {
                     await publicClient.waitForTransactionReceipt({ hash });
+                    // Refresh balance after successful mining
+                    await refetchBalance();
                 }
             };
 
-            toast.promise(txPromise(), {
+            await toast.promise(txPromise(), {
                 loading: 'Enviando Prueba y confirmando bloque en la Mainnet...',
                 success: 'Bloque validado On-Chain. Has recibido tu recompensa en QDs.',
                 error: 'Error al enviar el bloque o nonce rechazado por la Mainnet.'
             });
 
-            await txPromise();
             setBlockFound(false);
             setFoundNonce(null);
         } catch (error) {
@@ -217,6 +232,32 @@ export default function QuantumMinerUI() {
                     </div>
                 </div>
             </div>
+
+            {/* Airdrop CTA — only shown when balance is zero (new account) */}
+            {userBalanceFormatted === '0.00' && address && (
+                <div className="mb-6 p-4 rounded-2xl border border-white/30 bg-white/5 flex flex-col sm:flex-row items-start sm:items-center gap-3 relative z-10">
+                    <div className="flex-1">
+                        <p className="text-xs font-bold text-white tracking-widest uppercase mb-1">🎁 Bienvenido — 500 QDs Gratis</p>
+                        <p className="text-[10px] text-white/50">Tu cuenta es nueva. Reclama tu Airdrop de bienvenida para obtener tus primeros 500 QDs al instante.</p>
+                    </div>
+                    <button
+                        onClick={async () => {
+                            try {
+                                const res = await fetch('/api/quantum/airdrop', { method: 'POST' });
+                                const data = await res.json();
+                                if (!res.ok) throw new Error(data.error || 'Error al reclamar');
+                                toast.success('¡500 QDs reclamados! Tu balance se actualizará en segundos.');
+                                setTimeout(() => refetchBalance(), 3000);
+                            } catch(e: any) {
+                                toast.error(e.message);
+                            }
+                        }}
+                        className="shrink-0 px-4 py-2 bg-white text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-white/90 active:scale-95 transition-all"
+                    >
+                        Reclamar Airdrop
+                    </button>
+                </div>
+            )}
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-8 relative z-10">
                 <div className="flex items-center gap-3 sm:gap-4">
