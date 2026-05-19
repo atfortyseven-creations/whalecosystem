@@ -7,12 +7,7 @@ import { ReactNode } from 'react';
  */
 export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
-    <div
-      className="bg-transparent flex flex-col overflow-hidden"
-      style={{
-        height: '100dvh'
-      }}
-    >
+    <div className="bg-transparent flex flex-col flex-1 w-full h-full relative overflow-hidden">
       {children}
     </div>
   );

@@ -581,7 +581,12 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
       // Remove optimistic on failure
       setMessages(prev => prev.filter(m => m.id !== optimistic.id));
       console.error('[Chat] send failed:', e);
-      alert('Failed to send message.');
+      const msg = e?.message?.toLowerCase() || '';
+      if (msg.includes('network') || msg.includes('recipient') || msg.includes('not found')) {
+         toast.error('Destinatario Inactivo', { description: 'La wallet de destino no ha activado Whale Chat. No puede recibir mensajes aún.' });
+      } else {
+         toast.error('Error de Envío', { description: e?.message || 'Hubo un problema al enviar el mensaje de forma segura.' });
+      }
     } finally {
       setSending(false);
     }
@@ -769,7 +774,6 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
 
   // ── Theme-driven background is handled via CSS variables in globals.css ────────
 
-  // ── Guards ─────────────────────────────────────────────────────────────────
   if (!isConnected) {
     return (
       <div className="flex flex-1 w-full h-full bg-white items-center justify-center">
@@ -783,10 +787,29 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   if (xmtpError) {
     return (
       <div className="flex flex-1 w-full h-full bg-white items-center justify-center flex-col gap-4">
-        <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">XMTP Synchronization Error</p>
+        <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">Error de Sincronización XMTP</p>
         <p className="font-mono text-[10px] text-black/40 max-w-md text-center">{xmtpError}</p>
         <button onClick={() => initXmtpClient()} className="px-6 py-2.5 bg-black text-white font-mono text-[10px] uppercase tracking-widest rounded-xl">
-          Retry Sync
+          Reintentar Firma y Sincronizar
+        </button>
+      </div>
+    );
+  }
+
+  if (!xmtpReady) {
+    return (
+      <div className="flex flex-1 w-full h-full bg-white items-center justify-center flex-col gap-5 p-6 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center border border-black/10 animate-pulse">
+           <UserCheck size={28} className="text-black/60" />
+        </div>
+        <div>
+          <h2 className="font-mono text-[14px] font-black tracking-widest uppercase text-black mb-2">Activando Motor Criptográfico</h2>
+          <p className="font-mono text-[10px] text-black/50 max-w-[280px] mx-auto leading-relaxed">
+            Whale Chat requiere una firma única para cifrar tus mensajes de extremo a extremo. Revisa tu billetera.
+          </p>
+        </div>
+        <button onClick={() => initXmtpClient()} className="mt-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition-all text-white font-mono text-[11px] font-bold uppercase tracking-widest rounded-xl shadow-md">
+          Toque aquí para Firmar (Móvil)
         </button>
       </div>
     );
@@ -794,7 +817,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="absolute inset-0 flex text-black overflow-hidden chat-theme-wrapper bg-white" data-chat-theme={settings.theme} data-privacy={settings.privacyMode} onClick={() => showPeerMenu && setShowPeerMenu(false)}>
+    <div className="w-full h-full flex-1 flex text-black overflow-hidden chat-theme-wrapper bg-white relative" data-chat-theme={settings.theme} data-privacy={settings.privacyMode} onClick={() => showPeerMenu && setShowPeerMenu(false)}>
 
       {/* Settings overlay */}
       {showSettings && (
