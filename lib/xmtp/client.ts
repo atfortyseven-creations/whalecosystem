@@ -128,8 +128,46 @@ export async function getXMTPClient(
   }
   const dbEncryptionKey = new Uint8Array(Buffer.from(dbKeyHex, 'hex'));
 
-  // Client.create(signer, options) — v5.3.0 signature
-  const client = await Client.create(signer, { env: XMTP_ENV, dbEncryptionKey });
+  let client: Client;
+  try {
+    // Client.create(signer, options) — v5.3.0 signature
+    client = await Client.create(signer, { env: XMTP_ENV, dbEncryptionKey });
+  } catch (err: any) {
+    const errorMsg = err?.message || '';
+    if (
+      errorMsg.includes('already registered 10/10 installations') ||
+      errorMsg.includes('Cannot register a new installation')
+    ) {
+      console.warn('[XMTP] 10/10 installation limit reached. Attempting automatic revocation...');
+      try {
+        const match = errorMsg.match(/InboxID\s+([a-fA-F0-9]+)\s+has/i) || errorMsg.match(/InboxID\s+([a-fA-F0-9]+)/i);
+        const inboxId = match ? match[1] : null;
+        if (inboxId) {
+          console.log('[XMTP] Revoking installations for inbox:', inboxId);
+          const states = await (Client as any).inboxStateFromInboxIds([inboxId], XMTP_ENV);
+          if (states && states[0] && states[0].installations) {
+            const installationsToRevoke = states[0].installations.map((i: any) => i.bytes);
+            if (installationsToRevoke.length > 0) {
+              await (Client as any).revokeInstallations(signer as any, inboxId, installationsToRevoke, XMTP_ENV);
+              console.log('[XMTP] Successfully revoked installations. Retrying Client.create...');
+              client = await Client.create(signer, { env: XMTP_ENV, dbEncryptionKey });
+            } else {
+              throw err;
+            }
+          } else {
+            throw err;
+          }
+        } else {
+          throw err;
+        }
+      } catch (revokeErr: any) {
+        console.error('[XMTP] Automatic revocation failed:', revokeErr);
+        throw err;
+      }
+    } else {
+      throw err;
+    }
+  }
 
   clientRegistry.set(address, client);
   return client;
