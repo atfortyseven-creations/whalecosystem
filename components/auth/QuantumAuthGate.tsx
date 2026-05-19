@@ -846,7 +846,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         return (
           <div className="flex flex-col items-center justify-center py-20 space-y-10 relative">
             <div className="relative w-64 h-64 flex items-center justify-center -mt-8">
-               <RemoteLottie path="/system-shots/Block Abstract.json" className="w-full h-full object-contain opacity-100" />
+               <RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-contain opacity-100" loop={true} />
             </div>
             <div className="text-center space-y-4">
               <h2 className="text-[26px] font-black text-[#0A0A0A] tracking-tighter uppercase">Generating Wallet</h2>
@@ -873,7 +873,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         return (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-56 h-56 mx-auto mb-6">
-              <RemoteLottie path="/system-shots/Transaction Complete.json" className="w-full h-full object-contain" speed={0.25} />
+              <RemoteLottie path="/system-shots/Transaction Complete.json" className="w-full h-full object-contain" speed={1.15} />
             </div>
             <h2 className="text-2xl font-black text-emerald-500 tracking-tighter uppercase">
               Wallet Created

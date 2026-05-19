@@ -230,7 +230,7 @@ export default async function RootLayout({
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-black text-white px-4 py-2 rounded-lg font-bold text-sm">
           Skip to absolute content
         </a>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={true}>
           <ScrollProgressBar />
           <Providers cookies={cookies}>
             <GlobalErrorBoundary>

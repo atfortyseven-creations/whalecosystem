@@ -113,7 +113,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: ReactNode }) {
     // --- INITIAL STATES (With Persistence) ---
     // General
-    const [theme, setTheme] = useState<ThemeMode>('auto');
+    const [theme, setTheme] = useState<ThemeMode>('light');
     const [currency, setCurrency] = useState<Currency>('USD');
     const [language, setLanguage] = useState<Language>('en');
     const [searchEngine, setSearchEngine] = useState<SearchEngine>('Google');
