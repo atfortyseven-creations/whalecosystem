@@ -2,7 +2,6 @@
 // context only because WalletConnectProvider.tsx (which calls createWeb3Wallet)
 // is loaded with dynamic({ ssr: false }).
 import { Core } from '@walletconnect/core';
-// @ts-expect-error — resolved after `npm install` adds @walletconnect/web3wallet types
 import { Web3Wallet, IWeb3Wallet } from '@walletconnect/web3wallet';
 import { buildApprovedNamespaces, getSdkError } from '@walletconnect/utils';
 import { useWalletConnectStore } from '@/lib/store/wallet-connect-store';
@@ -26,7 +25,8 @@ export async function createWeb3Wallet() {
     });
 
     web3wallet = await Web3Wallet.init({
-        core,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        core: core as any, // pino Logger types diverge between nested @walletconnect package versions
         metadata: {
             name: 'Whale Portfolio',
             description: 'Institutional Sovereign Wallet',
