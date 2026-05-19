@@ -150,7 +150,8 @@ export const useWalletStore = create<WalletState>()(
             toast.success("Identity Unlocked", {
               description: `Active: ${get().accounts[existingIndex].label}`
             });
-            get().cloudSync();
+            // NOTE: cloudSync intentionally omitted here — this path fires on every
+            // auth unlock and would cause excess POST requests on mobile.
             return true;
           }
 
@@ -173,7 +174,8 @@ export const useWalletStore = create<WalletState>()(
             description: `Recovered: ${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
           });
           get().updateBalance();
-          get().cloudSync();
+          // NOTE: cloudSync intentionally omitted here — only sync explicitly when user
+          // adds a new account, not on every auth-gate unlock.
           return true;
         } catch (error) {
           console.error("Invalid private key during import:", error);

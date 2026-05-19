@@ -218,7 +218,22 @@ function SecureStepPanel({ t, onBack, onProceed }: { t: any; onBack: () => void;
 export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const [lang, setLang] = useState<LangKey>('en');
   const t = LANGS[lang];
-  const [step, setStep] = useState<'home' | 'login' | 'mnemonic' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting'>('home');
+
+  // ── Determine initial step ──────────────────────────────────────────────────
+  // If the user already has a sovereign_keystore we go straight to 'login'
+  // so they never see the "Create / Login" choice screen again.
+  const getInitialStep = (): 'home' | 'login' => {
+    if (typeof window === 'undefined') return 'home';
+    try {
+      const ks = localStorage.getItem('sovereign_keystore');
+      const vault = localStorage.getItem('sovereign_vault_v1');
+      return (ks || vault) ? 'login' : 'home';
+    } catch {
+      return 'home';
+    }
+  };
+
+  const [step, setStep] = useState<'home' | 'login' | 'mnemonic' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting'>(getInitialStep);
   const [hasKeystore, setHasKeystore] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -235,9 +250,20 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   // Mnemonic recovery state
   const [mnemonicInput, setMnemonicInput] = useState('');
   const [mnemonicError, setMnemonicError] = useState('');
+  // Timer refs for cleanup on unmount (prevents setState-on-unmounted warning)
+  const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { isConnected } = useAccount();
   const { importWallet } = useWalletStore();
   const { activateSovereignVault } = useSovereignConnect();
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
+      if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (clickedMint && isConnected) {
@@ -246,10 +272,18 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   }, [clickedMint, isConnected, onComplete]);
 
   useEffect(() => {
-    const ks = localStorage.getItem('sovereign_keystore');
-    const vault = localStorage.getItem('sovereign_vault_v1');
-    if (ks || vault) {
-      setHasKeystore(true);
+    try {
+      const ks = localStorage.getItem('sovereign_keystore');
+      const vault = localStorage.getItem('sovereign_vault_v1');
+      const exists = !!(ks || vault);
+      setHasKeystore(exists);
+      // Sync step: getInitialStep() runs before hydration so may default to 'home'.
+      // After mount we confirm: if keystore exists, always force login step.
+      if (exists) {
+        setStep('login');
+      }
+    } catch {
+      // localStorage blocked (iOS incognito) — stay on home
     }
   }, []);
 
@@ -297,12 +331,16 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       setLoadingProgress((currentStep / stepsCount) * 100);
       if (currentStep >= stepsCount) {
         clearInterval(timer);
+        progressTimerRef.current = null;
         setStep('transaction_complete');
-        setTimeout(() => {
-          setStep('reveal'); // Directly to reveal mnemonic phrase
+        const t = setTimeout(() => {
+          transitionTimerRef.current = null;
+          setStep('reveal');
         }, 2500);
+        transitionTimerRef.current = t;
       }
     }, interval);
+    progressTimerRef.current = timer;
   };
 
   const handleVerify = async () => {
@@ -811,8 +849,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
                <RemoteLottie path="/system-shots/Block Abstract.json" className="w-full h-full object-contain opacity-100" />
             </div>
             <div className="text-center space-y-4">
-              <h2 className="text-[26px] font-black text-[#0A0A0A] tracking-tighter uppercase">Forging Matrix</h2>
-              <p className="text-[15px] text-[#0A0A0A]/50 font-medium">Establishing local Sovereign identity on device...</p>
+              <h2 className="text-[26px] font-black text-[#0A0A0A] tracking-tighter uppercase">Generating Wallet</h2>
+              <p className="text-[15px] text-[#0A0A0A]/50 font-medium">Creating your secure wallet on this device...</p>
               
               {/* Terminal Progress Bar */}
               <div className="w-full max-w-[200px] mx-auto mt-4">
@@ -835,10 +873,10 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         return (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-56 h-56 mx-auto mb-6">
-              <RemoteLottie path="/system-shots/Transaction Complete.json" className="w-full h-full object-contain" />
+              <RemoteLottie path="/system-shots/Transaction Complete.json" className="w-full h-full object-contain" speed={0.25} />
             </div>
             <h2 className="text-2xl font-black text-emerald-500 tracking-tighter uppercase">
-              Identity Secured
+              Wallet Created
             </h2>
           </div>
         );

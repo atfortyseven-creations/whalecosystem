@@ -34,8 +34,16 @@ export function WalletConnectionBridge() {
     }, [isConnected, address, syncAddress]);
 
     // ─── [COSMIC BRIDGE] Real-Time Autologin Listener ───────────────────────
+    // GUARD: Only open SSE when actively waiting for a QR handshake.
+    // Prevents a persistent connection being held open on mobile for every user
+    // who already has a sovereign wallet or is connected via MetaMask/WalletConnect.
     useEffect(() => {
-        if (isConnected) return; // Already logged in
+        if (isConnected) return; // Already logged in — no SSE needed
+
+        // Check for pending QR session before opening SSE
+        let pendingSession: string | null = null;
+        try { pendingSession = sessionStorage.getItem('pending_qr_session'); } catch {}
+        if (!pendingSession) return; // No QR in flight — skip SSE entirely
 
         const eventSource = new EventSource('/api/whale-stream');
         
@@ -45,7 +53,7 @@ export function WalletConnectionBridge() {
                 const currentSessionId = sessionStorage.getItem('pending_qr_session');
                 
                 if (data.socketId === currentSessionId && data.address) {
-                    console.log(`[Handshake:Success] 10000% Relay Received for ${data.address}`);
+                    console.log(`[Handshake:Success] Relay received for ${data.address}`);
                     
                     // 1. Set the cookie for persistent auth
                     document.cookie = `sovereign_handshake=${data.address.toLowerCase()}; path=/; max-age=604800; samesite=lax`;
@@ -58,8 +66,9 @@ export function WalletConnectionBridge() {
                         detail: { address: data.address } 
                     }));
 
-                    // 4. Cleanup
+                    // 4. Cleanup — close stream immediately, session is done
                     sessionStorage.removeItem('pending_qr_session');
+                    eventSource.close();
                 }
             } catch (err) {
                 console.error('[Handshake:RelayError]', err);

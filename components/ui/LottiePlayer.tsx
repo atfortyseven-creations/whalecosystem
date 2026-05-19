@@ -75,13 +75,21 @@ export const LottiePlayer = ({
                     localInstance.destroy();
                 }
             } catch (e) {
-                // ABYSMALLY PERFECT CATCH: completely suppresses the React 18 strict mode crash 
-                // "this.elements[t].destroy is not a function" by isolating it within our own try/catch.
+                // Suppresses React 18 strict-mode double-invoke destroy crash.
             } finally {
                 instanceRef.current = null;
             }
         };
+    // speed intentionally excluded — handled by dedicated effect below
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [animationData, loop, autoplay]);
+
+    // Dedicated effect: update playback speed without re-creating the animation.
+    useEffect(() => {
+        if (instanceRef.current && speed !== undefined) {
+            instanceRef.current.setSpeed(speed);
+        }
+    }, [speed]);
 
     if (!animationData) return null;
 

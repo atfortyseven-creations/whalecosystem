@@ -12,7 +12,7 @@ import {
   BarChart2, MessageSquare, Menu, X, LogOut, ArrowLeft
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
-import { useAccount, useSwitchChain, useConnect, useDisconnect } from 'wagmi';
+import { useAccount, useSwitchChain, useDisconnect } from 'wagmi';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { mainnet, base, optimism, arbitrum, polygon } from 'wagmi/chains';
 import { useAppKit } from '@reown/appkit/react';
@@ -200,7 +200,6 @@ export default function PortfolioPage() {
   const { privateKey, address: storeAddress } = useWalletStore();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { open: openAppKit } = useAppKit();
-  const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = () => setRefreshKey(k => k + 1);
@@ -242,9 +241,15 @@ export default function PortfolioPage() {
   // Wait for client mount to avoid SSR hydration mismatch (wagmi state is client-only)
   if (!mounted) return null;
 
-  // sessionUnlocked: user completed QuantumAuthGate this session (stored in sessionStorage)
-  // isQuantumUnlocked: local vault was decrypted and private key is in memory
-  // wagmiConnected: MetaMask / WalletConnect is live
+  // Show the gate when the user has NOT authenticated in this session.
+  // Gate is skipped ONLY when:
+  //   A) privateKey is live in memory (just logged in this tab, not yet reloaded)
+  //   B) wagmi MetaMask/WalletConnect is live
+  //   C) sessionStorage flag set this session (survives soft navigation within the tab)
+  //
+  // When hasKeystore=true and none of the above apply, we STILL show the gate,
+  // but QuantumAuthGate auto-starts at the 'login' (unlock) step instead of 'home'.
+  // This is the correct security posture: the user must enter their password.
   const needsGate = !isQuantumUnlocked && !wagmiConnected && !sessionUnlocked;
 
   if (needsGate) {
