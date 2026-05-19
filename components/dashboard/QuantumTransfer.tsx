@@ -139,25 +139,25 @@ export default function QuantumTransfer() {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto bg-black border border-white/20 rounded-[32px] p-8 shadow-2xl overflow-hidden relative">
+        <div className="w-full max-w-lg mx-auto bg-black border border-white/20 rounded-3xl sm:rounded-[32px] p-5 sm:p-8 shadow-2xl overflow-hidden relative">
             {/* Background Glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] h-32 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
 
             {/* Tokenomics Balance */}
-            <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10 relative z-10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-white/10 relative z-10 gap-2 sm:gap-0">
                 <div>
-                    <h3 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Mi Balance Disponible</h3>
-                    <p className="text-2xl font-mono text-white">{userBalanceFormatted} <span className="text-sm">QDs</span></p>
+                    <h3 className="text-[10px] sm:text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Mi Balance Disponible</h3>
+                    <p className="text-xl sm:text-2xl font-mono text-white break-all">{userBalanceFormatted} <span className="text-xs sm:text-sm">QDs</span></p>
                 </div>
             </div>
 
-            <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-white/5 border border-white/20 rounded-2xl flex items-center justify-center">
-                    <Zap className="text-white" size={24} />
+            <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                    <Zap className="text-white" size={20} />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-black tracking-tighter text-white uppercase">Transferir QDs</h2>
-                    <p className="text-sm font-medium text-white/60">Red QuantumLedger (Inmutable)</p>
+                    <h2 className="text-lg sm:text-2xl font-black tracking-tighter text-white uppercase">Transferir QDs</h2>
+                    <p className="text-xs sm:text-sm font-medium text-white/60">Red QuantumLedger</p>
                 </div>
             </div>
 

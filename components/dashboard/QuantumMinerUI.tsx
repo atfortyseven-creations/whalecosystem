@@ -198,18 +198,18 @@ export default function QuantumMinerUI() {
     };
 
     return (
-        <div className="w-full max-w-xl mx-auto bg-black border border-white/20 rounded-[32px] p-8 shadow-2xl overflow-hidden relative">
+        <div className="w-full max-w-xl mx-auto bg-black border border-white/20 rounded-3xl sm:rounded-[32px] p-5 sm:p-8 shadow-2xl overflow-hidden relative">
             <div className="absolute top-0 right-0 w-[150%] h-48 bg-white/5 blur-[100px] rounded-full pointer-events-none" />
 
             {/* Tokenomics Header */}
-            <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10 relative z-10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 sm:mb-8 pb-6 border-b border-white/10 relative z-10">
                 <div>
                     <h3 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Mi Balance QD</h3>
-                    <p className="text-2xl font-mono text-white">{userBalanceFormatted} <span className="text-sm">QDs</span></p>
+                    <p className="text-xl sm:text-2xl font-mono text-white break-all">{userBalanceFormatted} <span className="text-xs sm:text-sm">QDs</span></p>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right w-full sm:w-auto">
                     <h3 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Circulante / Hard Cap</h3>
-                    <p className="text-lg font-mono text-white">
+                    <p className="text-base sm:text-lg font-mono text-white">
                         {currentSupplyFormatted.toLocaleString(undefined, { maximumFractionDigits: 0 })} / {maxSupply.toLocaleString()}
                     </p>
                     <div className="w-full bg-white/10 h-1 mt-2 rounded-full overflow-hidden">
@@ -218,37 +218,37 @@ export default function QuantumMinerUI() {
                 </div>
             </div>
 
-            <div className="flex items-center justify-between mb-8 relative z-10">
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-white/5 border border-white/20 rounded-2xl flex items-center justify-center relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-8 relative z-10">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-white/5 border border-white/20 rounded-2xl flex items-center justify-center relative overflow-hidden">
                         {isMining && <div className="absolute inset-0 bg-white/10 animate-pulse" />}
-                        <Cpu className={`text-white ${isMining ? 'animate-bounce' : ''}`} size={28} />
+                        <Cpu className={`text-white ${isMining ? 'animate-bounce' : ''}`} size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">Nódulo Minero</h2>
-                        <p className="text-xs font-bold text-white/60 tracking-widest uppercase">Proof-of-Work CPU</p>
+                        <h2 className="text-xl sm:text-2xl font-black tracking-tighter text-white uppercase">Nódulo Minero</h2>
+                        <p className="text-[10px] sm:text-xs font-bold text-white/60 tracking-widest uppercase">Proof-of-Work CPU</p>
                     </div>
                 </div>
                 
-                <div className="text-right">
-                    <p className="text-xs font-bold text-white/40 tracking-widest uppercase mb-1">Dificultad Target</p>
-                    <p className="text-xl font-mono text-white">0x{'0'.repeat(targetDifficulty)}...</p>
+                <div className="text-left sm:text-right">
+                    <p className="text-[10px] sm:text-xs font-bold text-white/40 tracking-widest uppercase mb-1">Dificultad Target</p>
+                    <p className="text-lg sm:text-xl font-mono text-white">0x{'0'.repeat(targetDifficulty)}...</p>
                 </div>
             </div>
 
             {/* Metrics Dashboard */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-[#111] border border-white/10 rounded-2xl p-5 relative overflow-hidden">
-                    <Activity className="absolute right-4 top-4 text-white/5" size={48} />
-                    <p className="text-xs font-bold text-white/40 tracking-widest uppercase mb-2">HashRate (CPU)</p>
-                    <p className="text-3xl font-black text-white tracking-tighter">
-                        {hashRate} <span className="text-sm font-medium text-white/60">H/s</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div className="bg-[#111] border border-white/10 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+                    <Activity className="absolute right-3 top-3 sm:right-4 sm:top-4 text-white/5" size={40} />
+                    <p className="text-[10px] sm:text-xs font-bold text-white/40 tracking-widest uppercase mb-1 sm:mb-2">HashRate (CPU)</p>
+                    <p className="text-2xl sm:text-3xl font-black text-white tracking-tighter">
+                        {hashRate} <span className="text-xs sm:text-sm font-medium text-white/60">H/s</span>
                     </p>
                 </div>
-                <div className="bg-[#111] border border-white/10 rounded-2xl p-5 relative overflow-hidden">
-                    <Hash className="absolute right-4 top-4 text-white/5" size={48} />
-                    <p className="text-xs font-bold text-white/40 tracking-widest uppercase mb-2">Hashes Totales</p>
-                    <p className="text-3xl font-black text-white tracking-tighter">
+                <div className="bg-[#111] border border-white/10 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+                    <Hash className="absolute right-3 top-3 sm:right-4 sm:top-4 text-white/5" size={40} />
+                    <p className="text-[10px] sm:text-xs font-bold text-white/40 tracking-widest uppercase mb-1 sm:mb-2">Hashes Totales</p>
+                    <p className="text-2xl sm:text-3xl font-black text-white tracking-tighter truncate">
                         {totalHashes.toLocaleString()}
                     </p>
                 </div>
