@@ -44,7 +44,7 @@ function WaveBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(2,6,23,0.55) 0%, rgba(2,6,23,0.72) 40%, rgba(2,6,23,0.88) 100%)",
+            "linear-gradient(to bottom, rgba(2,6,23,0.3) 0%, rgba(2,6,23,0.4) 40%, rgba(2,6,23,0.6) 100%)",
         }}
       />
     </div>

@@ -255,9 +255,6 @@ export function SovereignFooter() {
                     </span>
                 </div>
             </div>
-            <p className="font-mono text-[10px] text-[#050505]/40 tracking-[0.25em] uppercase max-w-[320px] text-center sm:text-left leading-relaxed mt-1 font-bold">
-              Institutional Intelligence · Sovereign Node Architecture
-            </p>
           </motion.div>
 
           {/* Minimalist Text Social Links */}
@@ -336,7 +333,7 @@ export function SovereignFooter() {
       </div>
       
       {/* Wave Graphic overlay (Subtle sketch effect for Light Mode) */}
-      <div className="absolute bottom-0 left-0 right-0 h-[220px] pointer-events-none opacity-[0.03] mix-blend-multiply" style={{ background: "url('/olas-hokusai-4k.png') repeat-x bottom", backgroundSize: "auto 100%" }} />
+      <div className="absolute bottom-0 left-0 right-0 h-[220px] pointer-events-none opacity-20 mix-blend-multiply" style={{ background: "url('/olas-hokusai-4k.png') repeat-x bottom", backgroundSize: "auto 100%" }} />
     </footer>
   );
 }

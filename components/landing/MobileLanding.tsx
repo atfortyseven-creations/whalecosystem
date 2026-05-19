@@ -188,13 +188,13 @@ function SigningOverlay({
 
         <div className="space-y-2">
           <h2 className="text-[24px] font-black tracking-tighter text-[#050505] leading-none">
-          {isSigning ? "Action Required" : error ? "Connection Failed" : "Connecting..."}
+          {isSigning ? "Signature Required" : error ? "Connection Failed" : "Connecting..."}
           </h2>
           <p className="text-[12px] text-[#050505]/50 leading-relaxed">
             {error
               ? "Could not cryptographically verify the wallet. Please try again."
               : isSigning
-              ? "Please open your wallet app to approve the signature request. This is required for secure platform access."
+              ? "Please approve the signature request. If you used Google/Email, tap the button below to complete login."
               : "Establishing encrypted tunnel with the Global Network... Please wait."}
           </p>
         </div>
@@ -218,10 +218,7 @@ function SigningOverlay({
             Retry Connection
           </button>
         ) : isSigning ? (
-          <div className="w-full flex flex-col gap-3">
-             <div className="w-full py-3 rounded-2xl bg-black/5 border border-black/10 text-black/60 font-black uppercase tracking-widest text-[10px] flex items-center justify-center text-center px-4">
-               Approve signature in your wallet app
-             </div>
+          <div className="w-full flex flex-col gap-3 mt-2">
              {wcDeepLink ? (
                <a
                   href={wcDeepLink}
@@ -235,7 +232,7 @@ function SigningOverlay({
                   onClick={onRetry}
                   className="w-full py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all hover:bg-black/90"
                 >
-                  Open Wallet To Sign
+                  Tap to Sign & Complete Login
                 </button>
              )}
           </div>
@@ -1188,6 +1185,9 @@ export function MobileLanding() {
                   setWcDeepLink(null);
                   setShowFallbackBtn(false);
 
+                  // Close custom modal overlay to let AppKit take over completely, preventing any z-index or pointer-event conflicts on mobile devices
+                  setShowConnectOverlay(false);
+
                   // Pure AppKit usage to avoid forcing the dapp browser
                   // AppKit native connection correctly uses standard Universal Links to sign and return to Chrome.
                   rkOpenModal({ view: 'Connect' });
@@ -1200,8 +1200,8 @@ export function MobileLanding() {
                   {/* Universal WC v2 */}
                   <WalletOption
                     logo="/official-whale-monochrome.png"
-                    name="WalletConnect"
-                    badge="Other Wallets (QR / AppKit)"
+                    name="Sign In / Connect Wallet"
+                    badge="Google, Email, Apple, Wallets"
                     loading={connecting === 'wc'}
                     onClick={() => openWalletModal('wc')}
                     delay={0.1}
