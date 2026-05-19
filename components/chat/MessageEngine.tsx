@@ -125,7 +125,8 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
 
   const locMatch = typeof msg.content === 'string' ? msg.content.match(/^\[LOCATION\]([^|]*)(?:\|(\d+))?$/) : null;
   const isLocation = !!locMatch;
-  const expiryTimestamp = locMatch && locMatch[2] ? parseInt(locMatch[2], 10) : 0;
+  const durationMs = locMatch && locMatch[2] ? parseInt(locMatch[2], 10) : 0;
+  const expiryTimestamp = durationMs > 0 ? msg.sentAt + durationMs : 0;
 
   return (
     <div className={`flex flex-col max-w-[75%] ${msg.isMine ? 'self-end items-end ml-auto' : 'self-start items-start'}`}>
