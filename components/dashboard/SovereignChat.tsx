@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { useWalletClient } from 'wagmi';
+import { useWalletClient, useSignMessage } from 'wagmi';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { ethers } from 'ethers';
@@ -158,6 +158,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   const { data: walletClient } = useWalletClient();
   const { privateKey: storePrivateKey } = useWalletStore();
   const { disconnect } = useDisconnect();
+  const { signMessageAsync } = useSignMessage();
   const { nuclearDisconnect } = useSovereignSignOut();
 
   const handleFullDisconnect = () => {
@@ -339,7 +340,8 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   const initXmtpClient = useCallback(async () => {
     if (!isConnected || !address) return;
     const hasLocalWallet = isLocalSovereignWallet && storePrivateKey;
-    if (!walletClient && !hasLocalWallet) return;
+    // We don't strictly need walletClient if we have signMessageAsync
+    // if (!walletClient && !hasLocalWallet) return;
 
     setXmtpError(null);
     let attempts = 0;
@@ -358,16 +360,14 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
               return ethersWallet.signMessage(msg);
             },
           };
-        } else if (walletClient) {
+        } else {
           signer = {
             getAddress: async () => address,
             signMessage: async (msg: string | Uint8Array) => {
               const text = typeof msg === 'string' ? msg : new TextDecoder().decode(msg);
-              return walletClient.signMessage({ message: text });
+              return signMessageAsync({ message: text });
             },
           };
-        } else {
-          return;
         }
         const client = await getXMTPClient(signer);
         xmtpClient.current = client;

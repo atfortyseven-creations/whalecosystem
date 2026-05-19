@@ -196,7 +196,7 @@ export default function PortfolioPage() {
   }, []);
 
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading, isConnected: isLiveConnected, address: userAddress } = useLivePortfolio();
-  const { chain, isConnected: wagmiConnected } = useAccount();
+  const { chain, isConnected: wagmiConnected, isReconnecting } = useAccount();
   const { privateKey, address: storeAddress, clearWallet } = useWalletStore();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { open: openAppKit } = useAppKit();
@@ -250,7 +250,7 @@ export default function PortfolioPage() {
   // When hasKeystore=true and none of the above apply, we STILL show the gate,
   // but QuantumAuthGate auto-starts at the 'login' (unlock) step instead of 'home'.
   // This is the correct security posture: the user must enter their password.
-  const needsGate = !isQuantumUnlocked && !wagmiConnected && !sessionUnlocked;
+  const needsGate = !isQuantumUnlocked && !wagmiConnected && !sessionUnlocked && !isReconnecting;
 
   if (needsGate) {
     return (
