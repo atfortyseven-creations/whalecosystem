@@ -47,7 +47,7 @@ function hashPIN(pin: string, address: string): string {
   const salt = address.toLowerCase() + "WHALE_QUANTUM_SALT";
   const key = CryptoJS.PBKDF2(pin, salt, {
     keySize: 256 / 32,
-    iterations: 50000,
+    iterations: 10000,
     hasher: CryptoJS.algo.SHA256
   });
   return key.toString(CryptoJS.enc.Hex);

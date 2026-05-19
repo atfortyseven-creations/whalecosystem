@@ -13,11 +13,14 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
   const [error, setError] = useState<string | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const frameRafId = useRef<number>(0);
+  const activeRequestRef = useRef<string | null>(null);
 
   const startCamera = useCallback(async () => {
     if (isInitializing) return;
     setIsInitializing(true);
     setError(null);
+    const activeRequestId = Math.random().toString();
+    activeRequestRef.current = activeRequestId;
 
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -33,6 +36,11 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
         audio: false,
       });
 
+      if (activeRequestRef.current !== activeRequestId) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
+
       streamRef.current = stream;
       setHasPermission(true);
 
@@ -43,15 +51,20 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
         });
       }
     } catch (err: any) {
-      console.error('Camera initialization failed:', err);
-      setHasPermission(false);
-      setError(err.message || 'Camera access denied or unavailable.');
+      if (activeRequestRef.current === activeRequestId) {
+        console.error('Camera initialization failed:', err);
+        setHasPermission(false);
+        setError(err.message || 'Camera access denied or unavailable.');
+      }
     } finally {
-      setIsInitializing(false);
+      if (activeRequestRef.current === activeRequestId) {
+        setIsInitializing(false);
+      }
     }
   }, [facingMode, isInitializing]);
 
   const stopCamera = useCallback(() => {
+    activeRequestRef.current = null;
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;

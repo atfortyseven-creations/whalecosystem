@@ -50,17 +50,17 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ i
         <header className="flex flex-col text-left mb-12 sm:mb-16">
           <div className="flex flex-wrap items-center gap-3 mb-6">
             <span className="text-[10px] font-black uppercase tracking-[0.25em] px-4 py-1.5 rounded-full border border-black/10 bg-black/10 text-black/70">
-              {role!.department}
+              {role.department}
             </span>
             {role.badge && (
               <span className="text-[10px] font-black uppercase tracking-[0.25em] px-4 py-1.5 rounded-full bg-white text-black">
-                {role!.badge}
+                {role.badge}
               </span>
             )}
           </div>
 
           <h1 className="text-[36px] sm:text-[48px] md:text-[64px] font-black text-black leading-[1] md:leading-[0.95] tracking-tight mb-8">
-            {role!.title}
+            {role.title}
           </h1>
 
           <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-4 sm:gap-6 pb-12 border-b border-black/10">
@@ -68,19 +68,19 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ i
                <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center">
                  <MapPin size={14} className="text-white/80" /> 
                </div>
-               {role!.location}
+               {role.location}
             </div>
             <div className="flex items-center gap-3 font-sans text-[12px] sm:text-[13px] font-bold text-black/60">
                <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center">
                  <Clock size={14} className="text-white/80" /> 
                </div>
-               {role!.type}
+               {role.type}
             </div>
             <div className="flex items-center gap-3 font-sans text-[12px] sm:text-[13px] font-bold text-black/60">
                <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center">
                  <DollarSign size={14} className="text-white/80" /> 
                </div>
-               {role!.salary}
+               {role.salary}
             </div>
           </div>
         </header>

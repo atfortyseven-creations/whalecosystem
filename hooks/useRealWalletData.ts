@@ -22,7 +22,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         queryFn: async () => {
             if (!isAuthenticated || isWeb3Connected) return null;
             try {
-                const { data } = await axios.get('/api/user/wallet');
+                const { data } = await axios.get('/api/user/wallet', { timeout: 15000 });
                 return data;
             } catch (error) {
                 return null;
@@ -66,8 +66,13 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         queryFn: async () => {
              // Si llegamos aquí sin check de 'enabled', evitamos la llamada igual
             if (!isValidAddress) return []; 
-            const { data } = await axios.get(`/api/wallet/positions?userAddress=${effectiveAddress}`);
-            return data;
+            try {
+                const { data } = await axios.get(`/api/wallet/positions?userAddress=${effectiveAddress}`, { timeout: 15000 });
+                return data;
+            } catch (error) {
+                console.warn("[Network] 4G/5G timeout on positions fetch", error);
+                return [];
+            }
         },
         enabled: !!isValidAddress,
         refetchInterval: 15000, // Sync prediction positions every 15s
@@ -79,10 +84,10 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         queryFn: async () => {
              if (!isValidAddress) return [];
              try {
-                const { data } = await axios.get(`/api/wallet/history/enriched?userAddress=${effectiveAddress}`);
+                const { data } = await axios.get(`/api/wallet/history/enriched?userAddress=${effectiveAddress}`, { timeout: 20000 });
                 return data.activities || [];
              } catch (e) {
-                console.error("Enriched history fetch failed:", e);
+                console.warn("[Network] 4G/5G timeout on enriched history fetch:", e);
                 return [];
              }
         },
@@ -96,9 +101,14 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         queryKey: ['portfolio-assets', effectiveAddress],
         queryFn: async () => {
             if (!effectiveAddress) return null;
-            // Fetch from Elite grade portfolio API
-            const { data } = await axios.get(`/api/wallet/portfolio?address=${effectiveAddress}`);
-            return data;
+            try {
+                // Fetch from Elite grade portfolio API
+                const { data } = await axios.get(`/api/wallet/portfolio?address=${effectiveAddress}`, { timeout: 20000 });
+                return data;
+            } catch (error) {
+                console.warn("[Network] 4G/5G timeout on portfolio assets fetch", error);
+                return null;
+            }
         },
         enabled: !!effectiveAddress,
             refetchInterval: 30_000, // Prevent RPC hammering at scale (was 5s)
@@ -159,7 +169,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         480: 'World Chain'
     };
 
-    const assets: Asset[] = (assetsData?.tokens || []).map((t: any) => ({
+    const assets: Asset[] = (Array.isArray(assetsData?.tokens) ? assetsData.tokens : []).map((t: any) => ({
         symbol: t.symbol,
         name: t.name,
         balance: t.balance,
@@ -196,9 +206,9 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         transactions,
         stats: historyRaw?.stats || null, // New Stats object
         assets,
-        perps: assetsData?.perps || [],
-        predictions: assetsData?.predictions || [],
-        claimables: assetsData?.claimables || [],
+        perps: Array.isArray(assetsData?.perps) ? assetsData.perps : [],
+        predictions: Array.isArray(assetsData?.predictions) ? assetsData.predictions : [],
+        claimables: Array.isArray(assetsData?.claimables) ? assetsData.claimables : [],
         isAssetsLoading,
         isHistoryLoading,
         isLoading: isBalanceLoading || isPositionsLoading || isHistoryLoading || isAssetsLoading,

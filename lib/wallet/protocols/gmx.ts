@@ -23,8 +23,9 @@ export async function discoverGmxPositions(address: string, chainIds: number[]):
     if (chainIds.includes(42161)) {
       const balances = await moralisService.getWalletBalances(address, 'arbitrum');
       
-      const foundGmx = balances.result?.find((b: any) => b.token_address.toLowerCase() === GMX_TOKENS.ARBITRUM.GMX.toLowerCase());
-      const foundGlp = balances.result?.find((b: any) => b.token_address.toLowerCase() === GMX_TOKENS.ARBITRUM.GLP.toLowerCase());
+      const balancesList = balances?.result || [];
+      const foundGmx = balancesList.find((b: any) => b && b.token_address?.toLowerCase() === GMX_TOKENS.ARBITRUM.GMX.toLowerCase());
+      const foundGlp = balancesList.find((b: any) => b && b.token_address?.toLowerCase() === GMX_TOKENS.ARBITRUM.GLP.toLowerCase());
 
       if (foundGmx || foundGlp) {
         // Add positions based on balances
