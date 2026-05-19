@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { useWalletClient, useSignMessage } from 'wagmi';
+import { useWalletClient, useSignMessage, useDisconnect, useReconnect } from 'wagmi';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { ethers } from 'ethers';
 import { QrCode, X, ChevronLeft, Menu, Settings, LogOut, ArrowLeft, UserX, UserCheck, Download, Trash2, UserPlus, User, MoreVertical } from 'lucide-react';
-import { useDisconnect } from 'wagmi';
 import { toast } from 'sonner';
 import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 
@@ -154,12 +153,21 @@ function playMessageSound() {
 // ── SovereignChat (Orchestrator) ──────────────────────────────────────────
 
 export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () => void }) {
-  const { address, isConnected, isLocalSovereignWallet } = useAccount();
+  const { address, isConnected, isLocalSovereignWallet, connector, isSovereignHandshake } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { privateKey: storePrivateKey } = useWalletStore();
   const { disconnect } = useDisconnect();
+  const { reconnect } = useReconnect();
   const { signMessageAsync } = useSignMessage();
   const { nuclearDisconnect } = useSovereignSignOut();
+
+  // MASTER RECOVERY: If wallet is connected but connector is missing (common on mobile redirects)
+  useEffect(() => {
+    if (isConnected && !connector && !isSovereignHandshake && !isLocalSovereignWallet) {
+        console.warn('[SovereignChat] Zombie session detected — attempting silent reconnection.');
+        reconnect();
+    }
+  }, [isConnected, connector, isSovereignHandshake, isLocalSovereignWallet, reconnect]);
 
   const handleFullDisconnect = () => {
     toast.success('Session disconnected.');
@@ -340,8 +348,9 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   const initXmtpClient = useCallback(async () => {
     if (!isConnected || !address) return;
     const hasLocalWallet = isLocalSovereignWallet && storePrivateKey;
-    // We don't strictly need walletClient if we have signMessageAsync
-    // if (!walletClient && !hasLocalWallet) return;
+    
+    // MASTER-FIX: Wait for walletClient to avoid "Connector not connected" Wagmi race condition on mount
+    if (!hasLocalWallet && !walletClient) return;
 
     setXmtpError(null);
     let attempts = 0;
