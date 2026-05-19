@@ -140,7 +140,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               className="flex flex-col items-center text-center py-10"
             >
               <div className="w-48 h-48 mb-6">
-                <RemoteLottie path="/system-shots/Transaction Complete.json" speed={0.25} />
+                <RemoteLottie path="/system-shots/Transaction Complete.json" speed={1.15} />
               </div>
               <h3 className="text-xl font-black uppercase tracking-tight text-emerald-500">Wallet Created</h3>
             </motion.div>
