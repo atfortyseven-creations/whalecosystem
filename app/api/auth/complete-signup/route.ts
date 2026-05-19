@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, isValidPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
+import { ethers } from 'ethers';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +84,33 @@ export async function POST(request: NextRequest) {
     // Set secure httpOnly cookies
     await setSessionCookies(accessToken, refreshToken);
 
+    // Generate Airdrop Signature for QuantumDots (500 QDs)
+    let airdropSignature = null;
+    if (walletAddress && process.env.AIRDROP_PRIVATE_KEY) {
+        try {
+            const adminWallet = new ethers.Wallet(process.env.AIRDROP_PRIVATE_KEY);
+            const domain = {
+                name: 'QuantumAirdrop',
+                version: '1',
+                chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '137'), // Polygon Amoy/Mainnet default
+                verifyingContract: process.env.NEXT_PUBLIC_AIRDROP_CONTRACT_ADDRESS || ethers.ZeroAddress
+            };
+            const types = {
+                Claim: [
+                    { name: 'wallet', type: 'address' },
+                    { name: 'amount', type: 'uint256' }
+                ]
+            };
+            const value = {
+                wallet: walletAddress,
+                amount: ethers.parseEther("500")
+            };
+            airdropSignature = await adminWallet.signTypedData(domain, types, value);
+        } catch (err) {
+            console.error('[Auth] Failed to generate airdrop signature:', err);
+        }
+    }
+
     return NextResponse.json({
       success: true,
       token: accessToken,
@@ -90,7 +118,8 @@ export async function POST(request: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name
-      }
+      },
+      airdropSignature
     });
 
   } catch (error) {

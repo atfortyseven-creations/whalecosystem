@@ -10,6 +10,8 @@
  *  - Version tag for forward-compatible migration
  */
 
+import { Buffer } from 'buffer';
+
 // Version tag embedded in all new ciphertexts.
 // v1 = 100k PBKDF2 iterations (legacy)
 // v2 = 600k PBKDF2 iterations (current OWASP 2024 standard)
@@ -28,6 +30,9 @@ async function deriveKey(
     salt: Uint8Array,
     iterations: number = ITERATIONS_V2,
 ): Promise<CryptoKey> {
+    if (typeof crypto === 'undefined' || !crypto.subtle) {
+        throw new Error('Web Crypto API no disponible. En móvil (iOS/Android) asegúrate de usar HTTPS, de lo contrario la seguridad del navegador bloquea la creación de wallets.');
+    }
     const encoder = new TextEncoder();
     const baseKey = await crypto.subtle.importKey(
         'raw',
