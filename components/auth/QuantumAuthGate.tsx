@@ -422,7 +422,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         try {
           const { plaintext, wasLegacy } = await tryDecryptAny(ks, password);
 
-          let walletObj: ethers.Wallet;
+          let walletObj: any;
           if (wasLegacy) {
             // Legacy path: plaintext is the private key
             walletObj = new ethers.Wallet(plaintext);
@@ -464,7 +464,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
           setStep('login');
           return;
         }
-        const walletObj = new ethers.Wallet(vaultPk);
+        const walletObj: any = new ethers.Wallet(vaultPk);
         pk = walletObj.privateKey;
         addr = walletObj.address;
         // Migrate vault_v1 → sovereign_keystore (AES-GCM)
