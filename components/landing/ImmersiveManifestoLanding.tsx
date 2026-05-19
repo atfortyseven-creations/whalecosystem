@@ -136,10 +136,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           </motion.p>
           <motion.div variants={FADE_UP} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/portfolio" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center">
-              Access Institutional Portfolio
+              Don't have a Whale Portfolio yet?
             </Link>
             <Link href="/forum" className="w-full sm:w-auto px-10 py-5 bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center">
-              Enter Secure Whale Chat
+              Travel to whale chat
             </Link>
           </motion.div>
         </motion.div>

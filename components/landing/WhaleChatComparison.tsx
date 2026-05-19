@@ -16,30 +16,30 @@ const FADE_UP = {
 
 const CHAT_DATA = [
   {
-    feature: "¿Quién puede leer los mensajes?",
-    us: "Solo tú y tu contacto (Cifrado Punto a Punto)",
-    common: "Servidores de la empresa y gobiernos",
+    feature: "Who can read the messages?",
+    us: "Only you and your contact (Point-to-Point Encryption)",
+    common: "Company servers and governments",
     usState: "positive",
     commonState: "negative",
   },
   {
-    feature: "Requisito de Número de Teléfono",
-    us: "Innecesario. Privacidad 100% Anónima.",
-    common: "Obligatorio (Vinculado a tu identidad)",
+    feature: "Phone Number Requirement",
+    us: "Unnecessary. 100% Anonymous Privacy.",
+    common: "Mandatory (Linked to your identity)",
     usState: "positive",
     commonState: "negative",
   },
   {
-    feature: "Riesgo de Censura o Baneo",
-    us: "Imposible. Infraestructura Soberana.",
-    common: "Cuentas eliminadas unilateralmente",
+    feature: "Risk of Censorship or Ban",
+    us: "Impossible. Sovereign Infrastructure.",
+    common: "Accounts unilaterally deleted",
     usState: "positive",
     commonState: "negative",
   },
   {
-    feature: "Vulnerabilidad a SIM Swapping",
-    us: "Inmune. Seguridad Criptográfica de Hardware.",
-    common: "Riesgo Crítico de robo de identidad",
+    feature: "Vulnerability to SIM Swapping",
+    us: "Immune. Cryptographic Hardware Security.",
+    common: "Critical risk of identity theft",
     usState: "positive",
     commonState: "warning",
   },
@@ -56,11 +56,11 @@ export function WhaleChatComparison() {
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={STAGGER} className="flex flex-col items-center text-center mb-20 md:mb-32">
           <motion.div variants={FADE_UP} className="w-px h-16 bg-gradient-to-b from-transparent to-black/20 mb-8" />
           <motion.h2 variants={FADE_UP} className="text-[48px] md:text-[80px] font-black tracking-tighter uppercase leading-[0.85] text-[#0A0A0A] mb-8">
-            Comunicaciones<br />
-            <span className="text-black/20">Blindadas.</span>
+            Armored<br />
+            <span className="text-black/20">Communications.</span>
           </motion.h2>
           <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[24px] text-black/60 leading-relaxed max-w-[700px] font-medium">
-            Las aplicaciones de mensajería tradicional comercializan con tus datos. Whale Chat restaura el derecho absoluto a la confidencialidad corporativa.
+            Traditional messaging applications commercialize your data. Whale Chat restores the absolute right to corporate confidentiality.
           </motion.p>
         </motion.div>
 
@@ -69,14 +69,14 @@ export function WhaleChatComparison() {
           {/* Header Row */}
           <div className="hidden md:grid grid-cols-[1.5fr_1fr_1fr] gap-6 px-8 pb-6 border-b border-black/5 mb-6">
             <div className="flex items-end pb-2">
-              <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-black/30">Métricas de Seguridad</span>
+              <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-black/30">Security Metrics</span>
             </div>
             <div className="flex flex-col p-6 bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-black/[0.03]">
               <span className="text-[20px] font-black tracking-tight uppercase text-[#0A0A0A]">Whale Chat</span>
-              <span className="text-[12px] font-mono text-emerald-600/80 uppercase tracking-widest mt-1">Nivel Institucional</span>
+              <span className="text-[12px] font-mono text-emerald-600/80 uppercase tracking-widest mt-1">Institutional Level</span>
             </div>
             <div className="flex flex-col p-6 bg-black/[0.02] rounded-2xl border border-transparent">
-              <span className="text-[20px] font-bold tracking-tight text-[#0A0A0A]/50">Apps Comunes</span>
+              <span className="text-[20px] font-bold tracking-tight text-[#0A0A0A]/50">Common Apps</span>
               <span className="text-[12px] font-mono text-black/30 uppercase tracking-widest mt-1">WhatsApp, Telegram</span>
             </div>
           </div>

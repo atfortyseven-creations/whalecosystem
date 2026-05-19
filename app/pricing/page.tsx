@@ -253,6 +253,8 @@ export default function PricingPage() {
       </div>
 
       <SovereignFooter />
+      {/* Semantic spacer so SovereignFooter content is not hidden behind the fixed mobile bottom nav */}
+      <div className="h-24 sm:h-0" />
     </div>
   );
 }

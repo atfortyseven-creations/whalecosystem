@@ -133,7 +133,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
-    const [showInfoModal, setShowInfoModal] = useState(false);
+    const showInfoModal = false;
+    const setShowInfoModal = (val: boolean) => {};
     const [isSessionLocked, setIsSessionLocked] = useState(false);
     const [tier, setTier] = useState<string | null>(null);
     const [subStatus, setSubStatus] = useState<string | null>(null);
@@ -518,13 +519,6 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
 
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={() => setShowInfoModal(true)}
-                            title="Module Information"
-                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 hover:scale-105 hover:shadow-sm text-[#888888] hover:text-[#050505] transition-all flex items-center justify-center w-10 h-10 text-[11px] font-black uppercase"
-                        >
-                            INFO
-                        </button>
-                        <button
                             onClick={() => setSettingsOpen(true)}
                             title="Open Settings"
                             className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 hover:scale-105 hover:shadow-sm text-[#888888] hover:text-[#050505] transition-all flex items-center justify-center w-10 h-10 text-[11px] font-black uppercase"
@@ -629,7 +623,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
 
         {/* ─── INFO MODAL — Noble Institutional ─── */}
         <AnimatePresence>
-        {showInfoModal && (
+        {false && (
             <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}

@@ -124,7 +124,7 @@ export function InstitutionalMarkets() {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 10 }}
-                                        className="absolute right-0 top-full mt-2 w-64 max-h-[300px] overflow-y-auto bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 shadow-2xl rounded-xl z-50 py-2"
+                                        className="absolute left-0 md:left-auto md:right-0 top-full mt-2 w-64 max-h-[300px] overflow-y-auto bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 shadow-2xl rounded-xl z-50 py-2"
                                     >
                                         <div className="px-4 py-2 border-b border-[#E5E5E5] dark:border-white/10 sticky top-0 bg-white dark:bg-[#111111] font-black text-[10px] text-[#888888] tracking-widest uppercase">Select Network</div>
                                         {RAW_NETWORKS.map(net => (

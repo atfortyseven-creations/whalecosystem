@@ -16,36 +16,36 @@ const FADE_UP = {
 
 const COMPARISON_DATA = [
   {
-    feature: "Custodia de Fondos",
-    us: "Control Absoluto (Tú posees las llaves)",
-    common: "Bajo tu control, interfaz compleja",
-    exchange: "Fondos bajo control de la plataforma",
+    feature: "Funds Custody",
+    us: "Absolute Control (You own the keys)",
+    common: "Under your control, complex interface",
+    exchange: "Funds under platform control",
     usState: "positive",
     commonState: "neutral",
     exchangeState: "negative",
   },
   {
-    feature: "Inmunidad a Bloqueos",
-    us: "Matemáticamente Imposible de Bloquear",
-    common: "Sujeto a jurisdicciones locales",
-    exchange: "Cierres de cuenta frecuentes sin aviso",
+    feature: "Block Immunity",
+    us: "Mathematically Impossible to Block",
+    common: "Subject to local jurisdictions",
+    exchange: "Frequent account closures without notice",
     usState: "positive",
     commonState: "warning",
     exchangeState: "negative",
   },
   {
-    feature: "Privacidad Transaccional",
-    us: "Cero Rastreo. Privacidad por Diseño.",
-    common: "Rastreo de IPs y metadatos",
+    feature: "Transactional Privacy",
+    us: "Zero Tracking. Privacy by Design.",
+    common: "IP and metadata tracking",
     usState: "positive",
     commonState: "negative",
     exchangeState: "negative",
   },
   {
-    feature: "Velocidad de Operación",
-    us: "Instantánea (Fusión Directa con Navegador)",
-    common: "Requiere plugins y aprobaciones manuales",
-    exchange: "Rápida, pero con demoras en retiros",
+    feature: "Operation Speed",
+    us: "Instantaneous (Direct Browser Fusion)",
+    common: "Requires plugins and manual approvals",
+    exchange: "Fast, but with withdrawal delays",
     usState: "positive",
     commonState: "negative",
     exchangeState: "warning",
@@ -63,11 +63,11 @@ export function WalletComparisonChart() {
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={STAGGER} className="flex flex-col items-center text-center mb-20 md:mb-32">
           <motion.div variants={FADE_UP} className="w-px h-16 bg-gradient-to-b from-transparent to-black/20 mb-8" />
           <motion.h2 variants={FADE_UP} className="text-[48px] md:text-[80px] font-black tracking-tighter uppercase leading-[0.85] text-[#0A0A0A] mb-8">
-            Nuestra Billetera<br />
-            <span className="text-black/20">vs El Resto.</span>
+            Our Wallet<br />
+            <span className="text-black/20">vs The Rest.</span>
           </motion.h2>
           <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[24px] text-black/60 leading-relaxed max-w-[700px] font-medium">
-            La infraestructura institucional más avanzada del mundo. Diseñada para ser inquebrantable, ultrarrápida y excepcionalmente hermosa.
+            The world's most advanced institutional infrastructure. Designed to be unbreakable, ultra-fast, and exceptionally beautiful.
           </motion.p>
         </motion.div>
 
@@ -76,18 +76,18 @@ export function WalletComparisonChart() {
           {/* Header Row */}
           <div className="hidden lg:grid grid-cols-[1.5fr_1.2fr_1fr_1fr] gap-6 px-8 pb-6 border-b border-black/5 mb-6">
             <div className="flex items-end pb-2">
-              <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-black/30">Criterio de Evaluación</span>
+              <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-black/30">Evaluation Criteria</span>
             </div>
             <div className="flex flex-col p-6 bg-[#FAFAF8] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-black/[0.04] scale-105 origin-bottom z-10">
               <span className="text-[20px] font-black tracking-tight uppercase text-[#0A0A0A]">Whale Alert Wallet</span>
-              <span className="text-[12px] font-mono text-emerald-600/80 uppercase tracking-widest mt-1">Soberanía Total</span>
+              <span className="text-[12px] font-mono text-emerald-600/80 uppercase tracking-widest mt-1">Total Sovereignty</span>
             </div>
             <div className="flex flex-col p-6 bg-black/[0.01] rounded-2xl border border-transparent">
-              <span className="text-[18px] font-bold tracking-tight text-[#0A0A0A]/50">Billeteras Comunes</span>
+              <span className="text-[18px] font-bold tracking-tight text-[#0A0A0A]/50">Common Wallets</span>
               <span className="text-[11px] font-mono text-black/30 uppercase tracking-widest mt-1">Metamask, Trust</span>
             </div>
             <div className="flex flex-col p-6 bg-black/[0.01] rounded-2xl border border-transparent">
-              <span className="text-[18px] font-bold tracking-tight text-[#0A0A0A]/50">Exchanges (Bolsas)</span>
+              <span className="text-[18px] font-bold tracking-tight text-[#0A0A0A]/50">Exchanges</span>
               <span className="text-[11px] font-mono text-black/30 uppercase tracking-widest mt-1">Binance, Coinbase</span>
             </div>
           </div>

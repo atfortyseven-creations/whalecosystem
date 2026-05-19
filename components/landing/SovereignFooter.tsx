@@ -242,8 +242,12 @@ export function SovereignFooter() {
         <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-10">
           <motion.div animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }} className="flex flex-col items-center sm:items-start gap-5">
             <div className="flex items-center gap-4">
-                <div className="relative flex items-center justify-center rounded-[20px] border border-[#050505]/10 bg-white shadow-sm overflow-hidden w-[68px] h-[44px] transition-transform hover:scale-105 duration-300">
-                    <img src="/official-whale-monochrome.png" alt="Whale Alert Network Logo" className="object-contain w-full h-full p-2 opacity-90 filter invert" />
+                <div className="relative flex items-center justify-center rounded-xl border border-black/5 bg-black/5 overflow-hidden w-[58px] h-[36px] transition-transform hover:scale-105 duration-300">
+                    <img 
+                        src="/official-whale-monochrome.png" 
+                        alt="Whale Alert Network Logo" 
+                        className="object-contain w-full h-full p-1 opacity-80 mix-blend-multiply" 
+                    />
                 </div>
                 <div className="flex flex-col leading-none text-[#050505] justify-center">
                     <span className="font-aztec-serif text-[26px] font-black uppercase tracking-tighter leading-none">
