@@ -753,7 +753,14 @@ export function MobileLanding() {
       }
     } catch (err: any) {
       console.error('[Auth] Handshake failed:', err);
-      setSigningError(err.message || 'Verification failed');
+      // Clear the cached signature on ANY error — a bad/stale/RPC-failed
+      // signature would cause every subsequent retry to fail with the same error.
+      try { localStorage.removeItem(`sovereign_auth_${norm}`); } catch {}
+      const raw = err?.message || 'Verification failed';
+      // Viem surfaces low-level RPC failures with a very technical message.
+      // Surface a friendlier string so the Retry button is the clear CTA.
+      const isViemRpc = raw.toLowerCase().includes('rpc') || raw.toLowerCase().includes('unknown');
+      setSigningError(isViemRpc ? 'RPC error — please retry the connection.' : raw);
     } finally {
       signingInProgressRef.current = false;
       setIsActuallySigning(false);
@@ -1072,6 +1079,9 @@ export function MobileLanding() {
           wcDeepLink={wcDeepLink}
           onSigned={() => {}}
           onRetry={() => {
+            // Clear error + cached auth so the retry always signs fresh
+            setSigningError(null);
+            try { localStorage.removeItem(`sovereign_auth_${(address || '').toLowerCase()}`); } catch {}
             if (address) establishSession(address);
           }}
         />

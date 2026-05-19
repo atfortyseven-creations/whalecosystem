@@ -543,8 +543,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                             touchAction: 'pan-y',
                         }}
                     >
-                        {/* pb-20 on mobile = clears the 64px bottom nav + safe area, no padding on desktop for edge-to-edge */}
-                        <div className="pb-[calc(80px+env(safe-area-inset-bottom,0px))] md:pb-0 w-full h-full flex-1 flex flex-col relative z-10">
+                        {/* Spacer clears the fixed mobile nav (64px) + iOS safe-area-inset-bottom */}
+                        <div className="pb-0 md:pb-0 w-full flex-1 flex flex-col relative z-10">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
@@ -559,14 +559,16 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                     </InstitutionalErrorBoundary>
                                 </motion.div>
                             </AnimatePresence>
+                            {/* iOS spacer: clears the fixed bottom nav + safe-area-inset-bottom */}
+                            <div className="block md:hidden shrink-0" style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))' }} aria-hidden="true" />
                         </div>
                     </div>
                 </main>
 
-                {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
-                {/* Only renders on real mobile hardware (screen.width < 1024).  */}
-                {/* Narrowing a PC browser window will NOT show this nav bar.    */}
-                <nav className={`mobile-bottom-nav ${isTrueDesktop ? 'hidden' : 'flex'} border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 shrink-0 z-50 transition-colors w-full`} style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+                {/* ─── Bottom Tab Navigation (Mobile Only) — FIXED to avoid obscuring content ─── */}
+                {/* Uses fixed positioning so scroll content is never clipped by the nav bar. */}
+                {/* A spacer div above (inside scroll container) reserves the equivalent height.*/}
+                <nav className={`mobile-bottom-nav ${isTrueDesktop ? 'hidden' : 'flex'} fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                      {[
                         { id: 'gold',        icon: <Zap size={18} />,           label: 'Mint' },
                         { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Tokens' },
