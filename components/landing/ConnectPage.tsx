@@ -106,6 +106,7 @@ export default function ConnectPage() {
   const [showMobileScanner, setShowMobileScanner] = useState(false);
   const [qrData, setQrData] = useState('');
   const [ephemeral, setEphemeral] = useState<{ publicKey: string; privateKey: string; isECDH?: boolean } | null>(null);
+  const [authStatus, setAuthStatus] = useState<"idle" | "verifying" | "failed">("idle");
   const redirectingRef = useRef(false);
 
   useEffect(() => {
@@ -263,7 +264,7 @@ export default function ConnectPage() {
   const signingRef = useRef(false);
   useEffect(() => {
     if (!mounted || !isConnected || !address) return;
-    if (redirectingRef.current || signingRef.current) return;
+    if (redirectingRef.current || signingRef.current || authStatus === 'failed') return;
     try {
       if (sessionStorage.getItem("__disconnected__") === "1") return;
     } catch {}
@@ -271,9 +272,13 @@ export default function ConnectPage() {
     signingRef.current = true;
 
     const runVerify = async () => {
+      setAuthStatus('verifying');
       try {
         // 1. Check if session already valid (returning user)
-        const checkRes = await fetch('/api/auth/verify-session', { cache: 'no-store' });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const checkRes = await fetch('/api/auth/verify-session', { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timeoutId);
         if (checkRes.ok) {
           const data = await checkRes.json();
           if (data.authenticated) {
@@ -335,15 +340,20 @@ export default function ConnectPage() {
           localStorage.setItem(`sovereign_auth_${norm}`, JSON.stringify({ signature, message }));
         }
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
         const verifyRes = await fetch('/api/auth/sovereign-verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address: norm, signature, message })
+          body: JSON.stringify({ address: norm, signature, message }),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         if (!verifyRes.ok) {
           toast.error('Session verification failed', { description: 'Please try connecting again.' });
           signingRef.current = false;
+          setAuthStatus('failed');
           return;
         }
 
@@ -357,11 +367,12 @@ export default function ConnectPage() {
           toast.error('Authentication failed', { description: msg });
         }
         signingRef.current = false;
+        setAuthStatus('failed');
       }
     };
 
     runVerify();
-  }, [isConnected, address, mounted, setLinked, signMessageAsync]);
+  }, [isConnected, address, mounted, setLinked, signMessageAsync, authStatus]);
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
     try { sessionStorage.removeItem("__disconnected__"); } catch {}
@@ -386,7 +397,12 @@ export default function ConnectPage() {
     openAppKit();
   }, [openAppKit]);
 
-  const isVerified = mounted && (isConnected || isLinked);
+  const triggerManualVerify = useCallback(() => {
+    signingRef.current = false;
+    setAuthStatus('idle');
+  }, []);
+
+  const isVerified = mounted && isLinked;
 
   return (
     <div className="w-full flex-1 flex flex-col items-center bg-[#FAFAF8] relative overflow-hidden">
@@ -484,6 +500,44 @@ export default function ConnectPage() {
                     Total Disconnect
                   </button>
                 </motion.div>
+
+              ) : isConnected && !isLinked ? (
+                <div className="flex flex-col items-center justify-center gap-6 flex-1 py-4 text-center">
+                  <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 mb-2">
+                    <Lock size={24} />
+                  </div>
+                  <div>
+                    <h2 className="text-[20px] font-black tracking-tight text-[#0A0A0A] mb-2">
+                      Signature Required
+                    </h2>
+                    <p className="text-[12px] text-[#888] leading-relaxed max-w-[260px] mx-auto">
+                      Sign the verification request in your wallet to complete secure authentication.
+                    </p>
+                  </div>
+                  {authStatus === 'failed' ? (
+                    <div className="flex flex-col gap-3 w-full">
+                      <button
+                        onClick={triggerManualVerify}
+                        className="w-full py-4 rounded-xl bg-black text-white font-mono text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#222] transition-all shadow-md active:scale-[0.98] border border-black"
+                      >
+                        Sign Message
+                      </button>
+                      <button
+                        onClick={handleTotalDisconnect}
+                        className="w-full py-4 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 font-mono text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-rose-500/20 active:scale-[0.98]"
+                      >
+                        Disconnect Wallet
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 size={24} className="animate-spin text-black/40" />
+                      <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/30 animate-pulse">
+                        Awaiting signature...
+                      </span>
+                    </div>
+                  )}
+                </div>
 
               ) : !mounted ? (
                 <div className="flex flex-col gap-3 flex-1">

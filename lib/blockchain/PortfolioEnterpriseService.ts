@@ -31,12 +31,12 @@ export class PortfolioEnterpriseService {
                 ]);
 
                 // Add Native ETH / BNB / MATIC etc.
-                const nativeBig = BigInt(nativeBal.balance);
+                const nativeBig = BigInt(nativeBal?.balance || '0');
                 if (nativeBig > 0n) {
                     const formatted = Number(nativeBig) / 1e18;
                     // Dynamically retrieve price for the native token
                     const prices = await moralisService.getTokenPrice('0x0000000000000000000000000000000000000000', moralisChain).catch(() => ({ usdPrice: 0 }));
-                    const price = prices.usdPrice || (chainId === 1 || chainId === 10 || chainId === 8453 || chainId === 42161 ? 3000 : chainId === 56 ? 580 : 0.7);
+                    const price = prices?.usdPrice || (chainId === 1 || chainId === 10 || chainId === 8453 || chainId === 42161 ? 3000 : chainId === 56 ? 580 : 0.7);
                     const val = formatted * price;
 
                     totalValueUsd += val;
@@ -52,15 +52,16 @@ export class PortfolioEnterpriseService {
                 }
 
                 // Add discovered ERC-20s
-                tokenBals.result.forEach((t: any) => {
-                    const balNum = Number(t.balance) / Math.pow(10, Number(t.decimals));
-                    const val = balNum * t.usd_price;
+                const tokenList = Array.isArray(tokenBals?.result) ? tokenBals.result : [];
+                tokenList.forEach((t: any) => {
+                    const balNum = Number(t?.balance || 0) / Math.pow(10, Number(t?.decimals || 18));
+                    const val = balNum * (t?.usd_price || 0);
                     totalValueUsd += val;
                     tokensToReturn.push({
-                        symbol: t.symbol,
-                        name: t.name,
+                        symbol: t?.symbol || 'UNK',
+                        name: t?.name || 'Unknown Token',
                         balanceNumeric: balNum,
-                        price: t.usd_price,
+                        price: t?.usd_price || 0,
                         valueUsd: val,
                         chainId,
                         source: 'getblock-rpc'

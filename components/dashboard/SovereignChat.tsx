@@ -408,110 +408,114 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     initXmtpClient(false);
   }, [initXmtpClient]);
 
-  // ── Global XMTP Stream ───────────────────────────────────────────────────
   useEffect(() => {
     if (!xmtpReady || !xmtpClient.current) return;
     
     let cancelled = false;
+    const abortController = new AbortController();
     const selfInboxId = (xmtpClient.current as any).inboxId ?? '';
+    let retryDelay = 2000;
 
-    (async () => {
-      try {
-        const gen = streamMessages(xmtpClient.current);
-        for await (const msg of gen) {
+    const startStream = async () => {
+      while (!cancelled) {
+        try {
+          const gen = streamMessages(xmtpClient.current, abortController.signal);
+          for await (const msg of gen) {
+            if (cancelled) break;
+            
+            // Reset backoff delay on successful message
+            retryDelay = 2000;
+            
+            const rendered = xmtpToRenderable(msg, selfInboxId);
+            if (typeof rendered.content === 'string' && rendered.content.includes('initiatedByInboxId')) {
+               continue;
+            }
+            const hydratedList = hydrateMessages([rendered]);
+            if (hydratedList.length === 0) continue;
+            const hydrated = hydratedList[0];
+
+            const fromPeer = msg.senderInboxId !== selfInboxId;
+            
+            let msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() || '';
+            if (!msgConvPeer && msg.conversation) {
+              try {
+                const rawMembers = msg.conversation.members;
+                const members: any[] = typeof rawMembers === 'function' ? await rawMembers() : (rawMembers ?? []);
+                const selfNorm = address?.toLowerCase() ?? '';
+                for (const m of members) {
+                  const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
+                  const peer = addrs.find((a: string) => a.toLowerCase() !== selfNorm);
+                  if (peer) {
+                    msgConvPeer = peer.toLowerCase();
+                    msg.conversation.peerAddress = peer;
+                    break;
+                  }
+                }
+              } catch (e) {}
+            }
+
+            const currentActivePeer = activeConvRef.current?.peerAddress.toLowerCase();
+            const belongsToActive = (msgConvPeer === currentActivePeer) || (!msgConvPeer && currentActivePeer);
+
+            if (belongsToActive) {
+              if (fromPeer && (settingsRef.current as any).soundEnabled !== false) playMessageSound();
+              setMessages(prev => {
+                if (prev.some(m => m.id === hydrated.id)) return prev;
+                if (!fromPeer) {
+                  const optIndex = prev.findIndex(m => m.id.startsWith('opt-') && m.content === hydrated.content);
+                  if (optIndex !== -1) {
+                    const next = [...prev];
+                    next[optIndex] = hydrated;
+                    return next.sort((a, b) => a.sentAt - b.sentAt);
+                  }
+                }
+                return [...prev, hydrated].sort((a, b) => a.sentAt - b.sentAt);
+              });
+              setConversations(prev => prev.map(c => 
+                c.peerAddress.toLowerCase() === currentActivePeer 
+                  ? { ...c, lastMessage: hydrated.content.slice(0, 30) } 
+                  : c
+              ));
+            } else if (fromPeer) {
+              setConversations(prev => {
+                 if (!msgConvPeer) return prev;
+                 const exists = prev.some(c => c.peerAddress.toLowerCase() === msgConvPeer);
+                 if (exists) {
+                   return prev.map(c => 
+                     c.peerAddress.toLowerCase() === msgConvPeer 
+                       ? { ...c, unread: c.unread + 1, lastMessage: hydrated.content.slice(0, 30) } 
+                       : c
+                   );
+                 } else {
+                   const newPeerAddr = msg.conversation.peerAddress || msgConvPeer;
+                   return [...prev, {
+                      peerAddress: newPeerAddr,
+                      displayName: newPeerAddr.slice(0, 6) + '...' + newPeerAddr.slice(-4),
+                      folder: 'all',
+                      unread: 1,
+                      lastMessage: hydrated.content.slice(0, 30)
+                   }];
+                 }
+              });
+              if ((settingsRef.current as any).soundEnabled !== false) playMessageSound();
+            }
+          }
+        } catch (e) {
+          console.warn('[Chat] global stream disconnected/failed (network switch/timeout):', e);
           if (cancelled) break;
-          
-          const rendered = xmtpToRenderable(msg, selfInboxId);
-          if (typeof rendered.content === 'string' && rendered.content.includes('initiatedByInboxId')) {
-             continue;
-          }
-          const hydratedList = hydrateMessages([rendered]);
-          if (hydratedList.length === 0) continue;
-          const hydrated = hydratedList[0];
-
-          const fromPeer = msg.senderInboxId !== selfInboxId;
-          
-          // Fallback to extract peerAddress from members if not natively provided by SDK v5.3.0
-          let msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() || '';
-          if (!msgConvPeer && msg.conversation) {
-            try {
-              const rawMembers = msg.conversation.members;
-              const members: any[] = typeof rawMembers === 'function' ? await rawMembers() : (rawMembers ?? []);
-              const selfNorm = address?.toLowerCase() ?? '';
-              for (const m of members) {
-                const addrs: string[] = m.accountAddresses ?? m.addresses ?? [];
-                const peer = addrs.find((a: string) => a.toLowerCase() !== selfNorm);
-                if (peer) {
-                  msgConvPeer = peer.toLowerCase();
-                  // Attach it to the conversation object so auto-add has it
-                  msg.conversation.peerAddress = peer;
-                  break;
-                }
-              }
-            } catch (e) {}
-          }
-
-          const currentActivePeer = activeConvRef.current?.peerAddress.toLowerCase();
-          
-          // Verify if message belongs to the current conversation
-          const belongsToActive = (msgConvPeer === currentActivePeer) || (!msgConvPeer && currentActivePeer);
-
-          if (belongsToActive) {
-            if (fromPeer && (settingsRef.current as any).soundEnabled !== false) playMessageSound();
-            setMessages(prev => {
-              if (prev.some(m => m.id === hydrated.id)) return prev;
-              
-              if (!fromPeer) {
-                // Deduplicate own optimistic messages
-                const optIndex = prev.findIndex(m => m.id.startsWith('opt-') && m.content === hydrated.content);
-                if (optIndex !== -1) {
-                  const next = [...prev];
-                  next[optIndex] = hydrated;
-                  return next.sort((a, b) => a.sentAt - b.sentAt);
-                }
-              }
-              
-              return [...prev, hydrated].sort((a, b) => a.sentAt - b.sentAt);
-            });
-            // Update last message in conv list
-            setConversations(prev => prev.map(c => 
-              c.peerAddress.toLowerCase() === currentActivePeer 
-                ? { ...c, lastMessage: hydrated.content.slice(0, 30) } 
-                : c
-            ));
-          } else if (fromPeer) {
-            // If it belongs to another conversation, update its unread count
-            setConversations(prev => {
-               if (!msgConvPeer) return prev;
-               
-               const exists = prev.some(c => c.peerAddress.toLowerCase() === msgConvPeer);
-               if (exists) {
-                 return prev.map(c => 
-                   c.peerAddress.toLowerCase() === msgConvPeer 
-                     ? { ...c, unread: c.unread + 1, lastMessage: hydrated.content.slice(0, 30) } 
-                     : c
-                 );
-               } else {
-                 // Auto-add new conversation
-                 const newPeerAddr = msg.conversation.peerAddress || msgConvPeer;
-                 return [...prev, {
-                    peerAddress: newPeerAddr,
-                    displayName: newPeerAddr.slice(0, 6) + '...' + newPeerAddr.slice(-4),
-                    folder: 'all',
-                    unread: 1,
-                    lastMessage: hydrated.content.slice(0, 30)
-                 }];
-               }
-            });
-            if ((settingsRef.current as any).soundEnabled !== false) playMessageSound();
-          }
+          // Wait and retry stream connection with exponential backoff
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          retryDelay = Math.min(retryDelay * 2, 30000);
         }
-      } catch (e) {
-        console.warn('[Chat] global stream failed:', e);
       }
-    })();
+    };
 
-    return () => { cancelled = true; };
+    startStream();
+
+    return () => { 
+      cancelled = true; 
+      abortController.abort();
+    };
   }, [xmtpReady]);
 
   // ── Load messages when conversation changes ───────────────────────────────
@@ -521,7 +525,10 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     let cancelled = false;
     const selfInboxId = (xmtpClient.current as any).inboxId ?? '';
 
+    let isFetching = false;
     const fetchHistorical = async () => {
+      if (isFetching) return;
+      isFetching = true;
       try {
         const raw = await getMessages(xmtpClient.current, activeConv.peerAddress);
         if (cancelled) return;
@@ -532,7 +539,6 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
         
         const hydrated = hydrateMessages(rendered);
         
-        // Merge with optimistic local messages safely
         setMessages(prev => {
           const optimistic = prev.filter(m => m.id.startsWith('opt-'));
           const renderedIds = new Set(hydrated.map(r => r.id));
@@ -540,6 +546,8 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
         });
       } catch (e) {
         console.warn('[Chat] load messages failed:', e);
+      } finally {
+        isFetching = false;
       }
     };
 

@@ -383,10 +383,31 @@ export async function discoverNewPeers(
   }
 }
 
-/** Async generator streaming all incoming messages in real time */
-export async function* streamMessages(client: Client) {
+/** Async generator streaming all incoming messages in real time with AbortSignal support */
+export async function* streamMessages(client: Client, signal?: AbortSignal) {
   const stream = await client.conversations.streamAllMessages();
-  for await (const message of stream as any) {
-    yield message;
+  
+  if (signal) {
+    const onAbort = () => {
+      try {
+        if (typeof (stream as any).return === 'function') {
+          (stream as any).return();
+        }
+      } catch {}
+    };
+    signal.addEventListener('abort', onAbort);
+  }
+
+  try {
+    for await (const message of stream as any) {
+      if (signal?.aborted) break;
+      yield message;
+    }
+  } finally {
+    try {
+      if (typeof (stream as any).return === 'function') {
+        (stream as any).return();
+      }
+    } catch {}
   }
 }

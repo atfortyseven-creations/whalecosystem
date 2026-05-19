@@ -127,10 +127,10 @@ export class PortfolioService {
       // Pagination Loop for exhaustive token discovery
       do {
           const tokensData: any = await moralisService.getWalletBalances(address, chain, cursor);
-          if (tokensData.result) {
+          if (tokensData && tokensData.result) {
               allTokens = [...allTokens, ...tokensData.result];
           }
-          cursor = tokensData.cursor;
+          cursor = tokensData?.cursor;
           page++;
           // Safety cap to prevent infinite loops (whales rarely have > 1000 tokens)
           if (page > 5) break; // Reduced cap for login speed
@@ -143,7 +143,7 @@ export class PortfolioService {
       ]);
 
       // Parse native balance
-      const nativeBalance = BigInt(nativeData.balance || '0');
+      const nativeBalance = BigInt(nativeData?.balance || '0');
       const nativeSymbol = this.getNativeSymbol(chainId);
       const nativeBalanceFormatted = parseFloat(ethers.formatUnits(nativeBalance, 18));
       
@@ -209,7 +209,8 @@ export class PortfolioService {
 
       // Calculate native USD value using Moralis Total Net Worth as primary source of truth for pricing
       let nativeValueUsd = 0;
-      const chainNetWorth = netWorthData?.chains?.find((c: any) => c.chain === chain);
+      const chainsArray = Array.isArray(netWorthData?.chains) ? netWorthData.chains : [];
+      const chainNetWorth = chainsArray.find((c: any) => c && c.chain === chain);
       
       if (chainNetWorth) {
           nativeValueUsd = parseFloat(chainNetWorth.native_balance_usd || '0');
@@ -246,8 +247,7 @@ export class PortfolioService {
         });
       }
 
-      // Sum enriched tokens (ignore Moralis total if manual fallbacks found more value)
-      const calculatedTotal = enrichedTokens.reduce((acc: number, t: any) => acc + t.valueUsd, 0);
+      const calculatedTotal = enrichedTokens.reduce((acc: number, t: any) => acc + (isNaN(t?.valueUsd) ? 0 : (t?.valueUsd || 0)), 0);
       const totalValueUsd = (chainNetWorth && parseFloat(chainNetWorth.networth_usd || '0') > calculatedTotal)
         ? parseFloat(chainNetWorth.networth_usd || '0')
         : calculatedTotal;
@@ -625,7 +625,8 @@ export class PortfolioService {
         moralisService.getWalletActiveChains(address).catch(() => ({ active_chains: [] }))
     ]);
 
-    const activeChainIds = new Set(activeChainsData.active_chains.map((c: any) => parseInt(c.chain_id)));
+    const activeChainsArray = Array.isArray(activeChainsData?.active_chains) ? activeChainsData.active_chains : [];
+    const activeChainIds = new Set(activeChainsArray.map((c: any) => c && c.chain_id ? parseInt(c.chain_id) : 0));
     
     // Always query all requested chains — each will at minimum show native 0.0000 balance
     const chainsToQuery = targetChains;

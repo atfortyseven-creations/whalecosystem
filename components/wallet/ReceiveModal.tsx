@@ -77,20 +77,30 @@ export default function ReceiveModal({ isOpen, onClose, address: propAddress }: 
     };
 
     const handleNetworkChange = (chainId: number) => {
+        if (typeof switchChain !== 'function') {
+            toast.error("Network switching is not supported by your current wallet.");
+            return;
+        }
         setStatusData({ status: 'LOADING', message: 'Cambiando de red en Whale Alert Network...' });
-        switchChain({ chainId }, {
-            onSuccess: () => {
-                setSelectedChainId(chainId);
-                setStatusData({ status: 'SUCCESS', message: 'Red cambiada exitosamente' });
-                setShowNetworkDropdown(false);
-                setTimeout(() => setStatusData({ status: 'IDLE', message: '' }), 2000);
-            },
-            onError: (err) => {
-                setStatusData({ status: 'ERROR', message: 'Error switching network' });
-                toast.error(err.message.split('\n')[0]);
-                setTimeout(() => setStatusData({ status: 'IDLE', message: '' }), 2000);
-            }
-        });
+        try {
+            switchChain({ chainId }, {
+                onSuccess: () => {
+                    setSelectedChainId(chainId);
+                    setStatusData({ status: 'SUCCESS', message: 'Red cambiada exitosamente' });
+                    setShowNetworkDropdown(false);
+                    setTimeout(() => setStatusData({ status: 'IDLE', message: '' }), 2000);
+                },
+                onError: (err) => {
+                    setStatusData({ status: 'ERROR', message: 'Error switching network' });
+                    toast.error(err.message.split('\n')[0]);
+                    setTimeout(() => setStatusData({ status: 'IDLE', message: '' }), 2000);
+                }
+            });
+        } catch (e: any) {
+            setStatusData({ status: 'ERROR', message: 'Error switching network' });
+            toast.error(e.message || 'Failed to switch network');
+            setTimeout(() => setStatusData({ status: 'IDLE', message: '' }), 2000);
+        }
     };
 
     return (

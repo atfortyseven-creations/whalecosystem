@@ -136,8 +136,9 @@ export class PriceService {
     if (!res.ok) throw new Error(`CG Status ${res.status}`);
     
     const text = await res.text();
-    const data = safeJsonParse<any[]>(text, [], 'PRICE_SERVICE_MARKETS');
-    return data.map((coin: any) => ({
+    const parsedData = safeJsonParse<any[]>(text, [], 'PRICE_SERVICE_MARKETS');
+    const coinList = Array.isArray(parsedData) ? parsedData : [];
+    return coinList.map((coin: any) => ({
       id: coin.id,
       symbol: coin.symbol.toUpperCase(),
       name: coin.name,

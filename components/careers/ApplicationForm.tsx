@@ -49,7 +49,7 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
 
   if (status === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center p-16 text-center bg-white/5 backdrop-blur-xl border border-white/10 rounded-[32px]">
+      <div className="flex flex-col items-center justify-center p-16 text-center bg-white/40 backdrop-blur-xl border border-black/5 rounded-[32px]">
         <div className="w-16 h-16 rounded-full bg-[#00C076]/10 flex items-center justify-center mb-6">
            <CheckCircle2 size={32} className="text-[#00C076]" />
         </div>
@@ -77,8 +77,8 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
       <form onSubmit={handleSubmit} className="flex flex-col gap-8">
 
         {status === 'error' && (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-red-950/60 border border-red-700/40 text-red-400">
-            <AlertTriangle size={18} />
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
+            <AlertTriangle size={18} className="text-red-500" />
             <span className="font-mono text-[11px] font-bold uppercase tracking-widest">{errorMsg}</span>
           </div>
         )}
@@ -144,7 +144,7 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
           <button
             type="submit"
             disabled={status === 'submitting'}
-            className="group relative flex items-center justify-center gap-3 bg-white text-black px-10 py-4 rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:bg-white/80 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-lg w-full sm:w-auto"
+            className="group relative flex items-center justify-center gap-3 bg-[#0a0a0a] text-white px-10 py-4 rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:bg-black/80 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-lg w-full sm:w-auto"
           >
             {status === 'submitting' ? (
               <>

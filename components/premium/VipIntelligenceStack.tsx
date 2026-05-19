@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Zap, Wallet, Layers, ChevronRight, Activity, Clock, Rocket, Turtle, Gauge, Cpu, Box } from 'lucide-react';
-import { Tooltip, ResponsiveContainer } from 'recharts';
 import { OMNI_CHAINS } from '@/lib/blockchain/OmniChainConstants';
 import { ChainPulseCard } from '@/components/network/ChainPulseCard';
 
@@ -39,7 +38,7 @@ function L2FeesPanel() {
     });
 
     const l2s = ['arbitrum', 'optimism', 'base', 'polygon', 'scroll', 'linea', 'blast'];
-    const l2Data = healthData?.filter(h => l2s.includes(h.id)) || [];
+    const l2Data = (Array.isArray(healthData) ? healthData : []).filter(h => h && h.id && l2s.includes(h.id));
 
     if (isLoading) return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -133,11 +132,14 @@ function FeesPanel() {
         retry: 2,
     });
 
-    const blocks = (mempool ?? []).slice(0, 4).map((b: any) => ({
-        medianFee: b.medianFee ?? b.median_fee ?? b.fee ?? null,
-        nTx:       b.nTx ?? b.n_tx ?? b.txCount ?? null,
-        sizeMB:    b.size ? (b.size / 1e6).toFixed(2) : b.sizeMB ?? null,
-    }));
+    const blocks = (Array.isArray(mempool) ? mempool : [])
+        .slice(0, 4)
+        .filter((b: any) => b && typeof b === 'object')
+        .map((b: any) => ({
+            medianFee: b.medianFee ?? b.median_fee ?? b.fee ?? null,
+            nTx:       b.nTx ?? b.n_tx ?? b.txCount ?? null,
+            sizeMB:    b.size ? (parseFloat(b.size) / 1e6).toFixed(2) : b.sizeMB ?? null,
+        }));
 
     const BLOCK_LABELS = ['IMMINENT BLOCK', 'PROJECTED +1', 'PROJECTED +2', 'PROJECTED +3'];
     const FEES = [
@@ -382,8 +384,9 @@ function ChainPanel() {
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-3">
                     {OMNI_CHAINS.map((chain, idx) => {
-                        const metrics = healthData?.find(
-                            (h: any) => h.id === chain.id || h.chain === chain.id || h.chainId === chain.id
+                        const healthDataArray = Array.isArray(healthData) ? healthData : [];
+                        const metrics = healthDataArray.find(
+                            (h: any) => h && (h.id === chain.id || h.chain === chain.id || h.chainId === chain.id)
                         );
                         return (
                             <ChainPulseCard
