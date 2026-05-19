@@ -1,0 +1,17 @@
+/* TEAM */
+  Architects: Humanity Ledger Team & Whale Alert Network Foundation
+  Location: Valencia, Spain
+  Twitter: @WhaleAlertNet
+
+/* INTELLECTUAL PROPERTY & COPYRIGHT */
+  Token: Quantum Dots (QDs)
+  Status: UNLISTED (Pre-Listing Phase)
+  Warning: Quantum Dots (QDs) is NOT listed on any exchange. Any offering is fraudulent.
+  Copyright: (c) 2026 Whale Alert Network Foundation. All Rights Reserved.
+  Legal: humanidfi.com holds the sole and absolute ownership of the Quantum Dots (QDs) smart contracts, algorithms, and intellectual property.
+
+/* SITE */
+  Last update: 2026
+  Standards: HTML5, CSS3, ES6, Web3, Solidity
+  Components: Next.js, Framer Motion, Wagmi, TailwindCSS, Hardhat
+  Software: Sovereign Vault Daemon, Aztec L2 ZK-Rollups
