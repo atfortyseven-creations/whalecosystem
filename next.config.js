@@ -129,9 +129,11 @@ const nextConfig = {
     // External packages are defined above in experimental.serverComponentsExternalPackages
 
     env: {
-        // ⚠️  No localhost fallback — if NEXT_PUBLIC_APP_URL is missing the build
-        //     must fail loudly rather than silently shipping localhost to the client.
-        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://whalealert.network',
+        // NEXT_PUBLIC_APP_URL: canonical production URL — MUST match WalletConnect Cloud registration.
+        // [IOS FIX] Was 'whalealert.network' — WalletConnect Cloud has 'humanidfi.com' registered.
+        // A mismatch causes the WC relay to SILENTLY reject the session on mobile, showing an
+        // endless loading spinner or "failed to connect" with no error message.
+        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://humanidfi.com',
         // Injected at build time so the client bundle never sees 'undefined'
         NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '47cce4049225582027fdeeecb2868ead',
         NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID || '47cce4049225582027fdeeecb2868ead',
@@ -148,8 +150,11 @@ const nextConfig = {
                     { key: 'X-Content-Type-Options',     value: 'nosniff' },
                     { key: 'X-Frame-Options',            value: 'SAMEORIGIN' },
                     { key: 'X-XSS-Protection',          value: '1; mode=block' },
-                    // HSTS: Force HTTPS for 1 year, including subdomains
-                    { key: 'Strict-Transport-Security',  value: 'max-age=31536000; includeSubDomains; preload' },
+                    // [IOS FIX] HSTS removed from next.config.js static headers.
+                    // middleware.ts already sets HSTS dynamically per-request in production.
+                    // Having it in BOTH places causes iOS Safari/Chrome to apply the union of both,
+                    // potentially enforcing HTTPS even on Railway preview/staging HTTP URLs,
+                    // which breaks SIWE nonce requests during QA and staging validation.
                     // Referrer: Only send origin, never full URL (protects wallet addresses in query strings)
                     { key: 'Referrer-Policy',            value: 'strict-origin-when-cross-origin' },
                     // Permissions: disable all sensitive APIs we don't use

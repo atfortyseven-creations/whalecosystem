@@ -664,6 +664,59 @@ export function MobileLanding() {
         setShowManualReconnectRaw(true);
       }
     } catch {}
+
+    // [IOS BFCACHE CRITICAL FIX] Reset stuck signing ref on mount.
+    // On iOS WKWebView bfcache restore: React state is reset (isActuallySigning → false)
+    // but useRef values PERSIST across bfcache restores. If the user backgrounded the tab
+    // mid-signing (to open their wallet), signingInProgressRef.current stays 'true' forever,
+    // silently blocking every future signing attempt via the guard:
+    //   if (isLinked || isActuallySigning || signingInProgressRef.current) return;
+    // This is THE primary cause of "Connect button does nothing" on iOS Chrome after
+    // returning from MetaMask/Trust Wallet via deep-link or universal link.
+    signingInProgressRef.current = false;
+
+    // [IOS REOWN OAUTH REDIRECT FIX] Detect when AppKit social auth (Google/Apple) redirects back.
+    // Reown adds `?wc-redirect` or `#wc-auth` to the URL after completing OAuth on mobile.
+    // On iOS, this redirect is a full page navigation (not a postMessage), so React mounts fresh.
+    // We detect this, clear stale auth state, and allow wagmi's post-redirect reconnection to work.
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlHash = window.location.hash;
+      const isOAuthReturn = (
+        urlParams.has('wc-redirect') ||
+        urlParams.has('code') ||
+        urlParams.has('state') ||
+        urlHash.includes('wc-auth') ||
+        urlHash.includes('access_token') ||
+        // Reown's own redirect marker
+        document.referrer.includes('accounts.reown.com') ||
+        document.referrer.includes('auth.reown.com') ||
+        document.referrer.includes('accounts.google.com')
+      );
+      if (isOAuthReturn) {
+        console.log('[Sovereign:iOS] OAuth redirect return detected — clearing stale auth state for clean reconnect');
+        // Remove stale cached signatures that predate this OAuth session
+        try {
+          const keysToRemove: string[] = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.startsWith('sovereign_auth_')) keysToRemove.push(k);
+          }
+          keysToRemove.forEach(k => localStorage.removeItem(k));
+        } catch {}
+        // Clear the pending wakeup flag since we just completed an OAuth flow
+        try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {};
+        try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {};
+        // Clean the URL to remove OAuth params without triggering a reload
+        try {
+          const cleanUrl = window.location.pathname + window.location.search
+            .replace(/[?&]code=[^&]*/g, '')
+            .replace(/[?&]state=[^&]*/g, '')
+            .replace(/^&/, '?');
+          window.history.replaceState({}, '', cleanUrl || window.location.pathname);
+        } catch {}
+      }
+    } catch {}
   }, []);
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -677,13 +730,14 @@ export function MobileLanding() {
 
     // 1. First, check if we already have a valid server session
     try {
-      const checkRes = await fetch('/api/auth/verify-session');
+      const checkRes = await fetch('/api/auth/verify-session', { cache: 'no-store' });
       if (checkRes.ok) {
         const data = await checkRes.json();
         if (data.authenticated) {
            console.log('[Auth] Existing session valid for:', norm);
            setLinkedAddress(norm);
            setIsLinked(true);
+           signingInProgressRef.current = false;
            return;
         }
       }
@@ -696,7 +750,8 @@ export function MobileLanding() {
     setSigningError(null);
 
     try {
-      let signature, message;
+      let signature: string | undefined;
+      let message: string | undefined;
       
       // FIX: Check for locally cached signature AND message to prevent mismatch failures
       let cached = localStorage.getItem(`sovereign_auth_${norm}`);
@@ -710,7 +765,44 @@ export function MobileLanding() {
 
       if (!signature || !message) {
         message = buildSovereignMessage(norm);
-        signature = await signMessageAsync({ message }) as string;
+
+        // [IOS WALLETCONNECT RELAY TIMING FIX]
+        // After a universal-link return from MetaMask/Rainbow/Trust on iOS WKWebView,
+        // wagmi reports isConnected=true from cookie-hydrated state BEFORE the WalletConnect
+        // relay WebSocket is fully re-established (~1-2s). Calling signMessageAsync in this
+        // window fails silently (the request is queued in the relay but never delivered).
+        // We detect WC connectors by name and apply a 1500ms relay stabilization delay.
+        // For injected/Sovereign connectors, sign immediately (no relay needed).
+        const connectorName = (connector?.name || '').toLowerCase();
+        const isWalletConnect = connectorName.includes('walletconnect') ||
+                                connectorName.includes('reown') ||
+                                connectorName.includes('wc') ||
+                                // Treat unknown connectors as WC (safer on iOS)
+                                (!connectorName.includes('injected') &&
+                                 !connectorName.includes('sovereign') &&
+                                 !connectorName.includes('metamask') &&
+                                 connectorName !== '');
+
+        if (isWalletConnect) {
+          console.log('[Auth:iOS] WalletConnect connector detected — applying 1.5s relay stabilization delay');
+          await new Promise(r => setTimeout(r, 1500));
+        }
+
+        // Wrap signMessageAsync with a timeout to prevent infinite iOS hangs.
+        // WKWebView can throttle background network requests; a 30s cap ensures
+        // the user sees a retry option rather than an eternal loading spinner.
+        // [TS FIX] Capture `message` in a typed const before the closure — TypeScript's
+        // control-flow narrowing does not traverse Promise executors (closures), so even
+        // though message was just assigned above, the compiler still sees string|undefined.
+        const messageStr: string = message;
+        const signWithTimeout = (ms: number) => new Promise<string>((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error('Signature timeout — please tap "Retry Connection" and approve in your wallet')), ms);
+          signMessageAsync({ message: messageStr })
+            .then(sig => { clearTimeout(timer); resolve(sig as string); })
+            .catch(err => { clearTimeout(timer); reject(err); });
+        });
+
+        signature = await signWithTimeout(30000);
         localStorage.setItem(`sovereign_auth_${norm}`, JSON.stringify({ signature, message }));
       }
 
@@ -762,7 +854,7 @@ export function MobileLanding() {
       signingInProgressRef.current = false;
       setIsActuallySigning(false);
     }
-  }, [isLinked, isActuallySigning, signMessageAsync]);
+  }, [isLinked, isActuallySigning, signMessageAsync, connector]);
 
   // ── onFocusRecheck — stable useCallback so multiple effects can reference it —
   const onFocusRecheck = useCallback(() => {
@@ -1174,7 +1266,7 @@ export function MobileLanding() {
               user picks wallet → WC v2 deep link → Android "Open with" dialog.
               ────────────────────────────────────────────────────────────────── */}
           <div className="w-full flex flex-col gap-3">
-            {(() => {
+              {(() => {
               // Helper: open the correct wallet flow
                 const openWalletModal = async (walletId: string) => {
                   if (isLinked && effectiveAddress) return;
@@ -1185,13 +1277,33 @@ export function MobileLanding() {
                   setWcDeepLink(null);
                   setShowFallbackBtn(false);
 
+                  // [ANDROID RECOVERY FIX] Set the wakeup flag BEFORE opening the modal.
+                  // On Android, Chrome may kill the tab when the user deep-links to MetaMask.
+                  // On return (full reload, not bfcache), the Ultra Recovery Effect checks
+                  // localStorage for this flag to activate the reconnect UI and polling.
+                  // Without this flag, the recovery UI never shows and the user sees a blank
+                  // connect screen with no feedback after returning from their wallet app.
+                  try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {}
+                  try { sessionStorage.setItem('sovereign_show_reconnect', '1'); } catch {}
+
                   // Close custom modal overlay to let AppKit take over completely, preventing any z-index or pointer-event conflicts on mobile devices
                   setShowConnectOverlay(false);
 
                   // Pure AppKit usage to avoid forcing the dapp browser
                   // AppKit native connection correctly uses standard Universal Links to sign and return to Chrome.
                   rkOpenModal({ view: 'Connect' });
-                  setTimeout(() => setConnecting(null), 10000);
+
+                  // [ANDROID UX FIX] Show the "I already connected" fallback button after 3.5s.
+                  // The comment documenting this was present but the implementation was missing.
+                  // On Android, if the user approves in MetaMask but the WC relay is slow, the
+                  // loading state clears after 10s but the user has no CTA to force re-check.
+                  // The fallback button triggers forceFullReconnect() to re-poll for the address.
+                  const fallbackTimer = setTimeout(() => setShowFallbackBtn(true), 3500);
+                  // Clear the loading indicator after 10s (UX: don't spin forever)
+                  setTimeout(() => {
+                    setConnecting(null);
+                    clearTimeout(fallbackTimer); // Only clear if connecting resolves first
+                  }, 10000);
                 };
 
 
@@ -1211,7 +1323,8 @@ export function MobileLanding() {
                   </div>
                 </>
               );
-            })()}
+            })()
+}
           </div>
 
               <div className="flex items-start gap-3 p-4 rounded-2xl bg-black/[0.03] border border-black/5 mt-6 w-full">

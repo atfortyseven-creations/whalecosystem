@@ -26,11 +26,30 @@ export function ClientRootRouter() {
         setHasSession(false);
       }
     };
+    
+    // Run immediately on mount
     check();
     
-    // Poll to catch any external cookie updates
-    const interval = setInterval(check, 500);
-    return () => clearInterval(interval);
+    // [ANDROID PERF FIX] Replace 500ms setInterval with event-driven checks.
+    // A continuous 500ms poll on the landing page consumes unnecessary CPU/battery
+    // on Android Chrome and causes laggy animations. Replace with:
+    // 1. visibilitychange: fires when user returns from wallet app (Android back gesture)
+    // 2. A single 1.5s delayed check to catch the immediate post-auth cookie write
+    // 3. storage event: fires when wagmi writes to localStorage after reconnection
+    const onVisibility = () => { if (document.visibilityState === 'visible') check(); };
+    const onStorage = () => check();
+    
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('storage', onStorage);
+    
+    // Single delayed check: catches cookies set within 1.5s of mount (post-redirect auth)
+    const delayedCheck = setTimeout(check, 1500);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('storage', onStorage);
+      clearTimeout(delayedCheck);
+    };
   }, [isConnected]);
 
   return (

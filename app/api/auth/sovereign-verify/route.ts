@@ -56,28 +56,49 @@ export async function POST(req: NextRequest) {
         });
 
         // 4. Secure Cookie Response
+        // [IOS CHROME HARDENING] Disable caching — prevents iOS from serving stale
+        // 401/500 responses from the bfcache on back-navigation after wallet deep-link.
         const response = NextResponse.json({ 
             success: true,
             user: {
                 address: normalizedAddress,
                 tier: user.tier
             }
+        }, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
+                'Pragma': 'no-cache',
+            }
         });
 
-        // Secure httpOnly JWT cookie
-        response.cookies.set('whale_session', jwt, {
+        const secureCookieBase = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: 'lax' as const,
             maxAge: 604800, // 7 days
             path: '/',
-        });
+        };
 
-        // Public convenience cookie (for UI routing)
+        // Primary Sovereign session token — for middleware auth
+        response.cookies.set('whale_session', jwt, secureCookieBase);
+
+        // [IOS LOOP FIX] Also write 'human_session' so that getSession() in
+        // verify-session/route.ts (which reads Priority 1: 'human_session') returns
+        // authenticated: true on page restore. Without this, iOS bfcache restores
+        // trigger a re-auth loop: wagmi reconnects → establishSession → verify-session
+        // returns 401 (reads wrong cookie) → infinite signing loop.
+        response.cookies.set('human_session', jwt, secureCookieBase);
+
+        // [IOS FIX] sovereign_handshake MUST have httpOnly: false explicitly.
+        // JS reads document.cookie to hydrate isLinked state. If this is httpOnly,
+        // document.cookie.includes('sovereign_handshake') always returns false on iOS,
+        // causing a permanent re-auth loop even after successful signing.
         response.cookies.set('sovereign_handshake', normalizedAddress, {
+            httpOnly: false, // CRITICAL: must be JS-readable for client-side isLinked check
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
             path: '/',
             maxAge: 604800,
-            sameSite: 'lax',
         });
 
         console.log(`[Auth:Success] Sovereign session established for ${normalizedAddress}`);

@@ -33,13 +33,17 @@ export async function GET(req: NextRequest) {
     headers: { 'Content-Type': 'text/plain' },
   });
 
-  // Store nonce in HTTP-only cookie (secure, per-request, short TTL)
+  // [IOS CHROME CRITICAL FIX] sameSite MUST be 'lax', NOT 'strict'.
+  // iOS WKWebView (Chrome on iOS, Safari) DROPS cookies with SameSite=Strict
+  // during cross-site navigation (deep-link to wallet app → universal link back).
+  // WalletConnect's redirect flow IS a cross-site top-level GET — 'lax' allows it.
+  // Using 'strict' = nonce cookie is gone on return → "No nonce in session" error.
   res.cookies.set('siwe-nonce', nonce, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax', // CRITICAL: was 'strict', breaks all iOS wallet redirects
     path: '/',
-    maxAge: 60 * 5, // 5 minutes — tighter window
+    maxAge: 60 * 5, // 5 minutes — tight enough to prevent replay
   });
 
   return res;

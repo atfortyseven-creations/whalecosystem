@@ -9,11 +9,20 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
     const [isPhysicallyMobile, setIsPhysicallyMobile] = useState(isMobileUserAgent);
 
     useEffect(() => {
-        const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
-        const isTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
-        const isSmallScreen = window.screen.width < 768;
+        const ua = navigator.userAgent.toLowerCase();
+        // [ANDROID TABLET FIX] UA detection MUST take priority over screen size.
+        // Android tablets (Galaxy Tab, Lenovo Tab) have screen.width >= 768 and
+        // maxTouchPoints > 0 but isSmallScreen = false. The old logic:
+        //   isMobile = isUaMobile || (isTouchScreen && isSmallScreen)
+        // ...sent tablets to the DESKTOP router, breaking the mobile auth flow.
+        // Any device with 'android' or 'iphone/ipad' in the UA IS mobile regardless
+        // of screen dimensions. We treat all touch-primary Android/iOS as mobile.
+        const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+        // Secondary: touch screen + no fine pointer (tablet/phone, not touch laptop)
+        const isTouchPrimary = navigator.maxTouchPoints > 1 && !window.matchMedia('(pointer: fine)').matches;
+        const isSmallScreen = window.screen.width < 1024; // extended breakpoint: covers large phones + tablets
 
-        setIsPhysicallyMobile(isUaMobile || (isTouchScreen && isSmallScreen));
+        setIsPhysicallyMobile(isUaMobile || (isTouchPrimary && isSmallScreen));
         setMounted(true);
     }, []);
 

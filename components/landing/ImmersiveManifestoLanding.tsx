@@ -128,18 +128,18 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           className="relative z-10 w-full max-w-[1200px] mx-auto px-6 text-center mt-20"
         >
           <motion.h1 variants={FADE_UP} className="text-[52px] sm:text-[80px] lg:text-[110px] font-black tracking-tighter uppercase leading-[0.85] text-white drop-shadow-2xl mb-8">
-            The Whale Alert<br />
-            <span className="text-white/40">Platform.</span>
+            Welcome to<br />
+            <span className="text-white/40">Whale Alert.</span>
           </motion.h1>
           <motion.p variants={FADE_UP} className="font-serif text-[20px] md:text-[28px] text-white/80 leading-relaxed max-w-[800px] mx-auto drop-shadow-md">
-            A new global standard for institutional security. We provide complete data protection, private communication, and absolute certainty for your most critical operations.
+            The new global standard for digital safety. We provide complete data protection, private communication, and absolute certainty for your digital life.
           </motion.p>
           <motion.div variants={FADE_UP} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/portfolio" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center">
-              Don't have a Whale Portfolio yet?
+              Don't have an Account yet?
             </Link>
             <Link href="/forum" className="w-full sm:w-auto px-10 py-5 bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center">
-              Travel to whale chat
+              Go to Whale Chat
             </Link>
           </motion.div>
         </motion.div>
@@ -199,10 +199,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="flex flex-col items-center text-center max-w-[800px] px-6">
           <motion.div variants={FADE_UP} className="w-16 h-[2px] bg-[#050505] mb-10" />
           <motion.h2 variants={FADE_UP} className="text-[36px] md:text-[56px] font-black tracking-tighter uppercase leading-[0.95] text-[#050505] mb-8">
-            Ready to Upgrade Your <br className="hidden sm:block"/>Institutional Security?
+            Ready to Upgrade Your <br className="hidden sm:block"/>Digital Security?
           </motion.h2>
           <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[22px] text-[#050505]/60 leading-relaxed mb-12">
-            Join the global network of professionals who trust the Whale Alert Platform to protect their data, privacy, and communications.
+            Join the global network of people who trust Whale Alert to protect their data, privacy, and communications.
           </motion.p>
           <motion.div variants={FADE_UP}>
             <Link href="/docs/getting-started" className="inline-flex items-center justify-center px-12 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">

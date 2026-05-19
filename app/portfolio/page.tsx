@@ -244,13 +244,18 @@ export default function PortfolioPage() {
   // Show the gate when the user has NOT authenticated in this session.
   // Gate is skipped ONLY when:
   //   A) privateKey is live in memory (just logged in this tab, not yet reloaded)
-  //   B) wagmi MetaMask/WalletConnect is live
+  //   B) wagmi is fully connected AND stable (not just reconnecting from a stale session)
   //   C) sessionStorage flag set this session (survives soft navigation within the tab)
   //
-  // When hasKeystore=true and none of the above apply, we STILL show the gate,
-  // but QuantumAuthGate auto-starts at the 'login' (unlock) step instead of 'home'.
-  // This is the correct security posture: the user must enter their password.
-  const needsGate = !isQuantumUnlocked && !wagmiConnected && !sessionUnlocked && !isReconnecting;
+  // [ANDROID RACE FIX] The old condition `!wagmiConnected && !isReconnecting` was inverted:
+  // isReconnecting=true means wagmi is NOT yet confirmed connected. This was passing
+  // `needsGate = false` during the reconnect window, causing the portfolio to render
+  // and fire Alchemy API calls without any address. Now we require both:
+  //   - wagmiConnected=true (actual confirmed connection)
+  //   - isReconnecting=false (connection is stable, not in-flight)
+  // This prevents the ~300ms window of unauthenticated portfolio data fetching on Android.
+  const isWagmiStable = wagmiConnected && !isReconnecting;
+  const needsGate = !isQuantumUnlocked && !isWagmiStable && !sessionUnlocked;
 
   if (needsGate) {
     return (
