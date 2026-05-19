@@ -345,12 +345,13 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   }, [(settings as any).screenshotProtection]);
 
   // ── XMTP Client Init ─────────────────────────────────────────────────────
-  const initXmtpClient = useCallback(async () => {
+  const initXmtpClient = useCallback(async (isManual = false) => {
     if (!isConnected || !address) return;
     const hasLocalWallet = isLocalSovereignWallet && storePrivateKey;
     
     // MASTER-FIX: Wait for walletClient to avoid "Connector not connected" Wagmi race condition on mount
-    if (!hasLocalWallet && !walletClient) return;
+    // If user clicked manually, bypass this check
+    if (!hasLocalWallet && !walletClient && !isManual) return;
 
     setXmtpError(null);
     let attempts = 0;
@@ -378,7 +379,11 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
             },
           };
         }
-        const client = await getXMTPClient(signer);
+        const clientPromise = getXMTPClient(signer);
+        const timeoutPromise = new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout de conexión en red móvil (5G). Reintentando...')), 20000)
+        );
+        const client = await Promise.race([clientPromise, timeoutPromise]);
         xmtpClient.current = client;
         setXmtpReady(true);
         return; // Success
@@ -400,7 +405,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   }, [isConnected, walletClient, address, isLocalSovereignWallet, storePrivateKey]);
 
   useEffect(() => {
-    initXmtpClient();
+    initXmtpClient(false);
   }, [initXmtpClient]);
 
   // ── Global XMTP Stream ───────────────────────────────────────────────────
@@ -583,7 +588,11 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     ));
 
     try {
-      await xmtpSend(xmtpClient.current, activeConv.peerAddress, finalContent);
+      const sendPromise = xmtpSend(xmtpClient.current, activeConv.peerAddress, finalContent);
+      const timeoutPromise = new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('El mensaje tardó demasiado en enviarse (posible problema de red 5G)')), 15000)
+      );
+      await Promise.race([sendPromise, timeoutPromise]);
       // Mark as sent (remove optimistic tag)
       setMessages(prev => prev.map(m => m.id === optimistic.id ? { ...m, readAt: undefined } : m));
     } catch (e: any) {
@@ -798,7 +807,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
       <div className="flex flex-1 w-full h-full bg-white items-center justify-center flex-col gap-4">
         <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">Error de Sincronización XMTP</p>
         <p className="font-mono text-[10px] text-black/40 max-w-md text-center">{xmtpError}</p>
-        <button onClick={() => initXmtpClient()} className="px-6 py-2.5 bg-black text-white font-mono text-[10px] uppercase tracking-widest rounded-xl">
+        <button onClick={() => initXmtpClient(true)} className="px-6 py-2.5 bg-black text-white font-mono text-[10px] uppercase tracking-widest rounded-xl">
           Reintentar Firma y Sincronizar
         </button>
       </div>
@@ -817,7 +826,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
             Whale Chat requiere una firma única para cifrar tus mensajes de extremo a extremo. Revisa tu billetera.
           </p>
         </div>
-        <button onClick={() => initXmtpClient()} className="mt-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition-all text-white font-mono text-[11px] font-bold uppercase tracking-widest rounded-xl shadow-md">
+        <button onClick={() => initXmtpClient(true)} className="mt-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition-all text-white font-mono text-[11px] font-bold uppercase tracking-widest rounded-xl shadow-md">
           Toque aquí para Firmar (Móvil)
         </button>
       </div>
