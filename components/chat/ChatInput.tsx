@@ -26,6 +26,13 @@ const EMOJI_GRID = [
   '🧠','🏆','🎯','🔐','⛓️','🌐','🦾','🤖',
 ];
 
+const LOCATION_DURATION_OPTS = [
+  { value: 300000, label: '5 Minutos' },
+  { value: 3600000, label: '1 Hora' },
+  { value: 86400000, label: '24 Horas' },
+  { value: 0, label: 'Permanente' },
+];
+
 // Pick best supported mime type
 function getSupportedMimeType(): string {
   const types = [
@@ -52,6 +59,8 @@ export default function ChatInput({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingMs, setRecordingMs] = useState(0);
   const [micError, setMicError] = useState<string | null>(null);
+  const [showLocationSelect, setShowLocationSelect] = useState(false);
+  const [isRetrievingLocation, setIsRetrievingLocation] = useState(false);
 
   const inputRef    = useRef<HTMLTextAreaElement>(null);
   const mediaRef    = useRef<MediaRecorder | null>(null);
@@ -79,20 +88,137 @@ export default function ChatInput({
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  const handleSendLocation = () => {
+  const triggerLocationSend = (durationMs: number) => {
     if (disabled) return;
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        onSendText(`[LOCATION]${position.coords.latitude},${position.coords.longitude}`);
-      },
-      () => {
-        alert("Unable to retrieve your location");
+    setIsRetrievingLocation(true);
+
+    const expiry = durationMs > 0 ? Date.now() + durationMs : 0;
+
+    const saveToCache = (lat: number, lon: number) => {
+      try {
+        localStorage.setItem('last_known_sovereign_location', JSON.stringify({
+          lat,
+          lon,
+          timestamp: Date.now()
+        }));
+      } catch (e) {}
+    };
+
+    const getFromCache = () => {
+      try {
+        const cached = localStorage.getItem('last_known_sovereign_location');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Date.now() - parsed.timestamp < 86400000) {
+            return parsed;
+          }
+        }
+      } catch (e) {}
+      return null;
+    };
+
+    const fetchIP1 = async () => {
+      const res = await fetch('https://ipapi.co/json/');
+      if (!res.ok) throw new Error('ipapi.co failed');
+      const data = await res.json();
+      if (data.latitude && data.longitude) return { lat: data.latitude, lon: data.longitude, source: 'ipapi' };
+      throw new Error('Coords missing in ipapi');
+    };
+
+    const fetchIP2 = async () => {
+      const res = await fetch('https://ip-api.com/json/');
+      if (!res.ok) throw new Error('ip-api.com failed');
+      const data = await res.json();
+      if (data.lat && data.lon) return { lat: data.lat, lon: data.lon, source: 'ip-api' };
+      throw new Error('Coords missing in ip-api');
+    };
+
+    const fetchIP3 = async () => {
+      const res = await fetch('https://ipinfo.io/json');
+      if (!res.ok) throw new Error('ipinfo.io failed');
+      const data = await res.json();
+      if (data.loc) {
+        const [latStr, lonStr] = data.loc.split(',');
+        const lat = parseFloat(latStr);
+        const lon = parseFloat(lonStr);
+        if (!isNaN(lat) && !isNaN(lon)) return { lat, lon, source: 'ipinfo' };
       }
-    );
+      throw new Error('Coords missing in ipinfo');
+    };
+
+    const getNativePos = (highAccuracy: boolean): Promise<{ lat: number, lon: number, source: string }> => {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error('Geolocation not supported'));
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            resolve({
+              lat: pos.coords.latitude,
+              lon: pos.coords.longitude,
+              source: highAccuracy ? 'native-gps' : 'native-network'
+            });
+          },
+          (err) => reject(err),
+          {
+            enableHighAccuracy: highAccuracy,
+            timeout: highAccuracy ? 3500 : 7000,
+            maximumAge: highAccuracy ? 0 : 300000
+          }
+        );
+      });
+    };
+
+    (async () => {
+      let resolved = false;
+
+      const handleSuccess = (lat: number, lon: number, source: string) => {
+        if (resolved) return;
+        resolved = true;
+        console.log(`[QuantumGeo] Resolved via ${source}: ${lat}, ${lon}`);
+        saveToCache(lat, lon);
+        onSendText(`[LOCATION]${lat},${lon}|${expiry}`);
+        setIsRetrievingLocation(false);
+      };
+
+      try {
+        const gpsPromise = getNativePos(true);
+        const timeoutGps = new Promise<never>((_, rej) => setTimeout(() => rej(new Error('GPS Timeout')), 3500));
+        
+        const fastGps = await Promise.race([gpsPromise, timeoutGps]);
+        handleSuccess(fastGps.lat, fastGps.lon, fastGps.source);
+        return;
+      } catch (gpsError) {
+        console.warn('[QuantumGeo] Precise GPS failed or timed out. Racing network and IP targets...', gpsError);
+      }
+
+      if (resolved) return;
+
+      try {
+        const networkPromise = getNativePos(false);
+        const ipPromise1 = fetchIP1();
+        const ipPromise2 = fetchIP2();
+        const ipPromise3 = fetchIP3();
+
+        const winner = await Promise.any([networkPromise, ipPromise1, ipPromise2, ipPromise3]);
+        handleSuccess(winner.lat, winner.lon, winner.source);
+        return;
+      } catch (raceError) {
+        console.error('[QuantumGeo] Parallel race failed. Trying last cached position...', raceError);
+      }
+
+      if (resolved) return;
+
+      const cached = getFromCache();
+      if (cached) {
+        handleSuccess(cached.lat, cached.lon, 'cache-fallback');
+        return;
+      }
+
+      alert("Unable to retrieve your location automatically. Please enable location services or check your browser permissions.");
+      setIsRetrievingLocation(false);
+    })();
   };
 
   // ── Voice recording ──────────────────────────────────────────────────────
@@ -245,11 +371,25 @@ export default function ChatInput({
           </button>
           
           <button
-            onClick={handleSendLocation}
+            onClick={() => {
+              if (isRetrievingLocation) return;
+              setShowLocationSelect(p => !p);
+              setShowEmoji(false);
+              setShowDestruct(false);
+            }}
             title="Share Location"
-            className="w-10 h-10 rounded-xl bg-black/[0.03] border border-black/8 flex items-center justify-center text-black/40 hover:text-black hover:bg-black/[0.06] transition-all shrink-0"
+            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all shrink-0 ${
+              showLocationSelect
+                ? 'bg-black text-white border-black'
+                : 'bg-black/[0.03] border-black/8 text-black/40 hover:text-black hover:bg-black/[0.06]'
+            }`}
+            disabled={isRetrievingLocation || disabled}
           >
-            <MapPin size={18} />
+            {isRetrievingLocation ? (
+              <div className="w-4 h-4 rounded-full border-2 border-black/25 border-t-black animate-spin" />
+            ) : (
+              <MapPin size={18} />
+            )}
           </button>
 
           {/* Textarea */}
@@ -337,6 +477,27 @@ export default function ChatInput({
               {e}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Location duration selector */}
+      {showLocationSelect && !isRecording && (
+        <div className="mt-2 bg-white border border-black/8 rounded-2xl p-3 flex flex-col gap-2 shadow-sm">
+          <p className="font-mono text-[10px] text-black/40 uppercase tracking-widest px-1">Duración en pantalla:</p>
+          <div className="flex gap-2 flex-wrap">
+            {LOCATION_DURATION_OPTS.map(o => (
+              <button
+                key={o.value}
+                onClick={() => {
+                  setShowLocationSelect(false);
+                  triggerLocationSend(o.value);
+                }}
+                className="px-3 py-1.5 rounded-lg font-mono text-[11px] border bg-black/[0.03] border-black/8 text-black/50 hover:text-black hover:bg-black/[0.06] transition-all"
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

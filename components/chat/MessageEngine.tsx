@@ -123,8 +123,9 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
   const match = typeof msg.content === 'string' ? msg.content.match(/^\[ATTACHMENT:([^\]]*)\](.*?)\|(.*)$/is) : null;
   const attachment = match ? { mime: match[1] || 'application/octet-stream', url: match[2], name: match[3] } : null;
 
-  const locMatch = typeof msg.content === 'string' ? msg.content.match(/^\[LOCATION\](.*)$/) : null;
+  const locMatch = typeof msg.content === 'string' ? msg.content.match(/^\[LOCATION\]([^|]*)(?:\|(\d+))?$/) : null;
   const isLocation = !!locMatch;
+  const expiryTimestamp = locMatch && locMatch[2] ? parseInt(locMatch[2], 10) : 0;
 
   return (
     <div className={`flex flex-col max-w-[75%] ${msg.isMine ? 'self-end items-end ml-auto' : 'self-start items-start'}`}>
@@ -173,19 +174,11 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
         {attachment ? (
           <AttachmentRenderer attachment={attachment} isMine={msg.isMine} />
         ) : isLocation && locMatch ? (
-          <div className={`mt-1 relative group cursor-pointer overflow-hidden rounded-xl shadow-sm border ${msg.isMine ? 'border-white/10' : 'border-black/5'}`}>
-             <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locMatch[1])}`} target="_blank" rel="noopener noreferrer" className={`block p-3 transition-colors ${msg.isMine ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
-               <div className="flex items-center gap-3">
-                 <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${msg.isMine ? 'bg-white/20' : 'bg-black/10'}`}>
-                   📍
-                 </div>
-                 <div>
-                   <p className={`font-mono text-[12px] font-bold ${msg.isMine ? 'text-white' : 'text-black'}`}>Ubicación Compartida</p>
-                   <p className={`font-mono text-[9px] uppercase mt-0.5 truncate max-w-[150px] ${msg.isMine ? 'text-white/60' : 'text-black/50'}`}>{locMatch[1]}</p>
-                 </div>
-               </div>
-             </a>
-          </div>
+          <LocationBubble
+            coords={locMatch[1]}
+            expiryTimestamp={expiryTimestamp}
+            isMine={msg.isMine}
+          />
         ) : (
           <p className="leading-relaxed break-words whitespace-pre-wrap font-mono" style={{ fontSize: ((settings?.textSize ?? 4) * 2 + 6) + 'px' }}>
             {settings?.privacyMode === 'stealth' ? msg.content.replace(/[a-zA-Z0-9]/g, '*') : msg.content}
@@ -351,6 +344,91 @@ function ContextMenu({ messageId, content, x, y, onReact, onPin, onDelete, onRep
           <Icon size={15} />{label}
         </button>
       ))}
+    </div>
+  );
+}
+
+function LocationBubble({
+  coords,
+  expiryTimestamp,
+  isMine
+}: {
+  coords: string;
+  expiryTimestamp: number;
+  isMine: boolean;
+}) {
+  const [timeText, setTimeText] = useState<string>('');
+  const [isExpired, setIsExpired] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (expiryTimestamp === 0) {
+      setTimeText('Ubicación Permanente');
+      setIsExpired(false);
+      return;
+    }
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = expiryTimestamp - now;
+      if (diff <= 0) {
+        setTimeText('Ubicación Expirada');
+        setIsExpired(true);
+      } else {
+        const totalSecs = Math.floor(diff / 1000);
+        const hours = Math.floor(totalSecs / 3600);
+        const mins = Math.floor((totalSecs % 3600) / 60);
+        const secs = totalSecs % 60;
+        
+        if (hours > 0) {
+          setTimeText(`Expira en ${hours}h ${mins}m`);
+        } else if (mins > 0) {
+          setTimeText(`Expira en ${mins}m ${secs}s`);
+        } else {
+          setTimeText(`Expira en ${secs}s`);
+        }
+        setIsExpired(false);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [expiryTimestamp]);
+
+  if (isExpired) {
+    return (
+      <div className={`mt-1 p-3 rounded-xl border ${isMine ? 'bg-white/5 border-white/10 opacity-50' : 'bg-black/[0.02] border-black/5 opacity-50'}`}>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-black/10 dark:bg-white/10">
+            ❌
+          </div>
+          <div>
+            <p className={`font-mono text-[12px] font-bold ${isMine ? 'text-white/60' : 'text-black/60'}`}>Ubicación Expirada</p>
+            <p className={`font-mono text-[9px] uppercase mt-0.5 ${isMine ? 'text-white/40' : 'text-black/40'}`}>{timeText}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`mt-1 relative group cursor-pointer overflow-hidden rounded-xl shadow-sm border ${isMine ? 'border-white/10' : 'border-black/5'}`}>
+      <a
+        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coords)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`block p-3 transition-colors ${isMine ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}
+      >
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isMine ? 'bg-white/20' : 'bg-black/10'}`}>
+            📍
+          </div>
+          <div>
+            <p className={`font-mono text-[12px] font-bold ${isMine ? 'text-white' : 'text-black'}`}>Ubicación Exacta</p>
+            <p className={`font-mono text-[9px] uppercase mt-0.5 tracking-wider ${isMine ? 'text-white/60' : 'text-black/50'}`}>{timeText}</p>
+          </div>
+        </div>
+      </a>
     </div>
   );
 }
