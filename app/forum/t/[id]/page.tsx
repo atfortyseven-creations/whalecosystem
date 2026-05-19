@@ -63,7 +63,7 @@ export default function TopicPage() {
       // If the user is in Chrome mobile (wagmi not reconnected yet) or rejects
       // the signature request, we post without a signature rather than blocking.
       let finalContent = replyContent;
-      finalContent = `${replyContent}\n\n[SIGNATURE:SESSION:AUTHENTICATED]`;
+      finalContent = `${replyContent}\n\n[SIGNATURE:SIGNED VERIFIED]`;
 
       let csrfToken = '';
       try {
@@ -338,8 +338,8 @@ function RenderContent({ content }: { content: string }) {
   }
   text = text.replace(docRegex, '').trim();
   
-  // Check for the new token format — hex signature OR session fallback
-  const tokenMatch = text.match(/\[SIGNATURE:(0x[a-fA-F0-9]+|SESSION:[a-zA-Z0-9x:]+)\]/i);
+  // Check for the new token format — hex signature OR session fallback OR legacy strings
+  const tokenMatch = text.match(/\[SIGNATURE:([^\]]+)\]/i);
   if (tokenMatch) {
     signature = tokenMatch[1];
     text = text.replace(tokenMatch[0], '').trim();

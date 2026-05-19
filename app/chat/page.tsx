@@ -6,6 +6,10 @@ export const metadata = {
 };
 
 export default function ChatPage() {
-  return <ChatClientPage />;
+  return (
+    <div className="flex flex-col flex-1 w-full h-full min-h-0 relative bg-white">
+      <ChatClientPage />
+    </div>
+  );
 }
 

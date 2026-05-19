@@ -11,22 +11,7 @@ export interface ChatSettings {
   privacyMode: PrivacyMode;
   autoDestruct: AutoDestructPreset;
   showReadReceipts: boolean;
-  showLastSeen: boolean;
-  soundEnabled: boolean;
-  notificationsEnabled: boolean;
-  differentialNoiseEpsilon: number;
-  linkPreviewsEnabled: boolean;
-  screenshotProtection: boolean;
   textSize: number;
-  autoDownloadCellular: boolean;
-  autoDownloadWifi: boolean;
-  keepMedia: string;
-  powerSavingMode: boolean;
-  enableAnimations: boolean;
-  backgroundSync: boolean;
-  language: string;
-  useProxy: boolean;
-  connectionType: string;
 }
 
 export const DEFAULT_SETTINGS: ChatSettings = {
@@ -34,22 +19,7 @@ export const DEFAULT_SETTINGS: ChatSettings = {
   privacyMode: 'standard',
   autoDestruct: 'off',
   showReadReceipts: true,
-  showLastSeen: false,
-  soundEnabled: true,
-  notificationsEnabled: true,
-  differentialNoiseEpsilon: 0.0001,
-  linkPreviewsEnabled: true,
-  screenshotProtection: true,
   textSize: 4,
-  autoDownloadCellular: true,
-  autoDownloadWifi: true,
-  keepMedia: 'Forever',
-  powerSavingMode: false,
-  enableAnimations: true,
-  backgroundSync: true,
-  language: 'English',
-  useProxy: false,
-  connectionType: 'Default',
 };
 
 interface AdvancedSettingsModalProps {
@@ -61,28 +31,15 @@ interface AdvancedSettingsModalProps {
 export default function AdvancedSettingsModal({
   onClose, settings, onSettingsChange,
 }: AdvancedSettingsModalProps) {
-  const [tab, setTab] = useState<'general' | 'privacy' | 'data' | 'appearance' | 'power' | 'language' | 'folders' | 'network' | 'keys'>('general');
-  const [rotating, setRotating] = useState(false);
+  const [tab, setTab] = useState<'general' | 'privacy' | 'appearance'>('general');
 
   const update = <K extends keyof ChatSettings>(key: K, val: ChatSettings[K]) =>
     onSettingsChange({ ...settings, [key]: val });
 
-  const handleKeyRotation = async () => {
-    setRotating(true);
-    await new Promise(r => setTimeout(r, 1400));
-    setRotating(false);
-  };
-
   const TABS = [
     { id: 'general', label: 'General' },
-    { id: 'privacy', label: 'Privacy and Security' },
-    { id: 'data', label: 'Data and Storage' },
+    { id: 'privacy', label: 'Privacy & Security' },
     { id: 'appearance', label: 'Appearance' },
-    { id: 'power', label: 'Power Saving' },
-    { id: 'folders', label: 'Chat Folders' },
-    { id: 'language', label: 'Language' },
-    { id: 'network', label: 'Network and Proxy' },
-    { id: 'keys', label: 'Encryption Keys' }
   ] as const;
 
   return (
@@ -140,25 +97,19 @@ export default function AdvancedSettingsModal({
             <div className="p-4 max-w-[400px] mx-auto space-y-6">
 
               {tab === 'general' && (
-                <>
-                  <Section title="NOTIFICATIONS">
-                    <ToggleRow label="Message Sounds" value={settings.soundEnabled} onChange={v => update('soundEnabled', v)} />
-                    <ToggleRow label="Push Notifications" value={settings.notificationsEnabled} onChange={v => update('notificationsEnabled', v)} isLast />
-                  </Section>
-                  <Section title="TEXT SIZE">
-                    <div className="px-4 py-3">
-                      <input 
-                        type="range" min="1" max="7" 
-                        value={settings.textSize} 
-                        onChange={e => update('textSize', parseInt(e.target.value))}
-                        className="w-full accent-[#007AFF]" 
-                      />
-                      <div className="flex justify-between text-[11px] text-[#8e8e93] mt-2 font-sans">
-                        <span>Small</span><span>Large</span>
-                      </div>
+                <Section title="TEXT SIZE">
+                  <div className="px-4 py-3">
+                    <input 
+                      type="range" min="1" max="7" 
+                      value={settings.textSize} 
+                      onChange={e => update('textSize', parseInt(e.target.value))}
+                      className="w-full accent-[#007AFF]" 
+                    />
+                    <div className="flex justify-between text-[11px] text-[#8e8e93] mt-2 font-sans">
+                      <span>Small</span><span>Large</span>
                     </div>
-                  </Section>
-                </>
+                  </div>
+                </Section>
               )}
 
               {tab === 'privacy' && (
@@ -176,10 +127,7 @@ export default function AdvancedSettingsModal({
                   </Section>
 
                   <Section title="MESSAGE CONTROLS">
-                    <ToggleRow label="Show Read Receipts" value={settings.showReadReceipts} onChange={v => update('showReadReceipts', v)} />
-                    <ToggleRow label="Show Last Seen" value={settings.showLastSeen} onChange={v => update('showLastSeen', v)} />
-                    <ToggleRow label="Screenshot Protection" value={settings.screenshotProtection} onChange={v => update('screenshotProtection', v)} />
-                    <ToggleRow label="Link Previews" value={settings.linkPreviewsEnabled} onChange={v => update('linkPreviewsEnabled', v)} isLast />
+                    <ToggleRow label="Show Read Receipts" value={settings.showReadReceipts} onChange={v => update('showReadReceipts', v)} isLast />
                   </Section>
 
                   <Section title="AUTO-DESTRUCT TIMER" footer="Messages will automatically disappear after the selected duration.">
@@ -202,34 +150,6 @@ export default function AdvancedSettingsModal({
                       ))}
                     </div>
                   </Section>
-
-                  <Section title="DIFFERENTIAL PRIVACY">
-                    <div className="px-4 py-3">
-                      <div className="flex justify-between text-[13px] mb-2 font-sans text-black">
-                        <span>Noise Epsilon</span>
-                        <span className="text-[#8e8e93]">{settings.differentialNoiseEpsilon.toFixed(4)}</span>
-                      </div>
-                      <input
-                        type="range" min={0.0001} max={0.01} step={0.0001}
-                        value={settings.differentialNoiseEpsilon}
-                        onChange={e => update('differentialNoiseEpsilon', parseFloat(e.target.value))}
-                        className="w-full accent-[#007AFF]"
-                      />
-                    </div>
-                  </Section>
-                </>
-              )}
-
-              {tab === 'data' && (
-                <>
-                  <Section title="AUTO-DOWNLOAD MEDIA">
-                    <ToggleRow label="Using Cellular" value={settings.autoDownloadCellular} onChange={v => update('autoDownloadCellular', v)} />
-                    <ToggleRow label="Using Wi-Fi" value={settings.autoDownloadWifi} onChange={v => update('autoDownloadWifi', v)} isLast />
-                  </Section>
-                  <Section title="STORAGE USAGE" footer="Clear cache to free up space.">
-                    <ActionRow label="Clear Cache" onClick={() => alert('Cache cleared')} rightText="1.2 GB" />
-                    <ActionRow label="Keep Media" onClick={() => update('keepMedia', settings.keepMedia === 'Forever' ? '1 Year' : 'Forever')} rightText={settings.keepMedia} isLast />
-                  </Section>
                 </>
               )}
 
@@ -244,69 +164,6 @@ export default function AdvancedSettingsModal({
                       isLast={idx === 4}
                     />
                   ))}
-                </Section>
-              )}
-
-              {tab === 'power' && (
-                <Section title="POWER SAVING OPTIONS" footer="Disabling animations will save battery but reduce visual fidelity.">
-                  <ToggleRow label="Power Saving Mode" value={settings.powerSavingMode} onChange={v => update('powerSavingMode', v)} />
-                  <ToggleRow label="Enable Animations" value={settings.enableAnimations} onChange={v => update('enableAnimations', v)} />
-                  <ToggleRow label="Background Sync" value={settings.backgroundSync} onChange={v => update('backgroundSync', v)} isLast />
-                </Section>
-              )}
-
-              {tab === 'folders' && (
-                <Section title="FOLDERS" footer="Organize your chats into custom folders.">
-                  <ActionRow label="Create New Folder" onClick={() => alert('Folder creation coming soon')} className="text-[#007AFF]" isLast />
-                </Section>
-              )}
-
-              {tab === 'language' && (
-                <Section title="APP LANGUAGE">
-                  {['English', 'Spanish', 'French', 'German'].map((lang, idx) => (
-                    <ActionRow 
-                      key={lang}
-                      label={lang} 
-                      onClick={() => update('language', lang)} 
-                      rightText={settings.language === lang ? '✓' : ''} 
-                      isLast={idx === 3} 
-                    />
-                  ))}
-                </Section>
-              )}
-
-              {tab === 'network' && (
-                <Section title="CONNECTION">
-                  <ToggleRow label="Use Proxy" value={settings.useProxy} onChange={v => update('useProxy', v)} />
-                  <ActionRow label="Connection Type" onClick={() => update('connectionType', settings.connectionType === 'Default' ? 'TCP' : 'Default')} rightText={settings.connectionType} />
-                  <ActionRow label="Data Usage" onClick={() => {}} rightText="42 MB" isLast />
-                </Section>
-              )}
-
-              {tab === 'keys' && (
-                <Section title="ENCRYPTION KEYS" footer="Key rotation generates a new zk-SNARK attestation.">
-                  <div className="px-4 py-3 bg-white border-b border-black/5">
-                    <p className="text-[13px] font-sans text-black">Active Key Pair</p>
-                    <p className="text-[11px] font-mono text-[#8e8e93] break-all mt-1 bg-[#f2f2f7] p-2 rounded-lg">
-                      ML-KEM-1024 · Session {typeof window !== 'undefined' ? btoa(Date.now().toString()).slice(0, 12) : '...'}
-                    </p>
-                  </div>
-                  <ActionRow
-                    label={rotating ? 'Rotating...' : 'Rotate Keys'}
-                    onClick={handleKeyRotation}
-                    className="text-[#007AFF]"
-                  />
-                  <ActionRow
-                    label="Wipe Local Message History"
-                    onClick={() => {
-                      if (confirm('Wipe all local messages? This cannot be undone.')) {
-                        localStorage.removeItem('sovereign_messages');
-                        window.location.reload();
-                      }
-                    }}
-                    className="text-[#FF3B30]"
-                    isLast
-                  />
                 </Section>
               )}
 

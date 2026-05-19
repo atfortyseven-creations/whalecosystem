@@ -33,6 +33,10 @@ const LinkedGate = dynamic(
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
+// NOTE: WalletConnectProvider is mounted globally in app/layout.tsx (ssr:false)
+// Do NOT declare or render it here to prevent double-initialization.
+// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // Routes that don't need the gate (public / landing)
 // ─────────────────────────────────────────────────────────────────────────────
 const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/login', '/news', '/careers', '/pricing', '/chat'];
@@ -231,6 +235,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         const isConnected = hasLocalWallet || hasSessionCookie;
         if (!isConnected) return;
 
+        // Try to get the active wallet address to attach to the log
+        let activeUserId = useWalletStore.getState().address;
+        if (!activeUserId) {
+            const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+            if (match && match[1]) activeUserId = match[1];
+        }
+        activeUserId = activeUserId || null;
+
         const target = e.target as HTMLElement;
         const clickable = target.closest('button, a, input[type="submit"], [role="button"], .cursor-pointer');
         if (clickable) {
@@ -239,7 +251,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             fetch('/api/session-logs', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: `INTERACTION: CLICKED ${actionText}` }),
+                body: JSON.stringify({ action: `INTERACTION: CLICKED ${actionText}`, userId: activeUserId }),
             }).catch(() => {});
         }
     };
@@ -288,23 +300,22 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const isCenteredPage = ['/connect', '/pricing', '/login', '/sign-up', '/clearance'].some(p => pathname.startsWith(p));
+  const isChat = pathname.startsWith('/chat');
+
   // Root container
-  const rootClass = isDashboard
+  const rootClass = isDashboard || isChat
     ? 'fixed inset-0 w-full h-full overflow-hidden flex flex-col bg-transparent z-0'
     : isBounded
       ? 'fixed inset-0 w-full h-full overflow-hidden flex flex-col bg-transparent z-0'
       : 'min-h-screen w-full relative z-0 flex flex-col bg-transparent';
 
   // Inner wrapper (below header)
-  const innerClass = isDashboard
+  const innerClass = isDashboard || isChat
     ? 'flex-1 flex flex-col relative w-full overflow-hidden min-h-0'
     : isBounded
       ? 'flex-1 flex flex-col relative w-full overflow-hidden min-h-0'
       : 'flex-1 flex flex-col relative w-full';
-
-  // <main> element
-  const isCenteredPage = ['/connect', '/pricing', '/login', '/sign-up', '/clearance'].some(p => pathname.startsWith(p));
-  const isChat = pathname.startsWith('/chat');
 
   const mainClass = isDashboard || isChat
     ? 'relative z-10 w-full flex-1 flex flex-col min-h-0 overflow-hidden'

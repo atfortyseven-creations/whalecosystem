@@ -16,12 +16,18 @@ import { InteractiveFluidGrid } from "@/components/landing/InteractiveFluidGrid"
 import { GoogleTagManager } from "@/components/privacy/GoogleTagManager";
 import { ErrorSuppressor } from "@/components/ui/ErrorSuppressor";
 import { ReactNode } from "react";
-import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
+import dynamic from 'next/dynamic';
+import { MobileEnforcer } from '@/components/layout/MobileEnforcer';
 import { ClientOverlays } from "@/components/layout/ClientOverlays";
-import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { GlobalErrorBoundary } from "@/components/ui/GlobalErrorBoundary";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { AntiTamperCore } from "@/components/security/AntiTamperCore";
+
+// ── Dynamic (client-only) providers ──────────────────────────────────────────
+const WalletConnectProvider = dynamic(
+  () => import('@/components/walletconnect/WalletConnectProvider').then(m => ({ default: m.WalletConnectProvider })),
+  { ssr: false }
+);
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -173,7 +179,7 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="en" className="light" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         {/* Proper viewport already handled by Next.js `viewport` export above */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -230,26 +236,25 @@ export default async function RootLayout({
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-black text-white px-4 py-2 rounded-lg font-bold text-sm">
           Skip to absolute content
         </a>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={true}>
-          <ScrollProgressBar />
-          <Providers cookies={cookies}>
-            <GlobalErrorBoundary>
-              <MobileEnforcer>
-                <ClientLayout>
-                  <CookieProvider>
-                    <ErrorSuppressor />
-                    <GoogleTagManager gtmId="GTM-52B9SCRM" />
-                    <AntiTamperCore />
-                    {children}
-                    <Toaster richColors position="top-right" />
-                    <CookieConsent />
-                    <ClientOverlays />
-                  </CookieProvider>
-                </ClientLayout>
-              </MobileEnforcer>
-            </GlobalErrorBoundary>
-          </Providers>
-        </ThemeProvider>
+        <ScrollProgressBar />
+        <Providers cookies={cookies}>
+          <GlobalErrorBoundary>
+            <MobileEnforcer>
+              <ClientLayout>
+                <CookieProvider>
+                  <ErrorSuppressor />
+                  <GoogleTagManager gtmId="GTM-52B9SCRM" />
+                  <AntiTamperCore />
+                  {children}
+                  <Toaster richColors position="top-right" />
+                  <CookieConsent />
+                  <ClientOverlays />
+                  <WalletConnectProvider />
+                </CookieProvider>
+              </ClientLayout>
+            </MobileEnforcer>
+          </GlobalErrorBoundary>
+        </Providers>
       </body>
     </html>
   )

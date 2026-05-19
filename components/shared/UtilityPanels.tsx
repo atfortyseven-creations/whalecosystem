@@ -2,19 +2,24 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Clock, Eye, Settings, ShieldAlert, Fingerprint, Zap, Laptop, MapPin, Smartphone, Globe, Shield, ArrowUpRight, ArrowDownLeft, Lock } from 'lucide-react';
+import { X, Clock, Eye, Settings, ShieldAlert, Fingerprint, Zap, Laptop, MapPin, Smartphone, Globe, Shield, ArrowUpRight, ArrowDownLeft, Lock, Link2, CheckCircle2 } from 'lucide-react';
 import { useUIStore } from '@/lib/store/ui-store';
 import { useSettings } from '@/src/context/SettingsContext';
 import useSWR from 'swr';
 import { useVIPStore, VIPStoreState, WhaleEvent } from '@/lib/vip-store'; 
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useOmniInfrastructure } from "@/lib/api-client";
+import { useWalletConnectStore } from '@/lib/store/wallet-connect-store';
+import { WCScannerModal } from '@/components/walletconnect/WCScannerModal';
+import { getWeb3Wallet } from '@/lib/walletconnect/walletKit';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export function UtilityPanels() {
     const { activePanel, setActivePanel } = useUIStore();
     const { address } = useAccount();
+    const [showScanner, setShowScanner] = useState(false);
+    const { sessions: wcSessions, isInitialized } = useWalletConnectStore();
 
     const {
         theme, setTheme, currency, setCurrency,
@@ -31,18 +36,21 @@ export function UtilityPanels() {
     const [sessionsLoading, setSessionsLoading] = useState(true);
 
     useEffect(() => {
-        const realLogs = [
-            {
-                id: 'init-1',
-                userId: address || null,
-                action: 'UTILITY_PANEL_OPEN',
-                ipAddress: 'Local Context',
-                userAgent: navigator.userAgent.substring(0, 50) + '...',
-                timestamp: new Date().toISOString()
-            }
-        ];
-        setSessions(realLogs);
-        setSessionsLoading(false);
+        if (!address) {
+            setSessions([]);
+            setSessionsLoading(false);
+            return;
+        }
+        setSessionsLoading(true);
+        fetch(`/api/session-logs?userId=${address}`)
+            .then(r => r.json())
+            .then(data => {
+                if (Array.isArray(data)) setSessions(data);
+                else if (data.logs) setSessions(data.logs);
+                else setSessions([]);
+            })
+            .catch(console.error)
+            .finally(() => setSessionsLoading(false));
     }, [address]);
 
     const { data: txData, isLoading: txLoading } = useSWR(address ? `/api/wallet/transactions?authUserId=${address}` : null, fetcher);
@@ -69,6 +77,31 @@ export function UtilityPanels() {
                         </div>
                     ) : (
                         <>
+                            {wcSessions && wcSessions.length > 0 && (
+                                <div className="mb-6">
+                                    <h4 className="text-[10px] font-black uppercase text-black/40 mb-3 tracking-widest border-b border-black/5 pb-2">Active Web3 Connections</h4>
+                                    <div className="space-y-3">
+                                        {wcSessions.map((session: any) => (
+                                            <div key={session.topic} className="p-4 border rounded-2xl bg-white border-[#00C076]/20 shadow-sm relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 w-16 h-16 bg-[#00C076]/5 rounded-bl-full -z-0" />
+                                                <div className="flex items-center gap-3 relative z-10">
+                                                    <img src={session.peer.metadata.icons[0]} className="w-8 h-8 rounded-full border border-black/10" alt="" />
+                                                    <div className="flex-1">
+                                                        <h4 className="text-[11px] font-bold text-black">{session.peer.metadata.name}</h4>
+                                                        <p className="text-[9px] font-mono text-black/50 truncate max-w-[150px]">{session.peer.metadata.url}</p>
+                                                    </div>
+                                                    <div className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse shadow-[0_0_8px_#00C076]" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {sessions.length > 0 && (
+                                <h4 className="text-[10px] font-black uppercase text-black/40 mb-3 tracking-widest border-b border-black/5 pb-2">Historical Security Audit</h4>
+                            )}
+
                             {sessions.map((log: any) => (
                                 <div key={log.id} className="p-4 border rounded-2xl transition-all group bg-white border-black/5 hover:border-black/20 shadow-sm">
                                     <div className="flex items-center justify-between mb-2">
@@ -277,14 +310,50 @@ export function UtilityPanels() {
                                 <span>1m</span>
                                 <span>60m</span>
                              </div>
-                        </div>
                     </div>
                 </div>
+
+                {/* ── dApp Connections section ── */}
+                <div className="pt-4 mt-2 border-t border-black/5 space-y-3">
+                    <h4 className="text-[10px] font-aztec-mono font-black text-black uppercase tracking-widest flex items-center gap-2">
+                        <Link2 size={12} /> dApp Connections
+                    </h4>
+                    <button
+                        onClick={() => setShowScanner(true)}
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-aztec-mono text-[11px] font-black uppercase tracking-widest bg-black text-white hover:bg-black/80 transition-all shadow-lg shadow-black/10"
+                    >
+                        <Link2 size={14} /> Connect dApp
+                    </button>
+                    {isInitialized && Object.keys(wcSessions).length > 0 && (
+                        <div className="space-y-2">
+                            <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">Active Sessions</span>
+                            {Object.values(wcSessions).map((session: any) => (
+                                <div key={session.topic} className="p-3 bg-white border border-black/5 rounded-xl flex items-center justify-between shadow-sm">
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle2 size={12} className="text-emerald-500" />
+                                        <span className="text-[11px] font-mono font-bold text-black truncate max-w-[180px]">{session.peer?.metadata?.name || 'Unknown dApp'}</span>
+                                    </div>
+                                    <button
+                                        onClick={async () => {
+                                            const wc = getWeb3Wallet();
+                                            if (wc) await wc.disconnectSession({ topic: session.topic, reason: { code: 6000, message: 'User disconnected' } });
+                                        }}
+                                        className="text-[9px] font-black text-red-500 hover:text-red-700 uppercase tracking-wider font-mono"
+                                    >
+                                        Revoke
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
+        </div>
         )
     };
 
     return (
+        <>
         <AnimatePresence>
             <div className="fixed inset-0 z-[100] pointer-events-none">
                 <motion.div 
@@ -311,11 +380,14 @@ export function UtilityPanels() {
                     </div>
 
                     <div className="relative z-10">
-                        {panels[activePanel]}
+                        {panels[activePanel as keyof typeof panels]}
                     </div>
                 </motion.div>
             </div>
         </AnimatePresence>
+
+        {showScanner && <WCScannerModal onClose={() => setShowScanner(false)} />}
+        </>
     );
 }
 

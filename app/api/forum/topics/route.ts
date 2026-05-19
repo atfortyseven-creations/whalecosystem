@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
         }
         const messageToVerify = `${title}\n${signedContent}`;
         try {
-            if (cryptoSignature !== 'SOVEREIGN_HANDSHAKE_VERIFIED') {
+            if (cryptoSignature !== 'SESSION:AUTHENTICATED') {
                 const isValidSig = await verifyMessage({
                     address: address as `0x${string}`,
                     message: messageToVerify,

@@ -1,6 +1,5 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { CreateConnectorFn, WagmiProvider } from 'wagmi';
 import { AppKitNetwork, mainnet, base, arbitrum, polygon, optimism, bsc } from "@reown/appkit/networks";
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
@@ -16,7 +15,7 @@ import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors';
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
     || process.env.NEXT_PUBLIC_WC_PROJECT_ID
-    || '093232b25784a0694c642ad54a6331fa'; // Master WalletConnect ID (Synced from next.config.js)
+    || '47cce4049225582027fdeeecb2868ead'; // Master WalletConnect ID (Synced from next.config.js)
 
 if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID && typeof window !== 'undefined') {
     console.warn('[WalletConnect] Using hardcoded project ID. Ensure NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is set in production.');

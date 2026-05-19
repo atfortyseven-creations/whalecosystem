@@ -233,7 +233,30 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   }, []);
 
   // ── Conversations & Messages ─────────────────────────────────────────────
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversationsState, setConversationsState] = useState<Conversation[]>([]);
+  const setConversations = useCallback((val: Conversation[] | ((prev: Conversation[]) => Conversation[])) => {
+    setConversationsState((prev: Conversation[]) => {
+      const next = typeof val === 'function' ? val(prev) : val;
+      if (address) {
+        localStorage.setItem(`whale_chat_convs_${address.toLowerCase()}`, JSON.stringify(next));
+      }
+      return next;
+    });
+  }, [address]);
+
+  const conversations = conversationsState;
+
+  useEffect(() => {
+    if (address) {
+      try {
+        const saved = JSON.parse(localStorage.getItem(`whale_chat_convs_${address.toLowerCase()}`) || '[]');
+        setConversationsState(saved);
+      } catch {}
+    } else {
+      setConversationsState([]);
+    }
+  }, [address]);
+
   const [activeConv, setActiveConv]       = useState<Conversation | null>(null);
   const [messages, setMessages]           = useState<RenderableMessage[]>([]);
   const [replyingTo, setReplyingTo]       = useState<{ id: string; preview: string } | undefined>();
@@ -305,12 +328,12 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   // ── Apply screenshot protection ──────────────────────────────────────────
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    if (settings.screenshotProtection) {
+    if ((settings as any).screenshotProtection) {
       document.body.style.userSelect = 'none';
     } else {
       document.body.style.userSelect = '';
     }
-  }, [settings.screenshotProtection]);
+  }, [(settings as any).screenshotProtection]);
 
   // ── XMTP Client Init ─────────────────────────────────────────────────────
   const initXmtpClient = useCallback(async () => {
@@ -420,7 +443,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
           const belongsToActive = (msgConvPeer === currentActivePeer) || (!msgConvPeer && currentActivePeer);
 
           if (belongsToActive) {
-            if (fromPeer && settingsRef.current.soundEnabled) playMessageSound();
+            if (fromPeer && (settingsRef.current as any).soundEnabled !== false) playMessageSound();
             setMessages(prev => {
               if (prev.some(m => m.id === hydrated.id)) return prev;
               
@@ -466,7 +489,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                  }];
                }
             });
-            if (settingsRef.current.soundEnabled) playMessageSound();
+            if ((settingsRef.current as any).soundEnabled !== false) playMessageSound();
           }
         }
       } catch (e) {
@@ -771,7 +794,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-1 w-full h-full text-black overflow-hidden chat-theme-wrapper" data-chat-theme={settings.theme} data-privacy={settings.privacyMode} onClick={() => showPeerMenu && setShowPeerMenu(false)}>
+    <div className="absolute inset-0 flex text-black overflow-hidden chat-theme-wrapper bg-white" data-chat-theme={settings.theme} data-privacy={settings.privacyMode} onClick={() => showPeerMenu && setShowPeerMenu(false)}>
 
       {/* Settings overlay */}
       {showSettings && (
@@ -1006,7 +1029,10 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                 <div>
                   <p className="font-mono text-[14px] font-bold text-black">{activeConv.displayName}</p>
                   <p className={`font-mono text-[10px] font-bold mt-0.5 uppercase tracking-widest ${sending || isUploading ? 'text-black/50' : 'text-emerald-500'}`}>
-                    {blockedList.includes(activeConv.peerAddress.toLowerCase()) ? <span className="text-red-400">Blocked</span> : sending || isUploading ? 'Typing...' : 'End-to-end encrypted'}
+                    {blockedList.includes(activeConv.peerAddress.toLowerCase()) ? <span className="text-red-400">Blocked</span> :
+                     !isConnected ? <span className="text-red-500">Offline</span> :
+                     !xmtpReady ? <span className="text-amber-500">Awaiting Handshake...</span> :
+                     sending || isUploading ? 'Typing...' : 'End-to-end encrypted'}
                   </p>
                 </div>
               </div>

@@ -260,7 +260,7 @@ export default function ChatInput({
               onChange={e => setText(e.target.value)}
               onKeyDown={handleKey}
               disabled={disabled}
-              placeholder={disabled ? 'Connecting…' : 'Encrypted message…'}
+              placeholder={disabled ? 'Connection unavailable' : 'Encrypted message…'}
               rows={1}
               className="w-full bg-black/[0.025] border border-black/10 rounded-xl px-4 py-3 text-[14px] font-mono text-black resize-none focus:outline-none focus:border-black/30 placeholder:text-black/25 transition-colors pr-12 leading-relaxed disabled:opacity-40"
             />

@@ -94,8 +94,8 @@ function NewTopicContent() {
         }
       });
 
-      finalSignature = 'SOVEREIGN_HANDSHAKE_VERIFIED';
-      finalContent = `${finalContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
+      finalSignature = 'SIGNED VERIFIED';
+      finalContent = `${finalContent}\n\n[SIGNATURE:SIGNED VERIFIED]`;
 
       let csrfToken = '';
       try {

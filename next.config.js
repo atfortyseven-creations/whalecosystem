@@ -133,8 +133,8 @@ const nextConfig = {
         //     must fail loudly rather than silently shipping localhost to the client.
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://whalealert.network',
         // Injected at build time so the client bundle never sees 'undefined'
-        NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
-        NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
+        NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '47cce4049225582027fdeeecb2868ead',
+        NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID || '47cce4049225582027fdeeecb2868ead',
     },
 
     // NOTE: CSP is handled exclusively by middleware.ts (per-request, nonce-based).
