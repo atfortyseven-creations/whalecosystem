@@ -5,6 +5,7 @@ import {
   Send, Paperclip, Smile, Mic, Timer,
   X, Reply, Square, Flame, MapPin
 } from 'lucide-react';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 export type AutoDestructPreset = 'off' | '1m' | '1h' | '24h' | '7d';
 
@@ -53,6 +54,9 @@ export default function ChatInput({
   onSendText, onSendVoice, onSendFile, onSendEmoji,
   replyingTo, onCancelReply, autoDestruct, onAutoDestructChange, disabled = false,
 }: ChatInputProps) {
+  const { address } = useSovereignAccount();
+  const walletKey = address ? address.toLowerCase() : 'guest';
+
   const [text, setText] = useState('');
   const [showEmoji, setShowEmoji] = useState(false);
   const [showDestruct, setShowDestruct] = useState(false);
@@ -61,6 +65,17 @@ export default function ChatInput({
   const [micError, setMicError] = useState<string | null>(null);
   const [showLocationSelect, setShowLocationSelect] = useState(false);
   const [isRetrievingLocation, setIsRetrievingLocation] = useState(false);
+  const [preferredDuration, setPreferredDuration] = useState<number>(300000); // default 5 minutes
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const key = `preferred_location_duration_${walletKey}`;
+      const saved = localStorage.getItem(key);
+      if (saved !== null) {
+        setPreferredDuration(parseInt(saved, 10));
+      }
+    }
+  }, [walletKey]);
 
   const inputRef    = useRef<HTMLTextAreaElement>(null);
   const mediaRef    = useRef<MediaRecorder | null>(null);
@@ -91,8 +106,6 @@ export default function ChatInput({
   const triggerLocationSend = (durationMs: number) => {
     if (disabled) return;
     setIsRetrievingLocation(true);
-
-    const expiry = durationMs > 0 ? Date.now() + durationMs : 0;
 
     const saveToCache = (lat: number, lon: number) => {
       try {
@@ -178,7 +191,7 @@ export default function ChatInput({
         resolved = true;
         console.log(`[QuantumGeo] Resolved via ${source}: ${lat}, ${lon}`);
         saveToCache(lat, lon);
-        onSendText(`[LOCATION]${lat},${lon}|${expiry}`);
+        onSendText(`[LOCATION]${lat},${lon}|${durationMs}`);
         setIsRetrievingLocation(false);
       };
 
@@ -489,10 +502,18 @@ export default function ChatInput({
               <button
                 key={o.value}
                 onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem(`preferred_location_duration_${walletKey}`, o.value.toString());
+                  }
+                  setPreferredDuration(o.value);
                   setShowLocationSelect(false);
                   triggerLocationSend(o.value);
                 }}
-                className="px-3 py-1.5 rounded-lg font-mono text-[11px] border bg-black/[0.03] border-black/8 text-black/50 hover:text-black hover:bg-black/[0.06] transition-all"
+                className={`px-3 py-1.5 rounded-lg font-mono text-[11px] border transition-all ${
+                  preferredDuration === o.value
+                    ? 'bg-black text-white border-black'
+                    : 'bg-black/[0.03] border-black/8 text-black/50 hover:text-black hover:bg-black/[0.06]'
+                }`}
               >
                 {o.label}
               </button>
