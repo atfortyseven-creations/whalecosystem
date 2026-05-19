@@ -85,10 +85,16 @@ export function UtilityPanels() {
                                             <div key={session.topic} className="p-4 border rounded-2xl bg-white border-[#00C076]/20 shadow-sm relative overflow-hidden">
                                                 <div className="absolute top-0 right-0 w-16 h-16 bg-[#00C076]/5 rounded-bl-full -z-0" />
                                                 <div className="flex items-center gap-3 relative z-10">
-                                                    <img src={session.peer.metadata.icons[0]} className="w-8 h-8 rounded-full border border-black/10" alt="" />
-                                                    <div className="flex-1">
-                                                        <h4 className="text-[11px] font-bold text-black">{session.peer.metadata.name}</h4>
-                                                        <p className="text-[9px] font-mono text-black/50 truncate max-w-[150px]">{session.peer.metadata.url}</p>
+                                                    {session?.peer?.metadata?.icons?.[0] ? (
+                                                        <img src={session.peer.metadata.icons[0]} className="w-8 h-8 rounded-full border border-black/10" alt="" />
+                                                    ) : (
+                                                        <div className="w-8 h-8 rounded-full border border-black/10 bg-black/5 flex items-center justify-center">
+                                                            <Globe size={14} className="text-black/40" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1 overflow-hidden">
+                                                        <h4 className="text-[11px] font-bold text-black truncate">{session?.peer?.metadata?.name || 'Unknown dApp'}</h4>
+                                                        <p className="text-[9px] font-mono text-black/50 truncate w-full">{session?.peer?.metadata?.url || 'No URL provided'}</p>
                                                     </div>
                                                     <div className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse shadow-[0_0_8px_#00C076]" />
                                                 </div>
