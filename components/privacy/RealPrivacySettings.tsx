@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { updatePrivacySettings, fetchPrivacySettings } from "@/app/actions/privacy-actions";
 import { toast } from "sonner";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { Shield, Lock, Eye, Download, Key } from "lucide-react";
@@ -23,22 +22,29 @@ export function RealPrivacySettings() {
   const [ipInput, setIpInput] = useState("");
 
   useEffect(() => {
-    if (userId) {
-      fetchPrivacySettings(userId).then(res => {
-        if (res.success && res.profile) setProfile(res.profile);
-      });
-    }
+    if (!userId || userId === 'guest-session') return;
+    fetch(`/api/privacy/settings?userId=${encodeURIComponent(userId)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(res => { if (res?.success && res.profile) setProfile(res.profile); })
+      .catch(() => {});
   }, [userId]);
 
   const handleUpdate = async (field: string, value: any) => {
     // Optimistic update
     setProfile((prev: any) => ({ ...prev, [field]: value }));
-    const promise = updatePrivacySettings(userId, field, value, "127.0.0.1", navigator.userAgent);
-    
+
+    const promise = fetch('/api/privacy/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, field, value }),
+    }).then(async r => {
+      if (!r.ok) throw new Error(await r.text());
+    });
+
     toast.promise(promise, {
       loading: 'Saving sovereign protocol...',
       success: 'Privacy setting enforced across nodes.',
-      error: 'Failed to synchronize setting.'
+      error:   'Failed to synchronize setting.',
     });
   };
 

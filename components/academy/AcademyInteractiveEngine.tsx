@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { motion, AnimatePresence } from "framer-motion";
 import { Server, CheckCircle2, ChevronDown, GraduationCap, Folder, Upload, Send, Lock, BookOpen, Shield, Terminal } from "lucide-react";
-import { syncAcademySyllabusToDB, getUserProgressAndSubmissions, toggleLessonProgress, submitProofOfWork } from "@/app/actions/academy-actions";
 import { SovereignProfileModal } from "./SovereignProfileModal";
 import { RemoteLottie } from "@/components/ui/RemoteLottie";
 
@@ -43,59 +42,75 @@ export function AcademyInteractiveEngine({
     const [txHashInput, setTxHashInput] = useState("");
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-    // Load User Progress Dynamically
+    // Load User Progress via stable REST API (no Server Action hash)
     useEffect(() => {
         if (!mounted || !address || !isSeeded) return;
-        getUserProgressAndSubmissions(address).then(res => {
-            const progressSet = new Set<string>();
-            res.progress.forEach((p: any) => p.completed && progressSet.add(p.lessonId));
-            setCompletedLessons(progressSet);
-
-            const subs: any = {};
-            res.submissions.forEach((s: any) => { subs[s.lessonId] = { status: s.status, feedback: s.feedback }; });
-            setSubmissions(subs);
-        });
+        fetch(`/api/academy/progress?address=${address}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(res => {
+                if (!res) return;
+                const progressSet = new Set<string>();
+                (res.progress || []).forEach((p: any) => p.completed && progressSet.add(p.lessonId));
+                setCompletedLessons(progressSet);
+                const subs: any = {};
+                (res.submissions || []).forEach((s: any) => { subs[s.lessonId] = { status: s.status, feedback: s.feedback }; });
+                setSubmissions(subs);
+            })
+            .catch(() => {});
     }, [address, mounted, isSeeded]);
 
     const handleSync = async () => {
         setIsSyncing(true);
-        const res = await syncAcademySyllabusToDB();
-        setIsSyncing(false);
-        if (res.ok) {
-            window.location.reload(); // Refresh Server Component bindings
-        } else {
-            alert("Error syncing: " + res.error);
+        try {
+            const res = await fetch('/api/academy/sync', { method: 'POST' });
+            const data = await res.json();
+            if (data.ok) window.location.reload();
+            else alert('Error syncing: ' + data.error);
+        } catch (e: any) {
+            alert('Sync failed: ' + e.message);
+        } finally {
+            setIsSyncing(false);
         }
     };
 
     const handleToggleComplete = async (lessonId: string) => {
-        if (!address) return alert("Wallet not connected");
+        if (!address) return alert('Wallet not connected');
         const isCompleted = completedLessons.has(lessonId);
-        
+
         // Optimistic UI update
         const nextSet = new Set(completedLessons);
-        if (isCompleted) nextSet.delete(lessonId);
-        else nextSet.add(lessonId);
+        if (isCompleted) nextSet.delete(lessonId); else nextSet.add(lessonId);
         setCompletedLessons(nextSet);
 
-        // Network Post
         try {
-           await toggleLessonProgress(address, lessonId, !isCompleted);
-        } catch(e) {
-           alert("Fallo al contactar base de datos");
-           setCompletedLessons(new Set(completedLessons)); // revert
+            const res = await fetch('/api/academy/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address, lessonId, completed: !isCompleted }),
+            });
+            if (!res.ok) throw new Error('Network error');
+        } catch {
+            alert('Fallo al contactar base de datos');
+            setCompletedLessons(new Set(completedLessons)); // revert
         }
     };
 
     const handleSubmitProof = async () => {
         if (!address || !proofingLessonId || !txHashInput) return;
-        const res = await submitProofOfWork(address, proofingLessonId, "", txHashInput);
-        if (res.ok) {
-            setSubmissions(prev => ({ ...prev, [proofingLessonId]: { status: "PENDING", feedback: null } }));
-            setProofingLessonId(null);
-            setTxHashInput("");
-            alert("Prueba enviada a validación criptográfica.");
-        }
+        try {
+            const res = await fetch('/api/academy/submissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address, lessonId: proofingLessonId, txHash: txHashInput }),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                setSubmissions(prev => ({ ...prev, [proofingLessonId]: { status: 'PENDING', feedback: null } }));
+                setProofingLessonId(null);
+                setTxHashInput('');
+                alert('Prueba enviada a validación criptográfica.');
+            }
+        } catch {}
     };
 
     if (!mounted) return null;

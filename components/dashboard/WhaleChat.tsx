@@ -132,21 +132,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     setShowProfile(false);
   };
 
-  const syncToAddressBook = (peer: string) => {
-    try {
-      const saved = localStorage.getItem('whale_contacts') || '[]';
-      const contacts = new Set<string>(JSON.parse(saved));
-      if (!contacts.has(peer.toLowerCase())) {
-         contacts.add(peer.toLowerCase());
-         localStorage.setItem('whale_contacts', JSON.stringify(Array.from(contacts)));
-         toast.success('Wallet added to Sovereign Contacts');
-      } else {
-         toast.info('Wallet is already in Contacts');
-      }
-    } catch {
-       toast.error('Failed to sync to Address Book');
-    }
-  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -787,11 +772,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         }
 
         if (peer) {
-            // Use cached result — avoids ~500ms static network lookup on repeated opens
+            // Cache only POSITIVE results (canMsg === true).
+            // If a peer was offline/unregistered, we must re-check on every attempt
+            // so that messages deliver the moment they come online. Caching `false`
+            // permanently blacklists them until page reload, which is unacceptable.
             let canMsg = canReceiveCache.current.get(peer.toLowerCase());
-            if (canMsg === undefined) {
+            if (canMsg !== true) {
                 canMsg = await canReceiveMessages(client, peer);
-                canReceiveCache.current.set(peer.toLowerCase(), canMsg);
+                if (canMsg) canReceiveCache.current.set(peer.toLowerCase(), true);
             }
             if (!canMsg) {
                 alert(`The address ${peer} is not registered on the XMTP network. They must connect their wallet to Whale Chat first.`);
@@ -843,11 +831,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     try {
       // ── 1. REAL ON-CHAIN DECENTRALIZED TRANSMISSION ──────────────────────────────
       if (activePeer.toLowerCase() !== '0xinstitutionalsupport_0000') {
-        // Use cached result — canReceiveMessages is a slow static call (~500ms)
+        // Cache only POSITIVE results. Never cache false — peers may register between retries.
         let canMsg = canReceiveCache.current.get(activePeer.toLowerCase());
-        if (canMsg === undefined) {
+        if (canMsg !== true) {
           canMsg = await canReceiveMessages(client, activePeer);
-          canReceiveCache.current.set(activePeer.toLowerCase(), canMsg);
+          if (canMsg) canReceiveCache.current.set(activePeer.toLowerCase(), true);
         }
         if (!canMsg) {
             alert(`The address ${activePeer} is not registered on the XMTP network. They must connect their wallet to Whale Chat first.`);
@@ -1255,8 +1243,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   const attachmentMatch = typeof content === 'string' ? content.match(/^\[ATTACHMENT:([^\]]*)\](.*?)\|(.*)$/is) : null;
                   const attachment = attachmentMatch ? { mime: attachmentMatch[1] || 'application/octet-stream', url: attachmentMatch[2], name: attachmentMatch[3] } : null;
                   
-                  // sentAtNs is now a plain number (ms), not BigInt
-                  const sentTime = typeof msg.sentAtNs === 'number' ? new Date(msg.sentAtNs) : (msg.sent || msg.sentAt || new Date());
+                  // sentTime already declared above — reuse it here.
                   return (
                     <React.Fragment key={msg.id}>
                       {showDate && (

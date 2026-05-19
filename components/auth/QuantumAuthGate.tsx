@@ -9,6 +9,7 @@ import { useAccount } from 'wagmi';
 import { toast } from 'sonner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { useSovereignConnect } from '@/hooks/useSovereignConnect';
+import { encryptWithPassword, tryDecryptAny } from '@/lib/wallet-security';
 
 type LangKey = 'en' | 'es' | 'zh' | 'ru';
 
@@ -355,36 +356,34 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     }
 
     setStep('encrypting');
-    
     const startTime = Date.now();
-    
-    // Small UI delay before heavy crypto work
-    await new Promise(r => setTimeout(r, 200));
+
+    // Yield to React so the loading UI renders before CPU work begins
+    await new Promise(r => setTimeout(r, 60));
 
     try {
-      const encryptedJson = await wallet.encrypt(password);
-      localStorage.setItem('sovereign_keystore', encryptedJson);
+      // ── SOVEREIGN UPGRADE: Use fast AES-256-GCM (PBKDF2-SHA256 × 600k)
+      //    instead of the legacy ethers scrypt which crashes on mobile.
+      //    We store the mnemonic phrase so it can be restored from any device.
+      const encryptedBlob = await encryptWithPassword(wallet.mnemonic.phrase, password);
+      localStorage.setItem('sovereign_keystore', encryptedBlob);
       importWallet(wallet.privateKey, 'Sovereign Main');
 
-      // Write session flag so portfolio gate unlocks immediately
       try {
         sessionStorage.setItem('portfolio_unlocked', 'true');
         sessionStorage.setItem('sovereign_wallet_addr', wallet.address.toLowerCase());
       } catch {}
 
       // Non-fatal: activateSovereignVault uses an injected provider that
-      // may not exist on mobile Chrome (iOS/Android). The keystore is
-      // already saved — proceed to dashboard regardless.
+      // may not exist on mobile Chrome (iOS/Android). Already saved — proceed regardless.
       try {
         await activateSovereignVault(wallet.privateKey, wallet.address);
       } catch (vaultErr: any) {
         console.warn('[QuantumAuthGate] Vault activation non-fatal:', vaultErr?.message);
       }
 
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(1500 - elapsedTime, 0);
-
-      await new Promise(r => setTimeout(r, remainingTime));
+      const elapsed = Date.now() - startTime;
+      await new Promise(r => setTimeout(r, Math.max(800 - elapsed, 0)));
       toast.success('Wallet creado y asegurado.');
       onComplete();
     } catch (e: any) {
@@ -406,30 +405,58 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       return;
     }
     setStep('encrypting');
-    
     const startTime = Date.now();
-    
-    // Small delay to allow UI to update before heavy crypto work
-    await new Promise(r => setTimeout(r, 120));
+
+    // Yield to React so the spinner renders before CPU-bound decryption
+    await new Promise(r => setTimeout(r, 60));
 
     try {
       let pk: string | null = null;
       let addr: string | null = null;
 
       if (ks) {
+        // ── SOVEREIGN UPGRADE: tryDecryptAny handles ALL formats atomically:
+        //   • New AES-GCM blobs (sovereign v1/v2)
+        //   • Legacy ethers scrypt keystores (V3)
+        //   • Transparently migrates legacy keystores to AES-GCM on first login
         try {
-          const decryptedWallet = await ethers.Wallet.fromEncryptedJson(ks, password);
-          pk = decryptedWallet.privateKey;
-          addr = decryptedWallet.address;
+          const { plaintext, wasLegacy } = await tryDecryptAny(ks, password);
+
+          let walletObj: ethers.Wallet;
+          if (wasLegacy) {
+            // Legacy path: plaintext is the private key
+            walletObj = new ethers.Wallet(plaintext);
+          } else {
+            // New path: plaintext is the 12/24-word mnemonic phrase
+            walletObj = ethers.Wallet.fromPhrase(plaintext);
+          }
+          pk = walletObj.privateKey;
+          addr = walletObj.address;
+
+          // ── Silent migration: if blob was legacy ethers scrypt, re-encrypt
+          //    under the new fast AES-GCM format so future logins are instant.
+          if (wasLegacy) {
+            try {
+              const mnemonic = walletObj.mnemonic?.phrase;
+              if (mnemonic) {
+                const newBlob = await encryptWithPassword(mnemonic, password);
+                localStorage.setItem('sovereign_keystore', newBlob);
+                console.log('[QuantumAuthGate] Silent migration: ethers→AES-GCM complete.');
+              }
+            } catch (migrateErr) {
+              // Non-fatal: keep the old blob if migration fails
+              console.warn('[QuantumAuthGate] Migration non-fatal:', migrateErr);
+            }
+          }
         } catch (decryptErr: any) {
-          // ethers v6 throws 'Error: invalid password' — catch all decryption errors
           toast.error('Contraseña incorrecta', {
-            description: 'La contraseña no es correcta. Inténtalo de nuevo.'
+            description: decryptErr.message || 'La contraseña no es correcta. Inténtalo de nuevo.',
           });
           setStep('login');
           return;
         }
       } else if (vault) {
+        // Legacy sovereign_vault_v1 path (pre-AES-GCM era)
         const { readStoredVaultKey } = await import('@/hooks/useSovereignConnect');
         const vaultPk = await readStoredVaultKey();
         if (!vaultPk) {
@@ -440,37 +467,35 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         const walletObj = new ethers.Wallet(vaultPk);
         pk = walletObj.privateKey;
         addr = walletObj.address;
-        // Migrate vault_v1 → sovereign_keystore
+        // Migrate vault_v1 → sovereign_keystore (AES-GCM)
         try {
-          const encryptedJson = await walletObj.encrypt(password);
-          localStorage.setItem('sovereign_keystore', encryptedJson);
+          const mnemonic = walletObj.mnemonic?.phrase;
+          const blob = mnemonic
+            ? await encryptWithPassword(mnemonic, password)
+            : await encryptWithPassword(vaultPk, password);
+          localStorage.setItem('sovereign_keystore', blob);
+          localStorage.removeItem('sovereign_vault_v1');
         } catch {}
       }
 
       if (pk && addr) {
-        // 1. Import wallet into in-memory store (sets privateKey + address)
         importWallet(pk, 'Sovereign Main');
-        
-        // 2. Write session flag so portfolio gate unlocks immediately
         try {
           sessionStorage.setItem('portfolio_unlocked', 'true');
           sessionStorage.setItem('sovereign_wallet_addr', addr.toLowerCase());
         } catch {}
 
-        // 3. Non-fatal: activate Wagmi connector (fails on mobile without injected provider)
         try {
           await activateSovereignVault(pk, addr);
         } catch (vaultErr: any) {
           console.warn('[QuantumAuthGate] Login vault activation non-fatal:', vaultErr?.message);
         }
 
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(800 - elapsedTime, 0);
-
+        const elapsed = Date.now() - startTime;
         setTimeout(() => {
           toast.success('Wallet desbloqueado', { description: `${addr!.slice(0, 6)}...${addr!.slice(-4)}` });
           onComplete();
-        }, remainingTime);
+        }, Math.max(500 - elapsed, 0));
       } else {
         throw new Error('No se pudo obtener la clave privada');
       }
@@ -482,8 +507,9 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   };
 
   const handleMnemonicRestore = async () => {
-    const phrase = mnemonicInput.trim().toLowerCase();
-    const words = phrase.split(/\s+/);
+    // Normalize: collapse multiple spaces/newlines to single spaces, trim, lowercase
+    const phrase = mnemonicInput.trim().toLowerCase().replace(/\s+/g, ' ');
+    const words = phrase.split(' ');
     if (words.length !== 12 && words.length !== 24) {
       setMnemonicError('La frase debe tener 12 o 24 palabras.');
       return;
@@ -494,11 +520,17 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
     }
     setMnemonicError('');
     setStep('encrypting');
-    await new Promise(r => setTimeout(r, 150));
+    await new Promise(r => setTimeout(r, 60));
     try {
+      // Validate phrase by deriving wallet — throws if any word is invalid
       const restoredWallet = ethers.Wallet.fromPhrase(phrase);
-      const encryptedJson = await restoredWallet.encrypt(password);
-      localStorage.setItem('sovereign_keystore', encryptedJson);
+
+      // ── SOVEREIGN UPGRADE: Encrypt with fast AES-GCM (not ethers scrypt)
+      const encryptedBlob = await encryptWithPassword(phrase, password);
+      localStorage.setItem('sovereign_keystore', encryptedBlob);
+      // Clean up any stale legacy vault entries
+      localStorage.removeItem('sovereign_vault_v1');
+
       importWallet(restoredWallet.privateKey, 'Sovereign Restored');
       try {
         sessionStorage.setItem('portfolio_unlocked', 'true');
@@ -510,7 +542,17 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       toast.success('Wallet restaurado', { description: `${restoredWallet.address.slice(0, 6)}...${restoredWallet.address.slice(-4)}` });
       onComplete();
     } catch (e: any) {
-      setMnemonicError('Frase mnemónica inválida. Comprueba las palabras e inténtalo de nuevo.');
+      const msg: string = e?.message ?? '';
+      // Surface ethers BIP-39 errors clearly vs generic failures
+      const isInvalidPhrase =
+        msg.toLowerCase().includes('invalid mnemonic') ||
+        msg.toLowerCase().includes('invalid phrase') ||
+        msg.toLowerCase().includes('no valid bip39');
+      setMnemonicError(
+        isInvalidPhrase
+          ? 'Frase inválida: una o más palabras no son BIP-39 válidas. Comprueba el orden y la ortografía.'
+          : 'Frase mnemónica inválida. Comprueba las palabras e inténtalo de nuevo.',
+      );
       setStep('mnemonic');
     }
   };
