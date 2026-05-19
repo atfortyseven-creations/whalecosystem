@@ -162,6 +162,19 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const setUiConfig = (c: Partial<UiConfig>) => setUiState(prev => ({ ...prev, ...c }));
 
 
+    // ── SOVEREIGN DOM LIGHT MODE LOCK (runs on every theme change) ──────────
+    // The SettingsContext `theme` state may be set to 'dark' from an old saved
+    // preference, but this platform enforces light mode for ALL users at all
+    // connection states. We intercept here and hard-pin the DOM to light.
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const root = window.document.documentElement;
+        // Regardless of what `theme` value is saved, the platform is light-only.
+        root.classList.remove('dark');
+        root.classList.add('light');
+        root.style.colorScheme = 'light';
+    }, [theme]);
+
     // --- SOVEREIGN SIWE AUTH --- 
     const { address } = useAccount();
     // The sovereign user identity is the wallet address

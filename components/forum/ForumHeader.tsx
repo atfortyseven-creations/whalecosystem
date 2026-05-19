@@ -5,14 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAccount, useEnsName, useEnsAvatar } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
-import { useTheme } from 'next-themes';
 
 export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: { address?: string; avatarUrl?: string }) {
   const { address: wagmiAddress } = useAccount();
   const address = wagmiAddress || serverAddress;
   const router = useRouter();
   const [menuOpen,    setMenuOpen]    = useState(false);
-  const { theme, setTheme } = useTheme();
+  // Theme is always 'light' — forced globally. No toggle needed.
   const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 

@@ -34,24 +34,39 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
     // Estados iniciales
-    const [theme, setTheme] = useState('dark'); // 'dark' o 'light'
+    const [theme, setTheme] = useState('light'); // Sovereign First — always light
     const [lang, setLang] = useState('en');     // Idioma por defecto
     const [currency, setCurrency] = useState('USD');
 
-    // Lógica del TEMA (Dark/Light)
+    // ── SOVEREIGN LIGHT MODE ENFORCER ──────────────────────────────────────
+    // This platform is light-mode-only. Connected OR disconnected, the html
+    // element must ALWAYS carry the 'light' class and NEVER carry 'dark'.
+    // We run this on every theme change AND once on mount via an empty deps
+    // array secondary effect so the html element is corrected even before
+    // next-themes / AppKit have a chance to re-inject their own class.
     useEffect(() => {
-        // Access window only on client
         if (typeof window === 'undefined') return;
-
         const root = window.document.documentElement;
-        if (theme === 'dark') {
-            root.classList.add('dark');
-            root.classList.remove('light');
-        } else {
-            root.classList.remove('dark');
-            root.classList.add('light');
-        }
+        // Hard-purge any dark class regardless of what other providers wrote
+        root.classList.remove('dark');
+        root.classList.add('light');
+        // Belt-and-suspenders: also set the color-scheme attribute
+        root.style.colorScheme = 'light';
     }, [theme]);
+
+    // Mount-time enforcement (runs once, before any provider effect)
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const root = window.document.documentElement;
+        root.classList.remove('dark');
+        root.classList.add('light');
+        root.style.colorScheme = 'light';
+        // Purge any persisted 'dark' value that next-themes wrote to localStorage
+        try {
+            const stored = localStorage.getItem('theme');
+            if (stored === 'dark') localStorage.setItem('theme', 'light');
+        } catch { /* incognito */ }
+    }, []);
 
     // Función para formatear dinero automáticamente
     const formatMoney = (amountInUSD: number) => {

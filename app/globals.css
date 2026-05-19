@@ -1478,3 +1478,97 @@ html.dark .doc-content .callout {
   border-left-color: rgba(255,255,255,0.4) !important;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   SOVEREIGN LIGHT-MODE FIREWALL — Zero Dark Mode. Ever.
+
+   This platform enforces light mode universally: connected, disconnected,
+   on wallet reconnect/disconnect cycles, and on AppKit modal open/close.
+
+   Even if the `dark` class is momentarily injected by next-themes, AppKit,
+   Wagmi, or any other provider before our React effects run, these rules
+   ensure the visual output is ALWAYS light-mode compliant.
+
+   Strategy: override the html.dark cascade back to light-mode values.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Force the browser's built-in color scheme to stay light even if .dark exists */
+html,
+html.dark,
+html.light {
+  color-scheme: light !important;
+}
+
+/* Neutralize the dark-body text inversion */
+html.dark body {
+  background-color: transparent !important;
+  color: #1C1917 !important; /* Slate-900 — sovereign light-mode text */
+}
+
+/* Neutralize white-text rules — restore dark sovereign text on light bg */
+html.dark p,
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6,
+html.dark span:not([class*="text-"]):not([class*="opacity-"]),
+html.dark li,
+html.dark label,
+html.dark td,
+html.dark th {
+  color: #1C1917 !important;
+}
+
+html.dark .text-black,
+html.dark [class*="text-black"],
+html.dark [class*="text-[#050505]"],
+html.dark [class*="text-[#0A0A0A]"],
+html.dark [class*="text-slate-900"],
+html.dark [class*="text-gray-900"],
+html.dark [class*="text-zinc-900"] {
+  color: #1C1917 !important;
+}
+
+/* Restore opacity-based dark text (do NOT invert to white) */
+html.dark [class*="text-black/"] {
+  color: unset !important;
+}
+
+/* Restore bg-white containers — do NOT make them transparent */
+html.dark [class*="bg-white"]:not([class*="bg-white/"]):not(button):not(a):not(input):not(textarea):not(select):not(img):not(svg):not(span):not(p):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+  background-color: #ffffff !important;
+}
+
+/* Restore cream/ivory inline-style backgrounds */
+html.dark [style*="#FDFCF8"],
+html.dark [style*="#FAF9F6"],
+html.dark [style*="#FFFDF8"] {
+  background-color: inherit !important;
+}
+
+/* Docs content: keep dark sovereign text on light surface */
+html.dark .doc-content h1,
+html.dark .doc-content h2,
+html.dark .doc-content h3,
+html.dark .doc-content h4,
+html.dark .doc-content p,
+html.dark .doc-content li,
+html.dark .doc-content td,
+html.dark .doc-content th,
+html.dark .doc-content span {
+  color: #1C1917 !important;
+  opacity: 1 !important;
+}
+
+html.dark .doc-content pre,
+html.dark .doc-content code {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+  color: #1C1917 !important;
+}
+
+html.dark .doc-content .callout {
+  background: rgba(0,0,0,0.02) !important;
+  border-left-color: rgba(0,0,0,0.3) !important;
+}
