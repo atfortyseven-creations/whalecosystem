@@ -14,10 +14,34 @@ export default function ErrorPage({
   useEffect(() => {
     // Optionally log the error to an error reporting service
     console.error("Application Error:", error);
+    
     // [ABYSMALLY COMPLEX OPTIMIZATION]: Auto-heal Next.js Server Action mismatch
     if (error?.message?.includes("Failed to find Server Action") || error?.digest?.includes("Failed to find Server Action")) {
       console.warn("Server Action Desync Detected. Initiating auto-reload...");
       window.location.reload();
+      return;
+    }
+
+    // [ABYSMALLY COMPLEX OPTIMIZATION]: Auto-heal ChunkLoadError (Stale build cache)
+    const isChunkError =
+      error?.name === 'ChunkLoadError' ||
+      error?.message?.includes('Loading chunk') ||
+      error?.message?.includes('Failed to fetch dynamically imported module') ||
+      error?.message?.includes('Importing a module script failed');
+
+    if (isChunkError) {
+      const reloadKey = 'global_chunk_reload_attempted';
+      try {
+        if (!sessionStorage.getItem(reloadKey)) {
+          sessionStorage.setItem(reloadKey, '1');
+          console.warn('Global ChunkLoadError detected. Initiating auto-reload to fetch fresh chunks...');
+          window.location.reload();
+        } else {
+          sessionStorage.removeItem(reloadKey);
+        }
+      } catch (e) {
+        console.error("Session storage failed during chunk reload", e);
+      }
     }
   }, [error]);
 
