@@ -67,8 +67,9 @@ contract QuantumLedger is ReentrancyGuard {
         bytes32 r,
         bytes32 s
     ) external nonReentrant returns (uint256) {
-        // Execute the gasless permit
-        IERC20Permit(address(quantumDots)).permit(msg.sender, address(this), amount, deadline, v, r, s);
+        // Execute the gasless permit, wrapped in try/catch to prevent MEV Griefing Attacks
+        // where a bot front-runs the permit signature in the mempool to intentionally revert this transaction.
+        try IERC20Permit(address(quantumDots)).permit(msg.sender, address(this), amount, deadline, v, r, s) {} catch {}
         
         return _executeTransfer(to, amount, memo);
     }
