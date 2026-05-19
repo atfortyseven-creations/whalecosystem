@@ -292,25 +292,6 @@ export async function GET(req: NextRequest) {
     try {
         const address = req.nextUrl.searchParams.get('address')?.toLowerCase();
 
-        // ── Clean up legacy off-chain mock records ──────────────────────────────
-        // Deletes any ticket that is off-chain (does not have a real txHash recorded).
-        // This ensures only real on-chain minted tickets remain in the system ledger.
-        const allTickets = await (prisma as any).goldenTicket.findMany();
-        for (const t of allTickets) {
-            let isOffchain = true;
-            if (t.signatureData) {
-                try {
-                    const parsed = JSON.parse(t.signatureData);
-                    if (parsed && parsed.txHash) {
-                        isOffchain = false;
-                    }
-                } catch {}
-            }
-            if (isOffchain) {
-                await (prisma as any).goldenTicket.delete({ where: { id: t.id } });
-            }
-        }
-
         const totalClaimed = await (prisma as any).goldenTicket.count();
         const remaining    = Math.max(0, MAX_SUPPLY - totalClaimed);
 
