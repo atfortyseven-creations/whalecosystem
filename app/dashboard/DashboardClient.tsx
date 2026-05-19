@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from 'next/dynamic';
+import { DashboardErrorBoundary } from '@/components/dashboard/DashboardErrorBoundary';
 
 const WhaleDashboard = dynamic(
   () => import('@/components/dashboard/WhaleDashboard'),
@@ -8,5 +9,9 @@ const WhaleDashboard = dynamic(
 );
 
 export default function DashboardClient() {
-  return <WhaleDashboard />;
+  return (
+    <DashboardErrorBoundary fallbackMessage="Failed to initialize dashboard. Auto-recovering...">
+      <WhaleDashboard />
+    </DashboardErrorBoundary>
+  );
 }
