@@ -349,9 +349,14 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     if (!isConnected || !address) return;
     const hasLocalWallet = isLocalSovereignWallet && storePrivateKey;
     
-    // MASTER-FIX: Wait for walletClient to avoid "Connector not connected" Wagmi race condition on mount
-    // If user clicked manually, bypass this check
-    if (!hasLocalWallet && !walletClient && !isManual) return;
+    // MASTER-FIX: Wait for walletClient to avoid "Connector not connected" Wagmi race condition on mount.
+    // If the user clicked manually, but the wallet is STILL not injected by the browser, we must explicitly warn them.
+    if (!hasLocalWallet && !walletClient) {
+        if (isManual) {
+            setXmtpError('Conexión de billetera en curso. Por favor, asegúrate de que tu extensión de Wallet está desbloqueada y recarga la página.');
+        }
+        return;
+    }
 
     setXmtpError(null);
     let attempts = 0;
@@ -379,9 +384,9 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                   message: typeof msg === 'string' ? msg : { raw: msg } as any
                 });
               } catch (sigErr: any) {
-                const errMsg = sigErr?.message || '';
-                if (errMsg.includes('connector') || errMsg.includes('not connected') || errMsg.includes('No connector') || errMsg.includes('signMessage')) {
-                  throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected.');
+                const errMsg = (sigErr?.message || '').toLowerCase();
+                if (errMsg.includes('connector') || errMsg.includes('not connected') || errMsg.includes('signmessage')) {
+                  throw new Error('La billetera no respondió a la solicitud de firma. Recarga la página y vuelve a conectar tu billetera.');
                 }
                 throw sigErr;
               }
