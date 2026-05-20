@@ -4,10 +4,47 @@ node_modules/
 .env*
 .gemini/
 build.log
-public/Aztec*
-public/*.png
-public/*.jpg
-public/*.jpeg
-public/*.gif
-public/*.mp4
-public/*.webm
+tsconfig.tsbuildinfo
+tsc_output.txt
+tmp_diff.txt
+
+# Smart Contracts & Build Cache
+artifacts/
+cache/
+contracts/
+ignition/
+typechain-types/
+.openzeppelin/
+forge/
+subgraph/
+
+# Non-runtime files
+docs/
+examples/
+test/
+k8s/
+.clerk/
+out/
+scratch/
+
+# Backup & helper scripts
+*.bat
+*.exe
+*.js
+*.py
+*.html
+*.mjs
+*.cjs
+*.patch
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.webm
+
+# Do NOT ignore important configuration scripts that PM2/Docker needs
+!server.js
+!next.config.js
+!ecosystem.config.json
+!clean.js

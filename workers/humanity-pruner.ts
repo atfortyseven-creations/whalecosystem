@@ -14,14 +14,18 @@ async function pruneOldBlocks() {
 
     console.log(`[PRUNER] Initiating absolute purge for blocks older than timestamp ${thresholdTimestamp}...`);
 
-    // Using raw SQL for maximum performance deletion
-    // Due to cascading deletion, removing blocks will also remove transactions
-    const result = await prisma.$executeRaw`
-      DELETE FROM "HumanityLedgerBlock" 
-      WHERE "timestamp" < ${thresholdTimestamp}
-    `;
+    // Using typed Prisma Client for maximum database-agnostic resilience.
+    // Due to cascading deletion configured in the database, removing blocks
+    // automatically removes all associated transactions in a single transaction.
+    const result = await prisma.humanityLedgerBlock.deleteMany({
+      where: {
+        timestamp: {
+          lt: BigInt(thresholdTimestamp)
+        }
+      }
+    });
 
-    console.log(`[PRUNER] Purge completed. Deleted rows: ${result}`);
+    console.log(`[PRUNER] Purge completed. Deleted blocks: ${result.count}`);
 
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -42,4 +46,21 @@ async function runPruner() {
   }
 }
 
+// Graceful shutdown handling to prevent orphaned PG connections on Railway
+const gracefulShutdown = async (signal: string) => {
+  console.log(`[PRUNER] Received ${signal}. Shutting down gracefully...`);
+  try {
+    await prisma.$disconnect();
+    console.log('[PRUNER] Database client disconnected successfully.');
+    process.exit(0);
+  } catch (err) {
+    console.error('[PRUNER ERROR] Error during database disconnection:', err);
+    process.exit(1);
+  }
+};
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+// Launch
 runPruner();
