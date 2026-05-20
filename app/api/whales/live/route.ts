@@ -7,6 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { whaleEngine } from '@/lib/blockchain/whale-ws-engine';
+import { privyRelayer } from '@/lib/services/PrivyRelayerService';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +27,20 @@ function ensureSubscribed() {
 
 export async function GET(req: Request) {
     try {
+        // Verify Privy JWT for precision and security
+        const authHeader = req.headers.get('authorization');
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.split(' ')[1];
+            const payload = await privyRelayer.verifyToken(token);
+            if (!payload) {
+                console.warn(`[Whale-Live] Invalid Privy JWT.`);
+                // Return 401 if strict auth is desired:
+                // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+        } else {
+            console.warn(`[Whale-Live] Missing Privy Authorization header.`);
+        }
+
         const { searchParams } = new URL(req.url);
         const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
 

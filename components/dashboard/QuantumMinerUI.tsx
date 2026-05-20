@@ -228,11 +228,11 @@ export default function QuantumMinerUI() {
             {/* Tokenomics Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 sm:mb-8 pb-6 border-b border-white/10 relative z-10">
                 <div>
-                    <h3 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Mi Balance QD</h3>
+                    <h3 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Mi Saldo en QDs</h3>
                     <p className="text-xl sm:text-2xl font-mono text-white break-all">{userBalanceFormatted} <span className="text-xs sm:text-sm">QDs</span></p>
                 </div>
                 <div className="text-left sm:text-right w-full sm:w-auto">
-                    <h3 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Circulante / Hard Cap</h3>
+                    <h3 className="text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Suministro Circulante / Límite Máximo</h3>
                     <p className="text-base sm:text-lg font-mono text-white">
                         {currentSupplyFormatted.toLocaleString(undefined, { maximumFractionDigits: 0 })} / {maxSupply.toLocaleString()}
                     </p>
@@ -276,12 +276,12 @@ export default function QuantumMinerUI() {
                     </div>
                     <div>
                         <h2 className="text-xl sm:text-2xl font-black tracking-tighter text-white uppercase">Nódulo Minero</h2>
-                        <p className="text-[10px] sm:text-xs font-bold text-white/60 tracking-widest uppercase">Proof-of-Work CPU</p>
+                        <p className="text-[10px] sm:text-xs font-bold text-white/60 tracking-widest uppercase">Prueba de Trabajo CPU</p>
                     </div>
                 </div>
                 
                 <div className="text-left sm:text-right">
-                    <p className="text-[10px] sm:text-xs font-bold text-white/40 tracking-widest uppercase mb-1">Dificultad Target</p>
+                    <p className="text-[10px] sm:text-xs font-bold text-white/40 tracking-widest uppercase mb-1">Objetivo de Dificultad</p>
                     <p className="text-lg sm:text-xl font-mono text-white">0x{'0'.repeat(targetDifficulty)}...</p>
                 </div>
             </div>
@@ -290,7 +290,7 @@ export default function QuantumMinerUI() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <div className="bg-[#111] border border-white/10 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
                     <Activity className="absolute right-3 top-3 sm:right-4 sm:top-4 text-white/5" size={40} />
-                    <p className="text-[10px] sm:text-xs font-bold text-white/40 tracking-widest uppercase mb-1 sm:mb-2">HashRate (CPU)</p>
+                    <p className="text-[10px] sm:text-xs font-bold text-white/40 tracking-widest uppercase mb-1 sm:mb-2">Tasa de Hash (CPU)</p>
                     <p className="text-2xl sm:text-3xl font-black text-white tracking-tighter">
                         {hashRate} <span className="text-xs sm:text-sm font-medium text-white/60">H/s</span>
                     </p>
@@ -307,7 +307,7 @@ export default function QuantumMinerUI() {
             {/* Terminal View */}
             <div className="bg-black border border-white/20 rounded-2xl p-4 font-mono text-xs mb-8 h-24 overflow-hidden relative flex flex-col justify-end">
                 <div className="text-white/40 mb-1">&gt; QuantumMiner.exe --start</div>
-                <div className="text-white/30 truncate mb-1">Target: {targetDifficulty} ceros iniciales</div>
+                <div className="text-white/30 truncate mb-1">Objetivo: {targetDifficulty} ceros iniciales</div>
                 <AnimatePresence>
                     {isMining && (
                         <motion.div 
@@ -320,7 +320,7 @@ export default function QuantumMinerUI() {
                         </motion.div>
                     )}
                 </AnimatePresence>
-                {!isMining && !blockFound && <div className="text-white/50 animate-pulse">&gt; _ SYSTEM IDLE</div>}
+                {!isMining && !blockFound && <div className="text-white/50 animate-pulse">&gt; _ SISTEMA INACTIVO</div>}
                 {blockFound && <div className="text-white font-bold bg-white/20 px-2 py-1 rounded">&gt; NONCE ENCONTRADO: {latestHash}</div>}
             </div>
 

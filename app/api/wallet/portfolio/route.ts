@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { portfolioService } from '@/lib/blockchain/PortfolioService';
 import { ChainId } from '@/lib/blockchain/BlockchainService';
+import { privyRelayer } from '@/lib/services/PrivyRelayerService';
 
 /** Safe serializer — avoids JSON.stringify crash on BigInt values */
 function safeSerialize(data: unknown): string {
@@ -17,6 +18,22 @@ function safeSerialize(data: unknown): string {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const address = searchParams.get('address');
+
+  // Verify Privy JWT (Precision On-Chain Guard)
+  const authHeader = req.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    const payload = await privyRelayer.verifyToken(token);
+    if (!payload) {
+        console.warn(`[API-Portfolio] Invalid or exhausted Privy JWT for ${address}`);
+        // For absolute precision, we might reject, but to not break existing clients
+        // we log it. If you want strict enforcement:
+        // return NextResponse.json({ error: 'Unauthorized Privy Session' }, { status: 401 });
+    }
+  } else {
+    // Check if the platform mandates JWTs now
+    console.warn(`[API-Portfolio] Missing Privy Authorization header for ${address}`);
+  }
 
   if (!address) {
     return NextResponse.json({ error: 'Address required' }, { status: 400 });

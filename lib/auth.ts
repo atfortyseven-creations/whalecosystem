@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
 /**
  * SOVEREIGN AUTH UTILITIES
@@ -43,6 +44,11 @@ export const authOptions: NextAuthOptions = {
   providers: [
     // Providers are managed manually via SIWE and QR-Sync endpoints
     // to maintain absolute decoupling from third-party identity silos.
+    // RESTORED: Google Provider strictly for the Status/Subscriptions portal
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
   ],
   session: {
     strategy: "jwt",
