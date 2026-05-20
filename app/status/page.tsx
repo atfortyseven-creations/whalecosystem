@@ -27,43 +27,39 @@ interface HealthData {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STATUS HELPERS (Quantum Theme)
+// STATUS HELPERS (Humanity Ledger Light Theme)
 // ─────────────────────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
   operational: {
     label: 'Operational',
-    color: 'bg-[#00FFAA]',
-    shadow: 'shadow-[0_0_15px_rgba(0,255,170,0.5)]',
-    text: 'text-[#00FFAA]',
-    bg: 'bg-[#00FFAA]/10',
-    border: 'border-[#00FFAA]/20',
+    color: 'bg-emerald-500',
+    text: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-100',
     icon: CheckCircle2,
   },
   degraded: {
     label: 'Degraded',
-    color: 'bg-amber-400',
-    shadow: 'shadow-[0_0_15px_rgba(251,191,36,0.5)]',
-    text: 'text-amber-400',
-    bg: 'bg-amber-400/10',
-    border: 'border-amber-400/20',
+    color: 'bg-amber-500',
+    text: 'text-amber-600',
+    bg: 'bg-amber-50',
+    border: 'border-amber-100',
     icon: AlertTriangle,
   },
   outage: {
     label: 'Outage',
     color: 'bg-red-500',
-    shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.5)]',
-    text: 'text-red-500',
-    bg: 'bg-red-500/10',
-    border: 'border-red-500/20',
+    text: 'text-red-600',
+    bg: 'bg-red-50',
+    border: 'border-red-100',
     icon: XCircle,
   },
   loading: {
     label: 'Checking…',
-    color: 'bg-white/30',
-    shadow: 'shadow-none',
-    text: 'text-white/50',
-    bg: 'bg-white/5',
-    border: 'border-white/10',
+    color: 'bg-black/10',
+    text: 'text-black/40',
+    bg: 'bg-black/5',
+    border: 'border-black/5',
     icon: Wifi,
   },
 } as const;
@@ -73,16 +69,16 @@ function StatusDot({ status }: { status: ServiceStatus }) {
   return (
     <span className="relative flex h-2.5 w-2.5 shrink-0">
       {status === 'operational' && (
-        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${cfg.color} opacity-50`} />
+        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${cfg.color} opacity-30`} />
       )}
-      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${cfg.color} ${cfg.shadow}`} />
+      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${cfg.color}`} />
     </span>
   );
 }
 
 function LatencyBadge({ ms }: { ms: number }) {
-  const color = ms < 300 ? 'text-[#00FFAA]' : ms < 1500 ? 'text-amber-400' : 'text-red-500';
-  return <span className={`font-mono text-[11px] font-bold tracking-widest ${color}`}>{ms}MS</span>;
+  const color = ms < 300 ? 'text-emerald-600' : ms < 1500 ? 'text-amber-600' : 'text-red-600';
+  return <span className={`font-mono text-[11px] font-black tracking-widest ${color}`}>{ms}MS</span>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -99,16 +95,16 @@ function MiniUptimeBar({ status }: { status: ServiceStatus }) {
   });
 
   return (
-    <div className="flex gap-[2px] items-end h-6 w-full mt-4">
+    <div className="flex gap-[2px] items-end h-8 w-full mt-6">
       {slots.map((s, i) => (
         <div
           key={i}
           title={s}
           className={`flex-1 rounded-sm transition-all ${
-            s === 'operational' ? 'bg-[#00FFAA]/80 h-6 hover:bg-[#00FFAA]' :
-            s === 'degraded'    ? 'bg-amber-400 h-4 hover:bg-amber-300' :
-                                   'bg-red-500 h-3 hover:bg-red-400'
-          } ${i === 89 ? 'ring-1 ring-offset-1 ring-offset-[#050505] ring-white/30' : 'opacity-80'}`}
+            s === 'operational' ? 'bg-emerald-400 h-8 hover:bg-emerald-500' :
+            s === 'degraded'    ? 'bg-amber-400 h-5 hover:bg-amber-500' :
+                                   'bg-red-500 h-4 hover:bg-red-600'
+          } ${i === 89 ? 'ring-1 ring-offset-2 ring-offset-white ring-black/10 scale-y-105' : 'opacity-80'}`}
         />
       ))}
     </div>
@@ -155,37 +151,38 @@ export default function StatusPage() {
   const OverallIcon = overallCfg.icon;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans absolute inset-0 z-[100] overflow-y-auto selection:bg-[var(--aztec-orchid)]/30">
+    <div className="min-h-screen bg-[#F8F9FA] text-[#0A0A0A] font-sans absolute inset-0 z-[100] overflow-y-auto selection:bg-[#0044CC]/20">
       
-      {/* Quantum Grid Background */}
+      {/* Light Clean Background */}
       <div className="absolute inset-0 bg-[url('/img/grid.svg')] opacity-[0.03] pointer-events-none" />
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[var(--aztec-orchid)]/10 blur-[150px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-[#00FFAA]/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <main className="w-full max-w-[1000px] mx-auto px-6 pt-32 pb-24 flex flex-col gap-8 relative z-10">
+      <main className="w-full max-w-[800px] mx-auto px-6 pt-32 pb-24 flex flex-col gap-10 relative z-10 items-center">
 
-        {/* Header Text */}
-        <div className="flex flex-col items-center justify-center mb-8 text-center">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-3 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full mb-6">
-                <Cpu size={14} className="text-[var(--aztec-orchid)]" />
-                <span className="text-[10px] uppercase tracking-[0.3em] font-black text-white/70">Quantum Node Telemetry</span>
+        {/* Header Text (Perfectly Centered) */}
+        <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center justify-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full mb-8 shadow-sm">
+                <Cpu size={14} className="text-[#0044CC]" />
+                <span className="text-[10px] uppercase tracking-[0.3em] font-black text-black/50">Humanity Ledger Telemetry</span>
             </motion.div>
-            <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white mb-4">
+            
+            <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-[#0A0A0A] mb-4">
                 System Status
             </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-sm font-mono text-white/40 tracking-widest uppercase">
-                Real-time cryptographic network monitoring
+            
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-sm font-serif text-slate-500 leading-relaxed">
+                Real-time cryptographic network monitoring and infrastructure telemetry. Automatically refreshing every 30 seconds.
             </motion.p>
         </div>
 
-        {/* ── OVERALL STATUS HERO ────────────────────────────────────────────── */}
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, type: 'spring' }} className={`w-full rounded-[2rem] border ${overallCfg.border} ${overallCfg.bg} backdrop-blur-2xl p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all duration-700 shadow-2xl`}>
-          <div className="flex items-center gap-6">
-            <div className={`p-4 rounded-2xl ${overallCfg.bg} border ${overallCfg.border} flex items-center justify-center`}>
-              <OverallIcon size={32} className={overallCfg.text} />
+        {/* ── OVERALL STATUS HERO (Centered Content) ────────────────────────────────────────────── */}
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, type: 'spring' }} className="w-full">
+          <div className={`w-full rounded-[2.5rem] bg-white border border-black/5 p-10 flex flex-col items-center text-center gap-6 transition-all duration-700 shadow-[0_8px_30px_rgb(0,0,0,0.04)]`}>
+            <div className={`p-5 rounded-3xl ${overallCfg.bg} border ${overallCfg.border} flex items-center justify-center mb-2`}>
+              <OverallIcon size={40} className={overallCfg.text} />
             </div>
+            
             <div>
-              <h1 className={`text-2xl font-black tracking-tighter uppercase ${overallCfg.text}`}>
+              <h1 className={`text-3xl font-black tracking-tighter uppercase ${overallCfg.text}`}>
                 {overall === 'operational'
                   ? 'All Systems Operational'
                   : overall === 'degraded'
@@ -194,34 +191,36 @@ export default function StatusPage() {
                   ? 'Service Disruption'
                   : 'Probing Nodes…'}
               </h1>
-              <p className="text-xs font-mono text-white/50 mt-1 uppercase tracking-wider">
+              <p className="text-sm font-mono text-black/40 mt-3 uppercase tracking-widest font-bold">
                 {health?.avgLatencyMs != null
                   ? `Network Latency: ${health.avgLatencyMs}ms`
                   : 'Establishing Secure Handshake...'}
               </p>
             </div>
-          </div>
 
-          <div className="flex flex-col sm:items-end gap-3 shrink-0">
-            <div className="text-left sm:text-right">
-              <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/30">Last Signature</p>
-              <p className="text-sm font-mono font-bold text-white/80">{lastChecked ?? '—'}</p>
-              <p className="text-[10px] text-[var(--aztec-orchid)] font-mono mt-1">NEXT PROBE IN {countdown}s</p>
+            <div className="w-full h-px bg-black/5 my-4" />
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 w-full">
+              <div className="text-center">
+                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-black/30">Last Signature</p>
+                <p className="text-sm font-mono font-bold text-[#0A0A0A] mt-1">{lastChecked ?? '—'}</p>
+                <p className="text-[10px] text-[#0044CC] font-mono mt-1 font-bold">NEXT PROBE IN {countdown}S</p>
+              </div>
+              <button
+                onClick={fetchHealth}
+                disabled={loading}
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-[#0A0A0A] hover:bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-md hover:shadow-xl active:scale-95 disabled:opacity-50"
+              >
+                <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                {loading ? 'Probing' : 'Force Refresh'}
+              </button>
             </div>
-            <button
-              onClick={fetchHealth}
-              disabled={loading}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--aztec-orchid)]/50 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-50"
-            >
-              <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
-              {loading ? 'Probing' : 'Force Refresh'}
-            </button>
           </div>
         </motion.div>
 
-        {/* ── LIVE METRICS SUMMARY ───────────────────────────────────────────── */}
+        {/* ── LIVE METRICS SUMMARY (Centered Grid) ───────────────────────────────────────────── */}
         {health && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
             {[
               {
                 label: 'Nodes Online',
@@ -248,12 +247,12 @@ export default function StatusPage() {
                 icon: ShieldAlert
               },
             ].map((m, i) => (
-              <div key={m.label} className="bg-white/5 backdrop-blur-xl border border-white/5 rounded-2xl p-5 flex flex-col gap-2 hover:border-white/10 transition-colors">
-                <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40">{m.label}</span>
-                    <m.icon size={12} className="text-white/20" />
+              <div key={m.label} className="bg-white border border-black/5 rounded-3xl p-6 flex flex-col items-center justify-center text-center gap-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all">
+                <div className="flex items-center justify-center gap-2">
+                    <m.icon size={14} className="text-[#0044CC]" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">{m.label}</span>
                 </div>
-                <span className={`text-2xl font-mono font-bold tracking-tight ${m.good ? 'text-white' : 'text-red-500'}`}>
+                <span className={`text-3xl font-black tracking-tighter ${m.good ? 'text-[#0A0A0A]' : 'text-red-600'}`}>
                   {m.value}
                 </span>
               </div>
@@ -262,17 +261,18 @@ export default function StatusPage() {
         )}
 
         {/* ── SERVICE CARDS ──────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-4 mt-4">
-          <div className="flex items-center justify-between px-2 mb-2">
-            <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Core Infrastructure</h2>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--aztec-orchid)]">90-Day Telemetry</span>
+        <div className="flex flex-col gap-5 mt-4 w-full">
+          <div className="flex items-center justify-center px-2 mb-4 gap-4">
+            <div className="h-px bg-black/10 flex-1" />
+            <h2 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#0A0A0A]">Core Infrastructure</h2>
+            <div className="h-px bg-black/10 flex-1" />
           </div>
 
           <AnimatePresence>
             {loading && !health && (
               <>
                 {[...Array(6)].map((_, i) => (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={`skeleton-${i}`} className="w-full h-28 rounded-[1.5rem] bg-white/5 border border-white/5 animate-pulse" />
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={`skeleton-${i}`} className="w-full h-32 rounded-[2rem] bg-white border border-black/5 shadow-sm animate-pulse" />
                 ))}
               </>
             )}
@@ -286,38 +286,33 @@ export default function StatusPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + (i * 0.05) }}
                   key={svc.name}
-                  className="w-full bg-[#0A0A0A]/80 backdrop-blur-2xl border border-white/10 rounded-[1.5rem] overflow-hidden hover:border-white/20 transition-all duration-300 group"
+                  className="w-full bg-white border border-black/5 rounded-[2rem] overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 group"
                 >
-                  <div className="px-6 py-5 flex items-center justify-between gap-4 border-b border-white/5">
-                    <div className="flex items-center gap-4 min-w-0">
+                  <div className="px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6 border-b border-black/5 text-center md:text-left">
+                    <div className="flex flex-col md:flex-row items-center gap-5 min-w-0">
                       <StatusDot status={svc.status} />
                       <div className="min-w-0">
-                        <p className="font-bold text-sm tracking-wide text-white truncate">{svc.name}</p>
-                        <p className="text-[10px] font-mono tracking-widest text-white/30 truncate mt-1 uppercase">{svc.url}</p>
+                        <p className="font-black text-lg tracking-tight text-[#0A0A0A] uppercase">{svc.name}</p>
+                        <p className="text-[11px] font-mono font-bold tracking-widest text-black/30 mt-1">{svc.url}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex items-center justify-center gap-4 shrink-0">
                       <LatencyBadge ms={svc.latencyMs} />
                       <span
-                        className={`hidden sm:inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.1em] px-3 py-1.5 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.text}`}
+                        className={`inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] px-4 py-2 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.text}`}
                       >
-                        <Icon size={12} />
+                        <Icon size={14} />
                         {cfg.label}
                       </span>
-                      {svc.httpCode && (
-                        <span className="hidden md:inline font-mono text-[9px] font-bold tracking-widest text-white/30 bg-white/5 border border-white/10 px-2 py-1 rounded-md">
-                          HTTP {svc.httpCode}
-                        </span>
-                      )}
                     </div>
                   </div>
 
-                  <div className="px-6 py-4 bg-white/[0.01]">
-                    <MiniUptimeBar status={svc.status} />
-                    <div className="flex justify-between mt-3 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
+                  <div className="px-8 py-6 bg-slate-50/50">
+                    <div className="flex justify-between mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-black/30">
                       <span>T-90 Days</span>
-                      <span>Real-Time</span>
+                      <span className="text-[#0044CC]">Real-Time</span>
                     </div>
+                    <MiniUptimeBar status={svc.status} />
                   </div>
                 </motion.div>
               );
@@ -325,14 +320,15 @@ export default function StatusPage() {
           </AnimatePresence>
         </div>
 
-        {/* ── FOOTER ─────────────────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 pb-12 border-t border-white/10 mt-8 gap-4">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-white/40 uppercase tracking-widest">
-            <Clock size={12} className="text-[var(--aztec-orchid)]" />
+        {/* ── FOOTER (Centered) ─────────────────────────────────────────────────────────── */}
+        <div className="flex flex-col items-center justify-center pt-10 mt-10 gap-4 w-full">
+          <div className="w-12 h-1 bg-black/10 rounded-full mb-4" />
+          <div className="flex items-center justify-center gap-3 text-[11px] font-mono font-bold text-black/40 uppercase tracking-widest">
+            <Clock size={14} className="text-[#0044CC]" />
             <span>UTC Timezone | Algorithmic polling active</span>
           </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
-            Whale Alert Network © {new Date().getFullYear()}
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-black/20">
+            Humanity Ledger © {new Date().getFullYear()}
           </span>
         </div>
 
