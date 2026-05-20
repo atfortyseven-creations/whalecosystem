@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Wifi, Clock, Activity, ShieldAlert, Cpu } from 'lucide-react';
+import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Wifi, Clock, Activity, ShieldAlert, Server } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -27,35 +27,35 @@ interface HealthData {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STATUS HELPERS (Humanity Ledger Light Theme)
+// STATUS HELPERS (Black & White Theme + Standard Colors)
 // ─────────────────────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
   operational: {
     label: 'Operational',
-    color: 'bg-emerald-500',
-    text: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-100',
+    color: 'bg-green-500',
+    text: 'text-green-600',
+    bg: 'bg-green-50',
+    border: 'border-green-100',
     icon: CheckCircle2,
   },
   degraded: {
     label: 'Degraded',
-    color: 'bg-amber-500',
-    text: 'text-amber-600',
-    bg: 'bg-amber-50',
-    border: 'border-amber-100',
+    color: 'bg-yellow-500',
+    text: 'text-yellow-600',
+    bg: 'bg-yellow-50',
+    border: 'border-yellow-100',
     icon: AlertTriangle,
   },
   outage: {
     label: 'Outage',
-    color: 'bg-red-500',
+    color: 'bg-red-600',
     text: 'text-red-600',
     bg: 'bg-red-50',
     border: 'border-red-100',
     icon: XCircle,
   },
   loading: {
-    label: 'Checking…',
+    label: 'Checking...',
     color: 'bg-black/10',
     text: 'text-black/40',
     bg: 'bg-black/5',
@@ -67,48 +67,18 @@ const STATUS_CONFIG = {
 function StatusDot({ status }: { status: ServiceStatus }) {
   const cfg = STATUS_CONFIG[status];
   return (
-    <span className="relative flex h-2.5 w-2.5 shrink-0">
+    <span className="relative flex h-3 w-3 shrink-0">
       {status === 'operational' && (
         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${cfg.color} opacity-30`} />
       )}
-      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${cfg.color}`} />
+      <span className={`relative inline-flex rounded-full h-3 w-3 ${cfg.color}`} />
     </span>
   );
 }
 
 function LatencyBadge({ ms }: { ms: number }) {
-  const color = ms < 300 ? 'text-emerald-600' : ms < 1500 ? 'text-amber-600' : 'text-red-600';
-  return <span className={`font-mono text-[11px] font-black tracking-widest ${color}`}>{ms}MS</span>;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MINI UPTIME BAR — 90 synthetic slots rendered live
-// ─────────────────────────────────────────────────────────────────────────────
-function MiniUptimeBar({ status }: { status: ServiceStatus }) {
-  const slots = Array.from({ length: 90 }, (_, i) => {
-    if (i === 89) return status === 'loading' ? 'operational' : status;
-    const rand = Math.sin(i * 7919) * 10000;
-    const frac = rand - Math.floor(rand);
-    if (frac < 0.015) return 'outage';
-    if (frac < 0.04)  return 'degraded';
-    return 'operational';
-  });
-
-  return (
-    <div className="flex gap-[2px] items-end h-8 w-full mt-6">
-      {slots.map((s, i) => (
-        <div
-          key={i}
-          title={s}
-          className={`flex-1 rounded-sm transition-all ${
-            s === 'operational' ? 'bg-emerald-400 h-8 hover:bg-emerald-500' :
-            s === 'degraded'    ? 'bg-amber-400 h-5 hover:bg-amber-500' :
-                                   'bg-red-500 h-4 hover:bg-red-600'
-          } ${i === 89 ? 'ring-1 ring-offset-2 ring-offset-white ring-black/10 scale-y-105' : 'opacity-80'}`}
-        />
-      ))}
-    </div>
-  );
+  const color = ms < 300 ? 'text-green-600' : ms < 1500 ? 'text-yellow-600' : 'text-red-600';
+  return <span className={`font-mono text-xs font-bold ${color}`}>{ms}ms</span>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -151,50 +121,47 @@ export default function StatusPage() {
   const OverallIcon = overallCfg.icon;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-[#0A0A0A] font-sans absolute inset-0 z-[100] overflow-y-auto selection:bg-[#0044CC]/20">
+    <div className="min-h-screen bg-white text-black font-sans absolute inset-0 z-[100] overflow-y-auto selection:bg-black/10">
       
-      {/* Light Clean Background */}
-      <div className="absolute inset-0 bg-[url('/img/grid.svg')] opacity-[0.03] pointer-events-none" />
+      <main className="w-full max-w-[800px] mx-auto px-6 pt-24 pb-24 flex flex-col gap-10 relative z-10 items-center">
 
-      <main className="w-full max-w-[800px] mx-auto px-6 pt-32 pb-24 flex flex-col gap-10 relative z-10 items-center">
-
-        {/* Header Text (Perfectly Centered) */}
+        {/* Header Text (Perfectly Centered & Simple Language) */}
         <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center justify-center gap-3 px-5 py-2 bg-white border border-black/5 rounded-full mb-8 shadow-sm">
-                <Cpu size={14} className="text-[#0044CC]" />
-                <span className="text-[10px] uppercase tracking-[0.3em] font-black text-black/50">Humanity Ledger Telemetry</span>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center justify-center gap-3 px-6 py-2 bg-white border border-black/10 rounded-full mb-8 shadow-sm">
+                <Server size={14} className="text-black" />
+                <span className="text-xs uppercase tracking-widest font-bold text-black/60">System Status</span>
             </motion.div>
             
-            <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-[#0A0A0A] mb-4">
-                System Status
+            <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-5xl font-extrabold tracking-tight text-black mb-4">
+                Service Overview
             </motion.h1>
             
-            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-sm font-serif text-slate-500 leading-relaxed">
-                Real-time cryptographic network monitoring and infrastructure telemetry. Automatically refreshing every 30 seconds.
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-base text-black/60 leading-relaxed">
+                Real-time monitoring of our services and platform components. Information is strictly live and automatically updates every 30 seconds.
             </motion.p>
         </div>
 
         {/* ── OVERALL STATUS HERO (Centered Content) ────────────────────────────────────────────── */}
         <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, type: 'spring' }} className="w-full">
-          <div className={`w-full rounded-[2.5rem] bg-white border border-black/5 p-10 flex flex-col items-center text-center gap-6 transition-all duration-700 shadow-[0_8px_30px_rgb(0,0,0,0.04)]`}>
-            <div className={`p-5 rounded-3xl ${overallCfg.bg} border ${overallCfg.border} flex items-center justify-center mb-2`}>
-              <OverallIcon size={40} className={overallCfg.text} />
+          <div className={`w-full rounded-3xl bg-white border border-black/10 p-10 flex flex-col items-center text-center gap-6 transition-all duration-700 shadow-md`}>
+            <div className={`p-6 rounded-full ${overallCfg.bg} border ${overallCfg.border} flex items-center justify-center mb-2`}>
+              <OverallIcon size={48} className={overallCfg.text} />
             </div>
             
             <div>
-              <h1 className={`text-3xl font-black tracking-tighter uppercase ${overallCfg.text}`}>
+              <h1 className={`text-3xl font-extrabold tracking-tight ${overallCfg.text}`}>
                 {overall === 'operational'
                   ? 'All Systems Operational'
                   : overall === 'degraded'
                   ? 'Degraded Performance'
                   : overall === 'outage'
-                  ? 'Service Disruption'
-                  : 'Probing Nodes…'}
+                  ? 'Service Outage Detected'
+                  : 'Checking Services...'}
               </h1>
-              <p className="text-sm font-mono text-black/40 mt-3 uppercase tracking-widest font-bold">
+              <p className="text-sm font-mono text-black/50 mt-3 font-semibold">
                 {health?.avgLatencyMs != null
-                  ? `Network Latency: ${health.avgLatencyMs}ms`
-                  : 'Establishing Secure Handshake...'}
+                  ? `Average Network Latency: ${health.avgLatencyMs}ms`
+                  : 'Connecting to servers...'}
               </p>
             </div>
 
@@ -202,17 +169,17 @@ export default function StatusPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 w-full">
               <div className="text-center">
-                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-black/30">Last Signature</p>
-                <p className="text-sm font-mono font-bold text-[#0A0A0A] mt-1">{lastChecked ?? '—'}</p>
-                <p className="text-[10px] text-[#0044CC] font-mono mt-1 font-bold">NEXT PROBE IN {countdown}S</p>
+                <p className="text-xs uppercase tracking-widest font-bold text-black/40">Last Update</p>
+                <p className="text-base font-mono font-bold text-black mt-1">{lastChecked ?? '—'}</p>
+                <p className="text-xs text-black/60 font-mono mt-1 font-bold">Refreshing in {countdown}s</p>
               </div>
               <button
                 onClick={fetchHealth}
                 disabled={loading}
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-[#0A0A0A] hover:bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-md hover:shadow-xl active:scale-95 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-black hover:bg-black/80 text-white rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-md active:scale-95 disabled:opacity-50"
               >
                 <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-                {loading ? 'Probing' : 'Force Refresh'}
+                {loading ? 'Updating' : 'Refresh Now'}
               </button>
             </div>
           </div>
@@ -223,36 +190,36 @@ export default function StatusPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
             {[
               {
-                label: 'Nodes Online',
+                label: 'Online',
                 value: `${health.services.filter(s => s.status === 'operational').length}/${health.services.length}`,
                 good: health.services.every(s => s.status === 'operational'),
                 icon: Activity
               },
               {
-                label: 'Avg Latency',
+                label: 'Latency',
                 value: `${health.avgLatencyMs}ms`,
                 good: health.avgLatencyMs < 1000,
                 icon: Wifi
               },
               {
-                label: 'Degraded',
+                label: 'Issues',
                 value: String(health.services.filter(s => s.status === 'degraded').length),
                 good: health.services.filter(s => s.status === 'degraded').length === 0,
                 icon: AlertTriangle
               },
               {
-                label: 'Anomalies',
+                label: 'Outages',
                 value: String(health.services.filter(s => s.status === 'outage').length),
                 good: health.services.filter(s => s.status === 'outage').length === 0,
                 icon: ShieldAlert
               },
             ].map((m, i) => (
-              <div key={m.label} className="bg-white border border-black/5 rounded-3xl p-6 flex flex-col items-center justify-center text-center gap-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all">
+              <div key={m.label} className="bg-white border border-black/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3 shadow-sm hover:shadow-md transition-all">
                 <div className="flex items-center justify-center gap-2">
-                    <m.icon size={14} className="text-[#0044CC]" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40">{m.label}</span>
+                    <m.icon size={16} className="text-black/50" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-black/50">{m.label}</span>
                 </div>
-                <span className={`text-3xl font-black tracking-tighter ${m.good ? 'text-[#0A0A0A]' : 'text-red-600'}`}>
+                <span className={`text-3xl font-extrabold tracking-tight ${m.good ? 'text-black' : 'text-red-600'}`}>
                   {m.value}
                 </span>
               </div>
@@ -261,10 +228,10 @@ export default function StatusPage() {
         )}
 
         {/* ── SERVICE CARDS ──────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-5 mt-4 w-full">
+        <div className="flex flex-col gap-4 mt-6 w-full">
           <div className="flex items-center justify-center px-2 mb-4 gap-4">
             <div className="h-px bg-black/10 flex-1" />
-            <h2 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#0A0A0A]">Core Infrastructure</h2>
+            <h2 className="text-sm font-bold uppercase tracking-widest text-black">Individual Components</h2>
             <div className="h-px bg-black/10 flex-1" />
           </div>
 
@@ -272,7 +239,7 @@ export default function StatusPage() {
             {loading && !health && (
               <>
                 {[...Array(6)].map((_, i) => (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={`skeleton-${i}`} className="w-full h-32 rounded-[2rem] bg-white border border-black/5 shadow-sm animate-pulse" />
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={`skeleton-${i}`} className="w-full h-24 rounded-2xl bg-white border border-black/10 shadow-sm animate-pulse" />
                 ))}
               </>
             )}
@@ -286,33 +253,25 @@ export default function StatusPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + (i * 0.05) }}
                   key={svc.name}
-                  className="w-full bg-white border border-black/5 rounded-[2rem] overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 group"
+                  className="w-full bg-white border border-black/10 rounded-2xl overflow-hidden hover:shadow-md transition-all duration-300"
                 >
-                  <div className="px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6 border-b border-black/5 text-center md:text-left">
+                  <div className="px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
                     <div className="flex flex-col md:flex-row items-center gap-5 min-w-0">
                       <StatusDot status={svc.status} />
                       <div className="min-w-0">
-                        <p className="font-black text-lg tracking-tight text-[#0A0A0A] uppercase">{svc.name}</p>
-                        <p className="text-[11px] font-mono font-bold tracking-widest text-black/30 mt-1">{svc.url}</p>
+                        <p className="font-extrabold text-lg tracking-tight text-black">{svc.name}</p>
+                        <p className="text-xs font-mono font-medium text-black/50 mt-1">{svc.url}</p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-center gap-4 shrink-0">
+                    <div className="flex items-center justify-center gap-6 shrink-0">
                       <LatencyBadge ms={svc.latencyMs} />
                       <span
-                        className={`inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] px-4 py-2 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.text}`}
+                        className={`inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.text}`}
                       >
-                        <Icon size={14} />
+                        <Icon size={16} />
                         {cfg.label}
                       </span>
                     </div>
-                  </div>
-
-                  <div className="px-8 py-6 bg-slate-50/50">
-                    <div className="flex justify-between mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-black/30">
-                      <span>T-90 Days</span>
-                      <span className="text-[#0044CC]">Real-Time</span>
-                    </div>
-                    <MiniUptimeBar status={svc.status} />
                   </div>
                 </motion.div>
               );
@@ -321,14 +280,13 @@ export default function StatusPage() {
         </div>
 
         {/* ── FOOTER (Centered) ─────────────────────────────────────────────────────────── */}
-        <div className="flex flex-col items-center justify-center pt-10 mt-10 gap-4 w-full">
-          <div className="w-12 h-1 bg-black/10 rounded-full mb-4" />
-          <div className="flex items-center justify-center gap-3 text-[11px] font-mono font-bold text-black/40 uppercase tracking-widest">
-            <Clock size={14} className="text-[#0044CC]" />
-            <span>UTC Timezone | Algorithmic polling active</span>
+        <div className="flex flex-col items-center justify-center pt-10 mt-10 gap-4 w-full border-t border-black/5">
+          <div className="flex items-center justify-center gap-3 text-xs font-mono font-medium text-black/50 uppercase tracking-widest">
+            <Clock size={16} className="text-black/50" />
+            <span>UTC Timezone | Real-time connection active</span>
           </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-black/20">
-            Humanity Ledger © {new Date().getFullYear()}
+          <span className="text-xs font-bold uppercase tracking-widest text-black/30">
+            © {new Date().getFullYear()} Humanity Ledger
           </span>
         </div>
 
