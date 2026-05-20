@@ -39,6 +39,11 @@
     "node_modules",
     "scripts",
     "contracts",
-    "subgraph"
+    "subgraph",
+    "test",
+    "workers",
+    "src/context",
+    "hardhat.config.ts",
+    "vitest.config.ts"
   ]
 }

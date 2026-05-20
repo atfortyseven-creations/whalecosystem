@@ -70,3 +70,18 @@ node_modules/
 build.log
 tsc_output.txt
 tmp_diff.txt
+
+# Corrupt / accidental files — never commit these
+{
+console.log('
+tokens.txt
+parse_pools.py
+light_theme.js
+normalize-4k.js
+refactor.js
+replace_terms.js
+purge_jargon.js
+evacuate.js
+powershell.bat
+task.md
+snapshot-config.json
