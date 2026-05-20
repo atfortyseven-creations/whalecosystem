@@ -156,6 +156,13 @@ function getProductionUrl(): string | undefined {
 
     try {
         const urlObj = new URL(rawUrl);
+        
+        // ── Fallback: If we detect the public proxy domain, rewrite it to use the private internal domain ──
+        if (urlObj.hostname.includes('proxy.rlwy.net')) {
+            urlObj.hostname = 'postgres.railway.internal';
+            urlObj.port = '5432';
+        }
+
         if (urlObj.protocol === 'postgresql:' || urlObj.protocol === 'postgres:') {
             // Force PgBouncer
             urlObj.searchParams.set('pgbouncer', 'true');

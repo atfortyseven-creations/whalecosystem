@@ -9,6 +9,18 @@ export PRISMA_HIDE_UPDATE_MESSAGE=1
 export NPM_CONFIG_UPDATE_NOTIFIER=false
 export NO_UPDATE_NOTIFIER=1
 
+# ── Fallback: If running inside Railway internal network, rewrite public proxy DATABASE_URL to internal URL ──
+if [ -n "$DATABASE_URL" ]; then
+  case "$DATABASE_URL" in
+    *proxy.rlwy.net*)
+      echo "[Sovereign] Rewriting public proxy DATABASE_URL to use high-speed internal Railway network..."
+      export DATABASE_URL=$(echo "$DATABASE_URL" | sed -E 's/@[^/]+/@postgres.railway.internal:5432/')
+      MASKED_URL=$(echo "$DATABASE_URL" | sed -E 's/:[^:@/]+@/:****@/')
+      echo "[Sovereign] Internal DATABASE_URL: $MASKED_URL"
+      ;;
+  esac
+fi
+
 echo "[Sovereign] ═══════════════════════════════════════════════"
 echo "[Sovereign] Phase 1: Prisma client generation..."
 echo "[Sovereign] ═══════════════════════════════════════════════"
