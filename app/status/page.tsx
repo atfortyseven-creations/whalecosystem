@@ -143,9 +143,9 @@ export default function StatusPage() {
             </div>
             
             <div>
-              <h1 className={`text-3xl font-extrabold tracking-tight ${overallCfg.text}`}>
+              <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight ${overallCfg.text} text-balance leading-tight`}>
                 {overall === 'operational'
-                  ? 'All Systems Operational'
+                  ? 'Whale Alert Network working perfectly.'
                   : overall === 'degraded'
                   ? 'Degraded Performance'
                   : overall === 'outage'
