@@ -11,6 +11,14 @@ import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { useSovereignConnect } from '@/hooks/useSovereignConnect';
 import { encryptWithPassword, tryDecryptAny } from '@/lib/wallet-security';
 
+export interface SovereignAccount {
+  id: string;
+  name: string;
+  address: string;
+  encryptedBlob: string;
+  createdAt: number;
+}
+
 type LangKey = 'en' | 'es' | 'zh' | 'ru';
 
 const LANGS: Record<LangKey, Record<string, any>> = {
@@ -226,6 +234,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   const getInitialStep = (): 'home' | 'login' => {
     if (typeof window === 'undefined') return 'home';
     try {
+      const accs = localStorage.getItem('sovereign_accounts');
+      if (accs && JSON.parse(accs).length > 0) return 'login';
       const ks = localStorage.getItem('sovereign_keystore');
       const vault = localStorage.getItem('sovereign_vault_v1');
       return (ks || vault) ? 'login' : 'home';
@@ -236,6 +246,8 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
 
   const [step, setStep] = useState<'home' | 'login' | 'mnemonic' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting'>(getInitialStep);
   const [hasKeystore, setHasKeystore] = useState(false);
+  const [accounts, setAccounts] = useState<SovereignAccount[]>([]);
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -267,6 +279,15 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   }, []);
 
   useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist().then(persistent => {
+        if (persistent) console.log("[Storage] Storage will not be cleared except by explicit user action.");
+        else console.log("[Storage] Storage may be cleared by the UA under storage pressure.");
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     if (clickedMint && isConnected) {
       onComplete();
     }
@@ -274,17 +295,41 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     try {
+      let currentAccounts: SovereignAccount[] = [];
+      const stored = localStorage.getItem('sovereign_accounts');
+      if (stored) {
+        currentAccounts = JSON.parse(stored);
+      }
+      
       const ks = localStorage.getItem('sovereign_keystore');
       const vault = localStorage.getItem('sovereign_vault_v1');
-      const exists = !!(ks || vault);
+      
+      // Migrate legacy single-account to new array format
+      if ((ks || vault) && currentAccounts.length === 0) {
+        const legacyAccount: SovereignAccount = {
+          id: 'legacy-1',
+          name: 'Main Wallet',
+          address: '', // Unknown until decrypted
+          encryptedBlob: (ks || vault) as string,
+          createdAt: Date.now()
+        };
+        currentAccounts.push(legacyAccount);
+        localStorage.setItem('sovereign_accounts', JSON.stringify(currentAccounts));
+      }
+
+      setAccounts(currentAccounts);
+      const exists = currentAccounts.length > 0 || !!(ks || vault);
       setHasKeystore(exists);
-      // Sync step: getInitialStep() runs before hydration so may default to 'home'.
-      // After mount we confirm: if keystore exists, always force login step.
+      
+      if (currentAccounts.length > 0) {
+        setSelectedAccountId(currentAccounts[0].id);
+      }
+
       if (exists) {
         setStep('login');
       }
     } catch {
-      // localStorage blocked (iOS incognito) — stay on home
+      // localStorage blocked (iOS incognito)
     }
   }, []);
 
@@ -366,7 +411,22 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       //    instead of the legacy ethers scrypt which crashes on mobile.
       //    We store the mnemonic phrase so it can be restored from any device.
       const encryptedBlob = await encryptWithPassword(wallet.mnemonic.phrase, password);
+      
+      const newAccount: SovereignAccount = {
+        id: Date.now().toString(),
+        name: \`Wallet \${accounts.length + 1}\`,
+        address: wallet.address,
+        encryptedBlob,
+        createdAt: Date.now()
+      };
+      const updatedAccounts = [...accounts, newAccount];
+      localStorage.setItem('sovereign_accounts', JSON.stringify(updatedAccounts));
+      setAccounts(updatedAccounts);
+      setSelectedAccountId(newAccount.id);
+
+      // Keep legacy item for backwards compatibility if needed, but primary is sovereign_accounts
       localStorage.setItem('sovereign_keystore', encryptedBlob);
+
       importWallet(wallet.privateKey, 'Sovereign Main');
 
       try {
@@ -393,13 +453,34 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   };
 
   const handleLogin = async () => {
-    const ks = localStorage.getItem('sovereign_keystore');
-    const vault = localStorage.getItem('sovereign_vault_v1');
-    if (!ks && !vault) {
+    if (accounts.length === 0 && !hasKeystore) {
       toast.error('No wallet found', { description: 'Please create a new wallet first.' });
       setStep('home');
       return;
     }
+    
+    let targetBlob = '';
+    let isLegacyVault = false;
+    let targetAccount = accounts.find(a => a.id === selectedAccountId);
+
+    if (targetAccount) {
+      targetBlob = targetAccount.encryptedBlob;
+      // Heuristic: if it's the legacy vault without address, it might be the old vault pk
+      if (targetAccount.id === 'legacy-1' && !localStorage.getItem('sovereign_keystore') && localStorage.getItem('sovereign_vault_v1')) {
+        isLegacyVault = true;
+      }
+    } else {
+      const ks = localStorage.getItem('sovereign_keystore');
+      const vault = localStorage.getItem('sovereign_vault_v1');
+      if (ks) targetBlob = ks;
+      else if (vault) { targetBlob = vault; isLegacyVault = true; }
+    }
+
+    if (!targetBlob && !isLegacyVault) {
+      toast.error('Wallet data missing');
+      return;
+    }
+
     if (!password) {
       toast.error('Password required');
       return;
@@ -414,13 +495,13 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       let pk: string | null = null;
       let addr: string | null = null;
 
-      if (ks) {
+      if (!isLegacyVault) {
         // ── SOVEREIGN UPGRADE: tryDecryptAny handles ALL formats atomically:
         //   • New AES-GCM blobs (sovereign v1/v2)
         //   • Legacy ethers scrypt keystores (V3)
         //   • Transparently migrates legacy keystores to AES-GCM on first login
         try {
-          const { plaintext, wasLegacy } = await tryDecryptAny(ks, password);
+          const { plaintext, wasLegacy } = await tryDecryptAny(targetBlob, password);
 
           let walletObj: any;
           if (wasLegacy) {
@@ -440,6 +521,11 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
               const mnemonic = walletObj.mnemonic?.phrase;
               if (mnemonic) {
                 const newBlob = await encryptWithPassword(mnemonic, password);
+                if (targetAccount) {
+                  const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, encryptedBlob: newBlob, address: addr } : a);
+                  localStorage.setItem('sovereign_accounts', JSON.stringify(updatedAccounts));
+                  setAccounts(updatedAccounts);
+                }
                 localStorage.setItem('sovereign_keystore', newBlob);
                 console.log('[QuantumAuthGate] Silent migration: ethers→AES-GCM complete.');
               }
@@ -455,7 +541,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
           setStep('login');
           return;
         }
-      } else if (vault) {
+      } else {
         // Legacy sovereign_vault_v1 path (pre-AES-GCM era)
         const { readStoredVaultKey } = await import('@/hooks/useSovereignConnect');
         const vaultPk = await readStoredVaultKey();
@@ -467,18 +553,30 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
         const walletObj: any = new ethers.Wallet(vaultPk);
         pk = walletObj.privateKey;
         addr = walletObj.address;
-        // Migrate vault_v1 → sovereign_keystore (AES-GCM)
+        // Migrate vault_v1 → sovereign_accounts (AES-GCM)
         try {
           const mnemonic = walletObj.mnemonic?.phrase;
           const blob = mnemonic
             ? await encryptWithPassword(mnemonic, password)
             : await encryptWithPassword(vaultPk, password);
+          if (targetAccount) {
+             const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, encryptedBlob: blob, address: addr } : a);
+             localStorage.setItem('sovereign_accounts', JSON.stringify(updatedAccounts));
+             setAccounts(updatedAccounts);
+          }
           localStorage.setItem('sovereign_keystore', blob);
           localStorage.removeItem('sovereign_vault_v1');
         } catch {}
       }
 
       if (pk && addr) {
+        // Update account address if it was missing (e.g. from legacy migration)
+        if (targetAccount && !targetAccount.address) {
+          const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, address: addr! } : a);
+          localStorage.setItem('sovereign_accounts', JSON.stringify(updatedAccounts));
+          setAccounts(updatedAccounts);
+        }
+
         importWallet(pk, 'Sovereign Main');
         try {
           sessionStorage.setItem('portfolio_unlocked', 'true');
@@ -527,6 +625,20 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
 
       // ── SOVEREIGN UPGRADE: Encrypt with fast AES-GCM (not ethers scrypt)
       const encryptedBlob = await encryptWithPassword(phrase, password);
+      
+      const restoredAccount: SovereignAccount = {
+        id: Date.now().toString(),
+        name: \`Restored \${accounts.length + 1}\`,
+        address: restoredWallet.address,
+        encryptedBlob,
+        createdAt: Date.now()
+      };
+      
+      const updatedAccounts = [...accounts, restoredAccount];
+      localStorage.setItem('sovereign_accounts', JSON.stringify(updatedAccounts));
+      setAccounts(updatedAccounts);
+      setSelectedAccountId(restoredAccount.id);
+
       localStorage.setItem('sovereign_keystore', encryptedBlob);
       // Clean up any stale legacy vault entries
       localStorage.removeItem('sovereign_vault_v1');
@@ -574,15 +686,21 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
             <div className="space-y-3">
               <button 
                 onClick={() => setStep('password')}
-                className="group w-full flex items-center justify-between p-6 rounded-[24px] bg-[#050505] text-white hover:bg-[#111] transition-all shadow-[0_8px_30px_rgba(0,0,0,0.12)] active:scale-[0.98] border border-white/10"
+                disabled={accounts.length >= 5}
+                className="group w-full flex items-center justify-between p-6 rounded-[24px] bg-[#050505] text-white hover:bg-[#111] transition-all shadow-[0_8px_30px_rgba(0,0,0,0.12)] active:scale-[0.98] border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <div className="flex items-center gap-5">
                   <div className="w-13 h-13 rounded-full bg-white/10 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform p-3">
                     <Wallet size={22} className="text-white" />
                   </div>
                   <div className="text-left">
-                    <div className="text-[16px] font-black uppercase tracking-widest">{t.create_vault}</div>
-                    <div className="text-[13px] text-white/50 font-medium mt-0.5 tracking-wide">{t.create_vault_sub}</div>
+                    <div className="text-[16px] font-black uppercase tracking-widest flex items-center gap-2">
+                       {t.create_vault}
+                       {accounts.length > 0 && <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">{accounts.length}/5</span>}
+                    </div>
+                    <div className="text-[13px] text-white/50 font-medium mt-0.5 tracking-wide">
+                       {accounts.length >= 5 ? 'Maximum vaults reached' : t.create_vault_sub}
+                    </div>
                   </div>
                 </div>
                 <ArrowRight size={20} className="text-white/40 group-hover:text-white transition-colors group-hover:translate-x-1" />
@@ -637,6 +755,40 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
             </div>
             
             <div className="space-y-4">
+              {accounts.length > 0 && (
+                <div className="w-full bg-[#FAFAF8] border border-black/10 rounded-[20px] p-2 mb-4">
+                  <div className="px-3 pt-2 pb-1 text-[11px] font-black uppercase tracking-widest text-[#0A0A0A]/40">
+                    Select Vault ({accounts.length}/5)
+                  </div>
+                  <div className="max-h-[160px] overflow-y-auto space-y-1 mt-2">
+                    {accounts.map(acc => (
+                      <button
+                        key={acc.id}
+                        onClick={() => setSelectedAccountId(acc.id)}
+                        className={`w-full flex items-center justify-between p-3 rounded-[14px] transition-all ${
+                          selectedAccountId === acc.id 
+                            ? 'bg-[#050505] text-white shadow-md' 
+                            : 'bg-transparent text-[#0A0A0A] hover:bg-black/5'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[12px] ${selectedAccountId === acc.id ? 'bg-white/20' : 'bg-black/5'}`}>
+                              {acc.name.substring(0, 2).toUpperCase()}
+                           </div>
+                           <div className="text-left flex flex-col">
+                              <span className="text-[13px] font-black uppercase tracking-wider">{acc.name}</span>
+                              <span className={`text-[11px] font-medium ${selectedAccountId === acc.id ? 'text-white/60' : 'text-[#0A0A0A]/40'}`}>
+                                {acc.address ? `${acc.address.slice(0, 6)}...${acc.address.slice(-4)}` : 'Encrypted Vault'}
+                              </span>
+                           </div>
+                        </div>
+                        {selectedAccountId === acc.id && <Check size={16} className="text-white" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <input 
                 type="password" 
                 value={password}
@@ -664,7 +816,26 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
                 <p className="text-left text-[13px] font-medium text-red-600/80 leading-relaxed">{t.danger_body}</p>
                 <div className="flex gap-2 pt-2">
                   <button onClick={() => setShowResetConfirm(false)} className="flex-1 py-3.5 rounded-xl border border-black/10 bg-white text-[#050505] text-[13px] font-black uppercase tracking-widest hover:bg-black/5 transition-all">{t.cancel}</button>
-                  <button onClick={() => { localStorage.removeItem('sovereign_keystore'); setStep('home'); setShowResetConfirm(false); }} className="flex-1 py-3.5 rounded-xl bg-red-500 text-white text-[13px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-md">{t.purge}</button>
+                  <button onClick={() => { 
+                    if (selectedAccountId) {
+                      const updatedAccounts = accounts.filter(a => a.id !== selectedAccountId);
+                      localStorage.setItem('sovereign_accounts', JSON.stringify(updatedAccounts));
+                      setAccounts(updatedAccounts);
+                      if (updatedAccounts.length > 0) {
+                        setSelectedAccountId(updatedAccounts[0].id);
+                      } else {
+                        localStorage.removeItem('sovereign_keystore');
+                        setStep('home');
+                      }
+                      toast.success('Wallet deleted');
+                    } else {
+                      localStorage.removeItem('sovereign_keystore');
+                      localStorage.removeItem('sovereign_accounts');
+                      setAccounts([]);
+                      setStep('home'); 
+                    }
+                    setShowResetConfirm(false); 
+                  }} className="flex-1 py-3.5 rounded-xl bg-red-500 text-white text-[13px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-md">{t.purge}</button>
                 </div>
               </motion.div>
             ) : (

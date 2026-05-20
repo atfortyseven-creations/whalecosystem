@@ -65,15 +65,15 @@ async function probe(name: string, url: string, timeoutMs = 8000): Promise<Servi
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.humanidfi.com';
 
-  // Probe all critical platform services in parallel — maximum efficiency
+  // Probe all platform feature components in parallel — maximum efficiency
   const results = await Promise.all([
-    probe('Dashboard',                    `${baseUrl}/`),
-    probe('Humanity Ledger API',          `${baseUrl}/api/humanity-ledger?limit=1`),
-    probe('Whale WebSocket Health',       `${baseUrl}/api/whales/live`),
-    probe('Portfolio API',                `${baseUrl}/api/wallet/portfolio`),
-    probe('Privy Relayer',               `${baseUrl}/api/auth/session`),
-    probe('Smart Contract RPC (Polygon)', 'https://polygon-rpc.com'),
-    probe('Smart Contract RPC (Base)',    'https://mainnet.base.org'),
+    probe('Dashboard',   `${baseUrl}/`),
+    probe('Whale Chat',  `${baseUrl}/chat`),
+    probe('Portfolio',   `${baseUrl}/portfolio`),
+    probe('News',        `${baseUrl}/news`),
+    probe('Academy',     `${baseUrl}/academy`),
+    probe('Forum',       `${baseUrl}/forum`),
+    probe('Careers',     `${baseUrl}/careers`),
   ]);
 
   const allOperational = results.every(r => r.status === 'operational');

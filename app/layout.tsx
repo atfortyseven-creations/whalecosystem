@@ -42,16 +42,19 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'Whale Alert Network | Secure Institutional Infrastructure',
-    template: '%s | Whale Alert Network'
+    default: 'Whale Alert — Live Crypto Whale Tracker & Blockchain Monitor',
+    template: '%s | Whale Alert'
   },
-  description: 'The definitive Whale Alert Network for secure institutional architecture, cryptographic attestation, and data compliance.',
+  description: 'Track massive crypto transactions in real time. Whale Alert shows you every large Bitcoin, Ethereum and altcoin move the moment it happens — free, live and no sign-up needed.',
   keywords: [
-    'Whale Alert Network', 'Secure Architecture', 'Cryptographic Attestation', 'Healthcare Integrity', 'Spitalul Colțea Alliance'
+    'whale alert', 'whale alert crypto', 'crypto whale tracker', 'whale transactions',
+    'blockchain monitor', 'large crypto transactions', 'bitcoin whale', 'ethereum whale',
+    'live crypto alerts', 'on-chain analytics', 'humanidfi', 'whale watching crypto',
+    'crypto market moves', 'defi whale tracker', 'whale alert live'
   ],
-  authors: [{ name: 'Whale Alert Network Foundation' }],
-  creator: 'Whale Alert Network Foundation',
-  publisher: 'Whale Alert Network Foundation',
+  authors: [{ name: 'Whale Alert' }],
+  creator: 'Whale Alert',
+  publisher: 'Whale Alert',
   metadataBase: new URL('https://www.humanidfi.com'),
   alternates: {
     canonical: '/',
@@ -59,7 +62,7 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
-    nocache: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
@@ -75,16 +78,16 @@ export const metadata = {
     statusBarStyle: 'default',
   },
   openGraph: {
-    title: 'Whale Alert Network | Professional Identity Layer',
-    description: 'The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+    title: 'Whale Alert — Live Crypto Whale Tracker & Blockchain Monitor',
+    description: 'Track massive crypto transactions in real time. See every large Bitcoin, Ethereum and altcoin move the moment it happens.',
     url: 'https://www.humanidfi.com',
-    siteName: 'Whale Alert Network',
+    siteName: 'Whale Alert',
     images: [
       {
         url: '/humanid_protocol_logo_1778714491433.png',
         width: 1200,
         height: 1200,
-        alt: 'Whale Alert Network',
+        alt: 'Whale Alert — Live Crypto Whale Tracker',
       },
     ],
     locale: 'en_US',
@@ -92,8 +95,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Whale Alert Network | Professional Identity Layer',
-    description: 'The definitive Whale Alert Network for professional-grade on-chain identity, cryptographic attestation, and real-time intelligence.',
+    title: 'Whale Alert — Live Crypto Whale Tracker & Blockchain Monitor',
+    description: 'Track massive crypto transactions in real time. See every large Bitcoin, Ethereum and altcoin move the moment it happens.',
     images: ['/humanid_protocol_logo_1778714491433.png'],
   },
 }
@@ -123,8 +126,16 @@ export default async function RootLayout({
       {
         "@type": "WebSite",
         "url": "https://www.humanidfi.com/",
-        "name": "Whale Alert Network",
-        "description": "The definitive Whale Alert Network for secure institutional architecture and cryptographic attestation.",
+        "name": "Whale Alert",
+        "description": "Track massive crypto whale transactions in real time. Live blockchain monitor for Bitcoin, Ethereum and all major altcoins.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://www.humanidfi.com/?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        },
         "publisher": {
           "@id": "https://www.humanidfi.com/#organization"
         }
@@ -132,7 +143,8 @@ export default async function RootLayout({
       {
         "@type": "Organization",
         "@id": "https://www.humanidfi.com/#organization",
-        "name": "Whale Alert Network Foundation",
+        "name": "Whale Alert",
+        "alternateName": ["Whale Alert Network", "humanidfi"],
         "url": "https://www.humanidfi.com",
         "logo": "https://www.humanidfi.com/humanid_protocol_logo_1778714491433.png",
         "sameAs": [
@@ -141,41 +153,32 @@ export default async function RootLayout({
       },
       {
         "@type": "WebApplication",
-        "name": "Secure Access Terminal",
-        "applicationCategory": "SecurityApplication",
+        "name": "Whale Alert — Live Crypto Tracker",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
         "creator": {
           "@id": "https://www.humanidfi.com/#organization"
         },
-        "description": "Secure Terminal for cryptographic data attestation and E2E communication.",
+        "description": "Free real-time tracker of large cryptocurrency transactions. See whale moves on Bitcoin, Ethereum, and 50+ blockchains the moment they happen.",
         "featureList": [
-          "End-to-End Encrypted Telemetry",
-          "Cryptographic Identity Verification",
-          "Aztec Network L2 Privacy Integration",
-          "Decentralized Data Integrity"
+          "Live Whale Transaction Alerts",
+          "On-Chain Analytics Dashboard",
+          "Portfolio Tracker",
+          "Crypto News & Academy",
+          "Community Forum"
         ]
-      },
-      {
-        "@type": "SoftwareSourceCode",
-        "name": "Whale Alert Network Architecture",
-        "codeRepository": "https://github.com/atfortyseven-creations/Humanity-Ledger",
-        "programmingLanguage": ["TypeScript", "Solidity", "React", "Next.js"],
-        "description": "Secure identity layer running over an optimized cryptographic UI."
-      },
-      {
-        "@type": "DataFeed",
-        "name": "Encrypted Telemetry Stream",
-        "dataFeedElement": {
-          "@type": "DataFeedItem",
-          "name": "Secure Handshake Verification",
-          "description": "Real-time cryptographic attestation via local peer nodes."
-        }
       },
       {
         "@type": "Product",
         "@id": "https://www.humanidfi.com/#quantumdots",
         "name": "Quantum Dots (QDs)",
         "alternateName": "QDs",
-        "description": "Quantum Dots (QDs) is the native cryptographic token exclusively engineered, patented, and owned by Whale Alert Network Foundation (humanidfi.com). OFFICIAL STATUS: UNLISTED. The Quantum Dots (QDs) token is currently NOT available on any public or private exchange. Any third-party entity claiming to list, sell, or trade Quantum Dots (QDs) is unauthorized and fraudulent. humanidfi.com holds the sole absolute ownership of the QDs intellectual property.",
+        "description": "Quantum Dots (QDs) is the native cryptographic token exclusively engineered, patented, and owned by Whale Alert (humanidfi.com). OFFICIAL STATUS: UNLISTED. Any third-party claiming to list, sell, or trade Quantum Dots (QDs) is unauthorized and fraudulent.",
         "brand": {
           "@id": "https://www.humanidfi.com/#organization"
         },
@@ -191,18 +194,6 @@ export default async function RootLayout({
           "seller": {
             "@id": "https://www.humanidfi.com/#organization"
           }
-        },
-        "isRelatedTo": {
-          "@type": "CreativeWork",
-          "name": "QuantumDots Intellectual Property",
-          "author": {
-            "@id": "https://www.humanidfi.com/#organization"
-          },
-          "copyrightHolder": {
-            "@id": "https://www.humanidfi.com/#organization"
-          },
-          "copyrightYear": "2026",
-          "license": "All Rights Reserved - Pre-Listing Asset"
         }
       }
     ]

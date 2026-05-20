@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Wifi, Clock, Activity, ShieldAlert, Server } from 'lucide-react';
+import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Wifi, Clock, Activity, ShieldAlert, Server, LayoutDashboard, MessageCircle, Briefcase, Newspaper, GraduationCap, Users, Award, LockOpen, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // TYPES
@@ -32,7 +32,7 @@ const STATUS_CONFIG = {
     text: 'text-green-600',
     bg: 'bg-green-50',
     border: 'border-green-100',
-    icon: CheckCircle2,
+    icon: LockOpen,
   },
   degraded: {
     label: 'Degraded',
@@ -40,7 +40,7 @@ const STATUS_CONFIG = {
     text: 'text-yellow-600',
     bg: 'bg-yellow-50',
     border: 'border-yellow-100',
-    icon: AlertTriangle,
+    icon: Lock,
   },
   outage: {
     label: 'Outage',
@@ -48,7 +48,7 @@ const STATUS_CONFIG = {
     text: 'text-red-600',
     bg: 'bg-red-50',
     border: 'border-red-100',
-    icon: XCircle,
+    icon: Lock,
   },
   loading: {
     label: 'Checking...',
@@ -56,7 +56,7 @@ const STATUS_CONFIG = {
     text: 'text-black/40',
     bg: 'bg-black/5',
     border: 'border-black/5',
-    icon: Wifi,
+    icon: Lock,
   },
 } as const;
 
@@ -78,6 +78,17 @@ function LatencyBadge({ ms }: { ms: number }) {
 }
 
 import StatusNavbar from '@/components/status/StatusNavbar';
+
+// Component icon + color mapping
+const COMPONENT_META: Record<string, { icon: React.ElementType; accent: string; gradient: string }> = {
+  'Dashboard':  { icon: LayoutDashboard, accent: 'text-violet-600',  gradient: 'from-violet-50 to-white' },
+  'Whale Chat': { icon: MessageCircle,   accent: 'text-cyan-600',    gradient: 'from-cyan-50 to-white' },
+  'Portfolio':  { icon: Briefcase,       accent: 'text-emerald-600', gradient: 'from-emerald-50 to-white' },
+  'News':       { icon: Newspaper,       accent: 'text-orange-600',  gradient: 'from-orange-50 to-white' },
+  'Academy':    { icon: GraduationCap,   accent: 'text-blue-600',    gradient: 'from-blue-50 to-white' },
+  'Forum':      { icon: Users,           accent: 'text-pink-600',    gradient: 'from-pink-50 to-white' },
+  'Careers':    { icon: Award,           accent: 'text-amber-600',   gradient: 'from-amber-50 to-white' },
+};
 
 // MAIN PAGE
 export default function StatusPage() {
@@ -242,33 +253,46 @@ export default function StatusPage() {
 
             {health?.services.map((svc, i) => {
               const cfg = STATUS_CONFIG[svc.status];
-              const Icon = cfg.icon;
+              const StatusIcon = cfg.icon;
+              const meta = COMPONENT_META[svc.name];
+              const ComponentIcon = meta?.icon ?? Server;
+              const accentClass = meta?.accent ?? 'text-black';
+              const gradientClass = meta?.gradient ?? 'from-white to-white';
               return (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + (i * 0.05) }}
+                  transition={{ delay: 0.08 + (i * 0.06), ease: [0.16, 1, 0.3, 1] }}
                   key={svc.name}
-                  className="w-full bg-white border border-black/10 rounded-2xl overflow-hidden hover:shadow-md transition-all duration-300"
+                  className={`w-full bg-gradient-to-r ${gradientClass} border border-black/[0.07] rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`}
                 >
-                  <div className="px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-                    <div className="flex flex-col md:flex-row items-center gap-5 min-w-0">
-                      <StatusDot status={svc.status} />
+                  <div className="px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    {/* Left: icon + name */}
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className={`w-12 h-12 rounded-2xl bg-white border border-black/[0.07] flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 transition-transform`}>
+                        <ComponentIcon size={22} className={accentClass} strokeWidth={1.8} />
+                      </div>
                       <div className="min-w-0">
-                        <p className="font-extrabold text-lg tracking-tight text-black">{svc.name}</p>
-                        <p className="text-xs font-mono font-medium text-black/50 mt-1">{svc.url}</p>
+                        <p className="font-black text-[16px] tracking-tight text-black leading-tight">{svc.name}</p>
+                        <p className="text-[11px] font-mono font-medium text-black/40 mt-0.5 truncate max-w-[220px]">{svc.url}</p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-center gap-6 shrink-0">
-                      <LatencyBadge ms={svc.latencyMs} />
+                    {/* Right: latency + status badge */}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex flex-col items-end">
+                        <LatencyBadge ms={svc.latencyMs} />
+                        <span className="text-[10px] text-black/30 font-mono uppercase tracking-wider mt-0.5">latency</span>
+                      </div>
                       <span
-                        className={`inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.text}`}
+                        className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest px-3.5 py-2 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.text}`}
                       >
-                        <Icon size={16} />
+                        <StatusIcon size={13} />
                         {cfg.label}
                       </span>
                     </div>
                   </div>
+                  {/* Subtle bottom bar colored by status */}
+                  <div className={`h-[2px] w-full ${cfg.color} opacity-40`} />
                 </motion.div>
               );
             })}
