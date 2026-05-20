@@ -47,6 +47,11 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
                 document.documentElement.style.setProperty('--mobile-sterile-enforcer', 'active');
                 if (document.body) {
                     document.body.classList.add('mobile-sterile-lock');
+                    document.body.classList.add('is-mobile-device');
+                }
+            } else {
+                if (document.body) {
+                    document.body.classList.remove('is-mobile-device');
                 }
             }
         };

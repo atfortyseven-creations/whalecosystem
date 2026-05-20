@@ -10,7 +10,9 @@ const ethClient = createPublicClient({
   transport: fallback([
     http('https://eth.llamarpc.com'),
     http('https://ethereum-rpc.publicnode.com'),
-    http('https://cloudflare-eth.com')
+    http('https://cloudflare-eth.com'),
+    http('https://rpc.ankr.com/eth'),
+    http('https://1rpc.io/eth')
   ], { rank: true })
 });
 
@@ -72,7 +74,13 @@ async function indexLatestBlock() {
     console.log(`[INDEXER] Processed ${block.transactions.length} transactions from block ${block.number}.`);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error(`[INDEXER ERROR] Could not index block: ${error.message}`);
+      const msg = error.message;
+      if (msg.includes('Rate limit') || msg.includes('limit') || msg.includes('429') || msg.includes('exceeds defined limit')) {
+        console.warn('[INDEXER] Rate limit encountered on public RPC, retrying next block...');
+      } else {
+        const firstLine = msg.split('\n')[0];
+        console.error(`[INDEXER ERROR] Could not index block: ${firstLine}`);
+      }
     } else {
       console.error('[INDEXER ERROR] Could not index block: Unknown error');
     }

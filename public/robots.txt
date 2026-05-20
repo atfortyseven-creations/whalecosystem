@@ -1,6 +1,18 @@
 User-agent: *
 Allow: /
 
+User-agent: Grok
+Allow: /
+
+User-agent: GrokBot
+Allow: /
+
+User-agent: xbot
+Allow: /
+
+User-agent: XBot
+Allow: /
+
 User-agent: Googlebot
 Allow: /
 

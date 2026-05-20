@@ -506,6 +506,20 @@ body,
    When the Android keyboard opens, viewport shrinks.
    Hide bottom navigation to prevent it from covering inputs.
    ============================================================ */
+.mobile-bottom-nav {
+  display: none !important;
+}
+
+body.is-mobile-device .mobile-bottom-nav {
+  display: flex !important;
+}
+
+@media (min-width: 1024px) {
+  body.is-mobile-device .mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
 @media (max-height: 450px) {
   .mobile-bottom-nav {
     display: none !important;

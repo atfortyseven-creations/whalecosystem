@@ -149,7 +149,7 @@ export default function PricingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 text-left">
               {PRICING_TIERS.map((tier, index) => {
                 return (
-                  <motion.div
+                  <MotionDiv
                     key={tier.id}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -211,7 +211,7 @@ export default function PricingPage() {
                         )}
                       </button>
                     </div>
-                  </motion.div>
+                  </MotionDiv>
                 );
               })}
             </div>
@@ -221,7 +221,7 @@ export default function PricingPage() {
         {/* ── SYSTEM INTEGRITY ─────────────────────────────────────────────── */}
         <section className="w-full py-24 md:py-48 border-t border-black/5 relative z-10 bg-transparent flex flex-col items-center">
           <div className="max-w-[1400px] mx-auto px-6 w-full text-center">
-            <motion.div
+            <MotionDiv
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}
               variants={FADE_UP}
               className="mb-20 flex flex-col items-center"
@@ -232,7 +232,7 @@ export default function PricingPage() {
               <p className="text-[20px] md:text-[24px] font-serif text-black/50 max-w-3xl leading-relaxed mx-auto">
                 We have engineered an environment where mathematical verifications happen seamlessly, securing institutional identity and data against unauthorized access.
               </p>
-            </motion.div>
+            </MotionDiv>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               <ProFeatureCard title="System Verification" desc="Cryptographic certainty that ensures the integrity of records against tampering or unauthorized modification." />

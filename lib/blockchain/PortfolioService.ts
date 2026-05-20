@@ -308,7 +308,10 @@ export class PortfolioService {
             }
           }
         } catch (qdsError: any) {
-          console.warn(`[Portfolio-QDs-Query] Failed to query QDs balance:`, qdsError.message);
+          const msg = qdsError.message || '';
+          if (!msg.includes('BAD_DATA') && !msg.includes('could not decode') && !msg.includes('0x')) {
+            console.warn(`[Portfolio-QDs-Query] Failed to query QDs balance:`, msg);
+          }
         }
       }
 
