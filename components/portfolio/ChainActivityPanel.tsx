@@ -67,6 +67,11 @@ type DisplayTx = {
   gasPrice: string;
   type: "send" | "receive" | "contract";
   explorer: string;
+  // Quantum fields
+  quantumEntropy?: string;
+  payloadHash?: string;
+  advancedMetadata?: string;
+  blockNumber?: string;
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -162,14 +167,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
     try {
       const base = `/api/portfolio/chain-activity?address=${address}&chain=${chain.slug}`;
 
-      if (chain.isQd) {
-        // Humanity Ledger: fetch QD token transfers
-        const txRes = await fetch(`${base}&type=txlist`);
-        const txData = await txRes.json();
-        if (txData.status === '1' && Array.isArray(txData.result)) {
-          setTxs(txData.result.map((t: TokenTx) => tokenToDisplay(t, address, chain.explorer!)));
-        }
-      } else {
+      if (!chain.isQd) {
         // Native chains: fetch native balance + tx list
         const [balRes, txRes] = await Promise.all([
           fetch(`${base}&type=balance`),
@@ -190,6 +188,50 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
       setLoading(false);
     }
   }, [chain, address]);
+
+  // Quantum Receipts via wagmi (only for Humanity Ledger)
+  const { data: qdReceiptsRaw, isLoading: loadingReceipts } = useReadContract({
+    address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as `0x${string}`,
+    abi: parseAbi([
+      'struct TransferReceipt { address from; address to; uint256 amount; uint256 timestamp; uint256 quantumEntropy; bytes advancedMetadata; bytes32 payloadHash; uint256 blockNumber; uint256 gasCost; }',
+      'function getUserReceipts(address) view returns (TransferReceipt[])'
+    ]),
+    functionName: 'getUserReceipts',
+    args: [(address || "0x") as `0x${string}`],
+    query: { enabled: chain.isQd && !!address && open },
+  });
+
+  useEffect(() => {
+    if (chain.isQd && qdReceiptsRaw && Array.isArray(qdReceiptsRaw)) {
+      try {
+        const receipts = [...qdReceiptsRaw].reverse(); // newest first
+        setTxs(receipts.map((r: any) => ({
+          hash: r.payloadHash || "0x", // Use payloadHash as hash for explorer
+          from: r.from || "0x",
+          to: r.to || "0x",
+          amount: r.amount ? formatToken(r.amount.toString(), 18) : "0",
+          symbol: chain.symbol,
+          timeStamp: r.timestamp ? r.timestamp.toString() : "0",
+          isError: false,
+          gasPrice: r.gasCost ? r.gasCost.toString() : "0",
+          type: (r.from || "").toLowerCase() === (address || "").toLowerCase() ? "send" : "receive",
+          explorer: chain.explorer!,
+          quantumEntropy: r.quantumEntropy ? r.quantumEntropy.toString() : "",
+          payloadHash: r.payloadHash || "",
+          advancedMetadata: r.advancedMetadata || "",
+          blockNumber: r.blockNumber ? r.blockNumber.toString() : "0"
+        })));
+        setFetched(true);
+      } catch (err) {
+        console.error("Failed to parse Quantum Receipts", err);
+        setTxs([]);
+        setFetched(true);
+      }
+    } else if (chain.isQd && qdReceiptsRaw !== undefined) {
+      setTxs([]);
+      setFetched(true);
+    }
+  }, [qdReceiptsRaw, chain.isQd, chain.symbol, chain.explorer, address]);
 
   useEffect(() => {
     if (!chain.slug) { setFetched(true); return; }
@@ -244,7 +286,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
           )}
         </div>
 
-        {loading
+        {(loading || (chain.isQd && loadingReceipts))
           ? <Loader2 size={14} className="animate-spin shrink-0" style={{ color: MUTED }} />
           : open
             ? <ChevronDown size={14} className="shrink-0" style={{ color: MUTED }} />
@@ -370,18 +412,31 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
                     </div>
 
                     {/* hash link */}
-                    <a
-                      href={`${tx.explorer}/tx/${tx.hash}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[9px] font-mono hover:opacity-100 opacity-40 transition-opacity flex items-center gap-1 shrink-0"
-                      style={{ color: INK }}
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <Hash size={9} />
-                      {shortHash(tx.hash)}
-                      <ExternalLink size={8} />
-                    </a>
+                    <div className="flex flex-col items-end shrink-0 gap-1">
+                      <a
+                        href={chain.isQd ? undefined : `${tx.explorer}/tx/${tx.hash}`}
+                        target={chain.isQd ? undefined : "_blank"}
+                        rel={chain.isQd ? undefined : "noopener noreferrer"}
+                        className="text-[9px] font-mono hover:opacity-100 opacity-40 transition-opacity flex items-center gap-1"
+                        style={{ color: INK, cursor: chain.isQd ? "default" : "pointer" }}
+                        onClick={e => chain.isQd && e.stopPropagation()}
+                      >
+                        <Hash size={9} />
+                        {shortHash(tx.hash)}
+                        {!chain.isQd && <ExternalLink size={8} />}
+                      </a>
+                      
+                      {tx.quantumEntropy && (
+                        <div className="flex flex-col items-end gap-0.5">
+                          <span className="text-[7px] font-mono font-black uppercase" style={{ color: "#8247e5" }}>
+                            ENTROPY: {shortHash(tx.quantumEntropy)}
+                          </span>
+                          <span className="text-[7px] font-mono" style={{ color: MUTED }}>
+                            BLK: {tx.blockNumber}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}

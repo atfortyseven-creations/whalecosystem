@@ -25,6 +25,49 @@ import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { QuantumAuthGate } from '@/components/auth/QuantumAuthGate';
 import QuantumTransfer from '@/components/dashboard/QuantumTransfer';
+import { useQueryClient } from '@tanstack/react-query';
+
+function QuantumEpochCountdown({ onReset }: { onReset: () => void }) {
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const epoch = new Date(now);
+      if (now.getHours() < 12) {
+        epoch.setHours(12, 0, 0, 0);
+      } else {
+        epoch.setHours(24, 0, 0, 0);
+      }
+      return Math.max(0, Math.floor((epoch.getTime() - now.getTime()) / 1000));
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const t = setInterval(() => {
+      const remaining = calculateTimeLeft();
+      setTimeLeft(remaining);
+      if (remaining === 0 || remaining === 43199) {
+        onReset();
+      }
+    }, 1000);
+    return () => clearInterval(t);
+  }, [onReset]);
+
+  const h = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
+  const m = Math.floor((timeLeft % 3600) / 60).toString().padStart(2, '0');
+  const s = (timeLeft % 60).toString().padStart(2, '0');
+
+  return (
+    <div className="flex flex-col items-end mr-3 hidden sm:flex">
+      <div className="text-[8px] font-mono font-black uppercase tracking-widest text-black/40">
+        Next Epoch
+      </div>
+      <div className="font-mono font-black text-xs text-black">
+        {h}:{m}:{s}
+      </div>
+    </div>
+  );
+}
 
 // ── Palette — Light Mode ─────────────────────────
 const BG   = "transparent";
@@ -188,6 +231,7 @@ function WalletAction({
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function PortfolioPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const eurRate = useEURRate();
   const fmt = useCallback((v: number) => formatEUR(v, eurRate), [eurRate]);
   const [hidden, setHidden] = useState(false);
@@ -218,7 +262,10 @@ export default function PortfolioPage() {
   const { open: openAppKit } = useAppKit();
   const { disconnect } = useDisconnect();
   const [refreshKey, setRefreshKey] = useState(0);
-  const refresh = () => setRefreshKey(k => k + 1);
+  const refresh = useCallback(() => {
+    setRefreshKey(k => k + 1);
+    queryClient.invalidateQueries();
+  }, [queryClient]);
 
   const isPositive = (change24hUSD ?? 0) >= 0;
 
@@ -340,6 +387,8 @@ export default function PortfolioPage() {
               </button>
             </div>
           </div>
+
+          <QuantumEpochCountdown onReset={refresh} />
 
           {/* Refresh */}
           <button
@@ -812,7 +861,7 @@ export default function PortfolioPage() {
           >
             <div className="flex flex-col mb-8 gap-2">
               <h2 className="font-black uppercase tracking-tight text-xl sm:text-2xl" style={{ color: INK }}>QDs ( Quantum Dots )</h2>
-              <p className="text-sm font-mono" style={{ color: MUTED }}>Envía QDs a otras wallets de forma instantánea y sin comisiones de gas.</p>
+              <p className="text-sm font-mono" style={{ color: MUTED }}>Ejecuta transferencias inmutables On-Chain de QDs pagando gas fees ridículos de L2.</p>
             </div>
             <div className="w-full flex items-center justify-center">
               <QuantumTransfer />

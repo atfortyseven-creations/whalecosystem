@@ -929,7 +929,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="flex items-center justify-center px-4 md:px-6 h-full w-full relative overflow-y-auto py-12 md:py-0">
       <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
-         <RemoteLottie path="/system-shots/Airplane Lottie Animation (1).json" className="w-full h-full object-cover" />
+         <RemoteLottie path="/system-shots/Airplane Lottie Animation (1).json" className="w-full h-full object-cover" loop={false} />
       </div>
       <motion.div 
         key={step}

@@ -319,7 +319,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
             transition={{ delay: 0.05, duration: 0.5 }}
             className="fixed inset-0 z-20 pointer-events-none flex items-center justify-center"
           >
-            <RemoteLottie path="/system-shots/Airplane Lottie Animation (1).json" className="w-full h-full object-cover opacity-100" />
+            <RemoteLottie path="/system-shots/Airplane Lottie Animation (1).json" className="w-full h-full object-cover opacity-100" loop={false} />
           </motion.div>
 
           <motion.div

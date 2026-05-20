@@ -202,11 +202,6 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
 
     let qdBalanceNum = qdBalanceRaw ? parseFloat(formatEther(qdBalanceRaw as bigint)) : 0;
     
-    // Sovereign owner fallback if balance is 0 or contract is not deployed
-    if (effectiveAddress && effectiveAddress.toLowerCase() === '0x78831c25c86ea2a78a6127fc2ccb95e612d87b4a' && qdBalanceNum === 0) {
-        qdBalanceNum = 2005000;
-    }
-    
     // QDs mapped at €1 = 1 QD equivalence for UI tracking purposes
     if (qdBalanceNum > 0 || isConnected) {
         assets.unshift({

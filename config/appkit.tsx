@@ -102,7 +102,13 @@ const queryClient = new QueryClient()
 //    if called before the document is fully loaded, causing the WC relay to reject the session.
 // The canonical URL is ALWAYS humanidfi.com in production. Preview URLs must be allowlisted
 // separately in WalletConnect Cloud dashboard if needed.
-const CANONICAL_APP_URL = 'https://humanidfi.com';
+let CANONICAL_APP_URL = 'https://humanidfi.com';
+if (typeof window !== 'undefined' && window.location && window.location.origin) {
+    const origin = window.location.origin;
+    if (origin !== 'null' && origin !== '' && (origin.includes('humanidfi.com') || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+        CANONICAL_APP_URL = origin;
+    }
+}
 
 
 const metadata = {

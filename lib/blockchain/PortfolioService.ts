@@ -273,12 +273,6 @@ export class PortfolioService {
           try {
             qdsBalance = await qdsContract.balanceOf(address);
           } catch (e) {}
-          
-          const sovereignOwner = "0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a";
-          if (address.toLowerCase() === sovereignOwner.toLowerCase() && qdsBalance === 0n) {
-            qdsBalance = ethers.parseEther("2005000");
-          }
-          
           if (qdsBalance > 0n) {
             const qdsBalanceFormatted = parseFloat(ethers.formatUnits(qdsBalance, 18));
             const existingIdx = enrichedTokens.findIndex(
@@ -294,8 +288,8 @@ export class PortfolioService {
               symbol: 'QDs',
               decimals: 18,
               logo: '/official-whale-monochrome.png',
-              price: 1.0,
-              valueUsd: qdsBalanceFormatted * 1.0,
+              price: 0,
+              valueUsd: 0,
               change24h: 0,
               chainId,
               sector: 'AI',
@@ -425,12 +419,6 @@ export class PortfolioService {
                       );
                       qdsBal = await qdsContract.balanceOf(address);
                   } catch (e) {}
-                  
-                  const sovereignOwner = "0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a";
-                  if (address.toLowerCase() === sovereignOwner.toLowerCase() && qdsBal === 0n) {
-                      qdsBal = ethers.parseEther("2005000");
-                  }
-                  
                   if (qdsBal > 0n) {
                       const qdsBalFormatted = parseFloat(ethers.formatUnits(qdsBal, 18));
                       const qdsToken = {
@@ -443,8 +431,8 @@ export class PortfolioService {
                           symbol: 'QDs',
                           decimals: 18,
                           logo: '/official-whale-monochrome.png',
-                          price: 1.0,
-                          valueUsd: qdsBalFormatted * 1.0,
+                          price: 0,
+                          valueUsd: 0,
                           chainId,
                           sector: 'AI',
                           isUnknown: false
