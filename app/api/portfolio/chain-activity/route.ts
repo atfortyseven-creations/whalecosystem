@@ -19,14 +19,23 @@ export async function GET(req: NextRequest) {
   if (!address) return NextResponse.json({ error: 'Missing address' }, { status: 400 });
   if (!ETHERSCAN_KEY) return NextResponse.json({ error: 'Etherscan key not configured' }, { status: 503 });
 
-  const chainId = CHAIN_IDS[chain] ?? 1;
+  const chainId = chain === 'humanity' ? 8453 : (CHAIN_IDS[chain] ?? 1);
   const base_url = `https://api.etherscan.io/v2/api?chainid=${chainId}&apikey=${ETHERSCAN_KEY}`;
 
   let url = '';
-  if (type === 'balance') {
-    url = `${base_url}&module=account&action=balance&address=${address}&tag=latest`;
+  if (chain === 'humanity') {
+      const qdContract = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || '0x';
+      if (type === 'balance') {
+          url = `${base_url}&module=account&action=tokenbalance&contractaddress=${qdContract}&address=${address}&tag=latest`;
+      } else {
+          url = `${base_url}&module=account&action=tokentx&contractaddress=${qdContract}&address=${address}&page=1&offset=50&sort=desc`;
+      }
   } else {
-    url = `${base_url}&module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=15&sort=desc`;
+      if (type === 'balance') {
+        url = `${base_url}&module=account&action=balance&address=${address}&tag=latest`;
+      } else {
+        url = `${base_url}&module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=15&sort=desc`;
+      }
   }
 
   try {
