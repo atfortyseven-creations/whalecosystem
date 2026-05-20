@@ -352,8 +352,8 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     // MASTER-FIX: Wait for walletClient to avoid "Connector not connected" Wagmi race condition on mount.
     // If the user clicked manually, but the wallet is STILL not injected by the browser, we must explicitly warn them.
     if (!hasLocalWallet && !walletClient) {
-        if (isManual) {
-            setXmtpError('Conexión de billetera en curso. Por favor, asegúrate de que tu extensión de Wallet está desbloqueada y recarga la página.');
+        if (isManual && !isConnected) {
+            setXmtpError('Conexión de billetera requerida. Por favor conecta tu billetera.');
         }
         return;
     }
