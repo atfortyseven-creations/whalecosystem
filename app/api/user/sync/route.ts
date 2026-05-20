@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { airdropWelcomeQDs } from '@/lib/blockchain/AirdropService';
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,14 +26,28 @@ export async function POST(req: NextRequest) {
       where: { walletAddress: walletAddress || authUser.walletAddress || '' },
     });
 
+    let newlyCreated = false;
     if (!user && (walletAddress || authUser.walletAddress)) {
-      user = await prisma.user.create({
-        data: {
-          walletAddress: walletAddress || authUser.walletAddress || '',
-          email: authUser.email,
-          tier: 'HUMAN',
-        },
-      });
+      try {
+        user = await prisma.user.create({
+          data: {
+            walletAddress: walletAddress || authUser.walletAddress || '',
+            email: authUser.email,
+            tier: 'HUMAN',
+          },
+        });
+        newlyCreated = true;
+      } catch (e) {
+        // Race condition fallback
+        user = await prisma.user.findUnique({
+          where: { walletAddress: walletAddress || authUser.walletAddress || '' },
+        });
+      }
+    }
+
+    if (newlyCreated && user?.walletAddress) {
+        // Asynchronous non-blocking call to prevent API freezes
+        airdropWelcomeQDs(user.walletAddress).catch(console.error);
     }
 
     if (user && settings) {

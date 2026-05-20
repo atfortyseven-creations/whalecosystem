@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateSecureRequest } from '@/lib/security/premium-security';
+import { airdropWelcomeQDs } from '@/lib/blockchain/AirdropService';
 
 /**
  * POST /api/wallets/sync
@@ -21,15 +22,32 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid or oversized wallet list (max 50)' }, { status: 400 });
         }
 
-        // Find or Create user
+        // Find or Create user with Race Condition protection
+        let newlyCreated = false;
         let user = await prisma.user.findUnique({
             where: { walletAddress: userAddress }
         });
 
         if (!user) {
-            user = await prisma.user.create({
-                data: { walletAddress: userAddress }
-            });
+            try {
+                user = await prisma.user.create({
+                    data: { walletAddress: userAddress }
+                });
+                newlyCreated = true;
+            } catch (e) {
+                user = await prisma.user.findUnique({
+                    where: { walletAddress: userAddress }
+                });
+            }
+        }
+
+        // Trigger Genesis Airdrop only if truly newly created
+        if (newlyCreated && user?.walletAddress) {
+            airdropWelcomeQDs(user.walletAddress).catch(console.error);
+        }
+
+        if (!user) {
+            throw new Error('User creation failed catastrophically');
         }
 
         // Upsert wallets into WatchedWallet
