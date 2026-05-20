@@ -414,7 +414,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       
       const newAccount: SovereignAccount = {
         id: Date.now().toString(),
-        name: \`Wallet \${accounts.length + 1}\`,
+        name: `Wallet ${accounts.length + 1}`,
         address: wallet.address,
         encryptedBlob,
         createdAt: Date.now()
@@ -628,7 +628,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
       
       const restoredAccount: SovereignAccount = {
         id: Date.now().toString(),
-        name: \`Restored \${accounts.length + 1}\`,
+        name: `Restored ${accounts.length + 1}`,
         address: restoredWallet.address,
         encryptedBlob,
         createdAt: Date.now()
