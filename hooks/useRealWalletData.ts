@@ -217,7 +217,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
             decimals: 18,
             logoURI: "",
             chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "8453"),
-            network: "Whale Network",
+            network: "Humanity Ledger",
             change24h: 0
         });
     }

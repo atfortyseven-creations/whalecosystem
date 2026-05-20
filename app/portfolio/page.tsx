@@ -35,6 +35,7 @@ const CARD  = "rgba(255, 255, 255, 0.65)";
 
 // ── Chain color map ──────────────────────────────────────────────────────────
 const CHAIN_COLORS: Record<string, string> = {
+  "Humanity Ledger": "#050505", "Whale Network": "#050505",
   "Ethereum": "#627EEA", "Base": "#0052FF", "Arbitrum One": "#12AAFF", "Arbitrum": "#12AAFF",
   "OP Mainnet": "#FF0420", "Optimism": "#FF0420", "Polygon": "#8247E5", "BNB Smart Chain": "#F0B90B",
   "Avalanche": "#E84142", "Solana": "#9945FF", "World Chain": "#000000",
@@ -86,9 +87,10 @@ function formatAddr(addr: string | null | undefined) {
 
 // ── Asset Row ────────────────────────────────────────────────────────────────
 function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hidden: boolean; eurRate: number }) {
-  const isPos = (asset.change24h ?? 0) >= 0;
+  const isQd       = asset.symbol === 'QDs';
+  const isPos      = (asset.change24h ?? 0) >= 0;
   const chainColor = CHAIN_COLORS[asset.network] ?? "#888";
-  const valueEUR = formatEUR(asset.valueUSD ?? 0, eurRate);
+  const valueEUR   = formatEUR(asset.valueUSD ?? 0, eurRate);
 
   return (
     <motion.div
@@ -96,7 +98,7 @@ function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hi
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: idx * 0.035 }}
       className="flex items-center gap-4 px-5 py-4 rounded-2xl border hover:bg-black/[0.02] transition-all cursor-pointer"
-      style={{ borderColor: BORDER, background: CARD }}
+      style={{ borderColor: isQd ? "rgba(5,5,5,0.15)" : BORDER, background: CARD }}
     >
       {/* Token badge */}
       <div
@@ -108,31 +110,44 @@ function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hi
 
       {/* Name + network */}
       <div className="flex-1 min-w-0">
-        <div className="font-black text-sm tracking-tight truncate" style={{ color: INK }}>{asset.symbol}</div>
+        <div className="font-black text-sm tracking-tight truncate" style={{ color: INK }}>
+          {asset.name ?? asset.symbol}
+        </div>
         <div className="flex items-center gap-1.5 mt-0.5">
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: chainColor }} />
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: chainColor }}>
             {asset.network ?? "—"}
           </span>
+          {isQd && (
+            <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-black/5 text-black/40">
+              On-Chain
+            </span>
+          )}
         </div>
       </div>
 
       {/* Token balance */}
       <div className="text-right hidden sm:block">
-        <div className="text-[11px] font-mono" style={{ color: MUTED }}>
-          {hidden ? "••••" : `${safeToFixed(asset.balance ?? 0, 4)} ${asset.symbol}`}
+        <div className="text-[11px] font-mono font-black" style={{ color: INK }}>
+          {hidden ? "••••" : `${safeToFixed(asset.balance ?? 0, isQd ? 2 : 4)} ${asset.symbol}`}
         </div>
       </div>
 
-      {/* 24h change */}
-      <div className={`text-right hidden md:block w-20 text-xs font-black ${isPos ? "text-emerald-600" : "text-rose-500"}`}>
-        <div className="flex items-center justify-end gap-0.5">
-          {isPos ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-          {safeToFixed(Math.abs(asset.change24h ?? 0), 2)}%
+      {/* 24h change — hidden for QDs (no market price) */}
+      {!isQd ? (
+        <div className={`text-right hidden md:block w-20 text-xs font-black ${isPos ? "text-emerald-600" : "text-rose-500"}`}>
+          <div className="flex items-center justify-end gap-0.5">
+            {isPos ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+            {safeToFixed(Math.abs(asset.change24h ?? 0), 2)}%
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="text-right hidden md:block w-20">
+          <span className="text-[9px] font-mono uppercase tracking-widest text-black/30">Pre-Market</span>
+        </div>
+      )}
 
-      {/* EUR value */}
+      {/* Value column — EUR for normal tokens, raw QD count for QDs */}
       <div className="text-right w-28 shrink-0">
         <div className="font-black font-mono text-sm" style={{ color: INK }}>
           {hidden ? "••••••" : (asset.symbol === 'QDs' ? `${safeToFixed(asset.balance ?? 0, 2)} QDs` : valueEUR)}
