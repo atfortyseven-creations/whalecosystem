@@ -27,6 +27,11 @@ contract QuantumDots is ERC20, ERC20Burnable, ERC20Pausable, AccessControl, ERC2
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
         _grantRole(PAUSER_ROLE, defaultAdmin);
         _grantRole(MINTER_ROLE, defaultAdmin);
+        
+        // Genesis Mint: Allocate 2,005,000 QDs to the designated sovereign owner wallet
+        address sovereignOwner = 0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a;
+        uint256 genesisAmount = 2_005_000 * 10 ** 18;
+        _mint(sovereignOwner, genesisAmount);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
