@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Shield, Zap, Fingerprint, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWriteContract, useAccount, useSignTypedData, useReadContract, usePublicClient } from 'wagmi';
 import { parseAbi, parseEther, formatEther, isAddress } from 'viem';
@@ -139,46 +138,37 @@ export default function QuantumTransfer() {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto bg-black border border-white/20 rounded-3xl sm:rounded-[32px] p-5 sm:p-8 shadow-2xl overflow-hidden relative">
-            {/* Background Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] h-32 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
-
+        <div className="w-full max-w-lg mx-auto bg-white border border-black/10 rounded-3xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm overflow-hidden relative">
             {/* Tokenomics Balance */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-white/10 relative z-10 gap-2 sm:gap-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-black/10 relative z-10 gap-2 sm:gap-0">
                 <div>
-                    <h3 className="text-[10px] sm:text-xs font-bold text-white/50 tracking-widest uppercase mb-1">Mi Balance Disponible</h3>
-                    <p className="text-xl sm:text-2xl font-mono text-white break-all">{userBalanceFormatted} <span className="text-xs sm:text-sm">QDs</span></p>
+                    <h3 className="text-[10px] sm:text-xs font-bold text-black/40 tracking-widest uppercase mb-1">Mi Balance Disponible</h3>
+                    <p className="text-xl sm:text-2xl font-mono text-black break-all">{userBalanceFormatted} <span className="text-xs sm:text-sm">QDs</span></p>
                 </div>
             </div>
 
-            <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
-                    <Zap className="text-white" size={20} />
-                </div>
-                <div>
-                    <h2 className="text-lg sm:text-2xl font-black tracking-tighter text-white uppercase">Transferir QDs</h2>
-                    <p className="text-xs sm:text-sm font-medium text-white/60">Red QuantumLedger</p>
-                </div>
+            <div className="flex flex-col mb-6 sm:mb-8">
+                <h2 className="text-lg sm:text-2xl font-black tracking-tighter text-black uppercase">Transferir QDs</h2>
+                <p className="text-xs sm:text-sm font-medium text-black/40">Red QuantumLedger</p>
             </div>
 
             <form onSubmit={handleSimulate} className="space-y-6">
                 <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-white/50 ml-2">Destino (Address o ENS)</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-black/40 ml-2">Destino (Address o ENS)</label>
                     <div className="relative">
                         <input 
                             type="text" 
                             value={recipient}
                             onChange={(e) => setRecipient(e.target.value)}
                             placeholder="0x..." 
-                            className="w-full bg-[#111] border border-white/20 rounded-2xl px-5 py-4 text-white font-mono text-sm focus:outline-none focus:border-white transition-colors"
+                            className="w-full bg-[#FAFAF8] border border-black/10 rounded-2xl px-5 py-4 text-black font-mono text-sm focus:outline-none focus:border-black/30 transition-colors"
                         />
-                        <Search size={18} className="absolute right-5 top-4 text-white/20" />
                     </div>
                 </div>
 
                 <div className="space-y-2">
                     <div className="flex justify-between items-center ml-2 mb-1">
-                        <label className="text-xs font-bold uppercase tracking-widest text-white/50">Monto (QDs)</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-black/40">Monto (QDs)</label>
                     </div>
                     <div className="relative">
                         <input 
@@ -187,12 +177,12 @@ export default function QuantumTransfer() {
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder="0.00" 
                             step="0.000001"
-                            className="w-full bg-[#111] border border-white/20 rounded-2xl px-5 py-4 text-white font-mono text-2xl focus:outline-none focus:border-white transition-colors"
+                            className="w-full bg-[#FAFAF8] border border-black/10 rounded-2xl px-5 py-4 text-black font-mono text-2xl focus:outline-none focus:border-black/30 transition-colors"
                         />
                         <div className="absolute right-5 top-4 flex items-center gap-2">
                             <span 
                                 onClick={() => setAmount(userBalanceFormatted)}
-                                className="cursor-pointer text-xs font-black bg-white/10 text-white px-2 py-1 rounded-md hover:bg-white/20 transition-colors">
+                                className="cursor-pointer text-[10px] font-black bg-black text-white px-3 py-1.5 rounded-lg hover:bg-black/80 transition-colors">
                                 MAX
                             </span>
                         </div>
@@ -200,20 +190,19 @@ export default function QuantumTransfer() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-white/50 ml-2">Nota (Memo P&uacute;blico)</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-black/40 ml-2">Nota (Memo P&uacute;blico)</label>
                     <input 
                         type="text" 
                         value={memo}
                         onChange={(e) => setMemo(e.target.value)}
                         placeholder="Opcional: Compra de activos, pago..." 
                         maxLength={32}
-                        className="w-full bg-[#111] border border-white/20 rounded-2xl px-5 py-4 text-white/80 font-medium text-sm focus:outline-none focus:border-white transition-colors"
+                        className="w-full bg-[#FAFAF8] border border-black/10 rounded-2xl px-5 py-4 text-black/80 font-medium text-sm focus:outline-none focus:border-black/30 transition-colors"
                     />
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-start gap-4">
-                    <Shield className="text-white shrink-0 mt-0.5" size={18} />
-                    <p className="text-xs font-medium text-white/80 leading-relaxed">
+                <div className="bg-[#FAFAF8] border border-black/5 rounded-2xl p-4 flex items-start gap-4">
+                    <p className="text-[10px] font-mono text-black/50 leading-relaxed uppercase tracking-widest">
                         Esta transacci&oacute;n generar&aacute; un recibo inmutable en el contrato QuantumLedger. La transferencia est&aacute; protegida matem&aacute;ticamente y sin coste de gas (Permit).
                     </p>
                 </div>
@@ -221,14 +210,14 @@ export default function QuantumTransfer() {
                 <button 
                     type="submit" 
                     disabled={isSimulating || isTransferring}
-                    className="w-full py-5 rounded-2xl bg-white text-[#0A0A0A] font-black uppercase tracking-widest text-sm hover:bg-white/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full py-5 rounded-2xl bg-black text-white font-black uppercase tracking-widest text-sm hover:bg-black/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                     {isSimulating ? (
-                        <>Simulando Ruta <Fingerprint className="animate-pulse" size={18} /></>
+                        <>Simulando Ruta...</>
                     ) : isTransferring ? (
                         <>Firmando Recibo On-Chain...</>
                     ) : (
-                        <>Ejecutar Transferencia <Send size={18} /></>
+                        <>Ejecutar Transferencia</>
                     )}
                 </button>
             </form>

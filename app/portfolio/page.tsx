@@ -796,7 +796,7 @@ export default function PortfolioPage() {
             style={{ borderColor: BORDER, background: CARD }}
           >
             <div className="flex flex-col mb-8 gap-2">
-              <h2 className="font-black uppercase tracking-tight text-xl sm:text-2xl" style={{ color: INK }}>Quantum Dots (QDs) Tokenomics</h2>
+              <h2 className="font-black uppercase tracking-tight text-xl sm:text-2xl" style={{ color: INK }}>QDs ( Quantum Dots )</h2>
               <p className="text-sm font-mono" style={{ color: MUTED }}>Envía QDs a otras wallets de forma instantánea y sin comisiones de gas.</p>
             </div>
             <div className="w-full flex items-center justify-center">
