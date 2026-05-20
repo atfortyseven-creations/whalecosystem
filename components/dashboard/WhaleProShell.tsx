@@ -186,13 +186,17 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
     // Uses hardware screen.width (not viewport) so narrowing the browser window
     // on a PC does NOT trigger the mobile nav. Only real mobile devices (screen
     // width < 1024px on physical hardware) see the bottom navigation bar.
+    const [isMounted, setIsMounted] = useState(false);
     const [isTrueDesktop, setIsTrueDesktop] = useState(true);
     useEffect(() => {
+        setIsMounted(true);
         const check = () => setIsTrueDesktop(window.screen.width >= 1024);
         check();
         window.addEventListener('resize', check);
         return () => window.removeEventListener('resize', check);
     }, []);
+
+    const showMobileNav = isMounted && !isTrueDesktop;
 
     // ── UX-19: Real node health — polled every 60s ──────────────────────────
     const [nodeStatus, setNodeStatus] = useState<'OPERATIONAL' | 'DEGRADED' | 'OFFLINE'>('OPERATIONAL');
@@ -480,44 +484,46 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     </div>
 
                     {/* Mobile Quick Dropdown */}
-                    <div className="lg:hidden flex-1 flex justify-center mx-4 relative">
-                        <button
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="flex items-center gap-2 px-4 py-2 bg-black/5 dark:bg-white/10 rounded-full text-[13px] font-semibold text-[#050505] dark:text-white active:scale-95 transition-transform"
-                        >
-                            {SIDEBAR_ITEMS.find(i => i.id === activeTab)?.label || 'Menu'}
-                            <ChevronDown size={12} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
+                    {showMobileNav && (
+                        <div className="lg:hidden flex-1 flex justify-center mx-4 relative">
+                            <button
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                className="flex items-center gap-2 px-4 py-2 bg-black/5 dark:bg-white/10 rounded-full text-[13px] font-semibold text-[#050505] dark:text-white active:scale-95 transition-transform"
+                            >
+                                {SIDEBAR_ITEMS.find(i => i.id === activeTab)?.label || 'Menu'}
+                                <ChevronDown size={12} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
 
-                        <AnimatePresence>
-                            {isDropdownOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="absolute top-full mt-2 w-[220px] bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col py-2"
-                                    style={{ willChange: 'transform, opacity' }}
-                                >
-                                    {SIDEBAR_ITEMS.filter(item => !item.requiresZK || isZkVerified).map(item => (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => {
-                                                handleTabChange(item.id);
-                                                setIsDropdownOpen(false);
-                                            }}
-                                            className={`px-4 py-3 text-left text-[13px] font-semibold transition-colors ${
-                                                activeTab === item.id
-                                                    ? 'bg-black text-white dark:bg-white dark:text-black'
-                                                    : 'text-[#050505] dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10'
-                                            }`}
-                                        >
-                                            {item.label}
-                                        </button>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
+                            <AnimatePresence>
+                                {isDropdownOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="absolute top-full mt-2 w-[220px] bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col py-2"
+                                        style={{ willChange: 'transform, opacity' }}
+                                    >
+                                        {SIDEBAR_ITEMS.filter(item => !item.requiresZK || isZkVerified).map(item => (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => {
+                                                    handleTabChange(item.id);
+                                                    setIsDropdownOpen(false);
+                                                }}
+                                                className={`px-4 py-3 text-left text-[13px] font-semibold transition-colors ${
+                                                    activeTab === item.id
+                                                        ? 'bg-black text-white dark:bg-white dark:text-black'
+                                                        : 'text-[#050505] dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10'
+                                                }`}
+                                            >
+                                                {item.label}
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    )}
 
                     <div className="flex items-center gap-2">
                         <button
@@ -562,7 +568,9 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                 </motion.div>
                             </AnimatePresence>
                             {/* iOS spacer: clears the fixed bottom nav + safe-area-inset-bottom */}
-                            <div className="block lg:hidden shrink-0" style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))' }} aria-hidden="true" />
+                            {showMobileNav && (
+                                <div className="block lg:hidden shrink-0" style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))' }} aria-hidden="true" />
+                            )}
                         </div>
                     </div>
                 </main>
@@ -570,41 +578,43 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* ─── Bottom Tab Navigation (Mobile Only) — FIXED to avoid obscuring content ─── */}
                 {/* Uses fixed positioning so scroll content is never clipped by the nav bar. */}
                 {/* A spacer div above (inside scroll container) reserves the equivalent height.*/}
-                <nav className={`mobile-bottom-nav lg:hidden flex fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-                     {[
-                        { id: 'gold',        icon: <Zap size={18} />,           label: 'Mint' },
-                        { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Tokens' },
-                        { id: 'inst-ledger', icon: <Globe size={18} />,          label: 'Ledger' },
-                        { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
-                    ].map(tab => {
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => {
-                                     if (tab.id === 'menu') {
-                                         setIsMenuDrawerOpen(true);
-                                     } else {
-                                         handleTabChange(tab.id);
-                                     }
-                                }}
-                                style={{ minHeight: 0, minWidth: 0 }}
-                                className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors ${
-                                    isActive ? 'text-black dark:text-white' : 'text-[#888888] hover:text-black dark:hover:text-white'
-                                }`}
-                            >
-                                {/* PERF-20: Active indicator pill — WCAG AA contrast */}
-                                {isActive && (
-                                    <span className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#050505] dark:bg-white" />
-                                )}
-                                <span className={isActive ? 'scale-110 transition-transform' : 'transition-transform'}>
-                                    {tab.icon}
-                                </span>
-                                <span className={`text-[10px] font-bold ${isActive ? 'opacity-100 font-black' : 'opacity-60'}`}>{tab.label}</span>
-                            </button>
-                        );
-                    })}
-                </nav>
+                {showMobileNav && (
+                    <nav className={`mobile-bottom-nav lg:hidden flex fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+                         {[
+                            { id: 'gold',        icon: <Zap size={18} />,           label: 'Mint' },
+                            { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Tokens' },
+                            { id: 'inst-ledger', icon: <Globe size={18} />,          label: 'Ledger' },
+                            { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
+                        ].map(tab => {
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => {
+                                         if (tab.id === 'menu') {
+                                             setIsMenuDrawerOpen(true);
+                                         } else {
+                                             handleTabChange(tab.id);
+                                         }
+                                    }}
+                                    style={{ minHeight: 0, minWidth: 0 }}
+                                    className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors ${
+                                        isActive ? 'text-black dark:text-white' : 'text-[#888888] hover:text-black dark:hover:text-white'
+                                    }`}
+                                >
+                                    {/* PERF-20: Active indicator pill — WCAG AA contrast */}
+                                    {isActive && (
+                                        <span className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#050505] dark:bg-white" />
+                                    )}
+                                    <span className={isActive ? 'scale-110 transition-transform' : 'transition-transform'}>
+                                        {tab.icon}
+                                    </span>
+                                    <span className={`text-[10px] font-bold ${isActive ? 'opacity-100 font-black' : 'opacity-60'}`}>{tab.label}</span>
+                                </button>
+                            );
+                        })}
+                    </nav>
+                )}
 
                 {/* ─── Status Bar ─── */}
                 <footer className="hidden md:flex h-7 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] items-center justify-between px-6 shrink-0 transition-colors duration-300">
@@ -686,7 +696,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
         )}
 
         {/* Mobile slide-up menu sheet drawer */}
-        {isMenuDrawerOpen && (
+        {showMobileNav && isMenuDrawerOpen && (
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
