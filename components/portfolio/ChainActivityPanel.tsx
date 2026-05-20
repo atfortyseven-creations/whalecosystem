@@ -7,6 +7,8 @@ import {
   RefreshCw, ChevronDown, ChevronRight, Loader2, Hash,
   Clock, Fuel, CheckCircle2, XCircle, AlertCircle
 } from 'lucide-react';
+import { useReadContract } from 'wagmi';
+import { parseAbi, formatEther } from 'viem';
 
 const BG     = "#FAF9F6";
 const INK    = "#050505";
@@ -15,6 +17,7 @@ const BORDER = "rgba(5,5,5,0.08)";
 const CARD   = "#FFFFFF";
 
 const CHAINS = [
+  { id: 999999,name: "Whale Network", slug: "whale",      color: "#050505", symbol: "QDs",  explorer: null },
   { id: 1,     name: "Ethereum",    slug: "ethereum", color: "#627EEA", symbol: "ETH",  explorer: "https://etherscan.io" },
   { id: 8453,  name: "Base",        slug: "base",     color: "#0052FF", symbol: "ETH",  explorer: "https://basescan.org" },
   { id: 42161, name: "Arbitrum",    slug: "arbitrum", color: "#12AAFF", symbol: "ETH",  explorer: "https://arbiscan.io" },
@@ -105,13 +108,28 @@ function ChainRow({
     }
   }, [chain, address]);
 
+  const { data: qdBalanceRaw } = useReadContract({
+      address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as `0x${string}`,
+      abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
+      functionName: 'balanceOf',
+      args: [(address || "0x") as `0x${string}`],
+      query: { enabled: chain.name === 'Whale Network' && !!address }
+  });
+
   // Load when expanded, or immediately on mount for World Chain (no API)
   useEffect(() => {
+    if (chain.name === 'Whale Network') { setFetched(true); return; }
     if (!chain.slug) { setFetched(true); return; } // World Chain: no Etherscan yet
     if (open && !fetched) load();
-  }, [open, fetched, load, chain.slug]);
+  }, [open, fetched, load, chain.slug, chain.name]);
 
-  const ethBal = balance !== null ? formatETH(balance) : '—';
+  let ethBal = '—';
+  if (chain.name === 'Whale Network') {
+      ethBal = qdBalanceRaw ? Number(formatEther(qdBalanceRaw as bigint)).toFixed(2) : '0.00';
+  } else if (balance !== null) {
+      ethBal = formatETH(balance);
+  }
+  
   const hasActivity = fetched && txs.length > 0;
 
   return (
@@ -211,9 +229,17 @@ function ChainRow({
               )}
 
               {/* No API for this chain */}
-              {!loading && !fetched && !chain.slug && (
+              {!loading && !fetched && !chain.slug && chain.name !== 'Whale Network' && (
                 <div className="py-10 text-center">
                   <p className="text-[11px] font-mono uppercase tracking-widest" style={{ color: MUTED }}>World Chain explorer coming soon</p>
+                </div>
+              )}
+
+              {/* Special Whale Network logic */}
+              {!loading && chain.name === 'Whale Network' && (
+                <div className="py-10 text-center space-y-2">
+                  <p className="text-[11px] font-mono uppercase tracking-widest" style={{ color: INK }}>Secured by Quantum Ledger</p>
+                  <p className="text-[9px] font-mono text-black/40 px-6 leading-relaxed">Transactions are settled instantly via the Sovereign Node. View your immutable receipts in the main dashboard.</p>
                 </div>
               )}
 

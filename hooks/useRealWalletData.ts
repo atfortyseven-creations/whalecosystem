@@ -1,4 +1,5 @@
-import { useBalance } from 'wagmi';
+import { useBalance, useReadContract } from 'wagmi';
+import { parseAbi, formatEther } from 'viem';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { matchNewsToMarket } from '@/utils/news-matcher';
@@ -187,9 +188,43 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         change24h: t.change24h || 0
     }));
 
+    // Quantum Dots Integration (On-Chain)
+    const { data: qdBalanceRaw } = useReadContract({
+        address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as `0x${string}`,
+        abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
+        functionName: 'balanceOf',
+        args: [(effectiveAddress || "0x") as `0x${string}`],
+        query: {
+            enabled: !!effectiveAddress,
+        }
+    });
+
+    const qdBalanceNum = qdBalanceRaw ? parseFloat(formatEther(qdBalanceRaw as bigint)) : 0;
+    
+    // QDs mapped at €1 = 1 QD equivalence for UI tracking purposes
+    if (qdBalanceNum > 0 || isConnected) {
+        assets.unshift({
+            symbol: "QDs",
+            name: "Quantum Dots",
+            balance: qdBalanceNum,
+            balanceNumeric: qdBalanceNum,
+            balanceFormatted: qdBalanceNum.toFixed(2),
+            price: 1.0,
+            usdPrice: 1.0,
+            value: qdBalanceNum * 1.0,
+            valueUSD: qdBalanceNum * 1.0,
+            address: process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || '0x',
+            decimals: 18,
+            logoURI: "",
+            chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "8453"),
+            network: "Whale Network",
+            change24h: 0
+        });
+    }
+
     // Totals
     const portfolioValue = positions.reduce((acc: number, curr: any) => acc + (isNaN(curr.value) ? 0 : curr.value), 0);
-    const multiChainBalance = assetsData?.totalValueUsd || 0;
+    const multiChainBalance = (assetsData?.totalValueUsd || 0) + (qdBalanceNum * 1.0);
     const usdcBalance = parseFloat(balanceData?.formatted || '0') || 0;
     
     // For "Rainbow" feel, we use the unified balance from the portfolio API
