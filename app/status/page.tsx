@@ -77,6 +77,8 @@ function LatencyBadge({ ms }: { ms: number }) {
   return <span className={`font-mono text-xs font-bold ${color}`}>{ms}ms</span>;
 }
 
+import StatusNavbar from '@/components/status/StatusNavbar';
+
 // MAIN PAGE
 export default function StatusPage() {
   const [health, setHealth] = useState<HealthData | null>(null);
@@ -115,9 +117,9 @@ export default function StatusPage() {
   const OverallIcon = overallCfg.icon;
 
   return (
-    <div className="min-h-screen bg-white text-black font-sans absolute inset-0 z-[100] overflow-y-auto selection:bg-black/10">
-      
-      <main className="w-full max-w-[800px] mx-auto px-6 pt-24 pb-24 flex flex-col gap-10 relative z-10 items-center">
+    <div className="min-h-screen bg-white text-black font-sans relative overflow-y-auto selection:bg-black/10">
+      <StatusNavbar />
+      <main className="w-full max-w-[800px] mx-auto px-6 pt-32 pb-24 flex flex-col gap-10 relative z-10 items-center">
 
         {/* Header Text */}
         <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
