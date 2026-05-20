@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { Calendar, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function StatusNavbar() {
   const { data: session } = useSession();
@@ -50,9 +51,9 @@ export default function StatusNavbar() {
               <div className="px-4 py-3 border-b border-slate-100 text-xs text-slate-500 truncate">
                 {session.user?.email}
               </div>
-              <button className="text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 font-medium">
+              <Link href="/status/account" className="text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 font-medium">
                 Manage subscriptions
-              </button>
+              </Link>
               <button 
                 onClick={() => signOut()}
                 className="text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 font-medium border-t border-slate-100"
