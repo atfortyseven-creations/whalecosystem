@@ -6,13 +6,13 @@
       "cwd": "/app",
       "interpreter": "node",
       "instances": 1,
-      "exec_mode": "cluster",
+      "exec_mode": "fork",
       "env": {
         "NODE_ENV": "production",
         "HOSTNAME": "0.0.0.0",
-        "NODE_OPTIONS": "--max-old-space-size=4096"
+        "NODE_OPTIONS": "--max-old-space-size=512"
       },
-      "max_memory_restart": "3800M",
+      "max_memory_restart": "600M",
       "restart_delay": 3000,
       "exp_backoff_restart_delay": 200,
       "max_restarts": 15,
@@ -27,8 +27,10 @@
       "interpreter": "node_modules/.bin/tsx",
       "cwd": "/app",
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "NODE_OPTIONS": "--max-old-space-size=256"
       },
+      "max_memory_restart": "300M",
       "autorestart": true,
       "restart_delay": 5000
     },
@@ -38,8 +40,10 @@
       "interpreter": "node_modules/.bin/tsx",
       "cwd": "/app",
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "NODE_OPTIONS": "--max-old-space-size=128"
       },
+      "max_memory_restart": "150M",
       "autorestart": true,
       "restart_delay": 10000
     }
