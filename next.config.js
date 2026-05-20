@@ -140,13 +140,14 @@ const nextConfig = {
 
     env: {
         // NEXT_PUBLIC_APP_URL: canonical production URL — MUST match WalletConnect Cloud registration.
-        // [IOS FIX] Was 'whalealert.network' — WalletConnect Cloud has 'humanidfi.com' registered.
-        // A mismatch causes the WC relay to SILENTLY reject the session on mobile, showing an
-        // endless loading spinner or "failed to connect" with no error message.
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://humanidfi.com',
-        // Injected at build time so the client bundle never sees 'undefined'
         NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '47cce4049225582027fdeeecb2868ead',
         NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID || '47cce4049225582027fdeeecb2868ead',
+        
+        // QuantumDots & QuantumLedger On-Chain Configuration
+        NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || '0x1111111111111111111111111111111111111111',
+        NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS || '0x2222222222222222222222222222222222222222',
+        NEXT_PUBLIC_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID || '8453',
     },
 
     // NOTE: CSP is handled exclusively by middleware.ts (per-request, nonce-based).
