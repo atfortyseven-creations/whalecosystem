@@ -9,23 +9,23 @@ tsc_output.txt
 tmp_diff.txt
 
 # Smart Contracts & Build Cache
-artifacts/
-cache/
-contracts/
-ignition/
-typechain-types/
-.openzeppelin/
-forge/
-subgraph/
+/artifacts/
+/cache/
+/contracts/
+/ignition/
+/typechain-types/
+/.openzeppelin/
+/forge/
+/subgraph/
 
 # Non-runtime files
-docs/
-examples/
-test/
-k8s/
-.clerk/
-out/
-scratch/
+/docs/
+/examples/
+/test/
+/k8s/
+/.clerk/
+/out/
+/scratch/
 public/system-shots/
 
 # Backup & helper scripts

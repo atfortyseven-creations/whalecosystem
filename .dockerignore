@@ -1,15 +1,15 @@
 # ─── DOCKER CONTEXT EXCLUSIONS ──────────────────────────────────────────────
 # Dev build artifacts
-node_modules
-.next
-out
-build
-.turbo
+/node_modules
+/.next
+/out
+/build
+/.turbo
 
 # Git & editor
-.git
-.gitignore
-.github
+/.git
+/.gitignore
+/.github
 .DS_Store
 *.lnk
 
@@ -19,18 +19,18 @@ build
 
 # Heavy dev-only directories (not needed at runtime)
 # 'scripts' is required for production background workers (sovereign-mesh.ts etc)
-k8s
-contracts
-typechain-types
-artifacts
-cache
-subgraph
-test
-ignition
-graphql
-neo4j
-docs
-examples
+/k8s
+/contracts
+/typechain-types
+/artifacts
+/cache
+/subgraph
+/test
+/ignition
+/graphql
+/neo4j
+/docs
+/examples
 
 # Misc junk accumulated during dev
 *.bat
