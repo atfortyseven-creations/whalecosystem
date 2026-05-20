@@ -6,7 +6,7 @@ import {
     ChevronLeft, ChevronRight, Search, ChevronDown,
     X, ArrowUpRight, Globe, Info, Lock,
     BarChart2, PlusCircle, Wallet, MessageSquare, Menu, PieChart,
-    Zap, Activity, Cpu
+    Zap, Activity, Cpu, Database
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -35,6 +35,7 @@ interface NavItem {
 const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold',          label: 'Create Badge',    icon: null },
     { id: 'billing',       label: 'Plans',           icon: null },
+    { id: 'humanity-ledger', label: 'Humanity Ledger', icon: null },
     { id: 'markets',       label: 'Tokens',          icon: null, requiresZK: true },
     { id: 'inst-ledger',   label: 'Block Explorer',  icon: null, requiresZK: true },
     { id: 'mass-transfer', label: 'Sync Records',    icon: null, requiresZK: true, minTier: 'STANDARD' },
@@ -50,6 +51,7 @@ function getModuleIcon(id: string) {
     switch (id) {
         case 'gold':          return <Zap size={18} />;
         case 'billing':       return <Wallet size={18} />;
+        case 'humanity-ledger': return <Database size={18} />;
         case 'markets':       return <BarChart2 size={18} />;
         case 'inst-ledger':   return <Globe size={18} />;
         case 'mass-transfer': return <Cpu size={18} />;
