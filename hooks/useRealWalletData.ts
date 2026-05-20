@@ -209,10 +209,10 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
             balance: qdBalanceNum,
             balanceNumeric: qdBalanceNum,
             balanceFormatted: qdBalanceNum.toFixed(2),
-            price: 1.0,
-            usdPrice: 1.0,
-            value: qdBalanceNum * 1.0,
-            valueUSD: qdBalanceNum * 1.0,
+            price: 0,
+            usdPrice: 0,
+            value: 0,
+            valueUSD: 0,
             address: process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || '0x',
             decimals: 18,
             logoURI: "",
@@ -224,7 +224,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
 
     // Totals
     const portfolioValue = positions.reduce((acc: number, curr: any) => acc + (isNaN(curr.value) ? 0 : curr.value), 0);
-    const multiChainBalance = (assetsData?.totalValueUsd || 0) + (qdBalanceNum * 1.0);
+    const multiChainBalance = assetsData?.totalValueUsd || 0; // Exclude QDs from fiat equivalent
     const usdcBalance = parseFloat(balanceData?.formatted || '0') || 0;
     
     // For "Rainbow" feel, we use the unified balance from the portfolio API

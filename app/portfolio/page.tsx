@@ -135,7 +135,7 @@ function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hi
       {/* EUR value */}
       <div className="text-right w-28 shrink-0">
         <div className="font-black font-mono text-sm" style={{ color: INK }}>
-          {hidden ? "••••••" : valueEUR}
+          {hidden ? "••••••" : (asset.symbol === 'QDs' ? `${safeToFixed(asset.balance ?? 0, 2)} QDs` : valueEUR)}
         </div>
       </div>
     </motion.div>
