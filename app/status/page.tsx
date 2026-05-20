@@ -4,9 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Wifi, Clock, Activity, ShieldAlert, Server } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// ─────────────────────────────────────────────────────────────────────────────
 // TYPES
-// ─────────────────────────────────────────────────────────────────────────────
 type ServiceStatus = 'operational' | 'degraded' | 'outage' | 'loading';
 
 interface ServiceResult {
@@ -26,9 +24,7 @@ interface HealthData {
   services: ServiceResult[];
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STATUS HELPERS (Black & White Theme + Standard Colors)
-// ─────────────────────────────────────────────────────────────────────────────
+// STATUS HELPERS
 const STATUS_CONFIG = {
   operational: {
     label: 'Operational',
@@ -81,9 +77,7 @@ function LatencyBadge({ ms }: { ms: number }) {
   return <span className={`font-mono text-xs font-bold ${color}`}>{ms}ms</span>;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // MAIN PAGE
-// ─────────────────────────────────────────────────────────────────────────────
 export default function StatusPage() {
   const [health, setHealth] = useState<HealthData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -125,7 +119,7 @@ export default function StatusPage() {
       
       <main className="w-full max-w-[800px] mx-auto px-6 pt-24 pb-24 flex flex-col gap-10 relative z-10 items-center">
 
-        {/* Header Text (Perfectly Centered & Simple Language) */}
+        {/* Header Text */}
         <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center justify-center gap-3 px-6 py-2 bg-white border border-black/10 rounded-full mb-8 shadow-sm">
                 <Server size={14} className="text-black" />
@@ -141,7 +135,7 @@ export default function StatusPage() {
             </motion.p>
         </div>
 
-        {/* ── OVERALL STATUS HERO (Centered Content) ────────────────────────────────────────────── */}
+        {/* OVERALL STATUS HERO */}
         <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, type: 'spring' }} className="w-full">
           <div className={`w-full rounded-3xl bg-white border border-black/10 p-10 flex flex-col items-center text-center gap-6 transition-all duration-700 shadow-md`}>
             <div className={`p-6 rounded-full ${overallCfg.bg} border ${overallCfg.border} flex items-center justify-center mb-2`}>
@@ -170,7 +164,7 @@ export default function StatusPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 w-full">
               <div className="text-center">
                 <p className="text-xs uppercase tracking-widest font-bold text-black/40">Last Update</p>
-                <p className="text-base font-mono font-bold text-black mt-1">{lastChecked ?? '—'}</p>
+                <p className="text-base font-mono font-bold text-black mt-1">{lastChecked ?? 'Pending'}</p>
                 <p className="text-xs text-black/60 font-mono mt-1 font-bold">Refreshing in {countdown}s</p>
               </div>
               <button
@@ -185,7 +179,7 @@ export default function StatusPage() {
           </div>
         </motion.div>
 
-        {/* ── LIVE METRICS SUMMARY (Centered Grid) ───────────────────────────────────────────── */}
+        {/* LIVE METRICS SUMMARY */}
         {health && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
             {[
@@ -227,7 +221,7 @@ export default function StatusPage() {
           </motion.div>
         )}
 
-        {/* ── SERVICE CARDS ──────────────────────────────────────────────────── */}
+        {/* SERVICE CARDS */}
         <div className="flex flex-col gap-4 mt-6 w-full">
           <div className="flex items-center justify-center px-2 mb-4 gap-4">
             <div className="h-px bg-black/10 flex-1" />
@@ -279,14 +273,14 @@ export default function StatusPage() {
           </AnimatePresence>
         </div>
 
-        {/* ── FOOTER (Centered) ─────────────────────────────────────────────────────────── */}
+        {/* FOOTER */}
         <div className="flex flex-col items-center justify-center pt-10 mt-10 gap-4 w-full border-t border-black/5">
           <div className="flex items-center justify-center gap-3 text-xs font-mono font-medium text-black/50 uppercase tracking-widest">
             <Clock size={16} className="text-black/50" />
             <span>UTC Timezone | Real-time connection active</span>
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-black/30">
-            © {new Date().getFullYear()} Humanity Ledger
+            Copyright {new Date().getFullYear()} Humanity Ledger
           </span>
         </div>
 
