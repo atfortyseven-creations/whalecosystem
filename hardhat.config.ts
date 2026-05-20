@@ -16,11 +16,11 @@ const config: HardhatUserConfig = {
   networks: {
     arbitrum: {
       url: process.env.ARBITRUM_RPC_URL || "https://arb1.arbitrum.io/rpc",
-      accounts: process.env.SOVEREIGN_AUTHORITY_PK ? [process.env.SOVEREIGN_AUTHORITY_PK] : [],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     base: {
       url: process.env.BASE_RPC_URL || "https://mainnet.base.org",
-      accounts: process.env.SOVEREIGN_AUTHORITY_PK ? [process.env.SOVEREIGN_AUTHORITY_PK] : [],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     }
   },
   etherscan: {

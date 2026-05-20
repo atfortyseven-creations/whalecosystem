@@ -1,41 +1,39 @@
-import { ethers, network } from "hardhat";
-import fs from "fs";
-import path from "path";
+import { ethers } from "hardhat";
 
 async function main() {
-    const [deployer] = await ethers.getSigners();
-    console.log("🐋 Deploying Quantum Network on", network.name);
-    console.log("Deployer:", deployer.address);
+  const [deployer] = await ethers.getSigners();
+  console.log("Deploying QuantumDots from:", deployer.address);
+  console.log("Network: Base Mainnet (chain 8453)");
+  
+  const balance = await ethers.provider.getBalance(deployer.address);
+  console.log("Deployer balance:", ethers.formatEther(balance), "ETH");
+  
+  if (balance === 0n) {
+    throw new Error("Deployer wallet has no ETH for gas. Fund it first.");
+  }
 
-    const ownerAddress = "0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a";
-
-    // Deploy QuantumDots
-    console.log("Deploying QuantumDots...");
-    const QuantumDots = await ethers.getContractFactory("QuantumDots");
-    const qd = await QuantumDots.deploy(ownerAddress);
-    await qd.waitForDeployment();
-    const qdAddress = await qd.getAddress();
-    console.log("✅ QuantumDots deployed at:", qdAddress);
-
-    // Deploy QuantumLedger
-    console.log("Deploying QuantumLedger...");
-    const QuantumLedger = await ethers.getContractFactory("QuantumLedger");
-    const ledger = await QuantumLedger.deploy(qdAddress);
-    await ledger.waitForDeployment();
-    const ledgerAddress = await ledger.getAddress();
-    console.log("✅ QuantumLedger deployed at:", ledgerAddress);
-
-    // Write to a local manifest for injection
-    const manifest = {
-        token: qdAddress,
-        ledger: ledgerAddress,
-        chainId: (await ethers.provider.getNetwork()).chainId.toString()
-    };
-    fs.writeFileSync("quantum-deployment.json", JSON.stringify(manifest, null, 2));
-    console.log("💾 Manifest saved to quantum-deployment.json");
+  const QuantumDots = await ethers.getContractFactory("QuantumDots");
+  
+  // Deploy with the sovereign owner wallet that receives the 2,005,000 genesis QDs
+  const sovereignOwner = "0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a";
+  console.log("Genesis mint recipient (owner):", sovereignOwner);
+  
+  const qd = await QuantumDots.deploy(sovereignOwner);
+  await qd.waitForDeployment();
+  
+  const address = await qd.getAddress();
+  console.log("\n===================================================");
+  console.log("QuantumDots (QDs) deployed to Base Mainnet:");
+  console.log(address);
+  console.log("===================================================");
+  console.log("Genesis supply: 2,005,000 QDs minted to:", sovereignOwner);
+  console.log("Max Supply: 21,000,000 QDs (hard cap)");
+  console.log("\nSet this in Railway env vars:");
+  console.log(`NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=${address}`);
+  console.log(`NEXT_PUBLIC_CHAIN_ID=8453`);
 }
 
-main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
+main().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
 });

@@ -9,7 +9,7 @@ import { parseAbi } from 'viem';
 
 export default function QuantumWelcomeClaim({ signature, onSuccess }: { signature: string, onSuccess: () => void }) {
     const [isClaiming, setIsClaiming] = useState(false);
-    const [claimed, setClaimed] = useState(false);
+    const [hasClaimed, setHasClaimed] = useState(false);
     
     const { writeContractAsync } = useWriteContract();
 
