@@ -121,7 +121,7 @@ export const mainnetClient = createPublicClient({
     ...getGbAllRpc('eth'),                                           // GB slots 1 + 2 (archive)
     `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://cloudflare-eth.com',
-    'https://rpc.ankr.com/eth',
+    'https://ethereum-rpc.publicnode.com',
     'https://eth.llamarpc.com',
   ]),
 });
@@ -143,7 +143,7 @@ export const bscClient = createPublicClient({
     ...getGbAllRpc('bsc'),                                          // GB slot 6
     'https://bsc-dataseed1.binance.org',
     'https://bsc-dataseed2.binance.org',
-    'https://rpc.ankr.com/bsc',
+    'https://bsc.publicnode.com',
     `https://bnb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://bsc.llamarpc.com',
   ]),
@@ -156,7 +156,7 @@ export const optimismClient = createPublicClient({
     ...getGbAllRpc('op'),                                           // GB slot 10
     `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://mainnet.optimism.io',
-    'https://rpc.ankr.com/optimism',
+    'https://optimism.publicnode.com',
   ]),
 });
 
@@ -167,7 +167,7 @@ export const baseClient = createPublicClient({
     ...getGbAllRpc('base'),                                         // GB slot 7 (archive)
     `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://mainnet.base.org',
-    'https://rpc.ankr.com/base',
+    'https://base.publicnode.com',
     'https://base.llamarpc.com',
   ]),
 });
@@ -179,7 +179,7 @@ export const polygonClient = createPublicClient({
     ...getGbAllRpc('polygon'),                                      // GB slot 5 (archive)
     `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://polygon-rpc.com',
-    'https://rpc.ankr.com/polygon',
+    'https://polygon.publicnode.com',
     'https://polygon.llamarpc.com',
   ]),
 });
@@ -191,7 +191,7 @@ export const arbitrumClient = createPublicClient({
     ...getGbAllRpc('arb'),                                          // GB slot 8 (archive)
     `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://arb1.arbitrum.io/rpc',
-    'https://rpc.ankr.com/arbitrum',
+    'https://arbitrum.publicnode.com',
   ]),
 });
 
@@ -202,7 +202,7 @@ export const avalancheClient = createPublicClient({
     ...getGbAllRpc('avax'),                                         // GB slot 13
     `https://avalanche-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://api.avax.network/ext/bc/C/rpc',
-    'https://rpc.ankr.com/avalanche',
+    'https://1rpc.io/avax',
   ]),
 });
 

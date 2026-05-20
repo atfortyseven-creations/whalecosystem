@@ -14,7 +14,7 @@ export function useSmartAccount() {
 
     const saService = useMemo(() => {
         // In a real institutional deployment, RPCs and Bundlers would be pulled from secure config
-        return new SmartAccountService(mainnet, 'https://rpc.ankr.com/eth');
+        return new SmartAccountService(mainnet, 'https://cloudflare-eth.com');
     }, []);
 
     const { data: smartAddress, isLoading, error } = useSWR(

@@ -48,7 +48,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
         })),
         // Públicos de emergencia
         { url: 'https://cloudflare-eth.com', chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
-        { url: 'https://rpc.ankr.com/eth',   chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://ethereum-rpc.publicnode.com', chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
         { url: 'https://eth.llamarpc.com',   chain: 'ETHEREUM' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
@@ -60,7 +60,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
         // Fallbacks públicos de emergencia
         { url: 'https://bsc-dataseed1.binance.org', chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
         { url: 'https://bsc-dataseed2.binance.org', chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
-        { url: 'https://rpc.ankr.com/bsc',          chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://bsc.publicnode.com',          chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
     POLYGON: [
@@ -70,7 +70,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
         })),
         // Fallbacks públicos de emergencia
         { url: 'https://polygon-rpc.com',           chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
-        { url: 'https://rpc.ankr.com/polygon',      chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://polygon.publicnode.com',      chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
         { url: 'https://polygon.llamarpc.com',       chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
@@ -81,7 +81,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
         })),
         // Fallbacks públicos de emergencia
         { url: 'https://mainnet.base.org',          chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
-        { url: 'https://rpc.ankr.com/base',         chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://base.publicnode.com',         chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
         { url: 'https://base.llamarpc.com',          chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
@@ -90,7 +90,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
             url, chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
         })),
         { url: 'https://arb1.arbitrum.io/rpc',      chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
-        { url: 'https://rpc.ankr.com/arbitrum',     chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://arbitrum.publicnode.com',     chain: 'ARB' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 
     OP: [
@@ -99,7 +99,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
             url, chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
         })),
         { url: 'https://mainnet.optimism.io',        chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
-        { url: 'https://rpc.ankr.com/optimism',      chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
+        { url: 'https://optimism.publicnode.com',      chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0 },
     ],
 };
 

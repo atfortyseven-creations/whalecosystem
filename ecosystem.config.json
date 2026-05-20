@@ -23,8 +23,8 @@
     },
     {
       "name": "humanity-indexer",
-      "script": "node_modules/ts-node/dist/bin.js",
-      "args": "workers/humanity-indexer.ts",
+      "script": "workers/humanity-indexer.ts",
+      "interpreter": "node_modules/.bin/tsx",
       "cwd": "/app",
       "env": {
         "NODE_ENV": "production"
@@ -34,8 +34,8 @@
     },
     {
       "name": "humanity-pruner",
-      "script": "node_modules/ts-node/dist/bin.js",
-      "args": "workers/humanity-pruner.ts",
+      "script": "workers/humanity-pruner.ts",
+      "interpreter": "node_modules/.bin/tsx",
       "cwd": "/app",
       "env": {
         "NODE_ENV": "production"

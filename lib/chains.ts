@@ -34,7 +34,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
     rpcUrls: [
       getGbRpc('eth') || 'https://cloudflare-eth.com',  // GB Registry slot 1 (Archive)
       'https://cloudflare-eth.com',
-      'https://rpc.ankr.com/eth',
+      'https://ethereum-rpc.publicnode.com',
     ],
     blockExplorerUrls: ['https://etherscan.io'],
     iconUrl: '/chains/ethereum.svg',
@@ -53,7 +53,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
     rpcUrls: [
       getGbRpc('bsc') || 'https://bsc-dataseed1.binance.org',  // GB Registry slot 6
       'https://bsc-dataseed1.binance.org',
-      'https://rpc.ankr.com/bsc',
+      'https://bsc.publicnode.com',
     ],
     blockExplorerUrls: ['https://bscscan.com'],
     iconUrl: '/chains/bsc.svg',
@@ -73,7 +73,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       getGbRpc('base') || 'https://mainnet.base.org',  // GB Registry slot 7 (Archive)
       'https://mainnet.base.org',
       'https://base.llamarpc.com',
-      'https://rpc.ankr.com/base',
+      'https://base.publicnode.com',
     ],
     blockExplorerUrls: ['https://basescan.org'],
     iconUrl: '/chains/base.svg',
@@ -92,7 +92,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
     rpcUrls: [
       getGbRpc('polygon') || 'https://polygon-rpc.com',  // GB Registry slot 5 (Archive)
       'https://polygon-rpc.com',
-      'https://rpc.ankr.com/polygon',
+      'https://polygon.publicnode.com',
     ],
     blockExplorerUrls: ['https://polygonscan.com'],
     iconUrl: '/chains/polygon.svg',
@@ -111,7 +111,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
     rpcUrls: [
       getGbRpc('arb') || 'https://arb1.arbitrum.io/rpc',  // GB Registry slot 8 (Archive)
       'https://arb1.arbitrum.io/rpc',
-      'https://rpc.ankr.com/arbitrum',
+      'https://arbitrum.publicnode.com',
     ],
     blockExplorerUrls: ['https://arbiscan.io'],
     iconUrl: '/chains/arbitrum.svg',
@@ -130,7 +130,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
     rpcUrls: [
       getGbRpc('op') || 'https://mainnet.optimism.io',  // GB Registry slot 10
       'https://mainnet.optimism.io',
-      'https://rpc.ankr.com/optimism',
+      'https://optimism.publicnode.com',
     ],
     blockExplorerUrls: ['https://optimistic.etherscan.io'],
     iconUrl: '/chains/optimism.svg',

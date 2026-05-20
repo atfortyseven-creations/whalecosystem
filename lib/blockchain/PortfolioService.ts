@@ -49,16 +49,25 @@ export class PortfolioService {
    * [LEGENDARY] Token Discovery List by Chain
    */
   private getCommonTokensForChain(chainId: ChainId): string[] {
+    const tokens: string[] = [];
+    const qdsChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '137', 10);
+    const qdsContractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
+    if (chainId === qdsChainId && qdsContractAddress && qdsContractAddress.startsWith('0x')) {
+      tokens.push(qdsContractAddress);
+    }
+
     switch (chainId) {
         case ChainId.WORLDCHAIN:
-            return ['0x2cfc85d8e48f8eab294be644d9e25c3030863003']; // WLD
+            tokens.push('0x2cfc85d8e48f8eab294be644d9e25c3030863003'); // WLD
+            break;
         case ChainId.OPTIMISM:
-            return ['0xdc6ff44d5d932cbd77b52e5612ba0529dc6226f1']; // WLD
+            tokens.push('0xdc6ff44d5d932cbd77b52e5612ba0529dc6226f1'); // WLD
+            break;
         case ChainId.BASE:
-            return ['0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913']; // USDC
-        default:
-            return [];
+            tokens.push('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'); // USDC
+            break;
     }
+    return tokens;
   }
 
   /**
@@ -191,6 +200,7 @@ export class PortfolioService {
           
           return {
             address: t.token_address,
+            contractAddress: t.token_address,
             balance: t.balance,
             balanceNumeric: balance,
             balanceFormatted: safeToLocaleString(balance, { maximumFractionDigits: 4 }),
@@ -247,6 +257,52 @@ export class PortfolioService {
         });
       }
 
+      // ─── CUSTOM TOKEN INJECTION: QuantumDots (QDs) ──────────────────────────
+      const qdsChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '137', 10);
+      const qdsContractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
+      if (chainId === qdsChainId && qdsContractAddress && qdsContractAddress.startsWith('0x')) {
+        try {
+          const { blockchainService } = await import('./BlockchainService');
+          const provider = blockchainService.getProvider(qdsChainId);
+          const qdsContract = new ethers.Contract(
+            qdsContractAddress,
+            ['function balanceOf(address) view returns (uint256)'],
+            provider
+          );
+          const qdsBalance: bigint = await qdsContract.balanceOf(address);
+          if (qdsBalance > 0n) {
+            const qdsBalanceFormatted = parseFloat(ethers.formatUnits(qdsBalance, 18));
+            const existingIdx = enrichedTokens.findIndex(
+              t => t.address && t.address.toLowerCase() === qdsContractAddress.toLowerCase()
+            );
+            const qdsToken = {
+              address: qdsContractAddress,
+              contractAddress: qdsContractAddress,
+              balance: qdsBalance.toString(),
+              balanceNumeric: qdsBalanceFormatted,
+              balanceFormatted: safeToLocaleString(qdsBalanceFormatted, { maximumFractionDigits: 4 }),
+              name: 'QuantumDots',
+              symbol: 'QDs',
+              decimals: 18,
+              logo: '/official-whale-monochrome.png',
+              price: 1.0,
+              valueUsd: qdsBalanceFormatted * 1.0,
+              change24h: 0,
+              chainId,
+              sector: 'AI',
+              isUnknown: false
+            };
+            if (existingIdx >= 0) {
+              enrichedTokens[existingIdx] = qdsToken;
+            } else {
+              enrichedTokens.push(qdsToken);
+            }
+          }
+        } catch (qdsError: any) {
+          console.warn(`[Portfolio-QDs-Query] Failed to query QDs balance:`, qdsError.message);
+        }
+      }
+
       const calculatedTotal = enrichedTokens.reduce((acc: number, t: any) => acc + (isNaN(t?.valueUsd) ? 0 : (t?.valueUsd || 0)), 0);
       const totalValueUsd = (chainNetWorth && parseFloat(chainNetWorth.networth_usd || '0') > calculatedTotal)
         ? parseFloat(chainNetWorth.networth_usd || '0')
@@ -299,29 +355,41 @@ export class PortfolioService {
               if (bal <= 0.000001) return null;
 
               // Use PriceService for valuation
-              const symbol = (chainId === ChainId.WORLDCHAIN && t.address.toLowerCase() === '0x2cfc85d8e48f8eab294be644d9e25c3030863003') ? 'WLD' : 'UNK';
-              const priceData = await PriceService.getBulkPrices([{
-                  symbol,
-                  address: t.address,
-                  chainId
-              }]);
-
-              const price = priceData[symbol]?.price || 0;
+              const qdsContractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
+              const isQd = qdsContractAddress && t.address.toLowerCase() === qdsContractAddress.toLowerCase();
+              const symbol = isQd ? 'QDs' : (chainId === ChainId.WORLDCHAIN && t.address.toLowerCase() === '0x2cfc85d8e48f8eab294be644d9e25c3030863003') ? 'WLD' : 'UNK';
+              
+              let price = 0;
+              if (isQd) {
+                  price = 1.0;
+              } else {
+                  try {
+                      const priceData = await PriceService.getBulkPrices([{
+                          symbol,
+                          address: t.address,
+                          chainId
+                      }]);
+                      price = priceData[symbol]?.price || 0;
+                  } catch (e) {
+                      console.warn(`[Portfolio-Fallback-Price] Failed for ${symbol}:`, e);
+                  }
+              }
 
               return {
                   address: t.address,
+                  contractAddress: t.address,
                   balance: t.balance,
                   balanceNumeric: bal,
                   balanceFormatted: safeToLocaleString(bal),
-                  name: symbol === 'WLD' ? 'Worldcoin' : 'Unknown Token',
+                  name: isQd ? 'QuantumDots' : symbol === 'WLD' ? 'Worldcoin' : 'Unknown Token',
                   symbol,
                   decimals,
-                  logo: symbol === 'WLD' ? 'https://assets.coingecko.com/coins/images/31069/small/worldcoin.jpeg' : null,
+                  logo: isQd ? '/official-whale-monochrome.png' : symbol === 'WLD' ? 'https://assets.coingecko.com/coins/images/31069/small/worldcoin.jpeg' : null,
                   price,
                   valueUsd: bal * price,
                   chainId,
-                  sector: symbol === 'WLD' ? 'DeFi' : 'Unknown',
-                  isUnknown: symbol === 'UNK'
+                  sector: isQd ? 'AI' : symbol === 'WLD' ? 'DeFi' : 'Unknown',
+                  isUnknown: !isQd && symbol === 'UNK'
               };
           }));
 

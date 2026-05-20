@@ -359,7 +359,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 240 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className={`${isTrueDesktop ? 'flex' : 'hidden'} sticky top-0 h-full border-r border-[#E5E5E5] dark:border-white/10 bg-white/70 dark:bg-[#0A0A0A]/70 backdrop-blur-2xl flex-col z-50 shrink-0`}
+                className={`hidden lg:flex sticky top-0 h-full border-r border-[#E5E5E5] dark:border-white/10 bg-white/70 dark:bg-[#0A0A0A]/70 backdrop-blur-2xl flex-col z-50 shrink-0`}
             >
                 {/* Logo area */}
                 {!isCollapsed && (
@@ -562,7 +562,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                 </motion.div>
                             </AnimatePresence>
                             {/* iOS spacer: clears the fixed bottom nav + safe-area-inset-bottom */}
-                            <div className="block md:hidden shrink-0" style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))' }} aria-hidden="true" />
+                            <div className="block lg:hidden shrink-0" style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))' }} aria-hidden="true" />
                         </div>
                     </div>
                 </main>
@@ -570,7 +570,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* ─── Bottom Tab Navigation (Mobile Only) — FIXED to avoid obscuring content ─── */}
                 {/* Uses fixed positioning so scroll content is never clipped by the nav bar. */}
                 {/* A spacer div above (inside scroll container) reserves the equivalent height.*/}
-                <nav className={`mobile-bottom-nav ${isTrueDesktop ? 'hidden' : 'flex'} fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+                <nav className={`mobile-bottom-nav lg:hidden flex fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                      {[
                         { id: 'gold',        icon: <Zap size={18} />,           label: 'Mint' },
                         { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Tokens' },

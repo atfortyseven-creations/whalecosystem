@@ -29,7 +29,7 @@ const ZSCORE_BASELINE_STDDEV   = 5_000; // conservative std-dev derived from mai
 
 const redis = createRedisClient({ name: 'Solana-Worker' });
 
-const SOLANA_RPC = process.env.SOLANA_RPC_URL || 'https://rpc.ankr.com/solana';
+const SOLANA_RPC = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 
 async function solanaRpcCall(method: string, params: any[] = []) {
     const response = await fetch(SOLANA_RPC, {

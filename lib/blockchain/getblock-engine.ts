@@ -11,7 +11,7 @@ import { getGbAllRpc, getActiveCount, getCoveredChains, markCuExhausted } from '
 const PUBLIC_ETH_FALLBACKS = [
   'https://eth.llamarpc.com',
   'https://cloudflare-eth.com',
-  'https://rpc.ankr.com/eth',
+  'https://ethereum-rpc.publicnode.com',
   'https://eth.drpc.org',
   'https://1rpc.io/eth',
   'https://ethereum-rpc.publicnode.com',
@@ -153,6 +153,7 @@ const KNOWN_ERC20: { symbol: string; address: string; decimals: number }[] = [
 export interface PortfolioToken {
   symbol:   string;
   address:  string;
+  contractAddress: string;
   balance:  number;
   decimals: number;
   chain:    string;
@@ -165,9 +166,21 @@ export async function getUserPortfolio(walletAddress: string): Promise<{
 }> {
   const addr = walletAddress.toLowerCase();
 
+  const activeTokens = [...KNOWN_ERC20];
+  const qdsContract = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
+  if (qdsContract && qdsContract.startsWith('0x')) {
+    if (!activeTokens.some(t => t.address.toLowerCase() === qdsContract.toLowerCase())) {
+      activeTokens.push({
+        symbol: 'QDs',
+        address: qdsContract,
+        decimals: 18
+      });
+    }
+  }
+
   const [ethHex, ...erc20Results] = await Promise.all([
     rpcWithFailover('eth_getBalance', [addr, 'latest']),
-    ...KNOWN_ERC20.map(t =>
+    ...activeTokens.map(t =>
       rpcWithFailover('eth_call', [
         { to: t.address, data: SIG_BALANCE_OF + padAddr(addr) },
         'latest',
@@ -177,10 +190,17 @@ export async function getUserPortfolio(walletAddress: string): Promise<{
 
   const ethBalance = parseInt(ethHex, 16) / 1e18;
 
-  const tokens: PortfolioToken[] = KNOWN_ERC20.map((t, i) => {
+  const tokens: PortfolioToken[] = activeTokens.map((t, i) => {
     const raw = erc20Results[i] || '0x0';
     const balance = parseInt(raw, 16) / Math.pow(10, t.decimals);
-    return { ...t, balance, chain: 'ethereum' };
+    return {
+      symbol: t.symbol,
+      address: t.address,
+      contractAddress: t.address,
+      balance,
+      decimals: t.decimals,
+      chain: 'ethereum'
+    };
   }).filter(t => t.balance > 0);
 
   return { ethBalance, tokens };

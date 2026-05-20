@@ -323,7 +323,7 @@ export const blockchainService = new BlockchainService([
     name: 'BNB Smart Chain',
     rpcUrls: [
       'https://bsc-dataseed1.binance.org',
-      'https://rpc.ankr.com/bsc',
+      'https://bsc.publicnode.com',
       'https://binance.llamarpc.com'
     ],
     bundlerUrl: `https://api.pimlico.io/v2/56/rpc?apikey=${process.env.NEXT_PUBLIC_PIMLICO_API_KEY}`,

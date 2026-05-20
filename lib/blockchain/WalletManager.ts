@@ -53,7 +53,7 @@ export class WalletManager {
   public async generateInitialAccounts(count: number = 5): Promise<WalletAccount[]> {
     if (!this.mnemonic) throw new Error('Wallet not initialized.');
 
-    const saService = new SmartAccountService(mainnet, 'https://rpc.ankr.com/eth'); // Default to mainnet for prediction
+    const saService = new SmartAccountService(mainnet, 'https://cloudflare-eth.com'); // Default to mainnet for prediction
     this.accounts = [];
 
     for (let i = 0; i < count; i++) {

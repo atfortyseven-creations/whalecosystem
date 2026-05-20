@@ -74,7 +74,7 @@ function getSanitizedRedisUrl(): string {
 
 const REDIS_URL = getSanitizedRedisUrl();
 
-const IS_BUILDING = process.env.NEXT_PHASE === 'phase-production-build' || process.env.NODE_ENV === 'test';
+const IS_BUILDING = process.env.NEXT_PHASE === 'phase-production-build' || process.env.npm_lifecycle_event === 'build' || process.env.NODE_ENV === 'test';
 
 /**
  * Elite-grade Redis Factory

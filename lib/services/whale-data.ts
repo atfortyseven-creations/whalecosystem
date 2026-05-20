@@ -65,12 +65,12 @@ const RPC_CONFIG = {
     ETH: [
         ...getGbAllRpc('eth'),                                      // GB slots 1+2 (archive)
         'https://cloudflare-eth.com',
-        'https://rpc.ankr.com/eth',
+        'https://ethereum-rpc.publicnode.com',
     ].filter(Boolean),
     BNB: [
         ...getGbAllRpc('bsc'),                                      // GB slot 6
         'https://bsc-dataseed1.binance.org',
-        'https://rpc.ankr.com/bsc',
+        'https://bsc.publicnode.com',
     ].filter(Boolean),
 };
 

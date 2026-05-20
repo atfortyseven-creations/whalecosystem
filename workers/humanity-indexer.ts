@@ -9,7 +9,7 @@ const ethClient = createPublicClient({
   chain: mainnet,
   transport: fallback([
     http('https://eth.llamarpc.com'),
-    http('https://rpc.ankr.com/eth'),
+    http('https://ethereum-rpc.publicnode.com'),
     http('https://cloudflare-eth.com')
   ], { rank: true })
 });

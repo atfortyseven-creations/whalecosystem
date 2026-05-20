@@ -69,7 +69,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       ...getGbAllRpc('eth'),                                          // GB slots 1+2 (archive)
       ...parseMultiplexKeys(process.env.ALCHEMY_ETH_RPCS),
       `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
-      'https://rpc.ankr.com/eth',
+      'https://ethereum-rpc.publicnode.com',
       'https://1rpc.io/eth',
       'https://eth.llamarpc.com',
       'https://cloudflare-eth.com',
@@ -87,7 +87,6 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       'https://1rpc.io/bnb',
       'https://bsc-dataseed1.binance.org',
       'https://bsc-dataseed2.binance.org',
-      'https://rpc.ankr.com/bsc',
       'https://bsc.publicnode.com',
     ].filter(Boolean),
     wss: [
@@ -100,7 +99,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       ...getGbAllRpc('polygon'),                                      // GB slot 5 (archive)
       'https://polygon.llamarpc.com',
       'https://1rpc.io/matic',
-      'https://rpc.ankr.com/polygon',
+      'https://polygon.publicnode.com',
       'https://polygon-rpc.com',
     ].filter(Boolean),
     wss: [
@@ -114,7 +113,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       'https://base.llamarpc.com',
       'https://1rpc.io/base',
       'https://mainnet.base.org',
-      'https://rpc.ankr.com/base',
+      'https://base.publicnode.com',
     ].filter(Boolean),
     wss: [
       ...getGbAllWss('base'),                                         // GB slot 8
@@ -124,7 +123,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
     archive: [
       ...getGbAllRpc('base'),
       `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
-      'https://rpc.ankr.com/base',
+      'https://base.publicnode.com',
     ].filter(Boolean),
   },
   42161: {
@@ -132,7 +131,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       ...getGbAllRpc('arb'),                                          // GB slot 8 (archive)
       `https://arb-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
       'https://arb1.arbitrum.io/rpc',
-      'https://rpc.ankr.com/arbitrum',
+      'https://arbitrum.publicnode.com',
     ].filter(Boolean),
     wss: [
       ...getGbAllWss('arb'),                                          // GB slot 14
@@ -145,7 +144,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       ...getGbAllRpc('op'),                                           // GB slot 25 (cuenta única)
       `https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
       'https://mainnet.optimism.io',
-      'https://rpc.ankr.com/optimism',
+      'https://optimism.publicnode.com',
     ].filter(Boolean),
     wss: [
       'wss://optimism-rpc.publicnode.com',
@@ -157,7 +156,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       ...getGbAllRpc('avax'),                                         // GB slot 13
       `https://avalanche-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
       'https://api.avax.network/ext/bc/C/rpc',
-      'https://rpc.ankr.com/avalanche',
+      'https://1rpc.io/avax',
     ].filter(Boolean),
     wss: [
       'wss://avalanche-c-chain-rpc.publicnode.com',
