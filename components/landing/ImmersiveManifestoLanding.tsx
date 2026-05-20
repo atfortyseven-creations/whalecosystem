@@ -134,6 +134,27 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           <motion.p variants={FADE_UP} className="font-serif text-[20px] md:text-[28px] text-white/80 leading-relaxed max-w-[800px] mx-auto drop-shadow-md">
             The new global standard for digital safety. We provide complete data protection, private communication, and absolute certainty for your digital life.
           </motion.p>
+          <motion.div variants={FADE_UP} className="mt-8 flex flex-col items-center justify-center gap-4">
+             <div className="flex items-center gap-6 md:gap-8">
+                {/* Aztec Logo */}
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 p-3 shadow-lg hover:scale-105 transition-transform duration-300">
+                   <svg viewBox="0 0 32 32" className="w-full h-full" fill="none">
+                      <path d="M16 2L30 16L16 30L2 16Z" fill="#7C3AED"/>
+                      <path d="M16 7L25 16L16 25L7 16Z" fill="white" opacity="0.85"/>
+                      <path d="M16 11L21 16L16 21L11 16Z" fill="#7C3AED" opacity="0.9"/>
+                   </svg>
+                </div>
+                {/* X */}
+                <div className="text-white/60 font-mono text-xl font-black">X</div>
+                {/* Whale Logo */}
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 p-3 shadow-lg hover:scale-105 transition-transform duration-300">
+                   <img src="/official-whale-monochrome.png" alt="Whale Network" className="w-full h-full object-contain invert drop-shadow-md opacity-90" />
+                </div>
+             </div>
+             <div className="font-mono text-[11px] md:text-[13px] font-black uppercase tracking-[0.3em] text-white/90 drop-shadow-md">
+                Whale Network x Aztec Network
+             </div>
+          </motion.div>
           <motion.div variants={FADE_UP} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/portfolio" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center">
               Don't have an Account yet?

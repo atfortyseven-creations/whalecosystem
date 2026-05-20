@@ -315,6 +315,31 @@ export function SovereignFooter() {
 
         <div className="w-full h-px bg-[#050505]/5" />
 
+        {/* Whale x Aztec Logo Section */}
+        <div className="flex flex-col items-center justify-center gap-4 py-2">
+             <div className="flex items-center gap-6 md:gap-8">
+                {/* Whale Logo */}
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border border-[#050505]/10 shadow-sm p-2.5 hover:scale-105 transition-transform duration-300">
+                   <img src="/official-whale-monochrome.png" alt="Whale Network" className="w-full h-full object-contain opacity-80 mix-blend-multiply" />
+                </div>
+                {/* X */}
+                <div className="text-[#050505]/40 font-mono text-xl font-black">X</div>
+                {/* Aztec Logo */}
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border border-[#050505]/10 shadow-sm p-2.5 hover:scale-105 transition-transform duration-300">
+                   <svg viewBox="0 0 32 32" className="w-full h-full" fill="none">
+                      <path d="M16 2L30 16L16 30L2 16Z" fill="#7C3AED"/>
+                      <path d="M16 7L25 16L16 25L7 16Z" fill="white" opacity="0.85"/>
+                      <path d="M16 11L21 16L16 21L11 16Z" fill="#7C3AED" opacity="0.9"/>
+                   </svg>
+                </div>
+             </div>
+             <div className="font-mono text-[11px] md:text-[13px] font-black uppercase tracking-[0.3em] text-[#050505]/70 mt-2">
+                Whale Network x Aztec Network
+             </div>
+        </div>
+
+        <div className="w-full h-px bg-[#050505]/5" />
+
 
 
         {/* Copyright */}

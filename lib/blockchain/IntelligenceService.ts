@@ -112,16 +112,16 @@ export class IntelligenceService {
             ]);
             
             const allResults: any[] = [
-                ...(ethHistory.status === 'fulfilled' ? ethHistory.value?.result || [] : []),
-                ...(baseHistory.status === 'fulfilled' ? baseHistory.value?.result || [] : []),
-                ...(opHistory.status === 'fulfilled' ? opHistory.value?.result || [] : []),
+                ...(ethHistory.status === 'fulfilled' ? (ethHistory as any).value?.result || [] : []),
+                ...(baseHistory.status === 'fulfilled' ? (baseHistory as any).value?.result || [] : []),
+                ...(opHistory.status === 'fulfilled' ? (opHistory as any).value?.result || [] : []),
             ];
 
             history = { 
                 result: allResults, 
-                total: (ethHistory.status === 'fulfilled' ? ethHistory.value?.total || 0 : 0) +
-                       (baseHistory.status === 'fulfilled' ? baseHistory.value?.total || 0 : 0) +
-                       (opHistory.status === 'fulfilled' ? opHistory.value?.total || 0 : 0)
+                total: (ethHistory.status === 'fulfilled' ? (ethHistory as any).value?.total || 0 : 0) +
+                       (baseHistory.status === 'fulfilled' ? (baseHistory as any).value?.total || 0 : 0) +
+                       (opHistory.status === 'fulfilled' ? (opHistory as any).value?.total || 0 : 0)
             };
 
             // 4. Fetch DeFi protocols & positions (Real Telemetry)

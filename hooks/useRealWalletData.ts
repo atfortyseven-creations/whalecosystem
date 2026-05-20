@@ -177,6 +177,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         balanceNumeric: typeof t.balanceNumeric === 'number' ? t.balanceNumeric : 0,
         balanceFormatted: t.balanceFormatted || (typeof t.balanceNumeric === 'number' ? t.balanceNumeric.toFixed(6) : "0"),
         price: t.price || t.priceUSD || 0,
+        priceUSD: t.price || t.priceUSD || 0,
         usdPrice: t.price || t.priceUSD || 0,   // ← alias used by LegendaryTransactionModal
         value: t.valueUsd || t.valueUSD || 0,
         valueUSD: t.valueUsd || t.valueUSD || 0,
@@ -211,6 +212,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
             balanceNumeric: qdBalanceNum,
             balanceFormatted: qdBalanceNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             price: 0,
+            priceUSD: 0,
             usdPrice: 0,
             value: 0,
             valueUSD: 0,

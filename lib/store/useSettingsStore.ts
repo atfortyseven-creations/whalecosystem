@@ -17,6 +17,7 @@ export interface SovereignSettings {
     displayUnit: 'FIAT' | 'BTC' | 'ETH';
     showBalances: boolean;
     soundEffects: boolean;
+    hapticFeedback: boolean;
     hardwareAcceleration: boolean;
     
     // 3. Network & RPC
@@ -76,6 +77,7 @@ export interface SettingsState extends SovereignSettings {
     setAllowAnalytics: (allow: boolean) => void;
     setAutoDisconnectTimer: (timer: SettingsState['autoDisconnectTimer']) => void;
     setHardwareAcceleration: (val: boolean) => void;
+    setHapticFeedback: (val: boolean) => void;
     setHiddenAssets: (val: string) => void;
     setSettingsOpen: (open: boolean) => void;
     clearAppData: () => void;
@@ -150,6 +152,7 @@ export const useSettingsStore = create<SettingsState>()(
             displayUnit: 'FIAT',
             showBalances: true,
             soundEffects: true,
+            hapticFeedback: true,
             hardwareAcceleration: true,
 
             gasPreset: 'STANDARD',
@@ -239,6 +242,7 @@ export const useSettingsStore = create<SettingsState>()(
             setAllowAnalytics: (val) => get().updateSetting('allowAnalytics', val),
             setAutoDisconnectTimer: (val) => get().updateSetting('autoDisconnectTimer', val),
             setHardwareAcceleration: (val) => get().updateSetting('hardwareAcceleration', val),
+            setHapticFeedback: (val) => get().updateSetting('hapticFeedback', val),
             setHiddenAssets: (val) => get().updateSetting('hiddenAssets', val),
 
             setSettingsOpen: (isSettingsOpen) => set({ isSettingsOpen }),
@@ -266,6 +270,7 @@ export const useSettingsStore = create<SettingsState>()(
                 displayUnit: state.displayUnit,
                 showBalances: state.showBalances,
                 soundEffects: state.soundEffects,
+                hapticFeedback: state.hapticFeedback,
                 hardwareAcceleration: state.hardwareAcceleration,
 
                 gasPreset: state.gasPreset,

@@ -36,9 +36,8 @@ const AGGREGATION_KEYS = {
 async function aggregateGlobalLeaderboard() {
     const rows = await prisma.whaleActivity.groupBy({
         by: ['walletAddress'],
-        _count: { transactionHash: true },
-        _sum: { /* usdValue is a string, so we count events for now */ transactionHash: false as any },
-        orderBy: { _count: { transactionHash: 'desc' } },
+        _count: { id: true },
+        orderBy: { _count: { id: 'desc' } },
         take: 100,
     });
 
@@ -64,8 +63,8 @@ async function aggregateLeaderboardByChain() {
         const rows = await prisma.whaleActivity.groupBy({
             by: ['walletAddress'],
             where: { chain },
-            _count: { transactionHash: true },
-            orderBy: { _count: { transactionHash: 'desc' } },
+            _count: { id: true },
+            orderBy: { _count: { id: 'desc' } },
             take: 50,
         });
 
@@ -126,8 +125,8 @@ async function aggregateTopWhaleEvents24h() {
 async function aggregateChainSummary() {
     const summary = await prisma.whaleActivity.groupBy({
         by: ['chain'],
-        _count: { transactionHash: true },
-        orderBy: { _count: { transactionHash: 'desc' } },
+        _count: { id: true },
+        orderBy: { _count: { id: 'desc' } },
     });
 
     await safeRedisSet(

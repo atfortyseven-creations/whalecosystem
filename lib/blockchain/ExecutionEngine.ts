@@ -58,7 +58,7 @@ export class ExecutionEngine {
         const client = await saService.createClient(account);
 
         // Execute the batch call via ERC-4337
-        const hash = await client.sendTransactions({
+        const hash = await (client as any).sendTransactions({
             transactions: calls.map(c => ({
                 to: c.to,
                 data: c.data,

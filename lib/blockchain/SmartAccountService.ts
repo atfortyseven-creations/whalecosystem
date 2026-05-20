@@ -76,7 +76,7 @@ export class SmartAccountService {
     /**
      * Creates a high-fidelity Smart Account Client with Gasless support.
      */
-    public async createClient(account: any): Promise<SmartAccountClient> {
+    public async createClient(account: any): Promise<any> {
         return createSmartAccountClient({
             account,
             bundlerTransport: this.bundlerClient ? this.bundlerClient.transport : http(),

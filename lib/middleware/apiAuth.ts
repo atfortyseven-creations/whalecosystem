@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../prisma';
 import { RedisRateLimiter } from '../redis/rate-limiter';
-import { SAAS_PLANS } from '../saas/plans';
+import { SAAS_PLANS, PlanTier } from '../saas/plans';
 import * as crypto from 'crypto';
+
+/** Safely coerce an arbitrary string to a PlanTier enum value, defaulting to FREE. */
+function toPlanTier(raw: string | undefined | null): PlanTier {
+  const upper = (raw ?? '').toUpperCase();
+  return (Object.values(PlanTier) as string[]).includes(upper)
+    ? (upper as PlanTier)
+    : PlanTier.FREE;
+}
 
 export interface ApiAuthResult {
   userId: string;
@@ -44,8 +52,8 @@ export async function withApiAuth(
     return { error: NextResponse.json({ error: 'Invalid or inactive API key' }, { status: 401 }) };
   }
 
-  const userTier = apiKeyRecord.plan || 'whale';
-  const planConfig = SAAS_PLANS[userTier] || SAAS_PLANS['whale'];
+  const userTier = toPlanTier(apiKeyRecord.plan);
+  const planConfig = SAAS_PLANS[userTier];
 
   // 4. Rate Limiting via Redis
   const rateLimitResult = await RedisRateLimiter.check(apiKeyRecord.id, userTier);

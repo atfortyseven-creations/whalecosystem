@@ -28,26 +28,26 @@ interface HealthData {
 const STATUS_CONFIG = {
   operational: {
     label: 'Operational',
-    color: 'bg-green-500',
-    text: 'text-green-600',
-    bg: 'bg-green-50',
-    border: 'border-green-100',
+    color: 'bg-black',
+    text: 'text-black',
+    bg: 'bg-black/5',
+    border: 'border-black/10',
     icon: LockOpen,
   },
   degraded: {
     label: 'Degraded',
-    color: 'bg-yellow-500',
-    text: 'text-yellow-600',
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-100',
+    color: 'bg-black/40',
+    text: 'text-black/60',
+    bg: 'bg-black/5',
+    border: 'border-black/10',
     icon: Lock,
   },
   outage: {
     label: 'Outage',
-    color: 'bg-red-600',
-    text: 'text-red-600',
-    bg: 'bg-red-50',
-    border: 'border-red-100',
+    color: 'bg-black/70',
+    text: 'text-black/70',
+    bg: 'bg-black/5',
+    border: 'border-black/10',
     icon: Lock,
   },
   loading: {
@@ -73,21 +73,20 @@ function StatusDot({ status }: { status: ServiceStatus }) {
 }
 
 function LatencyBadge({ ms }: { ms: number }) {
-  const color = ms < 300 ? 'text-green-600' : ms < 1500 ? 'text-yellow-600' : 'text-red-600';
-  return <span className={`font-mono text-xs font-bold ${color}`}>{ms}ms</span>;
+  return <span className="font-mono text-xs font-bold text-black/70">{ms}ms</span>;
 }
 
 import StatusNavbar from '@/components/status/StatusNavbar';
 
-// Component icon + color mapping
+// Component icon + color mapping — all neutral monochrome
 const COMPONENT_META: Record<string, { icon: React.ElementType; accent: string; gradient: string }> = {
-  'Dashboard':  { icon: LayoutDashboard, accent: 'text-violet-600',  gradient: 'from-violet-50 to-white' },
-  'Whale Chat': { icon: MessageCircle,   accent: 'text-cyan-600',    gradient: 'from-cyan-50 to-white' },
-  'Portfolio':  { icon: Briefcase,       accent: 'text-emerald-600', gradient: 'from-emerald-50 to-white' },
-  'News':       { icon: Newspaper,       accent: 'text-orange-600',  gradient: 'from-orange-50 to-white' },
-  'Academy':    { icon: GraduationCap,   accent: 'text-blue-600',    gradient: 'from-blue-50 to-white' },
-  'Forum':      { icon: Users,           accent: 'text-pink-600',    gradient: 'from-pink-50 to-white' },
-  'Careers':    { icon: Award,           accent: 'text-amber-600',   gradient: 'from-amber-50 to-white' },
+  'Dashboard':  { icon: LayoutDashboard, accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Whale Chat': { icon: MessageCircle,   accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Portfolio':  { icon: Briefcase,       accent: 'text-black/70', gradient: 'from-white to-white' },
+  'News':       { icon: Newspaper,       accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Academy':    { icon: GraduationCap,   accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Forum':      { icon: Users,           accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Careers':    { icon: Award,           accent: 'text-black/70', gradient: 'from-white to-white' },
 };
 
 // MAIN PAGE
@@ -226,7 +225,7 @@ export default function StatusPage() {
                     <m.icon size={16} className="text-black/50" />
                     <span className="text-xs font-bold uppercase tracking-widest text-black/50">{m.label}</span>
                 </div>
-                <span className={`text-3xl font-extrabold tracking-tight ${m.good ? 'text-black' : 'text-red-600'}`}>
+                <span className="text-3xl font-extrabold tracking-tight text-black">
                   {m.value}
                 </span>
               </div>

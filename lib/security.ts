@@ -16,6 +16,9 @@ export type SecurityEventSeverity = 'INFO' | 'WARNING' | 'CRITICAL';
 interface LogSecurityEventParams {
     type: SecurityEventType;
     severity: SecurityEventSeverity;
+    userId?: string;
+    ipAddress?: string;
+    userAgent?: string;
     metadata?: Record<string, any>;
 }
 

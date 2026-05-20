@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
 
-// Strict type alias: Web Crypto API requires ArrayBuffer, not ArrayBufferLike.
-// Using this alias throughout prevents TS2769 under strict DOM lib configurations.
-type CryptoBytes = Uint8Array<ArrayBuffer>;
+// Strict type alias: Web Crypto API requires ArrayBuffer-backed typed arrays.
+// Plain Uint8Array is compatible with all SubtleCrypto operations.
+type CryptoBytes = Uint8Array;
 
 /**
  * Derives a symmetric AES-256-GCM key from a wallet signature and a cryptographically

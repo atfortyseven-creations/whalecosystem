@@ -44,9 +44,9 @@ export default function UptimeBar({ serviceName, uptimePercentage, days }: Uptim
         {/* The Segments */}
         <div className="flex items-center h-8 gap-[2px] relative w-full">
           {days.map((day, i) => {
-            let bgColor = 'bg-emerald-400';
-            if (day.status === 'degraded') bgColor = 'bg-amber-400';
-            if (day.status === 'outage') bgColor = 'bg-red-500';
+            let bgColor = 'bg-black/80';
+            if (day.status === 'degraded') bgColor = 'bg-black/40';
+            if (day.status === 'outage') bgColor = 'bg-black/10';
 
             return (
               <div 
@@ -64,10 +64,10 @@ export default function UptimeBar({ serviceName, uptimePercentage, days }: Uptim
               className="absolute top-10 bg-white border border-slate-200 shadow-2xl rounded-lg w-64 z-20 pointer-events-none transform -translate-x-1/2"
               style={{ left: `${(hoveredDay.index / 90) * 100}%` }}
             >
-              <div className={`px-4 py-3 rounded-t-lg border-b border-slate-100 ${
-                hoveredDay.day.status === 'outage' ? 'bg-red-50 text-red-700' :
-                hoveredDay.day.status === 'degraded' ? 'bg-amber-50 text-amber-700' :
-                'bg-emerald-50 text-emerald-700'
+              <div className={`px-4 py-3 rounded-t-lg border-b border-black/10 ${
+                hoveredDay.day.status === 'outage' ? 'bg-black/10 text-black' :
+                hoveredDay.day.status === 'degraded' ? 'bg-black/5 text-black' :
+                'bg-black text-white'
               }`}>
                 <p className="text-xs font-bold uppercase tracking-wider">
                   {hoveredDay.day.status === 'outage' ? 'Major Outage' :

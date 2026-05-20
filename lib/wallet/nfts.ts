@@ -18,7 +18,7 @@ export interface NFT {
  */
 export async function getNFTs(address: string, chainId: number = 1): Promise<NFT[]> {
   try {
-    const nfts = await moralisService.getWalletNFTs(address, moralisService.getChainName(chainId));
+    const nfts = (await moralisService.getWalletNFTs(address, moralisService.getChainName(chainId))) as any[];
 
     return nfts?.map((nft: any) => ({
       id: `${nft.contract}-${nft.tokenId}`,

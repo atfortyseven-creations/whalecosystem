@@ -65,7 +65,7 @@ export class DilutionService {
     static async triggerGlobalAlerts(unlock: UnlockSchedule) {
         const users = await prisma.user.findMany({
             where: { email: { not: null } },
-            select: { email: true, name: true }
+            select: { email: true }
         });
 
         console.log(`[DilutionService] Triggering alerts for ${unlock.tokenSymbol} to ${users.length} users.`);

@@ -97,6 +97,7 @@ export class PortfolioService {
         const price = nativePriceMap[nativeSymbol.toUpperCase()]?.price || 0;
         const nativeToken = {
           address: 'native',
+          contractAddress: 'native',
           balance: rpcResult.nativeBalance,
           balanceNumeric: nativeBalanceFormatted,
           balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }),
@@ -241,6 +242,7 @@ export class PortfolioService {
       if (nativeBalanceFormatted >= 0) {
         enrichedTokens.unshift({
           address: 'native',
+          contractAddress: 'native',
           balance: nativeBalance.toString(),
           balanceNumeric: nativeBalanceFormatted,
           balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }) || '0.0000',
@@ -459,6 +461,7 @@ export class PortfolioService {
 
               filteredTokens.unshift({
                   address: 'native',
+                  contractAddress: 'native',
                   balance: rpcResult.nativeBalance,
                   balanceNumeric: nativeBalanceFormatted,
                   balanceFormatted: safeToLocaleString(nativeBalanceFormatted) || '0.0000',

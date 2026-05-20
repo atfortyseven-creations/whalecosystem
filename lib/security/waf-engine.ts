@@ -97,11 +97,23 @@ const INJECTION_PATTERNS = [
   /\beval\b\s*\(/i,                            // Eval injection
 ];
 
-// ─── SUSPICIOUS HEADERS ───────────────────────────────────────────────────────
+// ─── SUSPICIOUS HEADERS (Nation-State Hardened) ──────────────────────────────
 const SUSPICIOUS_HEADERS = [
-  'x-original-url',
-  'x-rewrite-url',
-  'x-custom-ip-authorization',
+  'x-original-url',           // IIS/nginx URL override — used for auth bypass
+  'x-rewrite-url',            // Apache mod_rewrite override
+  'x-custom-ip-authorization',// IP spoofing attempt
+  'x-forwarded-host',         // Host header injection via proxy headers
+  'x-host',                   // Duplicate host injection
+  'x-cluster-client-ip',      // Legacy proxy header — abused in SSRF chains
+  'x-forwarded-server',       // Server identity spoofing
+  'x-original-host',          // CDN origin override
+  'x-backend-server',         // Server disclosure / SSRF
+];
+
+// ─── HTTP REQUEST SMUGGLING INDICATORS ───────────────────────────────────────
+// Detects CL.TE and TE.CL desync attack patterns in raw headers.
+const SMUGGLING_HEADER_COMBINATIONS = [
+  ['content-length', 'transfer-encoding'], // Classic CL.TE
 ];
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -244,6 +256,16 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     }
   }
 
+  // ── VECTOR 3.5: HTTP Request Smuggling Detection ─────────────────────────
+  // CL.TE / TE.CL desync attacks — one of the most devastating web attack classes.
+  // Responsible for mass authentication bypasses at major institutions (HackerOne reports).
+  for (const [h1, h2] of SMUGGLING_HEADER_COMBINATIONS) {
+    if (req.headers.has(h1) && req.headers.has(h2)) {
+      anomalyScore += 15; // Near-instant hard block
+      reasons.push(`HTTP_SMUGGLING:${h1}+${h2}`);
+    }
+  }
+
   // ── VECTOR 4: HTTP Method Anomaly ─────────────────────────────────────────
   const allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'];
   if (!allowedMethods.includes(method)) {
@@ -270,6 +292,23 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
   if (host && !isKnownHost) {
     anomalyScore += 3;
     reasons.push(`HOST_MISMATCH:${host.slice(0, 30)}`);
+  }
+
+  // ── VECTOR 6.5: Accept-Encoding Anomaly (scanner fingerprint) ─────────────
+  // Legitimate browsers ALWAYS send Accept-Encoding. Scanners/bots often omit it.
+  // Combined with short/absent UA = near-certain automated probe.
+  const acceptEncoding = req.headers.get('accept-encoding');
+  if (!acceptEncoding && method === 'GET' && !ua) {
+    anomalyScore += 5;
+    reasons.push('MISSING_ACCEPT_ENCODING');
+  }
+
+  // ── VECTOR 6.7: Accept-Language Anomaly ──────────────────────────────────
+  // All browsers send Accept-Language. No legitimate human browser omits this.
+  const acceptLang = req.headers.get('accept-language');
+  if (!acceptLang && method === 'GET' && !BYPASS_IPS.includes(ip)) {
+    anomalyScore += 3;
+    reasons.push('MISSING_ACCEPT_LANGUAGE');
   }
 
   // ── VECTOR 7: Cryptographic Payload Integrity (HMAC Signature) ─────────────
