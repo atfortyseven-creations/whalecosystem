@@ -20,6 +20,28 @@
       "kill_timeout": 5000,
       "wait_ready": false,
       "autorestart": true
+    },
+    {
+      "name": "humanity-indexer",
+      "script": "node_modules/ts-node/dist/bin.js",
+      "args": "workers/humanity-indexer.ts",
+      "cwd": "/app",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "autorestart": true,
+      "restart_delay": 5000
+    },
+    {
+      "name": "humanity-pruner",
+      "script": "node_modules/ts-node/dist/bin.js",
+      "args": "workers/humanity-pruner.ts",
+      "cwd": "/app",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "autorestart": true,
+      "restart_delay": 10000
     }
   ]
 }

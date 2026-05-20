@@ -23,6 +23,7 @@ const InstitutionalLedger = dynamic(() => import('@/components/dashboard/Institu
 const MassTransferIntel = dynamic(() => import('@/components/dashboard/MassTransferIntel').then(m => ({ default: m.MassTransferIntel })), { ssr: false, loading: LoadingPanel });
 const SessionLogsPanel = dynamic(() => import('@/components/dashboard/SessionLogsPanel').then(m => ({ default: m.SessionLogsPanel })), { ssr: false, loading: LoadingPanel });
 const PlanDashboard = dynamic(() => import('@/components/dashboard/PlanDashboard').then(m => ({ default: m.PlanDashboard })), { ssr: false, loading: LoadingPanel });
+const HumanityLedger = dynamic(() => import('@/components/dashboard/HumanityLedger'), { ssr: false, loading: LoadingPanel });
 
 // Dynamic imports (SSR-unsafe or heavy)
 const PortfolioDashboard = dynamic(
@@ -118,6 +119,9 @@ export default function WhaleDashboard() {
 
             case 'billing':
                 return <div className={PANEL}><DashboardErrorBoundary key={`billing-${refreshKey}`}><PlanDashboard /></DashboardErrorBoundary></div>;
+
+            case 'humanity-ledger':
+                return <div className={PANEL}><DashboardErrorBoundary key={`humanity-ledger-${refreshKey}`}><HumanityLedger /></DashboardErrorBoundary></div>;
 
             case 'markets':
                 return <div className={PANEL}><DashboardErrorBoundary key={`markets-${refreshKey}`}><InstitutionalMarkets /></DashboardErrorBoundary></div>;
