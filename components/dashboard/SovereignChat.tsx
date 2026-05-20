@@ -827,29 +827,10 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   if (xmtpError) {
     return (
       <div className="flex flex-1 w-full h-full bg-white items-center justify-center flex-col gap-4">
-        <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">Error de Sincronización XMTP</p>
+        <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">XMTP Sync Error</p>
         <p className="font-mono text-[10px] text-black/40 max-w-md text-center">{xmtpError}</p>
         <button onClick={() => initXmtpClient(true)} className="px-6 py-2.5 bg-black text-white font-mono text-[10px] uppercase tracking-widest rounded-xl">
-          Reintentar Firma y Sincronizar
-        </button>
-      </div>
-    );
-  }
-
-  if (!xmtpReady) {
-    return (
-      <div className="flex flex-1 w-full h-full bg-white items-center justify-center flex-col gap-5 p-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center border border-black/10 animate-pulse">
-           <UserCheck size={28} className="text-black/60" />
-        </div>
-        <div>
-          <h2 className="font-mono text-[14px] font-black tracking-widest uppercase text-black mb-2">Activando Motor Criptográfico</h2>
-          <p className="font-mono text-[10px] text-black/50 max-w-[280px] mx-auto leading-relaxed">
-            Whale Chat requiere una firma única para cifrar tus mensajes de extremo a extremo. Revisa tu billetera.
-          </p>
-        </div>
-        <button onClick={() => initXmtpClient(true)} className="mt-2 px-8 py-3.5 bg-[#000000] text-white hover:bg-black/80 active:scale-95 transition-all font-mono text-[11px] font-bold uppercase tracking-widest rounded-xl shadow-md">
-          Haga clic o toque aquí para Firmar
+          Retry Signature & Sync
         </button>
       </div>
     );
@@ -1145,17 +1126,26 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                   bottomRef={bottomRef}
                   settings={settings}
                 />
-                <ChatInput
-                  onSendText={handleSendText}
-                  onSendVoice={handleSendVoice}
-                  onSendFile={handleSendFile}
-                  onSendEmoji={handleSendEmoji}
-                  replyingTo={replyingTo}
-                  onCancelReply={() => setReplyingTo(undefined)}
-                  autoDestruct={settings.autoDestruct}
-                  onAutoDestructChange={(val) => handleSettingsChange({ ...settings, autoDestruct: val })}
-                  disabled={!xmtpReady || sending || isUploading}
-                />
+                {!xmtpReady ? (
+                  <div className="p-5 border-t border-black/6 bg-white flex flex-col items-center justify-center gap-3 shrink-0">
+                     <p className="text-[10px] font-mono text-black/50 uppercase tracking-widest text-center leading-relaxed max-w-xs">Whale Chat uses End-to-End Encryption. Sign with your wallet to activate your secure inbox.</p>
+                     <button onClick={() => initXmtpClient(true)} className="px-6 py-3 bg-[#050505] text-white font-mono text-[11px] font-bold uppercase tracking-widest rounded-[14px] hover:bg-black/80 transition-all shadow-md active:scale-95">
+                       Tap Here to Sign & Activate
+                     </button>
+                  </div>
+                ) : (
+                  <ChatInput
+                    onSendText={handleSendText}
+                    onSendVoice={handleSendVoice}
+                    onSendFile={handleSendFile}
+                    onSendEmoji={handleSendEmoji}
+                    replyingTo={replyingTo}
+                    onCancelReply={() => setReplyingTo(undefined)}
+                    autoDestruct={settings.autoDestruct}
+                    onAutoDestructChange={(val) => handleSettingsChange({ ...settings, autoDestruct: val })}
+                    disabled={sending || isUploading}
+                  />
+                )}
               </div>
             </div>
           </>

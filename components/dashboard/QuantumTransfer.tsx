@@ -427,7 +427,7 @@ export default function QuantumTransfer() {
 
             // ── Step 2: Sign ERC-2612 Permit ──────────────────────────────────
             setStep('signing');
-            toast.info('Firma criptográfica solicitada…', { description: 'Autoriza el Permit ERC-2612 en tu wallet.' });
+            toast.info('Cryptographic signature requested...', { description: 'Authorize ERC-2612 Permit in your wallet.' });
 
             const { data: latestNonce } = await refetchNonce();
             const currentNonce = (latestNonce as bigint) ?? 0n;
@@ -467,7 +467,7 @@ export default function QuantumTransfer() {
 
                 // ── Step 3: Broadcast ─────────────────────────────────────────
                 setStep('broadcasting');
-                toast.loading('Inyectando entropía cuántica en la blockchain…', { id: 'tx-broadcast' });
+                toast.loading('Injecting quantum entropy into the blockchain...', { id: 'tx-broadcast' });
 
                 txHash = await writeContractAsync({
                     address:      LEDGER_ADDR,
@@ -488,9 +488,9 @@ export default function QuantumTransfer() {
                 });
             } catch (permitErr: any) {
                 // Fallback: use existing allowance path
-                if (!hasSufficientAllowance) throw new Error('Allowance insuficiente y Permit rechazado.');
+                if (!hasSufficientAllowance) throw new Error('Insufficient allowance and Permit rejected.');
                 setStep('broadcasting');
-                toast.loading('Broadcast on-chain…', { id: 'tx-broadcast' });
+                toast.loading('Broadcast on-chain...', { id: 'tx-broadcast' });
                 txHash = await writeContractAsync({
                     address:      LEDGER_ADDR,
                     abi:          LEDGER_ABI,
@@ -509,7 +509,7 @@ export default function QuantumTransfer() {
             // ── Step 4: Wait for confirmation ─────────────────────────────────
             setStep('confirming');
             toast.dismiss('tx-broadcast');
-            toast.loading('Esperando confirmación de bloque…', { id: 'tx-confirm' });
+            toast.loading('Waiting for block confirmation...', { id: 'tx-confirm' });
 
             let txReceipt: TransactionReceipt | null = null;
             if (publicClient) {
@@ -538,15 +538,15 @@ export default function QuantumTransfer() {
             setRecipient('');
             setAmount('');
             setMemo('');
-            toast.success('Transferencia inmutable finalizada.', { description: `Recibo On-Chain acuñado en el QuantumLedger.` });
+            toast.success('Immutable transfer completed.', { description: `On-Chain receipt minted in QuantumLedger.` });
         } catch (err: any) {
             console.error('QuantumTransfer error:', err);
-            const msg = err?.shortMessage || err?.message || 'Error desconocido';
+            const msg = err?.shortMessage || err?.message || 'Unknown error';
             setError(msg);
             setStep('error');
             toast.dismiss('tx-broadcast');
             toast.dismiss('tx-confirm');
-            toast.error('Operación rechazada', { description: msg });
+            toast.error('Operation rejected', { description: msg });
         }
     }, [
         address, formValid, publicClient, recipient, parsedAmount, memo,
@@ -588,12 +588,12 @@ export default function QuantumTransfer() {
                                         QuantumLedger v2 · {CHAIN_ID === 137 ? 'Polygon' : 'Base'}
                                     </div>
                                     <h2 className="text-2xl font-black tracking-tighter text-white uppercase">
-                                        Transferir QDs
+                                        Transfer QDs
                                     </h2>
                                 </div>
                                 <div className="flex flex-col items-end gap-1">
                                     <div className="text-[8px] font-mono uppercase tracking-widest text-white/30">
-                                        Tu Balance
+                                        Your Balance
                                     </div>
                                     <div className="font-mono font-black text-lg text-white">
                                         {qdBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })}
@@ -638,14 +638,14 @@ export default function QuantumTransfer() {
                             {/* Recipient */}
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-black uppercase tracking-[0.25em] text-black/40 ml-1">
-                                    Destinatario
+                                    Recipient
                                 </label>
                                 <div className="relative">
                                     <input
                                         type="text"
                                         value={recipient}
                                         onChange={e => setRecipient(e.target.value.trim())}
-                                        placeholder="0x…  — dirección EVM"
+                                        placeholder="0x...  — EVM Address"
                                         disabled={isActive}
                                         className="w-full bg-[#FAFAF8] border rounded-2xl px-5 py-4 text-black font-mono text-sm focus:outline-none transition-colors placeholder:text-black/25 disabled:opacity-50"
                                         style={{
@@ -661,7 +661,7 @@ export default function QuantumTransfer() {
                                 </div>
                                 {recipientValid === false && (
                                     <p className="text-[9px] font-mono text-red-500 ml-1">
-                                        Dirección inválida o es tu propia wallet.
+                                        Invalid address or it's your own wallet.
                                     </p>
                                 )}
                             </div>
@@ -670,7 +670,7 @@ export default function QuantumTransfer() {
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between ml-1">
                                     <label className="text-[9px] font-black uppercase tracking-[0.25em] text-black/40">
-                                        Monto (QDs)
+                                        Amount (QDs)
                                     </label>
                                     <button
                                         onClick={() => setAmount(qdBalance.toFixed(6))}
@@ -698,7 +698,7 @@ export default function QuantumTransfer() {
                                 </div>
                                 {amount && !amountValid && (
                                     <p className="text-[9px] font-mono text-red-500 ml-1">
-                                        Saldo insuficiente ({qdBalance.toFixed(4)} QDs disponibles).
+                                        Insufficient balance ({qdBalance.toFixed(4)} QDs available).
                                     </p>
                                 )}
                             </div>
@@ -706,13 +706,13 @@ export default function QuantumTransfer() {
                             {/* Memo */}
                             <div className="space-y-1.5">
                                 <label className="text-[9px] font-black uppercase tracking-[0.25em] text-black/40 ml-1">
-                                    Nota Pública <span className="text-black/20 normal-case font-normal">(opcional · max 64 chars)</span>
+                                    Public Note <span className="text-black/20 normal-case font-normal">(optional · max 64 chars)</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={memo}
                                     onChange={e => setMemo(e.target.value.slice(0, 64))}
-                                    placeholder="Compra de activos, pago P2P…"
+                                    placeholder="Asset purchase, P2P payment..."
                                     maxLength={64}
                                     disabled={isActive}
                                     className="w-full bg-[#FAFAF8] border border-black/10 rounded-2xl px-5 py-3.5 text-black text-sm focus:outline-none transition-colors placeholder:text-black/20 disabled:opacity-50"
@@ -729,7 +729,7 @@ export default function QuantumTransfer() {
                                         className="bg-[#FAFAF8] border border-black/5 rounded-2xl px-5 py-3 divide-y divide-black/5"
                                     >
                                         <div className="text-[8px] font-black uppercase tracking-widest text-black/30 pb-2">
-                                            Gas Estimado (L2)
+                                            Estimated Gas (L2)
                                         </div>
                                         <GasRow
                                             label="Gas Units"
@@ -737,14 +737,14 @@ export default function QuantumTransfer() {
                                             unit="gas"
                                         />
                                         <GasRow
-                                            label="Gas Máx. ETH"
+                                            label="Max Gas ETH"
                                             value={parseFloat(formatUnits(gasEstimate * 1_500_000_000n, 18)).toFixed(8)}
                                             unit={CHAIN_ID === 137 ? 'MATIC' : 'ETH'}
                                         />
                                         <GasRow
-                                            label="Gas Máx. USD"
+                                            label="Max Gas USD"
                                             value={`≈ $${(parseFloat(formatUnits(gasEstimate * 1_500_000_000n, 18)) * nativePrice).toFixed(4)}`}
-                                            unit="(ridículo)"
+                                            unit="(negligible)"
                                         />
                                     </motion.div>
                                 )}
@@ -753,7 +753,7 @@ export default function QuantumTransfer() {
                             {/* Protocol disclaimer */}
                             <div className="bg-[#FAFAF8] border border-black/5 rounded-2xl p-4">
                                 <p className="text-[9px] font-mono text-black/40 leading-relaxed uppercase tracking-wider">
-                                    Esta tx inyecta entropía cuántica de 256 bits, un payload ABI-codificado (plataforma, ruta de red, timestamp en ms) y genera un fingerprint Keccak-256 inmutable en el QuantumLedger. El Permit ERC-2612 elimina el approve() separado. Gas fees son costos L2 ridículos.
+                                    This tx injects 256-bit quantum entropy, an ABI-encoded payload (platform, network route, ms timestamp) and generates an immutable Keccak-256 fingerprint on the QuantumLedger. ERC-2612 Permit eliminates separate approve(). Gas fees are negligible L2 costs.
                                 </p>
                             </div>
 
@@ -799,15 +799,15 @@ export default function QuantumTransfer() {
                                     {isActive ? (
                                         <>
                                             <Loader2 size={16} className="animate-spin" />
-                                            {step === 'estimating'  && 'Estimando Gas…'}
-                                            {step === 'signing'     && 'Esperando Firma…'}
-                                            {step === 'broadcasting' && 'Broadcasting…'}
-                                            {step === 'confirming'  && 'Confirmando Bloque…'}
+                                            {step === 'estimating'  && 'Estimating Gas...'}
+                                            {step === 'signing'     && 'Awaiting Signature...'}
+                                            {step === 'broadcasting' && 'Broadcasting...'}
+                                            {step === 'confirming'  && 'Confirming Block...'}
                                         </>
                                     ) : (
                                         <>
                                             <Send size={16} />
-                                            Ejecutar Transferencia
+                                            Execute Transfer
                                             <ChevronRight size={14} />
                                         </>
                                     )}

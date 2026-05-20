@@ -861,7 +861,7 @@ export default function PortfolioPage() {
           >
             <div className="flex flex-col mb-8 gap-2">
               <h2 className="font-black uppercase tracking-tight text-xl sm:text-2xl" style={{ color: INK }}>QDs ( Quantum Dots )</h2>
-              <p className="text-sm font-mono" style={{ color: MUTED }}>Ejecuta transferencias inmutables On-Chain de QDs pagando gas fees ridículos de L2.</p>
+              <p className="text-sm font-mono" style={{ color: MUTED }}>Execute immutable On-Chain QD transfers paying negligible L2 gas fees.</p>
             </div>
             <div className="w-full flex items-center justify-center">
               <QuantumTransfer />
