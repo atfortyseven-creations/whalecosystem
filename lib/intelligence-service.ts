@@ -27,13 +27,12 @@ export class WacIntelligenceService {
     
     // 2. Analyze historical volume via Indexed Events
     const events = await prisma.globalWhaleEvent.findMany({
-      where: { wallet: { contains: addr.slice(-8), mode: 'insensitive' } },
       take: 20
     });
 
     // Score based on REAL activity data
     if (events.length === 0) score += 15; // Unknown/New wallet risk
-    if (events.some(e => e.action === 'VENTA')) score += 5; // Direct distribution signature
+    if (events.some(e => e.protocol.includes('VENTA'))) score += 5; // Direct distribution signature
     
     // 3. Institutional Entities (Lower risk platform profile)
     const isExchange = ['binance', 'coinbase', 'kraken', 'okx'].some(ex => addr.includes(ex));
@@ -48,7 +47,7 @@ export class WacIntelligenceService {
    */
   static async detectWashTrading(token: string): Promise<any[]> {
     const recent = await prisma.globalWhaleEvent.findMany({
-      where: { token: { mode: 'insensitive', equals: token } },
+      where: { protocol: { mode: 'insensitive', equals: token } },
       orderBy: { timestamp: 'desc' },
       take: 50
     });
@@ -57,26 +56,25 @@ export class WacIntelligenceService {
     const walletMap = new Map<string, string[]>();
 
     recent.forEach(e => {
-      const targets = walletMap.get(e.wallet) || [];
-      targets.push(e.token);
-      walletMap.set(e.wallet, targets);
+      const targets = walletMap.get(e.txHash) || [];
+      targets.push(e.protocol);
+      walletMap.set(e.txHash, targets);
     });
 
     // Detect if the same amount/token is bouncing back (Simplified logic)
     for (const e of recent) {
       const match = recent.find(rx => 
         rx.id !== e.id && 
-        rx.token === e.token && 
-        rx.action !== e.action && 
-        Math.abs(Number(rx.usdValue) - Number(e.usdValue)) < 0.05
+        rx.protocol === e.protocol && 
+        Math.abs(Number(rx.amountUSD) - Number(e.amountUSD)) < 0.05
       );
       
       if (match) {
         clusters.push({
           type: 'WASH_TRADING_CLUSTER',
-          wallets: [e.wallet, match.wallet],
-          token: e.token,
-          value: e.usdValue,
+          wallets: [e.txHash, match.txHash],
+          token: e.protocol,
+          value: e.amountUSD,
           confidence: 92
         });
       }
@@ -91,7 +89,7 @@ export class WacIntelligenceService {
   static async detectFlashLoan(token: string): Promise<any[]> {
     const anomalies = await this.getAnomalyAlerts(token);
     // Flash loans usually involve massive instantaneous USD value shifts
-    return anomalies.filter(a => Number(a.usdValue) > 5000000 && a.severity === 'CRITICAL');
+    return anomalies.filter(a => Number(a.amountUSD) > 5000000 && a.severity === 'CRITICAL');
   }
 
   /**
@@ -100,8 +98,8 @@ export class WacIntelligenceService {
   static async getDarkPoolEvents(): Promise<any[]> {
     const transfers = await prisma.globalWhaleEvent.findMany({
       where: { 
-        action: 'PUENTE', // Classified as Bridge/Internal in our radar
-        usdValue: { gte: 500000 } 
+        protocol: 'PUENTE', // Classified as Bridge/Internal in our radar
+        amountUSD: { gte: 500000 } 
       },
       orderBy: { timestamp: 'desc' },
       take: 30
@@ -110,7 +108,7 @@ export class WacIntelligenceService {
     // Dark pool heuristic: Transfer between tagged Elite entities or massive wallet-to-wallet
     return transfers.map(t => ({
       ...t,
-      intensity: Number(t.usdValue) > 2000000 ? 'BLOCK_TRADE' : 'OTC_TRANSFER',
+      intensity: Number(t.amountUSD) > 2000000 ? 'BLOCK_TRADE' : 'OTC_TRANSFER',
       transparency: 'PRIVATE'
     }));
   }
@@ -120,7 +118,7 @@ export class WacIntelligenceService {
    */
   static async getHeikinAshiSignals(token: string, limit: number = 20): Promise<HeikinAshiCandle[]> {
     const events = await prisma.globalWhaleEvent.findMany({
-      where: { token: { contains: token, mode: 'insensitive' } },
+      where: { protocol: { contains: token, mode: 'insensitive' } },
       orderBy: { timestamp: 'desc' },
       take: limit * 10,
     });
@@ -130,7 +128,7 @@ export class WacIntelligenceService {
     const buckets: Record<string, any> = {};
     events.forEach(e => {
       const bucketKey = new Date(e.timestamp).setMinutes(0, 0, 0).toString();
-      const val = Number(e.usdValue);
+      const val = Number(e.amountUSD);
       if (!buckets[bucketKey]) {
         buckets[bucketKey] = { o: val, h: val, l: val, c: val, t: new Date(parseInt(bucketKey)) };
       }
@@ -169,20 +167,20 @@ export class WacIntelligenceService {
   static async getAnomalyAlerts(token?: string): Promise<any[]> {
     const windowSize = 200;
     const events = await prisma.globalWhaleEvent.findMany({
-      where: token ? { token: { contains: token, mode: 'insensitive' } } : {},
+      where: token ? { protocol: { contains: token, mode: 'insensitive' } } : {},
       orderBy: { timestamp: 'desc' },
       take: windowSize,
     });
 
     if (events.length < 5) return [];
 
-    const values = events.map(e => Number(e.usdValue));
+    const values = events.map(e => Number(e.amountUSD));
     const mean = values.reduce((a, b) => a + b, 0) / values.length;
     const stdDev = Math.sqrt(values.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / values.length);
 
     return events
       .map(e => {
-        const zScore = (Number(e.usdValue) - mean) / (stdDev || 1);
+        const zScore = (Number(e.amountUSD) - mean) / (stdDev || 1);
         return {
           ...e,
           anomalyScore: parseFloat(zScore.toFixed(2)),

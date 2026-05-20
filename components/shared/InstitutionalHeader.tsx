@@ -13,7 +13,9 @@ const MENU_ITEMS = [
   { label: "Whale Chat", href: "/chat" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "Community", href: "#", subItems: [{ label: "News", href: "/news" }, { label: "Academy", href: "/academy" }, { label: "Forum", href: "/forum" }, { label: "Careers", href: "/careers" }] },
-  { label: "Pricing", href: "/pricing" }
+  { label: "Pricing", href: "/pricing" },
+  { label: "Status", href: "/status" },
+  { label: "Privacy", href: "/privacy" }
 ];
 
 function MegaMenuItem({ item }: { item: any }) {

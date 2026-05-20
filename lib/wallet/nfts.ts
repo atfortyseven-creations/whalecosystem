@@ -20,7 +20,7 @@ export async function getNFTs(address: string, chainId: number = 1): Promise<NFT
   try {
     const nfts = await moralisService.getWalletNFTs(address, moralisService.getChainName(chainId));
 
-    return nfts.map((nft: any) => ({
+    return nfts?.map((nft: any) => ({
       id: `${nft.contract}-${nft.tokenId}`,
       contract: nft.contract,
       tokenId: nft.tokenId,

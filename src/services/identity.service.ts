@@ -14,7 +14,7 @@ export class IdentityService {
             create: {
                 walletAddress,
                 tier: 'GHOST', // Nivel 0 por defecto
-                reputation: 10 // Base points for connecting wallet
+                humanityScore: 10 // Base points for connecting wallet
             }
         });
 
@@ -34,7 +34,7 @@ export class IdentityService {
                 where: { walletAddress },
                 data: {
                     tier: 'SOVEREIGN',
-                    reputation: { increment: 50 } // Reputation boost
+                    humanityScore: { increment: 50 } // Reputation boost
                 }
             });
         }

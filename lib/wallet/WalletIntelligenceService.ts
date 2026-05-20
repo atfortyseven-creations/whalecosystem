@@ -185,17 +185,11 @@ class WalletIntelligenceService {
     if (!forceRefresh && !deep) {
         try {
             const cached = await prisma.walletIntelligence.findUnique({
-                where: { address: resolvedAddr },
-                include: {
-                    yieldPositions: true,
-                    flowAnalysis: true,
-                    nftHoldings: true,
-                    dappActivities: true
-                }
+                where: { address: resolvedAddr }
             });
 
             // If found and fresh (< 5 minutes), return cached
-            if (cached && (Date.now() - new Date(cached.lastCheck).getTime() < 300000)) {
+            if (cached && (Date.now() - new Date(cached.updatedAt).getTime() < 300000)) {
                 console.log(`[INTEL] Returning cached DB record for ${resolvedAddr}`);
                 return this.mapDbToIntelligence(cached);
             }
@@ -550,89 +544,15 @@ class WalletIntelligenceService {
       const intelligence = await (tx as any).walletIntelligence.upsert({
         where: { address },
         update: {
-          totalValueUsd: portfolio?.totalValueUsd || 0,
-          pnl24h: portfolio?.change24hUSD || 0,
-          change24h: portfolio?.change24hPercent || 0,
-          riskScore: metrics.riskScore,
-          diversityScore: 100 - (portfolio?.analytics?.concentrationIndex || 0),
-          activityScore: Math.min(100, (metrics.txCount / 5)),
-          txCount: metrics.txCount,
-          rank: metrics.rank,
-          strategicSummary: metrics.strategicSummary,
-          whaleEvidence: metrics.whaleEvidence || [],
-          influenceScore: metrics.influenceScore || 0,
           category: metrics.category || null,
-          forensics: metrics.forensics as any || null,
-          updateCount: { increment: 1 },
-          lastCheck: new Date()
+          forensics: metrics.forensics as any || null
         },
         create: {
           address,
-          totalValueUsd: portfolio?.totalValueUsd || 0,
-          pnl24h: portfolio?.change24hUSD || 0,
-          change24h: portfolio?.change24hPercent || 0,
-          riskScore: metrics.riskScore,
-          diversityScore: 100 - (portfolio?.analytics?.concentrationIndex || 0),
-          activityScore: Math.min(100, (metrics.txCount / 5)),
-          txCount: metrics.txCount,
-          rank: metrics.rank,
-          strategicSummary: metrics.strategicSummary,
-          whaleEvidence: metrics.whaleEvidence || [],
-          influenceScore: metrics.influenceScore || 0,
           category: metrics.category || null,
           forensics: metrics.forensics as any || null
         }
       });
-
-      // Clear old sub-records
-      await (tx as any).yieldPosition.deleteMany({ where: { walletId: intelligence.id } });
-      await (tx as any).flowAnalysis.deleteMany({ where: { walletId: intelligence.id } });
-      await (tx as any).dAppInteraction.deleteMany({ where: { walletId: intelligence.id } });
-      await (tx as any).nFTHolding.deleteMany({ where: { walletId: intelligence.id } });
-
-      // Create new sub-records
-      if (yieldPos.length > 0) {
-        await (tx as any).yieldPosition.createMany({
-          data: yieldPos.map(p => ({
-            walletId: intelligence.id,
-            protocol: p.protocol,
-            type: p.type,
-            amount: p.amount,
-            apy: p.apy,
-            earnedUsd: p.earnedUsd,
-            asset: p.asset,
-            valueUsd: p.valueUsd || 0,
-            onChain: p.onChain || false,
-            details: p.details || null
-          }))
-        });
-      }
-
-      await (tx as any).flowAnalysis.create({
-        data: {
-          walletId: intelligence.id,
-          period: flows.period,
-          inflow: flows.inflow,
-          outflow: flows.outflow,
-          topSenders: flows.topSenders as any,
-          topReceivers: flows.topReceivers as any
-        }
-      });
-
-      const nfts = portfolio?.tokens?.filter((t: any) => t.isNft) || [];
-      if (nfts.length > 0) {
-        await (tx as any).nFTHolding.createMany({
-          data: nfts.map((n: any) => ({
-            walletId: intelligence.id,
-            contract: n.address,
-            tokenId: n.tokenId || '0',
-            name: n.name,
-            collection: n.collection || 'Default',
-            image: n.logo,
-            floorPrice: n.price
-          }))
-        });
-      }
 
       return intelligence;
     });

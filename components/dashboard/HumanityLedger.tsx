@@ -86,16 +86,16 @@ export default function HumanityLedger() {
     // ── OUTER WRAPPER ──────────────────────────────────────────────────────
     // bg logo pushed far right via backgroundPosition so it doesn't compete
     // with the main panel which is pinned to the left side of its container.
-    <div
-      className="w-full h-full min-h-0 flex flex-col items-start justify-start p-4 md:p-8 text-black font-sans overflow-y-auto no-scrollbar relative bg-white"
-      style={{
-        backgroundImage: "url('/aztec_x_whale_partnership.svg')",
-        backgroundPosition: 'right 2% center',
-        backgroundSize: 'min(520px, 42%)',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'local',
-      }}
-    >
+    <div className="w-full h-full min-h-0 flex flex-col items-start justify-start p-4 md:p-8 text-black font-sans overflow-y-auto no-scrollbar relative bg-white">
+      {/* ── BACKGROUND LOGOS — Centered in the white space on the right ─────────────── */}
+      <div className="fixed top-0 right-0 bottom-0 left-[780px] hidden lg:flex items-center justify-center pointer-events-none z-0">
+        <img 
+          src="/aztec_x_whale_partnership.svg" 
+          alt="Partnership Logos" 
+          className="w-full max-w-[520px] px-8 opacity-90 mix-blend-multiply" 
+        />
+      </div>
+
       {/* ── MAIN PANEL — left-aligned, deliberately narrower ─────────────── */}
       <div className="w-full max-w-[780px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 flex flex-col transition-all duration-500 z-10 ml-0">
 

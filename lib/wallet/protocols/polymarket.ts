@@ -12,7 +12,7 @@ export async function discoverPolymarketPositions(address: string): Promise<Pred
     const nfts = await moralisService.getWalletNFTs(address, 'polygon');
 
     // Filter for CTF contract
-    const polyNFTs = nfts.filter((nft: any) => nft.contract.toLowerCase() === CTF_CONTRACT.toLowerCase());
+    const polyNFTs = nfts?.filter((nft: any) => nft.contract.toLowerCase() === CTF_CONTRACT.toLowerCase());
 
     if (!polyNFTs || polyNFTs.length === 0) {
       return [];
@@ -41,7 +41,7 @@ export async function discoverPolymarketPositions(address: string): Promise<Pred
         pnlPercent: 0,
         chainId: 137,
       };
-    }).filter((p: any) => p !== null);
+    })?.filter((p: any) => p !== null);
 
     return positions;
   } catch (error) {

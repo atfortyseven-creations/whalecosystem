@@ -38,7 +38,7 @@ export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) =
                 webSockets(),
                 tcp()
             ],
-            connectionEncryption: [noise()],
+            connectionEncrypters: [noise()],
             streamMuxers: [yamux()],
             peerDiscovery: [
                 bootstrap({

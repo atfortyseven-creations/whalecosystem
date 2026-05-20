@@ -85,11 +85,12 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
         return createMockRedis(config.name);
     }
 
+    if (IS_BUILDING) {
+        console.warn(`[Redis:${config.name || 'Factory'}] ⚠️ Build Phase detected. Skipping real Redis connection.`);
+        return createMockRedis(config.name);
+    }
+
     if (!REDIS_URL) {
-        if (IS_BUILDING) {
-            console.warn(`[Redis:${config.name || 'Factory'}] ⚠️ Skipping connection: REDIS_URL not set during build.`);
-            return null as any;
-        }
         // Silent Mock-Mode transition
         return createMockRedis(config.name);
     }

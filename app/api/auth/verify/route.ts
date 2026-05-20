@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find verification code
+    // Find verification code (no include - VerificationCode has no user relation)
     const verificationCode = await prisma.verificationCode.findFirst({
       where: {
         userId,
@@ -22,9 +22,6 @@ export async function POST(request: NextRequest) {
         expiresAt: {
           gt: new Date()
         }
-      },
-      include: {
-        user: true
       }
     });
 
@@ -32,6 +29,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid or expired verification code' },
         { status: 401 }
+      );
+    }
+
+    // Fetch the user separately
+    const user = await prisma.authUser.findUnique({
+      where: { id: verificationCode.userId }
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
       );
     }
 
@@ -54,8 +63,8 @@ export async function POST(request: NextRequest) {
     const { createAccessToken, createRefreshToken, setSessionCookies, generateFingerprint } = await import('@/lib/session');
     const fingerprint = generateFingerprint(userAgent, ip);
     
-    const accessToken = await createAccessToken(verificationCode.user.id, verificationCode.user.email, fingerprint);
-    const refreshToken = await createRefreshToken(verificationCode.user.id, verificationCode.user.email, fingerprint);
+    const accessToken = await createAccessToken(user.id, user.email, fingerprint);
+    const refreshToken = await createRefreshToken(user.id, user.email, fingerprint);
 
     // Set secure httpOnly cookies
     await setSessionCookies(accessToken, refreshToken);
@@ -64,9 +73,9 @@ export async function POST(request: NextRequest) {
       success: true,
       token: accessToken,
       user: {
-        id: verificationCode.user.id,
-        email: verificationCode.user.email,
-        name: verificationCode.user.name,
+        id: user.id,
+        email: user.email,
+        name: user.name,
         verified: true
       }
     });

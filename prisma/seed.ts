@@ -1,5 +1,5 @@
 // prisma/seed.ts
-import { PrismaClient, IdentityTier, MarketStatus, ProposalStatus } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -14,55 +14,12 @@ async function main() {
         create: {
             walletAddress: '0x1234567890abcdef1234567890abcdef12345678',
             email: 'admin@whalealert.network',
-            tier: IdentityTier.SOVEREIGN, // Maximum tier
-            reputation: 9000,
+            tier: 'SOVEREIGN', // Maximum tier
         },
     })
     console.log('👤 Usuario Soberano creado.')
 
-    // 2. Inject Capital into Treasury (Make the charts go up)
-    await prisma.treasurySnapshot.create({
-        data: {
-            totalValueLocked: 54000000.50, // $54 Millones
-            circulatingSupply: 12000000,
-            protocolRevenue: 350000.75,    // $350k ganados
-        },
-    })
-    console.log('💰 Treasury funded.')
-
-    // 3. Crear un Mercado Activo (Bitcoin)
-    const market = await prisma.market.upsert({
-        where: { slug: 'bitcoin-100k-2026' },
-        update: {},
-        create: {
-            slug: 'bitcoin-100k-2026',
-            question: 'Will Bitcoin hit $100k before Q3 2026?',
-            category: 'Crypto',
-            status: MarketStatus.ACTIVE,
-            endDate: new Date('2026-06-30'),
-            volume: 1500000,    // 1.5M Volumen
-            liquidity: 500000,  // 500k Liquidez
-        },
-    })
-    console.log('📈 Mercado de Bitcoin abierto.')
-
-    // 4. Crear una Propuesta de Gobernanza
-    await prisma.marketProposal.create({
-        data: {
-            question: 'Should we increase staking rewards?',
-            description: 'Proposal to increase APY from 5% to 8% for Sovereign members.',
-            outcomes: ["Yes", "No"],
-            resolutionCriteria: 'Majority vote',
-            category: 'Governance',
-            creatorAddress: admin.walletAddress,
-            creatorNullifier: 'nullifier-hash-secret-123',
-            status: ProposalStatus.VOTING,
-            votingEndsAt: new Date('2026-02-28'),
-            votesFor: 150,
-            votesAgainst: 20,
-        }
-    })
-    console.log('🗳️ Propuesta de Gobernanza activa.')
+    // Treasury, Market, and Proposals sections removed due to schema changes.
 
     // 5. Crear una Noticia de Inteligencia (Intel)
     await prisma.intelItem.create({
@@ -72,7 +29,6 @@ async function main() {
             category: 'Regulation',
             url: 'https://bloomberg.com/crypto/whale-alert',
             publishedAt: new Date(),
-            sentimentScore: 0.85, // Muy positivo
             aiSummary: 'Fuentes internas confirman que la SEC ve con buenos ojos el modelo de identidad.',
         }
     })

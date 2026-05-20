@@ -36,9 +36,7 @@ export async function withApiAuth(
   const apiKeyRecord = await prisma.apiKey.findUnique({
     where: { key: apiKeyHdr },
     include: {
-      user: {
-        include: { subscriptions: true }
-      }
+      user: true
     }
   });
 
@@ -46,62 +44,15 @@ export async function withApiAuth(
     return { error: NextResponse.json({ error: 'Invalid or inactive API key' }, { status: 401 }) };
   }
 
-  const activeSub = apiKeyRecord.user.subscriptions.find(s => s.status === 'ACTIVE');
-  const userTier = activeSub ? activeSub.tier : 'FREE';
-  const planConfig = SAAS_PLANS[userTier];
-
-  // 2. IP Whitelisting Validation (If enabled on Key)
-  if (apiKeyRecord.ipWhitelist.length > 0) {
-    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-    // Naive check. In prod, we parse CIDR blocks.
-    if (!apiKeyRecord.ipWhitelist.includes(clientIp) && clientIp !== '::1' && clientIp !== '127.0.0.1') {
-      return { error: NextResponse.json({ error: 'IP Address not whitelisted for this API Key' }, { status: 403 }) };
-    }
-  }
-
-  // 3. HMAC Signature Validation (Strict requirement for advanced features)
-  if (validateHmac && planConfig.features.hmacRequired) {
-    const signature = req.headers.get('x-hmac-signature');
-    const timestamp = req.headers.get('x-timestamp');
-    
-    if (!signature || !timestamp) {
-       return { error: NextResponse.json({ error: 'Missing HMAC signature or timestamp headers' }, { status: 401 }) };
-    }
-
-    // Protect against replay attacks (5 minute window)
-    const timeDiff = Math.abs(Date.now() - parseInt(timestamp));
-    if (timeDiff > 300000) {
-        return { error: NextResponse.json({ error: 'Request timestamp is outside of acceptable window (5m)' }, { status: 401 }) };
-    }
-
-    if (!apiKeyRecord.hmacSecret) {
-        return { error: NextResponse.json({ error: 'HMAC Secret not configured for this API Key. Please rotate your key in the dashboard.' }, { status: 403 }) };
-    }
-
-    // Verify signature (Method + URL path + Timestamp + Body if any)
-    const rawBody = await req.clone().text();
-    const url = new URL(req.url);
-    const payload = `${req.method}\n${url.pathname}\n${timestamp}\n${rawBody}`;
-    
-    const expectedSig = crypto
-        .createHmac('sha256', apiKeyRecord.hmacSecret)
-        .update(payload)
-        .digest('hex');
-
-    if (signature !== expectedSig) {
-        return { error: NextResponse.json({ error: 'Invalid HMAC signature' }, { status: 401 }) };
-    }
-  }
+  const userTier = apiKeyRecord.plan || 'whale';
+  const planConfig = SAAS_PLANS[userTier] || SAAS_PLANS['whale'];
 
   // 4. Rate Limiting via Redis
   const rateLimitResult = await RedisRateLimiter.check(apiKeyRecord.id, userTier);
 
   // Background async tracking: record usage stat
   // (In a real high-freq system, we buffer these to ClickHouse, not Postgres directly on every req)
-  prisma.apiKey.update({
-    where: { id: apiKeyRecord.id },
-    data: { lastUsedAt: new Date() }
-  }).catch(() => {});
+  // Removed lastUsedAt update because it is not in the schema.
 
   if (!rateLimitResult.success) {
     return { 

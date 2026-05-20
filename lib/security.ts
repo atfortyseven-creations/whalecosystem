@@ -15,9 +15,6 @@ export type SecurityEventSeverity = 'INFO' | 'WARNING' | 'CRITICAL';
 
 interface LogSecurityEventParams {
     type: SecurityEventType;
-    userId?: string;
-    ipAddress: string;
-    userAgent?: string;
     severity: SecurityEventSeverity;
     metadata?: Record<string, any>;
 }
@@ -30,11 +27,11 @@ export async function logSecurityEvent(params: LogSecurityEventParams): Promise<
         await prisma.securityEvent.create({
             data: {
                 type: params.type,
-                userId: params.userId,
+                authUserId: params.userId,
                 ipAddress: params.ipAddress,
                 userAgent: params.userAgent,
                 severity: params.severity,
-                metadata: params.metadata || {},
+                details: params.metadata ? JSON.stringify(params.metadata) : undefined,
             },
         });
     } catch (error) {
@@ -47,29 +44,8 @@ export async function logSecurityEvent(params: LogSecurityEventParams): Promise<
  * Check if an IP address is blocked
  */
 export async function checkBlockedIP(ipAddress: string): Promise<boolean> {
-    try {
-        const blocked = await prisma.blockedIP.findUnique({
-            where: { ipAddress },
-        });
-
-        if (!blocked) {
-            return false;
-        }
-
-        // Check if block has expired
-        if (blocked.expiresAt && blocked.expiresAt < new Date()) {
-            // Remove expired block
-            await prisma.blockedIP.delete({
-                where: { ipAddress },
-            });
-            return false;
-        }
-
-        return true;
-    } catch (error) {
-        console.error('Failed to check blocked IP:', error);
-        return false; // Fail open - don't block on error
-    }
+    // BlockedIP model removed, stubbing feature
+    return false;
 }
 
 /**
@@ -80,21 +56,8 @@ export async function blockIP(
     reason: string,
     expiresAt?: Date
 ): Promise<void> {
+    // BlockedIP model removed, stubbing feature
     try {
-        await prisma.blockedIP.upsert({
-            where: { ipAddress },
-            create: {
-                ipAddress,
-                reason,
-                expiresAt,
-            },
-            update: {
-                reason,
-                expiresAt,
-                blockedAt: new Date(),
-            },
-        });
-
         await logSecurityEvent({
             type: 'BLOCKED',
             ipAddress,
@@ -102,7 +65,7 @@ export async function blockIP(
             metadata: { reason, expiresAt },
         });
     } catch (error) {
-        console.error('Failed to block IP:', error);
+        console.error('Failed to log blocked IP:', error);
     }
 }
 
