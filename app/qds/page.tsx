@@ -79,7 +79,7 @@ const SECTIONS = [
     title: 'Immutable supply rule',
     paragraphs: [
       'The twenty-one million supply ceiling is enforced by the contract itself, not by the goodwill of any team or governance body. Attempting to mint tokens beyond this ceiling will cause the transaction to revert with a protocol-level error. No account has the authority to modify this rule.',
-      'Immutability of the supply rule serves a specific function: it makes QDs useful as a unit of account in long-range planning. When the supply ceiling cannot be changed, participants can make calculations about QDs-denominated values that hold across time horizons longer than any single organization's commitment.',
+      "Immutability of the supply rule serves a specific function: it makes QDs useful as a unit of account in long-range planning. When the supply ceiling cannot be changed, participants can make calculations about QDs-denominated values that hold across time horizons longer than any single organization's commitment.",
       'The contract code governing QDs supply is open source and independently auditable. Any cryptographer, developer, or analyst can verify the constraint directly from the on-chain bytecode without relying on documentation, announcements, or team statements.',
       'Forks of the QDs protocol that alter the supply ceiling are not QDs. A fork is a separate protocol with separate economics. The canonical QDs is the chain launched at genesis with the original parameters intact.',
     ],
