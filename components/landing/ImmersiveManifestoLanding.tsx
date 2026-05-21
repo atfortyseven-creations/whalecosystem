@@ -54,12 +54,12 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
       ══════════════════════════════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative w-full h-[100svh] overflow-hidden bg-white"
+        className="relative w-full h-[100svh] overflow-hidden bg-white flex flex-col items-center justify-center pt-20 pb-10"
       >
-        {/* 3D Atom — covers full hero, client-only */}
+        {/* 3D Atom — centered above the buttons */}
         {mounted && (
           <div
-            className="absolute inset-0 z-0 pointer-events-none"
+            className="relative w-full h-[55vh] max-h-[500px] z-0 pointer-events-none flex items-center justify-center"
             style={{ willChange: 'transform' }}
           >
             <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
@@ -72,11 +72,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
         />
 
-        {/* CTA Buttons — pinned to bottom-center */}
+        {/* CTA Buttons — placed right below the atom */}
         <motion.div
           style={{ opacity: heroOpacity }}
           initial="hidden" animate="visible" variants={STAGGER}
-          className="absolute bottom-28 inset-x-0 z-20 flex justify-center px-6 pointer-events-none"
+          className="relative z-20 flex justify-center px-6 pointer-events-none mt-8"
         >
           <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
             <Link

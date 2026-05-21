@@ -103,8 +103,8 @@ const RING_MATERIAL_LIGHT = new THREE.MeshPhysicalMaterial({
 
 // Shared geometry instances — created once, reused across all rings
 const TORUS_GEO = new THREE.TorusGeometry(2.8, 0.04, 12, 80);
-const SPHERE_SM_GEO = new THREE.SphereGeometry(0.08, 10, 10);
-const SPHERE_NUC_GEO = new THREE.SphereGeometry(0.55, 24, 24);
+const SPHERE_SM_GEO = new THREE.SphereGeometry(0.12, 10, 10);
+const SPHERE_NUC_GEO = new THREE.SphereGeometry(0.85, 24, 24);
 
 function OrbitalRing({ inclination, azimuth, vel, progress, baseSpeed, isDark, index }: any) {
   const ref = useRef<THREE.Mesh>(null);
@@ -112,7 +112,7 @@ function OrbitalRing({ inclination, azimuth, vel, progress, baseSpeed, isDark, i
 
   useFrame((_, dt) => {
     if (!ref.current) return;
-    angle.current += dt * baseSpeed + vel.current * 0.0012;
+    angle.current += dt * baseSpeed + vel.current * 0.0003;
     ref.current.rotation.y = angle.current;
 
     // Fragmentation — avoids "new THREE.Vector3" per frame via pooled _v3
@@ -151,7 +151,7 @@ function Electron({ inclination, azimuth, phase, orbitRadius, vel }: any) {
 
   useFrame((_, dt) => {
     if (!meshRef.current) return;
-    t.current += dt * 1.6 + Math.abs(vel.current) * 0.009;
+    t.current += dt * 1.6 + Math.abs(vel.current) * 0.002;
     meshRef.current.position.set(
       Math.cos(t.current) * orbitRadius,
       Math.sin(t.current) * orbitRadius,
@@ -189,7 +189,7 @@ function Nucleus({ vel, isDark }: any) {
 
   useFrame((_, dt) => {
     if (!ref.current) return;
-    ref.current.rotation.y += dt * 0.3 + vel.current * 0.003;
+    ref.current.rotation.y += dt * 0.3 + vel.current * 0.0008;
     ref.current.rotation.x += dt * 0.12;
   });
 
@@ -230,7 +230,7 @@ function AtomGroup({ vel, progress, isDark, enableScale = false, isMobile = fals
     // MetaMask fox-style pointer tracking (smooth lerp, no snapping)
     const targetY = pointer.x * 1.5;
     const targetX = -pointer.y * 1.5;
-    masterRef.current.rotation.y += (targetY - masterRef.current.rotation.y) * 0.04 + vel.current * 0.02;
+    masterRef.current.rotation.y += (targetY - masterRef.current.rotation.y) * 0.04 + vel.current * 0.003;
     masterRef.current.rotation.x += (targetX - masterRef.current.rotation.x) * 0.04;
 
     // Continuous Z spin driven by scroll progress (gives "turn around" immersion)
@@ -240,9 +240,9 @@ function AtomGroup({ vel, progress, isDark, enableScale = false, isMobile = fals
       // Cinematic: zoom in as user scrolls into section, zoom out as they leave
       const p = progress.current;
       // Drastically reduced scale values to ensure perfectly small and centered look
-      const baseScale = isMobile ? 0.35 : 0.65; 
-      const peakScale = isMobile ? 0.65 : 1.3; 
-      const endScale = isMobile ? 0.4 : 0.7;
+      const baseScale = isMobile ? 0.2 : 0.45; 
+      const peakScale = isMobile ? 0.35 : 0.85; 
+      const endScale = isMobile ? 0.25 : 0.5;
       let targetScale: number;
       if (p < 0.5) {
         targetScale = baseScale + (p / 0.5) * (peakScale - baseScale);
@@ -252,7 +252,7 @@ function AtomGroup({ vel, progress, isDark, enableScale = false, isMobile = fals
       _scaleVec.setScalar(targetScale);
       masterRef.current.scale.lerp(_scaleVec, 0.06);
     } else {
-      const staticScale = isMobile ? 0.35 : 0.65;
+      const staticScale = isMobile ? 0.2 : 0.45;
       _scaleVec.setScalar(staticScale);
       masterRef.current.scale.lerp(_scaleVec, 0.1);
     }
