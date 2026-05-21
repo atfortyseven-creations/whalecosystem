@@ -150,22 +150,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
             <QDsAtomRenderer vel={vel} isDark={true} enableScale={true} />
           </motion.div>
           
-          <motion.div variants={FADE_UP} className="mt-8 flex flex-col items-center justify-center gap-4">
-             <div className="flex items-center gap-6 md:gap-8">
-                {/* Aztec Logo */}
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 p-3 shadow-lg hover:scale-105 transition-transform duration-300">
-                   <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-                      <path fillRule="evenodd" clipRule="evenodd" d="M12 2.5C12.5 2.5 13 2.7 13.4 3.1L20.9 10.6C21.7 11.4 21.7 12.6 20.9 13.4L13.4 20.9C12.6 21.7 11.4 21.7 10.6 20.9L3.1 13.4C2.3 12.6 2.3 11.4 3.1 10.6L10.6 3.1C11 2.7 11.5 2.5 12 2.5ZM12 8.5C11.6 8.5 11.2 8.7 10.9 8.9L8.9 10.9C8.3 11.5 8.3 12.5 8.9 13.1L10.9 15.1C11.5 15.7 12.5 15.7 13.1 15.1L15.1 13.1C15.7 12.5 15.7 11.5 15.1 10.9L13.1 8.9C12.8 8.7 12.4 8.5 12 8.5Z" fill="#7C3AED"/>
-                   </svg>
-                </div>
-                {/* X */}
-                <div className="text-white/60 font-mono text-xl font-black">X</div>
-                {/* Whale Logo */}
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10 p-3 shadow-lg hover:scale-105 transition-transform duration-300">
-                   <img src="/official-whale-monochrome.png" alt="Whale Network" className="w-full h-full object-contain invert drop-shadow-md opacity-90" />
-                </div>
-             </div>
-          </motion.div>
+
           <motion.div variants={FADE_UP} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/portfolio" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center">
               Don't have an Account yet?
