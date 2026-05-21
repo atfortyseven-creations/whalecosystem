@@ -39,10 +39,31 @@ export function useScrollVelocity() {
   return vel;
 }
 
+export function useScrollProgress() {
+  const progress = useRef(0);
+  
+  useEffect(() => {
+    const onScroll = () => {
+      const max = document.body.scrollHeight - window.innerHeight;
+      progress.current = max > 0 ? Math.max(0, Math.min(1, window.scrollY / max)) : 0;
+    };
+    // Initialize
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+  
+  return progress;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ORBITAL RING
 // ─────────────────────────────────────────────────────────────────────────────
-function OrbitalRing({ inclination, azimuth, vel, baseSpeed, isDark }: any) {
+function OrbitalRing({ inclination, azimuth, vel, progress, baseSpeed, isDark, index }: any) {
   const ref = useRef<THREE.Mesh>(null);
   const angle = useRef(0);
 
@@ -50,6 +71,19 @@ function OrbitalRing({ inclination, azimuth, vel, baseSpeed, isDark }: any) {
     if (!ref.current) return;
     angle.current += dt * baseSpeed + vel.current * 0.0012;
     ref.current.rotation.y = angle.current;
+
+    // ─── FRAGMENTATION EFFECT ───
+    // Fragments wildly in the middle of the scroll (progress = 0.5), defragments at ends (0.0 and 1.0)
+    const fragIntensity = Math.sin(progress.current * Math.PI); 
+    // High-frequency chaos based on scroll
+    const chaos = Math.sin(progress.current * 80 + index * 15);
+    const offset = fragIntensity * chaos * 4.5; // Pushes rings up to 4.5 units away!
+
+    ref.current.position.lerp(new THREE.Vector3(
+      Math.sin(azimuth) * offset,
+      Math.cos(inclination) * offset,
+      Math.sin(inclination) * offset
+    ), 0.08);
   });
 
   return (
@@ -128,7 +162,7 @@ function Nucleus({ vel, isDark }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // ATOM GROUP
 // ─────────────────────────────────────────────────────────────────────────────
-function AtomGroup({ vel, isDark, enableScale = false }: any) {
+function AtomGroup({ vel, progress, isDark, enableScale = false }: any) {
   const masterRef = useRef<THREE.Group>(null);
 
   useFrame((_, dt) => {
@@ -138,9 +172,15 @@ function AtomGroup({ vel, isDark, enableScale = false }: any) {
     masterRef.current.rotation.x = Math.sin(Date.now() * 0.0002) * 0.25;
 
     if (enableScale) {
-      const scrollY = window.scrollY;
-      const rawScale = 1.0 + (scrollY * 0.0015);
-      masterRef.current.scale.lerp(new THREE.Vector3(rawScale, rawScale, rawScale), 0.05);
+      // ─── MASSIVE PULSATING SCALE ───
+      // Pules multiple times as you scroll.
+      // Progress 0.0 -> 1.0. 
+      // Math.sin(progress * PI * 8) gives 4 full heartbeat pulses.
+      const pulse = Math.sin(progress.current * Math.PI * 8);
+      // Scale fluctuates between 0.45 (tiny) and 2.2 (massive)
+      const targetScale = 1.3 + (pulse * 0.85);
+      
+      masterRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.08);
     }
   });
 
@@ -159,7 +199,7 @@ function AtomGroup({ vel, isDark, enableScale = false }: any) {
   return (
     <group ref={masterRef}>
       {RINGS.map((r, i) => (
-        <OrbitalRing key={i} {...r} vel={vel} baseSpeed={r.speed} isDark={isDark} />
+        <OrbitalRing key={i} index={i} {...r} vel={vel} progress={progress} baseSpeed={r.speed} isDark={isDark} />
       ))}
       {ELECTRONS.map((e, i) => (
         <Electron key={i} {...e} orbitRadius={2.8} vel={vel} />
@@ -172,7 +212,7 @@ function AtomGroup({ vel, isDark, enableScale = false }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // SCENE
 // ─────────────────────────────────────────────────────────────────────────────
-function Scene({ vel, isDark, enableScale }: any) {
+function Scene({ vel, progress, isDark, enableScale }: any) {
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={40} />
@@ -184,7 +224,7 @@ function Scene({ vel, isDark, enableScale }: any) {
       <Environment preset={isDark ? "city" : "studio"} />
 
       <Float speed={0.8} floatIntensity={0.3} rotationIntensity={0.1}>
-        <AtomGroup vel={vel} isDark={isDark} enableScale={enableScale} />
+        <AtomGroup vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} />
       </Float>
 
       <EffectComposer disableNormalPass multisampling={4}>
@@ -215,6 +255,8 @@ function Scene({ vel, isDark, enableScale }: any) {
 // MAIN COMPONENT EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 export function QDsAtomRenderer({ vel, isDark = false, enableScale = false }: { vel: React.MutableRefObject<number>, isDark?: boolean, enableScale?: boolean }) {
+  const progress = useScrollProgress();
+
   return (
     <Canvas
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance', precision: 'highp' }}
@@ -223,7 +265,7 @@ export function QDsAtomRenderer({ vel, isDark = false, enableScale = false }: { 
       frameloop="always"
     >
       <Suspense fallback={null}>
-        <Scene vel={vel} isDark={isDark} enableScale={enableScale} />
+        <Scene vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} />
       </Suspense>
     </Canvas>
   );
