@@ -325,6 +325,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       : 'relative z-10 w-full flex-1 flex flex-col overscroll-none';
 
   const showInstitutionalHeader =
+    pathname.startsWith('/dashboard') ||
     pathname === '/ledger' ||
     (pathname === '/portfolio' && isConnected) ||
     pathname === '/support' ||

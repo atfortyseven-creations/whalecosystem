@@ -10,9 +10,9 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: ['GPTBot', 'ChatGPT-User', 'Google-Extended', 'Anthropic-ai', 'PerplexityBot', 'CCBot', 'grok', 'Grok'],
-        allow: ['/llms.txt', '/humans.txt', '/'],
+        allow: ['/llms.txt', '/humans.txt', '/.well-known/security.txt', '/'],
       }
     ],
-    sitemap: 'https://www.humanidfi.com/sitemap.xml',
+    sitemap: 'https://whalecosystem.io/sitemap.xml',
   }
 }

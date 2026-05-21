@@ -9,8 +9,6 @@ import { WhaleChatLink } from "@/components/shared/WhaleChatLink";
 export const revalidate = 60;
 
 export default async function AcademyPage() {
-    // Phase 2: Ultimate Zero-Mock Fetcher
-    // We attempt to fetch courses from the Postgres database.
     let dbCourses: any[] = [];
     try {
         dbCourses = await getAcademyData();
@@ -18,19 +16,22 @@ export default async function AcademyPage() {
         console.error("LMS DB Connection Missing", e);
     }
     
-    // Check if the database has been properly seeded
     const isDatabaseSeeded = dbCourses.length > 0;
 
     return (
         <WhaleMissionLoader>
-            <div className="bg-transparent">
-                <AcademyInteractiveEngine 
-                    dbCourses={dbCourses} 
-                    isSeeded={isDatabaseSeeded}
-                    expectedCategories={TOPIC_CATEGORIES.length} 
-                />
-                <WhaleChatLink />
-                <SovereignFooter />
+            <div className="flex-1 flex flex-col bg-white text-slate-900 w-full min-h-screen">
+              <div className="w-full flex flex-col items-center justify-start p-4 md:p-8 relative min-h-screen">
+                <div className="w-full max-w-[1200px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] flex flex-col transition-all duration-500 z-10 mt-16 md:mt-24 p-8 md:p-16">
+                    <AcademyInteractiveEngine 
+                        dbCourses={dbCourses} 
+                        isSeeded={isDatabaseSeeded}
+                        expectedCategories={TOPIC_CATEGORIES.length} 
+                    />
+                </div>
+              </div>
+              <WhaleChatLink />
+              <SovereignFooter />
             </div>
         </WhaleMissionLoader>
     );

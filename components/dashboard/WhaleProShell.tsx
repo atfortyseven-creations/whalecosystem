@@ -33,14 +33,14 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'gold',          label: 'Create Badge',    icon: null },
-    { id: 'billing',       label: 'Plans',           icon: null },
-    { id: 'humanity-ledger', label: 'Humanity Ledger', icon: null },
-    { id: 'markets',       label: 'Tokens',          icon: null, requiresZK: true },
-    { id: 'inst-ledger',   label: 'Block Explorer',  icon: null, requiresZK: true },
-    { id: 'mass-transfer', label: 'Sync Records',    icon: null, requiresZK: true, minTier: 'STANDARD' },
-    { id: 'logs',          label: 'Activity Log',    icon: null },
-    { id: 'support',       label: 'Help & Support',  icon: null },
+    { id: 'gold',          label: 'Create Badge',    icon: getModuleIcon('gold') },
+    { id: 'billing',       label: 'Plans',           icon: getModuleIcon('billing') },
+    { id: 'humanity-ledger', label: 'Humanity Ledger', icon: getModuleIcon('humanity-ledger') },
+    { id: 'markets',       label: 'Tokens',          icon: getModuleIcon('markets'), requiresZK: true },
+    { id: 'inst-ledger',   label: 'Block Explorer',  icon: getModuleIcon('inst-ledger'), requiresZK: true },
+    { id: 'mass-transfer', label: 'Sync Records',    icon: getModuleIcon('mass-transfer'), requiresZK: true, minTier: 'STANDARD' },
+    { id: 'logs',          label: 'Activity Log',    icon: getModuleIcon('logs') },
+    { id: 'support',       label: 'Help & Support',  icon: getModuleIcon('support') },
 ];
 
 const RESTRICTED_TABS = [
