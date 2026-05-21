@@ -274,7 +274,7 @@ const CA_OFFSET = new THREE.Vector2(0.0006, 0.0006);
 function Scene({ vel, progress, isDark, enableScale, isMobile }: any) {
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={40} />
+      <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={28} />
 
       {/* 3 directional lights — replaces env map, zero texture fetches */}
       <directionalLight position={[5, 5, 5]}   intensity={isDark ? 3.0 : 6.0} color="#ffffff" />

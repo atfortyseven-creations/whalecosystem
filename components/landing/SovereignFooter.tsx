@@ -161,10 +161,10 @@ export function SovereignFooter() {
           </div>
 
           <div className="flex items-center gap-6">
-            <a href="https://t.me/WhaleAlert" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-black transition-colors">
+            <a href="https://t.me/humanityledger" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-black transition-colors">
               Transmission
             </a>
-            <a href="https://x.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-black transition-colors">
+            <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-black transition-colors">
               X Network
             </a>
           </div>
@@ -197,7 +197,7 @@ export function SovereignFooter() {
           <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-12">
             {/* Aztec Network */}
             <div className="flex flex-col items-center gap-3 group">
-              <div className="w-14 h-14 rounded-2xl border border-black/8 bg-[#FAFAF8] flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors p-2.5">
+              <div className="w-14 h-14 rounded-2xl border border-black/8 bg-white flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors p-2.5">
                 <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
                   <path fillRule="evenodd" clipRule="evenodd" d="M12 2.5C12.5 2.5 13 2.7 13.4 3.1L20.9 10.6C21.7 11.4 21.7 12.6 20.9 13.4L13.4 20.9C12.6 21.7 11.4 21.7 10.6 20.9L3.1 13.4C2.3 12.6 2.3 11.4 3.1 10.6L10.6 3.1C11 2.7 11.5 2.5 12 2.5ZM12 8.5C11.6 8.5 11.2 8.7 10.9 8.9L8.9 10.9C8.3 11.5 8.3 12.5 8.9 13.1L10.9 15.1C11.5 15.7 12.5 15.7 13.1 15.1L15.1 13.1C15.7 12.5 15.7 11.5 15.1 10.9L13.1 8.9C12.8 8.7 12.4 8.5 12 8.5Z" fill="#2a1b4d"/>
                 </svg>
@@ -211,7 +211,7 @@ export function SovereignFooter() {
 
             {/* Whale Alert Network */}
             <div className="flex flex-col items-center gap-3 group">
-              <div className="w-14 h-14 rounded-2xl border border-black/8 bg-[#FAFAF8] flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors p-2">
+              <div className="w-14 h-14 rounded-2xl border border-black/8 bg-white flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors p-2">
                 <img src="/official-whale-monochrome.png" alt="Whale Alert Network" className="w-full h-full object-contain"/>
               </div>
             </div>
@@ -238,7 +238,7 @@ export function SovereignFooter() {
               { name: "Resend", sub: "Secure Comms" },
             ].map((partner) => (
               <div key={partner.name} className="flex flex-col items-center gap-1.5 group cursor-default">
-                <div className="px-4 py-2 border border-black/8 rounded-xl bg-white group-hover:border-black/20 group-hover:bg-[#FAFAF8] transition-all duration-200">
+                <div className="px-4 py-2 border border-black/8 rounded-xl bg-white group-hover:border-black/20 group-hover:bg-black/5 transition-all duration-200">
                   <span className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-black/60 group-hover:text-black transition-colors">
                     {partner.name}
                   </span>
@@ -249,18 +249,6 @@ export function SovereignFooter() {
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="flex items-center justify-center mt-10">
-          <Link href="/status" className="group flex items-center gap-3 px-6 py-3 bg-[#FAFAF8] border border-black/10 rounded-full hover:bg-black/5 hover:border-black/20 transition-all cursor-pointer">
-            <span className="relative flex h-2.5 w-2.5 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-            </span>
-            <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black/60 group-hover:text-black transition-colors">
-              Live Network Status
-            </span>
-          </Link>
         </div>
 
         <div className="w-full h-px bg-black/5" />

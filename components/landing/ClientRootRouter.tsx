@@ -53,7 +53,7 @@ export function ClientRootRouter() {
   }, [isConnected]);
 
   return (
-    <div className="flex flex-col w-full min-w-full flex-1 bg-[#F9F8F6]" style={{width:'100%',minWidth:'100%'}}>
+    <div className="flex flex-col w-full min-w-full flex-1 bg-white" style={{width:'100%',minWidth:'100%'}}>
 
       {/* Session Navigation Bar removed — Now handled by the Unified Master InstitutionalHeader */}
 
