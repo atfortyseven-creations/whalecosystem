@@ -144,9 +144,10 @@ model User {
   soundEffects        Boolean @default(true)
 
   // ── Whale Chat ───────────────────────────────────────────────────────────────
-  chatName String @default("Whale User")
-  chatBio  String @default("")
-  qrLabel  String @default("Scan My Wallet")
+  chatName    String  @default("Whale User")
+  chatBio     String  @default("")
+  qrLabel     String  @default("Scan My Wallet")
+  chatPinHash String?
 
   // Forum-specific settings
   isAdmin          Boolean @default(false)
@@ -309,6 +310,26 @@ model AddressBookEntry {
   @@unique([authUserId, address])
   @@index([authUserId])
   @@index([address])
+}
+
+model ChatContact {
+  id        String   @id @default(uuid())
+  owner     String
+  peer      String
+  updatedAt DateTime @updatedAt
+
+  @@unique([owner, peer])
+  @@index([owner])
+}
+
+model PendingChatMessage {
+  id        String   @id @default(uuid())
+  sender    String
+  recipient String
+  content   String   @db.Text
+  timestamp DateTime @default(now())
+
+  @@index([recipient])
 }
 
 model ExchangePosition {

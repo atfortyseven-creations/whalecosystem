@@ -154,7 +154,7 @@ export function SovereignFooter() {
                 </div>
                 <div className="flex flex-col leading-none text-[#050505] justify-center">
                     <span className="font-mono text-[14px] font-black uppercase tracking-[0.25em] leading-none">
-                        Scanner Humanity Ledger
+                        WHALE ALERT NETWORK™
                     </span>
                 </div>
             </div>
@@ -227,19 +227,25 @@ export function SovereignFooter() {
           </span>
           <div className="w-full flex flex-wrap justify-center items-center gap-x-10 gap-y-6">
             {[
-              { name: "Ethereum", sub: "L1 Settlement Layer" },
-              { name: "WalletConnect", sub: "Identity Bridge" },
-              { name: "WorldID", sub: "Human Verification" },
-              { name: "Railway", sub: "Infrastructure" },
-              { name: "Cloudflare", sub: "Edge Security" },
-              { name: "Neo4j", sub: "Graph Database" },
-              { name: "Flashbots", sub: "MEV Protection" },
-              { name: "Upstash", sub: "Distributed Cache" },
-              { name: "Resend", sub: "Secure Comms" },
+              { name: "Ethereum", sub: "L1 Settlement Layer", icon: "https://cdn.simpleicons.org/ethereum/050505" },
+              { name: "WalletConnect", sub: "Identity Bridge", icon: "https://cdn.simpleicons.org/walletconnect/050505" },
+              { name: "WorldID", sub: "Human Verification", icon: "https://cdn.simpleicons.org/worldcoin/050505" },
+              { name: "Railway", sub: "Infrastructure", icon: "https://cdn.simpleicons.org/railway/050505" },
+              { name: "Cloudflare", sub: "Edge Security", icon: "https://cdn.simpleicons.org/cloudflare/050505" },
+              { name: "Neo4j", sub: "Graph Database", icon: "https://cdn.simpleicons.org/neo4j/050505" },
+              { name: "Flashbots", sub: "MEV Protection", icon: null },
+              { name: "Upstash", sub: "Distributed Cache", icon: "https://cdn.simpleicons.org/upstash/050505" },
+              { name: "Resend", sub: "Secure Comms", icon: "https://cdn.simpleicons.org/resend/050505" },
             ].map((partner) => (
-              <div key={partner.name} className="flex flex-col items-center gap-1.5 group cursor-default">
-                <div className="px-4 py-2 border border-black/8 rounded-xl bg-white group-hover:border-black/20 group-hover:bg-black/5 transition-all duration-200">
-                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-black/60 group-hover:text-black transition-colors">
+              <div key={partner.name} className="flex flex-col items-center gap-2 group cursor-default">
+                <div className="flex items-center gap-2.5 px-4 py-2 border border-black/8 rounded-xl bg-white group-hover:border-black/20 group-hover:bg-black/5 transition-all duration-200">
+                  {partner.icon ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={partner.icon} alt={partner.name} className="w-3.5 h-3.5 object-contain opacity-60 group-hover:opacity-100 transition-opacity" />
+                  ) : partner.name === "Flashbots" ? (
+                    <svg className="w-3.5 h-3.5 text-black/60 group-hover:text-black transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                  ) : null}
+                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-black/60 group-hover:text-black transition-colors pt-0.5">
                     {partner.name}
                   </span>
                 </div>

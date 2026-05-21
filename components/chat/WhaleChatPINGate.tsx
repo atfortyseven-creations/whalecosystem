@@ -119,6 +119,17 @@ async function savePIN(pin: string, address: string): Promise<void> {
 
   // Layer 4: IndexedDB (survives localStorage quota errors and cache clears)
   await idbSet(key, hash);
+
+  // Layer 5: Server-side backup (survives device changes)
+  try {
+    await fetch('/api/chat/pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address, pinHash: hash })
+    });
+  } catch (e) {
+    console.error('Failed to backup PIN to server', e);
+  }
 }
 
 /**
@@ -149,6 +160,19 @@ async function loadPINHash(address: string): Promise<string | null> {
   // Layer 4: IndexedDB
   if (!hash) {
     hash = await idbGet(key);
+  }
+
+  // Layer 5: Server-side fallback
+  if (!hash) {
+    try {
+      const res = await fetch(`/api/chat/pin?address=${address}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.pinHash) hash = data.pinHash;
+      }
+    } catch (e) {
+      console.error('Failed to restore PIN from server', e);
+    }
   }
 
   // Restore any missing layers

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 import { createHash } from 'crypto';
+
+// Maximum attachment size: 3MB for forum documents
+const MAX_SIZE_BYTES = 3 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,38 +13,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'NO SECURE DOCUMENT PROVIDED' }, { status: 400 });
     }
 
-    // Convert file to buffer
+    if (file.size > MAX_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: `File too large. Maximum size is ${MAX_SIZE_BYTES / (1024 * 1024)}MB.` },
+        { status: 413 }
+      );
+    }
+
+    // Convert file to buffer then Base64 — immortal, zero filesystem dependency
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Cryptographic Hashing for Zero-Collision & Integrity
+    // Cryptographic hash for integrity verification
     const hash = createHash('sha256').update(buffer).digest('hex');
-    const extension = file.name.split('.').pop() || 'bin';
-    const secureFileName = `${hash.substring(0, 16)}.${extension}`;
 
-    // Define Vault Path
-    const vaultDir = join(process.cwd(), 'public', 'uploads', 'secure_vault');
-    const filePath = join(vaultDir, secureFileName);
+    // Detect MIME type precisely
+    const mimeType = file.type || 'application/octet-stream';
 
-    // Ensure directory exists
-    try {
-      await mkdir(vaultDir, { recursive: true });
-    } catch (e) {
-      console.error('[VAULT] Could not create directory', e);
-    }
-
-    // Persist File
-    await writeFile(filePath, buffer);
+    // Build a data URL — stored and served as inline data, survives all deploys
+    const base64 = buffer.toString('base64');
+    const dataUrl = `data:${mimeType};base64,${base64}`;
 
     return NextResponse.json({
       success: true,
-      url: `/uploads/secure_vault/${secureFileName}`,
-      hash: hash,
-      fileName: file.name
+      url: dataUrl,        // Immortal data URL — no disk reference needed
+      hash,
+      fileName: file.name,
+      mimeType,
+      sizeBytes: file.size,
     });
 
   } catch (error) {
-    console.error('[VAULT] Ingestion Error:', error);
-    return NextResponse.json({ error: 'VAULT INGESTION FAILED' }, { status: 500 });
+    console.error('[Forum Upload] Error:', error);
+    return NextResponse.json({ error: 'UPLOAD FAILED' }, { status: 500 });
   }
 }

@@ -200,7 +200,7 @@ function ForumHomeContent() {
                 <p className="text-[12px] font-medium text-slate-500 leading-relaxed mb-4">
                   Maintain professional and constructive discourse.
                 </p>
-                <Link href="/docs/code-of-conduct"
+                <Link href="/forum/guidelines"
                   className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors">
                   Read Guidelines
                 </Link>
@@ -212,37 +212,6 @@ function ForumHomeContent() {
 
       <WhaleChatLink />
       <SovereignFooter />
-
-      {/* Semantic spacer so SovereignFooter content is not hidden behind the fixed mobile bottom nav */}
-      <div className="lg:hidden w-full" style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))' }} />
-
-      {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
-      <nav className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 border-t border-slate-200/60 bg-white/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-           {[
-              { id: 'markets',     label: 'Telemetry' },
-              { id: 'portfolio',   label: 'Portfolio' },
-              { id: 'chat',        label: 'Chat' },
-              { id: 'menu',        label: 'Menu' },
-          ].map(tab => {
-              return (
-                  <button
-                      key={tab.id}
-                      onClick={() => {
-                          if (tab.id === 'menu') {
-                              router.push('/dashboard?tab=menu');
-                          }
-                          else if (tab.id === 'chat') router.push('/chat');
-                          else if (tab.id === 'portfolio') router.push('/portfolio');
-                          else router.push('/dashboard?tab=markets');
-                      }}
-                      style={{ minHeight: 0, minWidth: 0 }}
-                      className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors text-slate-500 hover:text-slate-900 py-4`}
-                  >
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-widest">{tab.label}</span>
-                  </button>
-              );
-          })}
-      </nav>
     </div>
   );
 }

@@ -33,7 +33,7 @@ const JWT_SECRET = new TextEncoder().encode(_rawJwtSecret || 'dev-only-not-for-p
 
 // Session configuration
 export const SESSION_CONFIG = {
-    ACCESS_TOKEN_DURATION: 30 * 60, // 30 minutes in seconds
+    ACCESS_TOKEN_DURATION: 7 * 24 * 60 * 60, // 7 days in seconds
     REFRESH_TOKEN_DURATION: 7 * 24 * 60 * 60, // 7 days in seconds
     REFRESH_INTERVAL: 15 * 60 * 1000, // 15 minutes in milliseconds (for client-side)
 } as const;

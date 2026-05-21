@@ -806,28 +806,28 @@ export default function PortfolioPage() {
 
                   return (
                     <>
-                      <div className="space-y-2 border-r border-white/5 last:border-0 pr-4">
-                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-white/40">
-                           <Activity size={12} /> Dominance
-                        </div>
-                        <div className="text-xl font-black font-mono text-white">
-                           {safeToFixed(topPct, 1)}% <span className="text-[11px] uppercase ml-1 opacity-50">{topAsset?.symbol || 'N/A'}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2 border-r border-white/5 last:border-0 pr-4">
-                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-white/40">
-                           <ShieldCheck size={12} /> Stablecoin Hedge
-                        </div>
-                        <div className="text-xl font-black font-mono text-white">
-                           {safeToFixed(stablePct, 1)}%
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest text-black/40">
-                           <ShieldAlert size={12} /> Risk Classification
-                        </div>
+                       <div className="space-y-2 border-r border-black/5 last:border-0 pr-4">
+                         <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>
+                            <Activity size={12} /> Dominance
+                         </div>
+                         <div className="text-xl font-black font-mono" style={{ color: INK }}>
+                            {safeToFixed(topPct, 1)}% <span className="text-[11px] uppercase ml-1 opacity-50">{topAsset?.symbol || 'N/A'}</span>
+                         </div>
+                       </div>
+                       
+                       <div className="space-y-2 border-r border-black/5 last:border-0 pr-4">
+                         <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>
+                            <ShieldCheck size={12} /> Stablecoin Hedge
+                         </div>
+                         <div className="text-xl font-black font-mono" style={{ color: INK }}>
+                            {safeToFixed(stablePct, 1)}%
+                         </div>
+                       </div>
+                       
+                       <div className="space-y-2">
+                         <div className="flex items-center gap-2 text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>
+                            <ShieldAlert size={12} /> Risk Classification
+                         </div>
                         <div className={`text-xl font-black font-mono ${riskColor}`}>
                            {riskClass}
                         </div>

@@ -215,6 +215,15 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     transition: background-color 0.4s ease, color 0.4s ease;
   }
 
+  /* ═══════════════════════════════════════════════════════
+     35% ZOOM EN ZONA PC (IMMULATE 135% ZOOM)
+     ═══════════════════════════════════════════════════════ */
+  @media (min-width: 1024px) {
+    html {
+      zoom: 1.35;
+    }
+  }
+
   body {
     background-color: transparent; /* wallpaper layer handles the base bg */
     color: inherit;

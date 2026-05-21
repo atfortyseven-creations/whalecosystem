@@ -12,32 +12,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ error: 'File too large. Maximum size is 2MB for sovereign transmission.' }, { status: 413 });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate unique filename while preserving extension
-    const originalName = file.name || 'attachment';
-    const ext = path.extname(originalName) || '';
-    const hash = crypto.randomUUID().slice(0, 8);
-    const uniqueFilename = `${hash}-${originalName.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-
-    // Define public upload directory
-    const uploadDir = path.join(process.cwd(), 'public', 'chat-uploads');
+    // Generate base64 data URL
+    const mimeType = file.type || 'application/octet-stream';
+    const base64Data = buffer.toString('base64');
     
-    // Ensure directory exists synchronously/safely
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    const filepath = path.join(uploadDir, uniqueFilename);
-    await fs.promises.writeFile(filepath, buffer);
-
-    const publicUrl = `/api/chat/attachments?file=${uniqueFilename}`;
+    // Format required by WhaleChat message parser: __IMAGE__data:... or __VIDEO__data:...
+    // Using standard data URL, client can determine type
+    const dataUrl = `data:${mimeType};base64,${base64Data}`;
+    
+    const originalName = file.name || 'attachment';
 
     return NextResponse.json({
-      url: publicUrl,
+      url: dataUrl,
       name: originalName,
-      type: file.type || 'application/octet-stream',
+      type: mimeType,
       size: buffer.length
     });
 
@@ -47,47 +43,4 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const filename = searchParams.get('file');
-    if (!filename) {
-      return NextResponse.json({ error: 'Missing file parameter' }, { status: 400 });
-    }
-
-    // Secure: prevent directory traversal
-    const safeFilename = path.basename(filename);
-    const uploadDir = path.join(process.cwd(), 'public', 'chat-uploads');
-    const filepath = path.join(uploadDir, safeFilename);
-
-    if (!fs.existsSync(filepath)) {
-      return NextResponse.json({ error: 'Attachment not found' }, { status: 404 });
-    }
-
-    const buffer = await fs.promises.readFile(filepath);
-
-    // Determine precise MIME type from file extension
-    const ext = path.extname(safeFilename).toLowerCase();
-    let contentType = 'application/octet-stream';
-    if (ext === '.png') contentType = 'image/png';
-    else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
-    else if (ext === '.gif') contentType = 'image/gif';
-    else if (ext === '.webp') contentType = 'image/webp';
-    else if (ext === '.svg') contentType = 'image/svg+xml';
-    else if (ext === '.mp4') contentType = 'video/mp4';
-    else if (ext === '.webm') contentType = 'video/webm';
-    else if (ext === '.mov') contentType = 'video/quicktime';
-    else if (ext === '.pdf') contentType = 'application/pdf';
-
-    return new Response(buffer, {
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
-    });
-  } catch (error: any) {
-    console.error('[Upload] Error retrieving attachment:', error);
-    return NextResponse.json({ error: 'Failed to retrieve attachment' }, { status: 500 });
-  }
-}
-
+// Removed GET method to completely eliminate filesystem dependencies

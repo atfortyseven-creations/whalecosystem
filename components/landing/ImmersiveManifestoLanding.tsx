@@ -56,40 +56,39 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
         ref={heroRef}
         className="relative w-full h-[100svh] overflow-hidden bg-white flex flex-col items-center justify-center py-16"
       >
-        {/* 3D Atom — centered above the buttons */}
-        {mounted && (
-          <div
-            className="relative w-full flex-1 max-h-[50vh] min-h-[300px] z-0 pointer-events-none flex items-center justify-center"
-            style={{ willChange: 'transform' }}
-          >
-            <div className="w-full max-w-[800px] h-full mx-auto flex items-center justify-center">
-              <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
-            </div>
-          </div>
-        )}
-
         {/* Bottom fade: white bleed into next section */}
         <div
           className="absolute inset-x-0 bottom-0 h-56 z-10 pointer-events-none"
           style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
         />
 
-        {/* CTA Buttons — placed right below the atom */}
+        {/* Layout: Button 1 - ATOM - Button 2 (Perfectly centered on PC) */}
         <motion.div
           style={{ opacity: heroOpacity }}
           initial="hidden" animate="visible" variants={STAGGER}
-          className="relative z-20 w-full flex justify-center px-6 pointer-events-none mt-2 shrink-0 mb-4"
+          className="relative z-20 w-full flex justify-center px-6 pointer-events-none mt-2 shrink-0 mb-4 h-full items-center"
         >
-          <motion.div variants={FADE_UP} className="grid grid-cols-1 sm:grid-cols-2 gap-4 pointer-events-auto max-w-[800px] mx-auto w-full">
+          <motion.div variants={FADE_UP} className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 pointer-events-auto max-w-[1400px] mx-auto w-full">
             <Link
               href="/portfolio"
-              className="flex items-center justify-center w-full px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
+              className="flex-1 flex items-center justify-center w-full max-w-[350px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
             >
               Don&apos;t have an Account yet?
             </Link>
+
+            {/* 3D Atom — centered perfectly between the buttons */}
+            {mounted && (
+              <div
+                className="relative w-[300px] h-[300px] lg:w-[500px] lg:h-[500px] shrink-0 z-0 pointer-events-none flex items-center justify-center"
+                style={{ willChange: 'transform' }}
+              >
+                <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
+              </div>
+            )}
+
             <Link
               href="/forum"
-              className="flex items-center justify-center w-full px-8 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
+              className="flex-1 flex items-center justify-center w-full max-w-[350px] px-8 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
             >
               Go to Whale Chat
             </Link>

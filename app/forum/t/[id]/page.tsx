@@ -288,37 +288,6 @@ export default function TopicPage() {
       {/* Semantic spacer so the content is not hidden behind the fixed mobile bottom nav */}
       <div className="lg:hidden w-full" style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))' }} />
 
-      {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
-      <nav className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 border-t border-black/10 bg-white/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-           {[
-              { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },
-              { id: 'portfolio',   icon: <PieChart size={18} />,      label: 'Portfolio' },
-              { id: 'chat',        icon: <MessageSquare size={18} />, label: 'Chat' },
-              { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
-          ].map(tab => {
-              const isActive = false;
-              return (
-                  <button
-                      key={tab.id}
-                      onClick={() => {
-                          if (tab.id === 'menu') {
-                              router.push('/dashboard?tab=menu');
-                          }
-                          else if (tab.id === 'chat') router.push('/chat');
-                          else if (tab.id === 'portfolio') router.push('/portfolio');
-                          else router.push('/dashboard?tab=markets');
-                      }}
-                      style={{ minHeight: 0, minWidth: 0 }}
-                      className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors text-[#888888] hover:text-black`}
-                  >
-                      <span className="transition-transform">
-                          {tab.icon}
-                      </span>
-                      <span className="text-[10px] font-bold opacity-60">{tab.label}</span>
-                  </button>
-              );
-          })}
-      </nav>
     </div>
   );
 }

@@ -87,8 +87,8 @@ export default function HumanityLedger() {
     // bg logo pushed far right via backgroundPosition so it doesn't compete
     // with the main panel which is pinned to the left side of its container.
     <div className="w-full h-full min-h-0 flex flex-col items-start justify-start p-4 md:p-8 text-black font-sans overflow-y-auto no-scrollbar relative bg-white">
-      {/* ── BACKGROUND LOGOS — Centered in the white space on the right ─────────────── */}
-      <div className="fixed top-0 right-0 bottom-0 left-[780px] hidden lg:flex items-center justify-center pointer-events-none z-0">
+      {/* ── BACKGROUND LOGOS — Centered in the white space on the right, fixed at top ─────────────── */}
+      <div className="fixed top-0 right-0 bottom-0 left-[780px] hidden lg:flex items-start justify-center pt-12 pointer-events-none z-0">
         <img 
           src="/aztec_x_whale_partnership.svg" 
           alt="Partnership Logos" 

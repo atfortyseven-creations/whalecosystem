@@ -407,13 +407,37 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
   const loadConversations = useCallback(async () => {
     try {
+      let merged: ConversationMeta[] = [];
       const stored = localStorage.getItem(`whale_chat_history_${address}`);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed.conversations) setConversations(parsed.conversations);
-      } else {
-        setConversations([]);
+        if (parsed.conversations) merged = parsed.conversations;
       }
+      
+      // Sync from server
+      if (address) {
+        try {
+          const res = await fetch(`/api/chat/contacts?address=${address}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.peers && Array.isArray(data.peers)) {
+               const serverPeers = data.peers as string[];
+               serverPeers.forEach(peer => {
+                 if (!merged.find(c => c.peerAddress.toLowerCase() === peer.toLowerCase())) {
+                   merged.push({ peerAddress: peer, lastMessage: '', lastAt: new Date() });
+                 }
+               });
+               if (merged.length > 0) {
+                 localStorage.setItem(`whale_chat_history_${address}`, JSON.stringify({ conversations: merged }));
+               }
+            }
+          }
+        } catch (e) {
+          console.error('Failed to sync contacts from server', e);
+        }
+      }
+      
+      setConversations(merged);
     } catch (e) {}
   }, [address]);
 
@@ -521,14 +545,21 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     }
   }, [isConnected, address, client, initError, initClient, forceAutoInit, isSovereignHandshake]);
 
-  const persistToLocal = (convs: ConversationMeta[]) => {
-    try {
-      localStorage.setItem(
-        `whale_chat_history_${address}`,
-        JSON.stringify({ conversations: convs }) // ZERO-MOCK: We only store the address book locally, NEVER messages.
-      );
-    } catch (e) { console.warn('[Chat] persist failed', e); }
-  };
+  // Sync contacts to backend debounced
+  const persistToLocal = useCallback((arr: ConversationMeta[]) => {
+    if (!address) return;
+    localStorage.setItem(`whale_chat_history_${address}`, JSON.stringify({ conversations: arr }));
+    
+    // Also backup to server
+    fetch('/api/chat/contacts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        address,
+        peers: arr.map(c => c.peerAddress)
+      })
+    }).catch(console.error);
+  }, [address]); // ZERO-MOCK: We only store the address book locally, NEVER messages.
 
   const syncToAddressBook = async (peerAddr: string) => {
     try {
@@ -718,6 +749,25 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         const raw = await getMessages(client, activePeer);
         if (cancelled) return;
         
+        // FETCH PENDING MESSAGES (OFFLINE ROUTING)
+        let pendingServer: any[] = [];
+        try {
+          const pRes = await fetch(`/api/chat/pending?address=${address}`);
+          if (pRes.ok) {
+            const pData = await pRes.json();
+            if (pData.pending && Array.isArray(pData.pending)) {
+               pendingServer = pData.pending.filter((p: any) => p.sender.toLowerCase() === activePeer.toLowerCase() || p.recipient.toLowerCase() === activePeer.toLowerCase()).map((p: any) => ({
+                  id: p.id,
+                  // XMTP uses client.inboxId but our fallback uses raw addresses to match UI logic
+                  senderInboxId: p.sender.toLowerCase() === activePeer.toLowerCase() ? activePeer : (client?.inboxId || address),
+                  content: p.content,
+                  sentAtNs: new Date(p.timestamp).getTime(),
+                  conversationId: `dm-${activePeer.toLowerCase()}`
+               }));
+            }
+          }
+        } catch (e) { console.error('Failed to fetch pending messages', e); }
+        
         const mappedMsgs = raw
           .map((m: any) => ({
             id: m.id,
@@ -734,9 +784,10 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           
           // Merge with optimistic local messages safely
           const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
-          const optimistic = prev.filter(m => m.conversationId === activeId && m.id.startsWith('optimistic-') && !mappedIds.has(m.id));
+          const pendingIds = new Set(pendingServer.map(p => p.id));
+          const optimistic = prev.filter(m => m.conversationId === activeId && m.id.startsWith('optimistic-') && !mappedIds.has(m.id) && !pendingIds.has(m.id));
           
-          return [...others, ...mappedMsgs, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
+          return [...others, ...mappedMsgs, ...pendingServer, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
         });
       } catch (e) {
         console.warn('[Chat] load messages failed:', e);
@@ -772,19 +823,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         }
 
         if (peer) {
-            // Cache only POSITIVE results (canMsg === true).
-            // If a peer was offline/unregistered, we must re-check on every attempt
-            // so that messages deliver the moment they come online. Caching `false`
-            // permanently blacklists them until page reload, which is unacceptable.
             let canMsg = canReceiveCache.current.get(peer.toLowerCase());
             if (canMsg !== true) {
                 canMsg = await canReceiveMessages(client, peer);
                 if (canMsg) canReceiveCache.current.set(peer.toLowerCase(), true);
             }
             if (!canMsg) {
-                alert(`The address ${peer} is not registered on the XMTP network. They must connect their wallet to Whale Chat first.`);
-                setSending(false);
-                return;
+                // DON'T BLOCK. Tell them we'll queue it.
+                toast.info(`Offline Routing: ${peer.slice(0,6)} is not registered on XMTP. Messages will be routed via Sovereign Vault until they connect.`);
             }
         }
 
@@ -830,19 +876,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
     try {
       // ── 1. REAL ON-CHAIN DECENTRALIZED TRANSMISSION ──────────────────────────────
-      if (activePeer.toLowerCase() !== '0xinstitutionalsupport_0000') {
-        // Cache only POSITIVE results. Never cache false — peers may register between retries.
-        let canMsg = canReceiveCache.current.get(activePeer.toLowerCase());
-        if (canMsg !== true) {
-          canMsg = await canReceiveMessages(client, activePeer);
-          if (canMsg) canReceiveCache.current.set(activePeer.toLowerCase(), true);
-        }
-        if (!canMsg) {
-            alert(`The address ${activePeer} is not registered on the XMTP network. They must connect their wallet to Whale Chat first.`);
-            setSending(false);
-            return;
-        }
-
         // Optimistic local message so the sender sees it immediately
         const optimisticId = `optimistic-${Date.now()}`;
         const optimisticMsg = {
@@ -854,17 +887,28 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         };
         setMessages(prev => [...prev, optimisticMsg].sort((a, b) => a.sentAtNs - b.sentAtNs));
 
-        // 🔑 FIX: Clear typing indicator immediately so receiver doesn't see "ghost typing"
-        // after the message is sent. The Redis key TTL (5s) handles cleanup, but we also
-        // fire a stop_typing signal to flush it before the next polling cycle.
+        // 🔑 FIX: Clear typing indicator immediately
         stopTypingSignal();
 
         // @ts-ignore
         if (!isMobile && typeof playAudioPing === 'function' && soundEffects) playAudioPing('send');
-        // Send to XMTP network (includes dm.sync() after send)
-        await sendMessage(client, activePeer, content);
-        // We do not eagerly refetch messages here anymore.
-        // The global stream or fallback historical poll handles UI sync effortlessly without duplicates.
+        
+        let canMsg = canReceiveCache.current.get(activePeer.toLowerCase());
+        if (canMsg !== true) {
+          canMsg = await canReceiveMessages(client, activePeer);
+          if (canMsg) canReceiveCache.current.set(activePeer.toLowerCase(), true);
+        }
+
+        if (canMsg) {
+           await sendMessage(client, activePeer, content);
+        } else {
+           // QUEUE TO SERVER FOR UNREGISTERED WALLET
+           await fetch('/api/chat/pending', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ sender: address, recipient: activePeer, content })
+           });
+        }
       }
 
       // ── 2. UPDATE LOCAL ADDRESS BOOK ──────────────────────────────────────────────

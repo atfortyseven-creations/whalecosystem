@@ -4,6 +4,7 @@ import { ForumHeader } from '@/components/forum/ForumHeader';
 
 import { prisma } from '@/lib/prisma';
 import { TelemetryTracker } from '@/components/forum/TelemetryTracker';
+import { MobileBottomNav } from '@/components/forum/MobileBottomNav';
 
 export default async function ForumLayout({
   children,
@@ -47,6 +48,10 @@ export default async function ForumLayout({
           <span className="text-[14px] font-serif font-black uppercase tracking-[0.15em] leading-none ml-[2px]">ztec</span>
         </div>
       </footer>
+
+      {/* Semantic spacer so Footer content is not hidden behind the fixed mobile bottom nav */}
+      <div className="lg:hidden w-full" style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))' }} />
+      <MobileBottomNav />
     </div>
   );
 }
