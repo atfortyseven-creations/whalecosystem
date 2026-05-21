@@ -115,17 +115,24 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
       {/* ══════════════════════════════════════════════════════════════════════
           1. HERO: COLTEA HOSPITAL (Normalized, Immersive)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="w-full min-h-[120dvh] relative flex flex-col items-center justify-center overflow-hidden bg-black">
+      <section ref={heroRef} className="w-full min-h-[120dvh] relative flex flex-col items-center justify-center overflow-hidden bg-[#5a5a5a]">
         <motion.div 
           style={{ y: heroY, opacity: heroOpacity, willChange: "transform, opacity" }} 
           className="absolute inset-0 w-full h-[120%]"
         >
-          <video autoPlay loop muted playsInline className="w-full h-full object-cover">
-            <source src="/system-shots/8783-214159384 (1).mp4" type="video/mp4" />
-          </video>
+          {/* CLASSIC DIAMOND GEOMETRIC BACKGROUND */}
+          <div 
+            className="w-full h-full"
+            style={{
+              backgroundColor: "#555555",
+              backgroundImage: "linear-gradient(45deg, #4d4d4d 25%, transparent 25%, transparent 75%, #4d4d4d 75%, #4d4d4d), linear-gradient(45deg, #4d4d4d 25%, transparent 25%, transparent 75%, #4d4d4d 75%, #4d4d4d)",
+              backgroundSize: "60px 60px",
+              backgroundPosition: "0 0, 30px 30px"
+            }}
+          />
         </motion.div>
         
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#555]/20 via-[#555]/40 to-[#5a5a5a]/80" />
 
         <motion.div 
           initial="hidden" animate="visible" variants={STAGGER} 
