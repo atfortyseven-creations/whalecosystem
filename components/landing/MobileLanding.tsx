@@ -349,6 +349,7 @@ function ConnectedScreen({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
+          style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
           className="w-full flex items-center justify-between mb-10"
         >
           <div className="flex items-center gap-3">
@@ -368,6 +369,7 @@ function ConnectedScreen({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
           className="w-full text-center mb-2"
         >
           <p className="text-[64px] sm:text-[72px] font-light tracking-[-0.04em] leading-none tabular-nums text-black">
@@ -393,6 +395,7 @@ function ConnectedScreen({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.6 }}
+          style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
           className="w-full mb-8"
         >
           <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/30 mb-3">Verified Identity</p>
@@ -416,6 +419,7 @@ function ConnectedScreen({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
+          style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
           className="w-full grid grid-cols-3 mb-8"
         >
           {[

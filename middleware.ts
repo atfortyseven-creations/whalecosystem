@@ -351,11 +351,11 @@ export default async function middleware(request: NextRequest) {
       'X-Frame-Options': 'SAMEORIGIN',
       'X-XSS-Protection': '1; mode=block',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Permissions-Policy': 'camera=(self), microphone=(), geolocation=(), payment=(self)',
+      'Permissions-Policy': 'camera=(self), microphone=(), geolocation=(), payment=(self), usb=(), bluetooth=()',
       'Expect-CT': 'enforce, max-age=86400',
       'X-Permitted-Cross-Domain-Policies': 'none',
       'Cross-Origin-Opener-Policy': 'unsafe-none', // [IOS CHROME FIX] Relaxed to allow Google Auth/WalletConnect iframes to bridge popups successfully
-      // 'Cross-Origin-Embedder-Policy' removed to allow Stripe, MoonPay, and external images to load without strict CORP requirements
+      'Cross-Origin-Resource-Policy': 'cross-origin', // Required for WalletConnect/Web3
     };
 
     const isInternalRoute = matchesPattern(pathname, PROTECTED_PATTERNS) || pathname.startsWith('/api');
@@ -366,6 +366,18 @@ export default async function middleware(request: NextRequest) {
     Object.entries(securityHeaders).forEach(([key, val]) => {
       response.headers.set(key, val);
     });
+
+    // Absolutamente forzar seguridad en cualquier cookie emitida por la respuesta
+    const setCookieHeader = response.headers.get('Set-Cookie');
+    if (setCookieHeader && process.env.NODE_ENV === 'production') {
+      const securedCookie = setCookieHeader.split(',').map(cookie => {
+        if (!cookie.toLowerCase().includes('secure')) cookie += '; Secure';
+        if (!cookie.toLowerCase().includes('httponly') && cookie.includes('whale_session')) cookie += '; HttpOnly';
+        if (!cookie.toLowerCase().includes('samesite')) cookie += '; SameSite=Strict';
+        return cookie;
+      }).join(',');
+      response.headers.set('Set-Cookie', securedCookie);
+    }
 
     response.headers.set('X-Nonce', nonce);
 
