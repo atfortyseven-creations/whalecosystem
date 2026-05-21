@@ -62,6 +62,22 @@ function verifyPIN(pin: string, address: string): boolean {
   return stored === hashPIN(pin, address);
 }
 
+function isSessionUnlocked(address: string): boolean {
+  if (typeof window === 'undefined') return false;
+  const val = localStorage.getItem(`whale_chat_unlocked_time_${address.toLowerCase()}`);
+  if (!val) return false;
+  const time = parseInt(val, 10);
+  // Remember PIN unlock for 24 hours
+  if (Date.now() - time < 86400000) {
+    return true;
+  }
+  return false;
+}
+
+function unlockSession(address: string) {
+  localStorage.setItem(`whale_chat_unlocked_time_${address.toLowerCase()}`, Date.now().toString());
+}
+
 async function wipeXMTPDatabases() {
   if (typeof indexedDB === 'undefined') return;
   try {
@@ -172,12 +188,18 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
     if (!address) return;
     setPin('');
     setPinFirst('');
+    
+    // If they already have a PIN but haven't entered it this session, show entry
     if (storedPINHash(address)) {
-      setPhase('enter-pin');
+      if (isSessionUnlocked(address)) {
+        onEnter();
+      } else {
+        setPhase('enter-pin');
+      }
     } else {
       setPhase('confirm');
     }
-  }, [address]);
+  }, [address, onEnter]);
 
   // ── Handle keypad ─────────────────────────────────────────────────────────
 
@@ -204,6 +226,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
       } else if (phase === 'set-pin-confirm') {
         if (pin === pinFirst) {
           savePIN(pin, address!);
+          unlockSession(address!);
           toast.success('PIN created. Welcome to Whale Chat!');
           onEnter();
         } else {
@@ -215,6 +238,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
         }
       } else if (phase === 'enter-pin') {
         if (verifyPIN(pin, address!)) {
+          unlockSession(address!);
           onEnter();
         } else {
           triggerShake();
@@ -430,6 +454,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
                   <button
                     onClick={() => {
                       localStorage.removeItem(getPINKey(address!));
+                      localStorage.removeItem(`whale_chat_unlocked_time_${address!.toLowerCase()}`);
                       document.cookie = `${getPINKey(address!)}=; max-age=0; path=/; samesite=lax`;
                       setPin('');
                       setAttempts(0);
