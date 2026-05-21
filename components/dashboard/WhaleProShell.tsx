@@ -34,6 +34,7 @@ interface NavItem {
 
 const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold',          label: 'Create Badge',    icon: getModuleIcon('gold') },
+    { id: 'seed-equity',   label: 'Seed Equity',     icon: getModuleIcon('seed-equity'), externalUrl: '/pitch_deck.html' },
     { id: 'billing',       label: 'Plans',           icon: getModuleIcon('billing') },
     { id: 'humanity-ledger', label: 'Humanity Ledger', icon: getModuleIcon('humanity-ledger') },
     { id: 'markets',       label: 'Tokens',          icon: getModuleIcon('markets'), requiresZK: true },
