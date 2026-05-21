@@ -290,62 +290,16 @@ export default function ConnectPage() {
         }
       } catch {}
 
-      // 2. No session — must SIWE-sign
+      // 2. No session — Bypassed SIWE-sign per user request
       try {
         const norm = address.toLowerCase();
-        // Check cached sig first
-        let signature: string | undefined;
-        let message: string | undefined;
-        try {
-          const cached = localStorage.getItem(`sovereign_auth_${norm}`);
-          if (cached) {
-            const parsed = JSON.parse(cached);
-            signature = parsed.signature;
-            message = parsed.message;
-          }
-        } catch {}
-
-        if (!signature || !message) {
-          // Fallback local builder to generate the SIWE message locally
-          // since the library module is missing
-          const buildLocalSovereignMessage = (address: string) => {
-            const domain = typeof window !== 'undefined' ? window.location.host : 'humanidfi.com';
-            const origin = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
-            return `${domain} wants you to sign in with your Ethereum account:\n${address}\n\nSign this message to authenticate securely.\n\nURI: ${origin}\nVersion: 1\nChain ID: 1\nNonce: ${crypto.randomUUID ? crypto.randomUUID() : Date.now().toString()}\nIssued At: ${new Date().toISOString()}`;
-          };
-          
-          message = buildLocalSovereignMessage(norm);
-          const msgToSign: string = message;
-
-          // [IOS WALLETCONNECT TIMING FIX]
-          // Replicating the MobileLanding fix here: WalletConnect relays on iOS WKWebView
-          // need ~1.5s to stabilize after returning from the wallet app via deep link.
-          // Without this, the signature request is swallowed by the dead socket and hangs forever.
-          try {
-            const isWc = localStorage.getItem('wagmi.wallet')?.toLowerCase().includes('walletconnect') || 
-                         localStorage.getItem('wagmi.wallet')?.toLowerCase().includes('reown');
-            if (isWc) {
-              await new Promise(r => setTimeout(r, 1500));
-            }
-          } catch {}
-
-          const signWithTimeout = (ms: number) => new Promise<string>((resolve, reject) => {
-            const timer = setTimeout(() => reject(new Error('Signature timeout — please tap "Retry Connection" and approve in your wallet')), ms);
-            signMessageAsync({ message: msgToSign })
-              .then(sig => { clearTimeout(timer); resolve(sig as string); })
-              .catch(err => { clearTimeout(timer); reject(err); });
-          });
-
-          signature = await signWithTimeout(30000);
-          localStorage.setItem(`sovereign_auth_${norm}`, JSON.stringify({ signature, message }));
-        }
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000);
         const verifyRes = await fetch('/api/auth/sovereign-verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address: norm, signature, message }),
+          body: JSON.stringify({ address: norm }),
           signal: controller.signal
         });
         clearTimeout(timeoutId);

@@ -821,80 +821,15 @@ export function MobileLanding() {
       console.warn('[Auth] Session check failed, proceeding to sign');
     }
 
-    // 2. No session? We MUST sign.
+    // 2. No session? Bypassed SIWE-sign per user request
     setIsActuallySigning(true);
     setSigningError(null);
 
     try {
-      let signature: string | undefined;
-      let message: string | undefined;
-      
-      // FIX: Check for locally cached signature AND message to prevent mismatch failures
-      let cached = localStorage.getItem(`sovereign_auth_${norm}`);
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          signature = parsed.signature;
-          message = parsed.message;
-        } catch (e) {}
-      }
-
-      if (!signature || !message) {
-        message = buildSovereignMessage(norm);
-
-        // [IOS WALLETCONNECT RELAY TIMING FIX]
-        // After a universal-link return from MetaMask/Rainbow/Trust on iOS WKWebView,
-        // wagmi reports isConnected=true from cookie-hydrated state BEFORE the WalletConnect
-        // relay WebSocket is fully re-established (~1-2s). Calling signMessageAsync in this
-        // window fails silently (the request is queued in the relay but never delivered).
-        // We detect WC connectors by name and apply a 1500ms relay stabilization delay.
-        // For injected/Sovereign connectors, sign immediately (no relay needed).
-        const connectorName = (connector?.name || '').toLowerCase();
-        const isWalletConnect = connectorName.includes('walletconnect') ||
-                                connectorName.includes('reown') ||
-                                connectorName.includes('wc') ||
-                                (!connectorName.includes('injected') &&
-                                 !connectorName.includes('sovereign') &&
-                                 !connectorName.includes('metamask') &&
-                                 connectorName !== '');
-
-        // ALWAYS apply a robust stabilization delay on mobile.
-        // Chrome Android and iOS WKWebView both need time to initialize either
-        // injected providers or WalletConnect relays after returning from bfcache/deep-links.
-        // This is crucial for achieving the "maximum quantum perfection" the user requested.
-        console.log(`[Auth] Mobile connection detected (${connectorName}) — applying 2.5s stabilization delay`);
-        await new Promise(r => setTimeout(r, 2500));
-
-        // Wrap signMessageAsync with a timeout to prevent infinite iOS hangs.
-        // WKWebView can throttle background network requests; a 30s cap ensures
-        // the user sees a retry option rather than an eternal loading spinner.
-        // [TS FIX] Capture `message` in a typed const before the closure — TypeScript's
-        // control-flow narrowing does not traverse Promise executors (closures), so even
-        // though message was just assigned above, the compiler still sees string|undefined.
-        const messageStr: string = message;
-        const signWithTimeout = (ms: number) => new Promise<string>((resolve, reject) => {
-          const timer = setTimeout(() => reject(new Error('Signature timeout — please tap "Retry Connection" and approve in your wallet')), ms);
-          signMessageAsync({ message: messageStr })
-            .then(sig => { clearTimeout(timer); resolve(sig as string); })
-            .catch(err => { clearTimeout(timer); reject(err); });
-        });
-
-        signature = await signWithTimeout(30000);
-        localStorage.setItem(`sovereign_auth_${norm}`, JSON.stringify({ signature, message }));
-      }
-
-      try {
-         const { keccak256 } = await import('viem');
-         const seed = keccak256(signature as `0x${string}`);
-         localStorage.setItem(`whale_chat_seed_${norm}`, seed);
-      } catch (seedErr) {
-         console.warn('[Auth] Could not derive chat seed during handshake', seedErr);
-      }
-
       const verifyRes = await fetch('/api/auth/sovereign-verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: norm, signature, message })
+        body: JSON.stringify({ address: norm })
       });
 
       if (!verifyRes.ok) {

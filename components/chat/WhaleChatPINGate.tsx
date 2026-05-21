@@ -13,70 +13,252 @@ import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import CryptoJS from 'crypto-js';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Storage keys
+// Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PIN_STORAGE_PREFIX = 'whale_chat_pin_';
+const SESSION_UNLOCK_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+const IDB_DB_NAME = 'WhaleChatSecureStore';
+const IDB_STORE_NAME = 'pin_hashes';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// IndexedDB helpers (ultimate fallback — survives localStorage/cookie wipes)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function openIDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') return reject(new Error('No IDB'));
+    const req = indexedDB.open(IDB_DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      try { req.result.createObjectStore(IDB_STORE_NAME); } catch {}
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbGet(key: string): Promise<string | null> {
+  try {
+    const db = await openIDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(IDB_STORE_NAME, 'readonly');
+      const req = tx.objectStore(IDB_STORE_NAME).get(key);
+      req.onsuccess = () => resolve(req.result ?? null);
+      req.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function idbSet(key: string, value: string): Promise<void> {
+  try {
+    const db = await openIDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(IDB_STORE_NAME, 'readwrite');
+      tx.objectStore(IDB_STORE_NAME).put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch {}
+}
+
+async function idbDelete(key: string): Promise<void> {
+  try {
+    const db = await openIDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(IDB_STORE_NAME, 'readwrite');
+      tx.objectStore(IDB_STORE_NAME).delete(key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  } catch {}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Storage key
+// ─────────────────────────────────────────────────────────────────────────────
 
 function getPINKey(address: string) {
   return `${PIN_STORAGE_PREFIX}${address.toLowerCase()}`;
 }
 
-function storedPINHash(address: string): string | null {
-  if (typeof window === 'undefined') return null;
-  const key = getPINKey(address);
-  
-  // 1. Try localStorage
-  let hash = localStorage.getItem(key);
-  if (hash) return hash;
-  
-  // 2. Try cookie (survives private browsing restarts)
-  const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
-  if (match) {
-    hash = match[2];
-    localStorage.setItem(key, hash); // restore to localStorage
-    return hash;
-  }
-  return null;
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// PIN Hash — SHA256 with address salt
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Cryptographic Hash — We use robust SHA256 hashing mixed with the address salt. 
-// This provides reliable, "Quantum-Resistant" local UI security while preventing
-// any blocking or race conditions during device hydration.
 function hashPIN(pin: string, address: string): string {
-  const salt = address.toLowerCase() + "_WHALE_QUANTUM_SALT";
+  // Always use lowercase address to ensure consistency regardless of EIP-55 checksum
+  const salt = address.toLowerCase() + '_WHALE_SECURE_SALT_V2';
   return CryptoJS.SHA256(pin + salt).toString(CryptoJS.enc.Hex);
 }
 
-function savePIN(pin: string, address: string) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Multi-layer PIN storage: localStorage + sessionStorage + cookie + IndexedDB
+// Reading: try all layers in order, restore missing ones
+// Writing: write to ALL layers simultaneously for maximum durability
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Save PIN hash to every available storage layer.
+ */
+async function savePIN(pin: string, address: string): Promise<void> {
   const key = getPINKey(address);
   const hash = hashPIN(pin, address);
-  localStorage.setItem(key, hash);
-  // Max-age 10 years to ensure it never expires
-  document.cookie = `${key}=${hash}; max-age=315360000; path=/; samesite=lax`;
+
+  // Layer 1: localStorage (primary)
+  try { localStorage.setItem(key, hash); } catch {}
+
+  // Layer 2: sessionStorage (fast in-memory access)
+  try { sessionStorage.setItem(key, hash); } catch {}
+
+  // Layer 3: Cookie (10-year max-age, survives private browsing reloads)
+  try {
+    document.cookie = `${key}=${hash}; max-age=315360000; path=/; samesite=lax`;
+  } catch {}
+
+  // Layer 4: IndexedDB (survives localStorage quota errors and cache clears)
+  await idbSet(key, hash);
 }
 
-function verifyPIN(pin: string, address: string): boolean {
-  const stored = storedPINHash(address);
-  if (!stored) return false;
-  return stored === hashPIN(pin, address);
+/**
+ * Read PIN hash from any available storage layer.
+ * Also restores missing layers so future reads are faster.
+ */
+async function loadPINHash(address: string): Promise<string | null> {
+  if (typeof window === 'undefined') return null;
+  const key = getPINKey(address);
+  let hash: string | null = null;
+
+  // Layer 1: localStorage
+  try { hash = localStorage.getItem(key); } catch {}
+
+  // Layer 2: sessionStorage
+  if (!hash) {
+    try { hash = sessionStorage.getItem(key); } catch {}
+  }
+
+  // Layer 3: Cookie
+  if (!hash) {
+    try {
+      const match = document.cookie.match(new RegExp('(^| )' + key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]+)'));
+      if (match?.[2]) hash = match[2];
+    } catch {}
+  }
+
+  // Layer 4: IndexedDB
+  if (!hash) {
+    hash = await idbGet(key);
+  }
+
+  // Restore any missing layers
+  if (hash) {
+    try { localStorage.setItem(key, hash); } catch {}
+    try { sessionStorage.setItem(key, hash); } catch {}
+    try {
+      document.cookie = `${key}=${hash}; max-age=315360000; path=/; samesite=lax`;
+    } catch {}
+    // IDB already has it if we got it from IDB
+    if (!(await idbGet(key))) {
+      await idbSet(key, hash);
+    }
+  }
+
+  return hash;
+}
+
+/**
+ * Synchronous version for initial render (reads localStorage + sessionStorage + cookie only).
+ * IndexedDB is async so we use loadPINHash for the definitive check.
+ */
+function loadPINHashSync(address: string): string | null {
+  if (typeof window === 'undefined') return null;
+  const key = getPINKey(address);
+
+  try {
+    const ls = localStorage.getItem(key);
+    if (ls) return ls;
+  } catch {}
+
+  try {
+    const ss = sessionStorage.getItem(key);
+    if (ss) return ss;
+  } catch {}
+
+  try {
+    const match = document.cookie.match(new RegExp('(^| )' + key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]+)'));
+    if (match?.[2]) return match[2];
+  } catch {}
+
+  return null;
+}
+
+/**
+ * Delete PIN hash from all storage layers.
+ */
+async function deletePIN(address: string): Promise<void> {
+  const key = getPINKey(address);
+  try { localStorage.removeItem(key); } catch {}
+  try { sessionStorage.removeItem(key); } catch {}
+  try {
+    document.cookie = `${key}=; max-age=0; path=/; samesite=lax`;
+  } catch {}
+  await idbDelete(key);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Session unlock: 30-day window stored in localStorage + sessionStorage
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getSessionKey(address: string) {
+  return `whale_chat_unlocked_time_${address.toLowerCase()}`;
 }
 
 function isSessionUnlocked(address: string): boolean {
   if (typeof window === 'undefined') return false;
-  const val = localStorage.getItem(`whale_chat_unlocked_time_${address.toLowerCase()}`);
+  const key = getSessionKey(address);
+  let val: string | null = null;
+
+  // Check sessionStorage first (faster, always current tab)
+  try { val = sessionStorage.getItem(key); } catch {}
+  if (!val) {
+    try { val = localStorage.getItem(key); } catch {}
+  }
+
   if (!val) return false;
   const time = parseInt(val, 10);
-  // Remember PIN unlock for 24 hours
-  if (Date.now() - time < 86400000) {
-    return true;
-  }
-  return false;
+  if (isNaN(time)) return false;
+
+  // 30-day window
+  return Date.now() - time < SESSION_UNLOCK_TTL;
 }
 
 function unlockSession(address: string) {
-  localStorage.setItem(`whale_chat_unlocked_time_${address.toLowerCase()}`, Date.now().toString());
+  const key = getSessionKey(address);
+  const now = Date.now().toString();
+  try { localStorage.setItem(key, now); } catch {}
+  try { sessionStorage.setItem(key, now); } catch {}
 }
+
+function clearSession(address: string) {
+  const key = getSessionKey(address);
+  try { localStorage.removeItem(key); } catch {}
+  try { sessionStorage.removeItem(key); } catch {}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Verify PIN
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function verifyPIN(pin: string, address: string): Promise<boolean> {
+  const stored = await loadPINHash(address);
+  if (!stored) return false;
+  return stored === hashPIN(pin, address);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Wipe XMTP DBs
+// ─────────────────────────────────────────────────────────────────────────────
 
 async function wipeXMTPDatabases() {
   if (typeof indexedDB === 'undefined') return;
@@ -176,29 +358,44 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
 
   const [phase, setPhase] = useState<Phase>('confirm');
   const [pin, setPin] = useState('');
-  const [pinFirst, setPinFirst] = useState(''); // stores first entry during set flow
+  const [pinFirst, setPinFirst] = useState('');
   const [shake, setShake] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Determine whether a PIN exists for this address
-  const hasPIN = address ? storedPINHash(address) !== null : false;
-
-  // On mount / address change: decide initial phase
+  // On mount / address change: async check for existing PIN across all layers
   useEffect(() => {
     if (!address) return;
+
     setPin('');
     setPinFirst('');
-    
-    // If they already have a PIN but haven't entered it this session, show entry
-    if (storedPINHash(address)) {
-      if (isSessionUnlocked(address)) {
+    setIsLoading(true);
+
+    // Check session unlock first (synchronous, fast)
+    if (isSessionUnlocked(address)) {
+      // Session still valid — also verify PIN still exists to be safe
+      const syncHash = loadPINHashSync(address);
+      if (syncHash) {
         onEnter();
-      } else {
-        setPhase('enter-pin');
+        return;
       }
-    } else {
-      setPhase('confirm');
     }
+
+    // Full async check across all storage layers
+    loadPINHash(address).then((hash) => {
+      setIsLoading(false);
+      if (hash) {
+        // Has a PIN — require entry
+        if (isSessionUnlocked(address)) {
+          onEnter();
+        } else {
+          setPhase('enter-pin');
+        }
+      } else {
+        // No PIN yet — go to confirm → create flow
+        setPhase('confirm');
+      }
+    });
   }, [address, onEnter]);
 
   // ── Handle keypad ─────────────────────────────────────────────────────────
@@ -218,14 +415,14 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
 
   useEffect(() => {
     if (pin.length < 6) return;
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       if (phase === 'set-pin') {
         setPinFirst(pin);
         setPin('');
         setPhase('set-pin-confirm');
       } else if (phase === 'set-pin-confirm') {
         if (pin === pinFirst) {
-          savePIN(pin, address!);
+          await savePIN(pin, address!);
           unlockSession(address!);
           toast.success('PIN created. Welcome to Whale Chat!');
           onEnter();
@@ -237,7 +434,8 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           toast.error('PINs do not match. Please try again.');
         }
       } else if (phase === 'enter-pin') {
-        if (verifyPIN(pin, address!)) {
+        const valid = await verifyPIN(pin, address!);
+        if (valid) {
           unlockSession(address!);
           onEnter();
         } else {
@@ -246,16 +444,13 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           const next = attempts + 1;
           setAttempts(next);
           if (next >= 5) {
-            toast.error('Security breach detected. Wiping all chats and locking device.');
-            // Delete the PIN so they can't keep trying
-            localStorage.removeItem(getPINKey(address!));
-            document.cookie = `${getPINKey(address!)}=; max-age=0; path=/; samesite=lax`;
-            // Wipe XMTP DBs, then disconnect entirely
-            wipeXMTPDatabases().finally(() => {
-              nuclearDisconnect();
-            });
+            toast.error('Too many incorrect attempts. Access locked — create a new PIN.');
+            clearSession(address!);
+            await deletePIN(address!);
+            await wipeXMTPDatabases();
+            nuclearDisconnect();
           } else {
-            toast.error(`Incorrect PIN (${5 - next} attempts left)`);
+            toast.error(`Incorrect PIN (${5 - next} attempt${5 - next !== 1 ? 's' : ''} left)`);
           }
         }
       }
@@ -310,6 +505,17 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           >
             Connect Wallet
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-black/10 border-t-black/60 rounded-full animate-spin" />
+          <p className="text-[11px] font-mono uppercase tracking-widest text-black/40">Verifying...</p>
         </div>
       </div>
     );
@@ -452,10 +658,9 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
                 {/* Forgot / reset PIN (enter phase) */}
                 {phase === 'enter-pin' && (
                   <button
-                    onClick={() => {
-                      localStorage.removeItem(getPINKey(address!));
-                      localStorage.removeItem(`whale_chat_unlocked_time_${address!.toLowerCase()}`);
-                      document.cookie = `${getPINKey(address!)}=; max-age=0; path=/; samesite=lax`;
+                    onClick={async () => {
+                      await deletePIN(address!);
+                      clearSession(address!);
                       setPin('');
                       setAttempts(0);
                       setPhase('confirm');

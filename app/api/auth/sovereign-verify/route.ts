@@ -11,23 +11,14 @@ import { prisma } from '@/lib/prisma';
  */
 export async function POST(req: NextRequest) {
     try {
-        const { address, signature, message } = await req.json();
-
-        if (!address || !signature || !message) {
-            return NextResponse.json({ error: 'Missing verification data' }, { status: 400 });
+        const { address } = await req.json();
+        
+        if (!address) {
+            return NextResponse.json({ error: 'Missing wallet address' }, { status: 400 });
         }
 
-        // 1. Cryptographic Verification
-        const isValid = await verifyMessage({
-            address: address as `0x${string}`,
-            message,
-            signature: signature as `0x${string}`
-        });
-
-        if (!isValid) {
-            console.warn(`[Auth:Reject] Invalid signature for ${address}`);
-            return NextResponse.json({ error: 'Invalid cryptographic proof' }, { status: 401 });
-        }
+        // 1. Cryptographic Verification BYPASSED per user request
+        // We just trust the address provided by the connected wallet via Wagmi/AppKit.
 
         const normalizedAddress = address.toLowerCase();
 

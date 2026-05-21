@@ -54,15 +54,17 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
       ══════════════════════════════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative w-full h-[100svh] overflow-hidden bg-white flex flex-col items-center justify-center pt-20 pb-10"
+        className="relative w-full h-[100svh] overflow-hidden bg-white flex flex-col items-center justify-center py-16"
       >
         {/* 3D Atom — centered above the buttons */}
         {mounted && (
           <div
-            className="relative w-full h-[55vh] max-h-[500px] z-0 pointer-events-none flex items-center justify-center"
+            className="relative w-full flex-1 max-h-[50vh] min-h-[300px] z-0 pointer-events-none flex items-center justify-center"
             style={{ willChange: 'transform' }}
           >
-            <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
+            <div className="w-full max-w-[800px] h-full mx-auto flex items-center justify-center">
+              <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
+            </div>
           </div>
         )}
 
@@ -76,18 +78,18 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
         <motion.div
           style={{ opacity: heroOpacity }}
           initial="hidden" animate="visible" variants={STAGGER}
-          className="relative z-20 flex justify-center px-6 pointer-events-none mt-8"
+          className="relative z-20 w-full flex justify-center px-6 pointer-events-none mt-2 shrink-0 mb-4"
         >
-          <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
+          <motion.div variants={FADE_UP} className="grid grid-cols-1 sm:grid-cols-2 gap-4 pointer-events-auto max-w-[800px] mx-auto w-full">
             <Link
               href="/portfolio"
-              className="w-full sm:w-auto px-10 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
+              className="flex items-center justify-center w-full px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
             >
               Don&apos;t have an Account yet?
             </Link>
             <Link
               href="/forum"
-              className="w-full sm:w-auto px-10 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
+              className="flex items-center justify-center w-full px-8 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
             >
               Go to Whale Chat
             </Link>

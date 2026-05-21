@@ -65,7 +65,7 @@ export function UtilityPanels() {
                     <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[#050505]">Log Session</h3>
                     <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${sessionsLoading ? 'bg-black/20' : 'bg-black animate-pulse shadow-sm'}`} />
-                        <span className="text-[10px] font-mono font-bold text-[#050505]/50 uppercase tracking-widest">{sessionsLoading ? 'Syncing...' : 'Encrypted Connect'}</span>
+                        <span className="text-[10px] font-mono font-bold text-[#050505]/50 uppercase tracking-widest">{sessionsLoading ? 'Syncing...' : 'Session Logs'}</span>
                     </div>
                 </div>
                 
@@ -105,7 +105,7 @@ export function UtilityPanels() {
                             )}
 
                             {sessions.length > 0 && (
-                                <h4 className="text-[10px] font-black uppercase text-black/40 mb-3 tracking-widest border-b border-black/5 pb-2">Historical Security Audit</h4>
+                                <h4 className="text-[10px] font-black uppercase text-black/40 mb-3 tracking-widest border-b border-black/5 pb-2">Session History</h4>
                             )}
 
                             {sessions.map((log: any) => (
@@ -151,7 +151,7 @@ export function UtilityPanels() {
                             {!sessionsLoading && sessions.length === 0 && (
                                 <div className="py-20 text-center">
                                     <Zap size={24} className="mx-auto text-black/20 mb-4 animate-pulse" />
-                                    <p className="text-[10px] font-black uppercase text-black/40 tracking-widest">No Security Audit Logs</p>
+                                    <p className="text-[10px] font-black uppercase text-black/40 tracking-widest">No Session Logs</p>
                                 </div>
                             )}
                         </>
