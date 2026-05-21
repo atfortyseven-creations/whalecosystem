@@ -2,10 +2,17 @@
 
 import React, { useRef } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { WalletComparisonChart } from "./WalletComparisonChart";
 import { WhaleChatComparison } from "./WhaleChatComparison";
-import { QDsAtomRenderer, useScrollVelocity } from "@/components/shared/QDsAtomRenderer";
+import { useScrollVelocity } from "@/components/shared/QDsAtomRenderer";
+
+// Load WebGL atom only on client — prevents SSR crash
+const QDsAtomRenderer = dynamic(
+  () => import("@/components/shared/QDsAtomRenderer").then(m => ({ default: m.QDsAtomRenderer })),
+  { ssr: false, loading: () => null }
+);
 
 // ─── Constants & Animations ──────────────────────────────────────────────────
 
