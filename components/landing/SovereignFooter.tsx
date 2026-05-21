@@ -67,7 +67,7 @@ const MEGA_CLUSTERS = [
     label: "Legal & Ethics",
     links: [
       { label: "Privacy Policy", href: "/privacy" },
-      { label: "QDs (Quantum Data)", href: "/qds" },
+      { label: "QDs (Quantum Dots)", href: "/qds" },
       { label: "Data Independence", href: "/developer/independence" },
       { label: "User Rights", href: "/developer/user-rights" },
       { label: "Terms of Service", href: "/legal" },
