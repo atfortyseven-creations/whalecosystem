@@ -220,7 +220,7 @@ const ELECTRONS_CONFIG = [
 
 const _scaleVec = new THREE.Vector3();
 
-function AtomGroup({ vel, progress, isDark, enableScale = false }: any) {
+function AtomGroup({ vel, progress, isDark, enableScale = false, isMobile = false }: any) {
   const masterRef = useRef<THREE.Group>(null);
 
   useFrame((state, dt) => {
@@ -239,14 +239,22 @@ function AtomGroup({ vel, progress, isDark, enableScale = false }: any) {
     if (enableScale) {
       // Cinematic: zoom in as user scrolls into section, zoom out as they leave
       const p = progress.current;
+      // Drastically reduced scale values to ensure perfectly small and centered look
+      const baseScale = isMobile ? 0.35 : 0.65; 
+      const peakScale = isMobile ? 0.65 : 1.3; 
+      const endScale = isMobile ? 0.4 : 0.7;
       let targetScale: number;
       if (p < 0.5) {
-        targetScale = 0.8 + (p / 0.5) * 2.0; // 0.8 → 2.8
+        targetScale = baseScale + (p / 0.5) * (peakScale - baseScale);
       } else {
-        targetScale = 2.8 - ((p - 0.5) / 0.5) * 1.6; // 2.8 → 1.2
+        targetScale = peakScale - ((p - 0.5) / 0.5) * (peakScale - endScale);
       }
       _scaleVec.setScalar(targetScale);
       masterRef.current.scale.lerp(_scaleVec, 0.06);
+    } else {
+      const staticScale = isMobile ? 0.35 : 0.65;
+      _scaleVec.setScalar(staticScale);
+      masterRef.current.scale.lerp(_scaleVec, 0.1);
     }
   });
 
@@ -284,7 +292,7 @@ function Scene({ vel, progress, isDark, enableScale, isMobile }: any) {
 
       {/* Float: subtle on mobile (saves calc), immersive on desktop */}
       <Float speed={isMobile ? 0.4 : 0.8} floatIntensity={isMobile ? 0.1 : 0.3} rotationIntensity={0.05}>
-        <AtomGroup vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} />
+        <AtomGroup vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} isMobile={isMobile} />
       </Float>
 
       {/* Post-processing: mobile gets Bloom only, desktop gets full suite */}

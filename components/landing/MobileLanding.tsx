@@ -853,16 +853,17 @@ export function MobileLanding() {
         const isWalletConnect = connectorName.includes('walletconnect') ||
                                 connectorName.includes('reown') ||
                                 connectorName.includes('wc') ||
-                                // Treat unknown connectors as WC (safer on iOS)
                                 (!connectorName.includes('injected') &&
                                  !connectorName.includes('sovereign') &&
                                  !connectorName.includes('metamask') &&
                                  connectorName !== '');
 
-        if (isWalletConnect) {
-          console.log('[Auth:iOS] WalletConnect connector detected — applying 1.5s relay stabilization delay');
-          await new Promise(r => setTimeout(r, 1500));
-        }
+        // ALWAYS apply a robust stabilization delay on mobile.
+        // Chrome Android and iOS WKWebView both need time to initialize either
+        // injected providers or WalletConnect relays after returning from bfcache/deep-links.
+        // This is crucial for achieving the "maximum quantum perfection" the user requested.
+        console.log(`[Auth] Mobile connection detected (${connectorName}) — applying 2.5s stabilization delay`);
+        await new Promise(r => setTimeout(r, 2500));
 
         // Wrap signMessageAsync with a timeout to prevent infinite iOS hangs.
         // WKWebView can throttle background network requests; a 30s cap ensures
