@@ -286,7 +286,7 @@ function VisitorMarkers() {
 function SolidCore() {
   return (
     <mesh>
-      <sphereGeometry args={[GLOBE_RADIUS * 0.99, 64, 64]} />
+      <sphereGeometry args={[GLOBE_RADIUS * 0.99, 32, 32]} />
       <meshBasicMaterial color="#F5F5F5" transparent opacity={1} />
     </mesh>
   );
@@ -316,7 +316,8 @@ export function SovereignGlobe3D() {
         <Canvas
           camera={{ position: [0, 0, 2.5], fov: 45, near: 0.01, far: 10 }}
           dpr={dpr}
-          gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
+          gl={{ antialias: false, powerPreference: "high-performance", alpha: true, stencil: false }}
+          performance={{ min: 0.5 }}
           style={{ background: "transparent", cursor: "grab" }}
         >
           <group rotation={[0.2, -0.5, 0]}>

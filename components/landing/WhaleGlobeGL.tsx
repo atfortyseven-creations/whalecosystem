@@ -325,13 +325,14 @@ export function WhaleGlobeGL({
     <Canvas
       camera={{ position: [0, 0, 650], fov: 60, near: 1, far: 3000 }}
       gl={{
-        antialias: false, // OFF for perf — blur is handled by Bloom
+        antialias: false,
         alpha: true,
         powerPreference: "high-performance",
         stencil: false,
         depth: false,
       }}
-      dpr={[1, 2]}
+      dpr={[1, 1.5]}
+      performance={{ min: 0.5 }}
       style={{ background: "transparent" }}
     >
       <DustField />

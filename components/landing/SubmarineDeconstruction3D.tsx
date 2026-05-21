@@ -189,7 +189,7 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
 
               return (
                 <mesh key={`node-${i}`} position={[posX, posY, posZ]} scale={0.02 + (phaseNetwork * 0.05)}>
-                  <sphereGeometry />
+                  <sphereGeometry args={[1, 8, 8]} />
                   <meshBasicMaterial color={i % 4 === 0 ? orchidColor : reactColor} transparent opacity={0.3 + phaseNetwork * 0.7} />
                 </mesh>
               );
@@ -378,7 +378,12 @@ export default function SubmarineDeconstruction3D() {
         <DOMAnnotations scrollProgress={scroll} />
 
         {/* 240Hz High-Performance WebGL Engine */}
-        <Canvas camera={{ position: [0, 0, 12], fov: 45 }} dpr={[1, 2]} performance={{ max: 1 }}>
+        <Canvas
+          camera={{ position: [0, 0, 12], fov: 45 }}
+          dpr={[1, 1.5]}
+          performance={{ min: 0.5, max: 1 }}
+          gl={{ antialias: false, powerPreference: 'high-performance', stencil: false, depth: true }}
+        >
           <color attach="background" args={['#050505']} />
           <fog attach="fog" args={['#050505', 10, 30]} />
           

@@ -1,14 +1,29 @@
 "use client";
 
-import React, { useRef, useEffect, Suspense } from 'react';
+import React, { useRef, useEffect, Suspense, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Float, PerspectiveCamera } from '@react-three/drei';
-import { EffectComposer, Bloom, DepthOfField, ChromaticAberration, Noise, Vignette } from '@react-three/postprocessing';
+import { Float, PerspectiveCamera } from '@react-three/drei';
+import { EffectComposer, Bloom, ChromaticAberration, Noise, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SHARED SCROLL VELOCITY HOOK
+// DEVICE CAPABILITY DETECTION — caps DPR + effects based on GPU tier
+// ─────────────────────────────────────────────────────────────────────────────
+function useDeviceTier() {
+  return useMemo(() => {
+    if (typeof window === 'undefined') return { dpr: 1, isMobile: false, isIOS: false };
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isMobile = isIOS || /Android|Mobile/.test(ua);
+    // iOS Safari and Android cap DPR to avoid GPU thrashing
+    const dpr: [number, number] = isIOS ? [1, 1] : isMobile ? [1, 1.2] : [1, 1.5];
+    return { dpr, isMobile, isIOS };
+  }, []);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SHARED SCROLL VELOCITY HOOK — passive listener, ref-only (zero re-renders)
 // ─────────────────────────────────────────────────────────────────────────────
 export function useScrollVelocity() {
   const vel = useRef(0);
@@ -39,6 +54,9 @@ export function useScrollVelocity() {
   return vel;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SCROLL PROGRESS HOOK — scoped to hero section (400vh), not whole page
+// ─────────────────────────────────────────────────────────────────────────────
 export function useScrollProgress() {
   const progress = useRef(0);
   
@@ -47,7 +65,6 @@ export function useScrollProgress() {
       const max = document.body.scrollHeight - window.innerHeight;
       progress.current = max > 0 ? Math.max(0, Math.min(1, window.scrollY / max)) : 0;
     };
-    // Initialize
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
@@ -61,8 +78,34 @@ export function useScrollProgress() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ORBITAL RING
+// REUSABLE VEC3 POOL — avoids "new THREE.Vector3()" GC pressure inside useFrame
 // ─────────────────────────────────────────────────────────────────────────────
+const _v3 = new THREE.Vector3();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ORBITAL RING — single mesh, shared material via props
+// ─────────────────────────────────────────────────────────────────────────────
+const RING_MATERIAL_DARK = new THREE.MeshPhysicalMaterial({
+  color: '#ffffff',
+  metalness: 1.0,
+  roughness: 0.15,
+  clearcoat: 1.0,
+  clearcoatRoughness: 0.1,
+});
+
+const RING_MATERIAL_LIGHT = new THREE.MeshPhysicalMaterial({
+  color: '#222222',
+  metalness: 1.0,
+  roughness: 0.15,
+  clearcoat: 1.0,
+  clearcoatRoughness: 0.1,
+});
+
+// Shared geometry instances — created once, reused across all rings
+const TORUS_GEO = new THREE.TorusGeometry(2.8, 0.04, 12, 80);
+const SPHERE_SM_GEO = new THREE.SphereGeometry(0.08, 10, 10);
+const SPHERE_NUC_GEO = new THREE.SphereGeometry(0.55, 24, 24);
+
 function OrbitalRing({ inclination, azimuth, vel, progress, baseSpeed, isDark, index }: any) {
   const ref = useRef<THREE.Mesh>(null);
   const angle = useRef(0);
@@ -72,62 +115,53 @@ function OrbitalRing({ inclination, azimuth, vel, progress, baseSpeed, isDark, i
     angle.current += dt * baseSpeed + vel.current * 0.0012;
     ref.current.rotation.y = angle.current;
 
-    // ─── FRAGMENTATION EFFECT ───
-    // Fragments wildly in the middle of the scroll (progress = 0.5), defragments at ends (0.0 and 1.0)
-    const fragIntensity = Math.sin(progress.current * Math.PI); 
-    // High-frequency chaos based on scroll
+    // Fragmentation — avoids "new THREE.Vector3" per frame via pooled _v3
+    const fragIntensity = Math.sin(progress.current * Math.PI);
     const chaos = Math.sin(progress.current * 80 + index * 15);
-    const offset = fragIntensity * chaos * 4.5; // Pushes rings up to 4.5 units away!
+    const offset = fragIntensity * chaos * 4.5;
 
-    ref.current.position.lerp(new THREE.Vector3(
+    _v3.set(
       Math.sin(azimuth) * offset,
       Math.cos(inclination) * offset,
-      Math.sin(inclination) * offset
-    ), 0.08);
+      Math.sin(inclination) * offset,
+    );
+    ref.current.position.lerp(_v3, 0.08);
   });
 
   return (
-    <mesh ref={ref} rotation={[inclination, azimuth, 0]}>
-      <torusGeometry args={[2.8, 0.04, 64, 256]} />
-      <meshPhysicalMaterial
-        color={isDark ? "#ffffff" : "#222222"}
-        metalness={1.0}
-        roughness={0.15}
-        clearcoat={1.0}
-        clearcoatRoughness={0.1}
-        envMapIntensity={isDark ? 2.0 : 3.0}
-      />
-    </mesh>
+    <mesh ref={ref} rotation={[inclination, azimuth, 0]} geometry={TORUS_GEO}
+      material={isDark ? RING_MATERIAL_DARK : RING_MATERIAL_LIGHT} />
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ELECTRON
 // ─────────────────────────────────────────────────────────────────────────────
+const ELECTRON_MAT = new THREE.MeshStandardMaterial({
+  color: '#ffffff',
+  emissive: '#ffffff',
+  emissiveIntensity: 2.5,
+  toneMapped: false,
+});
+
 function Electron({ inclination, azimuth, phase, orbitRadius, vel }: any) {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const t = useRef(phase);
 
   useFrame((_, dt) => {
-    if (!groupRef.current || !meshRef.current) return;
+    if (!meshRef.current) return;
     t.current += dt * 1.6 + Math.abs(vel.current) * 0.009;
-    const x = Math.cos(t.current) * orbitRadius;
-    const y = Math.sin(t.current) * orbitRadius;
-    meshRef.current.position.set(x, y, 0);
+    meshRef.current.position.set(
+      Math.cos(t.current) * orbitRadius,
+      Math.sin(t.current) * orbitRadius,
+      0,
+    );
   });
 
   return (
     <group ref={groupRef} rotation={[inclination, azimuth, 0]}>
-      <mesh ref={meshRef}>
-        <sphereGeometry args={[0.08, 32, 32]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          emissive="#ffffff"
-          emissiveIntensity={2.5}
-          toneMapped={false}
-        />
-      </mesh>
+      <mesh ref={meshRef} geometry={SPHERE_SM_GEO} material={ELECTRON_MAT} />
     </group>
   );
 }
@@ -135,6 +169,21 @@ function Electron({ inclination, azimuth, phase, orbitRadius, vel }: any) {
 // ─────────────────────────────────────────────────────────────────────────────
 // NUCLEUS
 // ─────────────────────────────────────────────────────────────────────────────
+const NUC_MAT_DARK = new THREE.MeshPhysicalMaterial({
+  color: '#aaaaaa',
+  metalness: 1.0,
+  roughness: 0.05,
+  clearcoat: 1.0,
+  clearcoatRoughness: 0.1,
+});
+const NUC_MAT_LIGHT = new THREE.MeshPhysicalMaterial({
+  color: '#000000',
+  metalness: 1.0,
+  roughness: 0.05,
+  clearcoat: 1.0,
+  clearcoatRoughness: 0.1,
+});
+
 function Nucleus({ vel, isDark }: any) {
   const ref = useRef<THREE.Mesh>(null);
 
@@ -145,63 +194,68 @@ function Nucleus({ vel, isDark }: any) {
   });
 
   return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[0.55, 64, 64]} />
-      <meshPhysicalMaterial
-        color={isDark ? "#aaaaaa" : "#000000"}
-        metalness={1.0}
-        roughness={0.05}
-        clearcoat={1.0}
-        clearcoatRoughness={0.1}
-        envMapIntensity={isDark ? 2.5 : 4.0}
-      />
-    </mesh>
+    <mesh ref={ref} geometry={SPHERE_NUC_GEO}
+      material={isDark ? NUC_MAT_DARK : NUC_MAT_LIGHT} />
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ATOM GROUP
+// ATOM GROUP — MetaMask-style mouse follow + scroll zoom + continuous spin
 // ─────────────────────────────────────────────────────────────────────────────
+const RINGS_CONFIG = [
+  { inclination: 0,             azimuth: 0,             speed: 0.28 },
+  { inclination: Math.PI / 3,   azimuth: Math.PI / 5,   speed: 0.22 },
+  { inclination: -Math.PI / 3,  azimuth: -Math.PI / 5,  speed: 0.32 },
+  { inclination: Math.PI / 4,   azimuth: -Math.PI / 4,  speed: 0.45 },
+  { inclination: -Math.PI / 4,  azimuth: Math.PI / 4,   speed: 0.38 },
+];
+
+const ELECTRONS_CONFIG = [
+  { inclination: 0,             azimuth: 0,             phase: 0   },
+  { inclination: Math.PI / 3,   azimuth: Math.PI / 5,   phase: 2.1 },
+  { inclination: -Math.PI / 3,  azimuth: -Math.PI / 5,  phase: 4.2 },
+  { inclination: Math.PI / 4,   azimuth: -Math.PI / 4,  phase: 1.5 },
+  { inclination: -Math.PI / 4,  azimuth: Math.PI / 4,   phase: 3.5 },
+];
+
+const _scaleVec = new THREE.Vector3();
+
 function AtomGroup({ vel, progress, isDark, enableScale = false }: any) {
   const masterRef = useRef<THREE.Group>(null);
 
-  useFrame((_, dt) => {
+  useFrame((state, dt) => {
     if (!masterRef.current) return;
-    const targetSpin = vel.current * 0.02;
-    masterRef.current.rotation.y += (targetSpin - masterRef.current.rotation.y) * 0.08;
-    masterRef.current.rotation.x = Math.sin(Date.now() * 0.0002) * 0.25;
+    const { pointer } = state;
+
+    // MetaMask fox-style pointer tracking (smooth lerp, no snapping)
+    const targetY = pointer.x * 1.5;
+    const targetX = -pointer.y * 1.5;
+    masterRef.current.rotation.y += (targetY - masterRef.current.rotation.y) * 0.04 + vel.current * 0.02;
+    masterRef.current.rotation.x += (targetX - masterRef.current.rotation.x) * 0.04;
+
+    // Continuous Z spin driven by scroll progress (gives "turn around" immersion)
+    masterRef.current.rotation.z += dt * 0.15 + progress.current * 0.05;
 
     if (enableScale) {
-      // ─── MASSIVE PULSATING SCALE ───
-      // Pules multiple times as you scroll.
-      // Progress 0.0 -> 1.0. 
-      // Math.sin(progress * PI * 8) gives 4 full heartbeat pulses.
-      const pulse = Math.sin(progress.current * Math.PI * 8);
-      // Scale fluctuates between 0.45 (tiny) and 2.2 (massive)
-      const targetScale = 1.3 + (pulse * 0.85);
-      
-      masterRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.08);
+      // Cinematic: zoom in as user scrolls into section, zoom out as they leave
+      const p = progress.current;
+      let targetScale: number;
+      if (p < 0.5) {
+        targetScale = 0.8 + (p / 0.5) * 2.0; // 0.8 → 2.8
+      } else {
+        targetScale = 2.8 - ((p - 0.5) / 0.5) * 1.6; // 2.8 → 1.2
+      }
+      _scaleVec.setScalar(targetScale);
+      masterRef.current.scale.lerp(_scaleVec, 0.06);
     }
   });
 
-  const RINGS = [
-    { inclination: 0, azimuth: 0, speed: 0.28 },
-    { inclination: Math.PI / 3, azimuth: Math.PI / 5, speed: 0.22 },
-    { inclination: -Math.PI / 3, azimuth: -Math.PI / 5, speed: 0.32 },
-  ];
-
-  const ELECTRONS = [
-    { inclination: 0, azimuth: 0, phase: 0 },
-    { inclination: Math.PI / 3, azimuth: Math.PI / 5, phase: 2.1 },
-    { inclination: -Math.PI / 3, azimuth: -Math.PI / 5, phase: 4.2 },
-  ];
-
   return (
     <group ref={masterRef}>
-      {RINGS.map((r, i) => (
+      {RINGS_CONFIG.map((r, i) => (
         <OrbitalRing key={i} index={i} {...r} vel={vel} progress={progress} baseSpeed={r.speed} isDark={isDark} />
       ))}
-      {ELECTRONS.map((e, i) => (
+      {ELECTRONS_CONFIG.map((e, i) => (
         <Electron key={i} {...e} orbitRadius={2.8} vel={vel} />
       ))}
       <Nucleus vel={vel} isDark={isDark} />
@@ -210,61 +264,81 @@ function AtomGroup({ vel, progress, isDark, enableScale = false }: any) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SCENE
+// CHROMATIC ABERRATION OFFSET — created once, never re-allocated
 // ─────────────────────────────────────────────────────────────────────────────
-function Scene({ vel, progress, isDark, enableScale }: any) {
+const CA_OFFSET = new THREE.Vector2(0.0006, 0.0006);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCENE — lighting tuned to remove HDR/env map dependency entirely
+// ─────────────────────────────────────────────────────────────────────────────
+function Scene({ vel, progress, isDark, enableScale, isMobile }: any) {
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={40} />
 
-      <directionalLight position={[5, 5, 5]} intensity={isDark ? 3.0 : 6.0} color="#ffffff" />
+      {/* 3 directional lights — replaces env map, zero texture fetches */}
+      <directionalLight position={[5, 5, 5]}   intensity={isDark ? 3.0 : 6.0} color="#ffffff" />
       <directionalLight position={[-5, -5, -5]} intensity={isDark ? 1.5 : 3.0} color="#ffffff" />
-      <directionalLight position={[0, 10, 0]} intensity={isDark ? 2.0 : 4.0} color="#ffffff" />
+      <directionalLight position={[0, 10, 0]}   intensity={isDark ? 2.0 : 4.0} color="#ffffff" />
       <ambientLight intensity={isDark ? 1.0 : 2.0} color="#ffffff" />
 
-      <Float speed={0.8} floatIntensity={0.3} rotationIntensity={0.1}>
+      {/* Float: subtle on mobile (saves calc), immersive on desktop */}
+      <Float speed={isMobile ? 0.4 : 0.8} floatIntensity={isMobile ? 0.1 : 0.3} rotationIntensity={0.05}>
         <AtomGroup vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} />
       </Float>
 
-      <EffectComposer disableNormalPass multisampling={4}>
-        <Bloom 
-          luminanceThreshold={0.5} 
-          mipmapBlur 
-          intensity={isDark ? 2.5 : 1.2} 
-          levels={8} 
+      {/* Post-processing: mobile gets Bloom only, desktop gets full suite */}
+      <EffectComposer disableNormalPass multisampling={0}>
+        <Bloom
+          luminanceThreshold={0.45}
+          mipmapBlur
+          intensity={isDark ? 2.2 : 1.0}
+          levels={isMobile ? 5 : 8}
         />
-        <DepthOfField 
-          focusDistance={0.0} 
-          focalLength={0.02} 
-          bokehScale={2} 
-          height={480} 
-        />
-        <ChromaticAberration 
-          blendFunction={BlendFunction.NORMAL} 
-          offset={new THREE.Vector2(0.0008, 0.0008)} 
-        />
-        <Noise opacity={isDark ? 0.05 : 0.025} />
-        <Vignette eskil={false} offset={0.1} darkness={isDark ? 0.5 : 0.3} />
+        {!isMobile && (
+          <>
+            <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={CA_OFFSET} />
+            <Noise opacity={isDark ? 0.04 : 0.02} />
+            <Vignette eskil={false} offset={0.1} darkness={isDark ? 0.45 : 0.25} />
+          </>
+        )}
       </EffectComposer>
     </>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MAIN COMPONENT EXPORT
+// MAIN COMPONENT — frameloop="always" for 240Hz display support
 // ─────────────────────────────────────────────────────────────────────────────
-export function QDsAtomRenderer({ vel, isDark = false, enableScale = false }: { vel: React.MutableRefObject<number>, isDark?: boolean, enableScale?: boolean }) {
+export function QDsAtomRenderer({
+  vel,
+  isDark = false,
+  enableScale = false,
+}: {
+  vel: React.MutableRefObject<number>;
+  isDark?: boolean;
+  enableScale?: boolean;
+}) {
   const progress = useScrollProgress();
+  const { dpr, isMobile, isIOS } = useDeviceTier();
 
   return (
     <Canvas
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance', precision: 'highp' }}
-      dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 2}
+      gl={{
+        antialias: false,         // Bloom handles edge softening — no MSAA cost
+        alpha: true,
+        powerPreference: 'high-performance',
+        precision: isIOS ? 'mediump' : 'highp',  // iOS GPU uses mediump natively
+        stencil: false,           // never needed here — saves buffer allocation
+        depth: true,
+      }}
+      dpr={dpr}
+      frameloop="always"          // never throttle — let the browser/display drive FPS
+      performance={{ min: 0.5 }}  // R3F adaptive DPR: drops to 0.5x if < 30fps
       style={{ background: 'transparent', width: '100%', height: '100%' }}
-      frameloop="always"
     >
       <Suspense fallback={null}>
-        <Scene vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} />
+        <Scene vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} isMobile={isMobile} />
       </Suspense>
     </Canvas>
   );

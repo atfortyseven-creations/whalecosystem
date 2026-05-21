@@ -122,36 +122,39 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
       {/* ══════════════════════════════════════════════════════════════════════
           1. HERO: COLTEA HOSPITAL (Normalized, Immersive)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="w-full min-h-[120dvh] relative flex flex-col items-center justify-center overflow-hidden bg-[#5a5a5a]">
-        <motion.div 
-          style={{ y: heroY, opacity: heroOpacity, willChange: "transform, opacity" }} 
-          className="absolute inset-0 w-full h-[120%]"
-        >
-          {/* CLASSIC DIAMOND GEOMETRIC BACKGROUND */}
-          <div 
-            className="w-full h-full"
-            style={{
-              backgroundColor: "#555555",
-              backgroundImage: "linear-gradient(45deg, #4d4d4d 25%, transparent 25%, transparent 75%, #4d4d4d 75%, #4d4d4d), linear-gradient(45deg, #4d4d4d 25%, transparent 25%, transparent 75%, #4d4d4d 75%, #4d4d4d)",
-              backgroundSize: "60px 60px",
-              backgroundPosition: "0 0, 30px 30px"
-            }}
-          />
-        </motion.div>
-        
-        <div className="absolute inset-0 bg-gradient-to-b from-[#555]/20 via-[#555]/40 to-[#5a5a5a]/80" />
-
-        <motion.div 
-          initial="hidden" animate="visible" variants={STAGGER} 
-          className="relative z-10 w-full max-w-[1200px] mx-auto px-6 text-center mt-20"
-        >
-          {/* 3D ATOM REPLACING HERO TEXT */}
-          <motion.div variants={FADE_UP} className="w-full h-[350px] sm:h-[450px] lg:h-[600px] mx-auto relative mb-8">
-            <QDsAtomRenderer vel={vel} isDark={true} enableScale={true} />
+      <section ref={heroRef} className="w-full h-[400vh] relative flex flex-col bg-[#5a5a5a]">
+        <div className="sticky top-0 w-full h-screen overflow-hidden">
+          <motion.div 
+            style={{ y: heroY, opacity: heroOpacity, willChange: "transform, opacity" }} 
+            className="absolute inset-0 w-full h-[120%]"
+          >
+            {/* CLASSIC DIAMOND GEOMETRIC BACKGROUND */}
+            <div 
+              className="w-full h-full"
+              style={{
+                backgroundColor: "#555555",
+                backgroundImage: "linear-gradient(45deg, #4d4d4d 25%, transparent 25%, transparent 75%, #4d4d4d 75%, #4d4d4d), linear-gradient(45deg, #4d4d4d 25%, transparent 25%, transparent 75%, #4d4d4d 75%, #4d4d4d)",
+                backgroundSize: "60px 60px",
+                backgroundPosition: "0 0, 30px 30px"
+              }}
+            />
           </motion.div>
           
+          <div className="absolute inset-0 bg-gradient-to-b from-[#555]/20 via-[#555]/40 to-[#5a5a5a]/80" />
 
-          <motion.div variants={FADE_UP} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* 3D ATOM - Sticky and Centered */}
+          <motion.div 
+            style={{
+               y: useTransform(heroProgress, [0, 0.2], ["-30%", "0%"])
+            }}
+            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
+          >
+             <div className="w-[100vw] h-[100vw] max-w-[1200px] max-h-[1200px] pointer-events-auto">
+               <QDsAtomRenderer vel={vel} isDark={true} enableScale={true} />
+             </div>
+          </motion.div>
+
+          <motion.div variants={FADE_UP} initial="hidden" animate="visible" className="absolute bottom-16 left-0 right-0 z-30 flex flex-col sm:flex-row items-center justify-center gap-4 px-6">
             <Link href="/portfolio" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center">
               Don't have an Account yet?
             </Link>
@@ -159,16 +162,16 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
               Go to Whale Chat
             </Link>
           </motion.div>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">Scroll</span>
-          <div className="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent" />
-        </motion.div>
+          
+          {/* Scroll Indicator */}
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30"
+          >
+            <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">Scroll</span>
+            <div className="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent" />
+          </motion.div>
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
