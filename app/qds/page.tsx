@@ -302,30 +302,38 @@ export default function QDsPage() {
         </div>
       </section>
 
-      {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
-      <section className="w-full bg-black py-36 px-6 flex flex-col items-center text-center relative overflow-hidden">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)' }}
-        />
+      {/* ── FINAL CTA (WITH VIDEO BACKGROUND) ───────────────────────────── */}
+      <section className="relative w-full h-[90vh] md:h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+        <div className="absolute inset-0 w-full h-full">
+          <video 
+            src="/system-shots/14683943_3840_2160_30fps.mp4" 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="w-full h-full object-cover opacity-60"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/80 pointer-events-none" />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 max-w-2xl flex flex-col items-center gap-8"
+          className="relative z-10 max-w-2xl flex flex-col items-center gap-8 px-6 text-center"
         >
-          <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/22">
+          <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/40 drop-shadow-md">
             Genesis Block · Before 2027
           </span>
           <h2
-            className="font-black tracking-tighter uppercase leading-[0.87] text-white text-balance"
+            className="font-black tracking-tighter uppercase leading-[0.87] text-white text-balance drop-shadow-lg"
             style={{ fontSize: 'clamp(36px, 7vw, 72px)' }}
           >
             Mining starts soon.
           </h2>
           <p
-            className="font-serif text-white/40 leading-relaxed max-w-xl"
+            className="font-serif text-white/80 leading-relaxed max-w-xl drop-shadow-md"
             style={{ fontSize: 'clamp(15px, 1.7vw, 19px)' }}
           >
             Open participation. Fixed supply. No exceptions to either rule.
@@ -339,7 +347,7 @@ export default function QDsPage() {
             </Link>
             <Link
               href="/developer"
-              className="px-10 py-5 bg-transparent border border-white/18 text-white/70 hover:border-white/40 hover:text-white rounded-full font-mono text-[11px] font-black uppercase tracking-[0.22em] transition-all active:scale-95"
+              className="px-10 py-5 bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-full font-mono text-[11px] font-black uppercase tracking-[0.22em] transition-transform active:scale-95"
             >
               Technical Docs
             </Link>

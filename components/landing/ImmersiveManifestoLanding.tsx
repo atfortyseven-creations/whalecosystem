@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
@@ -26,78 +26,6 @@ const STAGGER: Variants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
 };
 
-// ─── Reusable Cinematic Video Section ────────────────────────────────────────
-
-function CinematicVideoSection({ 
-  videoSrc, 
-  title, 
-  subtitle, 
-  description, 
-  linkText, 
-  linkHref, 
-  overlay = "bg-black/40",
-  align = "center"
-}: {
-  videoSrc: string;
-  title: React.ReactNode;
-  subtitle?: React.ReactNode;
-  description: string;
-  linkText?: string;
-  linkHref?: string;
-  overlay?: string;
-  align?: "left" | "center";
-}) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  // Aggressive parallax mapping for the 130% height video container
-  const yBg = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
-
-  return (
-    <section ref={ref} className="relative w-full h-[90vh] md:h-screen flex items-center justify-center overflow-hidden bg-black">
-      <motion.div 
-        style={{ y: yBg, willChange: "transform" }} 
-        className="absolute inset-x-0 top-[-15%] w-full h-[130%]"
-      >
-        <video 
-          src={videoSrc} 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className="w-full h-full object-cover"
-          style={{ willChange: "transform" }} // Force GPU accel on the video layer
-        />
-      </motion.div>
-      <div className={`absolute inset-0 ${overlay}`} style={{ willChange: "opacity" }} />
-      
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20">
-        <motion.div 
-          initial="hidden" 
-          whileInView="visible" 
-          viewport={{ once: true, margin: "-100px" }} 
-          variants={STAGGER}
-          className={`flex flex-col ${align === "center" ? "items-center text-center mx-auto max-w-[900px]" : "items-start text-left max-w-[700px]"}`}
-        >
-          <motion.h2 variants={FADE_UP} className="text-[44px] sm:text-[64px] lg:text-[88px] font-black tracking-tighter uppercase text-white leading-[0.9] mb-6 drop-shadow-lg">
-            {title}
-            {subtitle && <><br /><span className="text-white/40">{subtitle}</span></>}
-          </motion.h2>
-          <motion.p variants={FADE_UP} className="text-[18px] md:text-[24px] text-white/90 font-serif leading-relaxed mb-10 drop-shadow-md font-medium">
-            {description}
-          </motion.p>
-          {linkText && linkHref && (
-            <motion.div variants={FADE_UP}>
-              <Link href={linkHref} className="inline-flex items-center justify-center px-12 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-2xl">
-                {linkText}
-              </Link>
-            </motion.div>
-          )}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export interface ImmersiveManifestoLandingProps {
@@ -107,10 +35,12 @@ export interface ImmersiveManifestoLandingProps {
 
 export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveManifestoLandingProps = {}) {
   
-  // Ref for the Hospital Hero parallax
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  // Ref for the Hero parallax
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroY = useTransform(heroProgress, [0, 1], ["0%", "40%"]);
   const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
   
   // Shared scroll velocity for the 3D Atom
@@ -120,58 +50,58 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
     <div className="relative text-[#050505] font-sans antialiased overflow-x-hidden w-full flex flex-col bg-white">
 
       {/* ══════════════════════════════════════════════════════════════════════
-          1. HERO: COLTEA HOSPITAL (Normalized, Immersive)
+          1. HERO: WHITE QDS STYLE + 3D ATOM
       ══════════════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="w-full h-[400vh] relative flex flex-col bg-[#5a5a5a]">
-        <div className="sticky top-0 w-full h-screen overflow-hidden">
-          <motion.div 
-            style={{ y: heroY, opacity: heroOpacity, willChange: "transform, opacity" }} 
-            className="absolute inset-0 w-full h-[120%]"
+      <section
+        ref={heroRef}
+        className="relative w-full h-[100svh] overflow-hidden bg-white"
+      >
+        {/* 3D Atom — covers full hero, client-only */}
+        {mounted && (
+          <div
+            className="absolute inset-0 z-0 pointer-events-none"
+            style={{ willChange: 'transform' }}
           >
-            {/* CLASSIC DIAMOND GEOMETRIC BACKGROUND */}
-            <div 
-              className="w-full h-full"
-              style={{
-                backgroundColor: "#555555",
-                backgroundImage: "linear-gradient(45deg, #4d4d4d 25%, transparent 25%, transparent 75%, #4d4d4d 75%, #4d4d4d), linear-gradient(45deg, #4d4d4d 25%, transparent 25%, transparent 75%, #4d4d4d 75%, #4d4d4d)",
-                backgroundSize: "60px 60px",
-                backgroundPosition: "0 0, 30px 30px"
-              }}
-            />
-          </motion.div>
-          
-          <div className="absolute inset-0 bg-gradient-to-b from-[#555]/20 via-[#555]/40 to-[#5a5a5a]/80" />
+            <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
+          </div>
+        )}
 
-          {/* 3D ATOM - Sticky and Centered */}
-          <motion.div 
-            style={{
-               y: useTransform(heroProgress, [0, 0.2], ["-30%", "0%"])
-            }}
-            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
-          >
-             <div className="w-[100vw] h-[100vw] max-w-[1200px] max-h-[1200px] pointer-events-auto">
-               <QDsAtomRenderer vel={vel} isDark={true} enableScale={true} />
-             </div>
-          </motion.div>
+        {/* Bottom fade: white bleed into next section */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-56 z-10 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
+        />
 
-          <motion.div variants={FADE_UP} initial="hidden" animate="visible" className="absolute bottom-16 left-0 right-0 z-30 flex flex-col sm:flex-row items-center justify-center gap-4 px-6">
-            <Link href="/portfolio" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center">
-              Don't have an Account yet?
+        {/* CTA Buttons — pinned to bottom-center */}
+        <motion.div
+          style={{ opacity: heroOpacity }}
+          initial="hidden" animate="visible" variants={STAGGER}
+          className="absolute bottom-28 inset-x-0 z-20 flex justify-center px-6 pointer-events-none"
+        >
+          <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
+            <Link
+              href="/portfolio"
+              className="w-full sm:w-auto px-10 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
+            >
+              Don&apos;t have an Account yet?
             </Link>
-            <Link href="/forum" className="w-full sm:w-auto px-10 py-5 bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center">
+            <Link
+              href="/forum"
+              className="w-full sm:w-auto px-10 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
+            >
               Go to Whale Chat
             </Link>
           </motion.div>
-          
-          {/* Scroll Indicator */}
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30"
-          >
-            <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">Scroll</span>
-            <div className="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent" />
-          </motion.div>
-        </div>
+        </motion.div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30 pointer-events-none"
+        >
+          <span className="font-mono text-[9px] uppercase tracking-widest text-black/40">Scroll</span>
+          <div className="w-[1px] h-12 bg-gradient-to-b from-black/40 to-transparent" />
+        </motion.div>
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
@@ -185,47 +115,93 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
       <WhaleChatComparison />
 
       {/* ══════════════════════════════════════════════════════════════════════
-          4. DATA PROTECTION (Video: 8597294)
+          4. TEXT EXPLANATIONS (QDS Style on White)
       ══════════════════════════════════════════════════════════════════════ */}
-      <CinematicVideoSection
-        videoSrc="/system-shots/8597294-hd_1920_1080_30fps.mp4"
-        title="Unbreakable"
-        subtitle="Data Protection."
-        description="Your sensitive documents and records are converted into secure digital signatures. This guarantees that your information can never be secretly altered, hacked, or destroyed. You always have verifiable proof of your data."
-        linkText="Learn About Security"
-        linkHref="/platform/contracts"
-        overlay="bg-black/50"
-        align="center"
-      />
+      <section className="w-full bg-white py-32 md:py-48 border-t border-black/5">
+        <div className="w-full max-w-[960px] mx-auto px-6 flex flex-col gap-28 md:gap-40">
+          
+          {/* Data Protection */}
+          <motion.article
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] as any }}
+            className="flex flex-col md:flex-row gap-8 md:gap-20"
+          >
+            <div className="w-full md:w-[220px] shrink-0 flex flex-col gap-3 pt-1">
+              <span className="font-mono text-[10px] font-black text-black/22 tracking-[0.3em]">
+                01
+              </span>
+              <h2 className="text-[22px] md:text-[28px] font-black tracking-tight leading-[1.15] text-black">
+                Unbreakable<br/>Data Protection.
+              </h2>
+              <div className="w-8 h-[2px] bg-black rounded-full mt-2" />
+            </div>
+            <div className="flex-1 flex flex-col gap-6 items-start">
+              <p className="font-serif text-black/58 leading-[1.9]" style={{ fontSize: 'clamp(15px, 1.5vw, 17px)' }}>
+                Your sensitive documents and records are converted into secure digital signatures. This guarantees that your information can never be secretly altered, hacked, or destroyed. You always have verifiable proof of your data.
+              </p>
+              <Link href="/platform/contracts" className="inline-flex items-center justify-center px-8 py-4 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-md mt-4">
+                Learn About Security
+              </Link>
+            </div>
+          </motion.article>
+
+          {/* Infrastructure */}
+          <motion.article
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] as any }}
+            className="flex flex-col md:flex-row gap-8 md:gap-20"
+          >
+            <div className="w-full md:w-[220px] shrink-0 flex flex-col gap-3 pt-1">
+              <span className="font-mono text-[10px] font-black text-black/22 tracking-[0.3em]">
+                02
+              </span>
+              <h2 className="text-[22px] md:text-[28px] font-black tracking-tight leading-[1.15] text-black">
+                Built for<br />The Future.
+              </h2>
+              <div className="w-8 h-[2px] bg-black rounded-full mt-2" />
+            </div>
+            <div className="flex-1 flex flex-col gap-6 items-start">
+              <p className="font-serif text-black/58 leading-[1.9]" style={{ fontSize: 'clamp(15px, 1.5vw, 17px)' }}>
+                Powered by a resilient global network designed to keep your institution online 24/7. We use the most advanced decentralization technology available today, meaning there is no single point of failure that can bring your operations down.
+              </p>
+              <Link href="/platform/architecture" className="inline-flex items-center justify-center px-8 py-4 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-md mt-4">
+                View Network Architecture
+              </Link>
+            </div>
+          </motion.article>
+
+        </div>
+      </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          5. GLOBAL INFRASTRUCTURE (Video: 14683943)
+          5. CTA / DOWNPAGE (WITH VIDEO BACKGROUND)
       ══════════════════════════════════════════════════════════════════════ */}
-      <CinematicVideoSection
-        videoSrc="/system-shots/14683943_3840_2160_30fps.mp4"
-        title="Built for"
-        subtitle="The Future."
-        description="Powered by a resilient global network designed to keep your institution online 24/7. We use the most advanced decentralization technology available today, meaning there is no single point of failure that can bring your operations down."
-        linkText="View Network Architecture"
-        linkHref="/platform/architecture"
-        overlay="bg-gradient-to-l from-black/80 via-black/40 to-transparent"
-        align="left"
-      />
+      <section className="relative w-full h-[90vh] md:h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+        <div className="absolute inset-0 w-full h-full">
+          <video 
+            src="/system-shots/14683943_3840_2160_30fps.mp4" 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="w-full h-full object-cover opacity-60"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/80 pointer-events-none" />
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          6. SIMPLE ONBOARDING CALL TO ACTION
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full py-32 md:py-40 flex flex-col items-center bg-white border-t border-[#050505]/5">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="flex flex-col items-center text-center max-w-[800px] px-6">
-          <motion.div variants={FADE_UP} className="w-16 h-[2px] bg-[#050505] mb-10" />
-          <motion.h2 variants={FADE_UP} className="text-[36px] md:text-[56px] font-black tracking-tighter uppercase leading-[0.95] text-[#050505] mb-8">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="relative z-10 flex flex-col items-center text-center max-w-[800px] px-6">
+          <motion.h2 variants={FADE_UP} className="text-[44px] md:text-[64px] font-black tracking-tighter uppercase leading-[0.95] text-white mb-8 drop-shadow-lg">
             Ready to Upgrade Your <br className="hidden sm:block"/>Digital Security?
           </motion.h2>
-          <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[22px] text-[#050505]/60 leading-relaxed mb-12">
+          <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[22px] text-white/80 leading-relaxed mb-12 drop-shadow-md">
             Join the global network of people who trust Whale Alert to protect their data, privacy, and communications.
           </motion.p>
           <motion.div variants={FADE_UP}>
-            <Link href="/docs/getting-started" className="inline-flex items-center justify-center px-12 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+            <Link href="/docs/getting-started" className="inline-flex items-center justify-center px-12 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
               Get Started Now
             </Link>
           </motion.div>
