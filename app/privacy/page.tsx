@@ -74,120 +74,98 @@ export default function PrivacyVisionPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
-    // Force pure white background on the entire body document
-    document.body.style.backgroundColor = 'white';
-    return () => {
-      document.body.style.backgroundColor = '';
-    };
   }, []);
 
   if (!mounted) return null;
 
   return (
-    <div className="w-full min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white pb-32">
-      {/* ── IMMACULATE HEADER ── */}
-      <header className="sticky top-0 z-50 w-full py-6 px-8 flex justify-between items-center bg-white/95 backdrop-blur-xl border-b border-black/5">
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-full border border-black flex items-center justify-center font-serif text-[18px] leading-none pb-0.5">
-            W
-          </div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] font-black">
-            Whale Alert Network
-          </div>
-        </div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-40">
-          Our Vision & Methodology
-        </div>
-      </header>
-
-      {/* ── LEFT NAVIGATION & MAIN CONTENT LAYOUT ── */}
-      <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row mt-24 px-8 md:px-12 gap-12">
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col md:flex-row bg-white text-black selection:bg-black selection:text-white">
+      {/* ── LEFT NAVIGATION (SIDEBAR) ── */}
+      <aside className="w-full md:w-[300px] shrink-0 border-b md:border-b-0 md:border-r border-black/10 flex flex-col px-6 pt-8 pb-12 md:h-[100dvh] md:sticky md:top-0 bg-white z-50">
         
-        {/* SIDEBAR: 3200 PHASES INDEX */}
-        <aside className="w-full md:w-[280px] shrink-0 mb-16 md:mb-0 md:sticky md:top-[120px] h-[calc(100vh-160px)] flex flex-col">
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] font-black mb-6 shrink-0">
-            Index of Phases (1 - 3200)
+        {/* ── TOP BAR (from connect screen) ── */}
+        <div className="w-full flex items-center justify-between mb-10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center shrink-0">
+              <img src="/official-whale-monochrome.png" alt="Whale" className="w-full h-full object-contain" />
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] font-black">
+              Scanner Humanity Ledger
+            </span>
           </div>
-          
-          <nav className="flex flex-col gap-2 overflow-y-auto pr-4 pb-12" style={{ scrollbarWidth: 'thin' }}>
-            {Array.from({ length: 400 }).map((_, loopIndex) => (
-              <React.Fragment key={loopIndex}>
-                {visionSections.map((sec, index) => {
-                  const phaseNum = loopIndex * 8 + index + 1;
-                  const sectionTitle = `Phase ${phaseNum}: ${sec.title}`;
-                  return (
-                    <a 
-                      key={phaseNum} 
-                      href={`#phase-${phaseNum}`} 
-                      className="font-sans text-[12px] text-black/50 hover:text-black hover:translate-x-1 transition-all truncate"
-                    >
-                      {sectionTitle}
-                    </a>
-                  );
-                })}
-              </React.Fragment>
-            ))}
-          </nav>
-        </aside>
+        </div>
 
-        {/* MAIN VISION CONTENT */}
-        <main className="flex-1 max-w-[800px] md:pl-12">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-32"
-          >
-            <h1 className="text-[48px] sm:text-[64px] md:text-[72px] font-normal tracking-[-0.04em] leading-[1.05] mb-8 font-sans">
-              Achieving Proof of Financial Transparency
-            </h1>
-            <p className="text-[18px] md:text-[21px] leading-[1.6] text-black/70 font-light max-w-[650px]">
-              How to build a zero-knowledge on-chain telemetry network in a way that maximizes individual empowerment and establishes absolute mathematical certainty across both mobile and terrestrial platforms.
-            </p>
-          </motion.div>
+        {/* ── DIVIDER ── */}
+        <div className="w-full border-t border-black/8 mb-8" />
 
-          {/* ── MASSIVE ITERATIVE RENDER FOR VOLUME ("3200 PHASES") ── */}
-          <div className="flex flex-col gap-24">
-            {Array.from({ length: 400 }).map((_, loopIndex) => (
-              <React.Fragment key={loopIndex}>
-                {visionSections.map((sec, index) => {
-                  const phaseNum = loopIndex * 8 + index + 1;
-                  const sectionKey = 'sec-' + phaseNum;
-                  const sectionTitle = loopIndex === 0 ? sec.title : ('Phase ' + phaseNum + ': ' + sec.title);
+        {/* INDEX */}
+        <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/40 mb-6 shrink-0 pl-2">
+          Temas a explicar
+        </div>
+        
+        <nav className="flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar pb-8">
+          {visionSections.map((sec, index) => (
+            <a 
+              key={index} 
+              href={`#tema-${index + 1}`} 
+              className="group w-full flex items-center gap-4 p-4 rounded-2xl border border-black/5 bg-black/[0.02] hover:bg-black/[0.04] hover:border-black/10 active:scale-[0.97] transition-all duration-200 shadow-sm"
+            >
+              <div className="flex-1 text-left">
+                <p className="text-[12px] font-black uppercase tracking-tight text-[#050505] leading-snug">
+                  {sec.title}
+                </p>
+              </div>
+            </a>
+          ))}
+        </nav>
+      </aside>
 
-                  return (
-                    <motion.section
-                      key={sectionKey}
-                      id={`phase-${phaseNum}`}
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true, margin: '100px' }}
-                      transition={{ duration: 0.8 }}
-                    >
-                      <h2 className="text-[26px] md:text-[32px] font-normal tracking-tight mb-8">
-                        {sectionTitle}
-                      </h2>
-                      <div className="space-y-6">
-                        {sec.paragraphs.map((p, j) => (
-                          <p key={j} className="text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
-                            {p}
-                          </p>
-                        ))}
-                      </div>
-                    </motion.section>
-                  );
-                })}
-              </React.Fragment>
-            ))}
-          </div>
+      {/* MAIN VISION CONTENT */}
+      <main className="flex-1 px-8 md:px-16 pt-16 md:pt-24 pb-32">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-24"
+        >
+          <h1 className="text-[48px] sm:text-[64px] md:text-[72px] font-normal tracking-[-0.04em] leading-[1.05] mb-8 font-sans max-w-[800px]">
+            Achieving Proof of Financial Transparency
+          </h1>
+          <p className="text-[18px] md:text-[21px] leading-[1.6] text-black/70 font-light max-w-[650px]">
+            How to build a zero-knowledge on-chain telemetry network in a way that maximizes individual empowerment and establishes absolute mathematical certainty across both mobile and terrestrial platforms.
+          </p>
+        </motion.div>
 
-          <footer className="mt-48 pt-12 border-t border-black/10">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-40">
-              © 2026 Humanity Ledger · The Architecture of Reality
-            </p>
-          </footer>
-        </main>
-      </div>
+        <div className="flex flex-col gap-24 max-w-[800px]">
+          {visionSections.map((sec, index) => (
+            <motion.section
+              key={index}
+              id={`tema-${index + 1}`}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: '100px' }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-[26px] md:text-[32px] font-normal tracking-tight mb-8">
+                {sec.title}
+              </h2>
+              <div className="space-y-6">
+                {sec.paragraphs.map((p, j) => (
+                  <p key={j} className="text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+                    {p}
+                  </p>
+                ))}
+              </div>
+            </motion.section>
+          ))}
+        </div>
+
+        <footer className="mt-48 pt-12 border-t border-black/10 max-w-[800px]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-40">
+            © 2026 Humanity Ledger · The Architecture of Reality
+          </p>
+        </footer>
+      </main>
     </div>
   );
 }
