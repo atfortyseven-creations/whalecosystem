@@ -20,6 +20,7 @@ import { AlertTriangle, Database, Shield, ChevronDown, Clock, Hash, CheckCircle2
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { AkashicSkeleton } from "@/components/ui/skeleton-loader";
 import { toast } from "sonner";
+import { useSovereignFormatter } from "@/hooks/useSovereignFormatter";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -44,19 +45,7 @@ const CHAIN_COLORS: Record<string, string> = {
   MATIC: "#8247E5",
 };
 
-function formatUsd(value: number): string {
-  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`;
-  if (value >= 1_000_000)     return `$${(value / 1_000_000).toFixed(0)}M`;
-  return `$${value.toLocaleString()}`;
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-GB", {
-    day: "2-digit", month: "short", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
-  });
-}
+// Formatting relies on SovereignSettings now via useSovereignFormatter hook
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -134,6 +123,8 @@ function RecordCard({ record, index, isDense }: { record: AkashicRecord; index: 
   const [expanded, setExpanded] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerifiedLocally, setIsVerifiedLocally] = useState<boolean | null>(null);
+  
+  const { formatLargeMoney, formatDate, formatTime } = useSovereignFormatter();
 
   const chainColor = CHAIN_COLORS[record.chain] || "#888";
 
@@ -198,7 +189,7 @@ function RecordCard({ record, index, isDense }: { record: AkashicRecord; index: 
                   {record.amount}
                 </div>
                 <div className="text-[10px] font-bold mt-0.5" style={{ color: "rgba(0,0,0,0.3)" }}>
-                  {formatUsd(record.amountUsd)} USD equivalent
+                  {formatLargeMoney(record.amountUsd)} equivalent
                 </div>
               </div>
             </div>
@@ -207,7 +198,7 @@ function RecordCard({ record, index, isDense }: { record: AkashicRecord; index: 
             <div className="text-right shrink-0">
               <div className="flex items-center gap-1.5 justify-end mb-1" style={{ color: "rgba(0,0,0,0.25)" }}>
                 <Clock size={10} />
-                <span className="text-[9px] font-mono">{formatDate(record.timestamp)}</span>
+                <span className="text-[9px] font-mono">{formatDate(record.timestamp)} {formatTime(record.timestamp)}</span>
               </div>
               <HashDisplay hash={record.hash} chain={record.chain} />
             </div>
@@ -320,15 +311,16 @@ function StatsBar({ records, nextEntry, lastUpdated }: {
   nextEntry: string;
   lastUpdated: string;
 }) {
+  const { formatLargeMoney, formatTime } = useSovereignFormatter();
   const totalUsd = records.reduce((sum, r) => sum + r.amountUsd, 0);
   const chains   = [...new Set(records.map(r => r.chain))];
 
   const stats = [
-    { label: "Total Capital Recorded", value: formatUsd(totalUsd) },
+    { label: "Total Capital Recorded", value: formatLargeMoney(totalUsd) },
     { label: "Registry Entries",        value: records.length.toString().padStart(5, "0") },
     { label: "Chains Covered",           value: chains.join(", ") },
     { label: "Next Entry Slot",          value: nextEntry },
-    { label: "Last Synchronized",        value: new Date(lastUpdated).toLocaleTimeString() },
+    { label: "Last Synchronized",        value: formatTime(lastUpdated) },
   ];
 
   return (

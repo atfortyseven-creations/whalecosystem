@@ -7,16 +7,9 @@ import { Menu, X } from 'lucide-react';
 import { SystemsUtilityHeader } from './SystemsUtilityHeader';
 import Image from 'next/image';
 import { SplashContainer } from '@/components/shared/SplashContainer';
+import { useSovereignTranslation } from '@/hooks/useSovereignTranslation';
 
-const MENU_ITEMS = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Whale Chat", href: "/chat" },
-  { label: "Portfolio", href: "/portfolio" },
-  { label: "Community", href: "#", subItems: [{ label: "News", href: "/news" }, { label: "Academy", href: "/academy" }, { label: "Forum", href: "/forum" }, { label: "Careers", href: "/careers" }] },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Status", href: "/status" },
-  { label: "Privacy", href: "/privacy" }
-];
+// MENU_ITEMS moved inside InstitutionalHeader to use translation hook.
 
 function MegaMenuItem({ item }: { item: any }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -65,6 +58,17 @@ function MegaMenuItem({ item }: { item: any }) {
 
 export function InstitutionalHeader() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { t } = useSovereignTranslation();
+
+    const MENU_ITEMS = [
+      { label: t('NAV_DASHBOARD'), href: "/dashboard" },
+      { label: t('NAV_WHALE_CHAT'), href: "/chat" },
+      { label: t('NAV_PORTFOLIO'), href: "/portfolio" },
+      { label: t('NAV_COMMUNITY'), href: "#", subItems: [{ label: t('NAV_NEWS'), href: "/news" }, { label: t('NAV_ACADEMY'), href: "/academy" }, { label: t('NAV_FORUM'), href: "/forum" }, { label: t('NAV_CAREERS'), href: "/careers" }] },
+      { label: t('NAV_PRICING'), href: "/pricing" },
+      { label: t('NAV_STATUS'), href: "/status" },
+      { label: t('NAV_PRIVACY'), href: "/privacy" }
+    ];
 
     return (
         <header

@@ -7,6 +7,7 @@ import {
   FileText, Download, Image as ImageIcon, Video, Music, Paperclip
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSovereignFormatter } from '@/hooks/useSovereignFormatter';
 
 import type { ChatSettings } from '@/components/chat/AdvancedSettingsModal';
 
@@ -47,6 +48,7 @@ export default function MessageEngine({
   messages, onReact, onPin, onDelete, onReply, bottomRef, settings
 }: MessageEngineProps) {
   const [menuState, setMenuState] = useState<{ id: string; content: string; x: number; y: number } | null>(null);
+  const { formatDate } = useSovereignFormatter();
 
   const openMenu = useCallback((e: React.MouseEvent | React.TouchEvent, id: string, content: string) => {
     e.preventDefault();
@@ -63,8 +65,7 @@ export default function MessageEngine({
         return messages
           .filter(msg => !(typeof msg.content === 'string' && msg.content.includes('initiatedByInboxId')))
           .map((msg, index) => {
-            const dateObj = new Date(msg.sentAt);
-            const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+            const dateStr = formatDate(msg.sentAt);
             const showDate = dateStr !== lastDate;
             lastDate = dateStr;
             const replyToMsg = msg.replyToId ? messages.find(m => m.id === msg.replyToId) : undefined;
@@ -117,6 +118,7 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
   onReact: (id: string, emoji: string) => void;
   settings?: ChatSettings;
 }) {
+  const { formatTime } = useSovereignFormatter();
   const now = Date.now();
   const secondsLeft = msg.destructsAt ? Math.max(0, Math.round((msg.destructsAt - now) / 1000)) : null;
 
@@ -214,7 +216,7 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
 
       {/* Timestamp + read receipt */}
       <div data-chat-meta className="flex items-center gap-1.5 mt-1 px-1 text-[9px] font-mono text-black/30">
-        {settings?.privacyMode !== 'stealth' && new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        {settings?.privacyMode !== 'stealth' && formatTime(msg.sentAt)}
         {msg.isMine && settings?.showReadReceipts !== false && (
           msg.readAt
             ? <CheckCheck size={11} className="text-black/50" />

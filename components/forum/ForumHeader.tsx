@@ -39,11 +39,10 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
   const navLinks = [
     { href: '/forum',               label: 'CATEGORIES'   },
-    { href: '/forum/users',         label: 'MEMBERS'        },
-    { href: '/forum/groups',        label: 'COMMUNITIES'       },
-    { href: '/forum/guidelines',    label: 'GETTING STARTED'   },
-    { href: '/forum/anniversaries', label: 'INTRODUCTIONS' },
-    { href: '/forum/settings',      label: 'SETTINGS'     },
+    { href: '/forum/users',         label: 'VALIDATORS'   },
+    { href: '/forum/groups',        label: 'SYNDICATES'   },
+    { href: '/forum/guidelines',    label: 'WHITEPAPER'   },
+    { href: '/forum/anniversaries', label: 'GENESIS BLOCK' },
   ];
 
   return (
@@ -77,9 +76,6 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
               {n.label}
             </Link>
           ))}
-          <Link href="/forum/settings" className="shrink-0 text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            Forum Settings
-          </Link>
         </div>
       </div>
     </>

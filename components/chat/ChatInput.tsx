@@ -338,12 +338,7 @@ export default function ChatInput({
         </div>
       )}
 
-      {/* Auto-destruct indicator */}
-      {autoDestruct !== 'off' && (
-        <div className="flex items-center gap-2 text-[10px] font-mono text-red-500 mb-2 px-1">
-          <Flame size={11} /> Messages self-destruct after {autoDestruct}
-        </div>
-      )}
+      {/* Auto-destruct indicator (removed) */}
 
       {/* Mic error */}
       {micError && (
@@ -425,18 +420,7 @@ export default function ChatInput({
             </button>
           </div>
 
-          {/* Self-destruct toggle */}
-          <button
-            onClick={() => { setShowDestruct(p => !p); setShowEmoji(false); }}
-            title="Auto-destruct"
-            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all shrink-0 ${
-              autoDestruct !== 'off'
-                ? 'bg-red-50 border-red-200 text-red-500'
-                : 'bg-black/[0.03] border-black/8 text-black/30 hover:text-black hover:bg-black/[0.06]'
-            }`}
-          >
-            <Timer size={18} />
-          </button>
+          {/* Self-destruct toggle (removed) */}
 
           {/* Send / Mic */}
           {text.trim() ? (
@@ -459,24 +443,7 @@ export default function ChatInput({
         </div>
       )}
 
-      {/* Self-destruct selector */}
-      {showDestruct && !isRecording && (
-        <div className="mt-2 bg-white border border-black/8 rounded-2xl p-3 flex gap-2 flex-wrap shadow-sm">
-          {DESTRUCT_OPTS.map(o => (
-            <button
-              key={o.value}
-              onClick={() => { onAutoDestructChange(o.value); setShowDestruct(false); }}
-              className={`px-3 py-1.5 rounded-lg font-mono text-[11px] border transition-all ${
-                autoDestruct === o.value
-                  ? 'bg-black text-white border-black'
-                  : 'bg-black/[0.03] border-black/8 text-black/50 hover:text-black'
-              }`}
-            >
-              {o.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Self-destruct selector (removed) */}
 
       {/* Emoji picker */}
       {showEmoji && (

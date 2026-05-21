@@ -4,11 +4,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Fingerprint, Key, CheckCircle2, QrCode, Copy, UserCheck } from 'lucide-react';
+import { useSovereignFormatter } from '@/hooks/useSovereignFormatter';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { toast } from 'sonner';
 
 export default function CryptographicID() {
   const { address, isConnected } = useAccount();
+  const { formatAddress } = useSovereignFormatter();
   const [isRotating, setIsRotating] = useState(false);
 
   const handleRotateKeys = () => {
@@ -58,7 +60,7 @@ export default function CryptographicID() {
             <div className="space-y-4">
                <div className="text-[10px] text-white/40 uppercase">EVM_DERIVATION_PATH</div>
                <div className="bg-black border border-white/5 p-4 flex items-center justify-between group">
-                  <span className="text-xs font-bold tracking-widest truncate">{address || '0x0000000000000000000000000000000000000000'}</span>
+                  <span className="text-xs font-bold tracking-widest truncate">{formatAddress(address) || '0x0000000000000000000000000000000000000000'}</span>
                   <button onClick={() => { if(address) { navigator.clipboard.writeText(address); toast.success("ID_COPIED"); } }} className="text-white/10 hover:text-white transition-all">
                      <Copy size={14} />
                   </button>

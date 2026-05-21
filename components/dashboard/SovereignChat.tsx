@@ -348,14 +348,31 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   const initXmtpClient = useCallback(async (isManual = false) => {
     if (!isConnected || !address) return;
     const hasLocalWallet = isLocalSovereignWallet && storePrivateKey;
-    
-    // MASTER-FIX: Wait for walletClient to avoid "Connector not connected" Wagmi race condition on mount.
-    // If the user clicked manually, but the wallet is STILL not injected by the browser, we must explicitly warn them.
+
+    // FIX: When walletClient is null (wagmi race condition on mount), wait up to 2s on manual
+    // clicks before giving up. Previously this silently returned with no feedback.
     if (!hasLocalWallet && !walletClient) {
-        if (isManual && !isConnected) {
-            setXmtpError('Conexión de billetera requerida. Por favor conecta tu billetera.');
+      if (isManual) {
+        // Poll briefly — wagmi injects walletClient asynchronously after connect
+        let waited = 0;
+        const MAX_WAIT = 2000;
+        const INTERVAL = 200;
+        while (!walletClient && waited < MAX_WAIT) {
+          await new Promise(r => setTimeout(r, INTERVAL));
+          waited += INTERVAL;
         }
+        // After waiting, if still null, show a clear, actionable error
+        if (!walletClient) {
+          toast.error('Wallet Not Ready', {
+            description: 'Your wallet is connected but not yet responding. Please reload the page and try again.',
+          });
+          setXmtpError('Wallet not responding. Reload the page, reconnect your wallet and tap Sign & Activate again.');
+          return;
+        }
+      } else {
+        // On auto-init (non-manual), silently wait for next render cycle
         return;
+      }
     }
 
     setXmtpError(null);
@@ -395,7 +412,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
         }
         const clientPromise = getXMTPClient(signer);
         const timeoutPromise = new Promise<never>((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout de conexión en red móvil (5G). Reintentando...')), 20000)
+            setTimeout(() => reject(new Error('Timeout de conexión en red móvil (5G). Reintentando...')), 45000)
         );
         const client = await Promise.race([clientPromise, timeoutPromise]);
         xmtpClient.current = client;
@@ -612,7 +629,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     try {
       const sendPromise = xmtpSend(xmtpClient.current, activeConv.peerAddress, finalContent);
       const timeoutPromise = new Promise<never>((_, reject) => 
-          setTimeout(() => reject(new Error('El mensaje tardó demasiado en enviarse (posible problema de red 5G)')), 15000)
+          setTimeout(() => reject(new Error('El mensaje tardó demasiado en enviarse (posible problema de red 5G)')), 45000)
       );
       await Promise.race([sendPromise, timeoutPromise]);
       // Mark as sent (remove optimistic tag)
@@ -840,15 +857,7 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   return (
     <div className="w-full h-full flex-1 flex text-black overflow-hidden chat-theme-wrapper bg-white relative" data-chat-theme={settings.theme} data-privacy={settings.privacyMode} onClick={() => showPeerMenu && setShowPeerMenu(false)}>
 
-      {/* Settings overlay */}
-      {showSettings && (
-        <AdvancedSettingsModal
-          settings={settings}
-          onSettingsChange={handleSettingsChange}
-          onClose={() => setShowSettings(false)}
-        />
-      )}
-
+      {/* Settings overlay removed permanently for now */}
       {/* Scanner overlay */}
       {showScanner && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
@@ -979,12 +988,6 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
                 className="p-1.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-500 hover:bg-rose-100 transition-all"
               >
                 <LogOut size={15} />
-              </button>
-              <button
-                onClick={() => setShowSettings(true)}
-                className="p-1.5 bg-black/[0.04] border border-black/10 rounded-xl text-black hover:bg-black/[0.08] transition-all"
-              >
-                <Settings size={16} />
               </button>
             </div>
           </div>

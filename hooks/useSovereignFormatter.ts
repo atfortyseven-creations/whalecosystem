@@ -49,7 +49,6 @@ export function useSovereignFormatter() {
 
         const baseUnit = settings?.displayUnit || 'FIAT';
         if (baseUnit !== 'FIAT') {
-            // Keep native formatting for crypto, don't use Billions/Millions acronyms
             return formatMoney(usdValue, 2);
         }
 
@@ -69,5 +68,49 @@ export function useSovereignFormatter() {
         return `${symbol}${converted.toFixed(2)}`;
     };
 
-    return { formatMoney, formatLargeMoney };
+    const formatDate = (date: Date | string | number) => {
+        const d = new Date(date);
+        const format = settings?.dateFormat || 'DD/MM/YYYY';
+        
+        const day = d.getDate().toString().padStart(2, '0');
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const year = d.getFullYear();
+
+        if (format === 'MM/DD/YYYY') {
+            return `${month}/${day}/${year}`;
+        }
+        return `${day}/${month}/${year}`;
+    };
+
+    const formatTime = (date: Date | string | number) => {
+        const d = new Date(date);
+        const format = settings?.timeFormat || '24h';
+        
+        if (format === '12h') {
+            let hours = d.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            const minutes = d.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes} ${ampm}`;
+        } else {
+            const hours = d.getHours().toString().padStart(2, '0');
+            const minutes = d.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+    };
+
+    const formatAddress = (addressStr: string) => {
+        if (!addressStr) return '';
+        const format = settings?.addressFormat || 'truncated';
+        
+        if (format === 'full') return addressStr;
+        
+        if (addressStr.length > 10) {
+            return `${addressStr.slice(0, 6)}...${addressStr.slice(-4)}`;
+        }
+        return addressStr;
+    };
+
+    return { formatMoney, formatLargeMoney, formatDate, formatTime, formatAddress };
 }
