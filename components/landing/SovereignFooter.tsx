@@ -191,6 +191,81 @@ export function SovereignFooter() {
 
         <div className="w-full h-px bg-black/5" />
 
+        {/* ── AZTEC × WHALE NETWORK FEATURE PARTNERSHIP ── */}
+        <div className="w-full flex flex-col items-center gap-8 py-12">
+          <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-black/25 font-bold">
+            Core Infrastructure Partnership
+          </span>
+          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-12">
+            {/* Aztec Network */}
+            <div className="flex flex-col items-center gap-3 group">
+              <div className="w-14 h-14 rounded-2xl border border-black/8 bg-[#FAFAF8] flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors">
+                <svg viewBox="0 0 100 100" className="w-9 h-9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="50,5 95,30 95,70 50,95 5,70 5,30" fill="none" stroke="#050505" strokeWidth="6"/>
+                  <polygon points="50,25 75,38 75,62 50,75 25,62 25,38" fill="none" stroke="#050505" strokeWidth="3" strokeDasharray="6 4"/>
+                  <circle cx="50" cy="50" r="10" fill="#050505"/>
+                </svg>
+              </div>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black">Aztec Network</span>
+                <span className="font-mono text-[8px] uppercase tracking-widest text-black/35">ZK-Rollup L2</span>
+              </div>
+            </div>
+
+            {/* X connector */}
+            <div className="flex flex-col items-center gap-1">
+              <span className="font-mono text-[20px] font-black text-black/15 leading-none select-none">×</span>
+              <span className="font-mono text-[7px] uppercase tracking-[0.3em] text-black/20">Secure Data Bridge</span>
+            </div>
+
+            {/* Whale Alert Network */}
+            <div className="flex flex-col items-center gap-3 group">
+              <div className="w-14 h-14 rounded-2xl border border-black/8 bg-[#FAFAF8] flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors p-2">
+                <img src="/official-whale-monochrome.png" alt="Whale Alert Network" className="w-full h-full object-contain"/>
+              </div>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black">Whale Network</span>
+                <span className="font-mono text-[8px] uppercase tracking-widest text-black/35">On-Chain Intelligence</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full h-px bg-black/5" />
+
+        {/* ── ECOSYSTEM COLLABORATORS ── */}
+        <div className="w-full flex flex-col items-center gap-6 py-10">
+          <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-black/25 font-bold">
+            Ecosystem Collaborators
+          </span>
+          <div className="w-full flex flex-wrap justify-center items-center gap-x-10 gap-y-6">
+            {[
+              { name: "Ethereum", sub: "L1 Settlement Layer" },
+              { name: "WalletConnect", sub: "Identity Bridge" },
+              { name: "WorldID", sub: "Human Verification" },
+              { name: "Railway", sub: "Infrastructure" },
+              { name: "Cloudflare", sub: "Edge Security" },
+              { name: "Neo4j", sub: "Graph Database" },
+              { name: "Flashbots", sub: "MEV Protection" },
+              { name: "Upstash", sub: "Distributed Cache" },
+              { name: "Resend", sub: "Secure Comms" },
+            ].map((partner) => (
+              <div key={partner.name} className="flex flex-col items-center gap-1.5 group cursor-default">
+                <div className="px-4 py-2 border border-black/8 rounded-xl bg-white group-hover:border-black/20 group-hover:bg-[#FAFAF8] transition-all duration-200">
+                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-black/60 group-hover:text-black transition-colors">
+                    {partner.name}
+                  </span>
+                </div>
+                <span className="font-mono text-[7px] uppercase tracking-[0.25em] text-black/25">
+                  {partner.sub}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="w-full h-px bg-black/5" />
+
         {/* Copyright */}
         <div className="flex flex-col items-center gap-4 pt-8 pb-6">
           <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-[#050505]/40 text-center">

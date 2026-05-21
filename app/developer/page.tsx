@@ -203,8 +203,200 @@ ws.onmessage = (event) => {
             </div>
           </section>
 
+          {/* STEP 8: ERROR CODES & HANDLING */}
+          <section>
+            <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
+              8. Error Codes and Structured Error Handling
+            </h2>
+            <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+              <p>
+                Every response from the Humanity Ledger API follows a consistent JSON error schema. When a request fails, the response body will contain a structured object with a machine-readable <strong>error code</strong>, a human-readable <strong>message</strong>, and an optional <strong>details</strong> field containing specific field-level validation failures. You must always check the HTTP status code first, then parse the body.
+              </p>
+              <div className="bg-black/5 p-8 rounded-2xl font-mono text-[13px] leading-relaxed text-[#050505]">
+                <pre>{`// Standard Error Response Structure
+{
+  "error": "INVALID_API_KEY",
+  "message": "The provided API key does not match any active credential.",
+  "request_id": "req_3K9mNpXvQw2cL7dRtJ8sYb",
+  "timestamp": 1748472000,
+  "docs": "https://humanidfi.com/developer/authentication"
+}
+
+// Field Validation Error (422)
+{
+  "error": "VALIDATION_FAILED",
+  "message": "Request body failed schema validation.",
+  "details": [
+    { "field": "filters.min_usd_value", "issue": "Must be a positive integer greater than 0" },
+    { "field": "channel", "issue": "Unknown channel identifier. Valid: mempool.transfers, anomalies.zscore" }
+  ]
+}`}</pre>
+              </div>
+              <p>
+                The complete list of machine-readable error codes includes: <strong>INVALID_API_KEY</strong> (401), <strong>INSUFFICIENT_SCOPE</strong> (403), <strong>RATE_LIMIT_EXCEEDED</strong> (429), <strong>VALIDATION_FAILED</strong> (422), <strong>INTERNAL_NODE_ERROR</strong> (503), and <strong>PAYLOAD_SIGNATURE_MISMATCH</strong> (401). Building a robust client means handling all of these deterministically rather than treating all non-200 responses identically.
+              </p>
+              <p>
+                We strongly recommend implementing a <strong>circuit breaker pattern</strong> in production systems. If your application receives 5 consecutive 503 responses from a specific API endpoint within a 60-second window, your circuit breaker should open, redirecting traffic to a cached fallback state and alerting your operations team, rather than continuing to hammer a degraded node.
+              </p>
+            </div>
+          </section>
+
+          {/* STEP 9: SIWE DEEP DIVE */}
+          <section>
+            <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
+              9. Sign-In With Ethereum (SIWE) — Deep Technical Reference
+            </h2>
+            <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+              <p>
+                The SIWE protocol (defined in EIP-4361) is the authentication backbone of the Humanity Ledger. Unlike OAuth, SIWE does not require a password, a centralized identity provider, or a third-party server. The user's cryptographic signature is the proof of identity itself. Here is the full technical flow that our server executes every time a developer authenticates.
+              </p>
+              <p>
+                <strong>Step 1 — Nonce Request.</strong> Your client calls <code>GET /api/auth/nonce</code>. The server generates a cryptographically random, single-use nonce (32 bytes, base64url-encoded) and stores it server-side in Redis with a 5-minute TTL. The nonce is returned to the client. This prevents replay attacks where an attacker records a previous valid signature and resubmits it.
+              </p>
+              <div className="bg-black/5 p-8 rounded-2xl font-mono text-[13px] leading-relaxed text-[#050505]">
+                <pre>{`// Full SIWE Message Structure (EIP-4361 Compliant)
+humanidfi.com wants you to sign in with your Ethereum account:
+0xYourWalletAddress
+
+By signing, you confirm you are the authorized holder of this address
+and consent to accessing the Humanity Ledger Developer API.
+
+URI: https://humanidfi.com
+Version: 1
+Chain ID: 1
+Nonce: aBcDeFgHiJkLmNoPqRsT
+Issued At: 2026-05-21T06:00:00.000Z
+Expiration Time: 2026-05-21T06:05:00.000Z`}</pre>
+              </div>
+              <p>
+                <strong>Step 2 — Client Signs the Message.</strong> The message above is presented to the user's wallet (MetaMask, WalletConnect, etc.) using the <code>personal_sign</code> RPC method (prefixes the message with <code>\x19Ethereum Signed Message:\n</code> per EIP-191, preventing signature reuse in transactions). The wallet returns a 65-byte ECDSA signature: 32 bytes R, 32 bytes S, and 1 byte V (the recovery identifier).
+              </p>
+              <p>
+                <strong>Step 3 — Server Verification.</strong> The client submits the original message text and the 65-byte signature to <code>POST /api/auth/verify</code>. The server uses <code>ecrecover</code> to reconstruct the signing address from the message hash and the signature. If the recovered address matches the claimed address, and the nonce has not been consumed yet, authentication succeeds. The nonce is immediately invalidated in Redis to prevent replay. A signed JWT and a secure session cookie are issued in the response.
+              </p>
+            </div>
+          </section>
+
+          {/* STEP 10: NEO4J GRAPH QUERIES */}
+          <section>
+            <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
+              10. Neo4j Graph Database — Cypher Query Reference
+            </h2>
+            <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+              <p>
+                The Akashic Ledger is implemented as a property graph database using Neo4j. Every on-chain entity (wallet, smart contract, token, protocol) is a labeled <strong>Node</strong>. Every interaction (transfer, swap, approval, delegation) is a directed <strong>Relationship</strong> with properties (value, timestamp, gas). This structure allows queries that are impossible in relational databases, such as finding all capital flows within 3 hops of a specific address within the last 24 hours.
+              </p>
+              <div className="bg-black/5 p-8 rounded-2xl font-mono text-[13px] leading-relaxed text-[#050505]">
+                <pre>{`// Find all wallets that have interacted with a known whale
+// within 2 hops, in the last 7 days
+MATCH (whale:Wallet { address: "0xABCDEF..." })
+      -[:TRANSFERRED*1..2]->
+      (related:Wallet)
+WHERE related.last_seen > timestamp() - 604800000
+RETURN related.address, 
+       related.total_volume_usd,
+       related.risk_score
+ORDER BY related.total_volume_usd DESC
+LIMIT 50;
+
+// Detect circular capital flows (potential wash trading)
+MATCH path = (start:Wallet)-[:TRANSFERRED*3..6]->(start)
+WHERE ALL(r IN relationships(path) 
+          WHERE r.timestamp > timestamp() - 86400000)
+RETURN start.address, 
+       length(path) as cycle_length,
+       [r IN relationships(path) | r.value_usd] as flow_values
+ORDER BY cycle_length ASC;`}</pre>
+              </div>
+              <p>
+                Via the REST API, you can submit parameterized Cypher queries through the <code>POST /v1/graph/query</code> endpoint. Queries are sandboxed; you cannot execute write operations (CREATE, MERGE, DELETE) without a special elevated <code>write:graph</code> scope, which requires manual review and approval from the core team. All read queries are executed against a read-replica to protect the primary ledger's write performance.
+              </p>
+            </div>
+          </section>
+
+          {/* STEP 11: ZK PROOF VERIFICATION */}
+          <section>
+            <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
+              11. Zero-Knowledge Proof Verification
+            </h2>
+            <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+              <p>
+                For use cases requiring privacy-preserving verification — such as proving that a wallet holds more than a threshold balance without revealing the exact amount, or proving membership in a whitelist without revealing the specific address — the Humanity Ledger exposes a ZK proof pipeline built on <strong>SnarkJS</strong> and <strong>Circom</strong>-compiled arithmetic circuits.
+              </p>
+              <p>
+                The workflow is as follows: a developer submits private inputs to the <code>POST /v1/zk/prove</code> endpoint. The server executes the witness calculation and proof generation using the pre-compiled circuit and trusted setup parameters. The resulting proof object (<code>proof.json</code>) and public signals (<code>public.json</code>) are returned. Any third party can then independently verify this proof against the verification key without learning anything about the private inputs.
+              </p>
+              <div className="bg-black/5 p-8 rounded-2xl font-mono text-[13px] leading-relaxed text-[#050505]">
+                <pre>{`// Request a ZK proof that an address holds >= $1M
+POST /v1/zk/prove
+Authorization: Bearer hl_live_YOUR_API_KEY
+Content-Type: application/json
+
+{
+  "circuit": "balance_threshold_v2",
+  "private_inputs": {
+    "wallet_address": "0xYourAddress",
+    "threshold_usd": 1000000
+  }
+}
+
+// Response
+{
+  "proof": { "pi_a": [...], "pi_b": [[...],[...]], "pi_c": [...] },
+  "public_signals": ["1", "0x...merkle_root..."],
+  "verification_key_url": "https://cdn.humanidfi.com/circuits/balance_threshold_v2.vk.json",
+  "expires_at": 1748558400
+}`}</pre>
+              </div>
+              <p>
+                The verification key is public and immutable. It is derived from a multi-party computation (MPC) trusted setup ceremony in which independent participants contribute randomness. As long as at least one participant destroyed their secret contribution, the setup is secure. Humanity Ledger's trusted setup was conducted with 128 independent participants across 14 jurisdictions.
+              </p>
+            </div>
+          </section>
+
+          {/* STEP 12: DEPLOYING A NODE */}
+          <section>
+            <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
+              12. Deploying a Humanity Ledger Node
+            </h2>
+            <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+              <p>
+                The Humanity Ledger is a permissionless network. Any operator can run a full node to contribute to mempool surveillance, validation, and data distribution. Running a node not only strengthens the network's decentralization but also entitles operators to a share of the protocol's data fees, distributed in the native governance token.
+              </p>
+              <p>
+                <strong>Minimum Hardware Requirements:</strong> 16-core CPU (AMD EPYC or Intel Xeon preferred), 64 GB RAM, 4 TB NVMe SSD (read speeds above 3,000 MB/s), and a dedicated 1 Gbps symmetric internet connection with a static IP address. The node process maintains an in-memory graph of active mempool transactions and must be able to absorb 50,000+ events per second during peak market hours without dropping data.
+              </p>
+              <div className="bg-black/5 p-8 rounded-2xl font-mono text-[13px] leading-relaxed text-[#050505]">
+                <pre>{`# Clone the node repository
+git clone https://github.com/humanityledger/node.git
+cd node
+
+# Configure your environment
+cp .env.example .env.node
+# Set your ETHEREUM_RPC_URL, SIGNING_PRIVATE_KEY, and NODE_ID
+
+# Install dependencies and build
+npm install && npm run build:node
+
+# Register your node on-chain (requires ETH for gas)
+npm run register:node -- --stake 1000 # Stake 1000 HL tokens
+
+# Start the node process
+npm run start:node
+
+# Verify node health
+curl http://localhost:8080/health
+# { "status": "SYNCED", "peers": 47, "mempool_events_per_second": 12400 }`}</pre>
+              </div>
+              <p>
+                Once your node is registered and synced, it will automatically begin receiving peer-to-peer mempool data from existing nodes via an encrypted libp2p GossipSub mesh. Your node's data contributions are cryptographically signed with your node's ECDSA key, ensuring data provenance and integrity across the entire network. Malicious nodes that broadcast falsified data are automatically slashed by the on-chain governance contract, losing a portion of their staked tokens.
+              </p>
+            </div>
+          </section>
+
         </div>
       </main>
+
 
       <SovereignFooter />
     </div>
