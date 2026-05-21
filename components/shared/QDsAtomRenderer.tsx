@@ -221,7 +221,8 @@ function Scene({ vel, progress, isDark, enableScale }: any) {
       <directionalLight position={[-5, -5, -5]} intensity={isDark ? 0.8 : 1.5} color="#ffffff" />
       <ambientLight intensity={isDark ? 0.5 : 1.2} color="#ffffff" />
 
-      <Environment preset={isDark ? "city" : "studio"} />
+      {/* Force "studio" preset to avoid potsdamer_platz_1k.hdr fetch errors */}
+      <Environment preset="studio" />
 
       <Float speed={0.8} floatIntensity={0.3} rotationIntensity={0.1}>
         <AtomGroup vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} />
