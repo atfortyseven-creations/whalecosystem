@@ -217,12 +217,10 @@ function Scene({ vel, progress, isDark, enableScale }: any) {
     <>
       <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={40} />
 
-      <directionalLight position={[5, 5, 5]} intensity={isDark ? 2.0 : 4.5} color="#ffffff" />
-      <directionalLight position={[-5, -5, -5]} intensity={isDark ? 0.8 : 1.5} color="#ffffff" />
-      <ambientLight intensity={isDark ? 0.5 : 1.2} color="#ffffff" />
-
-      {/* Force "studio" preset to avoid potsdamer_platz_1k.hdr fetch errors */}
-      <Environment preset="studio" />
+      <directionalLight position={[5, 5, 5]} intensity={isDark ? 3.0 : 6.0} color="#ffffff" />
+      <directionalLight position={[-5, -5, -5]} intensity={isDark ? 1.5 : 3.0} color="#ffffff" />
+      <directionalLight position={[0, 10, 0]} intensity={isDark ? 2.0 : 4.0} color="#ffffff" />
+      <ambientLight intensity={isDark ? 1.0 : 2.0} color="#ffffff" />
 
       <Float speed={0.8} floatIntensity={0.3} rotationIntensity={0.1}>
         <AtomGroup vel={vel} progress={progress} isDark={isDark} enableScale={enableScale} />

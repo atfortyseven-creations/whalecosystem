@@ -1,29 +1,9 @@
-"use client";
+const fs = require('fs');
 
-import React, { useRef, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import dynamic from 'next/dynamic';
-import { useScrollVelocity } from '@/components/shared/QDsAtomRenderer';
+let content = fs.readFileSync('./app/qds/page.tsx', 'utf-8');
 
-// Load the 3D atom only on the client (WebGL needs browser)
-const QDsAtomRenderer = dynamic(
-  () => import('@/components/shared/QDsAtomRenderer').then(m => ({ default: m.QDsAtomRenderer })),
-  { ssr: false, loading: () => null }
-);
-
-// ─── Page Data ───────────────────────────────────────────────────────────────
-
-const STATS = [
-  { label: 'Total Supply',      value: '21,000,000', sub: 'QDs — mathematically fixed' },
-  { label: 'Decimal Precision', value: '8 places',   sub: '2.1 quadrillion units total' },
-  { label: 'Distribution',      value: '100% mined', sub: 'Open participation only' },
-  { label: 'Team Allocation',   value: '0%',          sub: 'No pre-mine, no reserves' },
-  { label: 'Mainnet Launch',    value: 'Before 2027', sub: 'Genesis block before Dec 31 2026' },
-  { label: 'Governance',        value: 'None',        sub: 'Supply rule is immutable' },
-];
-
-const SECTIONS = [
+// 1. Replace the SECTIONS array with a massive one
+const newSections = `const SECTIONS = [
   {
     num: '01',
     title: 'What QDs is',
@@ -124,253 +104,19 @@ const SECTIONS = [
       'After the genesis block, the protocol operates autonomously. The Whale Alert team contributes to the network as participants, not as administrators. The network is maintained by its participants, secured by its miners, and governed by its code. Any future evolution of the protocol must occur through decentralized consensus, not executive mandate.'
     ],
   },
-];
+];`;
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+const oldSectionsRegex = /const SECTIONS = \[[\s\S]*?\];\n/;
+content = content.replace(oldSectionsRegex, newSections + "\n");
 
-export default function QDsPage() {
-  const vel     = useScrollVelocity();
-  const heroRef = useRef<HTMLElement>(null);
-  const [mounted, setMounted] = useState(false);
+// 2. Change bg-[#FAFAF8] to bg-white
+content = content.replace(/bg-\[#FAFAF8\]/g, 'bg-white');
 
-  useEffect(() => { setMounted(true); }, []);
+// 3. Make typography even cleaner and more monochromatic.
+content = content.replace(/border-black\/\[0\.06\]/g, 'border-black/10');
+content = content.replace(/bg-\[#FAFAF8\]/g, 'bg-white');
+content = content.replace(/text-black\/40/g, 'text-black/50');
+content = content.replace(/text-black\/30/g, 'text-black/40');
 
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ['start start', 'end start'],
-  });
-  const heroTextY = useTransform(scrollYProgress, [0, 1], ['0%', '32%']);
-  const heroOpa   = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
-
-  return (
-    <div className="min-h-screen bg-white text-black font-sans antialiased overflow-x-hidden selection:bg-black selection:text-white">
-
-      {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section
-        ref={heroRef}
-        className="relative w-full overflow-hidden bg-white"
-        style={{ minHeight: '100svh' }}
-      >
-        {/* 3D Atom — covers full hero, client-only */}
-        {mounted && (
-          <div
-            className="absolute inset-0 z-0 pointer-events-none"
-            style={{ willChange: 'transform' }}
-          >
-            <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
-          </div>
-        )}
-
-        {/* Bottom fade */}
-        <div
-          className="absolute inset-x-0 bottom-0 h-56 z-10 pointer-events-none"
-          style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
-        />
-
-        {/* Hero text — parallax on scroll */}
-        <motion.div
-          style={{ y: heroTextY, opacity: heroOpa, minHeight: '100svh' } as any}
-          className="relative z-20 flex flex-col items-center justify-center text-center px-6 select-none pointer-events-none"
-        >
-          <div className="flex flex-col items-center justify-center" style={{ minHeight: '100svh' }}>
-            <motion.span
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              className="font-mono text-[11px] font-black uppercase tracking-[0.5em] text-black/40 mb-8 block"
-            >
-              Humanity Ledger · Digital Asset
-            </motion.span>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-              className="font-black tracking-tighter uppercase leading-[0.85] text-black mb-6"
-              style={{ fontSize: 'clamp(72px, 16vw, 180px)' }}
-            >
-              QDs
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.65 }}
-              className="font-serif text-black/50 max-w-[560px] leading-relaxed"
-              style={{ fontSize: 'clamp(16px, 2vw, 22px)' }}
-            >
-              Quantum Dots. 21,000,000 units. Mined, not issued.
-              <br className="hidden md:block" />
-              Launching before 2027.
-            </motion.p>
-
-            {/* Scroll cue */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.6, duration: 1 }}
-              className="mt-16 flex flex-col items-center gap-2"
-            >
-              <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-black/20">Scroll</span>
-              <div className="w-px h-10 bg-gradient-to-b from-black/15 to-transparent" />
-            </motion.div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ── STATS BAND ────────────────────────────────────────────────────── */}
-      <section className="w-full border-y border-black/10 bg-white py-14">
-        <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-          {STATS.map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.07, duration: 0.6, ease: 'easeOut' }}
-              className="flex flex-col gap-2 p-5 rounded-2xl bg-white border border-black/10 hover:border-black/15 transition-colors shadow-sm"
-            >
-              <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-black/40">
-                {s.label}
-              </span>
-              <span className="font-black text-[20px] tracking-tight text-black leading-none">
-                {s.value}
-              </span>
-              <span className="font-mono text-[9px] text-black/50 leading-snug">
-                {s.sub}
-              </span>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── CONTENT SECTIONS ─────────────────────────────────────────────── */}
-      <section className="w-full max-w-[960px] mx-auto px-6 py-28 md:py-40 flex flex-col gap-28 md:gap-40">
-        {SECTIONS.map((s) => (
-          <motion.article
-            key={s.num}
-            initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col md:flex-row gap-8 md:gap-20"
-          >
-            {/* Section label */}
-            <div className="w-full md:w-[220px] shrink-0 flex flex-col gap-3 pt-1">
-              <span className="font-mono text-[10px] font-black text-black/22 tracking-[0.3em]">
-                {s.num}
-              </span>
-              <h2 className="text-[22px] md:text-[28px] font-black tracking-tight leading-[1.15] text-black">
-                {s.title}
-              </h2>
-              <div className="w-8 h-[2px] bg-black rounded-full mt-2" />
-            </div>
-
-            {/* Body text */}
-            <div className="flex-1 flex flex-col gap-6">
-              {s.paragraphs.map((p, pi) => (
-                <p
-                  key={pi}
-                  className="font-serif text-black/58 leading-[1.9]"
-                  style={{ fontSize: 'clamp(15px, 1.5vw, 17px)' }}
-                >
-                  {p}
-                </p>
-              ))}
-            </div>
-          </motion.article>
-        ))}
-      </section>
-
-      {/* ── MID-PAGE ATOM DIVIDER ─────────────────────────────────────────── */}
-      <section
-        className="w-full relative border-y border-black/10 bg-[#F8F8F6] overflow-hidden"
-        style={{ height: 'clamp(340px, 45vh, 520px)' }}
-      >
-        {mounted && (
-          <div className="absolute inset-0">
-            <QDsAtomRenderer vel={vel} isDark={false} enableScale={false} />
-          </div>
-        )}
-        {/* Edge fades */}
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#F8F8F6] to-transparent pointer-events-none z-10" />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#F8F8F6] to-transparent pointer-events-none z-10" />
-        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-          <span className="font-mono text-[10px] font-black uppercase tracking-[0.55em] text-black/18">
-            QDs · Quantum Dots · 21,000,000 · 2026
-          </span>
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
-      <section className="w-full bg-black py-36 px-6 flex flex-col items-center text-center relative overflow-hidden">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)' }}
-        />
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 max-w-2xl flex flex-col items-center gap-8"
-        >
-          <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/22">
-            Genesis Block · Before 2027
-          </span>
-          <h2
-            className="font-black tracking-tighter uppercase leading-[0.87] text-white text-balance"
-            style={{ fontSize: 'clamp(36px, 7vw, 72px)' }}
-          >
-            Mining starts soon.
-          </h2>
-          <p
-            className="font-serif text-white/40 leading-relaxed max-w-xl"
-            style={{ fontSize: 'clamp(15px, 1.7vw, 19px)' }}
-          >
-            Open participation. Fixed supply. No exceptions to either rule.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 mt-2">
-            <Link
-              href="/status"
-              className="px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[11px] font-black uppercase tracking-[0.22em] transition-transform active:scale-95 shadow-xl"
-            >
-              Network Status
-            </Link>
-            <Link
-              href="/developer"
-              className="px-10 py-5 bg-transparent border border-white/18 text-white/70 hover:border-white/40 hover:text-white rounded-full font-mono text-[11px] font-black uppercase tracking-[0.22em] transition-all active:scale-95"
-            >
-              Technical Docs
-            </Link>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ── FOOTER ────────────────────────────────────────────────────────── */}
-      <footer className="w-full bg-white border-t border-black/[0.05] py-10 px-6">
-        <div className="max-w-[960px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="font-mono text-[9px] font-black uppercase tracking-[0.28em] text-black/28">
-            © 2026 Humanity Ledger · QDs Protocol
-          </span>
-          <div className="flex items-center gap-6">
-            {[
-              { label: 'Privacy',   href: '/privacy'   },
-              { label: 'Developer', href: '/developer' },
-              { label: 'Status',    href: '/status'    },
-              { label: 'Legal',     href: '/legal'     },
-            ].map((l) => (
-              <Link
-                key={l.label}
-                href={l.href}
-                className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/28 hover:text-black transition-colors"
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
+fs.writeFileSync('./app/qds/page.tsx', content);
+console.log("Updated QDs page");
