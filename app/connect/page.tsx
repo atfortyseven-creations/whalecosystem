@@ -39,7 +39,9 @@ function RealDeviceRouter() {
       const hasUuid = urlParams.has('uuid');
       if (!hasUuid) {
         const next = urlParams.get('next') || '/';
-        window.location.replace(next);
+        if (next !== window.location.pathname) {
+          window.location.replace(next);
+        }
       }
     }
   }, [isConnected]);
@@ -72,7 +74,20 @@ function RealDeviceRouter() {
       // NOTE: Goes to '/connect' so the user lands on the ConnectedScreen (scanner + info),
       // NOT the landing page and NOT the dashboard directly.
       const next = urlParams.get('next') || '/connect';
-      window.location.replace(next);
+      if (next !== window.location.pathname) {
+        window.location.replace(next);
+      } else {
+        // If we are already on the target page, we just determine the view.
+        const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
+        const isTouchDevice = (
+          'ontouchstart' in window ||
+          navigator.maxTouchPoints > 0 ||
+          // @ts-ignore
+          navigator.msMaxTouchPoints > 0
+        );
+        const isNarrowScreen = window.screen.width < 768;
+        setView(isUaMobile || (isTouchDevice && isNarrowScreen) ? 'mobile' : 'desktop');
+      }
       return;
     }
 

@@ -845,11 +845,10 @@ export function MobileLanding() {
       try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
       setShowManualReconnectRaw(false);
 
-      // REDIRECT TO SCANNER (ConnectedScreen) — never to /dashboard directly on mobile
       const params = new URLSearchParams(window.location.search);
-      const next = params.get('next') || '/connect';
-      console.log('[Auth] Redirecting to:', next);
-      if (next !== window.location.pathname) {
+      const next = params.get('next');
+      if (next && next !== '/connect' && next !== window.location.pathname) {
+          console.log('[Auth] Redirecting to:', next);
           window.location.replace(next);
       }
     } catch (err: any) {
