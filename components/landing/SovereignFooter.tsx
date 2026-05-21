@@ -21,46 +21,46 @@ const MEGA_CLUSTERS = [
   {
     label: "Protocol",
     links: [
-      { label: "Security Architecture", href: "/developer/security" },
-      { label: "Mempool Analysis", href: "/developer/mempool" },
-      { label: "Anomaly Detection", href: "/developer/anomalies" },
-      { label: "Edge Computing", href: "/developer/edge" },
+      { label: "Security Architecture", href: "/developer/security-architecture" },
+      { label: "Mempool Analysis", href: "/developer/mempool-analysis" },
+      { label: "Anomaly Detection", href: "/developer/anomaly-detection" },
+      { label: "Edge Computing", href: "/developer/edge-computing" },
     ]
   },
   {
     label: "Identity & Auth",
     links: [
-      { label: "Mobile Authentication", href: "/developer/mobile-auth" },
-      { label: "Biometric Verification", href: "/developer/biometrics" },
-      { label: "Session Management", href: "/developer/sessions" },
-      { label: "Digital Signatures", href: "/developer/signatures" },
+      { label: "Mobile Authentication", href: "/developer/mobile-authentication" },
+      { label: "Biometric Verification", href: "/developer/biometric-verification" },
+      { label: "Session Management", href: "/developer/session-management" },
+      { label: "Digital Signatures", href: "/developer/digital-signatures" },
     ]
   },
   {
     label: "Storage & Data",
     links: [
-      { label: "Transaction Routing", href: "/developer/routing" },
-      { label: "Graph Database", href: "/developer/graph" },
-      { label: "Transient Storage", href: "/developer/storage" },
-      { label: "Block Analysis", href: "/developer/blocks" },
+      { label: "Transaction Routing", href: "/developer/transaction-routing" },
+      { label: "Graph Database", href: "/developer/graph-database" },
+      { label: "Transient Storage", href: "/developer/transient-storage" },
+      { label: "Block Analysis", href: "/developer/block-analysis" },
     ]
   },
   {
     label: "Network Layer",
     links: [
-      { label: "WebSocket API", href: "/developer/websockets" },
-      { label: "Secure Communication", href: "/developer/secure-comm" },
-      { label: "Distributed Caching", href: "/developer/caching" },
-      { label: "System Fallbacks", href: "/developer/fallbacks" },
+      { label: "WebSocket API", href: "/developer/websocket-api" },
+      { label: "Secure Communication", href: "/developer/secure-communication" },
+      { label: "Distributed Caching", href: "/developer/distributed-caching" },
+      { label: "System Fallbacks", href: "/developer/system-fallbacks" },
     ]
   },
   {
     label: "Integrations",
     links: [
-      { label: "WorldID Protocol", href: "/developer/worldid" },
-      { label: "Cloudflare Workers", href: "/developer/cloudflare" },
-      { label: "Railway Hosting", href: "/developer/railway" },
-      { label: "EVM Compatibility", href: "/developer/evm" },
+      { label: "WorldID Protocol", href: "/developer/worldid-protocol" },
+      { label: "Cloudflare Workers", href: "/developer/cloudflare-workers" },
+      { label: "Railway Hosting", href: "/developer/railway-hosting" },
+      { label: "EVM Compatibility", href: "/developer/evm-compatibility" },
     ]
   },
   {

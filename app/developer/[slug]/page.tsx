@@ -1,101 +1,58 @@
-import React from "react";
-import { notFound } from "next/navigation";
-import { docsData } from "@/lib/docs-data";
-import { SovereignFooter } from "@/components/landing/SovereignFooter";
+import React from 'react';
+import { notFound } from 'next/navigation';
+import { DOCS_CONTENT } from '../content';
 
-// We disable caching to ensure the latest documentation is always served
-export const revalidate = 0;
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return DOCS_CONTENT.map((doc) => ({
+    slug: doc.slug,
+  }));
+}
 
 export default async function DocPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const doc = docsData[slug];
+  const resolvedParams = await params;
+  const doc = DOCS_CONTENT.find((d) => d.slug === resolvedParams.slug);
 
   if (!doc) {
-    // If a slug is not found in the local data, we show a generic not found or fallback
     notFound();
   }
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-white text-black selection:bg-black selection:text-white">
+    <article className="w-full max-w-[800px] mx-auto px-8 md:px-16 py-20 pb-40">
       
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 w-full py-6 px-8 flex justify-between items-center bg-white/95 backdrop-blur-xl border-b border-black/5">
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 flex items-center justify-center shrink-0">
-            <img src="/official-whale-monochrome.png" alt="Logo" className="w-full h-full object-contain" />
-          </div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] font-black">
-            Scanner Humanity Ledger
-          </div>
+      <div className="mb-16">
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] font-black text-black/40 mb-6">
+          Technical Specification / {doc.title}
         </div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-40 hidden md:block">
-          Technical Documentation
-        </div>
-      </header>
-
-      {/* ── MAIN LAYOUT ── */}
-      <div className="flex-1 w-full max-w-[1400px] mx-auto flex flex-col md:flex-row">
-        
-        {/* SIDEBAR NAVIGATION */}
-        <aside className="w-full md:w-[320px] shrink-0 border-b md:border-b-0 md:border-r border-black/10 flex flex-col px-6 pt-12 pb-12 md:min-h-[calc(100vh-80px)] bg-white z-40">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] font-black text-black/50 mb-8 px-4">
-            Documentation Index
-          </div>
-          
-          <nav className="flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
-            {Object.entries(docsData).map(([key, data]) => (
-              <a 
-                key={key} 
-                href={`/developer/${key}`} 
-                className={`group w-full flex flex-col gap-1 p-4 rounded-2xl border transition-all duration-200 shadow-sm ${
-                  slug === key 
-                    ? "border-black/20 bg-black/[0.04]" 
-                    : "border-transparent hover:bg-black/[0.02] hover:border-black/5"
-                }`}
-              >
-                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/40">
-                  {data.category}
-                </span>
-                <p className={`text-[13px] font-black tracking-tight ${slug === key ? "text-black" : "text-[#050505]/70"}`}>
-                  {data.title}
-                </p>
-              </a>
-            ))}
-          </nav>
-        </aside>
-
-        {/* DOCUMENT CONTENT */}
-        <main className="flex-1 px-8 md:px-16 pt-16 md:pt-24 pb-32 max-w-[900px]">
-          
-          <div className="mb-16">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] font-black text-black/50 mb-6">
-              {doc.category}
-            </div>
-            <h1 className="text-[40px] md:text-[56px] font-normal tracking-[-0.03em] leading-[1.05] font-sans">
-              {doc.title}
-            </h1>
-          </div>
-
-          <article className="flex flex-col gap-8">
-            {doc.content.map((paragraph, idx) => (
-              <p 
-                key={idx} 
-                className="text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify"
-              >
-                {paragraph}
-              </p>
-            ))}
-          </article>
-
-          <div className="mt-32 pt-12 border-t border-black/10">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-40">
-              © 2026 Humanity Ledger · Technical Specification
-            </p>
-          </div>
-        </main>
+        <h1 className="text-[36px] md:text-[52px] font-black tracking-[-0.03em] leading-[1.05] text-[#050505] mb-8">
+          {doc.title}
+        </h1>
+        <div className="w-full h-px bg-black/5" />
       </div>
 
-      <SovereignFooter />
-    </div>
+      {/* ── CONTENT BODY ── */}
+      <div className="prose prose-lg prose-neutral max-w-none">
+        {doc.content.map((paragraph, idx) => (
+          <p key={idx} className="text-[17px] md:text-[19px] leading-[1.8] text-[#1a1a1a] font-serif mb-8 opacity-90">
+            {paragraph}
+          </p>
+        ))}
+      </div>
+
+      {/* ── FOOTER ── */}
+      <div className="mt-32 pt-10 border-t border-black/5 flex flex-col md:flex-row items-center justify-between gap-6">
+        <p className="text-[12px] font-mono text-black/40 uppercase tracking-widest font-bold">
+          © 2026 Humanity Ledger Protocol
+        </p>
+        <div className="flex gap-4">
+          <a href="/developer" className="px-6 py-3 bg-black/5 hover:bg-black/10 rounded-full text-[11px] font-bold uppercase tracking-widest transition-colors">
+            Back to Docs
+          </a>
+        </div>
+      </div>
+      
+    </article>
   );
 }
