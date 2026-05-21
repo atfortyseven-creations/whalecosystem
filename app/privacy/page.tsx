@@ -75,6 +75,30 @@ const visionSections = [
       "When one node fails, or is subjected to an overwhelming attack, the intelligence stream does not collapse; it degrades gracefully. WebSocket connections automatically and seamlessly reconnect to the nearest surviving node using geographic Anycast routing. The global state is maintained in a decentralized memory matrix (Redis clusters), ensuring that the flow of data is unbroken.",
       "This is not merely standard software engineering; it is the deliberate construction of a decentralized digital organism capable of surviving and thriving in the most hostile network environments imaginable. The perception of reality provided by the network remains constant, immune to both physical and digital disruption."
     ]
+  },
+  {
+    title: "Post-Quantum Cryptographic Resilience",
+    paragraphs: [
+      "The theoretical timeline for fault-tolerant quantum computers capable of executing Shor’s algorithm is collapsing. When this threshold is breached, the Elliptic Curve Cryptography (ECC) that secures the entirety of the current global financial system and traditional blockchain networks will be fundamentally compromised. The Humanity Ledger operates under a \"Store Now, Decrypt Later\" (SNDL) threat model, acknowledging that adversarial state actors are currently harvesting encrypted traffic with the intention of retroactively decrypting it once quantum supremacy is achieved.",
+      "To future-proof the privacy of our operators, the underlying architecture is aggressively migrating toward hybrid key encapsulation mechanisms (KEMs). By integrating lattice-based cryptography, specifically the NIST-standardized Kyber algorithms, alongside traditional ECDSA, we ensure that the session keys generated during your ephemeral handshake possess forward-secrecy against quantum decryption.",
+      "This means that your identity, your telemetry queries, and your strategic movements within the graph matrix remain mathematically sealed. Even if the encrypted packets of your session are intercepted today by a global surveillance apparatus, they will not possess the mathematical capacity to decouple the zero-knowledge proof from the resulting ciphertext tomorrow. Your privacy is not merely protected against contemporary threats; it is shielded against the inevitable evolution of computation."
+    ]
+  },
+  {
+    title: "Sub-Millisecond Execution Privacy (MEV Shielding)",
+    paragraphs: [
+      "Visibility is a vulnerability in decentralized finance. The moment a transaction is broadcast to the public mempool, it becomes a target for predatory algorithmic bots executing sandwich attacks, generalized front-running, and arbitrage exploitation. This phenomenon, known as Maximal Extractable Value (MEV), is a structural tax on the individual, systematically transferring wealth from the retail operator to the institutional validator.",
+      "The Humanity Ledger eradicates this vulnerability by providing operators with Sub-Millisecond Execution Privacy. When you initiate a transaction or a complex smart contract interaction through the platform, your signed payload is never broadcast to the public P2P network. Instead, it is routed through a localized, encrypted tunnel directly to a consortium of trusted block builders and private RPC relays, such as Flashbots.",
+      "This architecture guarantees that your capital movement bypasses the dark forest of the public mempool entirely. Your transaction remains invisible to predatory algorithms until the exact moment it is cryptographically finalized and permanently embedded within the blockchain state. By shielding your execution intent, we return the tactical advantage of surprise back to the individual operator, ensuring that your strategic alpha cannot be harvested by parasitic network actors."
+    ]
+  },
+  {
+    title: "Decentralized Validator Memory Matrix",
+    paragraphs: [
+      "A network is only as secure as its physical topology. Systems that rely on centralized databases or concentrated server clusters, regardless of their cryptographic implementations, are inherently fragile. They can be subpoenaed, targeted by state-level denial of service attacks, or simply suffer catastrophic hardware failure. The Humanity Ledger circumvents this fragility through the deployment of a Decentralized Validator Memory Matrix.",
+      "Rather than storing the computational graph state on a central cluster, the mathematical reality of the mempool is fragmented and distributed across a global, fluid mesh of edge nodes. These nodes operate entirely in RAM (Random Access Memory), utilizing high-speed Redis clusters and Kafka streams. They do not persist data to physical hard drives. The state is a continuously flowing river of information, existing simultaneously everywhere and nowhere.",
+      "If an adversarial entity attempts to seize a node to extract user data or intelligence vectors, the system reacts instantaneously. The compromised node is mathematically severed from the consensus, and its local RAM is purged as power is disrupted. The global intelligence stream simply re-routes around the damage, perfectly preserving the continuity of perception for all connected operators. This is the ultimate expression of anti-fragile engineering, where the attempt to destroy the network only validates its absolute resilience."
+    ]
   }
 ];
 

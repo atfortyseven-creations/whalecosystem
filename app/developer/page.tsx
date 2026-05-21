@@ -167,6 +167,42 @@ ws.onmessage = (event) => {
             </div>
           </section>
 
+          {/* STEP 6: POST-QUANTUM THREAT MODELS */}
+          <section>
+            <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
+              6. Post-Quantum Cryptography & MEV Shielding
+            </h2>
+            <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+              <p>
+                The inevitable advent of fault-tolerant quantum computers running Shor’s algorithm poses a terminal threat to traditional Elliptic Curve Cryptography (ECC). The Humanity Ledger operates under a \"Store Now, Decrypt Later\" (SNDL) threat model. To future-proof our infrastructure, we are actively implementing hybrid key encapsulation mechanisms (KEMs), specifically integrating the NIST-standardized Kyber-768 lattice-based cryptography alongside standard ECDSA.
+              </p>
+              <p>
+                When an institutional developer initiates a high-security webhook or opens a WebSocket tunnel for private execution, the handshake derives its forward-secrecy through both a classic Diffie-Hellman exchange and a post-quantum lattice problem. Even if a nation-state harvests our encrypted TCP packets today, they will not have the mathematical capability to decrypt them tomorrow.
+              </p>
+              <p>
+                Furthermore, the API exposes advanced <strong>MEV (Maximal Extractable Value) Shielding</strong> vectors. If your quantitative algorithm detects a Z-Score anomaly and issues a trade execution payload through our `POST /v1/execute` endpoint, the transaction is completely obfuscated from the public mempool. We route the signed payload through private RPC relays (such as Flashbots and Eden Network), ensuring your alpha is immune to sandwich attacks and generalized front-running.
+              </p>
+            </div>
+          </section>
+
+          {/* STEP 7: NEURAL GRAPH STATE VECTORS */}
+          <section>
+            <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
+              7. Neural Graph State Vectors
+            </h2>
+            <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+              <p>
+                A simple relational database cannot comprehend the fluid dynamics of institutional liquidity. The Humanity Ledger utilizes a decentralized Neo4j Graph Database, augmented by specialized tensor processing units, to calculate \"Neural Graph State Vectors.\" Every wallet is a node; every smart contract interaction is a multidimensional edge holding specific weights related to token velocity, gas limits, and historical correlations.
+              </p>
+              <p>
+                Through the `/v1/graph/tensors` WebSocket channel, developers can subscribe to live vector embeddings. Instead of receiving raw transaction logs, your machine learning models receive pre-computed, normalized 512-dimensional vectors representing the current \"anxiety\" or \"accumulation\" state of the network. This eliminates the need for you to maintain massive local data pipelines; you simply ingest the mathematical reality directly into your neural networks.
+              </p>
+              <p>
+                This capability allows quantitative hedge funds to deploy autonomous AI agents that trade entirely based on topological shifts within the graph matrix, reacting to the shape of the capital flow rather than the arbitrary price of an asset.
+              </p>
+            </div>
+          </section>
+
         </div>
       </main>
 
