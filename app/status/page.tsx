@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Wifi, Clock, Activity, ShieldAlert, Server, LayoutDashboard, MessageCircle, Briefcase, Newspaper, GraduationCap, Users, Award, LockOpen, Lock } from 'lucide-react';
+import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Wifi, Clock, Activity, ShieldAlert, Server, LayoutDashboard, MessageCircle, Briefcase, Newspaper, GraduationCap, Users, Award, LockOpen, Lock, Atom, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // TYPES
@@ -14,6 +14,7 @@ interface ServiceResult {
   latencyMs: number;
   httpCode: number | null;
   checkedAt: string;
+  accessible?: boolean;
 }
 
 interface HealthData {
@@ -87,6 +88,7 @@ const COMPONENT_META: Record<string, { icon: React.ElementType; accent: string; 
   'Academy':    { icon: GraduationCap,   accent: 'text-black/70', gradient: 'from-white to-white' },
   'Forum':      { icon: Users,           accent: 'text-black/70', gradient: 'from-white to-white' },
   'Careers':    { icon: Award,           accent: 'text-black/70', gradient: 'from-white to-white' },
+  'QDs':        { icon: Atom,            accent: 'text-black/70', gradient: 'from-white to-white' },
 };
 
 // MAIN PAGE
@@ -276,12 +278,18 @@ export default function StatusPage() {
                         <p className="text-[11px] font-mono font-medium text-black/40 mt-0.5 truncate max-w-[220px]">{svc.url}</p>
                       </div>
                     </div>
-                    {/* Right: latency + status badge */}
-                    <div className="flex items-center gap-3 shrink-0">
+                    {/* Right: latency + accessibility + status badge */}
+                    <div className="flex items-center gap-3 shrink-0 flex-wrap justify-end">
                       <div className="flex flex-col items-end">
                         <LatencyBadge ms={svc.latencyMs} />
                         <span className="text-[10px] text-black/30 font-mono uppercase tracking-wider mt-0.5">latency</span>
                       </div>
+                      {svc.accessible === false && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-amber-200 bg-amber-50 text-amber-700">
+                          <XCircle size={11} />
+                          No access
+                        </span>
+                      )}
                       <span
                         className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest px-3.5 py-2 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.text}`}
                       >

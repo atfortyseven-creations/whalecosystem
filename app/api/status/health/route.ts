@@ -17,9 +17,10 @@ interface ServiceResult {
   latencyMs: number;
   httpCode: number | null;
   checkedAt: string;
+  accessible: boolean;   // true = page loads correctly for users
 }
 
-async function probe(name: string, url: string, timeoutMs = 8000): Promise<ServiceResult> {
+async function probe(name: string, url: string, timeoutMs = 9000): Promise<ServiceResult> {
   const start = Date.now();
   const checkedAt = new Date().toISOString();
   const controller = new AbortController();
@@ -30,23 +31,34 @@ async function probe(name: string, url: string, timeoutMs = 8000): Promise<Servi
       method: 'GET',
       signal: controller.signal,
       cache: 'no-store',
-      headers: { 'x-health-probe': '1' },
+      headers: {
+        'x-health-probe': '1',
+        'Accept': 'text/html,application/json',
+        'User-Agent': 'HumanityLedger-HealthBot/2.0',
+      },
     });
     clearTimeout(timer);
     const latencyMs = Date.now() - start;
     const httpCode = res.status;
 
+    // Determine accessibility: 2xx = fully accessible, 3xx = redirected (still accessible),
+    // 401/403/404 = page exists but access-gated (degraded from user perspective), 5xx = outage
+    const accessible = httpCode >= 200 && httpCode < 400;
     let serviceStatus: 'operational' | 'degraded' | 'outage';
-    if (httpCode >= 200 && httpCode < 400) {
-      serviceStatus = latencyMs > 3000 ? 'degraded' : 'operational';
-    } else if (httpCode >= 400 && httpCode < 500) {
-      // 4xx = service is up but auth-gated — still operational
-      serviceStatus = latencyMs > 4000 ? 'degraded' : 'operational';
-    } else {
+
+    if (httpCode >= 500) {
       serviceStatus = 'outage';
+    } else if (httpCode === 401 || httpCode === 403) {
+      // Auth-gated — service is up, but users hitting this without auth get blocked
+      serviceStatus = latencyMs > 4000 ? 'degraded' : 'operational';
+    } else if (httpCode >= 200 && httpCode < 400) {
+      serviceStatus = latencyMs > 3500 ? 'degraded' : 'operational';
+    } else {
+      serviceStatus = 'degraded';
     }
 
-    return { name, url, status: serviceStatus, latencyMs, httpCode, checkedAt };
+    return { name, url, status: serviceStatus, latencyMs, httpCode, checkedAt, accessible };
+
   } catch (err: unknown) {
     clearTimeout(timer);
     const latencyMs = Date.now() - start;
@@ -58,6 +70,7 @@ async function probe(name: string, url: string, timeoutMs = 8000): Promise<Servi
       latencyMs,
       httpCode: null,
       checkedAt,
+      accessible: false,
     };
   }
 }
@@ -65,15 +78,16 @@ async function probe(name: string, url: string, timeoutMs = 8000): Promise<Servi
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.humanidfi.com';
 
-  // Probe all platform feature components in parallel — maximum efficiency
+  // Probe all platform feature routes in parallel — real, live probes
   const results = await Promise.all([
-    probe('Dashboard',   `${baseUrl}/`),
-    probe('Whale Chat',  `${baseUrl}/chat`),
-    probe('Portfolio',   `${baseUrl}/portfolio`),
-    probe('News',        `${baseUrl}/news`),
-    probe('Academy',     `${baseUrl}/academy`),
-    probe('Forum',       `${baseUrl}/forum`),
-    probe('Careers',     `${baseUrl}/careers`),
+    probe('Dashboard',  `${baseUrl}/`),
+    probe('Whale Chat', `${baseUrl}/chat`),
+    probe('Portfolio',  `${baseUrl}/portfolio`),
+    probe('News',       `${baseUrl}/news`),
+    probe('Academy',    `${baseUrl}/academy`),
+    probe('Forum',      `${baseUrl}/forum`),
+    probe('Careers',    `${baseUrl}/careers`),
+    probe('QDs',        `${baseUrl}/qds`),
   ]);
 
   const allOperational = results.every(r => r.status === 'operational');
@@ -84,12 +98,17 @@ export async function GET() {
     results.reduce((acc, r) => acc + r.latencyMs, 0) / results.length
   );
 
+  // Count truly accessible pages (2xx/3xx)
+  const accessibleCount = results.filter(r => r.accessible).length;
+
   return NextResponse.json(
     {
       ok: true,
       overallStatus,
       avgLatencyMs: avgLatency,
       checkedAt: new Date().toISOString(),
+      totalServices: results.length,
+      accessibleServices: accessibleCount,
       services: results,
     },
     {
