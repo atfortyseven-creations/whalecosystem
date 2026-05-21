@@ -361,12 +361,12 @@ function ConnectedScreen({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
-          className="w-full flex flex-col items-center justify-center text-center mb-2"
+          className="w-full flex flex-col items-center justify-center text-center mb-2 px-6"
         >
           <img 
-            src="/atom_logo.png" 
-            alt="Atom Logo" 
-            className="w-24 h-24 sm:w-28 sm:h-28 object-contain mb-6"
+            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" 
+            alt="Silver Atom Logo" 
+            className="w-full max-w-[85vw] sm:max-w-xs h-auto object-contain mx-auto mb-6"
             style={{ imageRendering: 'high-quality' }}
           />
           <p className="text-[64px] sm:text-[72px] font-light tracking-[-0.04em] leading-none tabular-nums text-black">
