@@ -350,28 +350,25 @@ function ConnectedScreen({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
           style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
-          className="w-full flex items-center justify-between mb-10"
+          className="w-full flex items-center justify-center mb-10"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-full border border-black flex items-center justify-center">
-              <span className="font-serif text-[15px] leading-none pb-0.5">W</span>
-            </div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] font-black">Whale Alert</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-40">Connected</span>
-          </div>
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] font-black">Whale Alert Network</span>
         </motion.div>
 
-        {/* ── GIANT CLOCK ── */}
+        {/* ── ATOM LOGO & GIANT CLOCK ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
-          className="w-full text-center mb-2"
+          className="w-full flex flex-col items-center justify-center text-center mb-2"
         >
+          <img 
+            src="/atom_logo.png" 
+            alt="Atom Logo" 
+            className="w-24 h-24 sm:w-28 sm:h-28 object-contain mb-6"
+            style={{ imageRendering: 'high-quality' }}
+          />
           <p className="text-[64px] sm:text-[72px] font-light tracking-[-0.04em] leading-none tabular-nums text-black">
             {fmtTime(now)}
           </p>
@@ -450,18 +447,7 @@ function ConnectedScreen({
           </p>
         </motion.div>
 
-        {/* ── SCANNER UNLOCKED STATUS ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.38, duration: 0.5 }}
-          className="w-full flex items-center gap-3 px-4 py-3 border border-black/10 rounded-2xl mb-6"
-        >
-          <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
-          <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/60">
-            QR Scanner Active · Ready to Sync
-          </p>
-        </motion.div>
+
 
         {/* ── PRIMARY ACTION: OPEN QR SCANNER ── */}
         <motion.div
