@@ -841,18 +841,6 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
     );
   }
 
-  if (xmtpError) {
-    return (
-      <div className="flex flex-1 w-full h-full bg-white items-center justify-center flex-col gap-4">
-        <p className="font-mono text-[12px] tracking-widest text-red-500 uppercase">XMTP Sync Error</p>
-        <p className="font-mono text-[10px] text-black/40 max-w-md text-center">{xmtpError}</p>
-        <button onClick={() => initXmtpClient(true)} className="px-6 py-2.5 bg-black text-white font-mono text-[10px] uppercase tracking-widest rounded-xl">
-          Retry Signature & Sync
-        </button>
-      </div>
-    );
-  }
-
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="w-full h-full flex-1 flex text-black overflow-hidden chat-theme-wrapper bg-white relative" data-chat-theme={settings.theme} data-privacy={settings.privacyMode} onClick={() => showPeerMenu && setShowPeerMenu(false)}>

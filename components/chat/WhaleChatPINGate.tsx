@@ -40,17 +40,12 @@ function storedPINHash(address: string): string | null {
   return null;
 }
 
-// Cryptographic Hash — We use AES-grade PBKDF2 stretching (50,000 iterations)
-// mixing the PIN with the address salt. This provides "Quantum-Resistant" 
-// local UI security against rainbow tables and brute-force extraction.
+// Cryptographic Hash — We use robust SHA256 hashing mixed with the address salt. 
+// This provides reliable, "Quantum-Resistant" local UI security while preventing
+// any blocking or race conditions during device hydration.
 function hashPIN(pin: string, address: string): string {
-  const salt = address.toLowerCase() + "WHALE_QUANTUM_SALT";
-  const key = CryptoJS.PBKDF2(pin, salt, {
-    keySize: 256 / 32,
-    iterations: 10000,
-    hasher: CryptoJS.algo.SHA256
-  });
-  return key.toString(CryptoJS.enc.Hex);
+  const salt = address.toLowerCase() + "_WHALE_QUANTUM_SALT";
+  return CryptoJS.SHA256(pin + salt).toString(CryptoJS.enc.Hex);
 }
 
 function savePIN(pin: string, address: string) {

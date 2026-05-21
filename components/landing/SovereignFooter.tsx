@@ -193,39 +193,27 @@ export function SovereignFooter() {
 
         {/* ── AZTEC × WHALE NETWORK FEATURE PARTNERSHIP ── */}
         <div className="w-full flex flex-col items-center gap-8 py-12">
-          <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-black/25 font-bold">
-            Core Infrastructure Partnership
-          </span>
           <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-12">
             {/* Aztec Network */}
             <div className="flex flex-col items-center gap-3 group">
-              <div className="w-14 h-14 rounded-2xl border border-black/8 bg-[#FAFAF8] flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors">
-                <svg viewBox="0 0 100 100" className="w-9 h-9" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <polygon points="50,5 95,30 95,70 50,95 5,70 5,30" fill="none" stroke="#050505" strokeWidth="6"/>
-                  <polygon points="50,25 75,38 75,62 50,75 25,62 25,38" fill="none" stroke="#050505" strokeWidth="3" strokeDasharray="6 4"/>
-                  <circle cx="50" cy="50" r="10" fill="#050505"/>
+              <div className="w-14 h-14 rounded-2xl border border-black/8 bg-[#FAFAF8] flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors p-2.5">
+                <svg viewBox="0 0 32 32" className="w-full h-full" fill="none">
+                  <path d="M16 2L30 16L16 30L2 16Z" fill="#7C3AED"/>
+                  <path d="M16 7L25 16L16 25L7 16Z" fill="white" opacity="0.85"/>
+                  <path d="M16 11L21 16L16 21L11 16Z" fill="#7C3AED" opacity="0.9"/>
                 </svg>
-              </div>
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black">Aztec Network</span>
-                <span className="font-mono text-[8px] uppercase tracking-widest text-black/35">ZK-Rollup L2</span>
               </div>
             </div>
 
             {/* X connector */}
             <div className="flex flex-col items-center gap-1">
               <span className="font-mono text-[20px] font-black text-black/15 leading-none select-none">×</span>
-              <span className="font-mono text-[7px] uppercase tracking-[0.3em] text-black/20">Secure Data Bridge</span>
             </div>
 
             {/* Whale Alert Network */}
             <div className="flex flex-col items-center gap-3 group">
               <div className="w-14 h-14 rounded-2xl border border-black/8 bg-[#FAFAF8] flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors p-2">
                 <img src="/official-whale-monochrome.png" alt="Whale Alert Network" className="w-full h-full object-contain"/>
-              </div>
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black">Whale Network</span>
-                <span className="font-mono text-[8px] uppercase tracking-widest text-black/35">On-Chain Intelligence</span>
               </div>
             </div>
           </div>

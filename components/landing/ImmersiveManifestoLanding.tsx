@@ -151,9 +151,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
                    <img src="/official-whale-monochrome.png" alt="Whale Network" className="w-full h-full object-contain invert drop-shadow-md opacity-90" />
                 </div>
              </div>
-             <div className="font-mono text-[11px] md:text-[13px] font-black uppercase tracking-[0.3em] text-white/90 drop-shadow-md">
-                Whale Network x Aztec Network
-             </div>
           </motion.div>
           <motion.div variants={FADE_UP} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/portfolio" className="w-full sm:w-auto px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center">
