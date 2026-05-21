@@ -15,7 +15,8 @@ import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
 import { 
   Scan, MessageSquare, LogOut, MessageCircle, ScanLine, 
   Fingerprint, ChevronDown, CheckCircle, Zap, Shield, Menu,
-  ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, PieChart 
+  ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, PieChart,
+  Newspaper, GraduationCap, Briefcase, Activity
 } from 'lucide-react';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
@@ -522,6 +523,69 @@ function ConnectedScreen({
               <span className="text-[14px] font-medium text-black">Portfolio</span>
             </div>
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">View</span>
+          </Link>
+
+          {/* News */}
+          <Link
+            href="/news"
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <Newspaper size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <span className="text-[14px] font-medium text-black">News</span>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Read</span>
+          </Link>
+
+          {/* Academy */}
+          <Link
+            href="/academy"
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <GraduationCap size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <span className="text-[14px] font-medium text-black">Academy</span>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Learn</span>
+          </Link>
+
+          {/* Careers */}
+          <Link
+            href="/careers"
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <Briefcase size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <span className="text-[14px] font-medium text-black">Careers</span>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Join</span>
+          </Link>
+
+          {/* Status */}
+          <Link
+            href="/status"
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <Activity size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <span className="text-[14px] font-medium text-black">System Status</span>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Nodes</span>
+          </Link>
+
+          {/* Privacy */}
+          <Link
+            href="/privacy"
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <Shield size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <div className="flex flex-col">
+                <span className="text-[14px] font-medium text-black">Privacy Protocol</span>
+                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/30">Zero-Knowledge</span>
+              </div>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Audit</span>
           </Link>
         </motion.div>
 
