@@ -68,30 +68,36 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           initial="hidden" animate="visible" variants={STAGGER}
           className="relative z-20 w-full flex justify-center px-6 pointer-events-none mt-2 shrink-0 mb-4 h-full items-center"
         >
-          <motion.div variants={FADE_UP} className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 pointer-events-auto max-w-[1400px] mx-auto w-full">
-            <Link
-              href="/portfolio"
-              className="flex-1 flex items-center justify-center w-full max-w-[350px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
-            >
-              Don&apos;t have an Account yet?
-            </Link>
+          <motion.div variants={FADE_UP} className="w-full max-w-[1400px] mx-auto pointer-events-auto flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-center gap-8 lg:gap-8">
+            {/* Left Button */}
+            <div className="flex justify-center lg:justify-end w-full">
+              <Link
+                href="/portfolio"
+                className="flex items-center justify-center w-full max-w-[350px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
+              >
+                Don&apos;t have an Account yet?
+              </Link>
+            </div>
 
             {/* 3D Atom — centered perfectly between the buttons */}
             {mounted && (
               <div
-                className="relative w-[300px] h-[300px] lg:w-[500px] lg:h-[500px] shrink-0 z-0 pointer-events-none flex items-center justify-center"
+                className="relative w-[300px] h-[300px] lg:w-[500px] lg:h-[500px] shrink-0 z-0 pointer-events-none flex items-center justify-center mx-auto"
                 style={{ willChange: 'transform' }}
               >
                 <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
               </div>
             )}
 
-            <Link
-              href="/forum"
-              className="flex-1 flex items-center justify-center w-full max-w-[350px] px-8 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
-            >
-              Go to Whale Chat
-            </Link>
+            {/* Right Button */}
+            <div className="flex justify-center lg:justify-start w-full">
+              <Link
+                href="/forum"
+                className="flex items-center justify-center w-full max-w-[350px] px-8 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
+              >
+                Go to Whale Chat
+              </Link>
+            </div>
           </motion.div>
         </motion.div>
 

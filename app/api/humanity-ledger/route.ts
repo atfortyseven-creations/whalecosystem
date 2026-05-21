@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const page  = Math.max(parseInt(searchParams.get('page')  || '1',  10), 1);
     const skip  = (page - 1) * limit;
 
-    const [blocks, totalBlocks, totalTransactions] = await Promise.all([
+    const [blocks, currentBlocks, currentTransactions, auditLogs] = await Promise.all([
       prisma.humanityLedgerBlock.findMany({
         take: limit,
         skip,
@@ -23,7 +23,21 @@ export async function GET(request: Request) {
       }),
       prisma.humanityLedgerBlock.count(),
       prisma.humanityLedgerTransaction.count(),
+      prisma.auditLog.findMany({
+        where: { action: 'HUMANITY_LEDGER_RESET' }
+      })
     ]);
+
+    let totalBlocks = currentBlocks;
+    let totalTransactions = currentTransactions;
+
+    for (const log of auditLogs) {
+      if (log.metadata && typeof log.metadata === 'object') {
+        const meta = log.metadata as any;
+        if (meta.deletedBlocks) totalBlocks += meta.deletedBlocks;
+        if (meta.deletedTransactions) totalTransactions += meta.deletedTransactions;
+      }
+    }
 
     // BigInt → string for JSON serialization
     const body = JSON.stringify(

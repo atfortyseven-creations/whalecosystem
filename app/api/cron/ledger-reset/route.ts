@@ -48,10 +48,22 @@ export async function GET(request: Request) {
     }
 
     // ── ATOMIC RESET ──────────────────────────────────────────────────────────
-    // Delete all transactions first (FK constraint), then all blocks.
+    // Delete only old transactions and blocks (older than 11h 59m).
+    const thresholdDate = new Date(now - RESET_INTERVAL_MS);
+
     const [deletedTx, deletedBlocks] = await prisma.$transaction([
-      prisma.humanityLedgerTransaction.deleteMany({}),
-      prisma.humanityLedgerBlock.deleteMany({}),
+      prisma.humanityLedgerTransaction.deleteMany({
+        where: {
+          block: {
+            syncedAt: { lt: thresholdDate }
+          }
+        }
+      }),
+      prisma.humanityLedgerBlock.deleteMany({
+        where: {
+          syncedAt: { lt: thresholdDate }
+        }
+      }),
     ]);
 
     // Record this reset event in the audit log for full traceability
