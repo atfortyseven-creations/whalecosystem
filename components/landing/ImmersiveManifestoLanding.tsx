@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { WalletComparisonChart } from "./WalletComparisonChart";
 import { WhaleChatComparison } from "./WhaleChatComparison";
+import { QDsAtomRenderer, useScrollVelocity } from "@/components/shared/QDsAtomRenderer";
 
 // ─── Constants & Animations ──────────────────────────────────────────────────
 
@@ -104,6 +105,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
   const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(heroProgress, [0, 1], ["0%", "40%"]);
   const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
+  
+  // Shared scroll velocity for the 3D Atom
+  const vel = useScrollVelocity();
 
   return (
     <div className="relative text-[#050505] font-sans antialiased overflow-x-hidden w-full flex flex-col bg-white">
@@ -127,13 +131,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           initial="hidden" animate="visible" variants={STAGGER} 
           className="relative z-10 w-full max-w-[1200px] mx-auto px-6 text-center mt-20"
         >
-          <motion.h1 variants={FADE_UP} className="text-[52px] sm:text-[80px] lg:text-[110px] font-black tracking-tighter uppercase leading-[0.85] text-white drop-shadow-2xl mb-8">
-            Welcome to<br />
-            <span className="text-white/40">Whale Alert.</span>
-          </motion.h1>
-          <motion.p variants={FADE_UP} className="font-serif text-[20px] md:text-[28px] text-white/80 leading-relaxed max-w-[800px] mx-auto drop-shadow-md">
-            The new global standard for digital safety. We provide complete data protection, private communication, and absolute certainty for your digital life.
-          </motion.p>
+          {/* 3D ATOM REPLACING HERO TEXT */}
+          <motion.div variants={FADE_UP} className="w-full h-[350px] sm:h-[450px] lg:h-[600px] mx-auto relative mb-8">
+            <QDsAtomRenderer vel={vel} isDark={true} enableScale={true} />
+          </motion.div>
+          
           <motion.div variants={FADE_UP} className="mt-8 flex flex-col items-center justify-center gap-4">
              <div className="flex items-center gap-6 md:gap-8">
                 {/* Aztec Logo */}

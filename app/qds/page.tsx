@@ -12,299 +12,7 @@ import React, {
   useRef, useEffect, useState, Suspense,
   forwardRef, useImperativeHandle,
 } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Float, PerspectiveCamera, ContactShadows } from '@react-three/drei';
-import { EffectComposer, Bloom, DepthOfField, ChromaticAberration, Noise, Vignette } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import * as THREE from 'three';
-import Link from 'next/link';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SHARED SCROLL VELOCITY STORE
-// Tracked in a ref — no React state, zero re-renders.
-// ─────────────────────────────────────────────────────────────────────────────
-
-function useScrollVelocity() {
-  const vel = useRef(0);
-  const last = useRef(0);
-  const raf = useRef<number>(0);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const curr = window.scrollY;
-      const raw = curr - last.current;
-      // Scale and accumulate — clamp to avoid hyperspeed
-      vel.current = Math.max(-55, Math.min(55, vel.current + raw * 2.4));
-      last.current = curr;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    // Dampen velocity each animation frame — mimic physical inertia
-    const dampen = () => {
-      vel.current *= 0.88;
-      raf.current = requestAnimationFrame(dampen);
-    };
-    raf.current = requestAnimationFrame(dampen);
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(raf.current);
-    };
-  }, []);
-
-  return vel;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ORBITAL RING
-// A single torus at a given inclination. Rotates constantly + scroll effect.
-// ─────────────────────────────────────────────────────────────────────────────
-
-function OrbitalRing({
-  inclination,
-  azimuth,
-  vel,
-  baseSpeed,
-}: {
-  inclination: number;   // tilt from horizontal (radians)
-  azimuth: number;       // rotation about Y axis (radians)
-  vel: React.MutableRefObject<number>;
-  baseSpeed: number;     // base constant rotation speed (rad/s)
-}) {
-  const ref = useRef<THREE.Mesh>(null);
-  const angle = useRef(0);
-
-  useFrame((_, dt) => {
-    if (!ref.current) return;
-    // 240hz target — dt is already fractional seconds, no extra clamp needed
-    angle.current += dt * baseSpeed + vel.current * 0.0012;
-    ref.current.rotation.y = angle.current;
-  });
-
-  return (
-    <mesh ref={ref} rotation={[inclination, azimuth, 0]}>
-      <torusGeometry args={[2.8, 0.04, 64, 256]} />
-      <meshPhysicalMaterial
-        color="#222222"
-        metalness={1.0}
-        roughness={0.15}
-        clearcoat={1.0}
-        clearcoatRoughness={0.1}
-        envMapIntensity={3.0}
-      />
-    </mesh>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ELECTRON — tiny sphere that races around an orbit path
-// ─────────────────────────────────────────────────────────────────────────────
-
-function Electron({
-  inclination,
-  azimuth,
-  phase,
-  orbitRadius,
-  vel,
-}: {
-  inclination: number;
-  azimuth: number;
-  phase: number;
-  orbitRadius: number;
-  vel: React.MutableRefObject<number>;
-}) {
-  const groupRef = useRef<THREE.Group>(null);
-  const meshRef  = useRef<THREE.Mesh>(null);
-  const t = useRef(phase);
-
-  useFrame((_, dt) => {
-    if (!groupRef.current || !meshRef.current) return;
-    // Electrons orbit faster than rings
-    t.current += dt * 1.6 + Math.abs(vel.current) * 0.009;
-    const x = Math.cos(t.current) * orbitRadius;
-    const y = Math.sin(t.current) * orbitRadius;
-    meshRef.current.position.set(x, y, 0);
-  });
-
-  return (
-    <group ref={groupRef} rotation={[inclination, azimuth, 0]}>
-      <mesh ref={meshRef}>
-        <sphereGeometry args={[0.08, 32, 32]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          emissive="#ffffff"
-          emissiveIntensity={2.5}
-          toneMapped={false}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// NUCLEUS — the central atom core
-// ─────────────────────────────────────────────────────────────────────────────
-
-function Nucleus({ vel }: { vel: React.MutableRefObject<number> }) {
-  const ref = useRef<THREE.Mesh>(null);
-
-  useFrame((_, dt) => {
-    if (!ref.current) return;
-    ref.current.rotation.y += dt * 0.3 + vel.current * 0.003;
-    ref.current.rotation.x += dt * 0.12;
-  });
-
-  return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[0.55, 64, 64]} />
-      <meshPhysicalMaterial
-        color="#000000"
-        metalness={1.0}
-        roughness={0.05}
-        clearcoat={1.0}
-        clearcoatRoughness={0.1}
-        envMapIntensity={4.0}
-      />
-    </mesh>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ATOM GROUP — all rings + nucleus + electrons + master scroll rotation
-// ─────────────────────────────────────────────────────────────────────────────
-
-function AtomGroup({ vel }: { vel: React.MutableRefObject<number> }) {
-  const masterRef = useRef<THREE.Group>(null);
-
-  // Master group: scroll drives Y rotation AND massive scale
-  useFrame((_, dt) => {
-    if (!masterRef.current) return;
-    // Lerp toward velocity — smooth, physics-like spin
-    const targetSpin = vel.current * 0.02;
-    masterRef.current.rotation.y += (targetSpin - masterRef.current.rotation.y) * 0.08;
-    // Constant slow tilt oscillation on X
-    masterRef.current.rotation.x = Math.sin(Date.now() * 0.0002) * 0.25;
-
-    // SCROLL-DRIVEN MASSIVE SCALE
-    const scrollY = window.scrollY;
-    // Base scale is 1, max scale is ~3.5 at 2000px scroll, shrinking back at end
-    const rawScale = 1.0 + (scrollY * 0.0015);
-    // Smooth damp scale
-    masterRef.current.scale.lerp(new THREE.Vector3(rawScale, rawScale, rawScale), 0.05);
-  });
-
-  // Three rings: horizontal, +60°, -60° tilt
-  const RINGS = [
-    { inclination: 0,                   azimuth: 0,             speed: 0.28 },
-    { inclination:  Math.PI / 3,        azimuth: Math.PI / 5,   speed: 0.22 },
-    { inclination: -Math.PI / 3,        azimuth: -Math.PI / 5,  speed: 0.32 },
-  ];
-
-  const ELECTRONS = [
-    { inclination: 0,            azimuth: 0,            phase: 0 },
-    { inclination:  Math.PI / 3, azimuth: Math.PI / 5,  phase: 2.1 },
-    { inclination: -Math.PI / 3, azimuth: -Math.PI / 5, phase: 4.2 },
-  ];
-
-  return (
-    <group ref={masterRef}>
-      {RINGS.map((r, i) => (
-        <OrbitalRing
-          key={i}
-          inclination={r.inclination}
-          azimuth={r.azimuth}
-          vel={vel}
-          baseSpeed={r.speed}
-        />
-      ))}
-      {ELECTRONS.map((e, i) => (
-        <Electron
-          key={i}
-          inclination={e.inclination}
-          azimuth={e.azimuth}
-          phase={e.phase}
-          orbitRadius={2.8}
-          vel={vel}
-        />
-      ))}
-      <Nucleus vel={vel} />
-    </group>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SCENE — lighting optimized for white background
-// ─────────────────────────────────────────────────────────────────────────────
-
-function Scene({ vel }: { vel: React.MutableRefObject<number> }) {
-  return (
-    <>
-      <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={40} />
-
-      {/* Dramatic Studio Lighting */}
-      <directionalLight position={[5, 5, 5]} intensity={4.5} color="#ffffff" />
-      <directionalLight position={[-5, -5, -5]} intensity={1.5} color="#ffffff" />
-      <ambientLight intensity={1.2} color="#ffffff" />
-
-      {/* HDR environment for hyper-realistic metallic reflections */}
-      <Environment preset="studio" />
-
-      {/* Float adds micro-breathing animation */}
-      <Float speed={0.8} floatIntensity={0.3} rotationIntensity={0.1}>
-        <AtomGroup vel={vel} />
-      </Float>
-
-      {/* Ultra-High Quality Post-Processing Pipeline */}
-      <EffectComposer disableNormalPass multisampling={4}>
-        <Bloom 
-          luminanceThreshold={0.5} 
-          mipmapBlur 
-          intensity={1.2} 
-          levels={8} 
-        />
-        <DepthOfField 
-          focusDistance={0.0} 
-          focalLength={0.02} 
-          bokehScale={2} 
-          height={480} 
-        />
-        <ChromaticAberration 
-          blendFunction={BlendFunction.NORMAL} 
-          offset={new THREE.Vector2(0.0008, 0.0008)} 
-        />
-        <Noise opacity={0.025} />
-        <Vignette eskil={false} offset={0.1} darkness={0.3} />
-      </EffectComposer>
-    </>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CANVAS COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
-
-function QDsAtom({ vel, height = '100vh' }: { vel: React.MutableRefObject<number>; height?: string }) {
-  return (
-    <div className="w-full absolute inset-0" style={{ height }}>
-      <Canvas
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: 'high-performance',
-          precision: 'highp',
-        }}
-        dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 2}
-        style={{ background: 'transparent', width: '100%', height: '100%' }}
-        frameloop="always"
-      >
-        <Suspense fallback={null}>
-          <Scene vel={vel} />
-        </Suspense>
-      </Canvas>
-    </div>
-  );
-}
+import { QDsAtomRenderer, useScrollVelocity } from '@/components/shared/QDsAtomRenderer';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE CONTENT DATA
@@ -450,6 +158,11 @@ export default function QDsPage() {
           className="relative z-30 flex flex-col items-center justify-center text-center px-6 pointer-events-none select-none"
           style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' } as React.CSSProperties}
         >
+          <div className="absolute inset-0 z-0 flex items-center justify-center">
+             <div className="w-full h-full md:w-[80vw] md:h-[80vh] flex items-center justify-center">
+                <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
+             </div>
+          </div>
           <motion.span
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -463,7 +176,7 @@ export default function QDsPage() {
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-            className="font-black tracking-tighter uppercase leading-[0.82] text-black mb-8"
+            className="font-black tracking-tighter uppercase leading-[0.82] text-black mb-8 relative z-10"
             style={{ fontSize: 'clamp(80px, 18vw, 200px)' }}
           >
             QDs
@@ -473,7 +186,7 @@ export default function QDsPage() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.65 }}
-            className="font-serif text-black/45 max-w-[600px] leading-relaxed"
+            className="font-serif text-black/45 max-w-[600px] leading-relaxed relative z-10"
             style={{ fontSize: 'clamp(17px, 2.2vw, 26px)' }}
           >
             21,000,000 units. Mined, not issued.
@@ -569,8 +282,10 @@ export default function QDsPage() {
         style={{ height: 'clamp(360px, 50vh, 560px)' }}
       >
         {mounted && (
-          <div className="absolute inset-0">
-            <QDsAtom vel={vel} />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-[80vw] h-[80vh]">
+               <QDsAtomRenderer vel={vel} isDark={false} enableScale={false} />
+            </div>
           </div>
         )}
         {/* edge fades */}
