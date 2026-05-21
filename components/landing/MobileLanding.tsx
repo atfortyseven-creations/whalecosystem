@@ -340,209 +340,218 @@ function ConnectedScreen({
   const fmtDate   = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-[#FAF9F6] text-[#050505]">
-      <main className="relative z-10 flex-1 flex flex-col items-center px-6 pt-10 pb-8 gap-5 max-w-[480px] w-full mx-auto">
-        
-        {/* Header & Logo */}
-        <motion.div 
-           initial={{ opacity: 0, y: -10 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.6 }}
-           className="w-full flex flex-col items-center justify-center gap-5 mb-4 mt-2"
-        >
-           <WhaleLogo className="h-16 w-auto text-[#050505]" />
-           <div className="flex flex-col items-center text-center">
-             <h1 className="text-[22px] font-black uppercase tracking-[0.2em] text-[#050505] leading-none">Whale Alert Network</h1>
-             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-[#050505]/40 mt-2 mb-4">Professional Platform</p>
-             <div className="flex items-center gap-2 px-3 py-1.5 bg-[#050505]/5 rounded-full border border-[#050505]/10 mt-2">
-                <MessageCircle size={14} className="text-[#050505]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">
-                  Available now, Whale Chat !
-                </span>
-             </div>
-           </div>
-        </motion.div>
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-white text-black selection:bg-black selection:text-white">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-8 pb-12 gap-0 max-w-[480px] w-full mx-auto">
 
-        {/* ── KYC Identity Card ── */}
+        {/* ── TOP BAR ── */}
         <motion.div
-           initial={{ opacity: 0, scale: 0.98 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ delay: 0.1, duration: 0.6 }}
-           className="w-full bg-white rounded-[32px] border border-[#050505]/10 shadow-xl overflow-hidden flex flex-col"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="w-full flex items-center justify-between mb-10"
         >
-          {/* Identity card header */}
-          <div className="bg-[#FAF9F6] px-6 py-8 flex flex-col items-center text-center gap-2 border-b border-[#050505]/5">
-            <p className="text-[44px] font-black tracking-tighter text-[#050505] leading-none tabular-nums">
-              {fmtTime(now)}
-            </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#050505]/40">{fmtDate(now)}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full border border-black flex items-center justify-center">
+              <span className="font-serif text-[15px] leading-none pb-0.5">W</span>
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] font-black">Whale Alert</span>
           </div>
-
-          {/* On-chain data row */}
-          <div className="grid grid-cols-2 gap-px bg-[#050505]/5">
-            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1.5">Network</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-[#050505] truncate">{chainName(chainId)}</p>
-            </div>
-            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1.5">Balance</p>
-              <p className="text-[13px] font-black font-mono tracking-wider text-[#050505] truncate">
-                {fmtBalance() ?? <span className="text-[#050505]/25">—</span>}
-              </p>
-            </div>
-          </div>
-
-          {/* Wallet / identity row */}
-          <div className="grid grid-cols-2 gap-px bg-[#050505]/5 border-t border-[#050505]/5">
-            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1.5">Provider</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-[#050505] truncate">{connectorName || 'Secure Wallet'}</p>
-            </div>
-            <div className="bg-white px-5 py-5 flex flex-col items-center text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1.5">Identity</p>
-              <p className="text-[13px] font-black uppercase tracking-widest text-[#050505] truncate">{ensName ?? checksumAddr(address)}</p>
-            </div>
-          </div>
-
-          {/* Full address */}
-          <div className="px-6 py-6 bg-white border-t border-[#050505]/5 flex flex-col items-center text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-3">Verified On-Chain Address</p>
-            <div className="flex items-center justify-center gap-2 bg-[#FAF9F6] border border-[#050505]/5 rounded-2xl px-5 py-4 w-full">
-              <p className="text-[12px] font-mono text-[#050505] font-bold tracking-tight break-all leading-relaxed">
-                {address}
-              </p>
-            </div>
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+            <span className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-40">Connected</span>
           </div>
         </motion.div>
 
-
-
-        {/* ── Signature / QR sync note ── */}
+        {/* ── GIANT CLOCK ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.5 }}
-          className="w-full flex items-start gap-3 px-5 py-4 rounded-[20px] bg-white border border-[#050505]/10 shadow-sm"
+          transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full text-center mb-2"
         >
-          <Scan size={14} className="text-[#050505]/60 mt-0.5 shrink-0" />
-          <p className="text-[10px] text-[#050505]/60 font-medium leading-relaxed">
-            Scan the <span className="font-black text-[#050505]/85">QR Code</span> from the Desktop Platform to link your session securely — no additional signature required.
+          <p className="text-[64px] sm:text-[72px] font-light tracking-[-0.04em] leading-none tabular-nums text-black">
+            {fmtTime(now)}
           </p>
         </motion.div>
 
-        {/* ── SCANNER UNLOCKED badge ── */}
+        {/* ── DATE ── */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+          className="font-mono text-[10px] uppercase tracking-[0.3em] text-black/40 mb-10"
+        >
+          {fmtDate(now)}
+        </motion.p>
+
+        {/* ── DIVIDER ── */}
+        <div className="w-full border-t border-black/8 mb-8" />
+
+        {/* ── IDENTITY BLOCK ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="w-full flex items-center gap-3 px-5 py-4 rounded-[20px] bg-[#00C076]/10 border border-[#00C076]/20"
+          transition={{ delay: 0.25, duration: 0.6 }}
+          className="w-full mb-8"
         >
-          <div className="w-8 h-8 rounded-full bg-[#00C076]/20 flex items-center justify-center shrink-0">
-            <Scan size={16} className="text-[#00C076]" />
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Scanner Unlocked</span>
-            <span className="text-[9px] font-mono text-[#00C076]/70 mt-0.5 leading-relaxed">
-              You can use the scanner to link the desktop platform.
-            </span>
+          <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/30 mb-3">Verified Identity</p>
+          <div className="flex items-center gap-3 bg-black/[0.02] border border-black/8 rounded-2xl px-4 py-4">
+            <div className="w-9 h-9 rounded-full bg-black/5 border border-black/10 flex items-center justify-center shrink-0">
+              <Fingerprint size={16} className="text-black/40" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <p className="font-mono text-[11px] font-bold text-black tracking-tight break-all leading-snug">
+                {address}
+              </p>
+              {ensName && (
+                <p className="font-mono text-[9px] uppercase tracking-widest text-black/40 mt-0.5">{ensName}</p>
+              )}
+            </div>
           </div>
         </motion.div>
 
-        {/* ── OPEN QR SCANNER · SYNC DESKTOP ── */}
+        {/* ── DATA ROW ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.5 }}
-          className="w-full"
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="w-full grid grid-cols-3 mb-8"
+        >
+          {[
+            { label: 'Network', value: chainName(chainId) },
+            { label: 'Balance', value: fmtBalance() ?? '—' },
+            { label: 'Provider', value: connectorName || 'Secure' },
+          ].map((item, i) => (
+            <div key={i} className={`flex flex-col items-center text-center px-2 py-4 ${ i < 2 ? 'border-r border-black/8' : '' }`}>
+              <p className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/30 mb-1.5">{item.label}</p>
+              <p className="font-mono text-[11px] font-bold text-black truncate w-full text-center">{item.value}</p>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* ── DIVIDER ── */}
+        <div className="w-full border-t border-black/8 mb-8" />
+
+        {/* ── QR SYNC NOTE ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35, duration: 0.6 }}
+          className="w-full flex items-start gap-3 mb-8"
+        >
+          <Scan size={13} className="text-black/30 mt-0.5 shrink-0" />
+          <p className="text-[13px] text-black/50 font-light leading-relaxed">
+            Scan the <span className="font-semibold text-black">QR code</span> shown on the desktop platform to link your session instantly — no additional steps required.
+          </p>
+        </motion.div>
+
+        {/* ── SCANNER UNLOCKED STATUS ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.38, duration: 0.5 }}
+          className="w-full flex items-center gap-3 px-4 py-3 border border-black/10 rounded-2xl mb-6"
+        >
+          <div className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />
+          <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/60">
+            QR Scanner Active · Ready to Sync
+          </p>
+        </motion.div>
+
+        {/* ── PRIMARY ACTION: OPEN QR SCANNER ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="w-full mb-3"
         >
           <button
             id="open-qr-scanner-btn"
             onClick={onScan}
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] bg-[#050505] hover:bg-[#050505]/90 active:scale-[0.97] transition-all text-white shadow-lg"
-            style={{ fontSize: "11px" }}
+            className="w-full flex items-center justify-between py-5 px-6 rounded-2xl bg-black text-white font-medium tracking-tight text-[15px] active:scale-[0.98] transition-all group"
           >
-            <ScanLine size={18} />
-            Open QR Scanner · Sync Desktop
+            <span>Open QR Scanner</span>
+            <div className="flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+              <ScanLine size={16} />
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em]">Sync Desktop</span>
+            </div>
           </button>
         </motion.div>
 
-        {/* ── Forum CTA ── */}
+        {/* ── SECONDARY ACTIONS ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="w-full"
+          transition={{ delay: 0.45, duration: 0.5 }}
+          className="w-full flex flex-col gap-2 mb-6"
         >
+          {/* Forum */}
           <Link
             href="/forum"
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-[#050505]/10 bg-white hover:bg-[#050505]/5 transition-all group shadow-sm"
-            style={{ fontSize: "11px", color: "#050505" }}
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
           >
-            <MessageSquare size={18} className="group-hover:text-[#050505] transition-colors" />
-            Access Whale Alert Forum
+            <div className="flex items-center gap-3">
+              <MessageSquare size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <span className="text-[14px] font-medium text-black">Whale Alert Forum</span>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Access</span>
           </Link>
-        </motion.div>
 
-        {/* ── Whale Chat CTA ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.5 }}
-          className="w-full"
-        >
+          {/* Whale Chat */}
           <Link
             href="/chat"
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 transition-all text-purple-600 shadow-sm"
-            style={{ fontSize: "11px" }}
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
           >
-            <MessageCircle size={18} />
-            Enter Whale Chat Encrypted
+            <div className="flex items-center gap-3">
+              <MessageCircle size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <div className="flex flex-col">
+                <span className="text-[14px] font-medium text-black">Whale Chat</span>
+                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/30">End-to-End Encrypted</span>
+              </div>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Enter</span>
           </Link>
-        </motion.div>
 
-        {/* ── Portfolio CTA ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.38, duration: 0.5 }}
-          className="w-full mt-2"
-        >
+          {/* Portfolio */}
           <Link
             href="/portfolio"
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-[20px] font-black uppercase tracking-[0.15em] border border-[#050505]/10 bg-white hover:bg-[#050505]/5 transition-all text-[#050505] shadow-sm"
-            style={{ fontSize: "11px" }}
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
           >
-            <PieChart size={18} />
-            Access Portfolio
+            <div className="flex items-center gap-3">
+              <PieChart size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <span className="text-[14px] font-medium text-black">Portfolio</span>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">View</span>
           </Link>
         </motion.div>
 
-        {/* ── Disconnect session button ── */}
+        {/* ── DIVIDER ── */}
+        <div className="w-full border-t border-black/8 mb-6" />
+
+        {/* ── DISCONNECT ── */}
         {onDisconnect && (
           <motion.button
             id="sovereign-disconnect-btn"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.55, duration: 0.5 }}
             whileTap={{ scale: 0.97 }}
             onClick={onDisconnect}
-            disabled={false}
-            className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black uppercase tracking-[0.15em] bg-transparent hover:bg-[#050505]/5 transition-all mt-2 text-red-500/80 hover:text-red-600 active:scale-95"
-            style={{ fontSize: "10px" }}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-mono text-[9px] uppercase tracking-[0.3em] text-black/30 hover:text-black/60 active:scale-95 transition-all"
           >
-            <LogOut size={16} />
-            Disconnect · Change Wallet
+            <LogOut size={13} />
+            End Session · Change Wallet
           </motion.button>
         )}
 
-        {/* ── QR Sync hint ── */}
+        {/* ── FOOTER NOTE ── */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-[9px] font-mono text-[#050505]/40 text-center leading-relaxed px-4 pb-6"
+          transition={{ delay: 0.6, duration: 0.5 }}
+          className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/20 text-center mt-4 leading-relaxed px-4"
         >
-          On the Desktop Platform, click <span className="font-black text-[#050505]/80">Direct QR Handshake</span>, then scan the code with this button to link your session.
+          On the desktop platform, click <span className="text-black/40">Direct QR Handshake</span> then scan the code to link your session.
         </motion.p>
       </main>
 
@@ -553,8 +562,8 @@ function ConnectedScreen({
         initialScanData={initialScanData}
         onScan={(_result: string) => {
           const toast = document.createElement('div');
-          toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[11px] border border-white/20 font-black uppercase tracking-[0.2em] px-6 py-5 rounded-[20px] shadow-2xl text-center';
-          toast.textContent = 'SESSION SYNCHRONIZED';
+          toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[10px] border border-white/10 font-mono uppercase tracking-[0.3em] px-6 py-5 rounded-2xl shadow-2xl text-center';
+          toast.textContent = 'Session Synchronized';
           document.body.appendChild(toast);
           setTimeout(() => toast.remove(), 3000);
         }}
@@ -562,7 +571,6 @@ function ConnectedScreen({
     </div>
   );
 }
-
 // ── Main Component ────────────────────────────────────────────────────────────
 export function MobileLanding() {
   const searchParams = useSearchParams();
