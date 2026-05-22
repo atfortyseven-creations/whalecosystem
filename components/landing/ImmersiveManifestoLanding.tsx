@@ -53,43 +53,42 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
         />
 
-        {/* Layout: Button 1 - ATOM - Button 2 (Perfectly centered on PC) */}
+        {/* Layout: ATOM centered top — Buttons row below */}
         <motion.div
           style={{ opacity: heroOpacity }}
           initial="hidden" animate="visible" variants={STAGGER}
           className="relative z-20 w-full flex justify-center px-6 mt-2 shrink-0 mb-4 h-full items-center"
         >
-          <motion.div variants={FADE_UP} className="w-full max-w-[1400px] mx-auto flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-center gap-8 lg:gap-12">
-            {/* Left Button */}
-            <div className="flex justify-center lg:justify-end w-full z-10">
-              <Link
-                href="/portfolio"
-                className="flex items-center justify-center w-full max-w-[320px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
-              >
-                Don&apos;t have an Account yet?
-              </Link>
-            </div>
+          <motion.div variants={FADE_UP} className="w-full max-w-[900px] mx-auto flex flex-col items-center justify-center gap-6">
 
-            {/* Silver Atom Image — centered perfectly between the buttons */}
+            {/* Silver Atom — large, blended, no box */}
             {mounted && (
-              <div className="relative w-[280px] h-[280px] lg:w-[460px] lg:h-[460px] shrink-0 z-0 flex items-center justify-center mx-auto animate-[pulse_4s_ease-in-out_infinite]">
-                <img 
-                  src="/atom_3d_silver.jpg" 
-                  alt="Quantum Silver Atom" 
-                  className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl" 
+              <div className="w-[420px] h-[420px] sm:w-[560px] sm:h-[560px] lg:w-[700px] lg:h-[700px] shrink-0 flex items-center justify-center mx-auto">
+                <img
+                  src="/atom_3d_silver.jpg"
+                  alt="Silver Atom"
+                  className="w-full h-full object-contain mix-blend-multiply"
+                  draggable={false}
                 />
               </div>
             )}
 
-            {/* Right Button */}
-            <div className="flex justify-center lg:justify-start w-full z-10">
+            {/* Buttons — side by side, centered below atom */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+              <Link
+                href="/portfolio"
+                className="flex items-center justify-center w-full sm:w-auto min-w-[260px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
+              >
+                Don&apos;t have an Account yet?
+              </Link>
               <Link
                 href="/forum"
-                className="flex items-center justify-center w-full max-w-[320px] px-8 py-5 bg-white border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-lg text-center"
+                className="flex items-center justify-center w-full sm:w-auto min-w-[260px] px-8 py-5 bg-white border border-black/15 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
               >
                 Go to Whale Chat
               </Link>
             </div>
+
           </motion.div>
         </motion.div>
 
