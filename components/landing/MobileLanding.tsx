@@ -16,7 +16,7 @@ import {
   Scan, MessageSquare, LogOut, MessageCircle, ScanLine, 
   Fingerprint, ChevronDown, CheckCircle, Zap, Shield, Menu,
   ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, PieChart,
-  Newspaper, GraduationCap, Briefcase, Activity
+  Newspaper, GraduationCap, Briefcase, Activity, TrendingUp
 } from 'lucide-react';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
@@ -581,6 +581,28 @@ function ConnectedScreen({
 
         {/* ── DIVIDER ── */}
         <div className="w-full border-t border-black/8 mb-6" />
+
+        {/* ── SEED EQUITY ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="w-full mb-3"
+        >
+          <Link
+            href="/pitch_deck.html"
+            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <TrendingUp size={16} className="text-black/40 group-hover:text-black transition-colors" />
+              <div className="flex flex-col">
+                <span className="text-[14px] font-medium text-black">Seed Equity</span>
+                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/30">Investor Relations</span>
+              </div>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">View</span>
+          </Link>
+        </motion.div>
 
         {/* ── DISCONNECT ── */}
         {onDisconnect && (

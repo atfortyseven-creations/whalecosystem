@@ -11,6 +11,7 @@ export interface PrivyAppConfig {
 }
 
 const PRIVY_APPS: PrivyAppConfig[] = [
+    // ── Original Apps ────────────────────────────────────────────────────────
     {
         appId: 'cmpefwexw00b00cjvngj1bmzs',
         jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpefwexw00b00cjvngj1bmzs/jwks.json'
@@ -22,7 +23,32 @@ const PRIVY_APPS: PrivyAppConfig[] = [
     {
         appId: 'cmpefovkg008o0bl7ddzo3bhj',
         jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpefovkg008o0bl7ddzo3bhj/jwks.json'
-    }
+    },
+    // ── Expansion Apps (500 MAU each) ─────────────────────────────────────────
+    {
+        appId: 'cmpftp6px00ip0cl47m7nuqvg',
+        jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpftp6px00ip0cl47m7nuqvg/jwks.json'
+    },
+    {
+        appId: 'cmpfwxqz3004g0cl2pt3df3kh',
+        jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpfwxqz3004g0cl2pt3df3kh/jwks.json'
+    },
+    {
+        appId: 'cmpfx0mdv00z50dl5e00bgu9t',
+        jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpfx0mdv00z50dl5e00bgu9t/jwks.json'
+    },
+    {
+        appId: 'cmpfy1p4o00jl0cjvwlt2ezoi',
+        jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpfy1p4o00jl0cjvwlt2ezoi/jwks.json'
+    },
+    {
+        appId: 'cmpfy4c9s00o80djp38jb5ag9',
+        jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpfy4c9s00o80djp38jb5ag9/jwks.json'
+    },
+    {
+        appId: 'cmpfy6dcv00ph0cl5178i52tj',
+        jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpfy6dcv00ph0cl5178i52tj/jwks.json'
+    },
 ];
 
 export class PrivyRelayerService {

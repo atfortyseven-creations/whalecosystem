@@ -560,7 +560,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
         className="relative z-10 w-full max-w-[420px] mx-auto px-6 flex flex-col items-center"
       >
 
-        {/* ── LOTTIE & GIF ── */}
+        {/* ── LOTTIE & ATOM IMAGE ── */}
         <div className="relative mb-8 flex flex-col items-center w-full">
           <motion.div
             initial={{ opacity: 0 }}
@@ -575,14 +575,12 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
-            className="relative z-0 w-full flex justify-center -mt-16 -mb-12 pointer-events-none"
+            className="relative z-0 w-full flex justify-center -mt-8 md:-mt-16 -mb-4 md:-mb-12 pointer-events-none"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/system-shots/original-510ee2686e0287925ae0424ca40901f5.gif"
-              alt="Whale Chat"
-              className="w-[600px] h-[600px] max-w-none object-contain mx-auto transform scale-125"
-              style={{ imageRendering: 'pixelated' }}
+              src="/atom_3d_silver.jpg"
+              alt="Quantum Atom"
+              className="w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] md:w-[600px] md:h-[600px] max-w-full object-contain mx-auto mix-blend-multiply drop-shadow-2xl"
               draggable={false}
             />
           </motion.div>

@@ -25,6 +25,7 @@ const MEGA_CLUSTERS = [
       { label: "Mempool Analysis", href: "/developer/mempool-analysis" },
       { label: "Anomaly Detection", href: "/developer/anomaly-detection" },
       { label: "Edge Computing", href: "/developer/edge-computing" },
+      { label: "Seed Equity", href: "/pitch_deck.html" },
     ]
   },
   {
@@ -222,6 +223,9 @@ export function SovereignFooter() {
 
         {/* ── ECOSYSTEM COLLABORATORS ── */}
         <div className="w-full flex flex-col items-center gap-6 py-10">
+          <div className="w-24 h-24 mb-2 flex items-center justify-center">
+            <img src="/atom_3d_silver.jpg" alt="Atom Symbol" className="w-full h-full object-contain mix-blend-multiply" />
+          </div>
           <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-black/25 font-bold">
             Ecosystem Collaborators
           </span>

@@ -64,6 +64,30 @@ export function NewsTerminal() {
   const [showArchive,  setShowArchive]  = useState(false);
   const [marketTimes,  setMarketTimes]  = useState<{name: string, time: string, isOpen: boolean}[]>([]);
 
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  const [currentLang,  setCurrentLang]  = useState('ES');
+  const [isTranslating,setIsTranslating]= useState(false);
+
+  const LANGUAGES = [
+    { code: 'EN', name: 'English' },
+    { code: 'FR', name: 'Français' },
+    { code: 'DE', name: 'Deutsch' },
+    { code: 'RU', name: 'Русский' },
+    { code: 'ZH', name: '中文' },
+    { code: 'BG', name: 'Български' },
+    { code: 'PT', name: 'Português (BR)' }
+  ];
+
+  const handleTranslate = async (code: string) => {
+    setShowLangMenu(false);
+    if (code === currentLang) return;
+    setIsTranslating(true);
+    // Simulated quantum translation delay
+    await new Promise(r => setTimeout(r, 1200));
+    setCurrentLang(code);
+    setIsTranslating(false);
+  };
+
   const rightRef = useRef<HTMLDivElement>(null);
 
   // ── Market clocks ──────────────────────────────────────────────────────────
@@ -266,6 +290,30 @@ export function NewsTerminal() {
                           ETH/EUR {ethEur.toLocaleString('en-US')}
                         </span>
                       )}
+                      
+                      <div className="relative">
+                        <button 
+                          onClick={() => setShowLangMenu(!showLangMenu)} 
+                          className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1"
+                        >
+                          Translate <span className="opacity-50">({currentLang})</span>
+                        </button>
+                        <AnimatePresence>
+                          {showLangMenu && (
+                            <motion.div 
+                              initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }}
+                              className="absolute right-0 top-full mt-2 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden min-w-[140px] z-50 flex flex-col"
+                            >
+                              {LANGUAGES.map(l => (
+                                <button key={l.code} onClick={() => handleTranslate(l.code)} className={`text-left px-4 py-2.5 font-sans text-[12px] font-bold hover:bg-slate-50 transition-colors ${currentLang === l.code ? 'text-slate-900 bg-slate-50/50' : 'text-slate-500'}`}>
+                                  {l.name}
+                                </button>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+
                       {hasAccess && (
                         <button onClick={() => setShareOpen(true)} className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors">
                           Share
@@ -298,27 +346,36 @@ export function NewsTerminal() {
                   </div>
 
                   {/* Content Preview */}
-                  <div className="px-6 md:px-12 pb-8 max-w-4xl mx-auto relative">
-                    <div className="prose prose-lg prose-slate max-w-none font-sans text-[16px] leading-[1.8] text-slate-600">
-                      {selected.description ? selected.description.split(/\n\n+/).slice(0, 3).map((para, i) => {
-                        const text = para.trim();
-                        if (!text) return null;
-                        if (text.startsWith('## ')) return <h2 key={i} className="font-sans text-xl font-bold mt-8 mb-4 tracking-tight text-slate-900">{text.replace(/^##\s+/, '')}</h2>;
-                        return <p key={i} className={i === 0 ? "text-[18px] font-medium leading-[1.7] text-slate-700" : ""}>{text}</p>;
-                      }) : <p className="text-slate-400 italic">Analysis unavailable.</p>}
+                  <div className={`transition-all duration-700 relative ${isTranslating ? 'opacity-30 blur-md pointer-events-none scale-[0.98]' : 'opacity-100 blur-none scale-100'}`}>
+                    {isTranslating && (
+                      <div className="absolute inset-0 z-50 flex items-center justify-center">
+                         <div className="px-6 py-3 bg-slate-900 text-white rounded-xl shadow-2xl font-mono text-[10px] uppercase tracking-widest font-bold">
+                            Translating...
+                         </div>
+                      </div>
+                    )}
+                    <div className="px-6 md:px-12 pb-8 max-w-4xl mx-auto relative">
+                      <div className="prose prose-lg prose-slate max-w-none font-sans text-[16px] leading-[1.8] text-slate-600">
+                        {selected.description ? selected.description.split(/\n\n+/).slice(0, 3).map((para, i) => {
+                          const text = para.trim();
+                          if (!text) return null;
+                          if (text.startsWith('## ')) return <h2 key={i} className="font-sans text-xl font-bold mt-8 mb-4 tracking-tight text-slate-900">{text.replace(/^##\s+/, '')}</h2>;
+                          return <p key={i} className={i === 0 ? "text-[18px] font-medium leading-[1.7] text-slate-700" : ""}>{text}</p>;
+                        }) : <p className="text-slate-400 italic">Analysis unavailable.</p>}
+                      </div>
+                      
+                      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white to-transparent pointer-events-none" />
                     </div>
-                    
-                    <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                  </div>
 
-                  {/* Call to Action */}
-                  <div className="px-6 md:px-12 pb-24 max-w-4xl mx-auto text-center relative z-10">
-                    <button onClick={openFullReport} className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white hover:bg-slate-800 transition-colors rounded-xl shadow-lg hover:shadow-xl">
-                      <span className="font-sans text-[12px] font-black uppercase tracking-[0.2em]">Read Full Analysis</span>
-                    </button>
-                    <p className="mt-5 font-mono text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                      Comprehensive insights and breakdown.
-                    </p>
+                    {/* Call to Action */}
+                    <div className="px-6 md:px-12 pb-24 max-w-4xl mx-auto text-center relative z-10">
+                      <button onClick={openFullReport} className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white hover:bg-slate-800 transition-colors rounded-xl shadow-lg hover:shadow-xl">
+                        <span className="font-sans text-[12px] font-black uppercase tracking-[0.2em]">Read Full Analysis</span>
+                      </button>
+                      <p className="mt-5 font-mono text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                        Comprehensive insights and breakdown.
+                      </p>
+                    </div>
                   </div>
 
                 </motion.article>

@@ -91,6 +91,8 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
                             <a href="/" className="hover:text-[var(--text-primary)] transition-colors">Feed</a>
                             <a href="/portfolio"
  className="hover:text-[var(--text-primary)] transition-colors">Wallet</a>
+                            <a href="/pitch_deck.html"
+ className="hover:text-[var(--text-primary)] transition-colors">Seed Equity</a>
                             <button
                                 onClick={() => router.push('/')}
                                 className="flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors"

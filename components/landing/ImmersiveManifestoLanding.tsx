@@ -2,17 +2,9 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { WalletComparisonChart } from "./WalletComparisonChart";
 import { WhaleChatComparison } from "./WhaleChatComparison";
-import { useScrollVelocity } from "@/components/shared/QDsAtomRenderer";
-
-// Load WebGL atom only on client — prevents SSR crash
-const QDsAtomRenderer = dynamic(
-  () => import("@/components/shared/QDsAtomRenderer").then(m => ({ default: m.QDsAtomRenderer })),
-  { ssr: false, loading: () => null }
-);
 
 // ─── Constants & Animations ──────────────────────────────────────────────────
 
@@ -43,8 +35,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
   const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
   
-  // Shared scroll velocity for the 3D Atom
-  const vel = useScrollVelocity();
+
 
   return (
     <div className="relative text-[#050505] font-sans antialiased overflow-x-hidden w-full flex flex-col bg-white">
@@ -66,34 +57,35 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
         <motion.div
           style={{ opacity: heroOpacity }}
           initial="hidden" animate="visible" variants={STAGGER}
-          className="relative z-20 w-full flex justify-center px-6 pointer-events-none mt-2 shrink-0 mb-4 h-full items-center"
+          className="relative z-20 w-full flex justify-center px-6 mt-2 shrink-0 mb-4 h-full items-center"
         >
-          <motion.div variants={FADE_UP} className="w-full max-w-[1400px] mx-auto pointer-events-auto flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-center gap-8 lg:gap-8">
+          <motion.div variants={FADE_UP} className="w-full max-w-[1400px] mx-auto flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-center gap-8 lg:gap-12">
             {/* Left Button */}
-            <div className="flex justify-center lg:justify-end w-full">
+            <div className="flex justify-center lg:justify-end w-full z-10">
               <Link
                 href="/portfolio"
-                className="flex items-center justify-center w-full max-w-[350px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
+                className="flex items-center justify-center w-full max-w-[320px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-xl text-center"
               >
                 Don&apos;t have an Account yet?
               </Link>
             </div>
 
-            {/* 3D Atom — centered perfectly between the buttons */}
+            {/* Silver Atom Image — centered perfectly between the buttons */}
             {mounted && (
-              <div
-                className="relative w-[300px] h-[300px] lg:w-[500px] lg:h-[500px] shrink-0 z-0 pointer-events-none flex items-center justify-center mx-auto"
-                style={{ willChange: 'transform' }}
-              >
-                <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
+              <div className="relative w-[280px] h-[280px] lg:w-[460px] lg:h-[460px] shrink-0 z-0 flex items-center justify-center mx-auto animate-[pulse_4s_ease-in-out_infinite]">
+                <img 
+                  src="/atom_3d_silver.jpg" 
+                  alt="Quantum Silver Atom" 
+                  className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl" 
+                />
               </div>
             )}
 
             {/* Right Button */}
-            <div className="flex justify-center lg:justify-start w-full">
+            <div className="flex justify-center lg:justify-start w-full z-10">
               <Link
                 href="/forum"
-                className="flex items-center justify-center w-full max-w-[350px] px-8 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
+                className="flex items-center justify-center w-full max-w-[320px] px-8 py-5 bg-white border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-lg text-center"
               >
                 Go to Whale Chat
               </Link>

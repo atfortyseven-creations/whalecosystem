@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { docContent } from '@/lib/docs/data';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { safeHTML } from '@/hooks/useSanitizer';
 
 export default function DynamicDocPage({ slug: propSlug }: { slug?: string } = {}) {
   const params = useParams();
@@ -41,7 +42,7 @@ export default function DynamicDocPage({ slug: propSlug }: { slug?: string } = {
       </div>
 
       <article
-        dangerouslySetInnerHTML={{ __html: parseMD(content.content) }}
+        dangerouslySetInnerHTML={safeHTML(parseMD(content.content))}
       />
 
       <footer className="mt-24 pt-8 border-t border-current/8">
