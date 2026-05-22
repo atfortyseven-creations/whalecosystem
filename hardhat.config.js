@@ -7,10 +7,11 @@ require("dotenv").config();
 module.exports = {
     solidity: {
         compilers: [
-            { version: "0.8.22" },
-            { version: "0.8.20" },
-            { version: "0.5.17" },
-            { version: "0.6.12" },
+            { version: "0.8.24", settings: { optimizer: { enabled: true, runs: 200 } } },
+            { version: "0.8.22", settings: { optimizer: { enabled: true, runs: 200 } } },
+            { version: "0.8.20", settings: { optimizer: { enabled: true, runs: 200 } } },
+            { version: "0.5.17", settings: { optimizer: { enabled: true, runs: 200 } } },
+            { version: "0.6.12", settings: { optimizer: { enabled: true, runs: 200 } } },
         ],
     },
     networks: {

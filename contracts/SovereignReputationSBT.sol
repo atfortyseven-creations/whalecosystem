@@ -133,17 +133,17 @@ contract SovereignReputationSBT is ERC1155, Ownable {
     function safeTransferFrom(
         address, address, uint256, uint256, bytes memory
     ) public pure override {
-        revert("SBT: Soulbound — transfers are permanently disabled");
+        revert("SBT: Soulbound - transfers are permanently disabled");
     }
 
     function safeBatchTransferFrom(
         address, address, uint256[] memory, uint256[] memory, bytes memory
     ) public pure override {
-        revert("SBT: Soulbound — transfers are permanently disabled");
+        revert("SBT: Soulbound - transfers are permanently disabled");
     }
 
     function setApprovalForAll(address, bool) public pure override {
-        revert("SBT: Soulbound — approvals are permanently disabled");
+        revert("SBT: Soulbound - approvals are permanently disabled");
     }
 
     // ── Metadata ──────────────────────────────────────────────────────────────

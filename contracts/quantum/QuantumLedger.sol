@@ -174,15 +174,15 @@ contract QuantumLedger is ReentrancyGuard {
         userReceipts[to].push(receiptId);
 
         emit QuantumTransferExecuted(
-            receiptId,
-            msg.sender,
-            to,
-            amount,
-            quantumEntropy,
-            payloadHash,
-            block.number,
-            memo,
-            block.timestamp
+            rec.id,
+            rec.sender,
+            rec.receiver,
+            rec.amount,
+            rec.quantumEntropy,
+            rec.payloadHash,
+            rec.blockNumber,
+            rec.memo,
+            rec.timestamp
         );
 
         return receiptId;
