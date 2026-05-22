@@ -46,79 +46,75 @@ function ForumHomeContent() {
   return (
     <div className="flex-1 flex flex-col bg-white text-slate-900 w-full min-h-screen">
       
-      <div className="w-full flex flex-col items-center justify-start p-4 md:p-8 relative min-h-screen">
-        <div className="w-full max-w-[1200px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] flex flex-col transition-all duration-500 z-10 mt-16 md:mt-24 p-8 md:p-16">
+      <div className="w-full flex flex-col items-center justify-start relative min-h-screen bg-white pt-24 pb-20">
+        <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col z-10">
           
           {/* ═══════════════════════════════════════════════════════════════
-              HERO WELCOME
+              DISCOURSE-STYLE HEADER
           ═══════════════════════════════════════════════════════════════ */}
-          <section className="w-full flex flex-col items-center justify-center text-center relative px-6 py-12 md:py-24 border-b border-slate-200/60 mb-12">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.12 } } }}
-              className="relative z-10 flex flex-col items-center max-w-3xl mx-auto"
-            >
-              {/* Title */}
-              <motion.h1 variants={FADE_UP}
-                className="text-5xl md:text-7xl font-black tracking-tight leading-[1] text-slate-900 mb-8">
-                Forum.
-              </motion.h1>
-
-              {/* Subtitle */}
-              <motion.p variants={FADE_UP}
-                className="text-[17px] sm:text-[19px] leading-relaxed text-slate-500 max-w-xl font-medium mb-12">
-                A structured space for discussion, ideas, and knowledge sharing.
-              </motion.p>
-
-              {/* CTAs */}
-              <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                <Link href="/forum/new"
-                  className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-slate-900 text-white font-sans text-[12px] font-black uppercase tracking-[0.2em] hover:bg-slate-800 transition-all shadow-lg">
-                  Start a Discussion
-                </Link>
-              </motion.div>
-
-              {/* Stats row */}
-              <motion.div variants={FADE_UP}
-                className="flex items-center justify-center gap-8 md:gap-16 w-full max-w-2xl">
-                {FORUM_STATS.map((s, i) => (
-                  <div key={i} className="flex flex-col items-center gap-2">
-                    <div className="font-black text-2xl md:text-3xl tracking-tight text-slate-900">{s.value}</div>
-                    <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{s.label}</div>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
+          <section className="w-full flex flex-col sm:flex-row sm:items-end justify-between border-b border-slate-200/60 pb-6 mb-10 gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 mb-2">Forum</h1>
+              <p className="text-sm font-medium text-slate-500">A structured space for discussion, ideas, and knowledge sharing.</p>
+            </div>
+            <Link href="/forum/new"
+              className="inline-flex items-center justify-center px-6 py-3 rounded bg-[#0088cc] text-white font-sans text-[14px] font-bold hover:bg-[#0077b3] transition-all shadow-sm">
+              + New Topic
+            </Link>
           </section>
 
           {/* ═══════════════════════════════════════════════════════════════
-              MAIN CONTENT — Categories + Topics
+              MAIN CONTENT — Categories (Left) + Topics (Right)
           ═══════════════════════════════════════════════════════════════ */}
-          <div className="w-full flex flex-col lg:flex-row gap-12">
+          <div className="w-full flex flex-col lg:flex-row gap-12 lg:gap-16">
 
-            {/* LEFT — Topics */}
+            {/* LEFT SIDEBAR — Categories */}
+            <div className="w-full lg:w-[340px] shrink-0">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-200">
+                 <h2 className="font-sans text-[13px] font-bold text-slate-500 uppercase tracking-wide">Category</h2>
+                 <span className="font-sans text-[13px] font-bold text-slate-500 uppercase tracking-wide">Topics</span>
+              </div>
+              <div className="flex flex-col">
+                {categories.length === 0 ? (
+                  <div className="py-4 text-[12px] font-medium text-slate-400">Loading...</div>
+                ) : categories.map((cat, i) => {
+                  // Generate a deterministic color based on category index
+                  const colors = ['bg-green-500', 'bg-blue-500', 'bg-red-500', 'bg-amber-500', 'bg-sky-500', 'bg-slate-800', 'bg-pink-500', 'bg-purple-500'];
+                  const color = colors[i % colors.length];
+
+                  return (
+                    <Link key={cat.id} href={`/forum/c/${cat.slug}`}
+                      className="group flex flex-col py-4 border-b border-slate-100 hover:bg-slate-50 transition-colors px-2 -mx-2">
+                      <div className="flex items-start justify-between mb-1 gap-4">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2.5 h-2.5 rounded-sm ${color} shrink-0 mt-1`} />
+                          <span className="text-[15px] font-bold text-slate-900 group-hover:text-[#0088cc] transition-colors">{cat.name}</span>
+                        </div>
+                        {cat._count?.topics !== undefined && (
+                          <span className="text-[15px] font-medium text-slate-500 shrink-0">{cat._count.topics}</span>
+                        )}
+                      </div>
+                      {cat.description && (
+                        <span className="block text-[13px] text-slate-500 leading-snug pl-4.5">{cat.description}</span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* RIGHT — Topics */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-200/60">
-                <h2 className="font-sans text-[16px] font-black tracking-tight text-slate-900">
-                  Latest Discussions
+              <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-[#0088cc]">
+                <h2 className="font-sans text-[13px] font-bold text-[#0088cc] uppercase tracking-wide">
+                  Latest
                 </h2>
-                <Link href="/forum/new"
-                  className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors">
-                  New
-                </Link>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col">
                 {topics.length === 0 ? (
                   <div className="py-20 flex flex-col items-center gap-4 text-center">
-                    <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                      No active discussions yet.
-                    </p>
-                    <Link href="/forum/new"
-                      className="mt-2 inline-flex items-center px-6 py-3 rounded-lg bg-slate-50 border border-slate-200 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all">
-                      Start a Discussion
-                    </Link>
+                    <p className="text-[14px] text-slate-500">No active discussions yet.</p>
                   </div>
                 ) : topics.map(topic => {
                   const activity = formatDistanceToNowStrict(new Date(topic.updatedAt || topic.createdAt), { addSuffix: false })
@@ -131,38 +127,39 @@ function ForumHomeContent() {
                     <Link
                       key={topic.id}
                       href={`/forum/t/${topic.id}`}
-                      className="group flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-200/60 hover:bg-slate-100 hover:border-slate-300 transition-all duration-300"
+                      className="group flex items-center justify-between py-4 border-b border-slate-100 hover:bg-slate-50 transition-colors px-2 -mx-2 gap-4"
                     >
-                      {/* Avatar */}
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-white border border-slate-200 shrink-0">
-                        {topic.author?.walletAddress?.slice(2, 4) || 'ID'}
-                      </div>
+                      <div className="flex items-center gap-4 min-w-0">
+                        {/* Avatar */}
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-bold text-slate-600 bg-slate-200 shrink-0 uppercase">
+                          {topic.author?.walletAddress?.slice(2, 4) || 'ID'}
+                        </div>
 
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-sans text-[16px] font-bold leading-tight text-slate-900 mb-2 line-clamp-2">
-                          {topic.title}
-                        </h3>
-                        <div className="flex items-center gap-3 flex-wrap">
-                          {topic.category && (
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-slate-500">{topic.category.name}</span>
-                            </div>
-                          )}
-                          {topic.tags?.map((t: any) => (
-                            <span key={t.id} className="font-mono text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                              #{t.name}
-                            </span>
-                          ))}
+                        {/* Content */}
+                        <div className="flex flex-col min-w-0 gap-1">
+                          <h3 className="font-sans text-[16px] font-medium text-slate-900 group-hover:text-[#0088cc] transition-colors truncate">
+                            {topic.title}
+                          </h3>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {topic.category && (
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-2 h-2 rounded-sm bg-slate-400" />
+                                <span className="text-[12px] text-slate-500">{topic.category.name}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
                       {/* Stats */}
-                      <div className="flex flex-col sm:items-end gap-1 shrink-0 mt-3 sm:mt-0">
-                        <div className="font-mono text-[10px] font-bold text-slate-500">
-                          {topic._count?.posts || 0} REPLIES
+                      <div className="flex items-center gap-6 shrink-0 text-slate-500">
+                        <div className="flex flex-col items-end">
+                          <span className="text-[14px] font-medium text-slate-700">{topic._count?.posts || 0}</span>
+                          <span className="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity">replies</span>
                         </div>
-                        <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-slate-400">{isMounted ? activity : ''}</span>
+                        <div className="flex flex-col items-end min-w-[30px]">
+                          <span className="text-[14px] text-slate-500">{isMounted ? activity : ''}</span>
+                        </div>
                       </div>
                     </Link>
                   );
@@ -170,42 +167,6 @@ function ForumHomeContent() {
               </div>
             </div>
 
-            {/* RIGHT SIDEBAR — Categories */}
-            <div className="w-full lg:w-[280px] shrink-0">
-              <div className="mb-8 pb-4 border-b border-slate-200/60">
-                 <h2 className="font-sans text-[16px] font-black tracking-tight text-slate-900">Categories</h2>
-              </div>
-              <div className="flex flex-col gap-3">
-                {categories.length === 0 ? (
-                  <div className="py-4 text-[10px] font-bold text-slate-400 font-mono uppercase tracking-widest">Loading...</div>
-                ) : categories.map(cat => (
-                  <Link key={cat.id} href={`/forum/c/${cat.slug}`}
-                    className="group flex flex-col p-4 rounded-2xl bg-slate-50 border border-slate-200/60 hover:bg-slate-100 hover:border-slate-300 transition-all">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="block text-[14px] font-bold text-slate-900">{cat.name}</span>
-                      {cat._count?.topics !== undefined && (
-                        <span className="font-mono text-[10px] font-bold text-slate-400">{cat._count.topics}</span>
-                      )}
-                    </div>
-                    {cat.description && (
-                      <span className="block text-[12px] font-medium text-slate-500 line-clamp-2 leading-relaxed">{cat.description}</span>
-                    )}
-                  </Link>
-                ))}
-              </div>
-
-              {/* Forum guidelines */}
-              <div className="mt-8 p-6 rounded-2xl border border-slate-200/60 bg-slate-50">
-                <p className="font-sans text-[14px] font-bold text-slate-900 mb-2">Community Standards</p>
-                <p className="text-[12px] font-medium text-slate-500 leading-relaxed mb-4">
-                  Maintain professional and constructive discourse.
-                </p>
-                <Link href="/forum/guidelines"
-                  className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 transition-colors">
-                  Read Guidelines
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </div>
