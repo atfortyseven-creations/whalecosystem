@@ -25,7 +25,7 @@ export async function GET(req: Request) {
         }
 
         // 1. Get transaction from database
-        const transaction = await prisma.transaction.findUnique({
+        const transaction = await (prisma as any).transaction.findUnique({
             where: { hash: txHash }
         });
 
@@ -69,7 +69,7 @@ export async function GET(req: Request) {
             const status = receipt.status === 1 ? 'CONFIRMED' : 'FAILED';
             
             // Update database
-            await prisma.transaction.update({
+            await (prisma as any).transaction.update({
                 where: { hash: txHash },
                 data: {
                     status,

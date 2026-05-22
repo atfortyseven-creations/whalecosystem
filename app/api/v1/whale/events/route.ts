@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     const token = searchParams.get('token');
 
     // 3. Fetch events from database
-    const events = await prisma.globalWhaleEvent.findMany({
+    const events = await (prisma as any).globalWhaleEvent.findMany({
       where: {
         usdValue: { gte: minUsd },
         timestamp: { gte: minTimestamp },
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     });
 
     // 4. Generate Zero-Knowledge (ZK) Proof for the event batch
-    const formattedEvents = events.map(e => ({
+    const formattedEvents = events.map((e: any) => ({
         id: e.id,
         hash: e.hash,
         timestamp: e.timestamp,

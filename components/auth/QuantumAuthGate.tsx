@@ -522,7 +522,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
               if (mnemonic) {
                 const newBlob = await encryptWithPassword(mnemonic, password);
                 if (targetAccount) {
-                  const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, encryptedBlob: newBlob, address: addr } : a);
+                  const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, encryptedBlob: newBlob, address: addr! } : a);
                   localStorage.setItem('sovereign_accounts', JSON.stringify(updatedAccounts));
                   setAccounts(updatedAccounts);
                 }
@@ -560,7 +560,7 @@ export function QuantumAuthGate({ onComplete }: { onComplete: () => void }) {
             ? await encryptWithPassword(mnemonic, password)
             : await encryptWithPassword(vaultPk, password);
           if (targetAccount) {
-             const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, encryptedBlob: blob, address: addr } : a);
+             const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, encryptedBlob: blob, address: addr! } : a);
              localStorage.setItem('sovereign_accounts', JSON.stringify(updatedAccounts));
              setAccounts(updatedAccounts);
           }

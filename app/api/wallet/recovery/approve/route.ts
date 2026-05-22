@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         }
 
         // 1. Find the guardian
-        const guardian = await prisma.guardian.findUnique({
+        const guardian = await (prisma as any).guardian.findUnique({
             where: {
                 recoveryId_email: {
                     recoveryId,
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         }
 
         // 2. Mark as approved
-        await prisma.guardian.update({
+        await (prisma as any).guardian.update({
             where: { id: guardian.id },
             data: {
                 hasApproved: true,
@@ -40,16 +40,16 @@ export async function POST(req: Request) {
         });
 
         // 3. Check if threshold is reached
-        const recovery = await prisma.socialRecovery.findUnique({
+        const recovery = await (prisma as any).socialRecovery.findUnique({
             where: { id: recoveryId },
             include: { guardians: true }
         });
 
         if (recovery) {
-            const approvedCount = recovery.guardians.filter(g => g.hasApproved).length;
+            const approvedCount = recovery.guardians.filter((g: any) => g.hasApproved).length;
             
             if (approvedCount >= recovery.threshold) {
-                await prisma.socialRecovery.update({
+                await (prisma as any).socialRecovery.update({
                     where: { id: recoveryId },
                     data: { status: 'RECOVERED' }
                 });

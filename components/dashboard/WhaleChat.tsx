@@ -909,16 +909,15 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
              body: JSON.stringify({ sender: address, recipient: activePeer, content })
            });
         }
-      }
 
-      // ── 2. UPDATE LOCAL ADDRESS BOOK ──────────────────────────────────────────────
-      setConversations(prev => {
-        const updated = prev.find(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase())
-          ? prev.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
-          : [{ peerAddress: activePeer, lastMessage: content, lastAt: new Date() }, ...prev];
-        persistToLocal(updated);
-        return updated;
-      });
+        // ── 2. UPDATE LOCAL ADDRESS BOOK ──────────────────────────────────────────────
+        setConversations(prev => {
+          const updated = prev.find(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase())
+            ? prev.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
+            : [{ peerAddress: activePeer, lastMessage: content, lastAt: new Date() }, ...prev];
+          persistToLocal(updated);
+          return updated;
+        });
 
     } catch (err) {
       console.error('[Chat] executeSend failed:', err);

@@ -1,0 +1,152 @@
+﻿.next/types/app/api/telegram/connect/route.ts(12,13): error TS2344: Type 'OmitWithTag<typeof import("C:/Users/admin/.gemini/antigravity/scratch/Wallet Human Polymarket ID/app/api/telegram/connect/route"), "POST" | "GET" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | ... 9 more ... | "maxDuration", "">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'sendTelegramAlert' is incompatible with index signature.
+    Type '(chatId: string, message: string) => Promise<boolean>' is not assignable to type 'never'.
+.next/types/app/docs/[...slug]/page.ts(34,29): error TS2344: Type '{ slug?: string | undefined; } | undefined' does not satisfy the constraint 'PageProps'.
+  Type 'undefined' is not assignable to type 'PageProps'.
+app/api-marketplace/keys/page.tsx(62,40): error TS2322: Type '"PRO"' is not assignable to type 'PlanTier'.
+app/api/auth/me/route.ts(35,40): error TS2339: Property 'authenticator' does not exist on type 'SovereignPrismaClient'.
+app/api/bubbles/route.ts(20,46): error TS2339: Property 'market' does not exist on type 'SovereignPrismaClient'.
+app/api/bubbles/route.ts(24,33): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/governance/proposals/route.ts(16,40): error TS2339: Property 'marketProposal' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/proposals/route.ts(29,50): error TS7006: Parameter 'proposal' implicitly has an 'any' type.
+app/api/governance/propose/route.ts(65,47): error TS2339: Property 'marketProposal' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/propose/route.ts(94,39): error TS2339: Property 'marketProposal' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/propose/route.ts(109,22): error TS2339: Property 'userMetrics' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/propose/route.ts(146,40): error TS2339: Property 'marketProposal' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/vote/route.ts(55,39): error TS2339: Property 'marketProposal' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/vote/route.ts(81,43): error TS2339: Property 'proposalVote' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/vote/route.ts(98,35): error TS2339: Property 'proposalVote' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/vote/route.ts(118,46): error TS2339: Property 'marketProposal' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/vote/route.ts(125,26): error TS2339: Property 'marketProposal' does not exist on type 'SovereignPrismaClient'.
+app/api/governance/vote/route.ts(147,22): error TS2339: Property 'userMetrics' does not exist on type 'SovereignPrismaClient'.
+app/api/projects/[id]/route.ts(15,35): error TS2339: Property 'project' does not exist on type 'SovereignPrismaClient'.
+app/api/projects/[id]/route.ts(20,34): error TS2339: Property 'project' does not exist on type 'SovereignPrismaClient'.
+app/api/projects/[id]/route.ts(36,18): error TS2339: Property 'deployment' does not exist on type 'SovereignPrismaClient'.
+app/api/projects/[id]/route.ts(61,35): error TS2339: Property 'project' does not exist on type 'SovereignPrismaClient'.
+app/api/projects/[id]/route.ts(66,34): error TS2339: Property 'project' does not exist on type 'SovereignPrismaClient'.
+app/api/referrals/route.ts(22,39): error TS2339: Property 'referral' does not exist on type 'SovereignPrismaClient'.
+app/api/referrals/route.ts(28,45): error TS2339: Property 'referral' does not exist on type 'SovereignPrismaClient'.
+app/api/referrals/route.ts(32,44): error TS2339: Property 'referral' does not exist on type 'SovereignPrismaClient'.
+app/api/referrals/route.ts(66,42): error TS2339: Property 'referral' does not exist on type 'SovereignPrismaClient'.
+app/api/v1/whale/events/route.ts(41,9): error TS2353: Object literal may only specify known properties, and 'usdValue' does not exist in type 'GlobalWhaleEventWhereInput'.
+app/api/v1/whale/events/route.ts(52,17): error TS2339: Property 'hash' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(54,19): error TS2339: Property 'wallet' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(55,18): error TS2339: Property 'token' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(56,19): error TS2339: Property 'amount' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(57,33): error TS2339: Property 'usdValue' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(58,23): error TS2339: Property 'action' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(58,48): error TS2339: Property 'action' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(59,23): error TS2339: Property 'action' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(59,49): error TS2339: Property 'action' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(60,17): error TS2339: Property 'wallet' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(62,25): error TS2339: Property 'blockNumber' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(63,17): error TS2339: Property 'tier' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/events/route.ts(64,16): error TS2339: Property 'dex' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/export/route.ts(46,9): error TS2339: Property 'hash' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/export/route.ts(47,9): error TS2339: Property 'wallet' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/export/route.ts(48,9): error TS2339: Property 'token' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/export/route.ts(49,9): error TS2339: Property 'amount' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/export/route.ts(50,9): error TS2339: Property 'usdValue' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/export/route.ts(51,9): error TS2339: Property 'action' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/export/route.ts(52,9): error TS2339: Property 'dex' does not exist on type '{ id: string; amountUSD: number; timestamp: Date; txHash: string; protocol: string; }'.
+app/api/v1/whale/route.ts(47,15): error TS2353: Object literal may only specify known properties, and 'requests' does not exist in type '(Without<ApiKeyUpdateInput, ApiKeyUncheckedUpdateInput> & ApiKeyUncheckedUpdateInput) | (Without<...> & ApiKeyUpdateInput)'.
+app/api/variables/route.ts(12,36): error TS2339: Property 'variable' does not exist on type 'SovereignPrismaClient'.
+app/api/variables/route.ts(19,28): error TS7006: Parameter 'v' implicitly has an 'any' type.
+app/api/variables/route.ts(52,35): error TS2339: Property 'variable' does not exist on type 'SovereignPrismaClient'.
+app/api/wallet/activity/route.ts(24,17): error TS2353: Object literal may only specify known properties, and 'reputation' does not exist in type '(Without<UserCreateInput, UserUncheckedCreateInput> & UserUncheckedCreateInput) | (Without<...> & UserCreateInput)'.
+app/api/wallet/recovery/approve/route.ts(21,17): error TS2353: Object literal may only specify known properties, and 'recoveryId_email' does not exist in type 'GuardianWhereUniqueInput'.
+app/api/wallet/recovery/approve/route.ts(36,17): error TS2353: Object literal may only specify known properties, and 'hasApproved' does not exist in type '(Without<GuardianUpdateInput, GuardianUncheckedUpdateInput> & GuardianUncheckedUpdateInput) | (Without<...> & GuardianUpdateInput)'.
+app/api/wallet/recovery/approve/route.ts(45,13): error TS2322: Type '{ guardians: true; }' is not assignable to type 'never'.
+app/api/wallet/recovery/approve/route.ts(49,54): error TS2339: Property 'filter' does not exist on type 'never'.
+app/api/wallet/recovery/approve/route.ts(49,61): error TS7006: Parameter 'g' implicitly has an 'any' type.
+app/api/wallet/recovery/approve/route.ts(54,29): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type '(Without<SocialRecoveryUpdateInput, SocialRecoveryUncheckedUpdateInput> & SocialRecoveryUncheckedUpdateInput) | (Without<...> & SocialRecoveryUpdateInput)'.
+app/api/wallet/timelock/list/route.ts(14,24): error TS2353: Object literal may only specify known properties, and 'timeLockVaults' does not exist in type 'AuthUserInclude<DefaultArgs>'.
+app/api/wallet/transaction/status/route.ts(29,22): error TS2353: Object literal may only specify known properties, and 'hash' does not exist in type 'TransactionWhereUniqueInput'.
+app/api/wallet/transaction/status/route.ts(40,37): error TS2339: Property 'hash' does not exist on type '{ id: string; chainId: number; metadata: JsonValue; type: string; value: string | null; status: string; timestamp: Date; txHash: string; amount: number; authUserId: string | null; ... 5 more ...; gasUsed: bigint | null; }'.
+app/api/wallet/transaction/status/route.ts(64,41): error TS2339: Property 'hash' does not exist on type '{ id: string; chainId: number; metadata: JsonValue; type: string; value: string | null; status: string; timestamp: Date; txHash: string; amount: number; authUserId: string | null; ... 5 more ...; gasUsed: bigint | null; }'.
+app/api/wallet/transaction/status/route.ts(73,26): error TS2353: Object literal may only specify known properties, and 'hash' does not exist in type 'TransactionWhereUniqueInput'.
+app/api/wallet/transaction/status/route.ts(83,37): error TS2339: Property 'hash' does not exist on type '{ id: string; chainId: number; metadata: JsonValue; type: string; value: string | null; status: string; timestamp: Date; txHash: string; amount: number; authUserId: string | null; ... 5 more ...; gasUsed: bigint | null; }'.
+app/api/wallet/transaction/status/route.ts(105,41): error TS2339: Property 'hash' does not exist on type '{ id: string; chainId: number; metadata: JsonValue; type: string; value: string | null; status: string; timestamp: Date; txHash: string; amount: number; authUserId: string | null; ... 5 more ...; gasUsed: bigint | null; }'.
+app/api/webhooks/alchemy/route.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'TransactionStatus'.
+app/api/webhooks/alchemy/route.ts(24,26): error TS2353: Object literal may only specify known properties, and 'hash' does not exist in type 'BlockchainTransactionWhereUniqueInput'.
+app/api/webhooks/alchemy/route.ts(30,30): error TS2353: Object literal may only specify known properties, and 'hash' does not exist in type 'BlockchainTransactionWhereUniqueInput'.
+app/api/whale/smart-analysis/route.ts(67,7): error TS2554: Expected 1 arguments, but got 2.
+app/api/zk/verify-identity/route.ts(32,21): error TS2353: Object literal may only specify known properties, and 'reputation' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+app/forum/u/[address]/page.tsx(37,59): error TS18048: 'address' is possibly 'undefined'.
+app/status/page.tsx(274,40): error TS2322: Type 'number' is not assignable to type 'never'.
+app/status/page.tsx(274,50): error TS2322: Type 'string' is not assignable to type 'never'.
+app/status/page.tsx(274,74): error TS2322: Type 'number' is not assignable to type 'never'.
+components/auth/QuantumAuthGate.tsx(527,31): error TS2345: Argument of type '{ encryptedBlob: string; address: string | null; id: string; name: string; createdAt: number; }[]' is not assignable to parameter of type 'SetStateAction<SovereignAccount[]>'.
+  Type '{ encryptedBlob: string; address: string | null; id: string; name: string; createdAt: number; }[]' is not assignable to type 'SovereignAccount[]'.
+    Type '{ encryptedBlob: string; address: string | null; id: string; name: string; createdAt: number; }' is not assignable to type 'SovereignAccount'.
+      Types of property 'address' are incompatible.
+        Type 'string | null' is not assignable to type 'string'.
+          Type 'null' is not assignable to type 'string'.
+components/auth/QuantumAuthGate.tsx(565,26): error TS2345: Argument of type '{ encryptedBlob: string; address: string | null; id: string; name: string; createdAt: number; }[]' is not assignable to parameter of type 'SetStateAction<SovereignAccount[]>'.
+  Type '{ encryptedBlob: string; address: string | null; id: string; name: string; createdAt: number; }[]' is not assignable to type 'SovereignAccount[]'.
+    Type '{ encryptedBlob: string; address: string | null; id: string; name: string; createdAt: number; }' is not assignable to type 'SovereignAccount'.
+      Types of property 'address' are incompatible.
+        Type 'string | null' is not assignable to type 'string'.
+          Type 'null' is not assignable to type 'string'.
+components/bsv/SirDeggenBrowser.tsx(117,77): error TS2322: Type '{ size: number; className: string; title: string; }' is not assignable to type 'IntrinsicAttributes & Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>'.
+  Property 'title' does not exist on type 'IntrinsicAttributes & Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>'.
+components/bsv/SovereignMessenger.tsx(70,17): error TS2552: Cannot find name 'loadMessages'. Did you mean 'messages'?
+components/dashboard/CryptographicID.tsx(63,95): error TS2345: Argument of type '`0x${string}` | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+components/dashboard/QuantumTransfer.tsx(525,40): error TS2588: Cannot assign to '_receiptCounter' because it is a constant.
+components/dashboard/SuperWallet.tsx(427,18): error TS2367: This comparison appears to be unintentional because the types '"portfolio" | "support" | "billing" | "ticket_mint" | "top_markets" | "new_listings" | "whale_ledger" | "mass_transfers" | "block_explorer" | "aztec_pipeline" | "session_logs"' and '"analytics"' have no overlap.
+components/dashboard/SuperWallet.tsx(437,18): error TS2367: This comparison appears to be unintentional because the types '"portfolio" | "support" | "billing" | "ticket_mint" | "top_markets" | "new_listings" | "whale_ledger" | "mass_transfers" | "block_explorer" | "aztec_pipeline" | "session_logs"' and '"activity"' have no overlap.
+components/dashboard/SuperWallet.tsx(448,18): error TS2367: This comparison appears to be unintentional because the types '"portfolio" | "support" | "billing" | "ticket_mint" | "top_markets" | "new_listings" | "whale_ledger" | "mass_transfers" | "block_explorer" | "aztec_pipeline" | "session_logs"' and '"contacts"' have no overlap.
+components/dashboard/SuperWallet.tsx(454,18): error TS2367: This comparison appears to be unintentional because the types '"portfolio" | "support" | "billing" | "ticket_mint" | "top_markets" | "new_listings" | "whale_ledger" | "mass_transfers" | "block_explorer" | "aztec_pipeline" | "session_logs"' and '"referrals"' have no overlap.
+components/dashboard/SuperWallet.tsx(460,18): error TS2367: This comparison appears to be unintentional because the types '"portfolio" | "support" | "billing" | "ticket_mint" | "top_markets" | "new_listings" | "whale_ledger" | "mass_transfers" | "block_explorer" | "aztec_pipeline" | "session_logs"' and '"vault"' have no overlap.
+components/dashboard/SuperWallet.tsx(466,19): error TS2367: This comparison appears to be unintentional because the types '"portfolio" | "support" | "billing" | "ticket_mint" | "top_markets" | "new_listings" | "whale_ledger" | "mass_transfers" | "block_explorer" | "aztec_pipeline" | "session_logs"' and '"nfc"' have no overlap.
+components/dashboard/SuperWallet.tsx(472,19): error TS2367: This comparison appears to be unintentional because the types '"portfolio" | "support" | "billing" | "ticket_mint" | "top_markets" | "new_listings" | "whale_ledger" | "mass_transfers" | "block_explorer" | "aztec_pipeline" | "session_logs"' and '"network"' have no overlap.
+components/dashboard/SuperWallet.tsx(478,18): error TS2367: This comparison appears to be unintentional because the types '"portfolio" | "support" | "billing" | "ticket_mint" | "top_markets" | "new_listings" | "whale_ledger" | "mass_transfers" | "block_explorer" | "aztec_pipeline" | "session_logs"' and '"settings"' have no overlap.
+components/dashboard/TerminalSettingsPanel.tsx(47,9): error TS2741: Property 'hapticFeedback' is missing in type '{ theme: "light" | "system" | "dark"; language: "en" | "es-ES"; currency: "EUR" | "USD" | "GBP" | "JPY" | "CHF"; timeFormat: "24h" | "12h"; dateFormat: "DD/MM/YYYY" | "MM/DD/YYYY"; ... 25 more ...; hiddenAssets: string | undefined; }' but required in type 'SovereignSettings'.
+components/dashboard/TopWhaleEvents24h.tsx(29,29): error TS2304: Cannot find name 'useState'.
+components/dashboard/TopWhaleEvents24h.tsx(30,39): error TS2304: Cannot find name 'useState'.
+components/dashboard/TopWhaleEvents24h.tsx(31,31): error TS2304: Cannot find name 'useState'.
+components/dashboard/TopWhaleEvents24h.tsx(33,20): error TS2304: Cannot find name 'useCallback'.
+components/dashboard/TopWhaleEvents24h.tsx(47,5): error TS2304: Cannot find name 'useEffect'.
+components/guards/WorldGate.tsx(31,11): error TS7034: Variable 'ADDRESS_WHITELIST' implicitly has type 'any[]' in some locations where its type cannot be determined.
+components/guards/WorldGate.tsx(34,37): error TS7005: Variable 'ADDRESS_WHITELIST' implicitly has an 'any[]' type.
+components/history/Constellation.tsx(18,22): error TS2554: Expected 1 arguments, but got 0.
+components/landing/Hero3D.tsx(14,17): error TS2554: Expected 1 arguments, but got 0.
+components/landing/MobileLanding.tsx(370,22): error TS2322: Type '"high-quality"' is not assignable to type 'ImageRendering | undefined'.
+components/landing/SubmarineDeconstruction3D.tsx(227,13): error TS2322: Type '{ hidden: { opacity: number; y: number; filter: string; }; visible: { opacity: number; y: number; filter: string; transition: { duration: number; ease: string; }; }; exit: { opacity: number; scale: number; filter: string; transition: { ...; }; }; }' is not assignable to type 'Variants'.
+  Property 'visible' is incompatible with index signature.
+    Type '{ opacity: number; y: number; filter: string; transition: { duration: number; ease: string; }; }' is not assignable to type 'Variant'.
+      Type '{ opacity: number; y: number; filter: string; transition: { duration: number; ease: string; }; }' is not assignable to type 'TargetAndTransition'.
+        Type '{ opacity: number; y: number; filter: string; transition: { duration: number; ease: string; }; }' is not assignable to type '{ transition?: Transition<any> | undefined; transitionEnd?: ResolvedValues$1 | undefined; }'.
+          Types of property 'transition' are incompatible.
+            Type '{ duration: number; ease: string; }' is not assignable to type 'Transition<any> | undefined'.
+              Type '{ duration: number; ease: string; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+                Type '{ duration: number; ease: string; }' is not assignable to type 'ValueAnimationTransition<any>'.
+                  Types of property 'ease' are incompatible.
+                    Type 'string' is not assignable to type 'Easing | Easing[] | undefined'.
+components/landing/SubmarineDeconstruction3D.tsx(248,13): error TS2322: Type '{ hidden: { opacity: number; y: number; filter: string; }; visible: { opacity: number; y: number; filter: string; transition: { duration: number; ease: string; }; }; exit: { opacity: number; scale: number; filter: string; transition: { ...; }; }; }' is not assignable to type 'Variants'.
+components/landing/SubmarineDeconstruction3D.tsx(269,13): error TS2322: Type '{ hidden: { opacity: number; y: number; filter: string; }; visible: { opacity: number; y: number; filter: string; transition: { duration: number; ease: string; }; }; exit: { opacity: number; scale: number; filter: string; transition: { ...; }; }; }' is not assignable to type 'Variants'.
+components/landing/SubmarineDeconstruction3D.tsx(292,13): error TS2322: Type '{ hidden: { opacity: number; y: number; filter: string; }; visible: { opacity: number; y: number; filter: string; transition: { duration: number; ease: string; }; }; exit: { opacity: number; scale: number; filter: string; transition: { ...; }; }; }' is not assignable to type 'Variants'.
+components/landing/SubmarineDeconstruction3D.tsx(314,13): error TS2322: Type '{ hidden: { opacity: number; y: number; filter: string; }; visible: { opacity: number; y: number; filter: string; transition: { duration: number; ease: string; }; }; exit: { opacity: number; scale: number; filter: string; transition: { ...; }; }; }' is not assignable to type 'Variants'.
+components/landing/WorldMapBackground.tsx(43,81): error TS2345: Argument of type '{ txid: string; fromCity: string; toCity: string; btc: string; type: string; latencyMs: number; confirmations: string; confirmed: boolean; loading: boolean; }[]' is not assignable to parameter of type '(WhaleFlow & { loading?: boolean | undefined; })[] | (() => (WhaleFlow & { loading?: boolean | undefined; })[])'.
+  Type '{ txid: string; fromCity: string; toCity: string; btc: string; type: string; latencyMs: number; confirmations: string; confirmed: boolean; loading: boolean; }[]' is not assignable to type '(WhaleFlow & { loading?: boolean | undefined; })[]'.
+    Type '{ txid: string; fromCity: string; toCity: string; btc: string; type: string; latencyMs: number; confirmations: string; confirmed: boolean; loading: boolean; }' is not assignable to type 'WhaleFlow & { loading?: boolean | undefined; }'.
+      Type '{ txid: string; fromCity: string; toCity: string; btc: string; type: string; latencyMs: number; confirmations: string; confirmed: boolean; loading: boolean; }' is missing the following properties from type 'WhaleFlow': fromEntity, toEntity
+components/premium/ZKProofMatrix.tsx(326,61): error TS2322: Type 'string' is not assignable to type 'never'.
+components/shared/QDsAtomRenderer.tsx(306,9): error TS2322: Type 'Element | null' is not assignable to type 'Element'.
+  Type 'null' is not assignable to type 'ReactElement<any, any>'.
+lib/blockchain/DeFiPositionsService.ts(52,39): error TS7006: Parameter 'protocol' implicitly has an 'any' type.
+lib/blockchain/DeFiPositionsService.ts(59,69): error TS7006: Parameter 'position' implicitly has an 'any' type.
+lib/blockchain/DeFiPositionsService.ts(64,43): error TS7006: Parameter 't' implicitly has an 'any' type.
+lib/blockchain/DeFiPositionsService.ts(181,39): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/blockchain/ExecutionEngine.ts(62,37): error TS7006: Parameter 'c' implicitly has an 'any' type.
+lib/blockchain/mev.ts(56,11): error TS2559: Type 'string' has no properties in common with type 'TransactionRequest'.
+lib/blockchain/SmartAccountService.ts(69,56): error TS2554: Expected 1 arguments, but got 2.
+lib/blockchain/SmartAccountService.ts(108,56): error TS2554: Expected 1 arguments, but got 2.
+lib/engine/SqueezeGravityEngine.ts(161,55): error TS2339: Property 'getInstitutionalVigor' does not exist on type 'typeof WhaleRadarEngine'.
+lib/wallet/nfts.ts(21,18): error TS2352: Conversion of type '{ result: never[]; }' to type 'any[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ result: never[]; }' is missing the following properties from type 'any[]': length, pop, push, concat, and 35 more.
+lib/wallet/protocols/polymarket.ts(12,18): error TS2352: Conversion of type '{ result: never[]; }' to type 'any[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+lib/wallet/protocols/polymarket.ts(21,11): error TS2322: Type '({ id: string; protocol: string; marketTitle: any; outcome: any; shares: number; avgPrice: number; currentPrice: number; value: number; pnl: number; pnlPercent: number; chainId: number; } | null)[]' is not assignable to type 'PredictionPosition[]'.
+  Type '{ id: string; protocol: string; marketTitle: any; outcome: any; shares: number; avgPrice: number; currentPrice: number; value: number; pnl: number; pnlPercent: number; chainId: number; } | null' is not assignable to type 'PredictionPosition'.
+    Type 'null' is not assignable to type 'PredictionPosition'.

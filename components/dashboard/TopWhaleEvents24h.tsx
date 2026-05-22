@@ -7,7 +7,7 @@
  * Zero-Mock Mandate: no internal fetch loops or static data.
  */
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, ExternalLink, Zap, Loader2 } from 'lucide-react';
 import { useSovereignIntel } from '@/lib/api-client';

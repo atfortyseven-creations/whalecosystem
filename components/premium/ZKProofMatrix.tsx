@@ -14,7 +14,7 @@ type ProofStep = {
     id: string;
     label: string;
     detail: string;
-    icon: React.ElementType;
+    icon: any;
     status: 'idle' | 'running' | 'done' | 'error';
     output?: string;
 };

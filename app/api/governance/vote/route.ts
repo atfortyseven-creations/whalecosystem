@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if proposal exists and is still in voting period
-        const proposal = await prisma.marketProposal.findUnique({
+        const proposal = await (prisma as any).marketProposal.findUnique({
             where: { id: body.proposalId },
         });
 
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if user already voted (using nullifier hash)
-        const existingVote = await prisma.proposalVote.findUnique({
+        const existingVote = await (prisma as any).proposalVote.findUnique({
             where: {
                 proposalId_nullifierHash: {
                     proposalId: body.proposalId,
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Record vote
-        const vote = await prisma.proposalVote.create({
+        const vote = await (prisma as any).proposalVote.create({
             data: {
                 proposalId: body.proposalId,
                 nullifierHash: body.worldIdProof.nullifier_hash,
@@ -115,14 +115,14 @@ export async function POST(request: NextRequest) {
             updateData.votesAgainst = { increment: 1 };
         }
 
-        const updatedProposal = await prisma.marketProposal.update({
+        const updatedProposal = await (prisma as any).marketProposal.update({
             where: { id: body.proposalId },
             data: updateData,
         });
 
         // Check if proposal should be approved
         if (updatedProposal.votesFor >= updatedProposal.votingThreshold) {
-            await prisma.marketProposal.update({
+            await (prisma as any).marketProposal.update({
                 where: { id: body.proposalId },
                 data: {
                     status: 'APPROVED',
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Update user metrics
-        await prisma.userMetrics.upsert({
+        await (prisma as any).userMetrics.upsert({
             where: { userAddress: body.voterAddress },
             update: {
                 votescast: { increment: 1 },

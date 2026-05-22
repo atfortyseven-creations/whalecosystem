@@ -40,8 +40,8 @@ export class SmartAccountService {
         if (bundlerUrl) {
             this.bundlerClient = createPimlicoClient({
                 transport: http(bundlerUrl),
-                entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032' // EntryPoint v0.7
-            });
+                entryPoint: { address: '0x0000000071727De22E5E9d8BAf0edAc6f37da032', version: '0.7' }
+            } as any);
         }
     }
 
@@ -66,11 +66,12 @@ export class SmartAccountService {
      * Initializes a Kernel v3 Smart Account for a given EOA signer.
      */
     public async getKernelAccount(signer: any): Promise<any> {
-        return toKernelSmartAccount(this.publicClient, {
+        return toKernelSmartAccount({
+            client: this.publicClient,
             signer: signer,
-            entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+            entryPoint: { address: '0x0000000071727De22E5E9d8BAf0edAc6f37da032', version: '0.7' },
             index: 0n
-        });
+        } as any);
     }
 
     /**
@@ -81,7 +82,7 @@ export class SmartAccountService {
             account,
             bundlerTransport: this.bundlerClient ? this.bundlerClient.transport : http(),
             paymaster: this.paymasterUrl ? {
-                getPaymasterData: async (userOp) => {
+                getPaymasterData: async (userOp: any) => {
                     // Phase 2: High-Fidelity Gasless Sponsorship
                     const response = await fetch(this.paymasterUrl!, {
                         method: 'POST',
@@ -97,7 +98,7 @@ export class SmartAccountService {
                     return result.result;
                 }
             } : undefined
-        });
+        } as any);
     }
 
     /**
@@ -105,11 +106,12 @@ export class SmartAccountService {
      * This allows agents to execute within restricted cryptographic boundaries.
      */
     public async getScopedAccount(sessionSigner: any, validatorData: any): Promise<any> {
-        return toKernelSmartAccount(this.publicClient, {
+        return toKernelSmartAccount({
+            client: this.publicClient,
             signer: sessionSigner,
-            entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+            entryPoint: { address: '0x0000000071727De22E5E9d8BAf0edAc6f37da032', version: '0.7' },
             index: 0n
-        });
+        } as any);
     }
 
     /**

@@ -48,7 +48,7 @@ export function PortfolioSecurityPanel() {
         // But since this is just backup, we can show the private key if mnemonic is not available.
         const { ethers } = await import('ethers');
         const w = new ethers.Wallet(plaintext);
-        mnemonicStr = w.mnemonic?.phrase || plaintext;
+        mnemonicStr = (w as any).mnemonic?.phrase || plaintext;
       }
 
       setDecryptedMnemonic(mnemonicStr);

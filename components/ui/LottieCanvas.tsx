@@ -56,7 +56,7 @@ const LottieCanvas = ({
         renderConfig: {
           devicePixelRatio: safeDPR,
           useFrameInterpolation: true, // smooth 60fps at half CPU cost
-        },
+        } as any,
       });
 
       instanceRef.current = dotLottie;

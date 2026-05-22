@@ -7,10 +7,9 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { safeHTML } from '@/hooks/useSanitizer';
 
-export default function DynamicDocPage({ slug: propSlug }: { slug?: string } = {}) {
-  const params = useParams();
+export default function DynamicDocPage({ params }: any) {
   const rawSlug = params?.slug;
-  const slug = propSlug || (Array.isArray(rawSlug) ? rawSlug.join('/') : (rawSlug || ''));
+  const slug = Array.isArray(rawSlug) ? rawSlug.join('/') : (rawSlug || '');
   
   const content = (slug && docContent[slug]) || {
     title: 'Architectural Specification',

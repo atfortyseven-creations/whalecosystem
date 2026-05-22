@@ -12,12 +12,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const body = await req.json();
     const { name, description, status, liquidity, oracle } = body;
 
-    const existing = await prisma.project.findUnique({ where: { id } });
+    const existing = await (prisma as any).project.findUnique({ where: { id } });
     if (!existing || existing.userId !== wallet) {
         return new NextResponse("Node Not Found or Unauthorized Ownership", { status: 404 });
     }
 
-    const project = await prisma.project.update({
+    const project = await (prisma as any).project.update({
       where: { id },
       data: {
         ...(name && { name }),
@@ -33,7 +33,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       .update(`${id}-${new Date().toISOString()}`)
       .digest('hex');
 
-    await prisma.deployment.create({
+    await (prisma as any).deployment.create({
       data: {
         projectId: id,
         action: 'UPDATE',
@@ -58,12 +58,12 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (!wallet) return new NextResponse("Unauthorized Multi-Tenant Connection", { status: 401 });
     
     // Authorization Check: Only owner can delete their node
-    const existing = await prisma.project.findUnique({ where: { id } });
+    const existing = await (prisma as any).project.findUnique({ where: { id } });
     if (!existing || existing.userId !== wallet) {
         return new NextResponse("Node Not Found or Unauthorized Ownership", { status: 404 });
     }
 
-    const project = await prisma.project.delete({
+    const project = await (prisma as any).project.delete({
       where: { id }
     });
 

@@ -46,7 +46,7 @@ export function LanguageSelector() {
                                     <button
                                         key={lang.code}
                                         onClick={() => {
-                                            setLocale(lang.code);
+                                            setLocale(lang.code as any);
                                             setIsOpen(false);
                                         }}
                                         className={cn(

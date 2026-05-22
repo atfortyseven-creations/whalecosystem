@@ -6,7 +6,7 @@ import { SAAS_PLANS } from '@/lib/saas/plans';
 import { Button } from '@/components/ui/button';
 
 export function SecurityPanel({ tier }: { tier: string }) {
-    const config = SAAS_PLANS[tier];
+    const config = SAAS_PLANS[tier as keyof typeof SAAS_PLANS];
     const isPremium = config.features.ipWhitelist || config.features.hmacRequired;
 
     if (!isPremium) {

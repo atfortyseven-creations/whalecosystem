@@ -366,8 +366,8 @@ function ConnectedScreen({
           <img 
             src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" 
             alt="Silver Atom Logo" 
-            className="w-full max-w-[85vw] sm:max-w-xs h-auto object-contain mx-auto mb-6"
-            style={{ imageRendering: 'high-quality' }}
+            className="w-full max-w-[85vw] sm:max-w-xs h-auto object-contain mx-auto mb-6 scale-[1.4]"
+            style={{ imageRendering: 'high-quality' as any, mixBlendMode: 'multiply' }}
           />
           <p className="text-[64px] sm:text-[72px] font-light tracking-[-0.04em] leading-none tabular-nums text-black">
             {fmtTime(now)}

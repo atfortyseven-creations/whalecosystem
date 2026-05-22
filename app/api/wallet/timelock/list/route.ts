@@ -9,7 +9,7 @@ export async function GET(req: Request) {
         const user = { id: session.userId, email: session.email };
 
         const email = user.email;
-        const authUser = await prisma.authUser.findUnique({
+        const authUser = await (prisma as any).authUser.findUnique({
             where: { id: user.id },
             include: { timeLockVaults: true }
         }) as any;

@@ -17,11 +17,11 @@ export async function GET(req: NextRequest) {
     const riskMap: Record<string, string> = {};
     try {
       const { db: prisma } = await import('@/lib/db');
-      const classifiedMarkets = await prisma.market.findMany({
+      const classifiedMarkets = await (prisma as any).market.findMany({
         select: { slug: true, riskLevel: true }
       });
 
-      classifiedMarkets.forEach(m => {
+      classifiedMarkets.forEach((m: any) => {
         riskMap[m.slug.toLowerCase()] = m.riskLevel;
       });
     } catch (dbError) {

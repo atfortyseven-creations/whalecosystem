@@ -76,6 +76,7 @@ export function TerminalSettingsPanel() {
     chatBio:              store.chatBio,
     qrLabel:              store.qrLabel,
     hiddenAssets:         store.hiddenAssets,
+    hapticFeedback:       (store as any).hapticFeedback,
   };
 
   if (isLoading) {

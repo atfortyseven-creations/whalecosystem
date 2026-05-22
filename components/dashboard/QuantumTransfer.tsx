@@ -522,7 +522,7 @@ export default function QuantumTransfer() {
             await refetchBalance();
 
             setReceipt({
-                id:             BigInt(_receiptCounter++),
+                id:             BigInt(_receiptCounter.current++),
                 sender:         address,
                 receiver:       recipient as `0x${string}`,
                 amount:         parsedAmount,

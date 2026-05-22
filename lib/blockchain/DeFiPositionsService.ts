@@ -20,8 +20,8 @@ export class DeFiPositionsService {
 
       // Parallel execution: Moralis (Breadth) + On-Chain Scanner (Depth/Precision + Universal Discovery)
       const [moralisData, onChainData] = await Promise.all([
-        moralisService.getDefiPositions(address).catch(() => null),
-        onChainProtocolScanner.scanWallet(address as `0x${string}`, tokens).catch(() => [])
+        moralisService.getDefiPositions(address).catch(() => null as any),
+        onChainProtocolScanner.scanWallet(address as `0x${string}`, tokens).catch(() => [] as any[])
       ]);
       
       let allPositions: any[] = [];
@@ -49,19 +49,19 @@ export class DeFiPositionsService {
 
       // 2. Process Moralis Data (Fill the gaps)
       if (moralisData && moralisData.protocols) {
-        moralisData.protocols.forEach(protocol => {
+        moralisData.protocols.forEach((protocol: any) => {
           // Avoid duplication if the on-chain scanner already found this protocol
           const protocolKey = protocol.protocol_name.toLowerCase();
           const isCoreProtocol = protocolKey.includes('aave') || protocolKey.includes('lido') || protocolKey.includes('uniswap');
           
           // If it's a core protocol we already scanned on-chain, or it's a new protocol
           if (!isCoreProtocol || !seenProtocols.has(protocolKey)) {
-            const protocolPositions = protocol.position_details.map(position => ({
+            const protocolPositions = protocol.position_details.map((position: any) => ({
               protocol: protocol.protocol_name,
               protocolLogo: protocol.protocol_logo,
               type: this.categorizePosition(position.label),
               label: position.label,
-              tokens: position.tokens.map(t => ({
+              tokens: position.tokens.map((t: any) => ({
                 symbol: t.symbol,
                 balance: parseFloat(t.balance_formatted),
                 balanceFormatted: t.balance_formatted,
@@ -165,7 +165,7 @@ export class DeFiPositionsService {
    */
   async getSummary(address: string) {
     try {
-      const data = await moralisService.getDefiSummary(address);
+      const data: any = await moralisService.getDefiSummary(address);
       
       if (!data || !data.protocols) {
         return {
@@ -178,7 +178,7 @@ export class DeFiPositionsService {
       return {
         totalValueUsd: data.total_usd_value,
         protocolCount: data.protocols.length,
-        protocols: data.protocols.map(p => ({
+        protocols: data.protocols.map((p: any) => ({
           name: p.protocol_name,
           id: p.protocol_id,
           totalValueUsd: p.total_usd_value,

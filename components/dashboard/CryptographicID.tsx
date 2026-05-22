@@ -60,7 +60,7 @@ export default function CryptographicID() {
             <div className="space-y-4">
                <div className="text-[10px] text-white/40 uppercase">EVM_DERIVATION_PATH</div>
                <div className="bg-black border border-white/5 p-4 flex items-center justify-between group">
-                  <span className="text-xs font-bold tracking-widest truncate">{formatAddress(address) || '0x0000000000000000000000000000000000000000'}</span>
+                  <span className="text-xs font-bold tracking-widest truncate">{address ? formatAddress(address as string) : '0x0000000000000000000000000000000000000000'}</span>
                   <button onClick={() => { if(address) { navigator.clipboard.writeText(address); toast.success("ID_COPIED"); } }} className="text-white/10 hover:text-white transition-all">
                      <Copy size={14} />
                   </button>

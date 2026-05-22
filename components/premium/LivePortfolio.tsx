@@ -23,8 +23,7 @@ export function LivePortfolio() {
         change24hPercent,
         polymarketPositions,
         assets,
-        isLoading,
-        liveTick 
+        isLoading 
     } = useLivePortfolio();
 
     if (!mounted) {

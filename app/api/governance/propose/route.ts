@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if nullifier already used for a proposal
-        const existingProposal = await prisma.marketProposal.findUnique({
+        const existingProposal = await (prisma as any).marketProposal.findUnique({
             where: { creatorNullifier: body.worldIdProof.nullifier_hash },
         });
 
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
         const votingEndsAt = new Date();
         votingEndsAt.setDate(votingEndsAt.getDate() + 7); // 7 days voting period
 
-        const proposal = await prisma.marketProposal.create({
+        const proposal = await (prisma as any).marketProposal.create({
             data: {
                 question: body.question,
                 description: body.description,
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         });
 
         // 3. Update user metrics
-        await prisma.userMetrics.upsert({
+        await (prisma as any).userMetrics.upsert({
             where: { userAddress: body.creatorAddress },
             update: {
                 proposalsCreated: { increment: 1 },
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
         const status = searchParams.get('status') || 'VOTING';
         const limit = parseInt(searchParams.get('limit') || '20');
 
-        const proposals = await prisma.marketProposal.findMany({
+        const proposals = await (prisma as any).marketProposal.findMany({
             where: {
                 status: status as any,
             },

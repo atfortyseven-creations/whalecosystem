@@ -211,7 +211,7 @@ function DOMAnnotations({ scrollProgress }: { scrollProgress: number }) {
   const showNetwork = scrollProgress >= 0.60 && scrollProgress < 0.80;
   const showVault = scrollProgress >= 0.80 && scrollProgress < 0.95;
 
-  const cardVariants = {
+  const cardVariants: any = {
     hidden: { opacity: 0, y: 30, filter: "blur(5px)" },
     visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: "easeOut" } },
     exit: { opacity: 0, scale: 0.95, filter: "blur(10px)", transition: { duration: 0.4 } }

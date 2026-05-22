@@ -44,7 +44,7 @@ export default function SuperWallet({ recentNews = [] }: { recentNews?: NewsItem
 
 function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
     const { t } = useLanguage();
-    const [activeView, setActiveView] = useState<'ticket_mint' | 'portfolio' | 'billing' | 'top_markets' | 'new_listings' | 'whale_ledger' | 'mass_transfers' | 'block_explorer' | 'aztec_pipeline' | 'session_logs' | 'support'>('portfolio');
+    const [activeView, setActiveView] = useState<'ticket_mint' | 'portfolio' | 'billing' | 'top_markets' | 'new_listings' | 'whale_ledger' | 'mass_transfers' | 'block_explorer' | 'aztec_pipeline' | 'session_logs' | 'support' | 'analytics' | 'activity' | 'contacts' | 'referrals' | 'vault' | 'nfc' | 'network' | 'settings'>('portfolio');
     const [showWatchInput, setShowWatchInput] = useState(false);
     const [accounts, setAccounts] = useState<WalletAccount[]>([]);
     const [currentAddress, setCurrentAddress] = useState<string>('');

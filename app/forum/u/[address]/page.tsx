@@ -4,9 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNowStrict } from 'date-fns';
-
 export default function UserProfilePage() {
-  const { address } = useParams();
+  const { address } = useParams() as { address: string | string[] };
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 

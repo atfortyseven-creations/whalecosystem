@@ -63,8 +63,7 @@ export async function GET(request: NextRequest) {
 
     // Perform analysis with REAL on-chain data
     const analysis = await analyzeWalletSmartMoney(
-      address.toLowerCase(),
-      alchemy
+      address.toLowerCase()
     );
 
     // Cache the result

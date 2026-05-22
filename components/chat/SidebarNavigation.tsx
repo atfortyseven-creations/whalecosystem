@@ -57,17 +57,7 @@ export default function SidebarNavigation({ onSelectFolder, onOpenSettings, acti
         })}
       </div>
 
-      <div className="w-full px-3 mt-auto">
-        <button
-          onClick={onOpenSettings}
-          className="w-full flex items-center justify-start p-3 rounded-xl hover:bg-black/5 transition-all border border-transparent text-black/40 hover:text-black"
-        >
-          <Settings size={18} />
-          <span className="ml-3 font-mono text-[11px] text-black/40 whitespace-nowrap transition-opacity uppercase tracking-wide font-bold">
-            Settings
-          </span>
-        </button>
-      </div>
+
     </div>
   );
 }

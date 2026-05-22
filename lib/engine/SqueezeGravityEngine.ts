@@ -158,7 +158,7 @@ export class VIPMatrixEngine {
 
 
             // Phase 2: On-Chain Whale Radar Integration
-            const whaleState = await WhaleRadarEngine.getInstitutionalVigor(asset, markPrice);
+            const whaleState = await WhaleRadarEngine.getWhaleVigor(asset, markPrice);
             const institutionalVigorUsd = whaleState.usdVolume;
             const institutionalVigorPercent = whaleState.vigorPercent;
             const institutionalIsAccumulation = whaleState.isAccumulation;

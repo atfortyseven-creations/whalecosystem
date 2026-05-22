@@ -67,7 +67,7 @@ export const SovereignMessenger = () => {
 
             if (res.ok) {
                 setInput('');
-                loadMessages();
+                mutate();
             }
         } catch (e) {
             toast.error("Transmission Failure.");

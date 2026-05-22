@@ -114,7 +114,7 @@ export function SirDeggenBrowser({ initialUrl = 'aztek://hub' }: SirDeggenBrowse
             onKeyDown={(e) => e.key === 'Enter' && navigate(url)}
             className="bg-transparent border-none outline-none text-[10px] text-white/70 w-full font-aztec-mono uppercase tracking-[0.2em]"
           />
-          <ShieldCheck size={14} className="text-[var(--aztec-chartreuse)]" title="CWI SECURE" />
+          <ShieldCheck size={14} className="text-[var(--aztec-chartreuse)]" />
         </div>
 
         <button 

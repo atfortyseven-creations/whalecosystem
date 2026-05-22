@@ -31,6 +31,8 @@ const SKELETON = Array.from({ length: 5 }, (_, i) => ({
   txid:          `skel-${i}`,
   fromCity:      '——',
   toCity:        '——',
+  fromEntity:    '——',
+  toEntity:      '——',
   btc:           '——',
   type:          '——',
   latencyMs:     0,

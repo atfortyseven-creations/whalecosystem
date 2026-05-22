@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { TransactionStatus } from '@prisma/client';
+
 
 /**
  * [Elite] Alchemy Webhook Handler
@@ -20,13 +20,13 @@ export async function POST(req: Request) {
             const hash = activity.hash;
             
             // We only care about transactions we have registered as PENDING
-            const tx = await prisma.blockchainTransaction.findUnique({
+            const tx = await (prisma as any).blockchainTransaction.findUnique({
                 where: { hash }
             });
 
             if (tx) {
                 // Update final status
-                await prisma.blockchainTransaction.update({
+                await (prisma as any).blockchainTransaction.update({
                     where: { hash },
                     data: {
                         status: activity.category === 'external' ? 'CONFIRMED' : 'CONFIRMED',

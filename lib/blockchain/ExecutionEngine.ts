@@ -59,7 +59,7 @@ export class ExecutionEngine {
 
         // Execute the batch call via ERC-4337
         const hash = await (client as any).sendTransactions({
-            transactions: calls.map(c => ({
+            transactions: calls.map((c: any) => ({
                 to: c.to,
                 data: c.data,
                 value: c.value

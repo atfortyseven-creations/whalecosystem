@@ -19,17 +19,17 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'User ID required' }, { status: 400 });
         }
 
-        const referral = await prisma.referral.findFirst({
+        const referral = await (prisma as any).referral.findFirst({
             where: { referrerId: userId },
             include: { referee: true }
         });
 
         // Calculate stats
-        const totalReferrals = await prisma.referral.count({
+        const totalReferrals = await (prisma as any).referral.count({
             where: { referrerId: userId }
         });
 
-        const totalEarnings = await prisma.referral.aggregate({
+        const totalEarnings = await (prisma as any).referral.aggregate({
             where: { referrerId: userId },
             _sum: { totalEarnings: true }
         });
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
         }
 
         // Create Referral
-        const newReferral = await prisma.referral.create({
+        const newReferral = await (prisma as any).referral.create({
             data: {
                 referrer: { connect: { walletAddress: referrerId } },
                 referee: { connect: { walletAddress: refereeId } },

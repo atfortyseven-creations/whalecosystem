@@ -9,7 +9,7 @@ const CTF_CONTRACT = '0x4D970a14611C8BB70c3024832c3b841BC2F5d873';
 export async function discoverPolymarketPositions(address: string): Promise<PredictionPosition[]> {
   try {
     // Fetch ERC1155 tokens on Polygon (CTF positions are ERC1155)
-    const nfts = (await moralisService.getWalletNFTs(address, 'polygon')) as any[];
+    const nfts = (await moralisService.getWalletNFTs(address, 'polygon')) as unknown as any[];
 
     // Filter for CTF contract
     const polyNFTs = nfts?.filter((nft: any) => nft.contract.toLowerCase() === CTF_CONTRACT.toLowerCase());
@@ -41,7 +41,7 @@ export async function discoverPolymarketPositions(address: string): Promise<Pred
         pnlPercent: 0,
         chainId: 137,
       };
-    })?.filter((p: any) => p !== null);
+    })?.filter((p: any) => p !== null) as PredictionPosition[];
 
     return positions;
   } catch (error) {

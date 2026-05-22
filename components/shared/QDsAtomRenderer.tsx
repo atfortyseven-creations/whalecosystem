@@ -303,13 +303,12 @@ function Scene({ vel, progress, isDark, enableScale, isMobile }: any) {
           intensity={isDark ? 2.2 : 1.0}
           levels={isMobile ? 5 : 8}
         />
-        {!isMobile && (
+        {!isMobile ? (
           <>
             <ChromaticAberration blendFunction={BlendFunction.NORMAL} offset={CA_OFFSET} />
             <Noise opacity={isDark ? 0.04 : 0.02} />
-            <Vignette eskil={false} offset={0.1} darkness={isDark ? 0.45 : 0.25} />
           </>
-        )}
+        ) : <></>}
       </EffectComposer>
     </>
   );

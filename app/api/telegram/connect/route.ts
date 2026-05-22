@@ -145,7 +145,7 @@ export async function DELETE(req: NextRequest) {
 // Exported helper: send a real Telegram message
 // Used by cron jobs and signal processors
 // ──────────────────────────────────────────────
-export async function sendTelegramAlert(chatId: string, message: string): Promise<boolean> {
+async function sendTelegramAlert(chatId: string, message: string): Promise<boolean> {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     if (!botToken) return false;
 

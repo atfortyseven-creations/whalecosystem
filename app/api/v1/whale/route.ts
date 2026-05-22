@@ -41,13 +41,13 @@ export async function GET(req: NextRequest) {
       }
 
       // [METRICS] Increment usage (async fire and forget to not block response)
-      prisma.apiKey.update({
+      (prisma as any).apiKey.update({
           where: { id: validKey.id },
           data: { 
               requests: { increment: 1 },
               lastUsedAt: new Date()
-          } as any
-      }).catch(err => console.error('Failed to update stats', err));
+          }
+      }).catch((err: any) => console.error('Failed to update stats', err));
 
       // [LOGIC] Fetch Real Whale Data
       // Use Singleton Service for connection pooling

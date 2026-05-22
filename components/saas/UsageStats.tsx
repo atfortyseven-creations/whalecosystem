@@ -10,7 +10,7 @@ type Stats = {
 };
 
 export function UsageStats({ tier, stats }: { tier: string; stats: Stats }) {
-    const config = SAAS_PLANS[tier];
+    const config = SAAS_PLANS[tier as keyof typeof SAAS_PLANS];
     const limit = config.limits.requestsPerDay;
     const isUnlimited = limit === -1;
     

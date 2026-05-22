@@ -14,7 +14,7 @@ interface TransactionHeatmapProps {
  */
 export const TransactionHeatmap: React.FC<TransactionHeatmapProps> = ({ data }) => {
     // Generate last 365 days
-    const days = [];
+    const days: { date: string; count: number }[] = [];
     const today = new Date();
     for (let i = 364; i >= 0; i--) {
         const date = new Date(today);

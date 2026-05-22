@@ -53,7 +53,7 @@ export class SovereignMEVProtector {
       console.log(`[MEV Shield] Targeting private inclusion in block ${targetBlock}...`);
       
       const response = await this.flashbotsProvider.sendPrivateTransaction(
-        { transaction: signedTx, signer: this.authSigner },
+        { transaction: signedTx as any, signer: this.authSigner },
         { maxBlockNumber: targetBlock + 5 }
       );
 

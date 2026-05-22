@@ -13,7 +13,7 @@ export const revalidate = 0;
 
 export async function GET() {
     try {
-        const proposals = await prisma.marketProposal.findMany({
+        const proposals = await (prisma as any).marketProposal.findMany({
             where: {
                 status: {
                     in: ['VOTING', 'APPROVED']
@@ -26,7 +26,7 @@ export async function GET() {
         });
 
         // Transform the data to match the expected format
-        const formattedProposals = proposals.map(proposal => ({
+        const formattedProposals = proposals.map((proposal: any) => ({
             id: proposal.id,
             question: proposal.question,
             description: proposal.description,

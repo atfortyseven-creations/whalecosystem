@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
         });
       }
 
-      const hasPasskey = (await prisma.authenticator.count({ where: { userId: authUser.id } })) > 0;
+      const hasPasskey = (await (prisma as any).authenticator.count({ where: { userId: authUser.id } })) > 0;
 
       return NextResponse.json({
         id: authUser.id,

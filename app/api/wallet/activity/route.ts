@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Ensure user exists (Upsert logic for seamless onboarding)
-        await prisma.user.upsert({
+        await (prisma as any).user.upsert({
             where: { walletAddress: userAddress },
             update: { lastActive: new Date() },
             create: { 

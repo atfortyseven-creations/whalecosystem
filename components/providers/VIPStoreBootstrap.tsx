@@ -81,12 +81,12 @@ export function VIPStoreBootstrap() {
                     const data = await res.json();
                     
                     // Map real EVM scanner payload to VIP Store schema without ANY math mocking
-                    const evmEvents = (Array.isArray(data) ? data : []).map((tx: any) => ({
+                    const evmEvents: WhaleEvent[] = (Array.isArray(data) ? data : []).map((tx: any) => ({
                         id: tx.hash,
                         wallet: tx.from,
                         label: 'L1 Whale',
                         tier: tx.usdValue >= 10_000_000 ? 'MEGA' : (tx.usdValue >= 1_000_000 ? 'ALPHA' : 'PRO'),
-                        action: tx.type === 'ERC20_TRANSFER' ? 'TRANSFER' : 'BUY',
+                        action: (tx.type === 'ERC20_TRANSFER' ? 'TRANSFER' : 'BUY') as WhaleEvent['action'],
                         token: tx.asset,
                         amount: tx.amount.toString(),
                         usdValue: tx.usdValue >= 1_000_000 ? `$${(tx.usdValue / 1_000_000).toFixed(2)}M` : `$${(tx.usdValue / 1000).toFixed(0)}K`,

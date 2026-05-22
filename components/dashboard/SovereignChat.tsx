@@ -161,6 +161,9 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
   const { signMessageAsync } = useSignMessage();
   const { nuclearDisconnect } = useSovereignSignOut();
 
+  const walletClientRef = useRef<any>(walletClient);
+  useEffect(() => { walletClientRef.current = walletClient; }, [walletClient]);
+
   // MASTER RECOVERY: If wallet is connected but connector is missing (common on mobile redirects)
   useEffect(() => {
     if (isConnected && !connector && !isSovereignHandshake && !isLocalSovereignWallet) {
@@ -362,11 +365,11 @@ export default function SovereignChat({ onReturnToGate }: { onReturnToGate?: () 
         const MAX_WAIT = 10000;
         const INTERVAL = 300;
         // Read walletClient from wagmi via a live ref to avoid stale closure
-        while (!walletClient && waited < MAX_WAIT) {
+        while (!walletClientRef.current && waited < MAX_WAIT) {
           await new Promise(r => setTimeout(r, INTERVAL));
           waited += INTERVAL;
         }
-        if (!walletClient) {
+        if (!walletClientRef.current) {
           setXmtpInitializing(false);
           setXmtpError('Wallet not responding. Please disconnect, reconnect your wallet and try again.');
           toast.error('Wallet Not Ready', { description: 'Disconnect and reconnect your wallet, then try again.' });

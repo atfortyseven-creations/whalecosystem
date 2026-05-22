@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         
         if (result.success) {
             // Update the user to SOVEREIGN tier in the institutional database
-            await prisma.user.update({
+            await (prisma as any).user.update({
                 where: { walletAddress: address.toLowerCase() },
                 data: { 
                     tier: 'SOVEREIGN', 

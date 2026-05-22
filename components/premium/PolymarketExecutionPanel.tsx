@@ -26,7 +26,7 @@ export function PolymarketExecutionPanel({ symbol, probability, direction, marke
     const chainId = useChainId();
     const { switchChain, switchChainAsync } = useSwitchChain();
     const { sendTransaction, isPending, isSuccess } = useSendTransaction();
-    const { usdcBalance, liveTick } = useLivePortfolio();
+    const { usdcBalance } = useLivePortfolio();
 
     const isPolygon = chainId === 137;
 

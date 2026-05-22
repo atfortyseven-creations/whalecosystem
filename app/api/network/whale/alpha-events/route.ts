@@ -46,9 +46,9 @@ export async function GET(req: NextRequest) {
             type: evt.action === 'BUY' ? 'accumulation' : (evt.action === 'SELL' ? 'dump' : 'transfer'),
             confidence: evt.confidence || 95,
             // ⚡ V6.0 Deep Telemetry Fields
-            gasUsd: (evt as any).gasUsd,
-            blockConfirmations: evt.confirmations,
-            telemetryTag: evt.telemetryTag,
+            gasUsed: (evt as any).gasUsed,
+            confirmations: (evt as any).confirmations,
+            telemetryTag: (evt as any).telemetryTag,
         }));
 
         return NextResponse.json({

@@ -28,7 +28,7 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
     const [showSuccess, setShowSuccess] = useState(false);
 
     // Whitelist check by wallet address (SIWE-native identity)
-    const ADDRESS_WHITELIST = [
+    const ADDRESS_WHITELIST: string[] = [
         // Add whitelisted wallet addresses here
     ];
     const isWhitelisted = address ? ADDRESS_WHITELIST.includes(address.toLowerCase()) : false;

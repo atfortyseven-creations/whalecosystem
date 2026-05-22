@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const events = await prisma.globalWhaleEvent.findMany({
+    const events = await (prisma as any).globalWhaleEvent.findMany({
       where: {
         timestamp: { gte: startDate }
       },
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
     // Generate CSV
     const headers = ['id', 'timestamp', 'hash', 'wallet', 'token', 'amount', 'usd_value', 'action', 'dex'].join(',');
-    const rows = events.map(e => [
+    const rows = events.map((e: any) => [
       e.id,
       e.timestamp.toISOString(),
       e.hash,

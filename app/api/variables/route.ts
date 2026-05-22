@@ -9,14 +9,14 @@ export async function GET(req: Request) {
 
     if (!wallet) return NextResponse.json([], { status: 401 });
 
-    const variables = await prisma.variable.findMany({
+    const variables = await (prisma as any).variable.findMany({
       where: { userId: wallet },
       orderBy: { updatedAt: 'desc' }
     });
 
     // Decrypt all values before returning to the client
     const decrypted = await Promise.all(
-      variables.map(async (v) => ({
+      variables.map(async (v: any) => ({
         ...v,
         value: await decryptValue(v.value)
       }))
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     // Encrypt the value before persisting to PostgreSQL
     const encryptedValue = await encryptValue(value);
 
-    const variable = await prisma.variable.upsert({
+    const variable = await (prisma as any).variable.upsert({
       where: { userId_key: { userId: wallet, key } },
       update: { value: encryptedValue, description },
       create: { userId: wallet, key, value: encryptedValue, description }

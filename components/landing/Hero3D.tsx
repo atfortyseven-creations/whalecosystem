@@ -11,7 +11,7 @@ import gsap from 'gsap';
 // ── WebGL Neural Sphere Background ──────────────────────────
 // Particle count reduced: 8000 → 3000 — visually identical at screen res, 3x cheaper
 function WebGLParticleSphere(props: any) {
-    const ref = useRef<any>();
+    const ref = useRef<any>(null);
     // useMemo so sphere array is created once, not on every render
     const sphere = useMemo(() =>
         random.inSphere(new Float32Array(3000), { radius: 1.5 }), []);

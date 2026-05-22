@@ -16,7 +16,7 @@ function getSessionId(): string {
     return id;
 }
 
-type BridgeState = 'idle' | 'generating' | 'ready' | 'expired' | 'error';
+type BridgeState = 'idle' | 'generating' | 'ready' | 'expired' | 'error' | 'success';
 
 interface SovereignBridgeProps {
     onClose?: () => void;

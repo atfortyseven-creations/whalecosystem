@@ -15,7 +15,7 @@ const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), {
 
 export function Constellation() {
     const { address } = (useAccount as any)();
-    const graphRef = useRef<any>();
+    const graphRef = useRef<any>(null);
     const [data, setData] = useState<GraphData | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
