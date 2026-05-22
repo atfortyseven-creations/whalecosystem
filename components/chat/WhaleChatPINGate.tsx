@@ -580,8 +580,12 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
             <img
               src="/atom_3d_silver.jpg"
               alt="Quantum Atom"
-              className="w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] md:w-[600px] md:h-[600px] max-w-full object-contain mx-auto mix-blend-multiply drop-shadow-2xl"
+              className="w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] md:w-[600px] md:h-[600px] max-w-full object-contain mx-auto mix-blend-multiply"
               draggable={false}
+              style={{
+                maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 45%, transparent 80%)',
+                WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 45%, transparent 80%)',
+              }}
             />
           </motion.div>
         </div>

@@ -176,9 +176,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          5. CTA / DOWNPAGE (WITH VIDEO BACKGROUND)
+          5. CTA / DOWNPAGE (WITH VIDEO BACKGROUND + LOGO BELT)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="relative w-full h-[90vh] md:h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+      <section className="relative w-full min-h-[90vh] md:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+        {/* Video background */}
         <div className="absolute inset-0 w-full h-full">
           <video 
             src="/system-shots/14683943_3840_2160_30fps.mp4" 
@@ -189,21 +190,147 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
             className="w-full h-full object-cover opacity-60"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/80 pointer-events-none" />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/80 pointer-events-none" />
 
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={STAGGER} className="relative z-10 flex flex-col items-center text-center max-w-[800px] px-6">
-          <motion.h2 variants={FADE_UP} className="text-[44px] md:text-[64px] font-black tracking-tighter uppercase leading-[0.95] text-white mb-8 drop-shadow-lg">
+        {/* ── CTA Content ── */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={STAGGER}
+          className="relative z-10 flex flex-col items-center text-center max-w-[860px] px-6 w-full"
+        >
+          <motion.h2
+            variants={FADE_UP}
+            className="text-[44px] md:text-[64px] font-black tracking-tighter uppercase leading-[0.95] text-white mb-6 drop-shadow-lg"
+          >
             Ready to Upgrade Your <br className="hidden sm:block"/>Digital Security?
           </motion.h2>
-          <motion.p variants={FADE_UP} className="font-serif text-[18px] md:text-[22px] text-white/80 leading-relaxed mb-12 drop-shadow-md">
+          <motion.p
+            variants={FADE_UP}
+            className="font-serif text-[18px] md:text-[22px] text-white/75 leading-relaxed mb-10 drop-shadow-md max-w-[620px]"
+          >
             Join the global network of people who trust Whale Alert to protect their data, privacy, and communications.
           </motion.p>
           <motion.div variants={FADE_UP}>
-            <Link href="/docs/getting-started" className="inline-flex items-center justify-center px-12 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+            <Link
+              href="/docs/getting-started"
+              className="inline-flex items-center justify-center px-12 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+            >
               Get Started Now
             </Link>
           </motion.div>
         </motion.div>
+
+        {/* ── LOGO BELT ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10 w-full mt-16 md:mt-20"
+        >
+          {/* Label */}
+          <p className="text-center text-[9px] font-mono uppercase tracking-[0.35em] text-white/30 mb-5">
+            Powered by
+          </p>
+
+          {/* Fade masks left / right */}
+          <div className="absolute left-0 top-0 w-24 h-full bg-gradient-to-r from-black to-transparent z-20 pointer-events-none" />
+          <div className="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-black to-transparent z-20 pointer-events-none" />
+
+          {/* Marquee track */}
+          <div className="overflow-hidden w-full">
+            <div
+              className="flex items-center gap-8"
+              style={{
+                animation: 'logoMarquee 28s linear infinite',
+                width: 'max-content',
+              }}
+            >
+              {/* Two full sets so the loop is seamless */}
+              {[0, 1].map((set) => (
+                <React.Fragment key={set}>
+                  {/* Worldcoin / 64b5... */}
+                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
+                    <img
+                      src="/system-shots/64b5696bf0d1f9bd7b9b0f22_400-400Logo-300x300.png"
+                      alt="Worldcoin"
+                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
+                    />
+                  </div>
+                  {/* Aztec / Screenshot */}
+                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
+                    <img
+                      src="/system-shots/Captura de pantalla 2026-05-22 030758.png"
+                      alt="Aztec Network"
+                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
+                    />
+                  </div>
+                  {/* Cloudflare */}
+                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
+                    <img
+                      src="/system-shots/cloudflare_logo_icon_170372.png"
+                      alt="Cloudflare"
+                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
+                    />
+                  </div>
+                  {/* Coinbase */}
+                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
+                    <img
+                      src="/system-shots/coinbase-logo-icon.webp"
+                      alt="Coinbase"
+                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
+                    />
+                  </div>
+                  {/* Ethereum */}
+                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
+                    <img
+                      src="/system-shots/ethereum-eth.svg"
+                      alt="Ethereum"
+                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
+                    />
+                  </div>
+                  {/* Neo4j */}
+                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
+                    <img
+                      src="/system-shots/neo4j-logo-png-transparent.png"
+                      alt="Neo4j"
+                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
+                    />
+                  </div>
+                  {/* MetaMask */}
+                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
+                    <img
+                      src="/system-shots/MetaMask_Fox.svg.png"
+                      alt="MetaMask"
+                      className="h-8 w-auto object-contain opacity-85"
+                    />
+                  </div>
+                  {/* Upstash */}
+                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
+                    <img
+                      src="/system-shots/upstash-icon-white-bg.png"
+                      alt="Upstash"
+                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
+                    />
+                  </div>
+                  {/* Spacer between sets */}
+                  <div className="w-8 shrink-0" />
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Marquee keyframe injected inline */}
+        <style>{`
+          @keyframes logoMarquee {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}</style>
       </section>
 
     </div>
