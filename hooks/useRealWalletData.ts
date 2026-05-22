@@ -1,4 +1,4 @@
-import { useBalance, useReadContract } from 'wagmi';
+import { useBalance, useReadContract, useChains } from 'wagmi';
 import { parseAbi, formatEther } from 'viem';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -158,17 +158,9 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         platform: tx.platform
     })) || [];
 
-    // Assets processing (Mapped from Elite service)
-    const CHAIN_ID_TO_NETWORK: Record<number, string> = {
-        1: 'Ethereum',
-        137: 'Polygon',
-        8453: 'Base',
-        10: 'OP Mainnet',
-        42161: 'Arbitrum One',
-        43114: 'Avalanche',
-        56: 'BNB Smart Chain',
-        480: 'World Chain'
-    };
+    // Dynamic resolution of network names from Wagmi context instead of hardcoded mappings
+    const activeChains = useChains();
+    const getNetworkName = (id: number) => activeChains.find(c => c.id === id)?.name || 'Unknown';
 
     const assets: Asset[] = (Array.isArray(assetsData?.tokens) ? assetsData.tokens : []).map((t: any) => ({
         symbol: t.symbol,
@@ -185,7 +177,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         decimals: t.decimals || 18,
         logoURI: t.logo || t.logoURI,
         chainId: t.chainId,
-        network: CHAIN_ID_TO_NETWORK[t.chainId] || 'Unknown',
+        network: getNetworkName(t.chainId),
         change24h: t.change24h || 0
     }));
 

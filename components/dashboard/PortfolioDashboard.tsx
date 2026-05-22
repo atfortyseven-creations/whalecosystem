@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, ArrowDownRight, RefreshCcw, TrendingUp, Wallet, Loader2, PieChart, Activity, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus, Github, Twitter, Copy, ExternalLink, ArrowDownLeft, ArrowLeftRight } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, TrendingUp, Wallet, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus, Github, Twitter, Copy, ExternalLink, ArrowDownLeft, ArrowLeftRight, Network, X, Loader2 } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
@@ -11,11 +11,12 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { PortfolioSkeleton } from '@/components/ui/skeleton-loader';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { useRealWalletData } from '@/hooks/useRealWalletData';
-import SendModal from '@/components/wallet/SendModal';
 import ReceiveModal from '@/components/wallet/ReceiveModal';
-import SwapModal from '@/components/wallet/SwapModal';
+import UnifiedWalletModal from '@/components/wallet/UnifiedWalletModal';
 import { TokenLogo } from '@/components/ui/TokenLogo';
 import TransactionHistory from '@/components/wallet/TransactionHistory';
+import { useChainId, useChains, useSwitchChain } from 'wagmi';
+import { toast } from 'sonner';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
@@ -32,6 +33,12 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const { open } = useAppKit();
     const { address: web3Address } = useSovereignAccount();
     const isMobile = useIsMobile();
+
+    // ── Real-Time Chain Detection (replaces hardcoded 'Ethereum Mainnet')
+    const currentChainId = useChainId();
+    const allChains = useChains();
+    const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
+    const activeChainName = allChains.find(c => c.id === currentChainId)?.name || 'Unknown Network';
     
     // Integration with Encrypted Managed Identities
     const { accounts, switchAccount } = useWalletStore();
@@ -54,15 +61,39 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const [mounted, setMounted] = useState(false);
     const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
     const [isEyesOff, setIsEyesOff] = useState(false);
+    // Network switcher mini-modal state
+    const [isNetworkSwitcherOpen, setIsNetworkSwitcherOpen] = useState(false);
     
     // Modal states
-    const [isSendOpen, setIsSendOpen] = useState(false);
+    const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+    const [walletModalTab, setWalletModalTab] = useState<"SEND" | "SWAP" | "BRIDGE" | "BUY">("SEND");
     const [isReceiveOpen, setIsReceiveOpen] = useState(false);
-    const [isSwapOpen, setIsSwapOpen] = useState(false);
 
     // MetaMask Parity States
     const [activeTab, setActiveTab] = useState<'tokens' | 'activity'>('tokens');
     const [copied, setCopied] = useState(false);
+
+    // Real on-chain network switch handler
+    const handleNetworkSwitch = useCallback(async (chainId: number) => {
+        try {
+            await switchChainAsync({ chainId });
+            setIsNetworkSwitcherOpen(false);
+            toast.success(`Switched to ${allChains.find(c => c.id === chainId)?.name}`);
+        } catch (e: any) {
+            toast.error(e.shortMessage || 'Failed to switch network');
+        }
+    }, [switchChainAsync, allChains]);
+
+    // Real vault account creation handler
+    const handleCreateVault = useCallback(async () => {
+        try {
+            await useWalletStore.getState().createWallet();
+            toast.success('New encrypted vault created and activated.');
+            setIsSwitcherOpen(false);
+        } catch (e: any) {
+            toast.error(e.message || 'Failed to create vault.');
+        }
+    }, []);
 
     const handleCopy = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -139,10 +170,46 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
         <div className="w-full relative space-y-8">
             {/* 🔥 DASHBOARD HEADER & ACCOUNT SWITCHER */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-2">
-                <div className="flex items-center gap-3 bg-white/50 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-black/[0.05] shadow-sm">
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-                    <span className="text-sm font-black text-[#050505] dark:text-white uppercase tracking-tight">Ethereum Mainnet</span>
-                    <ChevronDown size={14} className="text-black/40" />
+                {/* Real-time chain indicator with network switcher */}
+                <div className="relative">
+                    <button
+                        onClick={() => setIsNetworkSwitcherOpen(!isNetworkSwitcherOpen)}
+                        className="flex items-center gap-3 bg-white/50 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-black/[0.05] shadow-sm hover:bg-white/70 transition-all"
+                    >
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
+                        <span className="text-sm font-black text-[#050505] dark:text-white uppercase tracking-tight">{activeChainName}</span>
+                        <ChevronDown size={14} className={cn("text-black/40 transition-transform", isNetworkSwitcherOpen && "rotate-180")} />
+                    </button>
+                    <AnimatePresence>
+                        {isNetworkSwitcherOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                                className="absolute top-full left-0 mt-2 w-64 bg-white border border-black/10 rounded-2xl shadow-2xl z-50 overflow-hidden"
+                            >
+                                <div className="px-4 py-3 border-b border-black/5 flex justify-between items-center">
+                                    <span className="text-[10px] font-black text-black/50 uppercase tracking-widest">Switch Network</span>
+                                    <button onClick={() => setIsNetworkSwitcherOpen(false)} className="text-black/30 hover:text-black transition-colors"><X size={14} /></button>
+                                </div>
+                                {allChains.map(chain => (
+                                    <button
+                                        key={chain.id}
+                                        onClick={() => handleNetworkSwitch(chain.id)}
+                                        disabled={isSwitchingChain}
+                                        className={cn(
+                                            "w-full text-left px-4 py-3 flex items-center justify-between text-[11px] font-black uppercase tracking-widest transition-colors",
+                                            chain.id === currentChainId ? "bg-black/5 text-black" : "text-black/50 hover:bg-black/[0.03] hover:text-black"
+                                        )}
+                                    >
+                                        {chain.name}
+                                        {chain.id === currentChainId && <Check size={14} className="text-emerald-500" />}
+                                        {isSwitchingChain && chain.id !== currentChainId && <Loader2 size={14} className="animate-spin opacity-30" />}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Account Switcher Pill */}
@@ -295,7 +362,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     <ActionButton 
                         icon={<ArrowUpRight size={20} />} 
                         label="Send" 
-                        onClick={() => setIsSendOpen(true)} 
+                        onClick={() => { setWalletModalTab("SEND"); setIsWalletModalOpen(true); }} 
                         primary
                     />
                     <ActionButton 
@@ -306,27 +373,27 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     <ActionButton 
                         icon={<ArrowLeftRight size={20} />} 
                         label="Swap" 
-                        onClick={() => setIsSwapOpen(true)} 
+                        onClick={() => { setWalletModalTab("SWAP"); setIsWalletModalOpen(true); }} 
                     />
                     <ActionButton 
                         icon={<Globe size={20} />} 
                         label="Bridge" 
-                        onClick={() => alert("Bridge module optimizing cross-chain liquidity paths.")} 
+                        onClick={() => { setWalletModalTab("BRIDGE"); setIsWalletModalOpen(true); }} 
                     />
                     <ActionButton 
                         icon={<Zap size={20} />} 
                         label="Buy" 
-                        onClick={() => alert("Buy crypto service powering direct on-ramps.")} 
+                        onClick={() => { setWalletModalTab("BUY"); setIsWalletModalOpen(true); }} 
                     />
                     <ActionButton 
-                        icon={<Globe size={20} />} 
+                        icon={<Network size={20} />} 
                         label="Network" 
-                        onClick={() => alert("Network settings config is available via bottom status or main command console.")} 
+                        onClick={() => setIsNetworkSwitcherOpen(true)} 
                     />
                     <ActionButton 
                         icon={<UserPlus size={20} />} 
                         label="New Account" 
-                        onClick={() => alert("Vault account creation triggered. Non-custodial ledger active.")} 
+                        onClick={handleCreateVault} 
                     />
                 </div>
             </motion.div>
@@ -508,9 +575,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             </div>
             
             {/* Modal Integrations */}
-            <SendModal isOpen={isSendOpen} onClose={() => setIsSendOpen(false)} />
-            <ReceiveModal isOpen={isReceiveOpen} onClose={() => setIsReceiveOpen(false)} />
-            <SwapModal isOpen={isSwapOpen} onClose={() => setIsSwapOpen(false)} />
+            <UnifiedWalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} initialTab={walletModalTab} userAssets={assets} />
+            <ReceiveModal isOpen={isReceiveOpen} onClose={() => setIsReceiveOpen(false)} userAssets={assets} />
         </div>
     );
 }

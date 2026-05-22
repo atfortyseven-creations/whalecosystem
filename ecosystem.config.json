@@ -20,32 +20,6 @@
       "kill_timeout": 5000,
       "wait_ready": false,
       "autorestart": true
-    },
-    {
-      "name": "humanity-indexer",
-      "script": "workers/humanity-indexer.ts",
-      "interpreter": "node_modules/.bin/tsx",
-      "cwd": "/app",
-      "env": {
-        "NODE_ENV": "production",
-        "NODE_OPTIONS": "--max-old-space-size=256"
-      },
-      "max_memory_restart": "300M",
-      "autorestart": true,
-      "restart_delay": 5000
-    },
-    {
-      "name": "humanity-pruner",
-      "script": "workers/humanity-pruner.ts",
-      "interpreter": "node_modules/.bin/tsx",
-      "cwd": "/app",
-      "env": {
-        "NODE_ENV": "production",
-        "NODE_OPTIONS": "--max-old-space-size=128"
-      },
-      "max_memory_restart": "150M",
-      "autorestart": true,
-      "restart_delay": 10000
     }
   ]
 }

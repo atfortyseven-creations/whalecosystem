@@ -65,8 +65,10 @@ async function fetchAlchemyTransfers(address: string, chainId: number): Promise<
   const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
   const networkMap: Record<number, string> = {
     1: 'eth-mainnet',
+    10: 'opt-mainnet',
     137: 'polygon-mainnet',
     8453: 'base-mainnet',
+    42161: 'arb-mainnet'
   };
 
   const network = networkMap[chainId];
@@ -101,7 +103,7 @@ async function fetchAlchemyTransfers(address: string, chainId: number): Promise<
 }
 
 export async function getEnrichedHistory(address: string) {
-  const chains = [1, 137, 8453]; 
+  const chains = [1, 10, 137, 8453, 42161]; 
   
   const allResults = await Promise.all(chains.map(async id => {
       const transfers = await fetchAlchemyTransfers(address, id);
