@@ -151,13 +151,12 @@ export default function QDsPage() {
         className="relative w-full overflow-hidden bg-white"
         style={{ minHeight: '100svh' }}
       >
-        {/* 3D Atom — covers full hero, client-only */}
+        {/* Static Image — replaces buggy 3D Atom */}
         {mounted && (
           <div
-            className="absolute inset-0 z-0 pointer-events-none"
-            style={{ willChange: 'transform' }}
+            className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-70 mix-blend-multiply"
           >
-            <QDsAtomRenderer vel={vel} isDark={false} enableScale={true} />
+            <img src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" alt="Quantum Atom" className="w-full h-full object-cover" />
           </div>
         )}
 
@@ -282,40 +281,30 @@ export default function QDsPage() {
         ))}
       </section>
 
-      {/* ── MID-PAGE ATOM DIVIDER ─────────────────────────────────────────── */}
+      {/* ── MID-PAGE IMAGE DIVIDER ─────────────────────────────────────────── */}
       <section
         className="w-full relative border-y border-black/10 bg-[#F8F8F6] overflow-hidden"
         style={{ height: 'clamp(340px, 45vh, 520px)' }}
       >
-        {mounted && (
-          <div className="absolute inset-0">
-            <QDsAtomRenderer vel={vel} isDark={false} enableScale={false} />
-          </div>
-        )}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <img 
+            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" 
+            alt="Quantum Atom" 
+            className="w-full h-full object-cover opacity-80 mix-blend-multiply"
+          />
+        </div>
         {/* Edge fades */}
         <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#F8F8F6] to-transparent pointer-events-none z-10" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#F8F8F6] to-transparent pointer-events-none z-10" />
-        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-          <span className="font-mono text-[10px] font-black uppercase tracking-[0.55em] text-black/18">
+        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none bg-white/20 backdrop-blur-[2px]">
+          <span className="font-mono text-[10px] font-black uppercase tracking-[0.55em] text-black/40 drop-shadow-sm">
             QDs · Quantum Dots · 21,000,000 · 2026
           </span>
         </div>
       </section>
 
-      {/* ── FINAL CTA (WITH VIDEO BACKGROUND) ───────────────────────────── */}
-      <section className="relative w-full h-[90vh] md:h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-        <div className="absolute inset-0 w-full h-full">
-          <video 
-            src="/system-shots/14683943_3840_2160_30fps.mp4" 
-            autoPlay 
-            loop 
-            muted 
-            playsInline 
-            className="w-full h-full object-cover opacity-60"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/80 pointer-events-none" />
-
+      {/* ── FINAL CTA ───────────────────────────── */}
+      <section className="relative w-full py-32 md:py-48 flex flex-col items-center justify-center overflow-hidden bg-[#FAF9F6] border-b border-black/10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -323,17 +312,17 @@ export default function QDsPage() {
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="relative z-10 max-w-2xl flex flex-col items-center gap-8 px-6 text-center"
         >
-          <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-white/40 drop-shadow-md">
+          <span className="font-mono text-[10px] font-black uppercase tracking-[0.5em] text-black/40">
             Genesis Block · Before 2027
           </span>
           <h2
-            className="font-black tracking-tighter uppercase leading-[0.87] text-white text-balance drop-shadow-lg"
+            className="font-black tracking-tighter uppercase leading-[0.87] text-black text-balance"
             style={{ fontSize: 'clamp(36px, 7vw, 72px)' }}
           >
             Mining starts soon.
           </h2>
           <p
-            className="font-serif text-white/80 leading-relaxed max-w-xl drop-shadow-md"
+            className="font-serif text-black/60 leading-relaxed max-w-xl"
             style={{ fontSize: 'clamp(15px, 1.7vw, 19px)' }}
           >
             Open participation. Fixed supply. No exceptions to either rule.
@@ -341,13 +330,13 @@ export default function QDsPage() {
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
             <Link
               href="/status"
-              className="px-10 py-5 bg-white text-black hover:bg-white/90 rounded-full font-mono text-[11px] font-black uppercase tracking-[0.22em] transition-transform active:scale-95 shadow-xl"
+              className="px-10 py-5 bg-black text-white hover:bg-black/90 rounded-full font-mono text-[11px] font-black uppercase tracking-[0.22em] transition-transform active:scale-95 shadow-xl"
             >
               Network Status
             </Link>
             <Link
               href="/developer"
-              className="px-10 py-5 bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-full font-mono text-[11px] font-black uppercase tracking-[0.22em] transition-transform active:scale-95"
+              className="px-10 py-5 bg-transparent border border-black/10 text-black hover:bg-black/5 rounded-full font-mono text-[11px] font-black uppercase tracking-[0.22em] transition-transform active:scale-95"
             >
               Technical Docs
             </Link>
