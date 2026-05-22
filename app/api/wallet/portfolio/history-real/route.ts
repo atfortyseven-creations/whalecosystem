@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// ════════════════════════════════════════════════════════════════════
-// /api/wallet/portfolio/history-real — Real Portfolio Value History
+// 
+// /api/wallet/portfolio/history-real  Real Portfolio Value History
 // Strategy: fetch ETH price history from CoinGecko (free tier)
 // and multiply by a wallet's real on-chain ETH balance to produce
 // an accurate historical USD valuation curve.
 //
 // If no wallet is connected, returns price index data (BTC/ETH market)
 // so the chart still shows real market movement, not random walks.
-// ════════════════════════════════════════════════════════════════════
+// 
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
         // Step 1: Get real ETH price history for the period (CoinGecko free API)
         const priceRes = await fetch(
             `https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=${days}&interval=daily`,
-            { next: { revalidate: 3600 } } // Cache 1h — price history doesn't change
+            { next: { revalidate: 3600 } } // Cache 1h  price history doesn't change
         );
 
         if (!priceRes.ok) throw new Error('CoinGecko price history unavailable');
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
                 if (balData.status === '1') {
                     balanceEth = parseInt(balData.result) / 1e18;
                 }
-            } catch { /* balance unavailable — use index mode */ }
+            } catch { /* balance unavailable  use index mode */ }
         }
 
         // Step 3: Build chart data

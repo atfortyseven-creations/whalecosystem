@@ -34,12 +34,12 @@ interface Props {
   onClose: () => void;
 }
 
-// ── Formatters ─────────────────────────────────────────────────────────────────
-const sym = (c: 'USD' | 'EUR') => c === 'EUR' ? '€' : '$';
+//  Formatters 
+const sym = (c: 'USD' | 'EUR') => c === 'EUR' ? '' : '$';
 
 function fmtP(n: number, c: 'USD' | 'EUR', r: number): string {
   const v = n * (c === 'EUR' ? r : 1), s = sym(c);
-  if (!v || isNaN(v)) return `${s}—`;
+  if (!v || isNaN(v)) return `${s}`;
   if (v >= 1000)  return `${s}${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   if (v >= 1)     return `${s}${v.toFixed(4)}`;
   if (v >= 0.01)  return `${s}${v.toFixed(6)}`;
@@ -48,7 +48,7 @@ function fmtP(n: number, c: 'USD' | 'EUR', r: number): string {
 
 function fmtL(n: number, c: 'USD' | 'EUR', r: number): string {
   const v = n * (c === 'EUR' ? r : 1), s = sym(c);
-  if (!v || isNaN(v)) return '—';
+  if (!v || isNaN(v)) return '';
   if (v >= 1e12) return `${s}${(v / 1e12).toFixed(2)}T`;
   if (v >= 1e9)  return `${s}${(v / 1e9).toFixed(2)}B`;
   if (v >= 1e6)  return `${s}${(v / 1e6).toFixed(2)}M`;
@@ -64,7 +64,7 @@ function pctFmt(v: number): string {
   return `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
+//  Sub-components 
 
 function DataRow({ label, value, mono = true, highlight = false }: {
   label: string;
@@ -93,7 +93,7 @@ function PctCell({ value }: { value: number }) {
   );
 }
 
-// ── Main Modal ─────────────────────────────────────────────────────────────────
+//  Main Modal 
 export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
   const [mounted, setMounted] = useState(false);
 
@@ -138,7 +138,7 @@ export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
             className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white border border-black/8 rounded-2xl shadow-[0_32px_80px_-12px_rgba(0,0,0,0.25)]"
             onClick={e => e.stopPropagation()}
           >
-            {/* ── HEADER ────────────────────────────────────────────────── */}
+            {/*  HEADER  */}
             <div className="flex items-center justify-between px-7 py-5 border-b border-black/6">
               <div className="flex items-center gap-4">
                 <div
@@ -170,7 +170,7 @@ export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
               </button>
             </div>
 
-            {/* ── PRICE HERO ───────────────────────────────────────────── */}
+            {/*  PRICE HERO  */}
             <div className="px-7 py-6 border-b border-black/6 bg-black/[0.015]">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/35 mb-2">Live Oracle Price</p>
               <div className="flex items-end justify-between gap-4">
@@ -202,7 +202,7 @@ export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
               )}
             </div>
 
-            {/* ── PRICE CHANGES GRID ────────────────────────────────────── */}
+            {/*  PRICE CHANGES GRID  */}
             {token.priceChange && (
               <div className="px-7 py-5 border-b border-black/6">
                 <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-black/30 mb-3 flex items-center gap-1.5">
@@ -224,16 +224,16 @@ export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
               </div>
             )}
 
-            {/* ── COMPLETE INDEXATION ────────────────────────────────────── */}
+            {/*  COMPLETE INDEXATION  */}
             <div className="px-7 py-5 border-b border-black/6">
               <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-black/30 mb-3 flex items-center gap-1.5">
                 <Database size={11} /> Complete Indexation
               </p>
               <div className="bg-black/[0.015] border border-black/6 rounded-xl px-5 py-1">
                 <DataRow label="24H Volume"      value={fmtL(token.volume, currency, eurRate)} />
-                <DataRow label="Market Cap"      value={token.mcap ? fmtL(token.mcap, currency, eurRate) : '—'} />
-                <DataRow label="Fully Diluted"   value={token.fdv ? fmtL(token.fdv, currency, eurRate) : '—'} />
-                <DataRow label="Liquidity Pool"  value={token.liquidity ? fmtL(token.liquidity, currency, eurRate) : '—'} />
+                <DataRow label="Market Cap"      value={token.mcap ? fmtL(token.mcap, currency, eurRate) : ''} />
+                <DataRow label="Fully Diluted"   value={token.fdv ? fmtL(token.fdv, currency, eurRate) : ''} />
+                <DataRow label="Liquidity Pool"  value={token.liquidity ? fmtL(token.liquidity, currency, eurRate) : ''} />
                 {token.getblockVerified && (
                   <DataRow
                     label="On-Chain State"
@@ -247,7 +247,7 @@ export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
               </div>
             </div>
 
-            {/* ── DEX METADATA ──────────────────────────────────────────── */}
+            {/*  DEX METADATA  */}
             {(token.dex || token.pairCreatedAt) && (
               <div className="px-7 py-4 border-b border-black/6">
                 <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-black/30 mb-3 flex items-center gap-1.5">
@@ -273,7 +273,7 @@ export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
               </div>
             )}
 
-            {/* ── FOOTER ────────────────────────────────────────────────── */}
+            {/*  FOOTER  */}
             <div className="px-7 py-4 flex items-center justify-between">
               <a
                 href={explorerBase[token.network] || 'https://etherscan.io'}

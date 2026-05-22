@@ -41,7 +41,7 @@ export const useAegisDefense = create<AegisState>((set, get) => ({
         const drop = (state.initialPortfolioValue - newVal) / state.initialPortfolioValue;
         
         if (drop > SAFETY_INVARIANTS.MAX_PORTFOLIO_DROP_PCT) {
-            console.error("🛡️ AEGIS TRIGGERED: Massive value drop detected!");
+            console.error("️ AEGIS TRIGGERED: Massive value drop detected!");
             set({ 
                 isFrozen: true, 
                 freezeReason: `PROTOCOL PAUSED: Portfolio dropped ${Math.round(drop * 100)}% suddenly. Investigation required.` 

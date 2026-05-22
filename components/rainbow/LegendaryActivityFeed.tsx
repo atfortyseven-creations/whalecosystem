@@ -50,7 +50,7 @@ export function LegendaryActivityFeed({ history }: { history: Transaction[] }) {
                         {tx.status === 'PENDING' && <LoaderPulse />}
                     </div>
                     <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">
-                        {tx.chainId === 1 ? 'Mainnet' : tx.chainId === 137 ? 'Polygon' : tx.chainId === 8453 ? 'Base' : tx.chainId === 480 ? 'WorldChain' : tx.chainId === 42161 ? 'Arbitrum' : 'Optimism'} • {formatDistanceToNow(new Date(tx.timestamp))}
+                        {tx.chainId === 1 ? 'Mainnet' : tx.chainId === 137 ? 'Polygon' : tx.chainId === 8453 ? 'Base' : tx.chainId === 480 ? 'WorldChain' : tx.chainId === 42161 ? 'Arbitrum' : 'Optimism'}  {formatDistanceToNow(new Date(tx.timestamp))}
                     </div>
                   </div>
                </div>

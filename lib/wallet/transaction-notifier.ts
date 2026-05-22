@@ -38,22 +38,22 @@ class TransactionNotifierService {
     // Determine toast message based on source and type
     const { amount, symbol, source, type, hash, usdValue } = notification;
 
-    let title = '🎉 Transaction Detected!';
+    let title = ' Transaction Detected!';
     let description = `${amount} ${symbol}`;
 
     if (type === 'incoming') {
       if (source === 'moonpay') {
-        title = '💳 MoonPay Purchase Complete!';
+        title = ' MoonPay Purchase Complete!';
         description = `+${amount} ${symbol} added to your wallet`;
       } else if (source === 'wallet') {
-        title = '🎉 Funds Received!';
+        title = ' Funds Received!';
         description = `+${amount} ${symbol} incoming`;
       }
     } else if (type === 'swap') {
-      title = '🔄 Swap Confirmed!';
+      title = ' Swap Confirmed!';
       description = `Swapped ${amount} ${symbol}`;
     } else if (type === 'bridge') {
-      title = '🌉 Bridge Complete!';
+      title = ' Bridge Complete!';
       description = `Bridged ${amount} ${symbol}`;
     }
 

@@ -73,7 +73,7 @@ export function EpicFooter() {
                     <button className="relative px-12 py-6 bg-white text-black text-xs font-black uppercase tracking-[0.3em] rounded-full overflow-hidden group hover:scale-105 transition-transform duration-300">
                         <div className="absolute inset-0 bg-[#ef4444] scale-y-0 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-100" />
                         <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-                            Start Terminal →
+                            Start Terminal 
                         </span>
                     </button>
                     

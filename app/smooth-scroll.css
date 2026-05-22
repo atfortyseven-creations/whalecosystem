@@ -4,10 +4,10 @@ html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
-/* ══ SINGLE SCROLLBAR ═══════════════════════════════════════════════════════
+/*  SINGLE SCROLLBAR 
    Only html has the styled scrollbar. Inner containers use .no-scrollbar
-   or .custom-scrollbar explicitly — never inherit from *.
-   ══════════════════════════════════════════════════════════════════════════ */
+   or .custom-scrollbar explicitly  never inherit from *.
+    */
 
 /* Firefox: only the root html scrollbar */
 html {

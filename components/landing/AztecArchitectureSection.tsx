@@ -14,7 +14,7 @@ const SECURITY_PILLARS = [
     index: "02",
     label: "Absolute Privacy",
     protocol: "ZERO-KNOWLEDGE ARCHITECTURE",
-    body: "Whale Alert Network ensures that your identity, portfolio, and strategic operations remain secure and private. Our infrastructure guarantees that your intelligence gathering remains confidential, operating with complete discretion at all times."
+    body: "Whale Alert Network ensures that your identity, portfolio, and strategic operations remain secure and private. Our infrastructure guarantees that your analytics gathering remains confidential, operating with complete discretion at all times."
   },
   {
     index: "03",
@@ -36,7 +36,7 @@ const HIGHLIGHTS = [
   { key: "Encryption Standard", value: "AES-GCM-256" },
   { key: "Identity Verification", value: "Biometric Liveness Proofs" },
   { key: "Session Control", value: "Zero-Knowledge Mathematics" },
-  { key: "Cross-Layer Execution", value: "Seamless L1 ↔ L2 Messaging" }
+  { key: "Cross-Layer Execution", value: "Seamless L1  L2 Messaging" }
 ];
 
 const AZTEC_EXTENDED_POINTS = [
@@ -61,7 +61,7 @@ const AZTEC_EXTENDED_POINTS = [
     desc: "Seamless interoperability bridging private UTXO state and public transparent state within a single transaction, allowing complex quantitative strategies to execute without fragmentation."
   },
   {
-    title: "L1 ↔ L2 Messaging",
+    title: "L1  L2 Messaging",
     desc: "A secure, trustless message-passing protocol between Ethereum Mainnet and the Whale Alert Network's Rollup, eliminating reliance on vulnerable third-party bridging infrastructure."
   },
   {
@@ -92,30 +92,30 @@ export function AztecArchitectureSection() {
     >
       <div className="w-full max-w-[2560px] mx-auto px-5 sm:px-8 py-24 flex flex-col gap-16 items-center">
 
-        {/* ── Section Header ── */}
+        {/*  Section Header  */}
         <div className="w-full max-w-[850px] flex flex-col gap-6 text-left">
           <div className="border-b-[1.5px] border-black pb-3 flex items-end justify-between">
             <h2 className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-black">
-              Security Infrastructure — Zero-Trust Protocol
+              Security Infrastructure  Zero-Trust Protocol
             </h2>
           </div>
 
           <div className="flex flex-col gap-4 font-serif text-[15px] sm:text-[16px] text-[#222] leading-relaxed text-left">
             <p>
-              In the modern era of on-chain intelligence, raw data is only half of the equation. 
+              In the modern era of on-chain analytics, raw data is only half of the equation. 
               The true advantage lies in <strong>operational secrecy</strong>. Our infrastructure is built 
               from the ground up on a foundation of absolute privacy, ensuring that your institutional 
               movements and analytical queries are never exposed.
             </p>
             <p>
               Unlike conventional analytics platforms that track your behavior, 
-              Whale Alert Network separates the act of gathering intelligence from the act of revealing it. 
+              Whale Alert Network separates the act of gathering analytics from the act of revealing it. 
               You gain total visibility over the market while maintaining operational privacy.
             </p>
           </div>
         </div>
 
-        {/* ── Security Pillars ── */}
+        {/*  Security Pillars  */}
         <div className="w-full max-w-[850px]">
           <div className="flex flex-col gap-[1px] bg-black border border-black shadow-sm">
             {SECURITY_PILLARS.map((pillar) => {
@@ -144,7 +144,7 @@ export function AztecArchitectureSection() {
                           {pillar.protocol}
                         </span>
                         <span className="font-mono text-[10px] text-black/20 select-none">
-                          {isOpen ? "−" : "+"}
+                          {isOpen ? "" : "+"}
                         </span>
                       </div>
                     </div>
@@ -161,7 +161,7 @@ export function AztecArchitectureSection() {
           </div>
         </div>
 
-        {/* ── Technical Highlights ── */}
+        {/*  Technical Highlights  */}
         <div className="w-full max-w-[850px] flex flex-col gap-0">
           <div className="border-b border-black pb-2 mb-0">
             <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/50 font-bold">
@@ -186,7 +186,7 @@ export function AztecArchitectureSection() {
           </div>
         </div>
 
-        {/* ── Extended Aztec Integration ── */}
+        {/*  Extended Aztec Integration  */}
         <div className="w-full max-w-[1200px] flex flex-col lg:flex-row gap-12 mt-12 border-t border-black pb-12 pt-16">
           
           <div className="w-full lg:w-[35%] flex flex-col gap-6">
@@ -216,13 +216,13 @@ export function AztecArchitectureSection() {
           </div>
         </div>
 
-        {/* ── Closing Statement ── */}
+        {/*  Closing Statement  */}
         <div className="w-full max-w-[850px] border-l-2 border-black pl-5 flex flex-col gap-2">
           <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/35 font-bold">
             The Institutional Edge
           </span>
           <p className="font-serif text-[14px] text-[#444] leading-relaxed text-left">
-            Your intelligence is only as valuable as your ability to protect it. 
+            Your analytics is only as valuable as your ability to protect it. 
             Whale Alert Network provides the definitive shield, allowing you to intercept, 
             analyze, and execute upon the flow of global capital with rigorous security.
           </p>

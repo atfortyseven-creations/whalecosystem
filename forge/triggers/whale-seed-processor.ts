@@ -26,7 +26,7 @@ export class WhaleSeedProcessor {
                 removeOnComplete: true,
                 removeOnFail: false
             });
-            console.log(`[WhaleSeedProcessor] 🌟 Injected event ${eventId} ($${amountUSD}) into Cosmic Forge`);
+            console.log(`[WhaleSeedProcessor]  Injected event ${eventId} ($${amountUSD}) into Cosmic Forge`);
         } catch (e) {
             console.error('[WhaleSeedProcessor] Failed to inject seed to queue.', e);
         }

@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Terminal, Lock, Activity, Users, Server, Globe, Cpu, ArrowDown, ShieldCheck, Database, Key } from "lucide-react";
 import Link from "next/link";
-import { SovereignFooter } from "@/components/landing/SovereignFooter";
+import { SystemFooter } from "@/components/landing/SystemFooter";
 
-// ─── UTILITIES ───
+//  UTILITIES 
 const StaggeredText = ({ text, className }: { text: string; className?: string }) => {
   return (
     <motion.span 
@@ -32,7 +32,7 @@ const StaggeredText = ({ text, className }: { text: string; className?: string }
   );
 };
 
-// ─── COMPONENTS ───
+//  COMPONENTS 
 
 // 1. Builder Announcements
 const BuilderAnnouncements = () => {
@@ -113,7 +113,7 @@ const FullStack = () => {
     { num: "04", title: "Redis-Backed Telemetry", desc: "A high-performance Redis cluster governs session rate-limiting. Institutional throughput is dynamically extracted and enforced per-request." },
     { num: "05", title: "Neo4j Topological Graphs", desc: "Graph databases map complex institutional capital transfers, isolating structural behavior patterns from standard mempool noise." },
     { num: "06", title: "EVM Energy & Z-Score Alerts", desc: "By tracking computational energy intra-block, our engines deploy Z-Score calculations to detect the accumulation of institutional positions before market impact." },
-    { num: "07", title: "Sovereign Forums", desc: "A communication layer where identities are linked to verifiable signatures. PII is hashed via SHA-256 to ensure complete privacy compliance." },
+    { num: "07", title: "System Forums", desc: "A communication layer where identities are linked to verifiable signatures. PII is hashed via SHA-256 to ensure complete privacy compliance." },
     { num: "08", title: "Institutional SLAs", desc: "Atomic cryptographic validation integrates with Stripe Webhooks for zero-trust subscription tracking and automated API key delivery." }
   ];
 
@@ -165,13 +165,13 @@ const ToolsAndLibraries = () => {
                Build on <br/>the <span className="italic text-black/40">Architecture.</span>
              </h2>
              <p className="font-sans text-xl text-black/60 italic border-l-2 border-[#0044CC] pl-6 py-2 leading-relaxed">
-               Access our primary suites for heuristic intelligence and cryptographic validation.
+               Access our primary suites for heuristic analytics and cryptographic validation.
              </p>
           </div>
 
           <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
              <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
-                <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">On-Chain Intelligence</div>
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">On-Chain Analytics</div>
                 <div className="space-y-6 font-serif text-[22px] font-normal">
                    <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
                      Whale Alert Pro Terminal <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -188,7 +188,7 @@ const ToolsAndLibraries = () => {
                      KYC API <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                    </div>
                    <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
-                     Humanity Score Matrix <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                     Humanity Score Grid <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                    </div>
                 </div>
              </div>
@@ -207,7 +207,7 @@ const ToolsAndLibraries = () => {
                 <div>
                    <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">Development Environment</div>
                    <div className="mb-10">
-                      <div className="font-serif text-[26px] font-normal hover:text-[#0044CC] cursor-pointer transition-colors mb-6">Sovereign Sandbox</div>
+                      <div className="font-serif text-[26px] font-normal hover:text-[#0044CC] cursor-pointer transition-colors mb-6">System Sandbox</div>
                       <p className="font-sans text-[15px] leading-[1.8] tracking-[0.01em] text-black/70">
                         An isolated environment simulating live mempool latency and complex graphs, enabling quantitative developers to test alerts locally before mainnet deployment.
                       </p>
@@ -346,7 +346,7 @@ const TransactionDiagram = () => {
             <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-8">Phase 05</div>
             <h3 className="font-serif text-[32px] font-normal text-white mb-8">Institutional Dashboard</h3>
             <p className="font-sans text-[15px] text-white/60 mb-10 leading-[1.7]">
-               The cryptographic payload arrives pristine. The operator is granted access to the heuristic terminal, receiving intelligence directly extracted from the EVM.
+               The cryptographic payload arrives pristine. The operator is granted access to the heuristic terminal, receiving analytics directly extracted from the EVM.
             </p>
             <div className="flex items-center gap-6 border-t border-white/10 pt-8 mt-auto">
                <div className="w-12 h-12 flex-shrink-0 bg-white border border-white text-black rounded-full flex items-center justify-center font-bold">
@@ -426,7 +426,7 @@ const FAQs = () => {
     },
     {
       q: "Why employ Neo4j over traditional PostgreSQL for heuristic analysis?",
-      a: "Determining the origin of capital across multi-hop transactions is inefficient using traditional SQL JOIN operations. Neo4j’s graph architecture maps these complex relationships natively, resulting in significantly lower latency."
+      a: "Determining the origin of capital across multi-hop transactions is inefficient using traditional SQL JOIN operations. Neo4js graph architecture maps these complex relationships natively, resulting in significantly lower latency."
     },
     {
       q: "How does Redis facilitate institutional rate-limiting without database bottlenecks?",
@@ -481,19 +481,19 @@ const FAQs = () => {
   );
 };
 
-// ─── MAIN PAGE COMPONENT ───
+//  MAIN PAGE COMPONENT 
 export default function DevelopersPage() {
   return (
     <div className="min-h-screen bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] overflow-x-hidden font-sans selection:bg-black/10 selection:text-[#0A0A0A]">
       
-      {/* ── TOP NAV SPACER ── */}
+      {/*  TOP NAV SPACER  */}
       <div className="fixed top-0 left-0 right-0 z-50 px-8 py-6 pointer-events-none flex justify-center backdrop-blur-md bg-white/20 dark:bg-black/20 border-b border-black/5 dark:border-white/5">
          <Link href="/" className="pointer-events-auto font-mono text-[10px] font-bold uppercase tracking-widest text-black/40 hover:text-black transition-colors flex items-center gap-2">
             <ArrowRight size={12} className="rotate-180" /> Return to Terminal
          </Link>
       </div>
       
-      {/* ── HERO SECTION ── */}
+      {/*  HERO SECTION  */}
       <section className="relative min-h-[90vh] flex flex-col justify-center px-6 pt-32 pb-24">
          <div className="max-w-[1400px] mx-auto w-full relative z-10 text-center flex flex-col items-center mt-12">
             
@@ -524,7 +524,7 @@ export default function DevelopersPage() {
          </div>
       </section>
 
-      {/* ── SECTIONS ── */}
+      {/*  SECTIONS  */}
       <BuilderAnnouncements />
       <FullStack />
       <ToolsAndLibraries />
@@ -533,8 +533,8 @@ export default function DevelopersPage() {
       <ResearchSection />
       <FAQs />
 
-      {/* ── FOOTER CALLOUT ── */}
-      <SovereignFooter />
+      {/*  FOOTER CALLOUT  */}
+      <SystemFooter />
 
     </div>
   );

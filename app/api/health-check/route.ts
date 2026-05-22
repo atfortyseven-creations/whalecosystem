@@ -7,7 +7,7 @@
  *   - Audit trail integrity
  *   - Database connectivity
  *
- * Authentication: requires valid sovereign_handshake or internal secret header
+ * Authentication: requires valid system_handshake or internal secret header
  * Rate: exempt from rate limiting (registered in middleware BYPASS list)
  */
 

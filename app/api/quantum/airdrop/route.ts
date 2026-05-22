@@ -5,13 +5,13 @@ import { privateKeyToAccount } from 'viem/accounts';
 
 export const dynamic = 'force-dynamic';
 
-// ─── Chain config (reads same RPC as rest of app) ───────────────────────────
+//  Chain config (reads same RPC as rest of app) 
 const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545';
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '1337', 10);
 
 const localChain = {
   id: chainId,
-  name: 'Sovereign Mainnet',
+  name: 'System Mainnet',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: { default: { http: [rpcUrl] } },
 } as const;
@@ -20,13 +20,13 @@ const AIRDROP_CONTRACT = (process.env.NEXT_PUBLIC_AIRDROP_CONTRACT_ADDRESS || '0
 const CLAIM_AMOUNT = BigInt('500000000000000000000'); // 500 QDs in wei
 
 /**
- * POST /api/quantum/airdrop
+ * POST /api/core/airdrop
  * Backend signs the EIP-712 claim and submits it on behalf of the user.
  * This prevents the user from needing ETH gas for their first QD claim.
  */
 export async function POST(req: NextRequest) {
   try {
-    // 1. Authenticate — get the user's wallet address from session
+    // 1. Authenticate  get the user's wallet address from session
     const session = await getSession();
     if (!session?.userId) {
       return NextResponse.json({ error: 'No autenticado. Conecta tu billetera primero.' }, { status: 401 });
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     // 5. Build the EIP-712 signature for the user's claim
     // Must match: keccak256("Claim(address wallet,uint256 amount)")
     const domain = {
-      name: 'QuantumAirdrop',
+      name: 'CoreAirdrop',
       version: '1',
       chainId: BigInt(chainId),
       verifyingContract: AIRDROP_CONTRACT,
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       abi: parseAbi(['function claimWelcomeBonus(bytes calldata signature) external']),
       functionName: 'claimWelcomeBonus',
       args: [signature],
-      // Override msg.sender to be the user — NOT possible server-side.
+      // Override msg.sender to be the user  NOT possible server-side.
       // Instead we submit signed data that the contract verifies against userWallet.
     });
 

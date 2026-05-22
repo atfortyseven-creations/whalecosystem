@@ -23,7 +23,7 @@ export function IntentMasterySection() {
              whileInView={{ opacity: 1, scale: 1 }}
              className="inline-block px-4 py-1.5 rounded-full bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest mb-8"
           >
-            Sovereign Intent Layer
+            System Intent Layer
           </motion.div>
           <h2 className="text-5xl md:text-8xl font-black tracking-tighter text-slate-950 mb-10 uppercase">
             Atomic Execution <br />

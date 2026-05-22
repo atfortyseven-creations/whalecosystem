@@ -47,7 +47,7 @@ export function WCScannerModal({ onClose }: Props) {
                         <Link2 size={20} />
                     </div>
                     <h2 className="text-lg font-black font-aztec-mono uppercase tracking-widest text-black">Connect dApp</h2>
-                    <p className="text-[10px] text-black/50 font-mono tracking-widest mt-1 uppercase px-4">Paste a WalletConnect URI to bridge your Sovereign Wallet.</p>
+                    <p className="text-[10px] text-black/50 font-mono tracking-widest mt-1 uppercase px-4">Paste a WalletConnect URI to bridge your System Wallet.</p>
                 </div>
 
                 <div className="p-6 space-y-4">

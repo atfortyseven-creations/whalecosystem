@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Whale Alert Network - Sovereign Vault Installer
+# Whale Alert Network - System Vault Installer
 # This script configures your environment in under 1 minute.
 
 set -e
 
 echo "==================================================="
-echo "   Whale Alert Network - Sovereign Vault Setup     "
+echo "   Whale Alert Network - System Vault Setup     "
 echo "==================================================="
 
 echo "Checking prerequisites..."
@@ -50,6 +50,6 @@ else
 fi
 
 echo "[4/4] Setup Complete!"
-echo "You can now start the Sovereign Vault with:"
+echo "You can now start the System Vault with:"
 echo "npm run dev"
 echo "==================================================="

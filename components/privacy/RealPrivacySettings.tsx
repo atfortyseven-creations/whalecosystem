@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useSovereignAccount } from "@/hooks/useSovereignAccount";
+import { useSystemAccount } from "@/hooks/useSystemAccount";
 import { Shield, Lock, Eye, Download, Key } from "lucide-react";
 
 export function RealPrivacySettings() {
-  const { connector, isConnected } = useSovereignAccount();
+  const { connector, isConnected } = useSystemAccount();
   const userId = connector?.id || "guest-session";
 
   const [profile, setProfile] = useState<any>({
@@ -15,7 +15,7 @@ export function RealPrivacySettings() {
     sessionAutoLogout: "1h",
     ipWhitelist: [],
     twoFAEnabled: false,
-    sovereignVisibility: "Public",
+    systemVisibility: "Public",
     exportEncryption: false,
   });
   
@@ -42,7 +42,7 @@ export function RealPrivacySettings() {
     });
 
     toast.promise(promise, {
-      loading: 'Saving sovereign protocol...',
+      loading: 'Saving system protocol...',
       success: 'Privacy setting enforced across nodes.',
       error:   'Failed to synchronize setting.',
     });
@@ -66,7 +66,7 @@ export function RealPrivacySettings() {
       <div className="p-4 bg-[#00f5ff]/5 border border-[#00f5ff]/20 rounded-xl flex items-start gap-4">
          <Shield className="text-[#00f5ff] shrink-0 mt-1" />
          <div>
-            <h4 className="text-[#00f5ff] font-bold text-sm uppercase tracking-widest">Sovereign Privacy Active</h4>
+            <h4 className="text-[#00f5ff] font-bold text-sm uppercase tracking-widest">System Privacy Active</h4>
             <p className="text-xs text-[#00f5ff]/60 mt-1">Changes made here are permanently recorded on the Event Ledger and reflect immediately across all active sessions.</p>
          </div>
       </div>
@@ -94,7 +94,7 @@ export function RealPrivacySettings() {
         {/* Data Sharing Toggle */}
         <ToggleItem 
           title="Data Sharing with On-Chain Analytics" 
-          description="Allow usage patterns to train Sovereign Global Intelligence." 
+          description="Allow usage patterns to train System Global Analytics." 
           active={profile.dataSharing} 
           onClick={() => handleUpdate("dataSharing", !profile.dataSharing)} 
         />
@@ -165,8 +165,8 @@ export function RealPrivacySettings() {
              </div>
           </div>
           <select 
-             value={profile.sovereignVisibility} 
-             onChange={e => handleUpdate("sovereignVisibility", e.target.value)}
+             value={profile.systemVisibility} 
+             onChange={e => handleUpdate("systemVisibility", e.target.value)}
              className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:border-[#00f5ff] outline-none text-xs"
           >
              <option value="Public">Public (Visible in Whale Network)</option>

@@ -11,7 +11,7 @@ export function NetworkTabs() {
     const pathname = usePathname();
 
     const tabs = [
-        { name: 'Flow Intelligence', href: '/network', icon: BarChart3 },
+        { name: 'Flow Analytics', href: '/network', icon: BarChart3 },
         { name: 'Mining Protocol', href: '/network/mining', icon: Zap },
     ];
 

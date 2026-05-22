@@ -1,12 +1,12 @@
 /**
  * lib/admin-guard.ts
- * ─────────────────────────────────────────────────────────────────────────────
+ * 
  * Institutional-grade authorization guard for all /api/admin/* routes.
  *
  * Strategy:
- *   1. Header-based secret: `X-Admin-Secret: <ADMIN_SECRET env var>` — used for
+ *   1. Header-based secret: `X-Admin-Secret: <ADMIN_SECRET env var>`  used for
  *      server-to-server calls (e.g. CI pipelines, Railway admin scripts).
- *   2. Query-param fallback: `?secret=<ADMIN_SECRET>` — for simple curl invocations
+ *   2. Query-param fallback: `?secret=<ADMIN_SECRET>`  for simple curl invocations
  *      during development. Disabled in production (NODE_ENV=production) to prevent
  *      secrets from appearing in server access logs.
  *
@@ -17,7 +17,7 @@
  *     if (deny) return deny;
  *     // ... rest of handler
  *   }
- * ─────────────────────────────────────────────────────────────────────────────
+ * 
  */
 
 import { NextResponse } from 'next/server';
@@ -26,7 +26,7 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET;
 
 /**
  * Returns a 401/403 NextResponse if the request is not authorized,
- * or `null` if it passes — allowing the handler to continue.
+ * or `null` if it passes  allowing the handler to continue.
  */
 export function requireAdmin(req: Request): NextResponse | null {
     // If ADMIN_SECRET is not configured, block all access in production.
@@ -40,7 +40,7 @@ export function requireAdmin(req: Request): NextResponse | null {
             );
         }
         // Development only: pass through with console warning
-        console.warn('[AdminGuard] ⚠️  ADMIN_SECRET not set — admin route is UNPROTECTED (dev only)');
+        console.warn('[AdminGuard] ️  ADMIN_SECRET not set  admin route is UNPROTECTED (dev only)');
         return null;
     }
 
@@ -50,7 +50,7 @@ export function requireAdmin(req: Request): NextResponse | null {
         return null; // Authorized
     }
 
-    // Strategy 2: Query param — development only
+    // Strategy 2: Query param  development only
     if (process.env.NODE_ENV !== 'production') {
         const url = new URL(req.url);
         const querySecret = url.searchParams.get('secret');

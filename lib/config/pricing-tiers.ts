@@ -1,9 +1,9 @@
 /**
  * lib/config/pricing-tiers.ts
- * ═══════════════════════════════════════════════════════════════════════════
+ * 
  * SINGLE SOURCE OF TRUTH for all pricing tier data across the platform.
  * Each feature is mapped to its corresponding system section.
- * ═══════════════════════════════════════════════════════════════════════════
+ * 
  */
 
 export interface PricingFeature {
@@ -44,7 +44,7 @@ export const SECTION_FEATURES: SectionFeatureGroup[] = [
   {
     section: 'dashboard',
     label: 'Dashboard',
-    icon: '◉',
+    icon: '',
     freeFeatures: [
       'Real-time whale alert feed (top 50 movements)',
       'Basic on-chain activity overview',
@@ -53,40 +53,40 @@ export const SECTION_FEATURES: SectionFeatureGroup[] = [
       'Standard network health indicators',
     ],
     proFeatures: [
-      'Unlimited whale movements — all chains, no cap',
+      'Unlimited whale movements  all chains, no cap',
       'Custom alert thresholds by wallet size & token',
       'AI-powered whale behavior prediction engine',
       'Smart money accumulation / distribution heatmaps',
       'Cross-chain tracking: ETH, BTC, SOL, ARB, BASE & more',
       'Institutional wallet profiling & risk scoring',
-      'Historical whale intelligence archive (12 months)',
+      'Historical whale analytics archive (12 months)',
       'Priority microsecond-latency data stream',
     ],
   },
   {
     section: 'chat',
     label: 'Whale Chat',
-    icon: '◈',
+    icon: '',
     freeFeatures: [
       'Access to public community chat',
       'Standard message history (7 days)',
       'Basic market discussion channels',
     ],
     proFeatures: [
-      'Exclusive VIP Whale Intelligence Channel',
-      'Verified analyst alpha signals — private feed',
+      'Exclusive VIP Whale Analytics Channel',
+      'Verified analyst alpha signals  private feed',
       'AI market sentiment engine from live chat data',
       'Direct line to on-chain event notifications in chat',
       'Priority message visibility & verified badge',
       'Custom keyword & token alert filters in chat',
-      'Extended message history — unlimited archive',
+      'Extended message history  unlimited archive',
       'Early-access announcement channel (before public)',
     ],
   },
   {
     section: 'portfolio',
     label: 'Portfolio',
-    icon: '◇',
+    icon: '',
     freeFeatures: [
       'Single wallet portfolio overview',
       'Basic P&L tracking (unrealized)',
@@ -96,7 +96,7 @@ export const SECTION_FEATURES: SectionFeatureGroup[] = [
     proFeatures: [
       'Unlimited multi-wallet & multi-chain tracking',
       'Advanced P&L with cost basis & tax optimization',
-      'Whale copytrading signals — follow top wallets',
+      'Whale copytrading signals  follow top wallets',
       'DeFi yield optimization & opportunity alerts',
       'Smart portfolio rebalancing recommendations',
       'NFT collection valuation & floor tracking',
@@ -107,7 +107,7 @@ export const SECTION_FEATURES: SectionFeatureGroup[] = [
   {
     section: 'community',
     label: 'Community',
-    icon: '◎',
+    icon: '',
     freeFeatures: [
       'Access to public community forums',
       'Read community research posts',
@@ -119,8 +119,8 @@ export const SECTION_FEATURES: SectionFeatureGroup[] = [
       'Monthly live AMA with top whale analysts',
       'DAO governance voting rights',
       'Early access to all new platform features',
-      'Priority support — dedicated response channel',
-      'Exclusive research reports & market intelligence',
+      'Priority support  dedicated response channel',
+      'Exclusive research reports & market analytics',
       'Referral program with revenue sharing',
     ],
   },
@@ -130,7 +130,7 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id:           'FREE',
     name:         'Whale Alert Network',
-    tagline:      'Real-time on-chain intelligence for every participant.',
+    tagline:      'Real-time on-chain analytics for every participant.',
     priceMonthly: '0',
     priceAnnual:  '0',
     accentColor:  '#050505',
@@ -150,20 +150,20 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id:           'STANDARD',
     name:         'Whale Alert Network +',
-    tagline:      'Full institutional intelligence — every tab unlocked.',
+    tagline:      'Full institutional analytics  every tab unlocked.',
     priceMonthly: '15',
     priceAnnual:  '150',
     accentColor:  '#050505',
-    badge:        '★ Institutional',
+    badge:        ' Institutional',
     highlight:    true,
     lottie:       'Safe Box.json',
     features: [
       // Dashboard
-      { text: 'Unlimited whale movements — all chains, no cap', highlight: true, section: 'dashboard' },
+      { text: 'Unlimited whale movements  all chains, no cap', highlight: true, section: 'dashboard' },
       { text: 'AI whale behavior prediction & accumulation heatmaps', highlight: true, section: 'dashboard' },
       { text: 'Custom thresholds, cross-chain + 12-month archive', section: 'dashboard' },
       // Chat
-      { text: 'VIP Whale Intelligence Channel + analyst alpha signals', highlight: true, section: 'chat' },
+      { text: 'VIP Whale Analytics Channel + analyst alpha signals', highlight: true, section: 'chat' },
       { text: 'AI sentiment engine & unlimited chat history', section: 'chat' },
       // Portfolio
       { text: 'Multi-wallet tracking + copytrading signals', highlight: true, section: 'portfolio' },

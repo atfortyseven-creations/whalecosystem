@@ -18,7 +18,7 @@ export function rateLimit(
 }
 
 // ============================================
-// SECURITY LAYER 2: Subscription Verification — NATIVE SOVEREIGN
+// SECURITY LAYER 2: Subscription Verification  NATIVE SOVEREIGN
 // ============================================
 
 export async function verifyPremiumAccess(userId: string): Promise<{
@@ -30,7 +30,7 @@ export async function verifyPremiumAccess(userId: string): Promise<{
     const normalizedUserId = userId.toLowerCase();
 
     // [ON-CHAIN ARTICULATION] 0. Cryptographic ZK/Token Validation
-    // Query the blockchain directly. If the wallet holds the Sovereign NFT,
+    // Query the blockchain directly. If the wallet holds the System NFT,
     // grant absolute access without consulting the centralized database.
     try {
         const publicClient = createPublicClient({ chain: optimism, transport: http() });
@@ -43,14 +43,14 @@ export async function verifyPremiumAccess(userId: string): Promise<{
         });
 
         if (balance > 0n) {
-            console.log(`[Zero-Trust] 🛡️ Validated Sovereign NFT holding for ${normalizedUserId}`);
+            console.log(`[Zero-Trust] ️ Validated System NFT holding for ${normalizedUserId}`);
             return { valid: true, tier: 'SOVEREIGN' };
         }
     } catch (rpcErr) {
         // Silent fallback to database if RPC fails (Network Resilience)
     }
 
-    // 1. Native DB TIER check (One-time payments and Sovereign tier)
+    // 1. Native DB TIER check (One-time payments and System tier)
     let user = await prisma.user.findUnique({
       where: { walletAddress: normalizedUserId },
       select: { tier: true }
@@ -154,7 +154,7 @@ export async function logAuditEvent(log: {
   ip?: string;
   userAgent?: string;
 }): Promise<void> {
-  // AuditLog table does not exist in schema.prisma — log to native Log model
+  // AuditLog table does not exist in schema.prisma  log to native Log model
   try {
     await prisma.log.create({
       data: {
@@ -177,7 +177,7 @@ export async function logAuditEvent(log: {
 }
 
 // ============================================
-// SECURITY LAYER 9: Request Validation — SOVEREIGN SIWE
+// SECURITY LAYER 9: Request Validation  SOVEREIGN SIWE
 // ============================================
 
 export async function validateSecureRequest(
@@ -193,13 +193,13 @@ export async function validateSecureRequest(
   const session = await getSession();
   let userId = session?.userId;
 
-  // FALLBACK: sovereign_handshake cookie (mobile QR auth flow)
+  // FALLBACK: system_handshake cookie (mobile QR auth flow)
   // This allows users who connected via mobile wallet to also call
   // authenticated forum and API endpoints without a full SIWE JWT.
   if (!userId) {
-    const sovereignHandshake = req.cookies.get('sovereign_handshake')?.value;
+    const systemHandshake = req.cookies.get('system_handshake')?.value;
     const webAddress = req.headers.get('x-web3-address');
-    const rawAddress = sovereignHandshake || webAddress;
+    const rawAddress = systemHandshake || webAddress;
     if (rawAddress && /^0x[a-fA-F0-9]{40}$/.test(rawAddress)) {
       userId = rawAddress.toLowerCase();
     }
@@ -214,7 +214,7 @@ export async function validateSecureRequest(
     if (!access.valid) return { valid: false, error: 'Premium required' };
   }
 
-  // CSRF is opt-in — only enforced for sensitive mutations that explicitly require it.
+  // CSRF is opt-in  only enforced for sensitive mutations that explicitly require it.
   // Payment checkout and session-based flows do NOT send this header and must not be blocked.
   if (options.requireCsrf && req.method !== 'GET') {
     const csrfToken = req.headers.get('x-csrf-token');

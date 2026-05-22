@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { Award, Zap, Shield, Activity, RefreshCw, AlertTriangle, Building } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function ReputationDashboard() {
-  const { address, isConnected } = useSovereignAccount();
+  const { address, isConnected } = useSystemAccount();
   const [score, setScore] = useState(0);
   const [isMinting, setIsMinting] = useState(false);
   const [hasCredential, setHasCredential] = useState(false);
@@ -128,7 +128,7 @@ export function ReputationDashboard() {
         </div>
       </div>
 
-      {/* Trait Matrix */}
+      {/* Trait Grid */}
       <div className="bg-white border border-black/5 shadow-sm rounded-2xl p-8 overflow-hidden relative">
         <h3 className="text-[11px] font-bold text-[#050505] uppercase tracking-widest mb-8">On-Chain Behavioral Analytics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

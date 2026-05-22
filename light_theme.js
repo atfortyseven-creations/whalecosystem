@@ -12,7 +12,7 @@ content = content.replace(/<div className="absolute inset-\[-10%\] bg-pc-living-
 content = content.replace(/<div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">/g, '<div className="fixed inset-0 z-0 overflow-hidden bg-[#FBC9C2] pointer-events-none">');
 
 // Remove the massive Globe rendering section completely:
-content = content.replace(/\{\/\* ─── WebGL Globe ─── \*\/\}[\s\S]*?mouse=\{mouse\} \/>[\s\S]*?<\/motion.div>/g, '');
+content = content.replace(/\{\/\*  WebGL Globe  \*\/\}[\s\S]*?mouse=\{mouse\} \/>[\s\S]*?<\/motion.div>/g, '');
 
 // Convert colors regex
 content = content.replace(/rgba\(255,255,255,/g, 'rgba(5,5,5,');

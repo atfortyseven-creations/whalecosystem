@@ -5,7 +5,7 @@
  * detector (EP2) to browser clients in real time.
  * 
  * Architecture:
- *   GetBlock WSS (EP2) → whaleEngine singleton → SSE → Browser clients
+ *   GetBlock WSS (EP2)  whaleEngine singleton  SSE  Browser clients
  * 
  * This endpoint defeats Vercel/Railway proxy buffering via:
  * 1. X-Accel-Buffering: no
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       const payload = typeof data === 'string' ? data : JSON.stringify(data);
       controller?.enqueue(encoder.encode(`data: ${payload}\n\n`));
     } catch {
-      // Stream may have closed — ignore
+      // Stream may have closed  ignore
     }
   };
 

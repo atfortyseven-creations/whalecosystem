@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Database, Waves, Activity, ArrowUpRight, TrendingUp, Anchor, AlertTriangle } from 'lucide-react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 import {
   Chart as ChartJS,
@@ -41,7 +41,7 @@ interface MorphoPool {
 }
 
 export function MorphoYieldDashboard() {
-  const { isConnected } = useSovereignAccount();
+  const { isConnected } = useSystemAccount();
   const [pools, setPools] = useState<MorphoPool[]>([]);
   const [loading, setLoading] = useState(true);
 

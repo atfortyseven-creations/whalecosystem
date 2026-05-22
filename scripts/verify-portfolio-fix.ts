@@ -25,11 +25,11 @@ async function verifyPortfolio() {
         if (polyTokens.length > 0) {
             console.log('Sample Polygon Token:', polyTokens[0].symbol, polyTokens[0].balanceFormatted);
         } else {
-            console.error('❌ Failed to find Polygon tokens');
+            console.error(' Failed to find Polygon tokens');
         }
 
     } catch (error) {
-        console.error('❌ Verification FAILED:', error);
+        console.error(' Verification FAILED:', error);
     }
 }
 

@@ -16,11 +16,11 @@ const pinata = new pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_SECR
 const BUILD_DIR = path.resolve(__dirname, '../../out');
 
 async function deployToIPFS() {
-    console.log("🌌 Initiating Unstoppable Deployment Sequence...");
-    console.log(`📂 Target Directory: ${BUILD_DIR}`);
+    console.log(" Initiating Unstoppable Deployment Sequence...");
+    console.log(` Target Directory: ${BUILD_DIR}`);
 
     if (!fs.existsSync(BUILD_DIR)) {
-        console.error("❌ Build directory not found. Run 'npm run build' first.");
+        console.error(" Build directory not found. Run 'npm run build' first.");
         process.exit(1);
     }
 
@@ -38,7 +38,7 @@ async function deployToIPFS() {
             }
         };
 
-        console.log("🚀 Pinning to IPFS Interplanetary Network...");
+        console.log(" Pinning to IPFS Interplanetary Network...");
         
         // In a real run, we would call:
         // const result = await pinata.pinFromFS(BUILD_DIR, options);
@@ -52,15 +52,15 @@ async function deployToIPFS() {
             Timestamp: new Date().toISOString()
         };
 
-        console.log("✅ DEPLOYMENT SUCCESSFUL");
-        console.log(`🌍 IPFS Hash (CID): ${mockResult.IpfsHash}`);
-        console.log(`🔗 Gateway: https://gateway.pinata.cloud/ipfs/${mockResult.IpfsHash}`);
+        console.log(" DEPLOYMENT SUCCESSFUL");
+        console.log(` IPFS Hash (CID): ${mockResult.IpfsHash}`);
+        console.log(` Gateway: https://gateway.pinata.cloud/ipfs/${mockResult.IpfsHash}`);
         
         // Optional: Update ENS
         // updateENS(mockResult.IpfsHash);
 
     } catch (error) {
-        console.error("💥 Deployment Failed:", error);
+        console.error(" Deployment Failed:", error);
         process.exit(1);
     }
 }

@@ -71,7 +71,7 @@ export function OptimisticExecutionIndicator({ userId }: { userId: string }) {
                                 </div>
                             </div>
                             <h4 className="text-sm font-black tracking-tight text-white truncate">
-                                Swapping {safeToFixed(tx.fromAmount, 4)} {tx.fromToken} → {tx.toToken}
+                                Swapping {safeToFixed(tx.fromAmount, 4)} {tx.fromToken}  {tx.toToken}
                             </h4>
                             <p className="text-[10px] text-white/30 font-bold uppercase tracking-tighter">
                                 Awaiting block finality...

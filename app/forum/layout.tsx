@@ -12,7 +12,7 @@ export default async function ForumLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const address = cookieStore.get('sovereign_handshake')?.value;
+  const address = cookieStore.get('system_handshake')?.value;
 
   let avatarUrl: string | undefined = undefined;
   if (address) {
@@ -23,7 +23,7 @@ export default async function ForumLayout({
       `;
       if (rows.length > 0 && rows[0].avatarUrl) avatarUrl = rows[0].avatarUrl;
     } catch {
-      // avatarUrl column not yet in remote DB — silently ignore (run /api/admin/sync-db to fix)
+      // avatarUrl column not yet in remote DB  silently ignore (run /api/admin/sync-db to fix)
     }
   }
 
@@ -32,12 +32,12 @@ export default async function ForumLayout({
       <TelemetryTracker />
       <ForumHeader address={address} avatarUrl={avatarUrl} />
 
-      {/* ─── Data Container — True full-width ─── */}
+      {/*  Data Container  True full-width  */}
       <main className="flex-1 w-full overflow-x-hidden">
         {children}
       </main>
       
-      {/* ─── Footer ─── */}
+      {/*  Footer  */}
       <footer className="w-full py-6 mt-auto flex flex-col items-center justify-center border-t border-slate-200/60">
         <span className="text-[9px] font-sans font-bold uppercase tracking-[0.2em] mb-1 text-slate-400">
           powered by

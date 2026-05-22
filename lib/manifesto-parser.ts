@@ -16,8 +16,8 @@ const FALLBACK_SECTIONS: ManifestoSection[] = [
     id: 'what-is-this-system',
     title: 'what is this system',
     body: [
-      'whale alert network is a sovereign, institutional-grade intelligence platform engineered to detect, classify, and broadcast anomalous on-chain capital movements across all major evm-compatible networks in real time.',
-      'it operates as a zero-latency telemetry layer positioned between raw blockchain mempool data and the decision-making intelligence layer of professional market participants.',
+      'whale alert network is a system, institutional-grade analytics platform engineered to detect, classify, and broadcast anomalous on-chain capital movements across all major evm-compatible networks in real time.',
+      'it operates as a zero-latency telemetry layer positioned between raw blockchain mempool data and the decision-making analytics layer of professional market participants.',
       '[SUBTITLE]core design principle',
       'every data point surfaced by this system is derived directly from cryptographically verified on-chain events. no inference, no interpolation, no editorial distortion.',
     ]
@@ -26,7 +26,7 @@ const FALLBACK_SECTIONS: ManifestoSection[] = [
     id: 'what-is-it-for',
     title: 'what is it for',
     body: [
-      'the system is designed for institutional actors — sovereign fund operators, quantitative researchers, protocol architects, and independent validators — who require ground-truth on-chain intelligence without intermediary risk.',
+      'the system is designed for institutional actors  system fund operators, quantitative researchers, protocol architects, and independent validators  who require ground-truth on-chain analytics without intermediary risk.',
       '[SUBTITLE]use cases',
       '[LIST_ITEM]real-time detection of whale-class transfer events exceeding configurable thresholds',
       '[LIST_ITEM]mempool surveillance for pending large-value transactions before block confirmation',
@@ -39,11 +39,11 @@ const FALLBACK_SECTIONS: ManifestoSection[] = [
     id: 'what-can-we-do-with-it',
     title: 'what can we do with it',
     body: [
-      'operators of this system gain sovereign observability of the entire on-chain capital ecosystem. from a single terminal, you can track the precise movement of billions in digital assets, receive sub-second alerts on anomalous behavior, and reconstruct the strategic posture of any major market participant.',
+      'operators of this system gain system observability of the entire on-chain capital ecosystem. from a single terminal, you can track the precise movement of billions in digital assets, receive sub-second alerts on anomalous behavior, and reconstruct the strategic posture of any major market participant.',
       '[SUBTITLE]active capabilities',
       '[LIST_ITEM]configure custom alert thresholds by asset, chain, or wallet category',
       '[LIST_ITEM]subscribe to institutional-grade telemetry feeds via sse or webhook',
-      '[LIST_ITEM]explore the sovereign vault — a cryptographically sealed archive of historical whale events',
+      '[LIST_ITEM]explore the system vault  a cryptographically sealed archive of historical whale events',
       '[LIST_ITEM]access the entity graph to map wallet relationships and trace capital provenance',
       '[LIST_ITEM]deploy the zkshield station to verify on-chain claims without exposing position data',
       'the system is not a product. it is a protocol. it is designed to be operated by those who understand that asymmetric information is the last remaining structural edge in digital markets.',
@@ -64,11 +64,11 @@ const FALLBACK_SECTIONS: ManifestoSection[] = [
     ]
   },
   {
-    id: 'access-and-sovereignty',
-    title: 'access and sovereignty',
+    id: 'access-and-systemty',
+    title: 'access and systemty',
     body: [
       'access to the full terminal is gated by cryptographic wallet signature. no username. no password. no custodial intermediary. your private key is your identity, and your signature is your credential.',
-      'the genesis ticket nft functions as a permanent, non-transferable access credential that grants the holder irrevocable access to the sovereign tier of the platform, including all real-time feeds, the advanced entity graph, and historical ledger archives.',
+      'the genesis ticket nft functions as a permanent, non-transferable access credential that grants the holder irrevocable access to the system tier of the platform, including all real-time feeds, the advanced entity graph, and historical ledger archives.',
       '[SUBTITLE]zero-trust access model',
       '[LIST_ITEM]single signature authentication via siwe (sign-in with ethereum)',
       '[LIST_ITEM]session tokens derived from threshold cryptography',
@@ -101,7 +101,7 @@ export function parseReadmeToManifesto(filename: string = 'README.md'): Manifest
   for (const rawLine of lines) {
     const line = rawLine.trim();
 
-    // Toggle code block state — skip ALL lines inside code blocks
+    // Toggle code block state  skip ALL lines inside code blocks
     if (line.startsWith('```')) {
       inCodeBlock = !inCodeBlock;
       continue;
@@ -113,7 +113,7 @@ export function parseReadmeToManifesto(filename: string = 'README.md'): Manifest
     if (line.startsWith('<div') || line.startsWith('</div') || line.startsWith('[![')) continue;
     if (line.startsWith('|')) continue; // Skip markdown tables
 
-    // H1 heading — use as document title section
+    // H1 heading  use as document title section
     if (line.startsWith('# ') && !line.startsWith('## ')) {
       if (currentSection) sections.push(currentSection);
       const title = line.replace(/^#\s+/, '').replace(/[*_`]/g, '').trim().toLowerCase();
@@ -122,7 +122,7 @@ export function parseReadmeToManifesto(filename: string = 'README.md'): Manifest
       continue;
     }
 
-    // H2 headings — new section
+    // H2 headings  new section
     if (line.startsWith('## ')) {
       if (currentSection) sections.push(currentSection);
       const title = line.replace('## ', '').replace(/^\d+\.\d*\s*/, '').trim().toLowerCase();
@@ -165,7 +165,7 @@ export function parseReadmeToManifesto(filename: string = 'README.md'): Manifest
       continue;
     }
 
-    // Normal paragraph text — strip markdown formatting
+    // Normal paragraph text  strip markdown formatting
     const cleanText = line
       .replace(/\*\*(.+?)\*\*/g, '$1')
       .replace(/\*(.+?)\*/g, '$1')

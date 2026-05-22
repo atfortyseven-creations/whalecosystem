@@ -45,7 +45,7 @@ export function UsageStats({ tier, stats }: { tier: string; stats: Stats }) {
                         </div>
                         <div className="text-right">
                             <div className="text-white/40 text-sm font-medium">
-                                / {isUnlimited ? '∞' : limit.toLocaleString()} reqs
+                                / {isUnlimited ? '' : limit.toLocaleString()} reqs
                             </div>
                         </div>
                     </div>

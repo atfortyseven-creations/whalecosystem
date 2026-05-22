@@ -2,20 +2,20 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Network } from 'lucide-react';
 
 export function SettingsEnforcer() {
-    const { address: eoaAddress } = useSovereignAccount();
-    const { address: sovereignAddress } = useWalletStore();
-    const walletAddress = eoaAddress || sovereignAddress;
+    const { address: eoaAddress } = useSystemAccount();
+    const { address: systemAddress } = useWalletStore();
+    const walletAddress = eoaAddress || systemAddress;
 
     const { testnetMode } = useSettingsStore();
     const initialSyncDone = useRef(false);
 
-    // 1. Secure PULL settings on connect (via Sovereign Session)
+    // 1. Secure PULL settings on connect (via System Session)
     useEffect(() => {
         if (walletAddress && !initialSyncDone.current) {
             useSettingsStore.getState().fetchSettings().then(() => {

@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
  *  - Real per-day BTC closing price (from Binance Klines, not fixed current price)
  *  - Binance OI per day
  *  - Bybit OI per day (when available)
- * No Math.random() — only real API data.
+ * No Math.random()  only real API data.
  */
 
 export const revalidate = 0;
@@ -39,12 +39,12 @@ export async function GET() {
         'https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=1d&limit=90',
         { signal: AbortSignal.timeout(8000), next: { revalidate: 0 } }
       ),
-      // Real BTC daily closing prices — aligned to OI timestamps
+      // Real BTC daily closing prices  aligned to OI timestamps
       fetch(
         'https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1d&limit=90',
         { signal: AbortSignal.timeout(8000), next: { revalidate: 0 } }
       ),
-      // Bybit OI history — linear perpetuals, 1d interval
+      // Bybit OI history  linear perpetuals, 1d interval
       fetch(
         'https://api.bybit.com/v5/market/open-interest?category=linear&symbol=BTCUSDT&intervalTime=1d&limit=200',
         { signal: AbortSignal.timeout(8000), next: { revalidate: 0 } }
@@ -67,17 +67,17 @@ export async function GET() {
         ? ((await bybitOiRes.value.json())?.result?.list ?? [])
         : [];
 
-    // Build Bybit OI map: timestamp (ms) → OI in USD
+    // Build Bybit OI map: timestamp (ms)  OI in USD
     // Bybit returns: { timestamp: "1700000000000", openInterest: "12345.67" }
     const bybitMap: Record<number, number> = {};
     for (const item of bybitOIRaw) {
       const ts = parseInt(item.timestamp || '0');
-      // Bybit OI is in BTC contracts — need to multiply by price to get USD
+      // Bybit OI is in BTC contracts  need to multiply by price to get USD
       // We'll join on date later
       bybitMap[ts] = parseFloat(item.openInterest || '0');
     }
 
-    // Build a klines map: openTime (ms) → close price
+    // Build a klines map: openTime (ms)  close price
     const klinesMap: Record<number, number> = {};
     for (const k of klines) {
       const openTime = k[0] as number;

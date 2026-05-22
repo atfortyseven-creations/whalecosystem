@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, count: wallets.length });
 
     } catch (error: any) {
-        console.error('[WALLET-SYNC-POST] 💀 Failure:', error.message);
+        console.error('[WALLET-SYNC-POST]  Failure:', error.message);
         return NextResponse.json({ error: 'Cloud synchronization failed' }, { status: 500 });
     }
 }
@@ -115,7 +115,7 @@ export async function GET(req: NextRequest) {
         });
 
     } catch (error: any) {
-        console.error('[WALLET-SYNC-GET] 💀 Failure:', error.message);
+        console.error('[WALLET-SYNC-GET]  Failure:', error.message);
         return NextResponse.json({ error: 'Identity restoration failed' }, { status: 500 });
     }
 }

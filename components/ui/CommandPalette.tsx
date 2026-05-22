@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * CommandPalette — Global Search and Navigation (Cmd+K / Ctrl+K)
+ * CommandPalette  Global Search and Navigation (Cmd+K / Ctrl+K)
  *
  * Provides instant access to:
  *   - All 16 dashboard modules
@@ -26,7 +26,7 @@ import {
   AlertTriangle, BookOpen
 } from "lucide-react";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+//  Types 
 
 interface CommandItem {
   id: string;
@@ -43,12 +43,12 @@ interface CommandPaletteProps {
   onBridgeOpen: () => void;
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+//  Constants 
 
 const SIGNAL_TEAL = "#00F2EA";
-const CATEGORY_ORDER = ["Navigation", "Intelligence", "Vault", "Academy", "Membership", "Actions"];
+const CATEGORY_ORDER = ["Navigation", "Analytics", "Vault", "Academy", "Membership", "Actions"];
 
-// ─── Hook ────────────────────────────────────────────────────────────────────
+//  Hook 
 
 export function useCommandPalette() {
   const [open, setOpen] = useState(false);
@@ -68,7 +68,7 @@ export function useCommandPalette() {
   return { open, setOpen };
 }
 
-// ─── Recent searches (localStorage) ──────────────────────────────────────────
+//  Recent searches (localStorage) 
 
 function getRecent(): string[] {
   try {
@@ -83,7 +83,7 @@ function addRecent(label: string) {
   } catch {}
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+//  Main Component 
 
 export function CommandPalette({ onNavigate, onBridgeOpen }: CommandPaletteProps) {
   const { open, setOpen } = useCommandPalette();
@@ -114,14 +114,14 @@ export function CommandPalette({ onNavigate, onBridgeOpen }: CommandPaletteProps
     { id: "explorer",       label: "Block Explorer",      description: "Search blocks, addresses, transactions",   icon: <Search size={15}/>,         category: "Navigation", action: () => navigate("explorer", "Block Explorer"),       keywords: ["block", "search", "explorer"] },
     { id: "alerts",         label: "Live Alerts",         description: "Real-time whale movement feed",            icon: <Activity size={15}/>,       category: "Navigation", action: () => navigate("alerts", "Live Alerts"),            keywords: ["alerts", "live", "feed"] },
     { id: "live-txs",       label: "Live Transactions",   description: "Unconfirmed transaction stream",           icon: <RefreshCw size={15}/>,      category: "Navigation", action: () => navigate("live-txs", "Live Transactions"),   keywords: ["transactions", "mempool", "live"] },
-    // Intelligence
-    { id: "tracker",        label: "Whale Tracker",       description: "Track major wallet movements",             icon: <Globe size={15}/>,          category: "Intelligence", action: () => navigate("tracker", "Whale Tracker"),       keywords: ["whale", "tracker", "wallet"] },
-    { id: "new-pairs",      label: "New Pairs",           description: "Newly launched token pairs on DEXs",       icon: <Plus size={15}/>,           category: "Intelligence", action: () => navigate("new-pairs", "New Pairs"),         keywords: ["pairs", "dex", "new", "tokens"] },
-    { id: "gainers-losers", label: "Gainers & Losers",    description: "24h market performance leaders",           icon: <TrendingUp size={15}/>,     category: "Intelligence", action: () => navigate("gainers-losers", "Gainers & Losers"), keywords: ["gainers", "losers", "performance"] },
-    { id: "topography",     label: "Visual Graph",        description: "Network topology visualization",           icon: <LayoutDashboard size={15}/>, category: "Intelligence", action: () => navigate("topography", "Visual Graph"),    keywords: ["graph", "topology", "visual"] },
-    { id: "api",            label: "API Terminal",        description: "Direct API access and testing",            icon: <Terminal size={15}/>,       category: "Intelligence", action: () => navigate("api", "API Terminal"),           keywords: ["api", "terminal", "developer"] },
-    { id: "akashic",        label: "Akashic Ledger",      description: "Permanent $50M+ movement registry",        icon: <Database size={15}/>,       category: "Intelligence", action: () => navigate("akashic", "Akashic Ledger"),     keywords: ["akashic", "ledger", "registry", "movements"] },
-    { id: "mass-transfer",  label: "Mass Transfers",      description: "Coordinated capital flow detection",       icon: <AlertTriangle size={15}/>,  category: "Intelligence", action: () => navigate("mass-transfer", "Mass Transfers"), keywords: ["mass", "transfer", "coordinated", "capital"] },
+    // Analytics
+    { id: "tracker",        label: "Whale Tracker",       description: "Track major wallet movements",             icon: <Globe size={15}/>,          category: "Analytics", action: () => navigate("tracker", "Whale Tracker"),       keywords: ["whale", "tracker", "wallet"] },
+    { id: "new-pairs",      label: "New Pairs",           description: "Newly launched token pairs on DEXs",       icon: <Plus size={15}/>,           category: "Analytics", action: () => navigate("new-pairs", "New Pairs"),         keywords: ["pairs", "dex", "new", "tokens"] },
+    { id: "gainers-losers", label: "Gainers & Losers",    description: "24h market performance leaders",           icon: <TrendingUp size={15}/>,     category: "Analytics", action: () => navigate("gainers-losers", "Gainers & Losers"), keywords: ["gainers", "losers", "performance"] },
+    { id: "topography",     label: "Visual Graph",        description: "Network topology visualization",           icon: <LayoutDashboard size={15}/>, category: "Analytics", action: () => navigate("topography", "Visual Graph"),    keywords: ["graph", "topology", "visual"] },
+    { id: "api",            label: "API Terminal",        description: "Direct API access and testing",            icon: <Terminal size={15}/>,       category: "Analytics", action: () => navigate("api", "API Terminal"),           keywords: ["api", "terminal", "developer"] },
+    { id: "akashic",        label: "Akashic Ledger",      description: "Permanent $50M+ movement registry",        icon: <Database size={15}/>,       category: "Analytics", action: () => navigate("akashic", "Akashic Ledger"),     keywords: ["akashic", "ledger", "registry", "movements"] },
+    { id: "mass-transfer",  label: "Mass Transfers",      description: "Coordinated capital flow detection",       icon: <AlertTriangle size={15}/>,  category: "Analytics", action: () => navigate("mass-transfer", "Mass Transfers"), keywords: ["mass", "transfer", "coordinated", "capital"] },
     // Vault
     { id: "portfolio",      label: "My Portfolio",        description: "Wallet assets and performance",            icon: <Wallet size={15}/>,         category: "Vault",        action: () => navigate("portfolio", "My Portfolio"),     keywords: ["portfolio", "wallet", "assets", "balance"] },
     { id: "security",       label: "Security Center",     description: "Vault security and session management",    icon: <Shield size={15}/>,         category: "Vault",        action: () => navigate("security", "Security Center"),   keywords: ["security", "vault", "session", "protection"] },
@@ -247,7 +247,7 @@ export function CommandPalette({ onNavigate, onBridgeOpen }: CommandPaletteProps
               className="overflow-y-auto scrollbar-hide"
               style={{ maxHeight: "60vh" }}
             >
-              {/* Recent searches — only when query is empty */}
+              {/* Recent searches  only when query is empty */}
               {!query && recent.length > 0 && (
                 <div className="p-3">
                   <div className="px-2 pb-2 text-[9px] font-black uppercase tracking-widest" style={{ color: "rgba(0,0,0,0.2)" }}>
@@ -335,8 +335,8 @@ export function CommandPalette({ onNavigate, onBridgeOpen }: CommandPaletteProps
               }}
             >
               {[
-                ["↑↓", "Navigate"],
-                ["↵", "Select"],
+                ["", "Navigate"],
+                ["", "Select"],
                 ["Esc", "Close"],
               ].map(([key, label]) => (
                 <div key={key} className="flex items-center gap-1.5">

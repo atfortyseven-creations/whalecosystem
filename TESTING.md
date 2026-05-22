@@ -10,7 +10,7 @@ This guide covers testing all gasless functionality before production deployment
 - [ ] All contracts deployed to Base Sepolia
 - [ ] Railway configured with environment variables
 - [ ] Relayer wallet funded with 0.1 ETH
-- [ ] Test wallet with WLD tokens
+- [ ] Test wallet with AUTH tokens
 
 ---
 
@@ -18,23 +18,23 @@ This guide covers testing all gasless functionality before production deployment
 
 ### Test 1: Gasless Zap (Happy Path)
 
-**Objective:** Verify user can zap WLD to outcome shares without gas
+**Objective:** Verify user can zap AUTH to outcome shares without gas
 
 **Steps:**
 1. Connect wallet to application
 2. Navigate to Zap interface
-3. Enter amount: `1 WLD`
+3. Enter amount: `1 AUTH`
 4. Select outcome: `Yes`
 5. Click "Zap (Free - No Gas)"
 6. Sign message in wallet (no gas prompt)
 7. Wait for confirmation
 
 **Expected Results:**
-- ✅ Signature prompt appears (no gas)
-- ✅ Transaction submitted by relayer
-- ✅ User receives outcome shares
-- ✅ Transaction appears on Basescan
-- ✅ Database updated with transaction
+-  Signature prompt appears (no gas)
+-  Transaction submitted by relayer
+-  User receives outcome shares
+-  Transaction appears on Basescan
+-  Database updated with transaction
 
 **Verification:**
 ```bash
@@ -58,9 +58,9 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 4. Wait for confirmation
 
 **Expected Results:**
-- ✅ Vote recorded on-chain
-- ✅ Vote count updated in UI
-- ✅ Transaction status: CONFIRMED
+-  Vote recorded on-chain
+-  Vote count updated in UI
+-  Transaction status: CONFIRMED
 
 ---
 
@@ -80,9 +80,9 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 5. Wait for confirmation
 
 **Expected Results:**
-- ✅ Proposal created on-chain
-- ✅ Proposal appears in database
-- ✅ Proposal visible in UI
+-  Proposal created on-chain
+-  Proposal appears in database
+-  Proposal visible in UI
 
 ---
 
@@ -91,13 +91,13 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 **Objective:** Verify zap fails if slippage too high
 
 **Steps:**
-1. Enter zap amount: `100 WLD`
+1. Enter zap amount: `100 AUTH`
 2. Manually set `minUSDC` very high in code
 3. Execute zap
 
 **Expected Results:**
-- ❌ Transaction reverts with "SlippageTooHigh"
-- ✅ User funds safe (not lost)
+-  Transaction reverts with "SlippageTooHigh"
+-  User funds safe (not lost)
 
 ---
 
@@ -111,7 +111,7 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 3. Try to submit same signature again
 
 **Expected Results:**
-- ❌ Second submission fails with "InvalidNonce"
+-  Second submission fails with "InvalidNonce"
 
 ---
 
@@ -125,7 +125,7 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 3. Submit signature
 
 **Expected Results:**
-- ❌ Transaction fails with "SignatureExpired"
+-  Transaction fails with "SignatureExpired"
 
 ---
 
@@ -138,8 +138,8 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 2. Try to execute zap
 
 **Expected Results:**
-- ❌ API returns 503 error
-- ✅ User sees "Relayer out of funds" message
+-  API returns 503 error
+-  User sees "Relayer out of funds" message
 
 ---
 
@@ -152,9 +152,9 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 2. Execute zap in both simultaneously
 
 **Expected Results:**
-- ✅ Both transactions succeed
-- ✅ Nonces increment correctly (0, 1)
-- ✅ No nonce collision
+-  Both transactions succeed
+-  Nonces increment correctly (0, 1)
+-  No nonce collision
 
 ---
 
@@ -169,9 +169,9 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 4. Check database again (should be CONFIRMED)
 
 **Expected Results:**
-- ✅ Initial status: PENDING
-- ✅ Final status: CONFIRMED
-- ✅ Block number populated
+-  Initial status: PENDING
+-  Final status: CONFIRMED
+-  Block number populated
 
 ---
 
@@ -180,14 +180,14 @@ psql $DATABASE_URL -c "SELECT * FROM \"ProposalVote\" WHERE \"transactionHash\" 
 **Objective:** Verify graceful error handling
 
 **Steps:**
-1. Try zap with insufficient WLD balance
+1. Try zap with insufficient AUTH balance
 2. Try vote on non-existent proposal
 3. Try execute proposal before timelock
 
 **Expected Results:**
-- ✅ Clear error messages
-- ✅ No crashes
-- ✅ User can retry
+-  Clear error messages
+-  No crashes
+-  User can retry
 
 ---
 
@@ -243,7 +243,7 @@ If issues arise in production:
    - Redeploy
 
 3. **Revert Deployment**
-   - Railway → Deployments → Rollback to previous
+   - Railway  Deployments  Rollback to previous
 
 ---
 

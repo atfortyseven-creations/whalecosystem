@@ -1,5 +1,5 @@
 /**
- * 🥞 WHALE ALERT MONITORING: PANCAKESWAP V3 (BSC)
+ *  WHALE ALERT MONITORING: PANCAKESWAP V3 (BSC)
  * Core Engine for Real-Time Elite Settlement Observation
  * 
  * Mastered by: Antigravity Systems
@@ -37,7 +37,7 @@ const tokenCache = new Map<string, { symbol: string, decimals: number }>();
  * CORE MONITORING ENGINE
  */
 async function startPancakeWorker() {
-    console.log("\n[SYSTEM] 🚀 INITIATING WHALE PANCAKESWAP MONITOR");
+    console.log("\n[SYSTEM]  INITIATING WHALE PANCAKESWAP MONITOR");
     console.log(`[SYSTEM] Threshold: $${WHALE_THRESHOLD_USD.toLocaleString()} USD`);
     
     let lastProcessedBlock: number;
@@ -45,7 +45,7 @@ async function startPancakeWorker() {
         lastProcessedBlock = await bscResilientProvider.call(p => p.getBlockNumber());
         console.log(`[SYSTEM] BSC Connected. Nexus established at block: ${lastProcessedBlock}`);
     } catch (err: any) {
-        console.error("❌ [CRITICAL] Connection failed:", err.message);
+        console.error(" [CRITICAL] Connection failed:", err.message);
         return;
     }
 

@@ -21,7 +21,7 @@ export class MegalodonDispatcher {
     async start() {
         if (this.isRunning) return;
         this.isRunning = true;
-        console.log(`🌌 MEGALODON DISPATCHER ONLINE [${CONSUMER_NAME}] 🌌`);
+        console.log(` MEGALODON DISPATCHER ONLINE [${CONSUMER_NAME}] `);
 
         // Ensure the stream group exists before reading
         try {
@@ -37,7 +37,7 @@ export class MegalodonDispatcher {
 
     stop() {
         this.isRunning = false;
-        console.log(`🛑 MEGALODON DISPATCHER STOPPED [${CONSUMER_NAME}]`);
+        console.log(` MEGALODON DISPATCHER STOPPED [${CONSUMER_NAME}]`);
     }
 
     private async pollStream() {
@@ -74,7 +74,7 @@ export class MegalodonDispatcher {
                     }
                 }
             } catch (error) {
-                console.error("🔴 Error reading from stream:", error);
+                console.error(" Error reading from stream:", error);
                 // Backoff on connection error
                 await new Promise(res => setTimeout(res, 5000));
             }
@@ -106,11 +106,11 @@ export class MegalodonDispatcher {
         switch (event.type) {
             case 'WHALE_TX':
                 const usd = event.payload.amountUsd ? `$${(event.payload.amountUsd / 1e6).toFixed(2)} MILLION` : 'HUGE AMOUNT';
-                return `🚨 **ASTRONOMICAL WHALE DETECTED** 🚨\nChain: ${event.chain}\nAsset: ${event.payload.asset}\nValue: ${usd}\n[View Deep Dive UI]`;
+                return ` **ASTRONOMICAL WHALE DETECTED** \nChain: ${event.chain}\nAsset: ${event.payload.asset}\nValue: ${usd}\n[View Deep Dive UI]`;
             case 'LIQUIDATION':
-                return `💥 **REKT ALERT**\nA massive short position on ${event.payload.asset} was just liquidated on ${event.chain}!\nSize: $${event.payload.amountUsd?.toLocaleString()}`;
+                return ` **REKT ALERT**\nA massive short position on ${event.payload.asset} was just liquidated on ${event.chain}!\nSize: $${event.payload.amountUsd?.toLocaleString()}`;
             default:
-                return `⚡ **${event.severity} ${event.type} ALERT** on ${event.chain}`;
+                return ` **${event.severity} ${event.type} ALERT** on ${event.chain}`;
         }
     }
 }

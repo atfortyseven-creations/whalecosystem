@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 
-// This route reads from IP address — no authentication needed.
+// This route reads from IP address  no authentication needed.
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -53,7 +53,7 @@ export async function GET(_req: Request) {
       headers: { 'Cache-Control': 'no-store' }
     });
   } catch (error) {
-    // Silently return empty — this is a non-critical endpoint
+    // Silently return empty  this is a non-critical endpoint
     return NextResponse.json({ sessions: [] }, {
       status: 200,
       headers: { 'Cache-Control': 'no-store' }

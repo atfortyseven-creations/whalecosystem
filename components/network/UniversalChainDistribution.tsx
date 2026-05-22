@@ -104,7 +104,7 @@ export function UniversalChainDistribution({ theme = 'default' }: { theme?: 'def
                     </div>
                     <div className="flex items-center gap-2">
                         <Activity size={14} className="text-emerald-500" />
-                        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Sovereign Validation Active</span>
+                        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">System Validation Active</span>
                     </div>
                 </div>
             </div>

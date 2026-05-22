@@ -1,5 +1,5 @@
 /**
- * FASE 6 — WEBSOCKET REAL DE ALTA FRECUENCIA
+ * FASE 6  WEBSOCKET REAL DE ALTA FRECUENCIA
  * Hook que conecta a Binance WSS para precios en tiempo real (sin polling).
  * Inyecta BTC, ETH, SOL, BNB, MATIC a 100ms de latencia real.
  */

@@ -101,7 +101,7 @@ export default async function ForumUsersPage() {
                 </div>
                 <div className="flex flex-col">
                   <div className="text-[15px] font-sans font-bold" style={{ color: 'var(--forum-text)' }}>
-                    {u.displayName || (u.walletAddress ? `${u.walletAddress.slice(0, 6)}…${u.walletAddress.slice(-4)}` : 'Anonymous')}
+                    {u.displayName || (u.walletAddress ? `${u.walletAddress.slice(0, 6)}${u.walletAddress.slice(-4)}` : 'Anonymous')}
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-[11px] font-sans font-bold" style={{ color: 'var(--forum-text-muted)' }}>

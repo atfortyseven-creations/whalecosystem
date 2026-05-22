@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { checkRedisHealth, redisClient } from '@/lib/redis/client';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // GET /api/health
 // Public operational status endpoint. Proves the system is live, not conceptual.
 // Returns verifiable metrics: DB latency, Redis status, worker heartbeats,
 // live whale event count, and system throughput. Zero sensitive data exposed.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 export async function GET() {
     const replicaId = process.env.RAILWAY_REPLICA_ID || 'local';
     const start = Date.now();
@@ -17,7 +17,7 @@ export async function GET() {
         await prisma.$queryRaw`SELECT 1`;
         const dbLatency = Date.now() - start;
 
-        // [2] Live data counts — proves real ingestion, not mock
+        // [2] Live data counts  proves real ingestion, not mock
         const [totalWhaleEvents, last24hEvents, totalTickets] = await Promise.all([
             prisma.whaleActivity.count(),
             prisma.whaleActivity.count({
@@ -53,14 +53,14 @@ export async function GET() {
         const overallOk = dbOk && cacheOk;
 
         return NextResponse.json({ 
-            // ── Core status ────────────────────────────────────────────────
+            //  Core status 
             status: overallOk ? 'operational' : 'degraded',
             timestamp: new Date().toISOString(),
             environment: process.env.RAILWAY_ENVIRONMENT || 'local',
             replicaId,
             version: process.env.npm_package_version || '1.0.0',
 
-            // ── Service health ─────────────────────────────────────────────
+            //  Service health 
             services: {
                 database: {
                     status: dbOk ? 'OK' : 'DEGRADED',
@@ -78,7 +78,7 @@ export async function GET() {
                 },
             },
 
-            // ── Live data proof — verifiable evidence of real ingestion ────
+            //  Live data proof  verifiable evidence of real ingestion 
             liveData: {
                 totalWhaleEventsIndexed: totalWhaleEvents,
                 whaleEventsLast24h: last24hEvents,
@@ -87,7 +87,7 @@ export async function GET() {
                 zeroMockCompliant: true,
             },
 
-            // ── Infrastructure ─────────────────────────────────────────────
+            //  Infrastructure 
             infrastructure: {
                 rpcPools: {
                     ethereum: '8 HTTP + 5 WSS endpoints (auto-failover 60s)',
@@ -97,13 +97,13 @@ export async function GET() {
                 },
                 apiRoutes: 100,
                 migrations: 12,
-                pm2Processes: ['sovereign-web (Next.js 15)', 'worker:scanner (Multi-chain)'],
+                pm2Processes: ['system-web (Next.js 15)', 'worker:scanner (Multi-chain)'],
             },
         }, { 
             status: 200,
             headers: {
                 'Cache-Control': 'no-store',
-                'X-Sovereign-Status': overallOk ? 'operational' : 'degraded',
+                'X-System-Status': overallOk ? 'operational' : 'degraded',
                 'X-Whale-Events-Total': String(totalWhaleEvents),
             }
         });

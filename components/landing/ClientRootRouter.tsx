@@ -3,21 +3,21 @@
 import React, { useEffect, useState } from "react";
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
 import { AztecArchitectureSection } from "./AztecArchitectureSection";
-import { SovereignFooter } from "./SovereignFooter";
-import { useSovereignAccount } from "@/hooks/useSovereignAccount";
+import { SystemFooter } from "./SystemFooter";
+import { useSystemAccount } from "@/hooks/useSystemAccount";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 
 
 
 export function ClientRootRouter() {
-  const { isConnected } = useSovereignAccount();
+  const { isConnected } = useSystemAccount();
   const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
     const check = () => {
       const hasCookie = typeof document !== "undefined" &&
-        (document.cookie.includes("sovereign_handshake=") ||
+        (document.cookie.includes("system_handshake=") ||
          document.cookie.includes("siwe_session="));
       
       if (isConnected || hasCookie) {
@@ -55,13 +55,13 @@ export function ClientRootRouter() {
   return (
     <div className="flex flex-col w-full min-w-full flex-1 bg-white" style={{width:'100%',minWidth:'100%'}}>
 
-      {/* Session Navigation Bar removed — Now handled by the Unified Master InstitutionalHeader */}
+      {/* Session Navigation Bar removed  Now handled by the Unified Master InstitutionalHeader */}
 
-      {/* ── Main Manifesto Landing ── */}
+      {/*  Main Manifesto Landing  */}
       <ImmersiveManifestoLanding />
 
-      {/* ── Footer ── */}
-      <SovereignFooter />
+      {/*  Footer  */}
+      <SystemFooter />
     </div>
   );
 }

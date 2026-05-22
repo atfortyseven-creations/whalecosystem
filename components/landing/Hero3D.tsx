@@ -8,8 +8,8 @@ import * as random from 'maath/random/dist/maath-random.esm';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 
-// ── WebGL Neural Sphere Background ──────────────────────────
-// Particle count reduced: 8000 → 3000 — visually identical at screen res, 3x cheaper
+//  WebGL Neural Sphere Background 
+// Particle count reduced: 8000  3000  visually identical at screen res, 3x cheaper
 function WebGLParticleSphere(props: any) {
     const ref = useRef<any>(null);
     // useMemo so sphere array is created once, not on every render
@@ -21,7 +21,7 @@ function WebGLParticleSphere(props: any) {
         ref.current.rotation.x -= delta / 10;
         ref.current.rotation.y -= delta / 15;
 
-        // Frame-rate independent lerp — works at any Hz
+        // Frame-rate independent lerp  works at any Hz
         const k = 1 - Math.pow(0.05, delta);
         const targetX = (state.pointer.x * Math.PI) / 4;
         const targetY = (state.pointer.y * Math.PI) / 4;
@@ -38,14 +38,14 @@ function WebGLParticleSphere(props: any) {
     );
 }
 
-// ── Hero Section ───────────────────────────────────────────
+//  Hero Section 
 export function Hero3D() {
     const titleRef = useRef<HTMLHeadingElement>(null);
     const cursorRef = useRef<HTMLDivElement>(null);
     const ctaRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
-        // Passive mouse listener — no setState, no re-renders
+        // Passive mouse listener  no setState, no re-renders
         const handleMouseMove = (e: MouseEvent) => {
             if (cursorRef.current) {
                 gsap.to(cursorRef.current, {
@@ -105,7 +105,7 @@ export function Hero3D() {
         <section className="relative w-full h-screen bg-[#030303] overflow-hidden cursor-none selection:bg-indigo-500/30">
             <div ref={cursorRef} className="fixed top-0 left-0 w-8 h-8 rounded-full border border-white/20 pointer-events-none z-[100] mix-blend-difference -translate-x-1/2 -translate-y-1/2" />
 
-            {/* WebGL Canvas — no DPR cap means this scales to device */}
+            {/* WebGL Canvas  no DPR cap means this scales to device */}
             <div className="absolute inset-0 z-0">
                 <Canvas
                     camera={{ position: [0, 0, 3] }}
@@ -125,7 +125,7 @@ export function Hero3D() {
                     transition={{ duration: 1, ease: 'easeOut' }}
                     className="mb-6 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md"
                 >
-                    <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/50">Next-Gen Blockchain Intelligence</span>
+                    <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white/50">Next-Gen Blockchain Analytics</span>
                 </motion.div>
 
                 <h1 ref={titleRef} className="text-[10vw] leading-[0.8] font-black uppercase text-white tracking-tighter mix-blend-difference">

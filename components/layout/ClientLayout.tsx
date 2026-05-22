@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect } from 'react';
-// Axioma 452 — SW registered here (non-blocking)
-// Axioma 350 — Funnel tracking per navigation
+// Axioma 452  SW registered here (non-blocking)
+// Axioma 350  Funnel tracking per navigation
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
-import { useSovereignSessionLock } from '@/hooks/useSovereignSessionLock';
+import { useSystemSessionLock } from '@/hooks/useSystemSessionLock';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
@@ -32,18 +32,18 @@ const LinkedGate = dynamic(
   { ssr: false }
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // NOTE: WalletConnectProvider is mounted globally in app/layout.tsx (ssr:false)
 // Do NOT declare or render it here to prevent double-initialization.
-// ─────────────────────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// 
 // Routes that don't need the gate (public / landing)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/login', '/news', '/careers', '/pricing', '/chat'];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Routes that must NOT get the legacy black Downhead footer
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 const NO_DOWNHEAD_PREFIXES = [
   '/dashboard', '/portfolio', '/academy', '/support',
   '/docs', '/privacy', '/terms', '/ticket', '/news', '/connect',
@@ -54,11 +54,11 @@ const NO_DOWNHEAD_PREFIXES = [
   '/careers',
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Routes that use a bounded-viewport layout (no dead space below content)
 // Everything except the landing page ("/") and the dashboard (managed by
 // WhaleProShell with its own fixed-inset shell) should be fully contained.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 const BOUNDED_PREFIXES = [
   '/portfolio', '/academy', '/support', '/news',
   '/predictions', '/ledger', '/voss-supremacy',
@@ -74,13 +74,13 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const { isConnected } = useAccount();
   const { fetchSettings, settings } = useSettingsStore();
 
-  useSovereignSessionLock();
+  useSystemSessionLock();
 
   React.useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
 
-  // ── Axioma 452: PWA Service Worker registration ─────────────────────────────
+  //  Axioma 452: PWA Service Worker registration 
   React.useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker
@@ -94,7 +94,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             if (!newSW) return;
             newSW.addEventListener('statechange', () => {
               if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                console.info('[SW] Update available — will apply on next visit.');
+                console.info('[SW] Update available  will apply on next visit.');
               }
             });
           });
@@ -103,7 +103,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // ── Axioma 350: Funnel tracking per navigation (non-blocking) ───────────────
+  //  Axioma 350: Funnel tracking per navigation (non-blocking) 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       // Session log (existing)
@@ -128,10 +128,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
   }, [pathname]);
 
-  // ── Layout mode ───────────────────────────────────────────────────────────
-  // DASHBOARD  → fixed inset-0 overflow-hidden   (WhaleProShell owns scroll)
-  // BOUNDED    → h-[100dvh] overflow-hidden       (header + inner scroll box)
-  // LANDING    → min-h-screen natural document scroll (immersive manifesto)
+  //  Layout mode 
+  // DASHBOARD   fixed inset-0 overflow-hidden   (WhaleProShell owns scroll)
+  // BOUNDED     h-[100dvh] overflow-hidden       (header + inner scroll box)
+  // LANDING     min-h-screen natural document scroll (immersive manifesto)
   const isDashboard = pathname.startsWith('/dashboard');
   const isBounded = !isDashboard && BOUNDED_PREFIXES.some(p => pathname.startsWith(p));
   const isLanding = pathname === '/';
@@ -140,15 +140,15 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const content = !isPublicPath ? <LinkedGate>{children}</LinkedGate> : children;
 
   // For non-landing, non-dashboard pages: content is constrained to the left
-  // portion of the screen. There is NO hard visual border — the wallpaper's
+  // portion of the screen. There is NO hard visual border  the wallpaper's
   // gradient overlay handles the fusion seamlessly.
-  // `isLanding` — full width immersive layout
-  // `isDashboard` — WhaleProShell owns the full viewport (its own shell)
-  // everything else — content max-width left-aligned with transparent bg
+  // `isLanding`  full width immersive layout
+  // `isDashboard`  WhaleProShell owns the full viewport (its own shell)
+  // everything else  content max-width left-aligned with transparent bg
   const displayContent = content;
 
 
-  // Strict body trap for PC/Desktop — completely block document-level scrolling on bounded modules
+  // Strict body trap for PC/Desktop  completely block document-level scrolling on bounded modules
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
     const originalBodyOverflow = document.body.style.overflow;
@@ -211,7 +211,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
     document.addEventListener('mousedown', handleAudioClick, { passive: true });
     
-    // ── INHUMAN OPTIMIZATION: AudioContext Memory Leak Fix ──
+    //  INHUMAN OPTIMIZATION: AudioContext Memory Leak Fix 
     return () => {
       document.removeEventListener('mousedown', handleAudioClick);
       if (ctx.state !== 'closed') {
@@ -220,7 +220,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     };
   }, [settings?.soundEffects]);
 
-  // ── Sovereign Interaction Telemetry (independent of sound settings) ─────────
+  //  System Interaction Telemetry (independent of sound settings) 
   // CRITICAL FIX: Previously gated behind soundEffects=true, so if users had
   // sound disabled, ZERO interactions were ever logged to Session Logs.
   // Now fires unconditionally for all authenticated sessions.
@@ -231,14 +231,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         // Only log telemetry if the user is authenticated (connected)
         // Check both local wagmi store AND secure QR session cookies
         const hasLocalWallet = !!useWalletStore.getState().address;
-        const hasSessionCookie = document.cookie.includes('sovereign_handshake=');
+        const hasSessionCookie = document.cookie.includes('system_handshake=');
         const isConnected = hasLocalWallet || hasSessionCookie;
         if (!isConnected) return;
 
         // Try to get the active wallet address to attach to the log
         let activeUserId = useWalletStore.getState().address;
         if (!activeUserId) {
-            const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+            const match = document.cookie.match(/system_handshake=(0x[0-9a-fA-F]{40,})/i);
             if (match && match[1]) activeUserId = match[1];
         }
         activeUserId = activeUserId || null;
@@ -260,10 +260,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener('mousedown', handleInteractionLog);
   }, []);
 
-  // ── Battery-aware CSS class for noise animation ──────────────────────────
-  // Sets body.perf-high when device is plugged in → enables noise-shift CSS
+  //  Battery-aware CSS class for noise animation 
+  // Sets body.perf-high when device is plugged in  enables noise-shift CSS
   // animation via the selector in globals.css.
-  // When on battery, the class is absent → noise-shift is paused (0 CPU).
+  // When on battery, the class is absent  noise-shift is paused (0 CPU).
   useEffect(() => {
     if (typeof window === 'undefined') return;
     let battery: any = null;
@@ -282,7 +282,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
           battery.addEventListener('chargingchange', onChange);
           battery.addEventListener('levelchange', onChange);
         } else {
-          // No Battery API — assume plugged in (desktop)
+          // No Battery API  assume plugged in (desktop)
           document.body.classList.add('perf-high');
         }
       } catch {
@@ -320,7 +320,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const mainClass = isDashboard || isChat
     ? 'relative z-10 w-full flex-1 flex flex-col min-h-0 overflow-hidden'
     : isBounded
-      // Scroll is fully contained here — no empty page-level void zones
+      // Scroll is fully contained here  no empty page-level void zones
       ? `relative z-10 w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain flex flex-col ${isCenteredPage ? 'items-center justify-center' : ''}`
       : 'relative z-10 w-full flex-1 flex flex-col overscroll-none';
 
@@ -337,7 +337,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname.startsWith('/forum') ||
     pathname === '/';
 
-  // /chat has its own full-screen header — never show the global one there
+  // /chat has its own full-screen header  never show the global one there
 
   return (
     <>

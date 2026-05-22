@@ -1,14 +1,14 @@
-diff --git a/components/mobile/MobileSovereignLanding.tsx b/components/mobile/MobileSovereignLanding.tsx
+diff --git a/components/mobile/MobileSystemLanding.tsx b/components/mobile/MobileSystemLanding.tsx
 index 700dd2e7..8d63c5fe 100644
---- a/components/mobile/MobileSovereignLanding.tsx
-+++ b/components/mobile/MobileSovereignLanding.tsx
+--- a/components/mobile/MobileSystemLanding.tsx
++++ b/components/mobile/MobileSystemLanding.tsx
 @@ -26,28 +26,53 @@ import { toast } from 'sonner';
  import { CinematicWhaleLogo } from './CinematicWhaleLogo';
  
- // ─── DEEP LINK HELPERS ─────────────────────────────────────────────────────
+ //  DEEP LINK HELPERS 
 +// IMPORTANT: These builders receive a real WalletConnect URI (wc:// string)
 +// and wrap it in the wallet's universal link scheme.
-+// Do NOT pass the dApp origin here — that causes the wallet to open the browser
++// Do NOT pass the dApp origin here  that causes the wallet to open the browser
 +// without establishing a WalletConnect session.
 +
  function getAppUrl(): string {
@@ -43,7 +43,7 @@ index 700dd2e7..8d63c5fe 100644
 +  return `https://go.cb-w.com/wc?uri=${encoded}`;
 +}
 +
-+// Rainbow uses rnbwapp.com universal links — rainbow:// scheme is NOT supported
++// Rainbow uses rnbwapp.com universal links  rainbow:// scheme is NOT supported
 +function buildRainbowDeepLink(wcUri: string): string {
 +  const encoded = encodeURIComponent(wcUri);
 +  return `https://rnbwapp.com/wc?uri=${encoded}`;
@@ -91,16 +91,16 @@ index 700dd2e7..8d63c5fe 100644
  
 @@ -105,72 +134,97 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
  
- // ─── CUSTOM WALLET PICKER ──────────────────────────────────────────────────
+ //  CUSTOM WALLET PICKER 
  const SUPPORTED_WALLETS = [
 -  { id: 'metamask', name: 'MetaMask', icon: '/official-whale-monochrome.png', color: '#F6851B', link: buildMetaMaskDeepLink },
--  { id: 'trust', name: 'Trust Wallet', icon: '🛡️', color: '#3375BB', link: buildTrustDeepLink },
--  { id: 'coinbase', name: 'Coinbase', icon: '🔵', color: '#0052FF', link: buildCoinbaseDeepLink },
--  { id: 'rainbow', name: 'Rainbow', icon: '🌈', color: '#001E59', link: buildRainbowDeepLink }
+-  { id: 'trust', name: 'Trust Wallet', icon: '️', color: '#3375BB', link: buildTrustDeepLink },
+-  { id: 'coinbase', name: 'Coinbase', icon: '', color: '#0052FF', link: buildCoinbaseDeepLink },
+-  { id: 'rainbow', name: 'Rainbow', icon: '', color: '#001E59', link: buildRainbowDeepLink }
 +  { id: 'metamask', name: 'MetaMask', icon: '/official-whale-monochrome.png', color: '#F6851B' },
-+  { id: 'trust',    name: 'Trust Wallet', icon: '🛡️', color: '#3375BB' },
-+  { id: 'coinbase', name: 'Coinbase', icon: '🔵', color: '#0052FF' },
-+  { id: 'rainbow',  name: 'Rainbow',  icon: '🌈', color: '#001E59' }
++  { id: 'trust',    name: 'Trust Wallet', icon: '️', color: '#3375BB' },
++  { id: 'coinbase', name: 'Coinbase', icon: '', color: '#0052FF' },
++  { id: 'rainbow',  name: 'Rainbow',  icon: '', color: '#001E59' }
  ];
  
 +const STORE_LINKS: Record<string, { ios: string; android: string }> = {
@@ -178,7 +178,7 @@ index 700dd2e7..8d63c5fe 100644
 +    );
 +
 +    if (!wcConnector) {
-+      // No WC connector — open the dApp browser link directly
++      // No WC connector  open the dApp browser link directly
 +      window.location.href = buildDappBrowserLink(wallet.id, os);
 +      setTimeout(() => openStoreAsFallback(wallet.id), 3000);
 +      setIsConnecting(null);
@@ -217,10 +217,10 @@ index 700dd2e7..8d63c5fe 100644
 +
 +      provider.on('display_uri', onDisplayUri);
 +
-+      // STEP 2: Trigger connection — this causes WC to emit display_uri
++      // STEP 2: Trigger connection  this causes WC to emit display_uri
 +      connect({ connector: wcConnector });
 +
-+      // STEP 3: Safety timeout — if display_uri never fires (e.g. existing pairing),
++      // STEP 3: Safety timeout  if display_uri never fires (e.g. existing pairing),
 +      // fall back to dApp-browser link after 5 seconds and open the store.
 +      setTimeout(() => {
 +        if (!uriCaptured) {
@@ -302,14 +302,14 @@ index 700dd2e7..8d63c5fe 100644
              </div>
              
              <button 
-@@ -256,9 +324,19 @@ export function MobileSovereignLanding() {
+@@ -256,9 +324,19 @@ export function MobileSystemLanding() {
  
      const handleConnectTrigger = useCallback(() => {
          if (walletBrowser) {
 -            const connector = connectors.find(c => c.id === 'injected' || c.id === walletBrowser);
 -            if (connector) connect({ connector });
 +            // Inside a wallet's InApp browser, the injected provider IS the wallet.
-+            // Never try to match by wallet name — always use 'injected'.
++            // Never try to match by wallet name  always use 'injected'.
 +            const injectedConnector = connectors.find(
 +                c => c.id === 'injected' || c.id === 'io.metamask' || c.type === 'injected'
 +            );
@@ -320,7 +320,7 @@ index 700dd2e7..8d63c5fe 100644
 +                connect({ connector: connectors[0] });
 +            }
          } else {
-+            // Not inside a wallet browser — show the picker modal
++            // Not inside a wallet browser  show the picker modal
              setIsPickerOpen(true);
          }
      }, [connect, connectors, walletBrowser]);
@@ -366,8 +366,8 @@ index a038ae61..e61ef8f1 100644
 -const QR_TTL = 300; // 5 minute precision
 +const QR_TTL = 300;
  
--// ─── LEGENDARY NOISE OVERLAY ───────────────────────────────────────────────
-+// ─── NOISE OVERLAY ──────────────────────────────────────────────────────────
+-//  LEGENDARY NOISE OVERLAY 
++//  NOISE OVERLAY 
  const GrainyOverlay = () => (
    <div className="absolute inset-0 pointer-events-none opacity-[0.03] animate-pulse" style={{
      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
@@ -391,11 +391,11 @@ index a038ae61..e61ef8f1 100644
 -    useEffect(() => { 
 -        setIsMounted(true); 
 -        if (typeof document !== 'undefined') {
--            const hasProtocolHandshake = document.cookie.split('; ').some(row => row.startsWith('sovereign_handshake=0x'));
+-            const hasProtocolHandshake = document.cookie.split('; ').some(row => row.startsWith('system_handshake=0x'));
 -            if (hasProtocolHandshake && !isLinked) setLinked(true);
 -        }
 -    }, [isLinked, setLinked]);
-+// ─── WALLET DEFINITIONS ─────────────────────────────────────────────────────
++//  WALLET DEFINITIONS 
 +const PC_WALLETS = [
 +  {
 +    id: 'metamask',
@@ -411,7 +411,7 @@ index a038ae61..e61ef8f1 100644
 +    id: 'trust',
 +    name: 'Trust Wallet',
 +    description: 'Via WalletConnect QR',
-+    icon: '🛡️',
++    icon: '️',
 +    isImage: false,
 +    color: '#3375BB',
 +    bgColor: '#F0F5FF',
@@ -421,7 +421,7 @@ index a038ae61..e61ef8f1 100644
 +    id: 'coinbase',
 +    name: 'Coinbase Wallet',
 +    description: 'Via WalletConnect QR',
-+    icon: '🔵',
++    icon: '',
 +    isImage: false,
 +    color: '#0052FF',
 +    bgColor: '#F0F4FF',
@@ -431,7 +431,7 @@ index a038ae61..e61ef8f1 100644
 +    id: 'rainbow',
 +    name: 'Rainbow',
 +    description: 'Via WalletConnect QR',
-+    icon: '🌈',
++    icon: '',
 +    isImage: false,
 +    color: '#7B3FE4',
 +    bgColor: '#F5F0FF',
@@ -439,7 +439,7 @@ index a038ae61..e61ef8f1 100644
 +  },
 +];
 +
-+// ─── PC WALLET PICKER MODAL ─────────────────────────────────────────────────
++//  PC WALLET PICKER MODAL 
 +function PCWalletPickerModal({
 +  isOpen,
 +  onClose,
@@ -543,12 +543,12 @@ index a038ae61..e61ef8f1 100644
 -                backgroundSize: '48px 48px'
 -            }} />
 +      } else {
-+        // MetaMask not installed — open AppKit modal
++        // MetaMask not installed  open AppKit modal
 +        openAppKit({ view: 'Connect' });
 +        onClose();
 +      }
 +    } else {
-+      // Trust, Coinbase, Rainbow → WalletConnect QR via AppKit
++      // Trust, Coinbase, Rainbow  WalletConnect QR via AppKit
 +      openAppKit({ view: 'Connect' });
 +      onClose();
 +    }
@@ -656,7 +656,7 @@ index a038ae61..e61ef8f1 100644
 +  );
 +}
 +
-+// ─── SIGN CONTRACT OVERLAY ──────────────────────────────────────────────────
++//  SIGN CONTRACT OVERLAY 
 +function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; onDisconnect: () => void }) {
 +  const { address } = useAccount();
 +  const { signMessageAsync } = useSignMessage();
@@ -669,10 +669,10 @@ index a038ae61..e61ef8f1 100644
 +    setError(null);
 +    try {
 +      const message = [
-+        '═══════════════════════════════',
++        '',
 +        '  WHALE ALERT NETWORK',
 +        '  SOVEREIGN ACCESS PROTOCOL',
-+        '═══════════════════════════════',
++        '',
 +        '',
 +        `Identity: ${address}`,
 +        `Nonce: ${Date.now()}`,
@@ -682,15 +682,15 @@ index a038ae61..e61ef8f1 100644
 +        'you are the sole owner of this',
 +        'address and authorize access',
 +        'to the institutional terminal.',
-+        '═══════════════════════════════',
++        '',
 +      ].join('\n');
 +
 +      const signature = await signMessageAsync({ message });
 +
 +      if (signature) {
 +        // Persist the handshake as a cookie so the server can read it
-+        document.cookie = `sovereign_handshake=${address}; path=/; max-age=604800; SameSite=Lax`;
-+        sessionStorage.setItem(`sovereign_signed_${address}`, 'true');
++        document.cookie = `system_handshake=${address}; path=/; max-age=604800; SameSite=Lax`;
++        sessionStorage.setItem(`system_signed_${address}`, 'true');
 +
 +        toast.success('IDENTIDAD VINCULADA', {
 +          description: `Terminal desbloqueado. ${address.slice(0, 6)}...${address.slice(-4)}`,
@@ -732,7 +732,7 @@ index a038ae61..e61ef8f1 100644
 +      <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/5 rounded-full shadow-sm">
 +        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
 +        <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/60 font-mono">
-+          {address?.slice(0, 8)}…{address?.slice(-6)}
++          {address?.slice(0, 8)}{address?.slice(-6)}
 +        </span>
 +      </div>
 +
@@ -792,7 +792,7 @@ index a038ae61..e61ef8f1 100644
 +  );
 +}
 +
-+// ─── MAIN GATE COMPONENT ────────────────────────────────────────────────────
++//  MAIN GATE COMPONENT 
 +export function LinkedGate({ children }: { children: React.ReactNode }) {
 +  const { isLinked, setLinked } = useUIStore();
 +  const { isConnected: isWalletConnected, address } = useAccount();
@@ -817,23 +817,23 @@ index a038ae61..e61ef8f1 100644
 +    if (typeof document !== 'undefined') {
 +      const hasHandshake = document.cookie
 +        .split('; ')
-+        .some(row => row.startsWith('sovereign_handshake=0x'));
++        .some(row => row.startsWith('system_handshake=0x'));
 +      if (hasHandshake) {
 +        setLinked(true);
 +      } else if (!isWalletConnected) {
-+        // No cookie and no wallet → force gate to show regardless of persisted state
++        // No cookie and no wallet  force gate to show regardless of persisted state
 +        setLinked(false);
 +      }
 +    }
 +  }, []); // run once on mount only
 +
-+  // When wallet connects — check sign status and show sign step if needed
++  // When wallet connects  check sign status and show sign step if needed
 +  useEffect(() => {
 +    if (!isWalletConnected || isLinked) return;
 +    if (!address) return;
-+    const alreadySigned = sessionStorage.getItem(`sovereign_signed_${address}`) === 'true';
++    const alreadySigned = sessionStorage.getItem(`system_signed_${address}`) === 'true';
 +    if (alreadySigned) {
-+      // Cookie should exist too — fast-path unlock
++      // Cookie should exist too  fast-path unlock
 +      setLinked(true);
 +    } else {
 +      setShowSignStep(true);
@@ -907,14 +907,14 @@ index a038ae61..e61ef8f1 100644
 +
 +  return (
 +    <>
-+      {/* ── PC WALLET PICKER MODAL ── */}
++      {/*  PC WALLET PICKER MODAL  */}
 +      <PCWalletPickerModal
 +        isOpen={isPickerOpen}
 +        onClose={() => setIsPickerOpen(false)}
 +        onConnected={() => setIsPickerOpen(false)}
 +      />
 +
-+      {/* ── GATEWAY SCREEN ── */}
++      {/*  GATEWAY SCREEN  */}
 +      <div className="fixed inset-0 z-[10000] bg-[#FAF9F6] flex items-center justify-center p-8 selection:bg-black selection:text-white font-sans overflow-auto">
 +        <GrainyOverlay />
 +
@@ -925,7 +925,7 @@ index a038ae61..e61ef8f1 100644
 +        }} />
 +
 +        <AnimatePresence mode="wait">
-+          {/* ── SIGN STEP (after wallet connects) ── */}
++          {/*  SIGN STEP (after wallet connects)  */}
 +          {showSignStep ? (
              <motion.div
 -                initial={{ opacity: 0, scale: 0.98 }}
@@ -960,7 +960,7 @@ index a038ae61..e61ef8f1 100644
 +              <SignContractStep onSigned={handleSigned} onDisconnect={handleDisconnect} />
 +            </motion.div>
 +          ) : (
-+            /* ── GATEWAY LOCKED SCREEN ── */
++            /*  GATEWAY LOCKED SCREEN  */
 +            <motion.div
 +              key="gate"
 +              initial={{ opacity: 0, scale: 0.98 }}
@@ -969,7 +969,7 @@ index a038ae61..e61ef8f1 100644
 +              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
 +              className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-20 items-center z-10"
 +            >
-+              {/* ── LEFT: BRANDING & ACTIONS ── */}
++              {/*  LEFT: BRANDING & ACTIONS  */}
 +              <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-16">
 +                <div className="flex flex-col items-center lg:items-start gap-10">
 +                  <motion.div
@@ -990,7 +990,7 @@ index a038ae61..e61ef8f1 100644
 +                  </div>
 +                </div>
 +
-+                {/* ── ACTION BUTTONS ── */}
++                {/*  ACTION BUTTONS  */}
 +                <div className="w-full max-w-sm space-y-4">
 +                  {/* PRIMARY: Custom Wallet Picker */}
 +                  <motion.button
@@ -1047,13 +1047,13 @@ index a038ae61..e61ef8f1 100644
 -                                <Smartphone size={20} className="text-indigo-600" />
 -                            </div>
 -                            <div className="text-left space-y-2">
--                                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]/80">Acceso Sovereign App</p>
+-                                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]/80">Acceso System App</p>
 -                                <p className="text-[12px] font-medium text-[#050505]/40 leading-relaxed uppercase tracking-widest">
 -                                    Autenticación asimétrica de 256 bits sin conexión local.
 -                                </p>
 -                            </div>
 -                        </div>
-+                  {/* SECONDARY: Mobile Sovereign App info */}
++                  {/* SECONDARY: Mobile System App info */}
 +                  <div className="p-6 bg-black/[0.02] border border-black/5 rounded-[2.5rem] flex items-start gap-5">
 +                    <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0 animate-pulse">
 +                      <Smartphone size={18} className="text-indigo-600" />
@@ -1135,7 +1135,7 @@ index a038ae61..e61ef8f1 100644
 -                            </AnimatePresence>
 -                        </div>
 -                    </div>
-+              {/* ── RIGHT: QR PANEL ── */}
++              {/*  RIGHT: QR PANEL  */}
 +              <div className="relative flex flex-col items-center">
 +                <div className="relative p-14 bg-white rounded-[5rem] shadow-[0_120px_240px_-60px_rgba(0,0,0,0.12)] border border-black/[0.04] overflow-hidden">
 +                  <div className="absolute inset-0 bg-gradient-to-tr from-[#050505]/[0.02] to-transparent" />
@@ -1294,7 +1294,7 @@ index d7d66d1b..257dba78 100644
 +
  const metadata = {
      name: 'Whale Alert Network',
-     description: 'Sovereign Institutional Intelligence',
+     description: 'System Institutional Analytics',
 -    url: typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com',
 -    icons: [
 -        typeof window !== 'undefined' ? `${window.location.origin}/official-whale-legendary.png` : 'https://humanidfi.com/official-whale-legendary.png'
@@ -1340,7 +1340,7 @@ index d7d66d1b..257dba78 100644
 -        ],
 -        allWallets: 'SHOW'
 -    })
-+// Singleton guard — createAppKit must only be called once per page load.
++// Singleton guard  createAppKit must only be called once per page load.
 +// Calling it twice (e.g. due to HMR or context remount) throws an internal error
 +// that manifests as the "Algo salió mal" crash screen on mobile browsers.
 +let appKitInitialized = false;

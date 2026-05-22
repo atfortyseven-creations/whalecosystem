@@ -1,5 +1,5 @@
 // components/MainVault.tsx
-import { useWLD } from '../hooks/useWLD'
+import { useAUTH } from '../hooks/useAUTH'
 import { useChainId, useAccount, useConnect, useSwitchChain } from 'wagmi';
 
 interface MainVaultProps {
@@ -7,7 +7,7 @@ interface MainVaultProps {
 }
 
 export const MainVault = ({ onConnect }: MainVaultProps) => {
-    const { balance, isLoading } = useWLD()
+    const { balance, isLoading } = useAUTH()
     const chainId = useChainId();
     const { isConnected, chain } = useAccount();
     const { connect, connectors } = useConnect();
@@ -63,7 +63,7 @@ export const MainVault = ({ onConnect }: MainVaultProps) => {
             <div className="flex justify-between items-start mb-6 relative z-10">
                 <div>
                     <p className="text-gray-500 text-sm font-medium flex items-center gap-2">
-                        Net Worth Estimate <span className="rotate-180">↺</span>
+                        Net Worth Estimate <span className="rotate-180"></span>
                     </p>
                     <h2 className="text-6xl font-bold mt-2 tracking-tighter">
                         ${isLoading ? '...' : (Number(balance) * 0.45).toFixed(2)}
@@ -71,7 +71,7 @@ export const MainVault = ({ onConnect }: MainVaultProps) => {
                     </h2>
                 </div>
                 <div className="bg-blue-500/10 text-blue-500 px-3 py-1 rounded-full text-xs font-bold h-fit">
-                    ↗ 0%
+                     0%
                 </div>
             </div>
 

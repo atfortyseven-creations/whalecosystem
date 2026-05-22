@@ -19,7 +19,7 @@ export async function GET() {
         // Aggregate volume from WhaleActivity in the last 24h
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-        // NOTE: WhaleActivity.usdValue is a String field in the Prisma schema —
+        // NOTE: WhaleActivity.usdValue is a String field in the Prisma schema 
         // Prisma _sum/_orderBy only work on numeric types (Float/Int/BigInt).
         // We use valueBTC (Float) for aggregation and derive a USD proxy in the map.
         const result = await prisma.whaleActivity.groupBy({
@@ -43,7 +43,7 @@ export async function GET() {
             take: 500,
         });
 
-        // Fallback for missing Prisma models — whaleSnapshot and walletAnalytics removed
+        // Fallback for missing Prisma models  whaleSnapshot and walletAnalytics removed
         const snapshotMap = new Map<string, any>();
         const analyticsMap = new Map<string, any>();
 

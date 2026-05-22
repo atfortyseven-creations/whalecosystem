@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
             ts: evt.ts,
             type: evt.action === 'BUY' ? 'accumulation' : (evt.action === 'SELL' ? 'dump' : 'transfer'),
             confidence: evt.confidence || 95,
-            // ⚡ V6.0 Deep Telemetry Fields
+            //  V6.0 Deep Telemetry Fields
             gasUsed: (evt as any).gasUsed,
             confirmations: (evt as any).confirmations,
             telemetryTag: (evt as any).telemetryTag,
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
 
     } catch (error: any) {
         console.error('[Alpha Events V6] Scanner error:', error?.message);
-        // Return empty events instead of 500 — UI shows "Waiting for anomalies..."
+        // Return empty events instead of 500  UI shows "Waiting for anomalies..."
         return NextResponse.json({
             events: [],
             status: 'degraded',

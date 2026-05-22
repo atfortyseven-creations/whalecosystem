@@ -31,7 +31,7 @@ export interface TradeIntent {
  * Creates and broadcasts a signed Intent to the Solver Network.
  */
 export async function submitIntent(signer: ethers.Signer | any, intent: TradeIntent) {
-    console.log("🧠 Broadcasting Intent to Solver Network...", intent);
+    console.log(" Broadcasting Intent to Solver Network...", intent);
     
     // 1. Sign off-chain (EIP-712)
     // No gas cost for the user to create the order!

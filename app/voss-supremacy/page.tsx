@@ -1,4 +1,4 @@
-import { VOSS_MASTER_MATRIX } from '@/lib/vossIntelligenceEngine';
+import { VOSS_MASTER_MATRIX } from '@/lib/vossAnalyticsEngine';
 
 export const metadata = {
   title: 'VOSS 2026 Supreme Roadmap | Whale Alert Network',
@@ -17,7 +17,7 @@ export default function VossSupremacyPage() {
             VOSS 2026: The 500 Dimensions of Apex Dominance
           </h1>
           <p className="text-lg md:text-xl text-[#666666] max-w-3xl leading-relaxed">
-            Sovereign-grade intelligence output. Constructed on the principles of Zero-Mock Mandate, Akashic Permanence, and Institutional Ivory. Every signal sourced directly from live blockchain state. 100% Non-Custodial. 100% Trustless.
+            System-grade analytics output. Constructed on the principles of Zero-Mock Mandate, Akashic Permanence, and Institutional Ivory. Every signal sourced directly from live blockchain state. 100% Non-Custodial. 100% Trustless.
           </p>
         </header>
 
@@ -85,7 +85,7 @@ export default function VossSupremacyPage() {
             <div className="bg-[#1A1A1A] text-white p-8">
                <h3 className="font-mono text-sm tracking-widest text-[#8C8C8C] mb-4">FASE 1 // DÍAS 1-30</h3>
                <p className="text-lg font-medium mb-2">Soberanía Absoluta</p>
-               <p className="text-sm text-gray-400">Implementación 1-125. Transición de PM2 Node a Rust Bindings (Prisma) y el ZK-Rollup Sovereign Mesh. Se inyecta la liquidez masiva.</p>
+               <p className="text-sm text-gray-400">Implementación 1-125. Transición de PM2 Node a Rust Bindings (Prisma) y el ZK-Rollup System Mesh. Se inyecta la liquidez masiva.</p>
             </div>
             <div className="bg-[#1A1A1A] text-white p-8">
                <h3 className="font-mono text-sm tracking-widest text-[#8C8C8C] mb-4">FASE 2 // DÍAS 31-90</h3>

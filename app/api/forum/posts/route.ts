@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
         }
         const address = validation.userId;
 
-        // Upsert user — create them if they don't exist yet.
+        // Upsert user  create them if they don't exist yet.
         const user = await prisma.user.upsert({
             where:  { walletAddress: address },
             update: {},
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        // Fire-and-forget side effects — never let failures block the response
+        // Fire-and-forget side effects  never let failures block the response
         const sideEffects = async () => {
             // Update topic timestamp
             try {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
                 }
             } catch { /* ForumTopic update may fail */ }
 
-            // AuditLog — optional, table may not exist
+            // AuditLog  optional, table may not exist
             try {
                 await prisma.auditLog.create({
                     data: {
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
                 });
             } catch { /* AuditLog table may not exist yet */ }
 
-            // ForumTelemetry — optional, table may not exist
+            // ForumTelemetry  optional, table may not exist
             try {
                 await (prisma as any).forumTelemetry.create({
                     data: {
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
             } catch { /* ForumTelemetry table may not exist yet */ }
         };
 
-        // Don't await — fire and forget
+        // Don't await  fire and forget
         sideEffects().catch(() => {});
 
         return NextResponse.json(newPost);

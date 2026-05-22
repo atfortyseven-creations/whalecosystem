@@ -32,10 +32,10 @@ export function UnifiedExplorerTerminal() {
                     <header className="mb-8">
                         <div className="flex items-center gap-3 mb-2">
                             <Activity size={16} className="text-indigo-600 animate-pulse" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-600">Sovereign Pulse Active</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-600">System Pulse Active</span>
                         </div>
                         <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase">
-                            Unified <span className="text-slate-300">Network Matrix</span>
+                            Unified <span className="text-slate-300">Network Grid</span>
                         </h1>
                         <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mt-2 max-w-2xl">
                             Epoch 4 institutional grade synchronization. Resolving global liquidity, computational armor, and atomic execution layers in real-time.
@@ -66,11 +66,11 @@ export function UnifiedExplorerTerminal() {
                         </div>
                     </section>
 
-                    {/* Section 3: Liquidity Intelligence (Epoch 2 & 3) */}
+                    {/* Section 3: Liquidity Analytics (Epoch 2 & 3) */}
                     <section className="space-y-6">
                         <div className="flex items-center gap-4 px-4">
                             <Activity size={18} className="text-slate-400" />
-                            <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">Whale Intelligence & Flow</h2>
+                            <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">Whale Analytics & Flow</h2>
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                             <WhaleWatch theme="arctic" />
@@ -129,7 +129,7 @@ export function UnifiedExplorerTerminal() {
                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Network Operational</span>
                             </div>
                             <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                                &copy; 2026 Sovereign Infrastructure Group
+                                &copy; 2026 System Infrastructure Group
                             </div>
                         </div>
                     </div>

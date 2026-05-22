@@ -144,7 +144,7 @@ export const ecosystemFeatures: FeatureContent[] = [
     shortDesc: '0% markup FX, instant conversion',
     deepDive: [
       'The Whale Card is not just plastic; it\'s a payment endpoint that resolves the off-ramp through an instant settlement protocol.',
-      'Visa payment rail integration, KYC/AML compliance, real-time crypto→fiat conversion.',
+      'Visa payment rail integration, KYC/AML compliance, real-time cryptofiat conversion.',
       'Total fee transparency: 0% FX markup vs 2.99% on Crypto.com.',
       'Spend your cryptocurrencies at any merchant that accepts Visa, seamlessly.'
     ],
@@ -173,7 +173,7 @@ export const ecosystemFeatures: FeatureContent[] = [
     category: 'productos',
     title: 'Smart Accounts Kit',
     subtitle: 'Protocol: ERC-4337 Account Abstraction Layer',
-    shortDesc: 'Human engineering for real digital sovereignty',
+    shortDesc: 'Human engineering for real digital systemty',
     deepDive: [
       'Your wallet is not just a simple address, it\'s an intelligent Smart Contract deployed on the network.',
       'Paymasters: pay gas in any token or we subsidize it.',

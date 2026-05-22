@@ -53,7 +53,7 @@ export async function deductCredits(userId: string, action: string, baseCost: nu
   const effectiveCost = Math.ceil(baseCost / multiplier);
 
   if (user.creditsBalance < effectiveCost) {
-    throw new Error(`Insufficient Sovereign Credits. Required: ${effectiveCost}, Balance: ${user.creditsBalance}`);
+    throw new Error(`Insufficient System Credits. Required: ${effectiveCost}, Balance: ${user.creditsBalance}`);
   }
 
   // 2. Execute Atomic Transaction

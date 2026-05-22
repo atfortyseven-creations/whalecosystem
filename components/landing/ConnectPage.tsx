@@ -9,7 +9,7 @@ import { useUIStore } from "@/lib/store/ui-store";
 import { toast } from "sonner";
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { QRCodeSVG } from 'qrcode.react';
-import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 
 import {
   ArrowRight,
@@ -97,7 +97,7 @@ export default function ConnectPage() {
   const { signMessageAsync } = useSignMessage();
   const { open: openAppKit } = useAppKit();
   const { isLinked, setLinked } = useUIStore();
-  const { nuclearDisconnect } = useSovereignSignOut();
+  const { nuclearDisconnect } = useSystemSignOut();
 
   const [mounted, setMounted] = useState(false);
   const [qrSession, setQrSession] = useState<string | null>(null);
@@ -127,10 +127,10 @@ export default function ConnectPage() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const hasCookie = document.cookie.split("; ").some((r) => r.startsWith("sovereign_handshake="));
+    const hasCookie = document.cookie.split("; ").some((r) => r.startsWith("system_handshake="));
     const hasLocal = (() => {
       try {
-        const raw = localStorage.getItem("sovereign_session_v2");
+        const raw = localStorage.getItem("system_session_v2");
         if (!raw) return false;
         const parsed = JSON.parse(raw);
         return parsed && parsed.exp && parsed.exp > Date.now();
@@ -165,7 +165,7 @@ export default function ConnectPage() {
 
   useEffect(() => { if (!qrSession && mounted) initEphemeral(); }, [qrSession, initEphemeral, mounted]);
 
-  // QR poll — desktop side: waits for mobile to complete handshake, then hydrates session
+  // QR poll  desktop side: waits for mobile to complete handshake, then hydrates session
   useEffect(() => {
     if (!qrSession || !ephemeral || syncStatus === "SYNCED") return;
     const poll = setInterval(async () => {
@@ -210,8 +210,8 @@ export default function ConnectPage() {
             return;
           }
 
-          // ── CRITICAL FIX: Removed `if (!data.kycVerified) return;` ──
-          // kycVerified is NEVER set in the qr-mobile-link payload —
+          //  CRITICAL FIX: Removed `if (!data.kycVerified) return;` 
+          // kycVerified is NEVER set in the qr-mobile-link payload 
           // this guard was silently blocking 100% of QR sessions from hydrating.
           // The JWT contains the wallet address and clearance level, that's sufficient.
 
@@ -257,9 +257,9 @@ export default function ConnectPage() {
     prevConnectedRef.current = isConnected;
   }, [isConnected]);
 
-  // [CRITICAL FIX] Wallet connect → SIWE sovereign-verify → then redirect.
-  // The old code went directly to /dashboard without calling sovereign-verify,
-  // meaning no whale_session/human_session/sovereign_handshake cookie was set.
+  // [CRITICAL FIX] Wallet connect  SIWE system-verify  then redirect.
+  // The old code went directly to /dashboard without calling system-verify,
+  // meaning no whale_session/human_session/system_handshake cookie was set.
   // Every subsequent API call to a protected route returned 401.
   const signingRef = useRef(false);
   useEffect(() => {
@@ -290,13 +290,13 @@ export default function ConnectPage() {
         }
       } catch {}
 
-      // 2. No session — Bypassed SIWE-sign per user request
+      // 2. No session  Bypassed SIWE-sign per user request
       try {
         const norm = address.toLowerCase();
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000);
-        const verifyRes = await fetch('/api/auth/sovereign-verify', {
+        const verifyRes = await fetch('/api/auth/system-verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ address: norm }),
@@ -316,7 +316,7 @@ export default function ConnectPage() {
         window.location.replace("/dashboard");
       } catch (err: any) {
         const msg = err?.message || '';
-        // User rejected signing — don't show an error, just reset
+        // User rejected signing  don't show an error, just reset
         if (!msg.toLowerCase().includes('rejected') && !msg.toLowerCase().includes('denied')) {
           toast.error('Authentication failed', { description: msg });
         }
@@ -344,7 +344,7 @@ export default function ConnectPage() {
 
   const handleMobileWallet = useCallback((walletId: string) => {
     try { sessionStorage.removeItem("__disconnected__"); } catch {}
-    try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {}
+    try { localStorage.setItem('system_pending_wakeup', '1'); } catch {}
     
     // Instead of forcing the user into the dapp browser with metamask.app.link/dapp,
     // we use AppKit which correctly uses standard Universal Links to sign and return to Chrome.

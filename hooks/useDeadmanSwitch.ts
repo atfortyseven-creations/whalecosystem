@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * useDeadmanSwitch — Full on-chain hook for SovereignDeadmanSwitch.
+ * useDeadmanSwitch  Full on-chain hook for SystemDeadmanSwitch.
  *
  * Reads live state directly from Polygon via wagmi/viem public client.
  * Writes (ping, proposeBackup, confirmBackup, setToimeout, pause, trigger)
- * are sent as real wallet transactions — no simulation, no mocks.
+ * are sent as real wallet transactions  no simulation, no mocks.
  */
 
 import { useCallback, useEffect, useState }       from "react";
@@ -13,14 +13,14 @@ import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { getContract, parseUnits, type Address }  from "viem";
 import { polygon, polygonAmoy }                    from "viem/chains";
 
-// ─── CONTRACT CONFIG ──────────────────────────────────────────────────────────
+//  CONTRACT CONFIG 
 // These are populated by the deployment script via lib/blockchain/abi/*.json.
 // Swap the address once you go to mainnet.
 
 let deploymentData: { address: string; abi: any[] } | null = null;
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  deploymentData = require("@/lib/blockchain/abi/SovereignDeadmanSwitch.json");
+  deploymentData = require("@/lib/blockchain/abi/SystemDeadmanSwitch.json");
 } catch {
   /* Not yet deployed */
 }
@@ -30,7 +30,7 @@ export const DEADMAN_CONTRACT_ADDRESS = (
 ) as Address;
 
 export const DEADMAN_ABI = deploymentData?.abi ?? [
-  // Minimal inline ABI for pre-deployment dev — full ABI replaces this after deploy
+  // Minimal inline ABI for pre-deployment dev  full ABI replaces this after deploy
   { name: "ping",              type: "function", stateMutability: "nonpayable", inputs: [],                     outputs: [] },
   { name: "proposeBackupWallet", type: "function", stateMutability: "nonpayable", inputs: [{ name: "newBackup", type: "address" }], outputs: [] },
   { name: "confirmBackupWallet", type: "function", stateMutability: "nonpayable", inputs: [],                  outputs: [] },
@@ -66,7 +66,7 @@ export const DEADMAN_ABI = deploymentData?.abi ?? [
   { name: "BackupWalletProposed", type: "event", inputs: [{ name: "proposed", type: "address", indexed: true }, { name: "effectiveAt", type: "uint256" }] },
 ];
 
-// ─── TYPES ────────────────────────────────────────────────────────────────────
+//  TYPES 
 
 export interface DeadmanStatus {
   owner:         Address;
@@ -81,7 +81,7 @@ export interface DeadmanStatus {
   pendingBackupTime: bigint;
   // derived
   daysLeft:      number;
-  percentLeft:   number;      // 0–100 for the progress arc
+  percentLeft:   number;      // 0100 for the progress arc
   isExpired:     boolean;
   isDangerous:   boolean;     // < 10 days left
 }
@@ -93,7 +93,7 @@ export interface DeadmanHookReturn {
   contractAddress: Address;
   refetch:         () => Promise<void>;
 
-  // Write actions — all return the tx hash on success
+  // Write actions  all return the tx hash on success
   sendPing:               () => Promise<string>;
   proposeBackup:          (newBackup: Address) => Promise<string>;
   confirmBackup:          () => Promise<string>;
@@ -103,7 +103,7 @@ export interface DeadmanHookReturn {
   triggerInheritance:     (erc20s: Address[], erc721s: Address[], tokenIds: bigint[]) => Promise<string>;
 }
 
-// ─── HOOK ─────────────────────────────────────────────────────────────────────
+//  HOOK 
 
 export function useDeadmanSwitch(): DeadmanHookReturn {
   const { address, chain }     = useAccount();
@@ -116,7 +116,7 @@ export function useDeadmanSwitch(): DeadmanHookReturn {
 
   const contractAddress = DEADMAN_CONTRACT_ADDRESS;
 
-  // ── READ ───────────────────────────────────────────────────────────────────
+  //  READ 
 
   const fetchStatus = useCallback(async () => {
     if (!publicClient || !contractAddress) { setIsLoading(false); return; }
@@ -172,7 +172,7 @@ export function useDeadmanSwitch(): DeadmanHookReturn {
     return () => clearInterval(id);
   }, [fetchStatus]);
 
-  // ── WRITE HELPERS ──────────────────────────────────────────────────────────
+  //  WRITE HELPERS 
 
   const writeContract = useCallback(async (
     functionName: string,
@@ -198,7 +198,7 @@ export function useDeadmanSwitch(): DeadmanHookReturn {
     return hash;
   }, [walletClient, address, contractAddress, publicClient, fetchStatus]);
 
-  // ── PUBLIC WRITE API ───────────────────────────────────────────────────────
+  //  PUBLIC WRITE API 
 
   const sendPing            = () => writeContract("ping");
   const proposeBackup       = (b: Address) => writeContract("proposeBackupWallet", [b]);

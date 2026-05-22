@@ -7,11 +7,11 @@ import {
     Lock, Server, Globe, CheckCircle2, 
     AlertTriangle, Terminal, Network, Search
 } from 'lucide-react';
-import QuantumPrecisionRadar from './QuantumPrecisionRadar';
+import CorePrecisionRadar from './CorePrecisionRadar';
 import { HeroCircuitry } from '@/components/landing/HeroCircuitry';
 
 /**
- * 💎 SYSTEM NODE CORE 💎
+ *  SYSTEM NODE CORE 
  * Hyper-secure, elite blockchain node dashboard.
  */
 export default function SystemNodeCore() {
@@ -72,7 +72,7 @@ export default function SystemNodeCore() {
                             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#ef4444]/10 border border-[#ef4444]/20"
                         >
                             <span className="w-1.5 h-1.5 rounded-full bg-[#ef4444] animate-pulse" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ef4444]">Quantum Precision Active</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#ef4444]">Core Precision Active</span>
                         </motion.div>
                         
                         <motion.h1 
@@ -95,11 +95,11 @@ export default function SystemNodeCore() {
                     </div>
 
                     <div className="relative">
-                        <QuantumPrecisionRadar />
+                        <CorePrecisionRadar />
                     </div>
                 </div>
 
-                {/* Telemetry Matrix */}
+                {/* Telemetry Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {telemetry.map((node, i) => (
                         <motion.button 
@@ -147,7 +147,7 @@ export default function SystemNodeCore() {
                                 {[
                                     { label: 'HSM Core', status: 'Operational', desc: 'Hardware-backed secret management active.', icon: Lock },
                                     { label: 'Multi-sig Layer', status: 'Synchronized', desc: 'Elite multi-chain consensus flow.', icon: Network },
-                                    { label: 'Quantum Shield', status: 'Active', desc: 'Post-quantum encryption enabled.', icon: ShieldCheck },
+                                    { label: 'Core Shield', status: 'Active', desc: 'Post-core encryption enabled.', icon: ShieldCheck },
                                     { label: 'Intrusion Detection', status: 'Zero Threats', desc: 'Millimetre detection sensitivity.', icon: Search }
                                 ].map((sys, i) => (
                                     <div key={i} className="flex gap-4 group/item">
@@ -232,7 +232,7 @@ export default function SystemNodeCore() {
                 >
                     <div className="space-y-2">
                         <h3 className="text-3xl font-black uppercase tracking-tighter">Global Node Reach</h3>
-                        <p className="text-white/40 text-sm font-medium tracking-tight">Our quantum core is natively integrated with 120+ elite networks.</p>
+                        <p className="text-white/40 text-sm font-medium tracking-tight">Our core core is natively integrated with 120+ elite networks.</p>
                     </div>
                     
                     <div className="flex flex-wrap justify-center gap-4 py-6">

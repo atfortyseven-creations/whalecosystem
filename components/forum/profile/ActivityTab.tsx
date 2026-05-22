@@ -20,7 +20,7 @@ export function ActivityTab({ items }: { items: any[] }) {
           : `/forum/t/${item.topicId}`;
         const label = item._type === 'TOPIC'
           ? (item.title || 'Untitled')
-          : (item.content?.slice(0, 80) || '—');
+          : (item.content?.slice(0, 80) || '');
 
         return (
           <Link

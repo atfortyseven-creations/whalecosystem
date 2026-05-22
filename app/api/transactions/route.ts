@@ -48,7 +48,7 @@ import {
 } from '@/lib/wallet/transactions-server';
 
 /**
- * Gets user transactions - Unified Sovereign Flow
+ * Gets user transactions - Unified System Flow
  */
 export async function GET(req: Request) {
     try {
@@ -59,7 +59,7 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
         }
 
-        // ── UNIFICACIÓN DE EXPLORADOR (5000T) ──────────────────────────────────
+        //  UNIFICACIÓN DE EXPLORADOR (5000T) 
         // Ya no consultamos una sola tabla; usamos el motor de unificación.
         const transactions = await getTransactionHistory(userId, { limit: 50 });
 

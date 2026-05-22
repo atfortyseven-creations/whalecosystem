@@ -121,7 +121,7 @@ export function TransactionStatusModal({ isOpen, status, title, message, onClose
                                         networkId === 'optimism'  ? `https://optimistic.etherscan.io/tx/${txHash}` :
                                         networkId === 'base'      ? `https://basescan.org/tx/${txHash}` :
                                         networkId === 'avalanche' ? `https://snowtrace.io/tx/${txHash}` :
-                                        `https://polygonscan.com/tx/${txHash}` // Sovereign Failover
+                                        `https://polygonscan.com/tx/${txHash}` // System Failover
                                     }
                                     target="_blank" 
                                     rel="noreferrer"

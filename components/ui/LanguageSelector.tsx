@@ -7,10 +7,10 @@ import { Globe, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const languages = [
-    { code: 'en', label: 'English', flag: '🇬🇧' },
-    { code: 'es', label: 'Spanish', flag: '🇪🇸' },
-    { code: 'ru', label: 'Русский', flag: '🇷🇺' },
-    { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+    { code: 'en', label: 'English', flag: '' },
+    { code: 'es', label: 'Spanish', flag: '' },
+    { code: 'ru', label: 'Русский', flag: '' },
+    { code: 'de', label: 'Deutsch', flag: '' },
 ] as const;
 
 export function LanguageSelector() {

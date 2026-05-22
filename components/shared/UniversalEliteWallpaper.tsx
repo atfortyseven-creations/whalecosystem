@@ -4,11 +4,11 @@ import React from 'react';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 
 /**
- * UniversalEliteWallpaper — Global fixed background layer
+ * UniversalEliteWallpaper  Global fixed background layer
  *
- * - backgroundSize: cover → zero white side bands, fills edge-to-edge
- * - Dark mode  → wallpaper fully visible, 55% dark overlay for contrast
- * - Light mode → wallpaper at full size, 88% white overlay for readability
+ * - backgroundSize: cover  zero white side bands, fills edge-to-edge
+ * - Dark mode   wallpaper fully visible, 55% dark overlay for contrast
+ * - Light mode  wallpaper at full size, 88% white overlay for readability
  */
 export function UniversalEliteWallpaper() {
     const theme = useSettingsStore((s) => s.theme);
@@ -25,12 +25,12 @@ export function UniversalEliteWallpaper() {
             style={{ zIndex: -1 }}
             aria-hidden="true"
         >
-            {/* ── Base: light background ─────────────── */}
+            {/*  Base: light background  */}
             <div className="absolute inset-0 bg-[#FAFAF8]" />
 
 
 
-            {/* ── Light mode: translucent overlay ──────── */}
+            {/*  Light mode: translucent overlay  */}
             {!isDark && (
                 <div
                     className="absolute inset-0 transition-opacity duration-700"
@@ -38,7 +38,7 @@ export function UniversalEliteWallpaper() {
                 />
             )}
 
-            {/* ── Dark mode: deepen shadows so white text is readable ────────────── */}
+            {/*  Dark mode: deepen shadows so white text is readable  */}
             {isDark && (
                 <div
                     className="absolute inset-0 transition-opacity duration-700"

@@ -8,7 +8,7 @@ interface LiquidationPoint {
   intensity: number;
 }
 
-// Deterministic liquidation wall model — no Math.random()
+// Deterministic liquidation wall model  no Math.random()
 // Liquidation clusters concentrate at ±2%, ±5%, ±8%, ±10% from current price
 const WALL_MULTIPLIERS = [1.02, 1.05, 0.98, 0.95, 1.08, 0.92, 1.10, 0.90];
 
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const interval = searchParams.get('interval') || '24h';
 
     // 1. Fetch real current price from Binance
-    let basePrice = 69420; // Institutional fallback — never Math.random()
+    let basePrice = 69420; // Institutional fallback  never Math.random()
     try {
       const binanceSymbol = `${symbol}${pair === 'EUR' ? 'EUR' : 'USDT'}`;
       const priceRes = await fetch(
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
         if (pd.price) basePrice = parseFloat(pd.price);
       }
     } catch {
-      // Fallback to last known price — not Math.random()
+      // Fallback to last known price  not Math.random()
     }
 
     const priceScale = pair === 'EUR' ? 0.92 : 1.0;
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
 
     for (let i = 0; i < points; i++) {
       const time  = now - (points - i) * timeStep;
-      // Deterministic price path using a sine wave — no Math.random()
+      // Deterministic price path using a sine wave  no Math.random()
       const trend = Math.sin(i / 20) * (adjustedBasePrice * 0.03);
       const currentPrice = adjustedBasePrice + trend;
 

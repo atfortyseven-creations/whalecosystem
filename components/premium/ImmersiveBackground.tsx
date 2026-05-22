@@ -5,22 +5,22 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Stars, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ImmersiveBackground — optimized for 240Hz, mobile/iOS safe
+// 
+// ImmersiveBackground  optimized for 240Hz, mobile/iOS safe
 //
 // Problems fixed vs original:
-//  1. MeshDistortMaterial removed — it recompiles shaders every frame on some
+//  1. MeshDistortMaterial removed  it recompiles shaders every frame on some
 //     mobile GPUs, causing intermittent frame drops. Replaced with animated
 //     MeshPhysicalMaterial (shader compiled once at load).
-//  2. 20x Float wrappers removed — each Float runs its own useFrame + lerp
+//  2. 20x Float wrappers removed  each Float runs its own useFrame + lerp
 //     every tick. Collapsed to a single InstancedMesh with manual animation.
-//  3. Stars count 5000 → 2000 on mobile, 5000 on desktop.
+//  3. Stars count 5000  2000 on mobile, 5000 on desktop.
 //  4. DPR capped at 1.5, adaptive via performance.min.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 const PARTICLE_COUNT = 20;
 
-// Shared geometry — one allocation, all instances share it
+// Shared geometry  one allocation, all instances share it
 const SPHERE_GEO = new THREE.IcosahedronGeometry(1, 0);
 const PARTICLE_MAT = new THREE.MeshStandardMaterial({
   color: '#818cf8',
@@ -30,7 +30,7 @@ const PARTICLE_MAT = new THREE.MeshStandardMaterial({
   opacity: 0.4,
 });
 
-// Pre-compute particle data at module scope — zero allocation in render
+// Pre-compute particle data at module scope  zero allocation in render
 const PARTICLE_DATA = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
   x: (Math.sin(i * 1234.5678) - 0.5) * 20,
   y: (Math.cos(i * 9876.5432) - 0.5) * 20,
@@ -50,7 +50,7 @@ function BackgroundElements({ isLight }: { isLight: boolean }) {
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
 
-    // Main icosahedron — simple trig rotation, no physics
+    // Main icosahedron  simple trig rotation, no physics
     if (icoRef.current) {
       icoRef.current.rotation.x = t * 0.1;
       icoRef.current.rotation.y = t * 0.15;
@@ -63,10 +63,10 @@ function BackgroundElements({ isLight }: { isLight: boolean }) {
         const floatY = Math.sin(t * d.speed + d.phase) * 1.5;
         _dummy.position.set(d.x, d.y + floatY, d.z);
         _dummy.scale.setScalar(d.scale);
-        _dummy.updateMatrix();
-        partRef.current.setMatrixAt(i, _dummy.matrix);
+        _dummy.updateGrid();
+        partRef.current.setGridAt(i, _dummy.grid);
       }
-      partRef.current.instanceMatrix.needsUpdate = true;
+      partRef.current.instanceGrid.needsUpdate = true;
     }
   });
 
@@ -75,7 +75,7 @@ function BackgroundElements({ isLight }: { isLight: boolean }) {
       <Stars
         radius={100}
         depth={50}
-        count={2000}           // Halved from 5000 — still dense, much cheaper
+        count={2000}           // Halved from 5000  still dense, much cheaper
         factor={4}
         saturation={0}
         fade
@@ -84,7 +84,7 @@ function BackgroundElements({ isLight }: { isLight: boolean }) {
 
       <Float speed={1} rotationIntensity={0.5} floatIntensity={1}>
         <mesh ref={icoRef} position={[0, 0, -5]}>
-          <icosahedronGeometry args={[4, 1]} />  {/* subdivision 15→1: 80 faces vs 14400 */}
+          <icosahedronGeometry args={[4, 1]} />  {/* subdivision 151: 80 faces vs 14400 */}
           <meshPhysicalMaterial
             color={isLight ? '#6366f1' : '#4f46e5'}
             roughness={0.1}
@@ -111,7 +111,7 @@ export function ImmersiveBackground({ theme = 'dark' }: { theme?: 'light' | 'dar
           antialias: false,
           powerPreference: 'high-performance',
           stencil: false,
-          alpha: false,         // Opaque base layer — no compositing cost
+          alpha: false,         // Opaque base layer  no compositing cost
           depth: true,
         }}
         dpr={[1, 1.5]}

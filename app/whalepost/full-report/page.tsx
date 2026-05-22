@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
 import Link from 'next/link';
-import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { SystemFooter } from '@/components/landing/SystemFooter';
 
 function formatFullDate(iso: string): string {
   const d = new Date(iso);
@@ -58,8 +58,8 @@ function renderBody(description: string, darkMode = false) {
         </blockquote>
       );
     }
-    if (/^[-•]\s/.test(para)) {
-      const items = para.split('\n').map(l => l.replace(/^[-•]\s+/, '').trim()).filter(Boolean);
+    if (/^[-]\s/.test(para)) {
+      const items = para.split('\n').map(l => l.replace(/^[-]\s+/, '').trim()).filter(Boolean);
       return (
         <ul key={i} className={`list-none pl-4 my-6 space-y-3 font-serif text-[18px] leading-[1.8] ${textBase}`}>
           {items.map((item, j) => (
@@ -140,7 +140,7 @@ function FullReportContent() {
   return (
     <article className="min-h-screen bg-white text-black pb-32">
 
-      {/* ── TOP NAV BAR — perfectly centered, full width ── */}
+      {/*  TOP NAV BAR  perfectly centered, full width  */}
       <nav className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-[60px] border-b border-black/8 py-0 flex items-center justify-between" style={{ height: '56px' }}>
         <div className="w-full max-w-[900px] mx-auto px-6 md:px-12 flex items-center justify-between h-full">
           <Link href="/news" className="flex items-center gap-3 group shrink-0">
@@ -163,7 +163,7 @@ function FullReportContent() {
         </div>
       </nav>
 
-      {/* ── HERO HEADER — centered at max-w-[880px] ── */}
+      {/*  HERO HEADER  centered at max-w-[880px]  */}
       <motion.header
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -192,7 +192,7 @@ function FullReportContent() {
         </div>
       </motion.header>
 
-      {/* ── MAIN BODY — centered, max-w-[880px] ── */}
+      {/*  MAIN BODY  centered, max-w-[880px]  */}
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -201,7 +201,7 @@ function FullReportContent() {
       >
         {renderBody(article.description ?? '', false)}
 
-        {/* ── 4-PAGE EXTENSION ── */}
+        {/*  4-PAGE EXTENSION  */}
         {(!article.description || article.description.length < 8000) && (
           <>
             {renderBody(`## Expanded Coverage: Market Structure and Capital Flows
@@ -214,7 +214,7 @@ Transaction fee data indicates a 42% increase in priority fees paid by large-sca
 
 - **Capital Velocity:** Short-term rotation metrics have accelerated sharply, indicating an urgency among investors to realign their portfolios.
 - **Order Book Imbalance:** Major exchanges are showing a pronounced skew toward the bid side within a 2% price depth.
-- **Derivatives Premium:** Futures markets reflect a structural premium of 18–23% annualized, a notable indicator of market sentiment.`, false)}
+- **Derivatives Premium:** Futures markets reflect a structural premium of 1823% annualized, a notable indicator of market sentiment.`, false)}
 
             {renderBody(`## Expanded Coverage: Cross-Network Activity
 
@@ -257,12 +257,12 @@ We will continue to monitor these developments closely across all major networks
         )}
       </motion.main>
 
-      {/* ── DISCLAIMER ── */}
+      {/*  DISCLAIMER  */}
       <footer className="w-full max-w-[880px] mx-auto px-6 md:px-8 mt-24">
         <div className="border-t border-black/8 pt-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div className="font-mono text-[9px] uppercase tracking-widest text-black/25">
-              Whale Alert Network — Editorial Desk
+              Whale Alert Network  Editorial Desk
             </div>
             <div className="font-mono text-[9px] uppercase tracking-widest text-black/25">
               ID: {article.id.substring(0, 16)}
@@ -274,7 +274,7 @@ We will continue to monitor these developments closely across all major networks
         </div>
       </footer>
 
-      {/* ── RELATED BRIEFINGS ── */}
+      {/*  RELATED BRIEFINGS  */}
       {allArticles.length > 0 && (
         <section className="w-full max-w-[880px] mx-auto px-6 md:px-8 mt-20">
           <h3 className="font-mono text-[10px] font-bold uppercase tracking-widest mb-8 pb-4 border-b border-black/8 text-black/30">Supplemental Briefings</h3>
@@ -292,7 +292,7 @@ We will continue to monitor these developments closely across all major networks
         </section>
       )}
 
-      <SovereignFooter />
+      <SystemFooter />
     </article>
   );
 }

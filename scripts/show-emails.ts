@@ -3,13 +3,13 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function showAllEmails() {
-  console.log('\n📧 ===============================================');
+  console.log('\n ===============================================');
   console.log('   ALL REGISTERED EMAILS IN THE APPLICATION');
   console.log('   ===============================================\n');
 
   try {
     // 1. AUTHUSER - Usuarios con cuenta completa
-    console.log('1️⃣  AUTHUSER - Usuarios Registrados\n');
+    console.log('1️  AUTHUSER - Usuarios Registrados\n');
     const authUsers = await prisma.authUser.findMany({
       select: {
         email: true,
@@ -28,18 +28,18 @@ async function showAllEmails() {
       authUsers.forEach(user => {
         const email = user.email.padEnd(30);
         const name = (user.name || 'N/A').padEnd(17);
-        const verified = user.verified ? '✅ Yes' : '❌ No';
+        const verified = user.verified ? ' Yes' : ' No';
         const date = user.createdAt.toISOString().split('T')[0];
         console.log(`   ${email} | ${name} | ${verified.padEnd(7)} | ${date}`);
       });
     } else {
-      console.log('   ⚠️  No registered users yet');
+      console.log('   ️  No registered users yet');
     }
 
     console.log('\n');
 
     // 2. EMAILSUBSCRIBER - Suscriptores al newsletter
-    console.log('2️⃣  EMAILSUBSCRIBER - Suscriptores al Newsletter\n');
+    console.log('2️  EMAILSUBSCRIBER - Suscriptores al Newsletter\n');
     const subscribers = await prisma.emailSubscriber.findMany({
       select: {
         email: true,
@@ -59,30 +59,30 @@ async function showAllEmails() {
       subscribers.forEach(sub => {
         const email = sub.email.padEnd(30);
         const name = (sub.name || 'N/A').padEnd(17);
-        const status = sub.subscribed ? '✅ Activo' : '❌ Inactivo';
+        const status = sub.subscribed ? ' Activo' : ' Inactivo';
         const freq = sub.frequency.padEnd(10);
         const date = sub.subscribedAt.toISOString().split('T')[0];
         console.log(`   ${email} | ${name} | ${status.padEnd(11)} | ${freq} | ${date}`);
       });
     } else {
-      console.log('   ⚠️  No subscribers yet');
+      console.log('   ️  No subscribers yet');
     }
 
     console.log('\n');
 
     // 3. RESUMEN CONSOLIDADO
-    console.log('📊 RESUMEN CONSOLIDADO\n');
+    console.log(' RESUMEN CONSOLIDADO\n');
     
     const allEmails = new Set([
       ...authUsers.map(u => u.email),
       ...subscribers.map(s => s.email)
     ]);
 
-    console.log(`   📧 Total unique emails: ${allEmails.size}`);
-    console.log(`   👤 Usuarios con cuenta:    ${authUsers.length}`);
+    console.log(`    Total unique emails: ${allEmails.size}`);
+    console.log(`    Usuarios con cuenta:    ${authUsers.length}`);
     console.log(`      - Verificados:          ${authUsers.filter(u => u.verified).length}`);
     console.log(`      - Pendientes:           ${authUsers.filter(u => !u.verified).length}`);
-    console.log(`   📨 Suscriptores:           ${subscribers.length}`);
+    console.log(`    Suscriptores:           ${subscribers.length}`);
     console.log(`      - Activos:              ${subscribers.filter(s => s.subscribed).length}`);
     console.log(`      - Inactivos:            ${subscribers.filter(s => !s.subscribed).length}`);
 
@@ -101,10 +101,10 @@ async function showAllEmails() {
 
     const fs = require('fs');
     fs.writeFileSync('emails-export.csv', csv);
-    console.log('   ✅ Exportado a: emails-export.csv\n');
+    console.log('    Exportado a: emails-export.csv\n');
 
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error(' Error:', error);
   } finally {
     await prisma.$disconnect();
   }

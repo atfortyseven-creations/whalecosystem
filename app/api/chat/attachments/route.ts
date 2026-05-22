@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
     const MAX_SIZE = 2 * 1024 * 1024; // 2MB
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 2MB for sovereign transmission.' }, { status: 413 });
+      return NextResponse.json({ error: 'File too large. Maximum size is 2MB for system transmission.' }, { status: 413 });
     }
 
     const bytes = await file.arrayBuffer();

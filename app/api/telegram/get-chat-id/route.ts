@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
         step1: 'Open your bot in Telegram',
         step2: 'Send /start to your bot',
         step3: 'Refresh this page to see your chat ID',
-        step4: 'Copy your chat ID and paste it in VIP → Notifications → Telegram',
+        step4: 'Copy your chat ID and paste it in VIP  Notifications  Telegram',
       },
       botInfo: {
         token: `${BOT_TOKEN.slice(0, 10)}...${BOT_TOKEN.slice(-10)}`,

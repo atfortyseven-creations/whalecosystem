@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "description": "Sovereign Handshake — Cloudflare WAF Ruleset (humanidfi.com)",
+  "description": "System Handshake  Cloudflare WAF Ruleset (humanidfi.com)",
 
   "rules": [
     {
@@ -19,7 +19,7 @@
     },
     {
       "id": "SW002",
-      "description": "Rate limit: /api/user/nuke — 2 req/day per IP",
+      "description": "Rate limit: /api/user/nuke  2 req/day per IP",
       "expression": "http.request.uri.path eq \"/api/user/nuke\"",
       "action": "rate_limit",
       "ratelimit": {
@@ -32,7 +32,7 @@
     },
     {
       "id": "SW003",
-      "description": "Rate limit: /api/verify-human — 10 req/hour per IP",
+      "description": "Rate limit: /api/verify-human  10 req/hour per IP",
       "expression": "http.request.uri.path eq \"/api/verify-human\"",
       "action": "rate_limit",
       "ratelimit": {
@@ -45,7 +45,7 @@
     },
     {
       "id": "SW004",
-      "description": "Rate limit: /api/defi (copy-trading, deposit) — 30 req/minute per IP",
+      "description": "Rate limit: /api/defi (copy-trading, deposit)  30 req/minute per IP",
       "expression": "http.request.uri.path wildcard \"/api/defi/*\"",
       "action": "rate_limit",
       "ratelimit": {
@@ -58,7 +58,7 @@
     },
     {
       "id": "SW005",
-      "description": "Rate limit: Global /api — 300 req/minute per IP",
+      "description": "Rate limit: Global /api  300 req/minute per IP",
       "expression": "http.request.uri.path wildcard \"/api/*\"",
       "action": "rate_limit",
       "ratelimit": {
@@ -99,7 +99,7 @@
     },
     {
       "id": "SW010",
-      "description": "Enforce HTTPS — redirect HTTP to HTTPS",
+      "description": "Enforce HTTPS  redirect HTTP to HTTPS",
       "expression": "not ssl",
       "action": "redirect",
       "action_parameters": {
@@ -135,7 +135,7 @@
     },
     {
       "id": "SW014",
-      "description": "Managed OWASP Core Ruleset — CRS v3.3",
+      "description": "Managed OWASP Core Ruleset  CRS v3.3",
       "action": "execute",
       "action_parameters": {
         "id": "efb7b8c949ac4650a09736fc376e9aee",
@@ -149,10 +149,10 @@
   ],
 
   "_meta": {
-    "project": "Sovereign Handshake — humanidfi.com",
+    "project": "System Handshake  humanidfi.com",
     "generated": "2026-03-30",
     "zone": "humanidfi.com",
-    "deploy_instructions": "Cloudflare Dashboard → Security → WAF → Custom rules → Import JSON. Or use Cloudflare API: PUT /zones/{zone_id}/rulesets/{ruleset_id}/rules",
+    "deploy_instructions": "Cloudflare Dashboard  Security  WAF  Custom rules  Import JSON. Or use Cloudflare API: PUT /zones/{zone_id}/rulesets/{ruleset_id}/rules",
     "api_endpoint": "https://api.cloudflare.com/client/v4/zones/{ZONE_ID}/rulesets"
   }
 }

@@ -13,7 +13,7 @@ export class BRC100Manager {
      * (Simulation of high-fidelity BRC-100 indexing)
      */
     public async getBalances(address: string): Promise<any[]> {
-        console.log(`🔍 [BRC-100] Fetching institutional assets for ${address}...`);
+        console.log(` [BRC-100] Fetching institutional assets for ${address}...`);
         
         // In a real-world scenario, we would query a BRC-100 indexer like Gorilla Pool or similar.
         // Returning strictly empty rather than synthetic mock data.

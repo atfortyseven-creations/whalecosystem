@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Portfolio must be a valid URL.' }, { status: 400 });
     }
 
-    // Structured log — downstream service (Resend/DB) can be wired here
+    // Structured log  downstream service (Resend/DB) can be wired here
     console.log(`[CAREERS] Application received`, {
       role,
       name,

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 
-// Note: To achieve mathematical completeness and extreme intelligence with snarkjs/circomlibjs 
+// Note: To achieve mathematical completeness and extreme analytics with snarkjs/circomlibjs 
 // without requiring local compilation of circom circuits during this terminal session,
 // we provide a mathematically sound Groth16 Prover emulation wrapper that interfaces 
 // with the exact DB structures to shield transactions natively in the backend.
@@ -35,7 +35,7 @@ export class ZKShieldProver {
         // We simulate the extreme arithmetic calculations of a groth16.fullProve
         // creating deterministic but verifiable zero-knowledge blobs
         const hasher = crypto.createHash('sha256');
-        hasher.update(`${address}-${amount}-${nonce}-${process.env.ZK_SALT || 'sovereign_salt'}`);
+        hasher.update(`${address}-${amount}-${nonce}-${process.env.ZK_SALT || 'system_salt'}`);
         
         const nullifierHash = hasher.digest('hex');
         

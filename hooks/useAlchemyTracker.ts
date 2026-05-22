@@ -18,7 +18,7 @@ export function useAlchemyTracker() {
     const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
     
     if (!apiKey) {
-      console.warn("⚠️ Alchemy API Key missing. Please add NEXT_PUBLIC_ALCHEMY_API_KEY to your .env.local. On-chain tracker disabled.");
+      console.warn("️ Alchemy API Key missing. Please add NEXT_PUBLIC_ALCHEMY_API_KEY to your .env.local. On-chain tracker disabled.");
       return;
     }
 

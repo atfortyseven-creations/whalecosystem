@@ -71,7 +71,7 @@ export class ClientGuardian {
       this.checkPositions();
     }, this.config.checkInterval);
 
-    console.log('[Guardian] 🛡️ Started monitoring', positions.length, 'positions');
+    console.log('[Guardian] ️ Started monitoring', positions.length, 'positions');
   }
 
   /**
@@ -83,7 +83,7 @@ export class ClientGuardian {
       this.intervalId = null;
     }
     this.positions.clear();
-    console.log('[Guardian] 🛑 Stopped monitoring');
+    console.log('[Guardian]  Stopped monitoring');
   }
 
   /**
@@ -115,7 +115,7 @@ export class ClientGuardian {
         this.triggerAlert({
           type: 'STOP_LOSS',
           severity: 'CRITICAL',
-          message: `🚨 STOP LOSS HIT: ${position.symbol} at $${safeToFixed(currentPrice, 2)}`,
+          message: ` STOP LOSS HIT: ${position.symbol} at $${safeToFixed(currentPrice, 2)}`,
           position: {
             symbol: position.symbol,
             side: position.side,
@@ -133,7 +133,7 @@ export class ClientGuardian {
         this.triggerAlert({
           type: 'LIQUIDATION_WARNING',
           severity: 'WARNING',
-          message: `⚠️ NEAR LIQUIDATION: ${position.symbol} at $${safeToFixed(currentPrice, 2)}`,
+          message: `️ NEAR LIQUIDATION: ${position.symbol} at $${safeToFixed(currentPrice, 2)}`,
           position: {
             symbol: position.symbol,
             side: position.side,
@@ -192,11 +192,11 @@ export class ClientGuardian {
 
     // Auto-close if enabled
     if (this.config.autoCloseOnStopLoss && alert.type === 'STOP_LOSS') {
-      console.log('[Guardian] 🔴 AUTO-CLOSE triggered for', alert.position.symbol);
+      console.log('[Guardian]  AUTO-CLOSE triggered for', alert.position.symbol);
       if (this.closePositionCallback) {
         this.closePositionCallback(alert.position);
       } else {
-        console.warn('[Guardian] ⚠️ Auto-close enabled but no closePositionCallback registered!');
+        console.warn('[Guardian] ️ Auto-close enabled but no closePositionCallback registered!');
       }
     }
   }
@@ -251,7 +251,7 @@ export class ClientGuardian {
       const data = prices[symbol.toUpperCase()];
       return data?.price || 0;
     } catch (e) {
-      console.warn(`[Guardian] ⚠️ Failed to fetch live price for ${symbol}:`, e);
+      console.warn(`[Guardian] ️ Failed to fetch live price for ${symbol}:`, e);
       return 0;
     }
   }
@@ -262,7 +262,7 @@ export class ClientGuardian {
    */
   public updateConfig(config: Partial<GuardianConfig>) {
     this.config = { ...this.config, ...config };
-    console.log('[Guardian] ⚙️ Config updated:', this.config);
+    console.log('[Guardian] ️ Config updated:', this.config);
   }
 }
 

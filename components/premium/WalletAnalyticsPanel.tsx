@@ -128,7 +128,7 @@ export default function WalletAnalyticsPanel({ address, label, analytics: initia
     const analytics = initialData || fetchedAnalytics;
     const loading = isLoading && !analytics;
 
-    // ✨ NEW: Handle specific diagnostic errors (like ALCHEMY_AUTH_FAILED or API_LIMIT_REACHED)
+    //  NEW: Handle specific diagnostic errors (like ALCHEMY_AUTH_FAILED or API_LIMIT_REACHED)
     const isPartial = analytics?.isPartial || analytics?.error;
     if (analytics?.error === 'ALCHEMY_AUTH_FAILED' || (error && !analytics)) {
         const errorType = analytics?.error || 'FETCH_FAILED';
@@ -239,8 +239,8 @@ export default function WalletAnalyticsPanel({ address, label, analytics: initia
 
     const tabs: { id: AnalyticsTab; label: string; icon: React.ReactNode; count?: number }[] = [
         { id: 'overview', label: 'Overview', icon: <BarChart3 size={16} /> },
-        { id: 'defi', label: '🔥 DeFi', icon: <Layers size={16} />, count: defiData?.positions?.length || 0 },
-        { id: 'pnl', label: '💰 P&L', icon: <DollarSign size={16} /> },
+        { id: 'defi', label: ' DeFi', icon: <Layers size={16} />, count: defiData?.positions?.length || 0 },
+        { id: 'pnl', label: ' P&L', icon: <DollarSign size={16} /> },
         { id: 'heatmap', label: 'Heatmap', icon: <Clock size={16} /> },
         { id: 'counterparties', label: 'Top Wallets', icon: <Users size={16} />, count: (analytics as any)?.topCounterparties?.length || 0 },
         { id: 'flows', label: 'Flows', icon: <ArrowUpDown size={16} /> },

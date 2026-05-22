@@ -47,10 +47,10 @@ export async function POST(request: NextRequest) {
 
     // [LEGENDARY BYPASS] Print code to server logs for manual recovery
     console.log(`
-    ╔════════════════════════════════════════════════════════════════╗
-    ║ [AUTH BYPASS] VERIFICATION CODE FOR: ${email.padEnd(25)} ║
-    ║ CODE: ${code.padEnd(54)} ║
-    ╚════════════════════════════════════════════════════════════════╝
+    
+     [AUTH BYPASS] VERIFICATION CODE FOR: ${email.padEnd(25)} 
+     CODE: ${code.padEnd(54)} 
+    
     `);
 
     // Send verification email

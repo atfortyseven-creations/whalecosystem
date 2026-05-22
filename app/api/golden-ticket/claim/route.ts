@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { prisma as sovereignPrisma } from '@/lib/prisma';
+import { prisma as systemPrisma } from '@/lib/prisma';
 import { verifyMessage } from 'viem';
 
 // Cast to base PrismaClient so TypeScript resolves goldenTicket + user models correctly.
-// The SovereignPrismaClient augmentation adds cosmicEntity but doesn't remove base models —
+// The SystemPrismaClient augmentation adds cosmicEntity but doesn't remove base models 
 // TypeScript just can't see them through the 'unknown' cast in lib/prisma.ts.
-const prisma = sovereignPrisma as unknown as PrismaClient;
+const prisma = systemPrisma as unknown as PrismaClient;
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -15,10 +15,10 @@ const MAX_SUPPLY       = 200;
 const CLAIM_RATE_LIMIT = 3;    // Max 3 claim attempts per IP per hour
 const RATE_WINDOW_SEC  = 3600; // 1 hour TTL
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Redis-backed Rate Limiter & Heuristic Anomaly Detection (Zero-Trust)
 // Prevents brute-force and automated sybil minting attacks.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 async function checkClaimRateLimit(ip: string, walletAddress: string): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
     try {
         const { redisClient } = await import('@/lib/redis/client');
@@ -50,20 +50,20 @@ async function checkClaimRateLimit(ip: string, walletAddress: string): Promise<{
             resetAt:   Date.now() + ttl * 1000,
         };
     } catch {
-        console.warn('[GoldenTicket] Rate limit Redis check failed — allowing request');
+        console.warn('[GoldenTicket] Rate limit Redis check failed  allowing request');
         return { allowed: true, remaining: 1, resetAt: 0 };
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // POST /api/golden-ticket/claim
 // One ticket per wallet address, enforced at DB + logic level.
 // Rate limited: 3 attempts per IP per hour (Redis-backed).
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 export async function POST(req: NextRequest) {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
 
-    // ── Parse body ────────────────────────────────────────────────────────────
+    //  Parse body 
     let body: any;
     try {
         body = await req.json();
@@ -77,19 +77,19 @@ export async function POST(req: NextRequest) {
 
     const { walletAddress, twitterHandle, signatureData, cryptoSignature, txHash } = body;
 
-    // ── Field-level validation ────────────────────────────────────────────────
+    //  Field-level validation 
     if (!walletAddress || typeof walletAddress !== 'string') {
         return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 });
     }
 
     const address = walletAddress.toLowerCase();
     if (!/^0x[a-f0-9]{40}$/.test(address)) {
-        return NextResponse.json({ error: 'Malformed wallet address — must be 40 hex chars with 0x prefix' }, { status: 400 });
+        return NextResponse.json({ error: 'Malformed wallet address  must be 40 hex chars with 0x prefix' }, { status: 400 });
     }
 
 
 
-    // ── Payload size guard (DoS protection) ──────────────────────────────────
+    //  Payload size guard (DoS protection) 
     // signatureData is a canvas image data URL (base64). Cap to 10KB max.
     // Client-side fix (JPEG thumbnail) ensures this never triggers, but we
     // truncate defensively here instead of hard-rejecting so no user is blocked.
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
             ? signatureData.slice(0, 10_240)
             : (signatureData ?? null);
 
-    // ── twitterHandle XSS sanitization ───────────────────────────────────────
+    //  twitterHandle XSS sanitization 
     // Strip HTML tags, script injections, and any non-safe characters.
     // Twitter handles are alphanumeric + underscore, max 15 chars per Twitter spec.
     const rawHandle   = typeof twitterHandle === 'string' ? twitterHandle : '';
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
         .slice(0, 50);               // max 50 chars (Twitter max is 15, we're generous)
     const safeHandle = cleanHandle.length > 0 ? cleanHandle : null;
 
-    // ── Redis-backed rate limit & Anomaly Detection ──────────────────────────
+    //  Redis-backed rate limit & Anomaly Detection 
     try {
         const rateCheck = await checkClaimRateLimit(ip, address);
         if (!rateCheck.allowed) {
@@ -129,10 +129,10 @@ export async function POST(req: NextRequest) {
                 }
             );
         }
-    } catch { /* Rate limit failure is non-fatal — allow request */ }
+    } catch { /* Rate limit failure is non-fatal  allow request */ }
 
     try {
-        // ── Verify Session or ECDSA signature ownership ────────────────────────
+        //  Verify Session or ECDSA signature ownership 
         const { getSession } = await import('@/lib/session');
         const session = await getSession();
         
@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // ── Fast-path: check for existing claim ───────────────────────────────
+        //  Fast-path: check for existing claim 
         const existing = await (prisma as any).goldenTicket.findUnique({
             where:  { userAddress: address },
             select: {
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
             }, { status: 409 });
         }
 
-        // ── Supply gate ───────────────────────────────────────────────────────
+        //  Supply gate 
         // NOTE: Interactive transactions fail over PgBouncer (Allocation failure).
         // Using sequential operations to guarantee 100% operational success.
         const totalClaimed = await (prisma as any).goldenTicket.count();
@@ -182,14 +182,14 @@ export async function POST(req: NextRequest) {
             throw new Error('MAX_SUPPLY_REACHED');
         }
 
-        // ── Ensure User row exists ────────────────────────────────────────────
+        //  Ensure User row exists 
         const user = await (prisma as any).user.upsert({
             where: { walletAddress: address },
             update: {},
             create: { walletAddress: address }
         });
 
-        // ── Validation: Prevent unpaid ticket minting (Firmas sin pagar) ──────
+        //  Validation: Prevent unpaid ticket minting (Firmas sin pagar) 
         // Removed for institutional demo testing
         /*
         if (user.tier === 'FREE' && !user.isPro) {
@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
         }
         */
 
-        // ── Create ticket using standard Prisma methods ───────────────────────
+        //  Create ticket using standard Prisma methods 
         const tempSerial = `PENDING-${address}-${Date.now()}`;
         // Pack on-chain mint details into signatureData JSON
         let packedSignatureData = safeSignatureData;
@@ -241,7 +241,7 @@ export async function POST(req: NextRequest) {
             data: { serialCode: finalSerial }
         });
 
-        // ── Absolute Atomic Supply Check (Anti-TOCTOU) ────────────────────────
+        //  Absolute Atomic Supply Check (Anti-TOCTOU) 
         if (finalTicket.ticketNumber > MAX_SUPPLY) {
             await (prisma as any).$executeRaw`
                 DELETE FROM "GoldenTicket" WHERE id = ${finalTicket.id}
@@ -283,11 +283,11 @@ export async function POST(req: NextRequest) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // GET /api/golden-ticket/claim
-// ?address=0x...  → per-wallet status + global supply
-// (no address)    → global supply stats only (for public counter)
-// ─────────────────────────────────────────────────────────────────────────────
+// ?address=0x...   per-wallet status + global supply
+// (no address)     global supply stats only (for public counter)
+// 
 export async function GET(req: NextRequest) {
     try {
         const address = req.nextUrl.searchParams.get('address')?.toLowerCase();

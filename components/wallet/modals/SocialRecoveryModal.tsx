@@ -41,7 +41,7 @@ export default function SocialRecoveryModal({ isOpen, onClose }: SocialRecoveryM
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ guardians, threshold }),
             });
-            alert(`✅ Social Recovery configured! ${threshold} of ${guardians.length} guardians required.`);
+            alert(` Social Recovery configured! ${threshold} of ${guardians.length} guardians required.`);
             onClose();
         } catch (e) {
             alert('Failed to save guardians');

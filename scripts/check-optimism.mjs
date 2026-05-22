@@ -17,16 +17,16 @@ async function checkOptimismDeploy() {
   const balance = await provider.getBalance(wallet.address);
   console.log(`Optimism Balance: ${ethers.formatEther(balance)} ETH`);
 
-  // Try to estimate gas for QuantumDots
+  // Try to estimate gas for CoreDots
   const solc = require("solc");
-  const qdSrc = readFileSync(join(ROOT, "contracts/quantum/QuantumDots.sol"), "utf8");
-  const ledgerSrc = readFileSync(join(ROOT, "contracts/quantum/QuantumLedger.sol"), "utf8");
+  const qdSrc = readFileSync(join(ROOT, "contracts/core/CoreDots.sol"), "utf8");
+  const ledgerSrc = readFileSync(join(ROOT, "contracts/core/CoreLedger.sol"), "utf8");
 
   const input = {
     language: "Solidity",
     sources: {
-      "QuantumDots.sol":   { content: qdSrc },
-      "QuantumLedger.sol": { content: ledgerSrc },
+      "CoreDots.sol":   { content: qdSrc },
+      "CoreLedger.sol": { content: ledgerSrc },
     },
     settings: {
       optimizer: { enabled: true, runs: 200 },
@@ -40,7 +40,7 @@ async function checkOptimismDeploy() {
   };
 
   const output = JSON.parse(solc.compile(JSON.stringify(input), { import: findImports }));
-  const qd = output.contracts["QuantumDots.sol"]["QuantumDots"];
+  const qd = output.contracts["CoreDots.sol"]["CoreDots"];
   
   const factory = new ethers.ContractFactory(qd.abi, "0x" + qd.evm.bytecode.object, wallet);
   try {

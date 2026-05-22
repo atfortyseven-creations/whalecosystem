@@ -15,7 +15,7 @@ import { useEffect, useRef } from 'react';
 import { useMarketStream } from '@/context/MarketStreamContext';
 import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useEthMetrics } from '@/hooks/useEthMetrics';
 import { getTierById, hasAccess } from '@/lib/config/pricing-tiers';
 import { toast } from 'sonner';
@@ -150,9 +150,9 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
     const { disconnect } = useDisconnect();
 
     const { latency, isConnected: streamConnected, mode } = useMarketStream();
-    const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
+    const { connector, isConnected: isWalletConnected, isSystemHandshake } = useSystemAccount();
 
-    // ── UX-18: Live ETH metrics (shared hook, DRY with landing) ─────────────
+    //  UX-18: Live ETH metrics (shared hook, DRY with landing) 
     const { blockNumber, baseFeeGwei, utcTime, syncing: ethSyncing } = useEthMetrics();
 
     const currentExplanation = MODULE_EXPLANATIONS[activeTab] || {
@@ -162,7 +162,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
         features: []
     };
 
-    // Load Tier + subscription for access control — single consolidated fetch
+    // Load Tier + subscription for access control  single consolidated fetch
     useEffect(() => {
         fetch('/api/auth/session', { cache: 'no-store' })
             .then(r => r.ok ? r.json() : null)
@@ -181,9 +181,9 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 setIsTierLoaded(true);
             });
     // Re-fetch when wallet connection state changes
-    }, [isWalletConnected, isSovereignHandshake]);
+    }, [isWalletConnected, isSystemHandshake]);
 
-    // ── True Desktop Detection ────────────────────────────────────────────────
+    //  True Desktop Detection 
     // Uses hardware screen.width (not viewport) so narrowing the browser window
     // on a PC does NOT trigger the mobile nav. Only real mobile devices (screen
     // width < 1024px on physical hardware) see the bottom navigation bar.
@@ -199,7 +199,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
 
     const showMobileNav = isMounted && !isTrueDesktop;
 
-    // ── UX-19: Real node health — polled every 60s ──────────────────────────
+    //  UX-19: Real node health  polled every 60s 
     const [nodeStatus, setNodeStatus] = useState<'OPERATIONAL' | 'DEGRADED' | 'OFFLINE'>('OPERATIONAL');
     useEffect(() => {
         /*
@@ -223,10 +223,10 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
 
 
 
-    // ── Inactivity Session Lock — driven by autoDisconnectTimer from settings ──
+    //  Inactivity Session Lock  driven by autoDisconnectTimer from settings 
     useEffect(() => {
         const ms = timerToMs(autoDisconnectTimer);
-        if (!ms) return; // 'never' — no timer
+        if (!ms) return; // 'never'  no timer
 
         const reset = () => {
             if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
@@ -329,7 +329,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             onTabChange={onTabChange}
         />
 
-        {/* ─── Session Lock Overlay ─── */}
+        {/*  Session Lock Overlay  */}
         <AnimatePresence>
             {isSessionLocked && (
                 <motion.div
@@ -358,7 +358,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
         <div className={`flex fixed inset-0 bg-transparent text-[#050505] dark:text-[#FAF9F6] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''}`}>
 
             
-            {/* ─── Persistent Pro Sidebar (True Desktop Only) ─── */}
+            {/*  Persistent Pro Sidebar (True Desktop Only)  */}
             {/* isTrueDesktop uses screen.width (hardware), not viewport, so     */}
             {/* narrowing the browser window on a PC keeps the sidebar visible.  */}
             <motion.aside 
@@ -454,10 +454,10 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 </div>
             </motion.aside>
 
-            {/* ─── Main Content Wrapper ─── */}
+            {/*  Main Content Wrapper  */}
             <div className="flex-1 flex flex-col min-w-0 relative h-full">
                 
-                {/* ─── Top Master Bar ─── */}
+                {/*  Top Master Bar  */}
                 <header className="sticky top-0 border-b border-black/[0.06] dark:border-white/10 bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300" style={{ minHeight: 'calc(56px + env(safe-area-inset-top, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
                     <button
                         onClick={() => setIsPaletteOpen(true)}
@@ -466,7 +466,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         <Search size={12} className="text-[#AAAAAA] group-hover:text-[#555] transition-colors shrink-0" />
                         <span className="text-[10px] text-[#AAAAAA] group-hover:text-[#555] font-medium transition-colors hidden sm:block pr-1">Search</span>
                         <span className="hidden sm:flex items-center gap-1 ml-0.5">
-                            <kbd className="text-[9px] font-black font-mono text-[#AAAAAA] bg-black/[0.04] border border-black/[0.08] rounded px-1.5 py-0.5 leading-none">⌘K</kbd>
+                            <kbd className="text-[9px] font-black font-mono text-[#AAAAAA] bg-black/[0.04] border border-black/[0.08] rounded px-1.5 py-0.5 leading-none">K</kbd>
                         </span>
                     </button>
 
@@ -538,7 +538,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 </header>
 
                 <main className="flex-1 flex flex-col min-h-0 transition-colors duration-300 bg-[#FAF9F6] dark:bg-[#0A0A0A] relative">
-                    {/* Background gradient — does NOT create a scroll stacking ctx */}
+                    {/* Background gradient  does NOT create a scroll stacking ctx */}
                     <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(10,10,10,0.5)_0%,transparent_80%)]" />
 
                     {/* Scroll container: flex-1 + min-h-0 = bounded by parent, never bleeds to document */}
@@ -576,7 +576,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     </div>
                 </main>
 
-                {/* ─── Bottom Tab Navigation (Mobile Only) — FIXED to avoid obscuring content ─── */}
+                {/*  Bottom Tab Navigation (Mobile Only)  FIXED to avoid obscuring content  */}
                 {/* Uses fixed positioning so scroll content is never clipped by the nav bar. */}
                 {/* A spacer div above (inside scroll container) reserves the equivalent height.*/}
                 {showMobileNav && (
@@ -603,7 +603,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                         isActive ? 'text-black dark:text-white' : 'text-[#888888] hover:text-black dark:hover:text-white'
                                     }`}
                                 >
-                                    {/* PERF-20: Active indicator pill — WCAG AA contrast */}
+                                    {/* PERF-20: Active indicator pill  WCAG AA contrast */}
                                     {isActive && (
                                         <span className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#050505] dark:bg-white" />
                                     )}
@@ -617,7 +617,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     </nav>
                 )}
 
-                {/* ─── Status Bar ─── */}
+                {/*  Status Bar  */}
                 <footer className="hidden md:flex h-7 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5 min-w-[120px]">
@@ -636,7 +636,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             </div>
         </div>
 
-        {/* ─── INFO MODAL — Noble Institutional ─── */}
+        {/*  INFO MODAL  Noble Institutional  */}
         <AnimatePresence>
         {false && (
             <motion.div

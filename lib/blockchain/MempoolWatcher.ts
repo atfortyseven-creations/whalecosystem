@@ -4,8 +4,8 @@ import { formatEther } from 'viem';
 // Absolute Perfection: The Engine that listens to Web3 without sleeping.
 // Integrates Phase 2 Stochastic Filtering and Data Lake Indexation.
 
-class SovereignMempoolStreamer {
-  private static instance: SovereignMempoolStreamer;
+class SystemMempoolStreamer {
+  private static instance: SystemMempoolStreamer;
   private isListening = false;
   private activeStreams: (() => void)[] = [];
 
@@ -13,21 +13,21 @@ class SovereignMempoolStreamer {
   public readonly recentTiers: any[] = [];
 
   private constructor() {
-    console.log('[Sovereign Engine] Mempool Streamer Initialized.');
+    console.log('[System Engine] Mempool Streamer Initialized.');
   }
 
-  public static getInstance(): SovereignMempoolStreamer {
-    if (!SovereignMempoolStreamer.instance) {
-      SovereignMempoolStreamer.instance = new SovereignMempoolStreamer();
+  public static getInstance(): SystemMempoolStreamer {
+    if (!SystemMempoolStreamer.instance) {
+      SystemMempoolStreamer.instance = new SystemMempoolStreamer();
     }
-    return SovereignMempoolStreamer.instance;
+    return SystemMempoolStreamer.instance;
   }
 
   public startListening() {
     if (this.isListening) return;
     this.isListening = true;
 
-    console.log('[Sovereign Engine] Opening Dark Forest WebSockets...');
+    console.log('[System Engine] Opening Dark Forest WebSockets...');
 
     // Watch Ethereum Blocks (True Macro Tracking - Zero Mock)
     const unwatchBlocks = getEthWsClient().watchBlocks({
@@ -71,7 +71,7 @@ class SovereignMempoolStreamer {
           this.recentTiers.splice(0, this.recentTiers.length - 150);
         }
 
-        console.log(`[Sovereign Indexer] Processed ${appended} active liquidity events into buffer.`);
+        console.log(`[System Indexer] Processed ${appended} active liquidity events into buffer.`);
       },
       onError: (error: any) =>
         console.error('[Block Watch Error] Critical WebSocket Failure:', error),
@@ -85,16 +85,16 @@ class SovereignMempoolStreamer {
     this.activeStreams = [];
     this.isListening = false;
   }
-} // ← class SovereignMempoolStreamer closes here
+} //  class SystemMempoolStreamer closes here
 
 // Global scope isolation for Next.js hot-reloading stability
-const globalForSovereign = globalThis as unknown as {
-  sovereignMempool?: SovereignMempoolStreamer;
+const globalForSystem = globalThis as unknown as {
+  systemMempool?: SystemMempoolStreamer;
 };
 
 export const mempoolWatcher =
-  globalForSovereign.sovereignMempool ?? SovereignMempoolStreamer.getInstance();
+  globalForSystem.systemMempool ?? SystemMempoolStreamer.getInstance();
 
 if (process.env.NODE_ENV !== 'production') {
-  globalForSovereign.sovereignMempool = mempoolWatcher;
+  globalForSystem.systemMempool = mempoolWatcher;
 }

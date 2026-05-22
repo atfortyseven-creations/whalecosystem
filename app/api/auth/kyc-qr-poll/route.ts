@@ -10,10 +10,10 @@ import { prisma } from '@/lib/prisma';
  * mobile device has completed the biometric KYC.
  *
  * Flow:
- *   PENDING → mobile hasn't completed yet
- *   SUCCESS + ciphertext → mobile completed, desktop decrypts and hydrates
- *   BURNED  → already consumed (replay protection)
- *   EXPIRED → TTL hit, session is gone
+ *   PENDING  mobile hasn't completed yet
+ *   SUCCESS + ciphertext  mobile completed, desktop decrypts and hydrates
+ *   BURNED   already consumed (replay protection)
+ *   EXPIRED  TTL hit, session is gone
  */
 export async function GET(req: NextRequest) {
   try {
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ status: 'PENDING' });
     }
 
-    // ── Mobile has completed KYC ─────────────────────────────────────────────
+    //  Mobile has completed KYC 
     if (session.status === 'VERIFIED') {
       const { livenessScore, spoofType, encryptedPayload, ekey } = session;
 

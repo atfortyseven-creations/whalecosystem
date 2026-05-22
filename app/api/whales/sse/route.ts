@@ -1,10 +1,10 @@
 /**
  * GET /api/whales/sse
- * Server-Sent Events endpoint — streams whale transfer events from EP2 WebSocket in real time.
+ * Server-Sent Events endpoint  streams whale transfer events from EP2 WebSocket in real time.
  * Connects GetBlock EP2 (wss://go.getblock.io/95cb42a5aa444537a068031ce279d343) directly to browser.
  *
  * Architecture:
- *   GetBlock WS EP2 → whaleEngine singleton → SSE push → AlertsPanel / WhalePortfolio
+ *   GetBlock WS EP2  whaleEngine singleton  SSE push  AlertsPanel / WhalePortfolio
  *
  * Format per event:
  *   data: {"txHash":"0x...","symbol":"USDC","from":"0x...","to":"0x...","amount":1234567,"usdValue":1234567,"timestamp":1234567890}
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
                 encoder.encode(`data: ${JSON.stringify({ type: 'CONNECTED', source: 'getblock_ep2_ws', timestamp: Date.now() })}\n\n`)
             );
 
-            // Subscribe to EP2 whale events — this starts the WS if not already running
+            // Subscribe to EP2 whale events  this starts the WS if not already running
             const unsubscribe = whaleEngine.subscribe((event) => {
                 try {
                     controller.enqueue(

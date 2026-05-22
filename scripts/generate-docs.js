@@ -87,7 +87,7 @@ export default function ${cleanTitle}Page() {
       <h1>${page.title}</h1>
 
       <p className="text-lg opacity-80 leading-relaxed mb-8">
-        This document details the architectural, operational, and mathematical foundations for the <strong>${page.title}</strong> module within the Sovereign Whale Terminal. Built for absolute precision and zero-latency performance.
+        This document details the architectural, operational, and mathematical foundations for the <strong>${page.title}</strong> module within the System Whale Terminal. Built for absolute precision and zero-latency performance.
       </p>
 
       <div className="callout border-l-4 border-[#00C076] bg-[#00C076]/5 p-6 rounded-r-xl mb-10">
@@ -99,15 +99,15 @@ export default function ${cleanTitle}Page() {
 
       <h2>Protocol Architecture</h2>
       <p>
-        The Sovereign layer employs state-of-the-art cryptographic primitives to ensure 
+        The System layer employs state-of-the-art cryptographic primitives to ensure 
         data immutability and seamless propagation across the distributed node network. 
         When interfacing with the ${page.title} subsystem, ensure your environment variables 
         and hardware configurations meet the baseline requirements outlined in the Operator overview.
       </p>
 
       <pre className="my-8 rounded-xl bg-black text-white p-6 overflow-x-auto border border-white/10 shadow-2xl">
-{\`// Sovereign Engine Verification Hook
-import { verifyModuleIntegrity } from '@sovereign/core';
+{\`// System Engine Verification Hook
+import { verifyModuleIntegrity } from '@system/core';
 
 async function execute${cleanTitle}() {
   const isVerified = await verifyModuleIntegrity({
@@ -122,7 +122,7 @@ async function execute${cleanTitle}() {
 
       <h2>Mathematical Assertions</h2>
       <p>
-        Our anomaly detection engines run continuous Z-Score calculations (Z ≥ 4.5 for MEGA events) 
+        Our anomaly detection engines run continuous Z-Score calculations (Z  4.5 for MEGA events) 
         and analyze the Neo4j temporal graph using a sliding window of 14 blocks. 
         Latency optimization within the <code>${pathTail}</code> daemon 
         reduces propagation delay to &lt;100ms.

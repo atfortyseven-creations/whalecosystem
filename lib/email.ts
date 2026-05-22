@@ -84,12 +84,12 @@ export async function sendVerificationEmail(email: string, code: string): Promis
         throw error;
       }
       
-      console.log(`[Email] ✓ Verification code sent to ${email} (attempt ${attempt})`, data ? { id: data.id } : {});
+      console.log(`[Email]  Verification code sent to ${email} (attempt ${attempt})`, data ? { id: data.id } : {});
       return; // Success!
       
     } catch (error: any) {
       lastError = error;
-      console.error(`[Email] ✗ Attempt ${attempt}/${MAX_RETRIES} failed for ${email}:`, {
+      console.error(`[Email]  Attempt ${attempt}/${MAX_RETRIES} failed for ${email}:`, {
         message: error?.message || error,
         name: error?.name,
         code: error?.code
@@ -155,7 +155,7 @@ export async function sendWelcomeEmail(email: string, name?: string): Promise<vo
                       </h2>
                       
                       <p style="font-size: 16px; line-height: 1.8; margin-bottom: 30px; font-weight: 500;">
-                        You have been successfully integrated into the most advanced on-chain intelligence stream on the planet. Your terminal has been validated, and you are now part of the elite monitoring the sovereign liquidity of the decentralized financial system.
+                        You have been successfully integrated into the most advanced on-chain analytics stream on the planet. Your terminal has been validated, and you are now part of the elite monitoring the system liquidity of the decentralized financial system.
                       </p>
 
                       <div style="background-color: #1D1A10; color: #B6EA26; padding: 30px; font-family: 'Roboto Mono', monospace; font-size: 12px; margin-bottom: 40px; border-left: 4px solid #D125C7;">
@@ -169,13 +169,13 @@ export async function sendWelcomeEmail(email: string, name?: string): Promise<vo
                       </div>
 
                       <p style="font-size: 14px; line-height: 1.6; color: rgba(29, 26, 16, 0.6); margin-bottom: 40px;">
-                        You will soon receive access credentials for the Forensic Stream V1. Prepare for absolute data sovereignty.
+                        You will soon receive access credentials for the Forensic Stream V1. Prepare for absolute data systemty.
                       </p>
 
                       <!-- Action CTA -->
                       <div style="text-align: left;">
                         <a href="https://whalealertid.fi" style="display: inline-block; background-color: #1D1A10; color: #F2ECD8; padding: 20px 40px; font-family: 'Roboto Mono', monospace; font-weight: 900; text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3em;">
-                          ENTER THE MATRIX —>
+                          ENTER THE MATRIX >
                         </a>
                       </div>
                     </td>

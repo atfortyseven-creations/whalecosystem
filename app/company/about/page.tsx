@@ -75,28 +75,28 @@ export default function AboutPage() {
 
                     <div className="space-y-4">
                         <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-2">🔐 Self-Custody is Non-Negotiable</h3>
+                            <h3 className="text-xl font-bold mb-2"> Self-Custody is Non-Negotiable</h3>
                             <p className="text-white/70">
-                                Your keys, your crypto. We will NEVER hold custody of your funds or private keys. This isn't a feature—it's a principle.
+                                Your keys, your crypto. We will NEVER hold custody of your funds or private keys. This isn't a featureit's a principle.
                             </p>
                         </div>
 
                         <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-2">🕵️ Privacy is a Right, Not a Luxury</h3>
+                            <h3 className="text-xl font-bold mb-2">️ Privacy is a Right, Not a Luxury</h3>
                             <p className="text-white/70">
                                 Everyone deserves financial privacy. Zero-knowledge proofs let you participate in DeFi without becoming a data product.
                             </p>
                         </div>
 
                         <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-2">🌍 Open, Transparent, Community-Driven</h3>
+                            <h3 className="text-xl font-bold mb-2"> Open, Transparent, Community-Driven</h3>
                             <p className="text-white/70">
                                 We publish audit reports, contribute to open-source, and listen to our community. No hidden agendas.
                             </p>
                         </div>
 
                         <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-2">⚡ Innovation with Responsibility</h3>
+                            <h3 className="text-xl font-bold mb-2"> Innovation with Responsibility</h3>
                             <p className="text-white/70">
                                 Cutting-edge tech, battle-tested security. We move fast, but never at the expense of user safety.
                             </p>
@@ -113,7 +113,7 @@ export default function AboutPage() {
                             WhaleAlert ID.fi is built by a team of crypto natives, privacy advocates, and DeFi power users who believe in a better financial future.
                         </p>
                         <p className="text-white/70">
-                            We're backed by experience in blockchain infrastructure, zero-knowledge cryptography, and Elite trading—combined with a deep commitment to user sovereignty.
+                            We're backed by experience in blockchain infrastructure, zero-knowledge cryptography, and Elite tradingcombined with a deep commitment to user systemty.
                         </p>
                     </div>
                 </section>
@@ -127,19 +127,19 @@ export default function AboutPage() {
                             <h3 className="text-xl font-bold mb-4">Frontend</h3>
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-center gap-2">
-                                    <span className="text-blue-400">▸</span>
+                                    <span className="text-blue-400"></span>
                                     <span>Next.js 15 (React Server Components)</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-blue-400">▸</span>
+                                    <span className="text-blue-400"></span>
                                     <span>TypeScript for type safety</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-blue-400">▸</span>
+                                    <span className="text-blue-400"></span>
                                     <span>Framer Motion for animations</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-blue-400">▸</span>
+                                    <span className="text-blue-400"></span>
                                     <span>TailwindCSS + custom design system</span>
                                 </li>
                             </ul>
@@ -149,19 +149,19 @@ export default function AboutPage() {
                             <h3 className="text-xl font-bold mb-4">Backend & Infrastructure</h3>
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-center gap-2">
-                                    <span className="text-green-400">▸</span>
+                                    <span className="text-green-400"></span>
                                     <span>Node.js with Express</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-green-400">▸</span>
+                                    <span className="text-green-400"></span>
                                     <span>PostgreSQL + Prisma ORM</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-green-400">▸</span>
+                                    <span className="text-green-400"></span>
                                     <span>Vercel (edge hosting)</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-green-400">▸</span>
+                                    <span className="text-green-400"></span>
                                     <span>WebSocket for real-time data</span>
                                 </li>
                             </ul>
@@ -171,19 +171,19 @@ export default function AboutPage() {
                             <h3 className="text-xl font-bold mb-4">Blockchain & Web3</h3>
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-center gap-2">
-                                    <span className="text-purple-400">▸</span>
+                                    <span className="text-purple-400"></span>
                                     <span>Alchemy SDK (multi-chain data)</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-purple-400">▸</span>
+                                    <span className="text-purple-400"></span>
                                     <span>ethers.js & viem</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-purple-400">▸</span>
+                                    <span className="text-purple-400"></span>
                                     <span>RainbowKit + Wagmi</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-purple-400">▸</span>
+                                    <span className="text-purple-400"></span>
                                     <span>WalletConnect v2</span>
                                 </li>
                             </ul>
@@ -193,19 +193,19 @@ export default function AboutPage() {
                             <h3 className="text-xl font-bold mb-4">Security & Identity</h3>
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-center gap-2">
-                                    <span className="text-red-400">▸</span>
-                                    <span>World ID (Worldcoin)</span>
+                                    <span className="text-red-400"></span>
+                                    <span>World ID (Identity)</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-red-400">▸</span>
+                                    <span className="text-red-400"></span>
                                     <span>Clerk (authentication)</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-red-400">▸</span>
+                                    <span className="text-red-400"></span>
                                     <span>WebAuthn (passkeys)</span>
                                 </li>
                                 <li className="flex items-center gap-2">
-                                    <span className="text-red-400">▸</span>
+                                    <span className="text-red-400"></span>
                                     <span>TLS 1.3 + AES-256 encryption</span>
                                 </li>
                             </ul>
@@ -224,19 +224,19 @@ export default function AboutPage() {
 
                         <ul className="space-y-2 text-sm">
                             <li className="flex items-start gap-2">
-                                <span className="text-blue-400">✓</span>
+                                <span className="text-blue-400"></span>
                                 <span><strong>GDPR & Spanish LOPD:</strong> Full data protection compliance</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-blue-400">✓</span>
+                                <span className="text-blue-400"></span>
                                 <span><strong>MiCA Preparation:</strong> Ready for EU crypto regulation</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-blue-400">✓</span>
+                                <span className="text-blue-400"></span>
                                 <span><strong>AML/CTF:</strong> Risk-based KYC with World ID</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-blue-400">✓</span>
+                                <span className="text-blue-400"></span>
                                 <span><strong>CNMV Registration:</strong> In progress for Spanish market</span>
                             </li>
                         </ul>
@@ -254,7 +254,7 @@ export default function AboutPage() {
                         Join the Movement
                     </h2>
                     <p className="text-lg mb-6">
-                        We're building the future of finance—one that's private, accessible, and truly yours. Join thousands of users who've already made the switch.
+                        We're building the future of financeone that's private, accessible, and truly yours. Join thousands of users who've already made the switch.
                     </p>
                     <div className="flex flex-wrap gap-4">
                         <a href="/signup" className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-bold hover:scale-105 transition-transform">

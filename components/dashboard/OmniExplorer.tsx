@@ -6,7 +6,7 @@ import {
     AlignLeft, Loader2, AlertCircle, X, ChevronRight, Zap
 } from "lucide-react";
 import { usePublicClient, useBlockNumber } from 'wagmi';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { formatEther } from 'viem';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -50,7 +50,7 @@ export function OmniExplorer() {
     const [blocks, setBlocks] = useState<any[]>([]);
     const [massiveTxs, setMassiveTxs] = useState<any[]>([]);
 
-    // ── On-chain block feed ─────────────────────────────────────────────────
+    //  On-chain block feed 
     useEffect(() => {
         // [MOLECULAR PRECISION] Early exit if RPC bridge is not yet established.
         // This prevents the 'Critical Node Failure' crash during early mobile hydration.
@@ -105,7 +105,7 @@ export function OmniExplorer() {
         fetchBlock();
     }, [blockNumber, publicClient]);
 
-    // ── Search handler ──────────────────────────────────────────────────────
+    //  Search handler 
     const handleSearch = async () => {
         const q = searchQuery.trim();
         if (!q || q.length < 2) return;
@@ -121,7 +121,7 @@ export function OmniExplorer() {
                 setSearchError(data.error || 'No results found');
             }
         } catch {
-            setSearchError('Network error — could not reach the graph index.');
+            setSearchError('Network error  could not reach the graph index.');
         } finally {
             setIsSearching(false);
         }
@@ -230,7 +230,7 @@ export function OmniExplorer() {
 
                         <div className="flex flex-col">
                             {blocks.length === 0 && (
-                                <div className="p-12 text-center text-[13px] text-[#888888] dark:text-[#AAAAAA] animate-pulse">Loading blocks…</div>
+                                <div className="p-12 text-center text-[13px] text-[#888888] dark:text-[#AAAAAA] animate-pulse">Loading blocks</div>
                             )}
                             <AnimatePresence>
                                 {blocks.map((block, i) => (
@@ -292,7 +292,7 @@ export function OmniExplorer() {
 
                         <div className="flex flex-col">
                             {massiveTxs.length === 0 && (
-                                <div className="p-12 text-center text-[13px] text-[#888888] dark:text-[#AAAAAA] animate-pulse">Loading transactions…</div>
+                                <div className="p-12 text-center text-[13px] text-[#888888] dark:text-[#AAAAAA] animate-pulse">Loading transactions</div>
                             )}
                             {massiveTxs.map((tx, i) => (
                                 <button 

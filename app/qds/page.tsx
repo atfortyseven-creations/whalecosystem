@@ -12,10 +12,10 @@ const QDsAtomRenderer = dynamic(
   { ssr: false, loading: () => null }
 );
 
-// ─── Page Data ───────────────────────────────────────────────────────────────
+//  Page Data 
 
 const STATS = [
-  { label: 'Total Supply',      value: '21,000,000', sub: 'QDs — mathematically fixed' },
+  { label: 'Total Supply',      value: '21,000,000', sub: 'QDs  mathematically fixed' },
   { label: 'Decimal Precision', value: '8 places',   sub: '2.1 quadrillion units total' },
   { label: 'Distribution',      value: '100% mined', sub: 'Open participation only' },
   { label: 'Team Allocation',   value: '0%',          sub: 'No pre-mine, no reserves' },
@@ -28,8 +28,8 @@ const SECTIONS = [
     num: '01',
     title: 'What QDs is',
     paragraphs: [
-      'QDs (Quantum Dots) is a digital asset designed to act as the foundational unit of economic exchange within the Whale Alert network. It is not a governance token, a reward coupon, or a speculative vehicle with hidden unlock schedules. It is a base layer of exchange: finite, minable, and enforced entirely by the deployed contract code.',
-      'The name derives from the concept of quantum dots — the smallest indivisible unit of verifiable computational work. Just as physical matter cannot be reduced below the atomic scale, QDs cannot be created beyond its defined ceiling or subdivided beyond its defined precision. This physical analogy represents the strict mathematical boundaries established by the protocol layer.',
+      'QDs (Core Dots) is a digital asset designed to act as the foundational unit of economic exchange within the Whale Alert network. It is not a governance token, a reward coupon, or a speculative vehicle with hidden unlock schedules. It is a base layer of exchange: finite, minable, and enforced entirely by the deployed contract code.',
+      'The name derives from the concept of core dots  the smallest indivisible unit of verifiable computational work. Just as physical matter cannot be reduced below the atomic scale, QDs cannot be created beyond its defined ceiling or subdivided beyond its defined precision. This physical analogy represents the strict mathematical boundaries established by the protocol layer.',
       'Every design decision for QDs was measured against one test: does this reduce complexity, or add it? Any structure that added complexity without adding a mathematical guarantee was removed. What remains is a token defined by absolute clarity. The codebase has been stripped of any redundant logic, administrative backdoors, or upgradeable proxy patterns that could introduce centralized risk.',
       'The full technical specification of QDs is publicly auditable from day one. There are no hidden parameters, no admin keys, and no emergency override functions. The rules encoded at genesis govern QDs until the final token is mined. Enterprise integrators can rely on this stability to build deterministic financial models and automated settlement infrastructure without the counterparty risk associated with human intervention.'
     ],
@@ -38,7 +38,7 @@ const SECTIONS = [
     num: '02',
     title: 'The 21,000,000 limit',
     paragraphs: [
-      'The supply of QDs is capped at exactly twenty-one million tokens. This number is written into the genesis contract as an immutable constant. It cannot be changed by any vote, team decision, or on-chain governance action — because no such mechanism exists in the protocol. The absence of governance is a deliberate architectural choice to ensure maximum predictability.',
+      'The supply of QDs is capped at exactly twenty-one million tokens. This number is written into the genesis contract as an immutable constant. It cannot be changed by any vote, team decision, or on-chain governance action  because no such mechanism exists in the protocol. The absence of governance is a deliberate architectural choice to ensure maximum predictability.',
       'Scarcity is not a feature layered on top of QDs. It is the architecture. Every participant, from the first block to the last, can know in advance the total number of tokens that will ever exist. Uncertainty about future supply is removed by design, not by promise. This rigid supply ceiling allows market participants to price risk and allocate capital with mathematical certainty.',
       'Each token is divisible to eight decimal places, yielding two quadrillion one hundred trillion discrete units. This granularity is sufficient for all practical economic uses while preserving the mathematical weight of the twenty-one million ceiling. Micro-transactions, API paywalls, and high-frequency settlement channels can all operate efficiently using fractional QDs.',
       'Any system claiming to offer QDs in quantities exceeding twenty-one million is operating outside the canonical protocol. The only authoritative record is the on-chain state of the genesis-deployed contract. No exception to this rule exists. Nodes validating the network will automatically reject any block proposing a supply expansion, ensuring the network remains structurally sound.'
@@ -58,7 +58,7 @@ const SECTIONS = [
     num: '04',
     title: 'No team, no treasury',
     paragraphs: [
-      'Zero percent of the QDs supply is allocated to the founding team, early investors, advisors, or any organizational entity. This is not a policy position subject to future amendment — it is a technical constraint baked into the genesis contract from which there is no administrative exit. The protocol fundamentally rejects the notion of privileged issuance.',
+      'Zero percent of the QDs supply is allocated to the founding team, early investors, advisors, or any organizational entity. This is not a policy position subject to future amendment  it is a technical constraint baked into the genesis contract from which there is no administrative exit. The protocol fundamentally rejects the notion of privileged issuance.',
       'The absence of a team allocation eliminates the most common form of misalignment in token design: the disconnect between team incentives and participant incentives. Every QDs token that exists was earned through the same mining process available to all participants. The creators of the protocol must commit computing resources to the network in the exact same manner as the general public if they wish to acquire the asset.',
       'There is no treasury wallet with signing authority over accumulated funds. There is no multisig controlled by named individuals who could, under pressure or incentive, alter the distribution model. The contract is the only authority, and its logic is entirely deterministic and non-interactive regarding monetary policy.',
       'Operating costs for the Whale Alert network are funded separately from QDs supply. The protocol economics and the operational economics are structurally independent, so neither can compromise the other. This separation of concerns protects the monetary layer from corporate insolvency, strategic pivots, or operational mismanagement.'
@@ -70,8 +70,8 @@ const SECTIONS = [
     paragraphs: [
       'Block rewards in the QDs protocol decrease by fifty percent at regular intervals. This halving mechanism ensures that early miners receive proportionally more tokens for their initial network-bootstrapping work, while later participants still have meaningful earning potential from transaction fees and residual block rewards. The decay curve is mathematically rigid.',
       'The halving schedule is predictable in advance by any participant. Block heights at which halvings occur are defined in the genesis parameters and cannot be adjusted. This predictability allows participants to plan hardware investments and energy costs with a clear view of expected revenue trajectories over multi-year capital depreciation cycles.',
-      'As the block reward decreases toward zero, transaction fees become the primary economic incentive for miners. The QDs fee market operates without a fee floor or ceiling imposed by the protocol — fees are determined by the competitive dynamics between transaction submitters and block producers. This transition is expected and modeled in the protocol architecture.',
-      'The final token will be mined in a distant future defined by the geometric decay rate of the emission schedule. The protocol does not set an end date for mining — it sets a mathematical limit that the emission curve asymptotically approaches. Long after the final whole unit is mined, the network will continue to process fractional rewards and transaction fees.'
+      'As the block reward decreases toward zero, transaction fees become the primary economic incentive for miners. The QDs fee market operates without a fee floor or ceiling imposed by the protocol  fees are determined by the competitive dynamics between transaction submitters and block producers. This transition is expected and modeled in the protocol architecture.',
+      'The final token will be mined in a distant future defined by the geometric decay rate of the emission schedule. The protocol does not set an end date for mining  it sets a mathematical limit that the emission curve asymptotically approaches. Long after the final whole unit is mined, the network will continue to process fractional rewards and transaction fees.'
     ],
   },
   {
@@ -88,10 +88,10 @@ const SECTIONS = [
     num: '07',
     title: 'Integration with Whale Alert',
     paragraphs: [
-      'QDs functions as the native economic layer of the Whale Alert network. Participants who contribute value to the network — through mining, data validation, or infrastructure provisioning — are compensated in QDs. Participants who consume network services pay in QDs. This creates a closed-loop economic system tied directly to network utility.',
+      'QDs functions as the native economic layer of the Whale Alert network. Participants who contribute value to the network  through mining, data validation, or infrastructure provisioning  are compensated in QDs. Participants who consume network services pay in QDs. This creates a closed-loop economic system tied directly to network utility.',
       'The Whale Alert platform tracks on-chain capital flows across multiple blockchain networks. QDs provides the internal accounting unit that aligns the economic interests of data producers and data consumers within this system. It standardizes the cost of data queries across disparate underlying protocols and network states.',
       'The fixed supply of QDs creates a deflationary pressure as network usage grows. More participants consuming network services while the supply remains constant means each QDs unit represents a greater share of network economic activity over time. This dynamic rewards long-term liquidity providers and network validators.',
-      'Integration between QDs and the broader Whale Alert ecosystem is documented in the technical specifications available in the developer section of this site. The integration is designed to function without custodial intermediaries — all settlement occurs on-chain via smart contracts that programmatically enforce data delivery upon payment.'
+      'Integration between QDs and the broader Whale Alert ecosystem is documented in the technical specifications available in the developer section of this site. The integration is designed to function without custodial intermediaries  all settlement occurs on-chain via smart contracts that programmatically enforce data delivery upon payment.'
     ],
   },
   {
@@ -100,7 +100,7 @@ const SECTIONS = [
     paragraphs: [
       'QDs is implemented as an ERC-20 compatible token on the Ethereum Virtual Machine. The contract inherits the standard interface to ensure compatibility with existing wallets, exchanges, and DeFi infrastructure without requiring custom integration work from third parties. This strategic decision prioritizes immediate interoperability over esoteric technical novelty.',
       'The contract includes a single additional function beyond the ERC-20 standard: the mine() function, which allows eligible participants to claim block rewards during the mining period. No other non-standard functions exist. The attack surface of the contract is minimal by design, reducing the vector footprint to an absolute minimum.',
-      'Gas consumption for QDs transactions is comparable to any standard ERC-20 transfer. No exotic opcodes, delegatecall patterns, or proxy architectures are used. The contract is static — what is deployed at genesis is what runs for the lifetime of the token. Code is law, and the code is remarkably brief.',
+      'Gas consumption for QDs transactions is comparable to any standard ERC-20 transfer. No exotic opcodes, delegatecall patterns, or proxy architectures are used. The contract is static  what is deployed at genesis is what runs for the lifetime of the token. Code is law, and the code is remarkably brief.',
       'Security audits of the QDs contract will be published before mainnet launch. Multiple independent audit firms will review the contract. All findings, including any that are remediated before launch, will be disclosed in full in the public audit documentation. Transparency regarding the security perimeter is non-negotiable.'
     ],
   },
@@ -126,7 +126,7 @@ const SECTIONS = [
   },
 ];
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+//  Main Page 
 
 export default function QDsPage() {
   const vel     = useScrollVelocity();
@@ -145,18 +145,18 @@ export default function QDsPage() {
   return (
     <div className="min-h-screen bg-white text-black font-sans antialiased overflow-x-hidden selection:bg-black selection:text-white">
 
-      {/* ── HERO ──────────────────────────────────────────────────────────── */}
+      {/*  HERO  */}
       <section
         ref={heroRef}
         className="relative w-full overflow-hidden bg-white"
         style={{ minHeight: '100svh' }}
       >
-        {/* Static Image — replaces buggy 3D Atom */}
+        {/* Static Image  replaces buggy 3D Atom */}
         {mounted && (
           <div
             className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-70 mix-blend-multiply"
           >
-            <img src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" alt="Quantum Atom" className="w-full h-full object-cover" />
+            <img src="/system-shots/pngtree-3d-silver-atom-symbol-matter-core-fiction-photo-picture-image_3222092.jpg" alt="Core Atom" className="w-full h-full object-cover" />
           </div>
         )}
 
@@ -166,7 +166,7 @@ export default function QDsPage() {
           style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
         />
 
-        {/* Hero text — parallax on scroll */}
+        {/* Hero text  parallax on scroll */}
         <motion.div
           style={{ y: heroTextY, opacity: heroOpa, minHeight: '100svh' } as any}
           className="relative z-20 flex flex-col items-center justify-center text-center px-6 select-none pointer-events-none"
@@ -198,7 +198,7 @@ export default function QDsPage() {
               className="font-serif text-black/50 max-w-[560px] leading-relaxed"
               style={{ fontSize: 'clamp(16px, 2vw, 22px)' }}
             >
-              Quantum Dots. 21,000,000 units. Mined, not issued.
+              Core Dots. 21,000,000 units. Mined, not issued.
               <br className="hidden md:block" />
               Launching before 2027.
             </motion.p>
@@ -217,7 +217,7 @@ export default function QDsPage() {
         </motion.div>
       </section>
 
-      {/* ── STATS BAND ────────────────────────────────────────────────────── */}
+      {/*  STATS BAND  */}
       <section className="w-full border-y border-black/10 bg-white py-14">
         <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
           {STATS.map((s, i) => (
@@ -243,7 +243,7 @@ export default function QDsPage() {
         </div>
       </section>
 
-      {/* ── CONTENT SECTIONS ─────────────────────────────────────────────── */}
+      {/*  CONTENT SECTIONS  */}
       <section className="w-full max-w-[960px] mx-auto px-6 py-28 md:py-40 flex flex-col gap-28 md:gap-40">
         {SECTIONS.map((s) => (
           <motion.article
@@ -281,15 +281,15 @@ export default function QDsPage() {
         ))}
       </section>
 
-      {/* ── MID-PAGE IMAGE DIVIDER ─────────────────────────────────────────── */}
+      {/*  MID-PAGE IMAGE DIVIDER  */}
       <section
         className="w-full relative border-y border-black/10 bg-[#F8F8F6] overflow-hidden"
         style={{ height: 'clamp(340px, 45vh, 520px)' }}
       >
         <div className="absolute inset-0 flex items-center justify-center">
           <img 
-            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" 
-            alt="Quantum Atom" 
+            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-core-fiction-photo-picture-image_3222092.jpg" 
+            alt="Core Atom" 
             className="w-full h-full object-cover opacity-80 mix-blend-multiply"
           />
         </div>
@@ -298,12 +298,12 @@ export default function QDsPage() {
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#F8F8F6] to-transparent pointer-events-none z-10" />
         <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none bg-white/20 backdrop-blur-[2px]">
           <span className="font-mono text-[10px] font-black uppercase tracking-[0.55em] text-black/40 drop-shadow-sm">
-            QDs · Quantum Dots · 21,000,000 · 2026
+            QDs · Core Dots · 21,000,000 · 2026
           </span>
         </div>
       </section>
 
-      {/* ── FINAL CTA ───────────────────────────── */}
+      {/*  FINAL CTA  */}
       <section className="relative w-full py-32 md:py-48 flex flex-col items-center justify-center overflow-hidden bg-[#FAF9F6] border-b border-black/10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -344,7 +344,7 @@ export default function QDsPage() {
         </motion.div>
       </section>
 
-      {/* ── FOOTER ────────────────────────────────────────────────────────── */}
+      {/*  FOOTER  */}
       <footer className="w-full bg-white border-t border-black/[0.05] py-10 px-6">
         <div className="max-w-[960px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="font-mono text-[9px] font-black uppercase tracking-[0.28em] text-black/28">

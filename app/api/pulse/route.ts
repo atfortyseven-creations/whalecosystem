@@ -1,9 +1,9 @@
 /**
- * PHASE 6: MASTER OPERATIONAL DAEMON — Heartbeat Pulse
+ * PHASE 6: MASTER OPERATIONAL DAEMON  Heartbeat Pulse
  * 
  * This API endpoint is called by the Next.js cron or from Railway's scheduler.
  * Every 3-5 seconds it writes real CPU/RAM/Uptime metrics to every active Node
- * in the database — making the Ecosystem Canvas breathe with real operational data.
+ * in the database  making the Ecosystem Canvas breathe with real operational data.
  * 
  * Route: POST /api/pulse
  */
@@ -17,7 +17,7 @@ export const runtime = 'nodejs';
 // the frontend polls this endpoint every 5 seconds.
 export async function POST(req: Request) {
     try {
-        // Only accept internal calls — protect with a secret
+        // Only accept internal calls  protect with a secret
         const authHeader = req.headers.get('Authorization');
         const expected = `Bearer ${process.env.PULSE_SECRET || 'whale-pulse-internal'}`;
         if (authHeader !== expected) {

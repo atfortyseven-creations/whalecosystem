@@ -359,8 +359,8 @@ export const advancedDefiModules = [
                     </section>
 
                     <section class="pro-section">
-                        <h2>II. Tsunami Criptoeconómico en Descuento (The Fixed APY Matrix L1 M1 P2P L2 T-1 M2 O(N))</h2>
-                        <p><strong>El Arb Avanzado P2P M1 L1 O(1) M2 T-1 L2:</strong> Solicitar Préstamo L1 P2P M2 L2 T-1 de USDC al 5% en Morpho O(N) M1 L1 L2 P2P, Comprar PT-sUSDe M2 T-1 a Descuento Fijo del 35% APY L1 M1 P2P L2 T-1 O(1), y Apalancar en Bucle Asintótico P2P M2 L1 (Looping O(N) L2 M1 P2P T-1). Generas M2 L1 O(1) un Spread Cuántico Libre de Riesgo de Precio Fíat T-1 L2 M1 P2P asintótico M1 del 30% M2 L1 P2P L2 T-1. Controlar la "Curva de Madurez O(N) L1 M1 P2P T-1 L2 M2 O(1)" de Pendle/Notional P2P L1 es el Conocimiento Exotérico Fiduciario M1 L2 M2 T-1 Supremo L1 O(N) P2P que diferencia L2 al Retail Quebrado M1 M2 T-1 de la Ballena Institucional O(1) Sovereign L1 P2P M1 L2 T-1 M2 O(N).</p>
+                        <h2>II. Tsunami Criptoeconómico en Descuento (The Fixed APY Grid L1 M1 P2P L2 T-1 M2 O(N))</h2>
+                        <p><strong>El Arb Avanzado P2P M1 L1 O(1) M2 T-1 L2:</strong> Solicitar Préstamo L1 P2P M2 L2 T-1 de USDC al 5% en Morpho O(N) M1 L1 L2 P2P, Comprar PT-sUSDe M2 T-1 a Descuento Fijo del 35% APY L1 M1 P2P L2 T-1 O(1), y Apalancar en Bucle Asintótico P2P M2 L1 (Looping O(N) L2 M1 P2P T-1). Generas M2 L1 O(1) un Spread Cuántico Libre de Riesgo de Precio Fíat T-1 L2 M1 P2P asintótico M1 del 30% M2 L1 P2P L2 T-1. Controlar la "Curva de Madurez O(N) L1 M1 P2P T-1 L2 M2 O(1)" de Pendle/Notional P2P L1 es el Conocimiento Exotérico Fiduciario M1 L2 M2 T-1 Supremo L1 O(N) P2P que diferencia L2 al Retail Quebrado M1 M2 T-1 de la Ballena Institucional O(1) System L1 P2P M1 L2 T-1 M2 O(N).</p>
                     </section>
                 </div>`
             }

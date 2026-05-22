@@ -13,7 +13,7 @@ interface InstitutionalShellProps {
   fullWidth?: boolean;
 }
 
-// ─── THE MASTER STACK SHELL — COSMIC WALLPAPER EDITION ───
+//  THE MASTER STACK SHELL  COSMIC WALLPAPER EDITION 
 export function InstitutionalShell({
   children,
   title,
@@ -25,7 +25,7 @@ export function InstitutionalShell({
   return (
     <div className="flex flex-col flex-1 h-full min-h-0 text-white relative font-aztec-body overflow-x-hidden">
 
-      {/* ── Layer 1: Cosmic ukiyo-e pattern — exact same as landing page hero ── */}
+      {/*  Layer 1: Cosmic ukiyo-e pattern  exact same as landing page hero  */}
       <div
         className="fixed inset-0 pointer-events-none -z-20 bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-left-top"
         style={{
@@ -36,10 +36,10 @@ export function InstitutionalShell({
         }}
       />
 
-      {/* ── Layer 2: Dark readability wash ── */}
+      {/*  Layer 2: Dark readability wash  */}
       <div className="fixed inset-0 pointer-events-none -z-10 bg-black/40 dark:bg-black/80" />
 
-      {/* ── Main content ── */}
+      {/*  Main content  */}
       <div className="flex-1 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -52,7 +52,7 @@ export function InstitutionalShell({
         </motion.div>
       </div>
 
-      {/* ── DOWNPAGE: Hokusai wave footer — mirroring landing page exactly ── */}
+      {/*  DOWNPAGE: Hokusai wave footer  mirroring landing page exactly  */}
       <div className="relative pt-24 pb-0 overflow-hidden border-t border-black/[0.05] z-10 mt-20">
 
         {/* Layer A: Cosmic pattern continues */}
@@ -67,7 +67,7 @@ export function InstitutionalShell({
           }}
         />
 
-        {/* Layer B: Hokusai blue waves — responsive scaling without quality loss */}
+        {/* Layer B: Hokusai blue waves  responsive scaling without quality loss */}
         <div
           className="absolute inset-0 z-[1] pointer-events-none select-none bg-[url('/olas-hokusai-4k.png')] bg-bottom bg-repeat-x"
           style={{

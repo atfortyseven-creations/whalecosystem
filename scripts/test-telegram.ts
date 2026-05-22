@@ -10,24 +10,24 @@ async function testBot() {
     
     try {
         const me = await axios.get(url);
-        console.log("✅ Bot Connected:", me.data.result.username);
+        console.log(" Bot Connected:", me.data.result.username);
         
         console.log("Sending test message to", CHAT_ID);
         const sendUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
         const res = await axios.post(sendUrl, {
             chat_id: CHAT_ID,
-            text: "🔔 <b>SYSTEM RECONFIGURED</b> | The signals bot is now operational.",
+            text: " <b>SYSTEM RECONFIGURED</b> | The signals bot is now operational.",
             parse_mode: "HTML"
         });
         
         if (res.data.ok) {
-            console.log("✅ Message sent successfully!");
+            console.log(" Message sent successfully!");
         } else {
-            console.error("❌ Message failed:", res.data);
+            console.error(" Message failed:", res.data);
         }
 
     } catch (e: any) { 
-        console.error("❌ Error:", e.response ? e.response.data : e.message);
+        console.error(" Error:", e.response ? e.response.data : e.message);
     }
 }
 

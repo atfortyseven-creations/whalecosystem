@@ -89,7 +89,7 @@ async function indexLatestBlock() {
 
 // Continuous polling loop with high fault tolerance
 async function runIndexer() {
-  console.log('[INDEXER] Booting Sovereign Humanity Indexer...');
+  console.log('[INDEXER] Booting System Humanity Indexer...');
   while (true) {
     await indexLatestBlock();
     // Wait 12 seconds (Ethereum block time)

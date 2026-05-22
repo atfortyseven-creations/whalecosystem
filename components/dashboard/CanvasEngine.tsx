@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import type { NodeType, NodeData, EdgeData } from './canvas-types';
 // Re-export for backward compatibility with existing imports
 export type { NodeType, NodeData, EdgeData } from './canvas-types';
@@ -27,7 +27,7 @@ export function CanvasEngine() {
     const { address } = useAccount();
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Real persistent state — loaded from DB
+    // Real persistent state  loaded from DB
     const [nodes, setNodes] = useState<NodeData[]>([]);
     const [edges, setEdges] = useState<EdgeData[]>([]);
     const [isLoading, setIsLoading] = useState(true);

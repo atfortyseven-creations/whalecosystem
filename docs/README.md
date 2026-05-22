@@ -1,4 +1,4 @@
-# Documentation Index — Whale Alert Network
+# Documentation Index  Whale Alert Network
 
 **Platform:** [humanidfi.com](https://humanidfi.com)  
 **X / Twitter:** [@whalecosystem](https://x.com/whalecosystem)  
@@ -21,9 +21,9 @@
 
 | Document | Description |
 |---|---|
-| [Stateful Agents](./stateful-agents.md) | Autonomous intelligence units with persistent memory |
+| [Stateful Agents](./stateful-agents.md) | Autonomous analytics units with persistent memory |
 | [Whale Identity](./whale-identity.md) | EIP-191 auth, KYC JWT, AES-GCM vault encryption |
-| [Neural Intelligence](./neural-intelligence.md) | Z-score engine, whale classification, signal generation |
+| [Neural Analytics](./neural-analytics.md) | Z-score engine, whale classification, signal generation |
 
 ---
 

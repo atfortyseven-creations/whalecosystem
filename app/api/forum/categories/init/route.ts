@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 export async function POST(req: Request) {
     try {
         const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
+        const address = cookieStore.get('system_handshake')?.value;
         if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // Ensure user is Pro or special admin (using isPro as basic check here)

@@ -17,7 +17,7 @@ export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
     try {
-        // ── Fast path: pre-computed aggregation index ─────────────────────────
+        //  Fast path: pre-computed aggregation index 
         const cached = await safeRedisGet(AGGREGATION_KEYS.TOP_WHALE_EVENTS_24H);
         if (cached && cached !== 'TIMEOUT') {
             const parsed = safeJsonParse(cached, null, 'TOP_WHALE_EVENTS');
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        // ── Cache miss: direct Prisma query + repopulate ──────────────────────
+        //  Cache miss: direct Prisma query + repopulate 
         const { prisma } = await import('@/lib/prisma');
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
 

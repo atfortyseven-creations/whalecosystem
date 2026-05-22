@@ -18,10 +18,10 @@ import { safeJsonParse } from '../utils/json';
  */
 export class PortfolioService {
   
-  // 🔥 [LEGENDARY] Redis Persistent Buffer handles 100M units
+  //  [LEGENDARY] Redis Persistent Buffer handles 100M units
   // We remove local LRUCaches and use safeRedis primitives directly
 
-  // 🔥 [THUNDERING HERD PROTECTION] Cache active promises to collapse duplicate requests
+  //  [THUNDERING HERD PROTECTION] Cache active promises to collapse duplicate requests
   private activeFetches: Map<string, Promise<any>> = new Map();
 
   private pendingTransactions: Map<string, any> = new Map(); // Track pending txs for optimistic updates
@@ -42,7 +42,7 @@ export class PortfolioService {
   }
 
   constructor() {
-    console.log('[Portfolio] ✅ Moralis-powered service initialized');
+    console.log('[Portfolio]  Moralis-powered service initialized');
   }
 
   /**
@@ -58,10 +58,10 @@ export class PortfolioService {
 
     switch (chainId) {
         case ChainId.WORLDCHAIN:
-            tokens.push('0x2cfc85d8e48f8eab294be644d9e25c3030863003'); // WLD
+            tokens.push('0x2cfc85d8e48f8eab294be644d9e25c3030863003'); // AUTH
             break;
         case ChainId.OPTIMISM:
-            tokens.push('0xdc6ff44d5d932cbd77b52e5612ba0529dc6226f1'); // WLD
+            tokens.push('0xdc6ff44d5d932cbd77b52e5612ba0529dc6226f1'); // AUTH
             break;
         case ChainId.BASE:
             tokens.push('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'); // USDC
@@ -78,13 +78,13 @@ export class PortfolioService {
   public async getFullPortfolio(chainId: ChainId, address: string, forceRefresh = false, preFetchedNetWorth: any = null) {
     const chain = moralisService.getChainName(chainId);
 
-    // ─── EARLY GUARD: Route unsupported chains directly to RPC fallback ──────
+    //  EARLY GUARD: Route unsupported chains directly to RPC fallback 
     // Moralis v2.2 supports: ETH(1), Polygon(137), BSC(56), Avalanche(43114),
     // Arbitrum(42161), Optimism(10), Base(8453). All others (e.g. World Chain 480)
     // fall through to this path to prevent mis-routed 'eth' queries & timeouts.
     const MORALIS_SUPPORTED = new Set([1, 137, 56, 43114, 42161, 10, 8453]);
     if (!MORALIS_SUPPORTED.has(chainId)) {
-      console.log(`[Portfolio] Chain ${chainId} not Moralis-supported — routing to RPC fallback.`);
+      console.log(`[Portfolio] Chain ${chainId} not Moralis-supported  routing to RPC fallback.`);
       try {
         const { blockchainService } = await import('./BlockchainService');
         const commonTokens = this.getCommonTokensForChain(chainId);
@@ -129,7 +129,7 @@ export class PortfolioService {
     try {
       console.log(`[Portfolio-Moralis] Fetching ${chain} portfolio for ${address.slice(0, 10)}...`);
       
-      // 🔥 LEGENDARY: Multi-source validation
+      //  LEGENDARY: Multi-source validation
       let allTokens: any[] = [];
       let cursor: string | undefined = undefined;
       let page = 0;
@@ -158,7 +158,7 @@ export class PortfolioService {
       const nativeBalanceFormatted = parseFloat(ethers.formatUnits(nativeBalance, 18));
       
       // Process tokens (Moralis already includes prices!)
-      // 🔥 [SPAM SHIELD] Strict filtering to prevent Quadrillion-dollar spam tokens
+      //  [SPAM SHIELD] Strict filtering to prevent Quadrillion-dollar spam tokens
       const enrichedTokens = await Promise.all(allTokens
         .filter((t: any) => {
             const decimals = parseInt(t.decimals || '18', 10);
@@ -171,7 +171,7 @@ export class PortfolioService {
             if (bal > 1000000 && price === 0) return false;
             
             // Filter out fake native tokens (e.g., ERC20 token named ETH with 0 price)
-            const isFakeNative = (t.symbol === 'ETH' || t.symbol === 'MATIC' || t.symbol === 'WLD' || t.symbol === 'BNB' || t.symbol === 'AVAX' || t.symbol === 'SOL') && price === 0 && t.token_address;
+            const isFakeNative = (t.symbol === 'ETH' || t.symbol === 'MATIC' || t.symbol === 'AUTH' || t.symbol === 'BNB' || t.symbol === 'AVAX' || t.symbol === 'SOL') && price === 0 && t.token_address;
             if (isFakeNative) return false;
 
             return bal > 0.000001;
@@ -182,7 +182,7 @@ export class PortfolioService {
           const balance = parseFloat(balRaw);
           let price = parseFloat(t.usd_price || '0');
           
-          // 🔥 [SENIOR FALLBACK] If Moralis doesn't have the price (common on World Chain/L2) or TIMEOUTS, use PriceService
+          //  [SENIOR FALLBACK] If Moralis doesn't have the price (common on World Chain/L2) or TIMEOUTS, use PriceService
           if (price === 0) {
               const symbol = t.symbol || 'UNK';
               try {
@@ -259,7 +259,7 @@ export class PortfolioService {
         });
       }
 
-      // ─── CUSTOM TOKEN INJECTION: QuantumDots (QDs) ──────────────────────────
+      //  CUSTOM TOKEN INJECTION: CoreDots (QDs) 
       const qdsChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '137', 10);
       const qdsContractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
       if (chainId === qdsChainId && qdsContractAddress && qdsContractAddress.startsWith('0x')) {
@@ -286,7 +286,7 @@ export class PortfolioService {
               balance: qdsBalance.toString(),
               balanceNumeric: qdsBalanceFormatted,
               balanceFormatted: safeToLocaleString(qdsBalanceFormatted, { maximumFractionDigits: 4 }),
-              name: 'QuantumDots',
+              name: 'CoreDots',
               symbol: 'QDs',
               decimals: 18,
               logo: '/official-whale-monochrome.png',
@@ -330,12 +330,12 @@ export class PortfolioService {
     } catch (error: any) {
       const isQuotaHit = error.message.includes('MORALIS_QUOTA_EXHAUSTED') || error.message.includes('401') || error.message.includes('Quota') || error.message.includes('consumed');
       if (isQuotaHit) {
-        console.warn(`[Portfolio-Moralis] 🛡️ Quota Limit Detected for chain ${chainId} (${chain}). Triggering High-Fidelity Fallback.`);
+        console.warn(`[Portfolio-Moralis] ️ Quota Limit Detected for chain ${chainId} (${chain}). Triggering High-Fidelity Fallback.`);
       } else {
-        console.error(`[Portfolio-Moralis] ❌ ERROR for chain ${chainId}:`, error.message);
+        console.error(`[Portfolio-Moralis]  ERROR for chain ${chainId}:`, error.message);
       }
       
-      // 🔥 [SENIOR RESILIENCE] Attempt RPC Fallback for ANY chain if Moralis fails
+      //  [SENIOR RESILIENCE] Attempt RPC Fallback for ANY chain if Moralis fails
       try {
           console.log(`[Portfolio-FALLBACK] Attempting Alchemy/Viem fallback for ${chain} (${address.slice(0, 10)})...`);
           
@@ -345,7 +345,7 @@ export class PortfolioService {
           }
 
           // Generic RPC Fallback (Worldchain, Base, etc.)
-          // 🚨 [QUORUM FIX] Use a SINGLE direct JsonRpcProvider to avoid ethers v6 FallbackProvider
+          //  [QUORUM FIX] Use a SINGLE direct JsonRpcProvider to avoid ethers v6 FallbackProvider
           // quorum-not-met errors when only one RPC endpoint is reachable per chain.
           const { blockchainService } = await import('./BlockchainService');
           
@@ -365,7 +365,7 @@ export class PortfolioService {
               // Use PriceService for valuation
               const qdsContractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
               const isQd = qdsContractAddress && t.address.toLowerCase() === qdsContractAddress.toLowerCase();
-              const symbol = isQd ? 'QDs' : (chainId === ChainId.WORLDCHAIN && t.address.toLowerCase() === '0x2cfc85d8e48f8eab294be644d9e25c3030863003') ? 'WLD' : 'UNK';
+              const symbol = isQd ? 'QDs' : (chainId === ChainId.WORLDCHAIN && t.address.toLowerCase() === '0x2cfc85d8e48f8eab294be644d9e25c3030863003') ? 'AUTH' : 'UNK';
               
               let price = 0;
               if (isQd) {
@@ -389,21 +389,21 @@ export class PortfolioService {
                   balance: t.balance,
                   balanceNumeric: bal,
                   balanceFormatted: safeToLocaleString(bal),
-                  name: isQd ? 'QuantumDots' : symbol === 'WLD' ? 'Worldcoin' : 'Unknown Token',
+                  name: isQd ? 'CoreDots' : symbol === 'AUTH' ? 'Identity' : 'Unknown Token',
                   symbol,
                   decimals,
-                  logo: isQd ? '/official-whale-monochrome.png' : symbol === 'WLD' ? 'https://assets.coingecko.com/coins/images/31069/small/worldcoin.jpeg' : null,
+                  logo: isQd ? '/official-whale-monochrome.png' : symbol === 'AUTH' ? 'https://assets.coingecko.com/coins/images/31069/small/identity.jpeg' : null,
                   price,
                   valueUsd: bal * price,
                   chainId,
-                  sector: isQd ? 'AI' : symbol === 'WLD' ? 'DeFi' : 'Unknown',
+                  sector: isQd ? 'AI' : symbol === 'AUTH' ? 'DeFi' : 'Unknown',
                   isUnknown: !isQd && symbol === 'UNK'
               };
           }));
 
           const filteredTokens = tokensWithPrices.filter(t => t !== null);
 
-          // --- FALLBACK PATH CUSTOM TOKEN INJECTION: QuantumDots (QDs) ---
+          // --- FALLBACK PATH CUSTOM TOKEN INJECTION: CoreDots (QDs) ---
           const qdsChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '137', 10);
           const qdsContractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
           if (chainId === qdsChainId && qdsContractAddress && qdsContractAddress.startsWith('0x')) {
@@ -429,7 +429,7 @@ export class PortfolioService {
                           balance: qdsBal.toString(),
                           balanceNumeric: qdsBalFormatted,
                           balanceFormatted: safeToLocaleString(qdsBalFormatted, { maximumFractionDigits: 4 }),
-                          name: 'QuantumDots',
+                          name: 'CoreDots',
                           symbol: 'QDs',
                           decimals: 18,
                           logo: '/official-whale-monochrome.png',
@@ -504,7 +504,7 @@ export class PortfolioService {
   }
 
   /**
-   * Risk Intelligence Engine & Legendary Analytics
+   * Risk Analytics Engine & Legendary Analytics
    */
   private calculateAnalytics(tokens: any[], totalValueUsd: number) {
     if (totalValueUsd === 0) return {
@@ -628,20 +628,20 @@ export class PortfolioService {
         const parsed = safeJsonParse(cached, null, 'PORTFOLIO_AGGREGATE');
         if (parsed) return parsed;
       } catch (err) {
-        // Corrupted/stale cache entry — evict silently and re-fetch.
+        // Corrupted/stale cache entry  evict silently and re-fetch.
       }
     }
 
-    // 🔥 [REQUEST COLLAPSING] If a fetch is already in progress for this key, join it
+    //  [REQUEST COLLAPSING] If a fetch is already in progress for this key, join it
     if (!forceRefresh && this.activeFetches.has(cacheKey)) {
-        console.log(`[Portfolio] 🛡️ Deduplicating concurrent request for ${rawAddress}`);
+        console.log(`[Portfolio] ️ Deduplicating concurrent request for ${rawAddress}`);
         return this.activeFetches.get(cacheKey);
     }
 
     // Start new fetch and store promise
     const fetchPromise = (async () => {
         try {
-            // 🔥 [Elite RESILIENCE] 25-second Global Hard-Timeout
+            //  [Elite RESILIENCE] 25-second Global Hard-Timeout
             const timeoutPromise = new Promise((_, reject) => 
                 setTimeout(() => reject(new Error('GLOBAL_PORTFOLIO_TIMEOUT')), 25000)
             );
@@ -758,14 +758,14 @@ export class PortfolioService {
     const activeChainsArray = Array.isArray(activeChainsData?.active_chains) ? activeChainsData.active_chains : [];
     const activeChainIds = new Set(activeChainsArray.map((c: any) => c && c.chain_id ? parseInt(c.chain_id) : 0));
     
-    // Always query all requested chains — each will at minimum show native 0.0000 balance
+    // Always query all requested chains  each will at minimum show native 0.0000 balance
     const chainsToQuery = targetChains;
 
     console.log(`[Portfolio-SPEED] Querying ${chainsToQuery.length}/${targetChains.length} active chains in parallel...`);
 
     // 3. standard EVM aggregation
     // Process chains in parallel with RESILIENT TIMEOUTS
-    // Timeout raised from 10s to 25s — Moralis P95 latency on cold start can hit 12-15s.
+    // Timeout raised from 10s to 25s  Moralis P95 latency on cold start can hit 12-15s.
     // Each chain has a per-attempt guard; the global 30s hard-timeout above is the final net.
     const results = await Promise.all(
       chainsToQuery.map(async (id) => {
@@ -773,7 +773,7 @@ export class PortfolioService {
             try {
               return await this.getFullPortfolio(id, address, forceRefresh, netWorthData);
             } catch (e: any) {
-              // First attempt failed — try once more with a fresh request (no cache)
+              // First attempt failed  try once more with a fresh request (no cache)
               console.warn(`[Portfolio-RETRY] Chain ${id} first attempt failed (${e.message}), retrying...`);
               return await this.getFullPortfolio(id, address, true, netWorthData);
             }
@@ -804,14 +804,14 @@ export class PortfolioService {
     const validResults = results.filter((r): r is NonNullable<typeof r> => r !== null && !(r as any).error);
     const errors = results.filter((r): r is NonNullable<typeof r> => r !== null && (r as any).error);
 
-    // 🔥 [SENIOR RESILIENCE] If some chains worked, proceed with what we have.
+    //  [SENIOR RESILIENCE] If some chains worked, proceed with what we have.
     // Don't kill the whole report just because one chain is down.
     if (validResults.length === 0 && errors.length > 0) {
       const authErrors = errors.filter((e: any) => e.error === 'ALCHEMY_AUTH_FAILED');
       const throttleErrors = errors.filter((e: any) => e.error === 'PRICE_THROTTLED');
       
       if (authErrors.length > 0) {
-        console.error('[Portfolio] 🚨 All chains failed due to invalid Alchemy API key');
+        console.error('[Portfolio]  All chains failed due to invalid Alchemy API key');
         return {
           error: 'ALCHEMY_AUTH_FAILED',
           errorMessage: 'Invalid Alchemy API key. Please configure ALCHEMY_API_KEY in your environment variables.',
@@ -824,7 +824,7 @@ export class PortfolioService {
       }
 
       if (throttleErrors.length > 0) {
-        console.warn('[Portfolio] ⚠️ Price feed throttled (429) across active chains.');
+        console.warn('[Portfolio] ️ Price feed throttled (429) across active chains.');
         return {
           error: 'PRICE_THROTTLED',
           errorMessage: 'Elite price feed is currently throttled by CoinGecko (429). Native balances discovered but valuation is pending.',
@@ -835,7 +835,7 @@ export class PortfolioService {
         } as any;
       }
       
-      console.error('[Portfolio] 🚨 All chains failed to fetch');
+      console.error('[Portfolio]  All chains failed to fetch');
       // For whales, we might want to return 0 gracefully instead of an error object that might break the UI
       return {
         totalValueUsd: 0,
@@ -849,7 +849,7 @@ export class PortfolioService {
       } as any;
     }
     
-    // 🔥 [WHALE DETECTION] If Mainnet returned 0 but we suspect there's more, 
+    //  [WHALE DETECTION] If Mainnet returned 0 but we suspect there's more, 
     // or if the user is a known whale, we should try harder.
     const mainnetResult = validResults.find(r => r.chainId === ChainId.MAINNET);
     if (!deepScan && (!mainnetResult || mainnetResult.totalValueUsd === 0)) {
@@ -1005,7 +1005,7 @@ export class PortfolioService {
             if (contractPrice && contractPrice.price > 0) {
                 basePriceData = contractPrice;
             } 
-            // 🔥 SYMBOL GUARD: Only fallback for verified majors
+            //  SYMBOL GUARD: Only fallback for verified majors
             else if (VERIFIED_MAJORS.includes(symbol) && symbolPrice?.price > 0) {
                 basePriceData = symbolPrice;
             }

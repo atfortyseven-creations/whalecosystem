@@ -13,7 +13,7 @@ const GMX_TOKENS = {
 };
 
 /**
- * 🔥 GMX DISCOVERY - MORALIS EDITION 🔥
+ *  GMX DISCOVERY - MORALIS EDITION 
  */
 export async function discoverGmxPositions(address: string, chainIds: number[]): Promise<PerpPosition[]> {
   const positions: PerpPosition[] = [];

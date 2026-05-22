@@ -15,7 +15,7 @@ export const getUsdcAddress = (chainId: number): Address | undefined => {
     return USDC_ADDRESSES[chainId];
 };
 
-export const WLD_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_WLD_TOKEN_ADDRESS || '0xdc6f18f83959cd25095c2453192f16d08b496666') as `0x${string}`;
+export const AUTH_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_AUTH_TOKEN_ADDRESS || '0xdc6f18f83959cd25095c2453192f16d08b496666') as `0x${string}`;
 
 export const TOKENS_BY_CHAIN: Record<number, any[]> = {
     [mainnet.id]: [

@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useMarketData } from '@/lib/api-client';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
-import { useSovereignFormatter } from '@/hooks/useSovereignFormatter';
+import { useSystemFormatter } from '@/hooks/useSystemFormatter';
 
 const List = dynamic<any>(
     () => import('react-window').then(m => (m as any).FixedSizeList),
@@ -15,7 +15,7 @@ const List = dynamic<any>(
 );
 const AutoSizer = dynamic(() => import('react-virtualized-auto-sizer'), { ssr: false });
 
-// ── Formatters ────────────────────────────────────────────────────────────
+//  Formatters 
 const fmt = (n: number) => {
     if (n >= 1e9)  return `$${(n / 1e9).toFixed(2)}B`;
     if (n >= 1e6)  return `$${(n / 1e6).toFixed(2)}M`;
@@ -76,7 +76,7 @@ export function WatchlistTable() {
     }, []);
 
     const { settings } = useSettingsStore();
-    const { formatMoney, formatLargeMoney } = useSovereignFormatter();
+    const { formatMoney, formatLargeMoney } = useSystemFormatter();
     
     type WalletEntity = {
         address: string;
@@ -139,7 +139,7 @@ export function WatchlistTable() {
         <div className="w-full h-full min-h-0 flex flex-col p-0 overflow-hidden">
         <div className="flex flex-col w-full flex-1 min-h-0 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-2xl border border-[#E5E5E5] dark:border-white/10 shadow-sm overflow-hidden">
 
-            {/* ── Toolbar ── */}
+            {/*  Toolbar  */}
             <div className="px-4 py-3 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] flex items-center gap-4 flex-wrap">
                 {/* View toggle */}
                 <div className="flex bg-[#F0F0F0] dark:bg-[#1A1A1A] p-1 rounded-xl border border-[#E5E5E5] dark:border-white/10">
@@ -152,7 +152,7 @@ export function WatchlistTable() {
                 </div>
                 {/* Search */}
                 <div className="relative flex-1 min-w-[180px] max-w-xs">
-                    <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter watchlist…"
+                    <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter watchlist"
                         className="w-full bg-white dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 rounded-lg px-3 py-1.5 text-[11px] font-mono text-[#050505] dark:text-white outline-none focus:border-[#050505] dark:focus:border-white transition-all"
                     />
                 </div>
@@ -227,7 +227,7 @@ export function WatchlistTable() {
                                                             {/* Current Price */}
                                                             <div className="px-3 text-right">
                                                                 <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white privacy-sensitive">
-                                                                    {md.currentPrice ? formatMoney(md.currentPrice, 6) : '—'}
+                                                                    {md.currentPrice ? formatMoney(md.currentPrice, 6) : ''}
                                                                 </span>
                                                             </div>
 
@@ -239,28 +239,28 @@ export function WatchlistTable() {
                                                             {/* Entry Price */}
                                                             <div className="px-3 text-right">
                                                                 <span className="text-[10px] font-bold font-mono text-[#888888] dark:text-[#AAAAAA] privacy-sensitive">
-                                                                    {t.entryPrice ? formatMoney(t.entryPrice, 6) : '—'}
+                                                                    {t.entryPrice ? formatMoney(t.entryPrice, 6) : ''}
                                                                 </span>
                                                             </div>
 
                                                             {/* ROI */}
                                                             <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(md.roi ?? 0)}`}>
-                                                                {md.roi != null ? pctFmt(md.roi) : '—'}
+                                                                {md.roi != null ? pctFmt(md.roi) : ''}
                                                             </div>
 
                                                             {/* MCap */}
                                                             <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505] dark:text-white privacy-sensitive">
-                                                                {md.mcap ? formatLargeMoney(md.mcap) : '—'}
+                                                                {md.mcap ? formatLargeMoney(md.mcap) : ''}
                                                             </div>
 
                                                             {/* Vol 24h */}
                                                             <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505] dark:text-white privacy-sensitive">
-                                                                {md.vol24h ? formatLargeMoney(md.vol24h) : '—'}
+                                                                {md.vol24h ? formatLargeMoney(md.vol24h) : ''}
                                                             </div>
 
                                                             {/* Top10 holders */}
                                                             <div className={`px-3 text-right text-[10px] font-black font-mono ${(md.whaleConcentration ?? 0) > 40 ? 'text-[#FF9500]' : 'text-[#050505] dark:text-white'}`}>
-                                                                {md.whaleConcentration != null ? `${md.whaleConcentration}%` : '—'}
+                                                                {md.whaleConcentration != null ? `${md.whaleConcentration}%` : ''}
                                                             </div>
 
                                                             {/* Delete / Save */}
@@ -282,7 +282,7 @@ export function WatchlistTable() {
                 </div>
             )}
 
-            {/* ── Wallet / Entity Table ── */}
+            {/*  Wallet / Entity Table  */}
             {view === 'WALLETS' && (
                 <div className="flex-1 overflow-auto flex flex-col min-h-0">
                     <div className="min-w-[1200px] flex flex-col h-full">
@@ -347,29 +347,29 @@ export function WatchlistTable() {
                                                             {/* Address */}
                                                             <div className="px-3">
                                                                 <span className="text-[9px] font-mono text-[#888888] dark:text-white/60 privacy-sensitive">
-                                                                    {w.address ? `${w.address.slice(0,8)}…${w.address.slice(-6)}` : '—'}
+                                                                    {w.address ? `${w.address.slice(0,8)}${w.address.slice(-6)}` : ''}
                                                                 </span>
                                                             </div>
 
                                                             {/* Net Worth */}
                                                             <div className="px-3 text-right text-[10px] font-black font-mono text-[#050505] dark:text-white privacy-sensitive">
-                                                                {an.netWorthUSD ? formatLargeMoney(an.netWorthUSD) : '—'}
+                                                                {an.netWorthUSD ? formatLargeMoney(an.netWorthUSD) : ''}
                                                             </div>
 
                                                             {/* PnL 30d */}
                                                             <div className={`px-3 text-right text-[10px] font-black font-mono privacy-sensitive ${pctColor(an.pnl30d ?? 0)}`}>
-                                                                {an.pnl30d != null ? formatLargeMoney(Math.abs(an.pnl30d)) : '—'}
+                                                                {an.pnl30d != null ? formatLargeMoney(Math.abs(an.pnl30d)) : ''}
                                                             </div>
 
                                                             {/* Win Rate */}
                                                             <div className={`px-3 text-right text-[10px] font-black font-mono ${(an.winRate ?? 0) > 65 ? 'text-[#00C076]' : 'text-[#888888] dark:text-[#AAAAAA]'}`}>
-                                                                {an.winRate ? `${an.winRate}%` : '—'}
+                                                                {an.winRate ? `${an.winRate}%` : ''}
                                                             </div>
 
                                                             {/* DEX Ratio */}
                                                             <div className="px-3 text-right">
                                                                 <div className="flex flex-col items-end gap-0.5">
-                                                                    <span className="text-[10px] font-bold font-mono text-[#050505] dark:text-white">{an.dexCexRatio ? `${(an.dexCexRatio * 100).toFixed(0)}% DEX` : '—'}</span>
+                                                                    <span className="text-[10px] font-bold font-mono text-[#050505] dark:text-white">{an.dexCexRatio ? `${(an.dexCexRatio * 100).toFixed(0)}% DEX` : ''}</span>
                                                                     {an.topProtocol && <span className="text-[8px] text-[#888888] dark:text-[#AAAAAA]">{an.topProtocol}</span>}
                                                                 </div>
                                                             </div>
@@ -377,7 +377,7 @@ export function WatchlistTable() {
                                                             {/* Alpha Score */}
                                                             <div className="px-3 text-right">
                                                                 <span className={`text-[10px] font-black font-mono flex items-center justify-end gap-1 ${(an.alphaScore ?? 0) > 70 ? 'text-[#D4AF37]' : 'text-[#888888] dark:text-[#AAAAAA]'}`}>
-                                                                    {an.alphaScore != null ? an.alphaScore : '—'}
+                                                                    {an.alphaScore != null ? an.alphaScore : ''}
                                                                 </span>
                                                             </div>
 
@@ -405,7 +405,7 @@ export function WatchlistTable() {
                 </div>
             )}
 
-            {/* ── Footer ── */}
+            {/*  Footer  */}
             <div className="px-6 py-4 border-t border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] rounded-b-2xl flex items-center justify-between text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-widest">
                 <span>{view === 'TOKENS' ? tokensFiltered.length : walletsFiltered.length} items · Enriched with live on-chain market data</span>
             </div>

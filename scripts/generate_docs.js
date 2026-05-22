@@ -10,7 +10,7 @@ const topics = [
   { title: "Identity and Verification", slug: "identity-and-verification" },
   { title: "Encrypted Communication", slug: "encrypted-communication" },
   { title: "Edge Architecture", slug: "edge-architecture" },
-  { title: "Post-Quantum Cryptographic Resilience", slug: "post-quantum-cryptographic-resilience" },
+  { title: "Post-Core Cryptographic Resilience", slug: "post-core-cryptographic-resilience" },
   { title: "Sub-Millisecond Execution Privacy (MEV Shielding)", slug: "sub-millisecond-execution-privacy" },
   { title: "Decentralized Validator Memory", slug: "decentralized-validator-memory" },
 

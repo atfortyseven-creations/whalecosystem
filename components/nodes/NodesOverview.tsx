@@ -11,7 +11,7 @@ import { NODE_SOLUTIONS, NodeSolution } from '@/lib/constants/node-data';
 import { HeroCircuitry } from '@/components/landing/HeroCircuitry';
 
 /**
- * 🔥 DEDICATED NODE INFRASTRUCTURE OVERVIEW 🔥
+ *  DEDICATED NODE INFRASTRUCTURE OVERVIEW 
  * Elite platform for private blockchain nodes.
  */
 export default function NodesOverview() {

@@ -11,13 +11,13 @@ function walkDir(dir, callback) {
 }
 
 const terms = {
-  'Sovereign Terminal': 'Institutional Platform',
+  'System Terminal': 'Institutional Platform',
   'SOVEREIGN TERMINAL': 'INSTITUTIONAL PLATFORM',
-  'Sovereign terminal': 'Institutional platform',
-  'sovereign terminal': 'institutional platform',
-  'Sovereign': 'Institutional',
+  'System terminal': 'Institutional platform',
+  'system terminal': 'institutional platform',
+  'System': 'Institutional',
   'SOVEREIGN': 'INSTITUTIONAL',
-  'sovereign': 'institutional',
+  'system': 'institutional',
   'Terminal': 'Platform',
   'TERMINAL': 'PLATFORM',
   'terminal': 'platform',

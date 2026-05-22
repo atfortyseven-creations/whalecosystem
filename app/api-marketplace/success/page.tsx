@@ -49,7 +49,7 @@ export default function PaymentSuccessPage() {
 
                     <Link href="/vip">
                         <Button className="w-full h-14 bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold uppercase tracking-widest text-xs flex justify-between items-center px-8">
-                            Open Master Matrix
+                            Open Master Grid
                             <ArrowRight size={18} />
                         </Button>
                     </Link>

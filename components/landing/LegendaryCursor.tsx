@@ -4,11 +4,11 @@ import { useEffect, useRef } from "react";
 
 /**
  * LegendaryCursor
- * ─────────────────
+ * 
  * Scroll-proof custom cursor using RAF + CSS transforms (no Framer Motion).
  * Two layers:
- *  - dot:   6px white circle — instant snap (interpolation factor 1.0)
- *  - ring: 40px outline ring — smooth lag (interpolation factor 0.1)
+ *  - dot:   6px white circle  instant snap (interpolation factor 1.0)
+ *  - ring: 40px outline ring  smooth lag (interpolation factor 0.1)
  *
  * Tracks clientX/clientY (viewport-relative) so it is always correct
  * even when the user scrolls deep into the page.

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { NewsTerminal } from '@/components/news/NewsTerminal';
-import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { SystemFooter } from '@/components/landing/SystemFooter';
 import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
 
 export default function WhaleNewsPage() {
@@ -16,7 +16,7 @@ export default function WhaleNewsPage() {
       </div>
       
       <WhaleChatLink />
-      <SovereignFooter />
+      <SystemFooter />
     </div>
   );
 }

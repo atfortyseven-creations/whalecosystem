@@ -1,4 +1,4 @@
-// Sovereign layout — No Clerk provider needed (SIWE-native auth)
+// System layout  No Clerk provider needed (SIWE-native auth)
 import { headers } from 'next/headers'
 import { Inter, Martel, Roboto_Mono } from 'next/font/google'
 import './globals.css'
@@ -42,14 +42,14 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'Whale Network — Institutional Blockchain Intelligence & Web3 Ecosystem',
+    default: 'Whale Network  Institutional Blockchain Analytics & Web3 Ecosystem',
     template: '%s | Whale Network'
   },
   description: 'The ultimate on-chain analytics and institutional ecosystem for Web3. Whale Network provides real-time monitoring, portfolio management, and a thriving community for blockchain professionals. Official domain: whalecosystem.io',
   keywords: [
     'whale network', 'whalecosystem', 'crypto ecosystem', 'institutional web3',
     'blockchain monitor', 'crypto tracking', 'on-chain analytics', 'defi',
-    'web3 intelligence', 'smart contracts', 'crypto data', 'whale ecosystem'
+    'web3 analytics', 'smart contracts', 'crypto data', 'whale ecosystem'
   ],
   authors: [{ name: 'Whale Network' }],
   creator: 'Whale Network',
@@ -77,7 +77,7 @@ export const metadata = {
     statusBarStyle: 'default',
   },
   openGraph: {
-    title: 'Whale Network — Institutional Blockchain Intelligence & Web3 Ecosystem',
+    title: 'Whale Network  Institutional Blockchain Analytics & Web3 Ecosystem',
     description: 'The ultimate on-chain analytics and institutional ecosystem for Web3. Whale Network provides real-time monitoring and a thriving community for blockchain professionals.',
     url: 'https://whalecosystem.io',
     siteName: 'Whale Network',
@@ -94,7 +94,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Whale Network — Institutional Web3 Ecosystem',
+    title: 'Whale Network  Institutional Web3 Ecosystem',
     description: 'The ultimate on-chain analytics and institutional ecosystem for Web3.',
     images: ['/humanid_protocol_logo_1778714491433.png'],
     site: '@whalecosystem',
@@ -128,7 +128,7 @@ export default async function RootLayout({
         "@type": "WebSite",
         "url": "https://whalecosystem.io/",
         "name": "Whale Network",
-        "description": "The official institutional blockchain intelligence and Web3 ecosystem. Whale Network is a secure, pristine, and authoritative platform.",
+        "description": "The official institutional blockchain analytics and Web3 ecosystem. Whale Network is a secure, pristine, and authoritative platform.",
         "potentialAction": {
           "@type": "SearchAction",
           "target": {
@@ -172,7 +172,7 @@ export default async function RootLayout({
           "Institutional Dashboard",
           "Pristine White UI Infrastructure",
           "Web3 Security Protocol",
-          "Sovereign Network Connectivity"
+          "System Network Connectivity"
         ]
       }
     ]
@@ -187,9 +187,9 @@ export default async function RootLayout({
         {/* Prevent iOS Safari from auto-detecting phone numbers as links */}
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        {/* ── localStorage → sessionStorage polyfill for incognito (iOS/Android) ──
+        {/*  localStorage  sessionStorage polyfill for incognito (iOS/Android) 
             Runs BEFORE any script so WalletConnect pairing data can be stored.
-            In iOS Safari Private, localStorage quota is 0 — this patches it
+            In iOS Safari Private, localStorage quota is 0  this patches it
             with sessionStorage so WC v2 sessions survive within the tab. */}
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: `(function(){
   try{
@@ -205,7 +205,7 @@ export default async function RootLayout({
     }catch(e2){}
   }
 })();` }} />
-        {/* ── Global ChunkLoadError Recovery ──
+        {/*  Global ChunkLoadError Recovery 
             Catches router-level dynamic import failures (stale deployment)
             that bubble past React Error Boundaries. */}
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: `(function(){

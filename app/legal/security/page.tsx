@@ -30,22 +30,22 @@ export default function SecurityPage() {
 
                     <div className="grid md:grid-cols-2 gap-4">
                         <div className="bg-blue-600/10 border border-blue-500/30 p-4 rounded-lg">
-                            <h4 className="font-bold mb-2">🔒 Self-Custody First</h4>
+                            <h4 className="font-bold mb-2"> Self-Custody First</h4>
                             <p className="text-sm text-white/70">Your private keys never touch our servers. You maintain complete control over your funds.</p>
                         </div>
 
                         <div className="bg-green-600/10 border border-green-500/30 p-4 rounded-lg">
-                            <h4 className="font-bold mb-2">🕵️ Zero-Knowledge Privacy</h4>
+                            <h4 className="font-bold mb-2">️ Zero-Knowledge Privacy</h4>
                             <p className="text-sm text-white/70">Identity verification without revealing personal information using cryptographic proofs.</p>
                         </div>
 
                         <div className="bg-purple-600/10 border border-purple-500/30 p-4 rounded-lg">
-                            <h4 className="font-bold mb-2">🛡️ Defense in Depth</h4>
+                            <h4 className="font-bold mb-2">️ Defense in Depth</h4>
                             <p className="text-sm text-white/70">Multiple overlapping security layers ensure no single point of failure.</p>
                         </div>
 
                         <div className="bg-orange-600/10 border border-orange-500/30 p-4 rounded-lg">
-                            <h4 className="font-bold mb-2">🔍 Transparency</h4>
+                            <h4 className="font-bold mb-2"> Transparency</h4>
                             <p className="text-sm text-white/70">Open about our architecture, audits, and security practices.</p>
                         </div>
                     </div>
@@ -100,7 +100,7 @@ export default function SecurityPage() {
                     </h3>
 
                     <div className="bg-red-600/10 border border-red-500/30 p-6 rounded-lg">
-                        <h4 className="font-bold text-red-400 mb-3">🔑 CRITICAL: We NEVER Have Your Private Keys</h4>
+                        <h4 className="font-bold text-red-400 mb-3"> CRITICAL: We NEVER Have Your Private Keys</h4>
                         <p className="text-sm mb-4">Your wallet private keys are generated and stored ONLY on your device. We use:</p>
 
                         <ul className="space-y-2 text-sm">
@@ -123,7 +123,7 @@ export default function SecurityPage() {
                         </ul>
 
                         <p className="text-sm mt-4 font-bold">
-                            ⚠️ If you lose your seed phrase, we CANNOT recover your wallet. This is by design—your funds, your control.
+                            ️ If you lose your seed phrase, we CANNOT recover your wallet. This is by designyour funds, your control.
                         </p>
                     </div>
 
@@ -171,32 +171,32 @@ export default function SecurityPage() {
 
                     <div className="grid md:grid-cols-3 gap-4">
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">📧 Email + Password</h4>
+                            <h4 className="font-bold mb-2"> Email + Password</h4>
                             <p className="text-xs text-white/70">Basic tier with rate limiting</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🔐 Passkeys (WebAuthn)</h4>
+                            <h4 className="font-bold mb-2"> Passkeys (WebAuthn)</h4>
                             <p className="text-xs text-white/70">Biometric (Face ID, Touch ID, Windows Hello)</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🌐 World ID</h4>
+                            <h4 className="font-bold mb-2"> World ID</h4>
                             <p className="text-xs text-white/70">Zero-knowledge proof of personhood</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🔑 Wallet Signature</h4>
+                            <h4 className="font-bold mb-2"> Wallet Signature</h4>
                             <p className="text-xs text-white/70">Sign-in with Ethereum (SIWE)</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">📱 TOTP (2FA)</h4>
+                            <h4 className="font-bold mb-2"> TOTP (2FA)</h4>
                             <p className="text-xs text-white/70">Google Authenticator, Authy</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🔒 Hardware Keys</h4>
+                            <h4 className="font-bold mb-2"> Hardware Keys</h4>
                             <p className="text-xs text-white/70">YubiKey, Titan Key (FIDO2)</p>
                         </div>
                     </div>
@@ -255,32 +255,32 @@ export default function SecurityPage() {
                     <h3 className="text-2xl font-bold mb-3 mt-6">4.2. Web Security</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🛡️ CSRF Protection</h4>
+                            <h4 className="font-bold mb-2">️ CSRF Protection</h4>
                             <p className="text-sm text-white/70">Anti-CSRF tokens on all state-changing requests</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🔒 XSS Prevention</h4>
+                            <h4 className="font-bold mb-2"> XSS Prevention</h4>
                             <p className="text-sm text-white/70">Content Security Policy (CSP), input sanitization</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">💉 SQL Injection Defense</h4>
+                            <h4 className="font-bold mb-2"> SQL Injection Defense</h4>
                             <p className="text-sm text-white/70">Parameterized queries, ORM (Prisma) with type safety</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🚫 Clickjacking Protection</h4>
+                            <h4 className="font-bold mb-2"> Clickjacking Protection</h4>
                             <p className="text-sm text-white/70">X-Frame-Options: DENY header</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🔐 HTTPS Enforcement</h4>
+                            <h4 className="font-bold mb-2"> HTTPS Enforcement</h4>
                             <p className="text-sm text-white/70">HSTS with preloading, automatic redirect from HTTP</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🛑 Rate Limiting</h4>
+                            <h4 className="font-bold mb-2"> Rate Limiting</h4>
                             <p className="text-sm text-white/70">API rate limits, login attempt throttling</p>
                         </div>
                     </div>
@@ -349,9 +349,9 @@ export default function SecurityPage() {
                     <div className="bg-blue-600/10 border border-blue-500/30 p-6 rounded-lg">
                         <p className="mb-4"><strong>Audit Status:</strong> In Progress / Upcoming</p>
                         <ul className="space-y-2 text-sm">
-                            <li>• <strong>Smart Contract Audits:</strong> Scheduled with [Auditor Name] for Q2 2026</li>
-                            <li>• <strong>Penetration Testing:</strong> Annual third-party pentests</li>
-                            <li>• <strong>GDPR Compliance:</strong> Data protection impact assessment completed</li>
+                            <li> <strong>Smart Contract Audits:</strong> Scheduled with [Auditor Name] for Q2 2026</li>
+                            <li> <strong>Penetration Testing:</strong> Annual third-party pentests</li>
+                            <li> <strong>GDPR Compliance:</strong> Data protection impact assessment completed</li>
                         </ul>
                         <p className="mt-4 text-sm text-white/70">
                             Audit reports will be published here upon completion and remediation of findings.
@@ -375,7 +375,7 @@ export default function SecurityPage() {
                     </h2>
 
                     <div className="bg-green-600/10 border border-green-500/30 p-6 rounded-lg">
-                        <h3 className="text-xl font-bold mb-4">🐛 Responsible Disclosure Rewards</h3>
+                        <h3 className="text-xl font-bold mb-4"> Responsible Disclosure Rewards</h3>
                         <p className="mb-4 text-sm">We welcome security researchers to help us keep WhaleAlert ID.fi secure. Report vulnerabilities responsibly and earn rewards:</p>
 
                         <table className="w-full border border-white/10 text-sm mb-4">
@@ -434,12 +434,12 @@ export default function SecurityPage() {
                     </h2>
 
                     <div className="bg-yellow-600/10 border border-yellow-500/30 p-6 rounded-lg">
-                        <h3 className="text-xl font-bold mb-4">🛡️ Protect Yourself</h3>
+                        <h3 className="text-xl font-bold mb-4">️ Protect Yourself</h3>
                         <p className="mb-4 text-sm">Security is a shared responsibility. Here's how to keep your account safe:</p>
 
                         <div className="grid md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <h4 className="font-bold mb-2">✅ DO:</h4>
+                                <h4 className="font-bold mb-2"> DO:</h4>
                                 <ul className="list-disc pl-6 space-y-1">
                                     <li>Enable 2FA/MFA immediately</li>
                                     <li>Use strong, unique passwords (20+ chars)</li>
@@ -452,7 +452,7 @@ export default function SecurityPage() {
                             </div>
 
                             <div>
-                                <h4 className="font-bold mb-2">❌ DON'T:</h4>
+                                <h4 className="font-bold mb-2"> DON'T:</h4>
                                 <ul className="list-disc pl-6 space-y-1">
                                     <li>Share seed phrases with ANYONE (not even us!)</li>
                                     <li>Click suspicious links in emails/DMs</li>
@@ -466,12 +466,12 @@ export default function SecurityPage() {
                         </div>
 
                         <div className="bg-red-600/20 border border-red-500/40 p-4 rounded-lg mt-4">
-                            <h4 className="font-bold text-red-400 mb-2">🚨 Common Scams to Avoid:</h4>
+                            <h4 className="font-bold text-red-400 mb-2"> Common Scams to Avoid:</h4>
                             <ul className="text-xs space-y-1">
-                                <li>• <strong>Phishing:</strong> Fake emails/websites impersonating WhaleAlert ID.fi</li>
-                                <li>• <strong>Fake Support:</strong> We will NEVER ask for your seed phrase or private keys</li>
-                                <li>• <strong>Impersonation:</strong> Verify our official social media accounts</li>
-                                <li>• <strong>Too Good to Be True:</strong> If it sounds too good to be true, it is</li>
+                                <li> <strong>Phishing:</strong> Fake emails/websites impersonating WhaleAlert ID.fi</li>
+                                <li> <strong>Fake Support:</strong> We will NEVER ask for your seed phrase or private keys</li>
+                                <li> <strong>Impersonation:</strong> Verify our official social media accounts</li>
+                                <li> <strong>Too Good to Be True:</strong> If it sounds too good to be true, it is</li>
                             </ul>
                         </div>
                     </div>
@@ -501,15 +501,15 @@ export default function SecurityPage() {
 
                 {/* Summary */}
                 <section className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 p-6 rounded-xl border border-white/10">
-                    <h2 className="text-2xl font-bold mb-4">📋 Security Summary</h2>
+                    <h2 className="text-2xl font-bold mb-4"> Security Summary</h2>
                     <ul className="space-y-2 text-sm">
-                        <li>✅ <strong>Self-Custody:</strong> Your keys, your crypto—we never have access</li>
-                        <li>✅ <strong>Encryption:</strong> TLS 1.3 in transit, AES-256 at rest</li>
-                        <li>✅ <strong>Multi-Factor Auth:</strong> Passkeys, 2FA, wallet signatures</li>
-                        <li>✅ <strong>24/7 Monitoring:</strong> Real-time threat detection and response</li>
-                        <li>✅ <strong>Bug Bounty:</strong> Up to $10,000 for responsible disclosure</li>
-                        <li>✅ <strong>Transparency:</strong> Regular audits and public incident reports</li>
-                        <li>✅ <strong>GDPR Compliant:</strong> Data protection by design and default</li>
+                        <li> <strong>Self-Custody:</strong> Your keys, your cryptowe never have access</li>
+                        <li> <strong>Encryption:</strong> TLS 1.3 in transit, AES-256 at rest</li>
+                        <li> <strong>Multi-Factor Auth:</strong> Passkeys, 2FA, wallet signatures</li>
+                        <li> <strong>24/7 Monitoring:</strong> Real-time threat detection and response</li>
+                        <li> <strong>Bug Bounty:</strong> Up to $10,000 for responsible disclosure</li>
+                        <li> <strong>Transparency:</strong> Regular audits and public incident reports</li>
+                        <li> <strong>GDPR Compliant:</strong> Data protection by design and default</li>
                     </ul>
                 </section>
             </div>

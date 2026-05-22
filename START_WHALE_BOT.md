@@ -1,6 +1,6 @@
 # Start Whale Bot - Quick Guide
 
-## ⚡ Simplest Method (Recommended)
+##  Simplest Method (Recommended)
 
 1. Open a terminal in the project root.
 2. Run the start script:
@@ -8,7 +8,7 @@
 ./start-bot.sh
 ```
 
-## 🛠️ Advanced Method (PM2 - High Availability)
+## ️ Advanced Method (PM2 - High Availability)
 
 If you have PM2 installed, use these commands to keep the bot running 24/7 even if the server restarts:
 
@@ -32,7 +32,7 @@ pm2 logs whale-bot
 pm2 save
 ```
 
-## 🚀 Alternative Method (Without PM2)
+##  Alternative Method (Without PM2)
 
 If you don't want to use PM2, you can run it directly with Node.js:
 
@@ -42,13 +42,13 @@ node scripts/whale-telegram-bot.js
 
 **Note**: This method will NOT automatically restart if the bot crashes.
 
-## 📊 Useful Commands
+##  Useful Commands
 
 *   **Stop bot (PM2)**: `pm2 stop whale-bot`
 *   **Restart bot (PM2)**: `pm2 restart whale-bot`
 *   **Delete from PM2**: `pm2 delete whale-bot`
 
-## 🧪 Verification
+##  Verification
 
 How to know if it's working:
 1. Run `pm2 logs whale-bot`.
@@ -59,7 +59,7 @@ How to know if it's working:
 [WhaleBot] Telegram connected.
 ```
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Command 'pm2' not found
 **Solution 1**: Close and reopen the terminal.

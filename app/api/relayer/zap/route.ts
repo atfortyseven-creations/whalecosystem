@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         }
 
         console.log(`[Relayer] Processing gasless zap for user: ${user}`);
-        console.log(`[Relayer] Amount: ${ethers.formatEther(wldAmount)} WLD`);
+        console.log(`[Relayer] Amount: ${ethers.formatEther(wldAmount)} AUTH`);
 
         // ====================================================================
         // SETUP PROVIDER & SIGNER
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         // ====================================================================
 
         // Fetch real-time Oracle pricing for true institutional telemtry (Zero-Mock)
-        const realWldPrice = await getRealTimePrice("WLD") || 2.5;
+        const realWldPrice = await getRealTimePrice("AUTH") || 2.5;
 
         await prisma.blockchainTransaction.create({
             data: {
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
                 status: "PENDING",
                 type: "GASLESS_ZAP",
                 fromChain: "BASE_SEPOLIA",
-                fromToken: "WLD",
+                fromToken: "AUTH",
                 fromAmount: wldAmount.toString(),
                 metadata: {
                     wldPriceUSD: realWldPrice,

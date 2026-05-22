@@ -14,7 +14,7 @@ Our local `Whale Worker` identified the following pattern:
 2. Within 15 minutes, all three wallets executed a sequential drain of a specific liquidity pool on Uniswap V3 (Base), pulling out $1.4M in total liquidity into cold storage.
 3. The thermodynamic Z-Score of the mempool spiked to `4.8` (anything above `3.0` indicates extreme statistical deviance from the 90-day MA).
 
-## Sovereign Validation
+## System Validation
 Because the user was running the node locally in `LITE_MODE=false`, the Neo4j graph automatically mapped the "Elite Neighbors". Wallet A was previously observed depositing 400 ETH to Coinbase Prime 6 months prior.
 
 ## Outcome

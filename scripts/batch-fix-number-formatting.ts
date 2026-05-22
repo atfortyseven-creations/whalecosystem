@@ -63,7 +63,7 @@ async function processFile(filePath: string): Promise<boolean> {
   const hasImport = content.includes('safeToFixed') || content.includes('safeToLocaleString');
   
   if (hasImport) {
-    console.log(`⏭️  Skipping ${path.relative(process.cwd(), filePath)} (already updated)`);
+    console.log(`️  Skipping ${path.relative(process.cwd(), filePath)} (already updated)`);
     return false;
   }
 
@@ -91,7 +91,7 @@ async function processFile(filePath: string): Promise<boolean> {
 
   if (modified) {
     fs.writeFileSync(filePath, content, 'utf-8');
-    console.log(`✅ Fixed ${path.relative(process.cwd(), filePath)}`);
+    console.log(` Fixed ${path.relative(process.cwd(), filePath)}`);
     return true;
   }
 
@@ -99,7 +99,7 @@ async function processFile(filePath: string): Promise<boolean> {
 }
 
 async function main() {
-  console.log('🔧 Batch fixing number formatting across codebase...\n');
+  console.log(' Batch fixing number formatting across codebase...\n');
 
   const patterns = [
     `${COMPONENTS_DIR}/**/*.tsx`,
@@ -128,7 +128,7 @@ async function main() {
     }
   }
 
-  console.log(`\n📊 Summary:`);
+  console.log(`\n Summary:`);
   console.log(`   Scanned: ${totalScanned} files`);
   console.log(`   Fixed: ${totalFixed} files`);
   console.log(`   Skipped: ${totalScanned - totalFixed} files`);

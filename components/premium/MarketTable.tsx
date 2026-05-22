@@ -194,7 +194,7 @@ export default function MarketTable() {
                         disabled={currentPage === 1}
                         className="px-4 py-2 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all"
                     >
-                        ← Previous
+                         Previous
                     </button>
                     
                     <div className="flex items-center gap-1">
@@ -230,7 +230,7 @@ export default function MarketTable() {
                         disabled={currentPage === totalPages}
                         className="px-4 py-2 bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all"
                     >
-                        Next →
+                        Next 
                     </button>
                 </div>
             </div>
@@ -249,7 +249,7 @@ export default function MarketTable() {
                             <th className="px-4 py-4 text-center text-[10px] font-black uppercase tracking-widest text-white/30">{t('market.week')}</th>
                             <th className="px-4 py-4 text-center text-[10px] font-black uppercase tracking-widest text-white/30">{t('market.month')}</th>
                             <th className="px-4 py-4 text-center text-[10px] font-black uppercase tracking-widest text-white/30">{t('market.year')}</th>
-                            <th className="px-6 py-4 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Intelligence</th>
+                            <th className="px-6 py-4 text-center text-[10px] font-black uppercase tracking-widest text-white/30">Analytics</th>
                             <th className="px-6 py-4 text-center text-[10px] font-black uppercase tracking-widest text-white/30">{t('market.actions')}</th>
                         </tr>
                     </thead>

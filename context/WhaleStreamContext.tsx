@@ -25,7 +25,7 @@ import React, {
     useCallback,
 } from 'react';
 
-// ─── Types ──────────────────────────────────────────────────────────────────
+//  Types 
 
 export interface WhaleEvent {
     id: string;
@@ -47,7 +47,7 @@ interface WhaleStreamState {
     clearEvents: () => void;
 }
 
-// ─── Context ────────────────────────────────────────────────────────────────
+//  Context 
 
 const WhaleStreamContext = createContext<WhaleStreamState>({
     events: [],
@@ -60,7 +60,7 @@ const MAX_EVENTS = 200; // Rolling buffer cap to prevent memory growth
 const BASE_RECONNECT_MS = 1_000;
 const MAX_RECONNECT_MS = 30_000;
 
-// ─── Provider ───────────────────────────────────────────────────────────────
+//  Provider 
 
 export function WhaleStreamProvider({ children }: { children: React.ReactNode }) {
     const [events, setEvents] = useState<WhaleEvent[]>([]);
@@ -108,7 +108,7 @@ export function WhaleStreamProvider({ children }: { children: React.ReactNode })
         });
 
         es.addEventListener('heartbeat', () => {
-            // Unconditional — avoids stale closure over initial isConnected = false
+            // Unconditional  avoids stale closure over initial isConnected = false
             if (!isMounted.current) return;
             setIsConnected(true);
         });
@@ -158,7 +158,7 @@ export function WhaleStreamProvider({ children }: { children: React.ReactNode })
     );
 }
 
-// ─── Hook ───────────────────────────────────────────────────────────────────
+//  Hook 
 
 export function useWhaleStream(): WhaleStreamState {
     return useContext(WhaleStreamContext);

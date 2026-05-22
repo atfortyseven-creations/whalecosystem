@@ -6,8 +6,8 @@
  *  - Token metadata (symbol/name placeholder derived from address)
  *
  * Architecture:
- *   GetBlock WS EP3 → newPairsEngine.buffer → this route → NewPairsTable
- *   GetBlock HTTP EP4 → slot0() eth_call → price enrichment
+ *   GetBlock WS EP3  newPairsEngine.buffer  this route  NewPairsTable
+ *   GetBlock HTTP EP4  slot0() eth_call  price enrichment
  */
 
 import { NextResponse } from 'next/server';
@@ -16,7 +16,7 @@ import { getGbAllRpc } from '@/lib/blockchain/getblock-registry';
 
 export const dynamic = 'force-dynamic';
 
-// HTTP endpoints para slot0() — GetBlock Registry primero, públicos de emergencia
+// HTTP endpoints para slot0()  GetBlock Registry primero, públicos de emergencia
 const SLOT0_ENDPOINTS = [
     ...getGbAllRpc('eth'),        // GB_ETH_RPC_1 + GB_ETH_RPC_2 (archive)
     'https://eth.llamarpc.com',
@@ -68,7 +68,7 @@ async function fetchSlot0(poolAddress: string): Promise<Slot0Result | null> {
     return null;
 }
 
-/** GET /api/market/new-pairs/live — enriched EP3 buffer */
+/** GET /api/market/new-pairs/live  enriched EP3 buffer */
 export async function GET() {
     try {
         // Ensure engine is running
@@ -81,7 +81,7 @@ export async function GET() {
             buffer.slice(0, 10).map(async (e) => {
                 const slot0 = await fetchSlot0(e.pool).catch(() => null);
                 const priceRaw = slot0?.price || 0;
-                // Format price — if pool is very new, price might be 0 until first swap
+                // Format price  if pool is very new, price might be 0 until first swap
                 const priceUsd = priceRaw > 0
                     ? priceRaw.toFixed(priceRaw < 0.001 ? 8 : priceRaw < 1 ? 6 : 4)
                     : '0.0000';
@@ -123,7 +123,7 @@ export async function GET() {
             })
         );
 
-        // Non-enriched pairs (11–50) added without slot0 call to avoid rate limits
+        // Non-enriched pairs (1150) added without slot0 call to avoid rate limits
         const rest = buffer.slice(10).map((e, i) => ({
             id:            e.pool,
             chain:         'ethereum',

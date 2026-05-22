@@ -4,9 +4,9 @@
  * 100% branch coverage on:
  *   - lock() happy path + value accumulation
  *   - lock() reverts on zero value + zero duration
- *   - withdraw() before unlock time → reverts
- *   - withdraw() after unlock time → succeeds, emits event
- *   - withdraw() with no funds → reverts
+ *   - withdraw() before unlock time  reverts
+ *   - withdraw() after unlock time  succeeds, emits event
+ *   - withdraw() with no funds  reverts
  *   - Re-lock after withdraw resets state cleanly
  *   - ETH is correctly returned to caller (balance check)
  */
@@ -28,7 +28,7 @@ describe("HumanTimeLock", function () {
         contract = await Factory.deploy();
     });
 
-    // ─── lock() ───────────────────────────────────────────────────────────────
+    //  lock() 
 
     describe("lock()", function () {
         it("accepts ETH and emits Locked event", async function () {
@@ -73,7 +73,7 @@ describe("HumanTimeLock", function () {
         });
     });
 
-    // ─── withdraw() ───────────────────────────────────────────────────────────
+    //  withdraw() 
 
     describe("withdraw()", function () {
         beforeEach(async function () {
@@ -139,7 +139,7 @@ describe("HumanTimeLock", function () {
         });
     });
 
-    // ─── getStatus convenience ────────────────────────────────────────────────
+    //  getStatus convenience 
 
     describe("View - locks mapping", function () {
         it("returns zero values for address with no lock", async function () {

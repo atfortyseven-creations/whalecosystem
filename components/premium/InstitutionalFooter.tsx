@@ -15,11 +15,11 @@ export default function InstitutionalFooter() {
         {/* Brand Section */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center gap-2">
-            <span className="text-purple-600 font-bold">✧</span>
+            <span className="text-purple-600 font-bold"></span>
             <span className="font-serif text-2xl font-black tracking-tighter uppercase text-[#1a1a1a]">Whale Protocol</span>
           </div>
           <p className="text-sm text-black/60 leading-relaxed font-serif max-w-sm">
-            The Sovereign Intelligence Protocol for advanced on-chain observability. 
+            The System Analytics Protocol for advanced on-chain observability. 
             Built on the principles of absolute privacy and zero-knowledge state transitions.
           </p>
         </div>

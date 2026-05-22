@@ -44,7 +44,7 @@ export function WhaleAlerts({ alerts, threshold, onThresholdChange }: Props) {
                         animate={{ x: 0, opacity: 1 }}
                         className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#12121a] border border-indigo-500/30 shadow-2xl shadow-indigo-500/10 text-white max-w-xs"
                     >
-                        <span className="text-2xl">🐋</span>
+                        <span className="text-2xl"></span>
                         <div>
                             <div className="font-bold text-red-300 text-sm">Whale Alert Network!</div>
                             <div className="text-xs text-gray-400">{a.btcAmount.toFixed(2)} BTC detected</div>
@@ -128,7 +128,7 @@ export function WhaleAlerts({ alerts, threshold, onThresholdChange }: Props) {
                                 </button>
                             </div>
                             <p className="text-[11px] text-gray-600">
-                                Currently alerting on transactions ≥ <span className="text-yellow-400 font-mono">{threshold} BTC</span>
+                                Currently alerting on transactions  <span className="text-yellow-400 font-mono">{threshold} BTC</span>
                             </p>
                         </div>
                     </motion.div>
@@ -146,7 +146,7 @@ export function WhaleAlerts({ alerts, threshold, onThresholdChange }: Props) {
                             className="flex flex-col items-center justify-center h-32 text-gray-600 gap-2"
                         >
                             <Bell size={28} className="opacity-40" />
-                            <p className="text-sm">No alerts yet — monitoring mempool...</p>
+                            <p className="text-sm">No alerts yet  monitoring mempool...</p>
                         </motion.div>
                     ) : localAlerts.map((alert, i) => (
                         <motion.div
@@ -162,7 +162,7 @@ export function WhaleAlerts({ alerts, threshold, onThresholdChange }: Props) {
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xl shrink-0">🐋</span>
+                                    <span className="text-xl shrink-0"></span>
                                     <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border ${
                                         alert.btcAmount > 1000 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
                                     }`}>
@@ -183,7 +183,7 @@ export function WhaleAlerts({ alerts, threshold, onThresholdChange }: Props) {
                                         <span className="text-gray-500 text-xs font-bold">{alert.asset || 'BTC'}</span>
                                     </div>
                                     <div className="text-gray-400 text-xs font-mono">
-                                        ≈ ${((alert.btcValueUsd || alert.btcAmount * 60000) / 1000000).toFixed(2)}M USD
+                                         ${((alert.btcValueUsd || alert.btcAmount * 60000) / 1000000).toFixed(2)}M USD
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">

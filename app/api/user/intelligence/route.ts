@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
-import { intelligenceService } from '@/lib/blockchain/IntelligenceService';
+import { analyticsService } from '@/lib/blockchain/AnalyticsService';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const address = searchParams.get('address') || '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
 
     try {
-        const report = await intelligenceService.getIntelligenceReport(address);
+        const report = await analyticsService.getAnalyticsReport(address);
         return NextResponse.json(report);
     } catch (error: any) {
-        console.error(`[Intelligence API] Critical failure for address ${address}:`, error);
+        console.error(`[Analytics API] Critical failure for address ${address}:`, error);
         
         // If it's a known service error or timeout, we might want to return a 503 or 404
         if (error.message?.includes('timeout') || error.message?.includes('rate limit')) {

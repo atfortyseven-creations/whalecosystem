@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 /**
  * SOVEREIGN INTEL PAYWALL (Pillar 2 - Phase 2)
  * -----------------------------------------
- * Institutional UI for unlocking premium blockchain intelligence.
+ * Institutional UI for unlocking premium blockchain analytics.
  * Requires a cryptographically verified micropayment in BSV.
  */
 export const IntelPaywall = ({ intelId, onUnlock }: { intelId: string; onUnlock: (data: any) => void }) => {
@@ -33,7 +33,7 @@ export const IntelPaywall = ({ intelId, onUnlock }: { intelId: string; onUnlock:
                 ticker: 'BSV',
                 amount: 5000,
                 recipient: '1HumanIDRevenueService...xyz', // Protocol Revenue Address
-                metadata: { intelId, protocol: 'Sovereign-Intel-V1.0' }
+                metadata: { intelId, protocol: 'System-Intel-V1.0' }
             });
 
             const txid = paymentResult.txid;
@@ -48,7 +48,7 @@ export const IntelPaywall = ({ intelId, onUnlock }: { intelId: string; onUnlock:
             const data = await res.json();
 
             if (data.success) {
-                toast.success("Payment Verified. Sovereign Intel Unlocked.");
+                toast.success("Payment Verified. System Intel Unlocked.");
                 onUnlock(data.intel);
             } else {
                 throw new Error(data.error || "Payment Verification Failure.");
@@ -80,7 +80,7 @@ export const IntelPaywall = ({ intelId, onUnlock }: { intelId: string; onUnlock:
             </div>
 
             <div className="relative z-10 max-w-md space-y-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--aztec-chartreuse)]">Premium Intelligence Restricted</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--aztec-chartreuse)]">Premium Analytics Restricted</span>
                 <h2 className="text-3xl font-bold font-aztec-serif uppercase tracking-tighter">Whale <span className="text-[var(--aztec-orchid)]">De-Masking</span> Required</h2>
                 <p className="text-[11px] font-aztec-mono text-white/40 leading-relaxed mb-6">
                     This high-tier alert contains identifying metadata and historical PnL analysis. 

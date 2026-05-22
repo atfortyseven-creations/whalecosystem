@@ -11,7 +11,7 @@ export function MobileNavBar() {
 
     const navItems = [
         { href: '/dashboard', label: 'Dashboard',     icon: LayoutDashboard },
-        { href: '/news',      label: 'Intelligence',  icon: Globe },
+        { href: '/news',      label: 'Analytics',  icon: Globe },
         { href: '/',          label: 'Home',          icon: Home },
         { href: '/portfolio', label: 'Portfolio',     icon: LineChart },
         { href: '/support',   label: 'Support',       icon: Target },

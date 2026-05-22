@@ -9,9 +9,9 @@ export const DownheadSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const features = [
-    { icon: <Shield size={24} />, title: "Sovereign Security", desc: "Local AES-256 mnemonic encryption. Your keys never leave the browser runtime." },
+    { icon: <Shield size={24} />, title: "System Security", desc: "Local AES-256 mnemonic encryption. Your keys never leave the browser runtime." },
     { icon: <Zap size={24} />, title: "Real-time Execution", desc: "Direct integration with Polygon and Ethereum RPCs for millisecond-precise transactions." },
-    { icon: <Globe size={24} />, title: "Global Intelligence", desc: "Aggregate whale movements across 12 chains using our proprietary indexing substrate." },
+    { icon: <Globe size={24} />, title: "Global Analytics", desc: "Aggregate whale movements across 12 chains using our proprietary indexing substrate." },
     { icon: <Cpu size={24} />, title: "Institutional Core", desc: "Viem + Ethers v6 optimized for high-throughput institutional trading environments." },
   ];
 

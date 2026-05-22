@@ -30,7 +30,7 @@ export default function SidebarNavigation({ onSelectFolder, onOpenSettings, acti
           <Search size={13} className="text-black/25 mr-2" />
           <input
             type="text"
-            placeholder="Search…"
+            placeholder="Search"
             className="bg-transparent border-none outline-none text-xs font-mono text-black placeholder:text-black/25 w-full"
           />
         </div>

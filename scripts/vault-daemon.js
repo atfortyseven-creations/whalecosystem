@@ -36,7 +36,7 @@ const server = http.createServer((req, res) => {
         // 1. Authorization Check
         const authHeader = req.headers['authorization'];
         if (!authHeader || authHeader !== `Bearer ${SECRET_KEY}`) {
-            console.warn(`[Vault] ❌ Unauthorized ingress attempt from ${req.socket.remoteAddress}`);
+            console.warn(`[Vault]  Unauthorized ingress attempt from ${req.socket.remoteAddress}`);
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Whale Key Invalid' }));
             return;
@@ -56,7 +56,7 @@ const server = http.createServer((req, res) => {
             fs.writeFileSync(testFile, 'OK');
             fs.unlinkSync(testFile);
         } catch (healthErr) {
-            console.error(`[Vault] ⚠️  Health Check Failed: ${healthErr.message}`);
+            console.error(`[Vault] ️  Health Check Failed: ${healthErr.message}`);
             res.writeHead(503, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Vault Not Ready', detail: healthErr.message }));
             return;
@@ -85,9 +85,9 @@ const server = http.createServer((req, res) => {
 
                 fs.writeFileSync(filePath, JSON.stringify(enrichedPayload, null, 2));
 
-                console.log(`[Vault] ✅ Ingested ${data?.length || 0} records (${payload_type}) from ${source}`);
-                console.log(`[Vault] 🔒 UHRP Hash: ${uhrp_hash}`);
-                console.log(`[Vault] 💾 Stored at: ${filePath}`);
+                console.log(`[Vault]  Ingested ${data?.length || 0} records (${payload_type}) from ${source}`);
+                console.log(`[Vault]  UHRP Hash: ${uhrp_hash}`);
+                console.log(`[Vault]  Stored at: ${filePath}`);
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ 
@@ -96,7 +96,7 @@ const server = http.createServer((req, res) => {
                     vault_path: filePath 
                 }));
             } catch (err) {
-                console.error('[Vault] 💀 Ingest Error:', err.message);
+                console.error('[Vault]  Ingest Error:', err.message);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Malformed Payload' }));
             }
@@ -129,12 +129,12 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
     console.log(`\n=================================================`);
-    console.log(`🏛️  WHALE VAULT DAEMON - ONLINE`);
+    console.log(`️  WHALE VAULT DAEMON - ONLINE`);
     console.log(`=================================================`);
-    console.log(`📡 STATUS: ACTIVE & LISTENING`);
-    console.log(`📍 ADDRESS: http://localhost:${PORT}`);
-    console.log(`📁 STORAGE: ${STORAGE_DIR}`);
-    console.log(`🔐 ACCESS: RESTRICTED VIA WHALE SECRET`);
+    console.log(` STATUS: ACTIVE & LISTENING`);
+    console.log(` ADDRESS: http://localhost:${PORT}`);
+    console.log(` STORAGE: ${STORAGE_DIR}`);
+    console.log(` ACCESS: RESTRICTED VIA WHALE SECRET`);
     console.log(`-------------------------------------------------\n`);
     console.log(`Waiting for Railway production to teleport data...`);
 });

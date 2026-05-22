@@ -28,7 +28,7 @@ export interface ApiAuthResult {
  * 1. API Key Auth
  * 2. IP Whitelisting (Pro/Elite)
  * 3. HMAC Signature Validation (Pro/Elite)
- * 4. Redis Sliding Window Rate Limiting (FREE, STD: 5k, STR: 10k, PRO: 500k, INST: ∞)
+ * 4. Redis Sliding Window Rate Limiting (FREE, STD: 5k, STR: 10k, PRO: 500k, INST: )
  */
 export async function withApiAuth(
   req: NextRequest, 

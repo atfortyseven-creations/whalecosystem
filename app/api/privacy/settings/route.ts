@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 }
 
-/** POST /api/privacy/settings — body: { userId, field, value } */
+/** POST /api/privacy/settings  body: { userId, field, value } */
 export async function POST(request: NextRequest) {
     try {
         const { userId, field, value } = await request.json();

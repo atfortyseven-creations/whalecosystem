@@ -7,7 +7,7 @@ export async function GET(req: Request) {
         const session = await getSession();
         if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        // AIRebalancerPlan has no relation to AuthUser — query directly by userId
+        // AIRebalancerPlan has no relation to AuthUser  query directly by userId
         const plans = await prisma.aIRebalancerPlan.findMany({
             where: { userId: session.userId },
             orderBy: { createdAt: 'desc' },

@@ -74,7 +74,7 @@ export function TransactionDetailPanel({ transaction, onClose, btcToUsd }: Trans
                             {safeToFixed(transaction.amount, 8)} <span className="text-orange-400">BTC</span>
                         </p>
                         <p className="text-gray-400 text-sm mt-1">
-                            ≈ ${safeToLocaleString(usdAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                             ${safeToLocaleString(usdAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                         </p>
                     </div>
 

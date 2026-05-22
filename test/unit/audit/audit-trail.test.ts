@@ -1,19 +1,19 @@
 /**
- * AUDIT TRAIL — Test Suite
+ * AUDIT TRAIL  Test Suite
  * Validates HMAC chain integrity, tamper detection, and entry structure.
  * Uses an in-memory mock for Prisma to avoid DB dependency in unit tests.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// ── Mock Prisma ────────────────────────────────────────────────────────────────
+//  Mock Prisma 
 const mockEntries: any[] = [];
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     $queryRaw: vi.fn(),
     // @ts-ignore
-    sovereignAuditLog: {
+    systemAuditLog: {
       findFirst: vi.fn(async ({ orderBy, select }: any) => {
         if (!mockEntries.length) return null;
         return { payloadHash: mockEntries[mockEntries.length - 1].payloadHash };
@@ -32,7 +32,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-// ── Set required env ───────────────────────────────────────────────────────────
+//  Set required env 
 process.env.AUDIT_SECRET = 'test-audit-secret-256-bits-minimum-length-ok';
 
 import { appendAuditEntry, verifyAuditTrailIntegrity } from '../../../lib/audit/audit-trail';
@@ -83,14 +83,14 @@ describe('Audit Trail', () => {
     if (!result.valid) expect(result.reason).toMatch(/Chain link broken/);
   });
 
-  it('does not throw when AUDIT_SECRET is missing — logs error and returns', async () => {
+  it('does not throw when AUDIT_SECRET is missing  logs error and returns', async () => {
     const original = process.env.AUDIT_SECRET;
     delete process.env.AUDIT_SECRET;
     await expect(appendAuditEntry('AUTH_SUCCESS', '0x0', '0.0.0.0', {})).resolves.toBeUndefined();
     process.env.AUDIT_SECRET = original;
   });
 
-  it('handles empty audit log — valid with count 0', async () => {
+  it('handles empty audit log  valid with count 0', async () => {
     const result = await verifyAuditTrailIntegrity();
     expect(result.valid).toBe(true);
     if (result.valid) expect(result.count).toBe(0);

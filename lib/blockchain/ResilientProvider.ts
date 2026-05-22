@@ -1,11 +1,11 @@
 import { ethers } from 'ethers';
 import { getGbAllRpc, getGbAllWss } from './getblock-registry';
 
-// ── GLOBAL RESILIENCE HACK ──────────────────────────────────────────────────
+//  GLOBAL RESILIENCE HACK 
 // NodeJS `ws` library (used under the hood by ethers.WebSocketProvider) 
 // will emit an unhandled exception and crash the entire process if it receives 
 // an HTTP 403 or 429 during the WS Handshake upgrade. 
-// We intercept it globally to protect the Sovereign Terminal.
+// We intercept it globally to protect the System Terminal.
 if (typeof process !== 'undefined' && !(globalThis as any).__WS_PROTECTED) {
     (globalThis as any).__WS_PROTECTED = true;
     process.on('uncaughtException', (err: any) => {
@@ -19,7 +19,7 @@ if (typeof process !== 'undefined' && !(globalThis as any).__WS_PROTECTED) {
             '429',
             'ECONNRESET',
             'ETIMEDOUT',
-            'ENOTFOUND',       // DNS resolution failure — hostname does not exist
+            'ENOTFOUND',       // DNS resolution failure  hostname does not exist
             'ECONNREFUSED',    // Remote host refused connection
             'EHOSTUNREACH',    // No route to host
             'getaddrinfo',     // DNS lookup failure prefix
@@ -47,7 +47,7 @@ interface RPCEndpoint {
 }
 
 /**
- * ResilientProvider — GetBlock Dedicated Interstellar Node Provider
+ * ResilientProvider  GetBlock Dedicated Interstellar Node Provider
  *
  * Pool con endpoints de alta fidelidad.
  *
@@ -55,13 +55,13 @@ interface RPCEndpoint {
  * BNB: https://go.getblock.us/8405bc34194e4343a10cdc7a76360793
  */
 
-// ── DYNAMIC ENDPOINT LOADING ────────────────────────────────────────────────
+//  DYNAMIC ENDPOINT LOADING 
 const parseMultiplexKeys = (envVal: string | undefined): string[] => {
   if (!envVal) return [];
   return envVal.split(',').map(s => s.trim()).filter(Boolean);
 };
 
-// ── FALLBACKS — construido desde getblock-registry + públicos ────────────────
+//  FALLBACKS  construido desde getblock-registry + públicos 
 // GetBlock siempre en primera posición. Nunca hardcodear URLs aquí.
 const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string[] }> = {
   1: {
@@ -138,7 +138,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       'wss://arbitrum-one-rpc.publicnode.com',
     ].filter(Boolean),
   },
-  // ── Optimism (chain 10) ───────────────────────────────────────────────────
+  //  Optimism (chain 10) 
   10: {
     rpc: [
       ...getGbAllRpc('op'),                                           // GB slot 25 (cuenta única)
@@ -163,7 +163,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       'wss://avax-mainnet.public.blastapi.io/ext/bc/C/ws',
     ].filter(Boolean),
   },
-  // ── WorldChain (480) ──────────────────────────────────────────────────────
+  //  WorldChain (480) 
   480: {
     rpc: [
       ...getGbAllRpc('world'),                                        // GB slot 27
@@ -172,7 +172,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
     ].filter(Boolean),
     wss: [],
   },
-  // ── HyperEVM (999) ────────────────────────────────────────────────────────
+  //  HyperEVM (999) 
   999: {
     rpc: [
       ...getGbAllRpc('hyperevm'),                                     // GB slot 28
@@ -182,7 +182,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string
       'wss://rpc.hyperliquid.xyz/evm',
     ].filter(Boolean),
   },
-  // ── Berachain (80084) ─────────────────────────────────────────────────────
+  //  Berachain (80084) 
   80084: {
     rpc: [
       ...getGbAllRpc('bera'),                                         // GB slot 29
@@ -232,7 +232,7 @@ export class ResilientProvider {
       new ethers.JsonRpcProvider(url, chainId, { staticNetwork: true })
     );
 
-    console.log(`[ResilientProvider] 🚀 Booted Multiplexer for chain ${chainId} with ${uniqueUrls.length} HTTP / ${this.wssUrls.length} WSS Endpoints.`);
+    console.log(`[ResilientProvider]  Booted Multiplexer for chain ${chainId} with ${uniqueUrls.length} HTTP / ${this.wssUrls.length} WSS Endpoints.`);
   }
 
   public destroy() {
@@ -285,7 +285,7 @@ export class ResilientProvider {
     ep.isHealthy = false;
     ep.exhaustedAt = Date.now();
     ep.errorCount++;
-    console.warn(`[ResilientProvider:🔴OPEN] chain=${this.chainId} reason=${reason} ep=${index} url=${ep.url.slice(0, 40)}...`);
+    console.warn(`[ResilientProvider:OPEN] chain=${this.chainId} reason=${reason} ep=${index} url=${ep.url.slice(0, 40)}...`);
     if (this.chainId === 1 && this.wssUrls.length > 0) {
         this.reconnectWS();
     }
@@ -330,10 +330,10 @@ export class ResilientProvider {
     ep.isHealthy = true;
     ep.errorCount = 0;
     ep.exhaustedAt = undefined;
-    console.log(`[ResilientProvider:🟢CLOSED] chain=${this.chainId} endpoint recovered: ${ep.url.slice(0, 40)}...`);
+    console.log(`[ResilientProvider:CLOSED] chain=${this.chainId} endpoint recovered: ${ep.url.slice(0, 40)}...`);
   }
 
-  // ── Timeout-enforced RPC call ─────────────────────────────────────────────
+  //  Timeout-enforced RPC call 
   private callWithTimeout<T>(fn: (provider: ethers.JsonRpcProvider) => Promise<T>, provider: ethers.JsonRpcProvider, timeoutMs = 8000): Promise<T> {
     return Promise.race([
       fn(provider),
@@ -346,9 +346,9 @@ export class ResilientProvider {
   async call<T>(fn: (provider: ethers.JsonRpcProvider) => Promise<T>): Promise<T> {
     const activeIndices = this.getActiveEndpoints();
 
-    // All circuits OPEN → emergency reset (last-resort, avoids total blackout)
+    // All circuits OPEN  emergency reset (last-resort, avoids total blackout)
     if (activeIndices.length === 0) {
-      console.warn(`[ResilientProvider] ⚡ EMERGENCY RESET chain=${this.chainId} — all circuits open`);
+      console.warn(`[ResilientProvider]  EMERGENCY RESET chain=${this.chainId}  all circuits open`);
       this.endpoints.forEach(ep => {
         ep.exhausted = false;
         ep.isHealthy = true;
@@ -365,11 +365,11 @@ export class ResilientProvider {
         const result = await this.callWithTimeout(fn, this.providers[i]);
         const latencyMs = Date.now() - t0;
 
-        // HALF_OPEN probe succeeded → recover endpoint
+        // HALF_OPEN probe succeeded  recover endpoint
         if (state === 'HALF_OPEN') this.markRecovered(i);
 
         // Latency telemetry (soft warn >3s, hard warn >6s)
-        if (latencyMs > 6000) console.warn(`[ResilientProvider] 🐢 SLOW chain=${this.chainId} ep=${i} latency=${latencyMs}ms`);
+        if (latencyMs > 6000) console.warn(`[ResilientProvider]  SLOW chain=${this.chainId} ep=${i} latency=${latencyMs}ms`);
 
         return result;
       } catch (error: any) {
@@ -386,14 +386,14 @@ export class ResilientProvider {
         } else if (isTimeout || isNetwork) {
           this.markExhausted(i, isTimeout ? 'TIMEOUT' : 'NETWORK_ERROR');
         } else {
-          // Transient error — increment but don't open circuit immediately
+          // Transient error  increment but don't open circuit immediately
           this.endpoints[i].errorCount++;
           if (this.endpoints[i].errorCount >= 3) {
             this.markExhausted(i, `REPEATED_FAILURE_x${this.endpoints[i].errorCount}`);
           }
         }
 
-        // HALF_OPEN probe failed → back to OPEN, don't try next endpoint
+        // HALF_OPEN probe failed  back to OPEN, don't try next endpoint
         if (state === 'HALF_OPEN') break;
         // Otherwise continue to next available endpoint
         continue;
@@ -408,7 +408,7 @@ export class ResilientProvider {
     if (typeof window !== 'undefined' || this.destroyed) return;
     
     if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
-      console.error(`[ResilientProvider] 🚫 MALFORMED_WS_URL skipping: ${url}`);
+      console.error(`[ResilientProvider]  MALFORMED_WS_URL skipping: ${url}`);
       this.reconnectWS();
       return;
     }
@@ -452,7 +452,7 @@ export class ResilientProvider {
     }
 
     this.currentWssIndex = (this.currentWssIndex + 1) % this.wssUrls.length;
-    console.log(`[WS] 🔄 Scaling to Next Endpoint Index ${this.currentWssIndex}...`);
+    console.log(`[WS]  Scaling to Next Endpoint Index ${this.currentWssIndex}...`);
     setTimeout(() => this.initWebSocket(this.wssUrls[this.currentWssIndex]), 5000);
   }
 
@@ -475,7 +475,7 @@ export class ResilientProvider {
   }
 }
 
-// ── Singleton instances — todos los chains cubiertos por GetBlock ──
+//  Singleton instances  todos los chains cubiertos por GetBlock 
 export const ethereumResilientProvider  = new ResilientProvider(1);
 export const bscResilientProvider       = new ResilientProvider(56);
 export const baseResilientProvider      = new ResilientProvider(8453);

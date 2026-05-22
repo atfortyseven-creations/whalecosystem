@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 
 /**
- * ClientMobileLanding — dynamic import to avoid SSR issues with
+ * ClientMobileLanding  dynamic import to avoid SSR issues with
  * MobileManifesto (uses browser APIs for live whale flow fetching).
  */
 export const ClientMobileLanding = dynamic(

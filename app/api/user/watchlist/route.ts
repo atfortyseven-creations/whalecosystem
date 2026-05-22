@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateSecureRequest } from '@/lib/security/premium-security';
 
-// ─── Zero Synthetic Price Engine ───────────────────────────────────────────
+//  Zero Synthetic Price Engine 
 async function fetchLiveMarketData(symbols: string[]) {
     try {
         const res = await fetch('https://api.binance.com/api/v3/ticker/24hr', { cache: 'no-store' });
@@ -59,15 +59,15 @@ function enrichWallet(wallet: any) {
     };
 }
 
-// ─── Route Handlers ─────────────────────────────────────────────────────────
+//  Route Handlers 
 
 export async function GET(req: NextRequest) {
     try {
         const validation = await validateSecureRequest(req);
-        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSystemAdmin';
 
         let userUuid = authWallet;
-        if (authWallet !== '0xSovereignAdmin') {
+        if (authWallet !== '0xSystemAdmin') {
             const userRecord = await prisma.user.findUnique({ where: { walletAddress: authWallet } });
             if (userRecord) userUuid = userRecord.id;
         }
@@ -94,10 +94,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const validation = await validateSecureRequest(req);
-        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSystemAdmin';
 
         let userUuid = authWallet;
-        if (authWallet !== '0xSovereignAdmin') {
+        if (authWallet !== '0xSystemAdmin') {
             const userRecord = await prisma.user.findUnique({ where: { walletAddress: authWallet } });
             if (userRecord) userUuid = userRecord.id;
         }
@@ -133,17 +133,17 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
 
     } catch (e: any) {
-        return NextResponse.json({ error: 'Failed — check server logs' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed  check server logs' }, { status: 500 });
     }
 }
 
 export async function DELETE(req: NextRequest) {
     try {
         const validation = await validateSecureRequest(req);
-        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSovereignAdmin';
+        const authWallet = (validation.valid && validation.userId) ? validation.userId : '0xSystemAdmin';
 
         let userUuid = authWallet;
-        if (authWallet !== '0xSovereignAdmin') {
+        if (authWallet !== '0xSystemAdmin') {
             const userRecord = await prisma.user.findUnique({ where: { walletAddress: authWallet } });
             if (userRecord) userUuid = userRecord.id;
         }

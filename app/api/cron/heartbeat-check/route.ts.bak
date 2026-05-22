@@ -23,7 +23,7 @@ export async function GET(req: Request) {
   const now = Math.floor(Date.now() / 1000);
 
   try {
-    // Read contract state using Sovereign Cluster Round-Robin
+    // Read contract state using System Cluster Round-Robin
     const RPC_URL = RpcRelayerManager.getRpcUrl('POLYGON', 'RPC') || 'https://rpc-amoy.polygon.technology';
 
     const response = await fetch(RPC_URL, {
@@ -87,7 +87,7 @@ export async function GET(req: Request) {
 
     // Alert threshold: < 14 days
     if (!triggered && !paused && daysLeft < 14) {
-      console.error(`[Cron:HeartbeatCheck] 🚨 CRITICAL: Deadman's Switch expires in ${daysLeft.toFixed(1)} days!`);
+      console.error(`[Cron:HeartbeatCheck]  CRITICAL: Deadman's Switch expires in ${daysLeft.toFixed(1)} days!`);
 
       // Fire notification (Resend email + console alert)
       if (process.env.RESEND_API_KEY && process.env.ALERT_EMAIL) {
@@ -100,16 +100,16 @@ export async function GET(req: Request) {
           body: JSON.stringify({
             from: 'alerts@humanidfi.com',
             to: process.env.ALERT_EMAIL,
-            subject: `🚨 URGENT: Deadman's Switch — ${Math.floor(daysLeft)} days left. Send Heartbeat NOW.`,
+            subject: ` URGENT: Deadman's Switch  ${Math.floor(daysLeft)} days left. Send Heartbeat NOW.`,
             html: `
               <div style="font-family: monospace; background: #0a0a0a; color: #fff; padding: 2rem; border-radius: 12px;">
-                <h1 style="color: #ef4444;">⚠️ Sovereign Handshake Alert</h1>
+                <h1 style="color: #ef4444;">️ System Handshake Alert</h1>
                 <p>Your Deadman's Switch will trigger inheritance in <strong style="color: #ef4444;">${daysLeft.toFixed(1)} days</strong> if no action is taken.</p>
                 <p>Contract: <code>${CONTRACT_ADDRESS}</code></p>
                 <p>Expires: <code>${new Date(expiresAt * 1000).toISOString()}</code></p>
                 <hr style="border-color: #333; margin: 1.5rem 0;"/>
-                <p>→ Login to your dashboard and click <strong>"Send Heartbeat"</strong> to reset the timer.</p>
-                <p style="color: #666; font-size: 0.75rem;">This is an automated security alert from Sovereign Handshake. Do not ignore this message.</p>
+                <p> Login to your dashboard and click <strong>"Send Heartbeat"</strong> to reset the timer.</p>
+                <p style="color: #666; font-size: 0.75rem;">This is an automated security alert from System Handshake. Do not ignore this message.</p>
               </div>
             `
           })

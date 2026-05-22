@@ -10,7 +10,7 @@ export const CreateMarketForm = () => {
                     HUMAN MARKETS
                 </h1>
                 <p className="text-blue-200/60 text-lg font-light tracking-wide">
-                    Intelligence driven by sovereign individuals, secured by World ID.
+                    Analytics driven by system individuals, secured by World ID.
                 </p>
             </div>
 

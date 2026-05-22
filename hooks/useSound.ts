@@ -9,7 +9,7 @@ export function useSound() {
   const { audioAlerts, hapticFeedback } = useSettingsStore();
 
   const playSound = useCallback((type: SoundType, volume: number = 0.5) => {
-    // Respect the user's audioAlerts setting — if disabled, do nothing
+    // Respect the user's audioAlerts setting  if disabled, do nothing
     if (!audioAlerts) return;
     if (typeof Audio === 'undefined') return;
 
@@ -25,10 +25,10 @@ export function useSound() {
       const audio = new Audio(sounds[type]);
       audio.volume = volume;
       audio.play().catch(() => {
-        // Autoplay blocked by browser — silent fail
+        // Autoplay blocked by browser  silent fail
       });
     } catch {
-      // Sound playback unsupported — silent fail
+      // Sound playback unsupported  silent fail
     }
   }, [audioAlerts]);
 
@@ -39,7 +39,7 @@ export function useSound() {
     try {
       navigator.vibrate(pattern);
     } catch {
-      // Not supported on this device — silent fail
+      // Not supported on this device  silent fail
     }
   }, [hapticFeedback]);
 

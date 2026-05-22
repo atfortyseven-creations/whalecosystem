@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { SovereignGlobe3D } from "./SovereignGlobe3D";
+import { SystemGlobe3D } from "./SystemGlobe3D";
 
-// ── Wrapper positioning the 3D Globe as a background layer ───────────────────
+//  Wrapper positioning the 3D Globe as a background layer 
 export function WorldMapBackground() {
   return (
     <div className="absolute inset-0 w-full h-full z-0 overflow-hidden" style={{ opacity: 0.9, display: 'block' }}>
-      <SovereignGlobe3D />
+      <SystemGlobe3D />
     </div>
   );
 }
 
-// ── BTC Transfer Legend — Real on-chain data via /api/network/whale-flows ────
+//  BTC Transfer Legend  Real on-chain data via /api/network/whale-flows 
 interface WhaleFlow {
   txid:          string;
   fromCity:      string;
@@ -29,14 +29,14 @@ interface WhaleFlow {
 // Fallback static structure displayed while API loads
 const SKELETON = Array.from({ length: 5 }, (_, i) => ({
   txid:          `skel-${i}`,
-  fromCity:      '——',
-  toCity:        '——',
-  fromEntity:    '——',
-  toEntity:      '——',
-  btc:           '——',
-  type:          '——',
+  fromCity:      '',
+  toCity:        '',
+  fromEntity:    '',
+  toEntity:      '',
+  btc:           '',
+  type:          '',
   latencyMs:     0,
-  confirmations: '—',
+  confirmations: '',
   confirmed:     false,
   loading:       true,
 }));
@@ -114,7 +114,7 @@ export function BtcTransferLegend() {
                 <span className="h-3 w-28 bg-black/5 rounded" />
               ) : (
                 <span className="text-[10px] font-black text-black/70 truncate uppercase tracking-widest">
-                  {r.fromCity} <span className="opacity-40">→</span> {r.toCity}
+                  {r.fromCity} <span className="opacity-40"></span> {r.toCity}
                 </span>
               )}
             </div>
@@ -130,7 +130,7 @@ export function BtcTransferLegend() {
                     {r.btc} BTC
                   </span>
                   <span className="text-[8px] font-mono text-black/40 uppercase">
-                    {r.type} • {r.latencyMs > 0 ? `${r.latencyMs}min` : 'live'} • {r.confirmations}
+                    {r.type}  {r.latencyMs > 0 ? `${r.latencyMs}min` : 'live'}  {r.confirmations}
                   </span>
                 </>
               )}
@@ -152,7 +152,7 @@ export function BtcTransferLegend() {
           </div>
           <p className="text-[11px] text-black/60 leading-relaxed font-medium max-w-lg">
             {error
-              ? 'Connecting to mempool.space — on-chain data loading.'
+              ? 'Connecting to mempool.space  on-chain data loading.'
               : 'Real-time institutional BTC transfers fetched from mempool.space. Addresses mapped to known exchange wallets.'
             }
           </p>

@@ -5,13 +5,13 @@
  * Prevents cascading failures when upstream providers become unstable.
  *
  * States:
- *   CLOSED   → Normal operation. Requests flow through.
- *   OPEN     → Failure threshold exceeded. Requests rejected immediately.
- *   HALF_OPEN → Probe state. One request allowed to test if upstream recovered.
+ *   CLOSED    Normal operation. Requests flow through.
+ *   OPEN      Failure threshold exceeded. Requests rejected immediately.
+ *   HALF_OPEN  Probe state. One request allowed to test if upstream recovered.
  *
  * Integration: Wrap ResilientProvider WebSocket calls with CircuitBreaker.execute()
  *
- * Reference: Michael Nygard, "Release It!" (2007) — Circuit Breaker pattern
+ * Reference: Michael Nygard, "Release It!" (2007)  Circuit Breaker pattern
  */
 
 export type CircuitState = 'CLOSED' | 'OPEN' | 'HALF_OPEN';
@@ -42,7 +42,7 @@ const DEFAULT_CONFIG: CircuitBreakerConfig = {
   failureThreshold: 3,
   openDurationMs: 30_000,   // 30 seconds in OPEN before probing
   heartbeatIntervalMs: 15_000,
-  name: 'sovereign-ws',
+  name: 'system-ws',
 };
 
 export class CircuitBreaker {
@@ -110,7 +110,7 @@ export class CircuitBreaker {
     this.lastSuccessAt = Date.now();
 
     if (this.state === 'HALF_OPEN') {
-      // Upstream recovered — close the circuit
+      // Upstream recovered  close the circuit
       this.transition('CLOSED');
     }
   }
@@ -145,16 +145,16 @@ export class CircuitBreaker {
       this.openedAt = Date.now();
       this.stopHeartbeat();
       console.error(
-        `[CircuitBreaker:${this.config.name}] ⚡ Circuit OPENED after ` +
+        `[CircuitBreaker:${this.config.name}]  Circuit OPENED after ` +
         `${this.consecutiveFailures} failures. Pausing ${this.config.openDurationMs / 1000}s.`
       );
     } else if (next === 'CLOSED') {
       this.openedAt = null;
       this.consecutiveFailures = 0;
       this.startHeartbeat();
-      console.log(`[CircuitBreaker:${this.config.name}] ✅ Circuit CLOSED — upstream recovered.`);
+      console.log(`[CircuitBreaker:${this.config.name}]  Circuit CLOSED  upstream recovered.`);
     } else if (next === 'HALF_OPEN') {
-      console.log(`[CircuitBreaker:${this.config.name}] 🔍 Circuit HALF_OPEN — probing upstream.`);
+      console.log(`[CircuitBreaker:${this.config.name}]  Circuit HALF_OPEN  probing upstream.`);
     }
 
     this.onStateChange?.(prev, next, this.config.name);
@@ -176,7 +176,7 @@ export class CircuitBreaker {
       // Always emit metrics on heartbeat for external monitoring
       const m = this.getMetrics();
       console.debug(
-        `[CircuitBreaker:${m.name}] 💓 CLOSED | successes=${m.totalSuccesses} failures=${m.totalFailures} consec=${m.consecutiveFailures}`
+        `[CircuitBreaker:${m.name}]  CLOSED | successes=${m.totalSuccesses} failures=${m.totalFailures} consec=${m.consecutiveFailures}`
       );
     }, this.config.heartbeatIntervalMs);
   }
@@ -196,7 +196,7 @@ export class CircuitBreaker {
     this.consecutiveFailures = 0;
     this.openedAt = null;
     this.lastFailureAt = null;
-    console.log(`[CircuitBreaker:${this.config.name}] 🔄 Manually reset to CLOSED.`);
+    console.log(`[CircuitBreaker:${this.config.name}]  Manually reset to CLOSED.`);
   }
 
   /** Dispose: clear timers */
@@ -210,7 +210,7 @@ export const baseCircuitBreaker = new CircuitBreaker(
   { name: 'rpc-base', failureThreshold: 3, openDurationMs: 30_000 },
   (prev, next, name) => {
     if (next === 'OPEN') {
-      console.error(`[Sovereign] RPC provider "${name}" circuit opened. Failover to backup RPC.`);
+      console.error(`[System] RPC provider "${name}" circuit opened. Failover to backup RPC.`);
     }
   }
 );
@@ -227,10 +227,10 @@ export const neo4jCircuitBreaker = new CircuitBreaker(
   { name: 'neo4j', failureThreshold: 2, openDurationMs: 60_000 },
   (prev, next) => {
     if (next === 'OPEN') {
-      console.warn('[Sovereign] Neo4j circuit opened. Memory Matrix mode activated.');
+      console.warn('[System] Neo4j circuit opened. Memory Grid mode activated.');
     }
     if (next === 'CLOSED') {
-      console.log('[Sovereign] Neo4j recovered. Switching back from Memory Matrix.');
+      console.log('[System] Neo4j recovered. Switching back from Memory Grid.');
     }
   }
 );

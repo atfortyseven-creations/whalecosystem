@@ -4,9 +4,9 @@ import { mintJWT } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 
 /**
- * POST /api/auth/sovereign-verify
+ * POST /api/auth/system-verify
  * 
- * Securely verifies a wallet signature and issues a Sovereign JWT.
+ * Securely verifies a wallet signature and issues a System JWT.
  * This replaces the insecure client-side cookie setting.
  */
 export async function POST(req: NextRequest) {
@@ -42,12 +42,12 @@ export async function POST(req: NextRequest) {
             kycStatus: 'UNVERIFIED',
             humanityScore: user.humanityScore || 0,
             iss: 'whale-alert-network',
-            source: 'sovereign-verify',
+            source: 'system-verify',
             issuedAt: new Date().toISOString()
         });
 
         // 4. Secure Cookie Response
-        // [IOS CHROME HARDENING] Disable caching — prevents iOS from serving stale
+        // [IOS CHROME HARDENING] Disable caching  prevents iOS from serving stale
         // 401/500 responses from the bfcache on back-navigation after wallet deep-link.
         const response = NextResponse.json({ 
             success: true,
@@ -70,21 +70,21 @@ export async function POST(req: NextRequest) {
             path: '/',
         };
 
-        // Primary Sovereign session token — for middleware auth
+        // Primary System session token  for middleware auth
         response.cookies.set('whale_session', jwt, secureCookieBase);
 
         // [IOS LOOP FIX] Also write 'human_session' so that getSession() in
         // verify-session/route.ts (which reads Priority 1: 'human_session') returns
         // authenticated: true on page restore. Without this, iOS bfcache restores
-        // trigger a re-auth loop: wagmi reconnects → establishSession → verify-session
-        // returns 401 (reads wrong cookie) → infinite signing loop.
+        // trigger a re-auth loop: wagmi reconnects  establishSession  verify-session
+        // returns 401 (reads wrong cookie)  infinite signing loop.
         response.cookies.set('human_session', jwt, secureCookieBase);
 
-        // [IOS FIX] sovereign_handshake MUST have httpOnly: false explicitly.
+        // [IOS FIX] system_handshake MUST have httpOnly: false explicitly.
         // JS reads document.cookie to hydrate isLinked state. If this is httpOnly,
-        // document.cookie.includes('sovereign_handshake') always returns false on iOS,
+        // document.cookie.includes('system_handshake') always returns false on iOS,
         // causing a permanent re-auth loop even after successful signing.
-        response.cookies.set('sovereign_handshake', normalizedAddress, {
+        response.cookies.set('system_handshake', normalizedAddress, {
             httpOnly: false, // CRITICAL: must be JS-readable for client-side isLinked check
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
             maxAge: 604800,
         });
 
-        console.log(`[Auth:Success] Sovereign session established for ${normalizedAddress}`);
+        console.log(`[Auth:Success] System session established for ${normalizedAddress}`);
         return response;
 
     } catch (error: any) {

@@ -52,7 +52,7 @@ export async function GET() {
                     : 'neutral';
 
     const historicalPoints = blocks.slice(0, 12).map((b: any, i: number) => {
-      // Derive per-block flow from real fee data — no random noise
+      // Derive per-block flow from real fee data  no random noise
       const blockFeeVelocity = (b.size / 1_000_000); // MB as proxy for pressure
       const blockScore = Math.min(100, Math.max(0, (blockFeeVelocity - 1) * 30 + 50));
       return {

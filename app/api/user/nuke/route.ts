@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         }
 
         // 3. Cryptographic Signature Verification
-        const message = `I want to permanently delete all my data from Sovereign Handshake. Wallet: ${address}. Timestamp: ${timestamp}`;
+        const message = `I want to permanently delete all my data from System Handshake. Wallet: ${address}. Timestamp: ${timestamp}`;
         let isValidSignature = false;
 
         try {
@@ -120,13 +120,13 @@ export async function POST(req: Request) {
         response.cookies.delete('human_session');
         response.cookies.delete('kyc_status');
         response.cookies.delete('kyc_token');
-        response.cookies.delete('sovereign_handshake');
+        response.cookies.delete('system_handshake');
         response.cookies.delete('next-auth.session-token');
 
         return response;
 
     } catch (error: any) {
-        console.error("❌ [WhaleFortress:Nuke] Critical Failure:", error);
+        console.error(" [WhaleFortress:Nuke] Critical Failure:", error);
         return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
     }
 }

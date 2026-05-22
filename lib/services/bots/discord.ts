@@ -7,7 +7,7 @@ export async function sendDiscordWebhook(message: string): Promise<boolean> {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
 
   if (!webhookUrl) {
-    console.warn('⚠️ Discord Webhook URL no configurado.');
+    console.warn('️ Discord Webhook URL no configurado.');
     return false;
   }
 
@@ -22,13 +22,13 @@ export async function sendDiscordWebhook(message: string): Promise<boolean> {
     });
 
     if (!response.ok) {
-      console.error('🔴 Error de Discord Webhook:', response.statusText);
+      console.error(' Error de Discord Webhook:', response.statusText);
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('🔴 Critical failure in Discord Service:', error);
+    console.error(' Critical failure in Discord Service:', error);
     return false;
   }
 }

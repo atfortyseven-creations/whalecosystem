@@ -1,7 +1,7 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import { ALL_MODULES } from "@/lib/data/academy-curriculum";
-import { SovereignFooter } from "@/components/landing/SovereignFooter";
+import { SystemFooter } from "@/components/landing/SystemFooter";
 import { ArrowLeft, Clock, Shield, Target, Zap, Activity, BookOpen, Terminal } from "lucide-react";
 import Link from "next/link";
 import { ScrollFloat } from "@/components/ui/ScrollFloat";
@@ -26,7 +26,7 @@ export default async function AcademyModulePage({ params }: { params: Promise<{ 
                 </Link>
                 <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-                    <span className="text-[10px] font-mono text-[#D4AF37] uppercase tracking-widest">Sovereign Intel Network Active</span>
+                    <span className="text-[10px] font-mono text-[#D4AF37] uppercase tracking-widest">System Intel Network Active</span>
                 </div>
             </header>
 
@@ -69,7 +69,7 @@ export default async function AcademyModulePage({ params }: { params: Promise<{ 
                     {/* Divider */}
                     <div className="w-full h-px bg-black/10 dark:bg-white/10" />
 
-                    {/* Content Matrix */}
+                    {/* Content Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                         {/* Main Reading / Documentation */}
                         <div className="lg:col-span-2 flex flex-col gap-8">
@@ -161,7 +161,7 @@ export default async function AcademyModulePage({ params }: { params: Promise<{ 
                 </div>
             </main>
 
-            <SovereignFooter />
+            <SystemFooter />
         </div>
     );
 }

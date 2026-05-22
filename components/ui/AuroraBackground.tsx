@@ -13,19 +13,19 @@ export function AuroraBackground() {
       className="fixed inset-0 z-[-10] overflow-hidden pointer-events-none bg-[#0a0f0a]"
       style={{ transform: 'translateZ(0)' }}
     >
-      {/* ── MASTER AURORA LAYER 1 ── */}
+      {/*  MASTER AURORA LAYER 1  */}
       <div 
         className="absolute inset-[-50%] opacity-40 bg-gradient-to-tr from-[#1a2e1a] via-[#4ade80] to-transparent animate-aurora-shift-1"
         style={{ transform: 'translateZ(0)' }}
       />
 
-      {/* ── MASTER AURORA LAYER 2 ── */}
+      {/*  MASTER AURORA LAYER 2  */}
       <div 
         className="absolute inset-[-50%] opacity-30 bg-gradient-to-bl from-[#05291a] via-[#22c55e] to-transparent animate-aurora-shift-2"
         style={{ transform: 'translateZ(0)' }}
       />
 
-      {/* ── NOISE GRAIN SUBSTRATE ── */}
+      {/*  NOISE GRAIN SUBSTRATE  */}
       <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay noise-bg" />
       
       <style jsx global>{`

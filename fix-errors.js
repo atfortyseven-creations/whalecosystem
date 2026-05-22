@@ -40,7 +40,7 @@ for (const file of filesToFix) {
       file.includes('app/api/relayer/') ||
       file.includes('app/api/rewards/') ||
       file.includes('app/api/royalties/') ||
-      file.includes('app/api/sovereignty/') ||
+      file.includes('app/api/systemty/') ||
       file.includes('app/api/user/')) {
     
     console.log(`Disabling broken API route: ${file}`);
@@ -109,7 +109,7 @@ for (const file of filesToFix) {
   if (file.includes('lib/store/useSettingsStore.canonical.ts')) {
       // circular dependency fix
       newContent = newContent.replace(/import \{ useSettingsStore \} from '\.\/useSettingsStore\.canonical';/g, '');
-      newContent = newContent.replace(/import \{ SovereignSettings \} from '\.\/useSettingsStore\.canonical';/g, '');
+      newContent = newContent.replace(/import \{ SystemSettings \} from '\.\/useSettingsStore\.canonical';/g, '');
   }
   
   if (content !== newContent) {

@@ -37,7 +37,7 @@ const types = {
 } as const;
 
 interface ZapParams {
-    wldAmount: string; // In WLD (e.g. "10")
+    wldAmount: string; // In AUTH (e.g. "10")
     conditionId: string; // Polymarket condition ID
     outcomeIndex: 0 | 1; // Binary outcome
     minUSDC?: string; // Optional slippage protection

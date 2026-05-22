@@ -91,7 +91,7 @@ export const WorldProvider = ({ children }: { children: ReactNode }) => {
             return;
         }
 
-        console.log("[WorldContext] 🔵 Initiating backend verification...");
+        console.log("[WorldContext]  Initiating backend verification...");
         
         try {
             const res = await fetch('/api/verify-identity', {
@@ -106,16 +106,16 @@ export const WorldProvider = ({ children }: { children: ReactNode }) => {
             const data = await res.json();
 
             if (res.ok && data.verified) {
-                console.log("[WorldContext] ✅ Backend verification successful.");
+                console.log("[WorldContext]  Backend verification successful.");
                 setIsVerified(true);
                 setNullifierHash(data.nullifier_hash || result.nullifier_hash);
                 safeStorage.setItem(`world-id-proof-${address.toLowerCase()}`, data.nullifier_hash || result.nullifier_hash);
             } else {
-                console.error("[WorldContext] ❌ Verification failed:", data.detail || "Unknown error");
+                console.error("[WorldContext]  Verification failed:", data.detail || "Unknown error");
                 throw new Error(data.detail || "Verification failed");
             }
         } catch (error) {
-            console.error("[WorldContext] ❌ Network/Server error during verification:", error);
+            console.error("[WorldContext]  Network/Server error during verification:", error);
             throw error; // Re-throw so IDKit handleVerify can catch it
         }
     };

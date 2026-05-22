@@ -82,9 +82,9 @@ export class ForgeService {
       });
 
       // Update Mesh Real-time
-      await safeRedisSet(`sovereign:forge:trigger:${seed.tier.toLowerCase()}`, JSON.stringify(entity), 'EX', 3600);
+      await safeRedisSet(`system:forge:trigger:${seed.tier.toLowerCase()}`, JSON.stringify(entity), 'EX', 3600);
       
-      console.log(`[CosmicForge] 🌍 Entity invoked: ${entity.id} (${seed.tier})`);
+      console.log(`[CosmicForge]  Entity invoked: ${entity.id} (${seed.tier})`);
       return entity as unknown as CosmicEntityBase;
       
     } catch (error) {
@@ -111,7 +111,7 @@ export class ForgeService {
       });
       
       const energy = result._sum.amountUSD || 0;
-      await safeRedisSet('sovereign:hive:energy', energy.toString());
+      await safeRedisSet('system:hive:energy', energy.toString());
       return energy;
     } catch (e) {
       console.error('[CosmicForge] Failed to calculate Hive Energy', e);
@@ -120,7 +120,7 @@ export class ForgeService {
   }
 
   static async getHiveEnergy(): Promise<number> {
-    const cached = await safeRedisGet('sovereign:hive:energy');
+    const cached = await safeRedisGet('system:hive:energy');
     if (cached && cached !== 'TIMEOUT') return parseFloat(cached);
     return this.updateHiveEnergy();
   }

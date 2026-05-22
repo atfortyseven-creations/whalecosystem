@@ -1,4 +1,4 @@
-# Quickstart — API
+# Quickstart  API
 
 This guide takes you from zero to your first authenticated API response in under 5 minutes.
 
@@ -14,19 +14,19 @@ This guide takes you from zero to your first authenticated API response in under
 
 ---
 
-## Step 1 — Obtain an API Key
+## Step 1  Obtain an API Key
 
 1. Navigate to [humanidfi.com](https://humanidfi.com) on desktop
 2. Connect your wallet using the **CONNECT WALLET** button
 3. Complete identity verification if required for your target plan tier
-4. Go to **Settings → Developer → API Keys**
-5. Generate a new key — it is shown only once. Store it securely.
+4. Go to **Settings  Developer  API Keys**
+5. Generate a new key  it is shown only once. Store it securely.
 
 API keys are scoped to your wallet address and plan tier. They cannot be transferred.
 
 ---
 
-## Step 2 — Authenticate
+## Step 2  Authenticate
 
 All API requests must include your key in the `Authorization` header using the Bearer scheme:
 
@@ -34,7 +34,7 @@ All API requests must include your key in the `Authorization` header using the B
 Authorization: Bearer wha_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-**Example — verify your key is active:**
+**Example  verify your key is active:**
 
 ```bash
 curl https://humanidfi.com/api/v1/auth/verify \
@@ -56,7 +56,7 @@ curl https://humanidfi.com/api/v1/auth/verify \
 
 ---
 
-## Step 3 — Your First Request
+## Step 3  Your First Request
 
 ### Fetch recent whale transactions
 
@@ -96,7 +96,7 @@ curl "https://humanidfi.com/api/v1/whale/recent?network=ethereum&minUsd=1000000&
 
 ---
 
-## Step 4 — Subscribe to Real-Time Stream
+## Step 4  Subscribe to Real-Time Stream
 
 For live data, open a WebSocket connection to the streaming endpoint:
 
@@ -113,7 +113,7 @@ const ws = new WebSocket(
 
 ws.onmessage = (event) => {
   const whale = JSON.parse(event.data);
-  console.log(`[${whale.network}] $${whale.amountUsd.toLocaleString()} — ${whale.token}`);
+  console.log(`[${whale.network}] $${whale.amountUsd.toLocaleString()}  ${whale.token}`);
 };
 
 ws.onclose = (event) => {
@@ -144,9 +144,9 @@ ws.onclose = (event) => {
 
 | Code | Message | Resolution |
 |---|---|---|
-| `401` | `UNAUTHORIZED` | Check your API key — it may be invalid, expired, or from the wrong environment |
+| `401` | `UNAUTHORIZED` | Check your API key  it may be invalid, expired, or from the wrong environment |
 | `403` | `RESTRICTED_JURISDICTION` | Your IP is in a geofenced jurisdiction |
-| `429` | `RATE_LIMITED` | You have exceeded your plan's request quota — wait for `Retry-After` seconds |
+| `429` | `RATE_LIMITED` | You have exceeded your plan's request quota  wait for `Retry-After` seconds |
 | `503` | `SERVICE_UNAVAILABLE` | Upstream RPC provider is temporarily unreachable |
 
 ---
@@ -169,4 +169,4 @@ const whales = await client.whale.recent({
 });
 ```
 
-See [Whale Code SDK →](./whale-code-sdk.md) for full reference.
+See [Whale Code SDK ](./whale-code-sdk.md) for full reference.

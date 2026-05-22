@@ -4,13 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { X, Settings, LogOut } from 'lucide-react';
-import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { TerminalSettingsPanel } from '@/components/dashboard/TerminalSettingsPanel';
 
 export function GlobalSettingsModal() {
     const { isSettingsOpen, setSettingsOpen } = useSettingsStore();
 
-    const { nuclearDisconnect } = useSovereignSignOut();
+    const { nuclearDisconnect } = useSystemSignOut();
     const [mounted, setMounted] = useState(false);
     const [confirmDisconnect, setConfirmDisconnect] = useState(false);
 

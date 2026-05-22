@@ -7,7 +7,7 @@ import { useUIStore } from '@/lib/store/ui-store';
 import { useSettings } from '@/src/context/SettingsContext';
 import useSWR from 'swr';
 import { useVIPStore, VIPStoreState, WhaleEvent } from '@/lib/vip-store'; 
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { useOmniInfrastructure } from "@/lib/api-client";
 import { useWalletConnectStore } from '@/lib/store/wallet-connect-store';
 import { WCScannerModal } from '@/components/walletconnect/WCScannerModal';
@@ -278,7 +278,7 @@ export function UtilityPanels() {
                                     className="w-full bg-white border border-black/10 rounded-xl px-3 py-2.5 text-[11px] font-black font-mono text-[#050505] focus:outline-none focus:border-black transition-all uppercase tracking-wider appearance-none"
                                 >
                                     <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
+                                    <option value="EUR">EUR ()</option>
                                     <option value="GBP">GBP (£)</option>
                                 </select>
                             </div>
@@ -286,7 +286,7 @@ export function UtilityPanels() {
                     </div>
 
                     <div className="space-y-3">
-                        <h4 className="text-[10px] font-aztec-mono font-black text-black uppercase tracking-widest">Intelligence Relays</h4>
+                        <h4 className="text-[10px] font-aztec-mono font-black text-black uppercase tracking-widest">Analytics Relays</h4>
                         <SettingToggle 
                             label="Push Alerts" 
                             description="Instant browser signal injection" 
@@ -319,7 +319,7 @@ export function UtilityPanels() {
                     </div>
                 </div>
 
-                {/* ── dApp Connections section ── */}
+                {/*  dApp Connections section  */}
                 <div className="pt-4 mt-2 border-t border-black/5 space-y-3">
                     <h4 className="text-[10px] font-aztec-mono font-black text-black uppercase tracking-widest flex items-center gap-2">
                         <Link2 size={12} /> dApp Connections
@@ -503,7 +503,7 @@ export function BillionWhaleNotification() {
                                         <span className="text-[9px] font-aztec-mono uppercase text-black/40 tracking-widest flex items-center gap-1.5">
                                             <Globe size={10} /> EUR EQUIVALENT
                                         </span>
-                                        <span className="font-aztec-mono text-xs font-black text-black">€{((whale.usdNum * 0.92) / 1000000000).toFixed(2)}B EUR</span>
+                                        <span className="font-aztec-mono text-xs font-black text-black">{((whale.usdNum * 0.92) / 1000000000).toFixed(2)}B EUR</span>
                                     </div>
                                 </div>
                             </div>

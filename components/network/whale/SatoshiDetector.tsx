@@ -81,7 +81,7 @@ export function SatoshiDetector({ whaleAddresses = [] }: Props) {
 
   const alertColors = {
     CRITICAL: { border: 'border-cyan-400/60', bg: 'bg-cyan-500/10', text: 'text-cyan-400', badge: 'SATOSHI ERA' },
-    HIGH: { border: 'border-blue-500/40', bg: 'bg-blue-500/8', text: 'text-blue-400', badge: 'SLEEPING ≥8Y' },
+    HIGH: { border: 'border-blue-500/40', bg: 'bg-blue-500/8', text: 'text-blue-400', badge: 'SLEEPING 8Y' },
     WATCH: { border: 'border-yellow-500/30', bg: 'bg-yellow-500/5', text: 'text-yellow-400', badge: 'WATCHED' },
     NORMAL: { border: 'border-white/5', bg: 'bg-white/2', text: 'text-gray-400', badge: 'ACTIVE' },
   };
@@ -105,7 +105,7 @@ export function SatoshiDetector({ whaleAddresses = [] }: Props) {
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
               className="bg-black/90 backdrop-blur-xl border-2 border-cyan-400 rounded-3xl p-10 max-w-xl text-center shadow-[0_0_100px_rgba(34,211,238,0.5)]"
             >
-              <div className="text-6xl mb-4">❄️💥</div>
+              <div className="text-6xl mb-4">️</div>
               <h2 className="text-3xl font-black text-cyan-400 mb-2">SLEEPING GIANT DETECTED!</h2>
               <p className="text-white/60 text-sm mb-4">
                 Wallet inactive for <span className="text-white font-black">{criticalAlert.yearsInactive} years</span>
@@ -128,7 +128,7 @@ export function SatoshiDetector({ whaleAddresses = [] }: Props) {
             </div>
             <div>
               <h3 className="text-white font-black text-lg">Satoshi Detector</h3>
-              <p className="text-white/30 text-xs font-mono">Historical wallets ≥8 years of inactivity</p>
+              <p className="text-white/30 text-xs font-mono">Historical wallets 8 years of inactivity</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export function SatoshiDetector({ whaleAddresses = [] }: Props) {
                         <p className="text-white/50 font-mono text-xs truncate">{alert.address}</p>
                         <div className="flex items-center gap-3 mt-1">
                           <p className="text-white/20 text-[10px]">
-                            Active in {new Date(alert.firstSeenDate).getFullYear()} → Last: {new Date(alert.lastActiveDate).toLocaleDateString('en', { month: 'short', year: 'numeric' })}
+                            Active in {new Date(alert.firstSeenDate).getFullYear()}  Last: {new Date(alert.lastActiveDate).toLocaleDateString('en', { month: 'short', year: 'numeric' })}
                           </p>
                           {alert.yearsInactive > 0 && (
                             <span className={`text-[9px] font-black ${colors.text}`}>{alert.yearsInactive}y inactive</span>

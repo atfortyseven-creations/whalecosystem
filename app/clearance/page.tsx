@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Navigation, Scale, FileText, ArrowRight } from 'lucide-react';
 
 const OTC_COUNTERS = [
-  { id: 'itrust', name: 'iTrustCapital', tier: 'Sovereign IRA', minDeposit: 100000, fee: '1% Trade', color: '#1A365D' },
+  { id: 'itrust', name: 'iTrustCapital', tier: 'System IRA', minDeposit: 100000, fee: '1% Trade', color: '#1A365D' },
   { id: 'galaxy', name: 'Galaxy Digital OTC', tier: 'Institutional Dark-Pool', minDeposit: 5000000, fee: 'Bespoke', color: '#000000' },
   { id: 'falconx', name: 'FalconX Prime', tier: 'Execution Desk', minDeposit: 1000000, fee: 'Spread Base', color: '#4F46E5' }
 ];
@@ -15,7 +15,7 @@ export default function ClearanceTab() {
 
   return (
     <div className="min-h-screen bg-[#020202] text-white p-12 relative overflow-hidden font-sans">
-      {/* Dark-Pool Aesthetic Matrix */}
+      {/* Dark-Pool Aesthetic Grid */}
       <div className="absolute inset-0 pattern-grid-lg opacity-[0.02]" />
 
       <header className="relative z-10 mb-20 max-w-4xl">
@@ -27,7 +27,7 @@ export default function ClearanceTab() {
         </div>
         <h1 className="text-6xl font-black uppercase tracking-tighter mb-4">Whale Clearance / OTC</h1>
         <p className="text-sm font-medium tracking-wide opacity-50 max-w-2xl leading-relaxed">
-          Access heavily vetted, institutional-grade Over-The-Counter (OTC) desks and Sovereign IRA gateways. Bypassing public order books eliminates slippage on high-velocity wealth transfers.
+          Access heavily vetted, institutional-grade Over-The-Counter (OTC) desks and System IRA gateways. Bypassing public order books eliminates slippage on high-velocity wealth transfers.
         </p>
       </header>
 
@@ -77,12 +77,12 @@ export default function ClearanceTab() {
                 </div>
                 <h3 className="text-xl font-black uppercase mb-2">Initialize Routing</h3>
                 <p className="text-xs tracking-wide opacity-50 mb-8 leading-relaxed">
-                  You are about to be routed via the Sovereign Bridge. This connection is cryptographically signed to ensure you receive zero-slippage execution and exclusive white-glove onboarding.
+                  You are about to be routed via the System Bridge. This connection is cryptographically signed to ensure you receive zero-slippage execution and exclusive white-glove onboarding.
                 </p>
 
                 <div className="space-y-4 mb-8 border-y border-white/10 py-6">
                   <div className="flex justify-between items-center text-[10px] font-mono uppercase tracking-widest">
-                    <span className="opacity-50">Sovereign Audit Log</span>
+                    <span className="opacity-50">System Audit Log</span>
                     <span className="text-green-500">Verified</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-mono uppercase tracking-widest">
@@ -92,7 +92,7 @@ export default function ClearanceTab() {
                 </div>
 
                 <a 
-                  href={`https://bridge.sovereign.network/otc/${selectedDesk}`}
+                  href={`https://bridge.system.network/otc/${selectedDesk}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-white text-black py-4 rounded-xl flex items-center justify-center gap-3 font-black uppercase text-xs tracking-widest hover:bg-gray-200 transition-colors"
@@ -108,7 +108,7 @@ export default function ClearanceTab() {
                 className="h-full flex flex-col items-center justify-center text-center p-8 opacity-30 border border-white/5 border-dashed rounded-3xl"
               >
                 <Scale size={32} className="mb-4" />
-                <p className="text-[10px] font-mono uppercase tracking-widest">Select a desk to initialize sovereign routing framework</p>
+                <p className="text-[10px] font-mono uppercase tracking-widest">Select a desk to initialize system routing framework</p>
               </motion.div>
             )}
           </AnimatePresence>

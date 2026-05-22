@@ -11,12 +11,12 @@ export async function POST(request: NextRequest) {
     maxAge: 0, // Immediately expire
   };
 
-  // ── Clear all sovereign session cookies ──────────────────────────────────
+  //  Clear all system session cookies 
   response.cookies.set("human_session", "", cookieBase);
-  response.cookies.set("sovereign_handshake", "", { ...cookieBase, httpOnly: false });
+  response.cookies.set("system_handshake", "", { ...cookieBase, httpOnly: false });
   response.cookies.set("wallet-auth", "", { ...cookieBase, httpOnly: false });
 
-  // ── Legacy cookies (email/next-auth) ─────────────────────────────────────
+  //  Legacy cookies (email/next-auth) 
   response.cookies.set("auth_token", "", cookieBase);
   response.cookies.set("human.access-token", "", cookieBase);
   response.cookies.set("human.refresh-token", "", cookieBase);

@@ -72,7 +72,7 @@ export function WhaleLeaderboard({ leaderboard, onSelectAddress, watchedAddresse
                                 onClick={() => onSelectAddress(entry.address)}
                                 className={`${heights[podiumIdx]} rounded-2xl border flex flex-col items-center justify-center gap-1 cursor-pointer hover:brightness-125 transition-all ${RANK_STYLES[podiumIdx] ?? 'text-gray-400 bg-white/5 border-white/10'}`}
                             >
-                                <span className="text-lg font-black">{'🥇🥈🥉'[actualRank - 1]}</span>
+                                <span className="text-lg font-black">{''[actualRank - 1]}</span>
                                 <span className="text-[9px] font-black tracking-tighter opacity-70">${(entry.totalUsd / 1_000_000).toFixed(1)}M</span>
                             </motion.button>
                         );
@@ -161,7 +161,7 @@ export function WhaleLeaderboard({ leaderboard, onSelectAddress, watchedAddresse
                                                         onClick={(e) => { e.stopPropagation(); onSelectAddress(entry.address); }}
                                                         className="px-4 py-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-[10px] font-black uppercase tracking-widest border border-indigo-500/30 transition-colors whitespace-nowrap"
                                                     >
-                                                        Intelligence Profile
+                                                        Analytics Profile
                                                     </button>
                                                 </div>
                                             </div>

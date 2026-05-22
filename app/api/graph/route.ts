@@ -35,7 +35,7 @@ function serializeRecord(record: any) {
     return obj;
 }
 
-// ── ZERO-MOCK ON-CHAIN FALLBACK RESOLVER ─────────────────────────────────────────
+//  ZERO-MOCK ON-CHAIN FALLBACK RESOLVER 
 async function resolveOnChainEntity(q: string) {
     const rpcUrl = RpcRelayerManager.getRpcUrl('ETH', 'RPC') || 'https://cloudflare-eth.com';
     const provider = new ethers.JsonRpcProvider(rpcUrl);
@@ -103,7 +103,7 @@ async function resolveOnChainEntity(q: string) {
             if (!results.find(r => r.node.address === u.walletAddress)) {
                 results.push({
                     node: {
-                        name: u.displayName || 'Unknown Sovereign',
+                        name: u.displayName || 'Unknown System',
                         address: u.walletAddress,
                         description: u.bio || 'Platform User',
                         _labels: ['Person', 'User']

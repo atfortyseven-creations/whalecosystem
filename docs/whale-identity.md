@@ -4,7 +4,7 @@ Whale Alert Network does not store passwords, email addresses, or any personally
 
 ---
 
-## Layer 1 — Wallet Connection (EIP-6963 + WalletConnect)
+## Layer 1  Wallet Connection (EIP-6963 + WalletConnect)
 
 The entry point is a standard Web3 wallet connection. The platform supports every EIP-6963-compatible browser extension and any WalletConnect v2-compatible mobile wallet.
 
@@ -30,30 +30,30 @@ The entry point is a standard Web3 wallet connection. The platform supports ever
 
 ```
 User clicks "CONNECT WALLET"
-        │
-        ▼
+        
+        
 EIP-6963 detection: is a wallet extension present?
-        │
-   YES  │  NO
-        │   └──→ WalletPickerModal opens
-        │          └──→ User selects wallet
-        │               └──→ WalletConnect QR generated
-        │                    └──→ Deep-link to mobile wallet
-        ▼
+        
+   YES    NO
+            WalletPickerModal opens
+                   User selects wallet
+                        WalletConnect QR generated
+                             Deep-link to mobile wallet
+        
 wagmi `connect()` called with matched connector
-        │
-        ▼
+        
+        
 Wallet returns: connected address + chain ID
-        │
-        ▼
+        
+        
 Session state written to cookie-based wagmi storage (SSR-safe)
 ```
 
 ---
 
-## Layer 2 — Whale Handshake (EIP-191)
+## Layer 2  Whale Handshake (EIP-191)
 
-After connecting a wallet, sensitive actions (vault access, QR synchronization, trading route entry) require a **Whale signature** — not a transaction. This proves ownership of the address without any gas cost and without broadcasting anything to the blockchain.
+After connecting a wallet, sensitive actions (vault access, QR synchronization, trading route entry) require a **Whale signature**  not a transaction. This proves ownership of the address without any gas cost and without broadcasting anything to the blockchain.
 
 ### Message Signed
 
@@ -61,7 +61,7 @@ After connecting a wallet, sensitive actions (vault access, QR synchronization, 
 Allow Access to Whale Vault
 ```
 
-This is a static, human-readable message. No dynamic nonces are included in this message — the uniqueness guarantee is provided by the encryption salt (see Layer 3).
+This is a static, human-readable message. No dynamic nonces are included in this message  the uniqueness guarantee is provided by the encryption salt (see Layer 3).
 
 ### Signature Verification
 
@@ -90,7 +90,7 @@ For the desktop-to-mobile QR sync flow (connecting a mobile wallet to a desktop 
 
 ---
 
-## Layer 3 — Whale Vault Encryption (AES-GCM-256 + PBKDF2)
+## Layer 3  Whale Vault Encryption (AES-GCM-256 + PBKDF2)
 
 Sensitive user data (portfolio snapshots, private notes, trading configurations) is encrypted client-side before leaving the browser. The server never receives the plaintext.
 
@@ -130,11 +130,11 @@ The encrypted vault stores three components alongside the ciphertext:
 | `iv` | 12 bytes | Initialization vector |
 | `salt` | 16 bytes | PBKDF2 salt |
 
-The wallet signature is **never stored** — the user must sign again to decrypt. This means even full server compromise cannot decrypt vault contents.
+The wallet signature is **never stored**  the user must sign again to decrypt. This means even full server compromise cannot decrypt vault contents.
 
 ---
 
-## Layer 4 — KYC JWT (Regulated Routes)
+## Layer 4  KYC JWT (Regulated Routes)
 
 Access to trading routes (`/trade/*`) requires a KYC approval token in addition to wallet authentication.
 

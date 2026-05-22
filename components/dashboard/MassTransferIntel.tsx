@@ -5,9 +5,9 @@ import { Loader2, RefreshCw } from "lucide-react";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSovereignIntel } from "@/lib/api-client";
+import { useSystemIntel } from "@/lib/api-client";
 
-// ─── Config ──────────────────────────────────────────────────────────────────
+//  Config 
 
 const TIER_CONFIG: Record<string, { bg: string; text: string; border: string; label: string }> = {
   ULTRA_CAPITAL_FLOW:  { bg: "#D4AF37", text: "#FFFFFF", border: "#D4AF37", label: "ULTRA FLOW"    },
@@ -38,7 +38,7 @@ function formatUsd(v: number): string {
 
 function shortAddr(addr: string): string {
   if (!addr || addr.length < 10) return addr;
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+  return `${addr.slice(0, 6)}${addr.slice(-4)}`;
 }
 
 function getExplorer(chain: string, type: "tx" | "address", val: string): string {
@@ -49,7 +49,7 @@ function getExplorer(chain: string, type: "tx" | "address", val: string): string
   return `https://${map[chain] || "etherscan.io"}/${type}/${val}`;
 }
 
-// ─── EventRow (no animation — pure render) ────────────────────────────────────
+//  EventRow (no animation  pure render) 
 
 function EventRow({ event }: { event: any }) {
   const tCfg = TIER_CONFIG[event.tier] || TIER_CONFIG.MICRO_TRANSFER;
@@ -119,7 +119,7 @@ function EventRow({ event }: { event: any }) {
           </div>
           <div className="text-[11px] font-black text-[#555555] mt-1 flex items-center gap-1.5">
             <span>{parseFloat(event.amount || "0").toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
-            <span className="uppercase tracking-widest">{event.token || "—"}</span>
+            <span className="uppercase tracking-widest">{event.token || ""}</span>
           </div>
         </div>
 
@@ -171,17 +171,17 @@ function EventRow({ event }: { event: any }) {
   );
 }
 
-// ─── Summary Cards ─────────────────────────────────────────────────────────────
+//  Summary Cards 
 
 function SummaryCards({ events }: { events: any[] }) {
   const totalUsd       = events.reduce((s, e) => s + (Number(e.usdValue) || 0), 0);
   const avgUsd         = events.length ? totalUsd / events.length : 0;
-  const maxEvent       = events.reduce((a, b) => (Number(b.usdValue) || 0) > (Number(a.usdValue) || 0) ? b : a, events[0] || { usdValue: 0, token: "—" });
+  const maxEvent       = events.reduce((a, b) => (Number(b.usdValue) || 0) > (Number(a.usdValue) || 0) ? b : a, events[0] || { usdValue: 0, token: "" });
   const uniqueSenders  = new Set(events.map(e => e.from).filter(Boolean)).size;
 
   const cards = [
     { label: "Aggregate Volume",    value: totalUsd,              sub: `${events.length} verified operations` },
-    { label: "Apex Transfer",       value: maxEvent?.usdValue||0, sub: `${maxEvent?.token || "—"} Equivalent` },
+    { label: "Apex Transfer",       value: maxEvent?.usdValue||0, sub: `${maxEvent?.token || ""} Equivalent` },
     { label: "Mean Transmission",   value: avgUsd,                sub: "per standard block" },
     { label: "Unique Nodes",        value: uniqueSenders,         sub: "distinct sender addresses", isNum: true },
   ];
@@ -203,7 +203,7 @@ function SummaryCards({ events }: { events: any[] }) {
   );
 }
 
-// ─── Main Ledger ───────────────────────────────────────────────────────────────
+//  Main Ledger 
 
 export function MassTransferIntel() {
   const queryClient    = useQueryClient();
@@ -219,7 +219,7 @@ export function MassTransferIntel() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // ── Sonar ping ─────────────────────────────────────────────────────────────
+  //  Sonar ping 
   const playPing = useCallback(() => {
     try {
       if (!audioCtxRef.current)
@@ -248,7 +248,7 @@ export function MassTransferIntel() {
     prevCountRef.current = events.length;
   }, [events.length, isSonarActive, playPing]);
 
-  // ── Sync handler — Real On-Chain L1 Fetch ──────────────────────
+  //  Sync handler  Real On-Chain L1 Fetch 
   const handleSync = useCallback(async () => {
     setSyncing(true);
     setIsLoading(true);
@@ -300,7 +300,7 @@ export function MassTransferIntel() {
     } catch (e) {
       console.error(e);
       setError(true);
-      toast.error("Sync failed — RPC unreachable");
+      toast.error("Sync failed  RPC unreachable");
     } finally {
       setSyncing(false);
       setIsLoading(false);
@@ -313,7 +313,7 @@ export function MassTransferIntel() {
     return () => clearInterval(interval);
   }, [handleSync]);
 
-  // ── Filter + sort ──────────────────────────────────────────────────────────
+  //  Filter + sort 
   const availableChains = useMemo(
     () => Array.from(new Set(events.map(e => e.chain).filter(Boolean))),
     [events]
@@ -336,7 +336,7 @@ export function MassTransferIntel() {
   return (
     <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#050505] dark:text-white font-sans">
 
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      {/*  Header  */}
       <div className="flex flex-wrap items-center justify-between px-8 py-6 border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] gap-4 shrink-0">
         <div>
           <div className="flex items-center gap-3 mb-1">
@@ -376,7 +376,7 @@ export function MassTransferIntel() {
             className="px-4 py-2 border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#1A1A1A] hover:bg-[#F0F0F0] dark:hover:bg-[#222] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors disabled:opacity-50"
           >
             <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
-            {syncing ? "Syncing…" : "Sync"}
+            {syncing ? "Syncing" : "Sync"}
           </button>
 
           {/* Sonar */}
@@ -415,7 +415,7 @@ export function MassTransferIntel() {
         </div>
       </div>
 
-      {/* ── Body ─────────────────────────────────────────────────────────────── */}
+      {/*  Body  */}
       <div className="flex-1 min-h-0 overflow-y-auto px-8 py-8">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full text-[#888888] gap-4">

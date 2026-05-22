@@ -67,7 +67,7 @@ export function useMarketStream(symbol: DisplaySymbol = 'BTC/USDT') {
     // Connect to WebSocket server - Use relative path / same origin to avoid port issues
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || window.location.origin;
     
-    console.log(`[MarketStream] 🔌 Connecting to ${wsUrl}`);
+    console.log(`[MarketStream]  Connecting to ${wsUrl}`);
 
     const socket = io(wsUrl, {
       auth: { userId },
@@ -78,32 +78,32 @@ export function useMarketStream(symbol: DisplaySymbol = 'BTC/USDT') {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log(`[MarketStream] ✅ Connected - Subscribing to ${symbol}`);
+      console.log(`[MarketStream]  Connected - Subscribing to ${symbol}`);
       setIsConnected(true);
       setConnectionError(null);
       socket.emit('subscribe-market', symbol);
     });
 
     socket.on('connect_error', (err) => {
-      console.error('[MarketStream] ❌ Connection Error:', err.message);
+      console.error('[MarketStream]  Connection Error:', err.message);
       setConnectionError(err.message);
       setIsConnected(false);
     });
 
     socket.on('disconnect', (reason) => {
-      console.log(`[MarketStream] ⚠️ Disconnected: ${reason}`);
+      console.log(`[MarketStream] ️ Disconnected: ${reason}`);
       setIsConnected(false);
     });
 
     socket.on('ticker_update', (data: MarketTicker) => {
-      // console.log('[MarketStream] 📊 Ticker update:', data.symbol, data.price);
+      // console.log('[MarketStream]  Ticker update:', data.symbol, data.price);
       if (data.symbol === symbol) {
         setTicker(data);
       }
     });
 
     socket.on('orderbook_update', (data: OrderBookData) => {
-      // console.log('[MarketStream] 📖 Order book update:', data.bids.length, 'bids');
+      // console.log('[MarketStream]  Order book update:', data.bids.length, 'bids');
       setOrderBook(data);
     });
 
@@ -116,7 +116,7 @@ export function useMarketStream(symbol: DisplaySymbol = 'BTC/USDT') {
     });
 
     return () => {
-      console.log(`[MarketStream] 🔌 Unsubscribing from ${symbol}`);
+      console.log(`[MarketStream]  Unsubscribing from ${symbol}`);
       socket.emit('unsubscribe-market', symbol);
       socket.disconnect();
     };

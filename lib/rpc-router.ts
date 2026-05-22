@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { redisClient } from './redis/client';
 import { getGbAllRpc } from '@/lib/blockchain/getblock-registry';
 
-// ─── Tipos ────────────────────────────────────────────────────────────────────
+//  Tipos 
 
 type SupportedChain = 'SOLANA' | 'ETHEREUM' | 'BSC' | 'POLYGON' | 'BASE' | 'ARB' | 'OP';
 
@@ -14,7 +14,7 @@ interface RPCEndpoint {
     errorCount: number;
 }
 
-// ─── Validación ───────────────────────────────────────────────────────────────
+//  Validación 
 
 const RpcSchema = z.string().url();
 
@@ -23,7 +23,7 @@ function safeParseRPC(envValue: string | undefined, fallback: string): string {
     return res.success ? res.data : fallback;
 }
 
-// ─── Pool — GetBlock primary + public fallbacks ───────────────────────────────
+//  Pool  GetBlock primary + public fallbacks 
 /**
  * Para ETH y chains cubiertas por el registry:
  *   - Prioridad 1: endpoints activos del GetBlock Registry
@@ -53,7 +53,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
     ],
 
     BSC: [
-        // 🔥 Todos los slots activos de GetBlock (primarios + backup) via registry
+        //  Todos los slots activos de GetBlock (primarios + backup) via registry
         ...getGbAllRpc('bsc').map(url => ({
             url, chain: 'BSC' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
         })),
@@ -64,7 +64,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
     ],
 
     POLYGON: [
-        // 🔥 Todos los slots activos de GetBlock (primarios + backup) via registry
+        //  Todos los slots activos de GetBlock (primarios + backup) via registry
         ...getGbAllRpc('polygon').map(url => ({
             url, chain: 'POLYGON' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
         })),
@@ -75,7 +75,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
     ],
 
     BASE: [
-        // 🔥 Todos los slots activos de GetBlock (primarios + backup) via registry
+        //  Todos los slots activos de GetBlock (primarios + backup) via registry
         ...getGbAllRpc('base').map(url => ({
             url, chain: 'BASE' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
         })),
@@ -94,7 +94,7 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
     ],
 
     OP: [
-        // 🔥 Slot GetBlock Optimism (cuenta única)
+        //  Slot GetBlock Optimism (cuenta única)
         ...getGbAllRpc('op').map(url => ({
             url, chain: 'OP' as SupportedChain, latencyMs: 0, health: 'HEALTHY' as const, errorCount: 0,
         })),
@@ -103,11 +103,11 @@ const RPC_POOL: Record<string, RPCEndpoint[]> = {
     ],
 };
 
-const REDIS_HEALTH_KEY = 'rpc:cluster:health:matrix';
+const REDIS_HEALTH_KEY = 'rpc:cluster:health:grid';
 
 export class GlobalRPCRouter {
     /**
-     * Sincroniza estado local con el Redis Health Matrix global.
+     * Sincroniza estado local con el Redis Health Grid global.
      */
     private static async syncHealth(chain: SupportedChain) {
         try {
@@ -146,7 +146,7 @@ export class GlobalRPCRouter {
         const healthyNodes = pool.filter(n => n.health === 'HEALTHY');
 
         if (healthyNodes.length === 0) {
-            // Emergencia: todos degradados — devolver el primero
+            // Emergencia: todos degradados  devolver el primero
             return pool[0].url;
         }
 
@@ -174,7 +174,7 @@ export class GlobalRPCRouter {
             if (node.errorCount > 3)  node.health = 'DEGRADED';
             if (node.errorCount > 10) node.health = 'DEAD';
 
-            console.warn(`[GlobalRPCRouter] Endpoint ${url.slice(0, 48)} → ${node.health} (errors: ${node.errorCount})`);
+            console.warn(`[GlobalRPCRouter] Endpoint ${url.slice(0, 48)}  ${node.health} (errors: ${node.errorCount})`);
 
             // Persistir al cluster Redis
             try {

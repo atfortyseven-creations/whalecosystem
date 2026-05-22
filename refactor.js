@@ -8,8 +8,8 @@ function replaceContent(filePath) {
     let original = content;
     
     // Replace while preserving basic casing
-    content = content.replace(/Sovereign/g, 'Institutional');
-    content = content.replace(/sovereign/g, 'institutional');
+    content = content.replace(/System/g, 'Institutional');
+    content = content.replace(/system/g, 'institutional');
     content = content.replace(/SOVEREIGN/g, 'INSTITUTIONAL');
     
     if (content !== original) {
@@ -42,8 +42,8 @@ function processDirectory(dirPath) {
     for (const item of items) {
         if (ignoreDirs.has(item)) continue;
         
-        let newName = item.replace(/Sovereign/g, 'Institutional')
-                          .replace(/sovereign/g, 'institutional')
+        let newName = item.replace(/System/g, 'Institutional')
+                          .replace(/system/g, 'institutional')
                           .replace(/SOVEREIGN/g, 'INSTITUTIONAL');
                           
         if (newName !== item) {

@@ -1,10 +1,10 @@
 import { createHash } from 'crypto';
 
-// ── Sovereign Architecture: Akashic Merkle Tree ──────────────────────────────
+//  System Architecture: Akashic Merkle Tree 
 // Generates Cryptographic Proof-of-Inclusion for Mass Transfers.
 // Ensures that no historical record in the Akashic Ledger can be altered 
 // without invalidating the entire Root Hash (Zero-Trust Data Integrity).
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 export class MerkleTree {
   private leaves: string[];

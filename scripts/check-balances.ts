@@ -2,7 +2,7 @@ const { ethers } = require("ethers");
 
 async function main() {
     const address = "0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a";
-    console.log("🕵️ Checking Balances for:", address);
+    console.log("️ Checking Balances for:", address);
 
     const networks = [
         { name: "Base", url: "https://mainnet.base.org" },
@@ -15,9 +15,9 @@ async function main() {
         try {
             const provider = new ethers.JsonRpcProvider(net.url);
             const balance = await provider.getBalance(address);
-            console.log(`🌍 ${net.name}: ${ethers.formatEther(balance)} ETH`);
+            console.log(` ${net.name}: ${ethers.formatEther(balance)} ETH`);
         } catch (e: any) {
-            console.log(`⚠️ ${net.name}: Error connecting (${e.message})`);
+            console.log(`️ ${net.name}: Error connecting (${e.message})`);
         }
     }
 }

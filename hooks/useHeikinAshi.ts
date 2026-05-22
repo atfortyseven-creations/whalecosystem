@@ -18,7 +18,7 @@ export function useHeikinAshi(tokens: string[]) {
     const fetchSignals = async () => {
       setIsLoading(true);
       try {
-        // We use the unified intelligence API
+        // We use the unified analytics API
         // For efficiency, we would ideally pass multiple tokens, 
         // but for now we fetch them one by one or we could add a bulk endpoint.
         // Given the "Legendary" requirement, I'll fetch the top tokens.
@@ -27,7 +27,7 @@ export function useHeikinAshi(tokens: string[]) {
         
         await Promise.all(tokens.map(async (token) => {
           try {
-            const res = await fetch(`/api/v1/whale/intelligence?type=heikin-ashi&token=${token}`, {
+            const res = await fetch(`/api/v1/whale/analytics?type=heikin-ashi&token=${token}`, {
               headers: {
                 'X-WAC-API-KEY': 'DEV_INTERNAL_WAC' // Internal bypass or use a real key if configured
               }

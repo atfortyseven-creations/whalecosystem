@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader2, Check, Lock, Zap, BarChart2, MessageSquare, Briefcase, Users } from 'lucide-react';
@@ -10,8 +10,8 @@ import { PRICING_TIERS, TIER_RANK, SECTION_FEATURES } from '@/lib/config/pricing
 import type { SectionFeatureGroup } from '@/lib/config/pricing-tiers';
 import dynamic from 'next/dynamic';
 
-const SovereignFooter = dynamic(
-  () => import('@/components/landing/SovereignFooter').then(m => ({ default: m.SovereignFooter })),
+const SystemFooter = dynamic(
+  () => import('@/components/landing/SystemFooter').then(m => ({ default: m.SystemFooter })),
   { ssr: false, loading: () => <div className="h-24" /> }
 );
 const MotionDiv = dynamic(
@@ -31,9 +31,9 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
   community: <Users size={16} />,
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 export default function PricingPage() {
-  const { isConnected, isSovereignHandshake, address } = useSovereignAccount();
+  const { isConnected, isSystemHandshake, address } = useSystemAccount();
   const router = useRouter();
   const [loadingTier, setLoadingTier]   = useState<string | null>(null);
   const [currentTier, setCurrentTier]   = useState<string>('FREE');
@@ -52,7 +52,7 @@ export default function PricingPage() {
       })
       .catch(() => {})
       .finally(() => setIsTierLoaded(true));
-  }, [isConnected, isSovereignHandshake]);
+  }, [isConnected, isSystemHandshake]);
 
   const currentTierLevel = TIER_RANK[currentTier as keyof typeof TIER_RANK] ?? 0;
 
@@ -95,7 +95,7 @@ export default function PricingPage() {
     <div className="w-full min-h-screen flex flex-col bg-[#FAFAF8] text-black font-sans selection:bg-black/10">
       <div className="relative z-10 w-full flex flex-col items-center">
 
-        {/* ── HERO ──────────────────────────────────────────── */}
+        {/*  HERO  */}
         <section className="w-full pt-36 pb-20 px-6 border-b border-black/5 relative z-10 flex flex-col justify-center items-center text-center overflow-hidden">
           {/* Subtle grid bg */}
           <div className="pointer-events-none absolute inset-0 opacity-[0.025]"
@@ -109,18 +109,18 @@ export default function PricingPage() {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/80 backdrop-blur-sm shadow-sm">
                 <Zap size={12} className="text-black/50" />
                 <span className="font-mono text-[10px] font-black uppercase tracking-[0.25em] text-black/50">
-                  Whale Alert Network — Access Plans
+                  Whale Alert Network  Access Plans
                 </span>
               </div>
 
               <h1 className="text-[56px] md:text-[96px] font-black uppercase tracking-tighter leading-[0.88] text-[#050505]">
                 Unlock Full<br />
-                <span className="text-black/15">Intelligence.</span>
+                <span className="text-black/15">Analytics.</span>
               </h1>
 
               <p className="text-[17px] md:text-[20px] font-serif text-black/50 max-w-2xl leading-relaxed mx-auto">
-                Choose your access level. The <strong className="text-black/70 font-semibold">15€/month</strong> plan unlocks
-                institutional-grade features across every section of the platform — Dashboard, Chat, Portfolio and Community.
+                Choose your access level. The <strong className="text-black/70 font-semibold">15/month</strong> plan unlocks
+                institutional-grade features across every section of the platform  Dashboard, Chat, Portfolio and Community.
               </p>
             </MotionDiv>
 
@@ -132,10 +132,10 @@ export default function PricingPage() {
               className="flex flex-wrap items-center justify-center gap-8 pt-4"
             >
               {[
-                { value: '∞', label: 'Whale Movements' },
+                { value: '', label: 'Whale Movements' },
                 { value: '8+', label: 'Pro Features / Tab' },
                 { value: '4', label: 'System Sections' },
-                { value: '15€', label: 'Per Month' },
+                { value: '15', label: 'Per Month' },
               ].map(({ value, label }) => (
                 <div key={label} className="flex flex-col items-center gap-1">
                   <span className="font-mono text-[28px] md:text-[36px] font-black tracking-tighter text-[#050505] leading-none">
@@ -150,7 +150,7 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
+        {/*  PRICING CARDS  */}
         <section className="w-full py-20 px-6 relative z-10 flex flex-col items-center">
           <div className="max-w-[1100px] mx-auto w-full">
 
@@ -175,7 +175,7 @@ export default function PricingPage() {
                     {isPro && (
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                         <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black shadow-lg">
-                          <span className="text-[10px]">★</span>
+                          <span className="text-[10px]"></span>
                           <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em]">Most Valuable</span>
                         </div>
                       </div>
@@ -196,7 +196,7 @@ export default function PricingPage() {
 
                       <div className="flex items-baseline gap-2">
                         <span className={`text-[72px] font-black tracking-tighter leading-none ${isPro ? 'text-white' : 'text-[#050505]'}`}>
-                          {tier.priceMonthly}€
+                          {tier.priceMonthly}
                         </span>
                         <span className={`text-[11px] font-black uppercase tracking-widest ${isPro ? 'text-white/30' : 'text-black/25'}`}>
                           / month
@@ -205,7 +205,7 @@ export default function PricingPage() {
 
                       {isPro && (
                         <p className="mt-3 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-white/30">
-                          150€ / year — save 2 months
+                          150 / year  save 2 months
                         </p>
                       )}
                     </div>
@@ -248,7 +248,7 @@ export default function PricingPage() {
                       ) : !isTierLoaded ? (
                         <div className="flex items-center gap-2"><Loader2 size={13} className="animate-spin" /> Syncing...</div>
                       ) : isGranted ? (
-                        '✓ Access Level Granted'
+                        ' Access Level Granted'
                       ) : tier.id === 'FREE' ? (
                         isConnected ? 'Current Access Level' : 'Initialize Connection'
                       ) : (
@@ -262,7 +262,7 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── SECTION COMPARISON: TABS ─────────────────────────────────────── */}
+        {/*  SECTION COMPARISON: TABS  */}
         <section className="w-full py-20 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-white">
           <div className="max-w-[1100px] mx-auto w-full">
 
@@ -276,7 +276,7 @@ export default function PricingPage() {
                 <span className="text-black/15">Per Section.</span>
               </h2>
               <p className="font-serif text-[17px] text-black/45 max-w-xl mx-auto leading-relaxed">
-                Every tab of Whale Alert Network gets a premium upgrade with the 15€ plan.
+                Every tab of Whale Alert Network gets a premium upgrade with the 15 plan.
                 Select a section below to see exactly what changes.
               </p>
             </MotionDiv>
@@ -338,7 +338,7 @@ export default function PricingPage() {
                     {SECTION_ICONS[activeSection]}
                   </div>
                   <div>
-                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">★ Institutional</p>
+                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5"> Institutional</p>
                     <p className="font-black text-[15px] uppercase tracking-tight text-white">Whale Alert Network +</p>
                   </div>
                 </div>
@@ -361,7 +361,7 @@ export default function PricingPage() {
                     disabled={isTierLoaded && currentTierLevel >= 1}
                     className="w-full py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.25em] rounded-[1.2rem] hover:bg-white/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    {isTierLoaded && currentTierLevel >= 1 ? '✓ Already Unlocked' : 'Unlock This Section — 15€/mo'}
+                    {isTierLoaded && currentTierLevel >= 1 ? ' Already Unlocked' : 'Unlock This Section  15/mo'}
                   </button>
                 </div>
               </div>
@@ -382,7 +382,7 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── FULL FEATURE MATRIX ──────────────────────────────────────────── */}
+        {/*  FULL FEATURE MATRIX  */}
         <section className="w-full py-20 px-6 border-t border-black/5 relative z-10 flex flex-col items-center">
           <div className="max-w-[1100px] mx-auto w-full">
 
@@ -402,7 +402,7 @@ export default function PricingPage() {
               <div className="grid grid-cols-[1fr_140px_140px] border-b border-black/8">
                 <div className="p-6 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30">Feature</div>
                 <div className="p-6 text-center font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30 border-l border-black/5">Free</div>
-                <div className="p-6 text-center font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white bg-[#050505] border-l border-black/5 rounded-tr-[2rem]">★ Pro</div>
+                <div className="p-6 text-center font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white bg-[#050505] border-l border-black/5 rounded-tr-[2rem]"> Pro</div>
               </div>
 
               {/* Rows */}
@@ -447,16 +447,16 @@ export default function PricingPage() {
               <div className="grid grid-cols-[1fr_140px_140px]">
                 <div className="p-6" />
                 <div className="p-4 border-l border-black/5 flex items-center justify-center">
-                  <span className="font-mono text-[10px] font-black text-black/30">0€</span>
+                  <span className="font-mono text-[10px] font-black text-black/30">0</span>
                 </div>
                 <div className="p-4 border-l border-black/5 bg-[#050505] flex items-center justify-center rounded-br-[2rem]">
                   <button
-                    id="matrix-cta-btn"
+                    id="grid-cta-btn"
                     onClick={() => handleSubscribeClick('STANDARD')}
                     disabled={isTierLoaded && currentTierLevel >= 1}
                     className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-white hover:text-white/70 transition-colors disabled:opacity-40"
                   >
-                    {isTierLoaded && currentTierLevel >= 1 ? '✓ Active' : '15€ / mo →'}
+                    {isTierLoaded && currentTierLevel >= 1 ? ' Active' : '15 / mo '}
                   </button>
                 </div>
               </div>
@@ -464,7 +464,7 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── VALUE PROPOSITION CALLOUT ─────────────────────────────────────── */}
+        {/*  VALUE PROPOSITION CALLOUT  */}
         <section className="w-full py-20 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-[#050505]">
           <div className="max-w-[900px] mx-auto w-full text-center">
             <MotionDiv
@@ -472,7 +472,7 @@ export default function PricingPage() {
               variants={FADE_UP}
             >
               <p className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6">
-                Institutional Intelligence
+                Institutional Analytics
               </p>
               <h2 className="text-[40px] md:text-[72px] font-black uppercase tracking-tighter leading-[0.88] text-white mb-8">
                 Every Section.<br />
@@ -480,16 +480,16 @@ export default function PricingPage() {
               </h2>
               <p className="font-serif text-[18px] text-white/45 max-w-2xl mx-auto leading-relaxed mb-12">
                 For the price of a coffee subscription, you get full institutional access to whale
-                intelligence across all four pillars of the platform. No paywalls mid-session.
+                analytics across all four pillars of the platform. No paywalls mid-session.
                 No feature locks on the features that matter.
               </p>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                 {[
-                  { icon: '◉', label: 'Dashboard', desc: 'AI predictions + unlimited movements' },
-                  { icon: '◈', label: 'Whale Chat', desc: 'VIP channels + analyst alpha' },
-                  { icon: '◇', label: 'Portfolio', desc: 'Multi-wallet + copytrading signals' },
-                  { icon: '◎', label: 'Community', desc: 'Verified badge + DAO voting' },
+                  { icon: '', label: 'Dashboard', desc: 'AI predictions + unlimited movements' },
+                  { icon: '', label: 'Whale Chat', desc: 'VIP channels + analyst alpha' },
+                  { icon: '', label: 'Portfolio', desc: 'Multi-wallet + copytrading signals' },
+                  { icon: '', label: 'Community', desc: 'Verified badge + DAO voting' },
                 ].map(({ icon, label, desc }) => (
                   <div key={label} className="flex flex-col gap-2 p-5 rounded-[1.5rem] border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] transition-colors">
                     <span className="text-[20px] text-white/40">{icon}</span>
@@ -508,9 +508,9 @@ export default function PricingPage() {
                 {loadingTier === 'STANDARD' ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : isTierLoaded && currentTierLevel >= 1 ? (
-                  '✓ Institutional License Active'
+                  ' Institutional License Active'
                 ) : (
-                  'Acquire Institutional License — 15€/mo'
+                  'Acquire Institutional License  15/mo'
                 )}
               </button>
             </MotionDiv>
@@ -519,7 +519,7 @@ export default function PricingPage() {
 
       </div>
 
-      <SovereignFooter />
+      <SystemFooter />
       <div className="h-24 sm:h-0" />
     </div>
   );

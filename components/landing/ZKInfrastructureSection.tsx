@@ -36,9 +36,9 @@ export function ZKInfrastructureSection() {
               <span className="text-[var(--aztec-orchid)]">Absolute Truth.</span>
             </h2>
             <p className="text-[var(--aztec-parchment)]/60 text-xl leading-relaxed mb-12 font-light max-w-xl">
-              Arctic Protocol L3 isn't just a dashboard; it's a **Sovereign Execution Environment**. 
+              Arctic Protocol L3 isn't just a dashboard; it's a **System Execution Environment**. 
               We leverage recursive Zero-Knowledge proofs to aggregate the state of 33+ chains into a single, 
-              mathematically certain liquidity matrix.
+              mathematically certain liquidity grid.
             </p>
 
             <div className="space-y-10">

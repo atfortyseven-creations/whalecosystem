@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSettingsStore, SovereignSettings } from '@/lib/store/useSettingsStore';
-import { useSovereignTranslation } from '@/hooks/useSovereignTranslation';
+import { useSettingsStore, SystemSettings } from '@/lib/store/useSettingsStore';
+import { useSystemTranslation } from '@/hooks/useSystemTranslation';
 import { Loader2 } from 'lucide-react';
 import { useDisconnect } from 'wagmi';
 import { toast } from 'sonner';
@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 
 export function TerminalSettingsPanel() {
   const store = useSettingsStore();
-  const { t } = useSovereignTranslation();
+  const { t } = useSystemTranslation();
   const { isLoading, updateSetting, fetchSettings } = store;
   const [activeTab, setActiveTab] = useState('general');
   const { disconnect } = useDisconnect();
@@ -29,7 +29,7 @@ export function TerminalSettingsPanel() {
     } catch {}
     
     document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "system_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     
@@ -44,7 +44,7 @@ export function TerminalSettingsPanel() {
     fetchSettings();
   }, [fetchSettings]);
 
-  const settings: SovereignSettings = {
+  const settings: SystemSettings = {
     theme:                store.theme,
     language:             store.language,
     currency:             store.currency,
@@ -87,7 +87,7 @@ export function TerminalSettingsPanel() {
     );
   }
 
-  const renderToggle = (key: keyof SovereignSettings, label: string, desc: string) => {
+  const renderToggle = (key: keyof SystemSettings, label: string, desc: string) => {
     const isActive = !!settings[key];
     return (
       <div className="flex items-center justify-between p-6 bg-white border border-black/10 rounded-2xl hover:border-black/30 transition-all cursor-pointer select-none" onClick={() => updateSetting(key, !isActive as never)}>
@@ -102,7 +102,7 @@ export function TerminalSettingsPanel() {
     );
   };
 
-  const renderSelect = (key: keyof SovereignSettings, label: string, desc: string, options: {value: string, label: string}[]) => {
+  const renderSelect = (key: keyof SystemSettings, label: string, desc: string, options: {value: string, label: string}[]) => {
     const currentValue = settings[key] as string;
     return (
       <div className="flex flex-col p-6 bg-white border border-black/10 rounded-2xl hover:border-black/30 transition-all">
@@ -126,7 +126,7 @@ export function TerminalSettingsPanel() {
     );
   };
 
-  const renderInput = (key: keyof SovereignSettings, label: string, desc: string, type: 'number' | 'text' = 'text', suffix?: string) => {
+  const renderInput = (key: keyof SystemSettings, label: string, desc: string, type: 'number' | 'text' = 'text', suffix?: string) => {
     return (
       <div className="flex flex-col p-6 bg-white border border-black/10 rounded-2xl hover:border-black/30 transition-all">
          <span className="text-[12px] font-black uppercase tracking-widest text-black mb-1.5">{label}</span>

@@ -4,7 +4,7 @@
  * "Powered by Whale Alert" Integration Registry
  *
  * Serves metadata for the dApps/protocols that have integrated
- * Whale Alert Network as their on-chain intelligence layer.
+ * Whale Alert Network as their on-chain analytics layer.
  *
  * Also acts as registration endpoint for new integrators.
  *
@@ -12,32 +12,32 @@
  *   Body: { projectName, projectUrl, description, contactEmail, apiKeyTier }
  *   Returns: integration credentials + iframe embed snippet
  *
- * Public registry is visible at /ecosystem — encourages ecosystem growth
- * without revealing sovereign detection methodology.
+ * Public registry is visible at /ecosystem  encourages ecosystem growth
+ * without revealing system detection methodology.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-// ─── Featured Integrations (curated showcase) ─────────────────────────────
+//  Featured Integrations (curated showcase) 
 
 const FEATURED_INTEGRATIONS = [
     {
         id:          'whale-alert-native',
         name:        'Whale Alert Network',
         url:         'https://whalealert.network',
-        description: 'The sovereign terminal. EVM Thermodynamics engine, ZK identity layer, institutional intelligence.',
-        category:    'intelligence',
+        description: 'The system terminal. EVM Thermodynamics engine, ZK identity layer, institutional analytics.',
+        category:    'analytics',
         tier:        'SOVEREIGN',
         since:       '2026-01-01',
         logo:        '/logo.png',
-        badge:       '🐋 Core Platform',
+        badge:       ' Core Platform',
         features:    ['Real-time whale detection', 'ZK identity', 'Dead Man Switch', 'API Marketplace'],
     },
 ];
 
-// ─── GET — Integration Registry ───────────────────────────────────────────
+//  GET  Integration Registry 
 
 export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// ─── POST — Register Integration ──────────────────────────────────────────
+//  POST  Register Integration 
 
 export async function POST(req: NextRequest) {
     try {
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
                 },
             });
         } catch {
-            console.log(`[PoweredBy] Registration: ${projectName} (${projectUrl}) — pending review`);
+            console.log(`[PoweredBy] Registration: ${projectName} (${projectUrl})  pending review`);
         }
 
         return NextResponse.json({

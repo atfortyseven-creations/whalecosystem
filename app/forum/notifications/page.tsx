@@ -34,7 +34,7 @@ export default function NotificationsPage() {
     <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
       <div className="mb-8 pb-6 border-b" style={{ borderColor: 'var(--forum-border)' }}>
         <h1 className="text-[16px] font-aztec-h2 font-black uppercase tracking-tight leading-snug" style={{ color: 'var(--forum-text)' }}>
-          Intelligence Alerts
+          Analytics Alerts
         </h1>
         <div className="text-[9px] font-mono uppercase tracking-[0.2em] mt-2" style={{ color: 'var(--forum-button-bg)' }}>
           SOVEREIGN NOTIFICATION CENTER
@@ -50,7 +50,7 @@ export default function NotificationsPage() {
           notifications.map(n => {
             const isUnread = !n.isRead;
             const linkHref = n.topicId ? `/forum/t/${n.topicId}` : '#';
-            const actorName = n.actor?.displayName || (n.actor?.walletAddress ? `${n.actor.walletAddress.slice(0,6)}…` : 'Unknown');
+            const actorName = n.actor?.displayName || (n.actor?.walletAddress ? `${n.actor.walletAddress.slice(0,6)}` : 'Unknown');
             
             let message = '';
             if (n.type === 'REPLY') message = 'replied to your transmission';

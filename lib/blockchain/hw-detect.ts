@@ -1,5 +1,5 @@
 /**
- * Sovereign Hardware Wallet Detection Heuristics
+ * System Hardware Wallet Detection Heuristics
  * 
  * Cold storage identification cannot be verified 100% reliably purely on-chain,
  * but via specific signatures, derivation path structures, or connector IDs
@@ -40,7 +40,7 @@ export function evaluateHardwareWallet(connectorId?: string, userAgent?: string)
         }
     }
 
-    // Thresholds for Sovereign VIP/Cold Storage tagging
+    // Thresholds for System VIP/Cold Storage tagging
     const isLikelyHardware = probability >= 0.7;
 
     return {

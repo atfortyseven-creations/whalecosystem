@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { motion, AnimatePresence } from "framer-motion";
-import { SovereignProfileModal } from "./SovereignProfileModal";
+import { SystemProfileModal } from "./SystemProfileModal";
 
 type Lesson = { id: string; title: string; description: string; duration: string; level: string; orderIndex: number };
 type Course = { id: string; slug: string; title: string; description: string; lessons: Lesson[] };
@@ -174,7 +174,7 @@ export function AcademyInteractiveEngine({
                     <div className="flex justify-between items-end mb-8 border-b border-slate-200/60 pb-6">
                         <div>
                             <button onClick={() => setSelectedCourseSlug(null)} className="text-[10px] font-bold font-mono tracking-widest uppercase text-slate-400 hover:text-slate-900 transition-colors mb-4">
-                                ← Back
+                                 Back
                             </button>
                             <h2 className="text-3xl font-sans font-black tracking-tight text-slate-900">{selectedCourse?.title}</h2>
                         </div>
@@ -195,7 +195,7 @@ export function AcademyInteractiveEngine({
                                     >
                                         <div className="flex items-center gap-6">
                                             <div onClick={(e) => { e.stopPropagation(); handleToggleComplete(lesson.id); }} className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors cursor-pointer ${isCompleted ? 'bg-slate-900 border-slate-900 text-white' : 'border-slate-300 text-transparent hover:border-slate-900'}`}>
-                                                <span className="text-[10px] font-bold">✓</span>
+                                                <span className="text-[10px] font-bold"></span>
                                             </div>
                                             <div>
                                                 <h4 className={`font-sans text-[16px] font-bold tracking-tight transition-colors ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
@@ -251,7 +251,7 @@ export function AcademyInteractiveEngine({
                 </div>
             )}
 
-            <SovereignProfileModal 
+            <SystemProfileModal 
                 isOpen={isProfileOpen} 
                 onClose={() => setIsProfileOpen(false)} 
                 walletAddress={address} 

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         // Phase 6: Real WorldID ZK Verification (Mathematical Certainty)
         const result = await verifyWorldIDProof(
             { proof, merkle_root, nullifier_hash, verification_level },
-            process.env.WLD_APP_ID || "app_d2014c58bb084dcb09e1f3c1c1144287",
+            process.env.AUTH_APP_ID || "app_d2014c58bb084dcb09e1f3c1c1144287",
             "verify-human-identity"
         );
         

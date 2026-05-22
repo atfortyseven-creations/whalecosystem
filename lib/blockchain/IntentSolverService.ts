@@ -5,7 +5,7 @@ import { blockchainService, ChainId } from './BlockchainService';
 /**
  * IntentSolverService
  * High-Lvl Orchestrator for Cross-Chain Intent execution.
- * Transforms complex liquidity moves into atomic, sovereign intents.
+ * Transforms complex liquidity moves into atomic, system intents.
  */
 export class IntentSolverService {
     /**

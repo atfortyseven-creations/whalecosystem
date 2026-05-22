@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { walletIntelligenceService } from '@/lib/wallet/WalletIntelligenceService';
+import { walletAnalyticsService } from '@/lib/wallet/WalletAnalyticsService';
 import { validateSecureRequest } from '@/lib/security/premium-security';
 
 /**
- * GET /api/wallet/intelligence/[address]
- * Returns full legendary wallet intelligence report.
+ * GET /api/wallet/analytics/[address]
+ * Returns full legendary wallet analytics report.
  */
 export async function GET(
   req: NextRequest,
@@ -29,13 +29,13 @@ export async function GET(
 
     console.log(`[API-INTELLIGENCE] Fetching report for ${address} (forceRefresh: ${forceRefresh}, deep: ${deep})`);
     
-    const intelligence = await walletIntelligenceService.getFullIntelligence(address, forceRefresh, deep);
+    const analytics = await walletAnalyticsService.getFullAnalytics(address, forceRefresh, deep);
 
-    return NextResponse.json(intelligence);
+    return NextResponse.json(analytics);
   } catch (error: any) {
     console.error(`[API-INTELLIGENCE-ERROR]:`, error);
     return NextResponse.json({ 
-      error: 'Failed to fetch wallet intelligence',
+      error: 'Failed to fetch wallet analytics',
 
       details: error.message 
     }, { status: 500 });

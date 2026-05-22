@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
-// ── Color palette ─────────────────────────────────────────────────────────────
+//  Color palette 
 const NODE_COLORS: Record<number, { fill: string; glow: string; label: string }> = {
     0: { fill: '#050505', glow: '#ffffff',  label: 'Genesis Node' },
     1: { fill: '#FF3B30', glow: '#FF3B30',  label: 'High Risk' },
@@ -27,8 +27,8 @@ export function EntityGraphVis() {
     const [mountKey, setMountKey]         = useState(0);
     const [zoomLevel, setZoomLevel]       = useState(1);
 
-    const { data: matrixData, isLoading, mutate } = useSWR(
-        `/api/intelligence/graph?t=${mountKey}`,
+    const { data: gridData, isLoading, mutate } = useSWR(
+        `/api/analytics/graph?t=${mountKey}`,
         fetcher,
         { refreshInterval: 0, revalidateOnFocus: false }
     );
@@ -39,16 +39,16 @@ export function EntityGraphVis() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const isOffline = !matrixData?.graph?.nodes?.length || matrixData?.degraded;
+    const isOffline = !gridData?.graph?.nodes?.length || gridData?.degraded;
 
-    // ── D3 render ────────────────────────────────────────────────────────────
+    //  D3 render 
     useEffect(() => {
         let nodes: any[] = [];
         let links: any[] = [];
 
-        if (matrixData?.graph?.nodes) {
-            nodes = matrixData.graph.nodes;
-            links = matrixData.graph.links;
+        if (gridData?.graph?.nodes) {
+            nodes = gridData.graph.nodes;
+            links = gridData.graph.links;
         }
 
         if (!svgRef.current || !nodes.length) return;
@@ -69,7 +69,7 @@ export function EntityGraphVis() {
             const svg = d3.select(svgRef.current);
             svg.selectAll('*').remove();
 
-            // ── Defs: glows ──────────────────────────────────────────────────
+            //  Defs: glows 
             const defs = svg.append('defs');
             Object.entries(NODE_COLORS).forEach(([group, colors]) => {
                 const filter = defs.append('filter')
@@ -84,7 +84,7 @@ export function EntityGraphVis() {
                 feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
             });
 
-            // ── Background & grid ────────────────────────────────────────────
+            //  Background & grid 
             svg.append('rect')
                 .attr('width', width)
                 .attr('height', height)
@@ -104,7 +104,7 @@ export function EntityGraphVis() {
 
             const g = svg.append('g');
 
-            // ── Zoom ─────────────────────────────────────────────────────────
+            //  Zoom 
             const zoom = d3.zoom<SVGSVGElement, unknown>()
                 .scaleExtent([0.08, 5])
                 .on('zoom', (event) => {
@@ -115,14 +115,14 @@ export function EntityGraphVis() {
             svg.call(zoom);
             zoomRef.current = zoom;
 
-            // ── Force simulation ─────────────────────────────────────────────
+            //  Force simulation 
             const simulation = d3.forceSimulation(d3Nodes as any)
                 .force('link',    d3.forceLink(d3Links).id((d: any) => d.id).distance(140))
                 .force('charge',  d3.forceManyBody().strength(-500))
                 .force('center',  d3.forceCenter(width / 2, height / 2))
                 .force('collide', d3.forceCollide().radius((d: any) => (d.size * 6) + 18));
 
-            // ── Links ────────────────────────────────────────────────────────
+            //  Links 
             const link = g.append('g')
                 .selectAll('line')
                 .data(d3Links)
@@ -134,7 +134,7 @@ export function EntityGraphVis() {
                 })
                 .attr('stroke-width', (d: any) => Math.max(0.5, Math.sqrt(d.value ?? 1) * 0.8));
 
-            // ── Nodes ────────────────────────────────────────────────────────
+            //  Nodes 
             const node = g.append('g')
                 .selectAll('circle')
                 .data(d3Nodes)
@@ -174,7 +174,7 @@ export function EntityGraphVis() {
                     });
                 });
 
-            // ── Labels ───────────────────────────────────────────────────────
+            //  Labels 
             const label = g.append('g')
                 .selectAll('text')
                 .data(d3Nodes)
@@ -192,7 +192,7 @@ export function EntityGraphVis() {
             // Keep reference for hover
             const linkEl = link;
 
-            // ── Drag ─────────────────────────────────────────────────────────
+            //  Drag 
             node.call(
                 d3.drag<SVGCircleElement, any>()
                     .on('start', (event, d: any) => {
@@ -206,7 +206,7 @@ export function EntityGraphVis() {
                     }) as any
             );
 
-            // ── Tick ─────────────────────────────────────────────────────────
+            //  Tick 
             simulation.on('tick', () => {
                 link
                     .attr('x1', (d: any) => d.source.x)
@@ -250,9 +250,9 @@ export function EntityGraphVis() {
         }
 
         return () => { if (cleanupFn) cleanupFn(); };
-    }, [matrixData, isOffline]);
+    }, [gridData, isOffline]);
 
-    // ── Zoom helpers ─────────────────────────────────────────────────────────
+    //  Zoom helpers 
     const handleZoomIn = () => {
         if (!svgRef.current || !zoomRef.current) return;
         d3.select(svgRef.current).transition().duration(300).call(zoomRef.current.scaleBy, 1.4);
@@ -269,7 +269,7 @@ export function EntityGraphVis() {
     return (
         <div className="w-full h-full min-h-0 flex flex-col overflow-hidden" style={{ minHeight: 600 }}>
 
-            {/* ── HEADER ────────────────────────────────────────────────────── */}
+            {/*  HEADER  */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0A0A0A] shrink-0">
                 <div className="flex items-center gap-3">
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,192,118,0.1)', border: '1px solid rgba(0,192,118,0.25)' }}>
@@ -318,7 +318,7 @@ export function EntityGraphVis() {
                 </div>
             </div>
 
-            {/* ── CANVAS ────────────────────────────────────────────────────── */}
+            {/*  CANVAS  */}
             <div ref={containerRef} className="flex-1 relative" style={{ background: '#0A0A0A', minHeight: 0 }}>
 
                 {/* Loading overlay */}
@@ -334,13 +334,13 @@ export function EntityGraphVis() {
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-40">
                         <WifiOff size={32} className="text-white/10" />
                         <p className="text-[10px] font-black uppercase tracking-widest text-white/20">Graph Unavailable</p>
-                        <p className="text-[9px] text-white/10">The entity intelligence layer is offline</p>
+                        <p className="text-[9px] text-white/10">The entity analytics layer is offline</p>
                     </div>
                 )}
 
                 <svg ref={svgRef} className="w-full h-full" style={{ display: 'block' }} />
 
-                {/* ── Legend ────────────────────────────────────────────────── */}
+                {/*  Legend  */}
                 <div className="absolute bottom-5 left-5 flex flex-col gap-2 pointer-events-none">
                     <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)' }}>
                         <div className="px-4 py-2.5 border-b border-white/5">
@@ -359,7 +359,7 @@ export function EntityGraphVis() {
                     </div>
                 </div>
 
-                {/* ── Stats HUD ─────────────────────────────────────────────── */}
+                {/*  Stats HUD  */}
                 <div className="absolute bottom-5 right-5 pointer-events-none">
                     <div className="rounded-xl border border-white/5 overflow-hidden" style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)' }}>
                         <div className="px-4 py-2.5 border-b border-white/5">
@@ -367,16 +367,16 @@ export function EntityGraphVis() {
                         </div>
                         <div className="px-4 py-3 grid grid-cols-2 gap-x-8 gap-y-2">
                             <span className="text-[7px] uppercase tracking-wider text-white/20">Nodes</span>
-                            <span className="text-[9px] font-black font-mono text-white">{matrixData?.graph?.nodes?.length ?? 0}</span>
+                            <span className="text-[9px] font-black font-mono text-white">{gridData?.graph?.nodes?.length ?? 0}</span>
                             <span className="text-[7px] uppercase tracking-wider text-white/20">Edges</span>
-                            <span className="text-[9px] font-black font-mono text-white">{matrixData?.graph?.links?.length ?? 0}</span>
+                            <span className="text-[9px] font-black font-mono text-white">{gridData?.graph?.links?.length ?? 0}</span>
                             <span className="text-[7px] uppercase tracking-wider text-white/20">Zoom</span>
                             <span className="text-[9px] font-black font-mono text-[#00C076]">{Math.round(zoomLevel * 100)}%</span>
                         </div>
                     </div>
                 </div>
 
-                {/* ── Selected Node Panel ───────────────────────────────────── */}
+                {/*  Selected Node Panel  */}
                 <AnimatePresence>
                     {selectedNode && (
                         <motion.div
@@ -409,9 +409,9 @@ export function EntityGraphVis() {
 
                                 {[
                                     { label: 'Layer Type', value: selectedNode.group === 0 ? 'Genesis Origin' : selectedNode.group === 1 ? 'Flagged High-Risk' : selectedNode.group === 2 ? 'Institutional Hub' : 'Standard Wallet', color: getNodeColor(selectedNode.group).glow },
-                                    { label: 'Wallet Address', value: selectedNode.address || '—', color: 'rgba(255,255,255,0.4)' },
-                                    { label: 'Network Weight', value: String(selectedNode.weight ?? selectedNode.size ?? '—'), color: '#00C076' },
-                                    { label: 'Connections', value: String(selectedNode.connections ?? '—'), color: 'rgba(255,255,255,0.4)' },
+                                    { label: 'Wallet Address', value: selectedNode.address || '', color: 'rgba(255,255,255,0.4)' },
+                                    { label: 'Network Weight', value: String(selectedNode.weight ?? selectedNode.size ?? ''), color: '#00C076' },
+                                    { label: 'Connections', value: String(selectedNode.connections ?? ''), color: 'rgba(255,255,255,0.4)' },
                                 ].map(({ label, value, color }) => (
                                     <div key={label} className="flex flex-col gap-0.5">
                                         <span className="text-[7px] uppercase tracking-[0.2em] text-white/20 font-black">{label}</span>
@@ -431,7 +431,7 @@ export function EntityGraphVis() {
                 </div>
             </div>
 
-            {/* ── FOOTER ────────────────────────────────────────────────────── */}
+            {/*  FOOTER  */}
             <div className="px-6 py-3 border-t border-white/5 bg-[#0A0A0A] flex justify-between items-center text-[7px] font-bold uppercase tracking-[0.2em] text-white/20 shrink-0">
                 <div className="flex items-center gap-4">
                     <span>Render: D3 Force Graph</span>
@@ -439,7 +439,7 @@ export function EntityGraphVis() {
                 </div>
                 <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
-                    Entity Intelligence v2.0
+                    Entity Analytics v2.0
                 </span>
             </div>
         </div>

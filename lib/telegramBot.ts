@@ -69,21 +69,21 @@ export function formatWhaleAlertTelegram(data: {
     // Convert to Euros (Approx rate: 0.96)
     const eurVal = val * 0.96;
     const millions = safeToFixed(eurVal / 1_000_000, 2);
-    return `€${millions} Million Euros`;
+    return `${millions} Million Euros`;
   };
 
-  const emoji = '🐋'; // Always whale, never mermaid
+  const emoji = ''; // Always whale, never mermaid
   const typeTranslated = data.type === 'CONTRACT' ? 'Interaction' : 'Transfer';
 
   return `
 ${emoji} <b>WHALE ALERT</b> | Base
 
-💶 <b>${formatMoney(data.amount)}</b>
+ <b>${formatMoney(data.amount)}</b>
 ${typeTranslated} of <b>${data.token}</b> successfully transferred
 
-👤 <code>${shortAddress}</code>
+ <code>${shortAddress}</code>
 
-🔗 ${data.txHash ? `<a href="https://basescan.org/tx/${data.txHash}">View Transaction</a>` : ''}
+ ${data.txHash ? `<a href="https://basescan.org/tx/${data.txHash}">View Transaction</a>` : ''}
 `.trim();
 }
 
@@ -96,18 +96,18 @@ export function formatPriceAlertTelegram(data: {
   targetPrice: number;
   condition: 'above' | 'below';
 }): string {
-  const emoji = data.condition === 'above' ? '📈' : '📉';
+  const emoji = data.condition === 'above' ? '' : '';
   const conditionText = data.condition === 'above' ? 'ABOVE' : 'BELOW';
   
   return `
 ${emoji} <b>PRICE ALERT</b>
 
 🪙 <b>Token:</b> ${data.token}
-💵 <b>Current Price:</b> $${safeToLocaleString(data.currentPrice)}
-🎯 <b>Target:</b> $${safeToLocaleString(data.targetPrice)}
-🔔 <b>Condition:</b> ${conditionText}
+ <b>Current Price:</b> $${safeToLocaleString(data.currentPrice)}
+ <b>Target:</b> $${safeToLocaleString(data.targetPrice)}
+ <b>Condition:</b> ${conditionText}
 
-⏰ ${new Date().toLocaleTimeString()}
+ ${new Date().toLocaleTimeString()}
   `.trim();
 }
 
@@ -123,23 +123,23 @@ export function formatDailyDigestTelegram(data: {
   const topMoversList = data.topMovers
     .slice(0, 3)
     .map((m, i) => {
-      const emoji = m.change > 0 ? '📈' : '📉';
+      const emoji = m.change > 0 ? '' : '';
       const shortAddr = `${m.address.slice(0, 6)}...${m.address.slice(-4)}`;
       return `${i + 1}. ${shortAddr}: ${emoji} ${m.change > 0 ? '+' : ''}${safeToFixed(m.change, 2)}%`;
     })
     .join('\n');
 
   return `
-📊 <b>DAILY SUMMARY</b>
+ <b>DAILY SUMMARY</b>
 
-👀 <b>Wallets Tracked:</b> ${data.walletsTracked}
-💰 <b>Total Value:</b> $${safeToFixed(data.totalValue / 1e6, 2)}M
-⚡ <b>Transactions 24h:</b> ${data.transactions24h}
+ <b>Wallets Tracked:</b> ${data.walletsTracked}
+ <b>Total Value:</b> $${safeToFixed(data.totalValue / 1e6, 2)}M
+ <b>Transactions 24h:</b> ${data.transactions24h}
 
-🏆 <b>Top Movers:</b>
+ <b>Top Movers:</b>
 ${topMoversList}
 
-📅 ${new Date().toLocaleDateString()}
+ ${new Date().toLocaleDateString()}
   `.trim();
 }
 

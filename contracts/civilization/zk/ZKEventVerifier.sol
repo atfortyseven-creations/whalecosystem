@@ -9,13 +9,13 @@ pragma solidity ^0.8.22;
  * This completely obsoletes the data-bloat paradigm of architectures like BSV.
  */
 contract ZKEventVerifier {
-    // ─── EVENTS ─────────────────────────────────────────────────────────────
+    //  EVENTS 
     
     // Emitted when a Zero-Knowledge Proof for a batch of highly-filtered whale events is finalized.
     // L2s and external indexers listen to this to know that the DA layer's data is authentic.
     event WhaleEventsAuthenticated(bytes32 indexed eventRoot, uint256 batchId, uint256 timestamp);
 
-    // ─── STATE VARIABLES ────────────────────────────────────────────────────
+    //  STATE VARIABLES 
     
     uint256 public currentBatchId;
     mapping(uint256 => bytes32) public authenticatedRoots;
@@ -23,26 +23,26 @@ contract ZKEventVerifier {
     // Address of the authorized relayer (for the initial permissioned prover phase)
     address public zkAggregator;
 
-    // ─── ERRORS ─────────────────────────────────────────────────────────────
+    //  ERRORS 
     
     error ProofInvalid();
     error RootAlreadyVerified();
     error UnauthorizedProver();
 
-    // ─── MODIFIERS ──────────────────────────────────────────────────────────
+    //  MODIFIERS 
     
     modifier onlyAggregator() {
         if (msg.sender != zkAggregator) revert UnauthorizedProver();
         _;
     }
 
-    // ─── CONSTRUCTOR ────────────────────────────────────────────────────────
+    //  CONSTRUCTOR 
     
     constructor() {
         zkAggregator = msg.sender;
     }
 
-    // ─── CORE LOGIC ─────────────────────────────────────────────────────────
+    //  CORE LOGIC 
 
     /**
      * @notice Verifies a Zero-Knowledge Proof (e.g., PLONK/Groth16/SP1) of off-chain events.

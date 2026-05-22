@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { useAppKitNetwork, useDisconnect } from '@reown/appkit/react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import NextLink from 'next/link';
 import { Shield, Link, Network, Cpu, LogOut, Activity, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function WalletConnectSessions() {
-    const { isConnected, address } = useSovereignAccount();
+    const { isConnected, address } = useSystemAccount();
     const caipAddress = `eip155:1:${address}`;
     const { caipNetwork } = useAppKitNetwork();
     const { disconnect } = useDisconnect();

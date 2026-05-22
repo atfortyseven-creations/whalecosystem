@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
-// DESTRUCTIVE ENDPOINT — requires X-Admin-Secret header + explicit confirmation body.
+// DESTRUCTIVE ENDPOINT  requires X-Admin-Secret header + explicit confirmation body.
 // Changed from GET to POST: destructive operations must never be idempotent GET requests
 // (browser prefetch, CDN crawlers, health checks could accidentally trigger a full wipe).
 export async function POST(req: Request) {
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const deletedTickets = await (prisma as any).goldenTicket.deleteMany({});
     const deletedUsers = await (prisma as any).user.deleteMany({});
 
-    console.warn(`[AdminNuke] ⚠️  FULL WIPE EXECUTED — tickets: ${deletedTickets.count}, users: ${deletedUsers.count}`);
+    console.warn(`[AdminNuke] ️  FULL WIPE EXECUTED  tickets: ${deletedTickets.count}, users: ${deletedUsers.count}`);
 
     return NextResponse.json({
       success: true,

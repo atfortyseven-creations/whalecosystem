@@ -13,7 +13,7 @@ export const SECTOR_TAXONOMY = {
   ECOSYSTEMS: ['ethereum', 'solana', 'base', 'arbitrum', 'optimism', 'bsc', 'polygon', 'avalanche']
 };
 
-class SovereignNeuralSegregator extends EventEmitter {
+class SystemNeuralSegregator extends EventEmitter {
   private activeStreams: Map<string, any[]> = new Map();
   private zScoreDecayFactor: number = 0.95;
 
@@ -72,4 +72,4 @@ class SovereignNeuralSegregator extends EventEmitter {
   }
 }
 
-export const neuralSegregator = new SovereignNeuralSegregator();
+export const neuralSegregator = new SystemNeuralSegregator();

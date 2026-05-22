@@ -1,10 +1,10 @@
 /**
- * Analytics Engine — Axiomas 350–358
- * ═══════════════════════════════════════════════════════════════
+ * Analytics Engine  Axiomas 350358
+ * 
  * Churn prediction, LTV modeling, cohort analysis, virality
- * coefficient, conversion funnel, NPS — all wallet-scoped,
+ * coefficient, conversion funnel, NPS  all wallet-scoped,
  * zero PII, GDPR-compliant.
- * ═══════════════════════════════════════════════════════════════
+ * 
  */
 
 import { prisma } from '@/lib/prisma';
@@ -29,10 +29,10 @@ async function setRedisValue(key: string, value: any, ttlSeconds?: number): Prom
   }
 }
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+//  Types 
 export interface ChurnScore {
   walletAddress: string;
-  score:         number;    // 0.0–1.0 (1.0 = certain churn)
+  score:         number;    // 0.01.0 (1.0 = certain churn)
   predictedDays: number;    // Days until estimated churn
   signals:       string[];
   computedAt:    string;
@@ -61,7 +61,7 @@ export interface ViralityMetrics {
   computedAt:     string;
 }
 
-// ── CHURN PREDICTION (Axioma 351) ─────────────────────────────────────────────
+//  CHURN PREDICTION (Axioma 351) 
 /**
  * Simple 30-day LTV regression scoring. 
  * Signals: days since last login, forum activity, tier level, referrals.
@@ -100,7 +100,7 @@ export async function computeChurnScore(walletAddress: string): Promise<ChurnSco
     // Signal 2: Free tier (higher churn risk)
     if (!user.tier || user.tier === 'FREE') { score += 0.2; signals.push('free_tier'); }
 
-    // Signal 3: Recency (newly joined < 3 days — still evaluating)
+    // Signal 3: Recency (newly joined < 3 days  still evaluating)
     const daysSinceJoin = (Date.now() - new Date(user.createdAt).getTime()) / 86_400_000;
     if (daysSinceJoin < 3) { score -= 0.1; signals.push('new_user'); }
 
@@ -116,7 +116,7 @@ export async function computeChurnScore(walletAddress: string): Promise<ChurnSco
   }
 }
 
-// ── COHORT ANALYSIS (Axioma 352) ──────────────────────────────────────────────
+//  COHORT ANALYSIS (Axioma 352) 
 export async function computeWeeklyCohorts(): Promise<CohortData[]> {
   const cacheKey = 'analytics:cohorts';
   const cached = await getRedisValue<CohortData[]>(cacheKey);
@@ -173,7 +173,7 @@ export async function computeWeeklyCohorts(): Promise<CohortData[]> {
   }
 }
 
-// ── CONVERSION FUNNEL (Axioma 350) ───────────────────────────────────────────
+//  CONVERSION FUNNEL (Axioma 350) 
 export async function trackFunnelEvent(event: FunnelEvent): Promise<void> {
   const key = `funnel:${event.step}:${new Date().toISOString().slice(0, 10)}`;
   await redis.incr(key);
@@ -196,7 +196,7 @@ export async function getFunnelMetrics(days = 7): Promise<Record<string, number>
   return metrics;
 }
 
-// ── VIRALITY COEFFICIENT (Axioma 353) ─────────────────────────────────────────
+//  VIRALITY COEFFICIENT (Axioma 353) 
 export async function computeViralityMetrics(): Promise<ViralityMetrics> {
   const cacheKey = 'analytics:virality';
   const cached = await getRedisValue<ViralityMetrics>(cacheKey);
@@ -231,10 +231,10 @@ export async function computeViralityMetrics(): Promise<ViralityMetrics> {
   }
 }
 
-// ── NPS SIGNED (Axioma 356) ───────────────────────────────────────────────────
+//  NPS SIGNED (Axioma 356) 
 export interface NPSEntry {
   walletAddress: string;
-  score:         number;   // 0–10
+  score:         number;   // 010
   comment?:      string;
   signature:     string;   // EIP-191 over JSON.stringify({walletAddress, score, comment, ts})
   timestamp:     string;

@@ -48,8 +48,8 @@ export async function GET() {
             };
         });
 
-        // ── [SOVEREIGN PERSISTENCE] Save mega-whale BTC movements to DB ──────
-        // Threshold: 50 BTC+ (5,000,000,000 satoshis) — only true giants are indexed.
+        //  [SOVEREIGN PERSISTENCE] Save mega-whale BTC movements to DB 
+        // Threshold: 50 BTC+ (5,000,000,000 satoshis)  only true giants are indexed.
         // FIRE AND FORGET: DB write never blocks the response.
         const giantWhales = mappedTxs.filter((tx: any) => tx.value >= 5_000_000_000);
 
@@ -62,7 +62,7 @@ export async function GET() {
 
                         await prisma.whaleActivity.upsert({
                             where: { transactionHash: whale.txid },
-                            update: {}, // preserve existing record — write-once semantics
+                            update: {}, // preserve existing record  write-once semantics
                             create: {
                                 walletAddress: whale.vin?.[0]?.prevout?.scriptpubkey_address || 'Unknown',
                                 type: 'BTC Transfer',
@@ -84,7 +84,7 @@ export async function GET() {
                             }
                         });
                     } catch {
-                        // Silent fail — background persistence never blocks the API response
+                        // Silent fail  background persistence never blocks the API response
                     }
                 }
             })();

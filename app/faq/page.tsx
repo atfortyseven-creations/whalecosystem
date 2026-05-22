@@ -13,25 +13,25 @@ const FAQ_CATEGORIES = [
     items: [
       {
         q: "What is Whale Alert Network?",
-        a: "Whale Alert Network is an institutional-grade, privacy-first on-chain intelligence platform. We provide real-time forensic monitoring of large capital flows (≥ $100K) across 24 ERC-20 tokens on Ethereum and major L2 networks. Our infrastructure detects institutional accumulation, exchange inflows/outflows, and anomalous on-chain behaviour before it impacts price action.",
+        a: "Whale Alert Network is an institutional-grade, privacy-first on-chain analytics platform. We provide real-time forensic monitoring of large capital flows ( $100K) across 24 ERC-20 tokens on Ethereum and major L2 networks. Our infrastructure detects institutional accumulation, exchange inflows/outflows, and anomalous on-chain behaviour before it impacts price action.",
       },
       {
         q: "Do I need to create an account or provide an email?",
         a: "No account registration is required. Authentication is handled exclusively through your Web3 wallet (MetaMask, Coinbase Wallet, Rainbow, etc.) using a cryptographic ECDSA signature. We do not store your email, password, or any personally identifiable information. Your private key never leaves your device.",
       },
       {
-        q: "What is the Sovereign Vault?",
-        a: "The Sovereign Vault is an optional local daemon process that runs on your machine. It enables fully private, local intelligence — all graph pruning, aggregation, and querying happens in your own RAM, with no data ever transmitted to external servers. It is ideal for institutional operators who require complete data sovereignty.",
+        q: "What is the System Vault?",
+        a: "The System Vault is an optional local daemon process that runs on your machine. It enables fully private, local analytics  all graph pruning, aggregation, and querying happens in your own RAM, with no data ever transmitted to external servers. It is ideal for institutional operators who require complete data systemty.",
       },
       {
         q: "What is a Golden Ticket (WGT-GENESIS)?",
-        a: "A Golden Ticket is a permanent, zero-knowledge verifiable on-chain credential (NFT) issued on Optimism L2. Holding one grants unrestricted, lifetime access to the Whale Alert Network terminal — without tying your identity to a subscription payment. Only 200 Genesis tickets have been minted.",
+        a: "A Golden Ticket is a permanent, zero-knowledge verifiable on-chain credential (NFT) issued on Optimism L2. Holding one grants unrestricted, lifetime access to the Whale Alert Network terminal  without tying your identity to a subscription payment. Only 200 Genesis tickets have been minted.",
       },
     ],
   },
   {
     id: "data",
-    label: "Data & Intelligence",
+    label: "Data & Analytics",
     icon: Zap,
     color: "#06b6d4",
     items: [
@@ -49,7 +49,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "What are EVM Thermodynamics?",
-        a: "EVM Thermodynamics is our proprietary methodology for measuring the density and frequency of smart contract interactions — specifically EIP-2929 memory access patterns, gas topology shifts, and contract call depth — to identify institutional accumulation behaviour before it manifests in price action. It gives us a predictive edge over standard volume-based alerts.",
+        a: "EVM Thermodynamics is our proprietary methodology for measuring the density and frequency of smart contract interactions  specifically EIP-2929 memory access patterns, gas topology shifts, and contract call depth  to identify institutional accumulation behaviour before it manifests in price action. It gives us a predictive edge over standard volume-based alerts.",
       },
       {
         q: "How does the Heikin-Ashi Signal Feed work?",
@@ -64,7 +64,7 @@ const FAQ_CATEGORIES = [
     color: "#8b5cf6",
     items: [
       {
-        q: "What hardware is required to run the Sovereign Vault?",
+        q: "What hardware is required to run the System Vault?",
         a: "We recommend a minimum of 8GB RAM for full mainnet indexing across all 24 tokens. A LITE_MODE is available for systems with 4GB RAM, which reduces the indexing scope to the top 5 tokens. A modern multi-core CPU is sufficient; no GPU is required for the local vault. Our production cloud infrastructure uses GPU clusters for neural forensic synthesis.",
       },
       {
@@ -73,7 +73,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: "Why is Aztec Network used in the infrastructure?",
-        a: "Aztec's ZK-rollup architecture allows us to batch-verify intelligence data proofs and create cryptographically certified audit trails without revealing underlying wallet addresses publicly. This enables our Dark Pool Radar and institutional entity classification features to operate with strong privacy guarantees for our users.",
+        a: "Aztec's ZK-rollup architecture allows us to batch-verify analytics data proofs and create cryptographically certified audit trails without revealing underlying wallet addresses publicly. This enables our Dark Pool Radar and institutional entity classification features to operate with strong privacy guarantees for our users.",
       },
       {
         q: "Do you store my portfolio data?",

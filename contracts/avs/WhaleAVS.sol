@@ -99,7 +99,7 @@ contract WhaleAVS is Ownable2Step, ReentrancyGuard, Pausable {
         require(!task.hasVoted[msg.sender], "Already attested");
 
         task.hasVoted[msg.sender] = true;
-        op.successfulVerifications += 1; // Track for Sovereign Hall of Fame
+        op.successfulVerifications += 1; // Track for System Hall of Fame
 
         if (isValid) {
             task.approvals += 1;
@@ -120,7 +120,7 @@ contract WhaleAVS is Ownable2Step, ReentrancyGuard, Pausable {
 
     /**
      * @dev Slashes a Byzantine operator who certified a mathematically invalid state.
-     * Controlled by Sovereign Governance.
+     * Controlled by System Governance.
      */
     function slashOperator(address operator, bytes32 taskHash) external onlyOwner {
         Operator storage op = operators[operator];

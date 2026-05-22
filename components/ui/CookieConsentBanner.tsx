@@ -8,7 +8,7 @@ export function CookieConsentBanner() {
 
   useEffect(() => {
     // Solo mostramos si no hay decisión tomada
-    const consent = localStorage.getItem("sovereign_cookie_consent");
+    const consent = localStorage.getItem("system_cookie_consent");
     if (!consent) {
       // Delay it slightly for aesthetic entrance
       const timer = setTimeout(() => setShow(true), 1500);
@@ -17,12 +17,12 @@ export function CookieConsentBanner() {
   }, []);
 
   const handleAcceptAll = () => {
-    localStorage.setItem("sovereign_cookie_consent", "all");
+    localStorage.setItem("system_cookie_consent", "all");
     setShow(false);
   };
 
   const handleEssential = () => {
-    localStorage.setItem("sovereign_cookie_consent", "essential");
+    localStorage.setItem("system_cookie_consent", "essential");
     setShow(false);
   };
 
@@ -38,7 +38,7 @@ export function CookieConsentBanner() {
         >
           <div className="w-full max-w-4xl mx-auto bg-white text-[#0a0a0a] border border-black/10 rounded-[24px] shadow-[0_30px_60px_rgba(0,0,0,0.1)] p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-12 pointer-events-auto backdrop-blur-2xl relative overflow-hidden">
             
-            {/* Ambient Background Matrix */}
+            {/* Ambient Background Grid */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
                  style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
 
@@ -48,7 +48,7 @@ export function CookieConsentBanner() {
                   Institutional Telemetry & Privacy
                 </h3>
                 <p className="text-[10px] md:text-[11px] text-black/50 leading-relaxed font-mono uppercase tracking-[0.1em] max-w-2xl">
-                  Whale Alert Network utilizes cryptographic local storage to maintain Sovereign identity sessions (Zero-Knowledge) and standard cookies for platform functionality. You must authorize data retention policies before operating the terminal.
+                  Whale Alert Network utilizes cryptographic local storage to maintain System identity sessions (Zero-Knowledge) and standard cookies for platform functionality. You must authorize data retention policies before operating the terminal.
                 </p>
               </div>
             </div>

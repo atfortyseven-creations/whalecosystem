@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QrCode, X } from 'lucide-react';
-import { SovereignBridge } from '@/components/premium/SovereignBridge';
+import { SystemBridge } from '@/components/premium/SystemBridge';
 
 export default function BridgePanel() {
     const [open, setOpen] = useState(false);
@@ -35,14 +35,14 @@ export default function BridgePanel() {
                         <div className="flex items-center justify-between mb-6">
                             <div>
                                 <h4 className="font-mono text-[11px] uppercase tracking-widest text-white font-bold">Device Bridge</h4>
-                                <p className="text-[9px] font-mono text-white/30 tracking-wide mt-0.5">Generate QR → Scan on mobile</p>
+                                <p className="text-[9px] font-mono text-white/30 tracking-wide mt-0.5">Generate QR  Scan on mobile</p>
                             </div>
                             <button onClick={() => setOpen(false)}
                                 className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
                                 <X size={13} className="text-white/50" />
                             </button>
                         </div>
-                        <SovereignBridge />
+                        <SystemBridge />
                     </motion.div>
                 )}
             </AnimatePresence>

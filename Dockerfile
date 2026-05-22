@@ -1,10 +1,10 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# SOVEREIGN TERMINAL — INSTITUTIONAL MULTI-STAGE DOCKER PIPELINE
+# 
+# SOVEREIGN TERMINAL  INSTITUTIONAL MULTI-STAGE DOCKER PIPELINE
 # Railway Hobby Plan: 8 vCPU / 8 GB RAM
-# Architecture: 5-stage build → minimal production runner
-# ─────────────────────────────────────────────────────────────────────────────
+# Architecture: 5-stage build  minimal production runner
+# 
 
-# ─── STAGE 1: RUNTIME BASE ───────────────────────────────────────────────────
+#  STAGE 1: RUNTIME BASE 
 # Updated to node:22-slim to satisfy @xmtp/browser-sdk requirements (>=22.0.0).
 FROM node:22-slim AS runtime
 WORKDIR /app
@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
-# ─── STAGE 2: BUILD DEPENDENCIES ─────────────────────────────────────────────
+#  STAGE 2: BUILD DEPENDENCIES 
 FROM runtime AS build-base
 
 # Consolidate all build-time tools into one layer.
@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     pkg-config \
     libssl-dev \
-    || (echo "[build-base] apt-get install failed — refreshing package index and retrying..." \
+    || (echo "[build-base] apt-get install failed  refreshing package index and retrying..." \
         && sleep 15 \
         && apt-get update \
         && apt-get install -y --no-install-recommends \
@@ -51,7 +51,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
             libssl-dev) \
     && rm -rf /var/lib/apt/lists/*
 
-# ─── STAGE 3: INSTALL DEPENDENCIES ───────────────────────────────────────────
+#  STAGE 3: INSTALL DEPENDENCIES 
 FROM build-base AS deps
 WORKDIR /app
 
@@ -60,7 +60,7 @@ COPY package.json package-lock.json ./
 # Note: npm ci is preferred for speed and deterministic builds in CI
 RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
-# ─── STAGE 4: BUILD ───────────────────────────────────────────────────────────
+#  STAGE 4: BUILD 
 FROM build-base AS builder
 WORKDIR /app
 
@@ -77,7 +77,7 @@ ENV SKIP_ENV_VALIDATION=true
 RUN npx prisma generate && \
     npx next build
 
-# ─── STAGE 5: PRODUCTION RUNNER ───────────────────────────────────────────────
+#  STAGE 5: PRODUCTION RUNNER 
 FROM runtime AS runner
 WORKDIR /app
 
@@ -96,6 +96,6 @@ RUN chmod +x /app/start.sh
 
 EXPOSE 3000
 
-# Execute the Sovereign boot sequence
+# Execute the System boot sequence
 CMD ["sh", "/app/start.sh"]
 

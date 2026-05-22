@@ -31,7 +31,7 @@ export function NukeProfile() {
 
         try {
             const timestamp = Date.now();
-            const message = `I want to permanently delete all my data from Sovereign Handshake. Wallet: ${address}. Timestamp: ${timestamp}`;
+            const message = `I want to permanently delete all my data from System Handshake. Wallet: ${address}. Timestamp: ${timestamp}`;
             
             toast.loading("Generating EIP-191 Proof of Ownership...", { id: toastId });
             

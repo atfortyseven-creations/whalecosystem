@@ -2,13 +2,13 @@
 
 This guide helps you resolve the intermittent access failures caused by database migration issues and case-sensitivity problems.
 
-## 🚨 Problem Summary
+##  Problem Summary
 
 - **Migration `20260131120000_phase2_3_4_init` rolled back**: Database is in inconsistent state
 - **Case-sensitive paths**: Windows development vs Linux production causing module resolution failures  
 - **Middleware blocking valid requests**: Requests without origin (health checks) being blocked
 
-## ✅ Fixes Applied
+##  Fixes Applied
 
 ### 1. Database Migration Handling
 - Created `scripts/check-migration-status.ts` - Diagnoses database state
@@ -26,7 +26,7 @@ This guide helps you resolve the intermittent access failures caused by database
 - Maintains security by blocking unauthorized origins
 - Added better logging for debugging
 
-## 📋 Deployment Checklist
+##  Deployment Checklist
 
 ### Before Deploying
 
@@ -59,10 +59,10 @@ git push
 ### After Deployment
 
 Monitor Railway logs for:
-- ✅ "Migration 20260131120000_phase2_3_4_init applied" or "already applied"
-- ✅ Build completes without "Module not found" errors
-- ✅ No middleware "Blocked request" warnings from valid sources
-- ✅ `/api/auth/session` requests succeed
+-  "Migration 20260131120000_phase2_3_4_init applied" or "already applied"
+-  Build completes without "Module not found" errors
+-  No middleware "Blocked request" warnings from valid sources
+-  `/api/auth/session` requests succeed
 
 ### Testing Access
 
@@ -72,7 +72,7 @@ Test with different scenarios:
 3. **Wallet features** - `/api/wallet/*` endpoints should respond
 4. **Different browsers/devices** - Verify consistent access
 
-## 🔧 Manual Migration Fix (if auto-deploy fails)
+##  Manual Migration Fix (if auto-deploy fails)
 
 If automatic migration fails, connect to Railway database:
 
@@ -87,14 +87,14 @@ railway run npx prisma migrate resolve --applied 20260131120000_phase2_3_4_init
 railway run npx prisma migrate deploy
 ```
 
-## 📊 Files Modified
+##  Files Modified
 
 - `package.json` - Added `build:railway`, `migrate:status`, `check-migration` scripts
 - `railway.json` - Updated build command to `npm run build:railway`
 - `next.config.js` - Added case-sensitive paths webpack plugin
 - `middleware.ts` - Fixed origin validation logic
 
-## 🆘 Troubleshooting
+##  Troubleshooting
 
 **Build fails with "Module not found":**
 - Check case-sensitivity of all imports

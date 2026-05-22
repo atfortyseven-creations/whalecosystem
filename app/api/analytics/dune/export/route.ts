@@ -1,7 +1,7 @@
 /**
  * GET /api/analytics/dune/export
  *
- * Sovereign Dune Analytics Export Engine
+ * System Dune Analytics Export Engine
  *
  * Exports live whale activity data in a format ready to be imported
  * into Dune Analytics or used as a dataset in a custom Dune query.
@@ -17,9 +17,9 @@
  *
  * Dune Import Steps (returned in X-Dune-Import-Instructions header):
  *   1. Download the CSV output
- *   2. Go to dune.com → My Uploads → Upload CSV
- *   3. Name: whalealert_sovereign_events
- *   4. Use query: SELECT * FROM dune_upload.whalealert_sovereign_events
+ *   2. Go to dune.com  My Uploads  Upload CSV
+ *   3. Name: whalealert_system_events
+ *   4. Use query: SELECT * FROM dune_upload.whalealert_system_events
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,7 +29,7 @@ export const runtime = 'nodejs';
 
 const MAX_LIMIT = 5000;
 
-// ─── CSV serializer ─────────────────────────────────────────────────────────
+//  CSV serializer 
 
 function toCSV(rows: any[]): string {
     if (!rows.length) return '';
@@ -48,7 +48,7 @@ function toCSV(rows: any[]): string {
     return [headerLine, ...dataLines].join('\n');
 }
 
-// ─── Row normalizer ────────────────────────────────────────────────────────
+//  Row normalizer 
 
 function normalizeRow(row: any) {
     return {
@@ -72,7 +72,7 @@ function normalizeRow(row: any) {
     };
 }
 
-// ─── Handler ──────────────────────────────────────────────────────────────
+//  Handler 
 
 export async function GET(req: NextRequest) {
     const params  = req.nextUrl.searchParams;
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
 
         const normalized = rows.map(normalizeRow);
 
-        // ── Aggregate stats for response metadata ──
+        //  Aggregate stats for response metadata 
         const totalUsd  = normalized.reduce((s, r) => s + r.usd_value, 0);
         const chainMap  = normalized.reduce((m, r) => ({ ...m, [r.chain]: (m[r.chain] ?? 0) + 1 }), {} as Record<string, number>);
 
@@ -111,8 +111,8 @@ export async function GET(req: NextRequest) {
             record_count:  normalized.length,
             total_usd:     totalUsd,
             chains:        chainMap,
-            dune_table:    'dune_upload.whalealert_sovereign_events',
-            query_example: `SELECT chain, token, SUM(usd_value) as total_volume, COUNT(*) as tx_count FROM dune_upload.whalealert_sovereign_events WHERE usd_value_bucket IN ('MEGA','MACRO') GROUP BY 1, 2 ORDER BY 3 DESC`,
+            dune_table:    'dune_upload.whalealert_system_events',
+            query_example: `SELECT chain, token, SUM(usd_value) as total_volume, COUNT(*) as tx_count FROM dune_upload.whalealert_system_events WHERE usd_value_bucket IN ('MEGA','MACRO') GROUP BY 1, 2 ORDER BY 3 DESC`,
         };
 
         if (format === 'csv') {
@@ -120,10 +120,10 @@ export async function GET(req: NextRequest) {
             return new Response(csv, {
                 headers: {
                     'Content-Type':              'text/csv; charset=utf-8',
-                    'Content-Disposition':       `attachment; filename="whalealert_sovereign_${days}d_${Date.now()}.csv"`,
+                    'Content-Disposition':       `attachment; filename="whalealert_system_${days}d_${Date.now()}.csv"`,
                     'X-Record-Count':            String(normalized.length),
                     'X-Total-USD':               String(totalUsd.toFixed(0)),
-                    'X-Dune-Import-Instructions': 'Upload to dune.com → My Uploads → Use table: dune_upload.whalealert_sovereign_events',
+                    'X-Dune-Import-Instructions': 'Upload to dune.com  My Uploads  Use table: dune_upload.whalealert_system_events',
                     'Cache-Control':             'no-store',
                 },
             });

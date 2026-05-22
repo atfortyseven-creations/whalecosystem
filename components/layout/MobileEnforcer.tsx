@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
-import { MobileLanding as MobileSovereignLanding } from '@/components/landing/MobileLanding';
+import { MobileLanding as MobileSystemLanding } from '@/components/landing/MobileLanding';
 import dynamic from 'next/dynamic';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { usePathname } from 'next/navigation';
 
 // Lazy-load the authenticated mobile news shell
@@ -16,7 +16,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [showNews, setShowNews] = useState(false);
-    const { isConnected, address, isZkVerified } = useSovereignAccount();
+    const { isConnected, address, isZkVerified } = useSystemAccount();
     const pathname = usePathname();
 
     // Track previous connection state to detect NEW wallet connections
@@ -32,7 +32,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             }
 
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-            // UA-based detection — works for standard mobile browsers
+            // UA-based detection  works for standard mobile browsers
             const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
             const isTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
             const isSmallScreen  = window.screen.width < 768;
@@ -40,7 +40,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             const mobileDetected = isUaMobile || (isTouchScreen && isSmallScreen);
             setIsMobile(mobileDetected);
 
-            // ── INHUMAN OPTIMIZATION: Sterile Layout Constraints ──
+            //  INHUMAN OPTIMIZATION: Sterile Layout Constraints 
             // If mobile is detected, immediately enforce sterile viewport physics
             // directly onto the root DOM before React finishes hydration.
             if (mobileDetected) {
@@ -60,11 +60,11 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         setMounted(true);
         window.addEventListener('resize', checkMobile);
 
-        // ─── [SOVEREIGN QR HANDSHAKE] Detect desktop QR URL params ────────
+        //  [SOVEREIGN QR HANDSHAKE] Detect desktop QR URL params 
         // When the user scans the PC QR code with their native iOS/Android camera,
         // the browser opens /connect?uuid=UUID&pub=BASE64_PUB&ecdh=0|1&exp=TIMESTAMP.
         // We detect these params here and store them for auto-completion after
-        // wallet authentication — no need to scan again inside the in-app scanner.
+        // wallet authentication  no need to scan again inside the in-app scanner.
         const urlParams = new URLSearchParams(window.location.search);
         const qrUuid   = urlParams.get('uuid');
         const qrPub    = urlParams.get('pub');   // URL-encoded base64 JWK
@@ -77,7 +77,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         if (qrUuid && qrPub) {
             const expiry = qrExp ? parseInt(qrExp, 10) : Infinity;
             if (Date.now() < expiry) {
-                console.log(`[QRHandshake] Desktop QR detected in URL — uuid: ${qrUuid}`);
+                console.log(`[QRHandshake] Desktop QR detected in URL  uuid: ${qrUuid}`);
                 try {
                     sessionStorage.setItem('pending_qr_uuid', qrUuid);
                     sessionStorage.setItem('pending_qr_pub',  qrPub);
@@ -87,7 +87,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
                     window.history.replaceState({}, '', window.location.pathname);
                 } catch (e) {}
             } else {
-                console.warn('[QRHandshake] Desktop QR link expired — ignoring params');
+                console.warn('[QRHandshake] Desktop QR link expired  ignoring params');
             }
         } else if (urlSession) {
             console.log(`[Handshake] Detected legacy session token in URL: ${urlSession}`);
@@ -106,22 +106,22 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             console.warn('[Safety] iOS Private Mode restricted sessionStorage read.');
         }
 
-        // CRITICAL: check for '0x' prefix so an expired cookie ('sovereign_handshake=; max-age=0')
+        // CRITICAL: check for '0x' prefix so an expired cookie ('system_handshake=; max-age=0')
         // does not falsely register as authenticated.
-        let hasSovereignCookie = false;
+        let hasSystemCookie = false;
         try {
-            hasSovereignCookie = typeof document !== 'undefined'
-                && (document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x')) || document.cookie.includes('wallet-auth='));
+            hasSystemCookie = typeof document !== 'undefined'
+                && (document.cookie.split('; ').some(r => r.startsWith('system_handshake=0x')) || document.cookie.includes('wallet-auth='));
         } catch(e) {}
 
-        if (bypassActive && hasSovereignCookie) {
+        if (bypassActive && hasSystemCookie) {
             setShowNews(true);
         }
 
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // ─── [AUTO-FULFILL NATIVE QR SCANS] ──────────────────────────────────────
+    //  [AUTO-FULFILL NATIVE QR SCANS] 
     // After wallet authentication, check if there are pending QR params from
     // the native camera scan flow. If yes, auto-complete the desktop handshake.
     useEffect(() => {
@@ -135,7 +135,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             if (qrUuid && qrPub) {
                 // Check expiry
                 if (qrExp && Date.now() > parseInt(qrExp, 10)) {
-                    console.warn('[QRHandshake] QR session expired — clearing params');
+                    console.warn('[QRHandshake] QR session expired  clearing params');
                     ['pending_qr_uuid','pending_qr_pub','pending_qr_ecdh','pending_qr_exp']
                         .forEach(k => sessionStorage.removeItem(k));
                     return;
@@ -144,14 +144,14 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
                 console.log('[QRHandshake] Auto-completing desktop QR handshake for:', address);
 
                 // Use qr-mobile-link to mint JWT + store in Redis in one shot
-                // (the endpoint reads sovereign_handshake cookie — always present post-sign)
+                // (the endpoint reads system_handshake cookie  always present post-sign)
                 fetch('/api/auth/qr-mobile-link', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify({
                         uuid: qrUuid,
-                        // Simplified payload — server mints and stores JWT directly
+                        // Simplified payload  server mints and stores JWT directly
                         encryptedPayload: 'native-camera-scan',
                         iv: 'native-camera-scan',
                         mobilePub: qrPub,
@@ -182,7 +182,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         } catch (e) {}
     }, [isConnected, address, mounted]);
 
-    // When wallet disconnects → reset showNews so landing returns to initial state
+    // When wallet disconnects  reset showNews so landing returns to initial state
     useEffect(() => {
         if (!mounted) return;
         if (!isConnected && prevConnected.current) {
@@ -202,15 +202,15 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         return <>{children}</>;
     }
 
-    // ── MOBILE ZONE ──────────────────────────────────────────────────────────
+    //  MOBILE ZONE 
     if (isMobile) {
-        // ─── [DIRECT ACCESS ROUTES] ───────────────────────────────────────────
+        //  [DIRECT ACCESS ROUTES] 
         // These are PUBLIC or informational routes that render normally on mobile.
-        // ⚠️  PC-ONLY routes (/dashboard, /portfolio, /settings, /sovereign-intel,
+        // ️  PC-ONLY routes (/dashboard, /portfolio, /settings, /system-intel,
         //     /predictions, /vip, /whalepost) are intentionally EXCLUDED here.
-        //     A mobile user — even with a connected wallet — must NOT reach those
+        //     A mobile user  even with a connected wallet  must NOT reach those
         //     pages because they are designed exclusively for the PC terminal.
-        //     They will stay on MobileSovereignLanding as intended.
+        //     They will stay on MobileSystemLanding as intended.
         const DIRECT_ACCESS_ROUTES = [
             '/news',
             '/connect',
@@ -245,17 +245,17 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             return <MobileNewsShell />;
         }
 
-        // Always show the Sovereign Landing:
-        // Pre-connection → wallet connect buttons
-        // Post-connection → connected state with navigation
+        // Always show the System Landing:
+        // Pre-connection  wallet connect buttons
+        // Post-connection  connected state with navigation
         return (
             <React.Suspense fallback={null}>
                 {/* @ts-ignore */}
-                <MobileSovereignLanding />
+                <MobileSystemLanding />
             </React.Suspense>
         );
     }
 
-    // ── PC ZONE ──────────────────────────────────────────────────────────────
+    //  PC ZONE 
     return <>{children}</>;
 }

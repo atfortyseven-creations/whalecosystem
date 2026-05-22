@@ -1,7 +1,7 @@
 /**
  * GET /api/user/portfolio?address=0x...
  * Powers LivePortfolio panel via GetBlock EP1 (JSON-RPC)
- * Real on-chain ETH + ERC-20 balances — no synthetic data.
+ * Real on-chain ETH + ERC-20 balances  no synthetic data.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
     } catch (error: any) {
         console.error('[Portfolio EP1 Error]', error?.message);
-        // Graceful fallback — return empty portfolio, not a crash
+        // Graceful fallback  return empty portfolio, not a crash
         return NextResponse.json({
             address: '',
             totalUsd: 0,

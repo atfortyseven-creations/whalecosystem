@@ -51,7 +51,7 @@ export default function AIRebalancerModal({ isOpen, onClose }: AIRebalancerModal
                 body: JSON.stringify({ plan: rebalancePlan }),
             });
             const data = await res.json();
-            alert(`✅ Portfolio rebalanced! ${data.swapsExecuted} swaps completed.`);
+            alert(` Portfolio rebalanced! ${data.swapsExecuted} swaps completed.`);
             onClose();
         } catch (e: any) {
             alert(e.message || 'Rebalance failed');
@@ -149,7 +149,7 @@ export default function AIRebalancerModal({ isOpen, onClose }: AIRebalancerModal
                                     {rebalancePlan.swaps?.map((swap: any, i: number) => (
                                         <div key={i} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
                                             <span className="text-white/80">
-                                                Swap {swap.from} → {swap.to}
+                                                Swap {swap.from}  {swap.to}
                                             </span>
                                             <span className="text-white font-bold">{swap.amount}</span>
                                         </div>

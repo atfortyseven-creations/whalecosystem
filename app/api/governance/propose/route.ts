@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verify World ID proof
-        const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as string;
+        const app_id = process.env.NEXT_PUBLIC_AUTH_APP_ID as string;
         const action = 'polymarket-wallet';
 
         const verifyRes = await verifyWorldIDProof({

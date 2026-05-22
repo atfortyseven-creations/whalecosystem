@@ -17,7 +17,7 @@ contract WhaleKnowledgeGraph is AccessControl {
     mapping(bytes32 => mapping(address => bool)) public hasSigned;
     mapping(bytes32 => uint256) public signatureCount;
 
-    struct EntityIntelligence {
+    struct EntityAnalytics {
         string name;          // e.g., "Binance Hot Wallet 6"
         string category;      // e.g., "Exchange", "OTC Bot", "MEV Searcher"
         uint8 riskScore;      // 0 to 100 (100 = High Risk / Dump trajectory)
@@ -26,8 +26,8 @@ contract WhaleKnowledgeGraph is AccessControl {
         bool exists;          // True if the entity has been indexed
     }
 
-    // Mapping from an Ethereum address to its Intelligence Profile
-    mapping(address => EntityIntelligence) private _knowledgeGraph;
+    // Mapping from an Ethereum address to its Analytics Profile
+    mapping(address => EntityAnalytics) private _knowledgeGraph;
 
     // Events for off-chain indexing (TheGraph / WebSockets)
     event EntityUpdated(address indexed targetProxy, string name, string category, uint8 riskScore);
@@ -43,7 +43,7 @@ contract WhaleKnowledgeGraph is AccessControl {
     }
 
     /**
-     * @dev Updates or creates an Intelligence Profile for a specific address.
+     * @dev Updates or creates an Analytics Profile for a specific address.
      * Restricted to addresses holding the `INTEL_NODE_ROLE`.
      * 
      * @param target The tracked blockchain address
@@ -52,7 +52,7 @@ contract WhaleKnowledgeGraph is AccessControl {
      * @param riskScore Scale 0-100
      * @param confidence Algorithm precision scale 0-100
      */
-    function updateEntityIntelligence(
+    function updateEntityAnalytics(
         address target,
         string calldata name,
         string calldata category,
@@ -70,7 +70,7 @@ contract WhaleKnowledgeGraph is AccessControl {
         signatureCount[updateHash]++;
         
         if (signatureCount[updateHash] >= requiredSignatures) {
-            _knowledgeGraph[target] = EntityIntelligence({
+            _knowledgeGraph[target] = EntityAnalytics({
                 name: name,
                 category: category,
                 riskScore: riskScore,
@@ -93,10 +93,10 @@ contract WhaleKnowledgeGraph is AccessControl {
     }
 
     /**
-     * @dev Public read function to fetch Intelligence on any address.
+     * @dev Public read function to fetch Analytics on any address.
      * Returns an empty struct if the address hasn't been tracked.
      */
-    function getEntityIntelligence(address target) 
+    function getEntityAnalytics(address target) 
         external 
         view 
         returns (
@@ -108,7 +108,7 @@ contract WhaleKnowledgeGraph is AccessControl {
             bool exists
         ) 
     {
-        EntityIntelligence memory intel = _knowledgeGraph[target];
+        EntityAnalytics memory intel = _knowledgeGraph[target];
         return (
             intel.name,
             intel.category,
@@ -122,12 +122,12 @@ contract WhaleKnowledgeGraph is AccessControl {
     /**
      * @dev Batch fetch multiple entities to save RPC calls from the frontend
      */
-    function getBatchEntityIntelligence(address[] calldata targets) 
+    function getBatchEntityAnalytics(address[] calldata targets) 
         external 
         view 
-        returns (EntityIntelligence[] memory) 
+        returns (EntityAnalytics[] memory) 
     {
-        EntityIntelligence[] memory batch = new EntityIntelligence[](targets.length);
+        EntityAnalytics[] memory batch = new EntityAnalytics[](targets.length);
         for (uint256 i = 0; i < targets.length; i++) {
             batch[i] = _knowledgeGraph[targets[i]];
         }

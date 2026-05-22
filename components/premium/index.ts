@@ -5,7 +5,7 @@ export { default as AdvancedAnalytics } from './AdvancedAnalytics';
 export { default as LegendaryNewsFeed } from './LegendaryNewsFeed';
 export { default as SmartAlertsEngine } from './SmartAlertsEngine';
 export { default as TokenFlowVisualizer } from './TokenFlowVisualizer';
-export { ZKProofMatrix } from './ZKProofMatrix';
-export { MasterMatrix } from './MasterMatrix';
+export { ZKProofGrid } from './ZKProofGrid';
+export { MasterGrid } from './MasterGrid';
 export type { WatchedWallet, WhaleActivity } from './WhaleTracker';
 

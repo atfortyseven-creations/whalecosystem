@@ -1,6 +1,6 @@
 /**
  * GET /api/whales/live
- * REST endpoint — returns the last 50 whale transfer events from the EP2 WS engine buffer.
+ * REST endpoint  returns the last 50 whale transfer events from the EP2 WS engine buffer.
  * Also starts the WS engine if not already running.
  * Powers the AlertsPanel whale feed and the WhalePortfolio leaderboard stats.
  */

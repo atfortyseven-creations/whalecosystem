@@ -5,7 +5,7 @@ import { multichainHealth } from '@/lib/blockchain/MultichainHealthService';
 
 export async function GET() {
     try {
-        const healthData = await multichainHealth.getUniversalMatrixHealth();
+        const healthData = await multichainHealth.getUniversalGridHealth();
         return NextResponse.json(healthData);
     } catch (error) {
         console.error('[Multiverse API Error]:', error);

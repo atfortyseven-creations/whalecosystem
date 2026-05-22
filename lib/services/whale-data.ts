@@ -3,7 +3,7 @@ import { safeRedisGet, safeRedisSet } from '../redis/client';
 import { getGbAllRpc } from '@/lib/blockchain/getblock-registry';
 
 /**
- * 🌌 WHALE INTELLIGENCE MATRIX V8.0 — ZERO SYNTHETIC DATA
+ *  WHALE INTELLIGENCE MATRIX V8.0  ZERO SYNTHETIC DATA
  * 100% real on-chain data. No Math.random(). No MATRIX_SYNC padding.
  * No generateSyntheticMovements(). Every event is a verified chain event.
  */
@@ -34,9 +34,9 @@ export interface WhaleMovement {
     gasUsd?: number;
 }
 
-// ─── Known DEX Router Addresses ───────────────────────────────────────────────
-// If `to` is in this set → tokens flow INTO router → SELL
-// If `from` is in this set → tokens flow OUT OF router → BUY
+//  Known DEX Router Addresses 
+// If `to` is in this set  tokens flow INTO router  SELL
+// If `from` is in this set  tokens flow OUT OF router  BUY
 const DEX_ROUTERS_ETH = new Set([
     '0x7a250d5630b4cf539739df2c5dacb4c659f2488d', // Uniswap V2 Router
     '0xe592427a0aece92de3edee1f18e0157c05861564', // Uniswap V3 SwapRouter
@@ -60,7 +60,7 @@ const DEX_ROUTERS_BNB = new Set([
     '0x1111111254eeb25477b68fb85ed929f73a960582', // 1inch v5 BSC
 ]);
 
-// RPC_CONFIG — construido desde el registry (GetBlock primero, públicos de emergencia)
+// RPC_CONFIG  construido desde el registry (GetBlock primero, públicos de emergencia)
 const RPC_CONFIG = {
     ETH: [
         ...getGbAllRpc('eth'),                                      // GB slots 1+2 (archive)
@@ -90,7 +90,7 @@ const BINANCE_24_TOKENS: Record<string, Record<string, { symbol: string; decimal
         '0xb0ba364bdcc6a4cc67d926acd6e0170a55809d41': { symbol: 'ARB', decimals: 18 },
         '0x4200000000000000000000000000000000000042': { symbol: 'OP', decimals: 18 },
         '0xca11bde05977b3631167028862be2a173976ca11': { symbol: 'STRK', decimals: 18 },
-        '0x163580175b4b418682358432b4a3f124b8401309': { symbol: 'WLD', decimals: 18 },
+        '0x163580175b4b418682358432b4a3f124b8401309': { symbol: 'AUTH', decimals: 18 },
         '0x85f17cf997934a597031b2e18a9ab6ebd4b9f6a4': { symbol: 'NEAR', decimals: 18 },
         '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c': { symbol: 'WBNB', decimals: 18 },
         '0x582a9973e80f68eea305f38339bdf7311145662d': { symbol: 'FDUSD', decimals: 18 },
@@ -111,13 +111,13 @@ const BINANCE_24_TOKENS: Record<string, Record<string, { symbol: string; decimal
 
 import { ethereumResilientProvider, bscResilientProvider } from '../blockchain/ResilientProvider';
 
-// ─── Price Feed (static estimates only for BUY/SELL USD sizing) ───────────────
+//  Price Feed (static estimates only for BUY/SELL USD sizing) 
 const FEED_PRICES: Record<string, number> = {
     ETH: 3500, BNB: 610, BTC: 89000, USDT: 1, USDC: 1, FDUSD: 1,
     LINK: 17, MATIC: 0.5, SHIB: 0.00003, PEPE: 0.00001, FET: 1.5,
     UNI: 12, DAI: 1, SOL: 140, DOGE: 0.15, TRX: 0.12, DOT: 7,
     ADA: 0.5, XRP: 0.6, AVAX: 40, APE: 1.2, LDO: 2.1, ARB: 1.1,
-    OP: 2.5, STRK: 0.4, WLD: 2.2, NEAR: 5.5, WBNB: 610, stETH: 3480,
+    OP: 2.5, STRK: 0.4, AUTH: 2.2, NEAR: 5.5, WBNB: 610, stETH: 3480,
     BTCB: 89000, BUSD: 1, WBTC: 89000,
 };
 
@@ -140,9 +140,9 @@ class WhaleDataService {
 
     /**
      * Determine BUY / SELL / TRANSFER using real DEX router detection.
-     * - `to` in DEX_ROUTERS → tokens flowing INTO the swap → SELL
-     * - `from` in DEX_ROUTERS → tokens flowing OUT OF swap → BUY
-     * - otherwise → TRANSFER (no swap involvement)
+     * - `to` in DEX_ROUTERS  tokens flowing INTO the swap  SELL
+     * - `from` in DEX_ROUTERS  tokens flowing OUT OF swap  BUY
+     * - otherwise  TRANSFER (no swap involvement)
      */
     private classifyAction(
         from: string,
@@ -194,7 +194,7 @@ class WhaleDataService {
 
                     if (usdValue < 15_000) continue;
 
-                    // ── REAL BUY/SELL DETECTION ──────────────────────────
+                    //  REAL BUY/SELL DETECTION 
                     const action = this.classifyAction(fromAddr, toAddr, chain);
 
                     movements.push({
@@ -265,7 +265,7 @@ class WhaleDataService {
             return movements.sort((a, b) => b.usdNum - a.usdNum).slice(0, 50);
         } catch (error) {
             console.error(`[WhaleService V8] Scan failure on ${chain}:`, error);
-            // Return empty — NEVER return synthetic data
+            // Return empty  NEVER return synthetic data
             return [];
         }
     }
@@ -277,15 +277,15 @@ class WhaleDataService {
     ): Promise<WhaleMovement[]> {
         const cacheKey = token
             ? `whale_v8_real_${token}_${minUsd ?? '0'}`
-            : `whale_v8_real_matrix_${minUsd ?? '0'}`;
+            : `whale_v8_real_grid_${minUsd ?? '0'}`;
 
         try {
             const cached = await safeRedisGet(cacheKey);
             if (cached && cached !== 'TIMEOUT') return JSON.parse(cached);
 
-            // Scan ETH and BNB in parallel — real data only
+            // Scan ETH and BNB in parallel  real data only
             const [ethMovements, bnbMovements] = await Promise.all([
-                this.processRecentBlocks('ETH', 3),   // 3 bloques (~36s) — balance entre frescura y CU
+                this.processRecentBlocks('ETH', 3),   // 3 bloques (~36s)  balance entre frescura y CU
                 this.processRecentBlocks('BNB', 3),
             ]);
 
@@ -303,12 +303,12 @@ class WhaleDataService {
 
             allMovements = allMovements.sort((a, b) => b.ts - a.ts).slice(0, limit);
 
-            // Cache 120s — reduce getLogs calls de ~5760/día a ~720/día (-87% CU)
+            // Cache 120s  reduce getLogs calls de ~5760/día a ~720/día (-87% CU)
             await safeRedisSet(cacheKey, JSON.stringify(allMovements), 'EX', '120');
             return allMovements;
         } catch (error) {
-            console.error('[WhaleService V8] Fatal error — returning empty:', error);
-            // Return empty array — NO synthetic fallback
+            console.error('[WhaleService V8] Fatal error  returning empty:', error);
+            // Return empty array  NO synthetic fallback
             return [];
         }
     }

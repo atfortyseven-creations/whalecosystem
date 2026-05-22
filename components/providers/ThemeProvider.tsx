@@ -4,9 +4,9 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from "next-themes";
 
 /**
- * SovereignThemeProvider
+ * SystemThemeProvider
  *
- * This platform enforces light mode for ALL users — connected or disconnected.
+ * This platform enforces light mode for ALL users  connected or disconnected.
  * `forcedTheme="light"` prevents next-themes from ever injecting the `dark`
  * class on the <html> element, regardless of:
  *   - system OS preference (prefers-color-scheme: dark)

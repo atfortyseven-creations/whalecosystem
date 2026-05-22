@@ -158,7 +158,7 @@ export const aiWeb3Modules = [
                 </div>`
             },
             {
-                id: "future-agi-decentralized-intelligence",
+                id: "future-agi-decentralized-analytics",
                 title: "10. El Futuro: AGI e Inteligencia Descentralizada",
                 description: "Hacia la singularidad de la red soberana.",
                 readTime: 85,
@@ -305,7 +305,7 @@ export const aiWeb3Modules = [
                         <p>Las Mega-Corporaciones L1 M1 P2P O(1) (Google T-1 M2 L2) Extraen la Biomasa Intelectual P2P L1 M1 de Foros L2 M2 (Reddit, StackOverflow T-1 O(N) P2P) Gratis M1 L1 O(1) L2. Empaquetan ese conocimiento P2P L1 M1 T-1 M2 en Sus Modelos O(N) L2 y Monetizan las Suscripciones L1 P2P M1 O(1) T-1 M2, Excluyendo Económicamente P2P L1 M1 T-1 L2 O(N) al Productor Real del Dato L2 M2 L1 P2P O(1).</p>
                     </section>
                     <section class="pro-section">
-                        <h2>II. Liquidación Perpetua de Regalías Neurológicas (Tokenized Dataset Sovereignty L1 P2P M1 T-1 L2 M2 O(N))</h2>
+                        <h2>II. Liquidación Perpetua de Regalías Neurológicas (Tokenized Dataset Systemty L1 P2P M1 T-1 L2 M2 O(N))</h2>
                         <p>Protocolos Ocean L1 M2 P2P O(1) y Autonolas T-1 M1 L2 Permiten <em>Tokenizar Datasets Privados M2 P2P L1 M1 O(N) T-1</em>. Un Médico L1 P2P O(1) M1 T-1 Sube sus MRIs de Cáncer L2 M2. Cuando una IA Científica P2P L1 O(N) M1 L2 T-1 Consume Ese Dataset O(1) L1 P2P M2 L2, el Contrato Vía ZK M1 T-1 P2P O(N) Libera Regalías en USDC L1 M2 P2P L2 O(1) T-1 M1 Directamente a la Billetera del Paciente/Médico L1 P2P M1 O(N) T-1 L2. Esto Establece una Cadena de Suministro Financiera L1 M2 P2P L2 O(1) M1 T-1 para el Intelecto Humano Colectivo O(N) L1 P2P M2 L2 T-1 M1.</p>
                     </section>
                 </div>`

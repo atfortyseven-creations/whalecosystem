@@ -1,18 +1,18 @@
-# .gitattributes — Export Control & Repository Integrity
-# © 2024–2026 atfortyseven-creations. All Rights Reserved.
+# .gitattributes  Export Control & Repository Integrity
+# © 20242026 atfortyseven-creations. All Rights Reserved.
 # Proprietary & Confidential.
 #
 # Note: export-ignore directives have been disabled to allow Railway's Metal 
 # Build System to successfully download the codebase snapshot via GitHub ZIP API.
 
-# ─── DEFAULT: All text files use LF line endings ────────────────────────────
+#  DEFAULT: All text files use LF line endings 
 * text=auto eol=lf
 
-# Legal documents — always export (must travel with any distribution)
+# Legal documents  always export (must travel with any distribution)
 LICENSE         export-subst
 NOTICE          export-subst
 
-# ─── BINARY ASSETS ──────────────────────────────────────────────────────────
+#  BINARY ASSETS 
 *.png   binary
 *.jpg   binary
 *.jpeg  binary
@@ -25,7 +25,7 @@ NOTICE          export-subst
 *.ttf   binary
 *.eot   binary
 
-# ─── LINGUIST OVERRIDES ─────────────────────────────────────────────────────
+#  LINGUIST OVERRIDES 
 # Prevents GitHub from showing language statistics that reveal tech stack
 *.tsx   linguist-language=TypeScript
 *.ts    linguist-language=TypeScript

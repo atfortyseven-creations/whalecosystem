@@ -7,7 +7,7 @@ export default function Web3EducatorPage() {
   return (
     <div className="relative min-h-screen bg-transparent text-[#050505] selection:bg-[#00C076]/30 font-sans antialiased overflow-x-hidden pt-32 pb-32">
       
-      {/* ── Ambient Background Texture ── */}
+      {/*  Ambient Background Texture  */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden flex justify-center z-0">
          <div className="w-[800px] h-[800px] bg-black/[0.02] rounded-full blur-[120px] absolute -top-40 opacity-70" />
       </div>
@@ -35,7 +35,7 @@ export default function Web3EducatorPage() {
             </div>
           </div>
           <p className="font-serif text-[16px] text-[#050505]/70 leading-[1.8] mt-6 max-w-2xl">
-            The Sovereign Terminal operates at the frontier of on-chain intelligence, utilizing stochastic filtering and zero-knowledge architecture to decode financial entropy. We require an educator capable of absolute precision to structure our academic curriculum, transforming institutional-grade heuristics into profound public mastery.
+            The System Terminal operates at the frontier of on-chain analytics, utilizing stochastic filtering and zero-knowledge architecture to decode financial entropy. We require an educator capable of absolute precision to structure our academic curriculum, transforming institutional-grade heuristics into profound public mastery.
           </p>
         </header>
 
@@ -49,7 +49,7 @@ export default function Web3EducatorPage() {
                </h3>
             </div>
             <p className="font-serif text-[15px] text-[#050505]/70 leading-[1.8] pl-11">
-              You will not be teaching basic cryptography. Your mandate is to elevate the global understanding of true decentralized sovereignty. You will architect the educational perimeter for our Whale Alert Network, explaining how we de-obfuscate dark entities, trace smart contract reentrancy vulnerabilities, and analyze macroeconomic liquidity flows directly from the mempool.
+              You will not be teaching basic cryptography. Your mandate is to elevate the global understanding of true decentralized systemty. You will architect the educational perimeter for our Whale Alert Network, explaining how we de-obfuscate dark entities, trace smart contract reentrancy vulnerabilities, and analyze macroeconomic liquidity flows directly from the mempool.
             </p>
           </section>
 

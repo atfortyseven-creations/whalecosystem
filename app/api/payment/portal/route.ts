@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Auth required' }, { status: 401 });
   }
 
-  // Native SIWE: find user by walletAddress (sovereign ID)
+  // Native SIWE: find user by walletAddress (system ID)
   const dbUser = await prisma.user.findUnique({ where: { walletAddress: session.userId } }) as any;
   if (!dbUser?.stripeCustomerId) {
     return NextResponse.json({ error: 'No billing profile found' }, { status: 404 });

@@ -1,4 +1,4 @@
-export type PostQuantumSecurity<T extends number = 512> = `ML-KEM-${T}` & { readonly __brand: unique symbol };
+export type PostCoreSecurity<T extends number = 512> = `ML-KEM-${T}` & { readonly __brand: unique symbol };
 export type UtilityFunction = (lambda: number, latency: number) => number;
 
 interface ZKStatement {
@@ -19,6 +19,6 @@ export interface ZK_Payload {
 }
 
 export type ZKMessage<T = ZK_Payload> = T & {
-  readonly __security: PostQuantumSecurity;
+  readonly __security: PostCoreSecurity;
   readonly differentialPrivacyEpsilon: 0.0001;
 };

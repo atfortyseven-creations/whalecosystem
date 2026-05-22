@@ -10,7 +10,7 @@ export const docsData: Record<string, DocSection> = {
     title: "Security Architecture",
     category: "Protocol",
     content: [
-      "Our system employs a comprehensive security architecture designed to protect sensitive financial and personal data against advanced threats. By operating on a zero-trust model, every request—whether originating from an internal microservice or an external client—must be fully authenticated, authorized, and continuously validated before access is granted. This foundational principle ensures that no entity is trusted by default.",
+      "Our system employs a comprehensive security architecture designed to protect sensitive financial and personal data against advanced threats. By operating on a zero-trust model, every requestwhether originating from an internal microservice or an external clientmust be fully authenticated, authorized, and continuously validated before access is granted. This foundational principle ensures that no entity is trusted by default.",
       "The architecture is built upon industry-standard cryptographic primitives. We utilize elliptic curve cryptography, specifically the secp256k1 curve, which provides robust security with minimal computational overhead. All data in transit is encrypted using Transport Layer Security (TLS) 1.3, ensuring that man-in-the-middle attacks are mathematically unfeasible. Furthermore, data at rest is encrypted using AES-256-GCM, managed by isolated hardware security modules (HSMs).",
       "To prevent lateral movement within the network, we have implemented strict network micro-segmentation. Each service operates within its own isolated virtual private cloud (VPC) subnet, with strict egress and ingress firewall rules. Application programming interfaces (APIs) are exposed only through a centralized gateway that performs deep packet inspection, rate limiting, and anomaly detection in real-time."
     ]
@@ -202,7 +202,7 @@ export const docsData: Record<string, DocSection> = {
     content: [
       "Data independence is a fundamental tenet of our operational philosophy. We engineer our systems to ensure that users maintain complete control and ownership over their personal and financial data. We reject the standard industry practice of monetizing user telemetry or selling access to third-party data brokers.",
       "Our architecture is designed to minimize data collection. We only process the information strictly necessary to provide our services. Wherever possible, data is anonymized or pseudonymized at the point of ingestion. For instance, user sessions are managed via ephemeral cryptographic hashes rather than permanent identifiers.",
-      "Users have the right to request the complete deletion of their data at any time. Our systems are built to ensure that such deletion requests are executed thoroughly and irreversibly across all active databases and backups, ensuring absolute compliance with global data sovereignty regulations."
+      "Users have the right to request the complete deletion of their data at any time. Our systems are built to ensure that such deletion requests are executed thoroughly and irreversibly across all active databases and backups, ensuring absolute compliance with global data systemty regulations."
     ]
   },
   "user-rights": {

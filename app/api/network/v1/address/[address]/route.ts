@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
-import { walletIntelligenceService } from '@/lib/wallet/WalletIntelligenceService';
+import { walletAnalyticsService } from '@/lib/wallet/WalletAnalyticsService';
 
 const MEMPOOL_BASE = 'https://mempool.space/api';
 
@@ -26,7 +26,7 @@ export async function GET(
         // --- EVM INTELLIGENCE PATH (Moralis/Alchemy) ---
         if (isEVM) {
             console.log(`[Address API] Deep scanning EVM entity: ${address}`);
-            const intel = await walletIntelligenceService.getFullIntelligence(address, false, true);
+            const intel = await walletAnalyticsService.getFullAnalytics(address, false, true);
             
             return NextResponse.json({
                 address,

@@ -44,7 +44,7 @@ export async function GET() {
       }));
     }
 
-    // ─── Compose response ────────────────────────────────────────────────────
+    //  Compose response 
     const response = {
       // On-chain volume metrics
       txCountLast30d: chainStats?.tx_count ?? null,

@@ -16,7 +16,7 @@ export async function syncAcademySyllabusToDB() {
                 create: {
                     slug,
                     title: category,
-                    description: `Sovereign Matrix Domain: ${category}`,
+                    description: `System Grid Domain: ${category}`,
                     totalDuration: "TBD",
                     level: "Institutional"
                 }

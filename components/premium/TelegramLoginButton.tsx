@@ -56,7 +56,7 @@ export default function TelegramLoginButton({ botName, onAuth }: TelegramLoginBu
   return (
     <div className="flex flex-col items-center justify-center p-4 bg-blue-50/50 rounded-xl border border-blue-100">
       <p className="text-sm font-bold text-blue-800 mb-3">
-        Click to connect instantly 👇
+        Click to connect instantly 
       </p>
       <div ref={containerRef} className="min-h-[40px]" />
       <p className="text-xs text-blue-600/70 mt-3 text-center">

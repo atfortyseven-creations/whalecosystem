@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AkashicLedger — Permanent Record of Institutional Capital Movements
+ * AkashicLedger  Permanent Record of Institutional Capital Movements
  *
  * Renders the SHA-256 verified registry of all movements exceeding the
  * systemic significance threshold ($50M USD equivalent). Each entry is
@@ -20,9 +20,9 @@ import { AlertTriangle, Database, Shield, ChevronDown, Clock, Hash, CheckCircle2
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { AkashicSkeleton } from "@/components/ui/skeleton-loader";
 import { toast } from "sonner";
-import { useSovereignFormatter } from "@/hooks/useSovereignFormatter";
+import { useSystemFormatter } from "@/hooks/useSystemFormatter";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+//  Types 
 
 interface AkashicResponse {
   ok: boolean;
@@ -33,7 +33,7 @@ interface AkashicResponse {
 }
 
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+//  Constants 
 
 const CHAIN_COLORS: Record<string, string> = {
   ETH: "#627EEA",
@@ -45,9 +45,9 @@ const CHAIN_COLORS: Record<string, string> = {
   MATIC: "#8247E5",
 };
 
-// Formatting relies on SovereignSettings now via useSovereignFormatter hook
+// Formatting relies on SystemSettings now via useSystemFormatter hook
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+//  Sub-components 
 
 function ChainBadge({ chain }: { chain: string }) {
   const color = CHAIN_COLORS[chain] || "#888";
@@ -124,7 +124,7 @@ function RecordCard({ record, index, isDense }: { record: AkashicRecord; index: 
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerifiedLocally, setIsVerifiedLocally] = useState<boolean | null>(null);
   
-  const { formatLargeMoney, formatDate, formatTime } = useSovereignFormatter();
+  const { formatLargeMoney, formatDate, formatTime } = useSystemFormatter();
 
   const chainColor = CHAIN_COLORS[record.chain] || "#888";
 
@@ -257,7 +257,7 @@ function RecordCard({ record, index, isDense }: { record: AkashicRecord; index: 
           </div>
         </div>
 
-        {/* ── Editorial Toggle ── */}
+        {/*  Editorial Toggle  */}
         <button
           onClick={() => setExpanded(!expanded)}
           className="w-full px-6 py-3 flex items-center justify-between transition-all"
@@ -267,7 +267,7 @@ function RecordCard({ record, index, isDense }: { record: AkashicRecord; index: 
           }}
         >
           <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "rgba(0,0,0,0.3)" }}>
-            Editorial Intelligence
+            Editorial Analytics
           </span>
           <ChevronDown
             size={13}
@@ -304,14 +304,14 @@ function RecordCard({ record, index, isDense }: { record: AkashicRecord; index: 
   );
 }
 
-// ─── Stats Bar ───────────────────────────────────────────────────────────────
+//  Stats Bar 
 
 function StatsBar({ records, nextEntry, lastUpdated }: {
   records: AkashicRecord[];
   nextEntry: string;
   lastUpdated: string;
 }) {
-  const { formatLargeMoney, formatTime } = useSovereignFormatter();
+  const { formatLargeMoney, formatTime } = useSystemFormatter();
   const totalUsd = records.reduce((sum, r) => sum + r.amountUsd, 0);
   const chains   = [...new Set(records.map(r => r.chain))];
 
@@ -344,7 +344,7 @@ function StatsBar({ records, nextEntry, lastUpdated }: {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+//  Main Component 
 
 export default function AkashicLedger() {
   const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'highest' | 'lowest'>('latest');
@@ -424,7 +424,7 @@ export default function AkashicLedger() {
     const a = document.createElement('a');
     a.setAttribute('hidden', '');
     a.setAttribute('href', url);
-    a.setAttribute('download', `Sovereign_Ledger_Export_${Date.now()}.csv`);
+    a.setAttribute('download', `System_Ledger_Export_${Date.now()}.csv`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -433,7 +433,7 @@ export default function AkashicLedger() {
 
   return (
     <div className="flex flex-col min-h-0 w-full h-full p-8 overflow-y-auto scrollbar-hide">
-      {/* ── Header ── */}
+      {/*  Header  */}
       <div className="mb-8 flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -496,14 +496,14 @@ export default function AkashicLedger() {
         </div>
       </div>
 
-      {/* ── Stats Bar ── */}
+      {/*  Stats Bar  */}
       <StatsBar
         records={data.records}
         nextEntry={data.nextEntry}
         lastUpdated={data.lastUpdated}
       />
 
-      {/* ── Integrity Notice ── */}
+      {/*  Integrity Notice  */}
       <div
         className="flex items-center gap-3 px-5 py-3 rounded-2xl mb-8"
         style={{
@@ -517,14 +517,14 @@ export default function AkashicLedger() {
         </p>
       </div>
 
-      {/* ── Records ── */}
+      {/*  Records  */}
       <div className={`space-y-${isDense ? '3' : '5'}`}>
         {sortedRecords.map((record, i) => (
           <RecordCard key={record.id} record={record} index={i} isDense={isDense} />
         ))}
       </div>
 
-      {/* ── Next Entry Placeholder ── */}
+      {/*  Next Entry Placeholder  */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

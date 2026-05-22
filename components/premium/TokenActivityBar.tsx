@@ -40,7 +40,7 @@ export function TokenActivityBar({ symbol }: TokenActivityBarProps) {
     // Institutional Fallback for Price Discovery
     const fallbackPrices: Record<string, number> = { BTC: 68420.50, ETH: 3512.20, BNB: 590.10, SOL: 145.40, LINK: 18.20, MATIC: 0.72 };
     const finalPrice = prices[symbol.toUpperCase()] || fallbackPrices[symbol.toUpperCase()] || 0;
-    const finalChange: number | null = (changes || {})[symbol.toUpperCase()] ?? null; // null when unavailable — no fake fallback
+    const finalChange: number | null = (changes || {})[symbol.toUpperCase()] ?? null; // null when unavailable  no fake fallback
 
     return (
         <div className="flex flex-col bg-white border-t border-slate-100 p-6 space-y-6">
@@ -63,7 +63,7 @@ export function TokenActivityBar({ symbol }: TokenActivityBarProps) {
                 ) : (
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border bg-slate-50 text-slate-400 border-slate-100">
                         <Activity size={10} />
-                        —
+                        
                     </div>
                 )}
             </div>

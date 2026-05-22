@@ -1,5 +1,5 @@
 // "God-Mode" Stub for Gensyn / DePIN AI Worker
-// Runs matrix multiplications in the browser to train the "WhaleAlert ID Sybil Model".
+// Runs grid multiplications in the browser to train the "WhaleAlert ID Sybil Model".
 
 // Worker Global Scope
 const ctx: Worker = self as any;
@@ -7,7 +7,7 @@ const ctx: Worker = self as any;
 ctx.onmessage = async (e) => {
     const { task, data } = e.data;
     if (task === 'TRAIN_EPOCH') {
-        console.log("🐝 Neural Hive: Training Epoch on Edge Device...", data.batchId);
+        console.log(" Neural Hive: Training Epoch on Edge Device...", data.batchId);
         
         // 1. Load WASM-based PyTorch/Tensorflow
         // await tf.setBackend('wasm');
@@ -24,13 +24,13 @@ export const useNeuralHive = () => {
      * Earns $HUMAN tokens.
      */
     const connectToHive = () => {
-        console.log("🐝 Constructing Neural Hive connection...");
+        console.log(" Constructing Neural Hive connection...");
         const worker = new Worker(new URL('./hive-worker.ts', import.meta.url));
         
         worker.postMessage({ task: 'TRAIN_EPOCH', data: { batchId: 101 } });
         
         worker.onmessage = (e) => {
-            console.log("🐝 Hive Reward Earned: Computation Verified.", e.data);
+            console.log(" Hive Reward Earned: Computation Verified.", e.data);
         };
     }
 

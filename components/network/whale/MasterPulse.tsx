@@ -93,9 +93,9 @@ export function MasterPulse({ totalWhaleVolume, inflowScore, liquidationTotal, a
   const ekgPath = generateEkgPath(history, W, H);
   
   const label = !isConnected ? 'ESTABLISHING WSS CONNECTION...'
-              : isAlert ? `⚡ CRITICAL ACTIVITY (${rate} TPS)` 
-              : isWarning ? `⚠️ ELEVATED NETWORK (${rate} TPS)`
-              : `✓ STABLE NETWORK (${rate} TPS)`;
+              : isAlert ? ` CRITICAL ACTIVITY (${rate} TPS)` 
+              : isWarning ? `️ ELEVATED NETWORK (${rate} TPS)`
+              : ` STABLE NETWORK (${rate} TPS)`;
 
   return (
     <div className={`w-full rounded-3xl overflow-hidden border transition-all duration-500 ${
@@ -110,7 +110,7 @@ export function MasterPulse({ totalWhaleVolume, inflowScore, liquidationTotal, a
           </div>
           <div>
             <h3 className="text-white font-black text-lg">Master AI Pulse</h3>
-            <p className="text-white/30 text-xs font-mono">Composite intelligence signal</p>
+            <p className="text-white/30 text-xs font-mono">Composite analytics signal</p>
           </div>
         </div>
         

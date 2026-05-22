@@ -17,7 +17,7 @@ export class WebhookDispatcher {
 
     const bodyString = JSON.stringify(payload);
     
-    // ─── HMAC-SHA256 SIGNING ───────────────────────────────────────────────
+    //  HMAC-SHA256 SIGNING 
     let signature = 'unsigned';
     if (sub.hmacSecret) {
       signature = createHmac('sha256', sub.hmacSecret)

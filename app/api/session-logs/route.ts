@@ -21,7 +21,7 @@ export async function GET(req: Request) {
       skip: offset,
     });
 
-    // Zero-Mock Mandate: return live DB data only — no synthetic padding.
+    // Zero-Mock Mandate: return live DB data only  no synthetic padding.
     const total = await prisma.userSessionLog.count({ where });
 
     return NextResponse.json({ logs, total: total > 0 ? total : logs.length });
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { exportFormat, action, userId } = body;
 
-    // ── Live insertion ────────────────────────────────────────────────────────
+    //  Live insertion 
     if (!exportFormat && action) {
       const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
       const ua = req.headers.get('user-agent') || 'System';
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // ── Bulk CSV export ───────────────────────────────────────────────────────
+    //  Bulk CSV export 
     let logs = await prisma.userSessionLog.findMany({
       orderBy: { timestamp: 'desc' },
       take: 5000,
@@ -108,7 +108,7 @@ export async function POST(req: Request) {
       return new NextResponse(header + rows, {
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': `attachment; filename="sovereign_security_logs_${new Date().toISOString().split('T')[0]}.csv"`,
+          'Content-Disposition': `attachment; filename="system_security_logs_${new Date().toISOString().split('T')[0]}.csv"`,
         },
       });
     }

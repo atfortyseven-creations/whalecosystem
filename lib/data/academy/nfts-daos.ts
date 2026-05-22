@@ -36,7 +36,7 @@ export const nftDaoModules = [
 
                     <section class="pro-section">
                         <h2>II. Proof-of-Personhood y Computación Cuadrática</h2>
-                        <p>La cibergobernanza de élite neutraliza el vector Sybil introduciendo <strong>Prueba de Humanidad (PoP)</strong> mediante integraciones como Gitcoin Passport o Worldcoin (Iris Hash ZK). Una vez probada la individualidad biológica, se aplica <strong>Voto Cuadrático (Quadratic Voting)</strong>: el <em>costo</em> de emitir Múltiples Votos crece geométricamente ($1 = 1 voto, $4 = 2 votos, $9 = 3 votos). Esto rompe la hegemonía del capital puro, penalizando matemáticamente a las ballenas y amplificando la voluntad coordinada de la mayoría silenciosa minorista.</p>
+                        <p>La cibergobernanza de élite neutraliza el vector Sybil introduciendo <strong>Prueba de Humanidad (PoP)</strong> mediante integraciones como Gitcoin Passport o Identity (Iris Hash ZK). Una vez probada la individualidad biológica, se aplica <strong>Voto Cuadrático (Quadratic Voting)</strong>: el <em>costo</em> de emitir Múltiples Votos crece geométricamente ($1 = 1 voto, $4 = 2 votos, $9 = 3 votos). Esto rompe la hegemonía del capital puro, penalizando matemáticamente a las ballenas y amplificando la voluntad coordinada de la mayoría silenciosa minorista.</p>
                     </section>
                 </div>`
             },

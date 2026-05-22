@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const { walletAddress, signature, message } = body;
 
-    // ─── INSTITUTIONAL AUTHENTICATION RESOLUTION ─────────────────────────────
-    const hasHandshakeCookie = req.cookies.get('sovereign_handshake')?.value;
+    //  INSTITUTIONAL AUTHENTICATION RESOLUTION 
+    const hasHandshakeCookie = req.cookies.get('system_handshake')?.value;
     let rawUserId = walletAddress || hasHandshakeCookie || (session as any)?.user?.email;
     let userId = rawUserId ? rawUserId.toLowerCase() : undefined;
 
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     const kycStatus = 'UNVERIFIED';
 
-    // ── Mint Sovereign JWT (human_session) ───────────────────────────────────
+    //  Mint System JWT (human_session) 
     try {
         const { mintJWT } = await import('@/lib/jwt');
         const sessionToken = await mintJWT({
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
 
     // Clean backend architecture: issue the identity cookie directly from the server
     // after cryptographic verification, reducing client-side trust.
-    response.cookies.set('sovereign_handshake', userId, {
+    response.cookies.set('system_handshake', userId, {
         path: '/',
         maxAge: 604800, // 7 days
         sameSite: 'lax',

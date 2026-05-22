@@ -13,7 +13,7 @@ export interface NFT {
 }
 
 /**
- * 🔥 LEGENDARY NFT FETCHING - MORALIS EDITION 🔥
+ *  LEGENDARY NFT FETCHING - MORALIS EDITION 
  * Uses Moralis NFT API for high-fidelity metadata.
  */
 export async function getNFTs(address: string, chainId: number = 1): Promise<NFT[]> {

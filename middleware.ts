@@ -13,11 +13,11 @@ enum PlanTier {
   ELITE = 'ELITE',
 }
 
-// Replay Attack Cache — tracks used nonces for 60s window
+// Replay Attack Cache  tracks used nonces for 60s window
 // Scoped to each Edge container instance; sufficient for single-instance deployments.
 // [SECURITY FIX]: Switched from Set + setTimeout (Memory Leak in Edge) to Map + Lazy Eviction
 const replayMap = new Map<string, number>(); // <nonce, expirationTimestamp>
-// Deterministic GC counter — increments on every POST, triggers cleanup every 100 requests.
+// Deterministic GC counter  increments on every POST, triggers cleanup every 100 requests.
 // Replaces Math.random() to avoid non-determinism in security-critical middleware.
 let replayGcCounter = 0;
 
@@ -30,9 +30,9 @@ function logAuditSafe(req: NextRequest, action: string, actor: string, ip: strin
   }).catch(() => {});
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Route Matchers (Inline — replaces clerkMiddleware createRouteMatcher)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// Route Matchers (Inline  replaces clerkMiddleware createRouteMatcher)
+// 
 
 function matchesPattern(pathname: string, patterns: string[]): boolean {
   return patterns.some((p) => {
@@ -59,13 +59,13 @@ const HONEYPOT_PATTERNS = [
   '/config(.*)',
   '/admin(.*)',
   '/setup(.*)',
-  // API scanner probes — paths legitimate traffic NEVER hits
+  // API scanner probes  paths legitimate traffic NEVER hits
   '/api/admin(.*)',
   '/api/debug(.*)',
   '/api/env(.*)',
   '/api/keys(.*)',
   '/api/secret(.*)',
-  // Note: /api/internal removed — logAuditSafe POSTs to /api/internal/audit; blocking it would self-cancel audit writes.
+  // Note: /api/internal removed  logAuditSafe POSTs to /api/internal/audit; blocking it would self-cancel audit writes.
   '/api/private(.*)',
   '/api/management(.*)',
   '/api/v1/admin(.*)',
@@ -82,14 +82,14 @@ const HONEYPOT_PATTERNS = [
 const GEO_RESTRICTED_PATTERNS = ['/api/polymarket(.*)'];
 const RESTRICTED_COUNTRIES = ['US', 'CU', 'IR', 'KP', 'SY'];
 
-// SECURITY MIDDLEWARE — "THE IRON GATE v6 - WHALE FORTRESS SOVEREIGN"
+// SECURITY MIDDLEWARE  "THE IRON GATE v6 - WHALE FORTRESS SOVEREIGN"
 // Absolute protection. Zero Clerk dependency. SIWE-native authentication.
 
 export default async function middleware(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl;
 
-    // ── LAYER -1: ABSOLUTE BYPASS — Healthcheck & Infra paths ───────────────────
+    //  LAYER -1: ABSOLUTE BYPASS  Healthcheck & Infra paths 
     if (pathname === '/api/health' || pathname === '/api/health-check') {
       return NextResponse.next();
     }
@@ -104,7 +104,7 @@ export default async function middleware(request: NextRequest) {
     const BYPASS_IPS = ['127.0.0.1', '91.126.42.179'];
     const isBypassIP = BYPASS_IPS.includes(ip);
 
-    // ── LAYER -1.5: ENFORCE STRICT DOMAIN FOR WALLETCONNECT CLOUD VERIFY ────────
+    //  LAYER -1.5: ENFORCE STRICT DOMAIN FOR WALLETCONNECT CLOUD VERIFY 
     // If the user lands on www, WalletConnect Cloud might reject their signature
     // or flag the connection as suspicious because the project is registered
     // under the bare domain. We force a redirect to the bare domain.
@@ -114,7 +114,7 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.redirect(url, { status: 308 });
     }
 
-    // ── LAYER 0: OWASP WAF ENGINE (Before EVERYTHING) ──────────────────────
+    //  LAYER 0: OWASP WAF ENGINE (Before EVERYTHING) 
     const wafBlock = await runWAF(request);
     if (wafBlock) return wafBlock;
 
@@ -135,10 +135,10 @@ export default async function middleware(request: NextRequest) {
       }
     }
 
-    // 0. GEOFENCING — Regulatory Firewall (CFTC/OFAC)
+    // 0. GEOFENCING  Regulatory Firewall (CFTC/OFAC)
     if (!isBypassIP && matchesPattern(pathname, GEO_RESTRICTED_PATTERNS)) {
       if (RESTRICTED_COUNTRIES.includes(country)) {
-        console.warn(`[WhaleFortress] 🚨 Geoblocked Restricted Access from Country: ${country}, IP: ${ip}`);
+        console.warn(`[WhaleFortress]  Geoblocked Restricted Access from Country: ${country}, IP: ${ip}`);
         return new NextResponse(
           JSON.stringify({
             error: 'RESTRICTED_JURISDICTION',
@@ -149,15 +149,15 @@ export default async function middleware(request: NextRequest) {
       }
     }
 
-    // 1. HONEYPOT TRAP — Instant Block
+    // 1. HONEYPOT TRAP  Instant Block
     if (!isBypassIP && matchesPattern(pathname, HONEYPOT_PATTERNS)) {
       const isCommonNoise = pathname.includes('wp-') || pathname.includes('phpmyadmin');
       if (isCommonNoise) {
         // Log common scanner noise at info level to keep console clean
-        console.info(`[WhaleFortress:Noise] 🤖 Scanner blocked: ${ip} -> ${pathname}`);
+        console.info(`[WhaleFortress:Noise]  Scanner blocked: ${ip} -> ${pathname}`);
       } else {
         // High-priority alert for unexpected paths (genuine security threats)
-        console.error(`[WhaleFortress:SECURITY] 🚨 SHADOW_PROBE BLOCKED: ${ip} -> ${pathname}`);
+        console.error(`[WhaleFortress:SECURITY]  SHADOW_PROBE BLOCKED: ${ip} -> ${pathname}`);
       }
       logAuditSafe(request, 'SECURITY_HONEYPOT_HIT', 'anonymous', ip, { path: pathname, isNoise: isCommonNoise });
       return new NextResponse(null, { status: 404 });
@@ -178,13 +178,13 @@ export default async function middleware(request: NextRequest) {
            
          // [ABYSMALLY COMPLEX OPTIMIZATION]: Defeat NAT overlap in Distributed Rate Limiter
          const uaHash = request.headers.get('user-agent') ? Array.from(request.headers.get('user-agent')!).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(16) : 'noua';
-         const sessionToken = request.cookies.get('whale_session')?.value || request.cookies.get('sovereign_handshake')?.value;
+         const sessionToken = request.cookies.get('whale_session')?.value || request.cookies.get('system_handshake')?.value;
          const distributedKey = sessionToken ? `sess:${sessionToken.slice(0, 32)}` : `ip:${ip}:ua:${uaHash}`;
          
          const limitCheck = await checkRateLimit(distributedKey, resolvedTier);
         if (!limitCheck.success) {
-          console.log(`[WhaleFortress] 🚨 DDoS Protection: Key ${distributedKey} (IP: ${ip}) Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
-          // Fire-and-forget audit entry — do not await to avoid adding latency
+          console.log(`[WhaleFortress]  DDoS Protection: Key ${distributedKey} (IP: ${ip}) Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
+          // Fire-and-forget audit entry  do not await to avoid adding latency
           logAuditSafe(request, 'SECURITY_RATE_LIMITED', 'system', ip, { tier, limit: limitCheck.limit, path: pathname, distributedKey });
           return new NextResponse(
             JSON.stringify({ error: 'SYSTEM_BUSY', message: 'Rate limit exceeded. Retry in 10s.' }),
@@ -197,8 +197,8 @@ export default async function middleware(request: NextRequest) {
 
       // 2.5 [CRITICAL] Anti-Replay Attack Engine (POST State Mutations)
       if (request.method === 'POST') {
-        const signatureNonce = request.headers.get('x-sovereign-nonce');
-        const txTimestamp = request.headers.get('x-sovereign-timestamp');
+        const signatureNonce = request.headers.get('x-system-nonce');
+        const txTimestamp = request.headers.get('x-system-timestamp');
         
         // Only enforce on critical mutation endpoints if they opt-in via headers, 
         // or forcefully block if headers exist but are duplicated/old.
@@ -208,7 +208,7 @@ export default async function middleware(request: NextRequest) {
             
             // Reject if older than 60 seconds or more than 5 seconds in the future
             if (now - txTime > 60000 || now - txTime < -5000) {
-               console.warn(`[WhaleFortress] 🚨 REPLAY ATTACK BLOCKED: Invalid payload timestamp from IP ${ip}`);
+               console.warn(`[WhaleFortress]  REPLAY ATTACK BLOCKED: Invalid payload timestamp from IP ${ip}`);
                return new NextResponse(JSON.stringify({ error: 'PAYLOAD_EXPIRED_OR_INVALID' }), { status: 401 });
             }
             
@@ -216,7 +216,7 @@ export default async function middleware(request: NextRequest) {
             if (replayMap.has(signatureNonce)) {
                const expiresAt = replayMap.get(signatureNonce)!;
                if (now < expiresAt) {
-                 console.warn(`[WhaleFortress] 🚨 REPLAY ATTACK BLOCKED: Duplicated signature from IP ${ip}`);
+                 console.warn(`[WhaleFortress]  REPLAY ATTACK BLOCKED: Duplicated signature from IP ${ip}`);
                  return new NextResponse(JSON.stringify({ error: 'REPLAY_DETECTED' }), { status: 401 });
                } else {
                  replayMap.delete(signatureNonce); // Cleanup expired manually
@@ -238,9 +238,9 @@ export default async function middleware(request: NextRequest) {
       }
     }
 
-    // 3. Sovereign SIWE Identity Verification
+    // 3. System SIWE Identity Verification
     const nextAuthToken = request.cookies.get('next-auth.session-token');
-    const sovereignHandshakeCookie = request.cookies.get('sovereign_handshake');
+    const systemHandshakeCookie = request.cookies.get('system_handshake');
 
     // Validate SIWE JWT from whale_session cookie
     let siweSessionValid = false;
@@ -260,22 +260,22 @@ export default async function middleware(request: NextRequest) {
       }
     }
 
-    // R1 FIX REVERT — sovereign_handshake is a raw Ethereum address issued by the client
+    // R1 FIX REVERT  system_handshake is a raw Ethereum address issued by the client
     // during the Mobile UX Zero-Friction flow or QR Handshake. 
     // Attempting to verify it as a JWT crashes the middleware and locks out legitimate users.
     // Security note: Spoofing this cookie only grants read-only UI access. Actual mutations
     // require cryptographic signatures (EIP-191/EIP-712) via the non-custodial wallet.
-    let sovereignHandshakeValid = false;
-    const sovereignHandshakeValue = sovereignHandshakeCookie?.value;
-    if (sovereignHandshakeValue && typeof sovereignHandshakeValue === 'string') {
-        if (/^0x[a-fA-F0-9]{40}$/.test(sovereignHandshakeValue)) {
-            sovereignHandshakeValid = true;
+    let systemHandshakeValid = false;
+    const systemHandshakeValue = systemHandshakeCookie?.value;
+    if (systemHandshakeValue && typeof systemHandshakeValue === 'string') {
+        if (/^0x[a-fA-F0-9]{40}$/.test(systemHandshakeValue)) {
+            systemHandshakeValid = true;
         } else {
-            console.warn(`[WhaleFortress] 🚨 Malformed sovereign_handshake address intercepted from IP: ${ip}`);
+            console.warn(`[WhaleFortress]  Malformed system_handshake address intercepted from IP: ${ip}`);
         }
     }
 
-    const isAuthenticated = siweSessionValid || !!nextAuthToken || sovereignHandshakeValid;
+    const isAuthenticated = siweSessionValid || !!nextAuthToken || systemHandshakeValid;
 
     if (matchesPattern(pathname, PROTECTED_PATTERNS)) {
       if (!isAuthenticated) {
@@ -285,7 +285,7 @@ export default async function middleware(request: NextRequest) {
           pathname.startsWith('/trade') ||
           pathname.startsWith('/settings')
         ) {
-          console.warn(`[WhaleFortress] 🛡️ Masking protected route: ${pathname} for IP: ${ip}`);
+          console.warn(`[WhaleFortress] ️ Masking protected route: ${pathname} for IP: ${ip}`);
           return new NextResponse(null, { status: 404 });
         }
         return NextResponse.redirect(new URL('/', request.url).toString());
@@ -297,18 +297,18 @@ export default async function middleware(request: NextRequest) {
     // 4. Final Header Injection & CSP
     const response = NextResponse.next();
 
-    // R2 FIX — Generate a cryptographically secure per-request nonce for CSP.
+    // R2 FIX  Generate a cryptographically secure per-request nonce for CSP.
     // 'unsafe-eval' and 'unsafe-inline' for scripts have been ELIMINATED.
     // All inline scripts must use the nonce attribute: <script nonce={nonce}>.
     // Wallet SDK libraries (WalletConnect, Reown) that require eval must load
-    // from their trusted origins only — no blanket eval permission granted.
+    // from their trusted origins only  no blanket eval permission granted.
     const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
 
     const scriptSrc = [
       "'self'",
       `'nonce-${nonce}'`,
-      // R2: 'unsafe-eval' REMOVED — violates CSP Level 3 and institutional audit requirements.
-      // R2: 'unsafe-inline' REMOVED — nonce-based policy replaces this.
+      // R2: 'unsafe-eval' REMOVED  violates CSP Level 3 and institutional audit requirements.
+      // R2: 'unsafe-inline' REMOVED  nonce-based policy replaces this.
       // 'wasm-unsafe-eval' REQUIRED for @xmtp/browser-sdk WebAssembly execution
       "'wasm-unsafe-eval'",
       "https://*.walletconnect.com",
@@ -392,7 +392,7 @@ export default async function middleware(request: NextRequest) {
     // to protected routes rather than silently passing all requests through.
     // Fail-Open was exploitable: an attacker who triggers a middleware crash
     // could bypass WAF, rate limiting, auth checks, and honeypot detection.
-    console.error('⨯ [WhaleFortress:Critical] 💀 Zero-Crash Safeguard:', err.message);
+    console.error('⨯ [WhaleFortress:Critical]  Zero-Crash Safeguard:', err.message);
     const { pathname } = request.nextUrl;
     if (matchesPattern(pathname, PROTECTED_PATTERNS) || pathname.startsWith('/api/admin')) {
         return new NextResponse(

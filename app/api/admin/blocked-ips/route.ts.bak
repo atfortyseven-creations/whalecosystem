@@ -10,8 +10,8 @@ import {
 } from '@/lib/redis/client';
 import { safeJsonParse } from '@/lib/utils/json';
 
-const BLOCKED_IP_PREFIX = 'sovereign:blocked_ip:';
-const BLOCKED_IP_INDEX  = 'sovereign:blocked_ip_index';
+const BLOCKED_IP_PREFIX = 'system:blocked_ip:';
+const BLOCKED_IP_INDEX  = 'system:blocked_ip_index';
 
 interface BlockedIPEntry {
     ipAddress: string;
@@ -20,7 +20,7 @@ interface BlockedIPEntry {
     expiresAt: string | null;
 }
 
-// ─── Admin authentication ────────────────────────────────────────────────────
+//  Admin authentication 
 async function isAdminAuthenticated(): Promise<boolean> {
     try {
         const cookieStore = await cookies();
@@ -33,14 +33,14 @@ async function isAdminAuthenticated(): Promise<boolean> {
     }
 }
 
-// ─── GET: List all active blocked IPs ────────────────────────────────────────
+//  GET: List all active blocked IPs 
 export async function GET(): Promise<NextResponse> {
     if (!(await isAdminAuthenticated())) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     try {
-        // Use the safe helper — handles mock/build/edge transparently
+        // Use the safe helper  handles mock/build/edge transparently
         const members = await safeRedisSMembers(BLOCKED_IP_INDEX);
         const now = new Date();
         const activeBlocks: BlockedIPEntry[] = [];
@@ -49,7 +49,7 @@ export async function GET(): Promise<NextResponse> {
             const raw = await safeRedisGet(`${BLOCKED_IP_PREFIX}${ip}`);
 
             if (!raw || raw === 'TIMEOUT') {
-                // TTL expired or Redis timeout — remove stale entry from index
+                // TTL expired or Redis timeout  remove stale entry from index
                 await redisClient.srem?.(BLOCKED_IP_INDEX, ip).catch(() => {});
                 continue;
             }
@@ -77,7 +77,7 @@ export async function GET(): Promise<NextResponse> {
     }
 }
 
-// ─── POST: Block an IP ───────────────────────────────────────────────────────
+//  POST: Block an IP 
 export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!(await isAdminAuthenticated())) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             // safeRedisSet supports 'EX' as a vararg
             await safeRedisSet(key, value, 'EX', ttlSeconds);
         } else {
-            // Permanent block — no TTL
+            // Permanent block  no TTL
             await safeRedisSet(key, value);
         }
 
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 }
 
-// ─── DELETE: Unblock an IP ───────────────────────────────────────────────────
+//  DELETE: Unblock an IP 
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
     if (!(await isAdminAuthenticated())) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -147,7 +147,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
         const key = `${BLOCKED_IP_PREFIX}${ipAddress}`;
 
         // Use safe wrappers where available; fall back to raw client for del/srem
-        // (both are fire-and-forget operations — errors here are non-fatal)
+        // (both are fire-and-forget operations  errors here are non-fatal)
         await safeRedisSet(key, '', 'EX', 1); // Immediate expiry = effective delete via TTL
         await redisClient.srem?.(BLOCKED_IP_INDEX, ipAddress).catch(() => {});
 

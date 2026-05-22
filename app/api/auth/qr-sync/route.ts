@@ -62,10 +62,10 @@ export async function POST(req: Request) {
 
         const normalizedAddress = address.toLowerCase();
 
-        // 3. P2P Bridge: Emitimos al Sovereign Auth Bus (Volume IV.4.2)
+        // 3. P2P Bridge: Emitimos al System Auth Bus (Volume IV.4.2)
         // El Mesh conectará los WebSockets y aplicará el State Hydration al PC
         if (redisClient && typeof redisClient.publish === 'function') {
-            await redisClient.publish('sovereign_mesh_auth_bus', JSON.stringify({
+            await redisClient.publish('system_mesh_auth_bus', JSON.stringify({
                 socketId: token, // QR token typically serves as the bridge socket ID
                 address: normalizedAddress,
                 timestamp: Date.now()
@@ -119,7 +119,7 @@ export async function POST(req: Request) {
             path: '/',
         });
 
-        response.cookies.set('sovereign_handshake', normalizedAddress, {
+        response.cookies.set('system_handshake', normalizedAddress, {
             path: '/',
             maxAge: 604800,
             sameSite: 'lax',

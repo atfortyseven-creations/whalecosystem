@@ -46,7 +46,7 @@ async function provisionBeta() {
     }
   }
 
-  console.log(`\n✅ Provisioning Complete. Generated ${successCount} Golden Tickets.`);
+  console.log(`\n Provisioning Complete. Generated ${successCount} Golden Tickets.`);
   console.log(`\n--- BETA INVITATION CODES ---`);
   
   // Print the first 5 codes for easy access by the founder during onboarding

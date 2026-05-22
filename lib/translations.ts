@@ -9,7 +9,7 @@ export const translations = {
         'nav.bubbles': 'BUBBLES',
         'nav.start': 'START',
         'nav.wallet_settings': 'WALLET SETTINGS',
-        'nav.whale': 'Whale Tracker 🐋',
+        'nav.whale': 'Whale Tracker ',
         'nav.settings': 'Config',
         'nav.hide': 'Hide',
         'nav.visible': 'Visible',
@@ -34,7 +34,7 @@ export const translations = {
 
         // Hero
         'hero.welcome': 'WELCOME TO',
-        'hero.subtitle': 'Sovereign wallet with biometric security, zero-knowledge proofs, and unmatched privacy.',
+        'hero.subtitle': 'System wallet with biometric security, zero-knowledge proofs, and unmatched privacy.',
         'hero.keys_control': 'Your keys. Your control.',
         'hero.cta': 'Get Started',
         'hero.stats.users': '10M+ Users',
@@ -55,7 +55,7 @@ export const translations = {
         'market.month': '30D',
         'market.year': '1Y',
         'market.actions': 'Links & Trade',
-        'market.sync': 'Market data sync active • Latency compensation enabled',
+        'market.sync': 'Market data sync active  Latency compensation enabled',
         'market.retry': 'Retry',
 
         // FeatureCardsSection
@@ -137,10 +137,10 @@ export const translations = {
         // Features Page
         'features.title': 'SYSTEM CORE',
         'features.subtitle': 'A detailed breakdown of the machinery powering your financial freedom.',
-        'features.visual_intel': 'Visual Intelligence',
+        'features.visual_intel': 'Visual Analytics',
         'features.visual_desc': 'System Visualizations',
         'features.visual_note': 'Interactive components coming soon. Explore the features below for a detailed system breakdown.',
-        'features.id.title': 'Sovereign Identity',
+        'features.id.title': 'System Identity',
         'features.id.desc': 'World ID integration ensures one-person-one-vote without revealing personal data.',
         'features.zap.title': 'Instant Zaps',
         'features.zap.desc': 'Convert assets to positions in one click. Our smart routers find the best path.',

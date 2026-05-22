@@ -16,7 +16,7 @@ interface State {
 /**
  * InstitutionalErrorBoundary
  * 
- * A robust, high-fidelity error boundary designed for the Sovereign Terminal.
+ * A robust, high-fidelity error boundary designed for the System Terminal.
  * Prevents local module failures from crashing the entire session.
  * Features an "Aztec Brutalist" fallback UI with a localized reset trigger.
  */
@@ -33,7 +33,7 @@ export class InstitutionalErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error(`[Term-Error-Node]: ${this.props.moduleName || 'Global'} Failure`, error, errorInfo);
 
-    // ── ChunkLoadError Recovery ──────────────────────────────────────────────
+    //  ChunkLoadError Recovery 
     // Stale Next.js chunks (after a new deployment) cause 404s on old chunk
     // hashes. The only fix is a hard reload to get the fresh HTML + manifest.
     const isChunkError =
@@ -47,7 +47,7 @@ export class InstitutionalErrorBoundary extends Component<Props, State> {
       try {
         if (!sessionStorage.getItem(reloadKey)) {
           sessionStorage.setItem(reloadKey, '1');
-          console.warn('[InstitutionalErrorBoundary] ChunkLoadError — reloading to fetch fresh chunks.');
+          console.warn('[InstitutionalErrorBoundary] ChunkLoadError  reloading to fetch fresh chunks.');
           window.location.reload();
         } else {
           sessionStorage.removeItem(reloadKey);

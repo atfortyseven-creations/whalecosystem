@@ -27,17 +27,17 @@ export function ExternalEmbed({
     const iframeRef             = useRef<HTMLIFrameElement>(null);
     const timeoutRef            = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    /* ── Start load timer on mount ──────────────────────────────────────── */
+    /*  Start load timer on mount  */
     React.useEffect(() => {
         // Start the 12s cross-origin fallback timer immediately on mount
         timeoutRef.current = setTimeout(() => setStatus('ready'), 12000);
         return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
     }, [url]);
 
-    /* ── Attempt to detect X-Frame-Options block ───────────────────────── */
+    /*  Attempt to detect X-Frame-Options block  */
     const handleLoad = useCallback(() => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        // Try accessing contentDocument — will throw if blocked by CORS/XFO
+        // Try accessing contentDocument  will throw if blocked by CORS/XFO
         try {
             const doc = iframeRef.current?.contentDocument;
             // If doc is null AND readyState isn't 'complete' it was blocked
@@ -47,7 +47,7 @@ export function ExternalEmbed({
                 setStatus('ready');
             }
         } catch {
-            // Security error means cross-origin but LOADED (not blocked) — OK
+            // Security error means cross-origin but LOADED (not blocked)  OK
             setStatus('ready');
         }
     }, []);
@@ -68,7 +68,7 @@ export function ExternalEmbed({
         startLoad();
     };
 
-    /* ── Loading skeleton ───────────────────────────────────────────────── */
+    /*  Loading skeleton  */
     const LoadingSkeleton = () => (
         <div className="absolute inset-0 bg-white flex flex-col">
             {/* Top nav skeleton */}
@@ -97,14 +97,14 @@ export function ExternalEmbed({
                 <div className="flex flex-col items-center gap-3">
                     <Loader2 size={32} className="animate-spin" style={{ color: accentColor }}/>
                     <span className="text-[10px] font-black text-[#888888] uppercase tracking-widest">
-                        Loading {title}…
+                        Loading {title}
                     </span>
                 </div>
             </div>
         </div>
     );
 
-    /* ── Blocked / fallback state ───────────────────────────────────────── */
+    /*  Blocked / fallback state  */
     const BlockedState = () => (
         <div className="absolute inset-0 bg-[#FAF9F6] flex flex-col items-center justify-center gap-6">
             <div
@@ -131,7 +131,7 @@ export function ExternalEmbed({
                 className="flex items-center gap-2 px-8 py-3 rounded-2xl text-white text-[11px] font-black uppercase tracking-widest shadow-lg transition-all hover:opacity-85 active:scale-95"
                 style={{ background: accentColor }}
             >
-                <ExternalLink size={15}/> Open {title} →
+                <ExternalLink size={15}/> Open {title} 
             </a>
             <button
                 onClick={handleRefresh}
@@ -145,7 +145,7 @@ export function ExternalEmbed({
     return (
         <div className="flex flex-col h-full overflow-hidden">
 
-            {/* ── Institutional Address Bar ── */}
+            {/*  Institutional Address Bar  */}
             <div
                 className="shrink-0 h-11 border-b border-[#E5E5E5] bg-[#FDFDFB] flex items-center px-4 gap-3 z-10"
             >
@@ -208,7 +208,7 @@ export function ExternalEmbed({
                 </span>
             </div>
 
-            {/* ── iframe area ── */}
+            {/*  iframe area  */}
             <div className="flex-1 relative overflow-hidden bg-white">
                 <AnimatePresence>
                     {status === 'loading' && (

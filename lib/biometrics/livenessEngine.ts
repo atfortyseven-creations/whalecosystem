@@ -1,14 +1,14 @@
 /**
- * Sovereign Biometric Liveness Engine v3.0
+ * System Biometric Liveness Engine v3.0
  * ==========================================
  * Production-grade anti-spoofing without external APIs.
  * Runs entirely client-side via Canvas pixel analysis.
  *
  * Pipeline:
- *  1. EAR (Eye Aspect Ratio)     — real blink vs photo
- *  2. Micro-movement jitter      — live face vs static photo
- *  3. Texture FFT analysis       — skin vs printed/screen pixels
- *  4. Parallax depth challenge   — 3D face vs 2D photo
+ *  1. EAR (Eye Aspect Ratio)      real blink vs photo
+ *  2. Micro-movement jitter       live face vs static photo
+ *  3. Texture FFT analysis        skin vs printed/screen pixels
+ *  4. Parallax depth challenge    3D face vs 2D photo
  */
 
 export type LivenessStage =
@@ -42,7 +42,7 @@ export interface FaceLandmarks {
   chin: { x: number; y: number };
 }
 
-// ── EAR Calculation ──────────────────────────────────────────────────────────
+//  EAR Calculation 
 // EAR = (|p2-p6| + |p3-p5|) / (2 * |p1-p4|)
 // Points: p1=outer, p4=inner, p2,p3=upper, p5,p6=lower
 export function calculateEAR(eyePoints: { x: number; y: number }[]): number {
@@ -59,7 +59,7 @@ export function calculateEAR(eyePoints: { x: number; y: number }[]): number {
   return (vertical1 + vertical2) / (2.0 * horizontal);
 }
 
-// ── Micro-Movement Jitter Analysis ───────────────────────────────────────────
+//  Micro-Movement Jitter Analysis 
 // A real face has natural micro-movements (breathing, heartbeat jitter)
 // A printed photo/screen is perfectly static
 export function analyzeJitter(
@@ -80,9 +80,9 @@ export function analyzeJitter(
   return Math.sqrt(stdX ** 2 + stdY ** 2);
 }
 
-// ── Texture FFT Analysis (Anti-Screen/Print) ─────────────────────────────────
-// Digital screens have regular pixel grids → detectable frequency peaks
-// Printed photos have halftone patterns → also detectable
+//  Texture FFT Analysis (Anti-Screen/Print) 
+// Digital screens have regular pixel grids  detectable frequency peaks
+// Printed photos have halftone patterns  also detectable
 // Real skin has irregular, broadband frequency distribution
 export function analyzeTextureFrquency(
   ctx: CanvasRenderingContext2D,
@@ -117,7 +117,7 @@ export function analyzeTextureFrquency(
     const centered = rowMeans.map((v) => v - mean);
     const variance = centered.reduce((a, b) => a + b ** 2, 0);
 
-    if (variance < 1) return 0.8; // Low contrast → likely real skin (hard to spoof low variance)
+    if (variance < 1) return 0.8; // Low contrast  likely real skin (hard to spoof low variance)
 
     let maxAutoCorr = 0;
     for (let lag = 4; lag <= 16; lag++) {
@@ -138,7 +138,7 @@ export function analyzeTextureFrquency(
   }
 }
 
-// ── Parallax Depth Analysis ───────────────────────────────────────────────────
+//  Parallax Depth Analysis 
 // When head turns: nose moves proportionally MORE than eyes (3D parallax)
 // On a flat photo: nose and eyes move identically (no depth offset)
 export function analyzeParallaxDepth(
@@ -159,12 +159,12 @@ export function analyzeParallaxDepth(
   if (eyeMidRange < 1) return 0; // No head movement detected
 
   // 3D face: nose moves ~1.4-2x more than eyes laterally
-  // Flat photo: ratio ≈ 1.0
+  // Flat photo: ratio  1.0
   const ratio = noseRange / eyeMidRange;
   return Math.min(1, ratio / 1.8); // normalized, >0.7 = real 3D face
 }
 
-// ── Combined Liveness Score ───────────────────────────────────────────────────
+//  Combined Liveness Score 
 export function computeLivenessScore(metrics: LivenessMetrics): {
   score: number;
   isLive: boolean;
@@ -184,14 +184,14 @@ export function computeLivenessScore(metrics: LivenessMetrics): {
     return { score: 0, isLive: false, spoofType: null };
   }
 
-  // ── Component Scores ──────────────────────────────────────────────────────
+  //  Component Scores 
 
   // 1. Blink score: 1-2 blinks in window = LIVE
   const blinkScore =
     blinkCount >= 1 && blinkCount <= 4
       ? 1.0
       : blinkCount === 0
-      ? 0.0 // No blink at all → likely photo
+      ? 0.0 // No blink at all  likely photo
       : 0.6;
 
   // 2. EAR variance: live eyes fluctuate; static photo has near-zero variance
@@ -204,7 +204,7 @@ export function computeLivenessScore(metrics: LivenessMetrics): {
       : 0;
   const earScore = Math.min(1, earVariance * 200);
 
-  // 3. Jitter score: real face has 0.3–2.5px jitter; photo has <0.1px
+  // 3. Jitter score: real face has 0.32.5px jitter; photo has <0.1px
   const jitterNorm = Math.min(1, Math.max(0, (jitterScore - 0.08) / 1.5));
 
   // 4. Texture score: already 0-1
@@ -213,7 +213,7 @@ export function computeLivenessScore(metrics: LivenessMetrics): {
   // 5. Parallax score: already 0-1
   const parScore = parallaxRatio;
 
-  // ── Weighted combination ──────────────────────────────────────────────────
+  //  Weighted combination 
   const weights = {
     blink: 0.30,
     ear: 0.20,
@@ -231,7 +231,7 @@ export function computeLivenessScore(metrics: LivenessMetrics): {
 
   const score = Math.round(rawScore * 100);
 
-  // ── Spoof detection ───────────────────────────────────────────────────────
+  //  Spoof detection 
   let spoofType: string | null = null;
 
   if (blinkCount === 0 && frameCount > 60) {
@@ -247,7 +247,7 @@ export function computeLivenessScore(metrics: LivenessMetrics): {
   return { score, isLive, spoofType };
 }
 
-// ── Canvas-based Face Region Extractor ───────────────────────────────────────
+//  Canvas-based Face Region Extractor 
 // Approximates facial landmark zones from canvas pixel analysis
 // (Used when MediaPipe is unavailable)
 export interface ApproximateLandmarks {
@@ -301,7 +301,7 @@ export function extractApproximateLandmarks(
   };
 }
 
-// ── Pixel brightness variance (for blink approximation) ──────────────────────
+//  Pixel brightness variance (for blink approximation) 
 export function getEyeRegionBrightness(
   ctx: CanvasRenderingContext2D,
   eyeX: number,

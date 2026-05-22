@@ -20,7 +20,7 @@ FORUM - WEB3 MINIMALIST REDESIGN:
 - forum/layout.tsx: bg #FAF9F6, text #050505, max-w 920px
 
 CAPITAL LEDGER - HARDENING:
-- New route /api/intelligence/mass-transfers (ETH+BSC+BASE)
+- New route /api/analytics/mass-transfers (ETH+BSC+BASE)
 - api-client.ts: direct fetch, 30s refetch / 25s stale
 - MassTransferIntel.tsx: floor pills ALL/`$100K to `$50M
 - Real Sync button with bust cache + queryClient invalidate
@@ -51,7 +51,7 @@ Write-Host "OK - staged." -ForegroundColor Green
 Write-Host ""
 
 Write-Host "[2/3] Committing..." -ForegroundColor Yellow
-$commitFile = Join-Path $env:TEMP "sovereign_commit.txt"
+$commitFile = Join-Path $env:TEMP "system_commit.txt"
 $commitMessage | Out-File -FilePath $commitFile -Encoding UTF8
 git commit -F $commitFile
 Remove-Item $commitFile -ErrorAction SilentlyContinue

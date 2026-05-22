@@ -15,7 +15,7 @@ const MUTED  = "rgba(5,5,5,0.45)";
 const BORDER = "rgba(5,5,5,0.08)";
 const CARD   = "#FFFFFF";
 
-// ── Chain registry ────────────────────────────────────────────────────────────
+//  Chain registry 
 const CHAINS = [
   { id: 999999, name: "Humanity Ledger", slug: "humanity",  color: "#050505", symbol: "QDs", explorer: "https://basescan.org",               isQd: true  },
   { id: 1,      name: "Ethereum",        slug: "ethereum",  color: "#627EEA", symbol: "ETH", explorer: "https://etherscan.io",                isQd: false },
@@ -26,7 +26,7 @@ const CHAINS = [
   { id: 480,    name: "World Chain",     slug: null,        color: "#000000", symbol: "ETH", explorer: "https://worldscan.org",              isQd: false },
 ];
 
-// ── Native transaction shape ──────────────────────────────────────────────────
+//  Native transaction shape 
 type NativeTx = {
   hash: string;
   from: string;
@@ -40,7 +40,7 @@ type NativeTx = {
   functionName?: string;
 };
 
-// ── ERC-20 token transfer shape (tokentx endpoint) ───────────────────────────
+//  ERC-20 token transfer shape (tokentx endpoint) 
 type TokenTx = {
   hash: string;
   from: string;
@@ -55,7 +55,7 @@ type TokenTx = {
   contractAddress: string;
 };
 
-// ── Unified display type ──────────────────────────────────────────────────────
+//  Unified display type 
 type DisplayTx = {
   hash: string;
   from: string;
@@ -67,14 +67,14 @@ type DisplayTx = {
   gasPrice: string;
   type: "send" | "receive" | "contract";
   explorer: string;
-  // Quantum fields
-  quantumEntropy?: string;
+  // Core fields
+  coreEntropy?: string;
   payloadHash?: string;
   advancedMetadata?: string;
   blockNumber?: string;
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+//  Helpers 
 function formatAge(ts: string) {
   const diff = Date.now() / 1000 - parseInt(ts);
   if (diff < 60)    return `${Math.floor(diff)}s ago`;
@@ -99,12 +99,12 @@ function formatToken(raw: string, decimals: number) {
 
 function formatGwei(gasPrice: string) {
   const val = parseFloat(gasPrice) / 1e9;
-  if (!val || isNaN(val)) return "—";
+  if (!val || isNaN(val)) return "";
   return val.toFixed(1) + " Gwei";
 }
 
-function shortHash(h: string) { return h.slice(0, 8) + "…" + h.slice(-6); }
-function shortAddr(a: string)  { return a.slice(0, 6) + "…" + a.slice(-4); }
+function shortHash(h: string) { return h.slice(0, 8) + "" + h.slice(-6); }
+function shortAddr(a: string)  { return a.slice(0, 6) + "" + a.slice(-4); }
 
 // Convert native txlist -> DisplayTx
 function nativeToDisplay(tx: NativeTx, address: string, symbol: string, explorer: string): DisplayTx {
@@ -126,7 +126,7 @@ function nativeToDisplay(tx: NativeTx, address: string, symbol: string, explorer
   };
 }
 
-// Convert ERC-20 tokentx -> DisplayTx  (no "contract" type — always send/receive)
+// Convert ERC-20 tokentx -> DisplayTx  (no "contract" type  always send/receive)
 function tokenToDisplay(tx: TokenTx, address: string, explorer: string): DisplayTx {
   const decimals = parseInt(tx.tokenDecimal) || 18;
   const type: "send" | "receive" = tx.from.toLowerCase() === address.toLowerCase() ? "send" : "receive";
@@ -144,7 +144,7 @@ function tokenToDisplay(tx: TokenTx, address: string, explorer: string): Display
   };
 }
 
-// ── Single chain row ──────────────────────────────────────────────────────────
+//  Single chain row 
 function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string }) {
   const [open, setOpen]       = useState(false);
   const [txs, setTxs]         = useState<DisplayTx[]>([]);
@@ -189,11 +189,11 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
     }
   }, [chain, address]);
 
-  // Quantum Receipts via wagmi (only for Humanity Ledger)
+  // Core Receipts via wagmi (only for Humanity Ledger)
   const { data: qdReceiptsRaw, isLoading: loadingReceipts } = useReadContract({
     address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as `0x${string}`,
     abi: parseAbi([
-      'struct TransferReceipt { address from; address to; uint256 amount; uint256 timestamp; uint256 quantumEntropy; bytes advancedMetadata; bytes32 payloadHash; uint256 blockNumber; uint256 gasCost; }',
+      'struct TransferReceipt { address from; address to; uint256 amount; uint256 timestamp; uint256 coreEntropy; bytes advancedMetadata; bytes32 payloadHash; uint256 blockNumber; uint256 gasCost; }',
       'function getUserReceipts(address) view returns (TransferReceipt[])'
     ]),
     functionName: 'getUserReceipts',
@@ -216,14 +216,14 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
           gasPrice: r.gasCost ? r.gasCost.toString() : "0",
           type: (r.from || "").toLowerCase() === (address || "").toLowerCase() ? "send" : "receive",
           explorer: chain.explorer!,
-          quantumEntropy: r.quantumEntropy ? r.quantumEntropy.toString() : "",
+          coreEntropy: r.coreEntropy ? r.coreEntropy.toString() : "",
           payloadHash: r.payloadHash || "",
           advancedMetadata: r.advancedMetadata || "",
           blockNumber: r.blockNumber ? r.blockNumber.toString() : "0"
         })));
         setFetched(true);
       } catch (err) {
-        console.error("Failed to parse Quantum Receipts", err);
+        console.error("Failed to parse Core Receipts", err);
         setTxs([]);
         setFetched(true);
       }
@@ -240,7 +240,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
   }, [open, fetched, load, chain.slug, chain.isQd]);
 
   // Balance shown in the collapsed header row
-  let displayBal = "—";
+  let displayBal = "";
   if (chain.isQd) {
     displayBal = qdBalanceRaw
       ? Number(formatEther(qdBalanceRaw as bigint)).toLocaleString('es-ES', { maximumFractionDigits: 2 })
@@ -253,7 +253,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
 
   return (
     <div className="border rounded-2xl overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
-      {/* ── Collapsed header ── */}
+      {/*  Collapsed header  */}
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-4 px-5 py-4 hover:bg-black/[0.02] transition-colors text-left"
@@ -268,7 +268,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
         <div className="flex-1 min-w-0">
           <div className="font-black text-sm" style={{ color: INK }}>{chain.name}</div>
           <div className="text-[10px] font-mono mt-0.5" style={{ color: MUTED }}>
-            {chain.isQd ? "Quantum Dots · Base L2" : `Chain ID: ${chain.id}`}
+            {chain.isQd ? "Core Dots · Base L2" : `Chain ID: ${chain.id}`}
           </div>
         </div>
 
@@ -294,7 +294,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
         }
       </button>
 
-      {/* ── Expanded transaction list ── */}
+      {/*  Expanded transaction list  */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -395,7 +395,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
                       </div>
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                         <span className="text-[9px] font-mono" style={{ color: MUTED }}>
-                          {tx.type === "send" ? `→ ${shortAddr(tx.to || "?")}` : `← ${shortAddr(tx.from || "?")}`}
+                          {tx.type === "send" ? ` ${shortAddr(tx.to || "?")}` : ` ${shortAddr(tx.from || "?")}`}
                         </span>
                         <span className="text-[9px] font-mono" style={{ color: MUTED }}>·</span>
                         <span className="text-[9px] font-mono flex items-center gap-0.5" style={{ color: MUTED }}>
@@ -426,10 +426,10 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
                         {!chain.isQd && <ExternalLink size={8} />}
                       </a>
                       
-                      {tx.quantumEntropy && (
+                      {tx.coreEntropy && (
                         <div className="flex flex-col items-end gap-0.5">
                           <span className="text-[7px] font-mono font-black uppercase" style={{ color: "#8247e5" }}>
-                            ENTROPY: {shortHash(tx.quantumEntropy)}
+                            ENTROPY: {shortHash(tx.coreEntropy)}
                           </span>
                           <span className="text-[7px] font-mono" style={{ color: MUTED }}>
                             BLK: {tx.blockNumber}
@@ -464,7 +464,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
   );
 }
 
-// ── Main exported component ───────────────────────────────────────────────────
+//  Main exported component 
 export function ChainActivityPanel({ address }: { address: string }) {
   return (
     <div className="rounded-3xl border overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>

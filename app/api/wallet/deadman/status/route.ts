@@ -8,7 +8,7 @@ export async function GET(req: Request) {
         if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const email = session.email;
-        // AuthUser has NO relation to DeadMansSwitch — query directly by userAddress
+        // AuthUser has NO relation to DeadMansSwitch  query directly by userAddress
         const authUser = await prisma.authUser.findUnique({ where: { email } });
         if (!authUser) return NextResponse.json({ active: false });
 

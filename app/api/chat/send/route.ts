@@ -8,7 +8,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 
-// ── Lazy Upstash client — only created when env vars are present ──────────────
+//  Lazy Upstash client  only created when env vars are present 
 // Previously: `new Redis({url: process.env.UPSTASH_REDIS_REST_URL!, token: ...})`
 // crashed at module-load time when env vars were undefined (! is a TypeScript-only
 // assertion; at runtime it's just `undefined`). Upstash constructor throws on
@@ -28,7 +28,7 @@ function getUpstashRedis(): any | null {
   }
 }
 
-// ── Shared in-memory fallback store (global so it's shared with the SSE stream route) ──
+//  Shared in-memory fallback store (global so it's shared with the SSE stream route) 
 declare global {
   var __whaleChatMemStore: Map<string, Array<{ id: string; sender: string; content: string; sentAt: string; _score: number }>>;
 }

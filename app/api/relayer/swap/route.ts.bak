@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         }
 
         console.log(`[Gasless Swap] Processing for user: ${user}`);
-        console.log(`[Gasless Swap] Route: ${fromToken} (${fromChain}) → ${toToken} (${toChain})`);
+        console.log(`[Gasless Swap] Route: ${fromToken} (${fromChain})  ${toToken} (${toChain})`);
         console.log(`[Gasless Swap] Amount: ${ethers.formatUnits(fromAmount, 18)}`);
 
         // ====================================================================
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        console.log("[Gasless Swap] Signature verified ✓");
+        console.log("[Gasless Swap] Signature verified ");
 
         // ====================================================================
         // SETUP RELAYER

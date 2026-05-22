@@ -64,14 +64,14 @@ node_modules/
 /vault-storage/
 /data/
 /lib/blockchain/abi/*.json
-!/lib/blockchain/abi/SovereignDeadmanSwitch.json
+!/lib/blockchain/abi/SystemDeadmanSwitch.json
 
 # Build Logs
 build.log
 tsc_output.txt
 tmp_diff.txt
 
-# Corrupt / accidental files — never commit these
+# Corrupt / accidental files  never commit these
 {
 console.log('
 tokens.txt

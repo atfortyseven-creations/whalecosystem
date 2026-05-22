@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ClientOverlays — thin "use client" wrapper so we can use dynamic({ ssr: false })
+ * ClientOverlays  thin "use client" wrapper so we can use dynamic({ ssr: false })
  * for decorative / utility components without polluting the Server Component layout.
  *
  * Rules:

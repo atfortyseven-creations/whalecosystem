@@ -1,11 +1,11 @@
 
 import { NextResponse } from 'next/server';
 
-// ════════════════════════════════════════════════════════════════════
-// /api/network/v1/hashrate — Real Bitcoin Network Hashrate
+// 
+// /api/network/v1/hashrate  Real Bitcoin Network Hashrate
 // Source: mempool.space (public, no API key needed)
 // Returns current hashrate in EH/s + 30-day history
-// ════════════════════════════════════════════════════════════════════
+// 
 
 export const revalidate = 60; // Cache 60 seconds
 
@@ -26,10 +26,10 @@ export async function GET() {
         const hashrateData = await hashrateRes.json();
         const blocks = blocksRes.ok ? await blocksRes.json() : [];
 
-        // mempool.space returns hashrates in H/s — convert to EH/s (/ 1e18)
+        // mempool.space returns hashrates in H/s  convert to EH/s (/ 1e18)
         const hashratePoints = (hashrateData.hashrates || []).map((h: any) => ({
             time: h.timestamp * 1000,
-            hashrate: h.avgHashrate / 1e18, // Convert H/s → EH/s
+            hashrate: h.avgHashrate / 1e18, // Convert H/s  EH/s
         }));
 
         // Use the currentHashrate provided by the API (if missing, use the last point)

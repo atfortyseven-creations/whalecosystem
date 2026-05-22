@@ -19,8 +19,8 @@ export class EntityLifecycle {
           where: { status: 'ACTIVE' },
           data: { status: 'HIBERNATING', updatedAt: new Date() }
         });
-        console.warn(`[EntityLifecycle] ❄️ Macro Crash detected ($${currentHiveEnergyUSD}). ${activeCount} entities forced to HIBERNATE.`);
-        await safeRedisSet('sovereign:hive:status', 'HIBERNATING');
+        console.warn(`[EntityLifecycle] ️ Macro Crash detected ($${currentHiveEnergyUSD}). ${activeCount} entities forced to HIBERNATE.`);
+        await safeRedisSet('system:hive:status', 'HIBERNATING');
       }
     } else {
       const hibernatingCount = await prisma.cosmicEntity.count({ where: { status: 'HIBERNATING' }});
@@ -29,8 +29,8 @@ export class EntityLifecycle {
           where: { status: 'HIBERNATING' },
           data: { status: 'ACTIVE', updatedAt: new Date() }
         });
-        console.log(`[EntityLifecycle] ☀️ Macro Recovery ($${currentHiveEnergyUSD}). ${hibernatingCount} entities AWAKENED.`);
-        await safeRedisSet('sovereign:hive:status', 'THRIVING');
+        console.log(`[EntityLifecycle] ️ Macro Recovery ($${currentHiveEnergyUSD}). ${hibernatingCount} entities AWAKENED.`);
+        await safeRedisSet('system:hive:status', 'THRIVING');
       }
     }
   }
@@ -46,7 +46,7 @@ export class EntityLifecycle {
         // Pseudo logic for merging: if combined energy is high enough, merge them.
         const combined = pair.a.amountUSD + pair.b.amountUSD;
         if (combined > 10_000_000) {
-            console.log(`[EntityLifecycle] 🧬 Entities ${pair.a.id} and ${pair.b.id} are merging into ${combined}`);
+            console.log(`[EntityLifecycle]  Entities ${pair.a.id} and ${pair.b.id} are merging into ${combined}`);
             // Update PRISMA states to MERGED
             await prisma.cosmicEntity.updateMany({
                 where: { id: { in: [pair.a.id, pair.b.id] } },

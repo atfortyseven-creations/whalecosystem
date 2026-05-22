@@ -14,7 +14,7 @@ yarn add @whalecosystem/sdk
 pnpm add @whalecosystem/sdk
 ```
 
-**Requirements:** Node.js ≥ 18, TypeScript ≥ 5.0 (optional but recommended)
+**Requirements:** Node.js  18, TypeScript  5.0 (optional but recommended)
 
 ---
 
@@ -69,11 +69,11 @@ const stream = client.whale.stream({
 });
 
 stream.on('whale', (event: WhaleEvent) => {
-  console.log(`🐋 $${event.amountUsd.toLocaleString()} ${event.token} on ${event.network}`);
+  console.log(` $${event.amountUsd.toLocaleString()} ${event.token} on ${event.network}`);
 });
 
 stream.on('signal', (signal: Signal) => {
-  console.log(`📡 Signal [${signal.type}] confidence=${signal.confidence}`);
+  console.log(` Signal [${signal.type}] confidence=${signal.confidence}`);
 });
 
 stream.on('error', (err) => {
@@ -141,7 +141,7 @@ const book = await client.markets.orderBook('0xabc123...', {
 ```typescript
 const signals = await client.signals.recent({
   type: 'accumulation',        // Optional: filter by signal type
-  minConfidence: 60,           // Minimum confidence score (0–100)
+  minConfidence: 60,           // Minimum confidence score (0100)
   asset: 'USDC',              // Optional: filter by asset
   limit: 10
 });
@@ -172,7 +172,7 @@ const liquidity = await client.liquidity.snapshot({
   tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC
 });
 
-// liquidity.liquidityScore: number (0–100)
+// liquidity.liquidityScore: number (0100)
 // liquidity.poolDepth1pct: number (USD)
 // liquidity.poolDepth5pct: number (USD)
 // liquidity.priceImpact: Record<'10k'|'50k'|'100k'|'500k'|'1m', number>
@@ -217,7 +217,7 @@ try {
   const events = await client.whale.recent({ network: 'ethereum' });
 } catch (err) {
   if (err instanceof RateLimitError) {
-    console.log(`Rate limited — retry in ${err.retryAfter}s`);
+    console.log(`Rate limited  retry in ${err.retryAfter}s`);
   } else if (err instanceof AuthError) {
     console.error('Invalid API key');
   } else if (err instanceof GeoRestrictedError) {
@@ -285,7 +285,7 @@ const client = new WhaleClient({ apiKey: process.env.WHALE_API_KEY! });
 async function main() {
   // Verify connection
   const auth = await client.auth.verify();
-  console.log(`Connected as ${auth.plan} plan — ${auth.requestsToday}/${auth.dailyLimit} requests today`);
+  console.log(`Connected as ${auth.plan} plan  ${auth.requestsToday}/${auth.dailyLimit} requests today`);
 
   // Open real-time stream
   const stream = client.whale.stream({

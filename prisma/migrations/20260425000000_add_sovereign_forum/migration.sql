@@ -1,7 +1,7 @@
--- ─────────────────────────────────────────────────────────────────────────────
--- SOVEREIGN FORUM — Manual Migration
+-- 
+-- SOVEREIGN FORUM  Manual Migration
 -- Creates all 6 Forum tables atomically. Leaves all existing tables untouched.
--- ─────────────────────────────────────────────────────────────────────────────
+-- 
 
 -- ForumCategory
 CREATE TABLE IF NOT EXISTS "ForumCategory" (
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS "ForumTopic" (
 CREATE INDEX IF NOT EXISTS "ForumTopic_categoryId_createdAt_idx" ON "ForumTopic"("categoryId", "createdAt" DESC);
 CREATE INDEX IF NOT EXISTS "ForumTopic_authorId_createdAt_idx" ON "ForumTopic"("authorId", "createdAt" DESC);
 
--- ForumTopic ↔ ForumTag (M2M join table)
+-- ForumTopic  ForumTag (M2M join table)
 CREATE TABLE IF NOT EXISTS "_TopicTags" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL,

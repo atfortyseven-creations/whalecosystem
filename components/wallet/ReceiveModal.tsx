@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Copy, QrCode as QrIcon, Check, AlertCircle, ChevronDown, ExternalLink } from "lucide-react";
 import { useChains, useSwitchChain } from "wagmi";
-import { useSovereignAccount } from "@/hooks/useSovereignAccount";
+import { useSystemAccount } from "@/hooks/useSystemAccount";
 import { toast } from "sonner";
 import { TransactionStatusModal } from "@/components/ui/TransactionStatusModal";
 import { TokenLogo } from '@/components/ui/TokenLogo';
@@ -17,7 +17,7 @@ interface ReceiveModalProps {
 }
 
 export default function ReceiveModal({ isOpen, onClose, address: propAddress, userAssets = [] }: ReceiveModalProps) {
-    const { address: wagmiAddress, chainId } = useSovereignAccount();
+    const { address: wagmiAddress, chainId } = useSystemAccount();
     const address = propAddress || wagmiAddress;
     const chains = useChains();
     const { switchChain } = useSwitchChain();

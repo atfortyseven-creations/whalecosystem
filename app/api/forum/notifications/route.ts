@@ -32,12 +32,12 @@ export async function GET(req: NextRequest) {
                 where: { userId: user.id, isRead: false }
             });
         } catch {
-            // ForumNotification table may not exist yet — return empty
+            // ForumNotification table may not exist yet  return empty
         }
 
         return NextResponse.json({ notifications, unreadCount });
     } catch (e: any) {
-        // Silent degradation — never crash the forum header
+        // Silent degradation  never crash the forum header
         return NextResponse.json({ notifications: [], unreadCount: 0 });
     }
 }

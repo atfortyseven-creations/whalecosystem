@@ -21,7 +21,7 @@ const SettingsMenu = () => {
                 <Menu size={20} />
             </button>
 
-            {/* The Monster Modal 🧠 */}
+            {/* The Monster Modal  */}
             <SettingsModal
                 isOpen={isSettingsOpen}
                 onClose={() => setIsSettingsOpen(false)}

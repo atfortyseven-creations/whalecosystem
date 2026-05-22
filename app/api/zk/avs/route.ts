@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/zk/avs
  * Fetches the current state of AVS tasks pending verification.
- * Used by Sovereign Nodes to pull thermodynamic signals that need ZK attestation.
+ * Used by System Nodes to pull thermodynamic signals that need ZK attestation.
  */
 export async function GET(req: NextRequest) {
     try {
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
             data: {
                 type: 'AVS_ATTESTATION',
                 severity: 'INFO',
-                ipAddress: 'Sovereign Node Proxy',
+                ipAddress: 'System Node Proxy',
                 userAgent: operatorId,
                 details: `Operator ${operatorId} submitted valid ZK proof for tx ${txHash}`,
                 timestamp: new Date()

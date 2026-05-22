@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useCallback } from "react";
 
 /**
- * DownheadCursor — Quantum Dot Trail System
- * ─────────────────────────────────────────
+ * DownheadCursor  Core Dot Trail System
+ * 
  * LIVE TRAIL: A stream of crisp purple square dots follows the mouse cursor
  *             inside the DownheadSection, fading from opaque near the cursor
  *             to transparent in the tail. Rendered at 60/120/240hz via rAF.
@@ -17,17 +17,17 @@ import React, { useEffect, useRef, useCallback } from "react";
  * native cursor is hidden and the dot trail IS the cursor.
  */
 
-// ── Config ────────────────────────────────────────────────────────────────────
+//  Config 
 
-const DOT_SIZE       = 6;       // px — exact square side length
-const DOT_GAP        = 10;      // px — minimum distance between trail dots
+const DOT_SIZE       = 6;       // px  exact square side length
+const DOT_GAP        = 10;      // px  minimum distance between trail dots
 const TRAIL_LENGTH   = 22;      // max live dots in trail
 const PURPLE_H       = 270;     // HSL hue for purple (270° = pure purple)
 const PURPLE_S       = 75;      // saturation %
 const PURPLE_L       = 58;      // lightness %
-const FADE_DURATION  = 420;     // ms — how long trail dots fade after cursor stops
+const FADE_DURATION  = 420;     // ms  how long trail dots fade after cursor stops
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+//  Types 
 
 interface TrailDot {
   x: number;
@@ -41,7 +41,7 @@ interface StampedDot {
   alpha: number;
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
+//  Component 
 
 export const DownheadCursor = ({
   containerRef,
@@ -59,7 +59,7 @@ export const DownheadCursor = ({
   const lastDotRef  = useRef({ x: -9999, y: -9999 });
   const lastMoveRef = useRef<number>(0);
 
-  // ── Draw a single square dot (pixel-snapped for crispness) ────────────────
+  //  Draw a single square dot (pixel-snapped for crispness) 
   const drawDot = useCallback(
     (ctx: CanvasRenderingContext2D, x: number, y: number, alpha: number) => {
       const px = Math.round(x - DOT_SIZE / 2);
@@ -70,7 +70,7 @@ export const DownheadCursor = ({
     []
   );
 
-  // ── Render loop ───────────────────────────────────────────────────────────
+  //  Render loop 
   const render = useCallback(() => {
     const liveCanvas = liveCanvasRef.current;
     if (!liveCanvas) { rafRef.current = requestAnimationFrame(render); return; }
@@ -106,7 +106,7 @@ export const DownheadCursor = ({
     rafRef.current = requestAnimationFrame(render);
   }, [drawDot]);
 
-  // ── Mouse move handler ────────────────────────────────────────────────────
+  //  Mouse move handler 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -138,7 +138,7 @@ export const DownheadCursor = ({
     return () => container.removeEventListener("mousemove", onMove);
   }, [containerRef]);
 
-  // ── Click: stamp current trail onto persistent canvas ────────────────────
+  //  Click: stamp current trail onto persistent canvas 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -164,7 +164,7 @@ export const DownheadCursor = ({
       });
 
       // Also paint a bright anchor dot at exact click position
-      // (slightly larger for emphasis — but pixel-perfect)
+      // (slightly larger for emphasis  but pixel-perfect)
       const px = Math.round(clickX - DOT_SIZE / 2);
       const py = Math.round(clickY  - DOT_SIZE / 2);
       ctx.fillStyle = `hsla(${PURPLE_H}, ${PURPLE_S}%, ${PURPLE_L}%, 1)`;
@@ -179,7 +179,7 @@ export const DownheadCursor = ({
     return () => container.removeEventListener("mousedown", onDown);
   }, [containerRef, drawDot]);
 
-  // ── Resize handler: keep canvases pixel-perfect ───────────────────────────
+  //  Resize handler: keep canvases pixel-perfect 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -192,7 +192,7 @@ export const DownheadCursor = ({
         if (!c) return;
         // Only resize if dimensions actually changed (avoids clearing stamps)
         if (c.width !== w || c.height !== h) {
-          // For persistent canvas: snapshot → resize → restore
+          // For persistent canvas: snapshot  resize  restore
           if (ref === persistentCanvasRef && c.width > 0 && c.height > 0) {
             const tempCanvas    = document.createElement("canvas");
             tempCanvas.width    = c.width;
@@ -216,7 +216,7 @@ export const DownheadCursor = ({
     return () => ro.disconnect();
   }, [containerRef]);
 
-  // ── Start / stop RAF loop ─────────────────────────────────────────────────
+  //  Start / stop RAF loop 
   useEffect(() => {
     rafRef.current = requestAnimationFrame(render);
     return () => cancelAnimationFrame(rafRef.current);
@@ -224,14 +224,14 @@ export const DownheadCursor = ({
 
   return (
     <>
-      {/* Persistent stamp layer — never cleared until unmount */}
+      {/* Persistent stamp layer  never cleared until unmount */}
       <canvas
         ref={persistentCanvasRef}
         className="pointer-events-none absolute inset-0 z-[48]"
         style={{ imageRendering: "pixelated" }}
       />
 
-      {/* Live trail layer — cleared and redrawn every frame */}
+      {/* Live trail layer  cleared and redrawn every frame */}
       <canvas
         ref={liveCanvasRef}
         className="pointer-events-none absolute inset-0 z-[49]"

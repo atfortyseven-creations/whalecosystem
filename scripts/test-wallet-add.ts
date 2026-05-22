@@ -31,8 +31,8 @@ const TEST_WALLETS = [
 ];
 
 async function testWalletAddition() {
-  console.log('🧪 Starting Wallet Addition Tests\n');
-  console.log('⚠️  NOTE: These tests require:');
+  console.log(' Starting Wallet Addition Tests\n');
+  console.log('️  NOTE: These tests require:');
   console.log('   - A running dev server (npm run dev)');
   console.log('   - Valid WEB3 address header');
   console.log('   - CSRF token generation working\n');
@@ -42,12 +42,12 @@ async function testWalletAddition() {
   
   console.log(`Base URL: ${baseUrl}`);
   console.log(`Test User: ${testUserAddress}\n`);
-  console.log('─'.repeat(60));
+  console.log(''.repeat(60));
   
   for (const wallet of TEST_WALLETS) {
-    console.log(`\n📋 Test: ${wallet.name}`);
+    console.log(`\n Test: ${wallet.name}`);
     console.log(`   Address: ${wallet.address}`);
-    console.log(`   Expected: ${wallet.shouldSucceed ? '✅ SUCCESS' : '❌ FAILURE'}`);
+    console.log(`   Expected: ${wallet.shouldSucceed ? ' SUCCESS' : ' FAILURE'}`);
     
     try {
       // Step 1: Get CSRF Token
@@ -56,7 +56,7 @@ async function testWalletAddition() {
       });
       
       if (!csrfRes.ok) {
-        console.log(`   ❌ Failed to get CSRF token: ${csrfRes.status}`);
+        console.log(`    Failed to get CSRF token: ${csrfRes.status}`);
         continue;
       }
       
@@ -80,28 +80,28 @@ async function testWalletAddition() {
       const data = await addRes.json();
       
       if (addRes.ok) {
-        console.log(`   ✅ Wallet added successfully`);
-        console.log(`   📊 Data:`, JSON.stringify(data, null, 2));
+        console.log(`    Wallet added successfully`);
+        console.log(`    Data:`, JSON.stringify(data, null, 2));
         
         if (!wallet.shouldSucceed) {
-          console.log(`   ⚠️  WARNING: Expected this to fail but it succeeded!`);
+          console.log(`   ️  WARNING: Expected this to fail but it succeeded!`);
         }
       } else {
-        console.log(`   ❌ Failed with status ${addRes.status}`);
-        console.log(`   📊 Error:`, JSON.stringify(data, null, 2));
+        console.log(`    Failed with status ${addRes.status}`);
+        console.log(`    Error:`, JSON.stringify(data, null, 2));
         
         if (wallet.shouldSucceed) {
-          console.log(`   ⚠️  WARNING: Expected this to succeed but it failed!`);
+          console.log(`   ️  WARNING: Expected this to succeed but it failed!`);
         }
       }
       
     } catch (error) {
-      console.log(`   💥 Exception:`, error);
+      console.log(`    Exception:`, error);
     }
   }
   
-  console.log('\n' + '─'.repeat(60));
-  console.log('\n✅ All tests completed!\n');
+  console.log('\n' + ''.repeat(60));
+  console.log('\n All tests completed!\n');
 }
 
 // Run tests

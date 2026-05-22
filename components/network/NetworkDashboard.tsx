@@ -35,7 +35,7 @@ export function NetworkDashboard() {
                     <FusionMiningVisualizer />
                 </motion.div>
 
-                {/* Page title block — editorial style */}
+                {/* Page title block  editorial style */}
                 <div className="border-b border-slate-100 pb-16 flex flex-col md:flex-row md:items-end justify-between gap-12">
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}

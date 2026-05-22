@@ -15,7 +15,7 @@ import { encrypt, isValidPrivateKey } from '@/lib/wallet/encryption';
 
 export async function POST(req: Request) {
     try {
-        // 1. Authenticate via Sovereign SIWE Session
+        // 1. Authenticate via System SIWE Session
         const session = await getSession();
         if (!session || !session.userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -49,10 +49,10 @@ export async function POST(req: Request) {
             throw new Error('Generated invalid private key');
         }
 
-        // 5. Encrypt private key using the Sovereign encryption module
+        // 5. Encrypt private key using the System encryption module
         const encryptedPrivateKey = encrypt(privateKey);
 
-        // 6. Persist to AuthUser — only fields that exist in schema.prisma
+        // 6. Persist to AuthUser  only fields that exist in schema.prisma
         await prisma.authUser.upsert({
             where: { email },
             update: {
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
             }
         });
 
-        // 7. Log security event — using correct schema field `authUserId`
+        // 7. Log security event  using correct schema field `authUserId`
         const authUser = await prisma.authUser.findUnique({ where: { email }, select: { id: true } });
         await prisma.securityEvent.create({
             data: {
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
             }
         });
 
-        console.log(`✅ Sovereign wallet created for ${email}: ${address}`);
+        console.log(` System wallet created for ${email}: ${address}`);
 
         return NextResponse.json({
             success: true,
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
         });
 
     } catch (error: any) {
-        console.error('❌ Wallet creation error:', error);
+        console.error(' Wallet creation error:', error);
 
         // Log error event using correct schema
         try {

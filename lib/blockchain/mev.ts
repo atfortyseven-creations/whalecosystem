@@ -1,15 +1,15 @@
 import { ethers } from 'ethers';
 import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle';
 
-// ── Sovereign Architecture: MEV Protection (Phase 6) ─────────────────────────
+//  System Architecture: MEV Protection (Phase 6) 
 // Routes all administrative transaction broadcasts through Private Mempools 
 // (Flashbots/Eden) to prevent front-running, sandwich attacks, and ensure 
-// Absolute Sovereignty over node operations.
-// ─────────────────────────────────────────────────────────────────────────────
+// Absolute Systemty over node operations.
+// 
 
 const FLASHBOTS_RELAY = 'https://relay.flashbots.net';
 
-export class SovereignMEVProtector {
+export class SystemMEVProtector {
   private flashbotsProvider: FlashbotsBundleProvider | null = null;
   private standardProvider: ethers.JsonRpcProvider;
   private authSigner: ethers.Wallet;
@@ -28,7 +28,7 @@ export class SovereignMEVProtector {
         this.authSigner,
         FLASHBOTS_RELAY
       );
-      console.log('[MEV Shield] 🛡️ Flashbots Relay Connection Established.');
+      console.log('[MEV Shield] ️ Flashbots Relay Connection Established.');
     } catch (err: any) {
       console.warn(`[MEV Shield] Failed to connect to Flashbots: ${err.message}. Running unprotected.`);
     }
@@ -65,12 +65,12 @@ export class SovereignMEVProtector {
       const receipt = await response.wait();
       if (receipt === 1) { // 1 = Included
         const hash = ethers.keccak256(signedTx);
-        console.log(`[MEV Shield] ✅ Transaction mined privately! Hash: ${hash}`);
+        console.log(`[MEV Shield]  Transaction mined privately! Hash: ${hash}`);
         return this.standardProvider.getTransactionReceipt(hash);
       }
     }
 
-    console.error('[MEV Shield] 💀 Failed to land private transaction after 3 blocks.');
+    console.error('[MEV Shield]  Failed to land private transaction after 3 blocks.');
     return null;
   }
 }

@@ -17,7 +17,7 @@ interface CoreProps {
     mode: string;
 }
 
-// ── Shared geometries — created once, never re-allocated ──────────────────────
+//  Shared geometries  created once, never re-allocated 
 const OCTA_GEO = new THREE.OctahedronGeometry(1.2, 0);
 const INNER_GEO = new THREE.SphereGeometry(0.8, 12, 12);
 
@@ -25,7 +25,7 @@ function CoreMesh({ mode }: CoreProps) {
     const mesh = useRef<THREE.Mesh>(null);
     const innerMesh = useRef<THREE.Mesh>(null);
 
-    // Stable material ref — mutated in place to avoid material recreation
+    // Stable material ref  mutated in place to avoid material recreation
     const innerMat = useMemo(() => new THREE.MeshStandardMaterial({
         color: '#00f2ea',
         emissive: '#00f2ea',
@@ -61,7 +61,7 @@ function CoreMesh({ mode }: CoreProps) {
         const t = state.clock.getElapsedTime();
         innerMesh.current.scale.setScalar(0.5 + Math.sin(t * 2) * 0.05);
 
-        // Mutate existing material colors — avoids any allocation
+        // Mutate existing material colors  avoids any allocation
         (innerMesh.current.material as THREE.MeshStandardMaterial).color.lerp(targetColor, lerpFactor);
         (innerMesh.current.material as THREE.MeshStandardMaterial).emissive.lerp(targetColor, lerpFactor);
     });

@@ -5,11 +5,11 @@ import { Send, Bell, BellOff, CheckCircle2, AlertCircle, Trash2, ExternalLink, L
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // TelegramSettings
-// Fully functional: GET config → POST connect (sends real test msg) → DELETE
-// Uses /api/telegram/connect — no mocked data, no faked states
-// ─────────────────────────────────────────────────────────────────────────────
+// Fully functional: GET config  POST connect (sends real test msg)  DELETE
+// Uses /api/telegram/connect  no mocked data, no faked states
+// 
 
 interface TelegramConfig {
   configured: boolean;
@@ -47,7 +47,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
 
   useEffect(() => { fetchConfig(); }, [fetchConfig]);
 
-  // ── Connect / Update ────────────────────────────────────────────────────────
+  //  Connect / Update 
   const handleConnect = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatId.trim() && !config?.configured) {
@@ -68,7 +68,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
       });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
-      toast.success('✅ Telegram alerts activated — check your chat for a test message');
+      toast.success(' Telegram alerts activated  check your chat for a test message');
       setChatId('');
       await fetchConfig();
     } catch (err: any) {
@@ -78,7 +78,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
     }
   };
 
-  // ── Disconnect ──────────────────────────────────────────────────────────────
+  //  Disconnect 
   const handleDisconnect = async () => {
     setLoading(true);
     try {
@@ -101,7 +101,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
     return (
       <div className="flex items-center justify-center py-10 gap-3 text-[#888888]">
         <Loader2 size={16} className="animate-spin" />
-        <span className="text-[10px] font-mono uppercase tracking-widest">Loading config…</span>
+        <span className="text-[10px] font-mono uppercase tracking-widest">Loading config</span>
       </div>
     );
   }
@@ -110,7 +110,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
 
   return (
     <div className="space-y-6">
-      {/* ── Status Banner ── */}
+      {/*  Status Banner  */}
       <div className={`flex items-center justify-between px-5 py-4 rounded-2xl border ${
         isActive
           ? 'bg-[#00C076]/5 border-[#00C076]/25'
@@ -149,7 +149,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
         </div>
       </div>
 
-      {/* ── Delete Confirmation ── */}
+      {/*  Delete Confirmation  */}
       <AnimatePresence>
         {confirmDel && (
           <motion.div
@@ -174,18 +174,18 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
                 disabled={loading}
                 className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest bg-[#FF3B30] text-white rounded-xl hover:bg-[#D32F2F] transition-all active:scale-95 disabled:opacity-50"
               >
-                {loading ? 'Removing…' : 'Yes, Disconnect'}
+                {loading ? 'Removing' : 'Yes, Disconnect'}
               </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── Setup Guide (only when not configured) ── */}
+      {/*  Setup Guide (only when not configured)  */}
       {!isActive && (
         <div className="bg-white border border-[#E5E5E5] rounded-2xl p-5">
           <p className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-3">
-            Setup Guide — 3 Steps
+            Setup Guide  3 Steps
           </p>
           <ol className="space-y-3">
             {[
@@ -215,7 +215,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
         </div>
       )}
 
-      {/* ── Main Form ── */}
+      {/*  Main Form  */}
       <form onSubmit={handleConnect} className="space-y-4">
         {/* Chat ID input (only when not yet configured) */}
         {!isActive && (
@@ -268,7 +268,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
                   : 'bg-white border-[#E5E5E5] text-[#888888] hover:border-[#050505]'
               }`}
             >
-              {evSignals ? '✓ Enabled' : 'Disabled'}
+              {evSignals ? ' Enabled' : 'Disabled'}
             </button>
           </div>
         </div>
@@ -281,7 +281,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
               'Whale movements > $1M',
               'Price threshold breaks',
               evSignals ? 'EV Polymarket signals' : null,
-              minApy <= 50 ? `DeFi APY ≥ ${minApy}%` : null,
+              minApy <= 50 ? `DeFi APY  ${minApy}%` : null,
               'Liquidation warnings',
               'Daily digest at 08:00 UTC',
             ].filter(Boolean).map((item, i) => (
@@ -301,7 +301,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
           }}
         >
           {loading
-            ? <><Loader2 size={14} className="animate-spin" /> Processing…</>
+            ? <><Loader2 size={14} className="animate-spin" /> Processing</>
             : isActive
             ? <><CheckCircle2 size={14} /> Save Changes & Send Test</>
             : <><Send size={14} /> Activate Telegram Alerts</>

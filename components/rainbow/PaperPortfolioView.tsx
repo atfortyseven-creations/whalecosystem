@@ -39,11 +39,11 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // 📡 Real-time Asset Sync
+  //  Real-time Asset Sync
   useEffect(() => {
     if (!address) return;
     const socket = io({ path: '/api/socket/io', reconnectionAttempts: 5, timeout: 10000 });
-    socket.on('connect', () => console.log('📡 [Network Hub] Synchronized'));
+    socket.on('connect', () => console.log(' [Network Hub] Synchronized'));
     socket.on('vitals.tx.new', (tx) => {
         if (tx.to?.toLowerCase() === address.toLowerCase() || tx.from?.toLowerCase() === address.toLowerCase()) {
             setLiveTxs(prev => [tx, ...prev].slice(0, 10));
@@ -53,7 +53,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
   }, [address]);
 
   const { data: portfolio } = useSWR(address ? `/api/user/portfolio?address=${address}` : null, fetcher);
-  const { data: intel } = useSWR(address ? `/api/user/intelligence?address=${address}` : null, fetcher);
+  const { data: intel } = useSWR(address ? `/api/user/analytics?address=${address}` : null, fetcher);
 
   const transactions = useMemo(() => {
     const hist = portfolio?.transactions || [];

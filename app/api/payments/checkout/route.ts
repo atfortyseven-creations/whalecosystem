@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
             },
             subscription_data: {
                 metadata: {
-                    sovereign_user_id: normalizedUserId,
+                    system_user_id: normalizedUserId,
                     tier: tier,
                     billingCycle: billingCycle,
                     maxTokens: planConfig.limits.maxTokens.toString(),

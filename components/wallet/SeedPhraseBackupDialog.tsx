@@ -32,7 +32,7 @@ export default function SeedPhraseBackupDialog({ onComplete, onCancel }: SeedPhr
   };
 
   const handleDownload = () => {
-    const blob = new Blob([`WhaleAlert ID Wallet Recovery Phrase\n\n${mnemonic}\n\n⚠️ KEEP THIS SAFE AND NEVER SHARE IT`], {
+    const blob = new Blob([`WhaleAlert ID Wallet Recovery Phrase\n\n${mnemonic}\n\n️ KEEP THIS SAFE AND NEVER SHARE IT`], {
       type: 'text/plain',
     });
     const url = URL.createObjectURL(blob);

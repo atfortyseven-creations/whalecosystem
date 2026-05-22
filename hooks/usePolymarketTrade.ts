@@ -136,7 +136,7 @@ export function usePolymarketTrade() {
 
             setStatus("POSTING");
 
-            // 🔥 PERSISTENCE: Log to Elite UserActivity
+            //  PERSISTENCE: Log to Elite UserActivity
             await fetch('/api/wallet/activity', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

@@ -1,9 +1,9 @@
 /**
- * useDragOrder — Sovereign Vault Widget Ordering Hook
+ * useDragOrder  System Vault Widget Ordering Hook
  *
  * Persists widget order in localStorage so the user's
  * layout resets are preserved across sessions.
- * No external dependencies — pure React + localStorage.
+ * No external dependencies  pure React + localStorage.
  */
 
 import { useState, useCallback } from 'react';

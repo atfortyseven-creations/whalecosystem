@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Copy, Menu, User, Loader2, ShieldCheck, AlertCircle, Settings as SettingsIcon, Vote } from "lucide-react";
-import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@identity/idkit";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -22,14 +22,14 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     // ... world id config ...
-    const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}` || "app_affe7470221b57a8edee20b3ac30c484";
+    const app_id = process.env.NEXT_PUBLIC_AUTH_APP_ID as `app_${string}` || "app_affe7470221b57a8edee20b3ac30c484";
     const action = "login";
 
     const handleVerify = async (proof: ISuccessResult) => {
         setIsLoading(true);
         const toastId = toast.loading("Verifying identity...");
 
-        console.log("🔐 World ID Verification Started", {
+        console.log(" World ID Verification Started", {
             app_id,
             action,
             hasProof: !!proof,
@@ -46,13 +46,13 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
             const data = await res.json();
 
             if (!res.ok) {
-                console.error("❌ Verification failed:", data);
+                console.error(" Verification failed:", data);
                 throw new Error(data.error || "Verification failed");
             }
 
-            console.log("✅ Verification successful!", data);
+            console.log(" Verification successful!", data);
             toast.dismiss(toastId);
-            toast.success("Identity Verified! Governance unlocked 🎉");
+            toast.success("Identity Verified! Governance unlocked ");
 
             // Trigger auth refresh
             await login();
@@ -60,7 +60,7 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
             // Redirect to wallet
             router.push("/wallet");
         } catch (error: any) {
-            console.error("❌ Login Error:", error);
+            console.error(" Login Error:", error);
             toast.dismiss(toastId);
             toast.error(error.message || "No se pudo verificar tu identidad");
         } finally {

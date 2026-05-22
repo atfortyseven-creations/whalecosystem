@@ -30,7 +30,7 @@ interface SIWEAuthGateProps {
   onAuthenticated?: (address: string) => void;
 }
 
-// ── Status labels for cinematic UX ───────────────────────────────────────────
+//  Status labels for cinematic UX 
 const STATUS_LABELS: Record<string, string> = {
   idle: "AWAITING SIGNATURE",
   "pending-nonce": "FETCHING NONCE...",
@@ -49,7 +49,7 @@ const STATUS_COLORS: Record<string, string> = {
   error: "#ef4444",
 };
 
-// ── Cinematic SIWE Panel ──────────────────────────────────────────────────────
+//  Cinematic SIWE Panel 
 function SIWEPanel({
   onAuthenticated,
   inline = false,
@@ -129,7 +129,7 @@ function SIWEPanel({
           </span>
 
           <h2 className="text-2xl font-black text-[#050505] tracking-tight leading-snug">
-            {isAuthed ? "Sovereign Access" : "Authenticate Identity"}
+            {isAuthed ? "System Access" : "Authenticate Identity"}
           </h2>
           <p className="text-xs text-[#050505]/50 mt-2 leading-relaxed max-w-[280px]">
             {isAuthed
@@ -250,7 +250,7 @@ function SIWEPanel({
   );
 }
 
-// ── Main Gate ─────────────────────────────────────────────────────────────────
+//  Main Gate 
 
 /**
  * SIWEAuthGate
@@ -264,7 +264,7 @@ export function SIWEAuthGate({ children, inline = false, onAuthenticated }: SIWE
   const [isVerified, setIsVerified] = useState(() => {
     // Check for existing session cookie on mount
     if (typeof document === "undefined") return false;
-    return document.cookie.includes("wallet-auth=") || document.cookie.includes("sovereign_handshake=");
+    return document.cookie.includes("wallet-auth=") || document.cookie.includes("system_handshake=");
   });
 
   const handleAuthenticated = (address: string) => {

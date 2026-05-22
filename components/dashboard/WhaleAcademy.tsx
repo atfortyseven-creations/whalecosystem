@@ -82,7 +82,7 @@ export function WhaleAcademy() {
         }
     };
 
-    // ── Lesson view ────────────────────────────────────────────────────
+    //  Lesson view 
     if (selectedLesson && selectedCourse) {
         return (
             <div className="flex flex-col gap-4">
@@ -123,7 +123,7 @@ export function WhaleAcademy() {
                     <div className="flex gap-3">
                         <button onClick={() => setSelectedLesson(null)}
                             className="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-[#E5E5E5] text-[#888888] hover:text-[#050505] hover:border-[#050505] transition-all">
-                            ← Back
+                             Back
                         </button>
                         <button onClick={markLessonComplete}
                             className="flex-1 py-2.5 rounded text-[10px] font-bold uppercase tracking-widest bg-[#050505] text-white hover:bg-[#A0A0A0] transition-colors flex items-center justify-center gap-2 border border-transparent">
@@ -136,7 +136,7 @@ export function WhaleAcademy() {
         );
     }
 
-    // ── Course detail view ─────────────────────────────────────────────
+    //  Course detail view 
     if (selectedCourse) {
         return (
             <div className="flex flex-col gap-4">
@@ -208,7 +208,7 @@ export function WhaleAcademy() {
         );
     }
 
-    // ── Main grid ─────────────────────────────────────────────────────
+    //  Main grid 
     return (
         <div className="h-full min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-5 pb-4">
             {/* Header */}
@@ -227,7 +227,7 @@ export function WhaleAcademy() {
                     {[
                         { label: 'Total Hours', value: '12h+' },
                         { label: 'Courses', value: COURSES.length.toString() },
-                        { label: 'Rating', value: '4.9★' },
+                        { label: 'Rating', value: '4.9' },
                     ].map((s, i) => (
                         <div key={i} className="text-center">
                             <div className="text-base font-bold font-mono text-[#050505]">{s.value}</div>

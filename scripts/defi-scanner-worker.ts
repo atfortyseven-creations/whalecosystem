@@ -18,7 +18,7 @@ const clients = [
 ];
 
 async function startScanner() {
-    console.log("🌊 [DeFi Scanner Worker] Starting Web3 native pair indexing...");
+    console.log(" [DeFi Scanner Worker] Starting Web3 native pair indexing...");
 
     for (const { name, client } of clients) {
         // V2 Watcher
@@ -45,7 +45,7 @@ async function startScanner() {
             }
         });
         
-        console.log(`✅ [DeFi Scanner Worker] Listening on ${name.toUpperCase()} for PairCreated/PoolCreated events.`);
+        console.log(` [DeFi Scanner Worker] Listening on ${name.toUpperCase()} for PairCreated/PoolCreated events.`);
     }
 }
 
@@ -77,7 +77,7 @@ async function cacheNewPair(chain, dex, t0, t1, poolAddress) {
         pairs.unshift(pairData); // Add to front
         if (pairs.length > 50) pairs = pairs.slice(0, 50); // Keep latest 50
         await redis.set(key, JSON.stringify(pairs), 'EX', 3600);
-        console.log(`📡 [Web3] Indexed new ${dex} pair on ${chain}: ${poolAddress}`);
+        console.log(` [Web3] Indexed new ${dex} pair on ${chain}: ${poolAddress}`);
     } catch (e) {
         console.error("Redis sync failed for new pair", e);
     }

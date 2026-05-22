@@ -48,7 +48,7 @@ export function ZKShieldStation() {
         <div className="w-full h-full p-4 flex flex-col items-center overflow-hidden">
         <div className="w-full h-full flex-1 min-h-0 bg-[#FFFFFF] text-[#050505] border border-[#E5E5E5] rounded-2xl font-sans flex flex-col overflow-hidden shadow-sm">
             
-            {/* ── ACADEMIC INTRO ── */}
+            {/*  ACADEMIC INTRO  */}
             <div className="p-8 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between shrink-0">
                <div className="flex items-center gap-6">
                   <div className="p-3 bg-[#050505] border border-[#050505] text-[#FFFFFF] rounded-xl">
@@ -129,7 +129,7 @@ export function ZKShieldStation() {
 
             </div>
 
-            {/* ── FOOTER ── */}
+            {/*  FOOTER  */}
             <div className="p-4 border-t border-[#E5E5E5] flex justify-between items-center text-[8px] text-[#888888] uppercase tracking-[0.2em] font-bold shrink-0 bg-[#FAF9F6]">
                <span>Aztec Node Alpha v3.1</span>
                <span>Non-Custodian Isolation Engine</span>

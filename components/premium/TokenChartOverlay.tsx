@@ -47,7 +47,7 @@ export const TokenChartOverlay = ({ symbol, onClose }: OverlayProps) => {
                     <div className="absolute bottom-0 right-0 w-[30%] h-[40%] bg-[var(--aztec-orchid)]/10 blur-[120px] rounded-full" />
                 </div>
 
-                {/* ── TOP HEADER BAR ── */}
+                {/*  TOP HEADER BAR  */}
                 <div className="relative z-10 flex items-center justify-between px-8 pt-6 pb-4 border-b border-white/5">
                     
                     {/* Left: Token identity */}
@@ -71,11 +71,11 @@ export const TokenChartOverlay = ({ symbol, onClose }: OverlayProps) => {
                                 <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-white/20">Heikin-Ashi 1m</span>
                                 <span className="w-px h-3 bg-white/10" />
                                 <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-white/20">
-                                    Vol — <span className="text-white/50">${fmtC(vol1h)}</span>
+                                    Vol  <span className="text-white/50">${fmtC(vol1h)}</span>
                                 </span>
                                 <span className="w-px h-3 bg-white/10" />
                                 <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-white/20">
-                                    {minP > 0 && maxP > 0 ? `${fmtP(minP, 0)} — ${fmtP(maxP, 0)}` : '—'}
+                                    {minP > 0 && maxP > 0 ? `${fmtP(minP, 0)}  ${fmtP(maxP, 0)}` : ''}
                                 </span>
                                 <span className="w-px h-3 bg-white/10" />
                                 <div className="flex items-center gap-1.5">
@@ -95,7 +95,7 @@ export const TokenChartOverlay = ({ symbol, onClose }: OverlayProps) => {
                     </button>
                 </div>
 
-                {/* ── MAIN CONTENT ── */}
+                {/*  MAIN CONTENT  */}
                 <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-0 overflow-hidden z-10">
 
                     {/* Chart */}
@@ -117,16 +117,16 @@ export const TokenChartOverlay = ({ symbol, onClose }: OverlayProps) => {
                             <div>
                                 <div className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/20 mb-1">Momentum</div>
                                 <div className={`font-aztec-h2 text-[11px] uppercase tracking-wide font-black ${isBull ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                    {isBull ? '▲ Bullish' : '▼ Bearish'}
+                                    {isBull ? ' Bullish' : ' Bearish'}
                                 </div>
                             </div>
                             <div>
                                 <div className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/20 mb-1">24h Low</div>
-                                <div className="font-mono text-sm font-black text-white/70">{minP > 0 ? fmtP(minP, 0) : '—'}</div>
+                                <div className="font-mono text-sm font-black text-white/70">{minP > 0 ? fmtP(minP, 0) : ''}</div>
                             </div>
                             <div>
                                 <div className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/20 mb-1">24h High</div>
-                                <div className="font-mono text-sm font-black text-white/70">{maxP > 0 ? fmtP(maxP, 0) : '—'}</div>
+                                <div className="font-mono text-sm font-black text-white/70">{maxP > 0 ? fmtP(maxP, 0) : ''}</div>
                             </div>
                         </div>
 
@@ -147,7 +147,7 @@ export const TokenChartOverlay = ({ symbol, onClose }: OverlayProps) => {
                                         <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-white/[0.02] transition-colors group">
                                             <div className="flex flex-col gap-0.5">
                                                 <span className="font-mono text-[10px] text-white/30 group-hover:text-white/50 transition-colors">
-                                                    {e.wallet.slice(0, 10)}…
+                                                    {e.wallet.slice(0, 10)}
                                                 </span>
                                                 <span className="font-mono text-[13px] font-black text-white">{fmt(e.usdNum)}</span>
                                             </div>

@@ -12,7 +12,7 @@ export const useSchrodingerDb = () => {
      * @param roundNumber - The Drand round number in the future (30 secs per round)
      */
     const sealDataUntil = async (data: string, roundNumber: number) => {
-        console.log(`📦 Schrödinger's Box: Sealing data until Round ${roundNumber}...`);
+        console.log(` Schrödinger's Box: Sealing data until Round ${roundNumber}...`);
 
         try {
             // const ciphertext = await timelockEncrypt(
@@ -34,7 +34,7 @@ export const useSchrodingerDb = () => {
      * Attempts to decrypt. Will FAIL if the round has not surely elapsed.
      */
     const observeState = async (ciphertext: string) => {
-        console.log("👁️ Observing Quantum State...");
+        console.log("️ Observing Core State...");
         
         // Only succeeds if currentDrandRound >= lockedRound
         // const plaintext = await timelockDecrypt(ciphertext, DRAND_CHAIN_HASH);

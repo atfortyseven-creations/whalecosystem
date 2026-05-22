@@ -195,7 +195,7 @@ export const useTradeStore = create<TradeState>((set, get) => ({
 
   placeOrder: async (orderData: any) => {
       try {
-          // 🛡️ [HUMAN GATE] Check if user is verified
+          // ️ [HUMAN GATE] Check if user is verified
           const isHuman = get().isHuman || await get().checkHumanity(orderData.walletAddress);
           if (!isHuman) {
               toast.error('HUMANITY REQUIRED', {
@@ -222,7 +222,7 @@ export const useTradeStore = create<TradeState>((set, get) => ({
               throw new Error(data.error || 'Failed to place order');
           }
 
-          toast.success('ORDER RELAYED ⚡', {
+          toast.success('ORDER RELAYED ', {
                description: `Action pending on blockchain...`,
                style: { border: '1px solid #10b981' }
           });

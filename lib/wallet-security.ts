@@ -128,7 +128,7 @@ export async function tryDecryptAny(
     blob: string,
     password: string,
 ): Promise<{ plaintext: string; wasLegacy: boolean }> {
-    // ── Strategy 1: New AES-GCM format (contains 'iv' + 'ciphertext' JSON keys) ──
+    //  Strategy 1: New AES-GCM format (contains 'iv' + 'ciphertext' JSON keys) 
     try {
         const parsed = JSON.parse(blob);
         if ('ciphertext' in parsed && 'iv' in parsed && 'salt' in parsed) {
@@ -148,7 +148,7 @@ export async function tryDecryptAny(
         }
     }
 
-    // ── Strategy 2: Legacy ethers.js Keystore (contains 'crypto.kdfparams') ──
+    //  Strategy 2: Legacy ethers.js Keystore (contains 'crypto.kdfparams') 
     try {
         const parsed = JSON.parse(blob);
         const isEthersKeystore =
@@ -160,7 +160,7 @@ export async function tryDecryptAny(
             const { ethers } = await import('ethers');
             try {
                 const w = await ethers.Wallet.fromEncryptedJson(blob, password);
-                // Successfully decrypted — return the private key
+                // Successfully decrypted  return the private key
                 // The caller will use it to reconstruct the wallet.
                 return { plaintext: w.privateKey, wasLegacy: true };
             } catch {

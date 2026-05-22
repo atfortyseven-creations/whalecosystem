@@ -37,7 +37,7 @@ const ENDPOINT_GROUPS: { label: string; icon: React.ReactNode; endpoints: Endpoi
         ]
     },
     {
-        label: 'Whale Intelligence',
+        label: 'Whale Analytics',
         icon: <Zap size={13}/>,
         endpoints: [
             { id: 'watched-wallets', group: 'whale', method: 'GET',  path: '/api/user/watched-wallets',         description: 'Retrieve your list of monitored whale entities with live analytics.',  category: 'WHALE' },
@@ -67,7 +67,7 @@ const ENDPOINT_GROUPS: { label: string; icon: React.ReactNode; endpoints: Endpoi
         endpoints: [
             { id: 'graph-search',    group: 'graph', method: 'GET',  path: '/api/graph?q=vitalik',            description: 'Search Neo4j graph for Person/Token/Wallet/Company entities.', category: 'GRAPH', params: 'q (string), type (person|token|wallet|company|all)' },
             { id: 'graph-query',     group: 'graph', method: 'POST', path: '/api/graph',                      description: 'Execute a safe read-only Cypher query on the network knowledge graph.', category: 'GRAPH', params: '{ cypher: string, params?: object }' },
-            { id: 'whale-intel',     group: 'graph', method: 'GET',  path: '/api/intelligence/whales',        description: 'On-chain whale leaderboard with real movement analytics and alpha scores.', category: 'GRAPH' },
+            { id: 'whale-intel',     group: 'graph', method: 'GET',  path: '/api/analytics/whales',        description: 'On-chain whale leaderboard with real movement analytics and alpha scores.', category: 'GRAPH' },
         ]
     },
 ];
@@ -157,7 +157,7 @@ export function ApiTerminal() {
     return (
         <div className="flex h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
 
-            {/* ── Left Sidebar ── */}
+            {/*  Left Sidebar  */}
             <div className="w-64 border-r border-[#E5E5E5] bg-[#FAF9F6] flex flex-col shrink-0 overflow-y-auto no-scrollbar">
                 <div className="px-4 py-3 border-b border-[#E5E5E5]">
                     <span className="text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] flex items-center gap-2">
@@ -193,7 +193,7 @@ export function ApiTerminal() {
                 </div>
             </div>
 
-            {/* ── Console ── */}
+            {/*  Console  */}
             <div className="flex-1 flex flex-col min-w-0 bg-[#050505] text-white">
 
                 {/* Header */}
@@ -262,14 +262,14 @@ export function ApiTerminal() {
                     {!response && !loading && (
                         <div className="absolute inset-0 flex items-center justify-center flex-col gap-3 text-white/15">
                             <Terminal size={32}/>
-                            <span className="text-[10px] font-mono uppercase tracking-widest">Awaiting execution…</span>
+                            <span className="text-[10px] font-mono uppercase tracking-widest">Awaiting execution</span>
                         </div>
                     )}
                     {loading && (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="flex flex-col items-center gap-3 text-[#00C076]">
                                 <div className="relative"><Terminal size={28}/><div className="absolute -right-1 -top-1 w-2 h-2 bg-[#00C076] rounded-full animate-ping"/></div>
-                                <span className="text-[9px] font-mono font-black tracking-widest uppercase">Requesting…</span>
+                                <span className="text-[9px] font-mono font-black tracking-widest uppercase">Requesting</span>
                             </div>
                         </div>
                     )}

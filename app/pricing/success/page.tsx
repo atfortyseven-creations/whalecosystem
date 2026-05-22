@@ -17,7 +17,7 @@ function SuccessContent() {
         setMounted(true);
     }, []);
 
-    // ── Polling Logic to wait for BullMQ Webhook execution (< 2 seconds) ──
+    //  Polling Logic to wait for BullMQ Webhook execution (< 2 seconds) 
     useEffect(() => {
         if (!mounted) return;
         let attempts = 0;

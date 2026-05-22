@@ -19,7 +19,7 @@ export default function GoldRegistryPage() {
   const triggerOnChainPing = (id: string, name: string) => {
     setVerifying(id);
     
-    // Simulate smart-contract Ping to SovereignValidator.sol
+    // Simulate smart-contract Ping to SystemValidator.sol
     setTimeout(() => {
       setVerifiedList(prev => ({ ...prev, [id]: true }));
       setVerifying(null);
@@ -29,8 +29,8 @@ export default function GoldRegistryPage() {
   return (
     <div className="min-h-screen bg-transparent text-[#050505] dark:text-[#FAF9F6] p-12">
       <header className="mb-14">
-         <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 text-indigo-600 block mb-3">Sovereign Authority Hub</span>
-         <h1 className="text-5xl font-black tracking-tighter uppercase italic">Sovereign Gold Registry</h1>
+         <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 text-indigo-600 block mb-3">System Authority Hub</span>
+         <h1 className="text-5xl font-black tracking-tighter uppercase italic">System Gold Registry</h1>
          <p className="mt-4 text-sm font-medium tracking-wide opacity-50 max-w-xl leading-relaxed">
            We do not publish "reviews". We perform cryptographic audits. Execute an on-chain ping to verify platform solvency and reserve thresholds directly from the blockchain.
          </p>
@@ -71,7 +71,7 @@ export default function GoldRegistryPage() {
                       {isVerified ? (
                         <div className="w-full lg:w-1/3 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-3xl p-8 flex flex-col justify-between">
                            <span className="text-[9px] font-black uppercase tracking-widest text-green-600 block mb-1">
-                             ✓ Solvency Verified
+                              Solvency Verified
                            </span>
                            {node.reserveUsd > 0 && (
                              <span className="font-mono text-sm text-green-700">
@@ -107,12 +107,12 @@ export default function GoldRegistryPage() {
                        className="mt-6 pt-6 border-t border-black/5"
                      >
                         <a 
-                          href={`https://bridge.sovereign.network/go/${node.id}`} 
+                          href={`https://bridge.system.network/go/${node.id}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="block w-full text-center py-4 bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 border border-black/5 dark:border-white/5 text-[#050505] dark:text-[#FAF9F6] font-black uppercase text-[11px] tracking-[0.3em] rounded-xl transition-colors"
                         >
-                           ENTER VIA SOVEREIGN BRIDGE →
+                           ENTER VIA SOVEREIGN BRIDGE 
                         </a>
                      </motion.div>
                    )}

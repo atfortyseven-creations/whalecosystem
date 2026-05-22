@@ -5,16 +5,16 @@ import { redisClient } from '@/lib/redis/client';
 export const runtime  = 'nodejs';
 export const dynamic  = 'force-dynamic';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // GET /api/scanner/status
 //
-// Real-time operational status of the Sovereign Scanner Cluster.
+// Real-time operational status of the System Scanner Cluster.
 // Exposes: worker heartbeats, circuit breaker states (via Redis), event
 // throughput (last 1h/24h), and per-chain ingestion metrics.
 //
 // This is the endpoint external evaluators (Grok, etc.) should hit FIRST
-// to verify the system is live and ingesting data — no wallet required.
-// ─────────────────────────────────────────────────────────────────────────────
+// to verify the system is live and ingesting data  no wallet required.
+// 
 
 const CHAINS = ['ETHEREUM', 'BASE', 'BSC', 'POLYGON', 'SOLANA', 'BITCOIN'];
 
@@ -23,7 +23,7 @@ export async function GET() {
     const replicaId = process.env.RAILWAY_REPLICA_ID || 'local';
 
     try {
-        // ── 1. Worker Heartbeats ────────────────────────────────────────────
+        //  1. Worker Heartbeats 
         const heartbeats: Record<string, { alive: boolean; lastSeen: string | null; ageMs: number }> = {};
 
         if (redisClient && !(redisClient as any).__isMock) {
@@ -45,7 +45,7 @@ export async function GET() {
             CHAINS.forEach(c => { heartbeats[c] = { alive: false, lastSeen: null, ageMs: -1 }; });
         }
 
-        // ── 2. Per-chain ingestion metrics (last 1h and 24h) ────────────────
+        //  2. Per-chain ingestion metrics (last 1h and 24h) 
         const now   = new Date();
         const h1ago = new Date(now.getTime() -  3_600_000);
         const h24ago= new Date(now.getTime() - 86_400_000);
@@ -81,11 +81,11 @@ export async function GET() {
             };
         });
 
-        // ── 3. System throughput ────────────────────────────────────────────
+        //  3. System throughput 
         const totalLast1h  = perChain1h.reduce((s, r)  => s + (r._count?.id ?? 0), 0);
         const totalLast24h = perChain24h.reduce((s, r) => s + (r._count?.id ?? 0), 0);
 
-        // ── 4. Redis Stream depth (backpressure indicator) ──────────────────
+        //  4. Redis Stream depth (backpressure indicator) 
         let streamDepth = -1;
         if (redisClient && !(redisClient as any).__isMock) {
             streamDepth = await (redisClient as any).xlen('whale:alert:stream').catch(() => -1);

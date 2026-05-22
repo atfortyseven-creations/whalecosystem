@@ -12,7 +12,7 @@ export const useRealityConsensus = () => {
      * "Did Address X post a harmful message?"
      */
     const assertTruth = async (question: string) => {
-        console.log(`⚖️ Reality Consensus: Asserting truth to the market: "${question}"`);
+        console.log(`️ Reality Consensus: Asserting truth to the market: "${question}"`);
 
         // 1. Post Assertion with Bond (e.g., 100 USDC)
         // If no one disputes it within 2 hours, it becomes Truth.

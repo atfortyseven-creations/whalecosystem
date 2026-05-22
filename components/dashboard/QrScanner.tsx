@@ -19,7 +19,7 @@ interface QrScannerProps {
     projectDescription?: string;
 }
 
-// Module-level constant — QrScanner is never mounted more than once simultaneously,
+// Module-level constant  QrScanner is never mounted more than once simultaneously,
 // so a fixed DOM ID for html5-qrcode's internal container is safe and allocation-free.
 const QR_CONTAINER_ID = 'qr-reader-container';
 
@@ -278,7 +278,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     <motion.div key="requesting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-4 py-16">
                         <div className="w-14 h-14 rounded-full border-2 border-black/20 border-t-black animate-spin" />
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/40">Requesting camera access…</p>
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/40">Requesting camera access</p>
                     </motion.div>
                 )}
 
@@ -287,11 +287,11 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     <motion.div key="validating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-4 py-16">
                         <Loader size={36} className="animate-spin text-black/40" />
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/40">Validating QR token…</p>
+                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/40">Validating QR token</p>
                     </motion.div>
                 )}
 
-                {/* SCANNING — live camera viewfinder */}
+                {/* SCANNING  live camera viewfinder */}
                 {state === 'scanning' && (
                     <motion.div key="scanning" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-5 w-full">

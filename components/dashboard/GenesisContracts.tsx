@@ -25,7 +25,7 @@ export default function GenesisContracts() {
   const GENESIS_RECORDS: ContractRecord[] = [
     { id: '1', name: 'IdentityRegistry_v1', address: '0x1a2b...3c4d', type: 'CORE', version: '1.2.0', lastHaltCheck: new Date().toISOString(), auditRating: 'AAA', status: 'SYNCHRONIZED' },
     { id: '2', name: 'WhaleDeadmanFailsafe', address: '0x5e6f...7g8h', type: 'VAULT', version: '2.0.1', lastHaltCheck: new Date().toISOString(), auditRating: 'AAA', status: 'SYNCHRONIZED' },
-    { id: '3', name: 'IntelligenceOracle_v3', address: '0x9i0j...1k2l', type: 'ORACLE', version: '3.1.4', lastHaltCheck: new Date().toISOString(), auditRating: 'AA+', status: 'SYNCHRONIZED' },
+    { id: '3', name: 'AnalyticsOracle_v3', address: '0x9i0j...1k2l', type: 'ORACLE', version: '3.1.4', lastHaltCheck: new Date().toISOString(), auditRating: 'AA+', status: 'SYNCHRONIZED' },
     { id: '4', name: 'LiquidStaking_Proxy', address: '0x3m4n...5o6p', type: 'PROXY', version: '1.0.0', lastHaltCheck: new Date().toISOString(), auditRating: 'AA', status: 'SYNCHRONIZED' },
     { id: '5', name: 'OmniChainBridge_Core', address: '0x7q8r...9s0t', type: 'CORE', version: '2.4.5', lastHaltCheck: new Date().toISOString(), auditRating: 'AAA', status: 'SYNCHRONIZED' },
   ];
@@ -48,7 +48,7 @@ export default function GenesisContracts() {
   return (
     <div className="h-full w-full min-h-0 bg-black text-white font-mono flex flex-col p-8 gap-8">
       
-      {/* ── ACADEMIC INTRO ── */}
+      {/*  ACADEMIC INTRO  */}
       <div className="border border-white/5 bg-white/[0.01] p-6 flex items-start gap-6">
         <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-500">
           <FileCode size={24} />
@@ -69,7 +69,7 @@ export default function GenesisContracts() {
         </button>
       </div>
 
-      {/* ── FILTER ── */}
+      {/*  FILTER  */}
       <div className="relative">
          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={12} />
          <input 
@@ -81,7 +81,7 @@ export default function GenesisContracts() {
          />
       </div>
 
-      {/* ── CONTRACT GRID ── */}
+      {/*  CONTRACT GRID  */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
          <div className="grid grid-cols-1 gap-1">
             <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_60px] gap-4 px-6 py-3 border-b border-white/10 text-[8px] text-white/20 uppercase tracking-[0.3em]">
@@ -123,7 +123,7 @@ export default function GenesisContracts() {
          </div>
       </div>
 
-      {/* ── FOOTER ── */}
+      {/*  FOOTER  */}
       <div className="mt-auto border-t border-white/5 pt-4 flex justify-between items-center text-[8px] text-white/20 uppercase tracking-[0.5em]">
          <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">

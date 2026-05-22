@@ -1,21 +1,21 @@
 /**
  * Ambassador Program API
  *
- * GET  /api/ambassador           — Fetch ambassador program info + application form
- * POST /api/ambassador           — Submit ambassador application
- * GET  /api/ambassador/dashboard — Authenticated ambassador stats (referrals, commissions)
+ * GET  /api/ambassador            Fetch ambassador program info + application form
+ * POST /api/ambassador            Submit ambassador application
+ * GET  /api/ambassador/dashboard  Authenticated ambassador stats (referrals, commissions)
  *
  * Tier System:
- *   WATCHER   → MIN_REFERRALS = 0   (applicant)
- *   SENTINEL  → MIN_REFERRALS = 5   (early community member)
- *   GUARDIAN  → MIN_REFERRALS = 20  (active promoter, 10% commission)
- *   SOVEREIGN → MIN_REFERRALS = 50  (elite ambassador, 20% commission + exclusive alpha)
+ *   WATCHER    MIN_REFERRALS = 0   (applicant)
+ *   SENTINEL   MIN_REFERRALS = 5   (early community member)
+ *   GUARDIAN   MIN_REFERRALS = 20  (active promoter, 10% commission)
+ *   SOVEREIGN  MIN_REFERRALS = 50  (elite ambassador, 20% commission + exclusive alpha)
  *
  * On approval, ambassador receives:
  *   - Unique referral code  (ref=ABC123)
  *   - Dashboard access      (/ambassador/dashboard)
  *   - Commission tracking   (Prisma referral model)
- *   - Sovereign badge       (NFT-mintable via WhalePass contract)
+ *   - System badge       (NFT-mintable via WhalePass contract)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -23,7 +23,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// ─── Program Metadata ──────────────────────────────────────────────────────
+//  Program Metadata 
 
 const PROGRAM_INFO = {
     name:        'Whale Alert Ambassador Program',
@@ -40,7 +40,7 @@ const PROGRAM_INFO = {
             name:         'SENTINEL',
             minReferrals:  5,
             commission:    5,
-            perks:        ['5% commission on referral subscriptions', 'Monthly whale intelligence briefing', 'Co-create Hall of Fame nominations'],
+            perks:        ['5% commission on referral subscriptions', 'Monthly whale analytics briefing', 'Co-create Hall of Fame nominations'],
         },
         {
             name:         'GUARDIAN',
@@ -52,17 +52,17 @@ const PROGRAM_INFO = {
             name:         'SOVEREIGN',
             minReferrals: 50,
             commission:   20,
-            perks:        ['20% lifetime commission', 'INSTITUTIONAL API access free', 'Private alpha channel', 'Sovereign NFT badge', '"State of Whale Intelligence" co-authorship'],
+            perks:        ['20% lifetime commission', 'INSTITUTIONAL API access free', 'Private alpha channel', 'System NFT badge', '"State of Whale Analytics" co-authorship'],
         },
     ],
     requirements: [
         'Wallet address must be verified via WorldID (no bot accounts)',
         'Minimum 30 days holding a Gold Ticket NFT (proves skin-in-the-game)',
-        'Agreement to sovereign intelligence non-disclosure standards',
+        'Agreement to system analytics non-disclosure standards',
     ],
 };
 
-// ─── GET — Program Info ────────────────────────────────────────────────────
+//  GET  Program Info 
 
 export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
     });
 }
 
-// ─── POST — Submit Application ─────────────────────────────────────────────
+//  POST  Submit Application 
 
 export async function POST(req: NextRequest) {
     try {
@@ -166,8 +166,8 @@ export async function POST(req: NextRequest) {
                 },
             });
         } catch {
-            // Ambassador table not yet migrated — log to user record metadata
-            console.log(`[Ambassador] New application from ${walletAddress} — ref: ${referralCode}`);
+            // Ambassador table not yet migrated  log to user record metadata
+            console.log(`[Ambassador] New application from ${walletAddress}  ref: ${referralCode}`);
         }
 
         return NextResponse.json({
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
             referralCode,
             tier:         'WATCHER',
             status:       'PENDING',
-            message:      '✅ Application received. Review takes 48–72h. Your referral code is already active.',
+            message:      ' Application received. Review takes 4872h. Your referral code is already active.',
             shareUrl:     `https://whalealert.network?ref=${referralCode}`,
             nextSteps:    [
                 'Share your referral link to start earning commissions immediately',

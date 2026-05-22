@@ -71,7 +71,7 @@ interface SniperState {
   setArmed: (armed: boolean) => void;
 }
 
-// ── Web Audio API (HFT Tactical Sounds) ──
+//  Web Audio API (HFT Tactical Sounds) 
 let audioCtx: AudioContext | null = null;
 
 const playTacticalBeep = (usdValue: number, action: string) => {

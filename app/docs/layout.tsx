@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/docs/Sidebar';
 import { Search } from '@/components/docs/Search';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { SystemFooter } from '@/components/landing/SystemFooter';
 
 const TOP_TABS = [
   { id: 'docs',      label: 'Docs',      href: '/docs' },
@@ -32,7 +32,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const activeTab = getActiveTopTab(pathname || '');
 
-  // NOTE: We do NOT force light mode — the system dark mode (html.dark) must
+  // NOTE: We do NOT force light mode  the system dark mode (html.dark) must
   // be respected so the docs text is white over the black wallpaper background.
   // The docs sidebar and content use dark-mode-aware classes.
 
@@ -42,7 +42,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className={`h-full flex flex-col ${bg} transition-colors duration-200 font-sans overflow-hidden`}>
 
-      {/* ── TOP BAR ── */}
+      {/*  TOP BAR  */}
       <header className={`sticky top-0 z-50 h-[56px] border-b ${hdrBg} w-full flex items-center px-6 backdrop-blur-xl`}>
 
         {/* Logo */}
@@ -56,7 +56,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           v2.0
         </span>
 
-        {/* Tab navigation — perfectly centered in the header */}
+        {/* Tab navigation  perfectly centered in the header */}
         <nav className="flex items-stretch h-full gap-0 flex-1 justify-center">
           {TOP_TABS.map(tab => (
             <Link
@@ -79,7 +79,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         </div>
       </header>
 
-      {/* ── BODY ── */}
+      {/*  BODY  */}
       <div className="flex flex-1 w-full min-h-0 overflow-hidden">
 
         {/* Left sidebar */}
@@ -100,7 +100,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           border-radius: 10px;
         }
 
-        /* Doc typography — Light mode with "White Titles / Black Text" */
+        /* Doc typography  Light mode with "White Titles / Black Text" */
         .doc-content { color: #111111; }
         .doc-content h1 { 
           font-size: 2.2rem; 
@@ -132,7 +132,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         .doc-content pre { background: #F8F8F8; border: 1px solid #EEEEEE; padding: 1.5rem; font-family: monospace; font-size: 0.8125rem; overflow-x: auto; margin: 1.5rem 0; color: #111111; border-radius: 8px; }
         .doc-content code { background: #F0F0F0; border: 1px solid #E0E0E0; padding: 0.15em 0.45em; font-family: monospace; font-size: 0.8125rem; color: #0056B3; border-radius: 3px; }
         .doc-content li { margin-bottom: 0.75rem; color: #333333; font-size: 1rem; line-height: 1.8; padding-left: 1.5rem; position: relative; }
-        .doc-content li::before { content: "•"; position: absolute; left: 0; color: rgba(0,0,0,0.2); }
+        .doc-content li::before { content: ""; position: absolute; left: 0; color: rgba(0,0,0,0.2); }
         .doc-content .callout { border-left: 3px solid #000000; padding: 1.25rem 1.5rem; margin: 2rem 0; background: #F9F9F9; border-radius: 0 8px 8px 0; }
         .doc-content .callout p { margin: 0; color: #111111; font-size: 0.9375rem; }
         .doc-content table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.9375rem; }

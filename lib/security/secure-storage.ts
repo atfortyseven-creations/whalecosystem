@@ -39,7 +39,7 @@ async function getEncryptionKey(): Promise<CryptoKey> {
     sessionStorage.setItem(ENCRYPTION_KEY_STORAGE, Buffer.from(rawKey).toString('base64'));
   } else {
     // Explicitly slice the underlying ArrayBuffer to satisfy WebCrypto's strict
-    // BufferSource type — Node.js Buffer wraps an ArrayBufferLike which may be
+    // BufferSource type  Node.js Buffer wraps an ArrayBufferLike which may be
     // a SharedArrayBuffer, but importKey requires a plain ArrayBuffer.
     const buf = Buffer.from(keyString, 'base64');
     rawKey = new Uint8Array(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer);

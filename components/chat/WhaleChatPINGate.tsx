@@ -4,26 +4,26 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppKit } from '@reown/appkit/react';
 import { useDisconnect } from 'wagmi';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { ArrowLeft, Delete, LogOut, RefreshCw, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import CryptoJS from 'crypto-js';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Constants
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 const PIN_STORAGE_PREFIX = 'whale_chat_pin_';
 const SESSION_UNLOCK_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
 const IDB_DB_NAME = 'WhaleChatSecureStore';
 const IDB_STORE_NAME = 'pin_hashes';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// IndexedDB helpers (ultimate fallback — survives localStorage/cookie wipes)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// IndexedDB helpers (ultimate fallback  survives localStorage/cookie wipes)
+// 
 
 function openIDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -75,17 +75,17 @@ async function idbDelete(key: string): Promise<void> {
   } catch {}
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Storage key
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 function getPINKey(address: string) {
   return `${PIN_STORAGE_PREFIX}${address.toLowerCase()}`;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PIN Hash — SHA256 with address salt
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// PIN Hash  SHA256 with address salt
+// 
 
 function hashPIN(pin: string, address: string): string {
   // Always use lowercase address to ensure consistency regardless of EIP-55 checksum
@@ -93,11 +93,11 @@ function hashPIN(pin: string, address: string): string {
   return CryptoJS.SHA256(pin + salt).toString(CryptoJS.enc.Hex);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Multi-layer PIN storage: localStorage + sessionStorage + cookie + IndexedDB
 // Reading: try all layers in order, restore missing ones
 // Writing: write to ALL layers simultaneously for maximum durability
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 /**
  * Save PIN hash to every available storage layer.
@@ -230,9 +230,9 @@ async function deletePIN(address: string): Promise<void> {
   await idbDelete(key);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Session unlock: 30-day window stored in localStorage + sessionStorage
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 function getSessionKey(address: string) {
   return `whale_chat_unlocked_time_${address.toLowerCase()}`;
@@ -270,9 +270,9 @@ function clearSession(address: string) {
   try { sessionStorage.removeItem(key); } catch {}
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Verify PIN
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 async function verifyPIN(pin: string, address: string): Promise<boolean> {
   const stored = await loadPINHash(address);
@@ -280,9 +280,9 @@ async function verifyPIN(pin: string, address: string): Promise<boolean> {
   return stored === hashPIN(pin, address);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Wipe XMTP DBs
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 async function wipeXMTPDatabases() {
   if (typeof indexedDB === 'undefined') return;
@@ -298,18 +298,18 @@ async function wipeXMTPDatabases() {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Format address
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 function formatAddress(addr: string) {
   if (!addr) return '';
   return addr.slice(0, 8) + ' ···· ' + addr.slice(-6);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // PIN Dot Display
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 function PINDots({ length, filled }: { length: number; filled: number }) {
   return (
@@ -330,11 +330,11 @@ function PINDots({ length, filled }: { length: number; filled: number }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Numeric Keypad
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
-const PAD_KEYS = ['1','2','3','4','5','6','7','8','9','','0','⌫'] as const;
+const PAD_KEYS = ['1','2','3','4','5','6','7','8','9','','0',''] as const;
 
 function NumPad({ onPress }: { onPress: (key: string) => void }) {
   return (
@@ -343,7 +343,7 @@ function NumPad({ onPress }: { onPress: (key: string) => void }) {
         if (key === '') {
           return <div key={idx} />;
         }
-        const isDelete = key === '⌫';
+        const isDelete = key === '';
         return (
           <motion.button
             key={key}
@@ -363,9 +363,9 @@ function NumPad({ onPress }: { onPress: (key: string) => void }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Main Gate Component
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 type Phase = 'confirm' | 'set-pin' | 'set-pin-confirm' | 'enter-pin';
 
@@ -378,7 +378,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
   const { open } = useAppKit();
   const { disconnect } = useDisconnect();
   const { clearWallet } = useWalletStore();
-  const { nuclearDisconnect } = useSovereignSignOut();
+  const { nuclearDisconnect } = useSystemSignOut();
 
   const [phase, setPhase] = useState<Phase>('confirm');
   const [pin, setPin] = useState('');
@@ -397,7 +397,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
 
     // Check session unlock first (synchronous, fast)
     if (isSessionUnlocked(address)) {
-      // Session still valid — also verify PIN still exists to be safe
+      // Session still valid  also verify PIN still exists to be safe
       const syncHash = loadPINHashSync(address);
       if (syncHash) {
         onEnter();
@@ -409,20 +409,20 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
     loadPINHash(address).then((hash) => {
       setIsLoading(false);
       if (hash) {
-        // Has a PIN — require entry
+        // Has a PIN  require entry
         if (isSessionUnlocked(address)) {
           onEnter();
         } else {
           setPhase('enter-pin');
         }
       } else {
-        // No PIN yet — go to confirm → create flow
+        // No PIN yet  go to confirm  create flow
         setPhase('confirm');
       }
     });
   }, [address, onEnter]);
 
-  // ── Handle keypad ─────────────────────────────────────────────────────────
+  //  Handle keypad 
 
   const handleKey = useCallback((key: string) => {
     if (key === 'del') {
@@ -435,7 +435,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
     });
   }, []);
 
-  // ── Auto-submit when 6 digits entered ────────────────────────────────────
+  //  Auto-submit when 6 digits entered 
 
   useEffect(() => {
     if (pin.length < 6) return;
@@ -468,7 +468,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           const next = attempts + 1;
           setAttempts(next);
           if (next >= 5) {
-            toast.error('Too many incorrect attempts. Access locked — create a new PIN.');
+            toast.error('Too many incorrect attempts. Access locked  create a new PIN.');
             clearSession(address!);
             await deletePIN(address!);
             await wipeXMTPDatabases();
@@ -488,14 +488,14 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
     setTimeout(() => setShake(false), 500);
   }
 
-  // ── Disconnect ────────────────────────────────────────────────────────────
+  //  Disconnect 
 
   function handleDisconnect() {
     toast.success('Session disconnected.');
     nuclearDisconnect();
   }
 
-  // ── Phase labels ─────────────────────────────────────────────────────────
+  //  Phase labels 
 
   const phaseLabel: Record<Phase, { title: string; sub: string }> = {
     'confirm': {
@@ -560,7 +560,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
         className="relative z-10 w-full max-w-[420px] mx-auto px-6 flex flex-col items-center"
       >
 
-        {/* ── LOTTIE & ATOM IMAGE ── */}
+        {/*  LOTTIE & ATOM IMAGE  */}
         <div className="relative mb-8 flex flex-col items-center w-full">
           <motion.div
             initial={{ opacity: 0 }}
@@ -579,7 +579,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           >
             <img
               src="/atom_3d_silver.jpg"
-              alt="Quantum Atom"
+              alt="Core Atom"
               className="w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] md:w-[600px] md:h-[600px] max-w-full object-contain mx-auto mix-blend-multiply"
               draggable={false}
               style={{
@@ -590,7 +590,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           </motion.div>
         </div>
 
-        {/* ── Address pill ── */}
+        {/*  Address pill  */}
         <motion.div
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -605,7 +605,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           </span>
         </motion.div>
 
-        {/* ── Phase card ── */}
+        {/*  Phase card  */}
         <AnimatePresence mode="wait">
           <motion.div
             key={phase}
@@ -625,7 +625,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
               </p>
             </div>
 
-            {/* ── CONFIRM PHASE ── */}
+            {/*  CONFIRM PHASE  */}
             {phase === 'confirm' && (
               <div className="mt-8 space-y-3">
                 <button
@@ -644,7 +644,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
               </div>
             )}
 
-            {/* ── PIN ENTRY PHASES ── */}
+            {/*  PIN ENTRY PHASES  */}
             {(phase === 'set-pin' || phase === 'set-pin-confirm' || phase === 'enter-pin') && (
               <div className="mt-4">
                 {/* Back button for set phases */}
@@ -702,7 +702,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           </motion.div>
         </AnimatePresence>
 
-        {/* ── Connect another wallet (always visible at bottom) ── */}
+        {/*  Connect another wallet (always visible at bottom)  */}
         {phase !== 'confirm' && (
           <div className="mt-8 pt-6 border-t border-black/6 w-full flex flex-col gap-2">
             <button
@@ -722,7 +722,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
           </div>
         )}
 
-        {/* ── Disconnect button on confirm phase ── */}
+        {/*  Disconnect button on confirm phase  */}
         {phase === 'confirm' && (
           <button
             onClick={handleDisconnect}

@@ -30,7 +30,7 @@ export async function DELETE(
     });
     if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     if (post.authorId !== user.id) {
-      return NextResponse.json({ error: 'Forbidden — not the author' }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden  not the author' }, { status: 403 });
     }
 
     // Delete likes on the post first (FK constraint)

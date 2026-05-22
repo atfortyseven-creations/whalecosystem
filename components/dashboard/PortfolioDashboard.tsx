@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, ArrowDownRight, TrendingUp, Wallet, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus, Github, Twitter, Copy, ExternalLink, ArrowDownLeft, ArrowLeftRight, Network, X, Loader2 } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -31,10 +31,10 @@ function formatTXO(address: string, symbol: string | undefined): string {
 
 export default function PortfolioDashboard({ walletAddress }: { walletAddress?: string }) {
     const { open } = useAppKit();
-    const { address: web3Address } = useSovereignAccount();
+    const { address: web3Address } = useSystemAccount();
     const isMobile = useIsMobile();
 
-    // ── Real-Time Chain Detection (replaces hardcoded 'Ethereum Mainnet')
+    //  Real-Time Chain Detection (replaces hardcoded 'Ethereum Mainnet')
     const currentChainId = useChainId();
     const allChains = useChains();
     const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
@@ -168,7 +168,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
 
     return (
         <div className="w-full relative space-y-8">
-            {/* 🔥 DASHBOARD HEADER & ACCOUNT SWITCHER */}
+            {/*  DASHBOARD HEADER & ACCOUNT SWITCHER */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-2">
                 {/* Real-time chain indicator with network switcher */}
                 <div className="relative">
@@ -295,7 +295,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                 </div>
             </div>
 
-            {/* 🔥 HERO BALANCE CARD */}
+            {/*  HERO BALANCE CARD */}
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -357,7 +357,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     </div>
                 </div>
 
-                {/* 🔥 ON-CHAIN ACTION BUTTONS - CENTER WRAP RESPONSIVE GRID STYLE */}
+                {/*  ON-CHAIN ACTION BUTTONS - CENTER WRAP RESPONSIVE GRID STYLE */}
                 <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 mt-12 relative z-10 w-full py-2">
                     <ActionButton 
                         icon={<ArrowUpRight size={20} />} 
@@ -398,7 +398,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                 </div>
             </motion.div>
 
-            {/* 🔥 TABS: TOKENS | ACTIVITY */}
+            {/*  TABS: TOKENS | ACTIVITY */}
             <div className="w-full max-w-[1400px] mx-auto px-2">
                 <div className="flex items-center gap-8 border-b border-black/[0.06] dark:border-white/10 mb-6">
                     <button
@@ -529,7 +529,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                 </AnimatePresence>
             </div>
 
-            {/* ── UNIFIED WAVE & DOWNHEAD FOOTER ── */}
+            {/*  UNIFIED WAVE & DOWNHEAD FOOTER  */}
             <div className="relative w-full min-h-[500px] flex flex-col justify-end overflow-hidden pt-32 mt-16 rounded-[2.5rem] border border-black/5" style={{ background: '#FAF9F6' }}>
                 {/* Massive Wave Background */}
                 <img 

@@ -1,6 +1,6 @@
 /**
  * [SOVEREIGN ADMIN SCRIPT] find-user.ts
- * ───────────────────────────────────────
+ * 
  * Finds a user in the database by wallet address, email, or partial match.
  * Zero-Clerk: uses native Prisma DB lookups only.
  *
@@ -16,11 +16,11 @@ const prisma = new PrismaClient();
 const SEARCH_TERM = process.env.SEARCH_TERM || '';
 
 async function findUser() {
-  console.log(`\n🔍 Searching for user: "${SEARCH_TERM}"`);
+  console.log(`\n Searching for user: "${SEARCH_TERM}"`);
   console.log('-------------------------------------------');
 
   if (!SEARCH_TERM) {
-    console.error('❌ Set SEARCH_TERM env var to a wallet address or email.');
+    console.error(' Set SEARCH_TERM env var to a wallet address or email.');
     return;
   }
 
@@ -36,12 +36,12 @@ async function findUser() {
     }).catch(() => null);
 
     if (byWallet) {
-      console.log('\n✅ Found in User table (by walletAddress):');
+      console.log('\n Found in User table (by walletAddress):');
       console.log(JSON.stringify(byWallet, null, 2));
     }
 
     if (byEmail) {
-      console.log('\n✅ Found in AuthUser table (by email):');
+      console.log('\n Found in AuthUser table (by email):');
       console.log(JSON.stringify(byEmail, null, 2));
 
       // If AuthUser has a walletAddress, look that up too
@@ -50,14 +50,14 @@ async function findUser() {
           where: { walletAddress: byEmail.walletAddress }
         });
         if (linked) {
-          console.log('\n🔗 Linked User record:');
+          console.log('\n Linked User record:');
           console.log(JSON.stringify(linked, null, 2));
         }
       }
     }
 
     if (!byWallet && !byEmail) {
-      console.log('⚠️  No user found with that wallet address or email.');
+      console.log('️  No user found with that wallet address or email.');
 
       // Partial wallet address search
       const partial = await prisma.user.findMany({
@@ -66,7 +66,7 @@ async function findUser() {
       });
 
       if (partial.length > 0) {
-        console.log(`\n📋 Partial matches (${partial.length}):`);
+        console.log(`\n Partial matches (${partial.length}):`);
         partial.forEach(u => console.log(`  - ${u.walletAddress} [${u.tier}]`));
       }
     }
@@ -77,12 +77,12 @@ async function findUser() {
       where: { userId: identifier }
     });
     if (sub) {
-      console.log('\n📊 Subscription status:');
+      console.log('\n Subscription status:');
       console.log(JSON.stringify(sub, null, 2));
     }
 
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error(' Error:', error);
   } finally {
     await prisma.$disconnect();
   }

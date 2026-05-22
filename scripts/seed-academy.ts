@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const COURSES = [
     {
         id: 'whale-basics',
-        title: 'Whale Intelligence Fundamentals',
+        title: 'Whale Analytics Fundamentals',
         description: 'Learn how to identify and track institutional whale wallets, interpret on-chain signals, and build your first watchlist.',
         totalDuration: '2h 30m', badge: 'Popular', level: 'Beginner',
         lessons: [

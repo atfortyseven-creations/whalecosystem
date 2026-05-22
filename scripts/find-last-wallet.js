@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  const lastIntel = await prisma.walletIntelligence.findFirst({
+  const lastIntel = await prisma.walletAnalytics.findFirst({
     orderBy: { lastCheck: 'desc' },
     select: { address: true, lastCheck: true, totalValueUsd: true }
   });

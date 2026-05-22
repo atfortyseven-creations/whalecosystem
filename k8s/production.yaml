@@ -1,5 +1,5 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# WHALE ALERT NETWORK — Kubernetes Production Stack
+# 
+# WHALE ALERT NETWORK  Kubernetes Production Stack
 # Institutional-grade Kubernetes manifests
 # 
 # Components:
@@ -18,10 +18,10 @@
 #   - cert-manager installed (for TLS)
 #   - NGINX Ingress Controller
 #   - Secrets provisioned via: kubectl apply -f k8s/secrets.yaml
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 
 ---
-# ─── Secrets (populate externally, never commit values) ──────────────────────
+#  Secrets (populate externally, never commit values) 
 # kubectl create secret generic whale-alert-secrets \
 #   --from-literal=DATABASE_URL=postgresql://... \
 #   --from-literal=REDIS_URL=redis://... \
@@ -31,7 +31,7 @@
 #   --namespace=whale-alert
 
 ---
-# ─── ConfigMap ───────────────────────────────────────────────────────────────
+#  ConfigMap 
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -51,7 +51,7 @@ data:
   SKIP_ENV_VALIDATION:   "false"
 
 ---
-# ─── Deployment: Next.js Application ─────────────────────────────────────────
+#  Deployment: Next.js Application 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -138,7 +138,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
 
 ---
-# ─── Deployment: Whale Scanner Worker ────────────────────────────────────────
+#  Deployment: Whale Scanner Worker 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -187,7 +187,7 @@ spec:
             periodSeconds: 60
 
 ---
-# ─── Deployment: Telegram Notifier Worker ────────────────────────────────────
+#  Deployment: Telegram Notifier Worker 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -231,7 +231,7 @@ spec:
               memory: "512Mi"
 
 ---
-# ─── Service: App ─────────────────────────────────────────────────────────────
+#  Service: App 
 apiVersion: v1
 kind: Service
 metadata:
@@ -251,7 +251,7 @@ spec:
   type: ClusterIP
 
 ---
-# ─── HorizontalPodAutoscaler ──────────────────────────────────────────────────
+#  HorizontalPodAutoscaler 
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -288,7 +288,7 @@ spec:
       stabilizationWindowSeconds: 300      # 5min cooldown before scale-down
 
 ---
-# ─── PodDisruptionBudget ──────────────────────────────────────────────────────
+#  PodDisruptionBudget 
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -301,7 +301,7 @@ spec:
       app: whale-alert-app
 
 ---
-# ─── ServiceAccount ───────────────────────────────────────────────────────────
+#  ServiceAccount 
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -312,7 +312,7 @@ metadata:
 automountServiceAccountToken: false
 
 ---
-# ─── Ingress (NGINX + cert-manager TLS) ──────────────────────────────────────
+#  Ingress (NGINX + cert-manager TLS) 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -323,7 +323,7 @@ metadata:
     cert-manager.io/cluster-issuer:                 "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    # SSE requires chunked transfer — disable buffering
+    # SSE requires chunked transfer  disable buffering
     nginx.ingress.kubernetes.io/proxy-buffering:    "off"
     nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
     # Security headers

@@ -23,12 +23,12 @@ export async function GET(request: NextRequest) {
     });
 
     try {
-        await subClient.psubscribe('sovereign:forge:trigger:*', (err: any) => {
+        await subClient.psubscribe('system:forge:trigger:*', (err: any) => {
             if (err) console.error('SSE Subscribe Error:', err);
         });
 
         subClient.on('pmessage', async (pattern: string, channel: string, message: string) => {
-            if (channel.startsWith('sovereign:forge:trigger:')) {
+            if (channel.startsWith('system:forge:trigger:')) {
                 try {
                     const entity = JSON.parse(message);
                     const payload = `data: ${JSON.stringify({ type: 'ENTITY_SPAWN', entity })}\n\n`;

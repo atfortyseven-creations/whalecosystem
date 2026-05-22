@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // POST /api/akashic/verify
 //
 // Batch tamper-evident hash verification for Akashic Ledger entries.
@@ -14,8 +14,8 @@ export const dynamic = 'force-dynamic';
 // WHY timingSafeEqual: Prevents timing-based side-channel attacks where an
 // attacker can infer the correct hash character-by-character by measuring
 // response time differences (strcmp short-circuits on first mismatch).
-// timingSafeEqual always compares all bytes → constant time regardless of match.
-// ─────────────────────────────────────────────────────────────────────────────
+// timingSafeEqual always compares all bytes  constant time regardless of match.
+// 
 
 const AKASHIC_THRESHOLD_USD = 50_000_000;
 const MAX_VERIFY_BATCH      = 50;
@@ -32,13 +32,13 @@ function computeAkashicHash(fields: {
     return createHash('sha256').update(canonical, 'utf8').digest('hex');
 }
 
-// Constant-time string comparison — prevents timing side-channel attacks
+// Constant-time string comparison  prevents timing side-channel attacks
 function safeEqual(a: string, b: string): boolean {
     if (a.length !== b.length) return false;
     try {
         return timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
     } catch {
-        // Non-hex strings fallback — still pad to same length
+        // Non-hex strings fallback  still pad to same length
         const aB = Buffer.from(a.padEnd(64, '0'));
         const bB = Buffer.from(b.padEnd(64, '0'));
         return timingSafeEqual(aB, bB);
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({
                 ok: false,
                 error: 'INVALID_PAYLOAD',
-                message: 'Body must be { ids: string[] } — array of Akashic entry IDs or SHA-256 hashes',
+                message: 'Body must be { ids: string[] }  array of Akashic entry IDs or SHA-256 hashes',
             }, { status: 400 });
         }
 
@@ -72,13 +72,13 @@ export async function POST(req: NextRequest) {
         });
         const qualifying = allLive.filter(r => parseFloat(r.usdValue.toString()) >= AKASHIC_THRESHOLD_USD);
 
-        // Build a map of id → {hash, fields}
+        // Build a map of id  {hash, fields}
         const entryMap = new Map<string, { hash: string; fields: any }>();
         qualifying.forEach((row, index) => {
             const id          = String(index + 1).padStart(5, '0');
             const amountUsd   = parseFloat(row.usdValue.toString()) || 0;
             const timestamp   = (row.timestamp ?? new Date()).toISOString();
-            // blockNumber is BigInt in Prisma — must call Number() via toString() to avoid TS error
+            // blockNumber is BigInt in Prisma  must call Number() via toString() to avoid TS error
             const blockNumber = row.blockNumber ? Number(row.blockNumber.toString()) : 0;
             const fromAddr    = row.fromAddress ?? '0x???';
             const toAddr      = row.toAddress   ?? '0x???';

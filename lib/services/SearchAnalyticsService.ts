@@ -1,5 +1,5 @@
-import { walletIntelligenceService } from '../wallet/WalletIntelligenceService';
-import { intelligenceService } from '../blockchain/IntelligenceService';
+import { walletAnalyticsService } from '../wallet/WalletAnalyticsService';
+import { analyticsService } from '../blockchain/AnalyticsService';
 import { moralisService } from '../blockchain/MoralisService';
 import { aiService, ForensicAnalysis } from './AIService';
 import { PriceService } from '../blockchain/PriceService';
@@ -21,7 +21,7 @@ export interface SearchResult {
 }
 
 /**
- * 🔥 LEGENDARY SEARCH ANALYTICS SERVICE 🔥
+ *  LEGENDARY SEARCH ANALYTICS SERVICE 
  * High-performance engine for real-time complex on-chain discovery.
  */
 export class SearchAnalyticsService {
@@ -56,13 +56,13 @@ export class SearchAnalyticsService {
     }
 
     private async handleAddressSearch(address: string, chain: string): Promise<SearchResult> {
-        console.log(`[ENGINE] 🔍 Deep scanning address: ${address} on ${chain}`);
+        console.log(`[ENGINE]  Deep scanning address: ${address} on ${chain}`);
         
         try {
             // Parallelized Deep Fetch
             const [portfolio, report] = await Promise.all([
-                walletIntelligenceService.getFullIntelligence(address, true, true),
-                intelligenceService.getIntelligenceReport(address)
+                walletAnalyticsService.getFullAnalytics(address, true, true),
+                analyticsService.getAnalyticsReport(address)
             ]);
 
             const riskScore = portfolio.riskScore || 50;
@@ -88,7 +88,7 @@ export class SearchAnalyticsService {
     }
 
     private async handleTransactionSearch(hash: string, chain: string): Promise<SearchResult> {
-        console.log(`[ENGINE] 🔍 Forensicating transaction: ${hash} on ${chain}`);
+        console.log(`[ENGINE]  Forensicating transaction: ${hash} on ${chain}`);
         
         try {
             if (chain === 'eth') {

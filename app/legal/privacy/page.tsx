@@ -97,7 +97,7 @@ export default function PrivacyPolicy() {
                     <div className="space-y-4">
                         <div className="bg-blue-600/10 border border-blue-500/30 p-4 rounded-lg">
                             <h4 className="font-bold text-blue-400 mb-2">a) Contractual Necessity (Art. 6(1)(b) GDPR)</h4>
-                            <p className="text-sm">Processing necessary to provide our services (wallet management, institutional matrix, identity verification).</p>
+                            <p className="text-sm">Processing necessary to provide our services (wallet management, institutional grid, identity verification).</p>
                         </div>
 
                         <div className="bg-green-600/10 border border-green-500/30 p-4 rounded-lg">
@@ -121,7 +121,7 @@ export default function PrivacyPolicy() {
                 <section>
                     <h2 className="text-3xl font-bold mb-4">5. How We Use Your Data</h2>
                     <ul className="list-disc pl-6 space-y-3">
-                        <li><strong>Service Delivery:</strong> Provide wallet management, institutional matrix, and identity verification services.</li>
+                        <li><strong>Service Delivery:</strong> Provide wallet management, institutional grid, and identity verification services.</li>
                         <li><strong>Security:</strong> Detect and prevent fraud, unauthorized access, and security incidents.</li>
                         <li><strong>Analytics:</strong> Understand usage patterns to improve our platform.</li>
                         <li><strong>Communication:</strong> Send service updates, security alerts, and (with consent) marketing materials.</li>
@@ -165,7 +165,7 @@ export default function PrivacyPolicy() {
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">World ID / Worldcoin (USA)</h4>
+                            <h4 className="font-bold mb-2">World ID / Identity (USA)</h4>
                             <p className="text-sm text-white/70 mb-2"><strong>Purpose:</strong> Proof of personhood verification</p>
                             <p className="text-sm text-white/70 mb-2"><strong>Data Shared:</strong> Nullifier hash only (anonymous)</p>
                             <p className="text-sm text-white/70"><strong>Safeguards:</strong> Zero-knowledge proofs ensure privacy</p>
@@ -173,7 +173,7 @@ export default function PrivacyPolicy() {
                     </div>
 
                     <div className="bg-yellow-600/10 border border-yellow-500/30 p-4 rounded-lg mt-6">
-                        <h4 className="font-bold text-yellow-400 mb-2">⚠️ Legal Disclosures</h4>
+                        <h4 className="font-bold text-yellow-400 mb-2">️ Legal Disclosures</h4>
                         <p className="text-sm">We may disclose your data to law enforcement, regulatory authorities, or in legal proceedings when required by Spanish or EU law, or to protect our legal rights.</p>
                     </div>
                 </section>
@@ -226,42 +226,42 @@ export default function PrivacyPolicy() {
 
                     <div className="grid md:grid-cols-2 gap-4">
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🔍 Right of Access (Art. 15)</h4>
+                            <h4 className="font-bold mb-2"> Right of Access (Art. 15)</h4>
                             <p className="text-sm text-white/70">Request a copy of all personal data we hold about you.</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">✏️ Right to Rectification (Art. 16)</h4>
+                            <h4 className="font-bold mb-2">️ Right to Rectification (Art. 16)</h4>
                             <p className="text-sm text-white/70">Correct inaccurate or incomplete data.</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🗑️ Right to Erasure (Art. 17)</h4>
+                            <h4 className="font-bold mb-2">️ Right to Erasure (Art. 17)</h4>
                             <p className="text-sm text-white/70">Request deletion of your data ("right to be forgotten").</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">⏸️ Right to Restriction (Art. 18)</h4>
+                            <h4 className="font-bold mb-2">️ Right to Restriction (Art. 18)</h4>
                             <p className="text-sm text-white/70">Limit how we use your data.</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">📦 Right to Data Portability (Art. 20)</h4>
+                            <h4 className="font-bold mb-2"> Right to Data Portability (Art. 20)</h4>
                             <p className="text-sm text-white/70">Receive your data in a machine-readable format.</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🚫 Right to Object (Art. 21)</h4>
+                            <h4 className="font-bold mb-2"> Right to Object (Art. 21)</h4>
                             <p className="text-sm text-white/70">Object to processing based on legitimate interests.</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🔄 Right to Withdraw Consent (Art. 7)</h4>
+                            <h4 className="font-bold mb-2"> Right to Withdraw Consent (Art. 7)</h4>
                             <p className="text-sm text-white/70">Withdraw consent for marketing or optional features.</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">⚖️ Right to Lodge a Complaint (Art. 77)</h4>
+                            <h4 className="font-bold mb-2">️ Right to Lodge a Complaint (Art. 77)</h4>
                             <p className="text-sm text-white/70">File a complaint with the Spanish Data Protection Authority (AEPD).</p>
                         </div>
                     </div>
@@ -270,14 +270,14 @@ export default function PrivacyPolicy() {
                         <h4 className="font-bold text-blue-400 mb-2">How to Exercise Your Rights</h4>
                         <p className="text-sm mb-2">To exercise any of these rights, contact us at:</p>
                         <ul className="text-sm space-y-1">
-                            <li>📧 Email: <a href="mailto:privacy@WhaleAlert ID.fi" className="text-blue-400 hover:underline">privacy@WhaleAlert ID.fi</a></li>
-                            <li>📧 DPO Email: <a href="mailto:dpo@WhaleAlert ID.fi" className="text-blue-400 hover:underline">dpo@WhaleAlert ID.fi</a></li>
+                            <li> Email: <a href="mailto:privacy@WhaleAlert ID.fi" className="text-blue-400 hover:underline">privacy@WhaleAlert ID.fi</a></li>
+                            <li> DPO Email: <a href="mailto:dpo@WhaleAlert ID.fi" className="text-blue-400 hover:underline">dpo@WhaleAlert ID.fi</a></li>
                         </ul>
                         <p className="text-sm mt-2 text-white/70">We will respond within <strong>30 days</strong> as required by GDPR.</p>
                     </div>
 
                     <div className="bg-red-600/10 border border-red-500/30 p-4 rounded-lg mt-4">
-                        <h4 className="font-bold text-red-400 mb-2">⚠️ Blockchain Data Limitations</h4>
+                        <h4 className="font-bold text-red-400 mb-2">️ Blockchain Data Limitations</h4>
                         <p className="text-sm">Due to the immutable nature of blockchain technology, we <strong>cannot delete</strong> transaction data already recorded on public blockchains (Ethereum, Polygon, etc.). This data remains publicly accessible forever. However, we can delete our off-chain records and stop collecting new data.</p>
                     </div>
                 </section>
@@ -298,7 +298,7 @@ export default function PrivacyPolicy() {
                     </ul>
 
                     <div className="bg-yellow-600/10 border border-yellow-500/30 p-4 rounded-lg mt-4">
-                        <h4 className="font-bold text-yellow-400 mb-2">🔔 Data Breach Notification</h4>
+                        <h4 className="font-bold text-yellow-400 mb-2"> Data Breach Notification</h4>
                         <p className="text-sm">In the event of a data breach affecting your personal data, we will notify you and the Spanish Data Protection Authority (AEPD) within <strong>72 hours</strong> as required by GDPR Article 33.</p>
                     </div>
                 </section>
@@ -447,15 +447,15 @@ export default function PrivacyPolicy() {
 
                 {/* Summary */}
                 <section className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 p-6 rounded-xl border border-white/10">
-                    <h2 className="text-2xl font-bold mb-4">📋 Summary</h2>
+                    <h2 className="text-2xl font-bold mb-4"> Summary</h2>
                     <ul className="space-y-2 text-sm">
-                        <li>✅ We collect minimal data necessary to provide our services</li>
-                        <li>✅ Your biometric data never leaves your device</li>
-                        <li>✅ Blockchain data is public by nature and cannot be deleted</li>
-                        <li>✅ You have full GDPR rights: access, rectification, erasure, portability</li>
-                        <li>✅ We use Standard Contractual Clauses for international transfers</li>
-                        <li>✅ You can contact our DPO at <a href="mailto:dpo@WhaleAlert ID.fi" className="text-blue-400 hover:underline">dpo@WhaleAlert ID.fi</a></li>
-                        <li>✅ We comply with GDPR, Spanish LOPD, and EU crypto regulations</li>
+                        <li> We collect minimal data necessary to provide our services</li>
+                        <li> Your biometric data never leaves your device</li>
+                        <li> Blockchain data is public by nature and cannot be deleted</li>
+                        <li> You have full GDPR rights: access, rectification, erasure, portability</li>
+                        <li> We use Standard Contractual Clauses for international transfers</li>
+                        <li> You can contact our DPO at <a href="mailto:dpo@WhaleAlert ID.fi" className="text-blue-400 hover:underline">dpo@WhaleAlert ID.fi</a></li>
+                        <li> We comply with GDPR, Spanish LOPD, and EU crypto regulations</li>
                     </ul>
                 </section>
             </div>

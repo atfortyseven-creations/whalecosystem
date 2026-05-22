@@ -4,7 +4,7 @@ import { broadcastSignal } from '../p2p/eternalNode';
 
 /**
  * SAL Block Schema
- * Represents an immutable record of thermodynamic intelligence.
+ * Represents an immutable record of thermodynamic analytics.
  */
 export type SALBlock = {
     height: number;
@@ -21,7 +21,7 @@ export type SALBlock = {
 };
 
 /**
- * Sovereign Akashic Ledger — Core Store
+ * System Akashic Ledger  Core Store
  * Manages the local chain state and gossip triggers.
  */
 class SALLedger {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { SovereignTelemetry } from '@/lib/telemetry/beta-metrics';
+import { SystemTelemetry } from '@/lib/telemetry/beta-metrics';
 import { verifySignedPayload } from '@/lib/crypto/eip191-verify';
 import prisma from '@/lib/prisma'; // Using the global instance for DB queries
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
       // 2. Cryptographically verify the survey submission
       // The message must precisely match what the user signed on the frontend
-      const expectedMessage = `Sovereign Network Beta NPS\nScore: ${score}\nFeedback: ${feedback || 'None'}\nNonce: ${nonce}`;
+      const expectedMessage = `System Network Beta NPS\nScore: ${score}\nFeedback: ${feedback || 'None'}\nNonce: ${nonce}`;
       
       const verification = verifySignedPayload({
         message: expectedMessage,
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       }
 
       // Feed into the memory aggregator (which automatically calculates P95 and flushes)
-      SovereignTelemetry.recordMetric('HANDSHAKE_LATENCY', latencyMs);
+      SystemTelemetry.recordMetric('HANDSHAKE_LATENCY', latencyMs);
       
       return NextResponse.json({ success: true, status: 'Aggregated' });
     }

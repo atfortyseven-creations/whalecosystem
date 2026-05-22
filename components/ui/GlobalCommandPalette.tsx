@@ -6,29 +6,29 @@ import {
   Search, Command
 } from "lucide-react";
 
-// ── Only the routes that actually exist in SIDEBAR_ITEMS ──────────────────────
+//  Only the routes that actually exist in SIDEBAR_ITEMS 
 const PAGES = [
-  // ── Overview ──
+  //  Overview 
   { id: "gold",          label: "Ticket Mint",     group: "Overview",       icon: null },
   { id: "portfolio",     label: "Main Portfolio",  group: "Overview",       icon: null },
   { id: "billing",       label: "Billing & Plan",  group: "Overview",       icon: null },
 
-  // ── Markets ──
+  //  Markets 
   { id: "markets",       label: "Top Markets",     group: "Markets",        icon: null },
   { id: "newpairs",      label: "New Listings",    group: "Markets",        icon: null },
 
-  // ── On-Chain ──
+  //  On-Chain 
   { id: "inst-ledger",   label: "Whale Ledger",    group: "On-Chain Data",  icon: null },
   { id: "mass-transfer", label: "Mass Transfers",  group: "On-Chain Data",  icon: null },
   { id: "omniexplorer",  label: "Block Explorer",  group: "On-Chain Data",  icon: null },
 
-  // ── Network State ──
+  //  Network State 
   { id: "zk",            label: "Aztec Network",   group: "Network State",  icon: null },
 
-  // ── Communications ──
+  //  Communications 
   { id: "chat",          label: "Whale Chat",      group: "Communications", icon: null },
 
-  // ── System ──
+  //  System 
   { id: "logs",          label: "Session Logs",    group: "System",         icon: null },
   { id: "support",       label: "Support",         group: "System",         icon: null },
 ];
@@ -47,7 +47,7 @@ export function GlobalCommandPalette({
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
 
-  // ── Keyboard shortcuts ──────────────────────────────────────────────────────
+  //  Keyboard shortcuts 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
@@ -72,7 +72,7 @@ export function GlobalCommandPalette({
       )
     : PAGES;
 
-  // ── Keyboard navigation ─────────────────────────────────────────────────────
+  //  Keyboard navigation 
   useEffect(() => {
     if (!isOpen) return;
     const handle = (e: KeyboardEvent) => {
@@ -154,7 +154,7 @@ export function GlobalCommandPalette({
                               </span>
                             </div>
                             {(page as any).external && (
-                              <span className="text-[9px] text-[#050505]/15 dark:text-white/15 mr-1">↗</span>
+                              <span className="text-[9px] text-[#050505]/15 dark:text-white/15 mr-1"></span>
                             )}
                           </button>
                         ))}
@@ -195,11 +195,11 @@ export function GlobalCommandPalette({
               <div className="shrink-0 px-4 py-2 border-t border-[#F0F0F0] dark:border-white/10 flex items-center justify-between bg-[#FAFAFA] dark:bg-[#1A1A1A]">
                 <div className="flex items-center gap-3 text-[8px] font-black uppercase tracking-widest text-[#050505]/20 dark:text-white/20">
                   <span className="flex items-center gap-1">
-                    <kbd className="bg-white dark:bg-[#333] border border-[#E5E5E5] dark:border-white/10 rounded px-1 py-0.5 text-[7.5px] leading-none">↑↓</kbd>
+                    <kbd className="bg-white dark:bg-[#333] border border-[#E5E5E5] dark:border-white/10 rounded px-1 py-0.5 text-[7.5px] leading-none"></kbd>
                     Navigate
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="bg-white dark:bg-[#333] border border-[#E5E5E5] dark:border-white/10 rounded px-1 py-0.5 text-[7.5px] leading-none">↵</kbd>
+                    <kbd className="bg-white dark:bg-[#333] border border-[#E5E5E5] dark:border-white/10 rounded px-1 py-0.5 text-[7.5px] leading-none"></kbd>
                     Open
                   </span>
                 </div>

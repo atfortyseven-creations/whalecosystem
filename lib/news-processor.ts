@@ -4,8 +4,8 @@ import {
     RawNewsItem, 
     AIAnalysisResult, 
     MarketSentiment,
-    NewsArticleIntelligence 
-} from './news-intelligence';
+    NewsArticleAnalytics 
+} from './news-analytics';
 
 let _openai: OpenAI | null = null;
 

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from '@scure/bip39';
-// @ts-expect-error — subpath types may be missing depending on @scure/bip39 version
+// @ts-expect-error  subpath types may be missing depending on @scure/bip39 version
 import { wordlist } from '@scure/bip39/wordlists/english';
 
 /**

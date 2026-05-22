@@ -312,7 +312,7 @@ export function MarketHeatmap24h() {
         fetch("/api/vip/liquidations-24h"),
       ]);
 
-      // Binance tickers — direct call (may be blocked by CORS in browser)
+      // Binance tickers  direct call (may be blocked by CORS in browser)
       let tickers: any[] = [];
       try {
         const ctrl = new AbortController();
@@ -325,7 +325,7 @@ export function MarketHeatmap24h() {
       } catch {}
 
       if (!tickers || tickers.length < 5) {
-        // No Math.random() fallback — show a real error state
+        // No Math.random() fallback  show a real error state
         setError("Binance Futures data unavailable. Retrying...");
         setLoading(false);
         return;
@@ -364,7 +364,7 @@ export function MarketHeatmap24h() {
       setLastUpdate(new Date());
     } catch (e) {
       console.error("[Heatmap] fetch error", e);
-      // Never fall back to Math.random() — show error state
+      // Never fall back to Math.random()  show error state
       if (coins.length === 0) {
         setError("Market data temporarily unavailable.");
       }
@@ -470,7 +470,7 @@ export function MarketHeatmap24h() {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-8 h-8 border-2 border-[var(--aztec-orchid)]/30 border-t-[var(--aztec-orchid)] rounded-full animate-spin" />
-              <span className="text-[10px] font-mono text-[var(--aztec-ink)]/40 uppercase tracking-widest">Loading market data…</span>
+              <span className="text-[10px] font-mono text-[var(--aztec-ink)]/40 uppercase tracking-widest">Loading market data</span>
             </div>
           </div>
         ) : (

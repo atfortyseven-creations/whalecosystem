@@ -2,12 +2,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType, IChartApi, AreaSeries } from 'lightweight-charts';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 export const PerformanceChart: React.FC = () => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
-    const { address } = useSovereignAccount();
+    const { address } = useSystemAccount();
     const [mode, setMode] = useState<'wallet' | 'market_index' | 'loading' | 'error'>('loading');
 
     useEffect(() => {
@@ -37,7 +37,7 @@ export const PerformanceChart: React.FC = () => {
 
         chartRef.current = chart;
 
-        // Fetch REAL price history — CoinGecko ETH 30-day history
+        // Fetch REAL price history  CoinGecko ETH 30-day history
         // If wallet connected: value = balance × ETH price at each point
         // If not connected: ETH market index (still 100% real data)
         const url = address
@@ -80,7 +80,7 @@ export const PerformanceChart: React.FC = () => {
             <div ref={chartContainerRef} className="w-full h-full" />
             {mode !== 'loading' && mode !== 'error' && (
                 <div className="absolute top-2 right-2 px-2 py-1 bg-black/60 rounded-lg border border-white/10 text-[9px] font-mono text-white/40 uppercase tracking-widest">
-                    {mode === 'wallet' ? '● Live Wallet' : '● ETH Index'} · CoinGecko
+                    {mode === 'wallet' ? ' Live Wallet' : ' ETH Index'} · CoinGecko
                 </div>
             )}
         </div>

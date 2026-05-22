@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     if (rlCount >= 3) {
       return NextResponse.json(
-        { error: 'Too Many Requests. Sovereign defense activated.' },
+        { error: 'Too Many Requests. System defense activated.' },
         { status: 429 }
       );
     }
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Session already completed.' }, { status: 409 });
     }
 
-    // Anti-spoofing gate: if server detects spoof → log and silently fail
+    // Anti-spoofing gate: if server detects spoof  log and silently fail
     if (spoofType && spoofType !== null) {
       console.warn(`[KYC:Session] Spoof detected (${spoofType}) for UUID: ${uuid.slice(0, 8)}, IP: ${ip}`);
       // Return 200 but don't update the session (client sees no response)
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     await safeRedisSet(`kyc-session:${uuid}`, updatedSession, 'EX', 120);
 
-    console.log(`[KYC:Session] Verified — UUID: ${uuid.slice(0, 8)}, score: ${livenessScore}`);
+    console.log(`[KYC:Session] Verified  UUID: ${uuid.slice(0, 8)}, score: ${livenessScore}`);
 
     return NextResponse.json({ success: true, status: 'VERIFIED', timestamp: Date.now() });
   } catch (error: any) {

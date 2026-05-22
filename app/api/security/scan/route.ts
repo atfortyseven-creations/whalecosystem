@@ -1,9 +1,9 @@
 /**
- * FASE 9 — ANTI-RUGPULL SCANNER SOBERANO
+ * FASE 9  ANTI-RUGPULL SCANNER SOBERANO
  * Analiza contratos inteligentes usando GoPlus Security API + Etherscan
  * para detectar: honeypots, liquidez no bloqueada, funciones maliciosas.
  *
- * El usuario pega la dirección del contrato → el backend lo analiza → 
+ * El usuario pega la dirección del contrato  el backend lo analiza  
  * devuelve un informe completo con puntuación de seguridad.
  */
 
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
 
         const res = await fetch(endpoint, {
             headers: { 'Accept': 'application/json' },
-            next: { revalidate: 300 } // Cache 5 mins — contract data doesn't change
+            next: { revalidate: 300 } // Cache 5 mins  contract data doesn't change
         });
 
         if (!res.ok) throw new Error(`GoPlus API error: ${res.status}`);
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
         const positives: string[] = [];
         let deductions = 0;
 
-        // ── Critical risk checks ──
+        //  Critical risk checks 
         if (tokenData.is_honeypot === '1') {
             risks.push({ severity: 'critical', label: 'HONEYPOT DETECTADO', description: 'El contrato tiene funciones que impiden al usuario vender el token. Trampa confirmada.' });
             deductions += 80;
@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
             deductions += 60;
         }
 
-        // ── High risk checks ──
+        //  High risk checks 
         if (tokenData.is_mintable === '1') {
             risks.push({ severity: 'high', label: 'TOKEN MINTEABLE', description: 'El propietario puede crear nuevos tokens infinitamente, diluyendo tu participación.' });
             deductions += 25;
@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
             deductions += 20;
         }
 
-        // ── Medium risk checks ──
+        //  Medium risk checks 
         const tax = Math.max(
             parseFloat(tokenData.buy_tax || '0'),
             parseFloat(tokenData.sell_tax || '0')
@@ -137,17 +137,17 @@ export async function GET(req: NextRequest) {
                     risks.push({ severity: 'high', label: `LIQUIDEZ SIN BLOQUEAR (${lockedPct.toFixed(0)}% bloqueada)`, description: 'El equipo puede retirar la liquidez en cualquier momento (rug pull).' });
                     deductions += 30;
                 } else {
-                    positives.push(`✅ ${lockedPct.toFixed(0)}% de la liquidez está bloqueada`);
+                    positives.push(` ${lockedPct.toFixed(0)}% de la liquidez está bloqueada`);
                 }
             } catch (_) {}
         }
 
-        // ── Positives ──
-        if (tokenData.is_open_source === '1') positives.push('✅ Código fuente verificado en el explorador');
-        if (tokenData.is_honeypot === '0') positives.push('✅ No es honeypot — test de venta OK');
-        if (tokenData.cannot_sell_all === '0') positives.push('✅ Permite vender el 100% del balance');
-        if (tokenData.is_mintable === '0') positives.push('✅ Supply fija — no minteable');
-        if (tax === 0) positives.push('✅ Sin impuesto en compra/venta');
+        //  Positives 
+        if (tokenData.is_open_source === '1') positives.push(' Código fuente verificado en el explorador');
+        if (tokenData.is_honeypot === '0') positives.push(' No es honeypot  test de venta OK');
+        if (tokenData.cannot_sell_all === '0') positives.push(' Permite vender el 100% del balance');
+        if (tokenData.is_mintable === '0') positives.push(' Supply fija  no minteable');
+        if (tax === 0) positives.push(' Sin impuesto en compra/venta');
 
         const safetyScore = Math.max(0, Math.min(100, 100 - deductions));
         const verdict: SecurityReport['verdict'] =

@@ -41,7 +41,7 @@ export const cryptographyModules = [
                 </div>`
             },
             {
-                id: "pqc-quantum-resistance",
+                id: "pqc-core-resistance",
                 title: "3. Criptografía Post-Cuántica (PQC)",
                 description: "Preparando Windows contra Sbor y Shor.",
                 readTime: 55,
@@ -342,7 +342,7 @@ export const cryptographyModules = [
 
                     <section class="pro-section">
                         <h2>II. El Tapón Analógico Computacional Ineludible (Delay FHE T-1 L1)</h2>
-                        <p>Las <strong>VDF (Verifiable Delay Functions L2 M2 P2P L1)</strong> fuerzan Criptográficamente la Paridad Temporal Global y Desarmamiento del Atacante. Establecen una operación puramente Secuencial O(N) L1 de cálculos T-1 L2 que <em>Obligatoriamente Demanda 5 Segundos Analógicos Reales Frecuenciales P2P de ALU Computación para resolverse</em>; Inviolable matemáticamente aunque el Atacante posea ASICs Multicore o Quantum P2P L2 infinitos asimétricos. El VDF L1 T-1 retrasa artificial e incuestionablemente la respuesta Aleatoria Final M2 lo suficiente como para anular permanentemente la Ventaja Estratégica Computacional Ex-Ante del Creador/Minero del Bloque Corrupto L2, resarciendo el consenso Cripto Aleatorio Neutral Fiduciario.</p>
+                        <p>Las <strong>VDF (Verifiable Delay Functions L2 M2 P2P L1)</strong> fuerzan Criptográficamente la Paridad Temporal Global y Desarmamiento del Atacante. Establecen una operación puramente Secuencial O(N) L1 de cálculos T-1 L2 que <em>Obligatoriamente Demanda 5 Segundos Analógicos Reales Frecuenciales P2P de ALU Computación para resolverse</em>; Inviolable matemáticamente aunque el Atacante posea ASICs Multicore o Core P2P L2 infinitos asimétricos. El VDF L1 T-1 retrasa artificial e incuestionablemente la respuesta Aleatoria Final M2 lo suficiente como para anular permanentemente la Ventaja Estratégica Computacional Ex-Ante del Creador/Minero del Bloque Corrupto L2, resarciendo el consenso Cripto Aleatorio Neutral Fiduciario.</p>
                     </section>
                 </div>`
             },

@@ -90,7 +90,7 @@ export default function SmartAlertsEngine({ isPremium, selectedWalletAddress }: 
     
     // WebSocket Listener for real-time "Push"
     const handleNewAlert = (data: any) => {
-      console.log("🔔 [SmartAlerts] Instanteous Push Received:", data);
+      console.log(" [SmartAlerts] Instanteous Push Received:", data);
       
       const newAlert: SmartAlert = {
         id: data.hash || ((typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`),
@@ -136,7 +136,7 @@ export default function SmartAlertsEngine({ isPremium, selectedWalletAddress }: 
 
   const handleCopyTrade = (alert: SmartAlert) => {
     if (!alert.copyable || !alert.action) return;
-    window.alert(`🎯 Copy Trade Executed!\n\n${alert.action.type} ${safeToLocaleString(alert.action.amount)} ${alert.action.token}\nValue: $${safeToLocaleString(alert.action.usdValue)}`);
+    window.alert(` Copy Trade Executed!\n\n${alert.action.type} ${safeToLocaleString(alert.action.amount)} ${alert.action.token}\nValue: $${safeToLocaleString(alert.action.usdValue)}`);
   };
 
   const handleMarkRead = async (id: string) => {
@@ -313,10 +313,10 @@ export default function SmartAlertsEngine({ isPremium, selectedWalletAddress }: 
               <div className="flex-1">
                 <div className="font-black text-white mb-2 uppercase tracking-tight">{rule.name}</div>
                 <div className="flex gap-2">
-                  {rule.actions.telegram && <ActionBadge icon="📱" label="Telegram" />}
-                  {rule.actions.push && <ActionBadge icon="🔔" label="Push" />}
-                  {rule.actions.email && <ActionBadge icon="📧" label="Email" />}
-                  {rule.actions.sms && <ActionBadge icon="💬" label="SMS" />}
+                  {rule.actions.telegram && <ActionBadge icon="" label="Telegram" />}
+                  {rule.actions.push && <ActionBadge icon="" label="Push" />}
+                  {rule.actions.email && <ActionBadge icon="" label="Email" />}
+                  {rule.actions.sms && <ActionBadge icon="" label="SMS" />}
                 </div>
               </div>
 
@@ -381,10 +381,10 @@ function CreateRuleModal({ isOpen, onClose, onCreate }: { isOpen: boolean, onClo
                   }`}
                 >
                   <span className="text-lg">
-                    {ch === 'telegram' && '📱'}
-                    {ch === 'push' && '🔔'}
-                    {ch === 'email' && '📧'}
-                    {ch === 'sms' && '💬'}
+                    {ch === 'telegram' && ''}
+                    {ch === 'push' && ''}
+                    {ch === 'email' && ''}
+                    {ch === 'sms' && ''}
                   </span>
                   {ch}
                 </button>
@@ -467,7 +467,7 @@ function AlertCard({ alert, index, onCopyTrade, onMarkRead }: {
                         ${alert.action.usdValue.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </span>
                       <span className="text-xs font-bold text-gray-500">
-                        (€{(alert.action.usdValue * eurRate).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })})
+                        ({(alert.action.usdValue * eurRate).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })})
                       </span>
                   </div>
               </div>

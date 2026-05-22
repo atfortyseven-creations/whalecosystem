@@ -15,7 +15,7 @@ export class SynthetixService {
   private readonly PERPS_MARKET_PROXY = getAddress('0x0A2AF93bd3cF17645e3ff479573F9314A4C8E568');
   private readonly ACCOUNT_TOKEN = getAddress('0x63f458569426f4Ff394A790937a09287B91e1Cd6');
   private readonly USDC = getAddress('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913');
-  private readonly WLD = getAddress('0x7890f6Fdc6F9d65942468305f884a28Ea65DeD78'); // WLD Bridged on Base
+  private readonly AUTH = getAddress('0x7890f6Fdc6F9d65942468305f884a28Ea65DeD78'); // AUTH Bridged on Base
 
   // Minimal ABIs for Elite Efficiency
   private readonly PERPS_ABI = [
@@ -175,7 +175,7 @@ export class SynthetixService {
     if (s.includes('ETH')) return 100;
     if (s.includes('BTC')) return 200;
     if (s.includes('SOL')) return 300;
-    if (s.includes('WLD')) return 400; 
+    if (s.includes('AUTH')) return 400; 
     return 100; // Default to ETH for safety
   }
 

@@ -17,7 +17,7 @@ export function MegalodonWhalePulse() {
     const [alerts, setAlerts] = useState<UIStoreAlert[]>([]);
     const [isMonitoring, setIsMonitoring] = useState(true);
 
-    // Connect to the REAL on-chain mempool stream — only whale events ($500k+) arrive here
+    // Connect to the REAL on-chain mempool stream  only whale events ($500k+) arrive here
     useEffect(() => {
         if (!isMonitoring) return;
         let isMounted = true;
@@ -83,7 +83,7 @@ export function MegalodonWhalePulse() {
     }, []);
 
     function fmtCount(n: number | undefined): string {
-        if (n === undefined || n === null) return '…';
+        if (n === undefined || n === null) return '';
         if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
         return n.toString();
     }
@@ -161,7 +161,7 @@ export function MegalodonWhalePulse() {
                 )}
             </div>
 
-            {/* Sub-footer stats — REAL data from mempool.space */}
+            {/* Sub-footer stats  REAL data from mempool.space */}
             <div className="p-4 bg-white/[0.01] border-t border-white/5 flex gap-4 overflow-x-auto no-scrollbar">
                 <MiniStat label="ETH 24H" value={`${fmtCount(alertStats?.eth24h)} Txs`} />
                 <MiniStat label="BTC 24H" value={`${fmtCount(alertStats?.btc24h)} Txs`} />

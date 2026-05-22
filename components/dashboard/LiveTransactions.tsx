@@ -3,8 +3,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Database, Loader2, AlertTriangle } from 'lucide-react';
-import { useSovereignIntel } from '@/lib/api-client';
-import { useSovereignENS } from '@/hooks/useSovereignENS';
+import { useSystemIntel } from '@/lib/api-client';
+import { useSystemENS } from '@/hooks/useSystemENS';
 
 interface Transaction {
     id: string;
@@ -20,16 +20,16 @@ interface Transaction {
 
 export default function LiveTransactions() {
     // =========================================================================
-    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // INJECTED DATA HOOK  Zero-Mock Mandate
     // MOCK STREAM ERADICATED: No more Math.random() / setInterval fake data.
     // Mempool endpoint injected via REGISTRY.SOVEREIGN_INTEL.massTransfers
     // =========================================================================
-    const { data: rawData, isLoading, error } = useSovereignIntel('massTransfers');
+    const { data: rawData, isLoading, error } = useSystemIntel('massTransfers');
     const txs: Transaction[] = (rawData?.transfers || []).slice(0, 20).map((t: any, i: number) => ({
         id:        t.id || String(i),
-        hash:      t.hash || t.txHash || '0x—',
-        from:      t.from || t.sender || '—',
-        to:        t.to   || t.receiver || '—',
+        hash:      t.hash || t.txHash || '0x',
+        from:      t.from || t.sender || '',
+        to:        t.to   || t.receiver || '',
         value:     t.value || t.amount || '0',
         asset:     t.asset || t.token || 'ETH',
         chain:     (t.chain || t.network || 'ETHEREUM').toUpperCase(),
@@ -48,7 +48,7 @@ export default function LiveTransactions() {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="px-4 py-2 bg-black text-white text-[9px] font-black uppercase tracking-widest rounded-xl">
-                        {isLoading ? '— Events / Min' : `${txs.length} Events / Minute`}
+                        {isLoading ? ' Events / Min' : `${txs.length} Events / Minute`}
                     </div>
                 </div>
             </header>
@@ -83,8 +83,8 @@ export default function LiveTransactions() {
 }
 
 function TransactionRow({ tx }: { tx: Transaction }) {
-    const { ensName: fromName, ensAvatar: fromAvatar, displayName: fromDisplay } = useSovereignENS(tx.from as `0x${string}`);
-    const { ensName: toName, ensAvatar: toAvatar, displayName: toDisplay } = useSovereignENS(tx.to as `0x${string}`);
+    const { ensName: fromName, ensAvatar: fromAvatar, displayName: fromDisplay } = useSystemENS(tx.from as `0x${string}`);
+    const { ensName: toName, ensAvatar: toAvatar, displayName: toDisplay } = useSystemENS(tx.to as `0x${string}`);
 
     return (
         <motion.div

@@ -8,7 +8,7 @@ export const BINANCE_SYMBOL_MAP: Record<string, string> = {
     ADA: 'adausdt', DOGE: 'dogeusdt', SHIB: 'shibusdt', DOT: 'dotusdt', LINK: 'linkusdt',
     MATIC: 'maticusdt', POL: 'polusdt', AVAX: 'avaxusdt', TRX: 'trxusdt', UNI: 'uniusdt', PEPE: 'pepeusdt',
     FET: 'fetusdt', DAI: 'daiusdt', APE: 'apeusdt', LDO: 'ldousdt', ARB: 'arbusdt',
-    OP: 'opusdt', STRK: 'strkusdt', WLD: 'wldusdt', NEAR: 'nearusdt', FTM: 'ftmusdt',
+    OP: 'opusdt', STRK: 'strkusdt', AUTH: 'wldusdt', NEAR: 'nearusdt', FTM: 'ftmusdt',
     TAO: 'taousdt', INJ: 'injusdt', RNDR: 'rndrusdt', RENDER: 'renderusdt', JUP: 'jupusdt'
 };
 
@@ -53,7 +53,7 @@ export function MarketWebsocketProvider({ children }: { children: React.ReactNod
             ws = new WebSocket('wss://stream.binance.com:9443/ws/!ticker@arr');
 
             ws.onopen = () => {
-                console.log('[Sovereign Matrix] Direct Neural Link to Binance established (Zero Latency).');
+                console.log('[System Grid] Direct Neural Link to Binance established (Zero Latency).');
                 setIsConnected(true);
             };
 
@@ -83,13 +83,13 @@ export function MarketWebsocketProvider({ children }: { children: React.ReactNod
             };
 
             ws.onclose = () => {
-                console.warn('[Sovereign Matrix] Neural Link lost. Reconnecting...');
+                console.warn('[System Grid] Neural Link lost. Reconnecting...');
                 setIsConnected(false);
                 reconnectTimer = setTimeout(connect, 3000);
             };
 
             ws.onerror = (err) => {
-                console.error('[Sovereign Matrix] WebSocket Error:', err);
+                console.error('[System Grid] WebSocket Error:', err);
                 ws.close();
             };
         };

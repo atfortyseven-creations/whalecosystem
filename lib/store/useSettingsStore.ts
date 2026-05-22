@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { safeStorage } from '@/lib/security/safe-storage';
 
-export interface SovereignSettings {
+export interface SystemSettings {
     // 1. General Settings
     theme: 'light' | 'dark' | 'system';
     density: 'relaxed' | 'compact' | 'dense';
@@ -48,8 +48,8 @@ export interface SovereignSettings {
     hiddenAssets?: string; // JSON array of symbols/addresses
 }
 
-export interface SettingsState extends SovereignSettings {
-    settings: SovereignSettings | null; // Legacy compat
+export interface SettingsState extends SystemSettings {
+    settings: SystemSettings | null; // Legacy compat
     isSettingsOpen: boolean;
     isLoading: boolean;
     isUpdating: boolean;
@@ -57,7 +57,7 @@ export interface SettingsState extends SovereignSettings {
     // API Sync Methods
     fetchSettings: () => Promise<void>;
     syncDOM: () => void;
-    updateSetting: <K extends keyof SovereignSettings>(key: K, value: SovereignSettings[K]) => Promise<void>;
+    updateSetting: <K extends keyof SystemSettings>(key: K, value: SystemSettings[K]) => Promise<void>;
 
     // Individual setters for backwards compatibility
     setTheme: (theme: SettingsState['theme']) => void;
@@ -83,11 +83,11 @@ export interface SettingsState extends SovereignSettings {
     clearAppData: () => void;
 }
 
-const applyDOMClasses = (state: Partial<SovereignSettings>) => {
+const applyDOMClasses = (state: Partial<SystemSettings>) => {
     if (typeof document === 'undefined') return;
     const html = document.documentElement;
 
-    // ── Theme Enforcement ───────────────────────────────────────────────────
+    //  Theme Enforcement 
     if (state.theme) {
         const resolvedDark =
             state.theme === 'dark' ||
@@ -96,7 +96,7 @@ const applyDOMClasses = (state: Partial<SovereignSettings>) => {
         if (resolvedDark) {
             html.classList.add('dark');
             html.setAttribute('data-theme', 'dark');
-            // Immediate background flush — prevents flash-of-wrong-color
+            // Immediate background flush  prevents flash-of-wrong-color
             html.style.backgroundColor = '#0A0A0A';
             html.style.color = '#F5F5F5';
         } else {
@@ -107,7 +107,7 @@ const applyDOMClasses = (state: Partial<SovereignSettings>) => {
         }
     }
 
-    // ── UI Density ──────────────────────────────────────────────────────────
+    //  UI Density 
     if (state.density) {
         const d = state.density;
         html.classList.remove('ui-relaxed', 'ui-compact', 'ui-dense');
@@ -116,19 +116,19 @@ const applyDOMClasses = (state: Partial<SovereignSettings>) => {
         else html.classList.add('ui-relaxed');
     }
 
-    // ── Stealth Mode: blur all [data-balance] elements ──────────────────────
+    //  Stealth Mode: blur all [data-balance] elements 
     if (state.stealthMode !== undefined) {
         if (state.stealthMode) html.classList.add('stealth-active');
         else html.classList.remove('stealth-active');
     }
 
-    // ── Show Balances: hide-balances class when showBalances is false ────────
+    //  Show Balances: hide-balances class when showBalances is false 
     if (state.showBalances !== undefined) {
         if (!state.showBalances) html.classList.add('hide-balances');
         else html.classList.remove('hide-balances');
     }
 
-    // ── Hardware Acceleration: disable GPU compositing hints when off ────────
+    //  Hardware Acceleration: disable GPU compositing hints when off 
     if (state.hardwareAcceleration !== undefined) {
         if (!state.hardwareAcceleration) html.classList.add('no-hw-accel');
         else html.classList.remove('no-hw-accel');
@@ -200,7 +200,7 @@ export const useSettingsStore = create<SettingsState>()(
                         applyDOMClasses(data);
                     }
                 } catch (e) {
-                    console.error('Failed to fetch sovereign settings', e);
+                    console.error('Failed to fetch system settings', e);
                 } finally {
                     set({ isLoading: false });
                 }
@@ -255,7 +255,7 @@ export const useSettingsStore = create<SettingsState>()(
             }
         }),
         {
-            name: 'sovereign-settings-store-v4',
+            name: 'system-settings-store-v4',
             storage: createJSONStorage(() => safeStorage),
             partialize: (state) => ({
                 theme: state.theme,

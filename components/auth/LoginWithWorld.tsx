@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@identity/idkit";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ export default function LoginWithWorld() {
     const [isLoading, setIsLoading] = useState(false);
 
     // Configuration from env
-    const app_id = (process.env.NEXT_PUBLIC_WLD_APP_ID || "app_d2014c58bb084dcb09e1f3c1c1144287") as `app_${string}`;
+    const app_id = (process.env.NEXT_PUBLIC_AUTH_APP_ID || "app_d2014c58bb084dcb09e1f3c1c1144287") as `app_${string}`;
     const action = "login"; // Acción específica solicitada
 
     const handleVerify = async (proof: ISuccessResult) => {

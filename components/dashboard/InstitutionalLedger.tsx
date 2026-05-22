@@ -96,7 +96,7 @@ export default function InstitutionalLedger() {
                 setSearchError(data.error || 'No results found');
             }
         } catch {
-            setSearchError('Network error — could not reach the graph index.');
+            setSearchError('Network error  could not reach the graph index.');
         } finally {
             setIsSearching(false);
         }
@@ -372,7 +372,7 @@ export default function InstitutionalLedger() {
                                 <div className="flex flex-col gap-2 sm:text-right mt-2 sm:mt-0">
                                     <div className="flex items-center sm:justify-end gap-2 text-[9px] font-mono font-bold text-[#888888] uppercase tracking-widest">
                                         <span className="text-[#888888] dark:text-[#AAAAAA]">{tx.from.substring(0,6) + '...'}</span>
-                                        <span className="text-[#E5E5E5] dark:text-white/10">→</span>
+                                        <span className="text-[#E5E5E5] dark:text-white/10"></span>
                                         <span className="text-[#050505] dark:text-white">{tx.to.substring(0,6) + '...'}</span>
                                     </div>
                                     <div className="flex items-center sm:justify-end gap-3">

@@ -3,9 +3,9 @@ import { ethers } from 'ethers';
 import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
 
 /**
- * /api/intelligence/mass-transfers
+ * /api/analytics/mass-transfers
  * 
- * Sovereign Capital Ledger — Real-time multi-chain mass transfer scanner.
+ * System Capital Ledger  Real-time multi-chain mass transfer scanner.
  * Scans ETH, BSC, and BASE chains for native + ERC-20 transfers,
  * normalizes to the WhaleEvent schema, and returns { events, transfers }.
  */
@@ -13,7 +13,7 @@ import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
 export const runtime  = 'nodejs';
 export const dynamic  = 'force-dynamic';
 
-// ─── Token Registry ───────────────────────────────────────────────────────────
+//  Token Registry 
 const TOKEN_REGISTRY: Record<string, { symbol: string; decimals: number }> = {
   // ETH MAINNET
   '0xdac17f958d2ee523a2206206994597c13d831ec7': { symbol: 'USDT',  decimals: 6 },
@@ -43,7 +43,7 @@ const TOKEN_REGISTRY: Record<string, { symbol: string; decimals: number }> = {
 
 const TRANSFER_TOPIC = ethers.id('Transfer(address,address,uint256)');
 
-// ─── Tier Classification ──────────────────────────────────────────────────────
+//  Tier Classification 
 function getTier(usd: number): string {
   if (usd >= 100_000_000) return 'ULTRA_CAPITAL_FLOW';
   if (usd >= 50_000_000)  return 'PRINCIPAL_BLOCK';
@@ -54,7 +54,7 @@ function getTier(usd: number): string {
   return 'MICRO_TRANSFER';
 }
 
-// ─── Price Oracle ─────────────────────────────────────────────────────────────
+//  Price Oracle 
 const priceCache: Record<string, { price: number; ts: number }> = {};
 const PRICE_TTL = 90_000; // 90s
 
@@ -95,7 +95,7 @@ async function getPrice(symbol: string): Promise<number> {
   }
 }
 
-// ─── Chain Definitions ────────────────────────────────────────────────────────
+//  Chain Definitions 
 interface ChainDef {
   code:          string;   // short code used in UI filters: ETH | BSC | BASE
   label:         string;   // full label for logging
@@ -146,12 +146,12 @@ function getChains(): ChainDef[] {
   ];
 }
 
-// ─── In-Memory Server Cache ───────────────────────────────────────────────────
+//  In-Memory Server Cache 
 type CacheEntry = { data: any[]; ts: number };
 const serverCache: Record<string, CacheEntry> = {};
 const CACHE_TTL = 30_000; // 30s
 
-// ─── Chain Scanner ────────────────────────────────────────────────────────────
+//  Chain Scanner 
 async function scanChain(chain: ChainDef, bustCache = false): Promise<any[]> {
   const cacheKey = chain.code;
   const cached   = serverCache[cacheKey];
@@ -184,7 +184,7 @@ async function scanChain(chain: ChainDef, bustCache = false): Promise<any[]> {
     const latestBlock  = await provider.getBlockNumber();
     const BLOCKS_BACK  = 5;
 
-    // ── Native transfers ──────────────────────────────────────────────────
+    //  Native transfers 
     const blockPromises: Promise<any>[] = [];
     for (let b = latestBlock; b > latestBlock - BLOCKS_BACK && b > 0; b--) {
       blockPromises.push(provider.getBlock(b, true));
@@ -218,7 +218,7 @@ async function scanChain(chain: ChainDef, bustCache = false): Promise<any[]> {
       }
     }
 
-    // ── ERC-20 transfers ──────────────────────────────────────────────────
+    //  ERC-20 transfers 
     try {
       const logs = await provider.getLogs({
         fromBlock: latestBlock - BLOCKS_BACK,
@@ -251,13 +251,13 @@ async function scanChain(chain: ChainDef, bustCache = false): Promise<any[]> {
             tier:          getTier(usdValue),
             action:        'ERC20 TRANSFER',
             method:        'ERC20 Transfer',
-            gasPriceGwei:  '—',
+            gasPriceGwei:  '',
             confirmations: 1,
             status:        'CONFIRMED',
             timestamp:     Date.now(),
           });
         } catch {
-          // malformed log — skip
+          // malformed log  skip
         }
       }
     } catch (e: any) {
@@ -272,7 +272,7 @@ async function scanChain(chain: ChainDef, bustCache = false): Promise<any[]> {
   return results;
 }
 
-// ─── GET Handler ──────────────────────────────────────────────────────────────
+//  GET Handler 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

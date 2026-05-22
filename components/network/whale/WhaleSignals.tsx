@@ -90,7 +90,7 @@ export function WhaleSignals({ signals, isFetching }: Props) {
 
             {/* Footer disclaimer */}
             <p className="text-[10px] text-gray-700 text-center border-t border-white/5 pt-3">
-                Signals are generated algorithmically from mempool patterns — not financial advice.
+                Signals are generated algorithmically from mempool patterns  not financial advice.
             </p>
         </div>
     );

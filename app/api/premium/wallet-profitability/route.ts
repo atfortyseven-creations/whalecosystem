@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error('[API] Profitability fetch failed, using fallback:', error.message);
     
-    // 🔥 [LEGENDARY FALLBACK] If Moralis fails, use Portfolio data for 24h P&L
+    //  [LEGENDARY FALLBACK] If Moralis fails, use Portfolio data for 24h P&L
     try {
         const portfolio = await portfolioService.getMultiChainPortfolio(address as string, undefined, false, false);
         return NextResponse.json({

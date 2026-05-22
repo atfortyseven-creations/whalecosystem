@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown, Waves, AlertCircle, Star, Eye, Bell, Search, BarChart3, X, Activity, Zap, ArrowRight, Crown, Lock, ShieldCheck, Award } from 'lucide-react';
-// Sovereign SIWE — No Clerk dependency. Wallet identity via wagmi useAccount.
+// System SIWE  No Clerk dependency. Wallet identity via wagmi useAccount.
 import useSWR from 'swr';
-import { useVIPIntelligence } from '@/hooks/useVIPIntelligence';
+import { useVIPAnalytics } from '@/hooks/useVIPAnalytics';
 import { usePublicClient } from 'wagmi';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
@@ -88,7 +88,7 @@ export default function WhaleTracker({
   onSelectWallet,
   onTabChange
 }: WhaleTrackerProps) {
-  const { address: web3Address } = useSovereignAccount();
+  const { address: web3Address } = useSystemAccount();
   const { isAuthenticated, isOwner, isPremium: authIsPremium, trialViews, viewedAddresses } = useAuth();
   const publicClient = usePublicClient();
 
@@ -134,9 +134,9 @@ export default function WhaleTracker({
     setSyncingAddresses(prev => new Set(prev).add(address.toLowerCase()));
     try {
         toast.loading(`Starting Deep Scan for ${address.slice(0,6)}...`, { id: 'sync-wallet' });
-        const res = await fetch(`/api/wallet/intelligence/${address}?refresh=true&deep=true`);
+        const res = await fetch(`/api/wallet/analytics/${address}?refresh=true&deep=true`);
         if (res.ok) {
-            toast.success(`✓ Data synchronized successfully (Full history recovered)`, { id: 'sync-wallet' });
+            toast.success(` Data synchronized successfully (Full history recovered)`, { id: 'sync-wallet' });
             await mutateWallets();
         } else {
             toast.error("Failed to synchronize deep data", { id: 'sync-wallet' });
@@ -162,7 +162,7 @@ export default function WhaleTracker({
     errorMessage: w.errorMessage
   }));
 
-  const { transactions } = useVIPIntelligence();
+  const { transactions } = useVIPAnalytics();
 
   useEffect(() => {
     if (!transactions || transactions.length === 0) return;
@@ -201,7 +201,7 @@ export default function WhaleTracker({
 
     let finalAddress = inputAddress.trim();
 
-    // ─── ENS RESOLUTION (con timeout agresivo de 1.5s) ──────────────────────
+    //  ENS RESOLUTION (con timeout agresivo de 1.5s) 
     const isEns = finalAddress.toLowerCase().endsWith('.eth') ||
         (!finalAddress.startsWith('0x') && !finalAddress.startsWith('bc1') && finalAddress.includes('.'));
 
@@ -240,7 +240,7 @@ export default function WhaleTracker({
         }
     }
 
-    // ─── BASIC VALIDATION ───────────────────────────────────────────────────
+    //  BASIC VALIDATION 
     if (!finalAddress.startsWith('0x') || finalAddress.length < 42) {
         toast.error('Invalid address. Use 0x... format or a valid .eth name.');
         return;
@@ -261,7 +261,7 @@ export default function WhaleTracker({
                 'Content-Type': 'application/json',
                 'x-web3-address': currentUserAddress,
                 'x-csrf-token': csrfToken,
-                'x-is-architect': (web3Address?.toLowerCase() === '0xatfortyseven' ? 'true' : 'false') // Placeholder — use OWNER_ADDRESSES
+                'x-is-architect': (web3Address?.toLowerCase() === '0xatfortyseven' ? 'true' : 'false') // Placeholder  use OWNER_ADDRESSES
             },
             body: JSON.stringify({
                 address: finalAddress,
@@ -271,7 +271,7 @@ export default function WhaleTracker({
         });
         
         if (res.ok) {
-            toast.success(`✓ ${label || inputAddress} added successfully`, { id: 'add-wallet' });
+            toast.success(` ${label || inputAddress} added successfully`, { id: 'add-wallet' });
             await mutateWallets();
             setShowAddWallet(false);
         } else {
@@ -296,7 +296,7 @@ export default function WhaleTracker({
     toast.loading(`Deleting "${label}"...`, { id: 'delete-wallet' });
 
     try {
-        // 🔥 CSRF HANDSHAKE
+        //  CSRF HANDSHAKE
         console.log('[DELETE-WALLET-FRONTEND] Fetching CSRF token...');
         const csrfRes = await fetch('/api/auth/csrf', {
             headers: { 'x-web3-address': currentUserAddress }
@@ -317,7 +317,7 @@ export default function WhaleTracker({
         console.log('[DELETE-WALLET-FRONTEND] Server response:', { status: res.status, data });
 
         if (res.ok) {
-            toast.success(`✓ Wallet "${label}" deleted successfully`, { id: 'delete-wallet' });
+            toast.success(` Wallet "${label}" deleted successfully`, { id: 'delete-wallet' });
             console.log('[DELETE-WALLET-FRONTEND] Mutation triggered');
             await mutateWallets();
         } else {
@@ -353,9 +353,9 @@ export default function WhaleTracker({
 
   const formatValue = (val: any) => {
     const num = typeof val === 'string' ? parseFloat(val) : Number(val);
-    if (isNaN(num)) return "$0.00 (€0.00)";
+    if (isNaN(num)) return "$0.00 (0.00)";
     const eur = num * 0.92;
-    return `$${safeToLocaleString(num, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (€${safeToLocaleString(eur, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
+    return `$${safeToLocaleString(num, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${safeToLocaleString(eur, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
   };
 
   const formatPercent = (val: any) => {
@@ -609,7 +609,7 @@ function SignalCard({ activity, index }: { activity: WhaleActivity, index: numbe
                     <div className="text-2xl font-black text-white tracking-tight">
                         ${(activity.usdValue).toLocaleString('de-DE', { maximumFractionDigits: 0 })}
                         <span className="text-sm text-gray-400 font-bold ml-2">
-                           (€{(activity.usdValue * 0.92).toLocaleString('de-DE', { maximumFractionDigits: 0 })})
+                           ({(activity.usdValue * 0.92).toLocaleString('de-DE', { maximumFractionDigits: 0 })})
                         </span>
                     </div>
                     <div className="text-sm font-medium text-gray-400">
@@ -625,7 +625,7 @@ function SignalCard({ activity, index }: { activity: WhaleActivity, index: numbe
                     </div>
                     {/* @ts-ignore */}
                     {activity.chain === 'bitcoin' ? (
-                       <div className="w-10 h-10 rounded-full bg-[#f7931a]/20 flex items-center justify-center text-[#f7931a] font-bold border border-[#f7931a]/30">₿</div> 
+                       <div className="w-10 h-10 rounded-full bg-[#f7931a]/20 flex items-center justify-center text-[#f7931a] font-bold border border-[#f7931a]/30"></div> 
                     ) : activity.chain === 'base' ? (
                        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-600/30">B</div>
                     ) : (
@@ -692,7 +692,7 @@ function ElegantWalletCard({
                             <div className="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] text-white font-bold border border-black shadow-lg">Ξ</div>
                         )}
                         {(wallet.address.startsWith('bc1') || /^[13]/.test(wallet.address)) && !wallet.address.startsWith('0x') && (
-                            <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-[10px] text-white font-bold border border-black shadow-lg">₿</div>
+                            <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-[10px] text-white font-bold border border-black shadow-lg"></div>
                         )}
                         {/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(wallet.address) && !wallet.address.startsWith('0x') && !wallet.address.startsWith('bc1') && (
                             <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-[10px] text-white font-bold border border-black shadow-lg">S</div>
@@ -833,7 +833,7 @@ function AddWalletModal({ isOpen, onClose, onAdd }: { isOpen: boolean, onClose: 
         (!address.startsWith('0x') && !address.startsWith('bc1') && address.includes('.') && address.length > 4);
     const isHexAddress = address.startsWith('0x') && address.length >= 40;
 
-    // ── Preview ENS inline mientras el usuario escribe ────────────────────────
+    //  Preview ENS inline mientras el usuario escribe 
     useEffect(() => {
         if (!isEnsInput) { setEnsPreview({ state: 'idle' }); return; }
         setEnsPreview({ state: 'resolving' });
@@ -918,7 +918,7 @@ function AddWalletModal({ isOpen, onClose, onAdd }: { isOpen: boolean, onClose: 
                             {isHexAddress && (
                                 <p className="text-xs text-green-400 font-bold flex items-center gap-1">
                                     <span className="w-2 h-2 bg-green-400 rounded-full inline-block" />
-                                    Valid 0x address — ready to track
+                                    Valid 0x address  ready to track
                                 </p>
                             )}
                             {isEnsInput && ensPreview.state === 'resolving' && (

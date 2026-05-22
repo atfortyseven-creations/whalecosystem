@@ -8,7 +8,7 @@ const SYMBOLS = [
   'ARBUSDT','OPUSDT','INJUSDT','SUIUSDT','APTUSDT',
 ];
 
-// Map Binance symbol → display name
+// Map Binance symbol  display name
 const SYMBOL_TO_NAME: Record<string, string> = {
   BTCUSDT:'BTC', ETHUSDT:'ETH', SOLUSDT:'SOL', BNBUSDT:'BNB', XRPUSDT:'XRP',
   ADAUSDT:'ADA', DOGEUSDT:'DOGE', AVAXUSDT:'AVAX', DOTUSDT:'DOT', LINKUSDT:'LINK',
@@ -19,7 +19,7 @@ const SYMBOL_TO_NAME: Record<string, string> = {
 /**
  * GET /api/vip/liquidations-24h
  * Returns real 24h forced liquidation volume per symbol from Binance Futures.
- * Endpoint: /fapi/v1/allForceOrders — public, no auth required.
+ * Endpoint: /fapi/v1/allForceOrders  public, no auth required.
  * We fan-out one request per symbol with a 24h startTime window, then aggregate.
  */
 
@@ -35,7 +35,7 @@ async function fetchSymbolLiquidations(symbol: string, startTime: number): Promi
     });
     if (!res.ok) return 0;
     const orders: any[] = await res.json();
-    // Each order: { origQty, price, ... } — cumulate notional (qty * price)
+    // Each order: { origQty, price, ... }  cumulate notional (qty * price)
     return orders.reduce((sum, o) => {
       const qty = parseFloat(o.origQty || '0');
       const price = parseFloat(o.averagePrice || o.price || '0');
@@ -49,7 +49,7 @@ async function fetchSymbolLiquidations(symbol: string, startTime: number): Promi
 export async function GET() {
   const startTime = Date.now() - 24 * 60 * 60 * 1000; // last 24h
 
-  // Fan-out — all symbols in parallel (server-side, no CORS)
+  // Fan-out  all symbols in parallel (server-side, no CORS)
   const results = await Promise.all(
     SYMBOLS.map(async (symbol) => {
       const liquidationUsd = await fetchSymbolLiquidations(symbol, startTime);

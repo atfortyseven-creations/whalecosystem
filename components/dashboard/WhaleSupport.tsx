@@ -16,7 +16,7 @@ interface Ticket {
 type Priority = 'LOW' | 'MEDIUM' | 'HIGH';
 
 const FAQ = [
-    { q: 'How do I connect my wallet?',        a: 'Navigate to the Portfolio section and use the sovereign handshake flow to link your wallet securely.' },
+    { q: 'How do I connect my wallet?',        a: 'Navigate to the Portfolio section and use the system handshake flow to link your wallet securely.' },
     { q: 'How do I upgrade my plan?',           a: 'Go to Subscription in the sidebar to view and manage available institutional tiers.' },
     { q: 'Is the dashboard available on mobile?', a: 'Yes. The entire platform is fully responsive and optimized for mobile devices.' },
     { q: 'Where does the market data come from?', a: 'Market data is sourced directly from on-chain oracles and verified exchange APIs in real time.' },
@@ -70,7 +70,7 @@ export function WhaleSupport() {
                 {/* Main grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-                    {/* ── Form ── */}
+                    {/*  Form  */}
                     <div className="lg:col-span-3 border border-[#E5E5E5] dark:border-white/10 rounded-2xl overflow-hidden bg-[#F9F9F9] dark:bg-[#111111]">
                         <div className="flex items-center gap-3 px-6 py-5 border-b border-[#E5E5E5] dark:border-white/10 bg-[#E5E5E5]/50 dark:bg-white/5">
                             <Mail size={14} className="text-[#888888]" />
@@ -149,7 +149,7 @@ export function WhaleSupport() {
                         </div>
                     </div>
 
-                    {/* ── Right column ── */}
+                    {/*  Right column  */}
                     <div className="lg:col-span-2 flex flex-col gap-6">
 
                         {/* Active Tickets */}

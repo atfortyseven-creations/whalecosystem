@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma';
 
 /**
  * SOVEREIGN ZK-BIOMETRICS ORACLE (V3)
- * ═══════════════════════════════════════════════════════════════════════════════
+ * 
  * Performs molecular verification of 3D liveness data bound to wallet signatures.
  * Zero mocks. Absolute cryptographic integrity.
- * ═══════════════════════════════════════════════════════════════════════════════
+ * 
  */
 
 export async function POST(req: NextRequest) {
@@ -21,16 +21,16 @@ export async function POST(req: NextRequest) {
         // 0. Strict Temporal Bound Check (60 seconds max delta)
         const timeDelta = Math.abs(Date.now() - timestamp);
         if (timeDelta > 60000) {
-            console.error(`[ZK-ORACLE] ❌ Temporal drift detected (${timeDelta}ms). Possible replay attack.`);
+            console.error(`[ZK-ORACLE]  Temporal drift detected (${timeDelta}ms). Possible replay attack.`);
             return NextResponse.json({ error: 'Payload expired' }, { status: 401 });
         }
 
-        console.log(`[ZK-ORACLE] 🔵 Molecular audit initiated for: ${address}`);
+        console.log(`[ZK-ORACLE]  Molecular audit initiated for: ${address}`);
 
         // 1. Verify Nonce (The Kill Switch)
         const storedNonce = await prisma.siweNonce.findUnique({ where: { nonce } });
         if (!storedNonce || storedNonce.expiresAt < new Date()) {
-            console.error(`[ZK-ORACLE] ❌ Invalid or expired nonce for ${address}. Violent rejection.`);
+            console.error(`[ZK-ORACLE]  Invalid or expired nonce for ${address}. Violent rejection.`);
             return NextResponse.json({ error: 'Invalid challenge response' }, { status: 401 });
         }
         // Destroy the nonce immediately (One-Time Use)
@@ -49,23 +49,23 @@ export async function POST(req: NextRequest) {
             const payloadData = await verifyJWT(token);
             
             if (payloadData.sub?.toLowerCase() !== address.toLowerCase()) {
-                console.error(`[ZK-ORACLE] ❌ Session identity mismatch for ${address}`);
+                console.error(`[ZK-ORACLE]  Session identity mismatch for ${address}`);
                 return NextResponse.json({ error: 'Session identity mismatch' }, { status: 401 });
             }
-            console.log(`[ZK-ORACLE] 🔐 Session valid for ${address}. Zero-signature verification successful.`);
+            console.log(`[ZK-ORACLE]  Session valid for ${address}. Zero-signature verification successful.`);
         } catch (jwtErr: any) {
-            console.error(`[ZK-ORACLE] ❌ JWT validation exception:`, jwtErr?.message);
+            console.error(`[ZK-ORACLE]  JWT validation exception:`, jwtErr?.message);
             return NextResponse.json({ error: 'Invalid or missing secure session. Reconnect wallet.' }, { status: 401 });
         }
 
         // 4. Neural Mesh Liveness Audit (Molecular Verification)
         // In a real production environment, this would involve a server-side ML model
         // processing the 'payload' buffer. Here, we perform a molecular state verification.
-        console.log(`[ZK-ORACLE] 🧠 Analyzing 3D Liveness Mesh (Bound to Signature)`);
+        console.log(`[ZK-ORACLE]  Analyzing 3D Liveness Mesh (Bound to Signature)`);
         
-        // 4. Persistence & Sovereign Attestation Issuance
+        // 4. Persistence & System Attestation Issuance
         // Zero-Knowledge Proof minted immediately upon molecular verification.
-        console.log(`[ZK-ORACLE] ✅ Molecular liveness confirmed for ${address}. Zero-Knowledge Proof minted.`);
+        console.log(`[ZK-ORACLE]  Molecular liveness confirmed for ${address}. Zero-Knowledge Proof minted.`);
 
         // 5. Update Database (Zero Mock)
         // Ensure the identity is fully recognized by the session layer.
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
                     const parsed = JSON.parse(sessionData);
                     parsed.kycVerified = true;
                     await safeRedisSet(`qr-session:${uuid}`, JSON.stringify(parsed), 'EX', 300);
-                    console.log(`[ZK-ORACLE] 📡 Synchronized KYC status for QR session: ${uuid}`);
+                    console.log(`[ZK-ORACLE]  Synchronized KYC status for QR session: ${uuid}`);
                 } catch (e) {}
             }
         }
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
         });
 
     } catch (error: any) {
-        console.error('[ZK-ORACLE] ❌ Internal Failure:', error);
+        console.error('[ZK-ORACLE]  Internal Failure:', error);
         return NextResponse.json({ error: 'Internal Oracle Failure' }, { status: 500 });
     }
 }

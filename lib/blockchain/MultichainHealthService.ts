@@ -12,7 +12,7 @@ export interface ChainHealth {
 }
 
 /**
- * 🛰️ UNIVERSAL MULTI-CHAIN HEALTH SERVICE
+ * ️ UNIVERSAL MULTI-CHAIN HEALTH SERVICE
  * Aggregates real-time telemetry from 33+ blockchain layers.
  * GetBlock endpoints used as PRIMARY for all covered chains.
  * Public nodes used as fallback for uncovered chains.
@@ -151,7 +151,7 @@ export class MultichainHealthService {
         }
     }
 
-    public async getUniversalMatrixHealth(): Promise<ChainHealth[]> {
+    public async getUniversalGridHealth(): Promise<ChainHealth[]> {
         const healthPromises = OMNI_CHAINS.map(async (chain) => {
             const endpoint = this.getEndpoint(chain.id);
             const baseTps = this.BASELINE_TPS[chain.id] ?? 0;

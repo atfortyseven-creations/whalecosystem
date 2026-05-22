@@ -53,7 +53,7 @@ export class OnChainProtocolScanner {
 
       results.push(...mainnetResults, ...baseResults, ...optimismResults);
 
-      // 2. 🔥 UNIVERSAL DISCOVERY: Scan token holdings for yield patterns (WLFI, etc.)
+      // 2.  UNIVERSAL DISCOVERY: Scan token holdings for yield patterns (WLFI, etc.)
       const heuristicResults = await this.discoverHeuristicPositions(address, tokens);
       results.push(...heuristicResults);
 
@@ -65,7 +65,7 @@ export class OnChainProtocolScanner {
   }
 
   /**
-   * 🔥 HEURISTIC DISCOVERY ENGINE
+   *  HEURISTIC DISCOVERY ENGINE
    * Detects positions based on token names, symbols, and underlying metadata for ANY token.
    */
   private async discoverHeuristicPositions(address: `0x${string}`, tokens: any[]): Promise<OnChainPosition[]> {

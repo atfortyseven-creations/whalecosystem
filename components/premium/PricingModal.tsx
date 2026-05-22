@@ -139,14 +139,14 @@ export default function PricingModal({ isOpen, onClose, onSubscribe }: PricingMo
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles size={20} className="text-white" />
-                <h3 className="text-xl font-black text-white uppercase italic">Sovereign Access</h3>
+                <h3 className="text-xl font-black text-white uppercase italic">System Access</h3>
                 <span className="ml-auto px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-black text-white">
                   LIFETIME VIP
                 </span>
               </div>
               
               <div className="text-5xl font-black text-white mb-2 tracking-tighter">
-                1.50 €
+                1.50 
                 <span className="text-sm font-bold text-white/70 block lowercase">One-time lifetime payment</span>
               </div>
 
@@ -198,7 +198,7 @@ export default function PricingModal({ isOpen, onClose, onSubscribe }: PricingMo
 
         {/* Footer */}
         <div className="mt-6 text-center text-xs text-[#1F1F1F]/60">
-          ✓ Cancel anytime • ✓ Secure payment • ✓ 7-day money-back guarantee
+           Cancel anytime   Secure payment   7-day money-back guarantee
         </div>
       </motion.div>
     </div>

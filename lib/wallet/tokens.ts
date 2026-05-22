@@ -429,21 +429,21 @@ export async function getInstitutionalTokens(chainId: number): Promise<TokenMeta
             { address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', symbol: 'USDT', name: 'Tether USD', decimals: 6, chainId: 1, logoURI: 'https://assets.coingecko.com/coins/images/325/small/tether.png' },
             { address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', symbol: 'WBTC', name: 'Wrapped BTC', decimals: 8, chainId: 1, logoURI: 'https://assets.coingecko.com/coins/images/7598/small/wrapped_bitcoin_wbtc.png' },
             { address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', symbol: 'WETH', name: 'Wrapped Ether', decimals: 18, chainId: 1, logoURI: 'https://assets.coingecko.com/coins/images/2518/small/weth.png' },
-            { address: '0x163f8c2467924be0ae7b5347228cabf260318753', symbol: 'WLD', name: 'Worldcoin', decimals: 18, chainId: 1, logoURI: 'https://assets.coingecko.com/coins/images/31070/small/worldcoin.jpeg' }
+            { address: '0x163f8c2467924be0ae7b5347228cabf260318753', symbol: 'AUTH', name: 'Identity', decimals: 18, chainId: 1, logoURI: 'https://assets.coingecko.com/coins/images/31070/small/identity.jpeg' }
         ],
         137: [ // Polygon
             { address: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359', symbol: 'USDC', name: 'USD Coin', decimals: 6, chainId: 137, logoURI: 'https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png' },
             { address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', symbol: 'USDT', name: 'Tether USD', decimals: 6, chainId: 137, logoURI: 'https://assets.coingecko.com/coins/images/325/small/tether.png' },
             { address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', symbol: 'WETH', name: 'Wrapped Ether', decimals: 18, chainId: 137, logoURI: 'https://assets.coingecko.com/coins/images/2518/small/weth.png' },
-            { address: '0x163f8c2467924be0ae7b5347228cabf260318753', symbol: 'WLD', name: 'Worldcoin', decimals: 18, chainId: 137 }
+            { address: '0x163f8c2467924be0ae7b5347228cabf260318753', symbol: 'AUTH', name: 'Identity', decimals: 18, chainId: 137 }
         ],
         8453: [ // Base
             { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', symbol: 'USDC', name: 'USD Coin', decimals: 6, chainId: 8453, logoURI: 'https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png' },
             { address: '0x4200000000000000000000000000000000000006', symbol: 'WETH', name: 'Wrapped Ether', decimals: 18, chainId: 8453, logoURI: 'https://assets.coingecko.com/coins/images/2518/small/weth.png' },
-            { address: '0x163f8c2467924be0ae7b5347228cabf260318753', symbol: 'WLD', name: 'Worldcoin', decimals: 18, chainId: 8453 }
+            { address: '0x163f8c2467924be0ae7b5347228cabf260318753', symbol: 'AUTH', name: 'Identity', decimals: 18, chainId: 8453 }
         ],
         480: [ // World Chain
-            { address: '0x2cFc85d8E48F8EAB294be644d9E25C3030863003', symbol: 'WLD', name: 'Worldcoin', decimals: 18, chainId: 480 },
+            { address: '0x2cFc85d8E48F8EAB294be644d9E25C3030863003', symbol: 'AUTH', name: 'Identity', decimals: 18, chainId: 480 },
             { address: '0x79A02482A880bCE3F13e09Da970dC34db4CD68d7', symbol: 'USDC', name: 'USD Coin', decimals: 6, chainId: 480 },
             { address: '0x4200000000000000000000000000000000000006', symbol: 'WETH', name: 'Wrapped Ether', decimals: 18, chainId: 480 }
         ]
@@ -512,7 +512,7 @@ function getRPCUrl(chainId: number): string {
   return rpcUrls[chainId] || rpcUrls[1];
 }
 /**
- * Categorizes tokens into specific sectors for legendary intelligence analysis.
+ * Categorizes tokens into specific sectors for legendary analytics analysis.
  */
 export function getSectorForSymbol(symbol: string): string {
     const s = symbol.toUpperCase();
@@ -523,7 +523,7 @@ export function getSectorForSymbol(symbol: string): string {
         'DeFi': ['UNI', 'AAVE', 'MAKER', 'MKR', 'SNX', 'CRV', 'LQTY', 'DYDX', 'COMP', 'LDO'],
         'Stablecoin': ['USDC', 'USDT', 'DAI', 'PYUSD', 'FRAX', 'LUSD', 'USDE'],
         'Layer 1': ['ETH', 'BTC', 'SOL', 'ADA', 'DOT', 'AVAX', 'NEAR', 'BNB'],
-        'Layer 2': ['MATIC', 'POL', 'ARB', 'OP', 'BASE', 'STRK', 'METIS', 'WLD'],
+        'Layer 2': ['MATIC', 'POL', 'ARB', 'OP', 'BASE', 'STRK', 'METIS', 'AUTH'],
         'Gaming': ['IMX', 'GALA', 'BEAM', 'AXS', 'SAND', 'MANA']
 
     };

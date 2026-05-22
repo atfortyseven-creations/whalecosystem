@@ -1,14 +1,14 @@
 /**
- * PROPERTY-BASED TESTING — Z-Score Intelligence Engine
+ * PROPERTY-BASED TESTING  Z-Score Analytics Engine
  *
  * Uses fast-check to generate thousands of random inputs and verify
  * that the Z-Score engine maintains mathematical invariants under all conditions.
  *
  * Invariants tested:
- *   1. Z-Score ∈ [-10, 10] for any valid numeric input
- *   2. Monotonicity: higher volume → higher Z-Score (ceteris paribus)
+ *   1. Z-Score  [-10, 10] for any valid numeric input
+ *   2. Monotonicity: higher volume  higher Z-Score (ceteris paribus)
  *   3. Symmetry: negative deviation returns negative Z-Score
- *   4. Identity: input = mean → Z-Score = 0
+ *   4. Identity: input = mean  Z-Score = 0
  *   5. Normalization: scaled inputs produce identical Z-Score
  *   6. No NaN/Infinity for any finite numeric input
  *   7. Division-by-zero safe when std_dev = 0
@@ -17,7 +17,7 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
 
-// ── Z-Score Engine (extracted for testability) ─────────────────────────────────
+//  Z-Score Engine (extracted for testability) 
 // This is the core formula used in entity-graph-miner and whale-worker
 // to classify whale activity conviction level.
 
@@ -25,7 +25,7 @@ function computeZScore(value: number, mean: number, stdDev: number): number {
   if (!isFinite(value) || !isFinite(mean) || !isFinite(stdDev)) return 0;
   if (stdDev === 0) return 0; // Division-by-zero guard
   const z = (value - mean) / stdDev;
-  // Clamp to [-10, 10] — extreme outliers are treated as maximum conviction
+  // Clamp to [-10, 10]  extreme outliers are treated as maximum conviction
   return Math.max(-10, Math.min(10, z));
 }
 
@@ -50,9 +50,9 @@ function computeWhaleZScore(params: {
   return Math.max(-10, Math.min(10, baseZ + velocityBonus + institutionalBonus));
 }
 
-// ── Property-Based Tests ───────────────────────────────────────────────────────
+//  Property-Based Tests 
 
-describe('Z-Score Engine — Property-Based Tests (fast-check)', () => {
+describe('Z-Score Engine  Property-Based Tests (fast-check)', () => {
 
   // PROPERTY 1: Output always in [-10, 10] for any finite input
   it('P1: Z-Score always bounded in [-10, 10]', () => {
@@ -86,7 +86,7 @@ describe('Z-Score Engine — Property-Based Tests (fast-check)', () => {
     );
   });
 
-  // PROPERTY 3: Identity — value equals mean → Z-Score = 0
+  // PROPERTY 3: Identity  value equals mean  Z-Score = 0
   it('P3: Z-Score = 0 when value equals mean (for any stdDev > 0)', () => {
     fc.assert(
       fc.property(
@@ -101,8 +101,8 @@ describe('Z-Score Engine — Property-Based Tests (fast-check)', () => {
     );
   });
 
-  // PROPERTY 4: Monotonicity — higher value → higher Z-Score (same mean/stdDev)
-  it('P4: Monotonicity — larger value produces larger Z-Score', () => {
+  // PROPERTY 4: Monotonicity  higher value  higher Z-Score (same mean/stdDev)
+  it('P4: Monotonicity  larger value produces larger Z-Score', () => {
     fc.assert(
       fc.property(
         fc.tuple(
@@ -123,8 +123,8 @@ describe('Z-Score Engine — Property-Based Tests (fast-check)', () => {
     );
   });
 
-  // PROPERTY 5: Symmetry — deviation above mean = positive Z, below = negative Z
-  it('P5: Symmetry — Z(mean + Δ) = -Z(mean - Δ)', () => {
+  // PROPERTY 5: Symmetry  deviation above mean = positive Z, below = negative Z
+  it('P5: Symmetry  Z(mean + Δ) = -Z(mean - Δ)', () => {
     fc.assert(
       fc.property(
         fc.float({ noNaN: true, noDefaultInfinity: true, min: 1e3, max: 1e9 }),
@@ -140,8 +140,8 @@ describe('Z-Score Engine — Property-Based Tests (fast-check)', () => {
     );
   });
 
-  // PROPERTY 6: Division by zero → returns 0 (no exception)
-  it('P6: stdDev = 0 → Z-Score = 0 for any value', () => {
+  // PROPERTY 6: Division by zero  returns 0 (no exception)
+  it('P6: stdDev = 0  Z-Score = 0 for any value', () => {
     fc.assert(
       fc.property(
         fc.float({ noNaN: true, noDefaultInfinity: true, min: -1e12, max: 1e12 }),
@@ -188,8 +188,8 @@ describe('Z-Score Engine — Property-Based Tests (fast-check)', () => {
     );
   });
 
-  // PROPERTY 9: Scale invariance — scaling all values by same constant preserves Z-Score
-  it('P9: Scale invariance — Z(kv, km, kσ) = Z(v, m, σ)', () => {
+  // PROPERTY 9: Scale invariance  scaling all values by same constant preserves Z-Score
+  it('P9: Scale invariance  Z(kv, km, kσ) = Z(v, m, σ)', () => {
     fc.assert(
       fc.property(
         fc.float({ noNaN: true, noDefaultInfinity: true, min: 1, max: 1e6 }),

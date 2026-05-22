@@ -1,11 +1,11 @@
 /**
- * IPFS / Pinata Client — Axioma 131
- * ═══════════════════════════════════════════════════════════════
+ * IPFS / Pinata Client  Axioma 131
+ * 
  * Pinata pinning with CIDv1 content addressing.
  * Signed metadata per upload (EIP-191 wallet signature).
  * Used by: Forum media attachments, signed video tutorials,
  *           SBOM IPFS anchoring, signed update manifests.
- * ═══════════════════════════════════════════════════════════════
+ * 
  */
 
 const PINATA_API    = 'https://api.pinata.cloud';
@@ -29,7 +29,7 @@ export interface PinataError {
   message: string;
 }
 
-// ── Upload file to IPFS via Pinata ────────────────────────────────────────────
+//  Upload file to IPFS via Pinata 
 export async function pinFileToIPFS(
   file:          File | Buffer,
   filename:      string,
@@ -70,7 +70,7 @@ export async function pinFileToIPFS(
       timestamp:     new Date().toISOString(),
       mimeType,
       // signature stored as metadata for off-chain verification
-      sig: signature.slice(0, 64), // Truncated — full sig returned in response
+      sig: signature.slice(0, 64), // Truncated  full sig returned in response
     },
   });
   formData.append('pinataMetadata', pinataMetadata);
@@ -86,7 +86,7 @@ export async function pinFileToIPFS(
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(`Pinata upload failed: ${res.status} — ${err.error?.details ?? res.statusText}`);
+    throw new Error(`Pinata upload failed: ${res.status}  ${err.error?.details ?? res.statusText}`);
   }
 
   const data = await res.json();
@@ -104,7 +104,7 @@ export async function pinFileToIPFS(
   };
 }
 
-// ── Pin JSON data to IPFS (for SBOM, manifests, signed metadata) ──────────────
+//  Pin JSON data to IPFS (for SBOM, manifests, signed metadata) 
 export async function pinJSONToIPFS(
   data:    object,
   name:    string,
@@ -131,7 +131,7 @@ export async function pinJSONToIPFS(
   return { cid, gatewayUrl: `${PINATA_GW}/${cid}` };
 }
 
-// ── Unpin (GDPR right-to-forget compatible) ───────────────────────────────────
+//  Unpin (GDPR right-to-forget compatible) 
 export async function unpinFromIPFS(cid: string): Promise<void> {
   if (!PINATA_JWT) throw new Error('PINATA_JWT not configured');
   const res = await fetch(`${PINATA_API}/pinning/unpin/${cid}`, {
@@ -143,7 +143,7 @@ export async function unpinFromIPFS(cid: string): Promise<void> {
   }
 }
 
-// ── Verify CID integrity (fetch and hash-check) ───────────────────────────────
+//  Verify CID integrity (fetch and hash-check) 
 export async function verifyCIDIntegrity(cid: string): Promise<boolean> {
   try {
     const res = await fetch(`${PINATA_GW}/${cid}`, { method: 'HEAD' });
@@ -153,7 +153,7 @@ export async function verifyCIDIntegrity(cid: string): Promise<boolean> {
   }
 }
 
-// ── Gateway URL builder ───────────────────────────────────────────────────────
+//  Gateway URL builder 
 export function ipfsUrl(cid: string): string {
   return `${PINATA_GW}/${cid}`;
 }

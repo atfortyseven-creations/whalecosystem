@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 
 const WhaleChatPINGate = dynamic(() => import('@/components/chat/WhaleChatPINGate'), { ssr: false });
-const SovereignChat = dynamic(() => import('@/components/dashboard/SovereignChat'), { ssr: false });
+const SystemChat = dynamic(() => import('@/components/dashboard/SystemChat'), { ssr: false });
 
 export default function ChatClientPage() {
   const [entered, setEntered] = useState(false);
@@ -15,7 +15,7 @@ export default function ChatClientPage() {
       {!entered ? (
         <WhaleChatPINGate key="gate" onEnter={() => setEntered(true)} />
       ) : (
-        <SovereignChat key="chat" onReturnToGate={() => setEntered(false)} />
+        <SystemChat key="chat" onReturnToGate={() => setEntered(false)} />
       )}
     </AnimatePresence>
   );

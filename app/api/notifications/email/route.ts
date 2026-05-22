@@ -30,17 +30,17 @@ export async function POST(request: NextRequest) {
     // Format email based on type
     switch (type) {
       case 'whale_alert':
-        subject = `🐋 Whale Alert: $${safeToLocaleString(data.amount)} Movement`;
+        subject = ` Whale Alert: $${safeToLocaleString(data.amount)} Movement`;
         html = formatWhaleAlertEmail(data);
         break;
       
       case 'price_alert':
-        subject = `📊 Price Alert: ${data.token} ${data.condition} $${data.targetPrice}`;
+        subject = ` Price Alert: ${data.token} ${data.condition} $${data.targetPrice}`;
         html = formatPriceAlertEmail(data);
         break;
       
       case 'daily_digest':
-        subject = `📈 Daily Digest: ${data.walletsTracked} Wallets Tracked`;
+        subject = ` Daily Digest: ${data.walletsTracked} Wallets Tracked`;
         html = formatDailyDigestEmail(data);
         break;
       
@@ -108,18 +108,18 @@ function formatWhaleAlertEmail(data: {
 <body>
   <div class="container">
     <div class="header">
-      <h1>🐋 Whale Alert</h1>
+      <h1> Whale Alert</h1>
     </div>
     <div class="content">
       <p>A significant transaction has been detected on one of your tracked wallets.</p>
       
       <div class="stat">
-        <div class="stat-label">💰 Amount</div>
+        <div class="stat-label"> Amount</div>
         <div class="stat-value">$${safeToLocaleString(data.amount)}</div>
       </div>
       
       <div class="stat">
-        <div class="stat-label">🔄 Type</div>
+        <div class="stat-label"> Type</div>
         <div class="stat-value">${data.type}</div>
       </div>
       
@@ -129,7 +129,7 @@ function formatWhaleAlertEmail(data: {
       </div>
       
       <div class="stat">
-        <div class="stat-label">📍 Wallet</div>
+        <div class="stat-label"> Wallet</div>
         <div class="stat-value" style="font-size: 14px; font-family: monospace;">${data.address}</div>
       </div>
       
@@ -151,7 +151,7 @@ function formatPriceAlertEmail(data: {
   targetPrice: number;
   condition: string;
 }): string {
-  const emoji = data.condition === 'above' ? '📈' : '📉';
+  const emoji = data.condition === 'above' ? '' : '';
   
   return `
 <!DOCTYPE html>
@@ -182,12 +182,12 @@ function formatPriceAlertEmail(data: {
       </div>
       
       <div class="stat">
-        <div class="stat-label">💵 Current Price</div>
+        <div class="stat-label"> Current Price</div>
         <div class="stat-value">$${safeToLocaleString(data.currentPrice)}</div>
       </div>
       
       <div class="stat">
-        <div class="stat-label">🎯 Target Price</div>
+        <div class="stat-label"> Target Price</div>
         <div class="stat-value">$${safeToLocaleString(data.targetPrice)}</div>
       </div>
     </div>
@@ -206,7 +206,7 @@ function formatDailyDigestEmail(data: {
   const topMoversList = data.topMovers
     .slice(0, 5)
     .map((m, i) => {
-      const emoji = m.change > 0 ? '📈' : '📉';
+      const emoji = m.change > 0 ? '' : '';
       return `
         <div style="padding: 10px; margin: 5px 0; background: ${m.change > 0 ? '#d4edda' : '#f8d7da'}; border-radius: 8px;">
           ${i + 1}. <code>${m.address.slice(0, 10)}...${m.address.slice(-8)}</code>
@@ -234,25 +234,25 @@ function formatDailyDigestEmail(data: {
 <body>
   <div class="container">
     <div class="header">
-      <h1>📊 Daily Digest</h1>
+      <h1> Daily Digest</h1>
     </div>
     <div class="content">
       <div class="stat">
-        <div class="stat-label">👀 Wallets Tracked</div>
+        <div class="stat-label"> Wallets Tracked</div>
         <div class="stat-value">${data.walletsTracked}</div>
       </div>
       
       <div class="stat">
-        <div class="stat-label">💰 Total Value</div>
+        <div class="stat-label"> Total Value</div>
         <div class="stat-value">$${safeToFixed(data.totalValue / 1e6, 2)}M</div>
       </div>
       
       <div class="stat">
-        <div class="stat-label">⚡ 24h Transactions</div>
+        <div class="stat-label"> 24h Transactions</div>
         <div class="stat-value">${data.transactions24h}</div>
       </div>
       
-      <h3 style="margin-top: 30px;">🏆 Top Movers</h3>
+      <h3 style="margin-top: 30px;"> Top Movers</h3>
       ${topMoversList}
     </div>
   </div>

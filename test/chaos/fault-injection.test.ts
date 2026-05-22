@@ -1,20 +1,20 @@
 // @ts-nocheck
 /**
- * Chaos Engineering Test Suite — Axioma 282
- * ═══════════════════════════════════════════════════════════════
+ * Chaos Engineering Test Suite  Axioma 282
+ * 
  * Fault injection tests targeting:
  *   - Redis unavailability (circuit breaker activation)
- *   - Neo4j latency → Memory Matrix fallback
- *   - WebSocket connection drops → reconnect logic
+ *   - Neo4j latency  Memory Grid fallback
+ *   - WebSocket connection drops  reconnect logic
  *   - Stripe webhook retry behavior
  *   - JWT expiry under race conditions
  *   - Network partition simulation
- * ═══════════════════════════════════════════════════════════════
+ * 
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// ── Mock Redis client ─────────────────────────────────────────────────────────
+//  Mock Redis client 
 vi.mock('@/lib/redis/client', () => ({
   redis: {
     get:     vi.fn(),
@@ -28,7 +28,7 @@ vi.mock('@/lib/redis/client', () => ({
   },
 }));
 
-// ── Mock Neo4j client ─────────────────────────────────────────────────────────
+//  Mock Neo4j client 
 vi.mock('@/lib/neo4j/client', () => ({
   neo4jClient: {
     session: vi.fn(() => ({
@@ -39,9 +39,9 @@ vi.mock('@/lib/neo4j/client', () => ({
   },
 }));
 
-describe('Chaos Engineering — Fault Injection Suite (Axioma 282)', () => {
+describe('Chaos Engineering  Fault Injection Suite (Axioma 282)', () => {
 
-  // ── SCENARIO 1: Redis complete failure ───────────────────────────────────────
+  //  SCENARIO 1: Redis complete failure 
   describe('Redis Unavailability', () => {
     it('Feature flag engine falls back to env vars when Redis throws', async () => {
       const { redis } = await import('@/lib/redis/client');
@@ -80,7 +80,7 @@ describe('Chaos Engineering — Fault Injection Suite (Axioma 282)', () => {
     });
   });
 
-  // ── SCENARIO 2: Neo4j latency → Memory Matrix fallback ───────────────────────
+  //  SCENARIO 2: Neo4j latency  Memory Grid fallback 
   describe('Neo4j Graceful Degradation (Axioma 18)', () => {
     it('Returns empty entity graph when Neo4j session fails', async () => {
       const { neo4jClient } = await import('@/lib/neo4j/client');
@@ -90,7 +90,7 @@ describe('Chaos Engineering — Fault Injection Suite (Axioma 282)', () => {
       };
       vi.mocked(neo4jClient.session).mockReturnValue(mockSession as never);
 
-      // Import a function that uses Neo4j — it should degrade gracefully
+      // Import a function that uses Neo4j  it should degrade gracefully
       const { queryEntityGraph } = await import('@/lib/neo4j/cypher').catch(() => ({
         queryEntityGraph: async () => ({ nodes: [], edges: [] }),
       }));
@@ -101,7 +101,7 @@ describe('Chaos Engineering — Fault Injection Suite (Axioma 282)', () => {
     });
   });
 
-  // ── SCENARIO 3: JWT expiry race condition ─────────────────────────────────────
+  //  SCENARIO 3: JWT expiry race condition 
   describe('JWT Expiry Under Load (Axioma 32)', () => {
     it('Concurrent JWT verifications do not cross-contaminate', async () => {
       const wallets = ['0xaaa', '0xbbb', '0xccc', '0xddd', '0xeee'];
@@ -119,7 +119,7 @@ describe('Chaos Engineering — Fault Injection Suite (Axioma 282)', () => {
     });
   });
 
-  // ── SCENARIO 4: Network partition (external API) ──────────────────────────────
+  //  SCENARIO 4: Network partition (external API) 
   describe('External API Network Partition', () => {
     it('Whale flow service returns cached data when API unreachable', async () => {
       const originalFetch = global.fetch;
@@ -137,7 +137,7 @@ describe('Chaos Engineering — Fault Injection Suite (Axioma 282)', () => {
     });
   });
 
-  // ── SCENARIO 5: Resilience scoring ───────────────────────────────────────────
+  //  SCENARIO 5: Resilience scoring 
   describe('Resilience Score Validation (SLA 99.999%)', () => {
     it('Circuit breaker activates after threshold failures', async () => {
       const { CircuitBreaker } = await import('@/lib/resilience/circuit-breaker');
@@ -183,7 +183,7 @@ describe('Chaos Engineering — Fault Injection Suite (Axioma 282)', () => {
   });
 });
 
-// ── Resilience score calculator ───────────────────────────────────────────────
+//  Resilience score calculator 
 export function computeResilienceScore(results: {
   scenario: string;
   passed:   boolean;

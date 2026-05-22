@@ -4,13 +4,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Fingerprint, Key, CheckCircle2, QrCode, Copy, UserCheck } from 'lucide-react';
-import { useSovereignFormatter } from '@/hooks/useSovereignFormatter';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemFormatter } from '@/hooks/useSystemFormatter';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { toast } from 'sonner';
 
 export default function CryptographicID() {
   const { address, isConnected } = useAccount();
-  const { formatAddress } = useSovereignFormatter();
+  const { formatAddress } = useSystemFormatter();
   const [isRotating, setIsRotating] = useState(false);
 
   const handleRotateKeys = () => {
@@ -25,7 +25,7 @@ export default function CryptographicID() {
   return (
     <div className="h-full w-full min-h-0 bg-black text-white font-mono flex flex-col p-8 gap-8">
       
-      {/* ── ACADEMIC INTRO ── */}
+      {/*  ACADEMIC INTRO  */}
       <div className="border border-white/5 bg-white/[0.01] p-6 flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-blue-500/10 border border-blue-500/20 text-blue-500">
@@ -40,7 +40,7 @@ export default function CryptographicID() {
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Identity Matrix */}
+        {/* Identity Grid */}
         <div className="lg:col-span-2 space-y-8">
           
           <div className="border border-white/5 bg-white/[0.02] p-8 space-y-8">
@@ -105,7 +105,7 @@ export default function CryptographicID() {
               </div>
               <span className="text-[8px] text-white/20 uppercase tracking-widest block mb-4">Mobile_Handshake_Node</span>
               <p className="text-[9px] text-white/40 leading-relaxed uppercase tracking-widest">
-                 Scan with Sovereign Mobile to synchronize your biometric identity with the terminal.
+                 Scan with System Mobile to synchronize your biometric identity with the terminal.
               </p>
            </div>
            
@@ -126,9 +126,9 @@ export default function CryptographicID() {
 
       </div>
 
-      {/* ── FOOTER ── */}
+      {/*  FOOTER  */}
       <div className="mt-auto border-t border-white/5 pt-4 flex justify-between items-center text-[8px] text-white/20 uppercase tracking-[0.5em]">
-         <span>Sovereign_ID_v3.1_Production</span>
+         <span>System_ID_v3.1_Production</span>
          <span>Security_Rating:_SSS</span>
       </div>
 

@@ -32,13 +32,13 @@ const stripeWorker = new Worker('stripe-webhook', async (job) => {
 
     // Check if it's a subscription mode checkout
     if (session.mode === 'subscription') {
-      const walletAddress = session.metadata?.userId || session.metadata?.sovereign_user_id || session.subscription_data?.metadata?.sovereign_user_id;
+      const walletAddress = session.metadata?.userId || session.metadata?.system_user_id || session.subscription_data?.metadata?.system_user_id;
       const planId = session.metadata?.tier || session.metadata?.plan_id;
       const customerId = session.customer;
       const subscriptionId = session.subscription;
 
       if (!walletAddress || !planId) {
-        throw new Error('Missing sovereign metadata in checkout session');
+        throw new Error('Missing system metadata in checkout session');
       }
 
       // Update Prisma
@@ -53,7 +53,7 @@ const stripeWorker = new Worker('stripe-webhook', async (job) => {
 
       // Update Redis cache & emit mesh bus event
       await redisClient.setex(`tier:${walletAddress}`, 600, planId.toUpperCase());
-      await redisClient.publish('sovereign_mesh_auth_bus', JSON.stringify({
+      await redisClient.publish('system_mesh_auth_bus', JSON.stringify({
         event: 'LICENSE_UPGRADED',
         wallet: walletAddress,
         tier: planId.toUpperCase()
@@ -84,7 +84,7 @@ const stripeWorker = new Worker('stripe-webhook', async (job) => {
       
       await redisClient.setex(`tier:${dbUser.walletAddress}`, 600, 'FREE');
       await redisClient.del(`human_session:${dbUser.walletAddress}`);
-      await redisClient.publish('sovereign_mesh_auth_bus', JSON.stringify({
+      await redisClient.publish('system_mesh_auth_bus', JSON.stringify({
         event: 'LICENSE_REVOKED',
         wallet: dbUser.walletAddress,
         tier: 'FREE'

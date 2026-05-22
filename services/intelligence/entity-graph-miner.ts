@@ -54,14 +54,14 @@ export class EntityGraphMiner {
             );
             console.log('[GRAPH-MINER] Connected to Neo4j Multi-Dimensional Index.');
         } else {
-            console.log('[GRAPH-MINER] Initializing deterministic Memory Matrix Mode (Local)');
+            console.log('[GRAPH-MINER] Initializing deterministic Memory Grid Mode (Local)');
         }
     }
 
     /**
-     * Memory Matrix Mode (PostgreSQL-only fallback).
+     * Memory Grid Mode (PostgreSQL-only fallback).
      * Returns REAL wallet nodes from the database.
-     * Links are EMPTY — we never fabricate topology.
+     * Links are EMPTY  we never fabricate topology.
      * The frontend renders nodes as isolated points until Neo4j provides real edges.
      */
     public async mineLocalNetworkGraph(): Promise<GraphResult> {
@@ -172,13 +172,13 @@ export class EntityGraphMiner {
                 console.log(`[GRAPH-MINER] LIVE Neo4j: ${graph.nodeCount} nodes, ${graph.linkCount} real relationships.`);
                 return graph;
             } catch (err: any) {
-                console.warn(`[GRAPH-MINER] Neo4j unavailable (${err.message}). Activating Memory Matrix Mode (nodes only, zero fabrication).`);
+                console.warn(`[GRAPH-MINER] Neo4j unavailable (${err.message}). Activating Memory Grid Mode (nodes only, zero fabrication).`);
                 const graph = await this.mineLocalNetworkGraph();
                 console.log(`[GRAPH-MINER] MEMORY_MATRIX: ${graph.nodeCount} nodes, 0 links (Zero-Simulation Mandate enforced).`);
                 return graph;
             }
         } else {
-            console.log('[GRAPH-MINER] No Neo4j driver. Memory Matrix Mode (nodes only).');
+            console.log('[GRAPH-MINER] No Neo4j driver. Memory Grid Mode (nodes only).');
             const graph = await this.mineLocalNetworkGraph();
             console.log(`[GRAPH-MINER] MEMORY_MATRIX: ${graph.nodeCount} nodes, 0 links (Zero-Simulation Mandate enforced).`);
             return graph;

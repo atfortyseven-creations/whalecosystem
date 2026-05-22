@@ -147,7 +147,7 @@ export function BRCExplorerShell() {
                 {!selected ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-[#888] bg-[url('/img/grid.svg')] bg-center bg-repeat opacity-50">
                         <FileText size={48} className="mb-6 opacity-20" />
-                        <h2 className="text-xl font-black text-[#111] tracking-tighter uppercase mb-2">Sovereign Knowledge Base</h2>
+                        <h2 className="text-xl font-black text-[#111] tracking-tighter uppercase mb-2">System Knowledge Base</h2>
                         <p className="text-[11px] font-mono font-bold max-w-sm text-center">Select a BRC standard from the topological index to view the on-chain specification.</p>
                     </div>
                 ) : (

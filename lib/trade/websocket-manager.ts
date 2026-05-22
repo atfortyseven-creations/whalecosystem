@@ -57,7 +57,7 @@ export class WebSocketManager {
         this.ws = new WebSocket(url);
 
         this.ws.onopen = () => {
-          console.log('[WS] ✅ Connected successfully');
+          console.log('[WS]  Connected successfully');
           this.isConnected = true;
           this.reconnectAttempts = 0;
           this.reconnectDelay = 1000;
@@ -157,7 +157,7 @@ export class WebSocketManager {
     // 50-Year Continuity: Never stop reconnecting. Cap delay at 60 seconds to prevent OOM/DDoS, but guarantee infinite uptime loop.
     const delay = Math.min(this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts), 60000);
     
-    console.log(`[WS] Reconnecting in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts} — Sovereign Infinity Loop)`);
+    console.log(`[WS] Reconnecting in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts}  System Infinity Loop)`);
 
     setTimeout(() => {
       this.connect(streams);

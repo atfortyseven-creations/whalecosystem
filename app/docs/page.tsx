@@ -77,7 +77,7 @@ export default function DocsPage() {
     <div className="w-full min-h-screen bg-[#FAFAF8] text-black font-sans selection:bg-black/10">
       <div className="max-w-[1200px] mx-auto py-24 px-6 lg:px-12 flex flex-col items-center">
 
-        {/* ── MASSIVE BENTO HERO ── */}
+        {/*  MASSIVE BENTO HERO  */}
         <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }} className="w-full flex flex-col items-center text-center gap-8 mb-24">
           
           <motion.div variants={FADE_UP} className="w-full flex flex-col items-center">
@@ -97,7 +97,7 @@ export default function DocsPage() {
           </motion.div>
         </motion.div>
 
-        {/* ── QUICK LINKS ── */}
+        {/*  QUICK LINKS  */}
         <motion.div initial="hidden" animate="visible" variants={FADE_UP} className="w-full mb-24">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-black/40 mb-8 flex items-center justify-center gap-2">
               <Zap size={14} /> Quick System Access
@@ -123,7 +123,7 @@ export default function DocsPage() {
           </div>
         </motion.div>
 
-        {/* ── SECTION CARDS ── */}
+        {/*  SECTION CARDS  */}
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="w-full mb-24">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-black/40 mb-8 flex items-center justify-center gap-2">
               <Network size={14} /> System Architecture
@@ -160,7 +160,7 @@ export default function DocsPage() {
           </div>
         </motion.div>
 
-        {/* ── PLATFORM INFO ── */}
+        {/*  PLATFORM INFO  */}
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="w-full border-t border-black/5 pt-24 pb-24 grid grid-cols-1 sm:grid-cols-3 gap-16 text-center">
           {[
             { value: '14+', label: 'Networks Supported' },

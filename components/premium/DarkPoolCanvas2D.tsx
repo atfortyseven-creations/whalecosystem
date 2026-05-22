@@ -1,20 +1,20 @@
 "use client";
 
 /**
- * ╔══════════════════════════════════════════════════════════════════════╗
- * ║        DARK POOL — HOURGLASS PHYSICS ENGINE  v2.0                   ║
- * ║        by WhaleAlert ID.fi · Elite Intelligence Layer             ║
- * ╠══════════════════════════════════════════════════════════════════════╣
- * ║  Architecture:                                                       ║
- * ║  • Dual-buffer rendering (motion blur via alpha compositing)         ║
- * ║  • Per-grain Verlet physics: gravity, wall normals, friction         ║
- * ║  • Signed-distance-field hourglass boundary — sub-pixel accurate     ║
- * ║  • Bloom pass: additive layered radial gradients per grain           ║
- * ║  • Chromatic aberration simulation for whale-class transactions      ║
- * ║  • Heat-map pool: accumulating glow at settling zone                 ║
- * ║  • Spatial hash grid for O(n) collision broad-phase                  ║
- * ║  • 60fps locked via rAF + delta-time clamping                        ║
- * ╚══════════════════════════════════════════════════════════════════════╝
+ * 
+ *         DARK POOL  HOURGLASS PHYSICS ENGINE  v2.0                   
+ *         by WhaleAlert ID.fi · Elite Analytics Layer             
+ * 
+ *   Architecture:                                                       
+ *    Dual-buffer rendering (motion blur via alpha compositing)         
+ *    Per-grain Verlet physics: gravity, wall normals, friction         
+ *    Signed-distance-field hourglass boundary  sub-pixel accurate     
+ *    Bloom pass: additive layered radial gradients per grain           
+ *    Chromatic aberration simulation for whale-class transactions      
+ *    Heat-map pool: accumulating glow at settling zone                 
+ *    Spatial hash grid for O(n) collision broad-phase                  
+ *    60fps locked via rAF + delta-time clamping                        
+ * 
  */
 
 import React, {
@@ -29,9 +29,9 @@ import { Zap } from "lucide-react";
 import { useVIPStore, WhaleEvent } from "@/lib/vip-store";
 import { usePerformanceMode, shouldRenderFrame } from "@/hooks/usePerformanceMode";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // CONFIG
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 const CFG = {
   MAX_GRAINS: 320,        // Runtime-scaled down via particleScale
   BASE_MAX_GRAINS: 320,   // Baseline (plugged in, HIGH mode)
@@ -47,16 +47,16 @@ const CFG = {
   DEPTH_LAYERS: 3,           
 } as const;
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // TYPES
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 type Phase = "falling" | "necking" | "pooling" | "settling" | "dissolving";
 
 interface Grain {
   // identity
   id: number;
   isWhale: boolean;
-  heat: number;           // 0 cold → 1 whale-red
+  heat: number;           // 0 cold  1 whale-red
   // physics (Verlet)
   x: number; y: number;
   px: number; py: number; // previous position
@@ -72,17 +72,17 @@ interface Grain {
   glowPulse: number;      // unique phase offset for bloom animation
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // MATH UTILS
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 let _uid = 0;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COLOR SYSTEM — perceptually uniform palette
-// cold(navy) → mid(violet) → hot(crimson) → supra(gold for mega-whale)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// COLOR SYSTEM  perceptually uniform palette
+// cold(navy)  mid(violet)  hot(crimson)  supra(gold for mega-whale)
+// 
 function heatRGB(t: number): [number, number, number] {
   t = clamp(t, 0, 1);
   if (t < 0.33) {
@@ -95,7 +95,7 @@ function heatRGB(t: number): [number, number, number] {
     const s = (t - 0.66) / 0.22;
     return [lerp(140, 200, s), lerp(40, 60, s), lerp(200, 100, s)]; // Soft crimson/pink
   } else {
-    // mega-whale → soft gold
+    // mega-whale  soft gold
     const s = (t - 0.88) / 0.12;
     return [lerp(200, 230, s), lerp(60, 180, s), lerp(100, 40, s)];
   }
@@ -106,11 +106,11 @@ function rgba(t: number, a: number): string {
   return `rgba(${r|0},${g|0},${b|0},${a.toFixed(3)})`;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HOURGLASS SDF — signed distance field
+// 
+// HOURGLASS SDF  signed distance field
 // Returns the maximum allowed half-width at Y coordinate y in [0, H]
 // Positive = inside hourglass
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 function hourglassMaxHalfWidth(
   y: number, H: number, W: number,
   neckY: number, neckHW: number, chamberHW: number
@@ -119,19 +119,19 @@ function hourglassMaxHalfWidth(
   const botFrac = Math.max(0, Math.min(1, (y - neckY) / (0.97 * H - neckY)));
 
   if (y < neckY) {
-    // top chamber: wide at top, narrows to neck — use smooth ease-in
+    // top chamber: wide at top, narrows to neck  use smooth ease-in
     const ease = topFrac * topFrac * (3 - 2 * topFrac); // smoothstep
     return lerp(chamberHW, neckHW, ease);
   } else {
-    // bottom chamber: neck widens to bottom — eases out
+    // bottom chamber: neck widens to bottom  eases out
     const ease = botFrac * botFrac * (3 - 2 * botFrac);
     return lerp(neckHW, chamberHW, ease);
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // GRAIN FACTORY
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 function makeGrain(W: number, H: number, neckX: number, chamberHW: number, isWhale = false, label?: string): Grain {
   // Deterministic seeds based on label or fallback
   const s = label ? label.charCodeAt(0) + label.length : 42;
@@ -168,14 +168,14 @@ function makeGrain(W: number, H: number, neckX: number, chamberHW: number, isWha
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SPATIAL HASH — broad phase for wall constraint (not grain-grain)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// SPATIAL HASH  broad phase for wall constraint (not grain-grain)
+// 
 // (We skip grain-grain collision for perf at 320 grains, but wall SDF is exact)
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // MAIN DRAW ENGINE
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 function runFrame(
   ctx: CanvasRenderingContext2D,
   W: number, H: number,
@@ -184,28 +184,28 @@ function runFrame(
   dt: number,
   skipBloom = false,
 ) {
-  // ── Geometry constants ────────────────────────────────────────────────────
+  //  Geometry constants 
   const neckX = W / 2;
   const neckY = H * 0.5;
   const neckHW = W * 0.032;
   const chamberHW = W * 0.34;
 
-  // ── Motion blur wipe ──────────────────────────────────────────────────────
+  //  Motion blur wipe 
   ctx.fillStyle = `rgba(4,6,16,${CFG.MOTION_BLUR_ALPHA})`;
   ctx.fillRect(0, 0, W, H);
 
-  // ── Background: subtle Perlin-esque depth gradient ────────────────────────
-  // Two radial gradients — top and bottom chamber atmosphere
+  //  Background: subtle Perlin-esque depth gradient 
+  // Two radial gradients  top and bottom chamber atmosphere
   const topAtm = ctx.createRadialGradient(neckX, H * 0.22, 0, neckX, H * 0.22, H * 0.35);
   topAtm.addColorStop(0, `rgba(40,30,90,${0.08 + Math.sin(t * 0.4) * 0.03})`);
   topAtm.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = topAtm;
   ctx.fillRect(0, 0, W, H);
 
-  // ── Hourglass structural lines ────────────────────────────────────────────
+  //  Hourglass structural lines 
   drawHourglassFrame(ctx, W, H, neckX, neckY, neckHW, chamberHW, t);
 
-  // ── Physics step: update grains ───────────────────────────────────────────
+  //  Physics step: update grains 
   const settled: Grain[] = [];
 
   for (const g of grains) {
@@ -218,7 +218,7 @@ function runFrame(
       continue;
     }
 
-    // ── Verlet integration ────────────────────────────────────────────────
+    //  Verlet integration 
     const vx = (g.x - g.px) * CFG.FRICTION;
     const vy = (g.y - g.py) * CFG.FRICTION;
     g.px = g.x;
@@ -226,7 +226,7 @@ function runFrame(
     g.x += vx;
     g.y += vy + CFG.GRAVITY * dt * 2;
 
-    // ── Phase transitions ─────────────────────────────────────────────────
+    //  Phase transitions 
     if (g.y >= neckY - H * 0.005 && g.y < neckY + H * 0.04) {
       if (g.phase === "falling") g.phase = "necking";
     } else if (g.y >= neckY + H * 0.04 && g.phase === "necking") {
@@ -237,13 +237,13 @@ function runFrame(
       g.phase = "dissolving";
     }
 
-    // ── Neck funneling force ──────────────────────────────────────────────
+    //  Neck funneling force 
     if (g.phase === "falling" && g.y > neckY - H * 0.12) {
       const pullStrength = CFG.NECK_SOFTNESS * Math.pow(1 - (neckY - g.y) / (H * 0.12), 2);
       g.x += (neckX - g.x) * pullStrength;
     }
 
-    // ── Wall constraint (SDF) ─────────────────────────────────────────────
+    //  Wall constraint (SDF) 
     const maxHW = hourglassMaxHalfWidth(g.y, H, W, neckY, neckHW, chamberHW);
     const leftWall = neckX - maxHW + g.r;
     const rightWall = neckX + maxHW - g.r;
@@ -257,7 +257,7 @@ function runFrame(
       g.px = g.x + (g.x - g.px) * CFG.RESTITUTION;
     }
 
-    // ── Floor at settling zone ────────────────────────────────────────────
+    //  Floor at settling zone 
     if (g.y > H * 0.94) {
       g.y = H * 0.94;
       g.py = g.y + (g.y - g.py) * 0.1;
@@ -274,7 +274,7 @@ function runFrame(
     settled.push(g);
   }
 
-  // ── Pool accumulated glow ─────────────────────────────────────────────────
+  //  Pool accumulated glow 
   const settlingCount = grains.filter(g => g.phase === "settling" || g.phase === "dissolving").length;
   if (settlingCount > 5) {
     const intensity = clamp(settlingCount / 80, 0, 1);
@@ -294,7 +294,7 @@ function runFrame(
     ctx.fillRect(0, H * 0.55, W, H * 0.45);
   }
 
-  // ── Render grains — depth-sorted ──────────────────────────────────────────
+  //  Render grains  depth-sorted 
   const sorted = [...grains].sort((a, b) => a.depth - b.depth);
 
   for (const g of sorted) {
@@ -302,7 +302,7 @@ function runFrame(
     const effAlpha = clamp(g.alpha, 0, 1);
     const pulse = 0.5 + 0.5 * Math.sin(t * 2.2 + g.glowPulse);
 
-    // ── Bloom rings (additive glow) ─────────────────────────────────────
+    //  Bloom rings (additive glow) 
     if (!skipBloom && (g.r > 2 || g.isWhale)) {
       const bloomCount = g.isWhale ? CFG.BLOOM_LAYERS + 2 : CFG.BLOOM_LAYERS;
       for (let b = bloomCount; b >= 1; b--) {
@@ -316,7 +316,7 @@ function runFrame(
       }
     }
 
-    // ── Chromatic aberration for whales (HIGH mode only) ───────────────────
+    //  Chromatic aberration for whales (HIGH mode only) 
     if (!skipBloom && g.isWhale) {
       const aberr = 2.5 + pulse * 1.5;
       ctx.beginPath();
@@ -329,7 +329,7 @@ function runFrame(
       ctx.fill();
     }
 
-    // ── Core grain ────────────────────────────────────────────────────────
+    //  Core grain 
     const coreGrad = ctx.createRadialGradient(
       g.x - g.r * 0.3, g.y - g.r * 0.3, 0,
       g.x, g.y, g.r * 1.1
@@ -349,7 +349,7 @@ function runFrame(
     ctx.fillStyle = `rgba(255,255,255,${effAlpha * 0.18})`;
     ctx.fill();
 
-    // ── Whale labels ──────────────────────────────────────────────────────
+    //  Whale labels 
     if (g.label && g.labelAlpha > 0.03) {
       ctx.save();
       ctx.font = `bold 8px 'SF Mono', 'Fira Code', monospace`;
@@ -360,7 +360,7 @@ function runFrame(
     }
   }
 
-  // ── Neck pulse glow (reacts to how many grains are passing through) ───────
+  //  Neck pulse glow (reacts to how many grains are passing through) 
   const neckCount = grains.filter(g => g.phase === "necking").length;
   if (neckCount > 0) {
     const ni = clamp(neckCount / 12, 0, 1);
@@ -372,7 +372,7 @@ function runFrame(
     ctx.fillRect(0, neckY - neckHW * 8, W, neckHW * 16);
   }
 
-  // ── Vignette ──────────────────────────────────────────────────────────────
+  //  Vignette 
   const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.2, W / 2, H / 2, H * 0.85);
   vig.addColorStop(0, "rgba(0,0,0,0)");
   vig.addColorStop(1, "rgba(2,4,14,0.6)");
@@ -380,9 +380,9 @@ function runFrame(
   ctx.fillRect(0, 0, W, H);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // HOURGLASS FRAME RENDERER
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 function drawHourglassFrame(
   ctx: CanvasRenderingContext2D,
   W: number, H: number,
@@ -399,7 +399,7 @@ function drawHourglassFrame(
   const nL = neckX - neckHW;
   const nR = neckX + neckHW;
 
-  // Glass cabinet lines — hair-thin, very subtle
+  // Glass cabinet lines  hair-thin, very subtle
   ctx.save();
   ctx.lineWidth = 0.8;
   ctx.setLineDash([]);
@@ -424,7 +424,7 @@ function drawHourglassFrame(
   ctx.bezierCurveTo(topR - chamberHW * 0.1, neckY * 0.6, nR + chamberHW * 0.05, neckY * 0.85, nR, neckY);
   ctx.stroke();
 
-  // Bottom chamber — mirrored
+  // Bottom chamber  mirrored
   ctx.strokeStyle = `rgba(80,60,160,${0.10 + Math.sin(t * 0.5) * 0.03})`;
   ctx.beginPath();
   ctx.moveTo(nL, neckY);
@@ -455,9 +455,9 @@ function drawHourglassFrame(
   ctx.restore();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 export function DarkPoolCanvas2D() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -478,7 +478,7 @@ export function DarkPoolCanvas2D() {
   const flowBucketRef = useRef<number[]>([]);
   const lastUpdateRef = useRef(0);
 
-  // ── Sync with Global Store ────────────────────────────────────────────────
+  //  Sync with Global Store 
   useEffect(() => {
     if (lastWhaleUpdate === lastUpdateRef.current) return;
     lastUpdateRef.current = lastWhaleUpdate;
@@ -503,7 +503,7 @@ export function DarkPoolCanvas2D() {
     });
   }, [lastWhaleUpdate, whaleEvents]);
 
-  // ── Render loop ───────────────────────────────────────────────────────────
+  //  Render loop 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -529,7 +529,7 @@ export function DarkPoolCanvas2D() {
     animRef.current = requestAnimationFrame(draw);
   }, []);
 
-  // ── Canvas resize ─────────────────────────────────────────────────────────
+  //  Canvas resize 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -561,7 +561,7 @@ export function DarkPoolCanvas2D() {
     <div className="w-full h-full bg-[#020408] rounded-[48px] overflow-hidden border border-white/[0.04] relative shadow-[0_0_120px_rgba(80,60,200,0.12)] group">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
       
-      {/* ── LEGENDARY OVERLAY ────────────────────────────────────────────────── */}
+      {/*  LEGENDARY OVERLAY  */}
       <div className="absolute inset-x-8 top-8 flex justify-between items-start pointer-events-none">
           <div>
               <div className="flex items-center gap-3 mb-2">
@@ -603,7 +603,7 @@ export function DarkPoolCanvas2D() {
           </div>
       </div>
 
-      {/* ── SCAN LINES ───────────────────────────────────────────────────────── */}
+      {/*  SCAN LINES  */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
           <div className="w-full h-[1px] bg-white/10 absolute top-1/4 animate-[scan_8s_linear_infinite]" />
           <div className="w-full h-[1px] bg-white/10 absolute top-2/4 animate-[scan_12s_linear_infinite_reverse]" />

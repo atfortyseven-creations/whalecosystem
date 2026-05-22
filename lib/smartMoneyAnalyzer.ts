@@ -134,12 +134,12 @@ function calculateTradeSizeScore(avgUSD: number): number {
 
 function generateInsights(data: any): string[] {
   const insights: string[] = [];
-  if (data.txCount > 500) insights.push(`🔥 Power User: High transaction frequency detected`);
-  if (data.avgTradeUSD > 10000) insights.push(`🐋 Significant capital: Average trade size is Elite level`);
-  if (data.winRate > 60) insights.push(`✅ Profitable: Historic performance indicates high win rate`);
-  if (data.ageDays > 730) insights.push(`🏆 Veteran: Wallet has been active for over 2 years`);
-  if (data.tokenCount > 15) insights.push(`🌈 Diversified: Strategic allocation across multiple assets`);
-  return insights.length > 0 ? insights : ['📊 Normal trading behavior detected'];
+  if (data.txCount > 500) insights.push(` Power User: High transaction frequency detected`);
+  if (data.avgTradeUSD > 10000) insights.push(` Significant capital: Average trade size is Elite level`);
+  if (data.winRate > 60) insights.push(` Profitable: Historic performance indicates high win rate`);
+  if (data.ageDays > 730) insights.push(` Veteran: Wallet has been active for over 2 years`);
+  if (data.tokenCount > 15) insights.push(` Diversified: Strategic allocation across multiple assets`);
+  return insights.length > 0 ? insights : [' Normal trading behavior detected'];
 }
 
 function determineCategory(score: number): SmartMoneyMetrics['category'] {
@@ -161,7 +161,7 @@ function getFallbackMetrics(): SmartMoneyMetrics {
       estimatedWinRate: 0,
       walletAge: 0,
     },
-    insights: ['⚠️ Analysis pending - limited on-chain history'],
+    insights: ['️ Analysis pending - limited on-chain history'],
     confidence: 'low',
     category: 'Beginner',
     metadata: {

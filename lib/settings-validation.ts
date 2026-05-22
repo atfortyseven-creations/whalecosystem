@@ -28,16 +28,16 @@ export const NotificationsConfigSchema = z.object({
 export type NotificationsConfig = z.infer<typeof NotificationsConfigSchema>;
 
 /**
- * [ABSOLUTE EXTENSION] Intelligence & AI Configuration
+ * [ABSOLUTE EXTENSION] Analytics & AI Configuration
  */
-export const IntelligenceConfigSchema = z.object({
+export const AnalyticsConfigSchema = z.object({
   tacticalThreshold: z.coerce.number().min(0).max(10000000000).default(500000000),
   signalSensitivity: z.coerce.number().min(0).max(1).default(0.8),
   agentAutonomy: z.boolean().default(false),
   alphaAlerts: z.boolean().default(true),
 });
 
-export type IntelligenceConfig = z.infer<typeof IntelligenceConfigSchema>;
+export type AnalyticsConfig = z.infer<typeof AnalyticsConfigSchema>;
 
 /**
  * [ABSOLUTE EXTENSION] Atomic Execution & Network Configuration
@@ -52,7 +52,7 @@ export const ExecutionConfigSchema = z.object({
 export type ExecutionConfig = z.infer<typeof ExecutionConfigSchema>;
 
 /**
- * [ABSOLUTE EXTENSION] Matrix UI & Aesthetic Configuration
+ * [ABSOLUTE EXTENSION] Grid UI & Aesthetic Configuration
  */
 export const UiConfigSchema = z.object({
   density: z.enum(['compact', 'standard', 'spacious']).default('standard'),
@@ -128,7 +128,7 @@ export const UserSettingsSchema = z.object({
   backupFrequency: z.enum(['daily', 'weekly', 'monthly']).or(z.string()).default('weekly'),
 
   // Absolute Extended Configs
-  intelligenceConfig: IntelligenceConfigSchema.default({
+  analyticsConfig: AnalyticsConfigSchema.default({
     tacticalThreshold: 500000000,
     signalSensitivity: 0.8,
     agentAutonomy: false,
@@ -267,7 +267,7 @@ export function getDefaultUserSettings(): UserSettings {
     backupFrequency: 'weekly',
 
     // Absolute Extended Configs
-    intelligenceConfig: {
+    analyticsConfig: {
       tacticalThreshold: 500000000,
       signalSensitivity: 0.8,
       agentAutonomy: false,

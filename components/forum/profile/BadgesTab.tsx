@@ -16,7 +16,7 @@ export function BadgesTab({ badges }: { badges: any[] }) {
                 badge.type === 'silver' ? 'bg-[#A8A9AD]/10 text-[#A8A9AD]' : 
                 'bg-[#CD7F32]/10 text-[#CD7F32]'
               }`}>
-                <span className="text-[16px]">♦</span>
+                <span className="text-[16px]"></span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[12px] font-mono font-black text-[#050505]">{badge.name}</span>

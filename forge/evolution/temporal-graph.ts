@@ -57,7 +57,7 @@ export class TemporalGraph {
 
   /**
    * Detects merge candidates (entities on the same chain max 2 hops away or completely disconnected)
-   * This drives the Mass Transfer Intelligence AI logic.
+   * This drives the Mass Transfer Analytics AI logic.
    */
   static async findMergeCandidates() {
     const query = `

@@ -14,7 +14,7 @@ export const useLiquidTime = () => {
      * @param config - Receiver and Flow Rate
      */
     const startStream = async (config: FlowConfig) => {
-        console.log("🌊 Initiating Liquid Time Stream...", config);
+        console.log(" Initiating Liquid Time Stream...", config);
 
         // 1. Construct CFA (Constant Flow Agreement) Transaction
         // using `@superfluid-finance/sdk-core` logic
@@ -31,7 +31,7 @@ export const useLiquidTime = () => {
      * Stops the flow of time (money).
      */
     const stopStream = async (streamId: string) => {
-        console.log("🛑 Stopping Stream", streamId);
+        console.log(" Stopping Stream", streamId);
         setActiveStreams(prev => prev.filter(s => s.id !== streamId));
     };
 

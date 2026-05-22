@@ -54,8 +54,8 @@ export const LOTTIE_CONTENT: LottieItem[] = [
   },
   {
     id: 'launch-2',
-    title: 'Quantum Security',
-    subtitle: 'Standard post-quantum encryption',
+    title: 'Core Security',
+    subtitle: 'Standard post-core encryption',
     src: 'https://assets5.lottiefiles.com/packages/lf20_khtrdrwa.json',
     category: 'Launch 2027',
   },
@@ -69,7 +69,7 @@ export const LOTTIE_CONTENT: LottieItem[] = [
   {
     id: 'launch-4',
     title: 'Universal ID',
-    subtitle: 'Sovereign identity across all chains',
+    subtitle: 'System identity across all chains',
     src: 'https://assets9.lottiefiles.com/packages/lf20_yom6uvgj.json',
     category: 'Launch 2027',
   },

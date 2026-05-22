@@ -1,4 +1,4 @@
-// NOTE: This module is deliberately NOT 'use client' — it runs in a browser
+// NOTE: This module is deliberately NOT 'use client'  it runs in a browser
 // context only because WalletConnectProvider.tsx (which calls createWeb3Wallet)
 // is loaded with dynamic({ ssr: false }).
 import { Core } from '@walletconnect/core';
@@ -29,13 +29,13 @@ export async function createWeb3Wallet() {
         core: core as any, // pino Logger types diverge between nested @walletconnect package versions
         metadata: {
             name: 'Whale Portfolio',
-            description: 'Institutional Sovereign Wallet',
+            description: 'Institutional System Wallet',
             url: 'https://humanidfi.com',
             icons: ['https://humanidfi.com/official-whale-monochrome.png'],
         },
     });
 
-    // Event Listeners — explicit `any` satisfies noImplicitAny until types are resolved by npm install
+    // Event Listeners  explicit `any` satisfies noImplicitAny until types are resolved by npm install
     web3wallet.on('session_proposal', (proposal: any) => {
         useWalletConnectStore.getState().addProposal(proposal);
     });
@@ -95,7 +95,7 @@ export async function approveSession(proposal: any, currentAddress: string) {
         useWalletConnectStore.getState().setSessions(web3wallet.getActiveSessions());
         return session;
     } catch (e) {
-        // Best-effort rejection — if the proposal is already expired this may throw, suppress it
+        // Best-effort rejection  if the proposal is already expired this may throw, suppress it
         try {
             await web3wallet.rejectSession({
                 id,

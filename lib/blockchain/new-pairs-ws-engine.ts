@@ -1,5 +1,5 @@
 /**
- * GetBlock WebSocket New Pairs Engine — Registry-backed
+ * GetBlock WebSocket New Pairs Engine  Registry-backed
  * Subscribes to UniswapV3 PoolCreated events in real time.
  * Factory: 0x1F98431c8aD98523631AE4a59f267346ea31F984
  * WSS pool: getblock-registry.ts (GB_ETH_WSS_1/2/3)
@@ -8,7 +8,7 @@
 import WebSocket from 'ws';
 import { getGbAllWss } from './getblock-registry';
 
-// WSS pool desde el registry — obtiene los WSS dinámicamente para respetar el CU Circuit Breaker
+// WSS pool desde el registry  obtiene los WSS dinámicamente para respetar el CU Circuit Breaker
 const getActiveWssUrls = (): string[] => {
     const gb = getGbAllWss('eth');
     return gb.length > 0 ? gb : ['wss://ethereum-rpc.publicnode.com'];
@@ -85,7 +85,7 @@ class NewPairsWebSocketEngine {
         });
 
         socket.on('close', () => {
-            console.warn('[NewPairsEngine] WS closed — reconnecting');
+            console.warn('[NewPairsEngine] WS closed  reconnecting');
             this.stopHeartbeat();
             this.scheduleReconnect();
         });
@@ -127,7 +127,7 @@ class NewPairsWebSocketEngine {
         this.stopHeartbeat();
         this.heartbeatTimer = setInterval(() => {
             if (this.isAlive === false) {
-                console.warn('[NewPairsEngine] Heartbeat missed — terminating connection');
+                console.warn('[NewPairsEngine] Heartbeat missed  terminating connection');
                 this.ws?.terminate();
                 return;
             }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Resend } from 'resend';
 
-// Resend instance — fallback for dev but required for prod
+// Resend instance  fallback for dev but required for prod
 const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
 
 const TIER_NAMES: Record<string, string> = {
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { reference, planId, billingCycle, priceEur, email, walletAddress: rawWalletAddress } = body;
     
-    // ── STRICT IDENTITY ENFORCEMENT ──
+    //  STRICT IDENTITY ENFORCEMENT 
     // Zero-Trust policy: A connected Web3 wallet is strictly required to bind the institutional license.
     if (!rawWalletAddress || rawWalletAddress === 'manual_sepa_user') {
       return NextResponse.json({ error: 'A connected Web3 Wallet is strictly required to issue an Institutional License. Please connect your wallet first.' }, { status: 401 });
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
             
             <!-- Header -->
             <div style="background-color: #050505; padding: 32px 40px; text-align: left;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Sovereign</h1>
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">System</h1>
               <p style="margin: 4px 0 0 0; color: #a1a1aa; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Invoice & Payment Instructions</p>
             </div>
 
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
               <!-- Payment Details Box -->
               <div style="background-color: #f3f4f6; border-radius: 8px; padding: 24px; margin-bottom: 32px;">
                 <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Amount Due</p>
-                <p style="margin: 0 0 24px 0; font-size: 36px; font-weight: 800; color: #111827; line-height: 1;">€${priceEur}</p>
+                <p style="margin: 0 0 24px 0; font-size: 36px; font-weight: 800; color: #111827; line-height: 1;">${priceEur}</p>
 
                 <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Bank Transfer Details (SEPA)</p>
                 <table style="width: 100%; font-size: 14px; color: #374151; border-collapse: collapse;">
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
             <!-- Footer -->
             <div style="background-color: #f9fafb; padding: 24px 40px; border-top: 1px solid #e5e7eb; text-align: center;">
               <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                Sovereign Intelligence · Madrid, Spain<br>
+                System Analytics · Madrid, Spain<br>
                 Receipt generated on ${new Date().toLocaleDateString()}
               </p>
             </div>
@@ -210,9 +210,9 @@ export async function POST(request: NextRequest) {
         </html>
       `;
 
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'billing@sovereign-intelligence.com';
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'billing@system-analytics.com';
       const emailResponse = await resend.emails.send({
-        from: `Sovereign Billing <${fromEmail}>`,
+        from: `System Billing <${fromEmail}>`,
         to: email,
         subject: `Invoice & Transfer Instructions: ${TIER_NAMES[planId] || planId} Plan`,
         html: invoiceHtml,

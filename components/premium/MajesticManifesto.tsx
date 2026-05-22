@@ -16,11 +16,11 @@ export function MajesticManifesto() {
                     <ManifestoItem 
                         icon={<Activity size={18} />}
                         title="Pulse Monitor"
-                        desc="A real-time synchronization of network velocity, monitoring throughput and heartbeats across five sovereign blockchain infrastructures."
+                        desc="A real-time synchronization of network velocity, monitoring throughput and heartbeats across five system blockchain infrastructures."
                     />
                     <ManifestoItem 
                         icon={<Landmark size={18} />}
-                        title="Liquidity Matrix"
+                        title="Liquidity Grid"
                         desc="Tracking the cross-chain migration of capital, identifying institutional pivots and systemic rebalancing with millimetric precision."
                     />
                 </div>

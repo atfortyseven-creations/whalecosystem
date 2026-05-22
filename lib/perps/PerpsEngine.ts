@@ -20,9 +20,9 @@ export interface PerpsMarket {
 // Configuration for Base Mainnet Synthetix V3 Markets
 // Mapped deterministically to on-chain global perps IDs.
 export const PERPS_MARKETS: Record<string, PerpsMarket> = {
-  'WLDUSDT': {
-    symbol: 'WLD',
-    marketId: 400, // Worldcoin on Base Perps V3
+  'AUTHUSDT': {
+    symbol: 'AUTH',
+    marketId: 400, // Identity on Base Perps V3
     maxLeverage: 10,
     minMargin: 50,
     tickSize: 0.001

@@ -12,7 +12,7 @@ const REGISTRY_ABI = [
  * This gives the NFT "Agency" (it can hold assets).
  */
 export async function activateNeuralAsset(signer: any, tokenContract: string, tokenId: string) {
-    console.log(`🧠 Awakening Neural Asset: NFT ${tokenContract} #${tokenId}`);
+    console.log(` Awakening Neural Asset: NFT ${tokenContract} #${tokenId}`);
 
     const registry = new ethers.Contract(REGISTRY_ADDRESS, REGISTRY_ABI, signer);
 
@@ -27,7 +27,7 @@ export async function activateNeuralAsset(signer: any, tokenContract: string, to
     );
 
     const receipt = await tx.wait();
-    console.log("🤖 Neural Asset Online:", receipt);
+    console.log(" Neural Asset Online:", receipt);
     return receipt;
 }
 

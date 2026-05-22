@@ -36,8 +36,8 @@ const decrypted = decrypt(encrypted, DEV_FALLBACK_KEY);
 console.log("Decrypted:", decrypted);
 
 if (testMnemonic === decrypted) {
-    console.log("✅ Encryption/Decryption Consistency Verified!");
+    console.log(" Encryption/Decryption Consistency Verified!");
 } else {
-    console.error("❌ Encryption/Decryption Consistency FAILED!");
+    console.error(" Encryption/Decryption Consistency FAILED!");
     process.exit(1);
 }

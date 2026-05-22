@@ -7,9 +7,9 @@ import { useMarketData } from '@/lib/api-client';
 import { TokenInfoModal, TokenInfoPayload } from '@/components/ui/TokenInfoModal';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
-// ── Formatters ────────────────────────────────────────────────────────────────
+//  Formatters 
 const fmt = (n: number) => {
-    if (!n || isNaN(n)) return '—';
+    if (!n || isNaN(n)) return '';
     if (Math.abs(n) >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
     if (Math.abs(n) >= 1e9)  return `$${(n / 1e9).toFixed(2)}B`;
     if (Math.abs(n) >= 1e6)  return `$${(n / 1e6).toFixed(2)}M`;
@@ -17,7 +17,7 @@ const fmt = (n: number) => {
     return `$${n.toFixed(2)}`;
 };
 const fmtPrice = (n: number) => {
-    if (!n || isNaN(n)) return '—';
+    if (!n || isNaN(n)) return '';
     if (n >= 1000) return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (n >= 1)    return `$${n.toFixed(4)}`;
     if (n >= 0.01) return `$${n.toFixed(6)}`;
@@ -42,12 +42,12 @@ type FilterNetwork = typeof ALL_NETWORKS[number];
 type TimeWindow = '1h' | '24h' | '7d';
 type ViewMode = 'all' | 'gainers' | 'losers';
 
-// ── Helper: strip USDT suffix to get ticker symbol ───────────────────────────
+//  Helper: strip USDT suffix to get ticker symbol 
 function stripUSDT(binanceSymbol: string): string {
     return binanceSymbol.replace('USDT', '').replace('BUSD', '');
 }
 
-// ── Row Component ─────────────────────────────────────────────────────────────
+//  Row Component 
 function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, onClick }: {
     rank: number;
     symbol: string;
@@ -65,11 +65,11 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
     const ticker = stripUSDT(symbol);
     const netColor = NETWORK_COLORS[meta.network] || NETWORK_COLORS.default;
     const rate  = currency === 'EUR' ? eurRate : 1;
-    const sym   = currency === 'EUR' ? '€' : '$';
+    const sym   = currency === 'EUR' ? '' : '$';
 
     const fmtCurrency = (n: number) => {
         const v = n * rate;
-        if (!v || isNaN(v)) return `${sym}—`;
+        if (!v || isNaN(v)) return `${sym}`;
         if (v >= 1e12) return `${sym}${(v / 1e12).toFixed(2)}T`;
         if (v >= 1e9)  return `${sym}${(v / 1e9).toFixed(2)}B`;
         if (v >= 1e6)  return `${sym}${(v / 1e6).toFixed(2)}M`;
@@ -78,7 +78,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
     };
     const fmtCurrencyPrice = (n: number) => {
         const v = n * rate;
-        if (!v || isNaN(v)) return `${sym}—`;
+        if (!v || isNaN(v)) return `${sym}`;
         if (v >= 1000) return `${sym}${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         if (v >= 1)    return `${sym}${v.toFixed(4)}`;
         if (v >= 0.01) return `${sym}${v.toFixed(6)}`;
@@ -113,7 +113,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
                         </span>
                         {(data as any).getblockVerified && (
                             <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/30 shadow-[0_0_8px_rgba(0,192,118,0.2)]">
-                                ✓ VERIFIED
+                                 VERIFIED
                             </span>
                         )}
                     </div>
@@ -156,7 +156,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
     );
 }
 
-// ── Main Panel ────────────────────────────────────────────────────────────────
+//  Main Panel 
 export function GainersLosersPanel() {
     const isMobile = useIsMobile();
     const [rawData, setRawData] = useState<any>(null);
@@ -277,7 +277,7 @@ export function GainersLosersPanel() {
         <div className="w-full h-full min-h-0 flex flex-col p-0 space-y-6 overflow-hidden text-[#050505] dark:text-[#FAF9F6] font-sans">
             <ModuleHeader moduleId="markets" />
             
-            {/* ── Summary Cards ── */}
+            {/*  Summary Cards  */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
                 {/* Top Gainers */}
                 <div className="bg-white/70 dark:bg-[#111111]/70 backdrop-blur-3xl border border-black/[0.05] dark:border-white/10 rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
@@ -348,7 +348,7 @@ export function GainersLosersPanel() {
                 </div>
             </div>
 
-            {/* ── Full Ledger Table ── */}
+            {/*  Full Ledger Table  */}
             <div className="flex-1 min-h-0 bg-white/70 dark:bg-[#111111]/70 backdrop-blur-3xl border border-black/[0.05] dark:border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.03)] rounded-2xl overflow-hidden flex flex-col relative">
                 
                 {/* Background Gradient for Ledger */}
@@ -397,7 +397,7 @@ export function GainersLosersPanel() {
                                         : { background: 'transparent', color: '#888888' }
                                     }
                                 >
-                                    {c === 'USD' ? '$' : '€'} {c}
+                                    {c === 'USD' ? '$' : ''} {c}
                                 </button>
                             ))}
                         </div>
@@ -410,7 +410,7 @@ export function GainersLosersPanel() {
                     </div>
                 </div>
 
-                {/* Toolbar Row 2 — Network selector */}
+                {/* Toolbar Row 2  Network selector */}
                 <div className="shrink-0 px-6 py-2.5 border-b border-black/[0.04] dark:border-white/10 bg-white/30 dark:bg-[#1A1A1A]/30 backdrop-blur-sm flex items-center gap-2.5 flex-wrap z-10">
                     <span className="text-[9px] font-black text-[#050505]/40 dark:text-white/40 uppercase tracking-[0.2em] mr-2">Topology:</span>
                     {ALL_NETWORKS.map(n => (
@@ -450,7 +450,7 @@ export function GainersLosersPanel() {
                     ) : filtered.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-center p-12 text-[#888888]">
                             <Search size={32} className="mb-4 opacity-30"/>
-                            <p className="text-[12px] font-black text-[#111] dark:text-white uppercase tracking-[0.2em] mb-2">No intelligence found</p>
+                            <p className="text-[12px] font-black text-[#111] dark:text-white uppercase tracking-[0.2em] mb-2">No analytics found</p>
                             <p className="text-[10px] uppercase tracking-widest opacity-60">Refine parameters</p>
                         </div>
                     ) : (
@@ -479,7 +479,7 @@ export function GainersLosersPanel() {
                 </div>
             </div>
 
-            {/* ── Token Info Modal ── */}
+            {/*  Token Info Modal  */}
             <TokenInfoModal
                 token={selectedToken}
                 currency={currency}

@@ -6,5 +6,5 @@
  *   SEARCH_TERM=0xYourWallet npx ts-node scripts/find-user.ts
  */
 
-// This file is intentionally empty — see find-user.ts
+// This file is intentionally empty  see find-user.ts
 export {};

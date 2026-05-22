@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+//  Types 
 
 export interface WhaleEvent {
   type: "whale";
@@ -44,12 +44,12 @@ export interface OnChainToken {
   chain: string;
 }
 
-// ─── Whale Events Hook ────────────────────────────────────────────────────────
+//  Whale Events Hook 
 
 /**
  * useWhaleStream
  * 
- * Subscribes to /api/whale-events/stream (SSE → GetBlock EP2 WebSocket)
+ * Subscribes to /api/whale-events/stream (SSE  GetBlock EP2 WebSocket)
  * Returns live and buffered whale alert events.
  */
 export function useWhaleStream(maxEvents = 50) {
@@ -102,12 +102,12 @@ export function useWhaleStream(maxEvents = 50) {
   return { events, connected, error };
 }
 
-// ─── New Pairs Hook ───────────────────────────────────────────────────────────
+//  New Pairs Hook 
 
 /**
  * useNewPairsStream
  * 
- * Subscribes to /api/new-pairs/stream (SSE → GetBlock EP3 WebSocket)
+ * Subscribes to /api/new-pairs/stream (SSE  GetBlock EP3 WebSocket)
  * Returns live UniswapV3 PoolCreated events.
  */
 export function useNewPairsStream(maxPairs = 50) {
@@ -159,12 +159,12 @@ export function useNewPairsStream(maxPairs = 50) {
   return { pairs, connected };
 }
 
-// ─── Pool Prices Hook ─────────────────────────────────────────────────────────
+//  Pool Prices Hook 
 
 /**
  * usePoolPrices
  * 
- * Polls /api/market/pool-prices every 30s (GetBlock EP4 → UniswapV3 slot0)
+ * Polls /api/market/pool-prices every 30s (GetBlock EP4  UniswapV3 slot0)
  * Returns live on-chain prices for top pools.
  */
 export function usePoolPrices(refreshInterval = 30_000) {
@@ -199,7 +199,7 @@ export function usePoolPrices(refreshInterval = 30_000) {
   return { prices, loading, error, lastUpdated, refetch: fetchPrices };
 }
 
-// ─── On-Chain Portfolio Hook ──────────────────────────────────────────────────
+//  On-Chain Portfolio Hook 
 
 /**
  * useOnChainPortfolio

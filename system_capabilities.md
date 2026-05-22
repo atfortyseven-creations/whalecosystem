@@ -1,6 +1,6 @@
 # SYSTEM CAPABILITIES COLLECTION (WHALE ALERT)
 
-Below are the detailed architecture, modules, and current capabilities of the "Whale Alert / Whale Tracker" system to date. The system operates as an elite on-chain intelligence platform focused on Bitcoin, with a strong emphasis on UX/UI (Glassmorphism, Dark Themes, Web3) and secure authentication.
+Below are the detailed architecture, modules, and current capabilities of the "Whale Alert / Whale Tracker" system to date. The system operates as an elite on-chain analytics platform focused on Bitcoin, with a strong emphasis on UX/UI (Glassmorphism, Dark Themes, Web3) and secure authentication.
 
 ## 1. AUTHENTICATION AND SECURITY SYSTEM
 *   **Restricted Access (White Login):** The login system (/login) has been redesigned as an immersive white vault (3D interactive animated background).

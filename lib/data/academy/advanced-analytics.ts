@@ -30,14 +30,14 @@ export const advancedAnalyticsModules = [
                                 <rect x="50" y="50" width="300" height="120" fill="rgba(255,77,77,0.1)" stroke="#ff4d4d" stroke-width="2" />
                                 <text x="200" y="40" fill="#ff4d4d" text-anchor="middle" style="font-weight: bold;">Sin Access List (Cold)</text>
                                 <text x="200" y="100" fill="#fff" text-anchor="middle">SLOAD: 2,100 Gas</text>
-                                <text x="200" y="130" fill="#ff4d4d" text-anchor="middle">I/O Disk Latency ⏱️</text>
+                                <text x="200" y="130" fill="#ff4d4d" text-anchor="middle">I/O Disk Latency ️</text>
                                 
                                 <path d="M400 110 L450 110" stroke="#fff" stroke-width="2" marker-end="url(#arrowhead)" />
                                 
                                 <rect x="500" y="50" width="250" height="120" fill="rgba(77,255,136,0.1)" stroke="#4dff88" stroke-width="2" />
                                 <text x="625" y="40" fill="#4dff88" text-anchor="middle" style="font-weight: bold;">Con EIP-2930 (Warm)</text>
                                 <text x="625" y="100" fill="#fff" text-anchor="middle">SLOAD: 100 Gas</text>
-                                <text x="625" y="130" fill="#4dff88" text-anchor="middle">Cache Ready 🚀</text>
+                                <text x="625" y="130" fill="#4dff88" text-anchor="middle">Cache Ready </text>
                             </svg>
                             <p class="diagram-caption">Figura 1: Reducción asintótica del costo de acceso mediante pre-warming de slots de estado.</p>
                         </div>
@@ -620,10 +620,10 @@ export const advancedAnalyticsModules = [
                                 
                                 <rect x="450" y="50" width="250" height="100" fill="rgba(255,77,77,0.1)" stroke="#ff4d4d" stroke-width="2" />
                                 <text x="575" y="95" fill="#ff4d4d" text-anchor="middle" style="font-weight: bold;">Untrusted Pool</text>
-                                <text x="575" y="125" fill="#fff" text-anchor="middle" style="font-size: 11px;">(Intentar SSTORE → REVERSA)</text>
+                                <text x="575" y="125" fill="#fff" text-anchor="middle" style="font-size: 11px;">(Intentar SSTORE  REVERSA)</text>
                                 
                                 <path d="M575 140 Q400 170 250 120" stroke="#ff4d4d" stroke-width="2" stroke-dasharray="4" marker-end="url(#cross)" />
-                                <text x="400" y="175" fill="#ff4d4d" text-anchor="middle" style="font-size: 10px;">REENTRANCY BLOCKED 🛡️</text>
+                                <text x="400" y="175" fill="#ff4d4d" text-anchor="middle" style="font-size: 10px;">REENTRANCY BLOCKED ️</text>
                             </svg>
                             <p class="diagram-caption">Figura 19: El escudo de inmutabilidad forzada mediante ejecución estática.</p>
                         </div>

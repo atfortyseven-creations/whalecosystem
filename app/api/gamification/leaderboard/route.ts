@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         const type  = searchParams.get('type')  || 'volume';
         const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
 
-        // ── CACHE LAYER (MAXIMA PERFECCION) ───────────────────────────────────
+        //  CACHE LAYER (MAXIMA PERFECCION) 
         if (type === 'volume') {
            const cached = await safeRedisGet(`${CACHE_KEY}:${limit}`);
            if (cached && cached !== 'TIMEOUT') {
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
             const entries = grouped.map((row, i) => ({
                 rank:          i + 1,
                 walletAddress: row.walletAddress,
-                username:      `${row.walletAddress.slice(0, 6)}…${row.walletAddress.slice(-4)}`,
+                username:      `${row.walletAddress.slice(0, 6)}${row.walletAddress.slice(-4)}`,
                 value:         Number(row.totalUsd).toFixed(2),
                 txCount:       Number(row.txCount),
                 badge:         i < 3 ? (['gold', 'silver', 'bronze'] as const)[i] : null,
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
             });
         }
 
-        // For other types (winRate, alpha) — pending real scores
+        // For other types (winRate, alpha)  pending real scores
         return NextResponse.json({
             type,
             entries: [],

@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
  */
 
 async function checkMigrationStatus() {
-  console.log('🔍 Checking database migration status...\n');
+  console.log(' Checking database migration status...\n');
 
   try {
     // Check if the required enums exist
@@ -22,7 +22,7 @@ async function checkMigrationStatus() {
     `;
     
     const enums = await prisma.$queryRawUnsafe<{ typname: string }[]>(enumsQuery);
-    console.log('📊 Enums found:', enums.map(e => e.typname));
+    console.log(' Enums found:', enums.map(e => e.typname));
 
     // Check if the required tables exist
     const tablesQuery = `
@@ -33,7 +33,7 @@ async function checkMigrationStatus() {
     `;
     
     const tables = await prisma.$queryRawUnsafe<{ table_name: string }[]>(tablesQuery);
-    console.log('📋 Tables found:', tables.map(t => t.table_name));
+    console.log(' Tables found:', tables.map(t => t.table_name));
 
     // Check if AuthUser has the new columns
     const columnsQuery = `
@@ -45,7 +45,7 @@ async function checkMigrationStatus() {
     `;
     
     const columns = await prisma.$queryRawUnsafe<{ column_name: string }[]>(columnsQuery);
-    console.log('🔑 AuthUser columns found:', columns.map(c => c.column_name));
+    console.log(' AuthUser columns found:', columns.map(c => c.column_name));
 
     // Check migration status
     const migrationQuery = `
@@ -55,10 +55,10 @@ async function checkMigrationStatus() {
     `;
     
     const migrations = await prisma.$queryRawUnsafe<any[]>(migrationQuery);
-    console.log('\n📝 Migration status:', migrations);
+    console.log('\n Migration status:', migrations);
 
     // Determine recommendation
-    console.log('\n🎯 RECOMMENDATION:');
+    console.log('\n RECOMMENDATION:');
     
     const expectedEnums = ['WalletTransactionType', 'WalletTransactionStatus', 'WalletType'];
     const expectedTables = ['Transaction', 'AddressBookEntry', 'Authenticator', 'WalletAccount'];
@@ -69,21 +69,21 @@ async function checkMigrationStatus() {
     const columnsExist = expectedColumns.every(c => columns.some(col => col.column_name === c));
 
     if (enumsExist && tablesExist && columnsExist) {
-      console.log('✅ All migration artifacts exist in the database.');
-      console.log('💡 Run: npx prisma migrate resolve --applied 20260131120000_phase2_3_4_init');
+      console.log(' All migration artifacts exist in the database.');
+      console.log(' Run: npx prisma migrate resolve --applied 20260131120000_phase2_3_4_init');
       console.log('   This will mark the migration as applied without re-running it.');
     } else {
-      console.log('❌ Migration artifacts are incomplete or missing.');
-      console.log('💡 Run: npx prisma migrate deploy');
+      console.log(' Migration artifacts are incomplete or missing.');
+      console.log(' Run: npx prisma migrate deploy');
       console.log('   This will apply all pending migrations.');
       
-      if (!enumsExist) console.log('   ⚠️  Missing enums:', expectedEnums.filter(e => !enums.some(en => en.typname === e)));
-      if (!tablesExist) console.log('   ⚠️  Missing tables:', expectedTables.filter(t => !tables.some(tb => tb.table_name === t)));
-      if (!columnsExist) console.log('   ⚠️  Missing columns:', expectedColumns.filter(c => !columns.some(col => col.column_name === c)));
+      if (!enumsExist) console.log('   ️  Missing enums:', expectedEnums.filter(e => !enums.some(en => en.typname === e)));
+      if (!tablesExist) console.log('   ️  Missing tables:', expectedTables.filter(t => !tables.some(tb => tb.table_name === t)));
+      if (!columnsExist) console.log('   ️  Missing columns:', expectedColumns.filter(c => !columns.some(col => col.column_name === c)));
     }
 
   } catch (error) {
-    console.error('❌ Error checking migration status:', error);
+    console.error(' Error checking migration status:', error);
     process.exit(1);
   } finally {
     await prisma.$disconnect();

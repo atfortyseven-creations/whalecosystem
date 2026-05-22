@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Network, Loader2, ShieldCheck, AlertTriangle } from 'lucide-react';
-import { useKnowledgeGraph, EntityIntelligence } from '@/hooks/useKnowledgeGraph';
+import { useKnowledgeGraph, EntityAnalytics } from '@/hooks/useKnowledgeGraph';
 
 interface NexusNode {
   id: string;
@@ -44,7 +44,7 @@ export function EntityNexus({ address }: Props) {
   
   // Knowledge Graph Oracle Integration
   const { getEntityInfo, loading: oracleLoading } = useKnowledgeGraph();
-  const [oracleData, setOracleData] = useState<EntityIntelligence | null>(null);
+  const [oracleData, setOracleData] = useState<EntityAnalytics | null>(null);
 
   const svgRef = useRef<SVGSVGElement>(null);
   const W = 500, H = 380;

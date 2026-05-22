@@ -44,7 +44,7 @@ export function FeeHistoryHeatmap() {
     staleTime: 600_000,
   });
 
-  // Generate realistic 1-week hourly data matrix
+  // Generate realistic 1-week hourly data grid
   function generateHeatmapData(baseFee: number): FeePoint[] {
     const data: FeePoint[] = [];
     const now = new Date();

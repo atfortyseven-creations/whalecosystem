@@ -56,7 +56,7 @@ export default function UserProfilePage() {
         <span style={{ color: 'var(--forum-text)' }}>Profile</span>
       </div>
 
-      {/* ── Avatar + Identity Block ── */}
+      {/*  Avatar + Identity Block  */}
       <div className="flex items-center gap-6 mb-8 pb-8" style={{ borderBottom: '1px solid var(--forum-border)' }}>
         <div
           className="w-20 h-20 shrink-0 rounded-full flex items-center justify-center text-[28px] font-sans font-bold text-white overflow-hidden"
@@ -71,7 +71,7 @@ export default function UserProfilePage() {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-3 flex-wrap">
             <span className="text-[22px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>
-              {user.displayName || `${addrStr.slice(0, 8)}…${addrStr.slice(-4)}`}
+              {user.displayName || `${addrStr.slice(0, 8)}${addrStr.slice(-4)}`}
             </span>
             {user.isPro && (
               <span className="text-[10px] font-sans font-bold bg-[#D4AF37] text-black px-2 py-0.5 rounded-sm">PRO</span>
@@ -79,7 +79,7 @@ export default function UserProfilePage() {
           </div>
 
           <div className="text-[13px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>
-            {user.bio || 'Sovereign Agent'} · {user.tier || 'FREE'}
+            {user.bio || 'System Agent'} · {user.tier || 'FREE'}
           </div>
 
           {/* Stats row */}
@@ -94,7 +94,7 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* ── Activity Feed ── */}
+      {/*  Activity Feed  */}
       <div className="mb-4">
         <h2 className="text-[13px] font-sans font-bold uppercase tracking-widest mb-6" style={{ color: 'var(--forum-text-muted)' }}>
           Activity · {activityFeed.length} contributions
@@ -130,7 +130,7 @@ function ActivityItem({ item }: { item: any }) {
   const isTopic = item._kind === 'TOPIC';
   const href = isTopic ? `/forum/t/${item.id}` : `/forum/t/${item.topicId || item.id}`;
   const title = isTopic ? item.title : (item.topic?.title || 'Reply');
-  const preview = !isTopic ? (item.content?.slice(0, 120) + (item.content?.length > 120 ? '…' : '')) : (item.content?.slice(0, 100) + (item.content?.length > 100 ? '…' : ''));
+  const preview = !isTopic ? (item.content?.slice(0, 120) + (item.content?.length > 120 ? '' : '')) : (item.content?.slice(0, 100) + (item.content?.length > 100 ? '' : ''));
   const timeAgo = item.createdAt
     ? formatDistanceToNowStrict(new Date(item.createdAt), { addSuffix: true })
     : '';

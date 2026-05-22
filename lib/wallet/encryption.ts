@@ -17,10 +17,10 @@ export const getEncryptionKey = (): string => {
   
   if (!key) {
     if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build') {
-      console.error('🔴 CRITICAL: WALLET_ENCRYPTION_KEY missing in production!');
+      console.error(' CRITICAL: WALLET_ENCRYPTION_KEY missing in production!');
       throw new Error('Encryption key not configured');
     }
-    console.warn('⚠️  Using fallback encryption key (development only)');
+    console.warn('️  Using fallback encryption key (development only)');
     return DEV_FALLBACK_KEY;
   }
   

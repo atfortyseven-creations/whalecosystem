@@ -3,7 +3,7 @@
 // VIPDataProvider.tsx
 // A single React component that lives in the VIP layout.
 // It boots ONE polling engine that feeds the global Zustand store.
-// Every VIP sub-page reads from the store — ZERO individual fetches.
+// Every VIP sub-page reads from the store  ZERO individual fetches.
 // No SSE. No manual refresh. Auto-updates every N seconds.
 // ================================================================
 import { useEffect, useRef } from 'react';
@@ -14,28 +14,28 @@ const SYMBOLS = [
     'ADAUSDT', 'DOGEUSDT', 'SHIBUSDT', 'DOTUSDT', 'LINKUSDT', 
     'MATICUSDT', 'AVAXUSDT', 'TRXUSDT', 'UNIUSDT', 'PEPEUSDT', 
     'FETUSDT', 'DAIUSDT', 'APEUSDT', 'LDOUSDT', 'ARBUSDT', 
-    'OPUSDT', 'STRKUSDT', 'WLDUSDT', 'NEARUSDT'
+    'OPUSDT', 'STRKUSDT', 'AUTHUSDT', 'NEARUSDT'
 ];
 
-// Staggered intervals — we avoid thundering-herd API abuse
+// Staggered intervals  we avoid thundering-herd API abuse
 const INTERVALS = {
-    whaleEvents:  8_000,   // 8s  — Etherscan
-    mempool:      10_000,  // 10s — mempool.space
-    funding:      6_000,   // 6s  — Binance+Bybit
-    liquidations: 5_000,   // 5s  — Binance Futures
-    liveNetwork:  8_000,   // 8s  — Network Oracle (ETH Block, Gas, Chainlink)
-    topWhales:    60_000,  // 60s — blockchain.info (heavy)
-    satoshi:      120_000, // 120s — Batch mode
-    volume:       20_000,  // 20s — Inflow/Outflow
-    activities:   12_000,  // 12s — Telegram Bot Feed
-    leaderboard:  60_000,  // 60s — 500 Whale Leaderboard
+    whaleEvents:  8_000,   // 8s   Etherscan
+    mempool:      10_000,  // 10s  mempool.space
+    funding:      6_000,   // 6s   Binance+Bybit
+    liquidations: 5_000,   // 5s   Binance Futures
+    liveNetwork:  8_000,   // 8s   Network Oracle (ETH Block, Gas, Chainlink)
+    topWhales:    60_000,  // 60s  blockchain.info (heavy)
+    satoshi:      120_000, // 120s  Batch mode
+    volume:       20_000,  // 20s  Inflow/Outflow
+    activities:   12_000,  // 12s  Telegram Bot Feed
+    leaderboard:  60_000,  // 60s  500 Whale Leaderboard
 };
 
 export function VIPDataProvider({ children }: { children: React.ReactNode }) {
     const store = useVIPStore();
     const timers = useRef<ReturnType<typeof setInterval>[]>([]);
 
-    // ── 1. WHALE EVENTS (Etherscan/Alpha) ──────────────────────
+    //  1. WHALE EVENTS (Etherscan/Alpha) 
     const pollWhaleEvents = async () => {
         try {
             const res = await fetch('/api/network/whale/alpha-events');
@@ -49,7 +49,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    // ── 2. WHALE ACTIVITIES (Telegram Bot Feed) ────────────────
+    //  2. WHALE ACTIVITIES (Telegram Bot Feed) 
     const pollWhaleActivities = async () => {
         try {
             const res = await fetch('/api/whale/activities');
@@ -60,7 +60,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── 3. MEMPOOL (mempool.space via proxy) ───────────────────
+    //  3. MEMPOOL (mempool.space via proxy) 
     const pollMempool = async () => {
         try {
             const res = await fetch('/api/network/mempool');
@@ -73,7 +73,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    // ── 4. FUNDING RATES (Binance + Bybit) ────────────────────
+    //  4. FUNDING RATES (Binance + Bybit) 
     const pollFunding = async () => {
         try {
             const [binRes, bybRes] = await Promise.all([
@@ -105,7 +105,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── 5. LIQUIDATION MAP (Binance Futures) ──────────────────
+    //  5. LIQUIDATION MAP (Binance Futures) 
     const pollLiquidations = async () => {
         try {
             const res = await fetch('/api/network/whale/liquidations');
@@ -123,7 +123,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── 6. NETWORK ORACLE METRICS (ETH Block, Gas, Chainlink) ──
+    //  6. NETWORK ORACLE METRICS (ETH Block, Gas, Chainlink) 
     const pollLiveNetwork = async () => {
         try {
             const res = await fetch('/api/network/live');
@@ -139,7 +139,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── 7. TOP WHALES PERSISTENCE (blockchain.info + our DB) ──
+    //  7. TOP WHALES PERSISTENCE (blockchain.info + our DB) 
     const pollTopWhales = async () => {
         try {
             const res = await fetch('/api/network/whale/top-whales');
@@ -150,7 +150,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── 7.5 500-WHALE LEADERBOARD (Volume Based) ──────────────
+    //  7.5 500-WHALE LEADERBOARD (Volume Based) 
     const pollLeaderboard = async () => {
         try {
             const res = await fetch('/api/network/whale/leaderboard');
@@ -161,7 +161,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── 8. SATOSHI DETECTOR (Batch) ───────────────────────────
+    //  8. SATOSHI DETECTOR (Batch) 
     const pollSatoshi = async () => {
         try {
             const res = await fetch('/api/network/whale/satoshi-detector?mode=batch');
@@ -170,7 +170,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── 9. VOLUME ON-CHAIN (Inflow/Outflow) ───────────────────
+    //  9. VOLUME ON-CHAIN (Inflow/Outflow) 
     const pollVolume = async () => {
         try {
             const res = await fetch('/api/network/whale/inflow-outflow');
@@ -179,7 +179,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── BOOT ENGINE ────────────────────────────────────────────
+    //  BOOT ENGINE 
     useEffect(() => {
         let isMounted = true;
         

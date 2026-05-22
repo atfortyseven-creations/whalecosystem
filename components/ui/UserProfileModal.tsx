@@ -19,7 +19,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
     const [activeTab, setActiveTab] = useState<'identity' | 'preferences' | 'security'>('identity');
 
     useEffect(() => {
-        const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+        const match = document.cookie.match(/system_handshake=(0x[0-9a-fA-F]{40,})/i);
         const addr = match?.[1]?.toLowerCase() ?? null;
         setAddress(addr);
         setIsConnected(!!addr);
@@ -202,7 +202,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                         transition={{ duration: 0.2 }}
                                         className="space-y-8"
                                     >
-                                        {/* ── TAB: IDENTITY ── */}
+                                        {/*  TAB: IDENTITY  */}
                                         {activeTab === 'identity' && (
                                             <div className="space-y-6">
                                                 <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -256,7 +256,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                             </div>
                                         )}
 
-                                        {/* ── TAB: PREFERENCES ── */}
+                                        {/*  TAB: PREFERENCES  */}
                                         {activeTab === 'preferences' && (
                                             <div className="space-y-6">
                                                 <div className="grid grid-cols-2 gap-4">
@@ -287,7 +287,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                             <DollarSign size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
                                                             <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full p-3.5 pl-10 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] text-[#050505] font-bold focus:border-black outline-none appearance-none cursor-pointer">
                                                                 <option value="USD">USD ($)</option>
-                                                                <option value="EUR">EUR (€)</option>
+                                                                <option value="EUR">EUR ()</option>
                                                                 <option value="GBP">GBP (£)</option>
                                                             </select>
                                                         </div>
@@ -304,7 +304,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                             </div>
                                         )}
 
-                                        {/* ── TAB: SECURITY ── */}
+                                        {/*  TAB: SECURITY  */}
                                         {activeTab === 'security' && (
                                             <div className="space-y-6">
                                                 <div>

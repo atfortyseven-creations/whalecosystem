@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 /**
- * 🐳 WHALE BRAND IDENTITY ENGINE
+ *  WHALE BRAND IDENTITY ENGINE
  * Centrally manages the official Whale Alert Network logo visualization.
  */
 export function WhaleLogo({ 

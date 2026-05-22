@@ -26,7 +26,7 @@ interface MegaWhaleOverlayProps {
     onDismiss: () => void;
 }
 
-// ─── Web Audio API sonic impact engine ───────────────────────────────────────
+//  Web Audio API sonic impact engine 
 function playMegaWhaleSound(usdValue: number) {
     try {
         const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -220,7 +220,7 @@ export function MegaWhaleOverlay({ tx, onDismiss }: MegaWhaleOverlayProps) {
                                 {amountFormatted}
                             </div>
 
-                            {/* from → to row */}
+                            {/* from  to row */}
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
@@ -267,7 +267,7 @@ export function MegaWhaleOverlay({ tx, onDismiss }: MegaWhaleOverlayProps) {
                                 className="flex items-center justify-between border-t border-white/[0.05] pt-6"
                             >
                                 <span className="text-[9px] font-mono text-white/20 truncate max-w-xs">
-                                    {tx.hash.slice(0, 22)}…
+                                    {tx.hash.slice(0, 22)}
                                 </span>
                                 <a
                                     href={getExplorerUrl(tx.hash, tx.chain)}

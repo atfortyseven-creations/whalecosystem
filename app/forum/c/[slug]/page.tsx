@@ -35,7 +35,7 @@ export default function CategoryPage() {
   return (
     <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12 py-10 flex flex-col gap-0">
       
-      {/* ── Breadcrumb & Controls ── */}
+      {/*  Breadcrumb & Controls  */}
       <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2 text-[14px]">
           <Link href="/forum" className="text-slate-500 hover:text-slate-800 transition-colors">
@@ -65,7 +65,7 @@ export default function CategoryPage() {
       )}
 
       <div className="w-full">
-        {/* ── Table Header ── */}
+        {/*  Table Header  */}
         <div className="flex items-center py-2 border-b-2 border-slate-200 text-[13px] font-medium text-slate-500">
           <div className="flex-1">Topic</div>
           <div className="w-20 text-center hidden sm:block">Replies</div>
@@ -73,7 +73,7 @@ export default function CategoryPage() {
           <div className="w-20 text-right">Activity</div>
         </div>
 
-        {/* ── Topic List ── */}
+        {/*  Topic List  */}
         <div className="flex flex-col">
           {!category.topics?.length ? (
             <div className="py-12 text-center text-sm text-slate-400">

@@ -14,7 +14,7 @@ import {
     Globe
 } from "lucide-react";
 import { useChainId } from "wagmi";
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { polygon } from "wagmi/chains";
 import { useRealWalletData } from "@/hooks/useRealWalletData";
 import { usePolymarketSession } from "@/hooks/usePolymarketSession";
@@ -282,7 +282,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                 <div className="mb-6 border-b border-[#E5E5E5] pb-6">
                                     <h3 className="text-[10px] font-black text-[#050505]/50 uppercase tracking-[0.2em] mb-2 flex items-center space-x-2">
                                         <TrendingUp className="w-4 h-4 text-emerald-600" />
-                                        <span>Live Orderbook — CLOB L1</span>
+                                        <span>Live Orderbook  CLOB L1</span>
                                     </h3>
                                     <p className="text-sm font-black text-[#050505] leading-tight">
                                         {selectedMarket ? selectedMarket.question : "Select market to track liquidity"}

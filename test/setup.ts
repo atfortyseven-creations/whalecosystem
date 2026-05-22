@@ -1,4 +1,4 @@
-// test/setup.ts — Global test setup for Sovereign test suite
+// test/setup.ts  Global test setup for System test suite
 // @ts-ignore - Vitest types not fully linked in strict mode
 import { vi } from 'vitest';
 

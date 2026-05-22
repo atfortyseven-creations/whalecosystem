@@ -8,22 +8,22 @@ export function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem("sovereign_cookie_consent");
+    const consent = localStorage.getItem("system_cookie_consent");
     if (!consent) {
       setIsVisible(true);
     }
   }, []);
 
   const acceptCookies = () => {
-    localStorage.setItem("sovereign_cookie_consent", "accepted");
+    localStorage.setItem("system_cookie_consent", "accepted");
     // set cookie for middleware if needed
-    document.cookie = "sovereign_cookie_consent=accepted; path=/; max-age=31536000";
+    document.cookie = "system_cookie_consent=accepted; path=/; max-age=31536000";
     setIsVisible(false);
   };
 
   const declineCookies = () => {
-    localStorage.setItem("sovereign_cookie_consent", "declined");
-    document.cookie = "sovereign_cookie_consent=declined; path=/; max-age=31536000";
+    localStorage.setItem("system_cookie_consent", "declined");
+    document.cookie = "system_cookie_consent=declined; path=/; max-age=31536000";
     setIsVisible(false);
   };
 

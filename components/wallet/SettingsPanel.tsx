@@ -7,12 +7,12 @@ import { WalletConnectSessions } from '@/components/wallet/WalletConnectSessions
 import BiometricGuard from '@/components/wallet/BiometricGuard';
 import { startRegistration } from '@simplewebauthn/browser';
 import { toast } from 'sonner';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 
 export default function SettingsPanel() {
-  const { address: authUserId, isConnected } = useSovereignAccount();
-  const { nuclearDisconnect } = useSovereignSignOut();
+  const { address: authUserId, isConnected } = useSystemAccount();
+  const { nuclearDisconnect } = useSystemSignOut();
   const [currency, setCurrency] = useState('USD');
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState('Light');
@@ -185,7 +185,7 @@ export default function SettingsPanel() {
         <h3 className="text-sm font-bold text-red-600 uppercase mb-4 tracking-wider">Session Connection</h3>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h4 className="font-bold text-[#1F1F1F]">Active Sovereign Session</h4>
+            <h4 className="font-bold text-[#1F1F1F]">Active System Session</h4>
             <p className="text-xs text-[#1F1F1F]/50">Log out and clear all secure keys and wallet registries from local cache.</p>
           </div>
           <button 

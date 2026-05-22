@@ -120,7 +120,7 @@ export default function AdvancedSettingsModal({
                         key={m}
                         label={m.charAt(0).toUpperCase() + m.slice(1)}
                         onClick={() => update('privacyMode', m)}
-                        rightText={settings.privacyMode === m ? '✓' : ''}
+                        rightText={settings.privacyMode === m ? '' : ''}
                         isLast={idx === 2}
                       />
                     ))}
@@ -160,7 +160,7 @@ export default function AdvancedSettingsModal({
                       key={t}
                       label={t.charAt(0).toUpperCase() + t.slice(1)}
                       onClick={() => update('theme', t)}
-                      rightText={settings.theme === t ? '✓' : ''}
+                      rightText={settings.theme === t ? '' : ''}
                       isLast={idx === 4}
                     />
                   ))}

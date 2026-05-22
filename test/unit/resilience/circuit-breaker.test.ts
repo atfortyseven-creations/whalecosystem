@@ -1,6 +1,6 @@
 /**
- * CIRCUIT BREAKER — Test Suite
- * Validates all state transitions: CLOSED → OPEN → HALF_OPEN → CLOSED
+ * CIRCUIT BREAKER  Test Suite
+ * Validates all state transitions: CLOSED  OPEN  HALF_OPEN  CLOSED
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -27,7 +27,7 @@ describe('CircuitBreaker', () => {
     expect(cb.getMetrics().consecutiveFailures).toBe(2);
   });
 
-  it('transitions CLOSED → OPEN at failure threshold', async () => {
+  it('transitions CLOSED  OPEN at failure threshold', async () => {
     const cb = makeBreaker({ failureThreshold: 3 });
     for (let i = 0; i < 3; i++) {
       await cb.execute(fail).catch(() => {});
@@ -42,7 +42,7 @@ describe('CircuitBreaker', () => {
     await expect(cb.execute(succeed)).rejects.toThrow('Circuit OPEN');
   });
 
-  it('transitions OPEN → HALF_OPEN after duration', async () => {
+  it('transitions OPEN  HALF_OPEN after duration', async () => {
     const cb = makeBreaker({ failureThreshold: 1, openDurationMs: 50 });
     await cb.execute(fail).catch(() => {});
     expect(cb.getMetrics().state).toBe('OPEN');
@@ -52,7 +52,7 @@ describe('CircuitBreaker', () => {
     expect(cb.getMetrics().state).toBe('CLOSED');
   });
 
-  it('transitions HALF_OPEN → CLOSED on probe success', async () => {
+  it('transitions HALF_OPEN  CLOSED on probe success', async () => {
     const cb = makeBreaker({ failureThreshold: 1, openDurationMs: 50 });
     await cb.execute(fail).catch(() => {});
     await new Promise(r => setTimeout(r, 60));
@@ -61,7 +61,7 @@ describe('CircuitBreaker', () => {
     expect(cb.getMetrics().consecutiveFailures).toBe(0);
   });
 
-  it('transitions HALF_OPEN → OPEN on probe failure', async () => {
+  it('transitions HALF_OPEN  OPEN on probe failure', async () => {
     const cb = makeBreaker({ failureThreshold: 1, openDurationMs: 50 });
     await cb.execute(fail).catch(() => {});
     await new Promise(r => setTimeout(r, 60));

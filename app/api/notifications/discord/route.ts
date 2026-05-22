@@ -98,16 +98,16 @@ function formatWhaleAlertDiscord(data: {
   if (data.amount > 5000000) color = 0xe74c3c; // Red
 
   return {
-    title: '🐋 WHALE ALERT',
+    title: ' WHALE ALERT',
     color,
     fields: [
       {
-        name: '💰 Amount',
+        name: ' Amount',
         value: `$${safeToLocaleString(data.amount)}`,
         inline: true,
       },
       {
-        name: '🔄 Type',
+        name: ' Type',
         value: data.type,
         inline: true,
       },
@@ -117,7 +117,7 @@ function formatWhaleAlertDiscord(data: {
         inline: true,
       },
       {
-        name: '📍 Wallet',
+        name: ' Wallet',
         value: `\`${data.address.slice(0, 10)}...${data.address.slice(-8)}\``,
         inline: false,
       },
@@ -138,7 +138,7 @@ function formatPriceAlertDiscord(data: {
   targetPrice: number;
   condition: string;
 }): any {
-  const emoji = data.condition === 'above' ? '📈' : '📉';
+  const emoji = data.condition === 'above' ? '' : '';
   const color = data.condition === 'above' ? 0x2ecc71 : 0xe74c3c;
 
   return {
@@ -151,17 +151,17 @@ function formatPriceAlertDiscord(data: {
         inline: true,
       },
       {
-        name: '💵 Current Price',
+        name: ' Current Price',
         value: `$${safeToLocaleString(data.currentPrice)}`,
         inline: true,
       },
       {
-        name: '🎯 Target Price',
+        name: ' Target Price',
         value: `$${safeToLocaleString(data.targetPrice)}`,
         inline: true,
       },
       {
-        name: '🔔 Condition',
+        name: ' Condition',
         value: data.condition.toUpperCase(),
         inline: true,
       },
@@ -182,33 +182,33 @@ function formatDailyDigestDiscord(data: {
   const topMoversList = data.topMovers
     .slice(0, 5)
     .map((m, i) => {
-      const emoji = m.change > 0 ? '📈' : '📉';
+      const emoji = m.change > 0 ? '' : '';
       const shortAddr = `${m.address.slice(0, 6)}...${m.address.slice(-4)}`;
       return `${i + 1}. \`${shortAddr}\`: ${emoji} ${m.change > 0 ? '+' : ''}${safeToFixed(m.change, 2)}%`;
     })
     .join('\n');
 
   return {
-    title: '📊 DAILY DIGEST',
+    title: ' DAILY DIGEST',
     color: 0x9b59b6,
     fields: [
       {
-        name: '👀 Wallets Tracked',
+        name: ' Wallets Tracked',
         value: data.walletsTracked.toString(),
         inline: true,
       },
       {
-        name: '💰 Total Value',
+        name: ' Total Value',
         value: `$${safeToFixed(data.totalValue / 1e6, 2)}M`,
         inline: true,
       },
       {
-        name: '⚡ 24h Transactions',
+        name: ' 24h Transactions',
         value: data.transactions24h.toString(),
         inline: true,
       },
       {
-        name: '🏆 Top Movers',
+        name: ' Top Movers',
         value: topMoversList || 'No movements',
         inline: false,
       },

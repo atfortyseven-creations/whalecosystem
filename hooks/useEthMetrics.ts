@@ -1,6 +1,6 @@
 /**
  * hooks/useEthMetrics.ts
- * ═══════════════════════════════════════════════════════════════════════════
+ * 
  * Shared hook: subscribes to the Ethereum mainnet block stream and exposes
  * real-time metrics (block number, base fee in Gwei, UTC time).
  *
@@ -9,12 +9,12 @@
  *   - components/dashboard/WhaleProShell.tsx            (top master bar)
  *
  * Design decisions:
- *   - Single `watchBlocks` subscription per mount — no polling.
+ *   - Single `watchBlocks` subscription per mount  no polling.
  *   - Ref-guarded cleanup prevents stale-closure leaks when publicClient
  *     changes (chain switch).
  *   - Graceful degradation: if provider is absent, all values remain null
  *     and the UI renders safe fallback text ("---").
- * ═══════════════════════════════════════════════════════════════════════════
+ * 
  */
 
 'use client';
@@ -41,7 +41,7 @@ export function useEthMetrics(): EthMetrics {
   const [utcTime,     setUtcTime    ] = useState<string | null>(null);
   const [syncing,     setSyncing    ] = useState(true);
 
-  // ── UTC clock — updates every second ─────────────────────────────────────
+  //  UTC clock  updates every second 
   useEffect(() => {
     const tick = () => {
       const now = new Date();
@@ -54,7 +54,7 @@ export function useEthMetrics(): EthMetrics {
     return () => clearInterval(id);
   }, []);
 
-  // ── Ethereum block subscription ───────────────────────────────────────────
+  //  Ethereum block subscription 
   const unwatchRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export function useEthMetrics(): EthMetrics {
           setSyncing(false);
         },
         onError: () => {
-          // Don't crash — silently degrade to last known values
+          // Don't crash  silently degrade to last known values
         },
       });
     } catch {

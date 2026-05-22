@@ -6,7 +6,7 @@ import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { WalletComparisonChart } from "./WalletComparisonChart";
 import { WhaleChatComparison } from "./WhaleChatComparison";
 
-// ─── Constants & Animations ──────────────────────────────────────────────────
+//  Constants & Animations 
 
 const FADE_UP: Variants = {
   hidden: { opacity: 0, y: 50 },
@@ -18,7 +18,7 @@ const STAGGER: Variants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
 };
 
-// ─── Main Component ─────────────────────────────────────────────────────────
+//  Main Component 
 
 export interface ImmersiveManifestoLandingProps {
   onOpenScanner?: () => void;
@@ -40,9 +40,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
   return (
     <div className="relative text-[#050505] font-sans antialiased overflow-x-hidden w-full flex flex-col bg-white">
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           1. HERO: WHITE QDS STYLE + 3D ATOM
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <section
         ref={heroRef}
         className="relative w-full h-[100svh] overflow-hidden bg-white flex flex-col items-center justify-center py-16"
@@ -53,7 +53,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
         />
 
-        {/* Layout: ATOM centered top — Buttons row below */}
+        {/* Layout: ATOM centered top  Buttons row below */}
         <motion.div
           style={{ opacity: heroOpacity }}
           initial="hidden" animate="visible" variants={STAGGER}
@@ -61,7 +61,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
         >
           <motion.div variants={FADE_UP} className="w-full max-w-[900px] mx-auto flex flex-col items-center justify-center gap-6">
 
-            {/* Silver Atom — large, blended, no box */}
+            {/* Silver Atom  large, blended, no box */}
             {mounted && (
               <div className="w-[420px] h-[420px] sm:w-[560px] sm:h-[560px] lg:w-[700px] lg:h-[700px] shrink-0 flex items-center justify-center mx-auto">
                 <img
@@ -73,7 +73,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
               </div>
             )}
 
-            {/* Buttons — side by side, centered below atom */}
+            {/* Buttons  side by side, centered below atom */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
               <Link
                 href="/portfolio"
@@ -102,19 +102,19 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
         </motion.div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           2. WALLET COMPARISON
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <WalletComparisonChart />
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           3. WHALE CHAT COMPARISON
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <WhaleChatComparison />
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           4. TEXT EXPLANATIONS (QDS Style on White)
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <section className="w-full bg-white py-32 md:py-48 border-t border-black/5">
         <div className="w-full max-w-[960px] mx-auto px-6 flex flex-col gap-28 md:gap-40">
           
@@ -175,9 +175,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           5. CTA / DOWNPAGE (WITH VIDEO BACKGROUND + LOGO BELT)
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <section className="relative w-full min-h-[90vh] md:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
         {/* Video background */}
         <div className="absolute inset-0 w-full h-full">
@@ -193,7 +193,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/80 pointer-events-none" />
 
-        {/* ── CTA Content ── */}
+        {/*  CTA Content  */}
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -223,7 +223,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
           </motion.div>
         </motion.div>
 
-        {/* ── LOGO BELT ── */}
+        {/*  LOGO BELT  */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -252,11 +252,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
               {/* Two full sets so the loop is seamless */}
               {[0, 1].map((set) => (
                 <React.Fragment key={set}>
-                  {/* Worldcoin / 64b5... */}
+                  {/* Identity / 64b5... */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
                     <img
                       src="/system-shots/64b5696bf0d1f9bd7b9b0f22_400-400Logo-300x300.png"
-                      alt="Worldcoin"
+                      alt="Identity"
                       className="h-7 w-auto object-contain brightness-0 invert opacity-80"
                     />
                   </div>

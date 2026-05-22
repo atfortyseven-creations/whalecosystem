@@ -14,7 +14,7 @@ interface NavItem {
 interface NavSection { title: string; tab: string; items: NavItem[]; }
 
 const NAV: NavSection[] = [
-  // ── DOCS TAB ──────────────────────────────────────────────────────────────
+  //  DOCS TAB 
   {
     title: 'Getting Started',
     tab: 'docs',
@@ -22,7 +22,7 @@ const NAV: NavSection[] = [
       { label: 'Overview', href: '/docs/overview' },
       { label: 'Quickstart', href: '/docs/quickstart' },
       { label: 'Core Concepts', href: '/docs/core-concepts' },
-      { label: 'Whale Code', href: '/docs/whale-code', badge: '↗' },
+      { label: 'Whale Code', href: '/docs/whale-code', badge: '' },
     ]
   },
   {
@@ -50,7 +50,7 @@ const NAV: NavSection[] = [
     ]
   },
 
-  // ── DEVELOPER TAB ────────────────────────────────────────────────────────
+  //  DEVELOPER TAB 
   {
     title: 'Getting Started',
     tab: 'developer',
@@ -94,7 +94,7 @@ const NAV: NavSection[] = [
     ]
   },
 
-  // ── OPERATOR TAB ────────────────────────────────────────────────────────
+  //  OPERATOR TAB 
   {
     title: 'Getting Started',
     tab: 'operator',
@@ -135,7 +135,7 @@ const NAV: NavSection[] = [
     ]
   },
 
-  // ── LEGAL TAB ──────────────────────────────────────────────────────────
+  //  LEGAL TAB 
   {
     title: 'Legal',
     tab: 'legal',

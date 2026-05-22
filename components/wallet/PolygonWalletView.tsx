@@ -18,9 +18,9 @@ import { useAccount, useDisconnect, useBalance } from "wagmi";
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 // Default Initial Data
 const ASSETS = [
-    { symbol: "POL", name: "Polygon Ecosystem Token", balance: "145.20", price: 0.72, value: 104.54, icon: "🟣" },
-    { symbol: "USDC.e", name: "Bridged USDC", balance: "2,450.00", price: 1.00, value: 2450.00, icon: "💲" },
-    { symbol: "WETH", name: "Wrapped Ether", balance: "0.05", price: 2300.00, value: 115.00, icon: "💎" },
+    { symbol: "POL", name: "Polygon Ecosystem Token", balance: "145.20", price: 0.72, value: 104.54, icon: "" },
+    { symbol: "USDC.e", name: "Bridged USDC", balance: "2,450.00", price: 1.00, value: 2450.00, icon: "" },
+    { symbol: "WETH", name: "Wrapped Ether", balance: "0.05", price: 2300.00, value: 115.00, icon: "" },
 ];
 
 const TRANSACTIONS = [

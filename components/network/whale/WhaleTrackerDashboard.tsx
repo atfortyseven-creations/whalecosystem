@@ -9,15 +9,15 @@ import {
     TrendingUp, LineChart, Globe, Zap, Scale, BarChart3,
     Newspaper, X, Menu
 } from 'lucide-react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { InmersiveConstellations } from '@/components/shared/InmersiveConstellations';
 import { GlobalMarketSessions } from '@/components/premium/GlobalMarketSessions';
-import { EliteIntelligenceNews } from '@/components/premium/EliteIntelligenceNews';
+import { EliteAnalyticsNews } from '@/components/premium/EliteAnalyticsNews';
 import { SplashContainer } from '@/components/shared/SplashContainer';
 import Link from 'next/link';
 
-// ─── Universal Explorer Logic ──────────────────────────────────────────
+//  Universal Explorer Logic 
 function getExplorerLink(item: any) {
     const hash = item.hash;
     const chain = (item.chain || 'ETHEREUM').toUpperCase();
@@ -53,7 +53,7 @@ function getExplorerLink(item: any) {
     return `https://etherscan.io/tx/${hash}`;
 }
 
-// ─── Market Intelligence Row ───────────────────────────────────────────────
+//  Market Analytics Row 
 function TransactionRow({ item, index }: { item: any, index: number }) {
     const [isOpen, setIsOpen] = useState(false);
     const auditLink = getExplorerLink(item);
@@ -207,7 +207,7 @@ export function WhaleTrackerDashboard() {
     const { unifiedWhaleFeed, isLoading } = useWhaleFeed();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState('ALL');
-    const { address, isConnected } = useSovereignAccount();
+    const { address, isConnected } = useSystemAccount();
     const [showNews, setShowNews] = useState(false);
 
     const filtered = useMemo(() => {
@@ -258,7 +258,7 @@ export function WhaleTrackerDashboard() {
                                         <X size={28} className="group-hover:rotate-90 transition-transform" />
                                     </button>
                                 </div>
-                                <EliteIntelligenceNews />
+                                <EliteAnalyticsNews />
                             </motion.div>
                         </>
                     )}

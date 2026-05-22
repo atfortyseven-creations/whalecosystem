@@ -3,14 +3,14 @@
 import React, { useEffect, useRef, useId } from 'react';
 
 /**
- * LottieCanvas — GPU-accelerated canvas renderer via @lottiefiles/dotlottie-web
+ * LottieCanvas  GPU-accelerated canvas renderer via @lottiefiles/dotlottie-web
  *
  * Fixes vs original:
  *   - id="dotlottie-canvas" was STATIC: multiple instances on the same page
  *     would collide (DotLottie internally queries by ID in some versions).
  *     Now uses React.useId() for a unique DOM id per instance.
- *   - DPR capped at 2 — prevents iOS 3x screens from tripling GPU load.
- *   - useFrameInterpolation: true — smooth 60fps at half the CPU cost.
+ *   - DPR capped at 2  prevents iOS 3x screens from tripling GPU load.
+ *   - useFrameInterpolation: true  smooth 60fps at half the CPU cost.
  *   - Intersection Observer threshold lowered to 0.05 (5% visibility).
  *   - Instance stored in ref to prevent stale closure during cleanup.
  */
@@ -68,7 +68,7 @@ const LottieCanvas = ({
     };
   }, [src, loop, autoplay]);
 
-  // Pause/resume based on visibility — saves battery on mobile
+  // Pause/resume based on visibility  saves battery on mobile
   useEffect(() => {
     if (!canvasRef.current) return;
 

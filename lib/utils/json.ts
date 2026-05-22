@@ -1,10 +1,10 @@
 /**
  * WhaleFortress JSON Security Utility
- * ═══════════════════════════════════════════════════════════════════════════════
+ * 
  * Proporciona un análisis de JSON ultra-seguro diseñado para entornos de alta
  * disponibilidad. Previene SyntaxErrors catastróficos causados por corrupciones
  * en caché o respuestas de API truncadas.
- * ═══════════════════════════════════════════════════════════════════════════════
+ * 
  */
 
 /**
@@ -20,7 +20,7 @@ export function safeJsonParse<T>(json: string | null | undefined, fallback: T, c
     // Guard: Detección proactiva de respuestas "TIMEOUT" de Redis/RPC
     if (json === 'TIMEOUT' || json === 'UNDEFINED') {
         if (process.env.NODE_ENV !== 'production') {
-            console.warn(`[Forensics:${context}] ⚠️ Bloqueado intento de parsear señal de control: ${json}`);
+            console.warn(`[Forensics:${context}] ️ Bloqueado intento de parsear señal de control: ${json}`);
         }
         return fallback;
     }
@@ -32,7 +32,7 @@ export function safeJsonParse<T>(json: string | null | undefined, fallback: T, c
         const snippet = json.length > 100 ? `${json.substring(0, 50)}...${json.substring(json.length - 50)}` : json;
         const position = err.message.match(/position (\d+)/)?.[1] || 'unknown';
         
-        console.error(`[Forensics:${context}] 💀 SyntaxError detectado en JSON en posición ${position}.`);
+        console.error(`[Forensics:${context}]  SyntaxError detectado en JSON en posición ${position}.`);
         console.error(`[Forensics:${context}] Snippet del contenido: "${snippet}"`);
         
         // En producción, evitamos exponer el contenido completo por seguridad, 

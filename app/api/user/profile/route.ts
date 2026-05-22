@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
         }
       });
     } catch {
-      // Extended columns not yet in DB — use base
+      // Extended columns not yet in DB  use base
       user = await prisma.user.findUnique({
         where: { walletAddress },
         select: { id: true, walletAddress: true }
@@ -116,13 +116,13 @@ export async function PUT(req: NextRequest) {
       });
       return NextResponse.json({ success: true, data: user });
     } catch {
-      // Extended columns don't exist yet — minimal fallback (walletAddress only)
+      // Extended columns don't exist yet  minimal fallback (walletAddress only)
       const fallbackUser = await prisma.user.upsert({
         where:  { walletAddress },
         update: {},
         create: { walletAddress }
       });
-      return NextResponse.json({ success: true, data: fallbackUser, warning: 'Profile columns not yet in DB — run /api/admin/sync-db' });
+      return NextResponse.json({ success: true, data: fallbackUser, warning: 'Profile columns not yet in DB  run /api/admin/sync-db' });
     }
   } catch (error: any) {
     console.error('[API] PUT User Profile Error:', error);

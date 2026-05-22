@@ -20,12 +20,12 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'news': {
-        title: 'Global Intelligence',
+        title: 'Global Analytics',
         subtitle: 'Macroeconomic Analysis',
         overview: 'An advanced aggregator that securely streams global financial reporting and macroeconomic events without centralized trackers.',
         features: [
             { title: 'Event Evaluation', desc: 'Measures the potential market impact of global reports.' },
-            { title: 'Continuous Updates', desc: 'Uninterrupted delivery of breaking intelligence.' },
+            { title: 'Continuous Updates', desc: 'Uninterrupted delivery of breaking analytics.' },
             { title: 'Relevance Filtering', desc: 'Discards redundant data packets.' }
         ]
     },
@@ -181,7 +181,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'vault': {
-        title: 'Sovereign Vault',
+        title: 'System Vault',
         subtitle: 'Encrypted Credential Storage',
         overview: 'A secure, isolated memory environment for protecting sensitive settings and API configurations. Data remains private and is never stored centrally.',
         features: [

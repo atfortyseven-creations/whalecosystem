@@ -7,9 +7,9 @@ import { EffectComposer, Bloom, ChromaticAberration, Noise, Vignette } from '@re
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DEVICE CAPABILITY DETECTION — caps DPR + effects based on GPU tier
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// DEVICE CAPABILITY DETECTION  caps DPR + effects based on GPU tier
+// 
 function useDeviceTier() {
   return useMemo(() => {
     if (typeof window === 'undefined') return { dpr: 1, isMobile: false, isIOS: false };
@@ -22,9 +22,9 @@ function useDeviceTier() {
   }, []);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SHARED SCROLL VELOCITY HOOK — passive listener, ref-only (zero re-renders)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// SHARED SCROLL VELOCITY HOOK  passive listener, ref-only (zero re-renders)
+// 
 export function useScrollVelocity() {
   const vel = useRef(0);
   const last = useRef(0);
@@ -54,9 +54,9 @@ export function useScrollVelocity() {
   return vel;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SCROLL PROGRESS HOOK — scoped to hero section (400vh), not whole page
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// SCROLL PROGRESS HOOK  scoped to hero section (400vh), not whole page
+// 
 export function useScrollProgress() {
   const progress = useRef(0);
   
@@ -77,14 +77,14 @@ export function useScrollProgress() {
   return progress;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// REUSABLE VEC3 POOL — avoids "new THREE.Vector3()" GC pressure inside useFrame
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// REUSABLE VEC3 POOL  avoids "new THREE.Vector3()" GC pressure inside useFrame
+// 
 const _v3 = new THREE.Vector3();
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ORBITAL RING — single mesh, shared material via props
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// ORBITAL RING  single mesh, shared material via props
+// 
 const RING_MATERIAL_DARK = new THREE.MeshPhysicalMaterial({
   color: '#ffffff',
   metalness: 1.0,
@@ -101,7 +101,7 @@ const RING_MATERIAL_LIGHT = new THREE.MeshPhysicalMaterial({
   clearcoatRoughness: 0.1,
 });
 
-// Shared geometry instances — created once, reused across all rings
+// Shared geometry instances  created once, reused across all rings
 const TORUS_GEO = new THREE.TorusGeometry(2.8, 0.04, 12, 80);
 const SPHERE_SM_GEO = new THREE.SphereGeometry(0.12, 10, 10);
 const SPHERE_NUC_GEO = new THREE.SphereGeometry(0.85, 24, 24);
@@ -115,7 +115,7 @@ function OrbitalRing({ inclination, azimuth, vel, progress, baseSpeed, isDark, i
     angle.current += dt * baseSpeed + vel.current * 0.0003;
     ref.current.rotation.y = angle.current;
 
-    // Fragmentation — avoids "new THREE.Vector3" per frame via pooled _v3
+    // Fragmentation  avoids "new THREE.Vector3" per frame via pooled _v3
     const fragIntensity = Math.sin(progress.current * Math.PI);
     const chaos = Math.sin(progress.current * 80 + index * 15);
     const offset = fragIntensity * chaos * 4.5;
@@ -134,9 +134,9 @@ function OrbitalRing({ inclination, azimuth, vel, progress, baseSpeed, isDark, i
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // ELECTRON
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 const ELECTRON_MAT = new THREE.MeshStandardMaterial({
   color: '#ffffff',
   emissive: '#ffffff',
@@ -166,9 +166,9 @@ function Electron({ inclination, azimuth, phase, orbitRadius, vel }: any) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // NUCLEUS
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 const NUC_MAT_DARK = new THREE.MeshPhysicalMaterial({
   color: '#aaaaaa',
   metalness: 1.0,
@@ -199,9 +199,9 @@ function Nucleus({ vel, isDark }: any) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ATOM GROUP — MetaMask-style mouse follow + scroll zoom + continuous spin
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// ATOM GROUP  MetaMask-style mouse follow + scroll zoom + continuous spin
+// 
 const RINGS_CONFIG = [
   { inclination: 0,             azimuth: 0,             speed: 0.28 },
   { inclination: Math.PI / 3,   azimuth: Math.PI / 5,   speed: 0.22 },
@@ -271,20 +271,20 @@ function AtomGroup({ vel, progress, isDark, enableScale = false, isMobile = fals
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CHROMATIC ABERRATION OFFSET — created once, never re-allocated
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// CHROMATIC ABERRATION OFFSET  created once, never re-allocated
+// 
 const CA_OFFSET = new THREE.Vector2(0.0006, 0.0006);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SCENE — lighting tuned to remove HDR/env map dependency entirely
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// SCENE  lighting tuned to remove HDR/env map dependency entirely
+// 
 function Scene({ vel, progress, isDark, enableScale, isMobile }: any) {
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={28} />
 
-      {/* 3 directional lights — replaces env map, zero texture fetches */}
+      {/* 3 directional lights  replaces env map, zero texture fetches */}
       <directionalLight position={[5, 5, 5]}   intensity={isDark ? 3.0 : 6.0} color="#ffffff" />
       <directionalLight position={[-5, -5, -5]} intensity={isDark ? 1.5 : 3.0} color="#ffffff" />
       <directionalLight position={[0, 10, 0]}   intensity={isDark ? 2.0 : 4.0} color="#ffffff" />
@@ -314,9 +314,9 @@ function Scene({ vel, progress, isDark, enableScale, isMobile }: any) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN COMPONENT — frameloop="always" for 240Hz display support
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// MAIN COMPONENT  frameloop="always" for 240Hz display support
+// 
 export function QDsAtomRenderer({
   vel,
   isDark = false,
@@ -332,15 +332,15 @@ export function QDsAtomRenderer({
   return (
     <Canvas
       gl={{
-        antialias: false,         // Bloom handles edge softening — no MSAA cost
+        antialias: false,         // Bloom handles edge softening  no MSAA cost
         alpha: true,
         powerPreference: 'high-performance',
         precision: isIOS ? 'mediump' : 'highp',  // iOS GPU uses mediump natively
-        stencil: false,           // never needed here — saves buffer allocation
+        stencil: false,           // never needed here  saves buffer allocation
         depth: true,
       }}
       dpr={dpr}
-      frameloop="always"          // never throttle — let the browser/display drive FPS
+      frameloop="always"          // never throttle  let the browser/display drive FPS
       performance={{ min: 0.5 }}  // R3F adaptive DPR: drops to 0.5x if < 30fps
       style={{ background: 'transparent', width: '100%', height: '100%' }}
     >

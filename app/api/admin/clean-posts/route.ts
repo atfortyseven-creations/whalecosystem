@@ -13,9 +13,9 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: Request) {
   try {
     const cookieStore = await cookies();
-    const address = cookieStore.get('sovereign_handshake')?.value;
+    const address = cookieStore.get('system_handshake')?.value;
     if (!isAdmin(address)) {
-        return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
+        return NextResponse.json({ error: 'Unauthorized: System Admin Only' }, { status: 403 });
     }
     // Find all topics
     const allTopics = await (prisma as any).forumTopic.findMany({
@@ -34,7 +34,7 @@ export async function GET(req: Request) {
       .map((t: any) => t.id);
 
     if (deleteIds.length === 0) {
-      return NextResponse.json({ message: 'Nothing to delete — only welcome posts found.', kept: keepIds.length });
+      return NextResponse.json({ message: 'Nothing to delete  only welcome posts found.', kept: keepIds.length });
     }
 
     // Cascade-delete everything for each topic being deleted

@@ -34,7 +34,7 @@ export function MetaMaskInterface({ onConnect }: { onConnect?: () => void }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          Your sovereign digital identity, protected by zero-knowledge proofs.
+          Your system digital identity, protected by zero-knowledge proofs.
           <br className="hidden sm:block" /> No seed phrases, just biometric verification.
         </motion.p>
 
@@ -58,7 +58,7 @@ export function MetaMaskInterface({ onConnect }: { onConnect?: () => void }) {
           transition={{ delay: 0.8 }}
           className="flex items-center justify-center gap-2 sm:gap-4 mt-8 flex-wrap"
         >
-          {['Biometric Auth', 'ZK-Proofs', 'Self-Sovereign'].map((feature, i) => (
+          {['Biometric Auth', 'ZK-Proofs', 'Self-System'].map((feature, i) => (
             <span
               key={i}
               className="px-3 py-1.5 sm:px-4 sm:py-2 bg-white/[0.05] border border-white/[0.1] rounded-full text-xs sm:text-sm text-zinc-300 backdrop-blur-sm"

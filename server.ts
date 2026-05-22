@@ -23,11 +23,11 @@ app.prepare().then(() => {
     });
 
     server.listen(port, () => {
-        console.log(`✅ [Terminal] Ready on http://${hostname}:${port}`);
-        console.log(`🚀 [Microservices] Architecture: DECENTRALIZED CORE ACTIVE`);
-        console.log(`📡 [Gateway] Standalone Gateway required for WebSocket connectivity.`);
+        console.log(` [Terminal] Ready on http://${hostname}:${port}`);
+        console.log(` [Microservices] Architecture: DECENTRALIZED CORE ACTIVE`);
+        console.log(` [Gateway] Standalone Gateway required for WebSocket connectivity.`);
     });
 }).catch((err) => {
-    console.error('💀 [Terminal] Fatal initialization error:', err);
+    console.error(' [Terminal] Fatal initialization error:', err);
     process.exit(1);
 });

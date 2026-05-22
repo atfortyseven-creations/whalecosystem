@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
-// GET /api/auth/me — Returns the sovereign authenticated user profile
+// GET /api/auth/me  Returns the system authenticated user profile
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession();

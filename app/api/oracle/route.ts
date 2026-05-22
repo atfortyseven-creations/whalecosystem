@@ -4,7 +4,7 @@ import { createHash } from 'crypto';
 export const runtime = 'nodejs';
 export const revalidate = 60; // Cache 1 min
 
-// ── The Oracle Protocol ──────────────────────────────────────────────────────
+//  The Oracle Protocol 
 // The system calculates probability vectors for major capital flows BEFORE they hit the public mempool
 // or news aggregators. The projection is hashed to SHA-256 and cryptographically sealed.
 // When the time horizon is reached, the projection is unsealed, proving mathematically

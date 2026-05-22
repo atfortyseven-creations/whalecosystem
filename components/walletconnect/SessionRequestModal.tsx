@@ -33,14 +33,14 @@ export function SessionRequestModal() {
             let response: { id: number; result: string; jsonrpc: string };
 
             if (methodRequest.method === 'personal_sign') {
-                if (!privateKey) throw new Error('Sovereign key not unlocked');
+                if (!privateKey) throw new Error('System key not unlocked');
                 const wallet = new ethers.Wallet(privateKey);
                 // params[0] = message (hex or plain text), params[1] = address
                 const messageParam = methodRequest.params[0] as string;
                 let signature: string;
 
                 if (messageParam.startsWith('0x')) {
-                    // Hex-encoded bytes — decode to raw bytes then sign
+                    // Hex-encoded bytes  decode to raw bytes then sign
                     const messageBytes = ethers.getBytes(messageParam);
                     signature = await wallet.signMessage(messageBytes);
                 } else {
@@ -51,7 +51,7 @@ export function SessionRequestModal() {
                 toast.success('Message signed', { description: `${methodRequest.method}` });
             }
             else if (methodRequest.method === 'eth_signTypedData_v4' || methodRequest.method === 'eth_signTypedData') {
-                if (!privateKey) throw new Error('Sovereign key not unlocked');
+                if (!privateKey) throw new Error('System key not unlocked');
                 const wallet = new ethers.Wallet(privateKey);
                 // params[0] = address, params[1] = JSON typed data string
                 const typedDataRaw = methodRequest.params[1] as string;
@@ -149,7 +149,7 @@ export function SessionRequestModal() {
 
                     {!privateKey && isSign && (
                         <div className="text-[10px] font-black text-red-500 uppercase tracking-widest border border-red-200 bg-red-50 rounded-xl px-4 py-3">
-                            ⚠ Sovereign key not unlocked — unlock your wallet to sign.
+                             System key not unlocked  unlock your wallet to sign.
                         </div>
                     )}
                 </div>

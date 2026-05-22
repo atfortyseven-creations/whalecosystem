@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     try {
         const rawBody = await req.text();
         
-        // ── INHUMAN OPTIMIZATION: Cryptographic Signature Validation ──
+        //  INHUMAN OPTIMIZATION: Cryptographic Signature Validation 
         const signature = req.headers.get('x-alchemy-signature') || req.headers.get('x-quicknode-signature');
         const secret = process.env.ALCHEMY_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
         
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
                 await prisma.notification.create({
                     data: {
                         userId: null, // Global Notification
-                        title: `🚨 ${usdValue >= 1000000 ? 'MEGALODON' : 'WHALE'} DETECTED`,
+                        title: ` ${usdValue >= 1000000 ? 'MEGALODON' : 'WHALE'} DETECTED`,
                         message: `${category || 'TRANSFER'}: ${parseFloat(value).toFixed(2)} ${safeAsset} ($${usdValue.toLocaleString()})`,
                         type: 'whale',
                         isGlobal: true,

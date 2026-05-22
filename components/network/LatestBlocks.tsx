@@ -61,7 +61,7 @@ export function LatestBlocks({ hideHeader = false, theme = 'default' }: { hideHe
 
     return (
         <div className={containerClass}>
-            {/* ── HEADER SECTION ───────────────────────────────────────── */}
+            {/*  HEADER SECTION  */}
             {!hideHeader && (
                 <div className="flex items-center gap-6">
                     <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">

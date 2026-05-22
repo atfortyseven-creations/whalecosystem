@@ -11,7 +11,7 @@ dotenv.config();
 
 const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50000;
 
-// ── MAX EFFICIENCY: In-worker price cache (30s TTL) ──────────────────────
+//  MAX EFFICIENCY: In-worker price cache (30s TTL) 
 // Without this, getRealTimePrice() is called for EVERY ERC-20 transfer event.
 // On a busy block (hundreds of transfers) this would drain the CU quota instantly.
 // This cache batches requests per symbol across the entire block cycle.
@@ -45,7 +45,7 @@ const TOKEN_CONFIG: Record<string, { symbol: string, decimals: number }> = {
 const TRANSFER_TOPIC = ethers.id("Transfer(address,address,uint256)");
 
 export async function startEvmWorker(resilient: ResilientProvider, chainLabel: string) {
-  console.log(`📡 [${chainLabel} Hub] Activating Standalone EVM Stream...`);
+  console.log(` [${chainLabel} Hub] Activating Standalone EVM Stream...`);
   
   // [INHUMAN RESILIENCE] Use persistent subscription model.
   // This ensures listeners survive WebSocket rotations automatically.
@@ -90,7 +90,7 @@ export async function startEvmWorker(resilient: ResilientProvider, chainLabel: s
             from = ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[1])[0] as string;
             to   = ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[2])[0] as string;
         } catch {
-            return; // Malformed log — skip silently, do NOT crash the daemon
+            return; // Malformed log  skip silently, do NOT crash the daemon
         }
 
         const price = await getCachedPrice(config.symbol);
@@ -99,12 +99,12 @@ export async function startEvmWorker(resilient: ResilientProvider, chainLabel: s
         if (usdValue >= WHALE_THRESHOLD_USD) {
             await processWhaleTx(log.transactionHash, from, to, config.symbol, tokenAmount, usdValue, log.blockNumber, chainLabel, { method: "ERC20" });
         }
-    } catch (e: any) {/* outer safety net — daemon must never crash */}
+    } catch (e: any) {/* outer safety net  daemon must never crash */}
   });
 
   // Fallback check: If no WebSocket providers available at boot, start polling
   if (!resilient.getWsProvider()) {
-      console.warn(`⚠️ [${chainLabel}] No initial WebSocket. Booting Polling fallback.`);
+      console.warn(`️ [${chainLabel}] No initial WebSocket. Booting Polling fallback.`);
       startPollingWorker(resilient, chainLabel);
   }
 }
@@ -114,7 +114,7 @@ async function startPollingWorker(resilient: ResilientProvider, chainLabel: stri
     // FIX: Cap the block range queried per polling cycle.
     // Without this, if the worker is offline for 1 hour it attempts getLogs for
     // ~300 Ethereum blocks in a single request, hitting the GetBlock/Alchemy
-    // 2000-event limit and silently truncating the response — whales are missed.
+    // 2000-event limit and silently truncating the response  whales are missed.
     // MAX_BLOCK_CHUNK=50 guarantees complete ingestion even after long downtime.
     const MAX_BLOCK_CHUNK = 50;
     let consecutiveErrors = 0;
@@ -140,7 +140,7 @@ async function startPollingWorker(resilient: ResilientProvider, chainLabel: stri
                                 ethers.AbiCoder.defaultAbiCoder().decode(["uint256"], log.data)[0],
                                 config.decimals
                             ));
-                        } catch { continue; } // Malformed data — skip
+                        } catch { continue; } // Malformed data  skip
 
                         if (tokenAmount * price >= WHALE_THRESHOLD_USD) {
                             let fromAddr = "Unknown";
@@ -149,7 +149,7 @@ async function startPollingWorker(resilient: ResilientProvider, chainLabel: stri
                                 try {
                                     fromAddr = ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[1])[0] as string;
                                     toAddr   = ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[2])[0] as string;
-                                } catch { /* non-standard log — keep Unknown addresses */ }
+                                } catch { /* non-standard log  keep Unknown addresses */ }
                             }
                             await processWhaleTx(log.transactionHash, fromAddr, toAddr, config.symbol, tokenAmount, tokenAmount * price, log.blockNumber, chainLabel, { method: "Polling" });
                         }
@@ -165,7 +165,7 @@ async function startPollingWorker(resilient: ResilientProvider, chainLabel: stri
         } catch (e: any) {
             consecutiveErrors++;
             const backoff = Math.min(30_000 * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);
-            console.error(`❌ [${chainLabel}] Polling error #${consecutiveErrors}. Backoff ${backoff / 1000}s:`, e.message);
+            console.error(` [${chainLabel}] Polling error #${consecutiveErrors}. Backoff ${backoff / 1000}s:`, e.message);
             await new Promise(r => setTimeout(r, backoff));
         }
     }
@@ -176,7 +176,7 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
     if (exists) return;
 
     // SCORING: Calculate institutional probability based on whale history or known addresses
-    // For this phase, we flag large transfers as institutional by default for the Sovereign Terminal view.
+    // For this phase, we flag large transfers as institutional by default for the System Terminal view.
     const isInstitutional = usdValue > 1000000;
     
     // TELEMETRY: Real-time BTC Equivalence calculation for the Cosmic Ledger
@@ -192,7 +192,7 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
     const isCexOutflow = metadata.isExchangeOutflow || from.toLowerCase().includes('binance') || from.toLowerCase().includes('coinbase');
     const type = isCexOutflow ? 'CEX_OUTFLOW' : (metadata.method || "TRANSFER");
 
-    console.log(`🌊 [${chain}] SOVEREIGN_EVENT: $${(usdValue / 1e6).toFixed(2)}M | BTC: ${valueBTC.toFixed(3)} | Type: ${type}`);
+    console.log(` [${chain}] SOVEREIGN_EVENT: $${(usdValue / 1e6).toFixed(2)}M | BTC: ${valueBTC.toFixed(3)} | Type: ${type}`);
 
     // [LOGICA INHUMANA] Ejecución paralela O(1) de persistencia BD y propagación Redis 
     // Reduce la latencia del trabajador a la mitad eliminando el bloqueo en serie.
@@ -228,7 +228,7 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
             }
         }).catch(e => {
             if (!e.message.includes('Unique constraint')) {
-                console.error(`❌ [${chain}] DB Persistence Fail:`, e.message);
+                console.error(` [${chain}] DB Persistence Fail:`, e.message);
             }
         }),
         addWhaleToQueue({ 
@@ -236,7 +236,7 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
             blockNumber: blockNumber.toString(), chain, type, 
             institutional: isInstitutional, metadata 
         }).catch(e => {
-            console.error(`❌ [${chain}] Redis Queue Fail:`, e.message);
+            console.error(` [${chain}] Redis Queue Fail:`, e.message);
         })
     ]);
 }

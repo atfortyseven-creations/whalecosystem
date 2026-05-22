@@ -8,7 +8,7 @@ import { fetchRealWhaleTransfers } from '@/lib/blockchain/WhaleFlowService';
  * 100% real on-chain data from Alchemy Asset Transfers.
  * No synthetic data. No mock fills. Every row is verifiable on-chain.
  *
- * Data source: Alchemy getAssetTransfers — ETH Mainnet, Base, Arbitrum, Polygon
+ * Data source: Alchemy getAssetTransfers  ETH Mainnet, Base, Arbitrum, Polygon
  * Threshold: > $100,000 USD per transaction
  */
 

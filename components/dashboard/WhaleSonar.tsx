@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Zap, ShieldAlert, Target, TrendingUp, Flame, Loader2 } from 'lucide-react';
-import { useSovereignIntel } from '@/lib/api-client';
+import { useSystemIntel } from '@/lib/api-client';
 
 export function WhaleSonar() {
     // =========================================================================
-    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // INJECTED DATA HOOK  Zero-Mock Mandate
     // Whale stream endpoint injected via REGISTRY.SOVEREIGN_INTEL.massTransfers
     // =========================================================================
-    const { data: rawData, isLoading } = useSovereignIntel('massTransfers');
+    const { data: rawData, isLoading } = useSystemIntel('massTransfers');
     const alerts: any[] = rawData?.alerts || rawData?.transfers || [];
     const stats = useMemo(() => ({
         alertCount: alerts.length,

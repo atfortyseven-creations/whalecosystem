@@ -4,7 +4,7 @@ import { useState } from 'react';
 // Could be Pinata, Infura, or a local Helia node.
 const IPFS_GATEWAY = "https://ipfs.io/ipfs/";
 
-export const useSovereignStorage = () => {
+export const useSystemStorage = () => {
     const [isUploading, setIsUploading] = useState(false);
 
     /**
@@ -19,7 +19,7 @@ export const useSovereignStorage = () => {
             formData.append('file', blob);
 
             // Require real implementation (e.g. Pinata, Infura, native IPFS node)
-            throw new Error("Sovereign Storage requires real IPFS provider configuration. Mock uploads disabled.");
+            throw new Error("System Storage requires real IPFS provider configuration. Mock uploads disabled.");
         } catch (err) {
             console.error("Upload failed", err);
             throw err;

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 /**
  * ShortcutVisualizer
  *
- * Pure visual indicator only — shows the Shift+Alt+W key combo on screen
+ * Pure visual indicator only  shows the Shift+Alt+W key combo on screen
  * when any of those keys are pressed. Does NOT trigger wallet creation.
  *
  * Wallet creation is handled EXCLUSIVELY by the Portfolio page,
@@ -25,7 +25,7 @@ export function ShortcutVisualizer() {
             if (e.shiftKey) setKeys(prev => ({ ...prev, shift: true }));
             if (e.altKey) setKeys(prev => ({ ...prev, alt: true }));
             if (key === 'w') setKeys(prev => ({ ...prev, w: true }));
-            // NO action triggered here — only the /portfolio page handles the combo.
+            // NO action triggered here  only the /portfolio page handles the combo.
         };
 
         const handleKeyUp = (e: KeyboardEvent) => {
@@ -60,7 +60,7 @@ export function ShortcutVisualizer() {
                     <KeyTile label="W" active={keys.w} />
                     
                     <div className="ml-4 pl-4 border-l border-white/10 flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Sovereign Trigger</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">System Trigger</span>
                         <span className="text-[11px] font-bold text-white tracking-tight">Generate Identity</span>
                     </div>
                 </motion.div>

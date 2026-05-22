@@ -59,7 +59,7 @@ export function FeaturesSection() {
                         viewport={{ once: true }}
                         className="text-zinc-400 max-w-2xl mx-auto text-lg"
                     >
-                        Redefining digital identity with the highest standards of privacy and sovereignty.
+                        Redefining digital identity with the highest standards of privacy and systemty.
                     </motion.p>
                 </div>
 
@@ -72,7 +72,7 @@ export function FeaturesSection() {
                     />
                     <FeatureCard
                         icon={LockOpen}
-                        title="Total Digital Sovereignty"
+                        title="Total Digital Systemty"
                         description="Your identity credentials live in your wallet, not on our servers. You are the sole owner of your KYC; you decide what you share, with whom, and when."
                         delay={0.1}
                     />

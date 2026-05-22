@@ -1,21 +1,21 @@
 "use client";
 // FIX: Added missing 'use client' directive.
-// GovernanceProposals uses useState, useSWR, useAccount, and toast —
+// GovernanceProposals uses useState, useSWR, useAccount, and toast 
 // all client-only hooks. Without this directive, Next.js 13+ App Router
 // attempts to Server-Side Render this component and throws:
 // "You're importing a component that needs useState. It only works in a Client Component."
 
 import { useState } from 'react';
-import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit';
+import { IDKitWidget, ISuccessResult, VerificationLevel } from '@identity/idkit';
 import { Vote, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import useSWR from 'swr';
 
-// FIX: World ID app_id moved to env var — hardcoded app IDs in client-side
+// FIX: World ID app_id moved to env var  hardcoded app IDs in client-side
 // JSX are visible to anyone who inspects the bundle. While World ID app_ids
 // are not secret, best practice is to centralise them for rotation.
-const WLD_APP_ID = (process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || 'app_ea6e54f0a2ba18bc8edba458a2d3c52d') as `app_${string}`;
+const AUTH_APP_ID = (process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || 'app_ea6e54f0a2ba18bc8edba458a2d3c52d') as `app_${string}`;
 
 interface Proposal {
     id: string;
@@ -57,7 +57,7 @@ function VoteButton({
     if (widgetOpen) {
         return (
             <IDKitWidget
-                app_id={WLD_APP_ID}
+                app_id={AUTH_APP_ID}
                 action={proposalId}
                 verification_level={VerificationLevel.Orb}
                 onSuccess={(proof: ISuccessResult) => {
@@ -196,7 +196,7 @@ export function GovernanceProposals() {
                             <div className="flex gap-3">
                                 {proposal.outcomes.map((outcome, idx) => (
                                     // FIX: Use VoteButton subcomponent for per-outcome
-                                    // isolated IDKitWidget state — prevents N-widget multi-mount
+                                    // isolated IDKitWidget state  prevents N-widget multi-mount
                                     <div key={idx} className="flex-1">
                                         <VoteButton
                                             outcome={outcome}

@@ -155,7 +155,7 @@ export default function PremiumLocked({
               animate={{ x: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             >
-              →
+              
             </motion.div>
           </div>
         </motion.button>

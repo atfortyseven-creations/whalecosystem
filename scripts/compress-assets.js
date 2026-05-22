@@ -37,7 +37,7 @@ async function compressDirectory() {
       await fs.unlink(inputPath);
     }
     
-    console.log(`\n🎉 Compression complete! Total space saved: ${(totalSaved / 1024 / 1024).toFixed(2)} MB`);
+    console.log(`\n Compression complete! Total space saved: ${(totalSaved / 1024 / 1024).toFixed(2)} MB`);
   } catch (error) {
     console.error('Error during compression:', error);
   }

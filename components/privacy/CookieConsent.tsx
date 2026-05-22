@@ -40,7 +40,7 @@ export function CookieConsent() {
                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                 className="fixed bottom-0 left-0 right-0 z-[99999] p-3 sm:p-5 pointer-events-none"
             >
-                {/* ── Outer container ── */}
+                {/*  Outer container  */}
                 <div className="w-full max-w-2xl mx-auto pointer-events-auto relative">
                     {/* Card */}
                     <div

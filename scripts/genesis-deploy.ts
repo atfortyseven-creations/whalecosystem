@@ -3,78 +3,78 @@ const fs = require("fs");
 const path = require("path");
 
 async function main() {
-    console.log("🌌 INITIATING OPERATION GENESIS: THE BIG BANG 🌌");
+    console.log(" INITIATING OPERATION GENESIS: THE BIG BANG ");
 
     const [deployer] = await hre.ethers.getSigners();
-    console.log("👨🚀 God-Mode Admin:", deployer.address);
+    console.log(" God-Mode Admin:", deployer.address);
     const balance = await hre.ethers.provider.getBalance(deployer.address);
-    console.log("⛽ Balance:", hre.ethers.formatEther(balance), "ETH");
+    console.log(" Balance:", hre.ethers.formatEther(balance), "ETH");
 
     const network = hre.network.name;
-    console.log("🌍 Network:", network);
+    console.log(" Network:", network);
 
     // 1. DETERMINE RESERVE TOKEN (USDC)
     // Base Mainnet USDC: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
     let reserveTokenAddress;
 
     if (network === "hardhat" || network === "localhost") {
-        console.log("\n🧪 Local Network Mocking...");
+        console.log("\n Local Network Mocking...");
         // Check if we are forking Base
         const chainId = (await hre.ethers.provider.getNetwork()).chainId;
         if (chainId === 8453n) {
-             console.log("🔗 Forking Base Mainnet detected. Using Real USDC.");
+             console.log(" Forking Base Mainnet detected. Using Real USDC.");
              reserveTokenAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
         } else {
-            console.log("⛓ Fresh Local Chain. Deploying Mock USDC.");
+            console.log(" Fresh Local Chain. Deploying Mock USDC.");
             const MockERC20 = await hre.ethers.getContractFactory("MANAToken"); // Lazy check: reusing MANAToken logic as generic ERC20 mock since it has mint
             const mockUsdc = await MockERC20.deploy();
             await mockUsdc.waitForDeployment();
             reserveTokenAddress = await mockUsdc.getAddress();
-            console.log("💵 Mock USDC Deployed:", reserveTokenAddress);
+            console.log(" Mock USDC Deployed:", reserveTokenAddress);
         }
     } else if (network === "baseSepolia") {
         reserveTokenAddress = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // Base Sepolia USDC
     } else if (network === "worldChain") {
-         console.log("🌏 World Chain Detected. Using WLD as Reserve.");
-         reserveTokenAddress = "0x2cFc85d8E48F8EAB294be644d9E25C3030863003"; // WLD on World Chain
+         console.log(" World Chain Detected. Using AUTH as Reserve.");
+         reserveTokenAddress = "0x2cFc85d8E48F8EAB294be644d9E25C3030863003"; // AUTH on World Chain
     } else {
         reserveTokenAddress = process.env.RESERVE_TOKEN || "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"; // Default to Base Main
     }
 
-    console.log("🏦 Reserve Token:", reserveTokenAddress);
+    console.log(" Reserve Token:", reserveTokenAddress);
 
     // 2. DEPLOY MANA (SOUL)
-    console.log("\n👻 Deploying $MANA (Soulbound)...");
+    console.log("\n Deploying $MANA (Soulbound)...");
     const MANA = await hre.ethers.getContractFactory("MANAToken");
     const mana = await MANA.deploy();
     await mana.waitForDeployment();
-    console.log("✅ $MANA Deployed:", await mana.getAddress());
+    console.log(" $MANA Deployed:", await mana.getAddress());
 
     // 3. DEPLOY MATTER (BODY)
-    console.log("\n⚛ Deploying $MATTER (Bonding Curve)...");
+    console.log("\n Deploying $MATTER (Bonding Curve)...");
     const MATTER = await hre.ethers.getContractFactory("MATTERToken");
     const matter = await MATTER.deploy(reserveTokenAddress);
     await matter.waitForDeployment();
-    console.log("✅ $MATTER Deployed:", await matter.getAddress());
+    console.log(" $MATTER Deployed:", await matter.getAddress());
 
     // 4. DEPLOY CONSTITUTION
-    console.log("\n📜 Deploying Constitution...");
+    console.log("\n Deploying Constitution...");
     const Constitution = await hre.ethers.getContractFactory("Constitution");
     // Default Guardian = Deployer for now, can be updated later
     const constitution = await Constitution.deploy(deployer.address); 
     await constitution.waitForDeployment();
-    console.log("✅ Constitution Deployed:", await constitution.getAddress());
+    console.log(" Constitution Deployed:", await constitution.getAddress());
 
     // 5. DEPLOY ASCENSION
-    console.log("\n🚀 Deploying Ascension (The End)...");
+    console.log("\n Deploying Ascension (The End)...");
     const Ascension = await hre.ethers.getContractFactory("Ascension");
     const ascension = await Ascension.deploy();
     await ascension.waitForDeployment();
     const ascensionAddress = await ascension.getAddress();
-    console.log("✅ Ascension Deployed:", ascensionAddress);
+    console.log(" Ascension Deployed:", ascensionAddress);
 
     // 6. REGISTER SYSTEMS FOR ASCENSION
-    console.log("\n🔗 Registering Systems for Liberation...");
+    console.log("\n Registering Systems for Liberation...");
     await ascension.registerSystem(await mana.getAddress());
     await ascension.registerSystem(await matter.getAddress());
     await ascension.registerSystem(await constitution.getAddress());
@@ -84,7 +84,7 @@ async function main() {
     // But for "God Mode" demo, let's keep Admin as owner, but REGISTER them so we see the path.
     // If we want to truly TEST Ascension, we must transfer ownership. 
     // Let's NOT transfer ownership automatically yet, to allow the user to play as Admin.
-    console.log("🔓 Systems registered in Ascension. Admin retains keys until T-10M Users.");
+    console.log(" Systems registered in Ascension. Admin retains keys until T-10M Users.");
 
     // 7. OUTPUT CONFIG
     const configContent = `// Address Configuration for Type V Civilization Contracts
@@ -100,9 +100,9 @@ export const CIVILIZATION_CONTRACTS = {
 
     const configPath = path.join(__dirname, "../config/contracts.ts");
     fs.writeFileSync(configPath, configContent);
-    console.log("\n💾 Configuration saved to:", configPath);
+    console.log("\n Configuration saved to:", configPath);
 
-    console.log("\n🌌 OPERATION GENESIS COMPLETE. CIVILIZATION IS ALIVE. 🌌");
+    console.log("\n OPERATION GENESIS COMPLETE. CIVILIZATION IS ALIVE. ");
 }
 
 main().catch((error) => {

@@ -15,7 +15,7 @@ interface SearchAnalyticsViewProps {
 }
 
 /**
- * 🔥 LEGENDARY SEARCH ANALYTICS VIEW 🔥
+ *  LEGENDARY SEARCH ANALYTICS VIEW 
  * Elite-grade visualization for deep on-chain discovery.
  */
 export function SearchAnalyticsView({ result, onClose }: SearchAnalyticsViewProps) {
@@ -153,7 +153,7 @@ export function SearchAnalyticsView({ result, onClose }: SearchAnalyticsViewProp
                                 </div>
                             </div>
 
-                            {/* Main Intelligence Body */}
+                            {/* Main Analytics Body */}
                             <div className="lg:col-span-8 space-y-10">
                                 
                                 {/* Deep Insight Box */}
@@ -212,7 +212,7 @@ export function SearchAnalyticsView({ result, onClose }: SearchAnalyticsViewProp
                                 {/* Flow / Telemetry Visual */}
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between px-4">
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40">Intelligence Stream Output</h4>
+                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40">Analytics Stream Output</h4>
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                                             <span className="text-[9px] font-black uppercase text-white/20 tracking-widest">Real-Time Sync</span>

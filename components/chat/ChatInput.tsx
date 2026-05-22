@@ -5,7 +5,7 @@ import {
   Send, Paperclip, Smile, Mic, Timer,
   X, Reply, Square, Flame, MapPin
 } from 'lucide-react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 export type AutoDestructPreset = 'off' | '1m' | '1h' | '24h' | '7d';
 
@@ -22,9 +22,9 @@ interface ChatInputProps {
 }
 
 const EMOJI_GRID = [
-  '😀','😂','🥹','😎','🤯','🫡','🔥','💎',
-  '🐳','🚀','📊','⚡','✅','❌','💰','🌊',
-  '🧠','🏆','🎯','🔐','⛓️','🌐','🦾','🤖',
+  '','','','','','🫡','','',
+  '','','','','','','','',
+  '','','','','️','','','',
 ];
 
 const LOCATION_DURATION_OPTS = [
@@ -54,7 +54,7 @@ export default function ChatInput({
   onSendText, onSendVoice, onSendFile, onSendEmoji,
   replyingTo, onCancelReply, autoDestruct, onAutoDestructChange, disabled = false,
 }: ChatInputProps) {
-  const { address } = useSovereignAccount();
+  const { address } = useSystemAccount();
   const walletKey = address ? address.toLowerCase() : 'guest';
 
   const [text, setText] = useState('');
@@ -81,7 +81,7 @@ export default function ChatInput({
   const mediaRef    = useRef<MediaRecorder | null>(null);
   const chunksRef   = useRef<BlobPart[]>([]);
   const timerRef    = useRef<ReturnType<typeof setInterval> | null>(null);
-  const durationRef = useRef<number>(0); // ← fix: use ref so onstop always has latest value
+  const durationRef = useRef<number>(0); //  fix: use ref so onstop always has latest value
   const fileRef     = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -109,7 +109,7 @@ export default function ChatInput({
 
     const saveToCache = (lat: number, lon: number) => {
       try {
-        localStorage.setItem('last_known_sovereign_location', JSON.stringify({
+        localStorage.setItem('last_known_system_location', JSON.stringify({
           lat,
           lon,
           timestamp: Date.now()
@@ -119,7 +119,7 @@ export default function ChatInput({
 
     const getFromCache = () => {
       try {
-        const cached = localStorage.getItem('last_known_sovereign_location');
+        const cached = localStorage.getItem('last_known_system_location');
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Date.now() - parsed.timestamp < 86400000) {
@@ -189,7 +189,7 @@ export default function ChatInput({
       const handleSuccess = (lat: number, lon: number, source: string) => {
         if (resolved) return;
         resolved = true;
-        console.log(`[QuantumGeo] Resolved via ${source}: ${lat}, ${lon}`);
+        console.log(`[CoreGeo] Resolved via ${source}: ${lat}, ${lon}`);
         saveToCache(lat, lon);
         onSendText(`[LOCATION]${lat},${lon}|${durationMs}`);
         setIsRetrievingLocation(false);
@@ -203,7 +203,7 @@ export default function ChatInput({
         handleSuccess(fastGps.lat, fastGps.lon, fastGps.source);
         return;
       } catch (gpsError) {
-        console.warn('[QuantumGeo] Precise GPS failed or timed out. Racing network and IP targets...', gpsError);
+        console.warn('[CoreGeo] Precise GPS failed or timed out. Racing network and IP targets...', gpsError);
       }
 
       if (resolved) return;
@@ -218,7 +218,7 @@ export default function ChatInput({
         handleSuccess(winner.lat, winner.lon, winner.source);
         return;
       } catch (raceError) {
-        console.error('[QuantumGeo] Parallel race failed. Trying last cached position...', raceError);
+        console.error('[CoreGeo] Parallel race failed. Trying last cached position...', raceError);
       }
 
       if (resolved) return;
@@ -234,7 +234,7 @@ export default function ChatInput({
     })();
   };
 
-  // ── Voice recording ──────────────────────────────────────────────────────
+  //  Voice recording 
 
   const startRecording = async () => {
     setMicError(null);
@@ -252,7 +252,7 @@ export default function ChatInput({
       };
 
       recorder.onstop = () => {
-        // Use durationRef — immune to stale closure
+        // Use durationRef  immune to stale closure
         const finalMs = durationRef.current;
         stream.getTracks().forEach(t => t.stop());
         if (chunksRef.current.length === 0) return;
@@ -357,7 +357,7 @@ export default function ChatInput({
           <div className="flex-1 bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
             <span className="font-mono text-[13px] text-black font-bold">{formatDuration(recordingMs)}</span>
-            <span className="font-mono text-[10px] text-black/35 ml-auto">Recording…</span>
+            <span className="font-mono text-[10px] text-black/35 ml-auto">Recording</span>
           </div>
           <button
             onClick={stopRecording}
@@ -408,7 +408,7 @@ export default function ChatInput({
               onChange={e => setText(e.target.value)}
               onKeyDown={handleKey}
               disabled={disabled}
-              placeholder={disabled ? 'Connection unavailable' : 'Encrypted message…'}
+              placeholder={disabled ? 'Connection unavailable' : 'Encrypted message'}
               rows={1}
               className="w-full bg-black/[0.025] border border-black/10 rounded-xl px-4 py-3 text-[14px] font-mono text-black resize-none focus:outline-none focus:border-black/30 placeholder:text-black/25 transition-colors pr-12 leading-relaxed disabled:opacity-40"
             />

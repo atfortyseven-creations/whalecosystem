@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     const address = searchParams.get('address');
 
     if (!address) {
-      return NextResponse.json({ error: 'Missing sovereign identity' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing system identity' }, { status: 400 });
     }
 
     // Generate high-fidelity deterministic insights based on the address string to ensure consistency per-user
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     ].map((f, i) => ({ ...f, conviction: f.conviction - (seed % (i + 1)) }));
 
     const smartMoneyTargets = [
-      { ticker: 'WLD', signal: 'EXTREME BUY', anomaly: '340% vol surge', sector: 'AI/Identity' },
+      { ticker: 'AUTH', signal: 'EXTREME BUY', anomaly: '340% vol surge', sector: 'AI/Identity' },
       { ticker: 'ONDO', signal: 'STRONG BUY', anomaly: 'RWA Vault Deposit', sector: 'RWA' },
       { ticker: 'PENDLE', signal: 'ACCUMULATE', anomaly: 'Yield Stripping Spike', sector: 'DeFi' },
     ];

@@ -4,13 +4,13 @@ import { validateSecureRequest } from '@/lib/security/premium-security';
 
 export const dynamic = 'force-dynamic';
 
-// ── Helper: resolve caller's address ────────────────────────────────────────
+//  Helper: resolve caller's address 
 async function getCallerAddress(req: NextRequest): Promise<string | null> {
     const validation = await validateSecureRequest(req);
     return validation.valid && validation.userId ? validation.userId : null;
 }
 
-// ── GET /api/forum/settings ─────────────────────────────────────────────────
+//  GET /api/forum/settings 
 // Returns: categories list + global forum config
 export async function GET(req: NextRequest) {
     try {
@@ -42,8 +42,8 @@ export async function GET(req: NextRequest) {
         // Read global forum settings (stored as key-value in a simple JSON field
         // using a dedicated ForumSettings model if it exists, fallback to defaults)
         let globalSettings = {
-            siteName: 'Sovereign Forum',
-            welcomeMessage: 'Welcome to the Sovereign Terminal community forum.',
+            siteName: 'System Forum',
+            welcomeMessage: 'Welcome to the System Terminal community forum.',
             moderationMode: 'STRICT', // STRICT | OPEN | LOCKED
             allowGuestRead: true,
             requireApproval: true,
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
                 globalSettings = { ...globalSettings, ...JSON.parse(row.data ?? '{}') };
             }
         } catch {
-            // Table doesn't exist yet — use defaults silently
+            // Table doesn't exist yet  use defaults silently
         }
 
         return NextResponse.json({ categories, user: userRow, globalSettings });
@@ -66,14 +66,14 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// ── POST /api/forum/settings ────────────────────────────────────────────────
+//  POST /api/forum/settings 
 // Accepts: { action, ...payload }
 // Actions:
-//   "update_profile"    → { displayName, bio, avatarUrl, notifyOnReply, notifyOnMention }
-//   "update_category"   → { id, name, description, color, orderIndex }
-//   "create_category"   → { name, slug, description, color, orderIndex }
-//   "delete_category"   → { id }
-//   "update_global"     → { siteName, welcomeMessage, moderationMode, allowGuestRead, requireApproval, maxTopicsPerDay, maxPostsPerDay }
+//   "update_profile"     { displayName, bio, avatarUrl, notifyOnReply, notifyOnMention }
+//   "update_category"    { id, name, description, color, orderIndex }
+//   "create_category"    { name, slug, description, color, orderIndex }
+//   "delete_category"    { id }
+//   "update_global"      { siteName, welcomeMessage, moderationMode, allowGuestRead, requireApproval, maxTopicsPerDay, maxPostsPerDay }
 export async function POST(req: NextRequest) {
     try {
         const address = await getCallerAddress(req);
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         });
 
         switch (action) {
-            // ── Profile update (any authenticated user) ──────────────────────
+            //  Profile update (any authenticated user) 
             case 'update_profile': {
                 const { displayName, bio, avatarUrl, notifyOnReply, notifyOnMention } = body;
                 const updated = await (prisma as any).user.update({
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ ok: true, user: updated });
             }
 
-            // ── Category management (admin only) ─────────────────────────────
+            //  Category management (admin only) 
             case 'create_category': {
                 if (!caller?.isAdmin) return NextResponse.json({ error: 'Admin only' }, { status: 403 });
                 const { name, slug, description, color, orderIndex } = body;
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ ok: true });
             }
 
-            // ── Global forum settings (admin only) ───────────────────────────
+            //  Global forum settings (admin only) 
             case 'update_global': {
                 if (!caller?.isAdmin) return NextResponse.json({ error: 'Admin only' }, { status: 403 });
                 const { siteName, welcomeMessage, moderationMode, allowGuestRead, requireApproval, maxTopicsPerDay, maxPostsPerDay } = body;
@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
                         update: { data },
                     });
                 } catch {
-                    // Model not migrated — silently skip, frontend shows success anyway
+                    // Model not migrated  silently skip, frontend shows success anyway
                 }
                 return NextResponse.json({ ok: true });
             }

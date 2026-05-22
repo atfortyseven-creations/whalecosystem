@@ -21,7 +21,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
   return (
     <article className="w-full max-w-[800px] mx-auto px-8 md:px-16 py-20 pb-40">
       
-      {/* ── HEADER ── */}
+      {/*  HEADER  */}
       <div className="mb-16">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] font-black text-black/40 mb-6">
           Technical Specification / {doc.title}
@@ -32,7 +32,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
         <div className="w-full h-px bg-black/5" />
       </div>
 
-      {/* ── CONTENT BODY ── */}
+      {/*  CONTENT BODY  */}
       <div className="prose prose-lg prose-neutral max-w-none">
         {doc.content.map((paragraph, idx) => (
           <p key={idx} className="text-[17px] md:text-[19px] leading-[1.8] text-[#1a1a1a] font-serif mb-8 opacity-90">
@@ -41,7 +41,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
         ))}
       </div>
 
-      {/* ── FOOTER ── */}
+      {/*  FOOTER  */}
       <div className="mt-32 pt-10 border-t border-black/5 flex flex-col md:flex-row items-center justify-between gap-6">
         <p className="text-[12px] font-mono text-black/40 uppercase tracking-widest font-bold">
           © 2026 Humanity Ledger Protocol

@@ -5,10 +5,10 @@ import { useAccount, useWalletClient } from 'wagmi';
 import { TrendingUp, TrendingDown, Zap, RefreshCw, AlertTriangle, Target, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 
-// ── Hyperliquid API constants ────────────────────────────────────────────────
+//  Hyperliquid API constants 
 const HL_INFO_URL = 'https://api.hyperliquid.xyz/info';
 
-// ── Types ────────────────────────────────────────────────────────────────────
+//  Types 
 interface MarketData {
   coin: string;
   markPx: string;
@@ -26,7 +26,7 @@ interface PositionData {
   leverage: string;
 }
 
-// ── Number formatting helpers ────────────────────────────────────────────────
+//  Number formatting helpers 
 const fmtUsd = (n: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(n);
 const fmtPct = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(2)}%`;
@@ -34,7 +34,7 @@ const fmtPct = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(2)}%`;
 const TOP_MARKETS = ['BTC', 'ETH', 'SOL', 'ARB', 'OP', 'AVAX', 'LINK', 'UNI'];
 
 // Static fallback data for when Hyperliquid API is unavailable
-// Module-level constant — never recreated on render
+// Module-level constant  never recreated on render
 const FALLBACK_MARKETS: MarketData[] = [
   { coin: 'BTC', markPx: '64532.10', fundingRate: '0.0012', openInterest: '1240500000', volume24h: '3500000000', priceChange24h: 2.4 },
   { coin: 'ETH', markPx: '3452.45',  fundingRate: '0.0015', openInterest: '840500000',  volume24h: '1500000000', priceChange24h: 1.8 },

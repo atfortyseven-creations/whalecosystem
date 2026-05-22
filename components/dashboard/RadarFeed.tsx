@@ -52,7 +52,7 @@ export default function RadarFeed() {
 
   return (
     <div className="flex flex-col h-full bg-[#FAF9F6] font-mono">
-      {/* ── HEADER ── */}
+      {/*  HEADER  */}
       <div className="grid grid-cols-[100px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[8px] font-black uppercase tracking-[0.3em] text-black/40 border-b border-black/10 shrink-0 items-center">
         <span className="flex items-center gap-2">
           <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-emerald-500' : 'bg-black/20'} animate-pulse`} />
@@ -88,7 +88,7 @@ export default function RadarFeed() {
                  </span>
                  <div className="flex items-center gap-2 text-[7px] text-black/40 mt-1 uppercase tracking-widest">
                     <span>{alert.from.slice(0,6)}</span>
-                    <span>→</span>
+                    <span></span>
                     <span>{alert.to.slice(0,6)}</span>
                  </div>
               </div>

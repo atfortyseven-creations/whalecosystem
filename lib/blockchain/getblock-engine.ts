@@ -1,5 +1,5 @@
 /**
- * GetBlock Engine — Multi-Endpoint Failover (vía getblock-registry)
+ * GetBlock Engine  Multi-Endpoint Failover (vía getblock-registry)
  *
  * Fuente única: getblock-registry.ts
  * No hardcodear URLs aquí. Para añadir endpoints, editar .env + registry.
@@ -7,7 +7,7 @@
 
 import { getGbAllRpc, getActiveCount, getCoveredChains, markCuExhausted } from './getblock-registry';
 
-// ── FALLBACK PÚBLICOS DE EMERGENCIA ──────────────────────────────────────────
+//  FALLBACK PÚBLICOS DE EMERGENCIA 
 const PUBLIC_ETH_FALLBACKS = [
   'https://eth.llamarpc.com',
   'https://cloudflare-eth.com',
@@ -19,7 +19,7 @@ const PUBLIC_ETH_FALLBACKS = [
 
 const PUBLIC_ETH_FALLBACK = PUBLIC_ETH_FALLBACKS[0];
 
-// ── Estado de salud por endpoint ─────────────────────────────────────────────
+//  Estado de salud por endpoint 
 interface EndpointHealth {
   url: string;
   exhausted: boolean;
@@ -57,10 +57,10 @@ function markExhausted(url: string, reason: string) {
   h.exhausted = true;
   h.exhaustedAt = Date.now();
   h.errorCount++;
-  console.warn(`[GetBlock-Engine] 💀 BLACKLISTED (${reason}): ${url.slice(0, 48)}...`);
+  console.warn(`[GetBlock-Engine]  BLACKLISTED (${reason}): ${url.slice(0, 48)}...`);
 }
 
-// ── JSON-RPC core con failover automático desde el registry ──────────────────
+//  JSON-RPC core con failover automático desde el registry 
 async function rpcWithFailover(method: string, params: unknown[], id = 1): Promise<string> {
   // ETAPA 1: Intentar endpoints GetBlock activos del registry
   const registryUrls = getGbAllRpc('eth');
@@ -100,7 +100,7 @@ async function rpcWithFailover(method: string, params: unknown[], id = 1): Promi
     }
   }
 
-  // ETAPA 2: GetBlock vacío o agotado → iterar fallbacks públicos en orden
+  // ETAPA 2: GetBlock vacío o agotado  iterar fallbacks públicos en orden
   for (const fallbackUrl of PUBLIC_ETH_FALLBACKS) {
     try {
       const r = await fetch(fallbackUrl, {
@@ -119,7 +119,7 @@ async function rpcWithFailover(method: string, params: unknown[], id = 1): Promi
   return '0x0'; // Silencio absoluto
 }
 
-// ── Pad address to 32-byte ABI encoding ─────────────────────────────────────
+//  Pad address to 32-byte ABI encoding 
 function padAddr(addr: string) {
   return '000000000000000000000000' + addr.toLowerCase().replace('0x', '');
 }
@@ -128,9 +128,9 @@ function padAddr(addr: string) {
 const SIG_BALANCE_OF = '0x70a08231'; // balanceOf(address)
 const SIG_SLOT0      = '0x3850c7bd'; // slot0() Uniswap V3
 
-// ────────────────────────────────────────────────────────────────────────────
+// 
 // Portfolio: eth_getBalance + batched balanceOf
-// ────────────────────────────────────────────────────────────────────────────
+// 
 
 const KNOWN_ERC20: { symbol: string; address: string; decimals: number }[] = [
   { symbol: 'USDC',  address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', decimals: 6  },
@@ -206,9 +206,9 @@ export async function getUserPortfolio(walletAddress: string): Promise<{
   return { ethBalance, tokens };
 }
 
-// ────────────────────────────────────────────────────────────────────────────
+// 
 // Market Intel: UniswapV3 slot0() on-chain prices
-// ────────────────────────────────────────────────────────────────────────────
+// 
 
 const TOP_POOLS_V3: { symbol: string; pool: string; token0Decimals: number; token1Decimals: number }[] = [
   { symbol: 'ETH/USDC',  pool: '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640', token0Decimals: 6,  token1Decimals: 18 },
@@ -226,7 +226,7 @@ export interface PoolPrice {
   price:        number;
 }
 
-/** Read slot0() para cada pool UniswapV3 — precios on-chain reales */
+/** Read slot0() para cada pool UniswapV3  precios on-chain reales */
 export async function getPoolPrices(): Promise<PoolPrice[]> {
   const results = await Promise.all(
     TOP_POOLS_V3.map(p =>
@@ -243,7 +243,7 @@ export async function getPoolPrices(): Promise<PoolPrice[]> {
 
     // Validate: must be a hex string of at least 64 chars (32 bytes for sqrtPriceX96)
     if (!raw || raw === '0x' || raw === '0x0' || raw.length < 66) {
-      // slot0 empty — RPC degraded, CoinGecko fallback will handle it below
+      // slot0 empty  RPC degraded, CoinGecko fallback will handle it below
       prices.push({ ...p, sqrtPriceX96: '0', tick: 0, price: 0 });
       continue;
     }
@@ -300,7 +300,7 @@ export async function getPoolPrices(): Promise<PoolPrice[]> {
           return p;
         });
       }
-    } catch { /* silencio — CoinGecko también falló */ }
+    } catch { /* silencio  CoinGecko también falló */ }
   }
 
   return prices;

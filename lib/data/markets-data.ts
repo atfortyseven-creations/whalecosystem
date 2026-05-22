@@ -391,8 +391,8 @@ USD
 814.28M
 USD
 22.74B
-Worldcoin
-WLD
+Identity
+AUTH
 0.23
 USD
 -2.80%
@@ -599,7 +599,7 @@ USD
 455.34M
 USD
 392.08M
-Artificial Superintelligence Alliance
+Artificial Superanalytics Alliance
 FET
 0.19
 USD
@@ -2471,7 +2471,7 @@ USD
 71.09M
 USD
 23.72M
-Matrixdock Gold
+Griddock Gold
 XAUM
 4,529
 USD
@@ -4372,7 +4372,7 @@ export const RAW_NETWORKS = [
 "zkSync Era"
 ];
 
-// Network-specific native & dominant tokens — ensures every chain has ≥1 representative entry
+// Network-specific native & dominant tokens  ensures every chain has 1 representative entry
 export const NETWORK_NATIVE_TOKENS: Record<string, { name: string; ticker: string; price: string; change24h: string; mcap: string; circulation: string }[]> = {
     "Aptos": [
         { name: "Aptos", ticker: "APT", price: "5.42", change24h: "-3.11%", mcap: "2.81B", circulation: "518.41M" },
@@ -4546,7 +4546,7 @@ export const NETWORK_NATIVE_TOKENS: Record<string, { name: string; ticker: strin
     ],
 };
 
-// Quick runtime parser — deterministic round-robin network assignment (guarantees every network appears)
+// Quick runtime parser  deterministic round-robin network assignment (guarantees every network appears)
 export function getParsedMarkets() {
     const lines = RAW_TOKENS_STRING.trim().split('\n');
     const tokens: any[] = [];

@@ -1,5 +1,5 @@
-# ACUERDO DE NO DIVULGACIÓN (NDA) — NIVEL INSTITUCIONAL
-## Humanity Ledger | Sovereign Network Architecture
+# ACUERDO DE NO DIVULGACIÓN (NDA)  NIVEL INSTITUCIONAL
+## Humanity Ledger | System Network Architecture
 ### Versión 1.0 | Abril 2026
 
 ---
@@ -12,9 +12,9 @@
 
 ---
 
-## CLÁUSULA 1 — OBJETO Y DEFINICIÓN DE INFORMACIÓN CONFIDENCIAL
+## CLÁUSULA 1  OBJETO Y DEFINICIÓN DE INFORMACIÓN CONFIDENCIAL
 
-1.1. El presente Acuerdo tiene por objeto proteger la información confidencial, técnica, estratégica y comercial relacionada con el proyecto **Humanity Ledger / Sovereign Network Architecture**, incluyendo sin limitación:
+1.1. El presente Acuerdo tiene por objeto proteger la información confidencial, técnica, estratégica y comercial relacionada con el proyecto **Humanity Ledger / System Network Architecture**, incluyendo sin limitación:
 
 a) **El Motor EVM Thermodynamico:** El algoritmo propietario de análisis termodinámico de la Máquina Virtual de Ethereum (EVM), incluyendo su formulación matemática completa, parámetros de calibración, funciones de energía de Boltzmann adaptadas a transacciones on-chain, y cualquier implementación derivada.
 
@@ -24,11 +24,11 @@ c) **El Grafo de Entidades Neo4j:** El esquema completo de la base de datos de g
 
 d) **El Motor Z-Score Soberano:** El algoritmo de cálculo de puntuación de convicción institucional, incluyendo pesos, umbrales, factores de velocidad y clasificación de tiers (LOW/MEDIUM/HIGH/EXTREME).
 
-e) **El Protocolo Sovereign Handshake:** La implementación completa del flujo de autenticación cripto-nativa, incluyendo la cadena de estados, formato de claims JWT, y la lógica de reconciliación móvil-escritorio.
+e) **El Protocolo System Handshake:** La implementación completa del flujo de autenticación cripto-nativa, incluyendo la cadena de estados, formato de claims JWT, y la lógica de reconciliación móvil-escritorio.
 
 f) **El Audit Trail Criptográfico:** La implementación del registro inmutable con cadena HMAC-SHA256, estructura de datos y algoritmos de verificación de integridad.
 
-g) **Business intelligence:** Estrategia de mercado, proyecciones financieras, modelo de negocio, pipeline de inversores, y toda información comercial estratégica.
+g) **Business analytics:** Estrategia de mercado, proyecciones financieras, modelo de negocio, pipeline de inversores, y toda información comercial estratégica.
 
 h) **Código fuente:** Cualquier fragmento de código fuente, pseudocódigo, diagramas de arquitectura, ADRs, o documentación técnica interna.
 
@@ -36,7 +36,7 @@ h) **Código fuente:** Cualquier fragmento de código fuente, pseudocódigo, dia
 
 ---
 
-## CLÁUSULA 2 — OBLIGACIONES DEL RECEPTOR
+## CLÁUSULA 2  OBLIGACIONES DEL RECEPTOR
 
 2.1. El Receptor se compromete a:
 
@@ -54,7 +54,7 @@ f) No realizar ingeniería inversa, descompilación o análisis del código fuen
 
 ---
 
-## CLÁUSULA 3 — EXCEPCIONES
+## CLÁUSULA 3  EXCEPCIONES
 
 3.1. Las obligaciones de confidencialidad no se aplicarán a información que:
 
@@ -68,7 +68,7 @@ d) Sea divulgada por mandato judicial o requerimiento regulatorio, siempre que e
 
 ---
 
-## CLÁUSULA 4 — PROPIEDAD INTELECTUAL
+## CLÁUSULA 4  PROPIEDAD INTELECTUAL
 
 4.1. El presente Acuerdo no implica cesión, licencia ni transferencia de ningún derecho de propiedad intelectual o industrial.
 
@@ -78,7 +78,7 @@ d) Sea divulgada por mandato judicial o requerimiento regulatorio, siempre que e
 
 ---
 
-## CLÁUSULA 5 — DURACIÓN
+## CLÁUSULA 5  DURACIÓN
 
 5.1. Las obligaciones de confidencialidad establecidas en el presente Acuerdo tendrán una vigencia de **cinco (5) años** desde la fecha de firma, o hasta que la información deje de ser confidencial por causas ajenas al incumplimiento del Receptor.
 
@@ -86,19 +86,19 @@ d) Sea divulgada por mandato judicial o requerimiento regulatorio, siempre que e
 
 ---
 
-## CLÁUSULA 6 — PROPÓSITO DE LA DIVULGACIÓN
+## CLÁUSULA 6  PROPÓSITO DE LA DIVULGACIÓN
 
 6.1. La Información Confidencial se divulga exclusivamente para el siguiente propósito:
 
-☐ Evaluación técnica para posible inversión
-☐ Colaboración técnica / desarrollo conjunto
-☐ Auditoría de seguridad contratada
-☐ Asesoramiento legal o fiscal
-☐ Otro: _________________________________
+ Evaluación técnica para posible inversión
+ Colaboración técnica / desarrollo conjunto
+ Auditoría de seguridad contratada
+ Asesoramiento legal o fiscal
+ Otro: _________________________________
 
 ---
 
-## CLÁUSULA 7 — PENALIZACIÓN E INDEMNIZACIÓN
+## CLÁUSULA 7  PENALIZACIÓN E INDEMNIZACIÓN
 
 7.1. El incumplimiento de cualquier obligación del presente Acuerdo dará derecho a la Empresa a:
 
@@ -108,11 +108,11 @@ b) Reclamar la indemnización de todos los daños y perjuicios causados, incluye
 
 c) Solicitar medidas cautelares urgentes ante los Juzgados de lo Mercantil competentes, sin necesidad de prestar caución.
 
-7.2. Las Partes acuerdan una **penalización contractual mínima de €50,000** por cada incumplimiento demostrable, sin perjuicio de la reclamación de daños adicionales.
+7.2. Las Partes acuerdan una **penalización contractual mínima de 50,000** por cada incumplimiento demostrable, sin perjuicio de la reclamación de daños adicionales.
 
 ---
 
-## CLÁUSULA 8 — LEY APLICABLE Y JURISDICCIÓN
+## CLÁUSULA 8  LEY APLICABLE Y JURISDICCIÓN
 
 8.1. El presente Acuerdo se rige por la legislación española, en particular:
 - Ley 1/2019, de 20 de febrero, de Secretos Empresariales
@@ -124,7 +124,7 @@ c) Solicitar medidas cautelares urgentes ante los Juzgados de lo Mercantil compe
 
 ---
 
-## CLÁUSULA 9 — DISPOSICIONES GENERALES
+## CLÁUSULA 9  DISPOSICIONES GENERALES
 
 9.1. Si alguna cláusula fuera declarada nula, el resto del Acuerdo permanecerá en plena vigencia.
 

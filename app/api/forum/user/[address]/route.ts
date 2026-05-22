@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 export async function GET(req: Request, { params }: { params: Promise<{ address: string }> }) {
     try {
         const cookieStore = await cookies();
-        const authAddress = cookieStore.get('sovereign_handshake')?.value;
+        const authAddress = cookieStore.get('system_handshake')?.value;
         if (!authAddress) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const { address } = await params;

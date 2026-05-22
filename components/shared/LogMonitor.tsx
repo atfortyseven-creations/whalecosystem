@@ -131,7 +131,7 @@ export function LogMonitor() {
               <span className="text-[9px] opacity-30">COMMIT_SHA:sov_612</span>
            </div>
         </div>
-        <div className="text-[9px] opacity-20 font-black italic">Sovereign OS v6.12.0u</div>
+        <div className="text-[9px] opacity-20 font-black italic">System OS v6.12.0u</div>
       </div>
     </div>
   );

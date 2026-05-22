@@ -15,7 +15,7 @@ export const useZeroGravity = () => {
      * on private data without revealing that data.
      */
     const proveInference = async (inputData: number[]) => {
-        console.log("🧠 Zero-Gravity: Generating ZK Proof for AI Inference...");
+        console.log(" Zero-Gravity: Generating ZK Proof for AI Inference...");
         
         // 1. Load ONNX Model & SRS (structured reference string)
         // const model = await ezkl.loadModel('anti-sybil.onnx');
@@ -40,7 +40,7 @@ export const useZeroGravity = () => {
      */
     const submitProofOnChain = async (signer: any, proofData: AIInferenceProof) => {
         const verifierAddress = "0xVerifierContract...";
-        console.log("🚀 Submitting zkML Proof to chain:", verifierAddress);
+        console.log(" Submitting zkML Proof to chain:", verifierAddress);
         
         // Contract.verify(proof, instances)
         return true;

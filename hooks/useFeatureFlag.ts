@@ -1,5 +1,5 @@
 /**
- * useFeatureFlag — Client hook — Axioma 281
+ * useFeatureFlag  Client hook  Axioma 281
  * Evaluates a feature flag for the current wallet session.
  * Cached per flag key with 30s SWR revalidation.
  */
@@ -7,7 +7,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 interface FlagResult {
   enabled: boolean;
@@ -17,7 +17,7 @@ interface FlagResult {
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export function useFeatureFlag(flagKey: string): FlagResult {
-  const { address } = useSovereignAccount();
+  const { address } = useSystemAccount();
 
   const { data, isLoading } = useSWR(
     address ? `/api/feature-flags/${flagKey}?wallet=${address}` : null,

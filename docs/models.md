@@ -10,7 +10,7 @@ A confirmed or pending on-chain transaction that has passed the anomaly scoring 
 
 ```typescript
 interface WhaleEvent {
-  /** Unique whale event identifier — prefix: wh_ */
+  /** Unique whale event identifier  prefix: wh_ */
   id: string;
 
   /** Source blockchain network */
@@ -28,7 +28,7 @@ interface WhaleEvent {
   /** Token symbol (e.g. USDC, ETH, MATIC) */
   token: string;
 
-  /** Token contract address — null for native asset transfers */
+  /** Token contract address  null for native asset transfers */
   tokenAddress: `0x${string}` | null;
 
   /** Raw token amount in smallest denomination (wei / base units) */
@@ -41,7 +41,7 @@ interface WhaleEvent {
    * Statistical anomaly score (Z-score).
    * Formula: z = (x - μ) / σ
    * Where x = transaction volume, μ = rolling 1-hour mean, σ = rolling 1-hour std dev.
-   * Values ≥ 2.5 are classified as whale-tier events.
+   * Values  2.5 are classified as whale-tier events.
    */
   anomalyScore: number;
 
@@ -105,7 +105,7 @@ interface MarketOutcome {
   /** Outcome label (e.g. "Yes", "No") */
   label: string;
 
-  /** Current best bid price (0–1 range, represents probability) */
+  /** Current best bid price (01 range, represents probability) */
   price: number;
 
   /** Token CLOB ID */
@@ -117,17 +117,17 @@ interface MarketOutcome {
 
 ## Signal
 
-A computed intelligence signal derived from cross-referencing whale activity with market microstructure.
+A computed analytics signal derived from cross-referencing whale activity with market microstructure.
 
 ```typescript
 interface Signal {
-  /** Unique signal identifier — prefix: sig_ */
+  /** Unique signal identifier  prefix: sig_ */
   id: string;
 
   /** Signal type classification */
   type: 'accumulation' | 'distribution' | 'liquidity_drain' | 'bridge_flow' | 'smart_money_entry';
 
-  /** Confidence score (0–100) */
+  /** Confidence score (0100) */
   confidence: number;
 
   /** Related whale events that triggered this signal */
@@ -148,7 +148,7 @@ interface Signal {
   /** Signal generation timestamp */
   generatedAt: string;
 
-  /** Signal expiry — after this point the signal should be discarded */
+  /** Signal expiry  after this point the signal should be discarded */
   expiresAt: string;
 }
 ```
@@ -161,7 +161,7 @@ The authenticated session object returned after wallet connection.
 
 ```typescript
 interface UserSession {
-  /** Clerk user ID (null if authenticated via sovereign handshake only) */
+  /** Clerk user ID (null if authenticated via system handshake only) */
   clerkUserId: string | null;
 
   /** Connected wallet address */
@@ -173,7 +173,7 @@ interface UserSession {
   /** KYC verification status */
   kycStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | 'NOT_STARTED';
 
-  /** Human Score (World ID verification level, 0–100) */
+  /** Human Score (World ID verification level, 0100) */
   humanScore: number;
 
   /** Session creation timestamp */
@@ -193,7 +193,7 @@ interface ApiKey {
   /** Prefixed key identifier (shown in dashboard, safe to store) */
   keyId: string;
 
-  /** The actual secret — shown ONCE at creation, never again */
+  /** The actual secret  shown ONCE at creation, never again */
   secret?: string;
 
   /** Environment */

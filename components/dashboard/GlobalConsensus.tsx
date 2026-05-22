@@ -32,7 +32,7 @@ export default function GlobalConsensus() {
   return (
     <div className="h-full w-full min-h-0 bg-black text-white font-mono flex flex-col p-8 gap-8">
       
-      {/* ── ACADEMIC INTRO ── */}
+      {/*  ACADEMIC INTRO  */}
       <div className="p-8 border border-white/5 bg-white/[0.01] flex flex-col gap-6">
         <div className="flex items-center gap-6">
            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
@@ -84,7 +84,7 @@ export default function GlobalConsensus() {
         )}
       </div>
 
-      {/* ── MACRO FEED PANEL ── */}
+      {/*  MACRO FEED PANEL  */}
       <div className="mt-auto border border-white/10 bg-white/[0.01] p-6 flex items-center justify-between">
          <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
@@ -97,11 +97,11 @@ export default function GlobalConsensus() {
             </div>
          </div>
          <button className="text-[10px] font-black uppercase tracking-[0.3em] hover:text-emerald-500 transition-colors">
-            ACCESS_MACRO_INSIGHT_LOGS →
+            ACCESS_MACRO_INSIGHT_LOGS 
          </button>
       </div>
 
-      {/* ── FOOTER ── */}
+      {/*  FOOTER  */}
       <div className="flex items-center justify-between text-[8px] text-white/20 uppercase tracking-[0.5em]">
          <span>Node_Status:_Primary_Active</span>
          <span>Global_Consensus_Model_ALFA-3.1</span>

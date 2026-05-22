@@ -1,10 +1,10 @@
 /**
  * GET /api/market/new-pairs/sse
- * Server-Sent Events endpoint — streams new UniswapV3 pool events from EP3 WebSocket in real time.
+ * Server-Sent Events endpoint  streams new UniswapV3 pool events from EP3 WebSocket in real time.
  * Connects GetBlock EP3 (wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a) directly to browser.
  *
  * Architecture:
- *   GetBlock WS EP3 → newPairsEngine singleton → SSE push → NewPairsTable
+ *   GetBlock WS EP3  newPairsEngine singleton  SSE push  NewPairsTable
  *
  * Format per event:
  *   data: {"type":"NEW_PAIR","pool":"0x...","token0":"0x...","token1":"0x...","fee":3000,"blockNumber":...,"timestamp":...}
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
                 );
             }
 
-            // Subscribe to new pool creation events — starts the WS if not already running
+            // Subscribe to new pool creation events  starts the WS if not already running
             const unsubscribe = newPairsEngine.subscribe((event) => {
                 try {
                     controller.enqueue(

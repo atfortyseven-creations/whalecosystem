@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { 
-  NewsArticleIntelligence, 
+  NewsArticleAnalytics, 
   MarketSentiment,
   RawNewsItem
-} from '@/lib/news-intelligence';
+} from '@/lib/news-analytics';
 import { safeJsonParse } from '@/lib/utils/json';
 
 export const revalidate = 0;
@@ -33,7 +33,7 @@ export interface UINewsArticle {
   btcBearish?: number;
 }
 
-// ─── Utilidad: Decodificador de Entidades HTML ────────────────────────────────
+//  Utilidad: Decodificador de Entidades HTML 
 function decodeHTMLEntities(text: string): string {
   if (!text) return '';
   return text
@@ -43,12 +43,12 @@ function decodeHTMLEntities(text: string): string {
     .replace(/&apos;/g, "'")
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
-    .replace(/&#8217;/g, '’')
-    .replace(/&#8216;/g, '‘')
-    .replace(/&#8220;/g, '“')
-    .replace(/&#8221;/g, '”')
-    .replace(/&#8211;/g, '–')
-    .replace(/&#8212;/g, '—')
+    .replace(/&#8217;/g, '')
+    .replace(/&#8216;/g, '')
+    .replace(/&#8220;/g, '')
+    .replace(/&#8221;/g, '')
+    .replace(/&#8211;/g, '')
+    .replace(/&#8212;/g, '')
     .replace(/&#39;/g, "'")
     .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
     .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
@@ -82,7 +82,7 @@ function generateBtcSentiment(title: string) {
 function cleanAnalysis(text: string): string {
   if (!text) return "";
   return text
-    .replace(/Executive Brief|Global Intelligence Network|WAN Intelligence Node|Semantic Sentiment:\s*\w+|Executive Assessment Frame|Systemic Weight|Market Trajectory|Domain Vector|Macro-Institutional/gi, "")
+    .replace(/Executive Brief|Global Analytics Network|WAN Analytics Node|Semantic Sentiment:\s*\w+|Executive Assessment Frame|Systemic Weight|Market Trajectory|Domain Vector|Macro-Institutional/gi, "")
     .replace(/\d+\s*\/100/g, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -119,7 +119,7 @@ function generateDeepAnalysis(title: string, domain: string): string {
   return templates[idx].join('\n\n');
 }
 
-// ─── Extractor de RSS SIN IMÁGENES ───────────────────────────────────────────
+//  Extractor de RSS SIN IMÁGENES 
 async function fetchRSSFeed(url: string, sourceName: string): Promise<UINewsArticle[]> {
   try {
     const res = await fetch(url, {
@@ -251,7 +251,7 @@ async function GET_internal() {
   const apiKeysEnv = process.env.CRYPTOPANIC_API_KEYS || process.env.CRYPTOPANIC_API_KEY || '';
   const apiKeys = apiKeysEnv.split(',').map(k => k.trim()).filter(Boolean);
 
-  // ── Capa 1: CryptoPanic ──────────────────────────────────────────────────
+  //  Capa 1: CryptoPanic 
   for (const key of apiKeys) {
     try {
       const res = await fetch(
@@ -286,7 +286,7 @@ async function GET_internal() {
     } catch { continue; }
   }
 
-  // ── Capa 2: RSS Feeds institucionales (Cointelegraph Prioritized) ──────────
+  //  Capa 2: RSS Feeds institucionales (Cointelegraph Prioritized) 
   const RSS_SOURCES = [
     { url: 'https://cointelegraph.com/rss', name: 'Cointelegraph' }, // Moved to top priority
     { url: 'https://www.coindesk.com/arc/outboundfeeds/rss/', name: 'CoinDesk' },

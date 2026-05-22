@@ -41,7 +41,7 @@ export function usePolymarketMarkets() {
                     }
                     let result = activeMarkets;
                     
-                    // Sovereign Requirement: 300 Oracle Consensus Probability Vectors
+                    // System Requirement: 300 Oracle Consensus Probability Vectors
                     const targetCount = 300;
                     if (result.length > 0) {
                         const originalMarkets = [...result];

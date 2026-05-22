@@ -4,7 +4,7 @@ import { PredictionPosition } from '@/types/wallet';
 const CTF_CONTRACT = '0x4D970a14611C8BB70c3024832c3b841BC2F5d873';
 
 /**
- * 🔥 POLYMARKET DISCOVERY - MORALIS EDITION 🔥
+ *  POLYMARKET DISCOVERY - MORALIS EDITION 
  */
 export async function discoverPolymarketPositions(address: string): Promise<PredictionPosition[]> {
   try {

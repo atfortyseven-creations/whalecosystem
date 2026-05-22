@@ -1,4 +1,4 @@
-# 🚨 PROBLEMA IDENTIFICADO: Base de Datos
+#  PROBLEMA IDENTIFICADO: Base de Datos
 
 ## El Error
 
@@ -7,11 +7,11 @@ Todos los 500 errors que ves son porque:
 - La base de datos está en **Railway production** (postgres.railway.internal:5432)
 - Tu máquina local NO puede conectarse a la DB interna de Railway
 
-## ✅ SOLUCIÓN INMEDIATA
+##  SOLUCIÓN INMEDIATA
 
 ### 1. Añade `ETHERSCAN_API_KEY` a Railway
 
-Ve a Railway Dashboard → Tu proyecto → Variables:
+Ve a Railway Dashboard  Tu proyecto  Variables:
 ```
 ETHERSCAN_API_KEY=HCK9HSJ6D9SFZT54IMNCCCZ71CII74HH6J
 ```
@@ -30,7 +30,7 @@ Tu app ya está desplegada en Railway. Accede ahí en lugar de localhost:
 4. Añade `vitalik.eth`
 5. Verás el balance REAL de Etherscan
 
-## 🔍 Alternativa (Para desarrollo local)
+##  Alternativa (Para desarrollo local)
 
 Si quieres desarrollar en local, necesitas una base de datos local:
 

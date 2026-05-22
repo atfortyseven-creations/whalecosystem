@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function ForumBadgesPage() {
   const badges = [
     { id: 'genesis',      label: 'Genesis Founder',    sub: 'First 10,000 protocol participants',    rarity: 'Legendary' },
-    { id: 'pro',          label: 'Institutional Pro',  sub: 'Active Sovereign Terminal subscribers',  rarity: 'Epic'      },
+    { id: 'pro',          label: 'Institutional Pro',  sub: 'Active System Terminal subscribers',  rarity: 'Epic'      },
     { id: 'human',        label: 'Verified Human',      sub: 'World ID or KYC verified identity',      rarity: 'Standard'  },
     { id: 'signal',       label: 'Signal Provider',     sub: 'Topics exceeding 100 community votes',   rarity: 'Rare'      },
   ];

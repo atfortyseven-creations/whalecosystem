@@ -11,7 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors';
 // SIWE Config will be defined below
 
-// 1. Get projectId — Falls back to real project ID so the app renders even without the env var.
+// 1. Get projectId  Falls back to real project ID so the app renders even without the env var.
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
     || process.env.NEXT_PUBLIC_WC_PROJECT_ID
@@ -31,7 +31,7 @@ const dedicatedBase = {
     }
 };
 
-// Infura key — server-side only, never expose in client bundle
+// Infura key  server-side only, never expose in client bundle
 const infuraKey = process.env.INFURA_API_KEY ?? '';
 
 const dedicatedMainnet = {
@@ -98,7 +98,7 @@ const queryClient = new QueryClient()
 // [IOS CHROME CRITICAL FIX] The CANONICAL_APP_URL must:
 // 1. Be a valid HTTPS string even during SSR (window is undefined on server)
 // 2. Match EXACTLY what is registered in WalletConnect Cloud dashboard
-// 3. NOT use window.location.origin — this can return '' or undefined on iOS WKWebView
+// 3. NOT use window.location.origin  this can return '' or undefined on iOS WKWebView
 //    if called before the document is fully loaded, causing the WC relay to reject the session.
 // The canonical URL is ALWAYS humanidfi.com in production. Preview URLs must be allowlisted
 // separately in WalletConnect Cloud dashboard if needed.
@@ -122,7 +122,7 @@ const metadata = {
     }
 }
 
-// ── 1-Click Auth (SIWE) Configuration ──
+//  1-Click Auth (SIWE) Configuration 
 // Natively integrated with WalletConnect to bundle connection and signature
 // in a single wallet prompt. Crucial for bypassing Android tab-discard loops.
 const siweConfig = createSIWEConfig({
@@ -168,7 +168,7 @@ const siweConfig = createSIWEConfig({
   }
 });
 
-// ── CRITICAL: createAppKit must be called at module level (not inside window check).
+//  CRITICAL: createAppKit must be called at module level (not inside window check).
 // Reown AppKit hooks (useAppKit, useAppKitAccount, etc.) are used during SSR in
 // Next.js server components. The hooks throw "Please call createAppKit before
 // using useAppKit hook" when this function hasn't been called before the hook runs.
@@ -188,7 +188,7 @@ try {
             // Reown Cloud project has "ReownAuthentication" enabled at dashboard
             // level, which silently overrides any siweConfig passed here and logs:
             // "ReownAuthentication option is enabled, SIWX configuration will be
-            // overridden." — session establishment is now handled directly in
+            // overridden."  session establishment is now handled directly in
             // MobileLanding via the wagmi address (see establishSession).
             allowUnsupportedChain: true,
             featuredWalletIds: [
@@ -202,7 +202,7 @@ try {
                 'c03dfee351b6fcc421b4494ea33b9d4b92a984f87aa76d1663bb28705e95034a', // Uniswap Wallet
             ],
             features: {
-                analytics: false, // ⚡ INSTANT BOOT: Disable telemetry to avoid blocking network requests
+                analytics: false, //  INSTANT BOOT: Disable telemetry to avoid blocking network requests
                 email: true, // Re-enabled for Google login
                 socials: ['google', 'x', 'github', 'discord', 'apple'], // Re-enabled for Google login
                 emailShowWallets: true,
@@ -220,7 +220,7 @@ try {
                 '--w3m-z-index': 9999,
             },
             enableInjected: true,
-            enableEIP6963: true, // ⚡ FAST INJECT: Bypass polling by using standard EIP-6963 window events
+            enableEIP6963: true, //  FAST INJECT: Bypass polling by using standard EIP-6963 window events
             enableWalletConnect: true,
             enableCoinbase: true,
             customWallets: []
@@ -256,7 +256,7 @@ export function Web3ModalProvider({ children, cookies }: { children: ReactNode; 
                     setTimeout(() => {
                         try {
                             reconnect(wagmiAdapter.wagmiConfig as any);
-                            console.log('[Sovereign Protocol] iOS Connection Healer executed.');
+                            console.log('[System Protocol] iOS Connection Healer executed.');
                         } catch (e) {}
                     }, 300); // 300ms delay gives iOS time to fully restore networking stack
                 }

@@ -38,7 +38,7 @@ export function Search({ theme }: SearchProps) {
         <div className={`flex items-center gap-1 px-2 py-0.5 border text-[9px] font-black tracking-tighter ${
           theme === 'light' ? 'bg-black text-white border-black' : 'bg-white text-black border-white'
         }`}>
-          <span>{isMac ? '⌘' : 'CTRL'}</span>
+          <span>{isMac ? '' : 'CTRL'}</span>
           <span>K</span>
         </div>
       </div>

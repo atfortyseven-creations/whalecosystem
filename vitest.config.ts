@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 import path from 'path';
 
 /**
- * SOVEREIGN TEST CONFIGURATION — Vitest
+ * SOVEREIGN TEST CONFIGURATION  Vitest
  *
  * Covers:
  *   - Unit tests: lib/crypto, lib/audit, lib/resilience, lib/security
@@ -12,10 +12,10 @@ import path from 'path';
  * Coverage target: >92% on critical paths (middleware, crypto, audit, resilience)
  *
  * Run:
- *   npx vitest run                    — all tests once
- *   npx vitest run --coverage         — with coverage report
- *   npx vitest watch                  — watch mode
- *   npx vitest run test/unit/crypto   — specific suite
+ *   npx vitest run                     all tests once
+ *   npx vitest run --coverage          with coverage report
+ *   npx vitest watch                   watch mode
+ *   npx vitest run test/unit/crypto    specific suite
  */
 export default defineConfig({
   test: {
@@ -41,7 +41,7 @@ export default defineConfig({
         'lib/audit/**',
         'lib/resilience/**',
         'lib/security/**',
-        'services/intelligence/**',
+        'services/analytics/**',
       ],
       thresholds: {
         // Institutional grade: >92% on critical paths

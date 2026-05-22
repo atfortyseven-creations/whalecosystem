@@ -98,7 +98,7 @@ export function NewsOfToday() {
         <div className="w-full h-full min-h-0 p-4 md:p-6 flex flex-col text-[#050505] dark:text-white font-sans overflow-hidden">
             <div className="flex-1 w-full bg-white/70 dark:bg-[#0A0A0A] backdrop-blur-3xl border border-black/[0.05] dark:border-white/10 rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col min-h-0 relative">
                 
-                {/* ── EXCHANGE STATUS TICKER ── */}
+                {/*  EXCHANGE STATUS TICKER  */}
                 <div className="shrink-0 w-full border-b border-black/[0.04] dark:border-white/10 bg-white/50 dark:bg-[#111111] backdrop-blur-md flex items-center px-6 overflow-x-auto whitespace-nowrap scrollbar-hide py-3 gap-8 relative z-10">
                     <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-[#888888] shrink-0">
                         <Clock size={12} className="text-[#050505] dark:text-white" />
@@ -114,7 +114,7 @@ export function NewsOfToday() {
                     ))}
                 </div>
 
-                {/* ── THE POST HEADER ── */}
+                {/*  THE POST HEADER  */}
                 <div className="shrink-0 px-8 pt-8 pb-6 border-b border-black/[0.04] dark:border-white/10 flex flex-col md:flex-row md:items-end justify-between bg-gradient-to-b from-white/80 dark:from-[#1A1A1A] to-transparent relative z-10 gap-6">
                     <div className="flex flex-col gap-2">
                         <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-[#050505] dark:text-white flex items-center gap-3">
@@ -131,7 +131,7 @@ export function NewsOfToday() {
                             <input 
                                 value={search} 
                                 onChange={e => setSearch(e.target.value)} 
-                                placeholder="Search publications…"
+                                placeholder="Search publications"
                                 className="w-full bg-white/50 dark:bg-[#111111] border border-black/10 dark:border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-[#050505] dark:text-white placeholder:text-[#888888] dark:placeholder:text-white/40 py-3 pl-4 pr-10 outline-none focus:border-[#050505] dark:focus:border-white focus:bg-white dark:focus:bg-[#1A1A1A] transition-all shadow-sm"
                             />
                             {search && (
@@ -146,12 +146,12 @@ export function NewsOfToday() {
                     </div>
                 </div>
 
-                {/* ── NEWS STACK ── */}
+                {/*  NEWS STACK  */}
                 <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col relative z-0 bg-[#FAFAFA]/50 dark:bg-[#050505]" style={{ scrollbarWidth: 'none' }}>
                     {loading ? (
                         <div className="flex flex-col items-center justify-center h-full gap-4 py-20">
                             <Loader2 size={32} className="animate-spin text-[#050505]/20 dark:text-white/20" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]/40 dark:text-white/40 animate-pulse">Synchronizing Intelligence...</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]/40 dark:text-white/40 animate-pulse">Synchronizing Analytics...</p>
                         </div>
                     ) : (
                         <div className="p-4 md:p-6 flex flex-col gap-4">
@@ -231,7 +231,7 @@ export function NewsOfToday() {
                                                             ))}
                                                         </div>
                                                         
-                                                        {/* Institutional Data Matrix */}
+                                                        {/* Institutional Data Grid */}
                                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-5 mt-2 border-t border-black/[0.04] dark:border-white/10">
                                                             <div className="flex flex-col gap-1">
                                                                 <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">Verification Level</span>

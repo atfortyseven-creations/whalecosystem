@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * SkeletonLoader — Standardized GPU-composited skeleton placeholders
+ * SkeletonLoader  Standardized GPU-composited skeleton placeholders
  *
  * Provides branded skeleton components for every data-heavy dashboard module.
  * All animations use transform+opacity only (240Hz GPU contract).
@@ -9,7 +9,7 @@
 
 import React from "react";
 
-// ─── Base shimmer animation ───────────────────────────────────────────────────
+//  Base shimmer animation 
 
 function Shimmer({ className = "", style = {} }: { className?: string; style?: React.CSSProperties }) {
   return (
@@ -32,7 +32,7 @@ function Shimmer({ className = "", style = {} }: { className?: string; style?: R
   );
 }
 
-// ─── Akashic Ledger Skeleton ──────────────────────────────────────────────────
+//  Akashic Ledger Skeleton 
 
 export function AkashicSkeleton() {
   return (
@@ -97,7 +97,7 @@ export function AkashicSkeleton() {
   );
 }
 
-// ─── Mass Transfer Skeleton ───────────────────────────────────────────────────
+//  Mass Transfer Skeleton 
 
 export function MassTransferSkeleton() {
   return (
@@ -168,7 +168,7 @@ export function MassTransferSkeleton() {
   );
 }
 
-// ─── Portfolio Skeleton ───────────────────────────────────────────────────────
+//  Portfolio Skeleton 
 
 export function PortfolioSkeleton() {
   return (
@@ -211,7 +211,7 @@ export function PortfolioSkeleton() {
   );
 }
 
-// ─── Generic Table Skeleton ───────────────────────────────────────────────────
+//  Generic Table Skeleton 
 
 export function TableSkeleton({ rows = 8 }: { rows?: number }) {
   return (
@@ -247,10 +247,10 @@ export function TableSkeleton({ rows = 8 }: { rows?: number }) {
   );
 }
 
-// ─── CSS keyframe injection ───────────────────────────────────────────────────
-// (shimmer is injected via globals.css or style tag — see below)
+//  CSS keyframe injection 
+// (shimmer is injected via globals.css or style tag  see below)
 if (typeof document !== "undefined") {
-  const id = "__sovereign_shimmer_kf";
+  const id = "__system_shimmer_kf";
   if (!document.getElementById(id)) {
     const style = document.createElement("style");
     style.id = id;

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Activity, ArrowDownLeft, ArrowUpRight, ShieldCheck } from "lucide-react";
 import { useChainId } from "wagmi";
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { polygon } from "wagmi/chains";
 import { Toaster } from "sonner";
 import NetworkSwitcher from "@/components/wallet/NetworkSwitcher";

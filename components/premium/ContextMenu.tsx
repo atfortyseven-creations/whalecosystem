@@ -23,7 +23,7 @@ export default function ContextMenu({ onAction, children }: ContextMenuProps) {
   const handleAction = (label: string) => {
     setIsVisible(false);
     playOrderSound();
-    addToast({ title: "Sovereign Action", message: `Initiating ${label}...`, type: "success" });
+    addToast({ title: "System Action", message: `Initiating ${label}...`, type: "success" });
   };
 
   useEffect(() => {

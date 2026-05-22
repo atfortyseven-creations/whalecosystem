@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 /**
  * UHRP (Universal Hash Resolution Protocol) - Institutional Utility
  * -------------------------------------------------------------
- * Provides content-addressable hashing (SHA-256) for the Sovereign Vault.
+ * Provides content-addressable hashing (SHA-256) for the System Vault.
  */
 export class Uhrp {
     /**

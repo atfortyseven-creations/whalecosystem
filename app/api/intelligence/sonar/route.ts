@@ -17,7 +17,7 @@ export async function GET() {
         
         const sonarAlerts: { id: number; text: string; type: 'threat' | 'opportunity' }[] = latestWhales.map((w, i) => ({
             id: i,
-            text: `⚠ WHALE detected on ${w.chain}: ${w.amount} ${w.token} movement`,
+            text: ` WHALE detected on ${w.chain}: ${w.amount} ${w.token} movement`,
             type: 'opportunity' as const
         }));
 

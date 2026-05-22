@@ -73,7 +73,7 @@ export default function SmartMoneyBreakdown({ address }: SmartMoneyBreakdownProp
   if (error || !metrics) {
     return (
       <div className="p-8 bg-red-50 rounded-2xl border border-red-200">
-        <p className="text-red-600 font-bold">❌ Analysis Error: {error || 'Unknown error'}</p>
+        <p className="text-red-600 font-bold"> Analysis Error: {error || 'Unknown error'}</p>
         <button
           onClick={fetchAnalysis}
           className="mt-4 px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700"

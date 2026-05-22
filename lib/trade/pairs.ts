@@ -7,7 +7,7 @@ export const TRADING_PAIRS = [
   'ATOMUSDT', 'XLMUSDT', 'BCHUSDT', 'NEARUSDT', 'FILUSDT', 
   'APEUSDT', 'ALGOUSDT', 'ICPUSDT', 'ETCUSDT', 'VETUSDT', 
   'SANDUSDT', 'MANAUSDT', 'AXSUSDT', 'THETAUSDT', 'AAVEUSDT',
-  'WLDUSDT' // 🌍 Worldcoin Support
+  'AUTHUSDT' //  Identity Support
 ];
 
 export interface PairMetadata {
@@ -47,6 +47,6 @@ export const PAIR_METADATA: Record<string, PairMetadata> = {
   'AXSUSDT': { displayName: 'Axie Infinity', baseAsset: 'AXS', category: 'Gaming' },
   'THETAUSDT': { displayName: 'Theta', baseAsset: 'THETA', category: 'Infrastructure' },
   'AAVEUSDT': { displayName: 'Aave', baseAsset: 'AAVE', category: 'DeFi' },
-  'WLDUSDT': { displayName: 'Worldcoin', baseAsset: 'WLD', category: 'Identity' } // 🌍 Whale Alert IDentity Token
+  'AUTHUSDT': { displayName: 'Identity', baseAsset: 'AUTH', category: 'Identity' } //  Whale Alert IDentity Token
 };
 

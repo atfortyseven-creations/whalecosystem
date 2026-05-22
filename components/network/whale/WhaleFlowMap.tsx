@@ -16,7 +16,7 @@ export function WhaleFlowMap({ data, onClick, theme = 'arctic' }: FlowMapProps) 
     const [pulses, setPulses] = useState<NetworkPulse[]>([]);
     
     // Calculate network activity metrics
-    const networkIntelligence = useMemo(() => {
+    const networkAnalytics = useMemo(() => {
         const stats: Record<string, { volume: number, txCount: number, avgSize: number }> = {};
         
         const BASES: Record<string, { vol: number, count: number }> = {
@@ -86,7 +86,7 @@ export function WhaleFlowMap({ data, onClick, theme = 'arctic' }: FlowMapProps) 
                 {NODES.map((node: any) => {
                     const pulse = pulses.find(p => p.label === node.label);
                     const tps = pulse?.tps || 0;
-                    const intel = networkIntelligence[node.label];
+                    const intel = networkAnalytics[node.label];
                     const activityLevel = Math.min(100, (tps / 30) * 100);
 
                     return (

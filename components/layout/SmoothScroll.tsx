@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 
-// Singleton RAF handle — prevents double-RAF if React strict mode double-fires
+// Singleton RAF handle  prevents double-RAF if React strict mode double-fires
 let rafId: number | null = null;
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {

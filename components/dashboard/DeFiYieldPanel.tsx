@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, RefreshCw, AlertTriangle, ExternalLink, ShieldCheck, Zap, Loader2 } from 'lucide-react';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { useTransactionHandler } from '@/hooks/useTransactionHandler';
 import { toast } from 'sonner';
 
@@ -183,7 +183,7 @@ export default function DeFiYieldPanel() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/50">MAX RISK:</span>
                     <select value={riskMax} onChange={e => setRiskMax(+e.target.value)} className="bg-white border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
-                        {[1,2,3,4,5].map(v => <option key={v} value={v}>{v} — {RISK[v]?.label}</option>)}
+                        {[1,2,3,4,5].map(v => <option key={v} value={v}>{v}  {RISK[v]?.label}</option>)}
                     </select>
                 </div>
                 <button onClick={load} className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded text-[9px] font-bold uppercase tracking-widest text-[#050505]/50 hover:text-[#050505] hover:bg-black/5 transition-all">
@@ -280,7 +280,7 @@ export default function DeFiYieldPanel() {
                                     {[
                                         { l: 'TVL',        v: fmtUsd(selected.tvlUsd) },
                                         { l: 'IL RISK',    v: selected.ilRisk === 'no' ? 'NONE' : selected.ilRisk.toUpperCase() },
-                                        { l: 'RISK',       v: `${selected.riskScore}/5 — ${RISK[selected.riskScore]?.label}` },
+                                        { l: 'RISK',       v: `${selected.riskScore}/5  ${RISK[selected.riskScore]?.label}` },
                                         { l: 'ASSET TYPE', v: selected.stablecoin ? 'STABLECOIN' : 'VOLATILE' },
                                     ].map(row => (
                                         <div key={row.l} className="flex justify-between items-center py-2.5 border-b border-[#E5E5E5]">

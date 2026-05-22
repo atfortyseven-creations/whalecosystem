@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Shield, Camera, Upload, Loader2, CheckCircle } from 'lucide-react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 interface QRScannerModalProps {
@@ -17,7 +17,7 @@ interface QRScannerModalProps {
 import jsQR from 'jsqr';
 import { useSecureCamera } from '@/hooks/useSecureCamera';
 
-// ── File/gallery scanner (fallback for restricted camera environments) ────────
+//  File/gallery scanner (fallback for restricted camera environments) 
 async function scanFileForQR(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -45,8 +45,8 @@ async function scanFileForQR(file: File): Promise<string> {
   });
 }
 
-// ─── Perimeter scan-line animation ───────────────────────────────────────────
-// The line travels: right → down → left → up (full perimeter), once per cycle.
+//  Perimeter scan-line animation 
+// The line travels: right  down  left  up (full perimeter), once per cycle.
 // SIZE: the pixel side length of the viewfinder square.
 const VIEWFINDER_SIZE = 240;
 const STROKE = 3;
@@ -78,7 +78,7 @@ function ScanLine({ active }: { active: boolean }) {
       }}
       viewBox={`0 0 ${VIEWFINDER_SIZE} ${VIEWFINDER_SIZE}`}
     >
-      {/* Dim border — always visible when scanning */}
+      {/* Dim border  always visible when scanning */}
       <path
         d={path}
         fill="none"
@@ -87,7 +87,7 @@ function ScanLine({ active }: { active: boolean }) {
         strokeLinejoin="round"
       />
 
-      {/* Animated scan line — travels the full perimeter */}
+      {/* Animated scan line  travels the full perimeter */}
       <path
         d={path}
         fill="none"
@@ -133,7 +133,7 @@ function ScanLine({ active }: { active: boolean }) {
   );
 }
 
-// ─── Elegant "Scanned!" success overlay ──────────────────────────────────────
+//  Elegant "Scanned!" success overlay 
 function ScannedOverlay() {
   return (
     <motion.div
@@ -198,7 +198,7 @@ function ScannedOverlay() {
             Scanned!
           </p>
           <p className="text-[9px] font-black uppercase tracking-widest text-black/50">
-            Syncing session…
+            Syncing session
           </p>
         </motion.div>
       </motion.div>
@@ -206,16 +206,16 @@ function ScannedOverlay() {
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+//  Main component 
 export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress, initialScanData }: QRScannerModalProps) {
-  const { address } = useSovereignAccount();
+  const { address } = useSystemAccount();
 
   const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error' | 'signing'>('idle');
   const [errMsg, setErrMsg]   = useState('');
   const [tab, setTab]         = useState<'camera' | 'file'>('camera');
   const [fileLoading, setFileLoading] = useState(false);
 
-  // ── Stable refs for callbacks — NEVER go into useEffect dep array ──────────
+  //  Stable refs for callbacks  NEVER go into useEffect dep array 
   const addressRef  = useRef(address || externalAddress);
   const extAddrRef  = useRef(externalAddress);
   const onCloseRef  = useRef(onClose);
@@ -230,7 +230,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
   const hasScannedRef = useRef(false);
   const handleSuccessRef = useRef<any>(null);
 
-  // ─── useSecureCamera Integration ─────────────────────────────────────────
+  //  useSecureCamera Integration 
   const { videoRef, canvasRef, hasPermission, isInitializing, error: camError, startCamera, stopCamera } = useSecureCamera({
     facingMode: 'environment',
     onFrame: useCallback((canvas: HTMLCanvasElement) => {
@@ -265,7 +265,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     }, [])
   });
 
-  // ─── Core cleanup ─────────────────────────────────────────────────────────
+  //  Core cleanup 
   const destroyScanner = useCallback(async () => {
     isInitingRef.current = false;
     hasScannedRef.current = false;
@@ -276,7 +276,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     stopCamera();
   }, [stopCamera]);
 
-  // ─── Successful scan handler ───────────────────────────────────────────────
+  //  Successful scan handler 
   const handleSuccess = useCallback(async (decodedText: string) => {
     // ATOMIC LOCK: first call wins, all subsequent calls from the camera loop are ignored
     if (hasScannedRef.current) return;
@@ -287,21 +287,21 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
 
     const addr = addressRef.current || extAddrRef.current ||
       (() => {
-        // Cookie fallback — reads sovereign_handshake set after wallet sign
+        // Cookie fallback  reads system_handshake set after wallet sign
         if (typeof document !== 'undefined') {
-          const m = document.cookie.match(/sovereign_handshake=(0x[a-fA-F0-9]{40})/i);
+          const m = document.cookie.match(/system_handshake=(0x[a-fA-F0-9]{40})/i);
           return m?.[1] ?? null;
         }
         return null;
       })();
 
     try {
-      // ── Step 1: Parse QR — support BOTH URL format (new) and JSON (legacy) ──
+      //  Step 1: Parse QR  support BOTH URL format (new) and JSON (legacy) 
       let uuid: string | null = null;
       let ephemeralPub: string | null = null;
       let isECDH = false;
 
-      // Try URL format first (new — native camera compatible)
+      // Try URL format first (new  native camera compatible)
       try {
         const url = new URL(decodedText);
         uuid = url.searchParams.get('uuid');
@@ -318,7 +318,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           return;
         }
       } catch {
-        // Not a URL — try legacy JSON format
+        // Not a URL  try legacy JSON format
         try {
           const parsed = JSON.parse(decodedText);
           uuid = parsed.uuid ?? null;
@@ -339,20 +339,20 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
         return;
       }
 
-      // ── Step 2: Generate mobile ephemeral keypair ──────────────────────────
+      //  Step 2: Generate mobile ephemeral keypair 
       const { generateX25519KeyPair, deriveSharedSecret, encryptAESGCM } = await import('@/lib/web-crypto');
       const mobilePair = await generateX25519KeyPair();
 
-      // ── Step 3: Derive shared secret and get a JWT to encrypt ─────────────
+      //  Step 3: Derive shared secret and get a JWT to encrypt 
       // The JWT we send to the desktop proves mobile's identity.
       // We derive sharedSecret = X25519(mobile.priv, desktop.pub)
-      // Desktop will decrypt using X25519(desktop.priv, mobile.pub) — same secret.
+      // Desktop will decrypt using X25519(desktop.priv, mobile.pub)  same secret.
       const shared = await deriveSharedSecret(mobilePair.privateKey, ephemeralPub, isECDH);
 
-      // ── Step 3b: Try to get an existing JWT from human_session cookie ────
+      //  Step 3b: Try to get an existing JWT from human_session cookie 
       // If the mobile already has a session (returning user), we re-use it.
       // Otherwise, qr-mobile-link will mint a fresh JWT server-side from
-      // the sovereign_handshake cookie (set after wallet connection + sign).
+      // the system_handshake cookie (set after wallet connection + sign).
       let jwt: string | null = null;
 
       try {
@@ -362,14 +362,14 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           jwt = exportData.jwt ?? null;
         }
       } catch {
-        // Network error — fall through to server-side mint path
+        // Network error  fall through to server-side mint path
       }
 
-      // ── Step 4: Build the POST payload ────────────────────────────────────
-      // PATH A — Client has JWT: encrypt it with the shared ECDH secret.
-      // PATH B — No JWT yet: send isServerMint=true so the backend mints one
-      //          from sovereign_handshake and stores it as serverJwt in Redis.
-      //          Do NOT send placeholder strings — they corrupt the Redis entry
+      //  Step 4: Build the POST payload 
+      // PATH A  Client has JWT: encrypt it with the shared ECDH secret.
+      // PATH B  No JWT yet: send isServerMint=true so the backend mints one
+      //          from system_handshake and stores it as serverJwt in Redis.
+      //          Do NOT send placeholder strings  they corrupt the Redis entry
       //          and cause the desktop's AES-GCM decryption to throw every time.
       let postBody: Record<string, unknown>;
 
@@ -395,7 +395,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
         };
       }
 
-      // ── Step 5: POST to backend to complete the handshake ─────────────────
+      //  Step 5: POST to backend to complete the handshake 
       const res = await fetch('/api/auth/qr-mobile-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -420,7 +420,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
       // Browser auto-stores human_session cookie from response (credentials:include)
       setStatus('success');
 
-      // ── [EXPERT-SYNC] Receive XMTP Seed from Desktop ──────────────────────
+      //  [EXPERT-SYNC] Receive XMTP Seed from Desktop 
       // We poll for a few seconds to see if the desktop pushed an identity seed.
       // If we get it, the user can enter chat without a signature.
       let seedAttempts = 0;
@@ -442,8 +442,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                            if (finalAddr) {
                                const normAddr = finalAddr.toLowerCase();
                                if (payload.seed) localStorage.setItem(`whale_chat_seed_${normAddr}`, payload.seed);
-                               if (payload.vault) localStorage.setItem("sovereign_vault_v1", payload.vault);
-                               console.log("[Sovereign:Sync] Full identity synchronized (0-signature active).");
+                               if (payload.vault) localStorage.setItem("system_vault_v1", payload.vault);
+                               console.log("[System:Sync] Full identity synchronized (0-signature active).");
                            }
                        } catch (e) {
                            const finalAddr = addr || addressRef.current || extAddrRef.current;
@@ -452,7 +452,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                   }
               }
           } catch (e) {
-              console.warn("[Sovereign:Sync] Seed sync error:", e);
+              console.warn("[System:Sync] Seed sync error:", e);
           }
       }, 1000);
 
@@ -468,7 +468,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     setTimeout(() => onCloseRef.current(), 1400);
   }, [destroyScanner]);
 
-  // ─── Initialize camera scanner ────────────────────────────────────────────
+  //  Initialize camera scanner 
   const initScanner = useCallback(async () => {
     if (isInitingRef.current) return;
     isInitingRef.current = true;
@@ -493,7 +493,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     handleSuccessRef.current = handleSuccess;
   }, [handleSuccess]);
 
-  // ─── Effect: reacts to isOpen only ───────────────────────────────────────
+  //  Effect: reacts to isOpen only 
   useEffect(() => {
 
     if (!isOpen) {
@@ -518,7 +518,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialScanData]);
 
-  // ─── Tab switch effect ───────────────────────────────────────────────────
+  //  Tab switch effect 
   useEffect(() => {
     if (!isOpen) return;
     if (tab === 'file') {
@@ -531,7 +531,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
-  // ─── File scan handler ───────────────────────────────────────────────────
+  //  File scan handler 
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -562,7 +562,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     initTimerRef.current = setTimeout(() => { initScanner(); }, 300);
   }, [destroyScanner, initScanner]);
 
-  // ─── JSX ──────────────────────────────────────────────────────────────────
+  //  JSX 
   return (
     <AnimatePresence>
       {isOpen && (
@@ -627,7 +627,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
             {/* Main scanner card */}
             <div className="relative w-full min-h-[340px] bg-white border border-black/8 rounded-[28px] overflow-hidden shadow-2xl flex flex-col items-center justify-start pt-5 px-4">
 
-              {/* ── CAMERA TAB ─────────────────────────────────────────── */}
+              {/*  CAMERA TAB  */}
               {tab === 'camera' && (
                 <>
                   <div className="relative w-full h-[320px] rounded-[20px] overflow-hidden bg-black flex items-center justify-center shadow-inner">
@@ -691,7 +691,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                 </>
               )}
 
-              {/* ── GALLERY TAB ────────────────────────────────────────── */}
+              {/*  GALLERY TAB  */}
               {tab === 'file' && (
                 <div className="flex flex-col items-center justify-center w-full h-full min-h-[280px] gap-5 p-6">
                   <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center">

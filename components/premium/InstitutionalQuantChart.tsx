@@ -1,18 +1,18 @@
 "use client";
 
 /**
- * ═══════════════════════════════════════════════════════════════
- * InstitutionalQuantChart — Epicentro 3: Quant Terminal
- * ═══════════════════════════════════════════════════════════════
+ * 
+ * InstitutionalQuantChart  Epicentro 3: Quant Terminal
+ * 
  * Native lightweight-charts (TradingView engine) integrated with
  * the Zustand whale event store for real-time volume visualization.
  *
  * Architecture decisions:
  * - NO React re-renders on data updates: reads store directly inside
  *   a setInterval loop and calls chart API imperatively.
- * - GPU Canvas renderer (lightweight-charts) — zero DOM overhead.
+ * - GPU Canvas renderer (lightweight-charts)  zero DOM overhead.
  * - Hardware-accelerated dark mode institutional palette.
- * ═══════════════════════════════════════════════════════════════
+ * 
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
@@ -29,7 +29,7 @@ import {
 } from 'lightweight-charts';
 import { useVIPStore } from '@/lib/vip-store';
 
-// ── Palette ──────────────────────────────────────────────────────────────────
+//  Palette 
 const PALETTE = {
   bg:            '#020202',
   text:          '#666666',
@@ -43,7 +43,7 @@ const PALETTE = {
   accentGold:    '#D4AF37',
 };
 
-// ── Time helpers ─────────────────────────────────────────────────────────────
+//  Time helpers 
 const toDay  = (t: number) => Math.floor(t / 86400) * 86400 as Time;
 const toHour = (t: number) => Math.floor(t / 3600)  * 3600  as Time;
 
@@ -51,11 +51,11 @@ type Resolution = '1H' | '4H' | '1D';
 const RES_SECONDS: Record<Resolution, number> = { '1H': 3600, '4H': 14400, '1D': 86400 };
 const RES_BARS:    Record<Resolution, number> = { '1H': 72,   '4H': 60,    '1D': 120  };
 
-// ── Candle builder ────────────────────────────────────────────────────────────
+//  Candle builder 
 /**
  * Builds OHLCV bars from the raw whale event feed kept in the Zustand store.
  * Each "close" is the aggregate USD volume in that bar's window.
- * This is not financial price data — it is a *volume-flow proxy chart*
+ * This is not financial price data  it is a *volume-flow proxy chart*
  * used for visual pattern recognition of whale activity, not trading signals.
  */
 function buildBarsFromStore(resolution: Resolution): {
@@ -66,7 +66,7 @@ function buildBarsFromStore(resolution: Resolution): {
   const interval = RES_SECONDS[resolution];
   const maxBars  = RES_BARS[resolution];
 
-  // Collect the bucket map: timestamp → total usd volume
+  // Collect the bucket map: timestamp  total usd volume
   const buckets = new Map<number, number[]>();
   const nowSec  = Math.floor(Date.now() / 1000);
 
@@ -89,7 +89,7 @@ function buildBarsFromStore(resolution: Resolution): {
     }
   });
 
-  // Convert buckets → OHLCV
+  // Convert buckets  OHLCV
   const sorted = [...buckets.entries()].sort(([a], [b]) => a - b).slice(-maxBars);
 
   // Map net flow to a "price" proxy for visual pattern recognition
@@ -125,17 +125,17 @@ function buildBarsFromStore(resolution: Resolution): {
   return { candles, volumes };
 }
 
-// ── Main Component ────────────────────────────────────────────────────────────
+//  Main Component 
 export function InstitutionalQuantChart() {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef     = useRef<IChartApi | null>(null);
   const candleRef    = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const volumeRef    = useRef<ISeriesApi<'Histogram'> | null>(null);
   const [resolution, setResolution] = useState<Resolution>('4H');
-  const [lastUpdate,  setLastUpdate]  = useState<string>('—');
+  const [lastUpdate,  setLastUpdate]  = useState<string>('');
   const [evCount,    setEvCount]    = useState(0);
 
-  // ── Initialize chart (once, on mount) ─────────────────────────────────────
+  //  Initialize chart (once, on mount) 
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -197,7 +197,7 @@ export function InstitutionalQuantChart() {
     candleRef.current  = candle;
     volumeRef.current  = volume;
 
-    // Resize observer — GPU compositor remap on panel size change
+    // Resize observer  GPU compositor remap on panel size change
     const ro = new ResizeObserver(entries => {
       for (const e of entries) {
         chart.applyOptions({ width: e.contentRect.width });
@@ -214,7 +214,7 @@ export function InstitutionalQuantChart() {
     };
   }, []);
 
-  // ── Live data injection loop ───────────────────────────────────────────────
+  //  Live data injection loop 
   const injectData = useCallback(() => {
     if (!candleRef.current || !volumeRef.current) return;
     const { candles, volumes } = buildBarsFromStore(resolution);
@@ -239,11 +239,11 @@ export function InstitutionalQuantChart() {
     return () => clearInterval(id);
   }, [injectData]);
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  //  Render 
   return (
     <div className="w-full flex flex-col gap-4 text-white">
 
-      {/* ── Terminal Header ── */}
+      {/*  Terminal Header  */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-white/10">
         <div className="flex flex-col gap-1">
           <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#888888]">
@@ -280,14 +280,14 @@ export function InstitutionalQuantChart() {
         </div>
       </div>
 
-      {/* ── Chart Canvas ── */}
+      {/*  Chart Canvas  */}
       <div
         ref={containerRef}
         className="w-full rounded-lg overflow-hidden border border-white/8 shadow-2xl"
         style={{ minHeight: 480 }}
       />
 
-      {/* ── Legend strip ── */}
+      {/*  Legend strip  */}
       <div className="flex items-center justify-between text-[8.5px] font-mono text-[#444444] uppercase tracking-widest px-1">
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5">

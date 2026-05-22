@@ -39,7 +39,7 @@ async function solanaRpcCall(method: string, params: any[] = []) {
     });
 
     if (response.status === 429) {
-        console.warn('⚠️ [Solana] Rate limited (429). Backing off...');
+        console.warn('️ [Solana] Rate limited (429). Backing off...');
         throw new Error('Solana RPC Rate Limit');
     }
 
@@ -55,11 +55,11 @@ async function interceptThermodynamicAnomalies() {
     // [PHASE 9] Obtain the best healthy RPC endpoint via the GlobalRPCRouter.
     // On failure of this connection, we will call reportFailure() and retry with the next one.
     let currentRpcHttp = GlobalRPCRouter.getBestRPC('SOLANA');
-    // Convert HTTP(S) to WSS for subscription — standard Solana convention
+    // Convert HTTP(S) to WSS for subscription  standard Solana convention
     const SOLANA_RPC_WSS = (process.env.SOLANA_RPC_WSS) 
         || currentRpcHttp.replace('https://', 'wss://').replace('http://', 'ws://');
 
-    console.log(`[SOLANA] 🖇 Connecting to ${SOLANA_RPC_WSS} (SIMD-0109 Engine via RPC Router)`);
+    console.log(`[SOLANA]  Connecting to ${SOLANA_RPC_WSS} (SIMD-0109 Engine via RPC Router)`);
     
     // Using a dedicated WSS connection for lowest latency slot-by-slot interception
     const connection = new Connection(currentRpcHttp, {
@@ -73,7 +73,7 @@ async function interceptThermodynamicAnomalies() {
         console.warn(`[SOLANA] RPC endpoint failed. Router will route to next healthy node.`);
     });
 
-    // ── RPC PROTOCOL FIX ────────────────────────────────────────────────────────
+    //  RPC PROTOCOL FIX 
     // The 'mentions' filter with native system programs (ComputeBudget et al.) is
     // rejected by most RPC nodes with code -32602 'Invalid mentions provided'.
     // Native programs are blocklisted at the subscription layer.
@@ -82,7 +82,7 @@ async function interceptThermodynamicAnomalies() {
     // callback. Functionally identical; universally accepted by all RPC providers.
     const filter: LogsFilter = 'all';
 
-    console.log(`[SOLANA] 🔊 Subscribing to ComputeBudget logs (Processed Commitment)...`);
+    console.log(`[SOLANA]  Subscribing to ComputeBudget logs (Processed Commitment)...`);
 
     // [HEARTBEAT] Signal worker vitality every 10s
     setInterval(async () => {
@@ -112,7 +112,7 @@ async function interceptThermodynamicAnomalies() {
         const touchesComputeBudget = logs.logs.some(
             l => typeof l === 'string' && l.includes(COMPUTE_BUDGET_PROGRAM.toBase58())
         );
-        // Also catch by log content — some RPCs don't show full program invocations
+        // Also catch by log content  some RPCs don't show full program invocations
         const hasComputeUnitPrice = logs.logs.some(
             l => typeof l === 'string' && l.includes('SetComputeUnitPrice')
         );
@@ -154,7 +154,7 @@ async function interceptThermodynamicAnomalies() {
                     channels: ['TELEGRAM', 'DISCORD', 'UI_INAPP']
                 };
 
-                console.log(`[SOLANA-SIMD0109] 🐋 WHALE TACTIC DETECTED -> Fee: ${microLamports} uLamports | Z-Score: ${zScore}`);
+                console.log(`[SOLANA-SIMD0109]  WHALE TACTIC DETECTED -> Fee: ${microLamports} uLamports | Z-Score: ${zScore}`);
                 
                 // [ESTABILIDAD CÓSMICA] Unified Message Bus: global_crypto_alerts
                 await (redis as any).xadd('global_crypto_alerts', 'MAXLEN', '~', 10000, '*', 'payload', JSON.stringify(eventPayload));

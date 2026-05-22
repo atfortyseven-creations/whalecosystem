@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'Wallet address required' }, { status: 400 });
         }
 
-        // Auto-provision Sovereign User if missing
+        // Auto-provision System User if missing
         await prisma.user.upsert({
             where: { walletAddress: wallet },
             update: { lastActive: new Date() },

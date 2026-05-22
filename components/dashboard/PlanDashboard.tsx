@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { Shield, CreditCard, Mail, CheckCircle2, AlertCircle, Loader2, CalendarClock, Download } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -21,7 +21,7 @@ interface UserData {
 }
 
 export function PlanDashboard() {
-  const { isConnected, address, isSovereignHandshake } = useSovereignAccount();
+  const { isConnected, address, isSystemHandshake } = useSystemAccount();
   const router = useRouter();
 
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -44,7 +44,7 @@ export function PlanDashboard() {
       }
     }
     fetchUser();
-  }, [isConnected, isSovereignHandshake]);
+  }, [isConnected, isSystemHandshake]);
 
   if (isLoading) {
     return (

@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 const prisma = new PrismaClient();
 
 const DOMAINS = [
-    'capital.xyz', 'ventures.eth', 'matrix.fund', 'global.institution',
-    'alpha.org', 'sovereign.io', 'blackbox.fi', 'quantum.trades',
+    'capital.xyz', 'ventures.eth', 'grid.fund', 'global.institution',
+    'alpha.org', 'system.io', 'blackbox.fi', 'core.trades',
     'genesis.block', 'omega.capital'
 ];
 
@@ -36,13 +36,13 @@ Please submit cryptographic proposals below.
 [SECURE_DOC:Mandate_Brief_v{Version}.pdf|ipfs://Qm{Hash}]`
     },
     {
-        title: "Intelligence Alert: Anomalous {Metric} detected on {Chain}",
+        title: "Analytics Alert: Anomalous {Metric} detected on {Chain}",
         content: `### Phenomenon Observation
 Our automated heuristic engines have flagged significant anomalies regarding {Metric} across the {Chain} ecosystem over the last 48 hours.
 
 ### Analysis & Trajectory
 1. Capital flows indicate a systemic rotation from primary layers to {Target}.
-2. Dark pool activity suggests accumulation by 3 major sovereign wallets.
+2. Dark pool activity suggests accumulation by 3 major system wallets.
 3. Network congestion metrics correlate with these hidden spikes.
 
 ### Institutional Strategy
@@ -86,7 +86,7 @@ function getRandomItem(arr: any[]) {
 }
 
 async function main() {
-    console.log('🛡️ Initiating Sovereign Database Matrix...');
+    console.log('️ Initiating System Database Grid...');
     console.log('Seeding 65 Highly Realistic Institutional Personas and Broad Sectors...');
 
     // Delete existing records to prevent foreign key violations and reset cleanly
@@ -118,7 +118,7 @@ async function main() {
 
     for (let i = 0; i < personasToCreate; i++) {
         const walletAddress = '0x' + generateRandomString(40);
-        const namePart1 = getRandomItem(['Alpha', 'Quantum', 'Apex', 'Zenith', 'Cipher', 'Nexus', 'Vertex']);
+        const namePart1 = getRandomItem(['Alpha', 'Core', 'Apex', 'Zenith', 'Cipher', 'Nexus', 'Vertex']);
         const namePart2 = getRandomItem(['Capital', 'Ventures', 'Labs', 'Research', 'Holdings', 'Systems']);
         const domain = getRandomItem(DOMAINS);
         
@@ -196,12 +196,12 @@ async function main() {
         }
     }
 
-    console.log('✅ Success! 65 Institutional Personas & Cryptographic Mandates injected into the Sovereign Network.');
+    console.log(' Success! 65 Institutional Personas & Cryptographic Mandates injected into the System Network.');
 }
 
 main()
     .catch(e => {
-        console.error('❌ Error during seeding:', e);
+        console.error(' Error during seeding:', e);
         process.exit(1);
     })
     .finally(async () => {

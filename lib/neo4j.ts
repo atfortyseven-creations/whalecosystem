@@ -24,7 +24,7 @@ export async function closeNeo4jDriver() {
 }
 
 /**
- * runQuery — Execute a Cypher query with a hard 5-second timeout.
+ * runQuery  Execute a Cypher query with a hard 5-second timeout.
  * If Neo4j is offline (Railway service not started, routing table empty),
  * this will fail fast instead of hanging the API handler.
  */

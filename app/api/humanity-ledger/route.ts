@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// GET — Real on-chain data only. No fallback mocks. No fabricated data.
+// GET  Real on-chain data only. No fallback mocks. No fabricated data.
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
       }
     }
 
-    // BigInt → string for JSON serialization
+    // BigInt  string for JSON serialization
     const body = JSON.stringify(
       { ok: true, blocks, stats: { totalBlocks, totalTransactions } },
       (_, v) => (typeof v === 'bigint' ? v.toString() : v)

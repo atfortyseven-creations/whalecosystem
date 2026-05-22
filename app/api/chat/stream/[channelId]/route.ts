@@ -11,7 +11,7 @@ import { NextRequest } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// ── Lazy Upstash client — avoids module-level crash when env vars are missing ──
+//  Lazy Upstash client  avoids module-level crash when env vars are missing 
 let _upstashRedis: any = null;
 function getUpstashRedis(): any | null {
   if (_upstashRedis) return _upstashRedis;
@@ -27,8 +27,8 @@ function getUpstashRedis(): any | null {
   }
 }
 
-// ── In-memory fallback store (same instance shared with chat/send/route.ts
-//    only when both run in the same Node.js process — fine for dev/single instance) ──
+//  In-memory fallback store (same instance shared with chat/send/route.ts
+//    only when both run in the same Node.js process  fine for dev/single instance) 
 declare global {
   var __whaleChatMemStore: Map<string, Array<{ id: string; sender: string; content: string; sentAt: string; _score: number }>>;
 }
@@ -70,7 +70,7 @@ export async function GET(
           let newMessages: any[] = [];
 
           if (redis) {
-            // ── Redis path ────────────────────────────────────────────────────
+            //  Redis path 
             const key = `whale_chat:messages:${channelId}`;
             const raw = await redis.zrangebyscore(key, lastScore + 1, '+inf', { withScores: false });
             if (raw && raw.length > 0) {
@@ -79,7 +79,7 @@ export async function GET(
               }).filter(Boolean);
             }
           } else {
-            // ── In-memory fallback ────────────────────────────────────────────
+            //  In-memory fallback 
             const msgs = memoryStore.get(channelId) ?? [];
             newMessages = msgs.filter(m => (m._score ?? new Date(m.sentAt).getTime()) > lastScore);
           }
@@ -91,7 +91,7 @@ export async function GET(
             }
           }
         } catch (err) {
-          // Any error — send heartbeat to keep connection alive rather than dying
+          // Any error  send heartbeat to keep connection alive rather than dying
           send({ type: 'heartbeat' });
         }
       };

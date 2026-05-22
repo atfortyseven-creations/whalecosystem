@@ -66,7 +66,7 @@ export async function POST(request: Request) {
             }
         });
 
-        console.log(`✅ Referral created: ${referrerId} -> ${refereeAddress}`);
+        console.log(` Referral created: ${referrerId} -> ${refereeAddress}`);
 
         return NextResponse.json({ 
             success: true, 

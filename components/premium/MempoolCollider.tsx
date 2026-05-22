@@ -1,8 +1,8 @@
 /**
- * ╔══════════════════════════════════════════════════════════════════════╗
- * ║   LIQUIDITY DYNAMICS — Capital Velocity Index                        ║
- * ║   Whale Alert Network Pro · Infrastructure Suite                             ║
- * ╚══════════════════════════════════════════════════════════════════════╝
+ * 
+ *    LIQUIDITY DYNAMICS  Capital Velocity Index                        
+ *    Whale Alert Network Pro · Infrastructure Suite                             
+ * 
  */
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -11,9 +11,9 @@ import { TrendingUp, TrendingDown, Minus, Zap, Activity, Radio, BarChart3 } from
 import { useMempoolStream } from "@/hooks/useMempoolStream";
 import { usePerformanceMode, shouldRenderFrame } from "@/hooks/usePerformanceMode";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // TYPES
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 type VectorDir = "EXPAND" | "NEUTRAL" | "CONTRACT";
 
 interface LiveSignal {
@@ -28,9 +28,9 @@ interface LiveSignal {
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
-// ─────────────────────────────────────────────────────────────────────────────
-// VELOCITY CANVAS — renders scrolling frequency map
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// VELOCITY CANVAS  renders scrolling frequency map
+// 
 function VelocityCanvas({
   history,
   direction,
@@ -158,9 +158,9 @@ function VelocityCanvas({
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // CONFIG
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 const DIR_CONFIG = {
   EXPAND: {
     label: "INFLOW",
@@ -368,7 +368,7 @@ export function MempoolCollider() {
                       {sig.value}
                     </div>
                     <div className={`text-xs font-black ${isUp ? 'text-emerald-500' : isDown ? 'text-rose-500' : 'text-slate-300'}`}>
-                        {isUp ? '↑' : isDown ? '↓' : '—'}
+                        {isUp ? '' : isDown ? '' : ''}
                     </div>
                   </div>
                   <p className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">{sig.unit}</p>

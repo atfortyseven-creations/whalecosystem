@@ -11,7 +11,7 @@ import { BarChart3, TrendingUp, TrendingDown, Zap, Shield, Cpu, Activity, Globe,
 import { useEffect, useRef, useState } from 'react';
 import { useVIPStore } from '@/lib/vip-store';
 
-// ─── Animated Number ─────────────────────────────────────────────────────────
+//  Animated Number 
 function AnimNumber({ value, decimals = 0, prefix = '', suffix = '' }: { value: number; decimals?: number; prefix?: string; suffix?: string }) {
     const mv = useMotionValue(0);
     const [disp, setDisp] = useState('0');
@@ -24,7 +24,7 @@ function AnimNumber({ value, decimals = 0, prefix = '', suffix = '' }: { value: 
     return <span>{prefix}{disp}{suffix}</span>;
 }
 
-// ─── Health Score Ring ────────────────────────────────────────────────────────
+//  Health Score Ring 
 function HealthScoreRing({ score }: { score: number }) {
     const R = 80;
     const C = 2 * Math.PI * R;
@@ -65,7 +65,7 @@ function HealthScoreRing({ score }: { score: number }) {
     );
 }
 
-// ─── Scanning Line Effect ─────────────────────────────────────────────────────
+//  Scanning Line Effect 
 function ScanLine() {
     return (
         <motion.div
@@ -76,7 +76,7 @@ function ScanLine() {
     );
 }
 
-// ─── Floating Hex Particle ─────────────────────────────────────────────────
+//  Floating Hex Particle 
 function HexParticles() {
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -86,21 +86,21 @@ function HexParticles() {
                     style={{ left: `${10 + (i % 4) * 25}%`, top: `${10 + Math.floor(i / 4) * 35}%` }}
                     animate={{ opacity: [0.3, 0.6, 0.3], y: [-5, 5, -5] }}
                     transition={{ duration: 4 + i * 0.3, delay: i * 0.4, repeat: Infinity }}>
-                    {['0x4A2', '∑BTC', 'SHA256', '₿lock', '0xE1F', 'UTXO', 'MVRV', 'NVT', 'S2F', 'HODL', 'DIFF', 'MWU'][i]}
+                    {['0x4A2', 'BTC', 'SHA256', 'lock', '0xE1F', 'UTXO', 'MVRV', 'NVT', 'S2F', 'HODL', 'DIFF', 'MWU'][i]}
                 </motion.div>
             ))}
         </div>
     );
 }
 
-// ─── Live Price Ticker ────────────────────────────────────────────────────────
+//  Live Price Ticker 
 function LivePriceTicker() {
     const { ethPrice, btcPrice, gasGwei, blockNumber } = useVIPStore();
     const items = [
         { label: 'BTC', value: btcPrice ? `$${btcPrice.toLocaleString()}` : '$104,000', color: '#0f172a', icon: <Hash size={12} /> },
         { label: 'ETH', value: ethPrice ? `$${ethPrice.toLocaleString()}` : '$3,300', color: '#0f172a', icon: <Zap size={12} /> },
-        { label: 'GAS', value: gasGwei ? `${gasGwei.toFixed(1)} Gwei` : '—', color: '#0f172a', icon: <Activity size={12} /> },
-        { label: 'BLOCK', value: blockNumber ? `#${blockNumber.toLocaleString()}` : '—', color: '#0f172a', icon: <Database size={12} /> },
+        { label: 'GAS', value: gasGwei ? `${gasGwei.toFixed(1)} Gwei` : '', color: '#0f172a', icon: <Activity size={12} /> },
+        { label: 'BLOCK', value: blockNumber ? `#${blockNumber.toLocaleString()}` : '', color: '#0f172a', icon: <Database size={12} /> },
     ];
     return (
         <div className="flex flex-wrap items-center gap-2">
@@ -117,7 +117,7 @@ function LivePriceTicker() {
     );
 }
 
-// ─── Macro Insight Card ───────────────────────────────────────────────────────
+//  Macro Insight Card 
 function InsightCard({ icon: Icon, title, value, sub, color, glow, delay = 0, trend }: {
     icon: any; title: string; value: string; sub: string; color: string; glow: string; delay?: number; trend?: 'up' | 'down' | 'neutral';
 }) {
@@ -140,7 +140,7 @@ function InsightCard({ icon: Icon, title, value, sub, color, glow, delay = 0, tr
     );
 }
 
-// ─── Network Signal Bars ─────────────────────────────────────────────────────
+//  Network Signal Bars 
 function SignalBars({ level, color }: { level: number; color: string }) {
     return (
         <div className="flex items-end gap-0.5 h-5">
@@ -155,7 +155,7 @@ function SignalBars({ level, color }: { level: number; color: string }) {
     );
 }
 
-// ─── Main Dashboard ───────────────────────────────────────────────────────────
+//  Main Dashboard 
 export function AnalyticsDashboard() {
     const { gasGwei, ethPrice, btcPrice } = useVIPStore();
 
@@ -212,7 +212,7 @@ export function AnalyticsDashboard() {
 
                 {/* Macro KPI Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <InsightCard icon={Cpu}           title="Congestion Index"   value={gasGwei ? `${gasGwei.toFixed(0)} Gwei` : '—'}    sub="Settlement Load"                  color="#f59e0b" glow="rgba(245,158,11,0.2)" delay={0.0} trend="up" />
+                    <InsightCard icon={Cpu}           title="Congestion Index"   value={gasGwei ? `${gasGwei.toFixed(0)} Gwei` : ''}    sub="Settlement Load"                  color="#f59e0b" glow="rgba(245,158,11,0.2)" delay={0.0} trend="up" />
                     <InsightCard icon={Globe}          title="Ecosystem Dominance" value="54.2%"                                            sub="Capital Concentration"            color="#f97316" glow="rgba(249,115,22,0.2)" delay={0.05} trend="up" />
                     <InsightCard icon={Shield}         title="Valuation Signal"    value="2.14"                                             sub="Macro MVRV Index"                 color="#6366f1" glow="rgba(99,102,241,0.2)" delay={0.1} trend="neutral" />
                     <InsightCard icon={Activity}       title="Capital Flow"        value="0.58"                                             sub="Sentiment Momentum"               color="#00ff9d" glow="rgba(0,255,157,0.2)" delay={0.15} trend="up" />
@@ -226,7 +226,7 @@ export function AnalyticsDashboard() {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="space-y-10">
                     <div className="flex items-end justify-between border-b border-slate-100 pb-8 mx-4">
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 mb-2">Flow Intelligence</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 mb-2">Flow Analytics</p>
                             <h2 className="text-3xl font-black text-slate-950 tracking-tight">On-Chain Forensic Panel</h2>
                         </div>
                     </div>

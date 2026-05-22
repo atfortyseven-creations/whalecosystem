@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { Search, Bell, Clock, Eye, Settings, User, Wallet } from 'lucide-react';
 import { useNativeWallet } from '@/hooks/useNativeWallet';
-import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { WhaleLogo } from '@/components/shared/WhaleLogo';
 
 export default function InstitutionalHeader() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const { address, isConnecting, connect, formatAddress } = useNativeWallet();
-  const { nuclearDisconnect } = useSovereignSignOut();
+  const { nuclearDisconnect } = useSystemSignOut();
 
   const handleDisconnect = async () => {
     await nuclearDisconnect();
@@ -85,7 +85,7 @@ export default function InstitutionalHeader() {
                onMouseEnter={() => setActiveMenu('analytics')}
                className="hover:text-black opacity-40 hover:opacity-100 transition-opacity"
              >
-               Intelligence
+               Analytics
              </button>
              {activeMenu === 'analytics' && (
                <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">

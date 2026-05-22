@@ -1,5 +1,5 @@
-# CODEOWNERS — Whale Alert Network
-# © 2024–2026 atfortyseven-creations. All Rights Reserved.
+# CODEOWNERS  Whale Alert Network
+# © 20242026 atfortyseven-creations. All Rights Reserved.
 # Proprietary & Confidential.
 #
 # This file defines the code ownership structure of this repository.
@@ -8,12 +8,12 @@
 #
 # Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-# ─── GLOBAL OWNER ───────────────────────────────────────────────────────────
+#  GLOBAL OWNER 
 # atfortyseven-creations is the sole owner of ALL files in this repository.
 # All pull requests require approval from this account.
 * @atfortyseven-creations
 
-# ─── CRITICAL PATHS ─────────────────────────────────────────────────────────
+#  CRITICAL PATHS 
 # These paths are particularly sensitive and require explicit review.
 
 # Authentication & Security Layer
@@ -22,8 +22,8 @@
 /components/security/         @atfortyseven-creations
 /components/shared/LinkedGate.tsx  @atfortyseven-creations
 /components/layout/TitaniumGate.tsx @atfortyseven-creations
-/hooks/useSovereignAccount.ts @atfortyseven-creations
-/hooks/useSovereignSessionLock.ts @atfortyseven-creations
+/hooks/useSystemAccount.ts @atfortyseven-creations
+/hooks/useSystemSessionLock.ts @atfortyseven-creations
 
 # Data Layer
 /prisma/                      @atfortyseven-creations
@@ -36,7 +36,7 @@
 /Dockerfile*                  @atfortyseven-creations
 /docker-compose*              @atfortyseven-creations
 
-# Legal Documents — Never modify without Owner consent
+# Legal Documents  Never modify without Owner consent
 /LICENSE                      @atfortyseven-creations
 /NOTICE                       @atfortyseven-creations
 /SECURITY.md                  @atfortyseven-creations

@@ -43,7 +43,7 @@ export default function VisualTopography() {
             <header className="mb-6 flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-black text-black uppercase tracking-tighter">Visual Topography</h2>
-                    <p className="text-[10px] text-black/30 font-bold uppercase tracking-[0.3em] mt-1">Sovereign Cluster Analysis // Q4 2026</p>
+                    <p className="text-[10px] text-black/30 font-bold uppercase tracking-[0.3em] mt-1">System Cluster Analysis // Q4 2026</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button className="p-2.5 bg-white border border-black/5 rounded-xl hover:bg-black hover:text-white transition-all">
@@ -56,7 +56,7 @@ export default function VisualTopography() {
             </header>
 
             <div className="flex-1 border-2 border-dashed border-black/[0.03] rounded-[3rem] relative overflow-hidden bg-white/10 backdrop-blur-sm group">
-                {/* ── CONNECTION GRID ── */}
+                {/*  CONNECTION GRID  */}
                 <div 
                     className="absolute inset-0 opacity-[0.03] pointer-events-none"
                     style={{ 
@@ -66,7 +66,7 @@ export default function VisualTopography() {
                 />
 
                 <svg className="absolute inset-0 w-full h-full">
-                    {/* ── EDGES ── */}
+                    {/*  EDGES  */}
                     {edges.map((edge, i) => {
                         const s = nodes.find(n => n.id === edge.source)!;
                         const t = nodes.find(n => n.id === edge.target)!;
@@ -84,7 +84,7 @@ export default function VisualTopography() {
                     })}
                 </svg>
 
-                {/* ── NODES ── */}
+                {/*  NODES  */}
                 {nodes.map((node) => (
                     <motion.div
                         key={node.id}

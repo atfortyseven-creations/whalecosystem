@@ -1,4 +1,4 @@
-// ── SOVEREIGN ADMIN REGISTRY ────────────────────────────────────────────────
+//  SOVEREIGN ADMIN REGISTRY 
 // SECURITY: Uses server-only ADMIN_WALLET_ADDRESS env var (no NEXT_PUBLIC_ prefix).
 // The NEXT_PUBLIC_ prefix would expose admin wallet to the client-side bundle,
 // making admin identity enumeration trivial for any attacker.
@@ -9,7 +9,7 @@ export const ADMIN_WALLETS = [
 
 if (ADMIN_WALLETS.length === 0) {
   // Logged as info-level so Railway shows it in blue. Admin routes are simply disabled.
-  console.log('[Sovereign] ⚠️  ADMIN_WALLET_ADDRESS not set — admin routes disabled (non-critical for public deployment).');
+  console.log('[System] ️  ADMIN_WALLET_ADDRESS not set  admin routes disabled (non-critical for public deployment).');
 }
 
 export function isAdmin(walletAddress?: string): boolean {

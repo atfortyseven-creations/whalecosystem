@@ -1,4 +1,4 @@
-// FIX: Use global Prisma singleton — prevents DB connection pool exhaustion.
+// FIX: Use global Prisma singleton  prevents DB connection pool exhaustion.
 import { prisma } from "../../lib/prisma";
 import dotenv from "dotenv";
 import { getRealTimePrice } from "../../lib/priceHelper";
@@ -10,7 +10,7 @@ async function sleep(ms: number) {
     return new Promise(r => setTimeout(r, ms));
 }
 
-// ── RPC with timeout ────────────────────────────────────────────────────────
+//  RPC with timeout 
 // FIX: Add AbortSignal.timeout() so a stalled Solana RPC node cannot block
 // the worker loop indefinitely. Previously, a hung connection would freeze
 // the entire while(true) loop with no recovery path.
@@ -34,7 +34,7 @@ async function solanaRpcCall(method: string, params: any[] = []) {
     return data.result;
 }
 
-// ── Wallet list ─────────────────────────────────────────────────────────────
+//  Wallet list 
 async function getTargetWallets(): Promise<string[]> {
     try {
         const entities = await prisma.onChainEntity.findMany({
@@ -49,7 +49,7 @@ async function getTargetWallets(): Promise<string[]> {
 
         if (solanaAddrs.length > 0) return solanaAddrs;
     } catch {
-        // DB unavailable — fall through to static fallback
+        // DB unavailable  fall through to static fallback
     }
 
     return [
@@ -61,7 +61,7 @@ async function getTargetWallets(): Promise<string[]> {
 }
 
 export async function startSolanaWorker() {
-    console.log("🦅 [SOL Hub] Activating Adaptive Solana Surveillance...");
+    console.log(" [SOL Hub] Activating Adaptive Solana Surveillance...");
     let lastSignatures = new Map<string, string>();
     let consecutiveErrors = 0;
     const MAX_BACKOFF_MS  = 10 * 60 * 1000; // 10 minutes max for institutional patience
@@ -107,10 +107,10 @@ export async function startSolanaWorker() {
                 } catch (walletErr: any) {
                     if (walletErr.message === "RATE_LIMIT_429") {
                         // [CRITICAL SCALE] If we hit a 429, we must back off the ENTIRE worker immediately
-                        console.warn(`[SOL] 🛡️ Global Rate Limit detected on wallet ${wallet.slice(0, 5)}. Cooling down...`);
+                        console.warn(`[SOL] ️ Global Rate Limit detected on wallet ${wallet.slice(0, 5)}. Cooling down...`);
                         throw walletErr; // Re-throw to trigger outer backoff
                     }
-                    console.warn(`⚠ [SOL] Wallet ${wallet.slice(0, 8)}... skipped: ${walletErr.message}`);
+                    console.warn(` [SOL] Wallet ${wallet.slice(0, 8)}... skipped: ${walletErr.message}`);
                 }
             }
 
@@ -123,7 +123,7 @@ export async function startSolanaWorker() {
             const baseWait = e.message === "RATE_LIMIT_429" ? 120_000 : 60_000;
             const backoff = Math.min(baseWait * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);
             
-            const logPrefix = e.message === "RATE_LIMIT_429" ? "🛡️ [SOL] Rate limit cooldown" : `❌ [SOL] Worker error`;
+            const logPrefix = e.message === "RATE_LIMIT_429" ? "️ [SOL] Rate limit cooldown" : ` [SOL] Worker error`;
             console.error(`${logPrefix} #${consecutiveErrors} (${e.message}). Delay: ${backoff / 1000}s...`);
             await sleep(backoff);
         }
@@ -138,7 +138,7 @@ async function processWhaleTx(
     const exists = await prisma.whaleActivity.findUnique({ where: { transactionHash: hash } });
     if (exists) return;
 
-    // Calculate BTC Equivalence for the sovereign view
+    // Calculate BTC Equivalence for the system view
     let btcPrice = await getRealTimePrice("BTC") || 65000;
     const valueBTC = usdValue / btcPrice;
 
@@ -164,7 +164,7 @@ async function processWhaleTx(
         }
     }).catch(e => {
         if (!e.message.includes('Unique constraint')) {
-            console.error(`❌ [${chain}] Persistence Fail:`, e.message);
+            console.error(` [${chain}] Persistence Fail:`, e.message);
         }
     });
 
@@ -172,6 +172,6 @@ async function processWhaleTx(
         hash, from, to, asset, amount, usdValue, valueBTC,
         blockNumber: blockNumber.toString(), chain, type: "SOL", metadata,
     }).catch(e => {
-        console.error(`❌ [${chain}] Queue Fail:`, e.message);
+        console.error(` [${chain}] Queue Fail:`, e.message);
     });
 }

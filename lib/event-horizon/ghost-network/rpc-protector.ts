@@ -16,7 +16,7 @@ export class GhostNetworkProvider extends ethers.JsonRpcProvider {
      * Here we execute the logic of a "Private Intent".
      */
     async broadcastTransaction(tx: string): Promise<ethers.TransactionResponse> {
-        console.log("👻 Ghost Network: Routing transaction through private relay...");
+        console.log(" Ghost Network: Routing transaction through private relay...");
         
         // 1. Check if the tx is vulnerable to sandwich attacks
         // (MEV Protection logic would go here)
@@ -24,7 +24,7 @@ export class GhostNetworkProvider extends ethers.JsonRpcProvider {
         // 2. Submit to Flashbots
         const response = await super.broadcastTransaction(tx);
         
-        console.log("🛡️ Transaction Protected. Invalidating Public Mempool Observers.");
+        console.log("️ Transaction Protected. Invalidating Public Mempool Observers.");
         return response;
     }
 }

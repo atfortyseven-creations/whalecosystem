@@ -1,27 +1,27 @@
-# Humanity Ledger — Enterprise Edition
-## Absolute Zero-Trust Sovereignty Framework
+# Humanity Ledger  Enterprise Edition
+## Absolute Zero-Trust Systemty Framework
 
 [![eIDAS 2.0 Ready](https://img.shields.io/badge/eIDAS_2.0-ARF_v2.4_Aligned-blue.svg)](#)
 [![NIST SP 800-207](https://img.shields.io/badge/NIST-Zero_Trust_Architecture-success.svg)](#)
 [![Coverage](https://img.shields.io/badge/Coverage-%3E92%25-brightgreen.svg)](#)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](#)
 
-Humanity Ledger is an institutional-grade, Zero-Trust on-chain intelligence platform. It provides mathematically proven, non-repudiable entity tracking across EVM and non-EVM networks, secured by a cryptographic audit trail and eIDAS 2.0-aligned identity protocols.
+Humanity Ledger is an institutional-grade, Zero-Trust on-chain analytics platform. It provides mathematically proven, non-repudiable entity tracking across EVM and non-EVM networks, secured by a cryptographic audit trail and eIDAS 2.0-aligned identity protocols.
 
 ---
 
-## 🏛 Institutional Guarantees
+##  Institutional Guarantees
 
-This Enterprise Edition enforces the **Sovereign Network Architecture v3**, which guarantees:
+This Enterprise Edition enforces the **System Network Architecture v3**, which guarantees:
 
 1. **Absolute Zero-Trust (TitaniumGate)**: No implicit trust. Every request is verified via EIP-191 ECDSA signatures. Passwords do not exist.
-2. **Zero-Simulation Mandate**: The entity graph (`Memory Matrix` / Neo4j) contains exactly 0 synthetic nodes. All relationships are proven by cryptographic on-chain links.
+2. **Zero-Simulation Mandate**: The entity graph (`Memory Grid` / Neo4j) contains exactly 0 synthetic nodes. All relationships are proven by cryptographic on-chain links.
 3. **Immutable Non-Repudiation**: Every security event (auth, rate limits, honeypot hits) is chained using HMAC-SHA256, proving the exact state of the system for external auditors.
 4. **Thermodynamic EVM Analysis**: Capital flows are evaluated using statistical mechanics (Z-Scores, Boltzmann distribution analogues) rather than raw volume, eliminating MEV noise.
 
 ---
 
-## 🔒 Security Architecture
+##  Security Architecture
 
 ### TitaniumGate Middleware
 Our Edge Runtime middleware processes all inbound traffic globally within 50ms:
@@ -36,13 +36,13 @@ Designed for compliance with the European Digital Identity Framework (ARF v2.4):
 
 ---
 
-## 📦 Deployment (Enterprise/On-Premise)
+##  Deployment (Enterprise/On-Premise)
 
 ### Prerequisites
 - Node.js 22.x (required by native bindings)
 - PostgreSQL 16+
 - Redis 7+
-- Neo4j 5.x Enterprise (optional, falls back to Memory Matrix)
+- Neo4j 5.x Enterprise (optional, falls back to Memory Grid)
 
 ### Environment Configuration
 Critical secrets required for deployment (see `SECURITY.md` for rotation policies):
@@ -67,7 +67,7 @@ npm run start
 
 ---
 
-## 📊 Deep Health Metrics
+##  Deep Health Metrics
 Enterprise operators can monitor the `CLOSED/OPEN/HALF_OPEN` state of all internal circuit breakers via the authenticated deep health endpoint:
 ```bash
 curl -H "X-Health-Secret: $HEALTH_CHECK_SECRET" "https://api.humanityledger.io/v1/health-check?deep=1"
@@ -75,7 +75,7 @@ curl -H "X-Health-Secret: $HEALTH_CHECK_SECRET" "https://api.humanityledger.io/v
 
 ---
 
-## 📚 Documentation Directory
+##  Documentation Directory
 - [Formal Threat Model (STRIDE)](./docs/THREAT_MODEL_v2.1.md)
 - [eIDAS 2.0 Compliance Report](./docs/eIDAS2_ALIGNMENT_REPORT_v1.0.md)
 - [Security Audit Brief](./docs/SECURITY_AUDIT_BRIEF_v2.1.md)

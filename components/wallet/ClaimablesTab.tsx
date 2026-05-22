@@ -60,7 +60,7 @@ export default function ClaimablesTab({ claimables, isLoading }: ClaimablesTabPr
                         <div>
                             <div className="font-black text-neutral-900">{item.name}</div>
                             <div className="text-xs text-neutral-500 font-bold flex items-center gap-1">
-                                {item.protocol} • <span className="text-blue-600">{item.type}</span>
+                                {item.protocol}  <span className="text-blue-600">{item.type}</span>
                             </div>
                         </div>
                     </div>

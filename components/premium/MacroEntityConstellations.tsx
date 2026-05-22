@@ -7,11 +7,11 @@ import { Activity } from 'lucide-react';
 
 interface Props {
   whales: any[];
-  isSovereignFlow: boolean;
+  isSystemFlow: boolean;
   onProfileClick: (address: string) => void;
 }
 
-export function MacroEntityConstellations({ whales, isSovereignFlow, onProfileClick }: Props) {
+export function MacroEntityConstellations({ whales, isSystemFlow, onProfileClick }: Props) {
   
   // Transform real-time whales into Scatter plot data
   const data = useMemo(() => {
@@ -23,16 +23,16 @@ export function MacroEntityConstellations({ whales, isSovereignFlow, onProfileCl
             btc: btc,
             size: Math.max(20, Math.min(800, btc * 2)), // Scatter node size
             address: tx.vout?.[0]?.scriptpubkey_address || '',
-            isSovereign: btc > 100,
+            isSystem: btc > 100,
             feeRate: tx.fee / tx.vsize
         }
     });
 
-    if (isSovereignFlow) {
-        pts = pts.filter(p => p.isSovereign);
+    if (isSystemFlow) {
+        pts = pts.filter(p => p.isSystem);
     }
     return pts;
-  }, [whales, isSovereignFlow]);
+  }, [whales, isSystemFlow]);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -87,7 +87,7 @@ export function MacroEntityConstellations({ whales, isSovereignFlow, onProfileCl
                     let fill = 'rgba(139, 92, 246, 0.4)'; // Default purple
                     let stroke = 'rgba(139, 92, 246, 0.8)';
 
-                    if (isSovereignFlow) {
+                    if (isSystemFlow) {
                         fill = 'rgba(6, 182, 212, 0.4)';
                         stroke = 'rgba(6, 182, 212, 0.8)';
                         if (isGiant) {

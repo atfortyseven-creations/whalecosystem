@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { walletIntelligenceService } from '../lib/wallet/WalletIntelligenceService';
+import { walletAnalyticsService } from '../lib/wallet/WalletAnalyticsService';
 
 async function testWhale() {
     const address = 'vitalik.eth';
@@ -8,10 +8,10 @@ async function testWhale() {
     const start = Date.now();
     try {
         // Use the pre-instantiated singleton to avoid constructor resolution issues
-        const intel = await walletIntelligenceService.getFullIntelligence(address, true);
+        const intel = await walletAnalyticsService.getFullAnalytics(address, true);
         
         const duration = (Date.now() - start) / 1000;
-        console.log(`[TEST] ✅ Intelligence fetched in ${duration.toFixed(2)}s`);
+        console.log(`[TEST]  Analytics fetched in ${duration.toFixed(2)}s`);
         console.log(`[TEST] Address: ${intel.address}`);
         console.log(`[TEST] Total Value: $${intel.totalValue.toLocaleString()}`);
         console.log(`[TEST] Token Count: ${intel.breakdown ? Object.keys(intel.breakdown).length : 0}`);

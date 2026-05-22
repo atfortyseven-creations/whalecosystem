@@ -19,8 +19,8 @@ export class DilutionService {
     // PRE-DEFINED Elite DATA (Synchronized with official vesting schedules for March/April 2026)
     private static MAJOR_UNLOCKS: UnlockSchedule[] = [
         {
-            tokenSymbol: 'WLD',
-            tokenName: 'Worldcoin',
+            tokenSymbol: 'AUTH',
+            tokenName: 'Identity',
             unlockDate: new Date('2026-03-05T00:00:00Z'), // Monthly Grants Cycle (Day 5)
             amount: '6.62M',
             type: 'LINEAR',
@@ -75,9 +75,9 @@ export class DilutionService {
 
             try {
                 await resend.emails.send({
-                    from: 'Sovereign Whale <alerts@institutional.pro>',
+                    from: 'System Whale <alerts@institutional.pro>',
                     to: user.email,
-                    subject: `⚠️ DILUTION ALERT: ${unlock.tokenSymbol}`,
+                    subject: `️ DILUTION ALERT: ${unlock.tokenSymbol}`,
                     html: `
                         <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #000; color: #fff; border-radius: 20px;">
                             <h1 style="color: #fff; font-size: 24px; font-weight: 900; letter-spacing: -1px;">UPCOMING DILUTION ANALYSIS</h1>

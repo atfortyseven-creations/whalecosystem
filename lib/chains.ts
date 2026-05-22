@@ -1,7 +1,7 @@
 /**
- * Multi-Chain Configuration — 20-Endpoint GetBlock Registry
+ * Multi-Chain Configuration  20-Endpoint GetBlock Registry
  * All rpcUrls[0] pulls from getblock-registry.ts (canonical source).
- * Fallbacks: Alchemy → public nodes.
+ * Fallbacks: Alchemy  public nodes.
  */
 import { getGbRpc } from './blockchain/getblock-registry';
 
@@ -177,7 +177,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
   worldchain: {
     id: 480,
     name: 'World Chain',
-    shortName: 'WLD',
+    shortName: 'AUTH',
     nativeCurrency: {
       name: 'Ether',
       symbol: 'ETH',

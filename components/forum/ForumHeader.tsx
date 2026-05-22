@@ -11,7 +11,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
   const address = wagmiAddress || serverAddress;
   const router = useRouter();
   const [menuOpen,    setMenuOpen]    = useState(false);
-  // Theme is always 'light' — forced globally. No toggle needed.
+  // Theme is always 'light'  forced globally. No toggle needed.
   const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +41,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
   return (
     <>
-      {/* ─── Main Header Removed ─── */}
+      {/*  Main Header Removed  */}
       {/* Handled by the Unified Master InstitutionalHeader in ClientLayout */}
 
 

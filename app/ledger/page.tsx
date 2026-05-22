@@ -204,7 +204,7 @@ export default function LedgerPage() {
             {/* Minimal Footer Info */}
             <div className="mt-32 pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between gap-8 text-[10px] font-mono uppercase tracking-widest text-white/40">
                 <p className="max-w-md leading-relaxed">
-                    Sovereign Layer synchronizes transparent state without custodial routing. Records are mirrored directly from local state.
+                    System Layer synchronizes transparent state without custodial routing. Records are mirrored directly from local state.
                 </p>
                 <div className="flex gap-12">
                      <div className="flex flex-col gap-1">

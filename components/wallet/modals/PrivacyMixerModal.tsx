@@ -26,7 +26,7 @@ export default function PrivacyMixerModal({ isOpen, onClose }: PrivacyMixerModal
                 }),
             });
             const data = await res.json();
-            alert(`🔒 Anonymous donation sent! Your identity is protected via privacy protocol.`);
+            alert(` Anonymous donation sent! Your identity is protected via privacy protocol.`);
             onClose();
         } catch (e: any) {
             alert(e.message || 'Privacy send failed');

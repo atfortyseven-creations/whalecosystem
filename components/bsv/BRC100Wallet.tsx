@@ -11,7 +11,7 @@ import { toast } from 'sonner';
  * BRC-100 INSTITUTIONAL WALLET (Pillar 1 - Phase 2)
  * -----------------------------------------------
  * High-performance UI for managing BRC-100 token assets.
- * Integrates with the Sovereign Identity and CWI Substrate.
+ * Integrates with the System Identity and CWI Substrate.
  */
 export const BRC100Wallet = () => {
     const { identity } = useCWI();

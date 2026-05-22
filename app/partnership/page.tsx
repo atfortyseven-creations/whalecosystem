@@ -18,7 +18,7 @@ export default function PartnershipPage() {
   return (
     <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0A] font-sans flex flex-col justify-between selection:bg-[#000000]/10">
       
-      {/* ── HEADER ── */}
+      {/*  HEADER  */}
       <header className="px-6 md:px-12 py-8 flex items-center justify-between border-b border-slate-100">
         <Link href="/" className="group flex items-center gap-3 px-4 py-2 hover:bg-slate-50 rounded-xl transition-all">
           <ArrowLeft size={16} className="text-[#0A0A0A] group-hover:-translate-x-1 transition-transform" />
@@ -30,7 +30,7 @@ export default function PartnershipPage() {
         </div>
       </header>
 
-      {/* ── MAIN CONTENT ── */}
+      {/*  MAIN CONTENT  */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12 max-w-[1200px] mx-auto w-full">
         <div className="w-full flex flex-col items-center text-center space-y-6 mb-12">
           <span className="font-mono text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">ANNOUNCEMENT PREVIEW</span>
@@ -42,7 +42,7 @@ export default function PartnershipPage() {
           </p>
         </div>
 
-        {/* ── IMAGE CANVAS DISPLAY ── */}
+        {/*  IMAGE CANVAS DISPLAY  */}
         <div className="w-full max-w-[960px] aspect-[16/9] bg-white border border-slate-200/80 rounded-[2.5rem] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.06)] overflow-hidden flex items-center justify-center p-2 relative group hover:border-slate-300 transition-all duration-500">
           <Image 
             src="/aztec_x_whale_partnership.svg" 
@@ -53,7 +53,7 @@ export default function PartnershipPage() {
           />
         </div>
 
-        {/* ── ACTION BUTTONS ── */}
+        {/*  ACTION BUTTONS  */}
         <div className="mt-12 flex flex-col sm:flex-row items-center gap-4">
           <button
             onClick={handleDownload}
@@ -74,7 +74,7 @@ export default function PartnershipPage() {
         </div>
       </main>
 
-      {/* ── FOOTER ── */}
+      {/*  FOOTER  */}
       <footer className="px-6 md:px-12 py-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-slate-400 gap-4">
         <span className="font-mono text-[9px] font-black uppercase tracking-wider">
           © {new Date().getFullYear()} Humanity Ledger Core. All Rights Reserved.

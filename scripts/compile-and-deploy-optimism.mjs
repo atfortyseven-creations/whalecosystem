@@ -28,8 +28,8 @@ function compileSolidity() {
   const input = {
     language: "Solidity",
     sources: {
-      "QuantumDots.sol":   { content: readFileSync(join(ROOT, "contracts/quantum/QuantumDots.sol"), "utf8") },
-      "QuantumLedger.sol": { content: readFileSync(join(ROOT, "contracts/quantum/QuantumLedger.sol"), "utf8") },
+      "CoreDots.sol":   { content: readFileSync(join(ROOT, "contracts/core/CoreDots.sol"), "utf8") },
+      "CoreLedger.sol": { content: readFileSync(join(ROOT, "contracts/core/CoreLedger.sol"), "utf8") },
     },
     settings: {
       optimizer: { enabled: true, runs: 200 },
@@ -48,20 +48,20 @@ function compileSolidity() {
 
   return {
     qd: {
-      abi:      output.contracts["QuantumDots.sol"]["QuantumDots"].abi,
-      bytecode: "0x" + output.contracts["QuantumDots.sol"]["QuantumDots"].evm.bytecode.object,
+      abi:      output.contracts["CoreDots.sol"]["CoreDots"].abi,
+      bytecode: "0x" + output.contracts["CoreDots.sol"]["CoreDots"].evm.bytecode.object,
     },
     ledger: {
-      abi:      output.contracts["QuantumLedger.sol"]["QuantumLedger"].abi,
-      bytecode: "0x" + output.contracts["QuantumLedger.sol"]["QuantumLedger"].evm.bytecode.object,
+      abi:      output.contracts["CoreLedger.sol"]["CoreLedger"].abi,
+      bytecode: "0x" + output.contracts["CoreLedger.sol"]["CoreLedger"].evm.bytecode.object,
     },
   };
 }
 
 async function main() {
-  console.log("\n╔══════════════════════════════════════════════════════════════╗");
-  console.log("║  QuantumDots + QuantumLedger — OPTIMISM MAINNET DEPLOY       ║");
-  console.log("╚══════════════════════════════════════════════════════════════╝");
+  console.log("\n");
+  console.log("  CoreDots + CoreLedger  OPTIMISM MAINNET DEPLOY       ");
+  console.log("");
 
   const { qd, ledger } = compileSolidity();
 
@@ -73,26 +73,26 @@ async function main() {
   console.log(`  Deployer : ${wallet.address}`);
   console.log(`  Balance  : ${ethers.formatEther(balance)} ETH`);
 
-  console.log("\n[3/5] Deploying QuantumDots (QDs)...");
+  console.log("\n[3/5] Deploying CoreDots (QDs)...");
   const qdFactory  = new ethers.ContractFactory(qd.abi, qd.bytecode, wallet);
   const qdContract = await qdFactory.deploy(wallet.address);
   console.log(`  Tx: ${qdContract.deploymentTransaction()?.hash}`);
   await qdContract.waitForDeployment();
   const QD_ADDRESS = await qdContract.getAddress();
-  console.log(`  ✓  ${QD_ADDRESS}`);
+  console.log(`    ${QD_ADDRESS}`);
 
   console.log("\n[4/5] Verifying genesis allocation...");
   const qdView = new ethers.Contract(QD_ADDRESS, qd.abi, provider);
   const [vaultBal] = await Promise.all([qdView.balanceOf(SOVEREIGN_VAULT)]);
   console.log(`  Vault (${SOVEREIGN_VAULT.slice(0,10)}...) : ${ethers.formatEther(vaultBal)} QDs`);
   
-  console.log("\n[5/5] Deploying QuantumLedger v2...");
+  console.log("\n[5/5] Deploying CoreLedger v2...");
   const lFactory   = new ethers.ContractFactory(ledger.abi, ledger.bytecode, wallet);
   const lContract  = await lFactory.deploy(QD_ADDRESS);
   console.log(`  Tx: ${lContract.deploymentTransaction()?.hash}`);
   await lContract.waitForDeployment();
   const LEDGER_ADDRESS = await lContract.getAddress();
-  console.log(`  ✓  ${LEDGER_ADDRESS}`);
+  console.log(`    ${LEDGER_ADDRESS}`);
 
   console.log("\n  Updating .env...");
   let content = readFileSync(join(ROOT, ".env"), "utf8");
@@ -101,18 +101,18 @@ async function main() {
                  !l.startsWith("NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS") &&
                  !l.startsWith("NEXT_PUBLIC_CHAIN_ID"))
     .join("\n");
-  content += `\n# ── QDs Optimism Mainnet ──\n`;
+  content += `\n#  QDs Optimism Mainnet \n`;
   content += `NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=${QD_ADDRESS}\n`;
   content += `NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS=${LEDGER_ADDRESS}\n`;
   content += `NEXT_PUBLIC_CHAIN_ID=10\n`;
   writeFileSync(join(ROOT, ".env"), content, "utf8");
   
-  console.log("\n╔══════════════════════════════════════════════════════════════╗");
-  console.log("║  OPTIMISM MAINNET DEPLOY COMPLETE ✓                          ║");
-  console.log("╠══════════════════════════════════════════════════════════════╣");
-  console.log(`║  QuantumDots   : ${QD_ADDRESS}`);
-  console.log(`║  QuantumLedger : ${LEDGER_ADDRESS}`);
-  console.log("╚══════════════════════════════════════════════════════════════╝\n");
+  console.log("\n");
+  console.log("  OPTIMISM MAINNET DEPLOY COMPLETE                           ");
+  console.log("");
+  console.log(`  CoreDots   : ${QD_ADDRESS}`);
+  console.log(`  CoreLedger : ${LEDGER_ADDRESS}`);
+  console.log("\n");
   console.log(`  Optimism Scan: https://optimistic.etherscan.io/address/${QD_ADDRESS}`);
 }
 

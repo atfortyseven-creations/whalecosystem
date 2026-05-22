@@ -83,7 +83,7 @@ export function ApiKeyManager({ tier, keys }: { tier: keyof typeof SAAS_PLANS; k
                             </div>
                             <div className="flex items-center gap-3">
                                 <code className="text-sm font-mono text-indigo-300 bg-indigo-500/10 px-2 py-1 rounded">
-                                    {visibleKeyId === key.id ? key.key : 'hdi_live_••••••••••••••••••••'}
+                                    {visibleKeyId === key.id ? key.key : 'hdi_live_'}
                                 </code>
                                 <button onClick={() => toggleKeyVisibility(key.id)} className="text-white/40 hover:text-white transition-colors">
                                     {visibleKeyId === key.id ? <EyeOff size={16} /> : <Eye size={16} />}

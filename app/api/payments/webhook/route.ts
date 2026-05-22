@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
         case 'checkout.session.completed':
             const session = event.data.object as any;
-            const userId = session.metadata?.userId || session.metadata?.sovereign_user_id;
+            const userId = session.metadata?.userId || session.metadata?.system_user_id;
             const tier = (session.metadata?.tier || session.metadata?.plan_id) as string;
             const billingCycle = session.metadata?.billingCycle === 'ANNUAL' ? 'ANNUAL' : 'MONTHLY';
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
 
         case 'customer.subscription.deleted':
             const subscription = event.data.object as any;
-            let subUserId = subscription.metadata?.userId || subscription.metadata?.sovereign_user_id;
+            let subUserId = subscription.metadata?.userId || subscription.metadata?.system_user_id;
 
             // Fallback: Automated cancellations might strip metadata. Lookup by Customer ID.
             if (!subUserId && subscription.customer) {
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
 
         case 'customer.subscription.updated':
             const updatedSub = event.data.object as any;
-            let updatedUserId = updatedSub.metadata?.userId || updatedSub.metadata?.sovereign_user_id;
+            let updatedUserId = updatedSub.metadata?.userId || updatedSub.metadata?.system_user_id;
             const updatedTier = updatedSub.metadata?.tier || updatedSub.metadata?.plan_id;
 
             // Fallback: Automated updates might strip metadata. Lookup by Customer ID.
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
                 try {
                     // Fetch the subscription to get the reliable end date and metadata
                     const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-                    const subUserId = subscription.metadata?.userId || subscription.metadata?.sovereign_user_id;
+                    const subUserId = subscription.metadata?.userId || subscription.metadata?.system_user_id;
                     const tier = subscription.metadata?.tier || subscription.metadata?.plan_id;
 
                     if (subUserId && tier) {

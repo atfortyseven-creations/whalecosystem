@@ -5,7 +5,7 @@ import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
 const TOKEN_EXPIRY_S = 5 * 60; // 5 minutes in seconds
 
-// POST /api/bridge/generate — PC generates a short-lived QR token
+// POST /api/bridge/generate  PC generates a short-lived QR token
 export async function POST(request: NextRequest) {
     try {
         let sessionId: string;
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// GET /api/bridge/generate?token=xxx — Mobile validates scanned token
+// GET /api/bridge/generate?token=xxx  Mobile validates scanned token
 export async function GET(request: NextRequest) {
     try {
         const token = request.nextUrl.searchParams.get('token');

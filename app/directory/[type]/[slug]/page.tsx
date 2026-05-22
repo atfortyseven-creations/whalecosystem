@@ -64,7 +64,7 @@ export default async function KnowledgeGraphEntityPage({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        {/* Metric Cards Matrix */}
+        {/* Metric Cards Grid */}
         <div className="col-span-1 space-y-4">
            {entity.capitalInfluenced && (
              <div className="bg-white p-6 border border-black/5 shadow-xl shadow-black/5 rounded-3xl">
@@ -107,7 +107,7 @@ export default async function KnowledgeGraphEntityPage({
            <div className="bg-white p-8 border border-black/5 shadow-2xl rounded-[2.5rem] min-h-[400px]">
               <div className="flex items-center gap-3 mb-8">
                  <Network size={20} className="text-indigo-600" />
-                 <h2 className="text-[14px] font-black uppercase tracking-[0.25em]">Sovereign Web3 Ontology</h2>
+                 <h2 className="text-[14px] font-black uppercase tracking-[0.25em]">System Web3 Ontology</h2>
               </div>
               
               <div className="space-y-6">

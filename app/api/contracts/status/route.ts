@@ -28,7 +28,7 @@ import { ethers } from 'ethers';
 export const dynamic  = 'force-dynamic';
 export const runtime  = 'nodejs';
 
-// ─── Minimal ABIs (view-only) ────────────────────────────────────────────────
+//  Minimal ABIs (view-only) 
 
 const DEADMAN_ABI = [
     "function getStatus() view returns (address _owner, address _backup, uint256 _lastPing, uint256 _timeoutPeriod, uint256 _expiresAt, bool _triggered, bool _paused)",
@@ -39,8 +39,8 @@ const TIMELOCK_ABI = [
     "function locks(address user) view returns (uint256 amount, uint256 unlockTime)",
 ];
 
-// ─── Known deployed addresses per chain ──────────────────────────────────────
-// These are read from env vars — never hard-code prod addresses in source
+//  Known deployed addresses per chain 
+// These are read from env vars  never hard-code prod addresses in source
 
 const CONTRACTS: Record<string, { deadmanSwitch?: string; timeLock?: string; rpcUrl: string }> = {
     base: {
@@ -55,7 +55,7 @@ const CONTRACTS: Record<string, { deadmanSwitch?: string; timeLock?: string; rpc
     },
 };
 
-// ─── Handler ─────────────────────────────────────────────────────────────────
+//  Handler 
 
 export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     try {
         const blockNumber = await provider.getBlockNumber();
 
-        // ── DeadMan Switch ────────────────────────────────────────────────────
+        //  DeadMan Switch 
         let deadmanSwitch = null;
         if (config.deadmanSwitch) {
             try {
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        // ── HumanTimeLock (per-user lock) ─────────────────────────────────────
+        //  HumanTimeLock (per-user lock) 
         let timeLock = null;
         if (config.timeLock && address) {
             try {

@@ -14,7 +14,7 @@ export function PortfolioSecurityPanel() {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('sovereign_accounts');
+      const stored = localStorage.getItem('system_accounts');
       if (stored) {
         const parsed = JSON.parse(stored);
         setAccounts(parsed);

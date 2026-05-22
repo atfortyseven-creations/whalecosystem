@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 const ALCHEMY_WS_URL = process.env.ALCHEMY_WS_URL || 'wss://eth-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_KEY';
 const MIN_WHALE_TX_ETH = 100; // 100 ETH minimum to flag as whale in mempool
 
-export class SovereignMempoolListener {
+export class SystemMempoolListener {
     private ws: WebSocket | null = null;
     private provider: ethers.WebSocketProvider;
     private isRunning = false;
@@ -17,7 +17,7 @@ export class SovereignMempoolListener {
         if (this.isRunning) return;
         this.isRunning = true;
         
-        console.log('[SovereignMempool] Initializing Bare-Metal WebSocket to Global Mempool...');
+        console.log('[SystemMempool] Initializing Bare-Metal WebSocket to Global Mempool...');
 
         // Using direct ethers.js subscription for robustness instead of raw wss
         this.provider.on('pending', async (txHash: string) => {
@@ -29,7 +29,7 @@ export class SovereignMempoolListener {
                     const ethValue = parseFloat(ethers.formatEther(tx.value));
                     
                     if (ethValue >= MIN_WHALE_TX_ETH) {
-                        console.log(`[SovereignMempool] 🐋 WHALE DETECTED IN MEMPOOL (-12s advantage)`);
+                        console.log(`[SystemMempool]  WHALE DETECTED IN MEMPOOL (-12s advantage)`);
                         console.log(`Hash: ${tx.hash}`);
                         console.log(`Value: ${ethValue} ETH`);
                         console.log(`From: ${tx.from}`);
@@ -45,14 +45,14 @@ export class SovereignMempoolListener {
         });
 
         (this.provider.websocket as any).onclose = () => {
-            console.error('[SovereignMempool] WebSocket Connection Lost. Reconnecting in 5s...');
+            console.error('[SystemMempool] WebSocket Connection Lost. Reconnecting in 5s...');
             this.isRunning = false;
             setTimeout(() => this.start(), 5000);
         };
     }
 
     public stop() {
-        console.log('[SovereignMempool] Terminating Neural Link.');
+        console.log('[SystemMempool] Terminating Neural Link.');
         this.isRunning = false;
         this.provider.removeAllListeners('pending');
         if (this.provider.websocket) {
@@ -62,4 +62,4 @@ export class SovereignMempoolListener {
 }
 
 // Singleton export
-export const globalMempoolListener = new SovereignMempoolListener();
+export const globalMempoolListener = new SystemMempoolListener();

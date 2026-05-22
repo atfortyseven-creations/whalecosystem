@@ -137,7 +137,7 @@ export function NotificationsSection() {
                             <NotificationItem
                                 type="info"
                                 title="Swap exitoso"
-                                subtitle="1 ETH → 0.05759 SOCKS"
+                                subtitle="1 ETH  0.05759 SOCKS"
                                 time="3h atrás"
                             />
                             <NotificationItem
@@ -218,7 +218,7 @@ export function DownloadCTASection() {
                     </div>
 
                     <div className="pt-8 opacity-50 text-sm font-mono uppercase tracking-widest">
-                        Multi-Chain • Non-Custodial • Open Source
+                        Multi-Chain  Non-Custodial  Open Source
                     </div>
                 </motion.div>
             </div>

@@ -10,7 +10,7 @@ export const useHolographicState = () => {
      * ZERO indexing or archival nodes required.
      */
     const verifyLegacyAction = async (account: string, blockNumber: number) => {
-        console.log(`📀 Holographic State: Reconstructing Reality at Block ${blockNumber}...`);
+        console.log(` Holographic State: Reconstructing Reality at Block ${blockNumber}...`);
 
         // 1. Query Herodotus API to generate a specific storage proof
         const query = {
@@ -24,7 +24,7 @@ export const useHolographicState = () => {
         
         await new Promise(r => setTimeout(r, 1200));
 
-        console.log("✅ Holographic Projection Stabilized.");
+        console.log(" Holographic Projection Stabilized.");
         return {
             isValid: true,
             value: "0x05" // e.g., They held 5 tokens

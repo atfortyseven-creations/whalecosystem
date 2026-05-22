@@ -41,7 +41,7 @@ export default function DeadMansSwitchModal({ isOpen, onClose }: DeadMansSwitchM
                 }),
             });
             const data = await res.json();
-            alert(`💀 Dead Man's Switch activated! Beneficiary: ${beneficiaryAddress.slice(0, 10)}...`);
+            alert(` Dead Man's Switch activated! Beneficiary: ${beneficiaryAddress.slice(0, 10)}...`);
             fetchStatus();
         } catch (e: any) {
             alert(e.message || 'Failed to setup switch');
@@ -53,7 +53,7 @@ export default function DeadMansSwitchModal({ isOpen, onClose }: DeadMansSwitchM
     const pingAlive = async () => {
         try {
             await fetch('/api/wallet/deadman/ping', { method: 'POST' });
-            alert('✅ Activity recorded! Switch timer reset.');
+            alert(' Activity recorded! Switch timer reset.');
             fetchStatus();
         } catch (e: any) {
             alert('Failed to ping');

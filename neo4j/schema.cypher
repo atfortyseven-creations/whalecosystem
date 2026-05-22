@@ -1,4 +1,4 @@
-// Neo4j Cypher Schema - Sovereign Global Knowledge Graph
+// Neo4j Cypher Schema - System Global Knowledge Graph
 // Run these commands to initialize the constraints
 
 // 1. CONSTRAINTS (Unique Identities)

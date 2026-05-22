@@ -83,11 +83,11 @@ export default function HumanityLedger() {
   }) || [];
 
   return (
-    // ── OUTER WRAPPER ──────────────────────────────────────────────────────
+    //  OUTER WRAPPER 
     // bg logo pushed far right via backgroundPosition so it doesn't compete
     // with the main panel which is pinned to the left side of its container.
     <div className="w-full h-full min-h-0 flex flex-col items-start justify-start p-4 md:p-8 text-black font-sans overflow-y-auto no-scrollbar relative bg-white">
-      {/* ── BACKGROUND LOGOS — Centered in the white space on the right, fixed at top ─────────────── */}
+      {/*  BACKGROUND LOGOS  Centered in the white space on the right, fixed at top  */}
       <div className="fixed top-0 right-0 bottom-0 left-[780px] hidden lg:flex items-start justify-center pt-12 pointer-events-none z-0">
         <img 
           src="/aztec_x_whale_partnership.svg" 
@@ -96,10 +96,10 @@ export default function HumanityLedger() {
         />
       </div>
 
-      {/* ── MAIN PANEL — left-aligned, deliberately narrower ─────────────── */}
+      {/*  MAIN PANEL  left-aligned, deliberately narrower  */}
       <div className="w-full max-w-[780px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 flex flex-col transition-all duration-500 z-10 ml-0">
 
-        {/* ── HEADER ─────────────────────────────────────────────────────── */}
+        {/*  HEADER  */}
         <div className="w-full flex-shrink-0 border-b border-slate-200/60 pb-5 mb-7">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex flex-col">
@@ -107,7 +107,7 @@ export default function HumanityLedger() {
                 Humanity Ledger
               </h1>
               <span className="mt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-                Aztec Network × Whale Alert Network — Live Indexer
+                Aztec Network × Whale Alert Network  Live Indexer
               </span>
             </div>
             <button
@@ -125,7 +125,7 @@ export default function HumanityLedger() {
           </p>
         </div>
 
-        {/* ── STATS ROW ──────────────────────────────────────────────────── */}
+        {/*  STATS ROW  */}
         <div className="grid grid-cols-2 gap-4 mb-7">
           <div className="p-5 md:p-6 bg-white/50 backdrop-blur-md border border-slate-200/40 rounded-2xl flex items-center justify-between shadow-sm hover:shadow-md hover:bg-white/70 transition-all duration-300">
             <div className="flex flex-col">
@@ -152,7 +152,7 @@ export default function HumanityLedger() {
           </div>
         </div>
 
-        {/* ── SEARCH ─────────────────────────────────────────────────────── */}
+        {/*  SEARCH  */}
         <div className="w-full mb-7 relative">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search size={16} className="text-slate-400" />
@@ -161,12 +161,12 @@ export default function HumanityLedger() {
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search block number or transaction hash…"
+            placeholder="Search block number or transaction hash"
             className="w-full pl-11 pr-4 py-3.5 bg-white/60 backdrop-blur-md border border-slate-200/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white/90 transition-all text-sm font-medium shadow-sm placeholder:text-slate-400"
           />
         </div>
 
-        {/* ── CONTENT ────────────────────────────────────────────────────── */}
+        {/*  CONTENT  */}
         <div className="w-full flex-1">
           {error && (
             <div className="p-4 bg-red-50/80 border border-red-200 text-red-700 rounded-xl mb-5 text-sm font-medium">
@@ -176,7 +176,7 @@ export default function HumanityLedger() {
 
           {!data && loading && (
             <div className="py-20 text-center text-slate-400 font-mono text-xs tracking-widest uppercase animate-pulse">
-              Loading ledger data…
+              Loading ledger data
             </div>
           )}
 
@@ -210,7 +210,7 @@ export default function HumanityLedger() {
                       <span className="text-slate-400 text-[10px] uppercase tracking-widest font-bold">Validator</span>
                       <span className="font-mono bg-white/70 px-2 py-0.5 rounded border border-slate-200/30 text-[11px] text-slate-700">
                         {block.miner
-                          ? `${String(block.miner).slice(0, 8)}…${String(block.miner).slice(-6)}`
+                          ? `${String(block.miner).slice(0, 8)}${String(block.miner).slice(-6)}`
                           : 'N/A'}
                       </span>
                     </div>

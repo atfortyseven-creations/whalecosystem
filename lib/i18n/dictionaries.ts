@@ -1,10 +1,10 @@
 export type Locale = 'en';
 
-// ─── Base dictionary shape (English is the source of truth) ─────────────────
+//  Base dictionary shape (English is the source of truth) 
 const en = {
   metadata: {
     title: 'Whale Alert Network',
-    description: 'The leading sovereign identity and whale intelligence platform.',
+    description: 'The leading system identity and whale analytics platform.',
   },
   nav: {
     wallet: 'Wallet',
@@ -29,7 +29,7 @@ const en = {
     hero: {
         badge: 'Elite Tracking Protocol',
         title: 'Whale Alert Network',
-        subtitle: 'Sovereign tracking with advanced security, real-time alerts, and unmatched precision.',
+        subtitle: 'System tracking with advanced security, real-time alerts, and unmatched precision.',
         keys: 'Real data. Deep insights.',
         identity: 'Tracking. Data. Alpha.',
         stats: {
@@ -52,14 +52,14 @@ const en = {
         impactAlert: 'Impact Alert'
     },
     features: {
-        title: 'Legendary Intelligence',
+        title: 'Legendary Analytics',
         hint: 'Continue scrolling or swipe cards to explore more',
         cta: 'KEY BENEFITS',
         que: 'QUEUED',
-        tap: 'TAP/SWIPE →',
+        tap: 'TAP/SWIPE ',
         feat: 'FEATURE',
         categories: {
-            intelligence: 'Intelligence',
+            analytics: 'Analytics',
             network: 'Network',
             ai: 'AI Analytics',
             viz: 'Visualization',
@@ -69,7 +69,7 @@ const en = {
         items: [
           {
             title: "Whale Movement Alerts",
-            category: "Intelligence",
+            category: "Analytics",
             description: "Instant notifications for massive BTC transactions in the mempool.",
             detailedInfo: "Track top holders, elite movements, and Satoshi-era wallets in real-time. Our system monitors every block and transaction to identify whale activity before it hits the exchanges.",
             benefits: ["Custom BTC threshold triggers", "Real-time sonar audio alerts", "One-click address profiling", "Permanent whale watchlist"]
@@ -112,7 +112,7 @@ const en = {
         ]
     },
     swap: {
-        badge: 'Premium Network Intelligence',
+        badge: 'Premium Network Analytics',
         title: 'Whale Monitoring',
         realtime: 'In Real Time',
         description: 'Advanced detection of whale movements in the Bitcoin Mempool. We guarantee you will always be informed of big flows before anyone else.',
@@ -120,7 +120,7 @@ const en = {
             lowLatency: { title: 'Direct Mempool Feed', desc: 'Low-latency connection to global Bitcoin nodes for sub-second data' },
             volume: { title: 'Volume Analysis', desc: 'Intelligent tracking of Satoshi-era wallets and large flows' },
             alerts: { title: 'Real-Time Alerts', desc: 'Customizable sonar alerts for transactions exceeding your BTC threshold' },
-            security: { title: 'Sovereign Privacy', desc: 'Non-custodial, anonymous monitoring with zero-knowledge data proofs' }
+            security: { title: 'System Privacy', desc: 'Non-custodial, anonymous monitoring with zero-knowledge data proofs' }
         },
         stats: {
             detection: 'Wallet Detection',
@@ -144,7 +144,7 @@ const en = {
     confirm: 'Confirm',
     retry: 'Retry',
     language: 'Language',
-    autoLoad: 'Auto-loading top whale from Leaderboard — click any address to switch',
+    autoLoad: 'Auto-loading top whale from Leaderboard  click any address to switch',
     loadingLeaderboard: 'Loading leaderboard data...',
   },
   whale: {
@@ -158,11 +158,11 @@ const en = {
       leaderboard: 'Ranking',
       leaderboardDesc: 'The Hall of Titans. A dynamic ranking of the world\'s most powerful Bitcoin entities based on 24-hour transactional volume, revealing who is currently dominating the liquidity of the network.',
       watchlist: 'Watch List',
-      watchlistDesc: 'Your private high-value intelligence list. Track specific addresses of interest and receive targeted updates whenever these specific entities initiate any movement on the blockchain.',
+      watchlistDesc: 'Your private high-value analytics list. Track specific addresses of interest and receive targeted updates whenever these specific entities initiate any movement on the blockchain.',
       flowChart: 'Network Graph',
       flowChartDesc: 'Visual mapping of the BTC ecosystem. See the complex web of interactions between whale wallets and major global exchanges to understand the path liquidity is taking across the entire grid.',
       satoshi: 'Satoshi Detector',
-      satoshiDesc: 'The ultimate "Black Swan" event monitor. This tool scans for movements from wallets dormant for ≥8 years (Satoshi Era). When these ancient whales wake up, it usually signals the end of a cycle.',
+      satoshiDesc: 'The ultimate "Black Swan" event monitor. This tool scans for movements from wallets dormant for 8 years (Satoshi Era). When these ancient whales wake up, it usually signals the end of a cycle.',
       cascada: 'Cascade Liquidations',
       cascadaDesc: 'Real-time tracking of forced selling pressure. Watch as Longs and Shorts are liquidated on global futures exchanges, creating the "cascade" effect that drives sudden and violent price movements.',
       flujo: 'Exchange Cockpit',
@@ -170,7 +170,7 @@ const en = {
       nexo: 'Entity Nexus',
       nexoDesc: 'Advanced entity clustering engine. Using complex heuristics, we link thousands of fragmented addresses to reveal the single massive entity operating behind them, exposing the true size of whale holdings.',
       pulsoIA: 'AI Market Pulse',
-      pulsoIADesc: 'The EKG of the entire market. A proprietary synthetic signal that fuses all our intelligence layers into a single, real-time "heartbeat" to tell you instantly if the market mood is healthy or in distress.',
+      pulsoIADesc: 'The EKG of the entire market. A proprietary synthetic signal that fuses all our analytics layers into a single, real-time "heartbeat" to tell you instantly if the market mood is healthy or in distress.',
     },
     scanning: 'Scanning historic Bitcoin wallets...',
     armed: 'ARMED',
@@ -185,7 +185,7 @@ const en = {
     criticalActivity: 'CRITICAL ACTIVITY DETECTED',
     elevatedActivity: 'ELEVATED NETWORK ACTIVITY',
     satoshiEra: 'SATOSHI ERA',
-    dormant: 'DORMANT ≥8Y',
+    dormant: 'DORMANT 8Y',
     watched: 'WATCHED',
     active: 'ACTIVE',
     yearsInactive: 'years inactive',
@@ -193,9 +193,9 @@ const en = {
     bullish: 'bullish',
     bearish: 'bearish',
     neutral: 'neutral',
-    accumulation: '✅ ACCUMULATION',
-    selling: '⚠️ SELL PRESSURE',
-    neutralSignal: '— NEUTRAL',
+    accumulation: ' ACCUMULATION',
+    selling: '️ SELL PRESSURE',
+    neutralSignal: ' NEUTRAL',
   },
   footer: {
       cta: {
@@ -239,7 +239,7 @@ const en = {
   countdown: {
       badge: 'Beyond the Horizon',
       title: 'WORLD RELEASE',
-      description: 'Witness the convergence of sovereign identity and decentralized power. Absolute financial freedom.',
+      description: 'Witness the convergence of system identity and decentralized power. Absolute financial freedom.',
       days: 'DAYS',
       hours: 'HOURS',
       minutes: 'MINUTES',
@@ -265,7 +265,7 @@ const en = {
     week: '7D',
     month: '30D',
     year: '1Y',
-    sync: 'Market data sync active • Latency compensation enabled',
+    sync: 'Market data sync active  Latency compensation enabled',
   },
   backers: {
       badge: 'Strategic Partners',
@@ -342,7 +342,7 @@ const en = {
     tradingActivity: 'Your trading activity will appear here',
   },
   vip: {
-      heroTitle: 'Elite Intelligence',
+      heroTitle: 'Elite Analytics',
       heroSubtitle: 'Advanced analytical tools to track whale wallets, predict on-chain liquidations, and measure token unlock pressure. Raw data presented without distractions.',
       stats: {
           activeWhales: 'Active Mega Whales',
@@ -351,12 +351,12 @@ const en = {
           baseFee: 'Base Fee (Gwei)'
       },
       reset: {
-          title: 'Elite Intelligence Reset',
+          title: 'Elite Analytics Reset',
           countdown: 'NEXT RESET IN:',
           status: 'Cross-Chain Persistence Active'
       },
-      matrix: {
-          title: 'Live Settlement Matrix',
+      grid: {
+          title: 'Live Settlement Grid',
           streamingBlock: 'Streaming Block',
           table: {
               timestamp: 'Timestamp',
@@ -435,7 +435,7 @@ const en = {
       },
   },
   support: {
-      title: 'Support Intelligence',
+      title: 'Support Analytics',
       heroSubtitle: 'Direct connection with our liquidators and level 3 engineers. Specialized technical help without bots.',
       stats: {
           responseTime: 'Response Time',
@@ -450,7 +450,7 @@ const en = {
           emailPlaceholder: 'email@provider.com',
           category: 'Category',
           categories: {
-              general: 'General Intelligence',
+              general: 'General Analytics',
               technical: 'Technical Anomaly',
               wallet: 'Wallet / Security',
               security: 'Security Report',
@@ -480,7 +480,7 @@ const en = {
 
 type Dictionary = typeof en;
 
-// ─── Export ──────────────────────────────────────────────────────────────────
+//  Export 
 export const dictionaries = { en } as any;
 
 

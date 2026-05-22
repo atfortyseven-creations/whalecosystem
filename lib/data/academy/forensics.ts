@@ -189,7 +189,7 @@ assembly {
                                 <text x="620" y="165" fill="#4dff88" style="font-size: 11px;">Facet: Governance.sol</text>
                                 
                                 <path d="M320 110 L200 110" stroke="#ff4d4d" stroke-width="3" marker-end="url(#arrowhead)" />
-                                <text x="100" y="115" fill="#ff4d4d" style="font-size: 12px; font-weight: bold;">INYECCIÓN MALICIOSA (🚨)</text>
+                                <text x="100" y="115" fill="#ff4d4d" style="font-size: 12px; font-weight: bold;">INYECCIÓN MALICIOSA ()</text>
                             </svg>
                             <p class="diagram-caption">Figura 14: Vector de compromiso mediante manipulación de DiamondCut (Selector Hijacking).</p>
                         </div>
@@ -243,7 +243,7 @@ bytes32 public immutable DOMAIN_SEPARATOR;
 constructor() {
     DOMAIN_SEPARATOR = keccak256(abi.encode(
         DOMAIN_TYPEHASH,
-        keccak256(bytes("Sovereign Intelligence")),
+        keccak256(bytes("System Analytics")),
         keccak256(bytes("1.0.0")),
         block.chainid,    // [!] Defensa contra Cross-Chain Replay
         address(this)     // [!] Defensa contra Cross-Contract Replay
@@ -276,7 +276,7 @@ constructor() {
                                 
                                 <rect x="340" y="90" width="200" height="70" fill="rgba(255,166,0,0.2)" stroke="#ffa600" stroke-width="2" />
                                 <text x="440" y="125" fill="#fff" text-anchor="middle" style="font-weight:bold;">TX_1: DEX Imbalance</text>
-                                <text x="440" y="145" fill="#ffa600" text-anchor="middle" style="font-size: 11px;">Price ETH = $2,500 📉</text>
+                                <text x="440" y="145" fill="#ffa600" text-anchor="middle" style="font-size: 11px;">Price ETH = $2,500 </text>
                                 
                                 <path d="M540 125 L600 125" stroke="#fff" marker-end="url(#arrowhead)" stroke-width="2" stroke-dasharray="4" />
 
@@ -400,7 +400,7 @@ function executeFlashArbitrage(bytes memory payload) external {
                         <h2>I. Anatomía de la Suplantación de la Raíz Ejecutora</h2>
                         <p>En la arquitectura de la Ethereum Virtual Machine, existen dos apuntadores contextuales sobre el llamante de una función: <code>msg.sender</code> (el emisor directo, que puede ser un contrato proxy u otra lógica) y <code>tx.origin</code> (la raíz absoluta, siempre una entidad criptográfica humana o EOA que firmó la transacción inicial). Usar <code>tx.origin</code> para validaciones de autorización institucionales es la negligencia fundamental que permite la Suplantación por Cadena de Llamadas (Call Chain Spoofing).</p>
                         
-                        <pre><code>// 🚨 CÓDIGO VULNERABLE INSTITUCIONALMENTE
+                        <pre><code>//  CÓDIGO VULNERABLE INSTITUCIONALMENTE
 function withdrawAll() external {
     // Si la wallet de la víctima (EOA) originó la transacción, pasa la validación,
     // INCLUSO si la llamada real a withdrawAll() la está haciendo un smart contract malicioso intermedio.
@@ -426,8 +426,8 @@ function withdrawAll() external {
                                 
                                 <rect x="630" y="60" width="150" height="120" fill="rgba(77,255,136,0.1)" stroke="#4dff88" stroke-width="2" />
                                 <text x="705" y="115" fill="#4dff88" text-anchor="middle" style="font-weight: bold;">Target Vault</text>
-                                <text x="705" y="135" fill="#fff" text-anchor="middle" style="font-size: 10px;">Validates tx.origin ✅</text>
-                                <text x="705" y="155" fill="#ff4d4d" text-anchor="middle" style="font-size: 10px;">FUNDS DRAINED 🚨</text>
+                                <text x="705" y="135" fill="#fff" text-anchor="middle" style="font-size: 10px;">Validates tx.origin </text>
+                                <text x="705" y="155" fill="#ff4d4d" text-anchor="middle" style="font-size: 10px;">FUNDS DRAINED </text>
                             </svg>
                             <p class="diagram-caption">Figura 16: Flujo de manipulación cruzada explotando la persistencia de tx.origin en todo el árbol de llamadas.</p>
                         </div>
@@ -474,7 +474,7 @@ constructor() {
                                 
                                 <rect x="450" y="40" width="300" height="100" fill="rgba(255,77,77,0.2)" stroke="#ff4d4d" stroke-width="2" />
                                 <text x="600" y="80" fill="#ff4d4d" text-anchor="middle" style="font-weight: bold;">Implementation Logic</text>
-                                <text x="600" y="100" fill="#fff" text-anchor="middle" style="font-size: 12px;">DESTROYED via SELFDESTRUCT 🗑️</text>
+                                <text x="600" y="100" fill="#fff" text-anchor="middle" style="font-size: 12px;">DESTROYED via SELFDESTRUCT ️</text>
                                 <text x="600" y="120" fill="#ff4d4d" text-anchor="middle" style="font-size: 10px;">Fallback Reverts. All assets frozen permanently.</text>
                             </svg>
                             <p class="diagram-caption">Figura 17: Colapso sistémico catastrófico "Brick" por la eliminación del contrato fuente.</p>
@@ -556,7 +556,7 @@ constructor() {
                                 <circle cx="120" cy="90" r="6" fill="#fff" />
                                 <circle cx="180" cy="110" r="6" fill="#fff" />
                                 <circle cx="140" cy="160" r="6" fill="#ff4d4d" />
-                                <text x="140" y="180" fill="#ff4d4d" text-anchor="middle" style="font-size: 10px;">Frontrunner Bots 👁️</text>
+                                <text x="140" y="180" fill="#ff4d4d" text-anchor="middle" style="font-size: 10px;">Frontrunner Bots ️</text>
 
                                 <rect x="350" y="70" width="100" height="100" fill="none" stroke="#ffa600" stroke-width="4" rx="10" />
                                 <text x="400" y="115" fill="#ffa600" text-anchor="middle" style="font-weight: bold; font-size: 12px;">MEV Builder</text>
@@ -673,11 +673,11 @@ constructor() {
 <span style="color: #6c757d;">// Análisis Forense de Vulnerabilidad en Cálculo de Acciones (Shares)</span>
 <span style="color: #6c757d;">// Si user = 100 wei, assets = 1000 wei, supply = 1010 wei</span>
 
-<span style="color: #ff4d4d; font-weight: bold;">// 🚨 VULNERABLE: Redondeo a Cero (Trucation)</span>
+<span style="color: #ff4d4d; font-weight: bold;">//  VULNERABLE: Redondeo a Cero (Trucation)</span>
 uint256 sharePrice = totalAssets / totalSupply; <span style="color: #ff4d4d;">// 1000 / 1010 = 0</span>
 uint256 userShares = amount * sharePrice; <span style="color: #ff4d4d;">// 100 * 0 = 0 (Usuario pierde fondos)</span>
 
-<span style="color: #4dff88; font-weight: bold;">// ✅ GRADO INSTITUCIONAL: Multiplicación Pre-Escalada</span>
+<span style="color: #4dff88; font-weight: bold;">//  GRADO INSTITUCIONAL: Multiplicación Pre-Escalada</span>
 uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
 <span style="color: #4dff88;">// (100 * 1010) / 1000 = 101000 / 1000 = 101 shares justificados</span>
                             </pre>
@@ -836,7 +836,7 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                                 <text x="655" y="65" fill="#fff" text-anchor="middle" style="font-weight: bold; font-family: monospace;">Variables del Target:</text>
                                 <text x="655" y="85" fill="#ff4d4d" text-anchor="middle" style="font-family: monospace; font-size: 12px;">address(this).balance += 100</text>
                                 <text x="655" y="105" fill="#4dff88" text-anchor="middle" style="font-family: monospace; font-size: 12px;">internalAccounting == 0</text>
-                                <text x="655" y="125" fill="#ffa600" text-anchor="middle" style="font-family: monospace; font-size: 12px; font-weight: bold;">INVARIANTE ROTO 💥</text>
+                                <text x="655" y="125" fill="#ffa600" text-anchor="middle" style="font-family: monospace; font-size: 12px; font-weight: bold;">INVARIANTE ROTO </text>
                             </svg>
                             <p class="diagram-caption">Figura 15: Ataque de inyección de Ether rompiendo las máquinas de estado interno de contabilidad.</p>
                         </div>
@@ -941,7 +941,7 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                                 <rect x="50" y="50" width="200" height="120" fill="rgba(77,148,255,0.1)" stroke="#4d94ff" stroke-width="2" />
                                 <text x="150" y="80" fill="#4d94ff" text-anchor="middle" style="font-weight: bold;">Contrato Principal (A)</text>
                                 <text x="150" y="105" fill="#fff" text-anchor="middle" style="font-size: 11px;">1. Update Balance (Effects)</text>
-                                <text x="150" y="125" fill="#fff" text-anchor="middle" style="font-size: 11px;">2. External Call 🚨</text>
+                                <text x="150" y="125" fill="#fff" text-anchor="middle" style="font-size: 11px;">2. External Call </text>
                                 <text x="150" y="145" fill="#555" text-anchor="middle" style="font-size: 11px;">3. Commit State (Nunca Clímax)</text>
                                 
                                 <path d="M250 120 L320 80" stroke="#ff4d4d" stroke-width="3" marker-end="url(#arrowhead)" stroke-dasharray="4" />
@@ -1197,19 +1197,19 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                         <div class="diagram-container">
                             <svg viewBox="0 0 800 200" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
                                 <rect x="50" y="40" width="120" height="40" fill="rgba(255,77,77,0.1)" stroke="#ff4d4d" stroke-width="2" />
-                                <text x="110" y="65" fill="#ff4d4d" text-anchor="middle">Binance Price 📉</text>
+                                <text x="110" y="65" fill="#ff4d4d" text-anchor="middle">Binance Price </text>
                                 
                                 <path d="M170 60 L300 100" stroke="#fff" marker-end="url(#arrowhead)" />
                                 <text x="235" y="75" fill="#fff" text-anchor="middle" style="font-size: 10px;">Información Arrabalera</text>
                                 
                                 <rect x="300" y="80" width="200" height="60" fill="rgba(255,166,0,0.1)" stroke="#ffa600" stroke-width="2" />
-                                <text x="400" y="110" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">AMM Arbitrage 🚨</text>
+                                <text x="400" y="110" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">AMM Arbitrage </text>
                                 <text x="400" y="130" fill="#fff" text-anchor="middle" style="font-size: 10px;">(Toxic Flow)</text>
                                 
                                 <path d="M500 110 L630 110" stroke="#4dff88" marker-end="url(#arrowhead)" />
                                 
                                 <rect x="630" y="80" width="120" height="60" fill="rgba(77,255,136,0.1)" stroke="#4dff88" stroke-width="2" />
-                                <text x="690" y="110" fill="#4dff88" text-anchor="middle">LP Profit: ❌</text>
+                                <text x="690" y="110" fill="#4dff88" text-anchor="middle">LP Profit: </text>
                                 <text x="690" y="130" fill="#fff" text-anchor="middle" style="font-size: 10px;">Extracto LVR</text>
                             </svg>
                             <p class="diagram-caption">Figura 7: Circuito de extracción de valor mediante flujo informado y arbitraje latente.</p>
@@ -1365,7 +1365,7 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                                 <path d="M150 90 L250 90" stroke="#fff" marker-end="url(#arrowhead)" />
                                 
                                 <rect x="250" y="50" width="300" height="80" fill="rgba(255,166,0,0.1)" stroke="#ffa600" stroke-width="2" />
-                                <text x="400" y="85" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">User Large Swap 💸</text>
+                                <text x="400" y="85" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">User Large Swap </text>
                                 <text x="400" y="105" fill="#fff" text-anchor="middle" style="font-size: 10px;">(Captura de Fees)</text>
                                 
                                 <path d="M550 90 L650 90" stroke="#fff" marker-end="url(#arrowhead)" />
@@ -1405,7 +1405,7 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                                 <text x="235" y="65" fill="#fff" text-anchor="middle" style="font-size: 10px;">Information Shift</text>
                                 
                                 <rect x="300" y="40" width="200" height="70" fill="rgba(255,166,0,0.1)" stroke="#ffa600" stroke-width="2" />
-                                <text x="400" y="70" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">Arbitrage Delivery 📦</text>
+                                <text x="400" y="70" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">Arbitrage Delivery </text>
                                 <text x="400" y="90" fill="#fff" text-anchor="middle" style="font-size: 10px;">(Price Discovery Agent)</text>
                                 
                                 <path d="M500 75 L630 75" stroke="#4dff88" marker-end="url(#arrowhead)" />
@@ -1431,7 +1431,7 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                     </section>
 
                     <section class="pro-section">
-                        <h2>II. LVR-Reduction y Sovereign Liquidity</h2>
+                        <h2>II. LVR-Reduction y System Liquidity</h2>
                         <p>Para la Whale Academy, un McAMM es la herramienta definitiva de <strong>Soberanía de Liquidez</strong>. Al capturar el valor del arbitraje, el protocolo reduce efectivamente el LVR del pool, permitiendo a los LPs ser rentables incluso con volúmenes retail menores. Es una transición de un modelo de "Mercado Abierto al Robo" hacia un modelo de "Mercado de Acceso Subastado", donde la plusvalía del flujo informado se queda dentro del ecosistema institucional.</p>
                     </section>
                 </div>`

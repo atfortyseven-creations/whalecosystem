@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useVIPIntelligence } from "@/hooks/useVIPIntelligence";
+import { useVIPAnalytics } from "@/hooks/useVIPAnalytics";
 import { useSocket } from "@/hooks/useSocket";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // TYPES
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 interface WalletEvent {
   id: string;
   wallet: string;
@@ -54,11 +54,11 @@ function computeClusters(events: WalletEvent[]): TokenCluster[] {
     .slice(0, 6);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // COMPONENTE PRINCIPAL (Estilo Minimalista)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 export function SmartMoneyTracker() {
-  const { transactions } = useVIPIntelligence();
+  const { transactions } = useVIPAnalytics();
   const { on, off } = useSocket();
   const [events, setEvents] = useState<WalletEvent[]>([]);
   const [clusters, setClusters] = useState<TokenCluster[]>([]);
@@ -67,7 +67,7 @@ export function SmartMoneyTracker() {
   // 1. WebSocket Listener for Real-Time "Pushes"
   useEffect(() => {
     const handleNewWhale = (data: any) => {
-      console.log("🌊 [WS] New Whale Alert Network Received:", data);
+      console.log(" [WS] New Whale Alert Network Received:", data);
       
       // Map BullMQ format to WalletEvent UI format
       const newEvent: WalletEvent = {
@@ -173,7 +173,7 @@ export function SmartMoneyTracker() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-stone-200/60">
 
-        {/* ── TRANSACTION FEED (8 cols) */}
+        {/*  TRANSACTION FEED (8 cols) */}
         <div className="lg:col-span-8 bg-white/40">
           <div className="px-8 py-4 border-b border-stone-200/60">
             <span className="text-[11px] uppercase tracking-widest text-stone-500 font-medium">Last Transactions</span>
@@ -241,7 +241,7 @@ export function SmartMoneyTracker() {
                         rel="noopener noreferrer"
                         className="text-[10px] text-blue-600/70 hover:text-blue-800 hover:underline transition-colors"
                       >
-                        View transaction ↗
+                        View transaction 
                       </a>
                     </div>
                   </div>
@@ -251,7 +251,7 @@ export function SmartMoneyTracker() {
           </div>
         </div>
 
-        {/* ── CONSENSO DE TOKENS (4 cols) */}
+        {/*  CONSENSO DE TOKENS (4 cols) */}
         <div className="lg:col-span-4 bg-[#FAFAFA] p-8 flex flex-col">
           <div className="mb-6">
             <span className="text-[11px] uppercase tracking-widest text-stone-500 font-medium">Consenso de Compra</span>

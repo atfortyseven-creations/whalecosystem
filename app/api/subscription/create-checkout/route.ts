@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
 
     console.log(`[CHECKOUT] User authenticated natively: ${authUserId}`);
 
-    // Create checkout session for one-time payment as per UI "1.50 € / cobro único"
-    console.log('[CHECKOUT] Creating Stripe checkout session for Lifetime VIP via Sovereign Webhook');
+    // Create checkout session for one-time payment as per UI "1.50  / cobro único"
+    console.log('[CHECKOUT] Creating Stripe checkout session for Lifetime VIP via System Webhook');
     
     const sessionParams: any = {
       mode: 'payment', // One-time payment

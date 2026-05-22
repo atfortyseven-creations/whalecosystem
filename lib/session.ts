@@ -2,13 +2,13 @@ import { SignJWT, jwtVerify, JWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 
-// ── CRITICAL SECURITY GUARD ────────────────────────────────────────────────
+//  CRITICAL SECURITY GUARD 
 // FIX: 'VOID_SECRET_99_POLY' was the hardcoded fallback. This secret is now
 // publicly visible in source code, making every SIWE+session JWT forgeable.
 // An attacker could craft:
 //   { alg:'HS256' }.{ sub:'0x<any_address>', clearance:'SOVEREIGN', exp:... }
 // sign it with the known secret and bypass ALL middleware authentication checks.
-// We now fail loud at module load — an unconfigured secret must halt the server.
+// We now fail loud at module load  an unconfigured secret must halt the server.
 const _rawJwtSecret = process.env.JWT_SECRET;
 if (!_rawJwtSecret && process.env.NODE_ENV === 'production' && process.env.SKIP_ENV_VALIDATION !== 'true') {
     // [RESILIENCE] Log a critical warning but never throw at module-level in production.
@@ -132,19 +132,19 @@ export async function setSessionCookies(accessToken: string, refreshToken: strin
 /**
  * Get session from cookies.
  * Supports TWO token formats:
- * 1. SIWE sovereign session: cookie 'human_session', JWT payload { sub, address, clearance }
+ * 1. SIWE system session: cookie 'human_session', JWT payload { sub, address, clearance }
  * 2. Email/legacy session:   cookie 'human.access-token', JWT payload { userId, email, type }
  */
 export async function getSession(): Promise<SessionPayload | null> {
     const cookieStore = await cookies();
 
-    // ── Priority 1: SIWE sovereign session ──────────────────────────────────
+    //  Priority 1: SIWE system session 
     const siweToken = cookieStore.get('human_session')?.value;
     if (siweToken) {
         try {
             const { verifyJWT } = await import('@/lib/jwt');
             const payload = await verifyJWT(siweToken) as any;
-            // Normalize SIWE payload → SessionPayload shape
+            // Normalize SIWE payload  SessionPayload shape
             const siweUserId = payload.address || payload.sub;
             if (siweUserId) {
                 return {
@@ -157,19 +157,19 @@ export async function getSession(): Promise<SessionPayload | null> {
                 };
             }
         } catch {
-            // Expired or invalid SIWE token — fall through to email session
+            // Expired or invalid SIWE token  fall through to email session
         }
     }
 
-    // ── Priority 2: Email/legacy access token ────────────────────────────────
+    //  Priority 2: Email/legacy access token 
     const accessToken = cookieStore.get('human.access-token')?.value;
     if (accessToken) {
         const verified = await verifyToken(accessToken);
         if (verified) return verified;
     }
 
-    // ── Priority 3: Sovereign QR Handshake ──────────────────────────────────
-    const handshakeToken = cookieStore.get('sovereign_handshake')?.value;
+    //  Priority 3: System QR Handshake 
+    const handshakeToken = cookieStore.get('system_handshake')?.value;
     if (handshakeToken && /^0x[a-fA-F0-9]{40}$/.test(handshakeToken)) {
         return {
             userId: handshakeToken.toLowerCase(),

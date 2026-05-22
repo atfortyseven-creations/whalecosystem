@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { SovereignFooter } from "@/components/landing/SovereignFooter";
+import { SystemFooter } from "@/components/landing/SystemFooter";
 
 export default function DeveloperLanding() {
   const [mounted, setMounted] = useState(false);
@@ -13,7 +13,7 @@ export default function DeveloperLanding() {
   return (
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-white text-black selection:bg-black selection:text-white">
       
-      {/* ── HEADER ── */}
+      {/*  HEADER  */}
       <header className="sticky top-0 z-50 w-full py-6 px-8 flex justify-between items-center bg-white/95 backdrop-blur-xl border-b border-black/5">
         <div className="flex items-center gap-4">
           <div className="w-8 h-8 flex items-center justify-center shrink-0">
@@ -28,7 +28,7 @@ export default function DeveloperLanding() {
         </div>
       </header>
 
-      {/* ── MASSIVE API & INTEGRATION DOCUMENTATION ── */}
+      {/*  MASSIVE API & INTEGRATION DOCUMENTATION  */}
       <main className="flex-1 w-full max-w-[1000px] mx-auto px-8 md:px-16 pt-24 pb-48">
         
         <motion.div 
@@ -170,14 +170,14 @@ ws.onmessage = (event) => {
           {/* STEP 6: POST-QUANTUM THREAT MODELS */}
           <section>
             <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
-              6. Post-Quantum Cryptography & MEV Shielding
+              6. Post-Core Cryptography & MEV Shielding
             </h2>
             <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
               <p>
-                The inevitable advent of fault-tolerant quantum computers running Shor’s algorithm poses a terminal threat to traditional Elliptic Curve Cryptography (ECC). The Humanity Ledger operates under a \"Store Now, Decrypt Later\" (SNDL) threat model. To future-proof our infrastructure, we are actively implementing hybrid key encapsulation mechanisms (KEMs), specifically integrating the NIST-standardized Kyber-768 lattice-based cryptography alongside standard ECDSA.
+                The inevitable advent of fault-tolerant core computers running Shors algorithm poses a terminal threat to traditional Elliptic Curve Cryptography (ECC). The Humanity Ledger operates under a \"Store Now, Decrypt Later\" (SNDL) threat model. To future-proof our infrastructure, we are actively implementing hybrid key encapsulation mechanisms (KEMs), specifically integrating the NIST-standardized Kyber-768 lattice-based cryptography alongside standard ECDSA.
               </p>
               <p>
-                When an institutional developer initiates a high-security webhook or opens a WebSocket tunnel for private execution, the handshake derives its forward-secrecy through both a classic Diffie-Hellman exchange and a post-quantum lattice problem. Even if a nation-state harvests our encrypted TCP packets today, they will not have the mathematical capability to decrypt them tomorrow.
+                When an institutional developer initiates a high-security webhook or opens a WebSocket tunnel for private execution, the handshake derives its forward-secrecy through both a classic Diffie-Hellman exchange and a post-core lattice problem. Even if a nation-state harvests our encrypted TCP packets today, they will not have the mathematical capability to decrypt them tomorrow.
               </p>
               <p>
                 Furthermore, the API exposes advanced <strong>MEV (Maximal Extractable Value) Shielding</strong> vectors. If your quantitative algorithm detects a Z-Score anomaly and issues a trade execution payload through our `POST /v1/execute` endpoint, the transaction is completely obfuscated from the public mempool. We route the signed payload through private RPC relays (such as Flashbots and Eden Network), ensuring your alpha is immune to sandwich attacks and generalized front-running.
@@ -198,7 +198,7 @@ ws.onmessage = (event) => {
                 Through the `/v1/graph/tensors` WebSocket channel, developers can subscribe to live vector embeddings. Instead of receiving raw transaction logs, your machine learning models receive pre-computed, normalized 512-dimensional vectors representing the current \"anxiety\" or \"accumulation\" state of the network. This eliminates the need for you to maintain massive local data pipelines; you simply ingest the mathematical reality directly into your neural networks.
               </p>
               <p>
-                This capability allows quantitative hedge funds to deploy autonomous AI agents that trade entirely based on topological shifts within the graph matrix, reacting to the shape of the capital flow rather than the arbitrary price of an asset.
+                This capability allows quantitative hedge funds to deploy autonomous AI agents that trade entirely based on topological shifts within the graph grid, reacting to the shape of the capital flow rather than the arbitrary price of an asset.
               </p>
             </div>
           </section>
@@ -244,14 +244,14 @@ ws.onmessage = (event) => {
           {/* STEP 9: SIWE DEEP DIVE */}
           <section>
             <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
-              9. Sign-In With Ethereum (SIWE) — Deep Technical Reference
+              9. Sign-In With Ethereum (SIWE)  Deep Technical Reference
             </h2>
             <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
               <p>
                 The SIWE protocol (defined in EIP-4361) is the authentication backbone of the Humanity Ledger. Unlike OAuth, SIWE does not require a password, a centralized identity provider, or a third-party server. The user's cryptographic signature is the proof of identity itself. Here is the full technical flow that our server executes every time a developer authenticates.
               </p>
               <p>
-                <strong>Step 1 — Nonce Request.</strong> Your client calls <code>GET /api/auth/nonce</code>. The server generates a cryptographically random, single-use nonce (32 bytes, base64url-encoded) and stores it server-side in Redis with a 5-minute TTL. The nonce is returned to the client. This prevents replay attacks where an attacker records a previous valid signature and resubmits it.
+                <strong>Step 1  Nonce Request.</strong> Your client calls <code>GET /api/auth/nonce</code>. The server generates a cryptographically random, single-use nonce (32 bytes, base64url-encoded) and stores it server-side in Redis with a 5-minute TTL. The nonce is returned to the client. This prevents replay attacks where an attacker records a previous valid signature and resubmits it.
               </p>
               <div className="bg-black/5 p-8 rounded-2xl font-mono text-[13px] leading-relaxed text-[#050505]">
                 <pre>{`// Full SIWE Message Structure (EIP-4361 Compliant)
@@ -269,10 +269,10 @@ Issued At: 2026-05-21T06:00:00.000Z
 Expiration Time: 2026-05-21T06:05:00.000Z`}</pre>
               </div>
               <p>
-                <strong>Step 2 — Client Signs the Message.</strong> The message above is presented to the user's wallet (MetaMask, WalletConnect, etc.) using the <code>personal_sign</code> RPC method (prefixes the message with <code>\x19Ethereum Signed Message:\n</code> per EIP-191, preventing signature reuse in transactions). The wallet returns a 65-byte ECDSA signature: 32 bytes R, 32 bytes S, and 1 byte V (the recovery identifier).
+                <strong>Step 2  Client Signs the Message.</strong> The message above is presented to the user's wallet (MetaMask, WalletConnect, etc.) using the <code>personal_sign</code> RPC method (prefixes the message with <code>\x19Ethereum Signed Message:\n</code> per EIP-191, preventing signature reuse in transactions). The wallet returns a 65-byte ECDSA signature: 32 bytes R, 32 bytes S, and 1 byte V (the recovery identifier).
               </p>
               <p>
-                <strong>Step 3 — Server Verification.</strong> The client submits the original message text and the 65-byte signature to <code>POST /api/auth/verify</code>. The server uses <code>ecrecover</code> to reconstruct the signing address from the message hash and the signature. If the recovered address matches the claimed address, and the nonce has not been consumed yet, authentication succeeds. The nonce is immediately invalidated in Redis to prevent replay. A signed JWT and a secure session cookie are issued in the response.
+                <strong>Step 3  Server Verification.</strong> The client submits the original message text and the 65-byte signature to <code>POST /api/auth/verify</code>. The server uses <code>ecrecover</code> to reconstruct the signing address from the message hash and the signature. If the recovered address matches the claimed address, and the nonce has not been consumed yet, authentication succeeds. The nonce is immediately invalidated in Redis to prevent replay. A signed JWT and a secure session cookie are issued in the response.
               </p>
             </div>
           </section>
@@ -280,7 +280,7 @@ Expiration Time: 2026-05-21T06:05:00.000Z`}</pre>
           {/* STEP 10: NEO4J GRAPH QUERIES */}
           <section>
             <h2 className="text-[32px] md:text-[40px] font-normal tracking-tight mb-10 pb-6 border-b border-black/10">
-              10. Neo4j Graph Database — Cypher Query Reference
+              10. Neo4j Graph Database  Cypher Query Reference
             </h2>
             <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
               <p>
@@ -321,7 +321,7 @@ ORDER BY cycle_length ASC;`}</pre>
             </h2>
             <div className="space-y-8 text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
               <p>
-                For use cases requiring privacy-preserving verification — such as proving that a wallet holds more than a threshold balance without revealing the exact amount, or proving membership in a whitelist without revealing the specific address — the Humanity Ledger exposes a ZK proof pipeline built on <strong>SnarkJS</strong> and <strong>Circom</strong>-compiled arithmetic circuits.
+                For use cases requiring privacy-preserving verification  such as proving that a wallet holds more than a threshold balance without revealing the exact amount, or proving membership in a whitelist without revealing the specific address  the Humanity Ledger exposes a ZK proof pipeline built on <strong>SnarkJS</strong> and <strong>Circom</strong>-compiled arithmetic circuits.
               </p>
               <p>
                 The workflow is as follows: a developer submits private inputs to the <code>POST /v1/zk/prove</code> endpoint. The server executes the witness calculation and proof generation using the pre-compiled circuit and trusted setup parameters. The resulting proof object (<code>proof.json</code>) and public signals (<code>public.json</code>) are returned. Any third party can then independently verify this proof against the verification key without learning anything about the private inputs.
@@ -398,7 +398,7 @@ curl http://localhost:8080/health
       </main>
 
 
-      <SovereignFooter />
+      <SystemFooter />
     </div>
   );
 }

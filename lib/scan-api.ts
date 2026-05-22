@@ -78,7 +78,7 @@ export class ScanApi {
         const baseUrl = this.getBaseUrl(chainId);
         if (!baseUrl) return { tokens: [], nfts: [] };
         
-        console.log(`[ScanApi] 🔍 Scanning Chain ${chainId} for ${address}...`);
+        console.log(`[ScanApi]  Scanning Chain ${chainId} for ${address}...`);
 
         try {
             // 1. Get Token Transfer History (to find contracts)

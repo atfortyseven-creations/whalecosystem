@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     card = await db.virtualCard.create({
       data: {
         userId: session.userId,
-        // crypto.randomInt provides a CSPRNG — Math.random() is explicitly forbidden for financial data
+        // crypto.randomInt provides a CSPRNG  Math.random() is explicitly forbidden for financial data
         cardNumber: `4111${crypto.randomInt(100000000000, 999999999999)}`,
         expiryMonth: new Date().getMonth() + 1,
         expiryYear: new Date().getFullYear() + 3,

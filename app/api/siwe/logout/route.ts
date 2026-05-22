@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const res = NextResponse.json({ ok: true, message: 'Sovereign session terminated.' });
+  const res = NextResponse.json({ ok: true, message: 'System session terminated.' });
 
   // Clear all SIWE/session cookies
   const cookiesToClear = [
@@ -9,7 +9,7 @@ export async function GET() {
     'human_session',
     'human.session-token',
     'wallet-auth',
-    'sovereign_handshake',
+    'system_handshake',
     'wallet-auth',
   ];
 

@@ -79,7 +79,7 @@ function LatencyBadge({ ms }: { ms: number }) {
 
 import StatusNavbar from '@/components/status/StatusNavbar';
 
-// Component icon + color mapping — all neutral monochrome
+// Component icon + color mapping  all neutral monochrome
 const COMPONENT_META: Record<string, { icon: any; accent: string; gradient: string }> = {
   'Dashboard':  { icon: LayoutDashboard, accent: 'text-black/70', gradient: 'from-white to-white' },
   'Whale Chat': { icon: MessageCircle,   accent: 'text-black/70', gradient: 'from-white to-white' },

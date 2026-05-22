@@ -6,14 +6,14 @@ import { Clock as ClockIcon, Search, Hash, Target, ChevronRight } from 'lucide-r
 import { ACADEMY_MODULES } from '@/lib/data/academy-data';
 import { safeHTML } from '@/hooks/useSanitizer';
 
-// ─── CORPORATE MINI LOGO ───
+//  CORPORATE MINI LOGO 
 function AcademyLogo() {
     return (
         <img src="/logo-landingpage.png" alt="Whale" className="w-8 h-8 object-contain opacity-80 group-hover:opacity-100 transition-opacity drop-shadow-sm" />
     );
 }
 
-// ─── MEMOIZED ARTICLE ────────────────────────────────────────────────────────
+//  MEMOIZED ARTICLE 
 const ArticleBlock = memo(function ArticleBlock({
     article,
     index,
@@ -216,10 +216,10 @@ export function AcademyViewer() {
                     <header className="mb-32 border-l-[6px] border-[#111111] pl-10">
                         <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-black text-[#111111] tracking-tighter mb-6 uppercase leading-[0.9]">
                             Strategic <br />
-                            <span className="text-[#888888]">Intelligence</span>
+                            <span className="text-[#888888]">Analytics</span>
                         </h1>
                         <p className="font-sans text-xl lg:text-2xl text-[#444444] max-w-2xl leading-relaxed font-medium">
-                            The sovereign framework. Core principles and deep-dive technical archives for maximum on-chain validation.
+                            The system framework. Core principles and deep-dive technical archives for maximum on-chain validation.
                         </p>
                     </header>
 

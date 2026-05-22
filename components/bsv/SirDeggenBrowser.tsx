@@ -89,7 +89,7 @@ export function SirDeggenBrowser({ initialUrl = 'aztek://hub' }: SirDeggenBrowse
   return (
     <div className="flex flex-col h-full w-full bg-black/20 rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl backdrop-blur-3xl relative">
       
-      {/* ── BROWSER CHROME ── */}
+      {/*  BROWSER CHROME  */}
       <div className="flex items-center gap-4 px-6 py-4 bg-black/40 border-b border-white/5">
         <div className="flex items-center gap-3 text-white/30">
           <ChevronLeft 
@@ -125,7 +125,7 @@ export function SirDeggenBrowser({ initialUrl = 'aztek://hub' }: SirDeggenBrowse
         </button>
       </div>
 
-      {/* ── VIEWPORT ── */}
+      {/*  VIEWPORT  */}
       <div className="flex-1 relative bg-[#050505]">
         {url === 'aztek://hub' ? (
           <div className="p-12 h-screen overflow-y-auto bg-[#050505]">
@@ -154,7 +154,7 @@ export function SirDeggenBrowser({ initialUrl = 'aztek://hub' }: SirDeggenBrowse
           />
         )}
 
-        {/* ── TERMINAL OVERLAY ── */}
+        {/*  TERMINAL OVERLAY  */}
         <AnimatePresence>
           {showTerminal && (
             <motion.div 

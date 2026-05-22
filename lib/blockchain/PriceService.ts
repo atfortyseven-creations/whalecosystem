@@ -10,7 +10,7 @@ import { LRUCache } from 'lru-cache';
 export class PriceService {
   private static cache = new LRUCache<string, any>({
     max: 2000,
-    ttl: 1000 * 30, // 30 seconds — real-time professional requirement
+    ttl: 1000 * 30, // 30 seconds  real-time professional requirement
   });
 
   private static MAJORS = ['ETH', 'BTC', 'USDC', 'USDT', 'SOL', 'BNB', 'AVAX', 'MATIC', 'POL', 'ARB', 'OP'];
@@ -51,7 +51,7 @@ export class PriceService {
     const result: Record<string, { price: number, change24h: number }> = {};
     const symbols = Array.from(new Set(tokens.map(t => t.symbol.toUpperCase())));
     
-    // 🔥 [STEEL DOME] Pre-populate with fallbacks for safety
+    //  [STEEL DOME] Pre-populate with fallbacks for safety
     try {
       symbols.forEach(sym => {
         if (!sym) return;
@@ -88,7 +88,7 @@ export class PriceService {
     
     if (missing.length > 0) {
       console.log(`[PriceService] Attempting DexScreener fallback for ${missing.length} tokens...`);
-      // 🔥 [LEGENDARY] Parallelizing DexScreener fetches to avoid massive sequential delay
+      //  [LEGENDARY] Parallelizing DexScreener fetches to avoid massive sequential delay
       const pricePromises = missing.map(async (token) => {
         try {
           const dsPrice = await PriceService.fetchDexScreenerPrice(token.address!, token.chainId!);
@@ -126,11 +126,11 @@ export class PriceService {
 
     const res = await fetch(url, { 
       headers, 
-      cache: 'no-store', // [REAL-TIME] no Next.js Data Cache — always fresh
+      cache: 'no-store', // [REAL-TIME] no Next.js Data Cache  always fresh
       signal: AbortSignal.timeout(10000)
     });
     if (res.status === 429) {
-        console.warn('[PriceService] ⚠️ CoinGecko 429 Throttled for markets. Using STEEL DOME Fallback immediately.');
+        console.warn('[PriceService] ️ CoinGecko 429 Throttled for markets. Using STEEL DOME Fallback immediately.');
         throw new Error('THROTTLED');
     }
     if (!res.ok) throw new Error(`CG Status ${res.status}`);
@@ -174,13 +174,13 @@ export class PriceService {
         signal: AbortSignal.timeout(8000)
       });
 
-      // 🚨 [HTML GUARD] DexScreener CDN/Cloudflare occasionally returns an HTML error page.
+      //  [HTML GUARD] DexScreener CDN/Cloudflare occasionally returns an HTML error page.
       // Attempting JSON.parse on HTML produces misleading SyntaxError log spam.
       // Bail out early if the response is not clean JSON.
       if (!res.ok) return null;
       const contentType = res.headers.get('content-type') || '';
       if (!contentType.includes('application/json') && !contentType.includes('text/json')) {
-        // Silently skip — this is a known transient CDN degradation, not a code bug.
+        // Silently skip  this is a known transient CDN degradation, not a code bug.
         return null;
       }
 

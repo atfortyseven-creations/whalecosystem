@@ -4,7 +4,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
-import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { SystemFooter } from '@/components/landing/SystemFooter';
 import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
 import { motion, Variants } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -49,9 +49,9 @@ function ForumHomeContent() {
       <div className="w-full flex flex-col items-center justify-start relative min-h-screen bg-white pt-24 pb-20">
         <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col z-10">
           
-          {/* ═══════════════════════════════════════════════════════════════
+          {/* 
               DISCOURSE-STYLE HEADER
-          ═══════════════════════════════════════════════════════════════ */}
+           */}
           <section className="w-full flex flex-col sm:flex-row sm:items-end justify-between border-b border-slate-200/60 pb-6 mb-10 gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 mb-2">Forum</h1>
@@ -63,12 +63,12 @@ function ForumHomeContent() {
             </Link>
           </section>
 
-          {/* ═══════════════════════════════════════════════════════════════
-              MAIN CONTENT — Categories (Left) + Topics (Right)
-          ═══════════════════════════════════════════════════════════════ */}
+          {/* 
+              MAIN CONTENT  Categories (Left) + Topics (Right)
+           */}
           <div className="w-full flex flex-col lg:flex-row gap-12 lg:gap-16">
 
-            {/* LEFT SIDEBAR — Categories */}
+            {/* LEFT SIDEBAR  Categories */}
             <div className="w-full lg:w-[340px] shrink-0">
               <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-200">
                  <h2 className="font-sans text-[13px] font-bold text-slate-500 uppercase tracking-wide">Category</h2>
@@ -103,7 +103,7 @@ function ForumHomeContent() {
               </div>
             </div>
 
-            {/* RIGHT — Topics */}
+            {/* RIGHT  Topics */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-[#0088cc]">
                 <h2 className="font-sans text-[13px] font-bold text-[#0088cc] uppercase tracking-wide">
@@ -172,7 +172,7 @@ function ForumHomeContent() {
       </div>
 
       <WhaleChatLink />
-      <SovereignFooter />
+      <SystemFooter />
     </div>
   );
 }

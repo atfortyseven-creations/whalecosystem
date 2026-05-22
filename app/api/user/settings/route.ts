@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateSecureRequest } from '@/lib/security/premium-security';
 
-// ── Complete store key → DB column map ────────────────────────────────────────
-// Every key in SovereignSettings is mapped here.
+//  Complete store key  DB column map 
+// Every key in SystemSettings is mapped here.
 const STORE_TO_DB: Record<string, string> = {
     // General
     theme:                  'theme',
@@ -51,10 +51,10 @@ const STORE_TO_DB: Record<string, string> = {
     hiddenAssets:           'hiddenAssets',
 };
 
-// ── DB column → store key (for reverse mapping on GET) ──────────────────────
+//  DB column  store key (for reverse mapping on GET) 
 const DB_TO_STORE: Record<string, string> = {
     layoutDensity: 'density',
-    // soundEffects is returned as-is — audioAlerts is a store alias
+    // soundEffects is returned as-is  audioAlerts is a store alias
 };
 
 function mapDbToStore(data: Record<string, any>): Record<string, any> {
@@ -63,14 +63,14 @@ function mapDbToStore(data: Record<string, any>): Record<string, any> {
         const storeKey = DB_TO_STORE[dbKey] ?? dbKey;
         out[storeKey] = val;
     }
-    // Duplicate soundEffects → audioAlerts for store compatibility
+    // Duplicate soundEffects  audioAlerts for store compatibility
     if ('soundEffects' in out) {
         out['audioAlerts'] = out['soundEffects'];
     }
     return out;
 }
 
-// ── Full column select for GET ────────────────────────────────────────────────
+//  Full column select for GET 
 const FULL_SELECT = {
     theme: true,
     language: true,
@@ -104,10 +104,10 @@ const FULL_SELECT = {
     hiddenAssets: true,
 };
 
-// ── Columns guaranteed to exist in every DB schema version ───────────────────
+//  Columns guaranteed to exist in every DB schema version 
 const SAFE_COLUMNS = ['theme', 'currency', 'showBalances', 'stealthMode', 'allowAnalytics'];
 
-// ── Minimal fallback select ───────────────────────────────────────────────────
+//  Minimal fallback select 
 const MINIMAL_SELECT = { theme: true, currency: true };
 
 export async function GET(req: any) {
@@ -162,7 +162,7 @@ export async function PATCH(req: any) {
 
         const body = await req.json();
 
-        // Translate store keys → DB column names, reject unknown keys
+        // Translate store keys  DB column names, reject unknown keys
         const updateData: Record<string, any> = {};
         for (const storeKey of Object.keys(body)) {
             const dbKey = STORE_TO_DB[storeKey];
@@ -184,7 +184,7 @@ export async function PATCH(req: any) {
                 data: updateData,
             });
         } catch {
-            // Extended columns not yet migrated — write only safe columns
+            // Extended columns not yet migrated  write only safe columns
             const safeData: Record<string, any> = {};
             for (const k of Object.keys(updateData)) {
                 if (SAFE_COLUMNS.includes(k)) safeData[k] = updateData[k];

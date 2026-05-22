@@ -1,26 +1,26 @@
 /**
  * Enterprise Edition API
  *
- * GET  /api/enterprise          — Edition info + feature matrix
- * POST /api/enterprise/contact  — Enterprise inquiry / deal initiation
- * GET  /api/enterprise/status   — Authenticated enterprise customer status
+ * GET  /api/enterprise           Edition info + feature grid
+ * POST /api/enterprise/contact   Enterprise inquiry / deal initiation
+ * GET  /api/enterprise/status    Authenticated enterprise customer status
  *
  * Philosophy: Enterprise Edition adds SUPPORT and SLA guarantees.
- * It does NOT remove sovereignty — the sovereign architecture is 
+ * It does NOT remove systemty  the system architecture is 
  * non-negotiable at all tiers.
  *
  * Tiers:
- *   COMMUNITY   — Open-source, self-hosted, no SLA
- *   PRO         — $99/mo. API key, email support, 48h response
- *   ENTERPRISE  — Custom pricing. SLA 99.9%, Slack channel, 4h response
- *   SOVEREIGN   — Air-gapped deployment, on-site audit, phone+Slack
+ *   COMMUNITY    Open-source, self-hosted, no SLA
+ *   PRO          $99/mo. API key, email support, 48h response
+ *   ENTERPRISE   Custom pricing. SLA 99.9%, Slack channel, 4h response
+ *   SOVEREIGN    Air-gapped deployment, on-site audit, phone+Slack
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-// ─── Feature Matrix ───────────────────────────────────────────────────────────
+//  Feature Grid 
 
 const EDITION_MATRIX = {
     COMMUNITY: {
@@ -107,19 +107,19 @@ const EDITION_MATRIX = {
             'On-site deployment and audit',
             'Custom algorithm tuning for your data',
             'Co-authorship on academic research',
-            'Quarterly intelligence briefing calls',
-            'Sovereign Ambassador Program credit',
+            'Quarterly analytics briefing calls',
+            'System Ambassador Program credit',
         ],
     },
 };
 
-// ─── GET — Edition Info ────────────────────────────────────────────────────
+//  GET  Edition Info 
 
 export async function GET() {
     return NextResponse.json({
         product:      'Whale Alert Network',
         version:      '3.0.0',
-        philosophy:   'Enterprise support. Sovereign architecture. Non-custodial always.',
+        philosophy:   'Enterprise support. System architecture. Non-custodial always.',
         editions:     EDITION_MATRIX,
         contactUrl:   '/api/enterprise/contact',
         docsUrl:      '/docs/enterprise',

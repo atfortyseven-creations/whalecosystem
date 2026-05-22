@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { ShieldCheck, ShieldAlert, Check, X, Trash2, AlertTriangle } from 'lucide-react';
 
-export default function SovereignAdminPanel() {
+export default function SystemAdminPanel() {
   const [queue, setQueue] = useState<{ topics: any[], posts: any[] }>({ topics: [], posts: [] });
   const [error, setError] = useState<string | null>(null);
   const [purgeStep, setPurgeStep] = useState<0 | 1 | 2>(0); // 0=idle, 1=confirm, 2=done
@@ -65,7 +65,7 @@ export default function SovereignAdminPanel() {
     <div className="flex flex-col items-center justify-center h-[60vh]">
        <ShieldAlert size={64} className="text-red-500 mb-4" />
        <h1 className="text-2xl font-bold" style={{ color: 'var(--forum-text)' }}>ACCESS DENIED</h1>
-       <p className="mt-2" style={{ color: 'var(--forum-text-muted)' }}>Only the Sovereign Administrator can access this terminal.</p>
+       <p className="mt-2" style={{ color: 'var(--forum-text-muted)' }}>Only the System Administrator can access this terminal.</p>
     </div>
   );
 
@@ -74,12 +74,12 @@ export default function SovereignAdminPanel() {
       <div className="flex items-center gap-3 mb-8 pb-4 border-b" style={{ borderColor: 'var(--forum-border)' }}>
          <ShieldCheck size={32} className="text-green-600" />
          <div>
-           <h1 className="text-[24px] font-bold" style={{ color: 'var(--forum-text)' }}>Sovereign Gatekeeper</h1>
+           <h1 className="text-[24px] font-bold" style={{ color: 'var(--forum-text)' }}>System Gatekeeper</h1>
            <p className="text-[14px]" style={{ color: 'var(--forum-text-muted)' }}>Global Moderation Queue. All standard user submissions land here as PENDING.</p>
          </div>
       </div>
 
-      {/* ── DANGER ZONE: Purge All Forum Content ── */}
+      {/*  DANGER ZONE: Purge All Forum Content  */}
       <div className="mb-10 p-5 rounded-xl border-2 border-red-200 bg-red-50">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-start gap-3">
@@ -113,7 +113,7 @@ export default function SovereignAdminPanel() {
                 disabled={purging}
                 className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white text-[12px] font-black uppercase rounded-lg transition-all disabled:opacity-60"
               >
-                {purging ? 'Purging…' : 'Yes, Delete Everything'}
+                {purging ? 'Purging' : 'Yes, Delete Everything'}
               </button>
             </div>
           )}
@@ -121,7 +121,7 @@ export default function SovereignAdminPanel() {
           {purgeStep === 2 && purgeResult && (
             <div className="flex items-center gap-2 text-green-700 text-[12px] font-bold">
               <Check size={14} />
-              Done — {purgeResult.topics} topics and {purgeResult.posts} posts deleted. Forum is now empty.
+              Done  {purgeResult.topics} topics and {purgeResult.posts} posts deleted. Forum is now empty.
             </div>
           )}
         </div>

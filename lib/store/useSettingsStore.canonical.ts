@@ -13,4 +13,4 @@
  *
  * This barrel avoids a module duplication runtime conflict.
  */
-export { useSettingsStore, type SovereignSettings } from './useSettingsStore';
+export { useSettingsStore, type SystemSettings } from './useSettingsStore';

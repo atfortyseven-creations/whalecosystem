@@ -1,6 +1,6 @@
 # QUICKSTART
 
-## Whale Alert Network - Sovereign Vault
+## Whale Alert Network - System Vault
 
 Get the Whale Alert Network up and running locally in under 5 minutes.
 
@@ -30,12 +30,12 @@ Get the Whale Alert Network up and running locally in under 5 minutes.
    ```
    *Edit `.env` using your preferred text editor.*
 
-4. **Start the Sovereign Vault**
+4. **Start the System Vault**
    We provide a batch script for a streamlined start on Windows, or you can use the standard npm commands:
    
    **Windows:**
    ```bash
-   SovereignVault_RUN.bat
+   SystemVault_RUN.bat
    ```
    
    **Linux/macOS:**

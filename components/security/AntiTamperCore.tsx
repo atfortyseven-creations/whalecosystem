@@ -4,12 +4,12 @@ import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 /**
- * 🛡️ Anti-Tamper Core — Nanoscopic Mutational Observer
+ * ️ Anti-Tamper Core  Nanoscopic Mutational Observer
  * Installs a hardware-level DOM watcher. If the user attempts to manipulate 
  * the DOM tree via DevTools to reveal hidden data or bypass visual restrictions, 
  * this sentinel terminates the session instantly.
  *
- * Additional Sovereign Protections:
+ * Additional System Protections:
  *  - Right-click / Context menu blocked globally.
  *  - F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S blocked.
  *  - Image drag-and-drop prevented.
@@ -22,16 +22,16 @@ export function AntiTamperCore() {
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        // ── Removed DevTools Probe and MutationObserver to prevent mobile freezes ──
+        //  Removed DevTools Probe and MutationObserver to prevent mobile freezes 
 
 
-        // ── Right-Click / Context Menu Block ───────────────────────────────────
+        //  Right-Click / Context Menu Block 
         const blockContextMenu = (e: MouseEvent) => {
             e.preventDefault();
             return false;
         };
 
-        // ── Keyboard Shortcut Block ─────────────────────────────────────────────
+        //  Keyboard Shortcut Block 
         const blockKeyboard = (e: KeyboardEvent) => {
             const key = e.key;
             const ctrl = e.ctrlKey || e.metaKey;
@@ -51,7 +51,7 @@ export function AntiTamperCore() {
             if (ctrl && (key === 'S' || key === 's')) { e.preventDefault(); return; }
         };
 
-        // ── Drag Prevention ─────────────────────────────────────────────────────
+        //  Drag Prevention 
         const blockDrag = (e: DragEvent) => {
             e.preventDefault();
             return false;

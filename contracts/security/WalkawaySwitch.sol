@@ -7,12 +7,12 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title WalkawaySwitch v3
- * @author Sovereign Akashic Ledger (SAL)
+ * @author System Akashic Ledger (SAL)
  * @notice A decentralized deadman switch that transfers protocol ownership to a 
  * community multisig after exactly 180 days of founder inactivity.
  */
 contract WalkawaySwitch is Ownable2Step, Pausable, ReentrancyGuard {
-    // ────────────── PARAMETERS ──────────────
+    //  PARAMETERS 
     
     // Exactly 180 days of thermodynamic silence trigger the switch
     uint256 public constant INACTIVITY_THRESHOLD = 180 days;
@@ -23,13 +23,13 @@ contract WalkawaySwitch is Ownable2Step, Pausable, ReentrancyGuard {
     // The designated community identity (Safe Multisig)
     address public immutable COMMUNITY_MULTISIG;
 
-    // ───────────────── EVENTS ─────────────────
+    //  EVENTS 
 
     event HeartbeatUpdated(address indexed founder, uint256 timestamp);
     event OwnershipTransferredToCommunity(address indexed communityMultisig, uint256 timestamp);
     event EmergencyPauseTriggered(address indexed administrator);
 
-    // ────────────── CONSTRUCTOR ──────────────
+    //  CONSTRUCTOR 
 
     /**
      * @param _communityMultisig The address of the community-governed Multisig (Safe).
@@ -41,7 +41,7 @@ contract WalkawaySwitch is Ownable2Step, Pausable, ReentrancyGuard {
         lastHeartbeat = block.timestamp;
     }
 
-    // ────────────── FUNCTIONS ────────────────
+    //  FUNCTIONS 
 
     /**
      * @notice Allows the founder to prove "liveness" and reset the 180-day countdown.
@@ -67,7 +67,7 @@ contract WalkawaySwitch is Ownable2Step, Pausable, ReentrancyGuard {
         emit OwnershipTransferredToCommunity(COMMUNITY_MULTISIG, block.timestamp);
     }
 
-    // ────────────── SECURITY ─────────────────
+    //  SECURITY 
 
     function pause() external onlyOwner {
         _pause();

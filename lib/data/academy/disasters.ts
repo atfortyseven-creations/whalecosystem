@@ -61,7 +61,7 @@ export const disasterModules = [
                                 <text x="670" y="85" fill="#ff4d4d" text-anchor="middle">Inversor Previo</text>
                                 <path d="M670 110 Q670 160 400 160 Q130 160 130 110" stroke="#ff4d4d" stroke-dasharray="6" marker-end="url(#arrowhead)"/>
                             </svg>
-                            <p class="diagram-caption">Figura 2: Flujo de capital en un esquema Ponzi tokenizado — la circulación es la evidencia forense.</p>
+                            <p class="diagram-caption">Figura 2: Flujo de capital en un esquema Ponzi tokenizado  la circulación es la evidencia forense.</p>
                         </div>
                     </section>
                 </div>`
@@ -103,7 +103,7 @@ export const disasterModules = [
                             <table>
                                 <thead><tr><th>Riesgo Operativo</th><th>Realidad Celsius</th><th>Estándar Institucional</th></tr></thead>
                                 <tbody>
-                                    <tr><td>Liquidez</td><td>Activos ilíquidos (stETH, DeFi).</td><td>Reservas líquidas ≥ 20% pasivos.</td></tr>
+                                    <tr><td>Liquidez</td><td>Activos ilíquidos (stETH, DeFi).</td><td>Reservas líquidas  20% pasivos.</td></tr>
                                     <tr><td>Auditorías</td><td>Sin Proof of Reserves verificable.</td><td>Auditorías trimestrales obligatorias.</td></tr>
                                     <tr><td>Separación de fondos</td><td>Fondos de clientes mezclados.</td><td>Cuentas segregadas por regulación.</td></tr>
                                 </tbody>
@@ -139,7 +139,7 @@ export const disasterModules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. La Puerta Trasera Contable: 8,000 Millones en el Vacío</h2>
-                        <p>FTX y Alameda Research no eran entidades separadas; eran dos caras de un fraude coordinado. La "backdoor" en el software de contabilidad de FTX permitía a Alameda acceder a los fondos de clientes como si fueran una línea de crédito ilimitada. Cuando los mercados cayeron en 2022, Alameda había acumulado posiciones perdedoras de decenas de miles de millones financiadas con los depósitos de los clientes. La publicación del balance de Alameda por CoinDesk en noviembre de 2022 —que mostraba su principal activo como el token nativo de FTX (FTT)— desencadenó la <strong>corrida bancaria más rápida de la historia cripto</strong>, con $6B en retiros en 72 horas.</p>
+                        <p>FTX y Alameda Research no eran entidades separadas; eran dos caras de un fraude coordinado. La "backdoor" en el software de contabilidad de FTX permitía a Alameda acceder a los fondos de clientes como si fueran una línea de crédito ilimitada. Cuando los mercados cayeron en 2022, Alameda había acumulado posiciones perdedoras de decenas de miles de millones financiadas con los depósitos de los clientes. La publicación del balance de Alameda por CoinDesk en noviembre de 2022 que mostraba su principal activo como el token nativo de FTX (FTT) desencadenó la <strong>corrida bancaria más rápida de la historia cripto</strong>, con $6B en retiros en 72 horas.</p>
                     </section>
 
                     <section class="pro-section">
@@ -383,11 +383,11 @@ export const disasterModules = [
                                 <text x="300" y="75" fill="#ff4d4d" font-size="11">Quemar UST</text>
                                 <circle cx="400" cy="110" r="60" fill="rgba(255,77,77,0.15)" stroke="#ff4d4d" stroke-width="2"/>
                                 <text x="400" y="108" fill="#ff4d4d" text-anchor="middle">LUNA</text>
-                                <text x="400" y="128" fill="#ff4d4d" text-anchor="middle">Emitida ↑</text>
+                                <text x="400" y="128" fill="#ff4d4d" text-anchor="middle">Emitida </text>
                                 <path d="M455 85 L545 85" stroke="#ff4d4d" marker-end="url(#arrowhead)" stroke-width="2"/>
                                 <circle cx="600" cy="110" r="60" fill="rgba(255,77,77,0.2)" stroke="#ff4d4d" stroke-width="3"/>
                                 <text x="600" y="108" fill="#fff" text-anchor="middle" font-weight="bold">LUNA</text>
-                                <text x="600" y="128" fill="#ff4d4d" text-anchor="middle">Precio → 0</text>
+                                <text x="600" y="128" fill="#ff4d4d" text-anchor="middle">Precio  0</text>
                                 <path d="M600 170 Q400 190 200 170" stroke="#ff4d4d" stroke-dasharray="4" marker-end="url(#arrowhead)"/>
                             </svg>
                             <p class="diagram-caption">Figura 16: El loop de retroalimentación negativa que destruyó $40B.</p>

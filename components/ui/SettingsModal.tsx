@@ -9,7 +9,7 @@ import {
     CreditCard, Beaker, Link, Info, MessageCircle, Lock,
     Loader2, Tablet, LogOut
 } from 'lucide-react';
-import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { ActiveSessions } from '../settings/ActiveSessions';
 import { CloudSyncManager } from '../settings/CloudSyncManager';
 import { RealPrivacySettings } from '../privacy/RealPrivacySettings';
@@ -18,7 +18,7 @@ import { verifyBiometricOwnership } from '@/src/services/security/BiometricServi
 import { revokeTokenAllowance } from '@/src/services/security/RevokeService';
 
 export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-    const { nuclearDisconnect } = useSovereignSignOut();
+    const { nuclearDisconnect } = useSystemSignOut();
     const {
         t, theme, setTheme, currency, setCurrency,
         language, setLanguage, searchEngine, setSearchEngine, lockApp,
@@ -157,7 +157,7 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                             <div className="pt-6 border-t border-white/5">
                                 <div className="bg-red-500/5 border border-red-500/10 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div>
-                                        <h4 className="text-white text-sm font-bold mb-1">Active Sovereign Session</h4>
+                                        <h4 className="text-white text-sm font-bold mb-1">Active System Session</h4>
                                         <p className="text-xs text-gray-500 max-w-[90%] font-serif">Log out and clear all secure keys and wallet registries from memory and local cache.</p>
                                     </div>
                                     <button 
@@ -261,8 +261,8 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                             <h4 className="text-orange-400 font-bold mb-2 flex items-center gap-2"><Beaker className="w-4 h-4"/> Beta Features</h4>
                             <p className="text-xs text-orange-400/70">These features are unstable. Use at your own risk. Loss of funds may occur on beta contract relays.</p>
                         </div>
-                        <ToggleItem title="Quantum Smart Routing" description="Route swaps through experimental L3 aggregators." active={false} onClick={() => {}} />
-                        <ToggleItem title="AI Rebalancer" description="Allow Sovereign AI to auto-rebalance stablecoins." active={false} onClick={() => {}} />
+                        <ToggleItem title="Core Smart Routing" description="Route swaps through experimental L3 aggregators." active={false} onClick={() => {}} />
+                        <ToggleItem title="AI Rebalancer" description="Allow System AI to auto-rebalance stablecoins." active={false} onClick={() => {}} />
                     </div>
                 );
 
@@ -270,7 +270,7 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                 return (
                     <div className="text-center py-10 space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                         <h1 className="text-4xl font-black text-white tracking-tighter">WhaleAlert ID.fi</h1>
-                        <p className="text-zinc-400 font-mono">v2.4.1 (Legendary Sovereign Build)</p>
+                        <p className="text-zinc-400 font-mono">v2.4.1 (Legendary System Build)</p>
                         <div className="flex justify-center gap-4 mt-8">
                             <a href="#" className="text-sm text-[#00f2ea] hover:underline">Terms of Service</a>
                             <span className="text-zinc-600">|</span>
@@ -315,7 +315,7 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                         className="fixed inset-0 md:inset-auto md:top-10 md:bottom-10 md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 
                                    w-full md:w-[900px] md:h-[700px] border border-white/10 md:rounded-3xl shadow-2xl z-[101] overflow-hidden flex flex-col md:flex-row relative"
                     >
-                        {/* Pure CSS Wallpaper Background — 400Hz Zero-Latency Render */}
+                        {/* Pure CSS Wallpaper Background  400Hz Zero-Latency Render */}
                         <div className="absolute inset-0 z-0 overflow-hidden md:rounded-3xl">
                             <div
                                 className="absolute inset-0 animate-prism-shift"

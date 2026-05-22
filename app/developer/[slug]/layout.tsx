@@ -10,7 +10,7 @@ export default function DocLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen w-full bg-[#fcfcfc] text-[#111] font-sans flex flex-col md:flex-row selection:bg-black selection:text-white">
       
-      {/* ── SIDEBAR ── */}
+      {/*  SIDEBAR  */}
       <aside className="w-full md:w-[280px] shrink-0 border-r border-black/5 bg-white flex flex-col h-screen sticky top-0 overflow-y-auto">
         <div className="p-6 border-b border-black/5 flex items-center justify-between sticky top-0 bg-white/90 backdrop-blur-md z-10">
           <Link href="/developer" className="font-black text-[14px] tracking-tight hover:opacity-70 transition-opacity flex items-center gap-2">
@@ -55,7 +55,7 @@ export default function DocLayout({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
 
-      {/* ── CONTENT AREA ── */}
+      {/*  CONTENT AREA  */}
       <main className="flex-1 min-h-screen bg-white">
         {children}
       </main>

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 
 /**
- * Sovereign Telemetry Engine (Zero-Third-Party / GDPR Compliant)
+ * System Telemetry Engine (Zero-Third-Party / GDPR Compliant)
  * 
  * Aggregates performance metrics (Latency, Uptime) in-memory and flushes 
  * to PostgreSQL securely. No PII, IP addresses, or wallet addresses are logged.
@@ -54,7 +54,7 @@ class TelemetryEngine {
   }
 
   /**
-   * Flushes a specific metric to the Sovereign Database.
+   * Flushes a specific metric to the System Database.
    */
   private async flush(type: MetricType) {
     const metric = this.buffer.get(type);
@@ -98,4 +98,4 @@ class TelemetryEngine {
 }
 
 // Export as singleton to be used across the application
-export const SovereignTelemetry = new TelemetryEngine();
+export const SystemTelemetry = new TelemetryEngine();

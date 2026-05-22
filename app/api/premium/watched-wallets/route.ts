@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({ 
                 error: 'LIMIT_REACHED',
-                message: 'Has alcanzado el límite de 3 carteras para usuarios gratuitos. Activa el acceso SOVEREIGN por 1.50€ para tener carteras ilimitadas.',
+                message: 'Has alcanzado el límite de 3 carteras para usuarios gratuitos. Activa el acceso SOVEREIGN por 1.50 para tener carteras ilimitadas.',
                 requirePremium: true
             }, { status: 403 });
         }
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     let stats = null;
     if (address.startsWith('0x')) {
         try {
-            // 🔥 [LEGENDARY DISCOVERY] Force Deep Scan on addition to prevent 0.00 balance lag
+            //  [LEGENDARY DISCOVERY] Force Deep Scan on addition to prevent 0.00 balance lag
             stats = await getLegendaryStats(address, true);
         } catch (statsError) {
             console.warn(`[WATCH-ADD] getLegendaryStats failed for ${address}:`, statsError);
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('[POST-WATCH-ERROR]', error);
     return NextResponse.json({ 
-        error: 'Matrix Resilience Active', 
+        error: 'Grid Resilience Active', 
         details: error.message || 'The blockchain data was discovered, but the database synchronization failed. Your view is live but changes may not persist.',
         syncStatus: 'FAILED'
     }, { status: 500 });
@@ -161,9 +161,9 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // [PHASE 4] Fetch Global Intelligence for these addresses to merge missing forensics/categories
+    // [PHASE 4] Fetch Global Analytics for these addresses to merge missing forensics/categories
     const addresses = wallets.map(w => w.address.toLowerCase());
-    const globalIntels = await (prisma.walletIntelligence as any).findMany({
+    const globalIntels = await (prisma.walletAnalytics as any).findMany({
         where: { address: { in: addresses } },
         select: { address: true, forensics: true, category: true }
     });
@@ -181,7 +181,7 @@ export async function GET(req: NextRequest) {
                 const stats = await getLegendaryStats(w.address).catch(() => null);
                 
                 if (stats) {
-                    // 🔥 PERSISTENCE FLOOR: Never return 0 if DB has a high lastValue and stats are fresh-0
+                    //  PERSISTENCE FLOOR: Never return 0 if DB has a high lastValue and stats are fresh-0
                     const dbValue = w.lastValue || 0;
                     const totalValue = stats ? ((stats.totalValue === 0 && dbValue > 0) ? dbValue : stats.totalValue) : dbValue;
                     
@@ -211,13 +211,13 @@ export async function GET(req: NextRequest) {
                         metadata: stats?.breakdown,
                         forensics: (w as any).forensics || (globalIntel as any)?.forensics || undefined,
                         category: (w as any).category || (globalIntel as any)?.category || undefined,
-                        // 🔥 MODIFIED: Analytics now fetched on-demand via separate API
+                        //  MODIFIED: Analytics now fetched on-demand via separate API
                         analytics: undefined
                     };
                 }
             }
             
-            // 🔥 FIX: If stats failed or wallet is not 0x, still return totalValue from DB
+            //  FIX: If stats failed or wallet is not 0x, still return totalValue from DB
             return {
                 ...w,
                 totalValue: w.lastValue || 0,
@@ -267,7 +267,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'ID required' }, { status: 400 });
     }
 
-    // 🔥 [IDENTITY FUSION] Check BOTH potential owner IDs
+    //  [IDENTITY FUSION] Check BOTH potential owner IDs
     const userIds = [userId];
     if (web3Address && web3Address !== userId) userIds.push(web3Address);
 

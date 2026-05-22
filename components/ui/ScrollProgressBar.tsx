@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * ScrollProgressBar — Thin top-of-page progress indicator
+ * ScrollProgressBar  Thin top-of-page progress indicator
  * Renders a 2px line that fills from left to right as the page scrolls.
- * CPU cost: zero after mount — runs entirely on scroll event + RAF.
+ * CPU cost: zero after mount  runs entirely on scroll event + RAF.
  */
 
 import { useEffect, useRef } from "react";

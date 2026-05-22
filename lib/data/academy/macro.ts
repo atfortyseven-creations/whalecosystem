@@ -72,7 +72,7 @@ export const macroModules = [
 
                     <section class="pro-section">
                         <h2>II. Neutralidad Termodinámica Apátrida</h2>
-                        <p>Ante la fragmentación geoeconómica (De-Dollarization) de vender Petróleo por Yenes o Rupias, se requieren conductos de pago de desahogo que no pertenezcan al sistema ACH. El Bloque no-alineado divisa que acumular una 'Reserva Apátrida' (State-Neutral Asset) matemáticamente descentralizada L1 (Bitcoin Sovereign Reserve) y liquidar remesas o compras mayoristas en la Red pública inhabilita la interdicción de cualquier aduana marina de la OTAN, garantizando la Autarquía (Sovereign Independence) Transaccional Financiera en Bloques Multilaterales emergentes.</p>
+                        <p>Ante la fragmentación geoeconómica (De-Dollarization) de vender Petróleo por Yenes o Rupias, se requieren conductos de pago de desahogo que no pertenezcan al sistema ACH. El Bloque no-alineado divisa que acumular una 'Reserva Apátrida' (State-Neutral Asset) matemáticamente descentralizada L1 (Bitcoin System Reserve) y liquidar remesas o compras mayoristas en la Red pública inhabilita la interdicción de cualquier aduana marina de la OTAN, garantizando la Autarquía (System Independence) Transaccional Financiera en Bloques Multilaterales emergentes.</p>
                     </section>
                 </div>`
             },
@@ -216,7 +216,7 @@ export const macroModules = [
 
                     <section class="pro-section">
                         <h2>II. Punto de Inflexión de Event Horizon L1</h2>
-                        <p>Este colapso M2 no será una transición suave burocrática. Cuando las clases medias urbanas planetarias se percaten sincrónicamente del "Fraude del Ponzi Soberano", se desencadenará un "Corralito Mundial" de estampida bancaria buscando Mover Riqueza Líquida de M2 Fíat L2 a M0 Cripto Duro L1. El Precio Spot de BTC subirá parabólicamente un 10,000% interdiario forzando a los Bancos Centrales a capitular, abandonar la moneda nacional y adoptar un Peg rígido Bitcoin G7 o emitir Bonos directamente denominados y saldados criptográficamente (Sovereign Lightning Bonds).</p>
+                        <p>Este colapso M2 no será una transición suave burocrática. Cuando las clases medias urbanas planetarias se percaten sincrónicamente del "Fraude del Ponzi Soberano", se desencadenará un "Corralito Mundial" de estampida bancaria buscando Mover Riqueza Líquida de M2 Fíat L2 a M0 Cripto Duro L1. El Precio Spot de BTC subirá parabólicamente un 10,000% interdiario forzando a los Bancos Centrales a capitular, abandonar la moneda nacional y adoptar un Peg rígido Bitcoin G7 o emitir Bonos directamente denominados y saldados criptográficamente (System Lightning Bonds).</p>
                     </section>
                 </div>`
             },
@@ -329,7 +329,7 @@ export const macroModules = [
                 </div>`
             },
             {
-                id: "game-theory-sovereign",
+                id: "game-theory-system",
                 title: "19. Teoría de Juegos de Adopción Soberana",
                 description: "¿Quién será el próximo El Salvador?",
                 readTime: 60,

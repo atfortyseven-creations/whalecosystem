@@ -2,21 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { VerificationLevel, ISuccessResult } from '@worldcoin/idkit';
+import { VerificationLevel, ISuccessResult } from '@identity/idkit';
 import { useWorld } from '@/src/context/WorldContext';
 import { ScanFace } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAccount } from 'wagmi';
-// Sovereign SIWE: WorldGate uses wallet address for identity — no Clerk dependency
+// System SIWE: WorldGate uses wallet address for identity  no Clerk dependency
 
-const IDKitWidget = dynamic(() => import('@worldcoin/idkit').then((mod) => mod.IDKitWidget), {
+const IDKitWidget = dynamic(() => import('@identity/idkit').then((mod) => mod.IDKitWidget), {
     ssr: false,
     loading: () => <div className="w-full h-16 animate-pulse bg-white/10 rounded-full" />
 });
 
-// 🔥 WHITELIST: Usuarios que NO necesitan World ID verification
+//  WHITELIST: Usuarios que NO necesitan World ID verification
 const EMAIL_WHITELIST = [
     'axel111@hotmail.es',
     'josejordan20222@gmail.com'
@@ -39,7 +39,7 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         if (isWhitelisted && address) {
-            console.log(`✅ [WHITELIST] Wallet ${address} bypassing World ID verification`);
+            console.log(` [WHITELIST] Wallet ${address} bypassing World ID verification`);
         }
     }, [isWhitelisted, address]);
 
@@ -57,9 +57,9 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (!isVerified && !isLoading && !isWhitelisted) {
             console.log("--------------------------------------------------");
-            console.log("👁️ WORLD ID DEBUGGER");
-            console.log(`🔹 Active App ID: ${APP_ID}`);
-            console.log(`🔹 Required Action: ${ACTION}`);
+            console.log("️ WORLD ID DEBUGGER");
+            console.log(` Active App ID: ${APP_ID}`);
+            console.log(` Required Action: ${ACTION}`);
             console.log("--------------------------------------------------");
         }
     }, [isVerified, isLoading, APP_ID, isWhitelisted]);
@@ -89,7 +89,7 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
             }
 
             toast.dismiss(toastId);
-            toast.success("✨ Identidad Soberana Verificada");
+            toast.success(" Identidad Soberana Verificada");
             await verifyIdentity(data);
             setShowSuccess(true);
 
@@ -110,7 +110,7 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
         );
     }
 
-    // ✅ BYPASS: Si el usuario está en la whitelist, permitir acceso directo
+    //  BYPASS: Si el usuario está en la whitelist, permitir acceso directo
     if (isWhitelisted) {
         return <>{children}</>;
     }
@@ -204,7 +204,7 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
                             </div>
                             <div className="space-y-2">
                                 <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase">Identity Verified</h2>
-                                <p className="text-emerald-400/80 font-mono text-[10px] tracking-widest uppercase">Sovereign Whale Detected // Access Granted</p>
+                                <p className="text-emerald-400/80 font-mono text-[10px] tracking-widest uppercase">System Whale Detected // Access Granted</p>
                             </div>
                             <button
                                 onClick={() => setShowSuccess(false)}

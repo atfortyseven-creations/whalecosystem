@@ -34,20 +34,20 @@ export function ConnectWalletModal() {
         }
     }, [isConnectModalOpen]);
 
-    // ─── [SOVEREIGN MANDATE] QR Handshake Completion Listener ───
+    //  [SOVEREIGN MANDATE] QR Handshake Completion Listener 
     // This event is only fired by WalletConnectionBridge when the SSE
     // auth-complete event is received (i.e. a QR scan was completed on
     // a connected mobile device). We close the modal but do NOT force
-    // any navigation — the user stays where they are and navigates manually.
+    // any navigation  the user stays where they are and navigates manually.
     useEffect(() => {
         const handleAuthSuccess = () => {
-             console.log('[ConnectModal] Sovereign handshake confirmed. Closing modal.');
+             console.log('[ConnectModal] System handshake confirmed. Closing modal.');
              setView('selection');
              closeConnectModal();
-             // ❌ NO forced navigation. The user is in control.
+             //  NO forced navigation. The user is in control.
         };
-        window.addEventListener('sovereign:auth_success', handleAuthSuccess);
-        return () => window.removeEventListener('sovereign:auth_success', handleAuthSuccess);
+        window.addEventListener('system:auth_success', handleAuthSuccess);
+        return () => window.removeEventListener('system:auth_success', handleAuthSuccess);
     }, [closeConnectModal]);
 
     if (!isConnectModalOpen) return null;
@@ -83,7 +83,7 @@ export function ConnectWalletModal() {
                 try { await connectAsync({ connector: injected }); return; } catch(e) {}
             }
         }
-        // Nothing found locally — fall back to AppKit (QR/WalletConnect flow)
+        // Nothing found locally  fall back to AppKit (QR/WalletConnect flow)
         openAppKit({ view: 'Connect' });
     };
 
@@ -156,11 +156,11 @@ export function ConnectWalletModal() {
                         </button>
                     </div>
 
-                    {/* Content — scrollable interior so header/footer stay fixed */}
+                    {/* Content  scrollable interior so header/footer stay fixed */}
                     <div className="px-4 py-4 sm:px-6 sm:py-6 relative overflow-y-auto flex-1">
 
                         <AnimatePresence mode="wait">
-                            {/* ── SELECTION VIEW ── */}
+                            {/*  SELECTION VIEW  */}
                             {view === 'selection' && (
                                 <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6 relative z-10">
                                     <div className="space-y-0.5 text-center px-2">
@@ -168,12 +168,12 @@ export function ConnectWalletModal() {
                                             Select Provider
                                         </h2>
                                         <p className="text-[10px] sm:text-[11px] text-black/60 font-sans leading-relaxed">
-                                            Connect your wallet to access institutional tools and on-chain intelligence.
+                                            Connect your wallet to access institutional tools and on-chain analytics.
                                         </p>
                                     </div>
 
                                     <div className="space-y-3 pt-2">
-                                        {/* QUICK ACCESS GRID — 3 cols on mobile, compact */}
+                                        {/* QUICK ACCESS GRID  3 cols on mobile, compact */}
                                         <div className="grid grid-cols-3 gap-2">
                                             {[
                                                 { id: 'metamask', name: 'MetaMask', logo: '/wallets/metamask.svg', handler: handleMetaMask },
@@ -205,7 +205,7 @@ export function ConnectWalletModal() {
                                             <div className="flex-1 h-[1px] bg-black/10" />
                                         </div>
 
-                                        {/* WALLET_CONNECT & LEDGER — compact on mobile */}
+                                        {/* WALLET_CONNECT & LEDGER  compact on mobile */}
                                         <div className="space-y-1.5">
                                             <button onClick={handleAppKitConnect} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
                                                 <div className="flex items-center gap-2.5">
@@ -241,7 +241,7 @@ export function ConnectWalletModal() {
                                 </motion.div>
                             )}
 
-                            {/* ── QR VIEW ── */}
+                            {/*  QR VIEW  */}
                             {view === 'qr' && (
                                 <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center py-4 space-y-8 relative z-10">
                                     <div className="text-center space-y-2">
@@ -276,7 +276,7 @@ export function ConnectWalletModal() {
                                 </motion.div>
                             )}
 
-                            {/* ── LEDGER VIEW ── */}
+                            {/*  LEDGER VIEW  */}
                             {view === 'ledger' && (
                                 <motion.div key="ledger" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-8 space-y-6 relative z-10">
                                     <div className="w-20 h-20 rounded-full border border-[#050505]/10 bg-[#FAF9F6] flex items-center justify-center shadow-sm">

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useEffect, useRef, useState } from 'react';
-import { WacIntelligenceService } from '@/lib/intelligence-service';
+import { WacAnalyticsService } from '@/lib/analytics-service';
 import { useVIPStore, VIPStoreState, EMPTY_ARRAY } from '@/lib/vip-store';
 
 const LOCAL_EMPTY: any[] = [];
@@ -93,7 +93,7 @@ function deriveSignals(items: any[]): WhaleSignal[] {
             id: `large_transfer_${now}`,
             type: 'large_transfer',
             severity: totalUsd > 10_000_000 ? 'critical' : 'high',
-            title: '🔱 Elite liquidity surge',
+            title: ' Elite liquidity surge',
             body: `${bigTxs.length} high-value movements ($${(totalUsd / 1e6).toFixed(1)}M USD) detected across ${new Set(bigTxs.map(t => t.chain)).size} chains.`,
             btcAmount: 0,
             txCount: bigTxs.length,
@@ -108,7 +108,7 @@ function deriveSignals(items: any[]): WhaleSignal[] {
             id: `accumulation_${now}`,
             type: 'accumulation',
             severity: 'high',
-            title: '🏦 Institutional Accumulation',
+            title: ' Institutional Accumulation',
             body: `Whales are aggressively accumulating ${[...new Set(accumulation.map(t => t.asset))].join(', ')}. Strong bullish conviction.`,
             btcAmount: 0,
             txCount: accumulation.length,
@@ -123,7 +123,7 @@ function deriveSignals(items: any[]): WhaleSignal[] {
             id: `sell_pressure_${now}`,
             type: 'sell_pressure',
             severity: 'high',
-            title: '⚠️ Distribution Alert',
+            title: '️ Distribution Alert',
             body: `High-volume distribution detected in ${[...new Set(distribution.map(t => t.asset))].join(', ')}. Monitoring for volatility.`,
             btcAmount: 0,
             txCount: distribution.length,
@@ -328,13 +328,13 @@ export function useWhaleFeed() {
         const merged = [...filteredMempool, ...filteredEvm, ...confirmed].sort((a, b) => b.timestamp - a.timestamp);
         
         return merged.map(item => {
-            const intel = WacIntelligenceService.generateTacticalIntel({
+            const intel = WacAnalyticsService.generateTacticalIntel({
                 usdValue: item.usdValue || 0, from: item.from, to: item.to, type: item.type, asset: item.asset, chain: item.chain
             });
             const chainIcons: Record<string, { color: string; icon: string }> = {
-                'BITCOIN': { color: '#f7931a', icon: '₿' }, 'ETHEREUM': { color: '#627eea', icon: 'Ξ' }, 'ETH': { color: '#627eea', icon: 'Ξ' },
+                'BITCOIN': { color: '#f7931a', icon: '' }, 'ETHEREUM': { color: '#627eea', icon: 'Ξ' }, 'ETH': { color: '#627eea', icon: 'Ξ' },
                 'BSC': { color: '#f3ba2f', icon: 'BNB' }, 'BNB': { color: '#f3ba2f', icon: 'BNB' }, 'BASE': { color: '#0052ff', icon: 'BASE' },
-                'SOLANA': { color: '#14F195', icon: '◎' }, 'SOL': { color: '#14F195', icon: '◎' },
+                'SOLANA': { color: '#14F195', icon: '' }, 'SOL': { color: '#14F195', icon: '' },
             };
             const config = chainIcons[item.chain] || { color: '#0052ff', icon: 'BASE' };
             let sentimentColor = 'text-gray-400';

@@ -205,7 +205,7 @@ export function CopyTradingArena() {
                     Copy Trading Arena
                 </h2>
                 <p className="text-xs font-bold font-mono text-[#888888] uppercase tracking-widest mt-2">
-                    Powered by Hyperliquid L1 — Real positions, real executions, real Order IDs
+                    Powered by Hyperliquid L1  Real positions, real executions, real Order IDs
                 </p>
             </div>
 
@@ -284,7 +284,7 @@ export function CopyTradingArena() {
                                 <button
                                     onClick={() => { setSelectedTrader(null); setCopyResult(null); }}
                                     className="absolute top-6 right-6 text-[#050505]/40 hover:text-[#050505] transition-colors text-xl font-bold"
-                                >✕</button>
+                                ></button>
                             )}
 
                             {copyResult ? (
@@ -375,8 +375,8 @@ export function CopyTradingArena() {
 
                                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-6">
                                         <p className="text-[9px] font-bold text-amber-800 uppercase tracking-widest">
-                                            ⚠ Requires USDC in Hyperliquid. If you have no funds there, the order will be rejected.{' '}
-                                            <a href="https://app.hyperliquid.xyz" target="_blank" rel="noopener noreferrer" className="underline">Deposit here →</a>
+                                             Requires USDC in Hyperliquid. If you have no funds there, the order will be rejected.{' '}
+                                            <a href="https://app.hyperliquid.xyz" target="_blank" rel="noopener noreferrer" className="underline">Deposit here </a>
                                         </p>
                                     </div>
 
@@ -387,7 +387,7 @@ export function CopyTradingArena() {
                                     >
                                         {isCopying
                                             ? <><Zap size={16} className="animate-pulse" /> Signing EIP-712...</>
-                                            : <><ShieldCheck size={14} /> CONFIRM API EXECUTION — HL L1</>
+                                            : <><ShieldCheck size={14} /> CONFIRM API EXECUTION  HL L1</>
                                         }
                                     </button>
                                 </>

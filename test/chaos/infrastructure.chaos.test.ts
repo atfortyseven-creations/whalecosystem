@@ -1,15 +1,15 @@
 /**
- * CHAOS ENGINEERING TEST SUITE — Sovereign Infrastructure
+ * CHAOS ENGINEERING TEST SUITE  System Infrastructure
  *
  * Validates system resilience under real failure conditions:
- *   1. Redis total failure → BullMQ graceful pause
- *   2. Neo4j timeout → Memory Matrix activation
- *   3. RPC provider failure → Circuit breaker + failover
- *   4. WebSocket disconnect → Reconnect with exponential backoff
- *   5. PostgreSQL slow query → Timeout + graceful error response
+ *   1. Redis total failure  BullMQ graceful pause
+ *   2. Neo4j timeout  Memory Grid activation
+ *   3. RPC provider failure  Circuit breaker + failover
+ *   4. WebSocket disconnect  Reconnect with exponential backoff
+ *   5. PostgreSQL slow query  Timeout + graceful error response
  *
  * Run with: npx vitest run test/chaos/
- * These tests use real timeouts — allow 60s per suite.
+ * These tests use real timeouts  allow 60s per suite.
  *
  * Reference: Principles of Chaos Engineering (principlesofchaos.org)
  */
@@ -22,13 +22,13 @@ import {
   validateNonce,
 } from '../../lib/crypto/eip191-verify';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // CHAOS SCENARIO 1: RPC Provider Cascade Failure
 // Steady State: circuit CLOSED, requests succeed
 // Chaos: provider returns 429/503 3× consecutively
 // Expected: circuit OPENS, subsequent calls rejected immediately
-// Recovery: provider recovers after 100ms; HALF_OPEN probe succeeds → CLOSED
-// ─────────────────────────────────────────────────────────────────────────────
+// Recovery: provider recovers after 100ms; HALF_OPEN probe succeeds  CLOSED
+// 
 describe('CHAOS 1: RPC Provider Cascade Failure', () => {
   let cb: CircuitBreaker;
   let requestCount = 0;
@@ -55,7 +55,7 @@ describe('CHAOS 1: RPC Provider Cascade Failure', () => {
     expect(cb.getMetrics().totalSuccesses).toBe(5);
   });
 
-  it('cascade failure → OPEN → auto-recovery → CLOSED', async () => {
+  it('cascade failure  OPEN  auto-recovery  CLOSED', async () => {
     // Steady state
     await cb.execute(() => simulateRPCCall(false));
     expect(cb.getMetrics().state).toBe('CLOSED');
@@ -79,7 +79,7 @@ describe('CHAOS 1: RPC Provider Cascade Failure', () => {
     expect(cb.getMetrics().consecutiveFailures).toBe(0);
   });
 
-  it('partial recovery: probe fails → stays OPEN', async () => {
+  it('partial recovery: probe fails  stays OPEN', async () => {
     for (let i = 0; i < 3; i++) {
       await cb.execute(() => simulateRPCCall(true)).catch(() => {});
     }
@@ -92,19 +92,19 @@ describe('CHAOS 1: RPC Provider Cascade Failure', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CHAOS SCENARIO 2: Neo4j Timeout → Memory Matrix Activation
+// 
+// CHAOS SCENARIO 2: Neo4j Timeout  Memory Grid Activation
 // Validates that EntityGraphMiner falls back cleanly with Zero-Simulation Mandate
-// ─────────────────────────────────────────────────────────────────────────────
-describe('CHAOS 2: Neo4j Timeout → Memory Matrix', () => {
-  it('Memory Matrix returns no fabricated links', async () => {
-    // Mock Memory Matrix result (matches mineLocalNetworkGraph return type)
+// 
+describe('CHAOS 2: Neo4j Timeout  Memory Grid', () => {
+  it('Memory Grid returns no fabricated links', async () => {
+    // Mock Memory Grid result (matches mineLocalNetworkGraph return type)
     const mockResult = {
       nodes: [
         { id: '0xabc', group: 2, label: 'Institutional Whale', size: 50 },
         { id: '0xdef', group: 3, label: 'Unknown', size: 5 },
       ],
-      links: [], // ZERO links — Zero-Simulation Mandate
+      links: [], // ZERO links  Zero-Simulation Mandate
       status: 'MEMORY_MATRIX_ACTIVE' as const,
       nodeCount: 2,
       linkCount: 0,
@@ -119,10 +119,10 @@ describe('CHAOS 2: Neo4j Timeout → Memory Matrix', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // CHAOS SCENARIO 3: Signature Replay Attack under Load
 // Validates that nonce replay protection holds under concurrent requests
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 describe('CHAOS 3: Concurrent Replay Attack', () => {
   it('detects replay even under 100 concurrent requests with same nonce', async () => {
     const { ethers } = await import('ethers');
@@ -160,10 +160,10 @@ describe('CHAOS 3: Concurrent Replay Attack', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // CHAOS SCENARIO 4: Malformed/Adversarial Inputs to Crypto Engine
 // Property-based chaos: random garbage inputs should never throw uncaught exceptions
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 describe('CHAOS 4: Adversarial Input Fuzzing (Crypto Engine)', () => {
   const adversarialInputs = [
     '',
@@ -205,10 +205,10 @@ describe('CHAOS 4: Adversarial Input Fuzzing (Crypto Engine)', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // CHAOS SCENARIO 5: Audit Trail Under Concurrent Writes
 // Validates sequential chaining under simulated concurrent appends
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 describe('CHAOS 5: Audit Trail Sequential Chain Integrity', () => {
   it('maintains correct prev_hash chain with sequential operations', async () => {
     const hashes: string[] = ['GENESIS'];

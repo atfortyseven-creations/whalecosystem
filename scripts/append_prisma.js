@@ -1,9 +1,9 @@
 const fs = require('fs');
 
 const appendText = `
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // HUMANITY LEDGER INDEXER (NATIVE ON-CHAIN ARCHIVE)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model HumanityLedgerBlock {
   id          BigInt   @id

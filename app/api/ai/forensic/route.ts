@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
         
         return NextResponse.json(analysis);
     } catch (error: any) {
-        console.error('[API:Forensic] 🚨 Error performing analysis:', error.message);
+        console.error('[API:Forensic]  Error performing analysis:', error.message);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

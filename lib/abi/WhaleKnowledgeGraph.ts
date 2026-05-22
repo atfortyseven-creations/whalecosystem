@@ -178,7 +178,7 @@ export const WhaleKnowledgeGraphABI = [
         "type": "address[]"
       }
     ],
-    "name": "getBatchEntityIntelligence",
+    "name": "getBatchEntityAnalytics",
     "outputs": [
       {
         "components": [
@@ -213,7 +213,7 @@ export const WhaleKnowledgeGraphABI = [
             "type": "bool"
           }
         ],
-        "internalType": "struct WhaleKnowledgeGraph.EntityIntelligence[]",
+        "internalType": "struct WhaleKnowledgeGraph.EntityAnalytics[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -229,7 +229,7 @@ export const WhaleKnowledgeGraphABI = [
         "type": "address"
       }
     ],
-    "name": "getEntityIntelligence",
+    "name": "getEntityAnalytics",
     "outputs": [
       {
         "internalType": "string",
@@ -422,7 +422,7 @@ export const WhaleKnowledgeGraphABI = [
         "type": "uint8"
       }
     ],
-    "name": "updateEntityIntelligence",
+    "name": "updateEntityAnalytics",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

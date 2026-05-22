@@ -4,9 +4,9 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 /**
- * SovereignThemeProvider (ui/ThemeProvider)
+ * SystemThemeProvider (ui/ThemeProvider)
  *
- * Mirror of components/providers/ThemeProvider — both enforce
+ * Mirror of components/providers/ThemeProvider  both enforce
  * forcedTheme="light" so that whichever import path is used,
  * next-themes always locks to light.
  */

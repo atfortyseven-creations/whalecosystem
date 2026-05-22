@@ -5,9 +5,9 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// VERTEX SHADER — GPU runs this for every single particle simultaneously
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// VERTEX SHADER  GPU runs this for every single particle simultaneously
+// 
 const VERTEX_SHADER = `
   uniform float uTime;
   uniform float uExplode;
@@ -41,24 +41,24 @@ const VERTEX_SHADER = `
     float pulse = sin(uTime * 0.8 + aOffset * 6.28) * 0.008;
     pos *= 1.0 + pulse * (1.0 - uExplode);
 
-    // Mouse parallax — only when sphere is whole
+    // Mouse parallax  only when sphere is whole
     float mp = 1.0 - uExplode;
     pos.x += uMouse.x * 30.0 * mp * (pos.z / 300.0);
     pos.y += uMouse.y * 20.0 * mp * (pos.z / 300.0);
 
-    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+    vec4 mvPosition = modelViewGrid * vec4(pos, 1.0);
     vDepth = (-mvPosition.z + 400.0) / 800.0;
     vAlpha = mix(0.15, 1.0, vDepth) * (1.0 - uExplode * 0.85);
 
     float dynamicSize = uSize * aScale * vDepth;
     gl_PointSize = dynamicSize * (300.0 / -mvPosition.z);
-    gl_Position  = projectionMatrix * mvPosition;
+    gl_Position  = projectionGrid * mvPosition;
   }
 `;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FRAGMENT SHADER — Per-pixel: round soft particle, gold vs blue tint
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// FRAGMENT SHADER  Per-pixel: round soft particle, gold vs blue tint
+// 
 const FRAGMENT_SHADER = `
   varying float vScale;
   varying float vDepth;
@@ -73,7 +73,7 @@ const FRAGMENT_SHADER = `
 
     float softness = smoothstep(0.5, 0.1, d);
 
-    // Color: deep ocean blue → cyan → white core; gold accents
+    // Color: deep ocean blue  cyan  white core; gold accents
     vec3 blueColor  = mix(vec3(0.05, 0.35, 0.95), vec3(0.0, 0.85, 1.0), vDepth);
     vec3 goldColor  = vec3(0.95, 0.8, 0.25);
     vec3 coreColor  = mix(blueColor, vec3(1.0), smoothstep(0.0, 0.2, d));
@@ -83,9 +83,9 @@ const FRAGMENT_SHADER = `
   }
 `;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// RING SHADER — the equatorial energy ring
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// RING SHADER  the equatorial energy ring
+// 
 const RING_VERTEX = `
   uniform float uTime;
   uniform float uExplode;
@@ -95,7 +95,7 @@ const RING_VERTEX = `
     vUv = position.x;
     float scale = 1.0 - uExplode * 1.5;
     vec3 pos = position * max(0.0, scale);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    gl_Position = projectionGrid * modelViewGrid * vec4(pos, 1.0);
   }
 `;
 
@@ -113,9 +113,9 @@ const RING_FRAGMENT = `
   }
 `;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PARTICLE GEOMETRY FACTORY — Fibonacci sphere, 60k particles
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// PARTICLE GEOMETRY FACTORY  Fibonacci sphere, 60k particles
+// 
 function buildSphereGeometry(count: number) {
   const positions = new Float32Array(count * 3);
   const scales    = new Float32Array(count);
@@ -128,7 +128,7 @@ function buildSphereGeometry(count: number) {
   const golden  = Math.PI * (3 - Math.sqrt(5));
 
   for (let i = 0; i < count; i++) {
-    // Fibonacci lattice — perfect uniform sphere distribution
+    // Fibonacci lattice  perfect uniform sphere distribution
     const y   = 1 - (i / (count - 1)) * 2;
     const rad = Math.sqrt(Math.max(0, 1 - y * y));
     const theta = golden * i;
@@ -164,9 +164,9 @@ function buildSphereGeometry(count: number) {
   return geo;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PARTICLES MESH — live WebGL object
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// PARTICLES MESH  live WebGL object
+// 
 function ParticleMesh({ explode, mouse }: { explode: number; mouse: [number, number] }) {
   const meshRef = useRef<THREE.Points>(null!);
   const ringRef = useRef<THREE.Line>(null!);
@@ -251,9 +251,9 @@ function ParticleMesh({ explode, mouse }: { explode: number; mouse: [number, num
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DUST FIELD — ambient micro-particles beyond the sphere
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// DUST FIELD  ambient micro-particles beyond the sphere
+// 
 function DustField() {
   const ref = useRef<THREE.Points>(null!);
   const count = 3000;
@@ -284,9 +284,9 @@ function DustField() {
       void main() {
         float twinkle = 0.3 + 0.7 * sin(uTime * 0.5 + position.x * 0.01 + position.y * 0.007);
         vAlpha = twinkle * 0.25;
-        vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+        vec4 mvPos = modelViewGrid * vec4(position, 1.0);
         gl_PointSize = aScale * 1.8 * (300.0 / -mvPos.z);
-        gl_Position  = projectionMatrix * mvPos;
+        gl_Position  = projectionGrid * mvPos;
       }
     `,
     fragmentShader: `
@@ -314,9 +314,9 @@ function DustField() {
   return <points ref={ref} geometry={geo} material={mat} />;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // EXPORTED COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 export function WhaleGlobeGL({
   explode = 0,
   mouse = [0, 0] as [number, number],
@@ -338,7 +338,7 @@ export function WhaleGlobeGL({
       <DustField />
       <ParticleMesh explode={explode} mouse={mouse} />
 
-      {/* ── POST PROCESSING ── */}
+      {/*  POST PROCESSING  */}
       <EffectComposer autoClear={false}>
         <Bloom
           intensity={1.6}

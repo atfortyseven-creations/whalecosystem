@@ -17,7 +17,7 @@
 import { ethers } from 'ethers';
 import crypto from 'crypto';
 
-// secp256k1 curve order n — used for low-s malleability check
+// secp256k1 curve order n  used for low-s malleability check
 const SECP256K1_N = BigInt('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
 const SECP256K1_HALF_N = SECP256K1_N / 2n;
 
@@ -106,7 +106,7 @@ export function verifyEIP191Signature(
     return { valid: false, error: 'INVALID_SIGNATURE_FORMAT' };
   }
 
-  // 2. Enforce low-s (anti-malleability — EIP-2)
+  // 2. Enforce low-s (anti-malleability  EIP-2)
   if (!enforceLoSValue(signature)) {
     return { valid: false, error: 'HIGH_S_MALLEABILITY_DETECTED' };
   }
@@ -133,7 +133,7 @@ export function verifyEIP191Signature(
 }
 
 /**
- * Full sovereign payload verification including timestamp and nonce validation.
+ * Full system payload verification including timestamp and nonce validation.
  *
  * @param payload The signed payload to verify
  * @param replayWindowMs How long (ms) a signature remains valid (default: 30s)
@@ -184,7 +184,7 @@ export function buildAuthMessage(params: {
   issuedAt: string;
   statement?: string;
 }): string {
-  const statement = params.statement ?? 'Sign this message to authenticate with Sovereign Network. This request will not trigger a blockchain transaction or cost any gas fees.';
+  const statement = params.statement ?? 'Sign this message to authenticate with System Network. This request will not trigger a blockchain transaction or cost any gas fees.';
   return [
     `${params.domain} wants you to sign in with your Ethereum account:`,
     params.address,

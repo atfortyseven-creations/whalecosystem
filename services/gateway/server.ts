@@ -10,7 +10,7 @@ const PORT = process.env.GATEWAY_PORT || 3001;
 const REDIS_URL = process.env.REDIS_URL;
 
 async function main() {
-    console.log("🌌 [Celestial Gateway] Starting Standalone WebSocket Server...");
+    console.log(" [Celestial Gateway] Starting Standalone WebSocket Server...");
 
     const httpServer = createServer();
     const io = new Server(httpServer, {
@@ -21,8 +21,8 @@ async function main() {
     if (REDIS_URL) {
         const redisSubscriber = createSubClient('Gateway-Subscriber');
         redisSubscriber.psubscribe('vitals.*', 'whale-alerts', (err: any) => {
-            if (err) console.error('❌ [Redis SUB] Failed:', err.message);
-            else console.log('📡 [Gateway] Subscribed to Redis Events');
+            if (err) console.error(' [Redis SUB] Failed:', err.message);
+            else console.log(' [Gateway] Subscribed to Redis Events');
         });
 
         redisSubscriber.on('pmessage', (pattern: string, channel: string, message: string) => {
@@ -44,7 +44,7 @@ async function main() {
     });
 
     httpServer.listen(PORT, () => {
-        console.log(`✅ [Gateway] Online on port ${PORT}`);
+        console.log(` [Gateway] Online on port ${PORT}`);
     });
 }
 

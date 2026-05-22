@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Uhrp } from '@/lib/vault/uhrp';
 
-// Secure Garbage Collector API: Pushes stale data to the Local Sovereign Vault
+// Secure Garbage Collector API: Pushes stale data to the Local System Vault
 // and instantly purges it from Railway's cloud DB to save space.
 export async function POST(request: Request) {
     try {
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         // 1. Generate UHRP Content-Addressable Hash
         const uhrp_hash = Uhrp.generateHash(dataToArchive);
 
-        // 2. Send Data to Local Sovereign Vault via Cloudflare Tunnel
+        // 2. Send Data to Local System Vault via Cloudflare Tunnel
         const response = await fetch(`${vaultUrl}/vault/ingest`, {
             method: 'POST',
             headers: {
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('Vault Sync Failed:', errorText);
-            return NextResponse.json({ error: 'Failed to push payload to the Sovereign Vault.' }, { status: 502 });
+            return NextResponse.json({ error: 'Failed to push payload to the System Vault.' }, { status: 502 });
         }
 
         const vaultResult = await response.json();

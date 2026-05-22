@@ -4,11 +4,11 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useRef, useMemo } from "react";
 import * as THREE from "three";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FLOATING PARTICLES — instanced mesh, single draw call, 50 particles
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// FLOATING PARTICLES  instanced mesh, single draw call, 50 particles
+// 
 
-// Shared geometry/material — created once at module scope
+// Shared geometry/material  created once at module scope
 const ICOSA_GEO = new THREE.IcosahedronGeometry(0.2, 0);
 const PARTICLE_MAT = new THREE.MeshStandardMaterial({
   color: '#ffffff',
@@ -20,13 +20,13 @@ const PARTICLE_MAT = new THREE.MeshStandardMaterial({
   opacity: 0.3,
 });
 
-const COUNT = 40; // Reduced from 50 — imperceptible difference, ~20% cheaper
+const COUNT = 40; // Reduced from 50  imperceptible difference, ~20% cheaper
 
 function FloatingParticles() {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
-  // Pre-compute all particle data once — no allocations in useFrame
+  // Pre-compute all particle data once  no allocations in useFrame
   const particles = useMemo(() =>
     Array.from({ length: COUNT }, () => ({
       x: (Math.random() - 0.5) * 20,
@@ -52,10 +52,10 @@ function FloatingParticles() {
       dummy.position.set(p.x, p.y, p.z);
       dummy.rotation.set(p.rx, p.ry, 0);
       dummy.scale.setScalar(p.scale);
-      dummy.updateMatrix();
-      mesh.current.setMatrixAt(i, dummy.matrix);
+      dummy.updateGrid();
+      mesh.current.setGridAt(i, dummy.grid);
     }
-    mesh.current.instanceMatrix.needsUpdate = true;
+    mesh.current.instanceGrid.needsUpdate = true;
   });
 
   return (
@@ -63,9 +63,9 @@ function FloatingParticles() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // EXPORT
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 export function AmbientBackground() {
   return (
     <div className="fixed inset-0 -z-10 bg-black">
@@ -77,7 +77,7 @@ export function AmbientBackground() {
           powerPreference: 'high-performance',
           stencil: false,
           depth: true,
-          alpha: false, // Opaque — no compositing cost since it's the base layer
+          alpha: false, // Opaque  no compositing cost since it's the base layer
         }}
         dpr={[1, 1.2]}
         performance={{ min: 0.5 }}

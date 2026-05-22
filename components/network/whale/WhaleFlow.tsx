@@ -10,7 +10,7 @@ interface Props {
     links: FlowLink[];
 }
 
-// ─── Simple Sankey-like SVG layout (no d3-sankey dependency) ─────────────────
+//  Simple Sankey-like SVG layout (no d3-sankey dependency) 
 
 const CANVAS_W = 560;
 const CANVAS_H = 320;
@@ -147,7 +147,7 @@ export function WhaleFlow({ nodes, links }: Props) {
                                 <g key={`src-${n.id}`}>
                                     <rect x={pos.x} y={pos.y} width={NODE_W} height={NODE_H} rx={8} fill={pos.color} fillOpacity={0.2} stroke={pos.color} strokeOpacity={0.5} strokeWidth={1} />
                                     <text x={pos.x + NODE_W / 2} y={pos.cy + 1} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize={9} fontWeight="bold" fontFamily="monospace">
-                                        {n.label.length > 14 ? n.label.slice(0, 12) + '…' : n.label}
+                                        {n.label.length > 14 ? n.label.slice(0, 12) + '' : n.label}
                                     </text>
                                 </g>
                             );
@@ -162,7 +162,7 @@ export function WhaleFlow({ nodes, links }: Props) {
                                 <g key={`dst-${n.id}`}>
                                     <rect x={pos.x} y={pos.y} width={NODE_W} height={NODE_H} rx={8} fill={pos.color} fillOpacity={0.2} stroke={pos.color} strokeOpacity={0.5} strokeWidth={1} />
                                     <text x={pos.x + NODE_W / 2} y={pos.cy - 5} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize={9} fontWeight="bold" fontFamily="monospace">
-                                        {n.label.length > 14 ? n.label.slice(0, 12) + '…' : n.label}
+                                        {n.label.length > 14 ? n.label.slice(0, 12) + '' : n.label}
                                     </text>
                                     <text x={pos.x + NODE_W / 2} y={pos.cy + 7} textAnchor="middle" dominantBaseline="middle" fill={pos.color} fontSize={8} fontFamily="monospace">
                                         {totalIn.toFixed(1)} BTC
@@ -189,7 +189,7 @@ export function WhaleFlow({ nodes, links }: Props) {
                                     style={{ background: nodes.find(n => n.id === link.source)?.color }}
                                 />
                             </div>
-                            <span className="text-gray-600 whitespace-nowrap w-32 truncate">{link.source} → {link.target}</span>
+                            <span className="text-gray-600 whitespace-nowrap w-32 truncate">{link.source}  {link.target}</span>
                             <span className="text-white font-mono font-bold shrink-0">{link.value.toFixed(1)}</span>
                         </div>
                     ))}

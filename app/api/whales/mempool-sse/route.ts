@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
             };
 
-            sendEvent({ type: 'MEMPOOL_CONNECTED', status: 'Scanning 0-conf matrix...' });
+            sendEvent({ type: 'MEMPOOL_CONNECTED', status: 'Scanning 0-conf grid...' });
 
             const unwatch = client.watchPendingTransactions({
                 onTransactions: async (hashes) => {

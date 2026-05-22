@@ -204,7 +204,7 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
             <div className="flex items-center justify-center gap-12 pt-8">
               <div className="text-center space-y-1">
                 <p className="font-mono text-lg font-bold tracking-tight text-black">
-                  {rates ? ethAmount : "—"} ETH
+                  {rates ? ethAmount : ""} ETH
                 </p>
                 <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/30 font-bold">
                   Monto en Cadena
@@ -213,7 +213,7 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
               <div className="w-[1px] h-10 bg-black/[0.06]" />
               <div className="text-center space-y-1">
                 <p className="font-mono text-lg font-bold tracking-tight text-black">
-                  {rates ? `${eurEquivalent} EUR` : "—"}
+                  {rates ? `${eurEquivalent} EUR` : ""}
                 </p>
                 <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/30 font-bold">
                   {rates ? "Ratio Oráculo Integrado" : "Conectando..."}
@@ -245,7 +245,7 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
                 animate={{ opacity: 1, scale: 1 }}
                 className="bg-[#00C076]/5 text-[#00C076] border border-[#00C076]/20 text-center py-6 font-mono text-[11px] font-black uppercase tracking-[0.4em] rounded-2xl"
               >
-                AUTORIZACIÓN COMPLETADA ✓
+                AUTORIZACIÓN COMPLETADA 
               </motion.div>
             ) : (
               <div className="space-y-6">

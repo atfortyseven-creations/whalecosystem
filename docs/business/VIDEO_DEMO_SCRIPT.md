@@ -1,5 +1,5 @@
 # PRODUCT VALIDATION: INSTITUTIONAL VIDEO DEMO
-## Sovereign Network Architecture | Humanity Ledger
+## System Network Architecture | Humanity Ledger
 ### Duration: 5-7 Minutes | Audience: ENISA, CDTI Evaluators, Seed Investors
 
 ---
@@ -18,7 +18,7 @@
 ## ACTO 1: TITANIUMGATE & THE SOVEREIGN HANDSHAKE (1:00 - 2:30)
 **VISUAL:** Grabación de pantalla del flujo de conexión. El usuario escanea el código QR desde su teléfono. La terminal de escritorio reacciona instantáneamente sin recargar la página.
 **AUDIO:**
-"Observen el protocolo Sovereign Handshake. No usamos contraseñas ni dependemos de servidores de terceros. El usuario firma criptográficamente un desafío EIP-191."
+"Observen el protocolo System Handshake. No usamos contraseñas ni dependemos de servidores de terceros. El usuario firma criptográficamente un desafío EIP-191."
 
 **VISUAL:** Zoom al código (`lib/crypto/eip191-verify.ts`). Resaltar la función `crypto.timingSafeEqual` y la validación de `low-s` (EIP-2).
 **AUDIO:**
@@ -44,9 +44,9 @@
 ## ACTO 3: RESILIENCE & THE AUDIT TRAIL (4:30 - 6:00)
 **VISUAL:** Terminal de comandos simulando la caída de un nodo RPC (Infura/Alchemy). La interfaz de la plataforma muestra un parpadeo, y el indicador "Circuit Breaker" pasa a amarillo (HALF_OPEN).
 **AUDIO:**
-"La infraestructura de grado institucional no puede caer. Si un proveedor falla, nuestros Circuit Breakers implementan un fallback instantáneo hacia la Memory Matrix local, manteniendo la continuidad operativa."
+"La infraestructura de grado institucional no puede caer. Si un proveedor falla, nuestros Circuit Breakers implementan un fallback instantáneo hacia la Memory Grid local, manteniendo la continuidad operativa."
 
-**VISUAL:** Pantalla de base de datos mostrando la tabla `sovereign_audit_log`. Se resalta la cadena de hashes (`payloadHash` y `prevHash`).
+**VISUAL:** Pantalla de base de datos mostrando la tabla `system_audit_log`. Se resalta la cadena de hashes (`payloadHash` y `prevHash`).
 **AUDIO:**
 "Y lo más importante para los reguladores y auditores: el Audit Trail Inmutable. Cada evento de seguridad en esta sesión ha sido encadenado mediante HMAC-SHA256. Es matemáticamente imposible alterar el registro histórico sin destruir la cadena criptográfica completa."
 

@@ -256,7 +256,7 @@ export default function SendModal({ isOpen, onClose, userAddress, chainId = 1, i
                                         <button onClick={() => setAmount(selectedToken?.balanceNumeric || '')} className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-purple-400 hover:text-purple-300 uppercase tracking-wider">MAX</button>
                                     </div>
                                     <div className="mt-2 flex justify-between">
-                                        <span className="text-white/40 text-xs font-bold">≈ ${((parseFloat(amount) || 0) * (selectedToken?.price || 0)).toFixed(2)} USD</span>
+                                        <span className="text-white/40 text-xs font-bold"> ${((parseFloat(amount) || 0) * (selectedToken?.price || 0)).toFixed(2)} USD</span>
                                         {gasEstimate && <span className="text-purple-400 text-xs font-bold">Gas: ~${gasEstimate}</span>}
                                     </div>
                                 </div>

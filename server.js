@@ -30,7 +30,7 @@ app.prepare().then(() => {
         }
     });
 
-    // ── BACKGROUND ENGINE / INDEXER LOGIC ──
+    //  BACKGROUND ENGINE / INDEXER LOGIC 
     // This represents the heuristic engine and indexer running completely independently
     // from the DOM and HTTP request lifecycle.
     

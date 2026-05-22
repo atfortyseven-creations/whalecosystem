@@ -6,7 +6,7 @@ Liquidity Analytics is an ELITE and PRO tier feature that provides institutional
 
 ## What Is Liquidity in This Context?
 
-In traditional finance, liquidity refers to how quickly an asset can be converted to cash without moving the price. In on-chain markets, the concept is more nuanced — liquidity is fragmented across:
+In traditional finance, liquidity refers to how quickly an asset can be converted to cash without moving the price. In on-chain markets, the concept is more nuanced  liquidity is fragmented across:
 
 1. **AMM liquidity pools** (Uniswap, Curve, Balancer, Aerodrome)
 2. **CLOB order books** (Polymarket, dYdX, Hyperliquid)
@@ -24,7 +24,7 @@ The Whale Alert Network Liquidity Analytics module monitors all four dimensions 
 For any Uniswap v3 (or v2) pool, pool depth measures the USD value of assets that can be traded before the price moves by a given percentage:
 
 ```
-depth(p%) = ∑ liquidity_in_ticks_within_p%_of_current_price × tick_spacing
+depth(p%) =  liquidity_in_ticks_within_p%_of_current_price × tick_spacing
 ```
 
 For concentrated liquidity pools (Uniswap v3), this is calculated tick-by-tick across the active range.
@@ -64,8 +64,8 @@ Pool fees are sourced directly from the pool contract's fee tier (0.01%, 0.05%, 
 ### Order Book Depth
 
 ```
-bidDepth(p%) = ∑ quantity × price for all bids within p% of best bid
-askDepth(p%) = ∑ quantity × price for all asks within p% of best ask
+bidDepth(p%) =  quantity × price for all bids within p% of best bid
+askDepth(p%) =  quantity × price for all asks within p% of best ask
 totalDepth(p%) = bidDepth(p%) + askDepth(p%)
 ```
 
@@ -112,7 +112,7 @@ At high utilization (>80%), borrow rates increase rapidly due to the kink model,
 lpi = (healthFactor - 1) / healthFactor
 ```
 
-For tracked whale wallets, the platform monitors health factors across Aave, Compound, and Morpho positions. Wallets approaching `healthFactor < 1.05` are flagged as liquidation risk — a source of predictable, high-impact on-chain activity.
+For tracked whale wallets, the platform monitors health factors across Aave, Compound, and Morpho positions. Wallets approaching `healthFactor < 1.05` are flagged as liquidation risk  a source of predictable, high-impact on-chain activity.
 
 ---
 
@@ -121,12 +121,12 @@ For tracked whale wallets, the platform monitors health factors across Aave, Com
 ### Net Bridge Flow
 
 ```
-netFlow(asset, t) = ∑ bridgeIn(asset, t) - ∑ bridgeOut(asset, t)
+netFlow(asset, t) =  bridgeIn(asset, t) -  bridgeOut(asset, t)
 ```
 
 Over a 4-hour rolling window, the net flow of USDC, ETH, and BTC equivalents across major bridges (Arbitrum, Optimism, Polygon PoS, Base, Stargate) is computed.
 
-Positive net flow to a chain indicates capital accumulation — often a precursor to increased on-chain activity. Negative net flow indicates capital extraction.
+Positive net flow to a chain indicates capital accumulation  often a precursor to increased on-chain activity. Negative net flow indicates capital extraction.
 
 ### Bridge Capacity Utilization
 
@@ -140,7 +140,7 @@ When bridge utilization exceeds 80%, users face increased slippage and longer co
 
 ## Liquidity Score
 
-Each asset is assigned a composite Liquidity Score (0–100) updated every minute:
+Each asset is assigned a composite Liquidity Score (0100) updated every minute:
 
 ```
 liquidityScore =
@@ -152,11 +152,11 @@ liquidityScore =
 ```
 
 **Interpretation:**
-- 80–100: Excellent liquidity — large trades can be executed with minimal impact
-- 60–79: Good liquidity — standard institutional volume executes cleanly  
-- 40–59: Moderate — price impact becomes meaningful above $500K
-- 20–39: Thin — elevated slippage, caution advised
-- 0–19: Illiquid — market making has withdrawn, high manipulation risk
+- 80100: Excellent liquidity  large trades can be executed with minimal impact
+- 6079: Good liquidity  standard institutional volume executes cleanly  
+- 4059: Moderate  price impact becomes meaningful above $500K
+- 2039: Thin  elevated slippage, caution advised
+- 019: Illiquid  market making has withdrawn, high manipulation risk
 
 ---
 

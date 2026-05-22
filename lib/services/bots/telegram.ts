@@ -8,7 +8,7 @@ export async function sendTelegramMessage(message: string): Promise<boolean> {
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!botToken || !chatId) {
-    console.warn('⚠️ Telegram Bot Token o Chat ID no configurado.');
+    console.warn('️ Telegram Bot Token o Chat ID no configurado.');
     return false;
   }
 
@@ -26,13 +26,13 @@ export async function sendTelegramMessage(message: string): Promise<boolean> {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('🔴 Error de Telegram API:', errorData);
+      console.error(' Error de Telegram API:', errorData);
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('🔴 Critical failure in Telegram Service:', error);
+    console.error(' Critical failure in Telegram Service:', error);
     return false;
   }
 }

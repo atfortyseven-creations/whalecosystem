@@ -4,10 +4,10 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, ArrowDownLeft, Copy, X, Send, QrCode } from 'lucide-react';
 import { useBalance, useReadContracts, useSendTransaction, useWriteContract } from 'wagmi';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { parseEther, parseUnits, formatEther, formatUnits, erc20Abi, isAddress } from 'viem';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
-import { getUsdcAddress, WLD_TOKEN_ADDRESS } from '@/config/tokens';
+import { getUsdcAddress, AUTH_TOKEN_ADDRESS } from '@/config/tokens';
 import { toast } from 'sonner';
 
 
@@ -39,7 +39,7 @@ export function TokenPortfolio() {
     const { data: tokenBalances, refetch: refetchBalances } = useReadContracts({
         contracts: [
             { address: usdcAddress, abi: erc20Abi, functionName: 'balanceOf', args: [address as `0x${string}`] },
-            { address: WLD_TOKEN_ADDRESS, abi: erc20Abi, functionName: 'balanceOf', args: [address as `0x${string}`] }
+            { address: AUTH_TOKEN_ADDRESS, abi: erc20Abi, functionName: 'balanceOf', args: [address as `0x${string}`] }
         ],
         query: { enabled: !!address, refetchInterval: 10000 }
     });
@@ -52,9 +52,9 @@ export function TokenPortfolio() {
         const wldVal = tokenBalances?.[1]?.result ? parseFloat(formatEther(tokenBalances[1].result as bigint)) : 0;
 
         return [
-            { id: 'eth', symbol: 'ETH', name: 'Ethereum', balance: ethVal, price: prices.ETH || 0, change: changes.ETH || 0, icon: '🔹', network: 'Base Sepolia', decimals: 18, isNative: true },
-            { id: 'usdc', symbol: 'USDC', name: 'USD Coin', balance: usdcVal, price: prices.USDC || 1, change: changes.USDC || 0, icon: '💲', network: 'Base Sepolia', decimals: 6, address: usdcAddress },
-            { id: 'wld', symbol: 'WLD', name: 'Worldcoin', balance: wldVal, price: prices.WLD || 0, change: changes.WLD || 0, icon: '🌍', network: 'Optimism / Base', decimals: 18, address: WLD_TOKEN_ADDRESS }
+            { id: 'eth', symbol: 'ETH', name: 'Ethereum', balance: ethVal, price: prices.ETH || 0, change: changes.ETH || 0, icon: '', network: 'Base Sepolia', decimals: 18, isNative: true },
+            { id: 'usdc', symbol: 'USDC', name: 'USD Coin', balance: usdcVal, price: prices.USDC || 1, change: changes.USDC || 0, icon: '', network: 'Base Sepolia', decimals: 6, address: usdcAddress },
+            { id: 'wld', symbol: 'AUTH', name: 'Identity', balance: wldVal, price: prices.AUTH || 0, change: changes.AUTH || 0, icon: '', network: 'Optimism / Base', decimals: 18, address: AUTH_TOKEN_ADDRESS }
         ];
     }, [ethBalance, tokenBalances, prices, changes, address, usdcAddress]);
 
@@ -171,7 +171,7 @@ export function TokenPortfolio() {
                         >
                             <div className="flex justify-between items-center mb-6">
                                 <button onClick={() => view === 'details' ? closeToken() : setView('details')} className="text-gray-400 hover:text-white">
-                                    {view === 'details' ? <X size={20} /> : <span className="text-xs">← Back</span>}
+                                    {view === 'details' ? <X size={20} /> : <span className="text-xs"> Back</span>}
                                 </button>
                                 <span className="text-xs font-bold tracking-widest text-gray-500 uppercase">{view} {selectedToken.symbol}</span>
                                 <div className="w-5" />
@@ -183,7 +183,7 @@ export function TokenPortfolio() {
                                         {selectedToken.icon}
                                     </div>
                                     <h2 className="text-3xl font-bold text-white mb-1">{safeToFixed(selectedToken.balance, 4)} <span className="text-lg text-gray-500">{selectedToken.symbol}</span></h2>
-                                    <p className="text-gray-400 font-mono mb-8">≈ {formatUSD(selectedToken.balance * selectedToken.price)}</p>
+                                    <p className="text-gray-400 font-mono mb-8"> {formatUSD(selectedToken.balance * selectedToken.price)}</p>
 
                                     <div className="grid grid-cols-2 gap-4 w-full">
                                         <button

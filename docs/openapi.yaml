@@ -1,11 +1,11 @@
 openapi: 3.1.0
 info:
-  title: Humanity Ledger — Zero-Trust Intelligence API
+  title: Humanity Ledger  Zero-Trust Analytics API
   version: 3.0.2
   description: |
-    Sovereign Network Architecture REST API.
+    System Network Architecture REST API.
     All endpoints are protected by the TitaniumGate Zero-Trust Edge Middleware.
-    Authentication requires EIP-191 ECDSA signatures and Sovereign Handshake JWTs.
+    Authentication requires EIP-191 ECDSA signatures and System Handshake JWTs.
   contact:
     name: Humanity Ledger Security Team
     email: security@humanityledger.io
@@ -19,13 +19,13 @@ servers:
 
 components:
   securitySchemes:
-    SovereignJWT:
+    SystemJWT:
       type: http
       scheme: bearer
       bearerFormat: JWT
       description: |
         JWT issued after successful EIP-191 signature verification.
-        Passed via HttpOnly cookie `sovereign_handshake` or Authorization header.
+        Passed via HttpOnly cookie `system_handshake` or Authorization header.
     InternalHealthSecret:
       type: apiKey
       in: header
@@ -41,7 +41,7 @@ components:
           example: UNAUTHORIZED
         message:
           type: string
-          example: Valid sovereign session required.
+          example: Valid system session required.
     
     AuditEntry:
       type: object
@@ -90,12 +90,12 @@ components:
           enum: [LOW, MEDIUM, HIGH, EXTREME]
 
 security:
-  - SovereignJWT: []
+  - SystemJWT: []
 
 paths:
   /auth/handshake:
     post:
-      summary: Initiate Sovereign Handshake
+      summary: Initiate System Handshake
       description: Validates EIP-191 signature and issues HttpOnly JWT session.
       security: []
       requestBody:
@@ -124,7 +124,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /intelligence/whales/stream:
+  /analytics/whales/stream:
     get:
       summary: Real-time Whale Alerts (SSE)
       description: Server-Sent Events stream for high-conviction whale movements.
@@ -136,7 +136,7 @@ paths:
               schema:
                 type: string
 
-  /intelligence/graph/neighbors/{address}:
+  /analytics/graph/neighbors/{address}:
     get:
       summary: Entity Graph Traversal
       description: Returns immediate on-chain relationships for a given entity.

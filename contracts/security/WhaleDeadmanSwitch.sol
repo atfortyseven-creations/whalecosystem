@@ -2,22 +2,22 @@
 pragma solidity ^0.8.20;
 
 /**
- * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║          WHALE HANDSHAKE — DEADMAN'S SWITCH v1.0.0                       ║
- * ║          Non-Custodial Inheritance Protocol (Polygon PoS / Amoy)             ║
- * ║                                                                              ║
- * ║  Architecture: Owner never cedes custody. Contract holds zero funds.         ║
- * ║  On trigger: approved ERC-20/721 allowances are forwarded to backupWallet.   ║
- * ║                                                                              ║
- * ║  Security Stack:                                                              ║
- * ║    - Ownable2Step (prevent single-tx ownership hijack)                       ║
- * ║    - ReentrancyGuard (prevent re-entrant inheritance drain)                  ║
- * ║    - Pausable (emergency global halt by owner)                               ║
- * ║    - Custom error types (gas efficient revert messages)                      ║
- * ║    - Anti-frontrun: any address can trigger after timeout (no privileged     ║
- * ║      caller means no MEV advantage over backup wallet)                       ║
- * ║    - Backup wallet cooldown: 72h change delay to prevent last-minute swap    ║
- * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * 
+ *           WHALE HANDSHAKE  DEADMAN'S SWITCH v1.0.0                       
+ *           Non-Custodial Inheritance Protocol (Polygon PoS / Amoy)             
+ *                                                                               
+ *   Architecture: Owner never cedes custody. Contract holds zero funds.         
+ *   On trigger: approved ERC-20/721 allowances are forwarded to backupWallet.   
+ *                                                                               
+ *   Security Stack:                                                              
+ *     - Ownable2Step (prevent single-tx ownership hijack)                       
+ *     - ReentrancyGuard (prevent re-entrant inheritance drain)                  
+ *     - Pausable (emergency global halt by owner)                               
+ *     - Custom error types (gas efficient revert messages)                      
+ *     - Anti-frontrun: any address can trigger after timeout (no privileged     
+ *       caller means no MEV advantage over backup wallet)                       
+ *     - Backup wallet cooldown: 72h change delay to prevent last-minute swap    
+ * 
  */
 
 import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
@@ -31,9 +31,9 @@ import {IERC721}                 from "@openzeppelin/contracts/token/ERC721/IERC
 contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // CONSTANTS
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     /// @dev Minimum allowed timeout (90 days in seconds).
     uint256 public constant MIN_TIMEOUT  = 90 days;
@@ -41,9 +41,9 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
     /// @dev Delay before a pending backup wallet change takes effect.
     uint256 public constant BACKUP_COOLDOWN = 72 hours;
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // STATE
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     /// @notice The wallet to receive all approved assets when inheritance triggers.
     address public backupWallet;
@@ -61,9 +61,9 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
     address public pendingBackupWallet;
     uint256 public pendingBackupTime;
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // EVENTS
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     event Ping(address indexed owner, uint256 timestamp);
     event BackupWalletProposed(address indexed proposed, uint256 effectiveAt);
@@ -80,9 +80,9 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
     event ERC721Forwarded(address indexed nftContract, address indexed to, uint256 tokenId);
     event EmergencyPaused(address indexed by, uint256 timestamp);
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // ERRORS
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     error InvalidBackupWallet();
     error CannotBeOwner();
@@ -94,9 +94,9 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
     error ArrayLengthMismatch();
     error Blocked();
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // CONSTRUCTOR
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     /**
      * @param _initialOwner  Address that owns the switch (your primary wallet).
@@ -117,16 +117,16 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
         lastPing       = block.timestamp;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────────
-    // NON-CUSTODIAL GUARANTEE — no native tokens accepted
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
+    // NON-CUSTODIAL GUARANTEE  no native tokens accepted
+    // 
 
     receive() external payable { revert Blocked(); }
     fallback() external payable { revert Blocked(); }
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // CORE HEARTBEAT
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     /**
      * @notice Reset the inactivity clock. Call from your wallet at least every
@@ -137,9 +137,9 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
         emit Ping(msg.sender, block.timestamp);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // CONFIGURATION (owner-only)
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     /**
      * @notice Step 1 of 2-step backup change: propose a new backup wallet.
@@ -178,9 +178,9 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
         emit TimeoutUpdated(old, newPeriod);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // INHERITANCE TRIGGER
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     /**
      * @notice Forward all pre-approved owner tokens to backupWallet.
@@ -192,7 +192,7 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
      *
      * @dev The owner must have granted allowance / setApprovalForAll to this
      *      contract *before* this function is called. This contract never holds
-     *      any assets itself — it only moves them from owner → backupWallet.
+     *      any assets itself  it only moves them from owner  backupWallet.
      */
     function triggerInheritance(
         address[] calldata erc20Tokens,
@@ -203,12 +203,12 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
         if (block.timestamp <= lastPing + timeoutPeriod)           revert NotYetExpired();
         if (erc721Contracts.length != erc721TokenIds.length)       revert ArrayLengthMismatch();
 
-        triggered = true; // permanent flag — prevents any second call
+        triggered = true; // permanent flag  prevents any second call
 
         address currentOwner  = owner();
         address currentBackup = backupWallet;
 
-        // ── ERC-20 loop ────────────────────────────────────────────────────────
+        //  ERC-20 loop 
         for (uint256 i; i < erc20Tokens.length; ) {
             IERC20 token = IERC20(erc20Tokens[i]);
             uint256 allowance = token.allowance(currentOwner, address(this));
@@ -224,7 +224,7 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
             unchecked { ++i; }
         }
 
-        // ── ERC-721 loop ───────────────────────────────────────────────────────
+        //  ERC-721 loop 
         for (uint256 i; i < erc721Contracts.length; ) {
             IERC721 nft = IERC721(erc721Contracts[i]);
             uint256 tokenId = erc721TokenIds[i];
@@ -249,9 +249,9 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
         );
     }
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // EMERGENCY CONTROLS
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     /// @notice Freeze all state-changing functions immediately.
     function pause() external onlyOwner {
@@ -264,9 +264,9 @@ contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
         _unpause();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
     // VIEW HELPERS (used by the frontend panel)
-    // ─────────────────────────────────────────────────────────────────────────────
+    // 
 
     /// @return secondsRemaining Seconds left before inheritance can trigger (0 = already expired).
     function secondsUntilExpiry() external view returns (uint256) {

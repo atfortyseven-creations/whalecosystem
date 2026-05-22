@@ -36,7 +36,7 @@ export default function WhaleAlertLanding({
         width: "100%",
       }}
     >
-      {/* ── Top navigation bar ─────────────────────────────────────── */}
+      {/*  Top navigation bar  */}
       <nav
         style={{
           borderBottom: "1px solid #d4d0c8",
@@ -88,7 +88,7 @@ export default function WhaleAlertLanding({
         </div>
       </nav>
 
-      {/* ── Document body ───────────────────────────────────────────── */}
+      {/*  Document body  */}
       <main
         style={{
           maxWidth: 760,
@@ -134,7 +134,7 @@ export default function WhaleAlertLanding({
               marginBottom: 32,
             }}
           >
-            A sovereign-grade, real-time blockchain intelligence system designed,
+            A system-grade, real-time blockchain analytics system designed,
             engineered, and deployed entirely by one independent developer.
           </p>
           <div
@@ -210,7 +210,7 @@ export default function WhaleAlertLanding({
           )}
         </header>
 
-        {/* ── Sections ────────────────────────────────────────────── */}
+        {/*  Sections  */}
         {sections.map((section, sectionIndex) => (
           <article
             key={section.id}
@@ -254,7 +254,7 @@ export default function WhaleAlertLanding({
             {/* Body paragraphs */}
             <div>
               {section.body.map((para, i) => {
-                /* ── Subtitle ── */
+                /*  Subtitle  */
                 if (para.startsWith("[SUBTITLE]")) {
                   return (
                     <h3
@@ -275,7 +275,7 @@ export default function WhaleAlertLanding({
                   );
                 }
 
-                /* ── List item ── */
+                /*  List item  */
                 if (para.startsWith("[LIST_ITEM]")) {
                   return (
                     <div
@@ -340,7 +340,7 @@ export default function WhaleAlertLanding({
           </article>
         ))}
 
-        {/* ── Footer ──────────────────────────────────────────────── */}
+        {/*  Footer  */}
         <footer
           style={{
             paddingTop: 40,
@@ -374,7 +374,7 @@ export default function WhaleAlertLanding({
               cursor: "pointer",
             }}
           >
-            Enter Terminal →
+            Enter Terminal 
           </button>
         </footer>
       </main>

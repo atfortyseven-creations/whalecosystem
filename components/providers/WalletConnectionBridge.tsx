@@ -1,31 +1,31 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 
 /**
  * WalletConnectionBridge
  * 
  * Synchronizes the external Wagmi/RainbowKit connection with the internal 
- * Sovereign Wallet Store. This ensures that when a user connects their 
+ * System Wallet Store. This ensures that when a user connects their 
  * wallet via the UI, the entire portfolio system recognizes the identity.
  */
 export function WalletConnectionBridge() {
-    const { address, isConnected } = useSovereignAccount();
+    const { address, isConnected } = useSystemAccount();
     const syncAddress = useWalletStore(state => state.syncAddress);
 
     useEffect(() => {
         // [AUDITED] Extract handshake address from cookie with strict validation
         const cookies = document.cookie.split('; ');
-        const handshakeCookie = cookies.find(row => row.trim().startsWith('sovereign_handshake=0x'));
+        const handshakeCookie = cookies.find(row => row.trim().startsWith('system_handshake=0x'));
         const handshakeAddress = handshakeCookie ? handshakeCookie.split('=')[1]?.trim().toLowerCase() : null;
         
         if (isConnected && address) {
             // Priority 1: Direct Web3 Connection (MetaMask/Rainbow/AppKit)
             syncAddress(address.toLowerCase());
         } else if (handshakeAddress && handshakeAddress.startsWith('0x')) {
-            // Priority 2: Sovereign Handshake (QR Link)
+            // Priority 2: System Handshake (QR Link)
             syncAddress(handshakeAddress);
         } else {
             // State: Purged/Disconnected
@@ -33,17 +33,17 @@ export function WalletConnectionBridge() {
         }
     }, [isConnected, address, syncAddress]);
 
-    // ─── [COSMIC BRIDGE] Real-Time Autologin Listener ───────────────────────
+    //  [COSMIC BRIDGE] Real-Time Autologin Listener 
     // GUARD: Only open SSE when actively waiting for a QR handshake.
     // Prevents a persistent connection being held open on mobile for every user
-    // who already has a sovereign wallet or is connected via MetaMask/WalletConnect.
+    // who already has a system wallet or is connected via MetaMask/WalletConnect.
     useEffect(() => {
-        if (isConnected) return; // Already logged in — no SSE needed
+        if (isConnected) return; // Already logged in  no SSE needed
 
         // Check for pending QR session before opening SSE
         let pendingSession: string | null = null;
         try { pendingSession = sessionStorage.getItem('pending_qr_session'); } catch {}
-        if (!pendingSession) return; // No QR in flight — skip SSE entirely
+        if (!pendingSession) return; // No QR in flight  skip SSE entirely
 
         const eventSource = new EventSource('/api/whale-stream');
         
@@ -56,17 +56,17 @@ export function WalletConnectionBridge() {
                     console.log(`[Handshake:Success] Relay received for ${data.address}`);
                     
                     // 1. Set the cookie for persistent auth
-                    document.cookie = `sovereign_handshake=${data.address.toLowerCase()}; path=/; max-age=604800; samesite=lax`;
+                    document.cookie = `system_handshake=${data.address.toLowerCase()}; path=/; max-age=604800; samesite=lax`;
                     
                     // 2. Trigger the sync in the store
                     syncAddress(data.address.toLowerCase());
                     
                     // 3. Emit global event for UI transitions (ConnectWalletModal)
-                    window.dispatchEvent(new CustomEvent('sovereign:auth_success', { 
+                    window.dispatchEvent(new CustomEvent('system:auth_success', { 
                         detail: { address: data.address } 
                     }));
 
-                    // 4. Cleanup — close stream immediately, session is done
+                    // 4. Cleanup  close stream immediately, session is done
                     sessionStorage.removeItem('pending_qr_session');
                     eventSource.close();
                 }

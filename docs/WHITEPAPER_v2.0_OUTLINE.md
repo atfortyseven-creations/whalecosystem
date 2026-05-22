@@ -1,7 +1,7 @@
-# Sovereign Network Architecture: A Zero-Trust Approach to On-Chain Entity Resolution and Identity Management
+# System Network Architecture: A Zero-Trust Approach to On-Chain Entity Resolution and Identity Management
 ## IEEE/ACM Formatted Whitepaper (v2.0)
 ### Abstract
-This paper presents the Sovereign Network Architecture (SNA), a comprehensive framework designed to solve the dual challenges of non-repudiable identity and high-fidelity entity resolution in public blockchain networks. We introduce *TitaniumGate*, an Edge-deployed middleware that enforces strict Zero-Trust principles via ECDSA signatures, and the *EVM Thermodynamic Model*, a novel approach to quantifying capital flows using statistical mechanics. Furthermore, we demonstrate how this architecture aligns with the European eIDAS 2.0 regulation (ARF v2.4), providing a bridge between permissionless Web3 environments and institutional compliance requirements.
+This paper presents the System Network Architecture (SNA), a comprehensive framework designed to solve the dual challenges of non-repudiable identity and high-fidelity entity resolution in public blockchain networks. We introduce *TitaniumGate*, an Edge-deployed middleware that enforces strict Zero-Trust principles via ECDSA signatures, and the *EVM Thermodynamic Model*, a novel approach to quantifying capital flows using statistical mechanics. Furthermore, we demonstrate how this architecture aligns with the European eIDAS 2.0 regulation (ARF v2.4), providing a bridge between permissionless Web3 environments and institutional compliance requirements.
 
 ---
 
@@ -20,12 +20,12 @@ This paper presents the Sovereign Network Architecture (SNA), a comprehensive fr
 ## 3. The EVM Thermodynamic Model
 - 3.1 Mathematical Formulation of Capital Flows
 - 3.2 Boltzmann Distribution Applied to Smart Contract Liquidity
-- 3.3 The Sovereign Z-Score: Normalizing Conviction
+- 3.3 The System Z-Score: Normalizing Conviction
 - 3.4 Elimination of MEV Noise through Velocity Discounting
 
 ## 4. Institutional Entity Resolution
 - 4.1 The Zero-Simulation Mandate
-- 4.2 Graph Construction (Neo4j) vs. Memory Matrix Fallback
+- 4.2 Graph Construction (Neo4j) vs. Memory Grid Fallback
 - 4.3 Taxonomical Classification (103 Micro-Sectors)
 - 4.4 Real-time Streaming Architecture (SSE)
 
@@ -48,7 +48,7 @@ This paper presents the Sovereign Network Architecture (SNA), a comprehensive fr
 
 ## 8. Conclusion and Future Work
 - 8.1 Summary of Institutional Guarantees
-- 8.2 Migration to Post-Quantum Cryptography
+- 8.2 Migration to Post-Core Cryptography
 - 8.3 Integration with European Digital Identity (EUDI) Wallets
 
 ## References

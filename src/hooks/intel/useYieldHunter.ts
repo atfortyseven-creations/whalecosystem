@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { intelligenceService } from '@/lib/blockchain/IntelligenceService';
+import { analyticsService } from '@/lib/blockchain/AnalyticsService';
 
 export interface YieldOpportunity {
     id: string;
@@ -20,7 +20,7 @@ export function useYieldHunter() {
     useEffect(() => {
         const fetchOpps = async () => {
             try {
-                const liveOpps = await intelligenceService.getLiveYieldOpportunities();
+                const liveOpps = await analyticsService.getLiveYieldOpportunities();
                 setPools(liveOpps);
             } catch (e) {
                 console.error('[useYieldHunter] Failed to sync with on-chain oracles');

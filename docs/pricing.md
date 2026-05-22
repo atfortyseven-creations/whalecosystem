@@ -1,6 +1,6 @@
 # Pricing & Plan Tiers
 
-Whale Alert Network operates a tiered access model. All tiers share the same underlying data infrastructure — the difference is throughput, concurrency, and access to premium intelligence features.
+Whale Alert Network operates a tiered access model. All tiers share the same underlying data infrastructure  the difference is throughput, concurrency, and access to premium analytics features.
 
 ---
 
@@ -9,15 +9,15 @@ Whale Alert Network operates a tiered access model. All tiers share the same und
 | Feature | FREE | STANDARD | STARTER | PRO | ELITE |
 |---|---|---|---|---|---|
 | **Daily API Requests** | 500 | 5,000 | 15,000 | 50,000 | Unlimited |
-| **Real-Time WebSocket** | ❌ | ✅ (1 stream) | ✅ (3 streams) | ✅ (10 streams) | ✅ Unlimited |
+| **Real-Time WebSocket** |  |  (1 stream) |  (3 streams) |  (10 streams) |  Unlimited |
 | **Whale Detection** | Delayed 60s | Delayed 15s | Near-real-time | Real-time | Pre-confirmation (mempool) |
-| **Signal Intelligence** | ❌ | ❌ | Basic | Advanced | Full (all signal types) |
-| **Polymarket Data** | Public only | Public only | ✅ | ✅ | ✅ + Order Book Depth |
-| **Liquidity Analytics** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **Governance Access** | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **KYC-Gated Trading** | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **Gasless Execution** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **Dedicated RPC** | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Signal Analytics** |  |  | Basic | Advanced | Full (all signal types) |
+| **Polymarket Data** | Public only | Public only |  |  |  + Order Book Depth |
+| **Liquidity Analytics** |  |  |  |  |  |
+| **Governance Access** |  |  |  |  |  |
+| **KYC-Gated Trading** |  |  |  |  |  |
+| **Gasless Execution** |  |  |  |  |  |
+| **Dedicated RPC** |  |  |  |  |  |
 | **SLA Uptime Guarantee** | None | None | 99.5% | 99.9% | 99.99% |
 | **Support** | Community | Email | Email | Priority | Dedicated |
 
@@ -50,7 +50,7 @@ Rate limits are enforced at two layers:
 | STANDARD | 5,000 | Hard block after quota |
 | STARTER | 15,000 | Hard block after quota |
 | PRO | 50,000 | Soft warning at 80%, block at 100% |
-| ELITE | -1 (unlimited) | No quota — SLA-governed only |
+| ELITE | -1 (unlimited) | No quota  SLA-governed only |
 
 > **Implementation note:** Elite plan keys return `{ success: true, limit: -1, remaining: -1 }` from the rate limiter, bypassing all quota checks. Rate limiting for Elite is governed exclusively by the per-endpoint WAF limits above.
 
@@ -72,7 +72,7 @@ Rate limits are enforced at two layers:
 
 ## Upgrading Your Plan
 
-Plan upgrades take effect immediately. Your API key inherits the new tier's limits within the same request cycle — no re-authentication required.
+Plan upgrades take effect immediately. Your API key inherits the new tier's limits within the same request cycle  no re-authentication required.
 
 Downgrading is effective at the start of the next billing cycle. Active sessions maintain their current tier until then.
 
@@ -95,5 +95,5 @@ The KYC flow is accessible at `/verify-human`. Approval is typically completed w
 There are no surprise overage charges. When a FREE, STANDARD, STARTER, or PRO key reaches its daily quota:
 
 - All further API requests return `HTTP 429` with a `Retry-After` header indicating seconds until midnight UTC reset
-- WebSocket connections already open remain connected — only new subscription requests are blocked
+- WebSocket connections already open remain connected  only new subscription requests are blocked
 - The quota resets atomically at midnight UTC via Redis key expiry

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Search, Banknote, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
 import { useSendTransaction, useSwitchChain, useChainId } from 'wagmi';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { polymarketRouterService } from '@/lib/blockchain/PolymarketRouterService';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { toast } from 'sonner';
@@ -50,7 +50,7 @@ function Skeleton({ count = 6 }) {
 
 export default function PolymarketPanel() {
     // =========================================================================
-    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // INJECTED DATA HOOK  Zero-Mock Mandate
     // Polymarket endpoint injected via REGISTRY.MARKET_DATA.polymarket
     // =========================================================================
     const [rawData, setRawData] = useState<any>(null);
@@ -266,17 +266,17 @@ export default function PolymarketPanel() {
                                         </span>
                                     )}
                                     <span className="bg-[#E5E5E5]/50 dark:bg-white/10 px-2 py-0.5 rounded text-[#111111] dark:text-white">{m.category}</span>
-                                    <span>•</span>
+                                    <span></span>
                                     <span>VOL: {fmtUsd(m.volume24h)}</span>
                                     {m.endDate && (
                                         <>
-                                            <span>•</span>
+                                            <span></span>
                                             <span>ENDS: {new Date(m.endDate).toLocaleDateString()}</span>
                                         </>
                                     )}
                                     {m.evSignal !== 'NEUTRAL' && (
                                         <>
-                                            <span>•</span>
+                                            <span></span>
                                             <span style={{ color: SIGNAL_COLOR[m.evSignal] || '#111111' }} className="font-black border px-1.5 py-0.5 rounded border-current">{m.evSignal.replace('_', ' ')}</span>
                                         </>
                                     )}
@@ -324,7 +324,7 @@ export default function PolymarketPanel() {
                                         onClick={() => setSelected(null)}
                                         className="text-[#888888] dark:text-white/60 hover:text-[#111111] dark:hover:text-white p-1 border border-transparent rounded hover:border-[#E5E5E5] dark:hover:border-white/10"
                                     >
-                                        ✕
+                                        
                                     </button>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-[9px] font-black bg-[#E5E5E5]/50 dark:bg-white/10 text-[#888888] dark:text-white/60 tracking-widest px-2.5 py-1 rounded inline-flex mb-3">
@@ -411,7 +411,7 @@ export default function PolymarketPanel() {
                             {!isPolygon && isConnected && (
                                 <div className="px-6 pb-6 bg-[#FFFFFF] dark:bg-[#111111]">
                                     <div className="w-full bg-[#0055ff]/5 text-[#0055ff] font-black uppercase tracking-widest text-[10px] py-3 px-4 rounded-xl flex justify-between items-center gap-2 border border-[#0055ff]/10">
-                                        <span className="flex items-center gap-2"><AlertTriangle size={12} /> ROUTE: L2 ➔ POLYGON (~45s)</span>
+                                        <span className="flex items-center gap-2"><AlertTriangle size={12} /> ROUTE: L2  POLYGON (~45s)</span>
                                         <button onClick={() => switchChain?.({ chainId: 137 })} className="underline hover:opacity-70 text-[9px]">SWITCH NATIVE</button>
                                     </div>
                                 </div>

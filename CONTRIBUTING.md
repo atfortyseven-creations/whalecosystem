@@ -2,22 +2,22 @@
 
 > [!WARNING]
 > **STRICT PROCEDURAL MANDATE**
-> The Sovereign Terminal is an institutional-grade codebase. We do not accept casual contributions, unverified logic modifications, or superficial UI tweaks. Every pull request is subjected to rigorous academic peer review and mathematical scrutiny. If you cannot abide by these Draconian standards, do not attempt to contribute.
+> The System Terminal is an institutional-grade codebase. We do not accept casual contributions, unverified logic modifications, or superficial UI tweaks. Every pull request is subjected to rigorous academic peer review and mathematical scrutiny. If you cannot abide by these Draconian standards, do not attempt to contribute.
 
 ## 1. Architectural Philosophy & Zero-Simulation
 
-Before writing a single line of code, you must internalize the philosophical tenets of the Sovereign Architecture:
+Before writing a single line of code, you must internalize the philosophical tenets of the System Architecture:
 1. **The Zero-Simulation Mandate:** Absolutely no mock data, stubbed APIs, or synthetic rendering states. All UI components must ingest live, deterministic telemetry.
 2. **Absolute Separation of Concerns:** The Next.js frontend must remain blissfully ignorant of cryptographic hashing logic. The Node.js indexing workers must never touch UI rendering paths.
-3. **Graceful Degradation:** If an external system fails (e.g., Neo4j graph latency spikes), your code must degrade elegantly to an in-memory matrix without crashing the main Event Loop.
+3. **Graceful Degradation:** If an external system fails (e.g., Neo4j graph latency spikes), your code must degrade elegantly to an in-memory grid without crashing the main Event Loop.
 
 ## 2. The Pull Request Crucible
 
-If you believe your optimization or feature is worthy of inclusion in the Sovereign Core, follow this exact sequence:
+If you believe your optimization or feature is worthy of inclusion in the System Core, follow this exact sequence:
 
 ### 2.1 Branch Nomenclature
 Branches must reflect the absolute precision of the work contained within.
-* **Cryptography/Security:** `matrix/crypto-enhancement-[descriptor]`
+* **Cryptography/Security:** `grid/crypto-enhancement-[descriptor]`
 * **High-Frequency Backend:** `engine/telemetry-optimization-[descriptor]`
 * **Institutional Frontend:** `terminal/ui-refinement-[descriptor]`
 * **Example:** `engine/eip1153-transient-storage-parser`
@@ -46,4 +46,4 @@ This codebase demands a level of perfection rarely seen outside of mission-criti
 
 *"The attainment of absolute perfection transpires not when there remains nothing further to add, but when there is unequivocally nothing left to strip away."*
 
-If your contribution adds unnecessary bloat, it will be discarded. If it refines the system closer to absolute mathematical truth, you will earn your place in the Sovereign ecosystem.
+If your contribution adds unnecessary bloat, it will be discarded. If it refines the system closer to absolute mathematical truth, you will earn your place in the System ecosystem.

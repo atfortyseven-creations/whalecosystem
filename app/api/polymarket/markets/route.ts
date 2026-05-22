@@ -73,7 +73,7 @@ export async function GET(req: Request) {
                 volume24h: parseFloat(m.volume24hr || m.volume || '0'),
                 volumeTotal: parseFloat(m.volumeNum || m.volume || '0'),
                 liquidity: parseFloat(m.liquidity || '0'),
-                // REAL execution fields — fpmmAddress is the Gnosis FPMM contract for this market
+                // REAL execution fields  fpmmAddress is the Gnosis FPMM contract for this market
                 fpmmAddress: m.market_maker_address || null,
                 conditionId: m.conditionId || null,
                 endDate: m.endDate || m.resolutionTime || null,
@@ -102,8 +102,8 @@ export async function GET(req: Request) {
 
 /** 
  * Compute expected value signal:
- * If price < 0.15 → HIGH chance it's under-valued (OVERWEIGHT_YES)
- * If price > 0.85 → Overbought, look at shorting
+ * If price < 0.15  HIGH chance it's under-valued (OVERWEIGHT_YES)
+ * If price > 0.85  Overbought, look at shorting
  * Returns a signal string for the frontend
  */
 function calcEV(yesPrice: number): string {

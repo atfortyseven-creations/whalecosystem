@@ -12,8 +12,8 @@ const getSender = (name: string) => {
 // Supply Unlocks Data (Matching DilutionTracker)
 const unlocks = [
     {
-        tokenSymbol: 'WLD',
-        tokenName: 'Worldcoin',
+        tokenSymbol: 'AUTH',
+        tokenName: 'Identity',
         unlockDate: new Date('2026-03-05T00:00:00Z'),
         amount: '6.62M',
         type: 'LINEAR',
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
             <body>
               <div class="container">
                 <div class="header">
-                  <h2 style="color: #000; margin: 0;">🚨 Hourly Supply Monitors</h2>
+                  <h2 style="color: #000; margin: 0;"> Hourly Supply Monitors</h2>
                   <p style="color: #666; margin-top: 5px;">Whale Alert Logic - Real-Time Tracking</p>
                 </div>
                 
@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
             resend.emails.send({
                 from: getSender('WhaleAlert ID Vault'),
                 to: sub.email,
-                subject: '🚨 Real-Time Supply Unlock Alert (Hourly Update)',
+                subject: ' Real-Time Supply Unlock Alert (Hourly Update)',
                 html: htmlContent
             }).catch(err => console.error(`[CRON] Failed to send email to ${sub.email}:`, err))
         );

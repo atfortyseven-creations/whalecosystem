@@ -79,7 +79,7 @@ export default function ContactPage() {
                                 security@WhaleAlert ID.fi
                             </a>
                             <p className="mt-3 text-xs text-white/60">
-                                <a href="/legal/security#bug-bounty" className="text-blue-400 hover:underline">View Bug Bounty Program →</a>
+                                <a href="/legal/security#bug-bounty" className="text-blue-400 hover:underline">View Bug Bounty Program </a>
                             </p>
                         </div>
 
@@ -192,7 +192,7 @@ export default function ContactPage() {
                                 Response time: {'<'} 1 hour average
                             </p>
                             <p className="text-xs text-white/60 mt-4">
-                                <a href="/product/pricing" className="text-blue-400 hover:underline">Upgrade to LEGEND →</a>
+                                <a href="/product/pricing" className="text-blue-400 hover:underline">Upgrade to LEGEND </a>
                             </p>
                         </div>
                     </div>

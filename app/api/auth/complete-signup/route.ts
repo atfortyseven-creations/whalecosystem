@@ -84,13 +84,13 @@ export async function POST(request: NextRequest) {
     // Set secure httpOnly cookies
     await setSessionCookies(accessToken, refreshToken);
 
-    // Generate Airdrop Signature for QuantumDots (500 QDs)
+    // Generate Airdrop Signature for CoreDots (500 QDs)
     let airdropSignature = null;
     if (walletAddress && process.env.AIRDROP_PRIVATE_KEY) {
         try {
             const adminWallet = new ethers.Wallet(process.env.AIRDROP_PRIVATE_KEY);
             const domain = {
-                name: 'QuantumAirdrop',
+                name: 'CoreAirdrop',
                 version: '1',
                 chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '137'), // Polygon Amoy/Mainnet default
                 verifyingContract: process.env.NEXT_PUBLIC_AIRDROP_CONTRACT_ADDRESS || ethers.ZeroAddress

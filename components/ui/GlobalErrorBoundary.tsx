@@ -62,7 +62,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               
               <p className="font-mono text-[11px] text-black/40 dark:text-white/40 uppercase tracking-widest leading-relaxed mb-8">
                 The terminal has encountered a module decoupling error. 
-                Sovereign state has been preserved.
+                System state has been preserved.
               </p>
 
               <div className="w-full space-y-3">

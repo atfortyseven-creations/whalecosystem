@@ -8,14 +8,14 @@ export async function POST(req: NextRequest) {
     try {
         const session = await getSession();
         if (!session || !session.user) {
-            return NextResponse.json({ error: 'Unauthorized Sovereign Access' }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized System Access' }, { status: 401 });
         }
 
         const body = await req.json();
         const { type, action, config } = body;
         const userEmail = session.user.email || session.user.id;
 
-        // ── DeadMan Switch ──────────────────────────────────────────────────────
+        //  DeadMan Switch 
         if (type === 'DEADMAN') {
             if (action === 'DEPLOY') {
                 // FIX: Use actual Prisma schema fields: userAddress, beneficiary,
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // ── TimeLock Vault ──────────────────────────────────────────────────────
+        //  TimeLock Vault 
         if (type === 'TIMELOCK') {
             if (action === 'DEPLOY') {
                 // FIX: Use actual Prisma schema fields: userAddress, amount,
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // ── Guardian Multi-Sig ──────────────────────────────────────────────────
+        //  Guardian Multi-Sig 
         // FIX: Expose the Guardian table through the API to fix single-point-of-failure.
         // With multi-sig guardians, a stolen wallet cannot unilaterally drain vault funds.
         if (type === 'GUARDIAN') {
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
     try {
         const session = await getSession();
         if (!session || !session.user) {
-            return NextResponse.json({ error: 'Unauthorized Sovereign Access' }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized System Access' }, { status: 401 });
         }
 
         const userEmail = session.user.email || session.user.id;

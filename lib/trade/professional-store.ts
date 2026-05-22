@@ -36,7 +36,7 @@ interface ProfessionalTradeState {
   
   // 24h ticker data
   ticker: Ticker24h | null; // Current pair ticker
-  globalTickers: Record<string, { price: number; change24h?: number }>; // 🔥 All pairs' realtime prices
+  globalTickers: Record<string, { price: number; change24h?: number }>; //  All pairs' realtime prices
   lastCandle: { time: number; open: number; high: number; low: number; close: number; volume: number } | null;
   
   // Connection status
@@ -82,7 +82,7 @@ export const useProfessionalTradeStore = create<ProfessionalTradeState>((set, ge
   maxTrades: 50,
   // Initialize with default ticker to PREVENT BLANK SCREEN
   ticker: null,
-  globalTickers: {}, // 🔥 Stores real-time prices for ALL 31 pairs
+  globalTickers: {}, //  Stores real-time prices for ALL 31 pairs
   lastCandle: null,
   historicalCandles: [],
   currentInterval: '1m',
@@ -169,7 +169,7 @@ export const useProfessionalTradeStore = create<ProfessionalTradeState>((set, ge
   connectToMarket: async (symbol, rawInterval = '1m') => {
     const lowerSymbol = symbol.toLowerCase();
     
-    // 🔥 FIX: Map TradingView resolution to Binance Interval
+    //  FIX: Map TradingView resolution to Binance Interval
     const intervalMap: Record<string, string> = {
         '1': '1m', '3': '3m', '5': '5m', '15': '15m', '30': '30m',
         '60': '1h', '120': '2h', '240': '4h', '360': '6h', '480': '8h', '720': '12h',
@@ -237,7 +237,7 @@ export const useProfessionalTradeStore = create<ProfessionalTradeState>((set, ge
         
         get().addTrade(trade);
 
-        // 🔥 REAL-TIME CANDLE UPDATE
+        //  REAL-TIME CANDLE UPDATE
         // Update the current candle immediately for "running to the second" feel
         const currentCandle = get().lastCandle;
         if (currentCandle) {
@@ -300,7 +300,7 @@ export const useProfessionalTradeStore = create<ProfessionalTradeState>((set, ge
               globalTickerUpdate[sym] = { price, change24h };
           });
           
-          // 🔥 Update global tickers for MarketSelector to display
+          //  Update global tickers for MarketSelector to display
           set({ globalTickers: { ...get().globalTickers, ...globalTickerUpdate } });
           
           // Update Portfolio Store for real-time equity calculation

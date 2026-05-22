@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // HUMANITY LEDGER AUTO-RESET CRON
-// Schedule: Every 11h 59min → prevents block accumulation & keeps the
-// local indexer operating at peak quantum efficiency.
+// Schedule: Every 11h 59min  prevents block accumulation & keeps the
+// local indexer operating at peak core efficiency.
 //
 // HOW TO TRIGGER:
 //   Railway Cron Service: Call GET /api/cron/ledger-reset
 //   with header: Authorization: Bearer <CRON_SECRET>
 //
-// Add to Railway: Settings → Cron Jobs → "0 */12 * * *" → GET /api/cron/ledger-reset
-// ─────────────────────────────────────────────────────────────────────────────
+// Add to Railway: Settings  Cron Jobs  "0 */12 * * *"  GET /api/cron/ledger-reset
+// 
 
 const RESET_INTERVAL_MS = 11 * 60 * 60 * 1000 + 59 * 60 * 1000; // 11h 59m exactly
 
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
       });
     }
 
-    // ── ATOMIC RESET ──────────────────────────────────────────────────────────
+    //  ATOMIC RESET 
     // Delete only old transactions and blocks (older than 11h 59m).
     const thresholdDate = new Date(now - RESET_INTERVAL_MS);
 
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
     });
 
     console.log(
-      `[CRON] Humanity Ledger reset — ${deletedBlocks.count} blocks, ${deletedTx.count} transactions purged.`
+      `[CRON] Humanity Ledger reset  ${deletedBlocks.count} blocks, ${deletedTx.count} transactions purged.`
     );
 
     return NextResponse.json({

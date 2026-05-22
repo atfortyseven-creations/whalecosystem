@@ -6,12 +6,12 @@ import { matchNewsToMarket } from '@/utils/news-matcher';
 import { Asset, NewsItem, Position, Transaction } from '@/types/wallet';
 import { useAuth } from '@/hooks/useAuth';
 import { useWalletStore } from '@/lib/store/wallet-store';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
 export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?: string) => {
-    const { address: web3Address, isConnected: isWeb3Connected } = useSovereignAccount();
+    const { address: web3Address, isConnected: isWeb3Connected } = useSystemAccount();
     const { isAuthenticated } = useAuth();
     
     // Unified connection state
@@ -32,23 +32,23 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         enabled: isAuthenticated && !isWeb3Connected
     });
 
-    const { address: sovereignAddress } = useWalletStore();
+    const { address: systemAddress } = useWalletStore();
     
     // [PERFECTION] Immediate Handshake Resolution (High-Efficiency Cookie Reader)
     let handshakeAddressFromCookie = null;
     try {
         handshakeAddressFromCookie = typeof document !== 'undefined' 
-            ? document.cookie.split('; ').find(r => r.trim().startsWith('sovereign_handshake=0x'))?.split('=')[1]?.toLowerCase() 
+            ? document.cookie.split('; ').find(r => r.trim().startsWith('system_handshake=0x'))?.split('=')[1]?.toLowerCase() 
             : null;
     } catch(e) {}
 
     // Priority Hierarchy: 1. Manual override, 2. Web3 Provider, 3. Immediate Handshake, 4. Store Persistence
-    const effectiveAddress = overrideAddress || web3Address || handshakeAddressFromCookie || sovereignAddress || managedWallet?.address;
+    const effectiveAddress = overrideAddress || web3Address || handshakeAddressFromCookie || systemAddress || managedWallet?.address;
 
     // [DEBUG] Monitor address resolution changes
     // console.log('[useRealWalletData] Address Resolution:', { effectiveAddress, isConnected, isAuthenticated, isWeb3Connected, handshakeAddressFromCookie });
 
-    // 1. On-Chain Native Balance (Wagmi v2 — no 'token' param, that's deprecated)
+    // 1. On-Chain Native Balance (Wagmi v2  no 'token' param, that's deprecated)
     // ERC-20 USDC balance is already fetched by the portfolio assets API below.
     const { data: balanceData, isLoading: isBalanceLoading } = useBalance({
         address: effectiveAddress as `0x${string}` | undefined,
@@ -170,7 +170,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         balanceFormatted: t.balanceFormatted || (typeof t.balanceNumeric === 'number' ? t.balanceNumeric.toFixed(6) : "0"),
         price: t.price || t.priceUSD || 0,
         priceUSD: t.price || t.priceUSD || 0,
-        usdPrice: t.price || t.priceUSD || 0,   // ← alias used by LegendaryTransactionModal
+        usdPrice: t.price || t.priceUSD || 0,   //  alias used by LegendaryTransactionModal
         value: t.valueUsd || t.valueUSD || 0,
         valueUSD: t.valueUsd || t.valueUSD || 0,
         address: t.address || 'native',
@@ -181,7 +181,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         change24h: t.change24h || 0
     }));
 
-    // Quantum Dots Integration (On-Chain)
+    // Core Dots Integration (On-Chain)
     const { data: qdBalanceRaw } = useReadContract({
         address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as `0x${string}`,
         abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
@@ -195,11 +195,11 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
 
     let qdBalanceNum = qdBalanceRaw ? parseFloat(formatEther(qdBalanceRaw as bigint)) : 0;
     
-    // QDs mapped at €1 = 1 QD equivalence for UI tracking purposes
+    // QDs mapped at 1 = 1 QD equivalence for UI tracking purposes
     if (qdBalanceNum > 0 || isConnected) {
         assets.unshift({
             symbol: "QDs",
-            name: "Quantum Dots",
+            name: "Core Dots",
             balance: qdBalanceNum.toString(),
             balanceNumeric: qdBalanceNum,
             balanceFormatted: qdBalanceNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),

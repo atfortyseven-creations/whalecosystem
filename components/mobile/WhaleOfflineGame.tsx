@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+//  CONSTANTS 
 const CW = 360, CH = 260;
 const GROUND = CH - 55;
 const WHALE_X = 65, WHALE_W = 46, WHALE_H = 34;
@@ -34,7 +34,7 @@ function spawn(s: GS): Obs {
   return { x: CW + 20, y: GROUND - c.h, w: c.w, h: c.h, type: t };
 }
 
-// ─── DRAW HELPERS ─────────────────────────────────────────────────────────────
+//  DRAW HELPERS 
 function drawBg(ctx: CanvasRenderingContext2D, frame: number) {
   const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
   sky.addColorStop(0, '#7EC8E3'); sky.addColorStop(1, '#C8EAF8');
@@ -131,12 +131,12 @@ function drawHUD(ctx: CanvasRenderingContext2D, score: number, hi: number, start
   if (!started) {
     ctx.textAlign='center'; ctx.fillStyle='rgba(0,0,0,0.38)';
     ctx.font='bold 12px "Courier New",monospace';
-    ctx.fillText('— TAP TO START —', CW/2, CH/2-8);
+    ctx.fillText(' TAP TO START ', CW/2, CH/2-8);
   }
   ctx.restore();
 }
 
-// ─── COMPONENT ────────────────────────────────────────────────────────────────
+//  COMPONENT 
 export function WhaleOfflineGame({ visible, onBack }: { visible: boolean; onBack?: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef    = useRef<number>(0);
@@ -278,7 +278,7 @@ export function WhaleOfflineGame({ visible, onBack }: { visible: boolean; onBack
             initial={{opacity:0,y:12}} animate={{opacity:1,y:0}}
             className="mt-2 px-6 py-2.5 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-xl pointer-events-auto active:scale-95 transition-transform"
             onClick={e => { e.stopPropagation(); onBack?.(); }}
-          >✓ Conexión Restaurada — Volver</motion.button>
+          > Conexión Restaurada  Volver</motion.button>
         )}
       </div>
     </motion.div>

@@ -21,13 +21,13 @@ export class DashboardErrorBoundary extends Component<Props, State> {
     online: typeof navigator !== "undefined" ? navigator.onLine : true,
   };
 
-  // ── Network recovery listeners ────────────────────────────────────────────
+  //  Network recovery listeners 
   private handleOnline = () => {
     this.setState({ online: true });
     // If we were in an error state due to network, auto-reset so the
     // child component remounts and retries its data fetch.
     if (this.state.hasError) {
-      console.log("[DashboardErrorBoundary] Network restored — auto-recovering panel");
+      console.log("[DashboardErrorBoundary] Network restored  auto-recovering panel");
       this.setState({ hasError: false, error: null });
     }
   };
@@ -43,7 +43,7 @@ export class DashboardErrorBoundary extends Component<Props, State> {
     window.removeEventListener("offline", this.handleOffline);
   }
 
-  // ── Reset when parent gives us a new key (tab switch) ────────────────────
+  //  Reset when parent gives us a new key (tab switch) 
   public componentDidUpdate(prevProps: Props) {
     // If children changed identity (parent used key= trick), clear the error
     if (prevProps.children !== this.props.children && this.state.hasError) {
@@ -58,7 +58,7 @@ export class DashboardErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("[DashboardErrorBoundary] Panel fault:", error.message, errorInfo.componentStack?.slice(0, 300));
 
-    // ── ChunkLoadError Recovery ──────────────────────────────────────────────
+    //  ChunkLoadError Recovery 
     // When Next.js deploys a new build, old chunk hashes become 404s. The only
     // correct fix is a hard reload to fetch the current HTML + chunk manifest.
     // We guard with sessionStorage to avoid infinite reload loops.
@@ -73,10 +73,10 @@ export class DashboardErrorBoundary extends Component<Props, State> {
       try {
         if (!sessionStorage.getItem(reloadKey)) {
           sessionStorage.setItem(reloadKey, '1');
-          console.warn('[DashboardErrorBoundary] ChunkLoadError detected — reloading page to fetch fresh chunks.');
+          console.warn('[DashboardErrorBoundary] ChunkLoadError detected  reloading page to fetch fresh chunks.');
           window.location.reload();
         } else {
-          // Second failure after reload — clear flag so next session tries again
+          // Second failure after reload  clear flag so next session tries again
           sessionStorage.removeItem(reloadKey);
         }
       } catch {}

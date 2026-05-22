@@ -343,14 +343,14 @@ header p {
     backdrop-filter: blur(20px);
 }
 
-.sovereign-spinner {
+.system-spinner {
     position: relative;
     width: 80px; height: 80px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 2rem;
 }
 
-.sovereign-spinner .ring {
+.system-spinner .ring {
     position: absolute;
     border-radius: 50%;
     border: 2px solid transparent;

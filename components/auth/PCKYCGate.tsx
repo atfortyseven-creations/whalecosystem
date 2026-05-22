@@ -15,7 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 
-// ── AES-GCM Decryption ───────────────────────────────────────────────────────
+//  AES-GCM Decryption 
 async function decryptPayload(ciphertext: string, hexKey: string): Promise<string> {
   const keyBytes = new Uint8Array(
     hexKey.match(/.{1,2}/g)!.map((b) => parseInt(b, 16))
@@ -38,7 +38,7 @@ async function decryptPayload(ciphertext: string, hexKey: string): Promise<strin
   return new TextDecoder().decode(decrypted);
 }
 
-// ── Timer Hook ───────────────────────────────────────────────────────────────
+//  Timer Hook 
 function useCountdown(expiresAt: number) {
   const [remaining, setRemaining] = useState(0);
   useEffect(() => {
@@ -50,7 +50,7 @@ function useCountdown(expiresAt: number) {
   return remaining;
 }
 
-// ── QR Orbit Animation ───────────────────────────────────────────────────────
+//  QR Orbit Animation 
 function QROrbit({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex items-center justify-center">
@@ -90,7 +90,7 @@ function QROrbit({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ── Pulsing Dot Status ────────────────────────────────────────────────────────
+//  Pulsing Dot Status 
 function StatusDot({ color, pulse = true }: { color: string; pulse?: boolean }) {
   return (
     <span className="relative flex h-2 w-2">
@@ -108,7 +108,7 @@ function StatusDot({ color, pulse = true }: { color: string; pulse?: boolean }) 
   );
 }
 
-// ── Props ────────────────────────────────────────────────────────────────────
+//  Props 
 interface PCKYCGateProps {
   walletAddress: string;
   onVerified: () => void;
@@ -116,7 +116,7 @@ interface PCKYCGateProps {
 
 type GateStage = "INIT" | "QR_WAITING" | "MOBILE_SCANNING" | "SUCCESS" | "EXPIRED" | "ERROR";
 
-// ── Main Component ────────────────────────────────────────────────────────────
+//  Main Component 
 export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
   const [stage, setStage] = useState<GateStage>("INIT");
   const [uuid, setUuid] = useState<string | null>(null);
@@ -127,7 +127,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
   const pollRef = useRef<NodeJS.Timeout | null>(null);
   const remaining = useCountdown(expiresAt);
 
-  // ── Initialize session ─────────────────────────────────────────────────────
+  //  Initialize session 
   const initSession = useCallback(async () => {
     setStage("INIT");
     try {
@@ -148,14 +148,14 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
     initSession();
   }, [initSession]);
 
-  // ── Auto-expire ────────────────────────────────────────────────────────────
+  //  Auto-expire 
   useEffect(() => {
     if (remaining === 0 && stage === "QR_WAITING") {
       setStage("EXPIRED");
     }
   }, [remaining, stage]);
 
-  // ── Polling for mobile completion ──────────────────────────────────────────
+  //  Polling for mobile completion 
   useEffect(() => {
     if (stage !== "QR_WAITING" || !uuid) return;
 
@@ -180,7 +180,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
           setStage("EXPIRED");
         }
       } catch {
-        // Silent — keep polling
+        // Silent  keep polling
       }
     }, 2000);
 
@@ -189,13 +189,13 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
     };
   }, [stage, uuid, walletAddress, onVerified]);
 
-  // ── QR URL ─────────────────────────────────────────────────────────────────
+  //  QR URL 
   const qrUrl =
     uuid && ekey
       ? `${typeof window !== "undefined" ? window.location.origin : ""}/mobile-kyc?session=${uuid}&ekey=${ekey}`
       : "";
 
-  // ── Time formatting ────────────────────────────────────────────────────────
+  //  Time formatting 
   const timeStr = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`;
   const timeProgress = expiresAt > 0 ? remaining / 300 : 1;
 
@@ -218,7 +218,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
 
       <AnimatePresence mode="wait">
 
-        {/* ── INIT / LOADING ─────────────────────────────────────────────── */}
+        {/*  INIT / LOADING  */}
         {stage === "INIT" && (
           <motion.div
             key="init"
@@ -233,12 +233,12 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
               transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
             />
             <p className="text-[10px] font-mono uppercase tracking-[0.4em] text-white/30">
-              Initializing Secure KYC Channel…
+              Initializing Secure KYC Channel
             </p>
           </motion.div>
         )}
 
-        {/* ── QR WAITING ─────────────────────────────────────────────────── */}
+        {/*  QR WAITING  */}
         {stage === "QR_WAITING" && uuid && ekey && (
           <motion.div
             key="qr"
@@ -255,7 +255,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
               </div>
               <div>
                 <p className="text-[9px] font-mono uppercase tracking-[0.4em] text-white/30">
-                  Humanity Ledger™
+                  Humanity Ledger
                 </p>
                 <p className="text-[11px] font-black text-white/80 uppercase tracking-wider">
                   Biometric Verification
@@ -372,13 +372,13 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
                 ))}
               </motion.div>
               <span className="text-[9px] font-mono text-white/30 uppercase tracking-widest">
-                Awaiting mobile verification…
+                Awaiting mobile verification
               </span>
             </div>
           </motion.div>
         )}
 
-        {/* ── MOBILE SCANNING (transition) ────────────────────────────────── */}
+        {/*  MOBILE SCANNING (transition)  */}
         {stage === "MOBILE_SCANNING" && (
           <motion.div
             key="scanning"
@@ -418,7 +418,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
           </motion.div>
         )}
 
-        {/* ── SUCCESS ─────────────────────────────────────────────────────── */}
+        {/*  SUCCESS  */}
         {stage === "SUCCESS" && (
           <motion.div
             key="success"
@@ -470,7 +470,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                Completada ✓
+                Completada 
               </motion.h2>
             </div>
 
@@ -488,13 +488,13 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
                 </span>
               </div>
               <p className="text-[10px] text-white/30 uppercase tracking-wider mt-2">
-                Redirecting to Sovereign Terminal…
+                Redirecting to System Terminal
               </p>
             </motion.div>
           </motion.div>
         )}
 
-        {/* ── EXPIRED ─────────────────────────────────────────────────────── */}
+        {/*  EXPIRED  */}
         {stage === "EXPIRED" && (
           <motion.div
             key="expired"
@@ -529,7 +529,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
           </motion.div>
         )}
 
-        {/* ── ERROR ───────────────────────────────────────────────────────── */}
+        {/*  ERROR  */}
         {stage === "ERROR" && (
           <motion.div
             key="error"

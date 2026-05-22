@@ -48,7 +48,7 @@ describe("WhaleDeadmanSwitch", function () {
         await mockERC721.connect(owner).setApprovalForAll(contract.target, true);
     });
 
-    // ─── Constructor ──────────────────────────────────────────────────────────
+    //  Constructor 
 
     describe("Constructor", function () {
         it("sets owner, backup, timeout correctly", async function () {
@@ -77,7 +77,7 @@ describe("WhaleDeadmanSwitch", function () {
         });
     });
 
-    // ─── Non-Custodial Guarantee ──────────────────────────────────────────────
+    //  Non-Custodial Guarantee 
 
     describe("Non-Custodial Guarantee", function () {
         it("reverts on ETH deposit via receive()", async function () {
@@ -87,7 +87,7 @@ describe("WhaleDeadmanSwitch", function () {
         });
     });
 
-    // ─── Ping ─────────────────────────────────────────────────────────────────
+    //  Ping 
 
     describe("Ping", function () {
         it("updates lastPing and emits event", async function () {
@@ -111,14 +111,14 @@ describe("WhaleDeadmanSwitch", function () {
         });
     });
 
-    // ─── Backup Wallet Change ─────────────────────────────────────────────────
+    //  Backup Wallet Change 
 
     describe("Backup Wallet 2-Step Change", function () {
         it("proposes and confirms after cooldown", async function () {
             await contract.connect(owner).proposeBackupWallet(newBackup.address);
             expect(await contract.pendingBackupWallet()).to.equal(newBackup.address);
 
-            // Before cooldown elapses → reverts
+            // Before cooldown elapses  reverts
             await expect(contract.connect(owner).confirmBackupWallet())
                 .to.be.revertedWithCustomError(contract, "CooldownNotElapsed");
 
@@ -145,7 +145,7 @@ describe("WhaleDeadmanSwitch", function () {
         });
     });
 
-    // ─── setTimeout ───────────────────────────────────────────────────────────
+    //  setTimeout 
 
     describe("setTimeout", function () {
         it("updates timeout", async function () {
@@ -160,7 +160,7 @@ describe("WhaleDeadmanSwitch", function () {
         });
     });
 
-    // ─── Trigger Inheritance ──────────────────────────────────────────────────
+    //  Trigger Inheritance 
 
     describe("triggerInheritance", function () {
         it("reverts before timeout", async function () {
@@ -210,7 +210,7 @@ describe("WhaleDeadmanSwitch", function () {
         it("skips ERC721 tokens not approved to contract", async function () {
             await mockERC721.connect(owner).setApprovalForAll(contract.target, false);
             await time.increase(TIMEOUT_SECS + 1);
-            // Should not revert — just skip the unapproved token
+            // Should not revert  just skip the unapproved token
             await contract.connect(stranger).triggerInheritance([], [mockERC721.target], [1]);
             expect(await mockERC721.ownerOf(1)).to.equal(owner.address);
         });
@@ -223,7 +223,7 @@ describe("WhaleDeadmanSwitch", function () {
             ).to.be.revertedWithCustomError(contract, "EnforcedPause");
         });
 
-        it("ping resets expiry — trigger blocked again", async function () {
+        it("ping resets expiry  trigger blocked again", async function () {
             await time.increase(TIMEOUT_SECS - 1000);
             await contract.connect(owner).ping();
             // After ping, another TIMEOUT_SECS must pass
@@ -234,7 +234,7 @@ describe("WhaleDeadmanSwitch", function () {
         });
     });
 
-    // ─── Emergency Controls ───────────────────────────────────────────────────
+    //  Emergency Controls 
 
     describe("Pause / Unpause", function () {
         it("owner can pause and unpause", async function () {
@@ -250,7 +250,7 @@ describe("WhaleDeadmanSwitch", function () {
         });
     });
 
-    // ─── View Helpers ─────────────────────────────────────────────────────────
+    //  View Helpers 
 
     describe("View Helpers", function () {
         it("secondsUntilExpiry returns correct countdown", async function () {

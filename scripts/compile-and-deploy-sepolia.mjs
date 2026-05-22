@@ -1,15 +1,15 @@
 /**
  * compile-and-deploy-sepolia.mjs
- * ─────────────────────────────────────────────────────────────────────────────
- * Deploys QuantumDots + QuantumLedger to BASE SEPOLIA (testnet).
- * Uses free faucet ETH. Identical logic to mainnet deploy — just different RPC.
+ * 
+ * Deploys CoreDots + CoreLedger to BASE SEPOLIA (testnet).
+ * Uses free faucet ETH. Identical logic to mainnet deploy  just different RPC.
  *
  * Steps:
  *   1. Get free testnet ETH from: https://faucet.quicknode.com/base/sepolia
  *      (paste address: 0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a)
  *   2. Run: node scripts/compile-and-deploy-sepolia.mjs
  *   3. Contracts deploy, .env gets updated automatically.
- * ─────────────────────────────────────────────────────────────────────────────
+ * 
  */
 
 import { createRequire } from "module";
@@ -22,7 +22,7 @@ const require   = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = join(__dirname, "..");
 
-// ── Load .env ─────────────────────────────────────────────────────────────────
+//  Load .env 
 function loadEnv() {
   const lines = readFileSync(join(ROOT, ".env"), "utf8").split("\n");
   const env   = {};
@@ -45,13 +45,13 @@ const RAW_KEY     = ENV.PRIVATE_KEY;
 if (!RAW_KEY) { console.error("[ABORT] PRIVATE_KEY missing from .env"); process.exit(1); }
 const PRIVATE_KEY = RAW_KEY.startsWith("0x") ? RAW_KEY : `0x${RAW_KEY}`;
 
-// Base Sepolia public RPC — no API key needed
+// Base Sepolia public RPC  no API key needed
 const RPC_URL        = "https://sepolia.base.org";
 const CHAIN_ID       = 84532n;
 const SOVEREIGN_VAULT = "0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a";
 const EXPECTED_GENESIS = 5_000_000n * 10n ** 18n;
 
-// ── Compile ───────────────────────────────────────────────────────────────────
+//  Compile 
 function compileSolidity() {
   console.log("\n[1/5] Compiling with solc@0.8.26...");
   const solc = require("solc");
@@ -68,8 +68,8 @@ function compileSolidity() {
   const input = {
     language: "Solidity",
     sources: {
-      "QuantumDots.sol":   { content: readFileSync(join(ROOT, "contracts/quantum/QuantumDots.sol"), "utf8") },
-      "QuantumLedger.sol": { content: readFileSync(join(ROOT, "contracts/quantum/QuantumLedger.sol"), "utf8") },
+      "CoreDots.sol":   { content: readFileSync(join(ROOT, "contracts/core/CoreDots.sol"), "utf8") },
+      "CoreLedger.sol": { content: readFileSync(join(ROOT, "contracts/core/CoreLedger.sol"), "utf8") },
     },
     settings: {
       optimizer: { enabled: true, runs: 200 },
@@ -84,26 +84,26 @@ function compileSolidity() {
     process.exit(1);
   }
 
-  console.log("  QuantumDots    compiled ✓");
-  console.log("  QuantumLedger  compiled ✓");
+  console.log("  CoreDots    compiled ");
+  console.log("  CoreLedger  compiled ");
 
   return {
     qd: {
-      abi:      output.contracts["QuantumDots.sol"]["QuantumDots"].abi,
-      bytecode: "0x" + output.contracts["QuantumDots.sol"]["QuantumDots"].evm.bytecode.object,
+      abi:      output.contracts["CoreDots.sol"]["CoreDots"].abi,
+      bytecode: "0x" + output.contracts["CoreDots.sol"]["CoreDots"].evm.bytecode.object,
     },
     ledger: {
-      abi:      output.contracts["QuantumLedger.sol"]["QuantumLedger"].abi,
-      bytecode: "0x" + output.contracts["QuantumLedger.sol"]["QuantumLedger"].evm.bytecode.object,
+      abi:      output.contracts["CoreLedger.sol"]["CoreLedger"].abi,
+      bytecode: "0x" + output.contracts["CoreLedger.sol"]["CoreLedger"].evm.bytecode.object,
     },
   };
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+//  Main 
 async function main() {
-  console.log("\n╔══════════════════════════════════════════════════════════════╗");
-  console.log("║  QuantumDots + QuantumLedger — BASE SEPOLIA (Testnet)        ║");
-  console.log("╚══════════════════════════════════════════════════════════════╝");
+  console.log("\n");
+  console.log("  CoreDots + CoreLedger  BASE SEPOLIA (Testnet)        ");
+  console.log("");
 
   const { qd, ledger } = compileSolidity();
 
@@ -133,14 +133,14 @@ async function main() {
     process.exit(1);
   }
 
-  // Deploy QuantumDots
-  console.log("\n[3/5] Deploying QuantumDots (QDs)...");
+  // Deploy CoreDots
+  console.log("\n[3/5] Deploying CoreDots (QDs)...");
   const qdFactory  = new ethers.ContractFactory(qd.abi, qd.bytecode, wallet);
   const qdContract = await qdFactory.deploy(wallet.address);
   console.log(`  Tx: ${qdContract.deploymentTransaction()?.hash}`);
   await qdContract.waitForDeployment();
   const QD_ADDRESS = await qdContract.getAddress();
-  console.log(`  ✓  ${QD_ADDRESS}`);
+  console.log(`    ${QD_ADDRESS}`);
 
   // Verify genesis
   console.log("\n[4/5] Verifying genesis allocation...");
@@ -156,16 +156,16 @@ async function main() {
     console.error(`[ABORT] Expected 5,000,000 QDs in vault, got ${ethers.formatEther(vaultBal)}`);
     process.exit(1);
   }
-  console.log("  5,000,000 QDs in Sovereign Vault ✓");
+  console.log("  5,000,000 QDs in System Vault ");
 
-  // Deploy QuantumLedger
-  console.log("\n[5/5] Deploying QuantumLedger v2...");
+  // Deploy CoreLedger
+  console.log("\n[5/5] Deploying CoreLedger v2...");
   const lFactory   = new ethers.ContractFactory(ledger.abi, ledger.bytecode, wallet);
   const lContract  = await lFactory.deploy(QD_ADDRESS);
   console.log(`  Tx: ${lContract.deploymentTransaction()?.hash}`);
   await lContract.waitForDeployment();
   const LEDGER_ADDRESS = await lContract.getAddress();
-  console.log(`  ✓  ${LEDGER_ADDRESS}`);
+  console.log(`    ${LEDGER_ADDRESS}`);
 
   // Patch .env
   console.log("\n  Updating .env...");
@@ -175,24 +175,24 @@ async function main() {
                  !l.startsWith("NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS") &&
                  !l.startsWith("NEXT_PUBLIC_CHAIN_ID"))
     .join("\n");
-  content += `\n# ── QDs Testnet (Base Sepolia 84532) — generated ${new Date().toISOString()}\n`;
+  content += `\n#  QDs Testnet (Base Sepolia 84532)  generated ${new Date().toISOString()}\n`;
   content += `NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=${QD_ADDRESS}\n`;
   content += `NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS=${LEDGER_ADDRESS}\n`;
   content += `NEXT_PUBLIC_CHAIN_ID=84532\n`;
   writeFileSync(join(ROOT, ".env"), content, "utf8");
-  console.log("  .env updated ✓");
+  console.log("  .env updated ");
 
-  console.log("\n╔══════════════════════════════════════════════════════════════╗");
-  console.log("║  TESTNET DEPLOY COMPLETE ✓                                   ║");
-  console.log("╠══════════════════════════════════════════════════════════════╣");
-  console.log(`║  QuantumDots   : ${QD_ADDRESS}`);
-  console.log(`║  QuantumLedger : ${LEDGER_ADDRESS}`);
-  console.log("╠══════════════════════════════════════════════════════════════╣");
-  console.log("║  Add these to Railway:                                       ║");
-  console.log(`║  NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=${QD_ADDRESS}`);
-  console.log(`║  NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS=${LEDGER_ADDRESS}`);
-  console.log("║  NEXT_PUBLIC_CHAIN_ID=84532                                  ║");
-  console.log("╚══════════════════════════════════════════════════════════════╝\n");
+  console.log("\n");
+  console.log("  TESTNET DEPLOY COMPLETE                                    ");
+  console.log("");
+  console.log(`  CoreDots   : ${QD_ADDRESS}`);
+  console.log(`  CoreLedger : ${LEDGER_ADDRESS}`);
+  console.log("");
+  console.log("  Add these to Railway:                                       ");
+  console.log(`  NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=${QD_ADDRESS}`);
+  console.log(`  NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS=${LEDGER_ADDRESS}`);
+  console.log("  NEXT_PUBLIC_CHAIN_ID=84532                                  ");
+  console.log("\n");
   console.log(`  BaseScan Sepolia: https://sepolia.basescan.org/address/${QD_ADDRESS}`);
   console.log(`  Ledger Sepolia  : https://sepolia.basescan.org/address/${LEDGER_ADDRESS}\n`);
 }

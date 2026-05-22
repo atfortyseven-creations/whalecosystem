@@ -12,7 +12,7 @@ interface CheckoutProps {
   onClose: () => void;
 }
 
-// FIX: Treasury sourced from env var — same correction as ClearanceView.tsx.
+// FIX: Treasury sourced from env var  same correction as ClearanceView.tsx.
 // Hardcoded treasury cannot be rotated without redeployment if compromised.
 const TARGET_TREASURY = (
     process.env.NEXT_PUBLIC_TREASURY_ADDRESS ||
@@ -21,7 +21,7 @@ const TARGET_TREASURY = (
 const TARGET_CHAIN    = 10;    // Optimism Mainnet
 const PRICE_USD       = 5.00;
 
-// Oráculo de tipo de cambio ETH → EUR y USD
+// Oráculo de tipo de cambio ETH  EUR y USD
 async function fetchCryptoRates(): Promise<{ eur: number, usd: number } | null> {
   try {
     const ctrl = new AbortController();
@@ -51,7 +51,7 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   // FIX: useId() generates a stable, SSR-safe identifier that matches
-  // between server and client render — eliminates the React hydration mismatch
+  // between server and client render  eliminates the React hydration mismatch
   // caused by Date.now() which produces different values on server vs client.
   const stableRef = useId().replace(/:/g, '').slice(0, 6).toUpperCase();
 
@@ -146,7 +146,7 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
               <div className="flex items-center gap-3 text-[#050505]/80">
                 <Terminal size={16} />
                 {/* FIX: Replaced Date.now().toString().slice(-6) with stable useId()
-                    Date.now() on server != Date.now() on client — causes React hydration
+                    Date.now() on server != Date.now() on client  causes React hydration
                     mismatch and console errors in Next.js 13+. useId() is SSR-safe. */}
                 <span className="font-mono text-[10px] uppercase tracking-[0.3em] font-black text-[#050505]/60">Clearance Ref. {stableRef}</span>
               </div>
@@ -195,13 +195,13 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
                 {/* EXACT EQUIVALENTS */}
                 <div className="flex items-center justify-center gap-8 pt-6">
                   <div className="text-center">
-                    <p className="font-mono text-sm font-black tracking-[0.1em] text-[#050505]">{rates ? ethAmount : "—"} ETH</p>
+                    <p className="font-mono text-sm font-black tracking-[0.1em] text-[#050505]">{rates ? ethAmount : ""} ETH</p>
                     <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#888888] font-bold mt-1">Monto en Cadena</p>
                   </div>
                   <div className="w-px h-8 bg-[#E5E5E5]" />
                   <div className="text-center">
                     <p className="font-mono text-sm font-black tracking-[0.1em] text-[#050505]">
-                      {rates ? `${eurEquivalent} EUR` : '—'}
+                      {rates ? `${eurEquivalent} EUR` : ''}
                     </p>
                     <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#888888] font-bold mt-1">
                       {rates ? `Ratio Oráculo Integrado` : 'Conectando...'}
@@ -224,7 +224,7 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
               {/* ACTION BUTTON */}
               {isConfirmed ? (
                 <div className="bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/30 text-center py-5 font-mono text-[10px] font-black uppercase tracking-[0.3em] rounded-xl">
-                  TRANSACCIÓN CONFIRMADA ✓
+                  TRANSACCIÓN CONFIRMADA 
                 </div>
               ) : (
                 <div className="space-y-4 pt-2">
@@ -252,7 +252,7 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
                   )}
                   {writeError && (
                     <p className="text-center text-red-500 font-mono text-[9px] uppercase tracking-[0.1em] font-bold mt-2">
-                       ❌ FONDOS INSUFICIENTES EN OPTIMISM O TRANSACCIÓN RECHAZADA.
+                        FONDOS INSUFICIENTES EN OPTIMISM O TRANSACCIÓN RECHAZADA.
                     </p>
                   )}
                 </div>

@@ -25,7 +25,7 @@ export async function getTransactionHistory(authUserId: string, options?: any) {
   const limit = options?.limit || 50;
   const offset = options?.offset || 0;
 
-  // ── UNIFICACIÓN SOBERANA DE TRIPLE FLUJO (5000T) ──────────────────────────
+  //  UNIFICACIÓN SOBERANA DE TRIPLE FLUJO (5000T) 
   // Consolidamos Ledger (Transaction), Inteligencia (WhaleActivity) y Red (BlockchainTransaction)
   const [legacy, whales, blockchain] = await Promise.all([
     prisma.transaction.findMany({

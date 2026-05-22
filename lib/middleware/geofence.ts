@@ -1,18 +1,18 @@
 /**
- * Geofencing Middleware — Axioma 295
- * ═══════════════════════════════════════════════════════════════
+ * Geofencing Middleware  Axioma 295
+ * 
  * Coercion-resistant geofencing layer.
  * - Reads Cloudflare `cf-ipcountry` header (trusted edge header)
  * - Applies OFAC/sanctioned country block list
  * - VPN/Tor/I2P detection via IP reputation (optional, non-blocking)
- * - Zero-trust: if header missing → allow (never block on uncertainty)
+ * - Zero-trust: if header missing  allow (never block on uncertainty)
  * - Coercion-resistant: no GPS, no browser API, only network-layer
- * ═══════════════════════════════════════════════════════════════
+ * 
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
-// OFAC + EU sanctions — ISO 3166-1 alpha-2
+// OFAC + EU sanctions  ISO 3166-1 alpha-2
 const BLOCKED_COUNTRIES = new Set([
   'CU', // Cuba
   'IR', // Iran
@@ -33,28 +33,28 @@ export interface GeoResult {
   allowed:   boolean;
   country:   string | null;
   reason?:   string;
-  sovereign: boolean; // true if user is using VPN/Tor (privacy-first)
+  system: boolean; // true if user is using VPN/Tor (privacy-first)
 }
 
 /**
  * Evaluate geofence for a request.
- * Never blocks on uncertainty — only blocks on confirmed blocked countries.
+ * Never blocks on uncertainty  only blocks on confirmed blocked countries.
  */
 export function evaluateGeofence(req: NextRequest): GeoResult {
   const pathname = req.nextUrl.pathname;
 
-  // Exempt paths — always allow
+  // Exempt paths  always allow
   if (EXEMPT_PATHS.has(pathname)) {
-    return { allowed: true, country: null, sovereign: false };
+    return { allowed: true, country: null, system: false };
   }
 
-  // Cloudflare trusted header — set at edge, cannot be spoofed by user
+  // Cloudflare trusted header  set at edge, cannot be spoofed by user
   const country = req.headers.get('cf-ipcountry') ?? null;
 
-  // If no country header (not behind Cloudflare) — allow, don't block
+  // If no country header (not behind Cloudflare)  allow, don't block
   if (!country || country === 'XX' || country === 'T1') {
     // T1 = Tor exit node in Cloudflare's classification
-    return { allowed: true, country, sovereign: true };
+    return { allowed: true, country, system: true };
   }
 
   if (BLOCKED_COUNTRIES.has(country)) {
@@ -62,15 +62,15 @@ export function evaluateGeofence(req: NextRequest): GeoResult {
       allowed:   false,
       country,
       reason:    `Access restricted in ${country} per OFAC/EU sanctions compliance`,
-      sovereign: false,
+      system: false,
     };
   }
 
-  return { allowed: true, country, sovereign: false };
+  return { allowed: true, country, system: false };
 }
 
 /**
- * Next.js middleware integration — call from middleware.ts
+ * Next.js middleware integration  call from middleware.ts
  */
 export function applyGeofence(
   req:   NextRequest,
@@ -94,9 +94,9 @@ export function applyGeofence(
 
   const response = next();
 
-  // Inject sovereign signal header for client awareness (no PII)
-  if (result.sovereign) {
-    response.headers.set('X-Sovereign-Network', '1');
+  // Inject system signal header for client awareness (no PII)
+  if (result.system) {
+    response.headers.set('X-System-Network', '1');
   }
 
   return response;

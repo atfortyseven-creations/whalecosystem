@@ -27,7 +27,7 @@ export function CWIProvider({ children }: { children: React.ReactNode }) {
   const [nexusData, setNexusData] = useState<any>(null);
   const [nexusResolve, setNexusResolve] = useState<any>(null);
 
-  // No default identity — user must create or import a wallet
+  // No default identity  user must create or import a wallet
 
   const getPublicKey = useCallback(async () => {
     return identity?.getPublicKey() || '';

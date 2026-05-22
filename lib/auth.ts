@@ -41,7 +41,7 @@ export function generateVerificationCode(): string {
  * 
  * PURGED: Google, Email, and Password providers.
  * Only SIWE and QR Handshake identities are supported to ensure 
- * 100% non-custodial sovereignty.
+ * 100% non-custodial systemty.
  */
 export const authOptions: NextAuthOptions = {
   providers: [

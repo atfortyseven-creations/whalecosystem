@@ -71,7 +71,7 @@ npx hardhat run scripts/deploy-zap-gasless.ts --network baseSepolia
 7. **Generate Domain**: Go to `Settings` -> `Networking` and click `Generate Domain` to get your public URL.
 8. **Check Prisma (If using PostgreSQL)**: If you are not using MongoDB/Supabase, make sure to add a Database Service in Railway, and link its `DATABASE_URL` to your app service.
 
-**Required Variables for Sovereign Terminal:**
+**Required Variables for System Terminal:**
 ```bash
 NEXT_PUBLIC_SITE_URL="https://your-domain.up.railway.app"
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your_wallet_connect_id"
@@ -87,7 +87,7 @@ PRISMA_GENERATE_DATAPROXY="true"
 
 1. Visit your Railway URL
 2. Open Network Tab (F12) to ensure WebSockets connect without 502 errors.
-3. Connect your wallet using the Sovereign QR Handshake.
+3. Connect your wallet using the System QR Handshake.
 4. Verify market telemetry is streaming in.
 
 ---

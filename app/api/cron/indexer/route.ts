@@ -1,7 +1,7 @@
 /**
  * GET /api/cron/indexer
  *
- * Railway Cron Job endpoint — triggered every 15 seconds by Railway's scheduler.
+ * Railway Cron Job endpoint  triggered every 15 seconds by Railway's scheduler.
  * Runs all aggregation cycles to pre-index data from the 1TB PostgreSQL store into Redis.
  *
  * Security: Protected by CRON_SECRET header (set in Railway env vars).

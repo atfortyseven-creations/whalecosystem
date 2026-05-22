@@ -11,7 +11,7 @@ export interface PrivyAppConfig {
 }
 
 const PRIVY_APPS: PrivyAppConfig[] = [
-    // ── Original Apps ────────────────────────────────────────────────────────
+    //  Original Apps 
     {
         appId: 'cmpefwexw00b00cjvngj1bmzs',
         jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpefwexw00b00cjvngj1bmzs/jwks.json'
@@ -24,7 +24,7 @@ const PRIVY_APPS: PrivyAppConfig[] = [
         appId: 'cmpefovkg008o0bl7ddzo3bhj',
         jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpefovkg008o0bl7ddzo3bhj/jwks.json'
     },
-    // ── Expansion Apps (500 MAU each) ─────────────────────────────────────────
+    //  Expansion Apps (500 MAU each) 
     {
         appId: 'cmpftp6px00ip0cl47m7nuqvg',
         jwksUrl: 'https://auth.privy.io/api/v1/apps/cmpftp6px00ip0cl47m7nuqvg/jwks.json'

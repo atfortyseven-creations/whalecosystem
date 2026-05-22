@@ -24,7 +24,7 @@ export default function AtomicPortfolioShare() {
 
   return (
     <div onDrop={handleDrop} onDragOver={e => e.preventDefault()} className="border border-dashed border-white/30 p-6 rounded-3xl text-center">
-      Arrastra tu posición on-chain aquí → se incrusta como rich media zk-proven en el chat
+      Arrastra tu posición on-chain aquí  se incrusta como rich media zk-proven en el chat
     </div>
   );
 }

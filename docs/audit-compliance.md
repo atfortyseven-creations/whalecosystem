@@ -12,11 +12,11 @@ Whale Alert Network operates under the following regulatory constraints:
 The Commodity Futures Trading Commission (CFTC) has asserted jurisdiction over prediction markets involving U.S. persons. Accordingly, all Polymarket data endpoints, trading routes, and signal feeds that could constitute prediction market access are geofenced against U.S.-based IP addresses.
 
 **Blocked jurisdictions for regulated routes (`/api/polymarket/*`, `/trade/*`):**
-- 🇺🇸 United States (`US`)
-- 🇨🇺 Cuba (`CU`)
-- 🇮🇷 Iran (`IR`)
-- 🇰🇵 North Korea (`KP`)
-- 🇸🇾 Syria (`SY`)
+-  United States (`US`)
+-  Cuba (`CU`)
+-  Iran (`IR`)
+-  North Korea (`KP`)
+-  Syria (`SY`)
 
 The geofence reads jurisdiction from two independent sources and applies the stricter result:
 - `x-vercel-ip-country` (Vercel Edge Network)
@@ -37,26 +37,26 @@ Trading routes are protected by a full Know Your Customer verification flow. The
 
 ```
 User navigates to /trade
-        │
-        ▼
+        
+        
 Middleware: is kyc_token cookie present?
-        │
-   YES  │  NO
-        │   └──→ Redirect to /verify-human
-        ▼          │
-JWT signature      ▼
+        
+   YES    NO
+            Redirect to /verify-human
+                  
+JWT signature      
 verification    WorldID Proof submitted
-        │          │
-   VALID│          ▼
-        │       Server verifies proof
-        ▼          │
-Access granted  APPROVED → JWT minted
-                   │
-                   ▼
+                  
+   VALID          
+               Server verifies proof
+                  
+Access granted  APPROVED  JWT minted
+                   
+                   
                kyc_token cookie set
                (HttpOnly, Secure, SameSite=Strict)
-                   │
-                   ▼
+                   
+                   
                Redirect back to /trade
 ```
 
@@ -89,8 +89,8 @@ The signing key (`KYC_SECRET`) is:
 
 All security-relevant events generate structured audit log entries. Logs are append-only and stored in two locations:
 
-1. **Structured JSON logs** → collected by Railway's log aggregator
-2. **Database AuditLog table** → PostgreSQL, retained for 7 years (regulatory requirement)
+1. **Structured JSON logs**  collected by Railway's log aggregator
+2. **Database AuditLog table**  PostgreSQL, retained for 7 years (regulatory requirement)
 
 ### AuditLog Schema
 
@@ -150,7 +150,7 @@ model AuditLog {
 
 ## Right to Deletion
 
-Users may request complete data deletion via the **Settings → Privacy → Delete My Data** flow. Upon confirmation:
+Users may request complete data deletion via the **Settings  Privacy  Delete My Data** flow. Upon confirmation:
 
 1. All Prisma database records linked to the wallet address are deleted
 2. Redis session keys are purged immediately
@@ -171,12 +171,12 @@ The Whale Alert Network platform undergoes security assessment continuously. The
 - Infrastructure security (Railway, Redis, PostgreSQL configuration)
 - Dependency vulnerability scanning (via automated npm audit in CI/CD pipeline)
 
-Security researchers who discover vulnerabilities are encouraged to report them responsibly. See [Security Architecture → Incident Response](./security-architecture.md#incident-response) for contact information.
+Security researchers who discover vulnerabilities are encouraged to report them responsibly. See [Security Architecture  Incident Response](./security-architecture.md#incident-response) for contact information.
 
 ---
 
 ## Disclaimer
 
-Whale Alert Network provides market intelligence data for **educational and informational purposes only**. Nothing on this platform constitutes financial advice, investment recommendations, or solicitation to trade. Past signal performance does not guarantee future results. Users are responsible for understanding the regulatory requirements of their jurisdiction before accessing any feature of the platform.
+Whale Alert Network provides market analytics data for **educational and informational purposes only**. Nothing on this platform constitutes financial advice, investment recommendations, or solicitation to trade. Past signal performance does not guarantee future results. Users are responsible for understanding the regulatory requirements of their jurisdiction before accessing any feature of the platform.
 
 **NO RELIANCE / EDUCATIONAL PURPOSES ONLY**

@@ -71,7 +71,7 @@ export default function AdvancedAnalytics({ walletAddress, isPremium, hasTrialed
     
     try {
       const refreshQuery = isManual ? '?refresh=true' : '';
-      const statsRes = await fetch(`/api/wallet/intelligence/${walletAddress}${refreshQuery}`);
+      const statsRes = await fetch(`/api/wallet/analytics/${walletAddress}${refreshQuery}`);
       
       if (!statsRes.ok) {
          throw new Error(`API Error: ${statsRes.status}`);
@@ -110,7 +110,7 @@ export default function AdvancedAnalytics({ walletAddress, isPremium, hasTrialed
         influenceScore: statsData.influenceScore || 0
       });
     } catch (e: any) {
-      console.error("Failed to fetch intelligence data", e);
+      console.error("Failed to fetch analytics data", e);
       setPortfolioData((prev: any) => ({ 
         ...prev, 
         loading: false, 
@@ -126,7 +126,7 @@ export default function AdvancedAnalytics({ walletAddress, isPremium, hasTrialed
     // [FAST-SYNC] Refresh basic stats every 5 seconds for "al segundo" feel
     const fastRefresh = async () => {
         try {
-            const statsRes = await fetch(`/api/wallet/intelligence/${walletAddress}`);
+            const statsRes = await fetch(`/api/wallet/analytics/${walletAddress}`);
             const statsData = await statsRes.json();
             setPortfolioData((prev: any) => ({
                 ...prev,
@@ -263,7 +263,7 @@ export default function AdvancedAnalytics({ walletAddress, isPremium, hasTrialed
                   </div>
                   {portfolioData.entityInfo && (
                     <div className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.1em]">
-                      Protocolo: {portfolioData.entityInfo.protocol} • {portfolioData.entityInfo.type}
+                      Protocolo: {portfolioData.entityInfo.protocol}  {portfolioData.entityInfo.type}
                     </div>
                   )}
                   {portfolioData.smartMoneyMetrics && (
@@ -561,7 +561,7 @@ function StatCard({ title, value, icon, trend, subtitle }: { title: string; valu
       )}
       {trend === undefined && (
         <div className="text-[10px] font-bold text-blue-500/60 uppercase tracking-tighter">
-          {subtitle || '• Real-Time Sync'}
+          {subtitle || ' Real-Time Sync'}
         </div>
       )}
     </motion.div>

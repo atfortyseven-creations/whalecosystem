@@ -3,13 +3,13 @@
 import { motion } from 'framer-motion';
 
 /**
- * CelestialMeshBackground — Sovereign Wallpaper System, v2
+ * CelestialMeshBackground  System Wallpaper System, v2
  *
  * Layer stack:
  *   L0  Institutional ivory base (#FAF9F6)
- *   L1  Patron Cosmico 4K — slow parallax drift, opacity 6%, multiply blend
- *   L2  Hokusai 4K — bottom-anchored, full-width, natural aspect ratio
- *   L3  Gradient vignette — top-to-bottom for typography legibility
+ *   L1  Patron Cosmico 4K  slow parallax drift, opacity 6%, multiply blend
+ *   L2  Hokusai 4K  bottom-anchored, full-width, natural aspect ratio
+ *   L3  Gradient vignette  top-to-bottom for typography legibility
  *
  * The patron-cosmico pattern drifts at a perceptible but non-distracting
  * velocity: 32-second cycle, 50px horizontal / 30px vertical displacement.
@@ -34,7 +34,7 @@ export function CelestialMeshBackground({
             className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
             style={{ backgroundColor: baseColor }}
         >
-            {/* ── L1: Patron Cosmico — animated parallax drift ──────────────── */}
+            {/*  L1: Patron Cosmico  animated parallax drift  */}
             {/*
              * The pattern tile occupies 140% of the container so drift never
              * exposes the base color at the edges. The motion is a smooth
@@ -64,9 +64,9 @@ export function CelestialMeshBackground({
                 }}
             />
 
-            {/* ── L2: Hokusai Great Wave — bottom-locked, zero-zoom ─────────── */}
+            {/*  L2: Hokusai Great Wave  bottom-locked, zero-zoom  */}
             {/*
-             * height: auto preserves native aspect ratio — the wave sits
+             * height: auto preserves native aspect ratio  the wave sits
              * naturally at the bottom without zoom, crop or distortion.
              * translateZ(0) promotes to a GPU compositor layer.
              */}
@@ -89,7 +89,7 @@ export function CelestialMeshBackground({
                 }}
             />
 
-            {/* ── L3: Top-bottom vignette for headline legibility ───────────── */}
+            {/*  L3: Top-bottom vignette for headline legibility  */}
             <div
                 className="absolute inset-0 z-[3]"
                 style={{

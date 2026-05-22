@@ -117,7 +117,7 @@ export class NewsDataService {
         } else if (cat === 'crypto') {
             params.set('q', 'crypto OR blockchain OR web3');
         } else if (cat === 'ai') {
-            params.set('q', 'artificial intelligence OR openai OR ai tech');
+            params.set('q', 'artificial analytics OR openai OR ai tech');
         } else if (cat === 'macro') {
             params.set('q', 'economy OR inflation OR fed rate');
         } else {

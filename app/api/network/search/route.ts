@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { searchAnalyticsService } from '@/lib/services/SearchAnalyticsService';
 
 /**
- * 🔥 LEGENDARY SEARCH API 🔥
+ *  LEGENDARY SEARCH API 
  * Unified discovery for Addresses and Transaction Hashes
  */
 export async function GET(req: NextRequest) {

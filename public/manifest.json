@@ -1,7 +1,7 @@
 {
   "name": "Whale Alert Network",
   "short_name": "Whale",
-  "description": "Institutional on-chain intelligence. Real-time mempool surveillance. Cryptographic identity. Zero-mock. Zero-trust.",
+  "description": "Institutional on-chain analytics. Real-time mempool surveillance. Cryptographic identity. Zero-mock. Zero-trust.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -67,21 +67,21 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Whale Alert Network — Desktop"
+      "label": "Whale Alert Network  Desktop"
     },
     {
       "src": "/system-shots/Captura de pantalla 2026-05-07 012904.png",
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Whale Alert Network — Mobile"
+      "label": "Whale Alert Network  Mobile"
     }
   ],
   "shortcuts": [
     {
       "name": "Dashboard",
       "short_name": "Terminal",
-      "description": "Open the intelligence terminal",
+      "description": "Open the analytics terminal",
       "url": "/dashboard",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },

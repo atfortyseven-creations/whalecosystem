@@ -1,17 +1,17 @@
 "use client";
-// WhaleDashboard v3 — 11 tabs, KYC removed
+// WhaleDashboard v3  11 tabs, KYC removed
 import React, { useState } from 'react';
 
 import { WhaleProShell }         from '@/components/dashboard/WhaleProShell';
 import { DashboardErrorBoundary } from '@/components/dashboard/DashboardErrorBoundary';
 import { useSearchParams }        from 'next/navigation';
-import { useSovereignAccount }    from '@/hooks/useSovereignAccount';
+import { useSystemAccount }    from '@/hooks/useSystemAccount';
 import dynamic                    from 'next/dynamic';
 
-// ── Static imports (lightweight) ──────────────────────────────────────────────
+//  Static imports (lightweight) 
 import { GoldTicketPanel }    from '@/components/dashboard/GoldTicketPanel';
 
-// ── Dynamic imports (Heavy tabs, mounted only when clicked) ────────────────────
+//  Dynamic imports (Heavy tabs, mounted only when clicked) 
 const LoadingPanel = () => (
   <div className="w-full h-full min-h-[400px] flex items-center justify-center bg-transparent">
     <div className="w-6 h-6 border-2 border-[#050505] dark:border-white border-t-transparent rounded-full animate-spin" />
@@ -41,14 +41,14 @@ import "@/app/dashboard/dashboard.css";
 
 export default function WhaleDashboard() {
     const searchParams = useSearchParams();
-    const { address, isConnected, isZkVerified: hasPassedZK, isChecking: isCheckingZK } = useSovereignAccount();
+    const { address, isConnected, isZkVerified: hasPassedZK, isChecking: isCheckingZK } = useSystemAccount();
     const initialTab = searchParams.get('tab') || 'gold';
     const [activeTab, setActiveTab] = useState<string>(initialTab);
 
-    // [SOVEREIGN-GATE] Cryptographic verification is now handled centrally via useSovereignAccount
+    // [SOVEREIGN-GATE] Cryptographic verification is now handled centrally via useSystemAccount
     // which polls the server in the background for mobile handoff completion.
 
-    // ── Sync URL param to state ──────────────────────────────────────────
+    //  Sync URL param to state 
     React.useEffect(() => {
         const tab = searchParams.get('tab');
         if (tab && tab !== activeTab) {
@@ -57,7 +57,7 @@ export default function WhaleDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]);
 
-    // ── Enforce valid tabs (Legacy Redirects) ───────────────────────────
+    //  Enforce valid tabs (Legacy Redirects) 
     React.useEffect(() => {
         const LEGACY_TABS = [
             'dashboard', 'watchlist', 'firehose', 'sov-intel', 'live-port',
@@ -71,7 +71,7 @@ export default function WhaleDashboard() {
     }, [activeTab]);
 
 
-    // ── Panel Refresh Key ────────────────────────────────────────────────
+    //  Panel Refresh Key 
     // Every time the user switches tabs OR returns to the page after it was
     // hidden (phone lock, switching apps, long idle), refreshKey increments.
     // This key is appended to every DashboardErrorBoundary, forcing React to
@@ -107,7 +107,7 @@ export default function WhaleDashboard() {
 
     const renderTabContent = () => {
         switch (activeTab) {
-            // Legacy redirects → Gold Ticket
+            // Legacy redirects  Gold Ticket
             case 'zk-identity':
                 return <div className={PANEL}><DashboardErrorBoundary key={`gold-redirect-${refreshKey}`}><GoldTicketPanel /></DashboardErrorBoundary></div>;
 

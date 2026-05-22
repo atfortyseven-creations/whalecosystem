@@ -7,7 +7,7 @@ include "../../node_modules/circomlib/circuits/poseidon.circom";
  * 
  * Verifies that a given CosmicEntity was genuinely spawned by a specific Whale Event
  * without revealing the precise exact parameters of the transaction to the public
- * if the user chooses to shield it via Sovereign Vault.
+ * if the user chooses to shield it via System Vault.
  * 
  * Flow (Future Phase):
  * 1. User provides raw event data (txHash, amountUSD) as private inputs.

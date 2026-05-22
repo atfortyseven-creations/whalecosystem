@@ -34,7 +34,7 @@ export function classifyTransaction(tx: any): BlockType {
     const outputCount = tx.outputs?.length || tx.vout?.length || 0;
     const outputs = tx.outputs || tx.vout || [];
 
-    // Consolidation: Many inputs → 1 output
+    // Consolidation: Many inputs  1 output
     if (inputCount > 5 && outputCount === 1) {
         return 'consolidation';
     }

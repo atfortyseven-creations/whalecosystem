@@ -5,9 +5,9 @@ import { prisma } from '@/lib/prisma';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// AKASHIC LEDGER — /api/akashic
-// The immutable, tamper-evident registry of sovereign capital movements.
+// 
+// AKASHIC LEDGER  /api/akashic
+// The immutable, tamper-evident registry of system capital movements.
 //
 // ARCHITECTURE:
 //   1. PRIMARY: Query live WhaleActivity records > $50M from PostgreSQL (Railway)
@@ -16,21 +16,21 @@ export const dynamic = 'force-dynamic';
 // Each entry carries a SHA-256 hash computed from all critical fields.
 // If any field is modified, the hash will fail verification on the client.
 // This is the Zero-Mock Mandate made cryptographically enforceable.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 const AKASHIC_THRESHOLD_USD = 50_000_000; // $50M minimum for Akashic entry
 
-// ── Curated historical registry (editorial-grade, used as fallback) ───────────
+//  Curated historical registry (editorial-grade, used as fallback) 
 const CURATED_REGISTRY = [
-  { id: '00001', chain: 'ETH', amount: '$2.4B', amountUsd: 2_400_000_000, from: '0x3f91…8D2a', to: '0xCb77…F01e', editorial: 'First recorded movement of >$2B in a single Ethereum transaction. Institutional repositioning detected 4 minutes before public mempool propagation.', timestamp: '2026-01-12T08:14:22Z', blockNumber: 21_847_332, source: 'CURATED' },
-  { id: '00002', chain: 'SOL',  amount: '$890M', amountUsd: 890_000_000,   from: 'DtSJ8…vKq2',  to: '9fmXr…W3nP',  editorial: 'Solana dark pool consolidation at peak network congestion. Mempool signal: 9 minutes pre-clearance. Z-score deviation: 4.8σ above 30-day average.',      timestamp: '2026-01-29T21:30:07Z', blockNumber: 312_441_009,  source: 'CURATED' },
-  { id: '00003', chain: 'BTC',  amount: '$1.7B', amountUsd: 1_700_000_000, from: '1A1zP…GKDT', to: 'bc1qg…m44k', editorial: 'First Bitcoin movement exceeding $1.5B since 2024 halving. Temporal correlation with US Treasury bond auction: 43 minutes. Classified as macro-hedge repositioning.', timestamp: '2026-02-14T14:00:00Z', blockNumber: 884_201,        source: 'CURATED' },
-  { id: '00004', chain: 'OP',   amount: '$340M', amountUsd: 340_000_000,   from: '0xF4aB…9c01', to: '0x2eD3…4A77', editorial: 'Largest single Optimism L2 transfer in recorded history. ZK state transition verified by Whale Alert Network sentinel nodes.', timestamp: '2026-03-03T06:44:11Z', blockNumber: 128_904_554, source: 'CURATED' },
-  { id: '00005', chain: 'ARB',  amount: '$612M', amountUsd: 612_000_000,   from: '0x8bC1…D5f9', to: '0x5a2F…E8b3', editorial: 'Arbitrum bridge exit at maximum velocity. Cross-chain capital migration pattern matched 2022 de-risking signature.', timestamp: '2026-03-19T17:22:55Z', blockNumber: 298_774_312, source: 'CURATED' },
+  { id: '00001', chain: 'ETH', amount: '$2.4B', amountUsd: 2_400_000_000, from: '0x3f918D2a', to: '0xCb77F01e', editorial: 'First recorded movement of >$2B in a single Ethereum transaction. Institutional repositioning detected 4 minutes before public mempool propagation.', timestamp: '2026-01-12T08:14:22Z', blockNumber: 21_847_332, source: 'CURATED' },
+  { id: '00002', chain: 'SOL',  amount: '$890M', amountUsd: 890_000_000,   from: 'DtSJ8vKq2',  to: '9fmXrW3nP',  editorial: 'Solana dark pool consolidation at peak network congestion. Mempool signal: 9 minutes pre-clearance. Z-score deviation: 4.8σ above 30-day average.',      timestamp: '2026-01-29T21:30:07Z', blockNumber: 312_441_009,  source: 'CURATED' },
+  { id: '00003', chain: 'BTC',  amount: '$1.7B', amountUsd: 1_700_000_000, from: '1A1zPGKDT', to: 'bc1qgm44k', editorial: 'First Bitcoin movement exceeding $1.5B since 2024 halving. Temporal correlation with US Treasury bond auction: 43 minutes. Classified as macro-hedge repositioning.', timestamp: '2026-02-14T14:00:00Z', blockNumber: 884_201,        source: 'CURATED' },
+  { id: '00004', chain: 'OP',   amount: '$340M', amountUsd: 340_000_000,   from: '0xF4aB9c01', to: '0x2eD34A77', editorial: 'Largest single Optimism L2 transfer in recorded history. ZK state transition verified by Whale Alert Network sentinel nodes.', timestamp: '2026-03-03T06:44:11Z', blockNumber: 128_904_554, source: 'CURATED' },
+  { id: '00005', chain: 'ARB',  amount: '$612M', amountUsd: 612_000_000,   from: '0x8bC1D5f9', to: '0x5a2FE8b3', editorial: 'Arbitrum bridge exit at maximum velocity. Cross-chain capital migration pattern matched 2022 de-risking signature.', timestamp: '2026-03-19T17:22:55Z', blockNumber: 298_774_312, source: 'CURATED' },
 ];
 
-// ── SHA-256 Tamper-Evident Hash ───────────────────────────────────────────────
-// All critical fields are included. Changing ANY field → hash mismatch.
+//  SHA-256 Tamper-Evident Hash 
+// All critical fields are included. Changing ANY field  hash mismatch.
 function computeAkashicHash(fields: {
   id: string; chain: string; amountUsd: number;
   from: string; to: string; timestamp: string; blockNumber: number | string;
@@ -43,7 +43,7 @@ function computeAkashicHash(fields: {
   return createHash('sha256').update(canonical, 'utf8').digest('hex');
 }
 
-// ── Format a live WhaleActivity row as an Akashic entry ─────────────────────
+//  Format a live WhaleActivity row as an Akashic entry 
 function formatLiveEntry(row: any, index: number) {
   const amountUsd = parseFloat(row.usdValue) || 0;
   const id = String(index + 1).padStart(5, '0');
@@ -59,13 +59,13 @@ function formatLiveEntry(row: any, index: number) {
     chain: row.chain,
     amount: `$${(amountUsd / 1_000_000).toFixed(1)}M`,
     amountUsd,
-    from: fromAddr.length > 12 ? `${fromAddr.slice(0, 6)}…${fromAddr.slice(-4)}` : fromAddr,
-    to:   toAddr.length   > 12 ? `${toAddr.slice(0, 6)}…${toAddr.slice(-4)}`   : toAddr,
+    from: fromAddr.length > 12 ? `${fromAddr.slice(0, 6)}${fromAddr.slice(-4)}` : fromAddr,
+    to:   toAddr.length   > 12 ? `${toAddr.slice(0, 6)}${toAddr.slice(-4)}`   : toAddr,
     token: row.token,
     type: row.type,
     institutional: row.institutional,
     editorial: row.institutional
-      ? `Institutional capital movement detected on ${row.chain}. Transfer exceeds $50M sovereign threshold. Classified as ${row.type}.`
+      ? `Institutional capital movement detected on ${row.chain}. Transfer exceeds $50M system threshold. Classified as ${row.type}.`
       : `Large capital movement on ${row.chain}. Token: ${row.token}. Type: ${row.type}.`,
     timestamp,
     blockNumber,
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   const verify = searchParams.get('verify'); // If set, verify hash of a specific entry
 
   try {
-    // ── 1. Query live Akashic-grade events from PostgreSQL ──────────────────
+    //  1. Query live Akashic-grade events from PostgreSQL 
     const where: any = {
       ...(chain ? { chain } : {}),
     };
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
     const paginated  = qualifying.slice(offset, offset + limit);
     const liveEntries = paginated.map((row, i) => formatLiveEntry(row, offset + i));
 
-    // ── 2. Determine data source strategy ───────────────────────────────────
+    //  2. Determine data source strategy 
     const useLive = liveEntries.length > 0;
 
     const records = useLive
@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
       ? totalLive
       : CURATED_REGISTRY.filter(r => !chain || r.chain === chain).length;
 
-    // ── 3. Integrity verification mode ──────────────────────────────────────
+    //  3. Integrity verification mode 
     if (verify) {
       const entry = records.find(r => r.id === verify || r.hash === verify);
       if (!entry) {
@@ -165,7 +165,7 @@ export async function GET(req: NextRequest) {
 
   } catch (err: any) {
     console.error('[Akashic:ERROR]', err?.message);
-    // Fail open with curated data — never expose internal errors
+    // Fail open with curated data  never expose internal errors
     const fallback = CURATED_REGISTRY
       .filter(r => !chain || r.chain === chain)
       .slice(offset, offset + limit)
@@ -184,7 +184,7 @@ export async function GET(req: NextRequest) {
       total: fallback.length,
       records: fallback,
       lastUpdated: new Date().toISOString(),
-      _dbError: true, // Internal flag for monitoring — doesn't expose msg
+      _dbError: true, // Internal flag for monitoring  doesn't expose msg
     });
   }
 }

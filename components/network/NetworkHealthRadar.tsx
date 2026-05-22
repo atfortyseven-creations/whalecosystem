@@ -54,7 +54,7 @@ function computeHealthMetrics(
 
   // --- Block Time Health: deviation from 10min target ---
   const avgBlockTime = 10; // We don't have live data here, use target as baseline
-  const blockTimeScore = 85; // Static good score — ideally pull from avgBlockTimeMin
+  const blockTimeScore = 85; // Static good score  ideally pull from avgBlockTimeMin
 
   return {
     hashrateSecurity: Math.round(hashrateScore),

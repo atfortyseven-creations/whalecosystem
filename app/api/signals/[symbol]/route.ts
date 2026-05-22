@@ -6,7 +6,7 @@ import { signalEngine } from '@/lib/signals/SignalEngine';
  * 
  * Returns AI-generated trading signal for the specified symbol
  * 
- * Example: /api/signals/WLDUSDT
+ * Example: /api/signals/AUTHUSDT
  * 
  * Response includes:
  * - Direction (LONG/SHORT/NEUTRAL)

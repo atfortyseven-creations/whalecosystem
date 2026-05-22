@@ -1,6 +1,6 @@
 // lib/workers/btc-worker.ts
-// BTC Worker — 100% on-chain data via Mempool.space + CoinGecko
-// Unified Institutional Intelligence
+// BTC Worker  100% on-chain data via Mempool.space + CoinGecko
+// Unified Institutional Analytics
 
 import db from '@/lib/db';
 
@@ -9,8 +9,8 @@ const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 const MIN_USD_VALUE = 50_000_000;   // $50M institutional threshold
 const POLL_INTERVAL = 60_000;       // review every 60s
 
-// ─── Map of known institutional entities ──────────────────────────────
-// ─── Map of known institutional entities with elite metadata ──────
+//  Map of known institutional entities 
+//  Map of known institutional entities with elite metadata 
 const INSTITUTIONAL_WALLETS: Record<string, { name: string; sector: string; confirmed: boolean }> = {
   'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh': { name: 'MicroStrategy', sector: 'CORPORATE', confirmed: true },
   '1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ':          { name: 'MicroStrategy', sector: 'CORPORATE', confirmed: true },
@@ -26,7 +26,7 @@ const INSTITUTIONAL_WALLETS: Record<string, { name: string; sector: string; conf
   '3K6m8sc9p68etajv983mqfghst0euhscck':          { name: 'MicroStrategy (Cold)', sector: 'CORPORATE', confirmed: true },
 };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+//  Types 
 interface MempoolTx {
   txid:   string;
   vin:    Array<{ prevout: { scriptpubkey_address: string; value: number } }>;
@@ -34,10 +34,10 @@ interface MempoolTx {
   status: { confirmed: boolean; block_height: number; block_time: number };
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-  if (!res.ok) throw new Error(`HTTP ${res.status} — ${url}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}  ${url}`);
   return res.json() as Promise<T>;
 }
 
@@ -57,15 +57,15 @@ async function getLatestBlockHeight(): Promise<number> {
   return parseInt(await res.text(), 10);
 }
 
-// ─── Deterministic Sovereign ID Generator ───────────────────────────────────
-function generateSovereignId(txHash: string): string {
+//  Deterministic System ID Generator 
+function generateSystemId(txHash: string): string {
   const seg1 = txHash.slice(0, 4).toUpperCase();
   const seg2 = txHash.slice(4, 8).toUpperCase();
   const seg3 = txHash.slice(8, 14).toUpperCase();
   return `SOV-${seg1}-${seg2}-${seg3}`;
 }
 
-// ─── Institutional Attribution ────────────────────────────────────────────────
+//  Institutional Attribution 
 function attributeTransaction(tx: MempoolTx) {
   const fromAddresses = tx.vin.map(v => v.prevout?.scriptpubkey_address).filter(Boolean);
   const toAddresses   = tx.vout.map(o => o.scriptpubkey_address).filter(Boolean);
@@ -86,7 +86,7 @@ function attributeTransaction(tx: MempoolTx) {
   return { entity: 'Unknown Whale', institutional: false, metadata: { sector: 'RETAIL' } };
 }
 
-// ─── Processor ───────────────────────────────────────────────────────────────
+//  Processor 
 export async function scanBlock(height: number, btcPrice: number) {
   try {
     const blockHashRes = await fetch(`${MEMPOOL_API}/block-height/${height}`);
@@ -104,7 +104,7 @@ export async function scanBlock(height: number, btcPrice: number) {
 
       if (valueUSD >= MIN_USD_VALUE) {
         const attribution = attributeTransaction(tx);
-        const immutableId = generateSovereignId(txid);
+        const immutableId = generateSystemId(txid);
 
         await db.whaleActivity.upsert({
           where: { transactionHash: txid },
@@ -136,7 +136,7 @@ export async function scanBlock(height: number, btcPrice: number) {
   }
 }
 
-// ─── Start ───────────────────────────────────────────────────────────────────
+//  Start 
 export async function initBtcHistorian() {
   console.log('[BTC-HISTORIAN] Initializing Permanent Historian Node...');
   

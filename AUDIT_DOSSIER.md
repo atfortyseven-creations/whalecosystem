@@ -1,9 +1,9 @@
-# 🛡️ Whale Ecosystem Audit Dossier (Q4 2026 Trail of Bits Prep)
+# ️ Whale Ecosystem Audit Dossier (Q4 2026 Trail of Bits Prep)
 
 This document maps the exact threat surface and invariant requirements for the formal auditing of the Whale Ecosystem.
 
 ## 1. System Overview
-**Project:** Whale Sovereign Intelligence Network
+**Project:** Whale System Analytics Network
 **Target Network:** Base (L2) / Polygon (L2) / Eigenlayer (L1)
 **Scope:** 
 - `WhaleDeadmanSwitch.sol`
@@ -13,7 +13,7 @@ This document maps the exact threat surface and invariant requirements for the f
 
 ## 2. Roles and Permissions
 1. **Admin / Architect (Multisig):** Can pause AVS operations, adjust time-lock durations, and slash Byzantine AVS nodes.
-2. **AVS Node (Sovereign Array):** Mocks ZK-SNARK verifiers and signs off on mathematical `G(t)/E(t)` thermodynamic metrics.
+2. **AVS Node (System Array):** Mocks ZK-SNARK verifiers and signs off on mathematical `G(t)/E(t)` thermodynamic metrics.
 3. **Backup Heir:** Has 0 permissions until the Deadman Switch timer hits zero, at which point they can claim control.
 
 ## 3. Formal Invariants & Slither Configuration

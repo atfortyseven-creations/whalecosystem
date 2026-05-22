@@ -80,7 +80,7 @@ export const LottiePlayer = ({
                 instanceRef.current = null;
             }
         };
-    // speed intentionally excluded — handled by dedicated effect below
+    // speed intentionally excluded  handled by dedicated effect below
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [animationData, loop, autoplay]);
 

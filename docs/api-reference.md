@@ -32,14 +32,14 @@ Returns the most recent whale events passing the anomaly threshold.
 
 | Param | Type | Required | Description |
 |---|---|---|---|
-| `network` | string | ✅ | `ethereum` \| `polygon` \| `base` \| `arbitrum` \| `optimism` \| `bsc` \| `worldchain` |
-| `minUsd` | number | ❌ | Minimum USD value (default: `500000`) |
-| `maxUsd` | number | ❌ | Maximum USD value filter |
-| `token` | string | ❌ | Token symbol filter (e.g. `USDC`, `ETH`) |
-| `direction` | string | ❌ | `exchange_inflow` \| `exchange_outflow` \| `wallet_to_wallet` \| `contract_interaction` \| `bridge` |
-| `confirmed` | boolean | ❌ | `true` = confirmed only, `false` = mempool only, omit = both (ELITE+) |
-| `limit` | number | ❌ | Results per page, max `100` (default: `20`) |
-| `page` | number | ❌ | Page number (default: `1`) |
+| `network` | string |  | `ethereum` \| `polygon` \| `base` \| `arbitrum` \| `optimism` \| `bsc` \| `worldchain` |
+| `minUsd` | number |  | Minimum USD value (default: `500000`) |
+| `maxUsd` | number |  | Maximum USD value filter |
+| `token` | string |  | Token symbol filter (e.g. `USDC`, `ETH`) |
+| `direction` | string |  | `exchange_inflow` \| `exchange_outflow` \| `wallet_to_wallet` \| `contract_interaction` \| `bridge` |
+| `confirmed` | boolean |  | `true` = confirmed only, `false` = mempool only, omit = both (ELITE+) |
+| `limit` | number |  | Results per page, max `100` (default: `20`) |
+| `page` | number |  | Page number (default: `1`) |
 
 **Response `200`:**
 ```json
@@ -84,15 +84,15 @@ Query historical whale events. Available to PRO and ELITE plans.
 
 | Param | Type | Required | Description |
 |---|---|---|---|
-| `network` | string | ✅ | Network filter |
-| `from` | string | ✅ | ISO 8601 start date |
-| `to` | string | ✅ | ISO 8601 end date (max range: 90 days for PRO, unlimited for ELITE) |
-| `token` | string | ❌ | Token filter |
-| `minUsd` | number | ❌ | Minimum USD value |
-| `direction` | string | ❌ | Direction filter |
-| `limit` | number | ❌ | Max `1000` |
-| `page` | number | ❌ | Page number |
-| `format` | string | ❌ | `json` (default) \| `csv` |
+| `network` | string |  | Network filter |
+| `from` | string |  | ISO 8601 start date |
+| `to` | string |  | ISO 8601 end date (max range: 90 days for PRO, unlimited for ELITE) |
+| `token` | string |  | Token filter |
+| `minUsd` | number |  | Minimum USD value |
+| `direction` | string |  | Direction filter |
+| `limit` | number |  | Max `1000` |
+| `page` | number |  | Page number |
+| `format` | string |  | `json` (default) \| `csv` |
 
 ---
 
@@ -117,11 +117,11 @@ Retrieve a single whale event by ID.
 
 | Param | Type | Required | Description |
 |---|---|---|---|
-| `type` | string | ❌ | `accumulation` \| `distribution` \| `liquidity_drain` \| `bridge_flow` \| `smart_money_entry` |
-| `minConfidence` | number | ❌ | Minimum confidence score 0–100 (default: `40`) |
-| `asset` | string | ❌ | Asset symbol filter |
-| `network` | string | ❌ | Network filter |
-| `limit` | number | ❌ | Max `50` (default: `10`) |
+| `type` | string |  | `accumulation` \| `distribution` \| `liquidity_drain` \| `bridge_flow` \| `smart_money_entry` |
+| `minConfidence` | number |  | Minimum confidence score 0100 (default: `40`) |
+| `asset` | string |  | Asset symbol filter |
+| `network` | string |  | Network filter |
+| `limit` | number |  | Max `50` (default: `10`) |
 
 **Response `200`:**
 ```json
@@ -154,13 +154,13 @@ Retrieve a single whale event by ID.
 
 | Param | Type | Required | Description |
 |---|---|---|---|
-| `status` | string | ❌ | `active` \| `resolved` \| `cancelled` |
-| `category` | string | ❌ | `crypto` \| `politics` \| `sports` \| `science` \| `economics` |
-| `minVolume` | number | ❌ | Minimum USDC volume |
-| `sortBy` | string | ❌ | `volume` \| `openInterest` \| `endDate` \| `liquidity` |
-| `order` | string | ❌ | `asc` \| `desc` (default: `desc`) |
-| `limit` | number | ❌ | Max `100` (default: `20`) |
-| `page` | number | ❌ | Page |
+| `status` | string |  | `active` \| `resolved` \| `cancelled` |
+| `category` | string |  | `crypto` \| `politics` \| `sports` \| `science` \| `economics` |
+| `minVolume` | number |  | Minimum USDC volume |
+| `sortBy` | string |  | `volume` \| `openInterest` \| `endDate` \| `liquidity` |
+| `order` | string |  | `asc` \| `desc` (default: `desc`) |
+| `limit` | number |  | Max `100` (default: `20`) |
+| `page` | number |  | Page |
 
 ---
 
@@ -178,8 +178,8 @@ Retrieve the current order book for a market outcome. Available to STANDARD+ pla
 
 | Param | Type | Required | Description |
 |---|---|---|---|
-| `outcome` | string | ✅ | Outcome label (e.g. `Yes`, `No`) |
-| `depth` | number | ❌ | Price levels on each side (default: `10`, max: `50`) |
+| `outcome` | string |  | Outcome label (e.g. `Yes`, `No`) |
+| `depth` | number |  | Price levels on each side (default: `10`, max: `50`) |
 
 **Response `200`:**
 ```json
@@ -240,9 +240,9 @@ Retrieve full liquidity snapshot for a token.
 
 | Param | Type | Required | Description |
 |---|---|---|---|
-| `asset` | string | ✅ | Asset symbol |
-| `period` | string | ❌ | `1h` \| `4h` \| `24h` (default: `4h`) |
-| `networks` | string[] | ❌ | Comma-separated list |
+| `asset` | string |  | Asset symbol |
+| `period` | string |  | `1h` \| `4h` \| `24h` (default: `4h`) |
+| `networks` | string[] |  | Comma-separated list |
 
 ---
 
@@ -312,9 +312,9 @@ Returns transaction history for the authenticated wallet. Requires authenticatio
 
 | Param | Type | Required | Description |
 |---|---|---|---|
-| `network` | string | ❌ | Filter by network |
-| `limit` | number | ❌ | Max `100` |
-| `page` | number | ❌ | Page |
+| `network` | string |  | Filter by network |
+| `limit` | number |  | Max `100` |
+| `page` | number |  | Page |
 
 ---
 
@@ -367,7 +367,7 @@ Delete a webhook.
 
 ### `GET /health`
 
-Public endpoint — no authentication required. Returns system operational status.
+Public endpoint  no authentication required. Returns system operational status.
 
 **Response `200`:**
 ```json
@@ -399,7 +399,7 @@ Public endpoint — no authentication required. Returns system operational statu
 | `403` | `KYC_REQUIRED` | Route requires KYC approval |
 | `404` | `NOT_FOUND` | Resource does not exist |
 | `422` | `UNPROCESSABLE` | Request structure is valid but semantically incorrect |
-| `429` | `RATE_LIMITED` | Daily quota exceeded — check `Retry-After` header |
+| `429` | `RATE_LIMITED` | Daily quota exceeded  check `Retry-After` header |
 | `429` | `WAF_RATE_LIMITED` | Per-endpoint WAF limit exceeded |
 | `503` | `SERVICE_UNAVAILABLE` | Upstream data source temporarily unreachable |
 | `403` | `WAF_BLOCK` | Request blocked by security policy |
@@ -417,8 +417,8 @@ Real-time whale event stream. Requires `Authorization` header at connection time
 | Type | Description |
 |---|---|
 | `WHALE_DETECTED` | New whale event (confirmed or mempool depending on plan) |
-| `SIGNAL_GENERATED` | New intelligence signal |
-| `PING` | Keepalive (every 30s — respond with `PONG` within 10s) |
+| `SIGNAL_GENERATED` | New analytics signal |
+| `PING` | Keepalive (every 30s  respond with `PONG` within 10s) |
 | `ERROR` | Stream-level error with code and message |
 | `RECONNECT` | Server-initiated reconnect request (maintenance) |
 

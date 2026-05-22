@@ -38,7 +38,7 @@ export function WhaleWatch({ hideHeader = false, theme = 'default' }: { hideHead
         return (
             <Card className={`${isArctic ? 'bg-white/60 backdrop-blur-3xl border-slate-100' : 'bg-slate-50 border-slate-100'} p-8 h-full flex flex-col items-center justify-center rounded-[2.5rem]`}>
                  <div className="animate-spin text-indigo-600 mb-4"><Radar size={32} /></div>
-                 <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em]">Scanning Multi-Chain Matrix...</span>
+                 <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em]">Scanning Multi-Chain Grid...</span>
             </Card>
         );
     }

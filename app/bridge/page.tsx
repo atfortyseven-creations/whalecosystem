@@ -94,17 +94,17 @@ export default function BridgePage() {
             Device Bridge
           </p>
           <h1 className="text-3xl font-black text-white tracking-tighter">
-            {stage === 'loading' && 'Linking Session…'}
+            {stage === 'loading' && 'Linking Session'}
             {stage === 'success' && 'Session Linked!'}
             {stage === 'error' && 'Link Failed'}
           </h1>
           <p className="text-white/40 text-[13px] leading-relaxed font-mono">
-            {stage === 'loading' && 'Validating your bridge token with the server…'}
+            {stage === 'loading' && 'Validating your bridge token with the server'}
             {(stage === 'success' || stage === 'error') && message}
           </p>
         </div>
 
-        {/* CTA for success — open full app */}
+        {/* CTA for success  open full app */}
         {stage === 'success' && (
           <motion.a
             href="/"
@@ -113,7 +113,7 @@ export default function BridgePage() {
             transition={{ delay: 0.8 }}
             className="w-full py-4 rounded-2xl bg-white text-black font-black text-[13px] uppercase tracking-widest text-center active:scale-95 transition-transform"
           >
-            Open Dashboard →
+            Open Dashboard 
           </motion.a>
         )}
 
@@ -123,7 +123,7 @@ export default function BridgePage() {
             href="/dashboard"
             className="font-mono text-[11px] uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors"
           >
-            ← Back to Dashboard
+             Back to Dashboard
           </a>
         )}
       </motion.div>

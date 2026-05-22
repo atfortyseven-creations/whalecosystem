@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 import { useSignMessage, useReconnect } from 'wagmi';
 
@@ -39,7 +39,7 @@ function Avatar({ address }: { address: string }) {
 }
 
 export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
-  const { address, isConnected, isSovereignHandshake, isChecking, connector, isZkVerified } = useSovereignAccount();
+  const { address, isConnected, isSystemHandshake, isChecking, connector, isZkVerified } = useSystemAccount();
   const { signMessageAsync } = useSignMessage();
   const { reconnect } = useReconnect();
   const { open: openAppKit } = useAppKit();
@@ -47,11 +47,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
   // MASTER RECOVERY: If wallet is connected but connector is missing (common on mobile redirects)
   useEffect(() => {
-    if (isConnected && !connector && !isSovereignHandshake) {
-        console.warn('[WhaleChat] Zombie session detected — attempting silent reconnection.');
+    if (isConnected && !connector && !isSystemHandshake) {
+        console.warn('[WhaleChat] Zombie session detected  attempting silent reconnection.');
         reconnect();
     }
-  }, [isConnected, connector, isSovereignHandshake, reconnect]);
+  }, [isConnected, connector, isSystemHandshake, reconnect]);
 
   const [client, setClient] = useState<Client | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
@@ -70,14 +70,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [peerStatus, setPeerStatus] = useState<{ online: boolean, lastSeen: number | null, isTyping: boolean }>({ online: false, lastSeen: null, isTyping: false });
 
-  // ── Audio recording state ──────────────────────────────────────────────────
+  //  Audio recording state 
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ── Playing audio messages ─────────────────────────────────────────────────
+  //  Playing audio messages 
   const [playingId, setPlayingId] = useState<string | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
@@ -143,7 +143,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const canReceiveCache = useRef<Map<string, boolean>>(new Map());
   // Track if initClient is already in-flight to prevent double-calls on mobile
   const initInFlight = useRef(false);
-  // Persistent known-peers set — survives across sync cycles (fixes mobile-to-mobile)
+  // Persistent known-peers set  survives across sync cycles (fixes mobile-to-mobile)
   const knownPeersRef = useRef<Set<string>>(new Set());
 
   // Detect physical device type (touch + narrow screen = mobile)
@@ -211,7 +211,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   }, [isConnected, address, client]);
 
   // AUTO-INITIALIZE: When wallet is connected and XMTP not yet started, auto-init.
-  // XMTP v3 stores session keys in IndexedDB — after the first sign,
+  // XMTP v3 stores session keys in IndexedDB  after the first sign,
   // subsequent loads are silent (no wallet prompt needed).
   // We always attempt auto-init on both desktop and mobile. If WASM fails on mobile,
   // the error boundary surfaces a manual "Retry" button. This is better than
@@ -288,7 +288,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   // Utility: immediately clear typing signal on the server (call after send)
   const stopTypingSignal = async () => {
     if (!activePeer || !address) return;
-    // We clear the typing key by sending an artificial empty heartbeat — Redis TTL handles it in 5s
+    // We clear the typing key by sending an artificial empty heartbeat  Redis TTL handles it in 5s
     // but this triggers an explicit flush to avoid the "ghost typing" 5-second tail.
     // We write a dummy value that the server interprets as "not typing" via the TTL expiry.
     // Fastest approach: write the key with a 0-second TTL to expire it immediately.
@@ -301,7 +301,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     } catch {}
   };
 
-  // ── Voice Recording: Hold-to-Record ─────────────────────────────────────────
+  //  Voice Recording: Hold-to-Record 
   const startRecording = useCallback(async () => {
     if (isRecording || !activePeer) return;
     try {
@@ -459,7 +459,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       try {
         if (attempts > 0) await new Promise(resolve => setTimeout(resolve, 2000 * Math.pow(1.5, attempts)));
 
-        // ── Step 1: Use standard wagmi signer ────────────────
+        //  Step 1: Use standard wagmi signer 
         // XMTP SDK automatically caches keys in IndexedDB, so returning users are not prompted.
         
         const wagmiSigner = {
@@ -470,8 +470,8 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             } catch (sigErr: any) {
               const msg = sigErr?.message || '';
               if (msg.includes('connector') || msg.includes('not connected') || msg.includes('No connector') || msg.includes('signMessage')) {
-                  const hasVault = typeof window !== 'undefined' && !!localStorage.getItem('sovereign_vault');
-                  if (isSovereignHandshake && !hasVault) {
+                  const hasVault = typeof window !== 'undefined' && !!localStorage.getItem('system_vault');
+                  if (isSystemHandshake && !hasVault) {
                     console.warn('[WhaleChat:Mobile] Signature requested on linked session without Vault.');
                   }
                   throw new Error('No active wallet connection detected. Please ensure your wallet app is open and connected to this terminal.');
@@ -481,7 +481,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           }
         };
 
-        // ── Step 2: Initialize client (Direct Execution) ───────────────
+        //  Step 2: Initialize client (Direct Execution) 
         const realClient = await getXMTPClient(wagmiSigner);
         setClient(realClient);
         if (typeof localStorage !== 'undefined') {
@@ -510,7 +510,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           if (err?.name === 'ChunkLoadError' || errorMsg.includes('Loading chunk')) {
             setInitError('Whale Alert Network module failed to load. Please check your network connection and reload the terminal.');
           } else if (errorMsg.includes('No active wallet') || errorMsg.includes('connector') || errorMsg.includes('signMessage') || errorMsg.toLowerCase().includes('unknown signer')) {
-            if (isSovereignHandshake) {
+            if (isSystemHandshake) {
                setInitError('Whale identity not yet synchronized from desktop. Please keep this browser open while the desktop terminal finishes the handshake.');
             } else {
                setInitError('Active wallet connection lost or not detected. Please ensure your wallet app is open and connected directly to this browser.');
@@ -527,23 +527,23 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         }
       }
     }
-  }, [address, isMobile, signMessageAsync, isSovereignHandshake, loadConversations]);
+  }, [address, isMobile, signMessageAsync, isSystemHandshake, loadConversations]);
 
   useEffect(() => {
     // Aggressive Auto-Init: Trigger for all connected users.
     if (isConnected && address && !client && !initInFlight.current && !initError) {
-      const hasVault = typeof localStorage !== 'undefined' && !!localStorage.getItem("sovereign_vault_v1");
+      const hasVault = typeof localStorage !== 'undefined' && !!localStorage.getItem("system_vault_v1");
       const hasInit = typeof localStorage !== 'undefined' && !!localStorage.getItem("whale_xmtp_initialized");
       const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
       
       // On mobile, auto-init can trigger unwanted wallet app switches if the keys aren't in IndexedDB.
       // However, if forceAutoInit is true or it's a handshake session, we proceed.
       // For returning users with IndexedDB keys, the auto-init is completely silent!
-      if (hasVault || hasInit || !isTouch || forceAutoInit || isSovereignHandshake) {
+      if (hasVault || hasInit || !isTouch || forceAutoInit || isSystemHandshake) {
         initClient();
       }
     }
-  }, [isConnected, address, client, initError, initClient, forceAutoInit, isSovereignHandshake]);
+  }, [isConnected, address, client, initError, initClient, forceAutoInit, isSystemHandshake]);
 
   // Sync contacts to backend debounced
   const persistToLocal = useCallback((arr: ConversationMeta[]) => {
@@ -589,7 +589,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     convIdToPeer.current.set(activePeerDmIdRef.current, activePeer);
   }, [client, activePeer]);
 
-  // ── Global XMTP Stream ───────────────────────────────────────────────────
+  //  Global XMTP Stream 
   useEffect(() => {
     if (!client || !address) return;
     
@@ -611,7 +611,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               .filter(a => !prevSet.has(a.toLowerCase()))
               .map(a => ({
                 peerAddress: a,
-                lastMessage: '✉ New message received',
+                lastMessage: ' New message received',
                 lastAt: new Date(),
               }));
 
@@ -722,7 +722,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     return () => { cancelled = true; clearInterval(globalPoll); };
   }, [client, address]);
 
-  // ── Load messages when active peer changes ───────────────────────────────
+  //  Load messages when active peer changes 
   useEffect(() => {
     if (!client || !activePeer) return;
 
@@ -830,7 +830,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             }
             if (!canMsg) {
                 // DON'T BLOCK. Tell them we'll queue it.
-                toast.info(`Offline Routing: ${peer.slice(0,6)} is not registered on XMTP. Messages will be routed via Sovereign Vault until they connect.`);
+                toast.info(`Offline Routing: ${peer.slice(0,6)} is not registered on XMTP. Messages will be routed via System Vault until they connect.`);
             }
         }
 
@@ -875,7 +875,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     }
 
     try {
-      // ── 1. REAL ON-CHAIN DECENTRALIZED TRANSMISSION ──────────────────────────────
+      //  1. REAL ON-CHAIN DECENTRALIZED TRANSMISSION 
         // Optimistic local message so the sender sees it immediately
         const optimisticId = `optimistic-${Date.now()}`;
         const optimisticMsg = {
@@ -887,7 +887,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         };
         setMessages(prev => [...prev, optimisticMsg].sort((a, b) => a.sentAtNs - b.sentAtNs));
 
-        // 🔑 FIX: Clear typing indicator immediately
+        //  FIX: Clear typing indicator immediately
         stopTypingSignal();
 
         // @ts-ignore
@@ -910,7 +910,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
            });
         }
 
-        // ── 2. UPDATE LOCAL ADDRESS BOOK ──────────────────────────────────────────────
+        //  2. UPDATE LOCAL ADDRESS BOOK 
         setConversations(prev => {
           const updated = prev.find(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase())
             ? prev.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
@@ -983,11 +983,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
       };
 
       if (type === 'send') {
-        // Ascending two-tone send chime — clean, positive
+        // Ascending two-tone send chime  clean, positive
         makeNote(880, ctx.currentTime, 0.12, 0.08);
         makeNote(1320, ctx.currentTime + 0.09, 0.14, 0.06);
       } else {
-        // Descending three-tone receive notification — softer, distinct
+        // Descending three-tone receive notification  softer, distinct
         makeNote(1046, ctx.currentTime, 0.1, 0.07);
         makeNote(880, ctx.currentTime + 0.08, 0.1, 0.06);
         makeNote(698, ctx.currentTime + 0.16, 0.15, 0.05);
@@ -1019,7 +1019,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   }
 
 
-  // ── Loading / Auto-init state ────────────────────────────────────────────────
+  //  Loading / Auto-init state 
   // Displayed while the XMTP client initialises automatically post-connection.
   // On returning sessions, encryption keys are retrieved from IndexedDB instantly.
   // On first-time sessions, a single gasless wallet signature derives the keys.
@@ -1061,7 +1061,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               <div className="space-y-2">
                 <span className="text-[10px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">02</span>
                 <p className={`text-[11px] font-black uppercase ${isZkVerified ? 'text-[#00C076]' : 'text-black/60 dark:text-white/60'}`}>Whale Identity</p>
-                <p className="text-[10px] text-black/30 dark:text-white/30 font-serif">Sovereign identity verified via cryptographic handshake.</p>
+                <p className="text-[10px] text-black/30 dark:text-white/30 font-serif">System identity verified via cryptographic handshake.</p>
               </div>
               <div className="space-y-2">
                 <span className="text-[10px] font-black text-black/20 dark:text-white/20 uppercase tracking-widest">03</span>
@@ -1071,7 +1071,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             </div>
 
             <p className="text-[#050505]/40 dark:text-white/40 text-[13px] md:text-[15px] font-serif leading-relaxed px-6 max-w-sm mx-auto text-center">
-              Mathematical identity. Sovereign communication.
+              Mathematical identity. System communication.
             </p>
           </div>
         </div>
@@ -1140,12 +1140,12 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     );
     }
 
-  const shortAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+  const shortAddr = (a: string) => `${a.slice(0, 6)}${a.slice(-4)}`;
 
   return (
-    // Transparent container — wallpaper shows through via parent backdrop
+    // Transparent container  wallpaper shows through via parent backdrop
     <div className="relative flex w-full h-full overflow-hidden" style={{ borderRadius: isMobile ? 0 : '1rem', border: isMobile ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
-      {/* ── Sidebar: Conversation List ── */}
+      {/*  Sidebar: Conversation List  */}
       <div className={`${showList ? 'flex' : 'hidden md:flex'} w-full md:w-72 flex-col border-r border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/50 backdrop-blur-[40px]`}>
         <div className="p-4 border-b border-black/6 dark:border-white/5">
           <div className="flex items-center justify-between mb-4">
@@ -1218,7 +1218,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         </div>
       </div>
 
-      {/* ── Chat Area ── */}
+      {/*  Chat Area  */}
       <div className={`${!showList ? 'flex' : 'hidden md:flex'} flex-1 flex-col min-w-0`}>
         {activePeer ? (
           <>
@@ -1286,7 +1286,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   const attachmentMatch = typeof content === 'string' ? content.match(/^\[ATTACHMENT:([^\]]*)\](.*?)\|(.*)$/is) : null;
                   const attachment = attachmentMatch ? { mime: attachmentMatch[1] || 'application/octet-stream', url: attachmentMatch[2], name: attachmentMatch[3] } : null;
                   
-                  // sentTime already declared above — reuse it here.
+                  // sentTime already declared above  reuse it here.
                   return (
                     <React.Fragment key={msg.id}>
                       {showDate && (
@@ -1378,7 +1378,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
             <div
               className="shrink-0 bg-white/60 dark:bg-black/60 backdrop-blur-[60px] border-t border-black/5 dark:border-white/5 pb-2"
             >
-              {/* ── Audio recording indicator ── */}
+              {/*  Audio recording indicator  */}
               {isRecording && (
                 <div className="flex items-center gap-2 px-4 pt-3 pb-1">
                     <div className="flex items-center gap-1.5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 px-2 py-1 rounded-md">
@@ -1487,7 +1487,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
       </div>
 
-      {/* ── Overlays ── */}
+      {/*  Overlays  */}
       {showScanner && (
         <div className="absolute inset-0 z-[100] bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
            <div className="w-full max-w-sm">
@@ -1499,7 +1499,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                </div>
                <div className="mb-8">
                  <p className="text-[10px] text-black/40 dark:text-white/40 text-center font-mono leading-relaxed px-4">
-                   Establish a cryptographically secured P2P channel by scanning a peer&apos;s Sovereign QR identity.
+                   Establish a cryptographically secured P2P channel by scanning a peer&apos;s System QR identity.
                  </p>
                </div>
                <QrScanner mode="scan" onScanSuccess={(addr) => handleStartConversationWithPeer(addr)} />

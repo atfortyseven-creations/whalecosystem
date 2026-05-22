@@ -94,7 +94,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
     try {
       // Hardware entropy
       const hwEntropy = window.crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
-      const message = `Sovereign KYC Attestation\n\nIdentity: ${address}\nTimestamp: ${Date.now()}\nLiveness: High-Fidelity WebRTC Frame Verified\nEntropy: ${hwEntropy}`;
+      const message = `System KYC Attestation\n\nIdentity: ${address}\nTimestamp: ${Date.now()}\nLiveness: High-Fidelity WebRTC Frame Verified\nEntropy: ${hwEntropy}`;
       
       const signature = await signMessageAsync({ message });
       
@@ -120,7 +120,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
   return (
     <div className="w-full max-w-lg mx-auto bg-white/95 backdrop-blur-xl rounded-[24px] p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-black/5 font-mono text-[#0a0a0a] relative overflow-hidden flex flex-col items-center justify-center min-h-[500px]">
       
-      {/* Background Matrix Grid */}
+      {/* Background Grid Grid */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
            style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
 
@@ -130,7 +130,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
         
         {/* Header */}
         <div className="mb-8 flex flex-col items-center">
-           <h2 className="text-[14px] font-bold uppercase tracking-[0.4em] text-[#0a0a0a]">Sovereign Identity</h2>
+           <h2 className="text-[14px] font-bold uppercase tracking-[0.4em] text-[#0a0a0a]">System Identity</h2>
            <p className="text-[9px] text-black/40 uppercase tracking-widest mt-2">Zero-Knowledge Biometric Protocol</p>
         </div>
 
@@ -235,7 +235,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
                    <CheckCircle2 size={32} className="text-emerald-500" />
                  </div>
                  <h3 className="text-[14px] font-black text-[#0a0a0a] uppercase tracking-[0.3em] mb-2">Identity Verified</h3>
-                 <p className="text-[9px] text-black/40 uppercase tracking-widest">Sovereign Terminal Unlocked</p>
+                 <p className="text-[9px] text-black/40 uppercase tracking-widest">System Terminal Unlocked</p>
               </motion.div>
             )}
 

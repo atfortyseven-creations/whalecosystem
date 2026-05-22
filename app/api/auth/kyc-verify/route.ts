@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         // 1. Strict Cryptographic Verification of the Attestation
         const isValid = await verifyMessage({ address, message, signature });
         if (!isValid) {
-            console.error(`[KYC:SECURITY] ❌ Invalid biometric signature attempted for ${address}`);
+            console.error(`[KYC:SECURITY]  Invalid biometric signature attempted for ${address}`);
             return NextResponse.json({ error: 'Cryptographic binding failed' }, { status: 401 });
         }
         const normalizedAddress = address.toLowerCase();
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        // 3. Issue Updated Sovereign JWT
+        // 3. Issue Updated System JWT
         const jwt = await mintJWT({
             sub: normalizedAddress,
             address: normalizedAddress,

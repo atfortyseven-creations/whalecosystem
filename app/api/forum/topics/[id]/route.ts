@@ -67,10 +67,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         });
         if (!topic) return NextResponse.json({ error: 'Topic not found' }, { status: 404 });
         if (topic.authorId !== user.id) {
-            return NextResponse.json({ error: 'Forbidden — not the author' }, { status: 403 });
+            return NextResponse.json({ error: 'Forbidden  not the author' }, { status: 403 });
         }
 
-        // Cascade: delete likes on posts → posts → topic likes → notifications → topic
+        // Cascade: delete likes on posts  posts  topic likes  notifications  topic
         const posts = await (prisma as any).forumPost.findMany({
             where: { topicId },
             select: { id: true },

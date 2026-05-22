@@ -75,7 +75,7 @@ export function CascadeLiquidations() {
           </div>
           <div>
             <h3 className="text-white font-black text-lg">Cascade Liquidations</h3>
-            <p className="text-white/30 text-xs font-mono">BTC — Perpetual Futures</p>
+            <p className="text-white/30 text-xs font-mono">BTC  Perpetual Futures</p>
           </div>
         </div>
         <div className="flex gap-4 text-xs">

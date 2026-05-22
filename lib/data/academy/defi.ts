@@ -64,7 +64,7 @@ export const defiModules = [
 
                     <section class="pro-section">
                         <h2>II. Chi Gastoken y la Optimización de Costes</h2>
-                        <p>1inch introdujo el concepto de <strong>Chi Gastoken</strong>, un mecanismo que permitía comprar gas barato durante períodos de baja congestión y "quemarlo" durante la ejecución de transacciones caras. Aunque los cambios de Ethereum en EIP-3529 eliminaron los contratos de gas token, el principio subyacente —optimizar el costo de abstracción— sigue siendo la filosofía guía de todos los agregadores modernos.</p>
+                        <p>1inch introdujo el concepto de <strong>Chi Gastoken</strong>, un mecanismo que permitía comprar gas barato durante períodos de baja congestión y "quemarlo" durante la ejecución de transacciones caras. Aunque los cambios de Ethereum en EIP-3529 eliminaron los contratos de gas token, el principio subyacente optimizar el costo de abstracción sigue siendo la filosofía guía de todos los agregadores modernos.</p>
                     </section>
                 </div>`
         },
@@ -131,7 +131,7 @@ export const defiModules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. Uniswap v3: Liquidez Concentrada y la ERC-721 como LP Position</h2>
-                        <p>Uniswap v3 introdujo la <strong>Liquidez Concentrada</strong> (Concentrated Liquidity): en lugar de distribuir capital uniformemente sobre toda la curva de precios (0 a ∞), un LP especifica un rango [Pa, Pb] donde desea proveer liquidez. Esto permite que el mismo capital sea 4,000x más eficiente que en v2 si el precio permanece en rango. Las posiciones de LP en v3 son <strong>tokens ERC-721 únicos</strong> (NFTs), no ERC-20 fungibles, porque cada posición es única en rango y concentración.</p>
+                        <p>Uniswap v3 introdujo la <strong>Liquidez Concentrada</strong> (Concentrated Liquidity): en lugar de distribuir capital uniformemente sobre toda la curva de precios (0 a ), un LP especifica un rango [Pa, Pb] donde desea proveer liquidez. Esto permite que el mismo capital sea 4,000x más eficiente que en v2 si el precio permanece en rango. Las posiciones de LP en v3 son <strong>tokens ERC-721 únicos</strong> (NFTs), no ERC-20 fungibles, porque cada posición es única en rango y concentración.</p>
                     </section>
 
                     <section class="pro-section">
@@ -167,7 +167,7 @@ export const defiModules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. CDPs, Vaults y la Política Monetaria Algorítmica</h2>
-                        <p>MakerDAO es el protocolo pionero de stablecoins descentralizadas. A través de las <strong>Posiciones de Deuda Colateralizada (CDPs / Vaults)</strong>, los usuarios depositan colateral (ETH, WBTC, stETH) y emiten DAI hasta un Límite de Deuda dictado por el <em>Liquidation Ratio</em> del activo. La Tasa de Estabilidad (Stability Fee — el "interés") y las políticas de colateralización son decididas por votos de poseedores de MKR, convirtiendo la gobernanza de la DAO en un <strong>Banco Central Descentralizado</strong> con política monetaria votable.</p>
+                        <p>MakerDAO es el protocolo pionero de stablecoins descentralizadas. A través de las <strong>Posiciones de Deuda Colateralizada (CDPs / Vaults)</strong>, los usuarios depositan colateral (ETH, WBTC, stETH) y emiten DAI hasta un Límite de Deuda dictado por el <em>Liquidation Ratio</em> del activo. La Tasa de Estabilidad (Stability Fee  el "interés") y las políticas de colateralización son decididas por votos de poseedores de MKR, convirtiendo la gobernanza de la DAO en un <strong>Banco Central Descentralizado</strong> con política monetaria votable.</p>
                     </section>
 
                     <section class="pro-section">
@@ -311,7 +311,7 @@ export const defiModules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. Money Legos: La Arquitectura de Composabilidad Infinita</h2>
-                        <p>La composabilidad de DeFi es su superpoder: los contratos inteligentes pueden interactúar entre sí sin permiso, creando productos financieros complejos de la combinación de primitivos simples. El stack completo es: <strong>L1/L2 (Settlement) → Activos (ETH, WBTC, stablecoins) → Primitivos (DEX, Lending, Derivados) → Optimizadores (Yearn, Convex) → Interfaces (Uniswap App, Aave Dashboard)</strong>. Cada capa añade funcionalidad y también riesgo: un fallo en cualquier capa inferior puede propagar daño hacia arriba instantáneamente.</p>
+                        <p>La composabilidad de DeFi es su superpoder: los contratos inteligentes pueden interactúar entre sí sin permiso, creando productos financieros complejos de la combinación de primitivos simples. El stack completo es: <strong>L1/L2 (Settlement)  Activos (ETH, WBTC, stablecoins)  Primitivos (DEX, Lending, Derivados)  Optimizadores (Yearn, Convex)  Interfaces (Uniswap App, Aave Dashboard)</strong>. Cada capa añade funcionalidad y también riesgo: un fallo en cualquier capa inferior puede propagar daño hacia arriba instantáneamente.</p>
                     </section>
 
                     <section class="pro-section">
@@ -329,7 +329,7 @@ export const defiModules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. veCRV: El Modelo Vote-Escrowed y la Alineación Temporal</h2>
-                        <p>El modelo <strong>ve (Vote-Escrowed)</strong>, popularizado por Curve Finance, requiere que los usuarios bloqueen su token CRV por un periodo de 1 a 4 años para obtener <strong>veCRV</strong>. A mayor duración del bloqueo, más veCRV (y por tanto más poder de voto y multiplicador de recompensas). Este diseño crea una selección adversa positiva: solo los holders más comprometidos —los que creen en el protocolo a largo plazo— acumulan influencia sobre la dirección del protocolo, alineando los incentivos de los tomadores de decisión con los resultados futuros.</p>
+                        <p>El modelo <strong>ve (Vote-Escrowed)</strong>, popularizado por Curve Finance, requiere que los usuarios bloqueen su token CRV por un periodo de 1 a 4 años para obtener <strong>veCRV</strong>. A mayor duración del bloqueo, más veCRV (y por tanto más poder de voto y multiplicador de recompensas). Este diseño crea una selección adversa positiva: solo los holders más comprometidos los que creen en el protocolo a largo plazo acumulan influencia sobre la dirección del protocolo, alineando los incentivos de los tomadores de decisión con los resultados futuros.</p>
                     </section>
 
                     <section class="pro-section">

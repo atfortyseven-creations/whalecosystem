@@ -17,7 +17,7 @@ interface FlowData {
 }
 
 function CockpitNeedle({ score }: { score: number }) {
-  // Map -100 to 100 → -135° to 135°
+  // Map -100 to 100  -135° to 135°
   const angle = (score / 100) * 135;
   
   return (
@@ -149,7 +149,7 @@ export function InflowOutflowCockpit() {
             </div>
             <div className="text-center mt-2">
               <p className={`text-2xl font-black ${isInflow ? 'text-red-400' : isOutflow ? 'text-emerald-400' : 'text-gray-400'}`}>
-                {isInflow ? '⚠️ SELL' : isOutflow ? '✅ ACCUMULATION' : '— NEUTRAL'}
+                {isInflow ? '️ SELL' : isOutflow ? ' ACCUMULATION' : ' NEUTRAL'}
               </p>
               <p className="text-white/20 text-xs mt-1">Net flow signal</p>
             </div>
@@ -158,9 +158,9 @@ export function InflowOutflowCockpit() {
           {/* Stats */}
           <div className="flex flex-col justify-center gap-4">
             {[
-              { label: 'Mempool Size', value: data ? `${data.mempoolSizeMb.toFixed(1)} MB` : '--', icon: '📦' },
-              { label: 'Avg Fee', value: data ? `${(data.avgFeeSat / 1000).toFixed(0)} sat/kB` : '--', icon: '⚡' },
-              { label: 'Pending Txs', value: data ? data.totalPendingTxs.toLocaleString() : '--', icon: '⏳' },
+              { label: 'Mempool Size', value: data ? `${data.mempoolSizeMb.toFixed(1)} MB` : '--', icon: '' },
+              { label: 'Avg Fee', value: data ? `${(data.avgFeeSat / 1000).toFixed(0)} sat/kB` : '--', icon: '' },
+              { label: 'Pending Txs', value: data ? data.totalPendingTxs.toLocaleString() : '--', icon: '' },
             ].map(({ label, value, icon }) => (
               <div key={label} className="flex items-center gap-3">
                 <span className="text-lg">{icon}</span>
@@ -176,7 +176,7 @@ export function InflowOutflowCockpit() {
         {/* Historical mini bars */}
         {data?.historicalPoints && data.historicalPoints.length > 0 && (
           <div className="mt-6 pt-4 border-t border-white/5">
-            <p className="text-white/20 text-[10px] font-mono uppercase mb-2">Flow history — last 12 blocks</p>
+            <p className="text-white/20 text-[10px] font-mono uppercase mb-2">Flow history  last 12 blocks</p>
             <div className="flex items-end gap-1 h-12">
               {data.historicalPoints.map((pt, i) => {
                 const netFlow = pt.outflow - pt.inflow;

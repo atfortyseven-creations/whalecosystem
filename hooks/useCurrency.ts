@@ -9,14 +9,14 @@ export function useCurrency() {
     const translatedValue = usdValue * rate;
 
     if (currency === 'BTC') {
-      return `₿${safeToLocaleString(translatedValue, { 
+      return `${safeToLocaleString(translatedValue, { 
         minimumFractionDigits: 4, 
         maximumFractionDigits: 8 
       })}`;
     }
 
     if (currency === 'EUR') {
-      return `€${safeToLocaleString(translatedValue, { 
+      return `${safeToLocaleString(translatedValue, { 
         minimumFractionDigits: decimals, 
         maximumFractionDigits: decimals 
       })}`;

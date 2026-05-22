@@ -58,7 +58,7 @@ export class NodeHealthService {
                 timestamp: Date.now()
             };
         } catch (error) {
-            console.error(`[NodeHealthService] 🚨 Fail for ${chain.name}:`, error);
+            console.error(`[NodeHealthService]  Fail for ${chain.name}:`, error);
             return {
                 chainId,
                 name: chain.name,

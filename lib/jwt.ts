@@ -21,7 +21,7 @@ async function getEdDSAKeys() {
       cachedPublicKey  = await importJWK(pubJwk,  'EdDSA');
       return { privateKey: cachedPrivateKey, publicKey: cachedPublicKey };
     } catch (parseErr) {
-      // Malformed JWK env var — fall back to HS256 silently
+      // Malformed JWK env var  fall back to HS256 silently
       console.warn('[JWT] JWT_EDDSA_*_JWK env var is malformed or invalid JSON. Falling back to HS256.', parseErr instanceof SyntaxError ? parseErr.message : '');
       cachedPrivateKey = null;
       cachedPublicKey  = null;
@@ -63,7 +63,7 @@ export const verifyJWT = async (token: string): Promise<JWTPayload> => {
       return payload;
     }
   } catch (e) {
-    // Si EdDSA falla y estamos en ventana de migración → intentar HS256
+    // Si EdDSA falla y estamos en ventana de migración  intentar HS256
     if (now < migrationCutoff) {
       const { payload } = await jwtVerify(token, new TextEncoder().encode(secretHS256), { algorithms: ['HS256'] });
       return payload;

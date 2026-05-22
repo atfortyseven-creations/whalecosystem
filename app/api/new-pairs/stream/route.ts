@@ -5,7 +5,7 @@
  * Also returns buffered events from the last ~50 pairs on connection.
  * 
  * Architecture:
- *   GetBlock WSS (EP3) → newPairsEngine singleton → SSE → Browser
+ *   GetBlock WSS (EP3)  newPairsEngine singleton  SSE  Browser
  */
 
 import { NextRequest } from 'next/server';

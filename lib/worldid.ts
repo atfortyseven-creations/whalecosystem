@@ -1,8 +1,8 @@
 /**
  * World ID Verification Utilities (Server-Side)
  * 
- * Replaces @worldcoin/idkit import to avoid React dependencies in API routes.
- * Uses direct REST API calls to Worldcoin Developer Portal.
+ * Replaces @identity/idkit import to avoid React dependencies in API routes.
+ * Uses direct REST API calls to Identity Developer Portal.
  */
 
 interface IVerifyResponse {
@@ -21,7 +21,7 @@ interface IVerifyRequest {
 }
 
 /**
- * Verifies a World ID proof using the Worldcoin API
+ * Verifies a World ID proof using the Identity API
  * @param proof The proof data object
  * @param app_id The app ID (e.g., app_...)
  * @param action The action ID
@@ -37,9 +37,9 @@ export async function verifyWorldIDProof(
     const finalAppId = app_id || "app_d2014c58bb084dcb09e1f3c1c1144287";
 
     try {
-        console.log(`Calling World ID API: https://developer.worldcoin.org/api/v2/verify/${finalAppId}`);
+        console.log(`Calling World ID API: https://developer.identity.org/api/v2/verify/${finalAppId}`);
         const response = await fetch(
-            `https://developer.worldcoin.org/api/v2/verify/${finalAppId}`,
+            `https://developer.identity.org/api/v2/verify/${finalAppId}`,
             {
                 method: 'POST',
                 headers: {
@@ -78,7 +78,7 @@ export async function verifyWorldIDProof(
         return {
             success: false,
             code: 'network_error',
-            detail: 'Failed to contact Worldcoin API',
+            detail: 'Failed to contact Identity API',
         };
     }
 }

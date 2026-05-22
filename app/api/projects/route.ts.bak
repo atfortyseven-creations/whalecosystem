@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     await prisma.log.create({
         data: {
             projectId: project.id,
-            message: `Node provisioned successfully. Master kernel linked to sovereign wallet signature.`,
+            message: `Node provisioned successfully. Master kernel linked to system wallet signature.`,
             level: 'INFO',
             source: 'KERNEL'
         }

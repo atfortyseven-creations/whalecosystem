@@ -21,7 +21,7 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
     return { valid: false, error: 'Missing API key. Include X-WAC-API-Key header.', statusCode: 401 };
   }
 
-  // ─── INTERNAL BYPASS for development/dashboard (LEGENDARY) ────────────────
+  //  INTERNAL BYPASS for development/dashboard (LEGENDARY) 
   if (apiKey === 'DEV_INTERNAL_WAC') {
     return { 
       valid: true, 
@@ -41,7 +41,7 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
     return { valid: false, error: 'Invalid API key format. Keys start with wac_live_', statusCode: 401 };
   }
 
-  // ─── Phase 1: Redis API Key Caching ─────────────────────
+  //  Phase 1: Redis API Key Caching 
   const keyHash = createHash('sha256').update(apiKey).digest('hex');
   const cacheKey = `apikey:${keyHash}`;
   
@@ -96,7 +96,7 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
         statusCode: 403,
       };
     }
-    // In grace period — allow access
+    // In grace period  allow access
   }
 
   // Check period end
@@ -108,7 +108,7 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
     };
   }
 
-  // ─── Tier Enforcement (Starter / Pro / Elite) ─────────────
+  //  Tier Enforcement (Starter / Pro / Elite) 
   const tier = subscription.tier.toLowerCase();
   
   // Set default limits if not in DB
@@ -124,7 +124,7 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
   subscription.enforcedThreshold = subscription.whaleThresholdUsd || limit.threshold;
   subscription.enforcedWindowDays = limit.windowDays;
 
-  // ─── IP Whitelisting (Elite/Pro) ───────────────────────────
+  //  IP Whitelisting (Elite/Pro) 
   const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
   if (subscription.ipWhitelist && subscription.ipWhitelist.length > 0) {
     if (!subscription.ipWhitelist.includes(clientIp)) {
@@ -136,7 +136,7 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
     }
   }
 
-  // ─── HMAC Request Signing (Elite) ──────────────────────────
+  //  HMAC Request Signing (Elite) 
   if (tier === 'Elite' && subscription.hmacSecret) {
     const signature = req.headers.get('x-wac-signature');
     const timestamp = req.headers.get('x-wac-timestamp');
@@ -160,7 +160,7 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
       .update(`${timestamp}${req.method}${req.nextUrl.pathname}`)
       .digest('hex');
 
-    // 🛡️ [AUDITED SECURITY] Use timingSafeEqual to prevent side-channel timing attacks
+    // ️ [AUDITED SECURITY] Use timingSafeEqual to prevent side-channel timing attacks
     const signatureBuffer = Buffer.from(signature, 'hex');
     const computedBuffer = Buffer.from(computedSignature, 'hex');
 
@@ -169,7 +169,7 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
     }
   }
 
-  // ─── High-Frequency Rate Limiting (Redis) ─────────────────────────
+  //  High-Frequency Rate Limiting (Redis) 
   if (subscription.dailyRequestLimit > 0) {
     const { success, current } = await RedisRateLimiter.check(
       subscription.id, 
@@ -188,11 +188,11 @@ export async function validateApiKey(req: NextRequest): Promise<ApiKeyValidation
   return { valid: true, subscription };
 }
 
-// ─── Log a successful API request ────────────────────────────────────────────
+//  Log a successful API request 
 export async function logApiRequest(req: NextRequest, subscriptionId: string, endpoint: string, statusCode: number) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
   
-  // ─── Phase 3: Redis-Buffered Logging (Unlocking 100M Scale) ───
+  //  Phase 3: Redis-Buffered Logging (Unlocking 100M Scale) 
   // Instead of direct DB writes, we push to a Redis list for background worker processing
   if (redisClient && !(redisClient as any).__isMock) {
     const logData = JSON.stringify({

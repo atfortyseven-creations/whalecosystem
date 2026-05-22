@@ -9,7 +9,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 /**
  * [LEGENDARY] Whale Monitoring Quality Section
- * Explains why Whale Alert Network has the world's best real-time whale intelligence
+ * Explains why Whale Alert Network has the world's best real-time whale analytics
  */
 export function SwapQualitySection() {
   const { t } = useLanguage();

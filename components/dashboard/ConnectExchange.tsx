@@ -34,7 +34,7 @@ export default function ConnectExchange() {
     return (
         <div className="h-full w-full min-h-0 flex flex-col p-6 gap-6 font-sans overflow-y-auto">
 
-            {/* ── HEADER ── */}
+            {/*  HEADER  */}
             <div className="rounded-2xl p-7 flex items-center justify-between relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-3" style={{ color: '#00F2EA' }}>
@@ -58,7 +58,7 @@ export default function ConnectExchange() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
 
-                {/* ── EXCHANGE SELECTOR ── */}
+                {/*  EXCHANGE SELECTOR  */}
                 <div className="space-y-3">
                     <div className="text-[9px] font-black uppercase tracking-[0.3em] ml-1 mb-3" style={{ color: 'rgba(255,255,255,0.2)' }}>Available Nodes</div>
                     {EXCHANGES.map((ex) => (
@@ -100,7 +100,7 @@ export default function ConnectExchange() {
                     ))}
                 </div>
 
-                {/* ── CONNECTION FORM ── */}
+                {/*  CONNECTION FORM  */}
                 <AnimatePresence mode="wait">
                     {selectedId ? (
                         <motion.div key="form" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}

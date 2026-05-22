@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Message is required' }, { status: 400 });
         }
 
-        // Map `category` (from form) → `section` (legacy field), fallback to either
+        // Map `category` (from form)  `section` (legacy field), fallback to either
         const resolvedSection = section || category || 'general';
 
         // Forward all fields including name so admin sees full context

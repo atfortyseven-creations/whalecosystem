@@ -3,25 +3,25 @@
 import { useEffect, useState, useRef } from "react";
 
 /**
- * ─────────────────────────────────────────────────────────────────────────────
+ * 
  * usePerformanceMode
- * ─────────────────────────────────────────────────────────────────────────────
+ * 
  * Detects device/battery state and returns a performance tier that canvas
  * components use to throttle their rAF loops.
  *
  * Tiers:
- *  "HIGH"    — plugged in, high-end GPU, tab visible       → target 60 fps
- *  "REDUCED" — battery ≤ 30% or charging but low cap       → target 30 fps
- *  "MINIMAL" — battery saver / power-saver OS mode / tab
- *              hidden or very low battery                   → target 10 fps
+ *  "HIGH"     plugged in, high-end GPU, tab visible        target 60 fps
+ *  "REDUCED"  battery  30% or charging but low cap        target 30 fps
+ *  "MINIMAL"  battery saver / power-saver OS mode / tab
+ *              hidden or very low battery                    target 10 fps
  *              (canvas renders skeleton only, particles halved)
  *
  * Returned values:
- *  mode          — "HIGH" | "REDUCED" | "MINIMAL"
- *  targetFps     — numeric fps cap the caller should honour
- *  isVisible     — false when document.hidden (pause canvas entirely)
- *  particleScale — 1.0 | 0.5 | 0.2  (multiply particle count by this)
- *  skipBloom     — true when mode is not HIGH (skip expensive bloom passes)
+ *  mode           "HIGH" | "REDUCED" | "MINIMAL"
+ *  targetFps      numeric fps cap the caller should honour
+ *  isVisible      false when document.hidden (pause canvas entirely)
+ *  particleScale  1.0 | 0.5 | 0.2  (multiply particle count by this)
+ *  skipBloom      true when mode is not HIGH (skip expensive bloom passes)
  */
 
 export type PerfMode = "HIGH" | "REDUCED" | "MINIMAL";
@@ -54,17 +54,17 @@ function deriveMode(
   prefersReducedMotion: boolean,
   isSaverMode: boolean
 ): PerfMode {
-  // User has opted into reduced motion — always be minimal
+  // User has opted into reduced motion  always be minimal
   if (prefersReducedMotion) return "MINIMAL";
   // OS battery saver active
   if (isSaverMode) return "MINIMAL";
-  // Tab hidden — no need to render at all (caller should pause rAF)
+  // Tab hidden  no need to render at all (caller should pause rAF)
   if (!isVisible) return "MINIMAL";
   // Critical battery
   if (batteryLevel <= 0.12 && !isCharging) return "MINIMAL";
   // Battery low (laptop unplugged under 30%)
   if (batteryLevel <= 0.30 && !isCharging) return "REDUCED";
-  // Charging but very low battery — still be kind
+  // Charging but very low battery  still be kind
   if (batteryLevel <= 0.15 && isCharging) return "REDUCED";
   return "HIGH";
 }
@@ -109,14 +109,14 @@ export function usePerformanceMode(): PerfState {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // ── Page Visibility API ─────────────────────────────────────────────────
+    //  Page Visibility API 
     const onVisibilityChange = () => {
       visibleRef.current = !document.hidden;
       updateMode();
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
 
-    // ── Battery Status API ──────────────────────────────────────────────────
+    //  Battery Status API 
     let battery: any = null;
     const onBattery = (b: any) => {
       battery = b;
@@ -132,11 +132,11 @@ export function usePerformanceMode(): PerfState {
 
     if ("getBattery" in navigator) {
       (navigator as any).getBattery().then(onBattery).catch(() => {
-        // Battery API unavailable — stay at HIGH
+        // Battery API unavailable  stay at HIGH
       });
     }
 
-    // ── Prefers Reduced Motion ──────────────────────────────────────────────
+    //  Prefers Reduced Motion 
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onMqChange = () => updateMode();
     mq.addEventListener("change", onMqChange);

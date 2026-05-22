@@ -61,7 +61,7 @@ function renderChart(pools) {
 
     // Create High-End Gradients
     const barGradient = ctx.createLinearGradient(0, 0, 0, 450);
-    barGradient.addColorStop(0, 'rgba(0, 192, 118, 0.8)');   // Sovereign Emerald
+    barGradient.addColorStop(0, 'rgba(0, 192, 118, 0.8)');   // System Emerald
     barGradient.addColorStop(1, 'rgba(0, 192, 118, 0.05)');
 
     const lineGradient = ctx.createLinearGradient(0, 0, 0, 450);
@@ -74,7 +74,7 @@ function renderChart(pools) {
             labels: labels,
             datasets: [
                 {
-                    label: 'Liquidity Matrix (TVL)',
+                    label: 'Liquidity Grid (TVL)',
                     data: tvlData,
                     backgroundColor: barGradient,
                     borderColor: '#00C076',

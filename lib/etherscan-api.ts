@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 
 
 const getEtherscanApiKey = () => process.env.ETHERSCAN_API_KEY || 'HCK9HSJ6D9SFZT54IMNCCCZ71CII74HH6J';
-// 🔥 MIGRATED TO V2 (V1 DEPRECATED FEB 2026)
+//  MIGRATED TO V2 (V1 DEPRECATED FEB 2026)
 const ETHERSCAN_BASE = 'https://api.etherscan.io/v2/api';
 const CHAINID = '1'; // Ethereum Mainnet
 
@@ -279,7 +279,7 @@ export async function getEtherscanNFTs(address: string) {
  * This replaces Alchemy completely for Ethereum Mainnet
  */
 export async function getEtherscanPortfolio(address: string) {
-  console.log(`[Etherscan] 🔍 Fetching complete portfolio for ${address}`);
+  console.log(`[Etherscan]  Fetching complete portfolio for ${address}`);
   
   try {
     const [ethBalance, tokenBalances, nfts] = await Promise.all([
@@ -288,7 +288,7 @@ export async function getEtherscanPortfolio(address: string) {
       getEtherscanNFTs(address),
     ]);
 
-    console.log(`[Etherscan] ✅ Portfolio fetched: ETH=${ethBalance?.balance || 0}, Tokens=${tokenBalances.length}, NFTs=${nfts.length}`);
+    console.log(`[Etherscan]  Portfolio fetched: ETH=${ethBalance?.balance || 0}, Tokens=${tokenBalances.length}, NFTs=${nfts.length}`);
 
     return {
       ethBalance: ethBalance?.balance || '0',
@@ -297,7 +297,7 @@ export async function getEtherscanPortfolio(address: string) {
       totalTokens: tokenBalances.length,
     };
   } catch (error) {
-    console.error('[Etherscan] ❌ Portfolio fetch failed:', error);
+    console.error('[Etherscan]  Portfolio fetch failed:', error);
     return {
       ethBalance: '0',
       tokens: [],

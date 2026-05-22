@@ -69,7 +69,7 @@ export class DexSwapService {
    * @returns Transaction hash
    */
   async executeSwap({ userId, tokenIn, tokenOut, amountIn, slippagePercent = 0.5 }: SwapParams): Promise<string> {
-    console.log(`[DEX] Swapping ${amountIn} ${tokenIn} → ${tokenOut}`);
+    console.log(`[DEX] Swapping ${amountIn} ${tokenIn}  ${tokenOut}`);
 
     // 1. Get User Wallet
     const user = await prisma.authUser.findFirst({

@@ -14,14 +14,14 @@ node scripts/create-admin.js
 
 **Output:**
 ```
-✅ Connected to MongoDB Atlas
-🗑️  Cleared existing admin users
-✅ Admin user created successfully!
+ Connected to MongoDB Atlas
+️  Cleared existing admin users
+ Admin user created successfully!
 
-📧 Email: admin@polymarketwallet.com
-🔑 Password: Admin_Poly_2026!
+ Email: admin@polymarketwallet.com
+ Password: Admin_Poly_2026!
 
-⚠️  IMPORTANT: Change this password after first login!
+️  IMPORTANT: Change this password after first login!
 ```
 
 ### 3. Start Development Server
@@ -44,24 +44,24 @@ npm run dev
 ### Authentication Flow
 ```
 User visits any page
-    ↓
+    
 Middleware checks for admin_token cookie
-    ↓
-No token? → Redirect to /admin/login
-    ↓
-User logs in → JWT token created
-    ↓
+    
+No token?  Redirect to /admin/login
+    
+User logs in  JWT token created
+    
 Token stored in HTTP-only cookie
-    ↓
+    
 Access granted to all routes
 ```
 
 ### Security Features
-- ✅ **HTTP-only cookies** (prevents XSS)
-- ✅ **bcrypt password hashing** (12 rounds)
-- ✅ **JWT tokens** (24h expiration)
-- ✅ **MongoDB Atlas** (encrypted connection)
-- ✅ **Middleware protection** (all routes protected)
+-  **HTTP-only cookies** (prevents XSS)
+-  **bcrypt password hashing** (12 rounds)
+-  **JWT tokens** (24h expiration)
+-  **MongoDB Atlas** (encrypted connection)
+-  **Middleware protection** (all routes protected)
 
 ---
 
@@ -87,7 +87,7 @@ MONGODB_URI="mongodb+srv://[REDACTED_DB_USER]:[REDACTED_DB_PASS]@cluster0.7kewab
 JWT_SECRET="VOID_SECRET_99_POLY"
 ```
 
-⚠️ **IMPORTANT:** Change `JWT_SECRET` in production!
+️ **IMPORTANT:** Change `JWT_SECRET` in production!
 
 ---
 
@@ -113,7 +113,7 @@ JWT_SECRET="VOID_SECRET_99_POLY"
 Currently, password change must be done manually in MongoDB Atlas:
 
 1. Go to MongoDB Atlas dashboard
-2. Browse Collections → `polymarket` → `adminusers`
+2. Browse Collections  `polymarket`  `adminusers`
 3. Edit the document
 4. Generate new hash:
    ```javascript
@@ -150,4 +150,4 @@ Currently, password change must be done manually in MongoDB Atlas:
 
 ---
 
-**Status:** ✅ Admin portal fully functional and integrated
+**Status:**  Admin portal fully functional and integrated

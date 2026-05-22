@@ -157,7 +157,7 @@ export const tradingModules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. Aislamiento Criptográfico Absoluto de la Delta Direccional</h2>
-                        <p>Un inversor estándar asume direccionalidad masiva y asimetría de precio para intentar lucrar. El análisis PhD implementa <strong>Delta-Neutralidad</strong>, en matemática financiera: su delta agregada de portafolio es estrictamente ≈0.00. Si el mercado criptográfico estalla en un Rally Parabólico de 250% o Colapsa un 85% de la noche a la mañana a $10k, un trader Delta Neutral experimenta matemáticamente un retorno patrimonial en Fíat (o Stablecoins) equivalente o superior de base nominal sin someterse a la varianza direccional terminal que revienta fondos direccionales como 3AC.</p>
+                        <p>Un inversor estándar asume direccionalidad masiva y asimetría de precio para intentar lucrar. El análisis PhD implementa <strong>Delta-Neutralidad</strong>, en matemática financiera: su delta agregada de portafolio es estrictamente 0.00. Si el mercado criptográfico estalla en un Rally Parabólico de 250% o Colapsa un 85% de la noche a la mañana a $10k, un trader Delta Neutral experimenta matemáticamente un retorno patrimonial en Fíat (o Stablecoins) equivalente o superior de base nominal sin someterse a la varianza direccional terminal que revienta fondos direccionales como 3AC.</p>
                     </section>
 
                     <section class="pro-section">
@@ -355,7 +355,7 @@ export const tradingModules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. Transparencia Pseudónima y Exploración Forense Criptográfica</h2>
-                        <p>La supremacía técnica L1 de la Blockchain Pública frente al monopolio L2 TradFi es que los movimientos mastodónticos perimetrales de Wall Street no pueden ser encubiertos ni falseados L1. Usando plataformas PhD como <em>Nansen L1/Arkham Intelligence L2</em>, el Retail Avanzado indexa algorítmicamente todas las direcciones EOA L1 con patrimonios transitorios <strong>mayores a $50 Millones ("Smart Money" Wallets)</strong> (VCs como Paradigm, a16z, o Jump Trading). Los flujos L2 migrando orgánicamente masivos de USDT L1 hacia Contratos Nativos Vírgenes L2 inyectan alertas pre-cognitivas L1 revelando "la narrativa meta-anual L2" antes del alarde publicitario periodístico corporativo tardío L1.</p>
+                        <p>La supremacía técnica L1 de la Blockchain Pública frente al monopolio L2 TradFi es que los movimientos mastodónticos perimetrales de Wall Street no pueden ser encubiertos ni falseados L1. Usando plataformas PhD como <em>Nansen L1/Arkham Analytics L2</em>, el Retail Avanzado indexa algorítmicamente todas las direcciones EOA L1 con patrimonios transitorios <strong>mayores a $50 Millones ("Smart Money" Wallets)</strong> (VCs como Paradigm, a16z, o Jump Trading). Los flujos L2 migrando orgánicamente masivos de USDT L1 hacia Contratos Nativos Vírgenes L2 inyectan alertas pre-cognitivas L1 revelando "la narrativa meta-anual L2" antes del alarde publicitario periodístico corporativo tardío L1.</p>
                     </section>
 
                     <section class="pro-section">

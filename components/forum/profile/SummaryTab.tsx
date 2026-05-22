@@ -17,8 +17,8 @@ export function SummaryTab({ summary }: { summary: any }) {
           <StatBox value={`${stats.recentReadTimeHours}h`} label="recent read time" />
           <StatBox value={stats.topicsViewed} label="topics viewed" />
           <StatBox value={stats.postsRead} label="posts read" />
-          <StatBox value={stats.likesGiven} label="given" icon="♥" />
-          <StatBox value={stats.likesReceived} label="received" icon="♥" />
+          <StatBox value={stats.likesGiven} label="given" icon="" />
+          <StatBox value={stats.likesReceived} label="received" icon="" />
           <StatBox value={stats.topicsCreated} label="topics created" />
           <StatBox value={stats.postsCreated} label="posts created" />
         </div>
@@ -33,7 +33,7 @@ export function SummaryTab({ summary }: { summary: any }) {
               <div className="flex items-center gap-2 text-[10px] font-mono text-[#050505]/40">
                 <span>{new Date(reply.createdAt).toLocaleDateString()}</span>
                 <span>·</span>
-                <span className="text-[#D4AF37]">♥ {reply._count?.likes || 0}</span>
+                <span className="text-[#D4AF37]"> {reply._count?.likes || 0}</span>
               </div>
               <Link href={`/forum/t/${reply.topic.id}`} className="text-[12px] font-mono text-[#050505] hover:underline underline-offset-2 truncate">
                 {reply.topic.title}
@@ -50,7 +50,7 @@ export function SummaryTab({ summary }: { summary: any }) {
               <div className="flex items-center gap-2 text-[10px] font-mono text-[#050505]/40">
                 <span>{new Date(topic.createdAt).toLocaleDateString()}</span>
                 <span>·</span>
-                <span className="text-[#D4AF37]">♥ {topic._count?.likes || 0}</span>
+                <span className="text-[#D4AF37]"> {topic._count?.likes || 0}</span>
               </div>
               <Link href={`/forum/t/${topic.id}`} className="text-[12px] font-mono text-[#050505] hover:underline underline-offset-2 truncate">
                 {topic.title}
@@ -109,7 +109,7 @@ export function SummaryTab({ summary }: { summary: any }) {
               <div key={badge.id} className="border border-[#E0E0E0] p-2 flex flex-col gap-1 hover:bg-[#F5F5F5] transition-colors">
                 <div className="flex items-center gap-2">
                   <span className={badge.type === 'gold' ? 'text-[#D4AF37]' : badge.type === 'silver' ? 'text-[#A8A9AD]' : 'text-[#CD7F32]'}>
-                    ♦
+                    
                   </span>
                   <span className="text-[10px] font-mono font-bold text-[#050505] truncate">{badge.name}</span>
                 </div>
@@ -149,11 +149,11 @@ function UserLikeRow({ user }: { user: any }) {
       </div>
       <div className="flex-1 flex flex-col">
         <span className="text-[11px] font-mono text-[#050505] group-hover:underline underline-offset-2">
-          {user.displayName || `${user.walletAddress.slice(0, 6)}…`}
+          {user.displayName || `${user.walletAddress.slice(0, 6)}`}
         </span>
       </div>
       <div className="flex items-center gap-1 text-[11px] font-mono text-[#D4AF37]">
-        <span>♥</span>
+        <span></span>
         <span>{user.count}</span>
       </div>
     </Link>

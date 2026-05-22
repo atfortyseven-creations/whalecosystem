@@ -9,7 +9,7 @@ export default function EnterpriseDashboard({ initialData }: { initialData?: any
     return (
         <div className="min-h-screen bg-[#080808] text-[#EAEAEA] font-sans selection:bg-white/20">
 
-            {/* 1. MESH BACKGROUND (Sutil, como Polygon/Worldcoin) */}
+            {/* 1. MESH BACKGROUND (Sutil, como Polygon/Identity) */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-[-20%] right-[0%] w-[600px] h-[600px] bg-purple-900/20 blur-[120px] rounded-full opacity-40 mix-blend-screen" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-900/10 blur-[120px] rounded-full opacity-30 mix-blend-screen" />

@@ -4,13 +4,13 @@ import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Starfield — each star is one BoxGeometry (streak), rendered as individual meshes.
-// 800 meshes → each has its own draw call. This is fine for a fixed background.
-// Star count reduced 800→400 for mobile safety. Still visually full and dense.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// Starfield  each star is one BoxGeometry (streak), rendered as individual meshes.
+// 800 meshes  each has its own draw call. This is fine for a fixed background.
+// Star count reduced 800400 for mobile safety. Still visually full and dense.
+// 
 
-// Shared geometry and material — created ONCE at module scope
+// Shared geometry and material  created ONCE at module scope
 const STAR_GEO  = new THREE.BoxGeometry(0.8, 0.8, 40);
 const STAR_MAT_WHITE = new THREE.MeshBasicMaterial({
   color: '#ffffff',
@@ -27,7 +27,7 @@ const STAR_MAT_BLUE = new THREE.MeshBasicMaterial({
   depthWrite: false,
 });
 
-// Pre-compute star data at module scope — no allocation inside components
+// Pre-compute star data at module scope  no allocation inside components
 const STAR_COUNT = 400;
 const starData = (() => {
   const rand = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
@@ -51,7 +51,7 @@ function Star({ idx }: { idx: number }) {
 
   useFrame((_, delta) => {
     const m = mesh.current;
-    // delta-correct motion — same speed at 60, 120, or 240 Hz
+    // delta-correct motion  same speed at 60, 120, or 240 Hz
     const spd = d.speed * delta;
     m.position.z += spd * 2000;
     m.position.x += Math.cos(d.angle) * spd * 100;
@@ -77,7 +77,7 @@ function Star({ idx }: { idx: number }) {
   );
 }
 
-// Memoized scene — star list never changes
+// Memoized scene  star list never changes
 const StarfieldScene = React.memo(function StarfieldScene() {
   const indices = useMemo(() => Array.from({ length: STAR_COUNT }, (_, i) => i), []);
   return (
@@ -98,7 +98,7 @@ export default function Starfield() {
           antialias: false,
           powerPreference: 'high-performance',
           stencil: false,
-          depth: false, // Stars have no depth relationship — saves depth buffer
+          depth: false, // Stars have no depth relationship  saves depth buffer
           alpha: false,
         }}
         dpr={[1, 1.5]}

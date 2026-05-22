@@ -3,9 +3,9 @@ const hre = require("hardhat");
 async function main() {
     const [deployer] = await hre.ethers.getSigners();
     if (!deployer) {
-        throw new Error("❌ No deployer account found! Please check your .env file and ensure PRIVATE_KEY is set and valid (starts with 0x...).");
+        throw new Error(" No deployer account found! Please check your .env file and ensure PRIVATE_KEY is set and valid (starts with 0x...).");
     }
-    console.log("🚀 Deploying contracts with account:", deployer.address);
+    console.log(" Deploying contracts with account:", deployer.address);
 
     // ---------------------------------------------------------
     // 1. DEPLOY CONDITIONAL TOKENS (CORE)
@@ -17,7 +17,7 @@ async function main() {
     try {
         ConditionalTokens = await hre.ethers.getContractFactory("ConditionalTokens");
     } catch (e) {
-        console.log("⚠️ Could not get factory for ConditionalTokens directly. Ensuring artifacts are present.");
+        console.log("️ Could not get factory for ConditionalTokens directly. Ensuring artifacts are present.");
         // If we can't find it, we might need to rely on importing it in a solidity file.
         throw e;
     }
@@ -26,7 +26,7 @@ async function main() {
     await conditionalTokens.waitForDeployment();
     const ctAddress = await conditionalTokens.getAddress();
 
-    console.log("\n✅ NEXT_PUBLIC_CTF_ADDRESS:");
+    console.log("\n NEXT_PUBLIC_CTF_ADDRESS:");
     console.log(ctAddress);
 
     // ---------------------------------------------------------
@@ -38,7 +38,7 @@ async function main() {
     await fpmmFactory.waitForDeployment();
     const factoryAddress = await fpmmFactory.getAddress();
 
-    console.log("\n✅ NEXT_PUBLIC_FPMM_FACTORY_ADDRESS:");
+    console.log("\n NEXT_PUBLIC_FPMM_FACTORY_ADDRESS:");
     console.log(factoryAddress);
 
     // ---------------------------------------------------------
@@ -53,21 +53,21 @@ async function main() {
         await mockToken.waitForDeployment();
         const tokenAddress = await mockToken.getAddress();
 
-        console.log("\n✅ NEXT_PUBLIC_COLLATERAL_TOKEN_ADDRESS (Test USDC):");
+        console.log("\n NEXT_PUBLIC_COLLATERAL_TOKEN_ADDRESS (Test USDC):");
         console.log(tokenAddress);
     } catch (error) {
-        console.log("\n⚠️ Error deploying MockERC20:", error);
+        console.log("\n️ Error deploying MockERC20:", error);
     }
 
     // ---------------------------------------------------------
     // 4. ORACLE NOTE
     // ---------------------------------------------------------
-    console.log("\n⚠️ NEXT_PUBLIC_ORACLE_ADDRESS:");
+    console.log("\n️ NEXT_PUBLIC_ORACLE_ADDRESS:");
     console.log("For the oracle, you need to deploy your UMA adapter or use an existing address.");
     console.log("If you don't have the adapter yet, this step is pending.");
 
     console.log("\n---------------------------------------------------------");
-    console.log("🎉 DEPLOYMENT COMPLETE! Copy the values above to Railway.");
+    console.log(" DEPLOYMENT COMPLETE! Copy the values above to Railway.");
 }
 
 main().catch((error) => {

@@ -29,7 +29,7 @@ const MarketStreamContext = createContext<MarketStreamContextType>({
 
 export const useMarketStream = () => useContext(MarketStreamContext);
 
-// ── Client-side synthetic bootstrap so the UI is never empty on first paint ──
+//  Client-side synthetic bootstrap so the UI is never empty on first paint 
 function buildSyntheticMap(): Map<string, MarketData> {
     return new Map<string, MarketData>();
 }
@@ -67,21 +67,21 @@ export const MarketStreamProvider = ({ children }: { children: ReactNode }) => {
                             setLatency(Math.round(end - start));
                             setMode('live');
                         } else {
-                            // Empty response — keep existing data, remain live
+                            // Empty response  keep existing data, remain live
                             setIsConnected(false);
                             setLatency(0);
                         }
                     }
                 }
             } catch {
-                // Network error — keep existing data, protocol stays live
+                // Network error  keep existing data, protocol stays live
                 if (isMounted) {
                     setIsConnected(false);
                     setLatency(0);
                 }
             } finally {
                 if (isMounted) {
-                    // Fixed 3s interval — deterministic, no synthetic fluctuation
+                    // Fixed 3s interval  deterministic, no synthetic fluctuation
                     timeoutId = setTimeout(fetchStream, 3000);
                 }
             }

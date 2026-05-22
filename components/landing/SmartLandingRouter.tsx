@@ -26,11 +26,11 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
         setMounted(true);
     }, []);
 
-    // Fast-path: server already told us it's mobile — render immediately
+    // Fast-path: server already told us it's mobile  render immediately
     // without waiting for JS hydration (eliminates ~3s blank white screen).
     if (!mounted && isMobileUserAgent) return <ClientMobileLanding />;
 
-    // Always show the landing page — never auto-redirect to /dashboard.
+    // Always show the landing page  never auto-redirect to /dashboard.
     // The dashboard redirect is handled exclusively by ConnectPage after
     // a successful wallet signature. This ensures that on page reload
     // the user always lands on the public landing page.

@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // 2. Check native Sovereign DB instead of Clerk Metadata
+    // 2. Check native System DB instead of Clerk Metadata
     const dbUser = await prisma.user.findUnique({
       where: { walletAddress: authUserId },
     });

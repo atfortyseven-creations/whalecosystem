@@ -19,7 +19,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-    // Protección básica — solo accesible con el CRON_SECRET o en desarrollo
+    // Protección básica  solo accesible con el CRON_SECRET o en desarrollo
     const authHeader = request.headers.get('x-cron-secret') ?? request.headers.get('authorization');
     const isAuthorized =
         process.env.NODE_ENV === 'development' ||

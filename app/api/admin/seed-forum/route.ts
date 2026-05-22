@@ -7,8 +7,8 @@ import { requireAdmin } from '@/lib/admin-guard';
 export const dynamic = 'force-dynamic';
 
 const DOMAINS = [
-    'capital.xyz', 'ventures.eth', 'matrix.fund', 'global.institution',
-    'alpha.org', 'sovereign.io', 'blackbox.fi', 'quantum.trades',
+    'capital.xyz', 'ventures.eth', 'grid.fund', 'global.institution',
+    'alpha.org', 'system.io', 'blackbox.fi', 'core.trades',
     'genesis.block', 'omega.capital'
 ];
 
@@ -39,13 +39,13 @@ Please submit cryptographic proposals below.
 [SECURE_DOC:Mandate_Brief_v{Version}.pdf|ipfs://Qm{Hash}]`
     },
     {
-        title: "Intelligence Alert: Anomalous {Metric} detected on {Chain}",
+        title: "Analytics Alert: Anomalous {Metric} detected on {Chain}",
         content: `### Phenomenon Observation
 Our automated heuristic engines have flagged significant anomalies regarding {Metric} across the {Chain} ecosystem over the last 48 hours.
 
 ### Analysis & Trajectory
 1. Capital flows indicate a systemic rotation from primary layers to {Target}.
-2. Dark pool activity suggests accumulation by 3 major sovereign wallets.
+2. Dark pool activity suggests accumulation by 3 major system wallets.
 3. Network congestion metrics correlate with these hidden spikes.
 
 ### Institutional Strategy
@@ -94,12 +94,12 @@ export async function POST(req: Request) {
 
     try {
         const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
+        const address = cookieStore.get('system_handshake')?.value;
         if (!isAdmin(address)) {
-            return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
+            return NextResponse.json({ error: 'Unauthorized: System Admin Only' }, { status: 403 });
         }
 
-        console.log('🛡️ Initiating Sovereign Database Matrix...');
+        console.log('️ Initiating System Database Grid...');
         
         const results: Record<string, number> = {
             categories: 0, users: 0, topics: 0, posts: 0,
@@ -135,7 +135,7 @@ export async function POST(req: Request) {
 
         for (let i = 0; i < personasToCreate; i++) {
             const walletAddress = '0x' + generateRandomString(40);
-            const namePart1 = getRandomItem(['Alpha', 'Quantum', 'Apex', 'Zenith', 'Cipher', 'Nexus', 'Vertex']);
+            const namePart1 = getRandomItem(['Alpha', 'Core', 'Apex', 'Zenith', 'Cipher', 'Nexus', 'Vertex']);
             const namePart2 = getRandomItem(['Capital', 'Ventures', 'Labs', 'Research', 'Holdings', 'Systems']);
             const domain = getRandomItem(DOMAINS);
             

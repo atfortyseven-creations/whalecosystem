@@ -6,8 +6,8 @@
  * authenticated with an EIP-712 signature from the user's wallet.
  *
  * Relevant endpoints (all public):
- *   POST https://api.hyperliquid.xyz/info  → query account data / leaderboard
- *   POST https://api.hyperliquid.xyz/exchange → place signed orders
+ *   POST https://api.hyperliquid.xyz/info   query account data / leaderboard
+ *   POST https://api.hyperliquid.xyz/exchange  place signed orders
  *
  * Docs: https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api
  */
@@ -48,7 +48,7 @@ export interface HLOrderPayload {
 
 /**
  * Fetch the Hyperliquid leaderboard and return the top 10 traders.
- * This is a PUBLIC endpoint — no authentication needed.
+ * This is a PUBLIC endpoint  no authentication needed.
  */
 export async function fetchHLLeaderboard(): Promise<HLTrader[]> {
     try {
@@ -103,7 +103,7 @@ export async function fetchHLLeaderboard(): Promise<HLTrader[]> {
 
 /**
  * Fetch open positions for a specific Hyperliquid address.
- * PUBLIC endpoint — no auth needed.
+ * PUBLIC endpoint  no auth needed.
  */
 export async function fetchHLPositions(address: string): Promise<HLPosition[]> {
     try {

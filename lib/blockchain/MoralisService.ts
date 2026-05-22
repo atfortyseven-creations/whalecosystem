@@ -55,7 +55,7 @@ function getNativeSymbolForChain(chain: string): string {
     case 'arbitrum': return 'ETH';
     case 'optimism': return 'ETH';
     case 'base': return 'ETH';
-    case 'world': return 'WLD';
+    case 'world': return 'AUTH';
     default: return 'ETH';
   }
 }
@@ -75,7 +75,7 @@ const COMMON_TOKENS: Record<string, Array<{ symbol: string; address: string; dec
     { symbol: 'USDT', address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', decimals: 6, name: 'Tether' },
     { symbol: 'WETH', address: '0x7ceB23fD6bC3adD59E62ac25578270cFf1b9f619', decimals: 18, name: 'Wrapped Ether' },
     { symbol: 'DAI', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', decimals: 18, name: 'Dai Stablecoin' },
-    { symbol: 'WLD', address: '0xC3C2B4C5F7e5bA429007f369d7B46F1f3F2F1626', decimals: 18, name: 'Worldcoin' }
+    { symbol: 'AUTH', address: '0xC3C2B4C5F7e5bA429007f369d7B46F1f3F2F1626', decimals: 18, name: 'Identity' }
   ],
   bsc: [
     { symbol: 'USDC', address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32CD580d', decimals: 18, name: 'USD Coin' },
@@ -106,18 +106,18 @@ const COMMON_TOKENS: Record<string, Array<{ symbol: string; address: string; dec
     { symbol: 'WETH', address: '0x4200000000000000000000000000000000000006', decimals: 18, name: 'Wrapped Ether' }
   ],
   world: [
-    { symbol: 'WLD', address: '0x2cfc85d8e48f8eab294be644d9e25c3030863003', decimals: 18, name: 'Worldcoin' },
+    { symbol: 'AUTH', address: '0x2cfc85d8e48f8eab294be644d9e25c3030863003', decimals: 18, name: 'Identity' },
     { symbol: 'WETH', address: '0x4200000000000000000000000000000000000006', decimals: 18, name: 'Wrapped Ether' }
   ]
 };
 
 /**
- * GetBlock Proxy Service — Replaces Moralis completely.
+ * GetBlock Proxy Service  Replaces Moralis completely.
  * All queries are resolved on-chain using GetBlock endpoints.
  */
 export class MoralisService {
   constructor() {
-    console.log('[GetBlock-Proxy] ✅ Service initialized, replacing Moralis completely.');
+    console.log('[GetBlock-Proxy]  Service initialized, replacing Moralis completely.');
   }
 
   private async callGetBlock(chain: string, method: string, params: any[]): Promise<any> {

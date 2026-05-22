@@ -8,7 +8,7 @@ import {
   getTransactionStats
 } from '@/lib/wallet/transactions-server';
 
-/** Safe JSON serializer — converts BigInt to string to avoid JSON.stringify crash */
+/** Safe JSON serializer  converts BigInt to string to avoid JSON.stringify crash */
 function safeStringify(data: unknown): string {
   return JSON.stringify(data, (_, v) =>
     typeof v === 'bigint' ? v.toString() : v

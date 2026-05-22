@@ -1,10 +1,10 @@
 /**
- * FASE 7 — ALERTAS TELEGRAM REALES
+ * FASE 7  ALERTAS TELEGRAM REALES
  * El usuario guarda su Chat ID y el servidor envía mensajes reales
  * usando el TELEGRAM_BOT_TOKEN ya configurado en Railway.
  * 
  * Flujo:
- *   1. Usuario abre @userinfobot en Telegram → obtiene su Chat ID
+ *   1. Usuario abre @userinfobot en Telegram  obtiene su Chat ID
  *   2. Lo pega en el panel y pulsa "ACTIVAR"
  *   3. El servidor guarda el Chat ID en Prisma (tabla TelegramAlert)
  *   4. Cada vez que una señal EV == 'OVERSOLD' o APY supera el umbral,
@@ -16,7 +16,7 @@ import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
-// ── Rate Limiting ────────────────────────────────────────────────────────────
+//  Rate Limiting 
 // Prevents DDoS/bot nets from abusing the Telegram API and getting the
 // corporate bot permanently banned by Telegram for flood violations.
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -53,13 +53,13 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// ──────────────────────────────────────────────
+// 
 // POST /api/telegram/connect
 // Body: { wallet, chatId, minApy, evSignals }
-// ──────────────────────────────────────────────
+// 
 export async function POST(req: NextRequest) {
     try {
-        // ── Rate Limit check ─────────────────────────────────────────────
+        //  Rate Limit check 
         const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
         if (!checkRateLimit(ip)) {
             return NextResponse.json(
@@ -88,15 +88,15 @@ export async function POST(req: NextRequest) {
                 chat_id: chatId,
                 parse_mode: 'HTML',
                 text: [
-                    '🔱 <b>SOVEREIGN INTELLIGENCE TERMINAL</b>',
+                    ' <b>SOVEREIGN INTELLIGENCE TERMINAL</b>',
                     '',
-                    '✅ Alertas activadas correctamente.',
+                    ' Alertas activadas correctamente.',
                     '',
-                    `📊 <b>Configuración:</b>`,
-                    `• APY mínimo para alertas: <code>${minApy}%</code>`,
-                    `• Señales EV Polymarket: ${evSignals ? 'ACTIVADAS' : 'DESACTIVADAS'}`,
+                    ` <b>Configuración:</b>`,
+                    ` APY mínimo para alertas: <code>${minApy}%</code>`,
+                    ` Señales EV Polymarket: ${evSignals ? 'ACTIVADAS' : 'DESACTIVADAS'}`,
                     '',
-                    '⚡ Recibirás notificaciones cuando aparezcan oportunidades reales de mercado.',
+                    ' Recibirás notificaciones cuando aparezcan oportunidades reales de mercado.',
                 ].join('\n'),
             })
         });
@@ -121,11 +121,11 @@ export async function POST(req: NextRequest) {
     }
 }
 
-// ──────────────────────────────────────────────
+// 
 // DELETE /api/telegram/connect
 // Body: { wallet }
 // Removes alert configuration
-// ──────────────────────────────────────────────
+// 
 export async function DELETE(req: NextRequest) {
     try {
         const { wallet } = await req.json();
@@ -141,10 +141,10 @@ export async function DELETE(req: NextRequest) {
     }
 }
 
-// ──────────────────────────────────────────────
+// 
 // Exported helper: send a real Telegram message
 // Used by cron jobs and signal processors
-// ──────────────────────────────────────────────
+// 
 async function sendTelegramAlert(chatId: string, message: string): Promise<boolean> {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     if (!botToken) return false;

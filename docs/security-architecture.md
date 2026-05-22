@@ -4,59 +4,59 @@ This document describes the complete security stack of Whale Alert Network, from
 
 ---
 
-## Overview — Defense in Depth
+## Overview  Defense in Depth
 
 ```
 INTERNET
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 0 — HSTS Preload                                         │
-│  max-age=63072000; includeSubDomains; preload                   │
-│  Forces HTTPS for all connections. Eliminates SSL stripping.    │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │
-┌────────────────────────────────▼────────────────────────────────┐
-│  LAYER 1 — WhaleFortress WAF v6 (Edge Runtime)                  │
-│  OWASP Core Rule Set v3.3 — Anomaly Scoring Engine              │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │
-┌────────────────────────────────▼────────────────────────────────┐
-│  LAYER 2 — Geofencing (CFTC / OFAC)                             │
-│  Blocks: US, CU, IR, KP, SY at network edge                     │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │
-┌────────────────────────────────▼────────────────────────────────┐
-│  LAYER 3 — Honeypot Routes                                       │
-│  /wp-admin, /.env, /phpmyadmin, /admin, /config → 404 silence   │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │
-┌────────────────────────────────▼────────────────────────────────┐
-│  LAYER 4 — Rate Limiting (Bicapa)                               │
-│  In-memory sliding window (WAF) + Redis atomic Lua (middleware)  │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │
-┌────────────────────────────────▼────────────────────────────────┐
-│  LAYER 5 — Identity Verification                                 │
-│  Clerk Auth + Sovereign Handshake + KYC JWT                     │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │
-┌────────────────────────────────▼────────────────────────────────┐
-│  LAYER 6 — Content Security Policy (Nonce-based)                │
-│  strict-dynamic, unsafe-eval only on wallet routes              │
-└────────────────────────────────┬────────────────────────────────┘
-                                 │
-┌────────────────────────────────▼────────────────────────────────┐
-│  LAYER 7 — Client-Side Vault Encryption                         │
-│  AES-GCM-256 + PBKDF2-SHA256 (210,000 iterations)              │
-└─────────────────────────────────────────────────────────────────┘
+    
+    
+
+  LAYER 0  HSTS Preload                                         
+  max-age=63072000; includeSubDomains; preload                   
+  Forces HTTPS for all connections. Eliminates SSL stripping.    
+
+                                 
+
+  LAYER 1  WhaleFortress WAF v6 (Edge Runtime)                  
+  OWASP Core Rule Set v3.3  Anomaly Scoring Engine              
+
+                                 
+
+  LAYER 2  Geofencing (CFTC / OFAC)                             
+  Blocks: US, CU, IR, KP, SY at network edge                     
+
+                                 
+
+  LAYER 3  Honeypot Routes                                       
+  /wp-admin, /.env, /phpmyadmin, /admin, /config  404 silence   
+
+                                 
+
+  LAYER 4  Rate Limiting (Bicapa)                               
+  In-memory sliding window (WAF) + Redis atomic Lua (middleware)  
+
+                                 
+
+  LAYER 5  Identity Verification                                 
+  Clerk Auth + System Handshake + KYC JWT                     
+
+                                 
+
+  LAYER 6  Content Security Policy (Nonce-based)                
+  strict-dynamic, unsafe-eval only on wallet routes              
+
+                                 
+
+  LAYER 7  Client-Side Vault Encryption                         
+  AES-GCM-256 + PBKDF2-SHA256 (210,000 iterations)              
+
 ```
 
 ---
 
-## WAF — WhaleFortress v6
+## WAF  WhaleFortress v6
 
-The Web Application Firewall runs in Next.js Edge Runtime — before any application code, before any database query, before any authentication check.
+The Web Application Firewall runs in Next.js Edge Runtime  before any application code, before any database query, before any authentication check.
 
 ### Anomaly Scoring Vectors
 
@@ -72,8 +72,8 @@ Requests accumulate an anomaly score across 6 independent detection vectors:
 | Host header anomaly | +3 | Host not in expected production/preview domain list |
 
 **Thresholds:**
-- Score ≥ 5: `CHALLENGE` — logged, monitored, adaptive limit applied
-- Score ≥ 10: `BLOCK` — immediate HTTP 403, `X-WAF-Block: true` header
+- Score  5: `CHALLENGE`  logged, monitored, adaptive limit applied
+- Score  10: `BLOCK`  immediate HTTP 403, `X-WAF-Block: true` header
 
 ### Bot UA Fingerprinting
 
@@ -102,7 +102,7 @@ javascript:                 # JS protocol injection
 
 ---
 
-## Rate Limiting — Bicapa Architecture
+## Rate Limiting  Bicapa Architecture
 
 ### Layer A: In-Memory (WAF, zero latency)
 
@@ -134,7 +134,7 @@ end
 return current
 ```
 
-This single atomic operation eliminates the INCR→EXPIRE race condition that would otherwise allow quota bypass under high concurrency. Keys expire at midnight UTC, resetting the daily quota.
+This single atomic operation eliminates the INCREXPIRE race condition that would otherwise allow quota bypass under high concurrency. Keys expire at midnight UTC, resetting the daily quota.
 
 **Adaptive limits:** Authenticated users are rate-limited according to their plan tier (FREE/STANDARD/STARTER/PRO/ELITE). ELITE keys receive `limit: -1` (unlimited) and bypass the Redis quota check entirely.
 
@@ -142,7 +142,7 @@ This single atomic operation eliminates the INCR→EXPIRE race condition that wo
 
 ## Content Security Policy
 
-The CSP is generated per-request with a cryptographically random nonce (128-bit, base64-encoded). Every legitimate inline script must carry this nonce attribute — injected scripts without it are blocked by the browser.
+The CSP is generated per-request with a cryptographically random nonce (128-bit, base64-encoded). Every legitimate inline script must carry this nonce attribute  injected scripts without it are blocked by the browser.
 
 ### Policy Structure
 
@@ -161,7 +161,7 @@ upgrade-insecure-requests;
 
 ### `unsafe-eval` Scope
 
-`unsafe-eval` is required by AppKit and WalletConnect for WebAssembly evaluation. It is **scoped only to wallet-related routes** (`/` and `/api/wallet/*`). All other routes — dashboard, API, admin — run with `unsafe-eval` removed, providing full XSS resistance via CSP.
+`unsafe-eval` is required by AppKit and WalletConnect for WebAssembly evaluation. It is **scoped only to wallet-related routes** (`/` and `/api/wallet/*`). All other routes  dashboard, API, admin  run with `unsafe-eval` removed, providing full XSS resistance via CSP.
 
 ---
 
@@ -182,18 +182,18 @@ upgrade-insecure-requests;
 
 ## Cryptographic Vault
 
-See [Sovereign Identity → Layer 3](./sovereign-identity.md#layer-3--vault-encryption-aes-gcm-256--pbkdf2) for the complete vault encryption specification.
+See [System Identity  Layer 3](./system-identity.md#layer-3--vault-encryption-aes-gcm-256--pbkdf2) for the complete vault encryption specification.
 
 ### Key Security Properties
 
 - **Key non-exportability:** `extractable: false` is set on all derived CryptoKey objects. The key cannot be serialized or extracted from the Web Crypto context.
 - **Forward secrecy:** Each encryption generates a fresh random salt. Compromise of one encrypted blob does not weaken others.
 - **Authentication:** AES-GCM's 128-bit GHASH tag detects any ciphertext tampering before decryption.
-- **Work factor:** 210,000 PBKDF2 iterations per OWASP 2024 guidelines — approximately 21× more expensive than the previous 10,000-iteration standard.
+- **Work factor:** 210,000 PBKDF2 iterations per OWASP 2024 guidelines  approximately 21× more expensive than the previous 10,000-iteration standard.
 
 ---
 
-## Threat Model — What We Protect Against
+## Threat Model  What We Protect Against
 
 | Threat | Defense |
 |---|---|

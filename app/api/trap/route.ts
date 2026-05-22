@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'edge'; // Edge runtime for zero-latency trap response
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HONEYPOT ROUTES — /api/trap/*
+// 
+// HONEYPOT ROUTES  /api/trap/*
 //
 // These routes mimic paths that automated scanners and attackers probe
 // (admin panels, debug endpoints, exposed configs, credential endpoints).
@@ -14,7 +14,7 @@ export const runtime = 'edge'; // Edge runtime for zero-latency trap response
 //   3. Sets a "SOVEREIGN_TRAP_HIT" header for downstream WAF correlation
 //
 // Legitimate traffic never hits these paths.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 const TRAP_ROUTES = [
     '/api/admin/users',
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     const referer   = req.headers.get('referer') ?? 'none';
     const timestamp = new Date().toISOString();
 
-    // Log to Railway console — surfaced in log drain + monitoring
+    // Log to Railway console  surfaced in log drain + monitoring
     console.warn(JSON.stringify({
         level:     'SECURITY_TRAP',
         event:     'HONEYPOT_HIT',
@@ -57,12 +57,12 @@ export async function GET(req: NextRequest) {
         note:      'Automated scanner or attacker probing restricted paths',
     }));
 
-    // Return realistic but empty response — don't alert attacker they were detected
+    // Return realistic but empty response  don't alert attacker they were detected
     // Vary response slightly by path type to appear real
     if (path.includes('admin') || path.includes('users')) {
         return NextResponse.json({ users: [], total: 0, page: 1 }, {
             headers: {
-                'X-Sovereign-Trap': 'HIT',
+                'X-System-Trap': 'HIT',
                 'Cache-Control': 'no-store',
             }
         });
@@ -70,14 +70,14 @@ export async function GET(req: NextRequest) {
 
     if (path.includes('debug') || path.includes('env') || path.includes('config')) {
         return NextResponse.json({ debug: false, environment: 'production' }, {
-            headers: { 'X-Sovereign-Trap': 'HIT', 'Cache-Control': 'no-store' }
+            headers: { 'X-System-Trap': 'HIT', 'Cache-Control': 'no-store' }
         });
     }
 
     // Default: 404-like response
     return NextResponse.json({ error: 'Not found' }, {
         status: 404,
-        headers: { 'X-Sovereign-Trap': 'HIT', 'Cache-Control': 'no-store' },
+        headers: { 'X-System-Trap': 'HIT', 'Cache-Control': 'no-store' },
     });
 }
 

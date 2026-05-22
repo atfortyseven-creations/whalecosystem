@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
-// ─── Constants ──────────────────────────────────────────────────────────────
+//  Constants 
 
 const FADE_UP: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -17,22 +17,22 @@ const STAGGER: Variants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
-// ─── Component ──────────────────────────────────────────────────────────────
+//  Component 
 
 export function MobileManifesto() {
   const [hasSession, setHasSession] = useState(false);
   const [noteExpanded, setNoteExpanded] = useState(false);
 
   useEffect(() => {
-    setHasSession(document.cookie.includes("sovereign_handshake=") || document.cookie.includes("siwe_session="));
+    setHasSession(document.cookie.includes("system_handshake=") || document.cookie.includes("siwe_session="));
   }, []);
 
   return (
     <div className="relative bg-[#F9F8F6] text-[#0A0A0A] font-sans antialiased overflow-x-hidden min-h-[100dvh] selection:bg-black/10 flex flex-col w-full">
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           1. HERO
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <section className="px-6 pb-16 border-b border-[#EBEBEB] bg-[#F9F8F6] relative overflow-hidden flex flex-col justify-center" style={{ paddingTop: "max(8rem, env(safe-area-inset-top, 8rem))", minHeight: "85vh" }}>
         {/* Subtle background grain */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none noise-bg mix-blend-multiply" />
@@ -72,9 +72,9 @@ export function MobileManifesto() {
         </motion.div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           2. ARCHITECTURE
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <section className="px-6 py-20 border-b border-[#EBEBEB] bg-white space-y-16">
         
         <div className="text-center space-y-4 mb-12">
@@ -89,7 +89,7 @@ export function MobileManifesto() {
         {[
           { num: '01', title: 'Digital Fingerprint', desc: 'Medical discharge summaries are converted into unique mathematical codes. Personal details remain safely at the hospital.' },
           { num: '02', title: 'Global Ledger', desc: 'The fingerprint is locked into the Ethereum blockchain, creating a permanent, verifiable record.' },
-          { num: '03', title: 'Patient Sovereignty', desc: 'Patients receive a secure code. Doctors globally can verify medical history authenticity instantly.' },
+          { num: '03', title: 'Patient Systemty', desc: 'Patients receive a secure code. Doctors globally can verify medical history authenticity instantly.' },
         ].map((block, i) => (
           <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={FADE_UP} className="flex flex-col gap-4 bg-[#F9F8F6] p-8 rounded-3xl border border-[#EBEBEB]">
             <span className="font-mono text-[10px] font-black text-[#0A0A0A]/30 tracking-widest uppercase">Pillar {block.num}</span>
@@ -102,9 +102,9 @@ export function MobileManifesto() {
 
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           3. WHALE CHAT
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <section className="px-6 py-20 bg-[#0A0A0A] text-white">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP}>
           <div className="flex items-center gap-3 mb-12">
@@ -119,7 +119,7 @@ export function MobileManifesto() {
 
           <div className="space-y-6 font-serif text-[16px] text-white/70 leading-[1.7] text-center max-w-[340px] mx-auto mb-10 px-2">
             <p>
-              Centralized messaging platforms are liabilities for medical confidentiality. Whale Chat is built on XMTP — encrypted directly with authorized personnel keys.
+              Centralized messaging platforms are liabilities for medical confidentiality. Whale Chat is built on XMTP  encrypted directly with authorized personnel keys.
             </p>
             
             <AnimatePresence>
@@ -143,9 +143,9 @@ export function MobileManifesto() {
         </motion.div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
+      {/* 
           4. AZTEC
-      ══════════════════════════════════════════════════════════════════════ */}
+       */}
       <section className="px-6 py-24 bg-[#F9F8F6] border-t border-black/5 text-center flex-1">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={FADE_UP}>
           <span className="inline-block font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#0A0A0A]/40 mb-6 px-3 py-1.5 border border-black/10 rounded-full">
@@ -155,7 +155,7 @@ export function MobileManifesto() {
             Powered by <br/><span className="text-black/30">Aztec Network.</span>
           </h2>
           <p className="font-serif text-[15px] text-[#666] leading-[1.6] max-w-[320px] mx-auto px-2">
-            The foundation of this absolute transparency and security is built upon the Aztec Network L2 zk-Rollup. It is the definitive infrastructure for institutional sovereignty.
+            The foundation of this absolute transparency and security is built upon the Aztec Network L2 zk-Rollup. It is the definitive infrastructure for institutional systemty.
           </p>
         </motion.div>
       </section>

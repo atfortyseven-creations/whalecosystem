@@ -3,7 +3,7 @@ import { ChainId, blockchainService } from './BlockchainService';
 
 /**
  * AppChainService
- * Orchestrates interaction with the Arctic Sovereign L3 (Modular Rollup).
+ * Orchestrates interaction with the Arctic System L3 (Modular Rollup).
  * Manages state commitments, Celestia DA integration, and Orbit stack communication.
  */
 export class AppChainService {
@@ -15,7 +15,7 @@ export class AppChainService {
      */
     public async submitStateCommitment(batch: any): Promise<string> {
         // In a production Arbitrum Orbit setup, this would be handled by the sequencer.
-        // For the Master Matrix, we provide a direct interface for high-frequency state updates.
+        // For the Master Grid, we provide a direct interface for high-frequency state updates.
         console.log(`[AppChainService] Submitting batch to Arctic L3...`);
         
         // Simulation of Nitro batch submission

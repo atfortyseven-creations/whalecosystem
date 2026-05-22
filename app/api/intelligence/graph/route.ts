@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { graphMiner } from '@/services/intelligence/entity-graph-miner';
+import { graphMiner } from '@/services/analytics/entity-graph-miner';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +14,7 @@ export async function GET() {
             success: true,
             graph: { nodes: [], links: [] },
             degraded: true,
-            reason: 'Graph database offline — no data available at this time.'
+            reason: 'Graph database offline  no data available at this time.'
         });
     }
 }

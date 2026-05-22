@@ -32,7 +32,7 @@ const KNOWN_WALLETS: Record<string, string> = {
 const STABLE_SYMBOLS = new Set(['USDC', 'USDT', 'DAI', 'BUSD', 'FRAX', 'LUSD', 'TUSD']);
 
 // Approx USD price lookup for whale threshold calculation
-// These are reference prices only — used only for filtering server-side
+// These are reference prices only  used only for filtering server-side
 const APPROX_PRICES: Record<string, number> = {
     'ETH': 3350, 'WETH': 3350,
     'BTC': 67000, 'WBTC': 67000,

@@ -1,5 +1,5 @@
 /**
- * DeFi Yield Scanner — Real APY Data
+ * DeFi Yield Scanner  Real APY Data
  * Uses DeFiLlama's free public API to scan top yield opportunities across chains.
  * Zero API keys required. 100% real data.
  */
@@ -59,7 +59,7 @@ export async function GET(req: Request) {
             .filter((p: any) => TRUSTED_PROTOCOLS.has(p.project))
             // Min APY filter
             .filter((p: any) => (p.apy || 0) >= minApy)
-            // Exclude pools with very low TVL (< $500k — usually inaccurate)
+            // Exclude pools with very low TVL (< $500k  usually inaccurate)
             .filter((p: any) => (p.tvlUsd || 0) >= 500_000)
             // Exclude stable-only if APY > 100% (almost certainly unsustainable)
             .filter((p: any) => !(p.stablecoin && p.apy > 100))

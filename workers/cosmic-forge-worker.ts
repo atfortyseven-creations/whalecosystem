@@ -9,7 +9,7 @@ const connection = createRedisClient({ name: 'CosmicForgeWorker' });
 
 export function startCosmicForgeWorker() {
   if (!FORGE_ENABLED) {
-    console.log('[CosmicForgeWorker] 💤 Forge is disabled by ENABLE_COSMIC_FORGE=false');
+    console.log('[CosmicForgeWorker]  Forge is disabled by ENABLE_COSMIC_FORGE=false');
     return;
   }
 
@@ -17,7 +17,7 @@ export function startCosmicForgeWorker() {
   setInterval(async () => {
     try {
       const energy = await ForgeService.updateHiveEnergy();
-      console.log(`[CosmicForgeWorker] ⚡ Hive Energy Pulse: $${energy.toLocaleString()}`);
+      console.log(`[CosmicForgeWorker]  Hive Energy Pulse: $${energy.toLocaleString()}`);
     } catch (e) {
       console.error('[CosmicForgeWorker] Hive Energy Pulse failed.', e);
     }
@@ -45,11 +45,11 @@ export function startCosmicForgeWorker() {
       timestamp: timestamp || Date.now()
     };
 
-    console.log(`[CosmicForgeWorker] 🌀 Processing Cosmic Seed for ${tier} (Hash: ${seedHash.substring(0, 8)}...)`);
+    console.log(`[CosmicForgeWorker]  Processing Cosmic Seed for ${tier} (Hash: ${seedHash.substring(0, 8)}...)`);
     const entity = await ForgeService.processWhaleSeed(seed);
 
     if (entity) {
-      console.log(`[CosmicForgeWorker] ✅ Entity Created: ${entity.id} [${entity.generatorType}]`);
+      console.log(`[CosmicForgeWorker]  Entity Created: ${entity.id} [${entity.generatorType}]`);
     }
 
   }, { connection });
@@ -58,5 +58,5 @@ export function startCosmicForgeWorker() {
     console.error(`[CosmicForgeWorker] Job ${job?.id} failed with ${err.message}`);
   });
 
-  console.log('[CosmicForgeWorker] 🚀 Initialization complete. Listening on "forge:seed"');
+  console.log('[CosmicForgeWorker]  Initialization complete. Listening on "forge:seed"');
 }

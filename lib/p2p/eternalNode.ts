@@ -15,7 +15,7 @@ let node: any = null;
 
 /**
  * Initializes the Eternal Node (libp2p) in the browser environment.
- * Enables peer-to-peer gossip for Sovereign blocks and thermodynamic signals.
+ * Enables peer-to-peer gossip for System blocks and thermodynamic signals.
  */
 export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) => {
     if (node) {
@@ -24,7 +24,7 @@ export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) =
     }
 
     try {
-        console.log('%c[Eternal Node] Booting Sovereign Mesh Layer...', 'color: #00ff9d; font-weight: bold');
+        console.log('%c[Eternal Node] Booting System Mesh Layer...', 'color: #00ff9d; font-weight: bold');
         
         node = await createLibp2p({
             addresses: {
@@ -46,7 +46,7 @@ export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) =
                         // Primary DNS (Protocol Labs)
                         '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnoo2uR3u2nd6P3R9YpxTQU3kH9ndU1hL1p92437',
                         '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa6A5TQU3nd6P3R9YpxTQU3kH9ndU1hL1p92437',
-                        // Secondary IPFS Swarm fallbacks (50-Year Sovereign continuity)
+                        // Secondary IPFS Swarm fallbacks (50-Year System continuity)
                         '/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ',
                         '/ip4/147.75.83.83/tcp/4001/p2p/QmbBHw1Xx9pUpAbrVZVDz1MKhJZWwu3k7kX4h8HCHaTuPZ'
                     ]
@@ -84,7 +84,7 @@ export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) =
             onMetricsUpdate({ peers: node.getPeers().length });
         });
 
-        // Subscribe to Sovereign Akashic Ledger blocks
+        // Subscribe to System Akashic Ledger blocks
         const SAL_TOPIC = 'sal-block';
         node.services.pubsub.subscribe(SAL_TOPIC);
         
@@ -97,7 +97,7 @@ export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) =
         });
 
         await node.start();
-        console.log('%c[Eternal Node] Node Online — Multiaddr:', 'color: #00ff9d', node.getMultiaddrs().map((ma: any) => ma.toString()));
+        console.log('%c[Eternal Node] Node Online  Multiaddr:', 'color: #00ff9d', node.getMultiaddrs().map((ma: any) => ma.toString()));
         
         return node;
 

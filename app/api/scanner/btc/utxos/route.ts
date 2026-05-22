@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
             usdValue: parseFloat(a.usdValue),
             timestamp: a.timestamp,
             confirmations: a.confirmed ? 12 : 0,
-            entityName: a.entityName || 'Sovereign Whale',
+            entityName: a.entityName || 'System Whale',
             category: a.institutional ? 'INSTITUTIONAL' : 'WHALE',
             status: a.confirmed ? 'UNSPENT' : 'PENDING'
         }));

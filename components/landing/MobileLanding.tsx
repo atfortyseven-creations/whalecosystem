@@ -5,13 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { ZKBiometricGate } from "@/components/security/ZKBiometricGate";
 import { AztecArchitectureSection } from "./AztecArchitectureSection";
-import { SovereignFooter } from "./SovereignFooter";
+import { SystemFooter } from "./SystemFooter";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect, useBalance, useEnsName } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { useSovereignSignOut } from '@/hooks/useSovereignSignOut';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { 
   Scan, MessageSquare, LogOut, MessageCircle, ScanLine, 
   Fingerprint, ChevronDown, CheckCircle, Zap, Shield, Menu,
@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
-// ── Reown AppKit + WagmiAdapter localStorage key patterns ─────────────────
+//  Reown AppKit + WagmiAdapter localStorage key patterns 
 // These are ALL the keys that Reown AppKit v1/v2 and its WagmiAdapter write
 // to localStorage (2025-2026). We scan ALL of them when recovering a session.
 const APPKIT_STORAGE_KEYS = [
@@ -68,14 +68,14 @@ function extractAddressFromAppKit(value: string): string | null {
       }
     }
   } catch {
-    // Not valid JSON — fall through to regex
+    // Not valid JSON  fall through to regex
   }
   // Final fallback: extract any valid Ethereum address from raw string
   const match = value.match(/0x[a-fA-F0-9]{40}(?![a-fA-F0-9])/i);
   return match ? match[0].toLowerCase() : null;
 }
 
-// ── Live clock hook ───────────────────────────────────────────────────────────
+//  Live clock hook 
 function useLiveClock(intervalMs = 1000): Date {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -85,7 +85,7 @@ function useLiveClock(intervalMs = 1000): Date {
   return now;
 }
 
-// QR Scanner — iOS-safe dynamic import
+// QR Scanner  iOS-safe dynamic import
 const DynamicQRScannerModal = dynamic(
   () => import("@/components/wallet/QRScannerModal"),
   { ssr: false }
@@ -94,19 +94,19 @@ const DynamicQRScannerModal = dynamic(
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
 import { WhalecosystemTweetFeed } from "./WhalecosystemTweetFeed";
 
-// ── Colour tokens ─────────────────────────────────────────────────────────────
+//  Colour tokens 
 const IVORY = "#FAF9F6";
 const INK   = "#050505";
 const FAINT = "rgba(5,5,5,0.08)";
 const MUTED = "rgba(5,5,5,0.50)";
 
-// ── Sovereign sign message (must mirror LinkedGate exactly) ───────────────────
-function buildSovereignMessage(address: string): string {
+//  System sign message (must mirror LinkedGate exactly) 
+function buildSystemMessage(address: string): string {
   return [
-    '═══════════════════════════════',
+    '',
     '  Whale Alert Network',
     '  SECURE ACCESS HANDSHAKE',
-    '═══════════════════════════════',
+    '',
     '',
     `Identity: ${address}`,
     `Nonce: ${Date.now()}`,
@@ -116,11 +116,11 @@ function buildSovereignMessage(address: string): string {
     'you are the sole owner of this',
     'address and authorize access',
     'to the secure dashboard.',
-    '═══════════════════════════════',
+    '',
   ].join('\n');
 }
 
-// ── Wallet button ─────────────────────────────────────────────────────────────
+//  Wallet button 
 function WalletOption({
   logo, name, badge, onClick, delay = 0, loading = false,
 }: {
@@ -146,7 +146,7 @@ function WalletOption({
       <div className="flex-1 text-left">
         <p className="text-[13px] font-black uppercase tracking-tight text-[#050505]">{name}</p>
         <p className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-widest mt-0.5">
-          {loading ? "Opening app…" : badge}
+          {loading ? "Opening app" : badge}
         </p>
       </div>
       {!loading && (
@@ -156,7 +156,7 @@ function WalletOption({
   );
 }
 
-// ── Signing overlay ───────────────────────────────────────────────────────────
+//  Signing overlay 
 function SigningOverlay({
   address, onSigned, onRetry, error, isSigning, wcDeepLink,
 }: {
@@ -183,7 +183,7 @@ function SigningOverlay({
 
         <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full shadow-sm">
           <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/60 font-mono">
-            {address.slice(0, 8)}…{address.slice(-6)}
+            {address.slice(0, 8)}{address.slice(-6)}
           </span>
         </div>
 
@@ -248,7 +248,7 @@ function SigningOverlay({
   );
 }
 
-// ── Network name from chain ID ────────────────────────────────────────────────
+//  Network name from chain ID 
 function chainName(id?: number): string {
   const MAP: Record<number, string> = {
     1: 'Ethereum Mainnet', 10: 'Optimism', 56: 'BNB Chain',
@@ -259,7 +259,7 @@ function chainName(id?: number): string {
   return id ? (MAP[id] ?? `Chain ${id}`) : 'Mainnet';
 }
 
-// ── Connected Screen ──────────────────────────────────────────────────────────
+//  Connected Screen 
 function ConnectedScreen({
   address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect, signMessageAsync, initialScanData, setShowKyc
 }: {
@@ -278,7 +278,7 @@ function ConnectedScreen({
   const [userAgentInfo, setUserAgentInfo] = useState('');
   const [sessionHistory, setSessionHistory] = useState<any[]>([]);
 
-  // ── Real on-chain data ────────────────────────────────────────────────────
+  //  Real on-chain data 
   const { data: balance } = useBalance({ address: address as `0x${string}` });
   const { data: ensName } = useEnsName({ address: address as `0x${string}`, chainId: 1 });
 
@@ -289,7 +289,7 @@ function ConnectedScreen({
   };
 
   const checksumAddr = (addr: string) =>
-    addr ? `${addr.slice(0, 8)}…${addr.slice(-6)}` : '';
+    addr ? `${addr.slice(0, 8)}${addr.slice(-6)}` : '';
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -304,7 +304,7 @@ function ConnectedScreen({
        setUserAgentInfo(detectedOs);
        
        if (address) {
-         const key = `sovereign_history_${address}`;
+         const key = `system_history_${address}`;
          let existing: any[] = [];
          try {
              const stored = localStorage.getItem(key);
@@ -344,7 +344,7 @@ function ConnectedScreen({
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col bg-white text-black selection:bg-black selection:text-white">
       <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-8 pb-12 gap-0 max-w-[480px] w-full mx-auto">
 
-        {/* ── TOP BAR ── */}
+        {/*  TOP BAR  */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -355,7 +355,7 @@ function ConnectedScreen({
           <span className="font-mono text-[10px] uppercase tracking-[0.25em] font-black">Whale Alert Network</span>
         </motion.div>
 
-        {/* ── ATOM LOGO & GIANT CLOCK ── */}
+        {/*  ATOM LOGO & GIANT CLOCK  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -364,7 +364,7 @@ function ConnectedScreen({
           className="w-full flex flex-col items-center justify-center text-center mb-2 px-6"
         >
           <img 
-            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" 
+            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-core-fiction-photo-picture-image_3222092.jpg" 
             alt="Silver Atom Logo" 
             className="w-full max-w-[85vw] sm:max-w-xs h-auto object-contain mx-auto mb-6 scale-[1.4]"
             style={{ imageRendering: 'high-quality' as any, mixBlendMode: 'multiply' }}
@@ -374,7 +374,7 @@ function ConnectedScreen({
           </p>
         </motion.div>
 
-        {/* ── DATE ── */}
+        {/*  DATE  */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -384,10 +384,10 @@ function ConnectedScreen({
           {fmtDate(now)}
         </motion.p>
 
-        {/* ── DIVIDER ── */}
+        {/*  DIVIDER  */}
         <div className="w-full border-t border-black/8 mb-8" />
 
-        {/* ── IDENTITY BLOCK ── */}
+        {/*  IDENTITY BLOCK  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -411,7 +411,7 @@ function ConnectedScreen({
           </div>
         </motion.div>
 
-        {/* ── DATA ROW ── */}
+        {/*  DATA ROW  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -421,7 +421,7 @@ function ConnectedScreen({
         >
           {[
             { label: 'Network', value: chainName(chainId) },
-            { label: 'Balance', value: fmtBalance() ?? '—' },
+            { label: 'Balance', value: fmtBalance() ?? '' },
             { label: 'Provider', value: connectorName || 'Secure' },
           ].map((item, i) => (
             <div key={i} className={`flex flex-col items-center text-center px-2 py-4 ${ i < 2 ? 'border-r border-black/8' : '' }`}>
@@ -431,10 +431,10 @@ function ConnectedScreen({
           ))}
         </motion.div>
 
-        {/* ── DIVIDER ── */}
+        {/*  DIVIDER  */}
         <div className="w-full border-t border-black/8 mb-8" />
 
-        {/* ── QR SYNC NOTE ── */}
+        {/*  QR SYNC NOTE  */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -443,13 +443,13 @@ function ConnectedScreen({
         >
           <Scan size={13} className="text-black/30 mt-0.5 shrink-0" />
           <p className="text-[13px] text-black/50 font-light leading-relaxed">
-            Scan the <span className="font-semibold text-black">QR code</span> shown on the desktop platform to link your session instantly — no additional steps required.
+            Scan the <span className="font-semibold text-black">QR code</span> shown on the desktop platform to link your session instantly  no additional steps required.
           </p>
         </motion.div>
 
 
 
-        {/* ── PRIMARY ACTION: OPEN QR SCANNER ── */}
+        {/*  PRIMARY ACTION: OPEN QR SCANNER  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -469,7 +469,7 @@ function ConnectedScreen({
           </button>
         </motion.div>
 
-        {/* ── SECONDARY ACTIONS ── */}
+        {/*  SECONDARY ACTIONS  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -579,10 +579,10 @@ function ConnectedScreen({
           </Link>
         </motion.div>
 
-        {/* ── DIVIDER ── */}
+        {/*  DIVIDER  */}
         <div className="w-full border-t border-black/8 mb-6" />
 
-        {/* ── SEED EQUITY ── */}
+        {/*  SEED EQUITY  */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -604,10 +604,10 @@ function ConnectedScreen({
           </Link>
         </motion.div>
 
-        {/* ── DISCONNECT ── */}
+        {/*  DISCONNECT  */}
         {onDisconnect && (
           <motion.button
-            id="sovereign-disconnect-btn"
+            id="system-disconnect-btn"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.55, duration: 0.5 }}
@@ -620,7 +620,7 @@ function ConnectedScreen({
           </motion.button>
         )}
 
-        {/* ── FOOTER NOTE ── */}
+        {/*  FOOTER NOTE  */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -647,12 +647,12 @@ function ConnectedScreen({
     </div>
   );
 }
-// ── Main Component ────────────────────────────────────────────────────────────
+//  Main Component 
 export function MobileLanding() {
   const searchParams = useSearchParams();
   const sessionParam = searchParams?.get('session');
 
-  // ── Reown AppKit is the PRIMARY connector ────────────────
+  //  Reown AppKit is the PRIMARY connector 
   const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
   const { connect, connectAsync, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
@@ -660,7 +660,7 @@ export function MobileLanding() {
   const { reconnect } = useReconnect();
   const { open: rkOpenModal, close: rkCloseModal } = useAppKit();
 
-  // ── Ref: always holds the latest wagmiAddress for use inside setInterval closures ──
+  //  Ref: always holds the latest wagmiAddress for use inside setInterval closures 
   // setInterval captures variables at creation time (stale closure). Without a ref,
   // the poll would never see wagmiAddress updating when wagmi hydrates from cookies.
   const wagmiAddressRef = useRef<string | undefined>(undefined);
@@ -680,33 +680,33 @@ export function MobileLanding() {
   // tab freeze/restore (which resets React state when user returns from Rainbow).
   const [showManualReconnect, setShowManualReconnectRaw] = useState(false);
   const setShowManualReconnect = (val: boolean) => {
-    try { sessionStorage.setItem('sovereign_show_reconnect', val ? '1' : '0'); } catch {}
+    try { sessionStorage.setItem('system_show_reconnect', val ? '1' : '0'); } catch {}
     setShowManualReconnectRaw(val);
   };
 
-  // Init isLinked from cookie immediately — no flash
+  // Init isLinked from cookie immediately  no flash
   const [isLinked, setIsLinked] = useState<boolean>(() => {
     if (typeof document === 'undefined') return false;
-    return document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
+    return document.cookie.split('; ').some(r => r.startsWith('system_handshake=0x'));
   });
 
   // linkedAddress: set synchronously in performLink so effectiveAddress
-  // is NEVER null after connection — critical for incognito mode where
+  // is NEVER null after connection  critical for incognito mode where
   // wagmi/appkit re-hydration is delayed and cookieAddress memo lags.
   const [linkedAddress, setLinkedAddress] = useState<string | null>(() => {
     if (typeof document === 'undefined') return null;
-    const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+    const match = document.cookie.match(/system_handshake=(0x[0-9a-fA-F]{40,})/i);
     return match?.[1] ?? null;
   });
 
   // Cookie address fallback (when wagmi hasn't reconnected yet)
   const cookieAddress = useMemo<string | null>(() => {
     if (typeof document === 'undefined') return null;
-    const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+    const match = document.cookie.match(/system_handshake=(0x[0-9a-fA-F]{40,})/i);
     return match?.[1] ?? null;
   }, [isLinked]);
 
-  // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
+  // Prefer linkedAddress (set in performLink)  wagmi address  cookie fallback
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
   // Auto-sync for mobile camera scans
@@ -726,16 +726,16 @@ export function MobileLanding() {
   const [showKyc, setShowKyc] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
 
-  // Start with connect overlay visible — like Scroll.io, users see wallet buttons immediately
+  // Start with connect overlay visible  like Scroll.io, users see wallet buttons immediately
   // The ImmersiveManifesto is moved to a secondary "Learn More" link below the buttons.
   const [showConnectOverlay, setShowConnectOverlay] = useState(true);
   const [connecting, setConnecting] = useState<string | null>(null);
-  // Emergency "I already connected" button — appears 3.5s after clicking a wallet button
+  // Emergency "I already connected" button  appears 3.5s after clicking a wallet button
   const [showFallbackBtn, setShowFallbackBtn] = useState(false);
   const [fallbackStatus, setFallbackStatus] = useState<'idle' | 'checking' | 'failed'>('idle');
-  // ── Direct deep-link state ───────────────────────────────────────────────
+  //  Direct deep-link state 
   // Populated after wagmi's walletConnect connector emits 'display_uri'.
-  // We render a native <a href> with this URI — bypasses AppKit's shadow DOM
+  // We render a native <a href> with this URI  bypasses AppKit's shadow DOM
   // which causes Chrome Android to silently block metamask:// navigations.
   const [wcDeepLink, setWcDeepLink] = useState<string | null>(null);
   const [wcTargetWallet, setWcTargetWallet] = useState<string>('metamask');
@@ -744,13 +744,13 @@ export function MobileLanding() {
     setMounted(true);
     // Restore button state from sessionStorage (survives Chrome tab freeze/restore)
     try {
-      if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
+      if (sessionStorage.getItem('system_show_reconnect') === '1') {
         setShowManualReconnectRaw(true);
       }
     } catch {}
 
     // [IOS BFCACHE CRITICAL FIX] Reset stuck signing ref on mount.
-    // On iOS WKWebView bfcache restore: React state is reset (isActuallySigning → false)
+    // On iOS WKWebView bfcache restore: React state is reset (isActuallySigning  false)
     // but useRef values PERSIST across bfcache restores. If the user backgrounded the tab
     // mid-signing (to open their wallet), signingInProgressRef.current stays 'true' forever,
     // silently blocking every future signing attempt via the guard:
@@ -778,19 +778,19 @@ export function MobileLanding() {
         document.referrer.includes('accounts.google.com')
       );
       if (isOAuthReturn) {
-        console.log('[Sovereign:iOS] OAuth redirect return detected — clearing stale auth state for clean reconnect');
+        console.log('[System:iOS] OAuth redirect return detected  clearing stale auth state for clean reconnect');
         // Remove stale cached signatures that predate this OAuth session
         try {
           const keysToRemove: string[] = [];
           for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);
-            if (k && k.startsWith('sovereign_auth_')) keysToRemove.push(k);
+            if (k && k.startsWith('system_auth_')) keysToRemove.push(k);
           }
           keysToRemove.forEach(k => localStorage.removeItem(k));
         } catch {}
         // Clear the pending wakeup flag since we just completed an OAuth flow
-        try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {};
-        try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {};
+        try { localStorage.removeItem('system_pending_wakeup'); } catch {};
+        try { sessionStorage.removeItem('system_show_reconnect'); } catch {};
         // Clean the URL to remove OAuth params without triggering a reload
         try {
           const cleanUrl = window.location.pathname + window.location.search
@@ -803,9 +803,9 @@ export function MobileLanding() {
     } catch {}
   }, []);
 
-  // ─────────────────────────────────────────────────────────────────────────────
+  // 
   // SECURE HANDSHAKE: Verifies wallet ownership via cryptographic proof
-  // ─────────────────────────────────────────────────────────────────────────────
+  // 
   const establishSession = useCallback(async (addr: string) => {
     if (isLinked || isActuallySigning || signingInProgressRef.current) return;
 
@@ -834,14 +834,14 @@ export function MobileLanding() {
     setSigningError(null);
 
     try {
-      const verifyRes = await fetch('/api/auth/sovereign-verify', {
+      const verifyRes = await fetch('/api/auth/system-verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ address: norm })
       });
 
       if (!verifyRes.ok) {
-        throw new Error('Verification rejected by Sovereign Node');
+        throw new Error('Verification rejected by System Node');
       }
 
       console.log('[Auth] Handshake successful for:', norm);
@@ -849,8 +849,8 @@ export function MobileLanding() {
       setIsLinked(true);
       setConnecting(null);
       setShowFallbackBtn(false);
-      try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
-      try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
+      try { sessionStorage.removeItem('system_show_reconnect'); } catch {}
+      try { localStorage.removeItem('system_pending_wakeup'); } catch {}
       setShowManualReconnectRaw(false);
 
       const params = new URLSearchParams(window.location.search);
@@ -861,21 +861,21 @@ export function MobileLanding() {
       }
     } catch (err: any) {
       console.error('[Auth] Handshake failed:', err);
-      // Clear the cached signature on ANY error — a bad/stale/RPC-failed
+      // Clear the cached signature on ANY error  a bad/stale/RPC-failed
       // signature would cause every subsequent retry to fail with the same error.
-      try { localStorage.removeItem(`sovereign_auth_${norm}`); } catch {}
+      try { localStorage.removeItem(`system_auth_${norm}`); } catch {}
       const raw = err?.message || 'Verification failed';
       // Viem surfaces low-level RPC failures with a very technical message.
       // Surface a friendlier string so the Retry button is the clear CTA.
       const isViemRpc = raw.toLowerCase().includes('rpc') || raw.toLowerCase().includes('unknown');
-      setSigningError(isViemRpc ? 'RPC error — please retry the connection.' : raw);
+      setSigningError(isViemRpc ? 'RPC error  please retry the connection.' : raw);
     } finally {
       signingInProgressRef.current = false;
       setIsActuallySigning(false);
     }
   }, [isLinked, isActuallySigning, signMessageAsync, connector]);
 
-  // ── onFocusRecheck — stable useCallback so multiple effects can reference it —
+  //  onFocusRecheck  stable useCallback so multiple effects can reference it 
   const onFocusRecheck = useCallback(() => {
     if (isLinked) return;
     // Fast path: wagmi already resolved the address
@@ -905,7 +905,7 @@ export function MobileLanding() {
           if (val) {
             const addr = extractAddressFromAppKit(val);
             if (addr) { 
-              console.log('[Sovereign:Sync] Found address in cookies:', addr);
+              console.log('[System:Sync] Found address in cookies:', addr);
               clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 
               // establishSession(addr); // DISABLED: We no longer auto-handshake to preserve single-signature flow
               return; 
@@ -925,11 +925,11 @@ export function MobileLanding() {
             
             const addr = extractAddressFromAppKit(raw);
             if (addr) { 
-              console.log('[Sovereign:Sync] Found address in storage key:', key, addr);
+              console.log('[System:Sync] Found address in storage key:', key, addr);
               
-              const hasHandshake = document.cookie.includes('sovereign_handshake=');
+              const hasHandshake = document.cookie.includes('system_handshake=');
               if (!hasHandshake) {
-                console.log('[Sovereign:Sync] Missing session cookie, skipping automatic handshake...');
+                console.log('[System:Sync] Missing session cookie, skipping automatic handshake...');
               }
 
               clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 
@@ -944,22 +944,22 @@ export function MobileLanding() {
       // Polling frequency reduced from 50ms to 500ms to prevent thermal throttling and CPU spikes.
       if (attempts >= 120) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
-        // ── LAST RESORT: check if sovereign_handshake cookie was set this session ──
+        //  LAST RESORT: check if system_handshake cookie was set this session 
         try {
-          const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+          const cookieMatch = document.cookie.match(/system_handshake=(0x[0-9a-fA-F]{40,})/i);
           if (cookieMatch?.[1]) {
-            console.log('[Sovereign:Recovery] Cookie found after poll timeout — using it:', cookieMatch[1]);
+            console.log('[System:Recovery] Cookie found after poll timeout  using it:', cookieMatch[1]);
             // establishSession(cookieMatch[1]); // DISABLED: We no longer auto-handshake to preserve single-signature flow
             return;
           }
         } catch {}
-        // Poll truly failed and no cookie — clear reconnect state cleanly
-        console.warn('[Sovereign:Recovery] Polling timeout reached. Handshake failed.');
+        // Poll truly failed and no cookie  clear reconnect state cleanly
+        console.warn('[System:Recovery] Polling timeout reached. Handshake failed.');
         setFallbackStatus('failed');
         setShowManualReconnectRaw(false);
         try { 
-          sessionStorage.removeItem('sovereign_show_reconnect');
-          localStorage.removeItem('sovereign_pending_wakeup');
+          sessionStorage.removeItem('system_show_reconnect');
+          localStorage.removeItem('system_pending_wakeup');
         } catch {}
       }
     }, 500);
@@ -986,7 +986,7 @@ export function MobileLanding() {
     }
   }, [mounted, isConnected, address, isLinked, isActuallySigning, signingError, establishSession]);
 
-  // ── forceFullReconnect — Manual sync trigger for Android Chrome ────────────
+  //  forceFullReconnect  Manual sync trigger for Android Chrome 
   const forceFullReconnect = useCallback(() => {
     try { sessionStorage.removeItem("__disconnected__"); } catch {}
     setFallbackStatus('checking');
@@ -995,13 +995,13 @@ export function MobileLanding() {
       // can cause a race condition with the WalletConnect relay handshake.
       // We just rely on AppKit's native reconnection and start polling.
     } catch (e) {
-      console.error('[Sovereign:Recovery] Manual sync failed:', e);
+      console.error('[System:Recovery] Manual sync failed:', e);
     }
     // Start polling immediately!
     onFocusRecheck();
   }, [onFocusRecheck]);
 
-  // ── Hardened Sovereign Wake-Sync Engine ───────────────────────────────────
+  //  Hardened System Wake-Sync Engine 
   useEffect(() => {
     if (!mounted) return;
     const handleVisibility = () => {
@@ -1010,13 +1010,13 @@ export function MobileLanding() {
       // inside the modal's WebComponent. Removing it kills the handshake.
       if (isLinked) return;
       
-      const isPending = localStorage.getItem('sovereign_pending_wakeup') === '1';
-      const isReconnecting = sessionStorage.getItem('sovereign_show_reconnect') === '1';
+      const isPending = localStorage.getItem('system_pending_wakeup') === '1';
+      const isReconnecting = sessionStorage.getItem('system_show_reconnect') === '1';
 
       if (isPending || isReconnecting) {
-        console.log('%c[MobileWallet] User returned to active tab — forcing recovery UI', 'color:#00ff00');
+        console.log('%c[MobileWallet] User returned to active tab  forcing recovery UI', 'color:#00ff00');
         setShowManualReconnectRaw(true);
-        try { sessionStorage.setItem('sovereign_show_reconnect', '1'); } catch {}
+        try { sessionStorage.setItem('system_show_reconnect', '1'); } catch {}
         forceFullReconnect();
       } else {
         onFocusRecheck();
@@ -1032,32 +1032,32 @@ export function MobileLanding() {
     };
   }, [mounted, isLinked, reconnect, onFocusRecheck, forceFullReconnect]);
 
-  // ── ULTRA-AGGRESSIVE RECOVERY — Android Chrome deep-link + iOS bfcache ─────────
+  //  ULTRA-AGGRESSIVE RECOVERY  Android Chrome deep-link + iOS bfcache 
   // Covers the case where Chrome DESTROYS the tab when the user goes to their
   // wallet app via deep-link. On return, the page is fully reloaded and neither
-  // the visibilitychange nor focus events fire — only pageshow does (bfcache).
+  // the visibilitychange nor focus events fire  only pageshow does (bfcache).
   useEffect(() => {
     if (!mounted || isLinked) return;
     let pendingWakeup = false;
-    try { pendingWakeup = localStorage.getItem('sovereign_pending_wakeup') === '1'; } catch {}
+    try { pendingWakeup = localStorage.getItem('system_pending_wakeup') === '1'; } catch {}
     if (!pendingWakeup) return;
 
-    // ── FAST PATH: sovereign_handshake cookie already exists from this session ──
+    //  FAST PATH: system_handshake cookie already exists from this session 
     // This means establishSession was already called and the cookie was written.
-    // No need to poll — just use the cookie address directly.
+    // No need to poll  just use the cookie address directly.
     try {
-      const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+      const cookieMatch = document.cookie.match(/system_handshake=(0x[0-9a-fA-F]{40,})/i);
       if (cookieMatch?.[1]) {
-        console.log('%c[MobileWallet] ⚡ Cookie shortcut — skipping recovery poll', 'color:#00ff00;font-weight:bold');
-        try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
-        try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
+        console.log('%c[MobileWallet]  Cookie shortcut  skipping recovery poll', 'color:#00ff00;font-weight:bold');
+        try { localStorage.removeItem('system_pending_wakeup'); } catch {}
+        try { sessionStorage.removeItem('system_show_reconnect'); } catch {}
         establishSession(cookieMatch[1]);
         return;
       }
     } catch {}
 
-    console.log('%c[MobileWallet] 🚨 Ultra Recovery Mode Activated', 'color:#ff00ff;font-weight:bold');
-    try { sessionStorage.setItem('sovereign_show_reconnect', '1'); } catch {}
+    console.log('%c[MobileWallet]  Ultra Recovery Mode Activated', 'color:#ff00ff;font-weight:bold');
+    try { sessionStorage.setItem('system_show_reconnect', '1'); } catch {}
     setShowManualReconnectRaw(true);
     setFallbackStatus('checking');
 
@@ -1069,7 +1069,7 @@ export function MobileLanding() {
     // pageshow fires when browser restores page from bfcache (critical for deep-link returns)
     const handlePageShow = (e: PageTransitionEvent) => {
       if (e.persisted) {
-        console.log('%c[MobileWallet] Pageshow from bfcache → forcing recovery', 'color:#00ff00');
+        console.log('%c[MobileWallet] Pageshow from bfcache  forcing recovery', 'color:#00ff00');
         doRecovery();
       }
     };
@@ -1080,7 +1080,7 @@ export function MobileLanding() {
 
 
 
-  // ── Hide rogue w3m-modal backdrop left open after mobile deep-link ───────────
+  //  Hide rogue w3m-modal backdrop left open after mobile deep-link 
   useEffect(() => {
     if (!isLinked) return;
     const id = setInterval(() => {
@@ -1095,22 +1095,22 @@ export function MobileLanding() {
     return () => clearInterval(id);
   }, [isLinked, rkCloseModal]);
 
-  // ── Scroll to top on landing ─────────────────────────────────────────────────
+  //  Scroll to top on landing 
   useEffect(() => {
     if (isLinked && typeof window !== 'undefined') {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
   }, [isLinked]);
 
-  // ── QR session fulfillment when user arrives via ?session= param ─────────────
-  // This handles: desktop generated QR → user scanned on mobile → mobile redirected
-  // with ?session=ID → mobile is now logged in and needs to confirm the handshake.
+  //  QR session fulfillment when user arrives via ?session= param 
+  // This handles: desktop generated QR  user scanned on mobile  mobile redirected
+  // with ?session=ID  mobile is now logged in and needs to confirm the handshake.
   useEffect(() => {
     if (!isLinked || !address || !sessionParam) return;
     const key = `fulfilled_session_${sessionParam}`;
     if (sessionStorage.getItem(key)) return;
 
-    // Sign then fulfill — API requires EIP-191 proof
+    // Sign then fulfill  API requires EIP-191 proof
     const message = `Authorize Institutional Platform Access for session: ${sessionParam}\nAddress: ${address}\nTimestamp: ${Date.now()}`;
     signMessageAsync({ message })
       .then((signature) =>
@@ -1125,18 +1125,18 @@ export function MobileLanding() {
           sessionStorage.setItem(key, 'true');
           const t = document.createElement('div');
           t.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-          t.textContent = '✓ Desktop Platform Unlocked';
+          t.textContent = ' Desktop Platform Unlocked';
           document.body.appendChild(t);
           setTimeout(() => t.remove(), 4000);
         }
       })
-      .catch(() => {}); // Non-blocking — user already authenticated, this is convenience sync
-  }, [isLinked, address, sessionParam]); // signMessageAsync intentionally omitted — stable wagmi ref
+      .catch(() => {}); // Non-blocking  user already authenticated, this is convenience sync
+  }, [isLinked, address, sessionParam]); // signMessageAsync intentionally omitted  stable wagmi ref
 
 
 
-  // ── handleDisconnect ──
-  const { nuclearDisconnect } = useSovereignSignOut();
+  //  handleDisconnect 
+  const { nuclearDisconnect } = useSystemSignOut();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleDisconnect = useCallback(async () => {
@@ -1150,9 +1150,9 @@ export function MobileLanding() {
   // (The previous showManualReconnect full-screen overlay was removed to prevent 
   // blocking the AppKit modal if visibility changes while the user is still selecting a wallet)
 
-  // ── Render: Session exists — show immediately using cookie address ──────────
+  //  Render: Session exists  show immediately using cookie address 
   // We NEVER wait for wagmi to reconnect. The cookie IS the source of truth.
-  // The cookie value IS the wallet address: sovereign_handshake=0xABCD...
+  // The cookie value IS the wallet address: system_handshake=0xABCD...
 
 
   if (isLinked && effectiveAddress) {
@@ -1174,8 +1174,8 @@ export function MobileLanding() {
     );
   }
 
-  // ── Render: Wallet connected, session being written (brief) ─────────────────
-  // This render is typically invisible — the useEffect above fires setIsLinked
+  //  Render: Wallet connected, session being written (brief) 
+  // This render is typically invisible  the useEffect above fires setIsLinked
   // in the same React batch. Shown only for a fraction of a second max.
   if ((isConnected && address && !isLinked) || isActuallySigning) {
     return (
@@ -1189,7 +1189,7 @@ export function MobileLanding() {
           onRetry={() => {
             // Clear error + cached auth so the retry always signs fresh
             setSigningError(null);
-            try { localStorage.removeItem(`sovereign_auth_${(address || '').toLowerCase()}`); } catch {}
+            try { localStorage.removeItem(`system_auth_${(address || '').toLowerCase()}`); } catch {}
             if (address) establishSession(address);
           }}
         />
@@ -1197,12 +1197,12 @@ export function MobileLanding() {
     );
   }
 
-  // ── Render: Unified Mobile Landing & Login Modal ──
+  //  Render: Unified Mobile Landing & Login Modal 
   // CRITICAL: This block must be AFTER all isLinked guards above.
   return (
     <div className="w-full min-h-[100dvh] bg-[#F9F8F6] relative font-sans text-[#050505]">
       
-      {/* ── Sticky Header ── */}
+      {/*  Sticky Header  */}
       <motion.header
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -1233,14 +1233,14 @@ export function MobileLanding() {
         )}
       </motion.header>
 
-      {/* ── Background Landing Page ── */}
+      {/*  Background Landing Page  */}
       <div className="flex flex-col w-full relative z-0">
         <ImmersiveManifestoLanding onOpenScanner={() => setShowConnectOverlay(true)} hideMap={true} />
         <AztecArchitectureSection />
-        <SovereignFooter />
+        <SystemFooter />
       </div>
 
-      {/* ── Login Modal Overlay (Light Mode) ── */}
+      {/*  Login Modal Overlay (Light Mode)  */}
       <AnimatePresence>
         {showConnectOverlay && (
           <motion.div
@@ -1279,11 +1279,11 @@ export function MobileLanding() {
         {/* Wallet Buttons */}
         <div className="w-full flex flex-col gap-3">
 
-          {/* ──────────────────────────────────────────────────────────────────
-              WALLET BUTTONS — Using Reown AppKit's useAppKit hook.
-              Flow: click → pre-flight disconnect → AppKit modal opens →
-              user picks wallet → WC v2 deep link → Android "Open with" dialog.
-              ────────────────────────────────────────────────────────────────── */}
+          {/* 
+              WALLET BUTTONS  Using Reown AppKit's useAppKit hook.
+              Flow: click  pre-flight disconnect  AppKit modal opens 
+              user picks wallet  WC v2 deep link  Android "Open with" dialog.
+               */}
           <div className="w-full flex flex-col gap-3">
               {(() => {
               // Helper: open the correct wallet flow
@@ -1302,8 +1302,8 @@ export function MobileLanding() {
                   // localStorage for this flag to activate the reconnect UI and polling.
                   // Without this flag, the recovery UI never shows and the user sees a blank
                   // connect screen with no feedback after returning from their wallet app.
-                  try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {}
-                  try { sessionStorage.setItem('sovereign_show_reconnect', '1'); } catch {}
+                  try { localStorage.setItem('system_pending_wakeup', '1'); } catch {}
+                  try { sessionStorage.setItem('system_show_reconnect', '1'); } catch {}
 
                   // Close custom modal overlay to let AppKit take over completely, preventing any z-index or pointer-event conflicts on mobile devices
                   setShowConnectOverlay(false);

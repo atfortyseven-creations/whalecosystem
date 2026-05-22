@@ -43,7 +43,7 @@ export function ForensicTerminal({ analysis, address }: ForensicTerminalProps) {
                                 transition={{ duration: 1, repeat: Infinity }}
                                 className="text-slate-200"
                             >
-                                Deciphering Sequence DNA…
+                                Deciphering Sequence DNA
                             </motion.span>
                         ) : (
                             displayedSummary

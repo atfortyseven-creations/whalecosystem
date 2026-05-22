@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "sovereign-web",
+      "name": "system-web",
       "script": "server.js",
       "cwd": "/app",
       "interpreter": "node",

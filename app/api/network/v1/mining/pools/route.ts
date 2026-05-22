@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
  * Mining Pool Distribution API
  * Source: mempool.space /api/v1/mining/pools/1w
  * Returns pool hashrate distribution for the last 7 days.
- * Cached for 10 minutes — block attribution data doesn't change fast.
+ * Cached for 10 minutes  block attribution data doesn't change fast.
  */
 export const revalidate = 600;
 
@@ -76,7 +76,7 @@ export async function GET() {
     });
   } catch (err: any) {
     console.error('[mining/pools] fetch error:', err.message);
-    // Return graceful fallback — known major pools (approximate distribution)
+    // Return graceful fallback  known major pools (approximate distribution)
     return NextResponse.json({
       pools: [
         { name: 'Foundry USA', slug: 'foundry', blockCount: 280, percentage: 29.2, avgMatchRate: 98.5 },

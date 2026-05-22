@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
         value: (tx.value || '0').toString(),
     }));
 
-    // 🔥 [LEGENDARY AUTOMATIC RECOVERY]: If DB is empty, trigger the blockchain fallback anyway
+    //  [LEGENDARY AUTOMATIC RECOVERY]: If DB is empty, trigger the blockchain fallback anyway
     if (history.length === 0) {
         console.warn(`[HistoryFallback] DB returned 0 items for ${address}. Triggering automatic blockchain scan...`);
         return await triggerBlockchainFallback(req, address);
@@ -90,7 +90,7 @@ async function triggerBlockchainFallback(req: NextRequest, address: string | nul
             })
         );
         
-        // 🔥 [Elite MERGE]: Use the new service-level merger
+        //  [Elite MERGE]: Use the new service-level merger
         const history = portfolioService.mergeHistoryStreams(historyResults).slice(0, 100);
 
         // Normalize for frontend LegendaryActivityFeed.tsx

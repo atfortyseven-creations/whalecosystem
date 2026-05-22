@@ -1,21 +1,21 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════════
- * WHALE ALERT NETWORK — Aggregation & Indexing Service
- * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * WHALE ALERT NETWORK  Aggregation & Indexing Service
+ * 
  *
  * Purpose: Pre-computes expensive analytics across the 1TB Railway volume.
  * Snapshots are stored as JSON in Redis with TTLs calibrated per data type.
  * This eliminates full-table-scans from the hot path completely.
  *
  * Architecture:
- *   PostgreSQL (1TB cold storage + indexes) → THIS SERVICE → Redis (hot cache)
- *   → API Routes serve from Redis in microseconds, never touching PG directly.
+ *   PostgreSQL (1TB cold storage + indexes)  THIS SERVICE  Redis (hot cache)
+ *    API Routes serve from Redis in microseconds, never touching PG directly.
  */
 
 import { prisma } from '@/lib/prisma';
 import { safeRedisSet } from '@/lib/redis/client';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+//  Constants 
 
 const AGGREGATION_KEYS = {
     LEADERBOARD_GLOBAL:     'idx:leaderboard:global',       // TTL: 30s
@@ -27,7 +27,7 @@ const AGGREGATION_KEYS = {
     ZK_VERIFIED_FEED:       'idx:feed:zk-verified',          // TTL: 15s (institutional)
 };
 
-// ─── Aggregators ─────────────────────────────────────────────────────────────
+//  Aggregators 
 
 /**
  * Computes the global leaderboard by total USD volume across all chains.
@@ -47,11 +47,11 @@ async function aggregateGlobalLeaderboard() {
         'EX', 30
     );
 
-    console.log(`[INDEXER] ✅ Global Leaderboard: ${rows.length} wallets indexed.`);
+    console.log(`[INDEXER]  Global Leaderboard: ${rows.length} wallets indexed.`);
 }
 
 /**
- * Computes per-chain leaderboards in parallel (Ethereum, Solana, Arbitrum…).
+ * Computes per-chain leaderboards in parallel (Ethereum, Solana, Arbitrum).
  */
 async function aggregateLeaderboardByChain() {
     const chains = await prisma.whaleActivity.findMany({
@@ -75,7 +75,7 @@ async function aggregateLeaderboardByChain() {
         );
     }));
 
-    console.log(`[INDEXER] ✅ Per-chain Leaderboards: ${chains.length} chains indexed.`);
+    console.log(`[INDEXER]  Per-chain Leaderboards: ${chains.length} chains indexed.`);
 }
 
 /**
@@ -94,7 +94,7 @@ async function aggregateSectorRankings() {
         'EX', 60
     );
 
-    console.log(`[INDEXER] ✅ Sector Rankings: ${sectors.length} sectors indexed.`);
+    console.log(`[INDEXER]  Sector Rankings: ${sectors.length} sectors indexed.`);
 }
 
 /**
@@ -116,7 +116,7 @@ async function aggregateTopWhaleEvents24h() {
         'EX', 30
     );
 
-    console.log(`[INDEXER] ✅ Top Whale Events (24h): ${events.length} events indexed.`);
+    console.log(`[INDEXER]  Top Whale Events (24h): ${events.length} events indexed.`);
 }
 
 /**
@@ -135,7 +135,7 @@ async function aggregateChainSummary() {
         'EX', 120
     );
 
-    console.log(`[INDEXER] ✅ Chain Summary: ${summary.length} chains computed.`);
+    console.log(`[INDEXER]  Chain Summary: ${summary.length} chains computed.`);
 }
 
 /**
@@ -158,10 +158,10 @@ async function aggregateZkVerifiedFeed() {
         'EX', 15
     );
 
-    console.log(`[INDEXER] ✅ ZK Feed: ${events.length} verified events indexed.`);
+    console.log(`[INDEXER]  ZK Feed: ${events.length} verified events indexed.`);
 }
 
-// ─── Master Runner ────────────────────────────────────────────────────────────
+//  Master Runner 
 
 /**
  * Runs all aggregators in parallel. Designed to be called:
@@ -169,7 +169,7 @@ async function aggregateZkVerifiedFeed() {
  *   2. On-demand by API routes on cache-miss.
  */
 export async function runAllAggregations(): Promise<void> {
-    console.log(`[INDEXER] 🚀 Starting full aggregation cycle...`);
+    console.log(`[INDEXER]  Starting full aggregation cycle...`);
     const start = Date.now();
 
     await Promise.allSettled([
@@ -182,7 +182,7 @@ export async function runAllAggregations(): Promise<void> {
     ]);
 
     const elapsed = Date.now() - start;
-    console.log(`[INDEXER] ✅ Full cycle complete in ${elapsed}ms. Railway storage utilized.`);
+    console.log(`[INDEXER]  Full cycle complete in ${elapsed}ms. Railway storage utilized.`);
 }
 
 // Export individual aggregators for targeted cache warming

@@ -6,7 +6,7 @@ import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { ChevronRight, ShieldCheck, Activity, BrainCircuit, X } from "lucide-react";
 import { useWalletStore } from "@/lib/store/wallet-store";
 
-const SEEN_ONBOARDING_KEY = "sovereign_onboarding_completed";
+const SEEN_ONBOARDING_KEY = "system_onboarding_completed";
 
 export function WelcomeModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +29,7 @@ export function WelcomeModal() {
   const steps = [
     {
       title: "THE APEX OF ON-CHAIN INTELLIGENCE",
-      desc: "Welcome to the Sovereign Terminal. Here, you gain unparalleled access to the darkest movements of the market. Observe the megalodons, trace the invisible flows, and protect your identity.",
+      desc: "Welcome to the System Terminal. Here, you gain unparalleled access to the darkest movements of the market. Observe the megalodons, trace the invisible flows, and protect your identity.",
       icon: <WhaleLogo className="w-12 h-12" />,
       action: "INITIALIZE SYSTEM"
     },

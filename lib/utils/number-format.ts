@@ -47,13 +47,13 @@ export function safeToFixed(
  * Safely converts a number to a locale string
  * @param value - The value to format (can be null, undefined, or NaN)
  * @param options - Intl.NumberFormatOptions
- * @param fallback - Fallback value when input is invalid (default: "—")
+ * @param fallback - Fallback value when input is invalid (default: "")
  * @returns Formatted string or fallback
  */
 export function safeToLocaleString(
   value: number | string | null | undefined,
   options?: Intl.NumberFormatOptions,
-  fallback: string = "—"
+  fallback: string = ""
 ): string {
   if (value === null || value === undefined) {
     return fallback;
@@ -118,13 +118,13 @@ export function safePercentage(
  * Formats a compact number (e.g., 1.2K, 3.4M)
  * @param value - The value to format
  * @param decimals - Number of decimal places (default: 1)
- * @param fallback - Fallback when invalid (default: "—")
+ * @param fallback - Fallback when invalid (default: "")
  * @returns Formatted compact string
  */
 export function safeCompact(
   value: number | string | null | undefined,
   decimals: number = 1,
-  fallback: string = "—"
+  fallback: string = ""
 ): string {
   if (value === null || value === undefined) {
     return fallback;

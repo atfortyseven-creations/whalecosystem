@@ -13,7 +13,7 @@ export const useShatteredKey = () => {
      */
     const signWithShards = async (message: string) => {
         setStatus('SIGNING');
-        console.log("🧩 Shattered Key: Initiating MPC Signature Ceremony...");
+        console.log(" Shattered Key: Initiating MPC Signature Ceremony...");
 
         try {
             // 1. Contact Lit Protocol Network / TSS Nodes
@@ -26,7 +26,7 @@ export const useShatteredKey = () => {
             // 3. Combine Shares
             const signature = "0xValidSignatureDerivedFromMPC";
             
-            console.log("✅ Signature Reconstructed.");
+            console.log(" Signature Reconstructed.");
             setStatus('READY');
             return signature;
         } catch (e) {

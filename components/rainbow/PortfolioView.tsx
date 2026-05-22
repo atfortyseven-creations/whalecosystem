@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * PortfolioView — SOVEREIGN TERMINAL v5
+ * PortfolioView  SOVEREIGN TERMINAL v5
  *
  * PERFORMANCE CONTRACT (IPAD / IOS ZERO-LAG):
  * - ZERO blur() CSS filters on animated elements
@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useChainId, useSwitchChain } from "wagmi";
-import { useSovereignAccount } from "@/hooks/useSovereignAccount";
+import { useSystemAccount } from "@/hooks/useSystemAccount";
 
 import { useState, useEffect, useCallback } from "react";
 import { LegendaryTransactionModal } from "./LegendaryTransactionModal";
@@ -50,7 +50,7 @@ import { DepositModal } from "./DepositModal";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import { useSmartWebSockets } from "@/hooks/useSmartWebSockets";
-import { useSovereignConnect } from "@/hooks/useSovereignConnect";
+import { useSystemConnect } from "@/hooks/useSystemConnect";
 import { OptimisticExecutionIndicator } from "./OptimisticExecutionIndicator";
 import { safeToFixed, safeToLocaleString } from "@/lib/utils/number-format";
 
@@ -62,7 +62,7 @@ interface PortfolioViewProps {
   change24hPercent: number;
 }
 
-// Chain name → display color map
+// Chain name  display color map
 const CHAIN_COLORS: Record<string, string> = {
   "Ethereum":      "#627EEA",
   "Base":          "#0052FF",
@@ -100,7 +100,7 @@ const SkeletonRow = () => (
 function ChainSelector() {
   const chainId = useChainId();
   const { chains, switchChain, isPending } = useSwitchChain();
-  const { isConnected, address } = useSovereignAccount();
+  const { isConnected, address } = useSystemAccount();
   const [isOpen, setIsOpen] = useState(false);
 
   const current = chains.find((c) => c.id === chainId);
@@ -185,11 +185,11 @@ import { GenerateWalletWizard } from "../wallet/GenerateWalletWizard";
 function RainbowAccountSwitcher({ userAddress }: { userAddress: string | undefined }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
-  const { activateSovereignVault } = useSovereignConnect();
+  const { activateSystemVault } = useSystemConnect();
   
   const handleGenerateWallet = async (privateKey: string, address: string) => {
       setShowWizard(false);
-      await activateSovereignVault(privateKey, address);
+      await activateSystemVault(privateKey, address);
   };
 
   return (
@@ -246,7 +246,7 @@ function RainbowAccountSwitcher({ userAddress }: { userAddress: string | undefin
                              <div className="text-sm font-black text-white tracking-tight">Generate New Identity</div>
                              <div className="flex items-center gap-1.5 mt-1.5">
                                  <div className="flex gap-1">
-                                    <span className="text-white/40 text-[9px] font-bold uppercase tracking-widest">Sovereign Onboarding Flow</span>
+                                    <span className="text-white/40 text-[9px] font-bold uppercase tracking-widest">System Onboarding Flow</span>
                                     <kbd className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 text-white/40 border border-white/10">Alt</kbd>
                                     <span className="text-white/20 text-[9px] font-bold">+</span>
                                     <kbd className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 text-purple-400 border border-purple-500/30">W</kbd>
@@ -268,11 +268,11 @@ function RainbowAccountSwitcher({ userAddress }: { userAddress: string | undefin
 function RainbowOnboarding() {
   const [step, setStep] = useState<"choosing" | "importing">("choosing");
   const [showWizard, setShowWizard] = useState(false);
-  const { activateSovereignVault } = useSovereignConnect();
+  const { activateSystemVault } = useSystemConnect();
 
   const handleGenerateWallet = async (privateKey: string, address: string) => {
       setShowWizard(false);
-      await activateSovereignVault(privateKey, address);
+      await activateSystemVault(privateKey, address);
   };
 
   if (step === "importing") {
@@ -282,13 +282,13 @@ function RainbowOnboarding() {
             <appkit-button />
         </div>
         <p className="text-white/30 text-xs hover:text-white/70 transition-colors cursor-pointer" onClick={() => setStep("choosing")}>
-          ← Go Back
+           Go Back
         </p>
       </div>
     );
   }
 
-  // "choosing" — main landing
+  // "choosing"  main landing
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8 px-6 text-center">
       {/* Icon */}
@@ -320,7 +320,7 @@ function RainbowOnboarding() {
             boxShadow: "0 4px 24px rgba(99,102,241,0.35)",
           }}
         >
-          🌈 Create Sovereign Identity
+           Create System Identity
         </motion.button>
 
         {/* I already have one */}
@@ -335,7 +335,7 @@ function RainbowOnboarding() {
       </div>
 
       <p className="text-white/20 text-[10px] tracking-widest uppercase">
-        Non-custodial · On-chain · Sovereign
+        Non-custodial · On-chain · System
       </p>
 
       {showWizard && <GenerateWalletWizard onCancel={() => setShowWizard(false)} onComplete={handleGenerateWallet} />}
@@ -343,7 +343,7 @@ function RainbowOnboarding() {
   );
 }
 
-// ─── Main Component ────────────────────────────────────────────────────────────
+//  Main Component 
 export default function PortfolioView({
   totalValue,
   balances,
@@ -362,7 +362,7 @@ export default function PortfolioView({
   const [historyLoading, setHistoryLoading] = useState(false);
   const [isDark, setIsDark] = useState(true);
 
-  const { address: userAddress, isConnected } = useSovereignAccount();
+  const { address: userAddress, isConnected } = useSystemAccount();
   const { mutate } = useSWRConfig();
   const { lastTx, connected: wsConnected } = useSmartWebSockets(userAddress || undefined);
 
@@ -452,7 +452,7 @@ export default function PortfolioView({
     setLastRefreshTime(now);
     try {
       await mutate("portfolio-assets", undefined, { revalidate: true });
-      toast.success("Portfolio refreshed ✨");
+      toast.success("Portfolio refreshed ");
     } catch {
       toast.error("Refresh failed");
     } finally {
@@ -478,7 +478,7 @@ export default function PortfolioView({
     }
   };
 
-  // ─ Render ─
+  //  Render 
   return (
     <div
       className="relative min-h-screen text-black font-sans selection:bg-black/10"
@@ -487,10 +487,10 @@ export default function PortfolioView({
       {/* Institutional Grid Pattern */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.05]"
           style={{ backgroundImage: 'repeating-linear-gradient(0deg,#000 0,#000 1px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,#000 0,#000 1px,transparent 1px,transparent 60px)' }} />
-      {/* ══════════════════════════════════════════════════════
-          HEADER — Matches screenshot exactly
+      {/* 
+          HEADER  Matches screenshot exactly
           Whale logo · Brand · Dark on left, tools on right
-          ══════════════════════════════════════════════════════ */}
+           */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-5 py-4"
         style={{
@@ -518,7 +518,7 @@ export default function PortfolioView({
             </div>
             <button
                 onClick={() => {
-                    document.cookie = 'sovereign_handshake=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                    document.cookie = 'system_handshake=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
                     window.location.reload();
                 }}
                 className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-red-500/20 group transition-all border border-white/10"
@@ -539,9 +539,9 @@ export default function PortfolioView({
         </div>
       </header>
 
-      {/* ══════════════════════════════════════════════════════
+      {/* 
           MODALS
-          ══════════════════════════════════════════════════════ */}
+           */}
       <LegendaryTransactionModal
         isOpen={isTransferOpen}
         onClose={() => setIsTransferOpen(false)}
@@ -555,9 +555,9 @@ export default function PortfolioView({
         address={userAddress || ""}
       />
 
-      {/* ══════════════════════════════════════════════════════
-          FLOATING REFRESH — Top right, minimal
-          ══════════════════════════════════════════════════════ */}
+      {/* 
+          FLOATING REFRESH  Top right, minimal
+           */}
       <button
         onClick={handleManualRefresh}
         disabled={isRefreshing}
@@ -576,17 +576,17 @@ export default function PortfolioView({
         />
       </button>
 
-      {/* ══════════════════════════════════════════════════════
+      {/* 
           MAIN CONTENT
-          ══════════════════════════════════════════════════════ */}
+           */}
       <main className="relative z-10 max-w-[2560px] mx-auto min-h-screen flex flex-col pt-8 px-4 pb-32 text-left items-start">
 
-        {/* NOT CONNECTED → Rainbow Wallet Onboarding */}
+        {/* NOT CONNECTED  Rainbow Wallet Onboarding */}
         {!isConnected ? (
           <RainbowOnboarding />
         ) : (
           <>
-            {/* ─ Hero Balance ─ */}
+            {/*  Hero Balance  */}
             <div className="text-center space-y-4 mb-12 relative z-10">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -612,10 +612,10 @@ export default function PortfolioView({
             </div>
           </div>
 
-            {/* ─ Action Cluster (Send / Receive / Swap / Buy) ─ */}
+            {/*  Action Cluster (Send / Receive / Swap / Buy)  */}
             <ActionCluster onAction={handleAction} />
 
-            {/* ─ BLOCKCHAIN LEDGER divider ─ */}
+            {/*  BLOCKCHAIN LEDGER divider  */}
             <div className="flex items-center gap-4 px-4 my-8">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               <span className="text-[9px] font-black text-white/25 tracking-[0.45em] uppercase whitespace-nowrap">
@@ -624,7 +624,7 @@ export default function PortfolioView({
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
 
-            {/* ─ Assets + Activity Grid ─ */}
+            {/*  Assets + Activity Grid  */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
               {/* Assets Column */}
@@ -653,7 +653,7 @@ export default function PortfolioView({
                       <SkeletonRow />
                     </>
                   ) : balances.length === 0 ? (
-                    /* Empty state — matches screenshot */
+                    /* Empty state  matches screenshot */
                     <div className="py-20 text-center rounded-3xl border border-white/[0.07] bg-white/[0.02]">
                       <Wallet size={40} className="mx-auto mb-4 text-white/10" />
                       <p className="text-white/20 font-black uppercase tracking-widest text-[10px]">

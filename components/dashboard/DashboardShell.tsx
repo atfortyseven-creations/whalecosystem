@@ -3,7 +3,7 @@
 // It is intentionally left blank to prevent import resolution errors in any legacy files,
 // but the component logic has been purged to ensure zero architectural confusion.
 // 
-// - The Sovereign Architecture Team
+// - The System Architecture Team
 export function DashboardShell() {
     return null;
 }

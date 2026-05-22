@@ -1,20 +1,20 @@
 /**
  * XMTP E2E Encrypted Chat Client
- * ═══════════════════════════════════════════════════════════════════════════════
- * Wraps @xmtp/browser-sdk v5.3.0 for sovereign wallet-to-wallet encrypted messaging.
+ * 
+ * Wraps @xmtp/browser-sdk v5.3.0 for system wallet-to-wallet encrypted messaging.
  *
  * v5.3.0 Signer interface (mandatory):
  *   type          : "EOA" | "SCW"
  *   getIdentifier : () => Promise<{ identifier: string; identifierKind: "Ethereum" }>
- *   signMessage   : (message: string) => Promise<Uint8Array>   ← string ONLY
+ *   signMessage   : (message: string) => Promise<Uint8Array>    string ONLY
  *
  * v5.3.0 Key API changes vs v5.2:
- *   - conversations.newDm(inboxId)            ← takes inboxId string
- *   - conversations.newDmWithIdentifier(id)   ← takes Identifier object  ✓ USE THIS
+ *   - conversations.newDm(inboxId)             takes inboxId string
+ *   - conversations.newDmWithIdentifier(id)    takes Identifier object   USE THIS
  *   - DecodedMessage: senderInboxId, sentAtNs (BigInt ns), content (decoded)
- *   - Dm.peerInboxId()                        ← async, returns inboxId string
+ *   - Dm.peerInboxId()                         async, returns inboxId string
  *   - conversations.sync() required before list/stream
- * ═══════════════════════════════════════════════════════════════════════════════
+ * 
  */
 
 'use client';
@@ -27,7 +27,7 @@ if (typeof window !== 'undefined' && !window.Buffer) {
 
 import { Client, type XmtpEnv } from '@xmtp/browser-sdk';
 
-// ── Type definitions matching browser-sdk v5.3.0 exactly ─────────────────────
+//  Type definitions matching browser-sdk v5.3.0 exactly 
 type IdentifierKind = 'Ethereum';
 export interface XmtpIdentifier {
   identifier: string;
@@ -37,10 +37,10 @@ export interface XmtpIdentifier {
 const XMTP_ENV: XmtpEnv =
   (process.env.NEXT_PUBLIC_XMTP_ENV as XmtpEnv) ?? 'production';
 
-// ── Singleton client registry (one client per lowercase address) ──────────────
+//  Singleton client registry (one client per lowercase address) 
 const clientRegistry = new Map<string, Client>();
 
-// ── Hex string → Uint8Array ───────────────────────────────────────────────────
+//  Hex string  Uint8Array 
 function hexToBytes(hex: string): Uint8Array {
   const clean = hex.startsWith('0x') ? hex.slice(2) : hex;
   if (clean.length % 2 !== 0) throw new Error('[XMTP] Malformed hex signature');
@@ -51,7 +51,7 @@ function hexToBytes(hex: string): Uint8Array {
   return bytes;
 }
 
-// ── BigInt nanoseconds → Date ─────────────────────────────────────────────────
+//  BigInt nanoseconds  Date 
 export function nsToDate(ns: bigint | undefined | null): Date {
   if (ns == null) return new Date();
   try {
@@ -113,10 +113,10 @@ export async function getXMTPClient(
     return clientRegistry.get(address)!;
   }
 
-  // ── Use Standard Wallet Signer ───────────────────────────────────────────
+  //  Use Standard Wallet Signer 
   const signer = buildXmtpSigner(wagmiSigner);
 
-  // ── Retrieve or Generate Local DB Encryption Key ─────────────────────────
+  //  Retrieve or Generate Local DB Encryption Key 
   // Passing this key prevents XMTP from prompting a signature on every reload
   const storageKey = `whale_xmtp_db_key_${address}`;
   let dbKeyHex = localStorage.getItem(storageKey);
@@ -130,7 +130,7 @@ export async function getXMTPClient(
 
   let client: Client;
   try {
-    // Client.create(signer, options) — v5.3.0 signature
+    // Client.create(signer, options)  v5.3.0 signature
     client = await Client.create(signer, { env: XMTP_ENV, dbEncryptionKey });
   } catch (err: any) {
     const errorMsg = err?.message || '';
@@ -215,7 +215,7 @@ export async function canReceiveMessages(
 
 /**
  * Get or create a DM with a peer and return its conversation ID.
- * v5.3.0 FIX: use newDmWithIdentifier() — newDm() takes inboxId, NOT Identifier.
+ * v5.3.0 FIX: use newDmWithIdentifier()  newDm() takes inboxId, NOT Identifier.
  */
 export async function getDmId(client: Client, peerAddress: string): Promise<string> {
   const identifier: XmtpIdentifier = {
@@ -259,17 +259,17 @@ export async function listConversations(client: Client): Promise<any[]> {
 /**
  * Retrieve message history for a specific peer conversation.
  *
- * FIX v3 — Dual-perspective DM discovery:
+ * FIX v3  Dual-perspective DM discovery:
  *  The core problem: XMTP DMs are asymmetric at creation time.
- *  - SENDER calls newDmWithIdentifier(peer) → creates a DM object locally.
- *  - RECEIVER never created that DM locally — they need conversations.sync()
+ *  - SENDER calls newDmWithIdentifier(peer)  creates a DM object locally.
+ *  - RECEIVER never created that DM locally  they need conversations.sync()
  *    to pull it from the network, then listDms() to find it by member address.
  *
  * Strategy (in order of reliability):
- *  1. conversations.sync() — pulls ALL new DMs from the p2p network (critical for receiver)
- *  2. listDms() → find by peer Ethereum address in dm.members[] — works for both parties
- *  3. listDms() → find by peerInboxId() — slower but covers edge cases
- *  4. newDmWithIdentifier() fallback — creates/reuses via identifier (sender path)
+ *  1. conversations.sync()  pulls ALL new DMs from the p2p network (critical for receiver)
+ *  2. listDms()  find by peer Ethereum address in dm.members[]  works for both parties
+ *  3. listDms()  find by peerInboxId()  slower but covers edge cases
+ *  4. newDmWithIdentifier() fallback  creates/reuses via identifier (sender path)
  *
  * Each found DM is individually sync()d before messages() to guarantee
  * the latest messages are returned, not a stale local snapshot.
@@ -277,7 +277,7 @@ export async function listConversations(client: Client): Promise<any[]> {
 export async function getMessages(client: Client, peerAddress: string): Promise<any[]> {
   const normalizedPeer = peerAddress.toLowerCase();
 
-  // ── Step 1: Global sync — CRITICAL for receiver discovery ────────────────
+  //  Step 1: Global sync  CRITICAL for receiver discovery 
   // Without this, the receiver's client never knows about DMs created by the sender.
   try {
     await client.conversations.sync();
@@ -285,7 +285,7 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
     console.warn('[XMTP] conversations.sync() failed:', e);
   }
 
-  // ── Step 2: Search by Ethereum address in dm.members (fastest, most reliable) ──
+  //  Step 2: Search by Ethereum address in dm.members (fastest, most reliable) 
   try {
     const dms = await client.conversations.listDms();
     let targetDm: any = null;
@@ -308,7 +308,7 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
     }
 
     if (targetDm) {
-      // Individual DM sync — pulls latest messages for this specific conversation
+      // Individual DM sync  pulls latest messages for this specific conversation
       try { await targetDm.sync(); } catch {}
       const msgs = await targetDm.messages();
       return msgs ?? [];
@@ -317,7 +317,7 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
     console.warn('[XMTP] Member-address DM search failed:', e);
   }
 
-  // ── Step 3: Search by peerInboxId() — covers identity-key-only DMs ─────────
+  //  Step 3: Search by peerInboxId()  covers identity-key-only DMs 
   try {
     const dms = await client.conversations.listDms();
 
@@ -330,7 +330,7 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
 
         if (!peerInboxId) continue;
 
-        // Cross-reference: resolve peer address → inboxId via canMessage
+        // Cross-reference: resolve peer address  inboxId via canMessage
         const identifier: XmtpIdentifier = {
           identifier: peerAddress,
           identifierKind: 'Ethereum',
@@ -363,7 +363,7 @@ export async function getMessages(client: Client, peerAddress: string): Promise<
     console.warn('[XMTP] peerInboxId DM search failed:', e);
   }
 
-  // ── Step 4: Fallback — newDmWithIdentifier (creates/reuses, sender path) ────
+  //  Step 4: Fallback  newDmWithIdentifier (creates/reuses, sender path) 
   try {
     const identifier: XmtpIdentifier = {
       identifier: peerAddress,

@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       path: '/'
     });
     
-    response.cookies.set('sovereign_handshake', payload.sub as string, { 
+    response.cookies.set('system_handshake', payload.sub as string, { 
       httpOnly: false, 
       secure: process.env.NODE_ENV === 'production', 
       sameSite: 'lax', 

@@ -228,7 +228,7 @@ CREATE TABLE "UserMetrics" (
     "proposalsCreated" INTEGER NOT NULL DEFAULT 0,
     "votescast" INTEGER NOT NULL DEFAULT 0,
     "zapsExecuted" INTEGER NOT NULL DEFAULT 0,
-    "totalWLDZapped" DECIMAL(18,6) NOT NULL DEFAULT 0,
+    "totalAUTHZapped" DECIMAL(18,6) NOT NULL DEFAULT 0,
     "totalRoyaltiesEarned" DECIMAL(18,6) NOT NULL DEFAULT 0,
     "totalRoyaltiesClaimed" DECIMAL(18,6) NOT NULL DEFAULT 0,
     "successfulProposals" INTEGER NOT NULL DEFAULT 0,

@@ -7,7 +7,7 @@ import { Menu, X } from 'lucide-react';
 import { SystemsUtilityHeader } from './SystemsUtilityHeader';
 import Image from 'next/image';
 import { SplashContainer } from '@/components/shared/SplashContainer';
-import { useSovereignTranslation } from '@/hooks/useSovereignTranslation';
+import { useSystemTranslation } from '@/hooks/useSystemTranslation';
 
 // MENU_ITEMS moved inside InstitutionalHeader to use translation hook.
 
@@ -58,7 +58,7 @@ function MegaMenuItem({ item }: { item: any }) {
 
 export function InstitutionalHeader() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const { t } = useSovereignTranslation();
+    const { t } = useSystemTranslation();
 
     const MENU_ITEMS = [
       { label: t('NAV_DASHBOARD'), href: "/dashboard" },
@@ -76,7 +76,7 @@ export function InstitutionalHeader() {
             className="relative flex items-center justify-between w-full border-b border-[#EBEBEB] sticky top-0 z-[100] bg-white shadow-[0_1px_0_rgba(0,0,0,0.05)]"
             style={{ minHeight: 'calc(64px + env(safe-area-inset-top, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)', width: '100%' }}
         >
-            {/* Inner container — centred, full-width up to 4K */}
+            {/* Inner container  centred, full-width up to 4K */}
             <div className="w-full max-w-[2560px] mx-auto px-6 lg:px-10 flex items-center justify-between h-full">
             {/* Paper grain texture overlay */}
             <div className="absolute inset-0 opacity-[0.035] pointer-events-none noise-bg" />
@@ -106,7 +106,7 @@ export function InstitutionalHeader() {
                 </Link>
             </div>
 
-            {/* CENTER: Tronscan Inspired Navigation Menu — perfectly centered */}
+            {/* CENTER: Tronscan Inspired Navigation Menu  perfectly centered */}
             <div className="hidden lg:flex items-center justify-center relative z-20 pointer-events-none lg:flex-[2]">
                 <nav className="flex items-center gap-1 h-full pointer-events-auto">
                     {MENU_ITEMS.map((item, index) => (
@@ -131,7 +131,7 @@ export function InstitutionalHeader() {
                 </motion.button>
             </div>
 
-            {/* ─── MOBILE MENU DRAWER ─── */}
+            {/*  MOBILE MENU DRAWER  */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div

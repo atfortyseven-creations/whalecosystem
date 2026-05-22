@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 /**
- * 🔒 DEPRECATED API ENDPOINT
+ *  DEPRECATED API ENDPOINT
  * 
  * This manual SQL migration script has been dismantled to ensure absolute 
  * structural integrity and prevent "Schema Drift".

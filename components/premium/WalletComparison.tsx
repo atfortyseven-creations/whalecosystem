@@ -98,7 +98,7 @@ export default function WalletComparison({
                       animate={{ scale: 1 }}
                       className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center"
                     >
-                      <span className="text-white text-xs">✓</span>
+                      <span className="text-white text-xs"></span>
                     </motion.div>
                   )}
                 </div>

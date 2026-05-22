@@ -5,20 +5,20 @@ import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
 
 export const dynamic = 'force-dynamic';
 
-// ── In-memory cache (10s TTL) ─────────────────────────────────────────────────
+//  In-memory cache (10s TTL) 
 let _cachedMarkets: any[] | null = null;
 let _cacheTs = 0;
 const CACHE_TTL_MS = 3_000;
 
-// ── Uniswap V3 Pool addresses for on-chain price validation ──────────────────
-// Format: symbol → [poolAddress, token0IsBase, token0Decimals, token1Decimals]
+//  Uniswap V3 Pool addresses for on-chain price validation 
+// Format: symbol  [poolAddress, token0IsBase, token0Decimals, token1Decimals]
 const UNISWAP_V3_POOLS: Record<string, [string, boolean, number, number]> = {
     'ETHUSDT':  ['0x4e68ccd3e89f51c3074ca5072bbac773960dfa36', false, 18, 6], // ETH/USDT 0.3%
     'BTCUSDT':  ['0x99ac8ca7087fa4a2a1fb6357269965a2014abc35', true,  8,  6], // WBTC/USDC 0.3%
     'LINKUSDT': ['0xa6cc3c2531fdaa6ae1a3ca84c2855806728693e8', false, 18, 6], // LINK/USDC
 };
 
-// ── Uniswap V3 slot0 ABI (returns sqrtPriceX96) ──────────────────────────────
+//  Uniswap V3 slot0 ABI (returns sqrtPriceX96) 
 const SLOT0_ABI = ['function slot0() view returns (uint160 sqrtPriceX96, int24 tick, uint16, uint16, uint16, uint8, bool)'];
 
 async function fetchOnChainPrices(): Promise<Record<string, number>> {
@@ -61,10 +61,10 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
             );
             // If we got at least one price, the endpoint is healthy
             if (Object.keys(prices).length > 0) break;
-            // slot0 returned empty — RPC degraded, CEX fallback covers this
+            // slot0 returned empty  RPC degraded, CEX fallback covers this
 
         } catch (e) {
-            console.log('[API] RPC provider exception — degrading to CEX data:', (e as Error).message);
+            console.log('[API] RPC provider exception  degrading to CEX data:', (e as Error).message);
 
             RpcRelayerManager.reportFailure('ETH', 'RPC', ep);
             continue;
@@ -73,7 +73,7 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
     return prices;
 }
 
-// ── Centralized Exchanges REST (Primary Price Feeds) ─────────────────────────
+//  Centralized Exchanges REST (Primary Price Feeds) 
 async function fetchCexMarkets(): Promise<any[] | null> {
     // 1. Try KuCoin API (Highly reliable, no US IP geoblocks for Railway/Vercel)
     try {
@@ -101,7 +101,7 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             }
         }
     } catch (e) {
-        console.log('[API] KuCoin unavailable — falling back to MEXC');
+        console.log('[API] KuCoin unavailable  falling back to MEXC');
 
     }
 
@@ -130,7 +130,7 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             }
         }
     } catch (e) {
-        console.log('[API] MEXC unavailable — falling back to Binance');
+        console.log('[API] MEXC unavailable  falling back to Binance');
 
     }
 
@@ -153,13 +153,13 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             if (Array.isArray(rawBinance) && rawBinance.length > 0) return rawBinance;
         }
     } catch (e) {
-        console.log('[API] Binance unavailable — trying CoinGecko');
+        console.log('[API] Binance unavailable  trying CoinGecko');
 
     }
     
     // 4. Final fallback: CoinGecko (free tier, globally accessible, no IP blocks)
     try {
-        const cgIds = 'bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin,shiba-inu,polkadot,avalanche-2,chainlink,matic-network,uniswap,arbitrum,optimism,aptos,injective-protocol,pepe,dogwifcoin,bonk,floki,fetch-ai,near,lido-dao,worldcoin-wld,starknet,jupiter,pyth-network,celestia,blur,gmx,sui,sei-network,toncoin';
+        const cgIds = 'bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin,shiba-inu,polkadot,avalanche-2,chainlink,matic-network,uniswap,arbitrum,optimism,aptos,injective-protocol,pepe,dogwifcoin,bonk,floki,fetch-ai,near,lido-dao,identity-wld,starknet,jupiter,pyth-network,celestia,blur,gmx,sui,sei-network,toncoin';
         const controllerCg = new AbortController();
         const idCg = setTimeout(() => controllerCg.abort(), 8000);
         const resCg = await fetch(
@@ -176,7 +176,7 @@ async function fetchCexMarkets(): Promise<any[] | null> {
                     'uniswap':'UNIUSDT','arbitrum':'ARBUSDT','optimism':'OPUSDT','aptos':'APTUSDT',
                     'injective-protocol':'INJUSDT','pepe':'PEPEUSDT','dogwifcoin':'WIFUSDT','bonk':'BONKUSDT',
                     'floki':'FLOKIUSDT','fetch-ai':'FETUSDT','near':'NEARUSDT','lido-dao':'LDOUSDT',
-                    'worldcoin-wld':'WLDUSDT','starknet':'STRKUSDT','jupiter':'JUPUSDT','pyth-network':'PYTHUSDT',
+                    'identity-wld':'AUTHUSDT','starknet':'STRKUSDT','jupiter':'JUPUSDT','pyth-network':'PYTHUSDT',
                     'celestia':'TIAUSDT','blur':'BLURUSDT','gmx':'GMXUSDT','sui':'SUIUSDT',
                     'sei-network':'SEIUSDT','toncoin':'TONUSDT',
                 };
@@ -191,7 +191,7 @@ async function fetchCexMarkets(): Promise<any[] | null> {
             }
         }
     } catch (e) {
-        console.log('[API] CoinGecko unavailable — returning null (all sources exhausted)');
+        console.log('[API] CoinGecko unavailable  returning null (all sources exhausted)');
 
     }
 
@@ -203,7 +203,7 @@ const PRIORITY_SYMBOLS = new Set([
     'DOGEUSDT','SHIBUSDT','DOTUSDT','AVAXUSDT','LINKUSDT','MATICUSDT',
     'UNIUSDT','ARBUSDT','OPUSDT','APTUSDT','INJUSDT','PEPEUSDT',
     'WIFUSDT','BONKUSDT','FLOKIUSDT','FETUSDT','NEARUSDT','LDOUSDT',
-    'WLDUSDT','STRKUSDT','JUPUSDT','PYTHUSDT','TIAUSDT','BLURUSDT',
+    'AUTHUSDT','STRKUSDT','JUPUSDT','PYTHUSDT','TIAUSDT','BLURUSDT',
     'GMXUSDT','SUIUSDT','SEIUSDT','TONUSDT',
 ]);
 
@@ -232,7 +232,7 @@ const ASSET_META: Record<string, { name: string; network: string; mcapRankHint: 
     FETUSDT:  { name: 'Fetch.ai',        network: 'ethereum',  mcapRankHint: 22 },
     NEARUSDT: { name: 'NEAR Protocol',   network: 'near',      mcapRankHint: 23 },
     LDOUSDT:  { name: 'Lido DAO',        network: 'ethereum',  mcapRankHint: 24 },
-    WLDUSDT:  { name: 'Worldcoin',       network: 'ethereum',  mcapRankHint: 25 },
+    AUTHUSDT:  { name: 'Identity',       network: 'ethereum',  mcapRankHint: 25 },
     STRKUSDT: { name: 'StarkNet',        network: 'starknet',  mcapRankHint: 26 },
     JUPUSDT:  { name: 'Jupiter',         network: 'solana',    mcapRankHint: 27 },
     PYTHUSDT: { name: 'Pyth Network',    network: 'solana',    mcapRankHint: 28 },
@@ -247,7 +247,7 @@ const ASSET_META: Record<string, { name: string; network: string; mcapRankHint: 
 // ... synthetic fallback purged ...
 
 export async function GET(_req: NextRequest) {
-    // ── Cache hit ─────────────────────────────────────────────────────────────
+    //  Cache hit 
     if (_cachedMarkets && Date.now() - _cacheTs < CACHE_TTL_MS) {
         return NextResponse.json(
             { success: true, timestamp: _cacheTs, data: _cachedMarkets, source: 'cache' },
@@ -255,14 +255,14 @@ export async function GET(_req: NextRequest) {
         );
     }
 
-    // ── Step 1: Fetch CEX Data (Primary) ───────────────────────────────────
+    //  Step 1: Fetch CEX Data (Primary) 
     let marketData = await fetchCexMarkets();
     if (marketData && marketData.length === 0) {
         marketData = null; // Treat empty array as failure
     }
     let source = marketData ? 'live-exchange' : 'degraded-exchange';
 
-    // ── Step 2: Fallback or Enrich with GetBlock on-chain prices ─────
+    //  Step 2: Fallback or Enrich with GetBlock on-chain prices 
     const onChainPrices = await fetchOnChainPrices();
 
     if (marketData) {
@@ -317,12 +317,12 @@ export async function GET(_req: NextRequest) {
         }
     }
 
-    // ── Step 3: If ALL sources failed, enforce fail-fast 503 error ──
+    //  Step 3: If ALL sources failed, enforce fail-fast 503 error 
     if (!marketData) {
         return NextResponse.json({ error: 'Data sources unreachable' }, { status: 503 });
     }
 
-    // ── Filter to priority USDT pairs + sort by volume for top display ────────
+    //  Filter to priority USDT pairs + sort by volume for top display 
     const filtered = (marketData as any[]).filter(t => PRIORITY_SYMBOLS.has(t.symbol));
     const finalData = (filtered.length > 0 ? filtered : marketData).map((t: any) => ({
         ...t,

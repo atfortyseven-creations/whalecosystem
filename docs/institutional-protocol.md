@@ -20,16 +20,16 @@ Institutional access is designed for:
 | Feature | ELITE | Enterprise |
 |---|---|---|
 | API requests | Unlimited | Unlimited |
-| Dedicated RPC node | ✅ | ✅ (co-located) |
-| Pre-confirmation (mempool) data | ✅ | ✅ |
-| Custom alert thresholds | ❌ | ✅ |
-| Private data endpoint | ❌ | ✅ (dedicated subdomain) |
-| Custom data retention | ❌ | ✅ (up to 5 years queryable) |
-| Dedicated infrastructure | ❌ | ✅ |
+| Dedicated RPC node |  |  (co-located) |
+| Pre-confirmation (mempool) data |  |  |
+| Custom alert thresholds |  |  |
+| Private data endpoint |  |  (dedicated subdomain) |
+| Custom data retention |  |  (up to 5 years queryable) |
+| Dedicated infrastructure |  |  |
 | SLA | 99.99% | 99.999% (custom SLA) |
 | Support | Dedicated | White-glove + on-call |
 | Compliance documentation | Standard | Custom (SOC 2, ISO 27001 on request) |
-| Custom signal models | ❌ | ✅ |
+| Custom signal models |  |  |
 | Pricing | $999/mo | Contact sales |
 
 ---
@@ -38,9 +38,9 @@ Institutional access is designed for:
 
 ELITE plan holders receive access to dedicated blockchain node connections rather than shared public endpoints. This eliminates:
 
-- **Shared rate limits** — no contention with other users on the same RPC endpoint
-- **Variable latency** — dedicated nodes respond consistently under any market condition
-- **Data gaps** — dedicated connections maintain persistent WebSocket state without competing for connections
+- **Shared rate limits**  no contention with other users on the same RPC endpoint
+- **Variable latency**  dedicated nodes respond consistently under any market condition
+- **Data gaps**  dedicated connections maintain persistent WebSocket state without competing for connections
 
 ### Supported Dedicated Node Providers
 
@@ -71,7 +71,7 @@ ELITE and Enterprise accounts receive whale event notifications for **unconfirme
 ### Mempool Data Caveats
 
 - **Not all pending transactions confirm.** Gas price wars and RBF (Replace-By-Fee) can cause transactions to be replaced or dropped. The SDK includes a `confirmed` field that must be checked before treating mempool data as final.
-- **Latency advantage is real but finite.** Pre-confirmation data arrives 400ms–15 seconds before confirmation, depending on network congestion. This window is valuable for positioning but should not be used for final settlement decisions.
+- **Latency advantage is real but finite.** Pre-confirmation data arrives 400ms15 seconds before confirmation, depending on network congestion. This window is valuable for positioning but should not be used for final settlement decisions.
 
 ---
 
@@ -103,10 +103,10 @@ Historical data is available from **January 1, 2024** onwards. Older data is ava
 ## Institutional Onboarding Process
 
 1. **Connect your wallet** at [humanidfi.com](https://humanidfi.com) using a multi-sig or institutional-grade wallet
-2. **Complete KYC verification** — institutional KYC requires entity documentation in addition to wallet ownership proof
+2. **Complete KYC verification**  institutional KYC requires entity documentation in addition to wallet ownership proof
 3. **Select ELITE plan** or contact the institutional sales channel for Enterprise pricing
-4. **Generate API credentials** from the dashboard — institutional accounts support multiple API keys with different permission scopes
-5. **Configure IP allowlisting** (recommended) — restrict your API keys to specific IP ranges via the dashboard
+4. **Generate API credentials** from the dashboard  institutional accounts support multiple API keys with different permission scopes
+5. **Configure IP allowlisting** (recommended)  restrict your API keys to specific IP ranges via the dashboard
 6. **Set up webhook delivery** to your infrastructure for push-based data delivery
 
 ---

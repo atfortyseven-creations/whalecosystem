@@ -19,7 +19,7 @@ export function SessionProposalModal() {
 
     const handleApprove = async () => {
         if (!address) {
-            toast.error('No Sovereign Wallet connected');
+            toast.error('No System Wallet connected');
             return;
         }
         setIsProcessing(true);
@@ -77,7 +77,7 @@ export function SessionProposalModal() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase text-black/60 tracking-widest">Connect with Sovereign Identity</label>
+                        <label className="text-[10px] font-black uppercase text-black/60 tracking-widest">Connect with System Identity</label>
                         <div className="p-3 border border-black/10 rounded-xl bg-black/5 flex items-center justify-between">
                             {address ? (
                                 <div className="flex flex-col">

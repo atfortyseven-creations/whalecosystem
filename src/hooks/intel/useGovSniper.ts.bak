@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { intelligenceService } from '@/lib/blockchain/IntelligenceService';
+import { analyticsService } from '@/lib/blockchain/AnalyticsService';
 
 export interface Proposal {
     id: string;
@@ -17,7 +17,7 @@ export function useGovSniper() {
     useEffect(() => {
         const fetchGov = async () => {
             try {
-                const liveProposals = await intelligenceService.getLiveGovProposals();
+                const liveProposals = await analyticsService.getLiveGovProposals();
                 setPools(liveProposals);
             } catch (e) {
                 console.error('[useGovSniper] Governance synchronization failed');

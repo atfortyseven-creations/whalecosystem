@@ -206,7 +206,7 @@ export default function ForumGuidelinesPage() {
             Las infracciones se tratarán según su gravedad: advertencia inicial para faltas menores, suspensión temporal de 3 a 30 días para reincidencias, y expulsión permanente del foro en casos graves de manipulación de mercado, acoso o exposición de datos privados. Las apelaciones pueden enviarse a <span className="font-bold border-b border-black dark:border-white">moderation@humanidfi.com</span> en un plazo máximo de 14 días. Las decisiones serán resueltas por el equipo en un plazo de 5 días hábiles.
           </p>
           <div className="flex items-center gap-2 pt-4 border-t border-black/10 dark:border-white/10">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-black/40 dark:text-white/40">Última actualización — Mayo 2026</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-black/40 dark:text-white/40">Última actualización  Mayo 2026</span>
           </div>
         </div>
 

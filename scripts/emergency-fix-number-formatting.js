@@ -99,7 +99,7 @@ async function fixFile(filePath) {
 }
 
 async function main() {
-  console.log('🚨 EMERGENCY FIX: Replacing ALL unsafe number formatting calls...\n');
+  console.log(' EMERGENCY FIX: Replacing ALL unsafe number formatting calls...\n');
 
   const patterns = [
     'components/**/*.{ts,tsx}',
@@ -124,16 +124,16 @@ async function main() {
       if (fixed) {
         totalFixed++;
         const relativePath = path.relative(process.cwd(), file);
-        console.log(`✅ FIXED: ${relativePath}`);
+        console.log(` FIXED: ${relativePath}`);
       }
     }
   }
 
-  console.log(`\n📊 EMERGENCY FIX COMPLETE:`);
+  console.log(`\n EMERGENCY FIX COMPLETE:`);
   console.log(`   Files scanned: ${totalScanned}`);
   console.log(`   Files fixed: ${totalFixed}`);
   console.log(`   Files skipped: ${totalScanned - totalFixed}`);
-  console.log(`\n🎯 All unsafe .toFixed() and .toLocaleString() calls have been replaced!`);
+  console.log(`\n All unsafe .toFixed() and .toLocaleString() calls have been replaced!`);
 }
 
 main().catch(console.error);

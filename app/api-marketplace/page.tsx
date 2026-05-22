@@ -176,10 +176,10 @@ function ApiMarketplacePageContent() {
 
       <div className="relative z-10 max-w-[1100px] mx-auto px-6 pt-24 pb-24 transform-gpu will-change-transform">
 
-        {/* ── HEADER ──────────────────────────────────── */}
+        {/*  HEADER  */}
         <div className="text-center mb-16">
           <Link href="/" className="text-xs font-mono uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors mb-6 inline-block">
-            ← Whale Alert Corporation
+             Whale Alert Corporation
           </Link>
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-4">
             API{" "}
@@ -194,7 +194,7 @@ function ApiMarketplacePageContent() {
 
         <div className="grid lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px] gap-8 xl:gap-12">
 
-          {/* ── LEFT: PLAN SELECTOR ─────────────────── */}
+          {/*  LEFT: PLAN SELECTOR  */}
           <div className="space-y-4">
             <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6">
               Select your plan
@@ -273,7 +273,7 @@ function ApiMarketplacePageContent() {
             })}
           </div>
 
-          {/* ── RIGHT: CHECKOUT PANEL ───────────────── */}
+          {/*  RIGHT: CHECKOUT PANEL  */}
           <div className="lg:sticky lg:top-24 h-fit transform-gpu">
             <div className="bg-white/[0.04] border border-white/15 rounded-3xl p-6 md:p-8">
               <div className="flex items-center gap-3 mb-6">
@@ -367,7 +367,7 @@ function ApiMarketplacePageContent() {
                   ) : (
                     <>
                       <CreditCard size={16} />
-                      Pay with Stripe — ${selectedPlan.price}/mo
+                      Pay with Stripe  ${selectedPlan.price}/mo
                     </>
                   )}
                 </motion.button>

@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'No nonce in session. Request a new nonce.' }, { status: 400 });
     }
 
-    // ── Cryptographic signature verification ─────────────────────────────────
+    //  Cryptographic signature verification 
     const siweMessage = new SiweMessage(message);
     const { data: fields, error: siweErr } = await siweMessage.verify({
       signature,
@@ -32,10 +32,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (fields.nonce !== nonce) {
-      return NextResponse.json({ ok: false, error: 'Nonce mismatch — replay attack rejected.' }, { status: 401 });
+      return NextResponse.json({ ok: false, error: 'Nonce mismatch  replay attack rejected.' }, { status: 401 });
     }
 
-    // ── Upsert Sovereign User ─────────────────────────────────────────────────
+    //  Upsert System User 
     let user;
     try {
       user = await prisma.user.upsert({
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Database synchronization failed. Session rejected.' }, { status: 500 });
     }
 
-    // ── Mint Sovereign JWT ────────────────────────────────────────────────────
+    //  Mint System JWT 
     const { mintJWT } = await import('@/lib/jwt');
     const sessionToken = await mintJWT({
       sub: fields.address.toLowerCase(),
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         humanityScore: user?.humanityScore || 0
     }), 'EX', 600);
 
-    // ── Build response with all session cookies ───────────────────────────────
+    //  Build response with all session cookies 
     const res = NextResponse.json({
       ok: true,
       address: fields.address,
@@ -89,8 +89,8 @@ export async function POST(req: NextRequest) {
     // Primary SIWE session token (JWT)
     res.cookies.set('human_session', sessionToken, cookieOptions);
 
-    // Sovereign handshake marker (read by middleware)
-    res.cookies.set('sovereign_handshake', fields.address.toLowerCase(), {
+    // System handshake marker (read by middleware)
+    res.cookies.set('system_handshake', fields.address.toLowerCase(), {
       ...cookieOptions,
       httpOnly: false, // Frontend-readable to show wallet address
     });
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     // Clear consumed nonce
     res.cookies.delete('siwe-nonce');
 
-    console.info(`[SIWE] ✅ Sovereign session issued for: ${fields.address}`);
+    console.info(`[SIWE]  System session issued for: ${fields.address}`);
     return res;
 
   } catch (e) {

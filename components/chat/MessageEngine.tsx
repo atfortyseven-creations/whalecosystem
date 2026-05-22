@@ -7,7 +7,7 @@ import {
   FileText, Download, Image as ImageIcon, Video, Music, Paperclip
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useSovereignFormatter } from '@/hooks/useSovereignFormatter';
+import { useSystemFormatter } from '@/hooks/useSystemFormatter';
 
 import type { ChatSettings } from '@/components/chat/AdvancedSettingsModal';
 
@@ -25,7 +25,7 @@ export interface RenderableMessage {
   readAt?: number;                 // unix ms (undefined = not read)
   reactions: Reaction[];
   replyToId?: string;
-  attestationScore?: number;       // 0–100 whale score
+  attestationScore?: number;       // 0100 whale score
 }
 
 export interface MessageEngineProps {
@@ -38,17 +38,17 @@ export interface MessageEngineProps {
   settings?: ChatSettings;
 }
 
-// ── Constants ──────────────────────────────────────────────────────────────
+//  Constants 
 
-const QUICK_REACTIONS = ['👍', '🔥', '🐳', '🚀', '💎', '❤️', '🤯', '✅'];
+const QUICK_REACTIONS = ['', '', '', '', '', '️', '', ''];
 
-// ── Component ──────────────────────────────────────────────────────────────
+//  Component 
 
 export default function MessageEngine({
   messages, onReact, onPin, onDelete, onReply, bottomRef, settings
 }: MessageEngineProps) {
   const [menuState, setMenuState] = useState<{ id: string; content: string; x: number; y: number } | null>(null);
-  const { formatDate } = useSovereignFormatter();
+  const { formatDate } = useSystemFormatter();
 
   const openMenu = useCallback((e: React.MouseEvent | React.TouchEvent, id: string, content: string) => {
     e.preventDefault();
@@ -109,7 +109,7 @@ export default function MessageEngine({
   );
 }
 
-// ── MessageBubble ──────────────────────────────────────────────────────────
+//  MessageBubble 
 
 function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
   msg: RenderableMessage;
@@ -118,7 +118,7 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
   onReact: (id: string, emoji: string) => void;
   settings?: ChatSettings;
 }) {
-  const { formatTime } = useSovereignFormatter();
+  const { formatTime } = useSystemFormatter();
   const now = Date.now();
   const secondsLeft = msg.destructsAt ? Math.max(0, Math.round((msg.destructsAt - now) / 1000)) : null;
 
@@ -162,7 +162,7 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
               {replyToMsg.isMine ? 'You' : 'Peer Address'}
             </span>
             <span className="truncate block">
-              {replyToMsg.content.includes('[ATTACHMENT:') ? '📎 Attachment' : replyToMsg.content}
+              {replyToMsg.content.includes('[ATTACHMENT:') ? ' Attachment' : replyToMsg.content}
             </span>
           </div>
         )}
@@ -227,7 +227,7 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
   );
 }
 
-// ── AttachmentRenderer ──────────────────────────────────────────────────────
+//  AttachmentRenderer 
 
 function AttachmentRenderer({ attachment, isMine }: { attachment: { mime: string, url: string, name: string }, isMine: boolean }) {
   const { mime, url, name } = attachment;
@@ -288,7 +288,7 @@ function AttachmentRenderer({ attachment, isMine }: { attachment: { mime: string
   );
 }
 
-// ── ContextMenu ────────────────────────────────────────────────────────────
+//  ContextMenu 
 
 function ContextMenu({ messageId, content, x, y, onReact, onPin, onDelete, onReply, onClose }: {
   messageId: string;
@@ -403,7 +403,7 @@ function LocationBubble({
       <div className={`mt-1 p-3 rounded-xl border ${isMine ? 'bg-white/5 border-white/10 opacity-50' : 'bg-black/[0.02] border-black/5 opacity-50'}`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-black/10 dark:bg-white/10">
-            ❌
+            
           </div>
           <div>
             <p className={`font-mono text-[12px] font-bold ${isMine ? 'text-white/60' : 'text-black/60'}`}>Ubicación Expirada</p>
@@ -424,7 +424,7 @@ function LocationBubble({
       >
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isMine ? 'bg-white/20' : 'bg-black/10'}`}>
-            📍
+            
           </div>
           <div>
             <p className={`font-mono text-[12px] font-bold ${isMine ? 'text-white' : 'text-black'}`}>Ubicación Exacta</p>

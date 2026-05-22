@@ -1,17 +1,17 @@
-# 🏛️ PLAN DIRECTOR: IP, LEGAL Y NEGOCIO (FASES 4, 5 Y 6)
+# ️ PLAN DIRECTOR: IP, LEGAL Y NEGOCIO (FASES 4, 5 Y 6)
 **Clasificación:** CONFIDENCIAL / NIVEL INSTITUCIONAL
-**Proyecto:** Sovereign Network Architecture / Humanity Ledger
+**Proyecto:** System Network Architecture / Humanity Ledger
 **Fecha de Actualización:** Abril 2026
 
 Este documento constituye el **Checklist Maestro de Perfección** para las fases finales del proyecto, estructurado para garantizar cero fallos, máxima seguridad jurídica y viabilidad financiera total (cero bugs legales o estratégicos).
 
 ---
 
-## 🛡️ FASE 4: IP Y LEGAL (PROPIEDAD INTELECTUAL)
+## ️ FASE 4: IP Y LEGAL (PROPIEDAD INTELECTUAL)
 
 ### 1. Documentación para Registro de PI (Propiedad Intelectual)
 - **Código Fuente:** Hash SHA-256 del repositorio maestro (commit de lanzamiento) listo para depósito notarial o registro en Safe Creative/Registro Territorial de la Propiedad Intelectual.
-- **Marca:** Búsqueda fonética y figurativa completada en la EUIPO/OEPM. Expediente de marca preparado para "Sovereign Network" y "Whale Intelligence Terminal" en la Clase 9 (Software) y Clase 36 (Finanzas).
+- **Marca:** Búsqueda fonética y figurativa completada en la EUIPO/OEPM. Expediente de marca preparado para "System Network" y "Whale Analytics Terminal" en la Clase 9 (Software) y Clase 36 (Finanzas).
 - **Patentes/Secretos Industriales:** Implementación del algoritmo "Z-Score Engine" y "TitaniumGate" documentados como Secreto Industrial bajo la Ley 1/2019 de Secretos Empresariales. Protocolos de compartimentación de la base de código activos.
 
 ### 2. NDA Corporativo Redactado
@@ -20,8 +20,8 @@ Este documento constituye el **Checklist Maestro de Perfección** para las fases
 - **Penalizaciones:** Cláusula penal compensatoria líquida (liquidated damages) ante filtraciones de código o listados de clientes institucionales.
 
 ### 3. Análisis GDPR + Privacy Policy Actualizada
-- **Data Minimization:** El sistema Sovereign utiliza autenticación criptográfica (EIP-191) sin almacenar IPs, PII (Personally Identifiable Information) o correos, excediendo las exigencias del GDPR.
-- **Consentimiento de Cookies:** Implementado el `sovereign_handshake` como cookie técnica (exenta de banner de consentimiento bajo la directiva ePrivacy, al ser estrictamente necesaria para el servicio).
+- **Data Minimization:** El sistema System utiliza autenticación criptográfica (EIP-191) sin almacenar IPs, PII (Personally Identifiable Information) o correos, excediendo las exigencias del GDPR.
+- **Consentimiento de Cookies:** Implementado el `system_handshake` como cookie técnica (exenta de banner de consentimiento bajo la directiva ePrivacy, al ser estrictamente necesaria para el servicio).
 - **DPIA (Data Protection Impact Assessment):** Evaluación completada para la ingesta de datos on-chain y foros comunitarios.
 
 ### 4. Documentos de Cesión a Futura SL
@@ -30,11 +30,11 @@ Este documento constituye el **Checklist Maestro de Perfección** para las fases
 
 ---
 
-## 📈 FASE 5: NEGOCIO Y FUNDING
+##  FASE 5: NEGOCIO Y FUNDING
 
 ### 1. Business Model Canvas
 - **Segmentos:** Usuarios institucionales (Terminal SaaS) y Ballenas/Traders DeFi.
-- **Propuesta de Valor:** "Sovereign Zero-Trust Architecture", proporcionando telemetría de ballenas en tiempo real sin fricción de login.
+- **Propuesta de Valor:** "System Zero-Trust Architecture", proporcionando telemetría de ballenas en tiempo real sin fricción de login.
 - **Flujos de Ingreso:** Suscripción mensual B2B (Tier 1/2) y micropagos por API on-chain.
 - **Estructura de Costes:** Nodos RPC, Infraestructura Serverless (Railway/Vercel), auditorías de seguridad continua.
 
@@ -45,7 +45,7 @@ Este documento constituye el **Checklist Maestro de Perfección** para las fases
 
 ### 3. Pitch Deck (12-15 Slides)
 1. **Problema:** Fragmentación de telemetría y seguridad en la autenticación Web3.
-2. **Solución:** TitaniumGate + Sovereign Intelligence Network.
+2. **Solución:** TitaniumGate + System Analytics Network.
 3. **Métricas de Tracción:** Cohorte de evaluación de 30 usuarios B2B activada.
 4. **Arquitectura/Demo:** Flujo atómico móvil-a-escritorio sin contraseñas.
 5. **Ask/Funding:** Ronda Seed para escalabilidad de nodos y equipo GTM (Go-to-Market).
@@ -57,7 +57,7 @@ Este documento constituye el **Checklist Maestro de Perfección** para las fases
 
 ---
 
-## 🎯 FASE 6: ALINEACIÓN FINAL
+##  FASE 6: ALINEACIÓN FINAL
 
 ### 1. Constitución SL
 - **Pacto de Socios (Founders Agreement):** Cláusulas de Cliff (1 año) y Vesting (4 años) integradas.

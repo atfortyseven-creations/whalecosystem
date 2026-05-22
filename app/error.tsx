@@ -67,7 +67,7 @@ export default function ErrorPage({
         </h1>
         
         <p className="text-[13px] font-bold text-black/50 leading-relaxed mb-6">
-          The sovereign terminal encountered an unexpected execution fault. Our sentinels have logged the anomaly.
+          The system terminal encountered an unexpected execution fault. Our sentinels have logged the anomaly.
         </p>
 
         {error.message && (

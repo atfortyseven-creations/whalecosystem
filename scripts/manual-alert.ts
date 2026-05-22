@@ -11,7 +11,7 @@ const ALCHEMY_KEY = "p2MK6Y8eQyHPbS5gQZ7TU"; // Hardcoded from .env for immediat
 const BOT_TOKEN = "8400528150:AAGtzfSpSvD6HgauHwg7Nw3sGElQx1Ug4rg";
 const CHAT_ID = "7247569356";
 
-console.log("🚀 Starting Manual Whale Alert Script...");
+console.log(" Starting Manual Whale Alert Script...");
 
 const config = {
   apiKey: ALCHEMY_KEY,
@@ -89,27 +89,27 @@ async function run() {
       // Conversion to Euros (Approx rate: 0.96)
       const eurVal = val * 0.96;
       const millions = (eurVal / 1_000_000).toFixed(2);
-      return `€${millions} Million Euros`; // Added € symbol at the start for clarity
+      return `${millions} Million Euros`; // Added  symbol at the start for clarity
     };
 
     // 5. Send Alerts
     for (const [i, tx] of whaleMovements.entries()) {
       const shortFrom = `${tx.from.slice(0, 4)}...${tx.from.slice(-4)}`;
-      const shortTo = tx.to && tx.to !== 'Contract' ? `${tx.to.slice(0, 4)}...${tx.to.slice(-4)}` : 'Contract 📄';
+      const shortTo = tx.to && tx.to !== 'Contract' ? `${tx.to.slice(0, 4)}...${tx.to.slice(-4)}` : 'Contract ';
       
-      const emoji = '🐋'; // Always whale, never mermaid
+      const emoji = ''; // Always whale, never mermaid
       const type = tx.to === 'Contract' ? 'Interaction' : 'Transfer';
       
       // Minimalist Premium Design (Personalized + Euros)
         const msg = `
 ${emoji} <b>WHALE ALERT</b> | Base
 
-💶 <b>${formatMoney(tx.usdValue)}</b>
+ <b>${formatMoney(tx.usdValue)}</b>
 ${type} of <b>${parseFloat(tx.value?.toFixed(2) || '0').toLocaleString()} ${tx.asset || 'Token'}</b> successfully transferred
 
-👤 <code>${shortFrom}</code> ➡️ <code>${shortTo}</code>
+ <code>${shortFrom}</code> ️ <code>${shortTo}</code>
 
-🔗 <a href="https://basescan.org/tx/${tx.hash}">View Transaction</a>
+ <a href="https://basescan.org/tx/${tx.hash}">View Transaction</a>
 `.trim();
 
       console.log(`Sending alert ${i+1}/${whaleMovements.length}...`);
@@ -119,7 +119,7 @@ ${type} of <b>${parseFloat(tx.value?.toFixed(2) || '0').toLocaleString()} ${tx.a
       await new Promise(r => setTimeout(r, 200));
     }
 
-    console.log("✅ All alerts sent!");
+    console.log(" All alerts sent!");
 
   } catch (error) {
     console.error("Script failed:", error);

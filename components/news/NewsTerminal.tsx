@@ -82,7 +82,7 @@ export function NewsTerminal() {
     setShowLangMenu(false);
     if (code === currentLang) return;
     setIsTranslating(true);
-    // Simulated quantum translation delay
+    // Simulated core translation delay
     await new Promise(r => setTimeout(r, 1200));
     setCurrentLang(code);
     setIsTranslating(false);
@@ -90,7 +90,7 @@ export function NewsTerminal() {
 
   const rightRef = useRef<HTMLDivElement>(null);
 
-  // ── Market clocks ──────────────────────────────────────────────────────────
+  //  Market clocks 
   useEffect(() => {
     const update = () => {
       const now = new Date();
@@ -108,7 +108,7 @@ export function NewsTerminal() {
     return () => clearInterval(id);
   }, []);
 
-  // ── Load data ──────────────────────────────────────────────────────────────
+  //  Load data 
   useEffect(() => {
     fetchEthEur().then(setEthEur);
 
@@ -398,7 +398,7 @@ export function NewsTerminal() {
               
               {shareSent ? (
                 <div className="p-12 text-center">
-                  <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-900 font-bold">✓</div>
+                  <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-900 font-bold"></div>
                   <h3 className="font-sans text-xl font-black text-slate-900 mb-2">Sent</h3>
                   <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">The report has been sent.</p>
                 </div>

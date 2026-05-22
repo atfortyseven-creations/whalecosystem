@@ -34,7 +34,7 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
         const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL;
         // If no gateway URL is configured, skip WebSocket connection silently.
         if (!GATEWAY_URL) {
-            setLogs([{ id: -1, timestamp: 'SYSCALL', type: 'info', message: 'Sovereign telemetry stream initializing...' }]);
+            setLogs([{ id: -1, timestamp: 'SYSCALL', type: 'info', message: 'System telemetry stream initializing...' }]);
             return;
         }
 
@@ -48,7 +48,7 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
 
         setLogs([
             { id: -2, timestamp: 'SYSCALL', type: 'info', message: 'Initializing Institutional WebSocket Topology...' },
-            { id: -1, timestamp: 'GATEWAY', type: 'info', message: <span className="text-[#888888]">Establishing sovereign connection...</span> }
+            { id: -1, timestamp: 'GATEWAY', type: 'info', message: <span className="text-[#888888]">Establishing system connection...</span> }
         ]);
 
         socket.on('connect', () => {

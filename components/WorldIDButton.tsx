@@ -1,19 +1,19 @@
 "use client";
 
-import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@identity/idkit";
 import { useRouter } from "next/navigation";
 
 export default function VerifyWorldID() {
   const router = useRouter();
 
   // 1. READ ENVIRONMENT VARIABLES
-  const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`;
-  const action = process.env.NEXT_PUBLIC_WLD_ACTION;
+  const app_id = process.env.NEXT_PUBLIC_AUTH_APP_ID as `app_${string}`;
+  const action = process.env.NEXT_PUBLIC_AUTH_ACTION;
 
   // 2. SECURITY LOGS FOR DEBUG
   console.log("--- World ID Config Check ---");
-  console.log("App ID loaded:", app_id ? "YES ✅" : "NO ❌");
-  console.log("Action ID loaded:", action ? `YES (${action}) ✅` : "NO ❌");
+  console.log("App ID loaded:", app_id ? "YES " : "NO ");
+  console.log("Action ID loaded:", action ? `YES (${action}) ` : "NO ");
 
   const handleVerify = async (proof: ISuccessResult) => {
     console.log("Proof received from IDKit:", proof);
@@ -21,19 +21,19 @@ export default function VerifyWorldID() {
   };
 
   const onSuccess = (result: ISuccessResult) => {
-    console.log("Verification Successful 🎉:", result);
+    console.log("Verification Successful :", result);
     // REDIRECTION TO MARKETS (Valid route)
     router.push("/markets");
   };
 
   const onError = (error: any) => {
-    console.error("VERIFICATION ERROR ❌:", error);
+    console.error("VERIFICATION ERROR :", error);
 
     // Detailed user alert
     alert(
-      `Worldcoin Error: ${error.code || "Unknown"}\n` +
+      `Identity Error: ${error.code || "Unknown"}\n` +
       `Detail: ${error.message || "The verification was declined or cancelled."}\n\n` +
-      `Tip: Check if your App in the Worldcoin Developer Portal is in PRODUCTION mode.`
+      `Tip: Check if your App in the Identity Developer Portal is in PRODUCTION mode.`
     );
   };
 

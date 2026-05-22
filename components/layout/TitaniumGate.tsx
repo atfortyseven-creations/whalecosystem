@@ -61,7 +61,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     }, [isPublicPage]);
 
     useEffect(() => {
-        // Increased debounce: 300ms was too short — on first mobile connection,
+        // Increased debounce: 300ms was too short  on first mobile connection,
         // establishSession() writes the cookie AFTER wagmi reconnects (~200-400ms).
         // 1500ms gives wagmi + cookie-write time to complete before we gate.
         // With ssr:true + cookieStorage in appkit.tsx, reconnect is now synchronous
@@ -73,7 +73,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             // This prevents aggressive redirects while the wallet modal is open.
             if (isConnecting || isReconnecting) return;
 
-            // [EXPERT SECURITY FIX] Removed sovereign_pending_wakeup bypass.
+            // [EXPERT SECURITY FIX] Removed system_pending_wakeup bypass.
             // Relying on localStorage for gating allowed a permanent UI bypass to protected routes.
             // If the user is genuinely recovering, isConnecting/isReconnecting will hold the gate.
 
@@ -89,15 +89,15 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                 return;
             }
 
-            // Priority 3: Sovereign Handshake (Cookie — must have real 0x address)
+            // Priority 3: System Handshake (Cookie  must have real 0x address)
             const hasHandshake = typeof document !== 'undefined'
-                && document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
+                && document.cookie.split('; ').some(r => r.startsWith('system_handshake=0x'));
             if (hasHandshake) {
                 setState('APP');
                 return;
             }
 
-            // Otherwise: Access Denied — redirect to connect
+            // Otherwise: Access Denied  redirect to connect
             setState('AUTH');
             if (pathname !== '/connect') router.push('/connect');
         }, 1500);
@@ -111,7 +111,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
     return (
         <GateStateContext.Provider value={{ state, hasPlayedIntro: true }}>
-            {/* THE APPLICATION (or EMERGENCY BYPASS) — zero loading UI */}
+            {/* THE APPLICATION (or EMERGENCY BYPASS)  zero loading UI */}
             {(state === 'APP' || forceVisible) ? (
                 <div 
                     className="relative z-10 h-full w-full"

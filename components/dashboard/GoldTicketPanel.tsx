@@ -9,7 +9,7 @@ import {
   useSendTransaction
 } from 'wagmi';
 import { parseEther } from 'viem';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { injected } from 'wagmi/connectors';
 import {
   Zap, Users, Lock, ExternalLink,
@@ -18,17 +18,17 @@ import {
 import { WhaleLogo } from '@/components/shared/WhaleLogo';
 import { useRouter } from 'next/navigation';
 
-// ── Treasury ──────────────────────────────────────────────────────────────────
+//  Treasury 
 const TREASURY_WALLET = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
 const OPTIMISM_CHAIN_ID = 10;
 const MAX_SUPPLY = 200;
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const truncAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+//  Helpers 
+const truncAddr = (a: string) => `${a.slice(0, 6)}${a.slice(-4)}`;
 const fmtEth = (wei: bigint) => (Number(wei) / 1e18).toFixed(4);
 const pct = (a: number, b: number) => Math.min(100, Math.round((a / b) * 100));
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+//  Sub-components 
 
 function SupplyBar({ minted, max }: { minted: number; max: number }) {
   const fill = pct(minted, max);
@@ -255,7 +255,7 @@ function GlobalLedger({ feed }: { feed: any[] }) {
 }
 
 export function GoldTicketPanel() {
-  const { address, isConnected, chainId, isSovereignHandshake } = useSovereignAccount();
+  const { address, isConnected, chainId, isSystemHandshake } = useSystemAccount();
   const { isConnected: isWagmiConnected } = useAccount(); // Real wagmi connector state
   const router = useRouter();
   const { switchChain } = useSwitchChain();
@@ -268,7 +268,7 @@ export function GoldTicketPanel() {
 
   const fetchStats = useCallback(async (isMounted: boolean = true) => {
     try {
-      // ── Zero-Mock Mandate: Fetch real data from our internal API ──
+      //  Zero-Mock Mandate: Fetch real data from our internal API 
       const res = await fetch(`/api/golden-ticket/claim${address ? `?address=${address}` : ''}`);
       if (!res.ok) throw new Error('API fetch failed');
       const data = await res.json();
@@ -332,7 +332,7 @@ export function GoldTicketPanel() {
         toast.dismiss(t2);
         const json = await res.json();
         if (res.ok) {
-          toast.success('Registration Complete — Welcome to the System Ledger ✓');
+          toast.success('Registration Complete  Welcome to the System Ledger ');
           fetchStats();
         } else if (res.status === 409) {
           toast.info('Access level already established.');
@@ -374,7 +374,7 @@ export function GoldTicketPanel() {
           },
           onError: async (err: any) => {
             toast.dismiss(signToastId);
-            toast.info('Ledger signature skipped — registering with transaction proof...');
+            toast.info('Ledger signature skipped  registering with transaction proof...');
             await performClaim(undefined, txHash);
           }
         }
@@ -383,7 +383,7 @@ export function GoldTicketPanel() {
       toast.error(`Mint execution failed: ${error?.shortMessage || error?.message || 'Transaction rejected'}`);
       setIsMinting(false);
     }
-  }, [isConnected, isWagmiConnected, isSovereignHandshake, signatureData, isMinting, isSigning, address, signMessage, sendTransactionAsync, switchChain, chainId, router, fetchStats]);
+  }, [isConnected, isWagmiConnected, isSystemHandshake, signatureData, isMinting, isSigning, address, signMessage, sendTransactionAsync, switchChain, chainId, router, fetchStats]);
 
   const hasTicket = dbStats?.ticket || false;
 
@@ -477,7 +477,7 @@ export function GoldTicketPanel() {
   return (
     <div className="w-full h-full min-h-0 flex flex-col gap-4 overflow-hidden">
       
-      {/* ── HERO & INTERACTION (BENTO GRID) ── */}
+      {/*  HERO & INTERACTION (BENTO GRID)  */}
       <div className="grid lg:grid-cols-2 gap-4 shrink-0">
           
           <div className="bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl flex flex-col justify-center p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
@@ -519,7 +519,7 @@ export function GoldTicketPanel() {
           )}
       </div>
 
-      {/* ── GLOBAL LEDGER ── */}
+      {/*  GLOBAL LEDGER  */}
       <div className="flex-1 bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl min-h-0 shadow-[0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col">
          <GlobalLedger feed={dbStats?.feed || []} />
       </div>

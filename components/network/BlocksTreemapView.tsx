@@ -200,7 +200,7 @@ export function BlocksTreemapView() {
 
                 {/* Treemap with Pending Block Sidebar */}
                 <div className="flex flex-col lg:flex-row gap-4 h-full min-h-[500px]">
-                    {/* 🔥 [LEGENDARY] Pending Block Representation - Mempool.space Style */}
+                    {/*  [LEGENDARY] Pending Block Representation - Mempool.space Style */}
                     <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}

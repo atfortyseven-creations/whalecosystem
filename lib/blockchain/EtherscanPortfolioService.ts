@@ -23,11 +23,11 @@ export class EtherscanPortfolioService {
     const cached = this.portfolioCache.get(cacheKey);
     
     if (cached && (Date.now() - cached.timestamp < this.CACHE_TTL)) {
-      console.log(`[EtherscanPortfolio] 📦 Cache hit for ${address}`);
+      console.log(`[EtherscanPortfolio]  Cache hit for ${address}`);
       return cached.data;
     }
 
-    console.log(`[EtherscanPortfolio] 🔍 Fetching from Etherscan: ${address}`);
+    console.log(`[EtherscanPortfolio]  Fetching from Etherscan: ${address}`);
     
     const portfolio = await getEtherscanPortfolio(address);
     
@@ -132,7 +132,7 @@ export class EtherscanPortfolioService {
     // Cache the result
     this.portfolioCache.set(cacheKey, { data: result, timestamp: Date.now() });
 
-    console.log(`[EtherscanPortfolio] ✅ ${address}: ${enrichedTokens.length} tokens, ${portfolio.nfts?.length || 0} NFTs, $${safeToFixed(totalValueUsd, 2)}`);
+    console.log(`[EtherscanPortfolio]  ${address}: ${enrichedTokens.length} tokens, ${portfolio.nfts?.length || 0} NFTs, $${safeToFixed(totalValueUsd, 2)}`);
 
     return result;
   }

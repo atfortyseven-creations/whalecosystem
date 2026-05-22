@@ -5,7 +5,7 @@ export const layer2Modules = [
     description: "Análisis profundo de las arquitecturas de escalado: Rollups, ZK-proofs y la transición hacia un ecosistema modular. 20 Módulos de Máxima Perfección.",
     articles: [
         {
-            id: "app-chains-sovereign-app-specific",
+            id: "app-chains-system-app-specific",
             title: "1. App-Chains: La Soberanía de la Aplicación Específica",
             description: "Cadenas diseñadas para un solo propósito: Máxima optimización y control de recursos.",
             readTime: 180,
@@ -48,7 +48,7 @@ export const layer2Modules = [
             content: `<div class="academy-article">
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
-                        <h2>I. Blast: Yield Nativo en el Bridge — El Caso del Yield L2</h2>
+                        <h2>I. Blast: Yield Nativo en el Bridge  El Caso del Yield L2</h2>
                         <p><strong>Blast</strong> introdujo un concepto radicalmente diferente: el ETH y las stablecoins bridgeados a Blast generan yield automáticamente. El ETH se restakieó (stETH/Lido) y el USDB acumula interés del protocolo DAI/PSM. Esto convierte el bridge no en un simple puente de liquidez sino en un <strong>almacenamiento productivo</strong>. El resultado fue captar &gt;$1.5B en TVL antes de su lanzamiento, demostrando que el yield nativo en L2 puede ser un diferenciador crítico en la guerra de liquidez.</p>
                     </section>
 
@@ -108,7 +108,7 @@ export const layer2Modules = [
 
                     <section class="pro-section">
                         <h2>II. El Camino al Danksharding Completo</h2>
-                        <p>EIP-4844 es el "proto" del eventual <strong>Danksharding completo</strong>, que permitirá hasta 64 blobs por bloque (vs. los 3-6 actuales) y añadirá DAS nativo en Ethereum. El roadmap: <strong>PeerDAS</strong> → <strong>Full Danksharding</strong> → capacidad de ~1MB/bloque en DA pura, suficiente para soportar miles de rollups en paralelo con comisiones de fraccion de centavo.</p>
+                        <p>EIP-4844 es el "proto" del eventual <strong>Danksharding completo</strong>, que permitirá hasta 64 blobs por bloque (vs. los 3-6 actuales) y añadirá DAS nativo en Ethereum. El roadmap: <strong>PeerDAS</strong>  <strong>Full Danksharding</strong>  capacidad de ~1MB/bloque en DA pura, suficiente para soportar miles de rollups en paralelo con comisiones de fraccion de centavo.</p>
                     </section>
                 </div>`
         },
@@ -126,7 +126,7 @@ export const layer2Modules = [
 
                     <section class="pro-section">
                         <h2>II. La Invisibilidad de la Infraestructura: La Criptomoneda Como Utilidad</h2>
-                        <p>El estadio final del escalado es cuando el usuario no sabe —ni necesita saber— en qué rollup está ejecutando. Wallets como <strong>Safe</strong> o interfaces de <strong>ERC-4337</strong> (Account Abstraction) ocultan la complejidad subyacente: el usuario simplemente interactua con una app, y el sistema elige automáticamente la cadena más eficiente. El objetivo es que la blockchain sea tan invisible como el protocolo TCP/IP para los usuarios de internet.</p>
+                        <p>El estadio final del escalado es cuando el usuario no sabe ni necesita saber en qué rollup está ejecutando. Wallets como <strong>Safe</strong> o interfaces de <strong>ERC-4337</strong> (Account Abstraction) ocultan la complejidad subyacente: el usuario simplemente interactua con una app, y el sistema elige automáticamente la cadena más eficiente. El objetivo es que la blockchain sea tan invisible como el protocolo TCP/IP para los usuarios de internet.</p>
                     </section>
                 </div>`
         },
@@ -355,7 +355,7 @@ export const layer2Modules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. ZK-SNARKs y ZK-STARKs: Las Dos Familias de Pruebas de Validez</h2>
-                        <p>Los <strong>ZK-Rollups</strong> adj colocan una prueba matemática criptográficamente sólida a cada lote de transacciones. Existen dos familias principales: <strong>ZK-SNARKs</strong> (zkSync, Polygon Hermez) — pruebas compactas y rápidas de verificar, pero que requieren un <em>Trusted Setup</em> inicial (una ceremonia de generación de parámetros que si es comprometida invalida la seguridad). <strong>ZK-STARKs</strong> (StarkNet, Polygon Miden) — pruebas más grandes pero sin Trusted Setup, basadas en hashing simétrico, cuantu-resistentes. La finalidad de los ZK-Rollups es instantánea: verificar la prueba en L1 es suficiente, sin períodos de desafío.</p>
+                        <p>Los <strong>ZK-Rollups</strong> adj colocan una prueba matemática criptográficamente sólida a cada lote de transacciones. Existen dos familias principales: <strong>ZK-SNARKs</strong> (zkSync, Polygon Hermez)  pruebas compactas y rápidas de verificar, pero que requieren un <em>Trusted Setup</em> inicial (una ceremonia de generación de parámetros que si es comprometida invalida la seguridad). <strong>ZK-STARKs</strong> (StarkNet, Polygon Miden)  pruebas más grandes pero sin Trusted Setup, basadas en hashing simétrico, cuantu-resistentes. La finalidad de los ZK-Rollups es instantánea: verificar la prueba en L1 es suficiente, sin períodos de desafío.</p>
                     </section>
 
                     <section class="pro-section">

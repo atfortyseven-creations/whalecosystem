@@ -9,7 +9,7 @@ import { ChainId } from '../blockchain/BlockchainService';
 
 const SYNC_COOLDOWN_MS = 30000; // 30s Cooldown to prevent RPC spam
 const lastSyncMap: Record<string, number> = {};
-const lastResultMap: Record<string, any> = {}; // 🔥 Store last successful results
+const lastResultMap: Record<string, any> = {}; //  Store last successful results
 
 // ----------------------------------------------------------------------------
 // DEPOSIT WATCHER SERVICE
@@ -29,7 +29,7 @@ export class DepositWatcher {
         const now = Date.now();
         const lastSync = lastSyncMap[walletAddress] || 0;
         
-        // 🔥 FIX: Return cached data during cooldown instead of just {skipped: true}
+        //  FIX: Return cached data during cooldown instead of just {skipped: true}
         if (now - lastSync < SYNC_COOLDOWN_MS) {
             const cachedResult = lastResultMap[walletAddress];
             if (cachedResult) {
@@ -42,16 +42,16 @@ export class DepositWatcher {
         }
 
         try {
-            console.log(`[DepositWatcher] 🔄 Universal Sync initiated for ${walletAddress}...`);
+            console.log(`[DepositWatcher]  Universal Sync initiated for ${walletAddress}...`);
             
-            // 🔥 Fetch ALL assets across ALL supported chains (including Worldchain for WLD)
+            //  Fetch ALL assets across ALL supported chains (including Worldchain for AUTH)
             const portfolio = await portfolioService.getMultiChainPortfolio(walletAddress, [
                 ChainId.MAINNET,
                 ChainId.BASE,
                 ChainId.POLYGON,
                 ChainId.ARBITRUM,
                 ChainId.OPTIMISM,
-                ChainId.WORLDCHAIN // 🌍 CRITICAL: WLD tokens are native on Worldchain
+                ChainId.WORLDCHAIN //  CRITICAL: AUTH tokens are native on Worldchain
             ]);
 
             if (!portfolio || !portfolio.tokens) {
@@ -89,11 +89,11 @@ export class DepositWatcher {
             }
 
             lastSyncMap[walletAddress] = now;
-            lastResultMap[walletAddress] = results; // 🔥 Cache successful result
-            console.log(`[DepositWatcher] ✅ Sync complete for ${walletAddress}. ${portfolio.tokens.length} assets synced.`);
+            lastResultMap[walletAddress] = results; //  Cache successful result
+            console.log(`[DepositWatcher]  Sync complete for ${walletAddress}. ${portfolio.tokens.length} assets synced.`);
             return results;
         } catch (error) {
-            console.error(`[DepositWatcher] ❌ Sync failed for ${walletAddress}:`, error);
+            console.error(`[DepositWatcher]  Sync failed for ${walletAddress}:`, error);
             return null;
         }
     }

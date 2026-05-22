@@ -1,14 +1,14 @@
 /**
- * Feature Flag Engine — Axioma 281 (Canary Releases)
- * ═══════════════════════════════════════════════════════════════
+ * Feature Flag Engine  Axioma 281 (Canary Releases)
+ * 
  * Wallet-scoped feature flag system backed by Redis.
  * Supports:
  *   - Global on/off flags
- *   - Wallet-address allowlist (1% → 10% → 100% canary)
+ *   - Wallet-address allowlist (1%  10%  100% canary)
  *   - Tier-gated flags (STARTER | PRO | ELITE)
  *   - Instant propagation via Redis (no deploy required)
  *   - Graceful fallback to env vars if Redis unavailable
- * ═══════════════════════════════════════════════════════════════
+ * 
  */
 
 import { redisClient as redis } from '@/lib/redis/client';
@@ -18,7 +18,7 @@ export type FlagTier = 'ALL' | 'STARTER' | 'PRO' | 'ELITE';
 export interface FeatureFlag {
   key:        string;
   enabled:    boolean;
-  rollout:    number;          // 0–100 percentage
+  rollout:    number;          // 0100 percentage
   allowlist:  string[];        // wallet addresses (lowercase)
   tierGate:   FlagTier;
   axiom:      number;          // Which axiom this covers
@@ -29,7 +29,7 @@ const FLAG_PREFIX  = 'feature_flag:';
 const FLAGS_INDEX  = 'feature_flags:index';
 const CACHE_TTL_MS = 30_000; // 30s in-memory cache to reduce Redis RTT
 
-// ── In-memory LRU cache ───────────────────────────────────────────────────────
+//  In-memory LRU cache 
 const memCache = new Map<string, { value: FeatureFlag; ts: number }>();
 
 function fromCache(key: string): FeatureFlag | null {
@@ -42,7 +42,7 @@ function toCache(key: string, flag: FeatureFlag): void {
   memCache.set(key, { value: flag, ts: Date.now() });
 }
 
-// ── Core evaluation ───────────────────────────────────────────────────────────
+//  Core evaluation 
 export async function evaluateFlag(
   flagKey:       string,
   walletAddress: string,
@@ -61,13 +61,13 @@ export async function evaluateFlag(
     // Tier gate: if flag requires PRO, only PRO/ELITE see it
     if (!passesTierGate(flag.tierGate, userTier)) return false;
 
-    // Rollout percentage: deterministic hash of wallet → stable assignment
+    // Rollout percentage: deterministic hash of wallet  stable assignment
     if (flag.rollout >= 100) return true;
     if (flag.rollout <= 0)   return false;
     return walletRolloutBucket(addr) < flag.rollout;
 
   } catch {
-    // Redis unavailable — fall back to env
+    // Redis unavailable  fall back to env
     return getEnvFallback(flagKey);
   }
 }
@@ -78,7 +78,7 @@ function passesTierGate(required: FlagTier, actual: string): boolean {
   return (order[actual as FlagTier] ?? 1) >= (order[required] ?? 1);
 }
 
-/** Deterministic [0,100) bucket from wallet address — stable per address. */
+/** Deterministic [0,100) bucket from wallet address  stable per address. */
 function walletRolloutBucket(addr: string): number {
   let hash = 0;
   for (let i = 0; i < addr.length; i++) {
@@ -92,7 +92,7 @@ function getEnvFallback(flagKey: string): boolean {
   return process.env[envKey] === 'true';
 }
 
-// ── CRUD ─────────────────────────────────────────────────────────────────────
+//  CRUD 
 export async function getFlag(flagKey: string): Promise<FeatureFlag | null> {
   const cached = fromCache(flagKey);
   if (cached) return cached;
@@ -131,8 +131,8 @@ export async function listFlags(): Promise<FeatureFlag[]> {
   return flags.filter(Boolean) as FeatureFlag[];
 }
 
-// ── Canary promotion helper ───────────────────────────────────────────────────
-/** Promote a flag through canary stages: 0 → 1 → 10 → 50 → 100 */
+//  Canary promotion helper 
+/** Promote a flag through canary stages: 0  1  10  50  100 */
 export async function promoteCanary(flagKey: string): Promise<number> {
   const flag = await getFlag(flagKey);
   if (!flag) throw new Error(`Flag "${flagKey}" not found`);
@@ -143,7 +143,7 @@ export async function promoteCanary(flagKey: string): Promise<number> {
   return nextRollout;
 }
 
-// ── Seed default flags for all 500 axiom elements ────────────────────────────
+//  Seed default flags for all 500 axiom elements 
 export const DEFAULT_FLAGS: Omit<FeatureFlag, 'updatedAt'>[] = [
   { key: 'TITANIUMGATE_ENHANCED',    enabled: true,  rollout: 100, allowlist: [], tierGate: 'ALL',     axiom: 30 },
   { key: 'X25519_SYNC',              enabled: true,  rollout: 100, allowlist: [], tierGate: 'ALL',     axiom: 31 },

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// ── Crash-hardened JSON parser — returns fallback on any parse failure ──
+//  Crash-hardened JSON parser  returns fallback on any parse failure 
 function safeJsonParse<T>(raw: unknown, fallback: T): T {
     if (Array.isArray(raw)) return raw as unknown as T;
     if (typeof raw !== 'string') return fallback;

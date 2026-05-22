@@ -117,18 +117,18 @@ export async function GET(request: NextRequest) {
     const success = await sendTelegramMessage({
       chatId,
       text: `
-🎉 <b>Test Notification</b>
+ <b>Test Notification</b>
 
-✅ Your Telegram alerts are working!
+ Your Telegram alerts are working!
 
 This is a test message from <b>Whale Alert VIP</b>.
 
 You will now receive:
-• Whale movement alerts
-• Price threshold notifications
-• Daily portfolio digests
+ Whale movement alerts
+ Price threshold notifications
+ Daily portfolio digests
 
-⏰ ${new Date().toLocaleString()}
+ ${new Date().toLocaleString()}
       `.trim(),
       parseMode: 'HTML',
       threadId: topicId || undefined,

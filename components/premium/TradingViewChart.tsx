@@ -115,7 +115,7 @@ export default function TradingViewChart({ symbol = "ETHUSDT", height = 400, tra
                   position: tx.type === 'BUY' ? 'belowBar' : (tx.type === 'SELL' ? 'aboveBar' : 'inBar'),
                   color: tx.type === 'BUY' ? '#22c55e' : (tx.type === 'SELL' ? '#ef4444' : '#8b5cf6'),
                   shape: tx.type === 'BUY' ? 'arrowUp' : (tx.type === 'SELL' ? 'arrowDown' : 'circle'),
-                  text: `${tx.type} 🐋 ${tx.amount.toLocaleString()}`,
+                  text: `${tx.type}  ${tx.amount.toLocaleString()}`,
                   size: 2
               })).filter(m => formattedData.some(d => d.time === m.time || Math.abs((d.time as number) - (m.time as number)) < 60));
               

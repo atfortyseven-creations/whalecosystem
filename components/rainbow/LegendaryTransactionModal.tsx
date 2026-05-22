@@ -15,7 +15,7 @@ import { useEliteSwap } from "@/hooks/useEliteSwap";
 import { useGaslessSwap } from "@/hooks/useGaslessSwap";
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
-// ── Design Tokens (Ivory Model) ────────────────────────────────────────────────
+//  Design Tokens (Ivory Model) 
 const BG     = "#FAF9F6";
 const INK    = "#050505";
 const MUTED  = "rgba(5,5,5,0.45)";
@@ -142,7 +142,7 @@ export function LegendaryTransactionModal({
      }
   }, [balances, fromAsset, fromAssetSymbol]);
 
-  // Quote Fetcher — uses Li.Fi (1inch API key is invalid)
+  // Quote Fetcher  uses Li.Fi (1inch API key is invalid)
   useEffect(() => {
     if (!amount || parseFloat(amount) <= 0 || !isOpen || (mode !== 'swap' && mode !== 'bridge' && mode !== 'buy')) {
         setQuote(null);
@@ -164,8 +164,8 @@ export function LegendaryTransactionModal({
             const amountInWei = amountInUnits.toString();
 
             if (mode === 'buy') {
-                // For buy mode, fetch live ETH/BTC/WLD price in EUR via CoinGecko
-                const coinMap: Record<string, string> = { 'ETH': 'ethereum', 'USDC': 'usd-coin', 'WLD': 'worldcoin-wld', 'BTC': 'bitcoin' };
+                // For buy mode, fetch live ETH/BTC/AUTH price in EUR via CoinGecko
+                const coinMap: Record<string, string> = { 'ETH': 'ethereum', 'USDC': 'usd-coin', 'AUTH': 'identity-wld', 'BTC': 'bitcoin' };
                 const coinId = coinMap[toAssetSymbol.toUpperCase()] || 'ethereum';
                 const currency = (['USD','EUR','GBP'].includes(subMode.toUpperCase()) ? subMode : 'EUR').toLowerCase();
                 try {
@@ -486,7 +486,7 @@ export function LegendaryTransactionModal({
 
               <div className="p-8 space-y-6" style={{ background: BG }}>
                 
-                {/* ── BUY CRYPTO MODE ── */}
+                {/*  BUY CRYPTO MODE  */}
                 {mode === 'buy' ? (
                       <div className="space-y-6">
                         <div className="border rounded-2xl p-6 relative" style={{ borderColor: BORDER, background: CARD }}>
@@ -530,8 +530,8 @@ export function LegendaryTransactionModal({
                                     <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>Receive (Est.)</label>
                                     <div className="text-4xl font-black tracking-tighter" style={{ color: MUTED }}>
                                         {quote?.price && Number(amount) > 0
-                                            ? `≈ ${(Number(amount) / quote.price).toLocaleString('de-DE', { maximumFractionDigits: 5 })} ${toAssetSymbol}`
-                                            : '—'}
+                                            ? ` ${(Number(amount) / quote.price).toLocaleString('de-DE', { maximumFractionDigits: 5 })} ${toAssetSymbol}`
+                                            : ''}
                                     </div>
                                 </div>
                                 <div className="border rounded-xl px-4 py-2 flex items-center gap-3" style={{ borderColor: BORDER, background: BG }}>
@@ -543,7 +543,7 @@ export function LegendaryTransactionModal({
                                     >
                                         <option value="ETH">ETH</option>
                                         <option value="USDC">USDC</option>
-                                        <option value="WLD">WLD</option>
+                                        <option value="AUTH">AUTH</option>
                                     </select>
                                 </div>
                             </div>
@@ -556,12 +556,12 @@ export function LegendaryTransactionModal({
                             style={{ background: INK, color: '#FFF' }}
                         >
                             {loading ? <Loader2 className="animate-spin" size={16} /> : <CreditCard size={16} />}
-                            {loading ? 'Verifying Gateway…' : 'Continue with Card'}
+                            {loading ? 'Verifying Gateway' : 'Continue with Card'}
                         </button>
                       </div>
                 ) : (
                     <div className="space-y-6">
-                        {/* ── BRIDGE CHAIN SELECTION ── */}
+                        {/*  BRIDGE CHAIN SELECTION  */}
                         {mode === 'bridge' && (
                             <div className="flex items-center gap-4 relative z-20">
                                 <NetworkSelectorDropdown chain={sourceChain} setChain={setSourceChain} label="Source" disabled />
@@ -570,7 +570,7 @@ export function LegendaryTransactionModal({
                             </div>
                         )}
 
-                        {/* ── FROM INPUT ── */}
+                        {/*  FROM INPUT  */}
                         <div className="border rounded-2xl p-6 relative" style={{ borderColor: BORDER, background: CARD }}>
                             <div className="flex justify-between items-end mb-4">
                                 <div className="flex-1">
@@ -645,7 +645,7 @@ export function LegendaryTransactionModal({
                                                 ? (Number(quote.estimate.toAmount) / (10 ** (quote.estimate?.toToken?.decimals ?? 6))).toFixed(4)
                                                 : quote?.action?.toAmount
                                                     ? (Number(quote.action.toAmount) / (10 ** (toAsset?.decimals ?? 6))).toFixed(4)
-                                                    : '—'}
+                                                    : ''}
                                         </div>
                                     </div>
                                     <div className="border rounded-xl flex items-center gap-3 cursor-pointer" style={{ borderColor: BORDER, background: BG }}>

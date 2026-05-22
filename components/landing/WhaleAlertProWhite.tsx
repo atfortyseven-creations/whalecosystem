@@ -11,9 +11,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
-import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { SystemFooter } from '@/components/landing/SystemFooter';
 
-// ── Types ───────────────────────────────────────────────────────────────────
+//  Types 
 interface PricingTier {
   id: string;
   name: string;
@@ -82,7 +82,7 @@ const PRICING_TIERS: PricingTier[] = [
   }
 ];
 
-// ── Components ──────────────────────────────────────────────────────────────
+//  Components 
 
 function PricingCard(tier: PricingTier) {
   const { isConnected } = useAccount();
@@ -105,7 +105,7 @@ function PricingCard(tier: PricingTier) {
       <span className="font-mono text-[11px] font-black uppercase tracking-[0.3em] mb-8 opacity-40">{tier.id}</span>
       <h3 className="text-4xl font-bold tracking-tight mb-4">{tier.name}</h3>
       <div className="flex items-baseline gap-2 mb-2">
-        <span className="text-6xl font-black tracking-tighter">€{tier.priceMonthly}</span>
+        <span className="text-6xl font-black tracking-tighter">{tier.priceMonthly}</span>
         <span className="text-xs font-mono font-bold uppercase tracking-widest opacity-40">/month</span>
       </div>
       <p className={`font-medium mb-10 leading-relaxed text-sm ${tier.highlight ? 'text-slate-400' : 'text-slate-500'}`}>{tier.tagline}</p>
@@ -158,12 +158,12 @@ export default function WhaleAlertProWhite() {
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#0A0A0A] font-sans overflow-x-hidden selection:bg-[#0044CC]/20">
       
-      {/* ─── NAVIGATION ─── */}
+      {/*  NAVIGATION  */}
       <nav className="fixed top-0 w-full z-[100] px-6 md:px-12 py-6 flex items-center justify-between pointer-events-none">
         <div className="flex items-center gap-8 pointer-events-auto">
           <Link href="/" className="group flex items-center gap-4 bg-white/90 backdrop-blur-xl border border-slate-200 px-6 py-3 rounded-2xl hover:border-slate-300 transition-all shadow-sm">
             <div className="relative w-6 h-6">
-              <Image src="/official-whale-monochrome.png" alt="Sovereign Whale" fill className="object-contain" />
+              <Image src="/official-whale-monochrome.png" alt="System Whale" fill className="object-contain" />
             </div>
             <div className="flex flex-col">
               <span className="text-[12px] font-black uppercase tracking-tight leading-none">Whale Alert</span>
@@ -202,7 +202,7 @@ export default function WhaleAlertProWhite() {
         </div>
       </nav>
 
-      {/* ─── HERO SECTION (NESTR STYLE) ─── */}
+      {/*  HERO SECTION (NESTR STYLE)  */}
       <section className="pt-40 pb-20 px-6 lg:px-12 max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-24 min-h-[90vh]">
         <div className="w-full lg:w-1/2 space-y-10 relative z-10 text-center lg:text-left">
           <motion.div
@@ -211,7 +211,7 @@ export default function WhaleAlertProWhite() {
             className="inline-flex items-center gap-4 px-6 py-2 bg-white border border-slate-200 rounded-full shadow-sm"
           >
             <div className="w-2 h-2 rounded-full bg-[#0044CC] animate-pulse" />
-            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-600">Sovereign Intelligence v3.0</span>
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-600">System Analytics v3.0</span>
           </motion.div>
           
           <h1 className="text-[48px] sm:text-[64px] lg:text-[80px] font-black text-[#0A0A0A] leading-[1.0] tracking-tight">
@@ -241,7 +241,7 @@ export default function WhaleAlertProWhite() {
         </div>
       </section>
 
-      {/* ─── WHY WHALE ALERT NETWORK: BLOCKS ─── */}
+      {/*  WHY WHALE ALERT NETWORK: BLOCKS  */}
       <section id="capabilities" className="py-24 px-6 lg:px-12 space-y-32">
         
         {/* Block 1 */}
@@ -286,7 +286,7 @@ export default function WhaleAlertProWhite() {
                     Whales attempt to hide their massive orders by splitting them across decentralized exchanges or utilizing dark pools. Our heuristic engine acts as an inescapable net.
                 </p>
                 <p className="text-[18px] text-slate-500 leading-relaxed font-medium">
-                    By clustering wallet behaviors and tracing topological graphs in real-time, the Sovereign Protocol flags OTC deals, sudden liquidity injections, and coordinated dumping behaviors instantly. We translate complex hexadecimal contract interactions into plain-English, actionable alerts.
+                    By clustering wallet behaviors and tracing topological graphs in real-time, the System Protocol flags OTC deals, sudden liquidity injections, and coordinated dumping behaviors instantly. We translate complex hexadecimal contract interactions into plain-English, actionable alerts.
                 </p>
             </div>
             <div className="w-full lg:w-1/2 bg-white rounded-[3rem] border border-slate-100 shadow-sm p-12 flex items-center justify-center aspect-square">
@@ -317,12 +317,12 @@ export default function WhaleAlertProWhite() {
 
       </section>
 
-      {/* ─── PRICING SECTION ─── */}
+      {/*  PRICING SECTION  */}
       <section id="pricing" className="py-32 px-6 lg:px-12 bg-white border-t border-slate-100">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center space-y-6 mb-20">
             <h2 className="text-[48px] sm:text-[64px] font-black text-[#0A0A0A] tracking-tight">Straightforward <span className="text-[#0044CC]">Pricing.</span></h2>
-            <p className="text-[20px] text-slate-500 max-w-2xl mx-auto font-medium">Choose the intelligence tier that fits your operational needs. Cancel or upgrade your smart contract subscription at any time.</p>
+            <p className="text-[20px] text-slate-500 max-w-2xl mx-auto font-medium">Choose the analytics tier that fits your operational needs. Cancel or upgrade your smart contract subscription at any time.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {PRICING_TIERS.map((tier, i) => (
@@ -332,7 +332,7 @@ export default function WhaleAlertProWhite() {
         </div>
       </section>
 
-      {/* ─── FAQ SECTION ─── */}
+      {/*  FAQ SECTION  */}
       <section id="faq" className="py-32 px-6 lg:px-12 bg-[#FAF9F6] border-t border-slate-100">
         <div className="max-w-[1000px] mx-auto">
             <div className="text-center mb-20 space-y-6">
@@ -343,7 +343,7 @@ export default function WhaleAlertProWhite() {
                 {[
                     { q: "Is the data really live?", a: "Yes. Our proprietary node network streams mempool data with a latency of under 100ms. We do not rely on delayed third-party APIs. You are observing the blockchain's state before blocks are even mined." },
                     { q: "How is my privacy protected?", a: "We operate on a Zero-Knowledge paradigm. We use End-to-End Encryption (E2EE) and never store your wallet's private keys. All session data is cryptographically ephemeral and bound to your local device." },
-                    { q: "Do I need to be a programmer to use this?", a: "No. The Sovereign Engine translates complex hexadecimal contract data into clear, human-readable alerts and beautiful UI dashboards." },
+                    { q: "Do I need to be a programmer to use this?", a: "No. The System Engine translates complex hexadecimal contract data into clear, human-readable alerts and beautiful UI dashboards." },
                     { q: "Can I cancel my tier at any time?", a: "Absolutely. Subscriptions are managed transparently. You can modify or terminate your access instantly through the settings dashboard with zero friction." }
                 ].map((item, i) => (
                     <div key={i} className="bg-white border border-slate-100 rounded-3xl p-8 sm:p-10 hover:shadow-lg transition-all duration-300">
@@ -355,7 +355,7 @@ export default function WhaleAlertProWhite() {
         </div>
       </section>
 
-      <SovereignFooter />
+      <SystemFooter />
 
     </div>
   );

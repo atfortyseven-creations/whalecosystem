@@ -1,5 +1,5 @@
-# MEMORIA DESCRIPTIVA — REGISTRO DE PROPIEDAD INTELECTUAL
-## Obra: Humanity Ledger — Sovereign Network Architecture
+# MEMORIA DESCRIPTIVA  REGISTRO DE PROPIEDAD INTELECTUAL
+## Obra: Humanity Ledger  System Network Architecture
 ### Ministerio de Cultura | Registro de la Propiedad Intelectual
 ### Versión 1.0 | Abril 2026
 
@@ -7,7 +7,7 @@
 
 ## DATOS DE LA OBRA
 
-**Título:** Humanity Ledger — Sovereign Network Architecture (Arquitectura de Autenticación Criptográfica, Identidad Soberana e Inteligencia On-Chain)
+**Título:** Humanity Ledger  System Network Architecture (Arquitectura de Autenticación Criptográfica, Identidad Soberana e Inteligencia On-Chain)
 
 **Naturaleza:** Obra informática original (programa de ordenador) conforme al artículo 96 del Texto Refundido de la Ley de Propiedad Intelectual (Real Decreto Legislativo 1/1996, de 12 de abril).
 
@@ -15,7 +15,7 @@
 
 **Lenguajes:** TypeScript, JavaScript, SQL (PostgreSQL), Cypher (Neo4j), Solidity (Ethereum smart contracts), Circom (ZK circuits).
 
-**Fecha de creación:** Enero 2024 – Abril 2026 (en continua evolución)
+**Fecha de creación:** Enero 2024  Abril 2026 (en continua evolución)
 
 **Autores:**
 - [NOMBRE COMPLETO], DNI/NIE: _____________, Porcentaje de autoría: 100%
@@ -38,7 +38,7 @@ Humanity Ledger es un sistema informático original que implementa una arquitect
 
 **Implementación:** TypeScript, procesamiento en tiempo real sobre flujos WebSocket de múltiples cadenas (Ethereum, BASE, BSC, Solana, Bitcoin).
 
-### 2.2 TitaniumGate — Middleware Zero-Trust de Edge Runtime
+### 2.2 TitaniumGate  Middleware Zero-Trust de Edge Runtime
 
 **Descripción:** Sistema de control de acceso criptográfico que opera en el Edge Runtime de Next.js, implementando un protocolo de autenticación Zero-Trust multicapa: verificación EIP-191 (ECDSA sobre secp256k1), gestión de tokens JWT con claims soberanos, Content Security Policy nonce-based dinámica, y sistema de honeypot para detección de ataques automatizados.
 
@@ -52,7 +52,7 @@ Humanity Ledger es un sistema informático original que implementa una arquitect
 
 **Fórmula central:**
 ```
-Z_sovereign = clamp(((V - μ_V) / σ_V) + β_vel·v + β_inst·I, -10, 10)
+Z_system = clamp(((V - μ_V) / σ_V) + β_vel·v + β_inst·I, -10, 10)
 donde:
   V = volumen USD de la transacción
   μ_V = media histórica de volumen (ventana móvil 30 días)
@@ -65,7 +65,7 @@ donde:
 
 **Originalidad:** La formulación específica del Z-Score soberano con tres factores composicionados (volumen estadístico + velocidad + factor institucional) y su aplicación al análisis de ballenas blockchain constituye un método de evaluación original.
 
-### 2.4 Sovereign Audit Trail — Registro Criptográfico Inmutable
+### 2.4 System Audit Trail  Registro Criptográfico Inmutable
 
 **Descripción:** Sistema de registro de eventos con cadena de hashes HMAC-SHA256, donde cada entrada incluye el hash criptográfico de la entrada anterior (prev_hash), creando una cadena inmutable donde cualquier modificación retroactiva es matemáticamente detectable.
 
@@ -82,9 +82,9 @@ ENTRY_N.prevHash = ENTRY_{N-1}.payloadHash
 
 **Descripción:** Esquema de base de datos de grafos y conjunto de queries Cypher propietarias para modelar relaciones entre entidades blockchain (exchanges, ballenas, MEV bots, fondos institucionales) con 103 micro-sectores clasificatorios.
 
-**Originalidad:** La taxonomía de 103 micro-sectores, las queries Cypher de detección de flujos triangulares, y el algoritmo de Memory Matrix (fallback a PostgreSQL con mandato Zero-Simulation) constituyen un diseño de datos original.
+**Originalidad:** La taxonomía de 103 micro-sectores, las queries Cypher de detección de flujos triangulares, y el algoritmo de Memory Grid (fallback a PostgreSQL con mandato Zero-Simulation) constituyen un diseño de datos original.
 
-### 2.6 Protocolo Sovereign Handshake — Autenticación Cripto-Nativa Móvil-Escritorio
+### 2.6 Protocolo System Handshake  Autenticación Cripto-Nativa Móvil-Escritorio
 
 **Descripción:** Protocolo de sincronización de sesión entre dispositivos móviles y escritorio mediante cookies HttpOnly, polling atómico, y verificación criptográfica cruzada. Implementa tolerancia a suspensión de pestañas del navegador (bfcache) y recuperación nuclear de almacenamiento.
 
@@ -105,8 +105,8 @@ El firmante declara bajo su responsabilidad que la obra descrita en la presente 
 
 ## 4. VALOR ECONÓMICO Y UTILIZACIÓN PREVISTA
 
-La obra tiene un valor económico estimado de €150,000-500,000 basado en:
-- Horas de desarrollo: ~2,400 horas × €75-120/hora = €180,000-288,000
+La obra tiene un valor económico estimado de 150,000-500,000 basado en:
+- Horas de desarrollo: ~2,400 horas × 75-120/hora = 180,000-288,000
 - Valor del conocimiento técnico propietario (EVM Thermodynamics): no replicable a corto plazo
 - Aplicación comercial prevista: SaaS institucional B2B, licencias API, consultoría de seguridad
 

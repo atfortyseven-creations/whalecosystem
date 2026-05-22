@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     const now = Math.floor(Date.now() / 1000);
     const secondsPerPoint = timeframe === '24h' ? 3600 : timeframe === '7d' ? 43200 : 86400;
     
-    // 🔥 [LEGENDARY] PRICE DISCOVERY FOR HISTORY
+    //  [LEGENDARY] PRICE DISCOVERY FOR HISTORY
     const uniqueAssets = Array.from(new Set(allTransfers.map(tx => tx.asset).filter(Boolean)));
     const assetPrices = await PriceService.getBulkPrices(uniqueAssets.map(sym => ({ symbol: sym })));
 

@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi';
 import { dictionary } from '@/src/lib/dictionary';
 import { toast } from 'sonner';
 import { 
-    IntelligenceConfig, ExecutionConfig, UiConfig, 
+    AnalyticsConfig, ExecutionConfig, UiConfig, 
     getDefaultUserSettings 
 } from '@/lib/settings-validation';
 
@@ -94,8 +94,8 @@ export interface SettingsContextType {
     setDefaultGasPrice: (p: string) => void;
 
     // [ABSOLUTE EXTENSION] Cosmic Configs
-    intelligenceConfig: IntelligenceConfig;
-    setIntelligenceConfig: (c: Partial<IntelligenceConfig>) => void;
+    analyticsConfig: AnalyticsConfig;
+    setAnalyticsConfig: (c: Partial<AnalyticsConfig>) => void;
     executionConfig: ExecutionConfig;
     setExecutionConfig: (c: Partial<ExecutionConfig>) => void;
     uiConfig: UiConfig;
@@ -153,16 +153,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const [defaultGasPrice, setDefaultGasPrice] = useState('medium');
 
     // [ABSOLUTE EXTENSION] Cosmic Configs
-    const [intelligenceConfig, setIntelligenceState] = useState<IntelligenceConfig>(getDefaultUserSettings().intelligenceConfig);
+    const [analyticsConfig, setAnalyticsState] = useState<AnalyticsConfig>(getDefaultUserSettings().analyticsConfig);
     const [executionConfig, setExecutionState] = useState<ExecutionConfig>(getDefaultUserSettings().executionConfig);
     const [uiConfig, setUiState] = useState<UiConfig>(getDefaultUserSettings().uiConfig);
 
-    const setIntelligenceConfig = (c: Partial<IntelligenceConfig>) => setIntelligenceState(prev => ({ ...prev, ...c }));
+    const setAnalyticsConfig = (c: Partial<AnalyticsConfig>) => setAnalyticsState(prev => ({ ...prev, ...c }));
     const setExecutionConfig = (c: Partial<ExecutionConfig>) => setExecutionState(prev => ({ ...prev, ...c }));
     const setUiConfig = (c: Partial<UiConfig>) => setUiState(prev => ({ ...prev, ...c }));
 
 
-    // ── SOVEREIGN DOM LIGHT MODE LOCK (runs on every theme change) ──────────
+    //  SOVEREIGN DOM LIGHT MODE LOCK (runs on every theme change) 
     // The SettingsContext `theme` state may be set to 'dark' from an old saved
     // preference, but this platform enforces light mode for ALL users at all
     // connection states. We intercept here and hard-pin the DOM to light.
@@ -177,7 +177,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
     // --- SOVEREIGN SIWE AUTH --- 
     const { address } = useAccount();
-    // The sovereign user identity is the wallet address
+    // The system user identity is the wallet address
     const userId = address || null;
     const userEmail = null; // Email is not available in SIWE-only flow
     const [version, setVersion] = useState<number>(1);
@@ -244,7 +244,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
                         backupFrequency: settings.backupFrequency,
                         defaultSlippage: settings.defaultSlippage,
                         defaultGasPrice: settings.defaultGasPrice,
-                        intelligenceConfig: settings.intelligenceConfig,
+                        analyticsConfig: settings.analyticsConfig,
                         executionConfig: settings.executionConfig,
                         uiConfig: settings.uiConfig
                     };
@@ -301,7 +301,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         if (parsed.defaultGasPrice) setDefaultGasPrice(parsed.defaultGasPrice);
         
         // Absolute Extension
-        if (parsed.intelligenceConfig) setIntelligenceState(prev => ({ ...prev, ...parsed.intelligenceConfig }));
+        if (parsed.analyticsConfig) setAnalyticsState(prev => ({ ...prev, ...parsed.analyticsConfig }));
         if (parsed.executionConfig) setExecutionState(prev => ({ ...prev, ...parsed.executionConfig }));
         if (parsed.uiConfig) setUiState(prev => ({ ...prev, ...parsed.uiConfig }));
     };
@@ -320,7 +320,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
                 testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled,
                 contacts, emailNotifications, pushNotifications, transactionAlerts, marketingEmails,
                 backupFrequency, defaultSlippage, defaultGasPrice,
-                intelligenceConfig, executionConfig, uiConfig,
+                analyticsConfig, executionConfig, uiConfig,
                 version // [LEGENDARY PERSISTENCE] Send version to prevent data loss
             };
 
@@ -367,7 +367,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
                             toast.success("Settings Synced", { 
                                 description: "Configuration secured in Human Cloud.",
                                 duration: 2000,
-                                icon: "⚡"
+                                icon: ""
                             });
                         } else {
                             // Don't spam toasts for silent background failures unless they persist
@@ -393,7 +393,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         testNetsEnabled, ipfsGateway, customRPC, stateLogsEnabled, contacts,
         emailNotifications, pushNotifications, transactionAlerts, marketingEmails,
         backupFrequency, defaultSlippage, defaultGasPrice, userId,
-        intelligenceConfig, executionConfig, uiConfig
+        analyticsConfig, executionConfig, uiConfig
     ]);
 
 
@@ -437,14 +437,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
     const lockApp = () => {
         // Mock locking
-        alert("🔒 SESSION LOCKED. Please re-authenticate.");
+        alert(" SESSION LOCKED. Please re-authenticate.");
         window.location.reload();
     };
 
     const formatAmount = (amount: number) => {
         if (hideBalances) return '****';
         const rates: Record<string, number> = { USD: 1, EUR: 0.92, GBP: 0.79, JPY: 150, MXN: 17.50 };
-        // const symbols: Record<string, string> = { USD: '$', EUR: '€', GBP: '£', JPY: '¥', MXN: '$' };
+        // const symbols: Record<string, string> = { USD: '$', EUR: '', GBP: '£', JPY: '¥', MXN: '$' };
         const value = amount * (rates[currency] || 1);
 
         return new Intl.NumberFormat(language === 'es' ? 'es-ES' : 'en-US', {
@@ -467,7 +467,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             emailNotifications, toggleEmailNotifications, pushNotifications, togglePushNotifications, transactionAlerts, toggleTransactionAlerts, marketingEmails, toggleMarketingEmails,
             backupFrequency, setBackupFrequency, lastBackupAt, triggerBackup,
             defaultSlippage, setDefaultSlippage, defaultGasPrice, setDefaultGasPrice,
-            intelligenceConfig, setIntelligenceConfig, executionConfig, setExecutionConfig, uiConfig, setUiConfig,
+            analyticsConfig, setAnalyticsConfig, executionConfig, setExecutionConfig, uiConfig, setUiConfig,
             formatAmount, lockApp, t,
             tier, setTier
         }}>

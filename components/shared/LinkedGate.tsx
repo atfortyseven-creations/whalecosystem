@@ -33,7 +33,7 @@ const UniversalEliteWallpaper = dynamic(
 
 const QR_TTL = 300;
 
-// ─── HUGE ANIMATED WHALE ───────────────────────────────
+//  HUGE ANIMATED WHALE 
 function HugeAnimatedWhale() {
   const [splashes, setSplashes] = useState<{ id: number; x: number; y: number }[]>([]);
 
@@ -66,16 +66,16 @@ function HugeAnimatedWhale() {
   );
 }
 
-// ─── WALLET DEFINITIONS ─────────────────────────────────────────────────────
+//  WALLET DEFINITIONS 
 
 
-// ─── SESSION PERSISTENCE (4-layer, never re-prompt) ──────────────────────────
-const LS_SESSION_KEY = 'sovereign_session_v2';
+//  SESSION PERSISTENCE (4-layer, never re-prompt) 
+const LS_SESSION_KEY = 'system_session_v2';
 
 function hasValidStoredSession(addr?: string): boolean {
   try {
     // Layer 1: cookie
-    if (document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake='))) return true;
+    if (document.cookie.split('; ').some(r => r.startsWith('system_handshake='))) return true;
     // Layer 2: localStorage with 30-day TTL
     const raw = localStorage.getItem(LS_SESSION_KEY);
     if (raw) {
@@ -84,16 +84,16 @@ function hasValidStoredSession(addr?: string): boolean {
       if (addrOk && data.exp > Date.now()) return true;
     }
     // Layer 3: sessionStorage per address
-    if (addr && sessionStorage.getItem(`sovereign_signed_${addr.toLowerCase()}`) === 'true') return true;
+    if (addr && sessionStorage.getItem(`system_signed_${addr.toLowerCase()}`) === 'true') return true;
   } catch {}
   return false;
 }
 
 function writeSessionAll(addr: string) {
   const norm = addr.toLowerCase();
-  // Cookie — 30 days
-  document.cookie = `sovereign_handshake=${norm}; path=/; max-age=2592000; SameSite=Lax`;
-  // localStorage — 30 days TTL
+  // Cookie  30 days
+  document.cookie = `system_handshake=${norm}; path=/; max-age=2592000; SameSite=Lax`;
+  // localStorage  30 days TTL
   try {
     localStorage.setItem(LS_SESSION_KEY, JSON.stringify({
       address: norm,
@@ -101,7 +101,7 @@ function writeSessionAll(addr: string) {
     }));
   } catch {}
   // sessionStorage
-  sessionStorage.setItem(`sovereign_signed_${norm}`, 'true');
+  sessionStorage.setItem(`system_signed_${norm}`, 'true');
 }
 
 function usePrevious<T>(value: T): T | undefined {
@@ -112,7 +112,7 @@ function usePrevious<T>(value: T): T | undefined {
   return ref.current;
 }
 
-// ─── MAIN GATE COMPONENT ────────────────────────────────────────────────────
+//  MAIN GATE COMPONENT 
 export function LinkedGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -123,7 +123,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
   const prevWalletConnected = usePrevious(isWalletConnected);
 
-  // ── Read session from ALL 3 layers on mount ──────────────────────────────
+  //  Read session from ALL 3 layers on mount 
   useEffect(() => {
     setIsMounted(true);
     if (typeof document !== 'undefined' && hasValidStoredSession(address)) {
@@ -132,11 +132,11 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setLinked, address]);
 
-  // ── Auto-Link Wallet WITHOUT secondary signature ────────────────────────
+  //  Auto-Link Wallet WITHOUT secondary signature 
   useEffect(() => {
     if (!isMounted) return;
 
-    // ── INHUMAN OPTIMIZATION: Nuclear Guard State Transition Fix ──
+    //  INHUMAN OPTIMIZATION: Nuclear Guard State Transition Fix 
     // If the wallet transitions from disconnected to connected, the user intentionally
     // re-authenticated. We MUST purge the __disconnected__ flag to resume auto-routing.
     if (prevWalletConnected === false && isWalletConnected) {
@@ -147,11 +147,11 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
     // do NOT auto-link them back immediately even if the wallet is still connected.
     const justDisconnected = sessionStorage.getItem('__disconnected__') === '1';
     if (justDisconnected && !isLinked) {
-        console.log('[LinkedGate] Nuclear Logout Guard active — blocking auto-link');
+        console.log('[LinkedGate] Nuclear Logout Guard active  blocking auto-link');
         return;
     }
 
-    // Triple-check all layers — zero false positives
+    // Triple-check all layers  zero false positives
     if (typeof document !== 'undefined' && hasValidStoredSession(address)) {
       setLinked(true);
       return;
@@ -164,7 +164,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   }, [isWalletConnected, isLinked, isMounted, address, prevWalletConnected]);
 
 
-  // ── Body scroll lockdown when gate is active ──────────────────────────────
+  //  Body scroll lockdown when gate is active 
   useEffect(() => {
     if (!isMounted) return;
     const shouldLock = !isLinked && !isWalletConnected;
@@ -176,10 +176,10 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
     };
   }, [isLinked, isWalletConnected, isMounted]);
 
-  // ── Redirect unauthenticated users to /connect ────────────────────────────
+  //  Redirect unauthenticated users to /connect 
   // SOVEREIGN LAW: 400ms debounce prevents false-positive redirects during the
   // transient window right after a wallet connects (before the sign step or
-  // sovereign_handshake cookie has been written).
+  // system_handshake cookie has been written).
   useEffect(() => {
     if (!isMounted) return;
     const isPublic = pathname === '/' ||
@@ -191,7 +191,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                      pathname.startsWith('/developers') ||
                      pathname.startsWith('/news') ||
                      pathname.startsWith('/chat') ||
-                     pathname.startsWith('/portfolio') ||   // ← mobile users can create/login here
+                     pathname.startsWith('/portfolio') ||   //  mobile users can create/login here
                      pathname.startsWith('/sign-up') ||
                      (pathname.startsWith('/forum') && !pathname.startsWith('/forum/settings'));
     const isBot = typeof window !== 'undefined' && /bot|google|grok|crawler|spider|robot|crawling|bing/i.test(navigator.userAgent);

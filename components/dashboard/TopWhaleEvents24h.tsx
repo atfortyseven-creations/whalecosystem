@@ -3,14 +3,14 @@
 /**
  * TopWhaleEvents24h
  *
- * Consumes the Sovereign Intel pipeline via the centralized api-client.
+ * Consumes the System Intel pipeline via the centralized api-client.
  * Zero-Mock Mandate: no internal fetch loops or static data.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, ExternalLink, Zap, Loader2 } from 'lucide-react';
-import { useSovereignIntel } from '@/lib/api-client';
+import { useSystemIntel } from '@/lib/api-client';
 
 interface WhaleEvent {
     id: string;
@@ -69,10 +69,10 @@ function fmtTime(ts: string): string {
 
 export function TopWhaleEvents24h() {
     // =========================================================================
-    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // INJECTED DATA HOOK  Zero-Mock Mandate
     // Whale events endpoint injected via REGISTRY.SOVEREIGN_INTEL.eventLedger
     // =========================================================================
-    const { data: rawData, isLoading, error } = useSovereignIntel('eventLedger');
+    const { data: rawData, isLoading, error } = useSystemIntel('eventLedger');
     const events: WhaleEvent[] = rawData?.data ?? [];
     const updatedAt: string | undefined = rawData?.updatedAt;
 
@@ -135,7 +135,7 @@ export function TopWhaleEvents24h() {
                                             {event.protocol}
                                         </div>
                                         <div className="text-[9px] font-mono text-[#888888] truncate">
-                                            {event.txHash.slice(0, 8)}…{event.txHash.slice(-6)}
+                                            {event.txHash.slice(0, 8)}{event.txHash.slice(-6)}
                                         </div>
                                     </div>
                                 </div>
@@ -165,7 +165,7 @@ export function TopWhaleEvents24h() {
 
             {/* Footer */}
             <div className="px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] text-[9px] font-black text-[#888888] uppercase tracking-widest flex justify-between">
-                <span>Sovereign Intel — Event Ledger</span>
+                <span>System Intel  Event Ledger</span>
                 {updatedAt && (
                     <span>Updated {fmtTime(updatedAt)}</span>
                 )}

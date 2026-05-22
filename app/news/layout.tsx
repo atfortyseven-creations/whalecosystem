@@ -7,7 +7,7 @@ export const metadata = {
 
 // Layout minimalista absoluto para /news.
 // Dark/Light mode lo controla NewsTerminal desde su estado interno.
-// Sin background fijo — NewsTerminal ocupa el 100% del viewport.
+// Sin background fijo  NewsTerminal ocupa el 100% del viewport.
 export default function WhaleNewsLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

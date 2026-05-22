@@ -11,20 +11,20 @@ import { prisma } from '../lib/prisma';
 
 async function main() {
     console.log("=================================================");
-    console.log("🛠️  SOVEREIGN DB HARDENING — INITIALIZING");
+    console.log("️  SOVEREIGN DB HARDENING  INITIALIZING");
     console.log("=================================================");
 
     try {
-        console.log("📡 Testing Database Connectivity...");
+        console.log(" Testing Database Connectivity...");
         await prisma.$queryRaw`SELECT 1`;
-        console.log("✅ Database Reachable.");
+        console.log(" Database Reachable.");
     } catch (err: any) {
-        console.error("❌ Database Connection Failed!");
+        console.error(" Database Connection Failed!");
         console.error("Reason:", err.message);
         process.exit(1);
     }
 
-    console.log("\n🚀 Commencing Schema Alignment (Prisma DB Push)...");
+    console.log("\n Commencing Schema Alignment (Prisma DB Push)...");
     
     try {
         // We use --accept-data-loss because we prioritizing current schema stability 
@@ -34,23 +34,23 @@ async function main() {
             env: { ...process.env, FORCE_COLOR: '1' }
         });
         
-        console.log("\n✅ [SUCCESS] Schema Is Now Synchronized.");
+        console.log("\n [SUCCESS] Schema Is Now Synchronized.");
         console.log("The following issues should be resolved:");
         console.log("- Missing Table: public.IntelItem");
         console.log("- Missing Column: Transaction.authUserId");
         console.log("- Deployment Crashes: Solved.");
 
     } catch (err: any) {
-        console.error("\n❌ [FAILURE] DB Sync Failed.");
+        console.error("\n [FAILURE] DB Sync Failed.");
         console.error("Details:", err.message);
-        console.log("\n💡 Institutional Recommendation:");
+        console.log("\n Institutional Recommendation:");
         console.log("1. Check if DATABASE_URL contains an invalid specialized character.");
         console.log("2. Ensure Railway PostgreSQL is not in 'Read-Only' state due to usage limits.");
         console.log("3. Try running 'npx prisma generate' before syncing.");
     }
 
     console.log("\n=================================================");
-    console.log("🏁 HARDENING SEQUENCE COMPLETE");
+    console.log(" HARDENING SEQUENCE COMPLETE");
     console.log("=================================================\n");
 }
 

@@ -6,12 +6,12 @@ Keeps your whale monitoring bot running **24/7** with automatic restart on failu
 
 ## Features
 
-✅ **Auto-Restart**: Restarts automatically if the bot crashes  
-✅ **Daily Reboot**: Automatically restarts at 4:00 AM daily for fresh memory  
-✅ **Persistent Logging**: All alerts saved to `logs/whale-monitor-*.log`  
-✅ **Memory Management**: Restarts if memory usage exceeds 500MB  
-✅ **Exponential Backoff**: Intelligent restart delays to prevent spam  
-✅ **Boot Persistence**: Starts automatically when server reboots  
+ **Auto-Restart**: Restarts automatically if the bot crashes  
+ **Daily Reboot**: Automatically restarts at 4:00 AM daily for fresh memory  
+ **Persistent Logging**: All alerts saved to `logs/whale-monitor-*.log`  
+ **Memory Management**: Restarts if memory usage exceeds 500MB  
+ **Exponential Backoff**: Intelligent restart delays to prevent spam  
+ **Boot Persistence**: Starts automatically when server reboots  
 
 ## Quick Start
 

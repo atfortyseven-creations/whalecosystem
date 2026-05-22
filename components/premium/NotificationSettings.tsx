@@ -81,7 +81,7 @@ export default function NotificationSettings() {
       let endpoint = '';
       let body: any = {
         type: 'custom',
-        data: { message: 'Test notification from Whale Alert Network VIP 🎉' },
+        data: { message: 'Test notification from Whale Alert Network VIP ' },
       };
 
       switch (channelId) {
@@ -382,7 +382,7 @@ export default function NotificationSettings() {
           </>
         ) : (
           <>
-            <span>💾</span>
+            <span></span>
             Save Settings
           </>
         )}
@@ -411,7 +411,7 @@ function ChannelCard({
       case 'telegram':
         return '1. Search @HumanDeFiBot on Telegram\n2. Send /start\n3. Copy your Chat ID and paste below';
       case 'discord':
-        return '1. Right-click Discord channel → Edit Channel\n2. Integrations → Webhooks → New Webhook\n3. Copy webhook URL and paste below';
+        return '1. Right-click Discord channel  Edit Channel\n2. Integrations  Webhooks  New Webhook\n3. Copy webhook URL and paste below';
       default:
         return '';
     }

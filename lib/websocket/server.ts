@@ -3,22 +3,22 @@ import { Server as HttpServer } from 'http';
 import Redis from 'ioredis';
 import { createSubClient } from '../redis/client';
 
-// ─── STRICT RUNTIME GUARD ──────────────────────────────────────────────────────
+//  STRICT RUNTIME GUARD 
 // In production, Redis is NON-OPTIONAL.
 // A system without Redis cannot guarantee cache coherence nor multi-instance Pub/Sub.
 if (process.env.NODE_ENV === 'production' && !process.env.REDIS_URL) {
     console.error('');
-    console.error('╔══════════════════════════════════════════════════════════════╗');
-    console.error('║  💀 FATAL: REDIS_URL is not set in production environment!  ║');
-    console.error('║  Real-time events and intelligent caching require Redis.     ║');
-    console.error('║  → Add REDIS_URL to your Railway/environment variables.     ║');
-    console.error('╚══════════════════════════════════════════════════════════════╝');
     console.error('');
-    // process.exit(1); // Hard fail — disabled for maximum stability in fallback mode
-    console.warn('⚠️ [WebSocket] [SAFETY] Continuing in degraded mode as requested.');
+    console.error('   FATAL: REDIS_URL is not set in production environment!  ');
+    console.error('  Real-time events and intelligent caching require Redis.     ');
+    console.error('   Add REDIS_URL to your Railway/environment variables.     ');
+    console.error('');
+    console.error('');
+    // process.exit(1); // Hard fail  disabled for maximum stability in fallback mode
+    console.warn('️ [WebSocket] [SAFETY] Continuing in degraded mode as requested.');
 }
 
-// ─── TYPES ────────────────────────────────────────────────────────────────────
+//  TYPES 
 interface TransactionEvent {
     hash: string;
     from: string;
@@ -39,16 +39,16 @@ interface WhaleAlertEvent {
     source: string;
 }
 
-// ─── SINGLETON ────────────────────────────────────────────────────────────────
+//  SINGLETON 
 let io: Server | null = null;
 let redisSubscriber: Redis | null = null;
 
-// ─── REDIS FACTORY ────────────────────────────────────────────────────────────
+//  REDIS FACTORY 
 function createRedisSubscriber(url: string): Redis {
     return createSubClient('WS-Subscriber');
 }
 
-// ─── INITIALIZER ──────────────────────────────────────────────────────────────
+//  INITIALIZER 
 export function initializeWebSocket(httpServer: HttpServer): Server {
     if (io) return io;
 
@@ -64,21 +64,21 @@ export function initializeWebSocket(httpServer: HttpServer): Server {
         },
     });
 
-    console.log('✅ [WebSocket Server] Initialized with Redis Pub/Sub support');
+    console.log(' [WebSocket Server] Initialized with Redis Pub/Sub support');
 
-    // ─── REDIS PUB/SUB ──────────────────────────────────────────────────────
+    //  REDIS PUB/SUB 
     if (process.env.REDIS_URL) {
         redisSubscriber = createRedisSubscriber(process.env.REDIS_URL);
 
         // Subscribe to:
-        //  vitals.tx.*   → per-address transaction events (e.g. vitals.tx.0xabc...)
-        //  whale-alerts  → global whale detection events
-        //  vitals.tx.new → global broadcast for any UI listening
+        //  vitals.tx.*    per-address transaction events (e.g. vitals.tx.0xabc...)
+        //  whale-alerts   global whale detection events
+        //  vitals.tx.new  global broadcast for any UI listening
         redisSubscriber.psubscribe('vitals.*', 'whale-alerts', (err) => {
             if (err) {
-                console.error('❌ [Redis SUB] Subscribe failed:', err.message);
+                console.error(' [Redis SUB] Subscribe failed:', err.message);
             } else {
-                console.log('📡 [Redis SUB] Subscribed to: vitals.*, whale-alerts');
+                console.log(' [Redis SUB] Subscribed to: vitals.*, whale-alerts');
             }
         });
 
@@ -92,7 +92,7 @@ export function initializeWebSocket(httpServer: HttpServer): Server {
                     // Broadcast to all connected clients (whale alerts are global)
                     io.emit('new-whale-alert', data);
                 } else if (channel === 'vitals.tx.new') {
-                    // Global broadcast — every client gets it and filters client-side
+                    // Global broadcast  every client gets it and filters client-side
                     io.emit('vitals.tx.new', data);
                 } else if (channel.startsWith('vitals.tx.0x')) {
                     // Address-specific channel: route ONLY to that user's socket rooms
@@ -100,21 +100,21 @@ export function initializeWebSocket(httpServer: HttpServer): Server {
                     io.to(`address:${targetAddress}`).emit('vitals.tx.new', data);
                 }
             } catch (e) {
-                console.error('❌ [WebSocket] Message parse error:', e);
+                console.error(' [WebSocket] Message parse error:', e);
             }
         });
     } else {
         // Non-production: warn but continue
-        console.warn('⚠️ [WebSocket] Redis not configured. Pub/Sub disabled in this instance.');
+        console.warn('️ [WebSocket] Redis not configured. Pub/Sub disabled in this instance.');
     }
 
-    // ─── NATIVE MEMPOOL TELEMETRY (REAL WEBSOCKET, NO POLLING) ──────────────
+    //  NATIVE MEMPOOL TELEMETRY (REAL WEBSOCKET, NO POLLING) 
     if (process.env.ALCHEMY_WEB3_WSS) {
         try {
             const { WebSocketProvider } = require('ethers');
             const wsProvider = new WebSocketProvider(process.env.ALCHEMY_WEB3_WSS, 1);
             wsProvider.on('error', (err: any) => console.error('Mempool WS error:', err.message || err));
-            console.log('📡 [Mempool WS] Connected directly to Alchemy PendingTransactions');
+            console.log(' [Mempool WS] Connected directly to Alchemy PendingTransactions');
             
             // Ultra-fast global stream (throttle or sample for UI rendering)
             let tickCount = 0;
@@ -126,11 +126,11 @@ export function initializeWebSocket(httpServer: HttpServer): Server {
                 }
             });
         } catch (err) {
-            console.error('❌ [Mempool WS] Failed to listen to native mempool:', err);
+            console.error(' [Mempool WS] Failed to listen to native mempool:', err);
         }
     }
 
-    // ─── SOCKET CONNECTION HANDLING ─────────────────────────────────────────
+    //  SOCKET CONNECTION HANDLING 
     io.on('connection', async (socket) => {
         // Track active clients for CU Optimization (Sleep Mode)
         try {
@@ -139,7 +139,7 @@ export function initializeWebSocket(httpServer: HttpServer): Server {
             await redis.expire('WHALE_MONITOR_CLIENTS', 3600); // 1-hour relative expiry
             await redis.quit();
         } catch (e) {
-            console.error('⚠️ [WebSocket] Failed to increment presence counter:', e);
+            console.error('️ [WebSocket] Failed to increment presence counter:', e);
         }
 
         // Client registers its address to receive personalized tx events
@@ -167,7 +167,7 @@ export function initializeWebSocket(httpServer: HttpServer): Server {
                 if (count < 0) await redis.set('WHALE_MONITOR_CLIENTS', '0');
                 await redis.quit();
             } catch (e) {
-                console.error('⚠️ [WebSocket] Failed to decrement presence counter:', e);
+                console.error('️ [WebSocket] Failed to decrement presence counter:', e);
             }
         });
     });
@@ -180,7 +180,7 @@ export function getIO(): Server | null {
 }
 
 /**
- * Graceful shutdown — used in process.on('SIGTERM') handlers
+ * Graceful shutdown  used in process.on('SIGTERM') handlers
  */
 export async function shutdownWebSocket(): Promise<void> {
     if (redisSubscriber) {

@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 
 // NOTE: STRIPE_SECRET_KEY is validated at runtime when stripe is first used.
-// No module-level console.warn — it would pollute Railway [err] logs.
+// No module-level console.warn  it would pollute Railway [err] logs.
 // Fallback to a dummy key because the SDK throws 'Neither apiKey nor config.authenticator provided' during static generation without it
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_build_validation', {
   apiVersion: '2026-01-28.clover' as any,
@@ -13,7 +13,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy
  * Mapping of internal PlanTier to Stripe Price IDs.
  * Note: These should ideally be moved to environment variables or fetched from Stripe API.
  */
-// Monthly price IDs — maps STRIPE_PRICE_* env vars (existing) + STRIPE_*_PRICE_ID_MO (canonical)
+// Monthly price IDs  maps STRIPE_PRICE_* env vars (existing) + STRIPE_*_PRICE_ID_MO (canonical)
 export const PRICE_IDS: Record<string, Record<string, string>> = {
   MONTHLY: {
     STANDARD: process.env.STRIPE_STANDARD_PRICE_ID_MO || 'prod_UVQSatw61ksVah',

@@ -34,7 +34,7 @@ class MarketStream {
     this.ws = new WebSocket(`wss://stream.binance.com/stream?streams=${streams}`);
 
     this.ws.onopen = () => {
-      console.log('🚀 MULTI-PAIR STREAM CONNECTED - 30 PAIRS ACTIVE');
+      console.log(' MULTI-PAIR STREAM CONNECTED - 30 PAIRS ACTIVE');
       this.activeStreams = new Set(TRADING_PAIRS);
     };
 
@@ -44,7 +44,7 @@ class MarketStream {
     };
 
     this.ws.onclose = () => {
-      console.log('📡 RECONNECTING TO MARKET STREAM...');
+      console.log(' RECONNECTING TO MARKET STREAM...');
       this.reconnectTimeout = setTimeout(() => this.connect(), 2000);
     };
 
@@ -103,7 +103,7 @@ class MarketStream {
       const value = trade.quantity * trade.price;
       if (value > 50000) {
         import('sonner').then(({ toast }) => {
-          toast(`🐋 WHALE ALERT: ${symbol}`, {
+          toast(` WHALE ALERT: ${symbol}`, {
             description: `${trade.side === 'buy' ? 'BOUGHT' : 'SOLD'} $${safeToLocaleString(value)}`,
             style: {
               background: trade.side === 'buy' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)',

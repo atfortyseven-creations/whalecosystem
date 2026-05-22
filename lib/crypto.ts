@@ -1,5 +1,5 @@
 /**
- * AES-256-GCM Sovereign Encryption Vault
+ * AES-256-GCM System Encryption Vault
  * Phase 2: Environment Variable Cryptography
  *
  * Secrets stored in PostgreSQL are always ciphertext.
@@ -8,10 +8,10 @@
 
 const ALGORITHM = 'AES-GCM';
 const KEY_LENGTH = 256;
-const IV_LENGTH = 12; // bytes — standard for AES-GCM
+const IV_LENGTH = 12; // bytes  standard for AES-GCM
 
 function getMasterKey(): string {
-    const secret = process.env.VAULT_SECRET || process.env.NEXTAUTH_SECRET || 'whale-alert-network-sovereign-fallback-key-2026';
+    const secret = process.env.VAULT_SECRET || process.env.NEXTAUTH_SECRET || 'whale-alert-network-system-fallback-key-2026';
     return secret.padEnd(32, '0').slice(0, 32);
 }
 

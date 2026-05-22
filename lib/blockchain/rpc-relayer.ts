@@ -1,6 +1,6 @@
 // lib/blockchain/rpc-relayer.ts
 /**
- * RpcRelayerManager — Multi-Chain RPC Load Balancer
+ * RpcRelayerManager  Multi-Chain RPC Load Balancer
  *
  * Distribuye requests entre todos los endpoints GetBlock del registry
  * usando Round-Robin con cooldown automático en caso de 429/500.
@@ -38,7 +38,7 @@ interface Endpoint {
   url: string;
   failures: number;
   lastFailedAt: number | null;
-  backoffFactor: number; // ── INHUMAN OPTIMIZATION: Exponential Backoff Multiplier ──
+  backoffFactor: number; //  INHUMAN OPTIMIZATION: Exponential Backoff Multiplier 
 }
 
 // Fallbacks públicos por red, usados si el cluster GetBlock está vacío
@@ -112,15 +112,15 @@ export class RpcRelayerManager {
   }
 
   private static initialize() {
-    // ── ETH ────────────────────────────────────────────────────────────────────────
-    // Primarios (cuentas 1-3): RPC_1, RPC_2, RPC_3, RPC_4 → Backup (cuentas 12-14). RR natural.
+    //  ETH 
+    // Primarios (cuentas 1-3): RPC_1, RPC_2, RPC_3, RPC_4  Backup (cuentas 12-14). RR natural.
     this.loadCluster('ETH_RPC', [
       process.env.GB_ETH_RPC_1,
       process.env.GB_ETH_RPC_2,
-      process.env.GB_ETH_RPC_3,    // cuenta 3 — 2x HTTP
-      process.env.GB_ETH_RPC_4,    // cuenta 3 — slot adicional
+      process.env.GB_ETH_RPC_3,    // cuenta 3  2x HTTP
+      process.env.GB_ETH_RPC_4,    // cuenta 3  slot adicional
       process.env.RPC_CLUSTER_ETH_RPC,  // legacy comma-separated
-      // — backups (cuentas 12–14) — solo entran si primarios en cooldown
+      //  backups (cuentas 1214)  solo entran si primarios en cooldown
       process.env.GB_ETH_RPC_B1,
       process.env.GB_ETH_RPC_B2,
       process.env.GB_ETH_RPC_B3,
@@ -130,53 +130,53 @@ export class RpcRelayerManager {
       process.env.GB_ETH_WSS_1,
       process.env.GB_ETH_WSS_2,
       process.env.RPC_CLUSTER_ETH_WSS,  // legacy comma-separated
-      // — backups —
+      //  backups 
       process.env.GB_ETH_WSS_B1,
       process.env.GB_ETH_WSS_B2,
     ]);
     this.loadCluster('ETH_MEV', [process.env.GB_ETH_MEV_RPC]);
 
-    // ── SOLANA ───────────────────────────────────────────────────────────────────────
-    // Primarios (cuentas 4-5) → Backup (cuentas 15-16). RR natural.
+    //  SOLANA 
+    // Primarios (cuentas 4-5)  Backup (cuentas 15-16). RR natural.
     this.loadCluster('SOL_RPC', [
       process.env.GB_SOL_RPC_1,
       process.env.GB_SOL_RPC_EXTRA,
       process.env.GB_SOL_RPC_2,
       process.env.GB_SOL_RPC_3,
       process.env.RPC_CLUSTER_SOL_RPC,  // legacy comma-separated
-      // — backups (cuentas 15–16) —
+      //  backups (cuentas 1516) 
       process.env.GB_SOL_RPC_B1,
       process.env.GB_SOL_RPC_B2,
       process.env.GB_SOL_RPC_B3,
     ]);
     this.loadCluster('SOL_WSS', [
       process.env.GB_SOL_WSS_1,
-      // — backup —
+      //  backup 
       process.env.GB_SOL_WSS_B1,
     ]);
 
-    // ── BASE ────────────────────────────────────────────────────────────────────────
-    // Primario (cuenta 11) → Backup (cuenta 22). RR natural.
+    //  BASE 
+    // Primario (cuenta 11)  Backup (cuenta 22). RR natural.
     this.loadCluster('BASE_RPC', [
       process.env.GB_BASE_RPC_1,
-      // — backup (cuenta 22) —
+      //  backup (cuenta 22) 
       process.env.GB_BASE_RPC_B1,
     ]);
     this.loadCluster('BASE_WSS', [
       process.env.GB_BASE_WSS_1,
-      // — backup —
+      //  backup 
       process.env.GB_BASE_WSS_B1,
     ]);
 
-    // ── POLYGON ──────────────────────────────────────────────────────────────────────
-    // Primarios (cuentas 6-7) → Backup (cuentas 17-18). RR natural.
+    //  POLYGON 
+    // Primarios (cuentas 6-7)  Backup (cuentas 17-18). RR natural.
     this.loadCluster('POL_RPC', [
       process.env.GB_POL_RPC_1,
       process.env.GB_POL_RPC_EXTRA,
       process.env.GB_POL_RPC_2,
       process.env.GB_POL_RPC_3,
       process.env.RPC_CLUSTER_POLYGON_RPC,
-      // — backups (cuentas 17–18) —
+      //  backups (cuentas 1718) 
       process.env.GB_POL_RPC_B1,
       process.env.GB_POL_RPC_B2,
       process.env.GB_POL_RPC_B3,
@@ -184,18 +184,18 @@ export class RpcRelayerManager {
     this.loadCluster('POL_WSS', [
       process.env.GB_POL_WSS_1,
       process.env.RPC_CLUSTER_POLYGON_WSS,
-      // — backup —
+      //  backup 
       process.env.GB_POL_WSS_B1,
     ]);
 
-    // ── BSC ─────────────────────────────────────────────────────────────────────────
-    // Primarios (cuentas 8-9) → Backup (cuentas 19-20). RR natural.
+    //  BSC 
+    // Primarios (cuentas 8-9)  Backup (cuentas 19-20). RR natural.
     this.loadCluster('BSC_RPC', [
       process.env.GB_BSC_RPC_1,
       process.env.GB_BSC_RPC_2,
       process.env.GB_BSC_RPC_3,
       process.env.RPC_CLUSTER_BSC_RPC,
-      // — backups (cuentas 19–20) —
+      //  backups (cuentas 1920) 
       process.env.GB_BSC_RPC_B1,
       process.env.GB_BSC_RPC_B2,
       process.env.GB_BSC_RPC_B3,
@@ -204,45 +204,45 @@ export class RpcRelayerManager {
       process.env.GB_BSC_WSS_1,
       process.env.GB_BSC_WSS_2,
       process.env.RPC_CLUSTER_BSC_WSS,
-      // — backup —
+      //  backup 
       process.env.GB_BSC_WSS_B1,
     ]);
 
-    // ── ARBITRUM ──────────────────────────────────────────────────────────────────────
-    // Primario (cuenta 10) → Backup (cuenta 21). RR natural.
+    //  ARBITRUM 
+    // Primario (cuenta 10)  Backup (cuenta 21). RR natural.
     this.loadCluster('ARB_RPC', [
       process.env.GB_ARB_RPC_1,
       process.env.RPC_CLUSTER_ARB_RPC,  // legacy comma-separated (2 URLs)
-      // — backup (cuenta 21) —
+      //  backup (cuenta 21) 
       process.env.GB_ARB_RPC_B1,
     ]);
     this.loadCluster('ARB_WSS', [
       process.env.GB_ARB_WSS_1,
-      // — backup —
+      //  backup 
       process.env.GB_ARB_WSS_B1,
     ]);
 
-    // ── OPTIMISM ──────────────────────────────────────────────────────────────
+    //  OPTIMISM 
     this.loadCluster('OP_RPC', [process.env.GB_OP_RPC_1]);
 
-    // ── WORLDCHAIN ────────────────────────────────────────────────────────────
+    //  WORLDCHAIN 
     this.loadCluster('WORLD_RPC', [process.env.GB_WORLD_RPC_1]);
 
-    // ── BITCOIN ───────────────────────────────────────────────────────────────
+    //  BITCOIN 
     this.loadCluster('BTC_RPC', [process.env.GB_BTC_RPC_1]);
 
-    // ── AVALANCHE ─────────────────────────────────────────────────────────────
+    //  AVALANCHE 
     this.loadCluster('AVAX_RPC', [process.env.GB_AVAX_RPC_1]);
 
-    // ── META-CHAINS 2025 ──────────────────────────────────────────────────────
+    //  META-CHAINS 2025 
     this.loadCluster('HYPEREVM_RPC', [process.env.GB_HYPEREVM_RPC_1]);
     this.loadCluster('BERA_RPC',     [process.env.GB_BERA_RPC_1]);
 
-    // ── Startup log ────────────────────────────────────────────────────────────
+    //  Startup log 
     const totalActive = Object.values(this.endpoints).reduce(
       (acc, cluster) => acc + cluster.length, 0
     );
-    console.log(`[RpcRelayer] 🚀 Initialized — ${totalActive} total endpoint slots loaded.`);
+    console.log(`[RpcRelayer]  Initialized  ${totalActive} total endpoint slots loaded.`);
   }
 
   /**
@@ -271,7 +271,7 @@ export class RpcRelayerManager {
     this.indices[key] = 0;
 
     if (this.endpoints[key].length > 0) {
-      console.log(`[RpcRelayer] ✅ ${key}: ${this.endpoints[key].length} endpoint(s)`);
+      console.log(`[RpcRelayer]  ${key}: ${this.endpoints[key].length} endpoint(s)`);
     }
   }
 
@@ -309,7 +309,7 @@ export class RpcRelayerManager {
       }
 
       if (ep.lastFailedAt) {
-        // Cooldown expirado — recuperar endpoint (mantener backoff para castigar reincidencia lenta)
+        // Cooldown expirado  recuperar endpoint (mantener backoff para castigar reincidencia lenta)
         ep.lastFailedAt = null;
       }
 
@@ -318,14 +318,14 @@ export class RpcRelayerManager {
       return ep.url;
     }
 
-    // Todos en cooldown — intentar con el primero de todos modos o saltar a fallbacks
+    // Todos en cooldown  intentar con el primero de todos modos o saltar a fallbacks
     if (fallbacks.length > 0) {
       const fIdx = (this.indices[key] || 0) % fallbacks.length;
       this.indices[key] = (fIdx + 1) % fallbacks.length;
       return fallbacks[fIdx];
     }
 
-    console.error(`[RpcRelayer] ⚠️ ALL nodes cooling down for ${key} — forcing primary.`);
+    console.error(`[RpcRelayer] ️ ALL nodes cooling down for ${key}  forcing primary.`);
     return cluster[0].url;
   }
 
@@ -339,7 +339,7 @@ export class RpcRelayerManager {
       ep.failures += 1;
       ep.lastFailedAt = Date.now();
       ep.backoffFactor = Math.min(ep.backoffFactor * 2, this.MAX_BACKOFF); // Inhuman Optimization
-      console.warn(`[RpcRelayer] 🔴 EXPONENTIAL COOLDOWN → ${url.slice(0, 50)} | Fails: ${ep.failures} | Backoff: ${ep.backoffFactor}x`);
+      console.warn(`[RpcRelayer]  EXPONENTIAL COOLDOWN  ${url.slice(0, 50)} | Fails: ${ep.failures} | Backoff: ${ep.backoffFactor}x`);
     }
   }
 

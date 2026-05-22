@@ -96,7 +96,7 @@ export default function LiquidationHeatmap() {
     try {
       seriesInstance.current.update({ time: now, value: currentPrice });
     } catch {
-      // Lightweight charts can throw if time is not strictly increasing — suppress silently.
+      // Lightweight charts can throw if time is not strictly increasing  suppress silently.
     }
   }, [currentPrice]);
 

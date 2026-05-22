@@ -15,9 +15,9 @@ import { isAdmin } from '@/lib/admin';
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const address = cookieStore.get('sovereign_handshake')?.value;
+    const address = cookieStore.get('system_handshake')?.value;
     if (!isAdmin(address)) {
-      return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
+      return NextResponse.json({ error: 'Unauthorized: System Admin Only' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

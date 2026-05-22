@@ -1,6 +1,6 @@
 /**
  * [SOVEREIGN ADMIN SCRIPT] grant-premium.ts
- * ──────────────────────────────────────────
+ * 
  * Grants SOVEREIGN tier access to a user by wallet address.
  * Zero-Clerk: uses native Prisma DB lookups only.
  *
@@ -14,19 +14,19 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-// ─── CONFIG ─────────────────────────────────────────────────────────────────
+//  CONFIG 
 const TARGET_WALLET = process.env.TARGET_WALLET || '0xYOUR_WALLET_ADDRESS_HERE';
 const TARGET_TIER   = 'SOVEREIGN';
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 async function grantPremium() {
-  console.log(`\n🚀 Granting ${TARGET_TIER} Access`);
+  console.log(`\n Granting ${TARGET_TIER} Access`);
   console.log(`   Wallet: ${TARGET_WALLET}`);
   console.log('-------------------------------------------');
 
   try {
     // 1. Upsert User in DB with SOVEREIGN tier
-    console.log('💾 Upserting User in database...');
+    console.log(' Upserting User in database...');
     const user = await prisma.user.upsert({
       where: { walletAddress: TARGET_WALLET.toLowerCase() },
       update: {
@@ -39,10 +39,10 @@ async function grantPremium() {
         isPro: true,
       },
     });
-    console.log(`✅ User record saved: ${user.walletAddress} → tier: ${user.tier}`);
+    console.log(` User record saved: ${user.walletAddress}  tier: ${user.tier}`);
 
     // 2. Upsert Subscription as lifetime
-    console.log('📝 Creating/Updating Subscription record...');
+    console.log(' Creating/Updating Subscription record...');
     const existing = await prisma.subscription.findFirst({
       where: { userId: user.walletAddress }
     });
@@ -61,12 +61,12 @@ async function grantPremium() {
         expiresAt: new Date('2099-12-31'),
       },
     });
-    console.log(`✅ Subscription: ${subscription.id} → status: ${subscription.status}`);
+    console.log(` Subscription: ${subscription.id}  status: ${subscription.status}`);
 
-    console.log('\n✨ MISSION ACCOMPLISHED: Full sovereign access granted.');
+    console.log('\n MISSION ACCOMPLISHED: Full system access granted.');
 
   } catch (error) {
-    console.error('❌ Error during grant process:', error);
+    console.error(' Error during grant process:', error);
   } finally {
     await prisma.$disconnect();
   }

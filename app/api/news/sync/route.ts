@@ -29,7 +29,7 @@ export async function GET(request: Request) {
             title: item.title || 'Untitled Update',
             summary: item.description || item.title || 'No summary available',
             url: item.link || '#',
-            source: item.source || 'Global Intelligence',
+            source: item.source || 'Global Analytics',
             publishedAt: item.pubDate || new Date().toISOString(),
             imageUrl: item.imageUrl,
             category: item.category?.[0] || 'global'

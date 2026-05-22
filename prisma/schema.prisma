@@ -2,7 +2,7 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // NOTE: pg_trgm/btree_gin/unaccent extensions omitted —
+  // NOTE: pg_trgm/btree_gin/unaccent extensions omitted 
   // Railway PostgreSQL does not guarantee superuser extension access.
   // Full-text search is handled at the application layer via Prisma fullTextSearchPostgres.
 }
@@ -13,9 +13,9 @@ generator client {
   binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // TRI-LAYER KINETIC MATRICES & ARTICLES
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model Article {
   id          String   @id @default(uuid())
@@ -30,15 +30,15 @@ model Article {
 
   sector Sector? @relation(fields: [sectorId], references: [id])
 
-  // ── 🔍 INDEXACIÓN CÓSMICA: Articulación para texto completo e informes temporales
+  //   INDEXACIÓN CÓSMICA: Articulación para texto completo e informes temporales
   @@index([category, publishedAt(sort: Desc)]) // Filtrado rápido por categoría + cronología
   @@index([bias, sentiment]) // Análisis de polaridad institucional
   @@index([sectorId, publishedAt(sort: Desc)]) // Drill-down por sector en dashboards
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // 103 MICRO-SECTORS ENGINE
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model Sector {
   id          String    @id @default(uuid())
@@ -50,14 +50,14 @@ model Sector {
   zScore      Float // Custom Whale Rotation Score
   articles    Article[]
 
-  // ── 🔍 INDEXACIÓN CÓSMICA: Rendimiento y ordenamiento dinámico
+  //   INDEXACIÓN CÓSMICA: Rendimiento y ordenamiento dinámico
   @@index([zScore(sort: Desc)]) // Top Sectors by Whale Rotation Score
   @@index([totalTvl(sort: Desc)]) // Ranking por TVL en tiempo real
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SOVEREIGN AUTHORITY & COMMERCIAL ONTOLOGY
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model GoldRegistryAudit {
   id                 String  @id @default(uuid())
@@ -67,16 +67,16 @@ model GoldRegistryAudit {
   isVerifiedOnChain  Boolean @default(false)
   smartContractRef   String? // Contract validated by local/Polygon ping
   solvencyStatus     String // "Confirmed", "Suspicious", "Unknown"
-  sovereignBridgeUrl String // E.g., The dark-pool routed affiliate bridge
+  systemBridgeUrl String // E.g., The dark-pool routed affiliate bridge
 
   // High-performance metrics tailored to CryptoSlate's taxonomies
   features        String[] // ["No KYC", "Instant Withdrawal", "Cold Storage"]
   supportedChains String[] // ["Ethereum", "Solana", "Base"]
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // ECOSYSTEM MAPPING
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model EcosystemWarRoomData {
   id            String @id @default(uuid())
@@ -87,9 +87,9 @@ model EcosystemWarRoomData {
   volume24h     Float  @default(0.0)
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SOVEREIGN USER PROFILES & WATCHLISTS
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model User {
   id                String   @id @default(uuid())
@@ -107,7 +107,7 @@ model User {
 
   worldIdNullifierHash String? @unique
 
-  // ── General Settings ────────────────────────────────────────────────────────
+  //  General Settings 
   theme         String @default("light")
   currency      String @default("USD")
   language      String @default("en")
@@ -115,7 +115,7 @@ model User {
   dateFormat    String @default("DD/MM/YYYY") // "DD/MM/YYYY" | "MM/DD/YYYY"
   addressFormat String @default("truncated")  // "truncated" | "full"
 
-  // ── Display & Hardware ───────────────────────────────────────────────────────
+  //  Display & Hardware 
   showBalances        Boolean  @default(true)
   hiddenAssets        String[] @default([])
   defaultTimeframe    String   @default("1W")    // "1D", "1W", "1M", "ALL"
@@ -123,27 +123,27 @@ model User {
   layoutDensity       String   @default("compact") // "relaxed" | "compact" | "dense"
   hardwareAcceleration Boolean @default(true)
 
-  // ── Network & RPC ────────────────────────────────────────────────────────────
+  //  Network & RPC 
   gasPreset     String  @default("STANDARD") // "ECONOMY" | "STANDARD" | "FAST" | "INSTANT"
   customRpcUrl  String?
   mevProtection Boolean @default(false)
   maxSlippage   Float   @default(0.5)
   testnetMode   Boolean @default(false)
 
-  // ── Privacy & Security ───────────────────────────────────────────────────────
+  //  Privacy & Security 
   inactivityLockMinutes Int     @default(60)
   autoDisconnectTimer   String  @default("1h") // "15m" | "1h" | "24h" | "never"
   stealthMode           Boolean @default(false)
   requireSignForExports Boolean @default(true)
   allowAnalytics        Boolean @default(true)
 
-  // ── Sonar Alerts ─────────────────────────────────────────────────────────────
+  //  Sonar Alerts 
   emailAlerts         Boolean @default(false)
   telegramAlerts      Boolean @default(false)
   whaleAlertThreshold Float   @default(1000000)
   soundEffects        Boolean @default(true)
 
-  // ── Whale Chat ───────────────────────────────────────────────────────────────
+  //  Whale Chat 
   chatName    String  @default("Whale User")
   chatBio     String  @default("")
   qrLabel     String  @default("Scan My Wallet")
@@ -175,7 +175,7 @@ model User {
   forumNotifications ForumNotification[]
   actorNotifications ForumNotification[] @relation("ActorNotifications")
 
-  // ── 🔍 INDEXACIÓN CÓSMICA: Segmentación de usuarios para analytics y acceso a nivel Pro
+  //   INDEXACIÓN CÓSMICA: Segmentación de usuarios para analytics y acceso a nivel Pro
   @@index([tier, lastActive(sort: Desc)]) // Consulta de usuarios activos por tier
   @@index([isPro, createdAt(sort: Desc)]) // Funnel de conversión Pro
   @@index([createdAt(sort: Desc)]) // Registro cronológico general
@@ -184,7 +184,7 @@ model User {
   watchedWallets     WatchedWallet[]
   exchangePositions  ExchangePosition[]
 
-  // Sovereign Credits & Humanity Ledger (SaaS V4.0)
+  // System Credits & Humanity Ledger (SaaS V4.0)
   creditsBalance     Int             @default(2500)
   humanityScore      Int             @default(0)
   creditLedgers      CreditLedger[]
@@ -349,10 +349,10 @@ model ExchangePosition {
   @@index([userId, status])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SAAS SUBSCRIPTIONS & STRIPE
 // FIX: Missing Subscription model referenced by Stripe webhooks
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 model Subscription {
   id        String   @id @default(uuid())
   userId    String   @unique // Maps to User.walletAddress typically
@@ -399,9 +399,9 @@ model CanvasState {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SIWE AUTHENTICATION NONCES
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model SiweNonce {
   id        String   @id @default(uuid())
@@ -410,9 +410,9 @@ model SiweNonce {
   createdAt DateTime @default(now())
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // ON-CHAIN ACADEMY PROGRESSION
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model Course {
   id            String   @id @default(uuid())
@@ -453,9 +453,9 @@ model UserProgress {
   @@unique([userId, lessonId])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // ACADEMY MENTORING & TEACHER VALIDATIONS (MAXIMUM LMS)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model AcademySubmission {
   id          String   @id @default(uuid())
@@ -489,9 +489,9 @@ model MentoringMessage {
   @@index([receiverId, read])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // GOLDEN TICKET CLAIM
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model GoldenTicket {
   id                    String   @id @default(uuid())
@@ -515,9 +515,9 @@ model GoldenTicket {
   @@index([ticketNumber])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SOVEREIGN INTELLIGENCE CORPUS (ARKHAM/NANSEN KILLER)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model IntelItem {
   id          String   @id @default(uuid())
@@ -597,9 +597,9 @@ model NeuralAgentConfig {
   lastPingAt         DateTime @default(now())
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SOBERANIA DE CUSTODIA (ON-CHAIN CONTRACT STATES)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model TimeLockVault {
   id          String   @id @default(uuid())
@@ -639,9 +639,9 @@ model PrivacyDonation {
   timestamp  DateTime @default(now())
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // WHALE TELEMETRY & ACTIVITY
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model WhaleActivity {
   id              String   @id @default(uuid())
@@ -666,28 +666,28 @@ model WhaleActivity {
   timestamp       DateTime @default(now())
   isZkVerified    Boolean  @default(false)
 
-  // ── 🔍 INDEXACIÓN INSTITUCIONAL
+  //   INDEXACIÓN INSTITUCIONAL
   @@index([usdValue])
   @@index([valueBTC])
   @@index([timestamp(sort: Desc)])
   @@index([institutional])
   @@index([entityName])
   @@index([chain, timestamp(sort: Desc)])
-  // ── 🔍 INDEXACIÓN COMPUESTA (query patterns de /api/akashic y /api/institutional)
-  // Pattern 1: Akashic feed — filtrar por chain, ordenar por timestamp, paginar
+  //   INDEXACIÓN COMPUESTA (query patterns de /api/akashic y /api/institutional)
+  // Pattern 1: Akashic feed  filtrar por chain, ordenar por timestamp, paginar
   @@index([chain, timestamp(sort: Desc), usdValue])
-  // Pattern 2: Dashboard institucional — movimientos >$1M clasificados como institucionales
+  // Pattern 2: Dashboard institucional  movimientos >$1M clasificados como institucionales
   @@index([institutional, usdValue, timestamp(sort: Desc)])
-  // Pattern 3: Análisis por token — ej. todos los movimientos de USDC en Ethereum
+  // Pattern 3: Análisis por token  ej. todos los movimientos de USDC en Ethereum
   @@index([token, chain, timestamp(sort: Desc)])
   // Pattern 4: Búsqueda por dirección (from/to wallet lookup)
   @@index([fromAddress, timestamp(sort: Desc)])
   @@index([toAddress, timestamp(sort: Desc)])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // BITCOIN SV (BSV) BRC STANDARDS INDEX
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model BRCStandard {
   id         String    @id @default(uuid())
@@ -704,10 +704,10 @@ model BRCStandard {
   lastSyncAt DateTime  @default(now())
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // TELEGRAM ALERTS
 // Referenced by: /api/telegram/connect, /api/cron/*, webhook handlers
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model TelegramAlert {
   id            String   @id @default(uuid())
@@ -787,7 +787,7 @@ model GlobalWhaleEvent {
   protocol  String
   timestamp DateTime @default(now())
 
-  // ── 🔍 INDEXACIÓN CÓSMICA: Eventos Macro para pantalla de liderazgo institucional
+  //   INDEXACIÓN CÓSMICA: Eventos Macro para pantalla de liderazgo institucional
   @@index([protocol, timestamp(sort: Desc)]) // Filtrado por protocolo en tiempo real
   @@index([amountUSD(sort: Desc)]) // Ranking de mayores transacciones
   @@index([timestamp(sort: Desc)]) // Vista cronológica global
@@ -801,9 +801,9 @@ model AlertRule {
   isActive  Boolean @default(true)
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// OPERATIONAL AUDIT TRAIL (sovereign action log)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
+// OPERATIONAL AUDIT TRAIL (system action log)
+// 
 
 model AuditLog {
   id        String   @id @default(uuid())
@@ -818,20 +818,20 @@ model AuditLog {
   @@index([action, timestamp(sort: Desc)])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SOVEREIGN CRYPTOGRAPHIC AUDIT TRAIL
 // Immutable HMAC-SHA256 chained event log for ENISA / eIDAS 2.0 compliance.
 // Each entry's HMAC includes the previous entry's payloadHash (hash chain).
 // Any deletion or modification of entries is cryptographically detectable.
 // This table must have INSERT-ONLY permissions at the DB role level.
-// Verification: lib/audit/audit-trail.ts → verifyAuditTrailIntegrity()
-// ─────────────────────────────────────────────────────────────────────────────
+// Verification: lib/audit/audit-trail.ts  verifyAuditTrailIntegrity()
+// 
 
-model SovereignAuditLog {
+model SystemAuditLog {
   id          String   @id @default(uuid())
   createdAt   DateTime @default(now())
   // Event classification
-  event       String   // AuditEventType — see lib/audit/audit-trail.ts
+  event       String   // AuditEventType  see lib/audit/audit-trail.ts
   actor       String   // Wallet address (0x...) or system identifier
   ip          String
   metadata    String   @db.Text // JSON-serialized, included in payloadHash
@@ -843,16 +843,16 @@ model SovereignAuditLog {
   @@index([event, createdAt(sort: Desc)])
   @@index([actor, createdAt(sort: Desc)])
   @@index([createdAt(sort: Desc)])
-  @@map("sovereign_audit_log")
+  @@map("system_audit_log")
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // STRIPE PURCHASE INTENT (anti-chargeback evidence)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model ApiPurchaseIntent {
   id              String   @id @default(uuid())
-  userId          String // Sovereign wallet address (SIWE identity)
+  userId          String // System wallet address (SIWE identity)
   planId          String
   stripeSessionId String   @unique
   ip              String?
@@ -890,7 +890,7 @@ model BlockchainTransaction {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // ── 🔍 INDEXACIÓN CÓSMICA: Estado de transacciones para reconciliación ultra-rápida
+  //   INDEXACIÓN CÓSMICA: Estado de transacciones para reconciliación ultra-rápida
   @@index([userId]) // Lookup de historial por usuario
   @@index([status, createdAt(sort: Desc)]) // Monitoreo de pendientes en tiempo real
   @@index([blockNumber(sort: Desc)]) // Lookup por bloque
@@ -906,9 +906,9 @@ model Session {
   createdAt    DateTime @default(now())
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SOVEREIGN WALLET & EXCHANGE STATE
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model ExchangeBalance {
   id        String   @id @default(uuid())
@@ -921,9 +921,9 @@ model ExchangeBalance {
   @@unique([userId, asset])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SYSTEM TELEMETRY
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model Log {
   id        String   @id @default(uuid())
@@ -936,9 +936,9 @@ model Log {
   @@index([createdAt(sort: Desc)])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // PRIVACY & SESSION AUDITING LOGS
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model UserSessionLog {
   id         String   @id @default(uuid())
@@ -968,15 +968,15 @@ model UserPrivacyProfile {
   sessionAutoLogout   String   @default("1h")
   ipWhitelist         String[] @default([])
   twoFAEnabled        Boolean  @default(false)
-  sovereignVisibility String   @default("Public")
+  systemVisibility String   @default("Public")
   exportEncryption    Boolean  @default(false)
   updatedAt           DateTime @updatedAt
   createdAt           DateTime @default(now())
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // AKASHIC COSMIC FORGE
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model CosmicEntity {
   id                String   @id @default(uuid())
@@ -1005,9 +1005,9 @@ model CosmicEntity {
   @@index([chain, createdAt(sort: Desc)])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // FINTECH & GAMIFICATION (Unleashed Models)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model VirtualCard {
   id          String   @id @default(uuid())
@@ -1040,9 +1040,9 @@ model GamificationRecord {
   @@index([userId])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // SOVEREIGN FORUM
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model ForumCategory {
   id          String       @id @default(uuid())
@@ -1155,9 +1155,9 @@ model ForumTelemetry {
   @@index([userId, createdAt(sort: Desc)])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // PHASE 3: PRODUCT VALIDATION & TELEMETRY (GDPR COMPLIANT)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model BetaTelemetry {
   id              String   @id @default(uuid())
@@ -1180,10 +1180,10 @@ model NPSSurvey {
   timestamp       DateTime @default(now())
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // AUTH: EMAIL VERIFICATION CODES
 // Used by /api/auth/signup, /api/auth/verify, /api/auth/verify-code
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model VerificationCode {
   id        String   @id @default(uuid())
@@ -1197,12 +1197,12 @@ model VerificationCode {
   @@index([code])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // ON-CHAIN INTELLIGENCE CACHE
-// Used by /api/premium/watched-wallets GET (global intelligence merge)
-// ─────────────────────────────────────────────────────────────────────────────
+// Used by /api/premium/watched-wallets GET (global analytics merge)
+// 
 
-model WalletIntelligence {
+model WalletAnalytics {
   id        String   @id @default(uuid())
   address   String   @unique
   forensics Json?    // Risk signals, entity labels, etc.
@@ -1231,9 +1231,9 @@ model Notification {
   @@index([createdAt(sort: Desc)])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // HUMANITY LEDGER INDEXER (NATIVE ON-CHAIN ARCHIVE)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 model HumanityLedgerBlock {
   id          BigInt   @id

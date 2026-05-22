@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { ShieldAlert, Zap, Eye, AlertTriangle, CheckCircle, XCircle, RefreshCw, Activity, Layers } from 'lucide-react';
 
-// ── Risk Taxonomy ──────────────────────────────────────────────────────────
+//  Risk Taxonomy 
 export type RiskLevel = 'ELEVATED' | 'MODERATE' | 'STANDARD' | 'LOW' | 'NOMINAL';
 
 export interface SequenceAlert {
@@ -23,13 +23,13 @@ export interface SequenceAlert {
 }
 
 const KNOWN_SELECTORS: Record<string, string> = {
-  '0x095ea7b3': 'approve() — High-variance token allocation',
-  '0xa22cb465': 'setApprovalForAll() — Global asset delegation',
-  '0x23b872dd': 'transferFrom() — Delegated transfer execution',
-  '0x42842e0e': 'safeTransferFrom() — Verified asset transfer',
-  '0x1cff79cd': 'execute() — Arbitrary execution sequence',
-  '0x3593564c': 'execute() — Universal router interaction',
-  '0xac9650d8': 'multicall() — Batched transaction sequence',
+  '0x095ea7b3': 'approve()  High-variance token allocation',
+  '0xa22cb465': 'setApprovalForAll()  Global asset delegation',
+  '0x23b872dd': 'transferFrom()  Delegated transfer execution',
+  '0x42842e0e': 'safeTransferFrom()  Verified asset transfer',
+  '0x1cff79cd': 'execute()  Arbitrary execution sequence',
+  '0x3593564c': 'execute()  Universal router interaction',
+  '0xac9650d8': 'multicall()  Batched transaction sequence',
 };
 
 const HIGH_FREQUENCY_PATTERNS = ['0x000000000', '0xEeeeeE', 'sandwich'];
@@ -50,7 +50,7 @@ function evaluateSequenceRisk(tx: any): { level: RiskLevel; type: string; reason
       flags.push('Broad asset allocation detected');
     } else if (selector === '0x1cff79cd') {
       score += 90;
-      flags.push('Arbitrary execution sequence — requires verification');
+      flags.push('Arbitrary execution sequence  requires verification');
     } else {
       score += 30;
       flags.push(`Identified method: ${desc}`);
@@ -103,8 +103,8 @@ const RISK_CONFIG: Record<RiskLevel, { label: string; color: string; icon: any }
   NOMINAL:  { label: 'NOMINAL',  color: '#43A047', icon: CheckCircle },
 };
 
-const truncAddr = (a: string) => a ? `${a.slice(0, 6)}…${a.slice(-4)}` : '—';
-const truncHash = (h: string) => h ? `${h.slice(0, 10)}…${h.slice(-6)}` : '—';
+const truncAddr = (a: string) => a ? `${a.slice(0, 6)}${a.slice(-4)}` : '';
+const truncHash = (h: string) => h ? `${h.slice(0, 10)}${h.slice(-6)}` : '';
 
 const CHAINS = [
   { id: 'eth', label: 'Ethereum Mainnet' },
@@ -297,7 +297,7 @@ export function MempoolForensicsPanel() {
         ) : isActive && alerts.length === 0 ? (
           <div className="flex items-center justify-center py-16 gap-3 text-black/40">
             <RefreshCw size={16} className="animate-spin" />
-            <span className="text-[12px] font-medium">Aggregating block data…</span>
+            <span className="text-[12px] font-medium">Aggregating block data</span>
           </div>
         ) : filteredAlerts.length === 0 ? (
           <div className="flex items-center justify-center py-16 text-black/40">
@@ -335,7 +335,7 @@ export function MempoolForensicsPanel() {
                   <span className="text-[12px] font-bold text-[#050505]">{alert.value} ETH</span>
 
                   <span className="text-[11px] text-black/50 leading-snug truncate" title={alert.reason}>
-                    <strong className="text-[#050505] font-semibold">{alert.riskType}</strong> — {alert.reason.split(' | ')[0]}
+                    <strong className="text-[#050505] font-semibold">{alert.riskType}</strong>  {alert.reason.split(' | ')[0]}
                   </span>
 
                   <span className="text-[11px] font-mono text-black/40">

@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
  * 
  * FIX Bug 14: Removed ALL Math.random() fake address/PKI generation.
  * Previously, fallback responses contained invented Bitcoin addresses and
- * cryptographic public keys — these could cause users to verify signatures
+ * cryptographic public keys  these could cause users to verify signatures
  * against non-existent keys, resulting in fund loss.
  * Now: unresolvable handles return a clear 404 error instead of fabricated data.
  */
@@ -21,9 +21,9 @@ export async function GET(request: Request) {
         }
 
         const [user, domain] = handle.split('@');
-        console.log(`📡 [Identity] Resolving Paymail Identity: ${handle}...`);
+        console.log(` [Identity] Resolving Paymail Identity: ${handle}...`);
 
-        // ── Step 1: Fetch the BSVALIAS capability document ─────────────────────
+        //  Step 1: Fetch the BSVALIAS capability document 
         const wellKnownUrl = `https://${domain}/.well-known/bsvalias`;
         let resolveEndpoint: string | null = null;
 
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
             // Domain doesn't support Paymail or is offline
         }
 
-        // ── Step 2: Attempt live address resolution ─────────────────────────────
+        //  Step 2: Attempt live address resolution 
         if (resolveEndpoint) {
             try {
                 const resolveUrl = resolveEndpoint.replace('{alias}', user).replace('{domain.tld}', domain);
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
             }
         }
 
-        // ── Step 3: Honest failure — no data is better than fake data ───────────
+        //  Step 3: Honest failure  no data is better than fake data 
         // FIX: Previously returned Math.random() fake address + fake PKI key here.
         // We now return 404 so the caller knows the identity is unresolvable.
         return NextResponse.json({

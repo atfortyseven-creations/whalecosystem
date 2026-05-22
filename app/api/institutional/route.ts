@@ -10,13 +10,13 @@ export async function POST(request: Request) {
       case 'file_save':
         return NextResponse.json({ success: true, message: 'Institutional state successfully encrypted and saved to Whale Alert Network.' });
       case 'file_export':
-        return NextResponse.json({ success: true, message: 'Data matrix exported with military-grade zk-SNARK proof.' });
+        return NextResponse.json({ success: true, message: 'Data grid exported with military-grade zk-SNARK proof.' });
       case 'edit_preferences':
-        return NextResponse.json({ success: true, message: 'Sovereign preferences synchronized across cluster nodes.' });
+        return NextResponse.json({ success: true, message: 'System preferences synchronized across cluster nodes.' });
       case 'view_toggle_mode':
-        return NextResponse.json({ success: true, mode: payload, message: `View matrix switched to ${payload} mode.` });
+        return NextResponse.json({ success: true, mode: payload, message: `View grid switched to ${payload} mode.` });
       case 'analytics_generate':
-        return NextResponse.json({ success: true, reportId: `ANLTX-${Date.now()}`, message: 'Deep quantum analytics report generation initiated.' });
+        return NextResponse.json({ success: true, reportId: `ANLTX-${Date.now()}`, message: 'Deep core analytics report generation initiated.' });
       default:
         return NextResponse.json({ success: false, message: 'Unrecognized institutional command protocol.' }, { status: 400 });
     }

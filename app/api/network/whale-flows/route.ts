@@ -14,8 +14,8 @@ import { NextResponse } from 'next/server';
 
 export const revalidate = 60; // ISR: cache for 60 seconds
 
-// ─── Known institutional BTC wallet registry (publicly documented on-chain) ───
-// Sources: Arkham Intelligence, Blockchain.com labels, community research
+//  Known institutional BTC wallet registry (publicly documented on-chain) 
+// Sources: Arkham Analytics, Blockchain.com labels, community research
 const ENTITY_REGISTRY: Record<string, { name: string; city: string; type: string }> = {
   // Binance
   '1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ': { name: 'Binance',       city: 'Singapore',     type: 'Exchange'     },
@@ -64,7 +64,7 @@ function deriveType(addr: string): string {
 
 function resolveEntity(addr: string) {
   return ENTITY_REGISTRY[addr] ?? {
-    name: addr.slice(0, 6) + '…' + addr.slice(-4),
+    name: addr.slice(0, 6) + '' + addr.slice(-4),
     city: deriveCity(addr),
     type: deriveType(addr),
   };
@@ -101,7 +101,7 @@ async function fetchAddressTxs(addr: string): Promise<any[]> {
 
 export async function GET() {
   try {
-    // ── 1. Get current BTC block height for confirmation calculation ────────
+    //  1. Get current BTC block height for confirmation calculation 
     let tipHeight = 0;
     try {
       const tipRes = await fetch('https://mempool.space/api/blocks/tip/height', {
@@ -110,7 +110,7 @@ export async function GET() {
       if (tipRes.ok) tipHeight = Number(await tipRes.text());
     } catch { /* continue without it */ }
 
-    // ── 2. Fetch txs for a subset of known exchange wallets in parallel ─────
+    //  2. Fetch txs for a subset of known exchange wallets in parallel 
     // Limit to 6 addresses to avoid rate-limiting mempool.space
     const watchedAddresses = [
       '1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ', // Binance Cold 1
@@ -129,7 +129,7 @@ export async function GET() {
 
     const allTxs = allTxBatches.flat();
 
-    // ── 3. Deduplicate by txid ──────────────────────────────────────────────
+    //  3. Deduplicate by txid 
     const seen = new Set<string>();
     const unique = allTxs.filter(({ tx }) => {
       if (seen.has(tx.txid)) return false;
@@ -137,7 +137,7 @@ export async function GET() {
       return true;
     });
 
-    // ── 4. Build flows ──────────────────────────────────────────────────────
+    //  4. Build flows 
     const flows: WhaleFlow[] = [];
 
     for (const { tx, watchedAddr } of unique) {
@@ -193,7 +193,7 @@ export async function GET() {
       if (flows.length >= 5) break;
     }
 
-    // ── 5. Sort by most recent block time ───────────────────────────────────
+    //  5. Sort by most recent block time 
     flows.sort((a, b) => (b.blockTime ?? 0) - (a.blockTime ?? 0));
 
     return NextResponse.json({ flows, tipHeight, timestamp: Date.now() }, {

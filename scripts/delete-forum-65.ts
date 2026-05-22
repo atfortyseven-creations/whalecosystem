@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🛡️ Initiating Sovereign Purge Protocol...');
+    console.log('️ Initiating System Purge Protocol...');
     
     // Find all mock users by their specific generated bio pattern
     const mockUsers = await prisma.user.findMany({
@@ -17,7 +17,7 @@ async function main() {
     const userIds = mockUsers.map(u => u.id);
     
     if (userIds.length === 0) {
-        console.log('✅ No mock personas found in the database. Clean matrix.');
+        console.log(' No mock personas found in the database. Clean grid.');
         return;
     }
 
@@ -45,7 +45,7 @@ async function main() {
     const delTopics = await prisma.forumTopic.deleteMany({
         where: { authorId: { in: userIds } }
     });
-    console.log(`[-] Erased ${delTopics.count} intelligence alerts (topics).`);
+    console.log(`[-] Erased ${delTopics.count} analytics alerts (topics).`);
 
     // 5. Delete the personas themselves
     const delUsers = await prisma.user.deleteMany({
@@ -53,12 +53,12 @@ async function main() {
     });
     console.log(`[-] Erased ${delUsers.count} synthetic identities.`);
 
-    console.log('✅ Success! The Sovereign Network is now perfectly clean.');
+    console.log(' Success! The System Network is now perfectly clean.');
 }
 
 main()
     .catch(e => {
-        console.error('❌ Error during purge:', e);
+        console.error(' Error during purge:', e);
         process.exit(1);
     })
     .finally(async () => {

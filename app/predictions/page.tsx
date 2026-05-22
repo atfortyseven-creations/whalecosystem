@@ -11,7 +11,7 @@ const MARKET_PREDICTIONS = [
   { id: '4', title: 'OpenAI releases GPT-5 before Q3?', category: 'Tech/AI', volumeUsd: 31000000, yesPct: 81, noPct: 19 },
 ];
 
-export default function PredictionMatrixTab() {
+export default function PredictionGridTab() {
   const [activeFilter, setActiveFilter] = useState('All');
 
   return (
@@ -20,9 +20,9 @@ export default function PredictionMatrixTab() {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <Target size={20} className="text-indigo-600" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Embedded Prediction Matrix</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Embedded Prediction Grid</span>
           </div>
-          <h1 className="text-5xl font-black uppercase tracking-tighter">Global Socio-Political Intelligence</h1>
+          <h1 className="text-5xl font-black uppercase tracking-tighter">Global Socio-Political Analytics</h1>
         </div>
         <div className="flex gap-2">
            {['All', 'Macro', 'Crypto', 'Tech/AI', 'Chain Wars'].map(filter => (
@@ -75,7 +75,7 @@ export default function PredictionMatrixTab() {
                 </div>
 
                 <a 
-                  href={`https://bridge.sovereign.network/predict/${market.id}`}
+                  href={`https://bridge.system.network/predict/${market.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-white/20 dark:bg-black/20 backdrop-blur-md text-[#050505] dark:text-[#FAF9F6] p-3 rounded-xl flex items-center justify-center gap-2 font-black uppercase text-[10px] tracking-widest hover:bg-white/40 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5"

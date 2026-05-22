@@ -3,7 +3,7 @@ import { portfolioService } from '@/lib/blockchain/PortfolioService';
 import { ChainId } from '@/lib/blockchain/BlockchainService';
 import { privyRelayer } from '@/lib/services/PrivyRelayerService';
 
-/** Safe serializer — avoids JSON.stringify crash on BigInt values */
+/** Safe serializer  avoids JSON.stringify crash on BigInt values */
 function safeSerialize(data: unknown): string {
   return JSON.stringify(data, (_, v) =>
     typeof v === 'bigint' ? v.toString() : v
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
         ChainId.BSC, ChainId.WORLDCHAIN,
       ]) as ChainId[];
 
-  // Hard 28-second global guard — must be LARGER than the per-chain 25s timeout
+  // Hard 28-second global guard  must be LARGER than the per-chain 25s timeout
   // inside PortfolioService so individual chains can complete before the API cuts them off.
   // Railway serverless function limit is 60s; 28s gives chains 25s + 3s for aggregation.
   const GLOBAL_TIMEOUT_MS = 28_000;
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
       chainBreakdown: {},
       address,
       status: 'TIMEOUT',
-      error: 'GLOBAL_TIMEOUT — partial data only.',
+      error: 'GLOBAL_TIMEOUT  partial data only.',
     }), GLOBAL_TIMEOUT_MS)
   );
 

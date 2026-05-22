@@ -2,7 +2,7 @@ import { redisClient } from '../redis/client';
 import { OmnichannelAlertEvent, AlertChain, AlertSeverity } from '../types/alerts';
 
 /**
- * 🌌 UNIFIED COSMIC MESSAGE BUS Proxy (v3.0)
+ *  UNIFIED COSMIC MESSAGE BUS Proxy (v3.0)
  * Replaces legacy BullMQ logic with pure Redis Streams to achieve <10ms 
  * internal propagation across the institutional cluster.
  */
@@ -24,7 +24,7 @@ export interface WhaleJobData {
 }
 
 /** 
- * Helper to add a job — now optimized for Redis Streams 
+ * Helper to add a job  now optimized for Redis Streams 
  */
 export async function addWhaleToQueue(data: WhaleJobData) {
   if (!redisClient || redisClient.__isMock) {
@@ -82,7 +82,7 @@ export async function addWhaleToQueue(data: WhaleJobData) {
     const results = await pipeline.exec();
     return results?.[0]?.[1] || null;
   } catch (err: any) {
-    console.error(`[StreamProxy] 💀 Failed to enqueue event ${data.hash}:`, err.message);
+    console.error(`[StreamProxy]  Failed to enqueue event ${data.hash}:`, err.message);
     return null;
   }
 }

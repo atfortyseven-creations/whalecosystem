@@ -9,7 +9,7 @@ import { Database, ShieldCheck } from 'lucide-react';
 
 export default function ApiKeysDashboard() {
     // User state - derived from auth
-    const userTier: any = 'PRO'; // Sovereign string tier — no Prisma enum dependency
+    const userTier: any = 'PRO'; // System string tier  no Prisma enum dependency
     
     const initialKeys = [
         {

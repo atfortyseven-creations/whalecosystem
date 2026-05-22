@@ -20,7 +20,7 @@ export default function TermsOfService() {
                     </p>
 
                     <div className="bg-red-600/10 border border-red-500/30 p-4 rounded-lg">
-                        <h4 className="font-bold text-red-400 mb-2">⚠️ Important Notice</h4>
+                        <h4 className="font-bold text-red-400 mb-2">️ Important Notice</h4>
                         <p className="text-sm">By using this Platform, you acknowledge that cryptocurrency trading and DeFi activities involve significant financial risk. You may lose all invested funds. We do not provide investment advice.</p>
                     </div>
                 </section>
@@ -32,28 +32,28 @@ export default function TermsOfService() {
 
                     <div className="grid md:grid-cols-2 gap-4">
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">🔐 Zero-Knowledge Identity</h4>
+                            <h4 className="font-bold mb-2"> Zero-Knowledge Identity</h4>
                             <p className="text-sm text-white/70">Privacy-preserving identity verification using ZK-proofs and biometric authentication.</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">💼 Multi-Chain Wallet</h4>
+                            <h4 className="font-bold mb-2"> Multi-Chain Wallet</h4>
                             <p className="text-sm text-white/70">Self-custody wallet supporting Ethereum, Base, Polygon, Arbitrum, and Optimism.</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">📊 Institutional Matrix</h4>
+                            <h4 className="font-bold mb-2"> Institutional Grid</h4>
                             <p className="text-sm text-white/70">Professional trading interface with real-time data for 30+ crypto pairs (demo mode).</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h4 className="font-bold mb-2">📈 Portfolio Analytics</h4>
+                            <h4 className="font-bold mb-2"> Portfolio Analytics</h4>
                             <p className="text-sm text-white/70">Real-time blockchain analytics powered by Alchemy API.</p>
                         </div>
                     </div>
 
                     <div className="bg-yellow-600/10 border border-yellow-500/30 p-4 rounded-lg mt-4">
-                        <h4 className="font-bold text-yellow-400 mb-2">💡 Demo Mode vs Production</h4>
+                        <h4 className="font-bold text-yellow-400 mb-2"> Demo Mode vs Production</h4>
                         <p className="text-sm">Trading features currently operate in <strong>DEMO MODE</strong> with simulated funds. Real trading requires explicit wallet connection and user confirmation for each transaction. We never have custody of your funds.</p>
                     </div>
                 </section>
@@ -75,13 +75,13 @@ export default function TermsOfService() {
                     <p className="mb-4">Our services are <strong>NOT available</strong> to users in the following jurisdictions:</p>
 
                     <div className="bg-red-600/10 border border-red-500/30 p-4 rounded-lg">
-                        <h4 className="font-bold text-red-400 mb-2">🚫 Restricted Territories</h4>
+                        <h4 className="font-bold text-red-400 mb-2"> Restricted Territories</h4>
                         <ul className="text-sm space-y-1">
-                            <li>• United States and its territories</li>
-                            <li>• North Korea, Iran, Syria, Cuba</li>
-                            <li>• Crimea, Donetsk, Luhansk regions</li>
-                            <li>• Any jurisdiction where cryptocurrency services are prohibited</li>
-                            <li>• OFAC-sanctioned countries and territories</li>
+                            <li> United States and its territories</li>
+                            <li> North Korea, Iran, Syria, Cuba</li>
+                            <li> Crimea, Donetsk, Luhansk regions</li>
+                            <li> Any jurisdiction where cryptocurrency services are prohibited</li>
+                            <li> OFAC-sanctioned countries and territories</li>
                         </ul>
                     </div>
 
@@ -113,7 +113,7 @@ export default function TermsOfService() {
                     </ul>
 
                     <div className="bg-red-600/10 border border-red-500/30 p-4 rounded-lg mt-4">
-                        <h4 className="font-bold text-red-400 mb-2">🔑 Private Key Responsibility</h4>
+                        <h4 className="font-bold text-red-400 mb-2"> Private Key Responsibility</h4>
                         <p className="text-sm">We do NOT store your private keys, seed phrases, or passwords. If you lose them, <strong>we CANNOT recover your wallet or funds</strong>. This is a fundamental principle of self-custody.</p>
                     </div>
                 </section>
@@ -125,28 +125,28 @@ export default function TermsOfService() {
 
                     <div className="grid md:grid-cols-2 gap-3">
                         <div className="bg-red-600/5 p-3 rounded-lg border border-red-500/20">
-                            <p className="text-sm">❌ Money laundering or terrorist financing</p>
+                            <p className="text-sm"> Money laundering or terrorist financing</p>
                         </div>
                         <div className="bg-red-600/5 p-3 rounded-lg border border-red-500/20">
-                            <p className="text-sm">❌ Fraud, scams, or Ponzi schemes</p>
+                            <p className="text-sm"> Fraud, scams, or Ponzi schemes</p>
                         </div>
                         <div className="bg-red-600/5 p-3 rounded-lg border border-red-500/20">
-                            <p className="text-sm">❌ Market manipulation or wash trading</p>
+                            <p className="text-sm"> Market manipulation or wash trading</p>
                         </div>
                         <div className="bg-red-600/5 p-3 rounded-lg border border-red-500/20">
-                            <p className="text-sm">❌ Hacking or unauthorized access attempts</p>
+                            <p className="text-sm"> Hacking or unauthorized access attempts</p>
                         </div>
                         <div className="bg-red-600/5 p-3 rounded-lg border border-red-500/20">
-                            <p className="text-sm">❌ Violating sanctions or embargoes</p>
+                            <p className="text-sm"> Violating sanctions or embargoes</p>
                         </div>
                         <div className="bg-red-600/5 p-3 rounded-lg border border-red-500/20">
-                            <p className="text-sm">❌ Infringing intellectual property rights</p>
+                            <p className="text-sm"> Infringing intellectual property rights</p>
                         </div>
                         <div className="bg-red-600/5 p-3 rounded-lg border border-red-500/20">
-                            <p className="text-sm">❌ Distributing malware or viruses</p>
+                            <p className="text-sm"> Distributing malware or viruses</p>
                         </div>
                         <div className="bg-red-600/5 p-3 rounded-lg border border-red-500/20">
-                            <p className="text-sm">❌ Circumventing security measures</p>
+                            <p className="text-sm"> Circumventing security measures</p>
                         </div>
                     </div>
 
@@ -160,7 +160,7 @@ export default function TermsOfService() {
                     <h2 className="text-3xl font-bold mb-4">6. Trading Risk Disclosures</h2>
 
                     <div className="bg-red-600/10 border border-red-500/30 p-6 rounded-lg">
-                        <h4 className="font-bold text-red-400 mb-4">⚠️ CRITICAL: READ BEFORE TRADING</h4>
+                        <h4 className="font-bold text-red-400 mb-4">️ CRITICAL: READ BEFORE TRADING</h4>
                         
                         <div className="space-y-4 text-sm">
                             <p className="font-bold">Trading cryptocurrencies involves substantial risk of loss. You should only trade with funds you can afford to lose entirely.</p>
@@ -180,7 +180,7 @@ export default function TermsOfService() {
                             </div>
 
                             <div className="bg-black/30 p-3 rounded">
-                                <p className="font-bold">Past Performance ≠ Future Results</p>
+                                <p className="font-bold">Past Performance  Future Results</p>
                                 <p className="text-xs mt-1">Historical prices and charts do not predict future performance. All trading decisions are your sole responsibility.</p>
                             </div>
                         </div>
@@ -188,7 +188,7 @@ export default function TermsOfService() {
 
                     <h3 className="text-2xl font-bold mb-3 mt-6">6.1. No Investment Advice</h3>
                     <p className="mb-4">
-                        Whale Alert Network is a <strong>technology platform</strong>, not a financial advisor or investment advisor. We provide tools, data, and infrastructure—not recommendations or advice.
+                        Whale Alert Network is a <strong>technology platform</strong>, not a financial advisor or investment advisor. We provide tools, data, and infrastructurenot recommendations or advice.
                     </p>
                     <ul className="list-disc pl-6 space-y-2">
                         <li>We do NOT recommend buying, selling, or holding any specific cryptocurrency</li>
@@ -232,7 +232,7 @@ export default function TermsOfService() {
                                 <td className="border border-white/10 p-3">FREE</td>
                             </tr>
                             <tr>
-                                <td className="border border-white/10 p-3">Institutional Matrix (Demo Mode)</td>
+                                <td className="border border-white/10 p-3">Institutional Grid (Demo Mode)</td>
                                 <td className="border border-white/10 p-3">FREE</td>
                             </tr>
                             <tr className="bg-white/5">
@@ -344,7 +344,7 @@ export default function TermsOfService() {
                         </ul>
 
                         <p className="mt-4 text-sm font-bold">
-                            OUR TOTAL LIABILITY FOR ANY CLAIM SHALL NOT EXCEED €100 OR THE AMOUNT YOU PAID US IN THE 12 MONTHS PRIOR TO THE CLAIM, WHICHEVER IS GREATER.
+                            OUR TOTAL LIABILITY FOR ANY CLAIM SHALL NOT EXCEED 100 OR THE AMOUNT YOU PAID US IN THE 12 MONTHS PRIOR TO THE CLAIM, WHICHEVER IS GREATER.
                         </p>
 
                         <p className="mt-4 text-xs text-white/70">
@@ -512,16 +512,16 @@ export default function TermsOfService() {
 
                 {/* Summary */}
                 <section className="bg-gradient-to-r from-red-600/20 to-orange-600/20 p-6 rounded-xl border border-white/10">
-                    <h2 className="text-2xl font-bold mb-4">📋 Key Points Summary</h2>
+                    <h2 className="text-2xl font-bold mb-4"> Key Points Summary</h2>
                     <ul className="space-y-2 text-sm">
-                        <li>✅ You must be 18+ and not in a restricted jurisdiction</li>
-                        <li>✅ You are responsible for your private keys and funds</li>
-                        <li>✅ Trading involves significant risk; you may lose everything</li>
-                        <li>✅ We provide technology, not investment advice</li>
-                        <li>✅ Platform is provided "as is" without warranties</li>
-                        <li>✅ Our liability is limited to the maximum extent permitted by law</li>
-                        <li>✅ Governed by Spanish law; disputes resolved in Spanish courts</li>
-                        <li>✅ We may modify these Terms with 30 days' notice</li>
+                        <li> You must be 18+ and not in a restricted jurisdiction</li>
+                        <li> You are responsible for your private keys and funds</li>
+                        <li> Trading involves significant risk; you may lose everything</li>
+                        <li> We provide technology, not investment advice</li>
+                        <li> Platform is provided "as is" without warranties</li>
+                        <li> Our liability is limited to the maximum extent permitted by law</li>
+                        <li> Governed by Spanish law; disputes resolved in Spanish courts</li>
+                        <li> We may modify these Terms with 30 days' notice</li>
                     </ul>
                 </section>
             </div>

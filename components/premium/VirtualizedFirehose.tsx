@@ -62,7 +62,7 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
 
     return (
         <div style={style} className="px-2 py-1">
-            {/* Pure CSS entry animation — zero JS overhead vs motion.div */}
+            {/* Pure CSS entry animation  zero JS overhead vs motion.div */}
             <div
                 className={`w-full h-full flex flex-col justify-center border-b border-[#E5E5E5] ${bgPulse} hover:bg-[#FAF9F6] bg-white cursor-pointer rounded-sm px-4 firehose-row-enter`}
             >
@@ -122,13 +122,13 @@ export function VirtualizedFirehose() {
     const [autoScroll, setAutoScroll] = useState(true);
     const [isMounted,  setIsMounted]  = useState(false);
     const [showJumpTop, setShowJumpTop] = useState(false);
-    // Throttle flag — prevents scrollTo() from firing on every individual event
+    // Throttle flag  prevents scrollTo() from firing on every individual event
     const scrollThrottleRef = useRef(false);
 
     // Dynamic imports SSR guard
     useEffect(() => { setIsMounted(true); }, []);
 
-    // PERF: Throttled auto-scroll — coalesce rapid store updates into a single scroll
+    // PERF: Throttled auto-scroll  coalesce rapid store updates into a single scroll
     useEffect(() => {
         if (!autoScroll || !listRef.current || whaleEvents.length === 0) return;
         if (scrollThrottleRef.current) return;

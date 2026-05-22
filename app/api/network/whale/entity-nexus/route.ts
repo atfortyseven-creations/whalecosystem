@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { walletIntelligenceService } from '@/lib/wallet/WalletIntelligenceService';
+import { walletAnalyticsService } from '@/lib/wallet/WalletAnalyticsService';
 
 interface NexusNode {
   id: string;
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
   try {
     if (isEVM) {
       console.log(`[EntityNexus] Building EVM graph for ${address}`);
-      const intel = await walletIntelligenceService.getFullIntelligence(address, false, true);
+      const intel = await walletAnalyticsService.getFullAnalytics(address, false, true);
       
       const nodes: NexusNode[] = [];
       const links: NexusLink[] = [];

@@ -76,7 +76,7 @@ export default function FiatCardIssuance({ walletAddress, balance }: { walletAdd
 
     // Helper to format card number
     const formatCardNumber = (num: string) => {
-        if (!num) return "•••• •••• •••• 4288";
+        if (!num) return "   4288";
         return `${num.slice(0, 4)} ${num.slice(4, 8)} ${num.slice(8, 12)} ${num.slice(12)}`;
     };
 
@@ -132,7 +132,7 @@ export default function FiatCardIssuance({ walletAddress, balance }: { walletAdd
                             
                             <div>
                                 <div className="font-mono text-lg md:text-xl tracking-[0.2em] mb-4 opacity-80">
-                                    {cardData ? formatCardNumber(cardData.cardNumber) : "•••• •••• •••• 4288"}
+                                    {cardData ? formatCardNumber(cardData.cardNumber) : "   4288"}
                                 </div>
                                 <div className="flex justify-between items-end">
                                     <div>
@@ -141,7 +141,7 @@ export default function FiatCardIssuance({ walletAddress, balance }: { walletAdd
                                     </div>
                                     <div className="text-right">
                                         <div className="text-[10px] uppercase tracking-widest opacity-50 mb-1">CVV</div>
-                                        <div className="font-mono font-bold text-lg">{cardData?.cvv || "•••"}</div>
+                                        <div className="font-mono font-bold text-lg">{cardData?.cvv || ""}</div>
                                     </div>
                                 </div>
                             </div>
@@ -278,7 +278,7 @@ export default function FiatCardIssuance({ walletAddress, balance }: { walletAdd
                                             </button>
                                             
                                             <button className="w-full py-4 bg-[#F5F5F7] text-black rounded-2xl font-bold text-lg flex items-center justify-center gap-3 hover:bg-gray-200 transition-colors">
-                                                <span className="text-2xl mb-1"></span> Add to Apple Wallet
+                                                <span className="text-2xl mb-1"></span> Add to Apple Wallet
                                             </button>
                                         </>
                                     ) : (

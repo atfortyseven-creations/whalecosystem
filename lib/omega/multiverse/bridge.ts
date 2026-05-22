@@ -10,7 +10,7 @@ export const useMultiverseBridge = () => {
      * @param data - The "WhaleAlert ID" state update payload
      */
     const teleportState = async (signer: any, destinationChain: string, data: string) => {
-        console.log("🌌 Engaging Multiverse Bridge to chain:", destinationChain);
+        console.log(" Engaging Multiverse Bridge to chain:", destinationChain);
 
         // 1. Build CCIP Message
         // In "God-Mode", we assume the contract handles the fee calculation (LINK or Native)
@@ -23,7 +23,7 @@ export const useMultiverseBridge = () => {
         
         await new Promise(r => setTimeout(r, 1500)); // Travel time equivalent to light speed ;)
         
-        console.log("✅ State Teleported.");
+        console.log(" State Teleported.");
         return "0xMessageId...";
     };
 

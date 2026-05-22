@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'snxAccountId and walletAddress are required' }, { status: 400 });
         }
 
-        // 🛡️ [SECURITY] Hard-bind to the authenticated SIWE user
+        // ️ [SECURITY] Hard-bind to the authenticated SIWE user
         if (walletAddress.toLowerCase() !== authUserId.toLowerCase()) {
              return NextResponse.json({ error: 'Wallet not associated with this session' }, { status: 403 });
         }

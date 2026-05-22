@@ -21,12 +21,12 @@ export default async function ForumGroupsPage() {
     });
     groupsData.TOTAL = total;
   } catch {
-    // tier column may not exist yet — silently show zero counts
+    // tier column may not exist yet  silently show zero counts
     // (run /api/admin/sync-db to apply schema and reload)
   }
 
   const groups = [
-    { id: 'ELITE',    label: 'Enterprise Members',    sub: 'Full platform access — all features unlocked',  count: groupsData.ELITE    },
+    { id: 'ELITE',    label: 'Enterprise Members',    sub: 'Full platform access  all features unlocked',  count: groupsData.ELITE    },
     { id: 'PRO',      label: 'Professional Members',  sub: 'Advanced analytics and real-time data access',  count: groupsData.PRO      },
     { id: 'STANDARD', label: 'Explorer Members',      sub: 'Market data and community access',               count: groupsData.STANDARD },
     { id: 'FREE',     label: 'Free Members',           sub: 'Forum and news access',                          count: groupsData.FREE     },

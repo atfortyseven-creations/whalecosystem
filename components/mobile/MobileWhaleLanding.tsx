@@ -83,7 +83,7 @@ export const MobileWhaleLanding = () => {
               {/* TITULO Y SUBTITULO MAESTRO */}
               <div className="text-center w-full max-w-sm mb-12">
                   <h1 className="text-4xl xs:text-5xl font-black uppercase tracking-tighter leading-[0.9] text-white">
-                     Sovereign<br/>
+                     System<br/>
                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2EA] to-white/70">
                        Terminal
                      </span>

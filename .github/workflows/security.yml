@@ -1,4 +1,4 @@
-# Sovereign Security CI Pipeline — Axiomas 461–465
+# System Security CI Pipeline  Axiomas 461465
 # Runs on every push and PR: npm audit, SBOM generation, SLSA provenance
 
 name: Security & Compliance
@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # Daily at 03:00 UTC — catch new CVEs on unchanged code
+    # Daily at 03:00 UTC  catch new CVEs on unchanged code
     - cron: '0 3 * * *'
 
 permissions:
@@ -18,7 +18,7 @@ permissions:
   id-token: write   # Required for SLSA provenance
 
 jobs:
-  # ── Job 1: Dependency Audit (Axioma 461) ─────────────────────────────────────
+  #  Job 1: Dependency Audit (Axioma 461) 
   dependency-audit:
     name: CVE Dependency Audit
     runs-on: ubuntu-latest
@@ -31,10 +31,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies (CI — no scripts)
+      - name: Install dependencies (CI  no scripts)
         run: npm ci --ignore-scripts
 
-      - name: npm audit — block on HIGH/CRITICAL
+      - name: npm audit  block on HIGH/CRITICAL
         run: |
           npm audit --audit-level=high --json > npm-audit-report.json || true
           node -e "
@@ -46,7 +46,7 @@ jobs:
               console.error('BLOCKED: ' + blocking + ' HIGH/CRITICAL vulnerabilities found.');
               process.exit(1);
             }
-            console.log('Audit passed — no HIGH/CRITICAL vulnerabilities.');
+            console.log('Audit passed  no HIGH/CRITICAL vulnerabilities.');
           "
 
       - name: Upload audit report
@@ -57,7 +57,7 @@ jobs:
           path: npm-audit-report.json
           retention-days: 90
 
-  # ── Job 2: SBOM Generation — CycloneDX (Axioma 462) ─────────────────────────
+  #  Job 2: SBOM Generation  CycloneDX (Axioma 462) 
   sbom:
     name: Generate SBOM (CycloneDX)
     runs-on: ubuntu-latest
@@ -96,7 +96,7 @@ jobs:
             sbom.json.sha256
           retention-days: 365
 
-  # ── Job 3: Type Check & Lint ──────────────────────────────────────────────────
+  #  Job 3: Type Check & Lint 
   quality:
     name: TypeScript & Lint
     runs-on: ubuntu-latest
@@ -123,7 +123,7 @@ jobs:
       - name: ESLint
         run: npm run lint
 
-  # ── Job 4: Unit Tests ─────────────────────────────────────────────────────────
+  #  Job 4: Unit Tests 
   test:
     name: Unit Tests (Vitest)
     runs-on: ubuntu-latest
@@ -152,7 +152,7 @@ jobs:
           path: coverage/
           retention-days: 30
 
-  # ── Job 5: Build Validation ───────────────────────────────────────────────────
+  #  Job 5: Build Validation 
   build:
     name: Next.js Production Build
     runs-on: ubuntu-latest

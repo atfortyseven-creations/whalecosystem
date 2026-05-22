@@ -8,7 +8,7 @@ import { safeRedisGet, safeRedisSet } from './redis/client';
 const CACHE_TTL = 15; // 15s in seconds for Redis
 
 /**
- * 🔥 BTC Detection Logic
+ *  BTC Detection Logic
  */
 function isBTCAddress(address: string) {
     return /^(1|3|bc1)[a-zA-Z0-9]{25,62}$/.test(address);
@@ -55,7 +55,7 @@ async function getBTCStats(address: string) {
 }
 
 /**
- * 🔥 LEGENDARY STATS ENGINE 🔥
+ *  LEGENDARY STATS ENGINE 
  * UNIFIED WITH PORTFOLIO SERVICE - FULL MULTI-CHAIN DATA
  * MORALIS-POWERED (via PortfolioService)
  */
@@ -72,22 +72,22 @@ export async function getLegendaryStats(address: string, forceDeep = false) {
     const cached = await safeRedisGet(cacheKey);
     
     if (!forceDeep && cached && cached !== 'TIMEOUT') {
-        console.log(`[LEGENDARY-STATS] 📦 Returning persistent Redis data for ${addrLower}`);
+        console.log(`[LEGENDARY-STATS]  Returning persistent Redis data for ${addrLower}`);
         try {
             const data = JSON.parse(cached);
             return { ...data, fromCache: true };
         } catch {
-            // Corrupted entry — re-fetch silently.
+            // Corrupted entry  re-fetch silently.
         }
     }
 
     try {
-        console.log(`[LEGENDARY-STATS] 🔍 Fetching ${forceDeep ? 'FORCED DEEP ' : 'MULTI-CHAIN '}data for ${addrLower}...`);
+        console.log(`[LEGENDARY-STATS]  Fetching ${forceDeep ? 'FORCED DEEP ' : 'MULTI-CHAIN '}data for ${addrLower}...`);
         
         let portfolio = await portfolioService.getMultiChainPortfolio(addrLower, [], forceDeep);
 
         if (!forceDeep && (!portfolio || portfolio.totalValueUsd === 0) && (addrLower.includes('.') || addrLower.length > 20)) {
-            console.log(`[LEGENDARY-STATS] 🐋 Suspected whale/ENS ${addrLower} returned $0. Triggering DEEP SCAN...`);
+            console.log(`[LEGENDARY-STATS]  Suspected whale/ENS ${addrLower} returned $0. Triggering DEEP SCAN...`);
             portfolio = await portfolioService.getMultiChainPortfolio(addrLower, [], true);
         }
 
@@ -139,11 +139,11 @@ export async function getLegendaryStats(address: string, forceDeep = false) {
         };
         
         await safeRedisSet(cacheKey, JSON.stringify(result), 'EX', CACHE_TTL);
-        console.log(`[LEGENDARY-STATS] ✅ Unified data persisted: $${safeToFixed(totalValue, 2)} across ${portfolio.tokens.length} assets.`);
+        console.log(`[LEGENDARY-STATS]  Unified data persisted: $${safeToFixed(totalValue, 2)} across ${portfolio.tokens.length} assets.`);
         
         return result;
     } catch (e) {
-        console.error(`[LEGENDARY-STATS] ❌ UNIFICATION ERROR for ${addrLower}:`, e);
+        console.error(`[LEGENDARY-STATS]  UNIFICATION ERROR for ${addrLower}:`, e);
         if (cached && cached !== 'TIMEOUT') {
             try { return { ...JSON.parse(cached), fromCache: true, error: true }; } catch { /* ignore */ }
         }

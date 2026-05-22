@@ -30,7 +30,7 @@ export async function GET() {
 
         return NextResponse.json({ nonce });
     } catch (error) {
-        console.error('[NONCE-GENERATOR] ❌ Cryptographic fault:', error);
+        console.error('[NONCE-GENERATOR]  Cryptographic fault:', error);
         return NextResponse.json({ error: 'Failed to generate cryptographic challenge' }, { status: 500 });
     }
 }

@@ -390,8 +390,8 @@ USD
 814.28M
 USD
 22.74B
-Worldcoin
-WLD
+Identity
+AUTH
 0.23
 USD
 -2.80%
@@ -598,7 +598,7 @@ USD
 455.34M
 USD
 392.08M
-Artificial Superintelligence Alliance
+Artificial Superanalytics Alliance
 FET
 0.19
 USD
@@ -2470,7 +2470,7 @@ USD
 71.09M
 USD
 23.72M
-Matrixdock Gold
+Griddock Gold
 XAUM
 4,529
 USD

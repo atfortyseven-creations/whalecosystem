@@ -2,11 +2,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// ════════════════════════════════════════════════════════════════════
-// /api/network/whale/alert-stats — Real Alert Counter Statistics
+// 
+// /api/network/whale/alert-stats  Real Alert Counter Statistics
 // Counts actual whale events recorded in the Prisma DB + derives
 // live mempool activity from mempool.space
-// ════════════════════════════════════════════════════════════════════
+// 
 
 export const dynamic = 'force-dynamic';
 

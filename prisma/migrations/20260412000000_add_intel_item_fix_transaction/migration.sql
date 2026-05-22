@@ -1,11 +1,11 @@
--- ─────────────────────────────────────────────────────────────────────────────
+-- 
 -- Migration: 20260412000000_add_intel_item_fix_transaction
 -- Purpose: Create IntelItem table (missing from DB despite existing in schema)
 --          and add authUserId column to Transaction table.
 -- Errors fixed:
 --   P1009: table "public.IntelItem" does not exist
 --   P2022: column "Transaction.authUserId" does not exist
--- ─────────────────────────────────────────────────────────────────────────────
+-- 
 
 -- Create IntelItem table (was in schema but never migrated)
 CREATE TABLE IF NOT EXISTS "IntelItem" (

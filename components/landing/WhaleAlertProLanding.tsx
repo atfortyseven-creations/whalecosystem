@@ -133,7 +133,7 @@ export function WhaleAlertProLanding() {
           >
             <div className="flex items-center justify-center gap-4 mb-8">
               <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-cyan-500" />
-              <span className="text-cyan-400 font-mono text-[10px] tracking-[0.5em] uppercase">Whale Alert Network Intelligence</span>
+              <span className="text-cyan-400 font-mono text-[10px] tracking-[0.5em] uppercase">Whale Alert Network Analytics</span>
               <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-cyan-500" />
             </div>
             
@@ -145,7 +145,7 @@ export function WhaleAlertProLanding() {
             <p className="text-lg md:text-2xl text-white/50 font-light max-w-3xl mx-auto mb-12 leading-relaxed tracking-tight">
               Detect. Decrypt. Dominate. <br />
               The world's most immersive real-time <span className="text-white font-medium">Whale Observation System</span>, 
-              built for the elite 1% of the Web3 sovereign era.
+              built for the elite 1% of the Web3 system era.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
@@ -215,7 +215,7 @@ export function WhaleAlertProLanding() {
                    </h2>
                    <p className="text-xl text-white/40 leading-relaxed font-light mb-10">
                       Our proprietary scanner threads penetrate every liquidity pool in real-time. 
-                      Not just transfers—we detect the <span className="text-white">intents</span> of the world's most powerful wallets before they hit the order book.
+                      Not just transferswe detect the <span className="text-white">intents</span> of the world's most powerful wallets before they hit the order book.
                    </p>
                    <div className="grid grid-cols-2 gap-8">
                       <div>
@@ -361,7 +361,7 @@ export function WhaleAlertProLanding() {
               </h3>
               <p className="text-xl text-white/40 mb-12 font-light">
                 Join the network that defines the frontier. <br />
-                Whale Alert Network Pro is more than a tool—it's your absolute vision into the cosmic flow of value.
+                Whale Alert Network Pro is more than a toolit's your absolute vision into the cosmic flow of value.
               </p>
               <Link href="/vip">
                 <motion.button

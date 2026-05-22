@@ -34,7 +34,7 @@ const BINANCE_MAP: Record<string, string> = {
   'SOL': 'SOLUSDT', 'XRP': 'XRPUSDT', 'ADA': 'ADAUSDT', 'AVAX': 'AVAXUSDT', 'DOT': 'DOTUSDT',
   'LINK': 'LINKUSDT', 'UNI': 'UNIUSDT', 'BNB': 'BNBUSDT', 'LTC': 'LTCUSDT', 'BCH': 'BCHUSDT',
   'XLM': 'XLMUSDT', 'ALGO': 'ALGOUSDT', 'FIL': 'FILUSDT', 'FET': 'FETUSDT', 'RNDR': 'RNDRUSDT',
-  'NEAR': 'NEARUSDT', 'INJ': 'INJUSDT', 'PEPE': 'PEPEUSDT', 'WLD': 'WLDUSDT', 'TAO': 'TAOUSDT'
+  'NEAR': 'NEARUSDT', 'INJ': 'INJUSDT', 'PEPE': 'PEPEUSDT', 'AUTH': 'AUTHUSDT', 'TAO': 'TAOUSDT'
 };
 
 export async function GET(request: NextRequest) {

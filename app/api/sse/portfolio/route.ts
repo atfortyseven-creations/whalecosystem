@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 
 /**
  * Server-Sent Events (SSE) for Portfolio Updates
- * Enables real-time server→client push notifications
+ * Enables real-time serverclient push notifications
  */
 
 // In-memory event emitter for portfolio events

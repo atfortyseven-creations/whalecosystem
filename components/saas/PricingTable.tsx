@@ -109,7 +109,7 @@ export function PricingTable() {
                                 </h3>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-4xl font-mono font-bold text-white tracking-tight">
-                                        €{isAnnual ? plan.priceMetrics.annual : plan.priceMetrics.monthly}
+                                        {isAnnual ? plan.priceMetrics.annual : plan.priceMetrics.monthly}
                                     </span>
                                     <span className="text-white/40 text-[10px] font-mono uppercase tracking-widest">
                                         / {isAnnual ? 'YR' : 'MO'}
@@ -123,7 +123,7 @@ export function PricingTable() {
                                     <div className="flex justify-between items-center text-[13px] py-2 border-b border-white/[0.02]">
                                         <span className="text-white/50 tracking-wide">Daily Requests</span>
                                         <span className="text-white font-mono font-medium">
-                                            {plan.limits.requestsPerDay === -1 ? '∞' : plan.limits.requestsPerDay.toLocaleString()}
+                                            {plan.limits.requestsPerDay === -1 ? '' : plan.limits.requestsPerDay.toLocaleString()}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center text-[13px] py-2 border-b border-white/[0.02]">

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-console.log('🤖 Building Extension...');
+console.log(' Building Extension...');
 
 const appApiDir = path.join(__dirname, '../app/api');
 const backupApiDir = path.join(__dirname, '../api_backup');
@@ -15,14 +15,14 @@ let movedActions = false;
 try {
     // 1. Temporarily move API routes
     if (fs.existsSync(appApiDir)) {
-        console.log('📦 Stashing API routes...');
+        console.log(' Stashing API routes...');
         fs.renameSync(appApiDir, backupApiDir);
         movedApi = true;
     }
 
     // 2. Temporarily move Server Actions
     if (fs.existsSync(srcActionsDir)) {
-        console.log('📦 Stashing Server Actions...');
+        console.log(' Stashing Server Actions...');
         fs.renameSync(srcActionsDir, backupActionsDir);
         movedActions = true;
     }
@@ -36,11 +36,11 @@ try {
 } finally {
     // 4. Restore everything
     if (movedApi && fs.existsSync(backupApiDir)) {
-        console.log('♻️ Restoring API routes...');
+        console.log('️ Restoring API routes...');
         fs.renameSync(backupApiDir, appApiDir);
     }
     if (movedActions && fs.existsSync(backupActionsDir)) {
-        console.log('♻️ Restoring Server Actions...');
+        console.log('️ Restoring Server Actions...');
         fs.renameSync(backupActionsDir, srcActionsDir);
     }
 }
@@ -51,7 +51,7 @@ const newNextDir = path.join(outDir, 'next');
 
 // 4. Rename _next to next (Chrome Extensions hate underscores)
 if (fs.existsSync(nextDir)) {
-    console.log('🧹 Sanitizing _next folder...');
+    console.log(' Sanitizing _next folder...');
     fs.renameSync(nextDir, newNextDir);
 }
 
@@ -69,7 +69,7 @@ function updateHtmlFiles(dir) {
             if (content.includes('/_next/')) {
                 content = content.replace(/\/_next\//g, '/next/');
                 fs.writeFileSync(filePath, content);
-                console.log(`✨ Patched ${file}`);
+                console.log(` Patched ${file}`);
             }
         }
     }
@@ -77,4 +77,4 @@ function updateHtmlFiles(dir) {
 
 updateHtmlFiles(outDir);
 
-console.log('✅ Extension Build Complete! Load "out" folder in Chrome.');
+console.log(' Extension Build Complete! Load "out" folder in Chrome.');

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useVIPIntelligence } from "@/hooks/useVIPIntelligence";
+import { useVIPAnalytics } from "@/hooks/useVIPAnalytics";
 import { Activity, Clock, ShieldCheck, Cpu } from "lucide-react";
 import { Network } from "lucide-react";
 
 export function LegendaryDownhead() {
-  const { stats } = useVIPIntelligence();
+  const { stats } = useVIPAnalytics();
   const [latency, setLatency] = useState(0);
 
   useEffect(() => {

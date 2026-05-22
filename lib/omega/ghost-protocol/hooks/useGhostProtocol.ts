@@ -33,11 +33,11 @@ export const useGhostProtocol = () => {
                 zkeyPath
             );
 
-            console.log("👻 Ghost Protocol: Proof Generated", proof);
+            console.log(" Ghost Protocol: Proof Generated", proof);
             setProofData({ proof, publicSignals });
             return { proof, publicSignals };
         } catch (err: any) {
-            console.error("👻 Ghost Protocol: Proving Failed", err);
+            console.error(" Ghost Protocol: Proving Failed", err);
             setError(err.message || "Proving failed");
             throw err;
         } finally {

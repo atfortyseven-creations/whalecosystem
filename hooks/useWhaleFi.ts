@@ -2,7 +2,7 @@ import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { parseEther, erc20Abi, maxUint256 } from "viem";
 
 // ABIs Mínimos
-const MOCK_WLD_ABI = [
+const MOCK_AUTH_ABI = [
     { name: "faucet", type: "function", stateMutability: "nonpayable", inputs: [], outputs: [] },
     { name: "balanceOf", type: "function", stateMutability: "view", inputs: [{ name: "", type: "address" }], outputs: [{ name: "", type: "uint256" }] }
 ] as const;
@@ -20,7 +20,7 @@ const WHALEFI_ABI = [
 ] as const;
 
 const WHALEFI_ADDRESS = process.env.NEXT_PUBLIC_WHALEFI_CONTRACT as `0x${string}`;
-const WLD_TOKEN = process.env.NEXT_PUBLIC_WLD_TOKEN as `0x${string}`;
+const AUTH_TOKEN = process.env.NEXT_PUBLIC_AUTH_TOKEN as `0x${string}`;
 
 export function useWhaleFi() {
     const { address } = useAccount();
@@ -28,10 +28,10 @@ export function useWhaleFi() {
 
     // Lecturas de estado
     const { data: wldBalance } = useReadContract({
-        address: WLD_TOKEN, abi: MOCK_WLD_ABI, functionName: "balanceOf", args: [address!], query: { enabled: !!address }
+        address: AUTH_TOKEN, abi: MOCK_AUTH_ABI, functionName: "balanceOf", args: [address!], query: { enabled: !!address }
     });
     const { data: allowance } = useReadContract({
-        address: WLD_TOKEN, abi: erc20Abi, functionName: "allowance", args: [address!, WHALEFI_ADDRESS], query: { enabled: !!address }
+        address: AUTH_TOKEN, abi: erc20Abi, functionName: "allowance", args: [address!, WHALEFI_ADDRESS], query: { enabled: !!address }
     });
     const { data: votingPower } = useReadContract({
         address: WHALEFI_ADDRESS, abi: WHALEFI_ABI, functionName: "votingPower", args: [address!], query: { enabled: !!address }
@@ -39,7 +39,7 @@ export function useWhaleFi() {
 
     // 1. Obtener Fondos (Faucet)
     const claimFaucet = () => {
-        writeContract({ address: WLD_TOKEN, abi: MOCK_WLD_ABI, functionName: "faucet", args: [] });
+        writeContract({ address: AUTH_TOKEN, abi: MOCK_AUTH_ABI, functionName: "faucet", args: [] });
     };
 
     // 2. Ejecutar Zap (Approve automático)
@@ -47,7 +47,7 @@ export function useWhaleFi() {
         const wei = parseEther(amount);
         // Simple logic: if allowance is insufficient, approve. Otherwise, zap.
         if (!allowance || allowance < wei) {
-            writeContract({ address: WLD_TOKEN, abi: erc20Abi, functionName: "approve", args: [WHALEFI_ADDRESS, maxUint256] });
+            writeContract({ address: AUTH_TOKEN, abi: erc20Abi, functionName: "approve", args: [WHALEFI_ADDRESS, maxUint256] });
         } else {
             writeContract({ address: WHALEFI_ADDRESS, abi: WHALEFI_ABI, functionName: "zap", args: [wei] });
         }

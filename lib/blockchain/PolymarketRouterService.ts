@@ -33,7 +33,7 @@ export class PolymarketRouterService {
         },
     ] as const;
 
-    // Real Gnosis FPMM ABI — `buy` is the entrypoint for purchasing outcome shares
+    // Real Gnosis FPMM ABI  `buy` is the entrypoint for purchasing outcome shares
     private readonly FPMM_ABI = [
         {
             inputs: [
@@ -81,7 +81,7 @@ export class PolymarketRouterService {
      * This sends USDC to the market and receives outcome shares (YES or NO tokens).
      *
      * @param fpmmAddress - The market's FPMM address
-     * @param direction - 'YES' → outcomeIndex 0, 'NO' → outcomeIndex 1
+     * @param direction - 'YES'  outcomeIndex 0, 'NO'  outcomeIndex 1
      * @param usdcAmountHuman - Human-readable USDC amount
      * @param slippagePct - Slippage tolerance in percent (default 2%)
      */

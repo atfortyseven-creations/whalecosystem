@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// No Clerk dependency — wallet identity comes from SIWE wagmi
+// No Clerk dependency  wallet identity comes from SIWE wagmi
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { 
@@ -343,7 +343,7 @@ export default function MetaMaskWalletView() {
                                                         value={revealPassword}
                                                         onChange={(e) => setRevealPassword(e.target.value)}
                                                         className="w-full bg-black/[0.02] border border-black/10 rounded-2xl px-4 py-4 text-black outline-none focus:border-black/40 transition-all font-mono"
-                                                        placeholder="••••••••"
+                                                        placeholder=""
                                                     />
                                                 </div>
                                             </div>

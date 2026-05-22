@@ -116,7 +116,7 @@ export function NewPairsTable() {
     const lastRefresh = new Date(); // To be controlled by react-query internally in the future
 
     const fmt = (n: number | null | undefined) => {
-        if (n == null || isNaN(n)) return '—';
+        if (n == null || isNaN(n)) return '';
         if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
         if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
         if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
@@ -125,7 +125,7 @@ export function NewPairsTable() {
 
     const pctColor = (v: number) => v >= 0 ? 'text-[#00C076]' : 'text-[#FF3B30]';
     const pctFmt   = (v: number | null | undefined) => {
-        if (v == null || isNaN(v)) return '—';
+        if (v == null || isNaN(v)) return '';
         return `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
     };
 
@@ -157,14 +157,14 @@ export function NewPairsTable() {
         <div className="w-full h-full min-h-0 p-0 flex flex-col overflow-hidden text-[#050505] font-sans">
             <div className="flex-1 w-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm flex flex-col min-h-0">
 
-            {/* ── Toolbar ── */}
+            {/*  Toolbar  */}
             <div className="shrink-0 px-4 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
                 {/* Search */}
                 <div className="relative flex-1 min-w-[180px] max-w-xs">
                     <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]" />
                     <input
                         value={search} onChange={e => setSearch(e.target.value)}
-                        placeholder="Symbol, chain…"
+                        placeholder="Symbol, chain"
                         className="w-full bg-white border border-[#E5E5E5] rounded-lg pl-8 pr-3 py-1.5 text-[11px] font-mono text-[#050505] outline-none focus:border-[#050505] transition-all"
                     />
                 </div>
@@ -195,7 +195,7 @@ export function NewPairsTable() {
                 </div>
             </div>
 
-            {/* ── Network Filter Row (Fix B) ── */}
+            {/*  Network Filter Row (Fix B)  */}
             <div className="shrink-0 px-4 py-2 border-b border-[#E5E5E5] bg-white flex items-center gap-2 flex-wrap">
                 <span className="text-[9px] font-black text-[#888888] uppercase tracking-widest mr-1">Network:</span>
                 {chains.map(c => (
@@ -210,7 +210,7 @@ export function NewPairsTable() {
                 ))}
             </div>
 
-            {/* ── Table ── */}
+            {/*  Table  */}
             {/* outer scroll: horizontal only */}
             <div className="flex-1 overflow-x-auto relative min-h-0 flex flex-col">
                 {/* min-width wrapper */}
@@ -355,8 +355,8 @@ export function NewPairsTable() {
                                                         {p.security.honeypotRisk && <AlertTriangle size={9} className="text-[#FF9500]" />}
                                                     </div>
                                                     <div className="flex gap-1.5 justify-end mt-1">
-                                                        {security.lpBurned     && <span className="text-[7px] font-black text-[#00C076]">LP✓</span>}
-                                                        {security.mintRevoked  && <span className="text-[7px] font-black text-[#00C076]">MINT✓</span>}
+                                                        {security.lpBurned     && <span className="text-[7px] font-black text-[#00C076]">LP</span>}
+                                                        {security.mintRevoked  && <span className="text-[7px] font-black text-[#00C076]">MINT</span>}
                                                         {(taxes.buy || 0)  > 0 && <span className="text-[7px] font-bold text-[#888888]">B:{taxes.buy}%</span>}
                                                         {(taxes.sell || 0) > 0 && <span className="text-[7px] font-bold text-[#888888]">S:{taxes.sell}%</span>}
                                                     </div>
@@ -371,7 +371,7 @@ export function NewPairsTable() {
                 </div>
             </div>
 
-            {/* ── Status Footer ── */}
+            {/*  Status Footer  */}
             <div className="shrink-0 px-5 py-2.5 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em]">
                 <span>{filtered.length} PAIRS · ON-CHAIN VERIFIED</span>
                 <span className="font-mono text-[#050505]/40 tracking-widest">WAN SECURITY ENGINE</span>

@@ -52,7 +52,7 @@ export const HeikinAshiChart = memo(({
     const { candles, netBuy, netSell, netTransfer, nowIndex = -1 } = useMemo(() => {
         if (!data.length) return { candles: [], netBuy: 0, netSell: 0, netTransfer: 0 };
 
-        // 🛡️ [DATA PRECISION] 1-Minute Wall-Clock Aligned Binning
+        // ️ [DATA PRECISION] 1-Minute Wall-Clock Aligned Binning
         const binCount = 60; // 60 minutes of history
         const intervalMs = 60000; // 1 minute
         const now = Date.now();
@@ -85,13 +85,13 @@ export const HeikinAshiChart = memo(({
             });
 
             const total = buy + sell + trans || (i === binCount - 1 ? 0.01 : 0); // Active candle baseline
-            // 🚀 [TACTICAL VOLATILITY] Increased multiplier from 10 to 55 for aggressive signal detection
+            //  [TACTICAL VOLATILITY] Increased multiplier from 10 to 55 for aggressive signal detection
             const impact = total > 0 ? ((buy - sell) / Math.max(total, 0.01)) * 55 : 0;
             const newClose = Math.max(5, Math.min(95, haClose + impact));
 
             const open = (haOpen + haClose) / 2;
             const close = (open + newClose + Math.max(newClose, open) + Math.min(newClose, open)) / 4;
-            // 📍 [VISUAL AMPLIFICATION] Widened wick range for better readability
+            //  [VISUAL AMPLIFICATION] Widened wick range for better readability
             const high = Math.min(98, Math.max(open, close) + Math.abs(impact) * 0.8);
             const low = Math.max(2, Math.min(open, close) - Math.abs(impact) * 0.8);
 
@@ -108,7 +108,7 @@ export const HeikinAshiChart = memo(({
         const trimStart = firstNonEmpty > 0 ? Math.max(0, firstNonEmpty - 3) : 0;
         const trimmedCandles = processedCandles.slice(trimStart);
         
-        // 📍 [CLARITY MAP] Calculate relative position of "NOW"
+        //  [CLARITY MAP] Calculate relative position of "NOW"
         const nowIdx = Math.floor((endOfCurrentMinute - startOfWindow) / intervalMs) - trimStart;
 
         return { candles: trimmedCandles, netBuy: nb, netSell: ns, netTransfer: nt, nowIndex: nowIdx };
@@ -123,7 +123,7 @@ export const HeikinAshiChart = memo(({
         const wickH = c.high - c.low;
         const color = COLORS[c.type as keyof typeof COLORS];
         
-        // 🧠 [REAL CODE VIBRATION] Micro-oscillation tied to volume intensity
+        //  [REAL CODE VIBRATION] Micro-oscillation tied to volume intensity
         // Higher volume = more "visual pressure"
         const vibrationScale = c.volume > 0 ? Math.min(1.05, 1 + (c.volume / 1000000) * 0.01) : 1;
         const activeClass = i === candles.length - 1 ? 'animate-pulse' : '';
@@ -150,7 +150,7 @@ export const HeikinAshiChart = memo(({
                     className={`absolute rounded-full z-10 ${isLarge ? 'w-1.5 lg:w-3' : 'w-1 lg:w-2'}`}
                     style={{ 
                         backgroundColor: color, 
-                        // 📏 [VISIBILITY WALL] Minimum height increased for ultra-premium visibility
+                        //  [VISIBILITY WALL] Minimum height increased for ultra-premium visibility
                         height: `${Math.max(isLarge ? 4 : 3, bodyH)}%`, 
                         bottom: `${bodyBot}%`, 
                         boxShadow: isLarge ? `0 0 15px ${color}60` : 'none',
@@ -222,7 +222,7 @@ export const HeikinAshiChart = memo(({
         <div onClick={onClick} className="relative w-full h-full flex flex-col bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-slate-200 group/chart">
             <div className="absolute inset-0 bg-white pointer-events-none" />
             <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-white/80 backdrop-blur-md relative z-10">
-                <span className="text-[12px] font-mono font-black text-slate-500 uppercase tracking-[0.3em]">{symbol} / High-Fidelity Matrix</span>
+                <span className="text-[12px] font-mono font-black text-slate-500 uppercase tracking-[0.3em]">{symbol} / High-Fidelity Grid</span>
                 <div className="flex items-center gap-3 sm:gap-6 text-[9px] sm:text-[11px] font-black uppercase tracking-widest overflow-hidden">
                    <div className="hidden sm:flex items-center gap-2 mr-4 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-100 shrink-0">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
@@ -257,13 +257,13 @@ export const HeikinAshiChart = memo(({
                         <div className="absolute top-4 left-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Volume Profile</div>
                         {candles.map((c, i) => {
                             const maxV = Math.max(...candles.map(x => x.volume), 1);
-                            // 📊 [LOG SCALE FEEL] Volume bars use sqrt for more balanced profile visibility
+                            //  [LOG SCALE FEEL] Volume bars use sqrt for more balanced profile visibility
                             const barH = c.volume > 0 ? Math.max(5, (c.volume / maxV) * 90) : 0;
                             return <div key={i} className="flex-1 rounded-t-[4px] transition-all hover:bg-cyan-500/30" style={{ height: `${barH}%`, backgroundColor: COLORS[c.type as keyof typeof COLORS] + '80' }} />;
                         })}
                     </div>
 
-                    {/* Momentum Matrix */}
+                    {/* Momentum Grid */}
                     <div className="bg-white border border-slate-200 rounded-3xl p-8 flex flex-col justify-center gap-5 shadow-sm">
                         <div className="flex justify-between items-end">
                             <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Institutional Conviction</span>

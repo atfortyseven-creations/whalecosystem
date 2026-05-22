@@ -6,8 +6,8 @@ const config: Config = {
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
     ],
-    // Sovereign: darkMode is intentionally disabled platform-wide.
-    // Using a phantom class that is never applied — dark: variants in JSX
+    // System: darkMode is intentionally disabled platform-wide.
+    // Using a phantom class that is never applied  dark: variants in JSX
     // are inert. The light-mode firewall in globals.css also overrides any
     // accidental .dark injection from AppKit/Wagmi disconnect cycles.
     darkMode: ['class', '.never-trigger-dark-mode-ever'],

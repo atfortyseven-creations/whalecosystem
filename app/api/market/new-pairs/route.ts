@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 
 export const revalidate = 0;
 
-// ── DexScreener endpoints ─────────────────────────────────────────────────────
+//  DexScreener endpoints 
 // Discovery: Latest token profiles (often very new/hype)
 const DS_PROFILES = 'https://api.dexscreener.com/token-profiles/latest/v1';
 // Recovery: Search for recent pairs across all chains
 const DS_SEARCH   = 'https://api.dexscreener.com/latest/dex/search?q=ETH%2FUSDT';
 
-// ── Map DexScreener pair to standard table shape ───────────────────────────────
+//  Map DexScreener pair to standard table shape 
 function mapDexPair(p: any, idx = 0) {
     const chainRaw = (p.chainId || p.chain || 'ethereum').toLowerCase();
     const chain =
@@ -64,7 +64,7 @@ function mapDexPair(p: any, idx = 0) {
     };
 }
 
-// ── Fetch metadata for an array of addresses found in profiles ─────────────────
+//  Fetch metadata for an array of addresses found in profiles 
 async function fetchEnrichedPairs(addresses: string[]): Promise<any[]> {
     if (addresses.length === 0) return [];
     try {

@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-    // [RESILIENCE] Never throw at module-level — this kills the server process.
+    // [RESILIENCE] Never throw at module-level  this kills the server process.
     // Routes that need MongoDB will handle null connections gracefully at request time.
     if (process.env.NODE_ENV === 'production') {
-        console.error('[MongoDB] ⚠️ MONGODB_URI not set. MongoDB-dependent routes will return 503.');
+        console.error('[MongoDB] ️ MONGODB_URI not set. MongoDB-dependent routes will return 503.');
         console.error('[MongoDB] Set MONGODB_URI in Railway dashboard to enable database features.');
     }
 }
@@ -38,7 +38,7 @@ async function connectMongoDB() {
         };
 
         cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-            console.log('✅ MongoDB Atlas Connected');
+            console.log(' MongoDB Atlas Connected');
             return mongoose;
         });
     }

@@ -19,7 +19,7 @@ export const useOracleDefense = () => {
     const consultOracle = async (txData: any): Promise<PredictionReport> => {
         setIsPredicting(true);
         try {
-            console.log("🔮 Oracle of Delphi: Peering into the future block...", txData);
+            console.log(" Oracle of Delphi: Peering into the future block...", txData);
 
             // Authentic Network Latency
             await new Promise(r => setTimeout(r, 800));

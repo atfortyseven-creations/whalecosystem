@@ -2,13 +2,13 @@ import { PrismaClient, Prisma } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // COSMIC ENTITY TYPE BRIDGE
 // The Prisma client was generated before CosmicEntity was added to the schema.
 // This type declaration makes the TypeScript compiler aware of prisma.cosmicEntity
 // so that all forge services compile correctly right now.
 // Once `npx prisma generate` is run the generated types supersede this cast.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 type CosmicEntityRecord = {
   id: string;
@@ -73,14 +73,14 @@ type CosmicEntityDelegate = {
   }>;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // WALLET INTELLIGENCE TYPE BRIDGE
-// WalletIntelligence was added to schema.prisma but npx prisma generate
+// WalletAnalytics was added to schema.prisma but npx prisma generate
 // has not been run yet. This bridge makes the TypeScript compiler aware of
-// prisma.walletIntelligence immediately, without regenerating the client.
-// ─────────────────────────────────────────────────────────────────────────────
+// prisma.walletAnalytics immediately, without regenerating the client.
+// 
 
-type WalletIntelligenceRecord = {
+type WalletAnalyticsRecord = {
   id: string;
   address: string;
   forensics: Prisma.JsonValue | null;
@@ -89,23 +89,23 @@ type WalletIntelligenceRecord = {
   createdAt: Date;
 };
 
-type WalletIntelligenceDelegate = {
+type WalletAnalyticsDelegate = {
   findMany(args?: {
     where?: Partial<{ address: string | { in: string[] }; category: string }>;
-    select?: Partial<Record<keyof WalletIntelligenceRecord, boolean>>;
-    orderBy?: Partial<Record<keyof WalletIntelligenceRecord, 'asc' | 'desc'>>;
+    select?: Partial<Record<keyof WalletAnalyticsRecord, boolean>>;
+    orderBy?: Partial<Record<keyof WalletAnalyticsRecord, 'asc' | 'desc'>>;
     take?: number;
     skip?: number;
-  }): Promise<Partial<WalletIntelligenceRecord>[]>;
+  }): Promise<Partial<WalletAnalyticsRecord>[]>;
   findUnique(args: {
     where: { id?: string; address?: string };
-    select?: Partial<Record<keyof WalletIntelligenceRecord, boolean>>;
-  }): Promise<Partial<WalletIntelligenceRecord> | null>;
+    select?: Partial<Record<keyof WalletAnalyticsRecord, boolean>>;
+  }): Promise<Partial<WalletAnalyticsRecord> | null>;
   upsert(args: {
     where: { address: string };
-    create: Partial<WalletIntelligenceRecord>;
-    update: Partial<WalletIntelligenceRecord>;
-  }): Promise<WalletIntelligenceRecord>;
+    create: Partial<WalletAnalyticsRecord>;
+    update: Partial<WalletAnalyticsRecord>;
+  }): Promise<WalletAnalyticsRecord>;
   count(args?: { where?: Partial<{ address: string; category: string }> }): Promise<number>;
 };
 
@@ -143,9 +143,9 @@ type VerificationCodeDelegate = {
 };
 
 /** PrismaClient augmented with models not yet reflected in the generated client */
-type SovereignPrismaClient = PrismaClient & {
+type SystemPrismaClient = PrismaClient & {
   cosmicEntity: CosmicEntityDelegate;
-  walletIntelligence: WalletIntelligenceDelegate;
+  walletAnalytics: WalletAnalyticsDelegate;
   notification: NotificationDelegate;
   verificationCode: VerificationCodeDelegate;
 };
@@ -157,7 +157,7 @@ function getProductionUrl(): string | undefined {
     try {
         const urlObj = new URL(rawUrl);
         
-        // ── Fallback: If we detect the public proxy domain, rewrite it to use the private internal domain ──
+        //  Fallback: If we detect the public proxy domain, rewrite it to use the private internal domain 
         if (urlObj.hostname.includes('proxy.rlwy.net')) {
             urlObj.hostname = 'postgres.railway.internal';
             urlObj.port = '5432';
@@ -186,7 +186,7 @@ function createPrismaClient(): PrismaClient {
             : ['query', 'error', 'warn'],
     });
 
-    // Sovereign error filter: suppress P1009 (table not in DB yet) which floods logs
+    // System error filter: suppress P1009 (table not in DB yet) which floods logs
     // during the window between schema push and migration. Log all other errors normally.
     if (process.env.NODE_ENV === 'production') {
         (client as any).$on('error', (e: any) => {
@@ -208,9 +208,9 @@ function createPrismaClient(): PrismaClient {
     return client;
 }
 
-export const prisma = (globalForPrisma.prisma ?? createPrismaClient()) as unknown as SovereignPrismaClient;
+export const prisma = (globalForPrisma.prisma ?? createPrismaClient()) as unknown as SystemPrismaClient;
 
 // Always store the singleton globally, even in production, to prevent Serverless/Edge connection explosions
-(globalForPrisma as unknown as { prisma: SovereignPrismaClient }).prisma = prisma;
+(globalForPrisma as unknown as { prisma: SystemPrismaClient }).prisma = prisma;
 
 export default prisma;

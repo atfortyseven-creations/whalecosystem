@@ -7,7 +7,7 @@ export const useDarkForest = () => {
      * Initializes the Nym WASM client to cloak network traffic.
      */
     const enterTheForest = async () => {
-        console.log("🌲 Entering the Dark Forest (Nym Mixnet)...");
+        console.log(" Entering the Dark Forest (Nym Mixnet)...");
 
         try {
             // 1. Load Nym WASM
@@ -20,7 +20,7 @@ export const useDarkForest = () => {
             // 3. All subsequent requests are wrapped in Sphinx packets
             // window.fetch = nym.fetchProxy(...);
             
-            console.log("🌑 Metadata Shredded. You are now invisible.");
+            console.log(" Metadata Shredded. You are now invisible.");
             return true;
         } catch (e) {
             console.error("Failed to enter the Dark Forest", e);

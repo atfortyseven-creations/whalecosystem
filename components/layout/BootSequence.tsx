@@ -16,7 +16,7 @@ const ZK_LOGS = [
     "IDENTITY_LAYER_UNLOCKED::PRO_MODE"
 ];
 
-// Random hash generator for "Matrix" visual effect
+// Random hash generator for "Grid" visual effect
 const generateRandomHash = () =>
     '0x' + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 

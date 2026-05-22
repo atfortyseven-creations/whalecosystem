@@ -1,6 +1,6 @@
 /**
- * checkpoint-image API — Institutional Asset Serving
- * ═══════════════════════════════════════════════════
+ * checkpoint-image API  Institutional Asset Serving
+ * 
  * Serves high-fidelity 4K pattern assets from the local filesystem.
  */
 
@@ -8,11 +8,11 @@ import { readFileSync, existsSync } from "fs";
 import { NextResponse } from "next/server";
 import path from "path";
 
-// ── Asset alias map ──────────────────────────────────────────────────────────
-// Maps clean semantic names → actual filesystem paths
+//  Asset alias map 
+// Maps clean semantic names  actual filesystem paths
 const ASSET_ALIAS: Record<string, string[]> = {
-  "official-whale-sovereign.png": [
-    path.join(process.cwd(), "public", "official-whale-sovereign.png"),
+  "official-whale-system.png": [
+    path.join(process.cwd(), "public", "official-whale-system.png"),
     path.join(process.cwd(), "public", "logo-landingpage.png"),
     path.join(process.cwd(), "public", "official-whale-legendary.png"),
     path.join(process.cwd(), "public", "official-whale-monochrome.png"),
@@ -20,7 +20,7 @@ const ASSET_ALIAS: Record<string, string[]> = {
     path.join(process.cwd(), "public", "official-whale.png"),
   ],
   "whale-logo-institutional.png": [
-    path.join(process.cwd(), "public", "official-whale-sovereign.png"),
+    path.join(process.cwd(), "public", "official-whale-system.png"),
     path.join(process.cwd(), "public", "logo-landingpage.png"),
     path.join(process.cwd(), "public", "whale-logo-institutional.png"),
   ],
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
     return new NextResponse("Missing or invalid name", { status: 400 });
   }
 
-  // 1️⃣ Check alias map first
+  // 1️ Check alias map first
   const aliasPaths = ASSET_ALIAS[name] || [path.join(PUBLIC_DIR, name)];
   
   for (const candidate of aliasPaths) {
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
           headers: {
             "Content-Type": detectMime(candidate),
             "Cache-Control": "public, max-age=31536000, immutable",
-            "X-Asset-Source": "Sovereign-Local"
+            "X-Asset-Source": "System-Local"
           },
         });
       } catch (e) {

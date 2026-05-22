@@ -29,12 +29,12 @@ export const useSocket = () => {
     connectionCount++;
 
     const onConnect = () => {
-      console.log('📡 [WebSocket] Connected to Hub');
+      console.log(' [WebSocket] Connected to Hub');
       setIsConnected(true);
     };
 
     const onDisconnect = () => {
-      console.log('📡 [WebSocket] Disconnected');
+      console.log(' [WebSocket] Disconnected');
       setIsConnected(false);
     };
 
@@ -46,7 +46,7 @@ export const useSocket = () => {
 
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible' && !socket.connected) {
-        console.log('📡 [WebSocket] Tab became visible. Forcing reconnection...');
+        console.log(' [WebSocket] Tab became visible. Forcing reconnection...');
         socket.connect();
       }
     };

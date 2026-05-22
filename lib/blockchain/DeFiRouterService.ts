@@ -14,7 +14,7 @@ export interface RouteResponse {
 }
 
 /**
- * Universal DeFi Router Service — powered by the Li.Fi API.
+ * Universal DeFi Router Service  powered by the Li.Fi API.
  *
  * Li.Fi is a cross-chain swap & bridge aggregator that also handles
  * vault deposits via its /quote endpoint. It is completely free to
@@ -46,7 +46,7 @@ export class DeFiRouterService {
     }
 
     /**
-     * Builds the on-chain deposit calldata for USDC → Vault using Li.Fi.
+     * Builds the on-chain deposit calldata for USDC  Vault using Li.Fi.
      *
      * @param chainName   Chain name as returned by DeFiLlama (e.g. "Ethereum")
      * @param vaultAddress The vault/pool contract address from DeFiLlama
@@ -83,7 +83,7 @@ export class DeFiRouterService {
                 order:        'RECOMMENDED',
             });
 
-            console.log(`[DeFiRouter] Requesting Li.Fi quote → ${this.LIFI_QUOTE_URL}?${params}`);
+            console.log(`[DeFiRouter] Requesting Li.Fi quote  ${this.LIFI_QUOTE_URL}?${params}`);
 
             const response = await fetch(`${this.LIFI_QUOTE_URL}?${params}`, {
                 headers: {

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-const quantumDotsAbi = [
+const coreDotsAbi = [
     "function mint(address to, uint256 amount) public"
 ];
 
@@ -15,31 +15,31 @@ export async function airdropWelcomeQDs(walletAddress: string) {
 
         // Skip if not properly configured or if using the dummy placeholder address from earlier
         if (!privateKey || !contractAddress || contractAddress === '0x1111111111111111111111111111111111111111') {
-            console.log(`[QuantumAirdrop] Skipped 500 QDs for ${walletAddress}. Not connected to live Mainnet config.`);
+            console.log(`[CoreAirdrop] Skipped 500 QDs for ${walletAddress}. Not connected to live Mainnet config.`);
             return;
         }
 
         const provider = new ethers.JsonRpcProvider(rpcUrl);
         const wallet = new ethers.Wallet(privateKey, provider);
-        const contract = new ethers.Contract(contractAddress, quantumDotsAbi, wallet);
+        const contract = new ethers.Contract(contractAddress, coreDotsAbi, wallet);
 
         // 500 QDs
         const amount = ethers.parseEther("500");
 
-        console.log(`[QuantumAirdrop] 🚀 Executing Genesis 500 QDs drop to ${walletAddress}...`);
+        console.log(`[CoreAirdrop]  Executing Genesis 500 QDs drop to ${walletAddress}...`);
         
         // Fire transaction
         const tx = await contract.mint(walletAddress, amount);
-        console.log(`[QuantumAirdrop] ✅ Tx Sent: ${tx.hash}`);
+        console.log(`[CoreAirdrop]  Tx Sent: ${tx.hash}`);
         
         // Wait for confirmation in the background so we don't block
         tx.wait().then(() => {
-            console.log(`[QuantumAirdrop] 💎 500 QDs Genesis Confirmed for ${walletAddress}.`);
+            console.log(`[CoreAirdrop]  500 QDs Genesis Confirmed for ${walletAddress}.`);
         }).catch((e: any) => {
-            console.error(`[QuantumAirdrop] 💀 Tx failed to mine for ${walletAddress}:`, e.message);
+            console.error(`[CoreAirdrop]  Tx failed to mine for ${walletAddress}:`, e.message);
         });
 
     } catch (error: any) {
-        console.error(`[QuantumAirdrop] 💀 Fatal Error during airdrop to ${walletAddress}:`, error.message);
+        console.error(`[CoreAirdrop]  Fatal Error during airdrop to ${walletAddress}:`, error.message);
     }
 }

@@ -11,7 +11,7 @@ const alchemy = new Alchemy({
 /**
  * AlchemyMonitor
  * Real-time mempool monitoring PERSONALIZED per connected wallet address.
- * No longer hardcoded to vitalik.eth — follows the authenticated user.
+ * No longer hardcoded to vitalik.eth  follows the authenticated user.
  * 
  * Architecture:
  *   - watchAddress(addr): registers WebSocket subscriptions for that address
@@ -33,7 +33,7 @@ export class AlchemyMonitor {
             return;
         }
 
-        console.log(`📡 [AlchemyMonitor] Registering mempool watch for ${addr.slice(0, 10)}...`);
+        console.log(` [AlchemyMonitor] Registering mempool watch for ${addr.slice(0, 10)}...`);
         this.watchedAddresses.add(addr);
 
         const subOut = alchemy.ws.on(
@@ -46,7 +46,7 @@ export class AlchemyMonitor {
         );
 
         this.subscriptions.set(addr, [subOut, subIn]);
-        console.log(`✅ [AlchemyMonitor] Watching ${addr.slice(0, 10)}... — Total watched: ${this.watchedAddresses.size}`);
+        console.log(` [AlchemyMonitor] Watching ${addr.slice(0, 10)}...  Total watched: ${this.watchedAddresses.size}`);
     }
 
     /**
@@ -60,11 +60,11 @@ export class AlchemyMonitor {
     }
 
     /**
-     * Legacy start() method — no longer hardcodes Vitalik.
+     * Legacy start() method  no longer hardcodes Vitalik.
      * Kept for backward compatibility; does nothing if no addresses registered.
      */
     public start() {
-        console.log(`✅ [AlchemyMonitor] Initialized. Watching ${this.watchedAddresses.size} addresses. Call watchAddress(addr) to register.`);
+        console.log(` [AlchemyMonitor] Initialized. Watching ${this.watchedAddresses.size} addresses. Call watchAddress(addr) to register.`);
     }
 
     private async handleTransaction(tx: any, direction: 'IN' | 'OUT', watchedAddr: string) {
@@ -100,7 +100,7 @@ export class AlchemyMonitor {
                 }));
             }
         } catch (e) {
-            console.error('❌ [AlchemyMonitor] Handle error:', e);
+            console.error(' [AlchemyMonitor] Handle error:', e);
         }
     }
 }

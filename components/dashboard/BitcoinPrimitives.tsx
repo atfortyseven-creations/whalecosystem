@@ -49,7 +49,7 @@ export default function BitcoinPrimitives() {
   return (
     <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col p-6 gap-6 bg-[#FFFFFF] text-[#050505] shrink-0 min-h-[600px]">
 
-      {/* ── HEADER ── */}
+      {/*  HEADER  */}
       <div className="flex items-center justify-between gap-4 p-5 rounded-2xl bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm">
         <div className="flex items-center gap-4">
           <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#E5E5E5]">
@@ -122,7 +122,7 @@ export default function BitcoinPrimitives() {
         ))}
       </div>
 
-      {/* ── FOOTER ── */}
+      {/*  FOOTER  */}
       <div className="pt-4 flex justify-between items-center text-[9px] uppercase tracking-[0.3em] font-bold border-t border-[#E5E5E5] text-[#888888]">
         <div className="flex items-center gap-5">
           <div className="flex items-center gap-2">

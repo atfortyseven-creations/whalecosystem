@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ShieldCheck, User, Bell, Tag, Settings, Plus, Trash2, Save, Loader2, Check, AlertTriangle } from 'lucide-react';
 import { SIWEPanel } from '@/components/auth/SIWEAuthGate';
 
-// ─── Types ──────────────────────────────────────────────────────────────────
+//  Types 
 interface Category {
   id: string; name: string; slug: string; description: string;
   color: string; orderIndex: number; _count?: { topics: number };
@@ -20,7 +20,7 @@ interface GlobalSettings {
   maxTopicsPerDay: number; maxPostsPerDay: number;
 }
 
-// ─── API helpers ─────────────────────────────────────────────────────────────
+//  API helpers 
 async function apiForum(action: string, payload: object) {
   const res = await fetch('/api/forum/settings', {
     method: 'POST',
@@ -30,7 +30,7 @@ async function apiForum(action: string, payload: object) {
   return res.json();
 }
 
-// ─── Tiny status banner ──────────────────────────────────────────────────────
+//  Tiny status banner 
 function Banner({ msg, ok }: { msg: string; ok: boolean }) {
   return (
     <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold ${ok ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
@@ -40,7 +40,7 @@ function Banner({ msg, ok }: { msg: string; ok: boolean }) {
   );
 }
 
-// ─── Section wrapper ─────────────────────────────────────────────────────────
+//  Section wrapper 
 function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-5">
@@ -53,7 +53,7 @@ function Section({ icon, title, children }: { icon: React.ReactNode; title: stri
   );
 }
 
-// ─── Label + input helper ────────────────────────────────────────────────────
+//  Label + input helper 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -65,7 +65,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 const inputCls = "w-full px-3 py-2 rounded-lg text-[14px] font-mono outline-none transition-all focus:ring-1 bg-[#FAF9F6] dark:bg-[#111111] border border-black/10 dark:border-white/10 text-[#050505] dark:text-[#FAF9F6]";
 
-// ════════════════════════════════════════════════════════════════════════════
+// 
 export default function ForumSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -83,7 +83,7 @@ export default function ForumSettingsPage() {
   // global settings
   const [global, setGlobal] = useState<GlobalSettings | null>(null);
 
-  // ── Load data ──────────────────────────────────────────────────────────────
+  //  Load data 
   useEffect(() => {
     fetch('/api/forum/settings')
       .then(r => r.json())
@@ -103,14 +103,14 @@ export default function ForumSettingsPage() {
     setTimeout(() => setBanner(null), 3500);
   };
 
-  // ── Profile save ───────────────────────────────────────────────────────────
+  //  Profile save 
   const saveProfile = async () => {
     if (!profile) return;
     setSaving(true);
     const r = await apiForum('update_profile', {
       displayName: profile.displayName || null,
       bio: profile.bio || null,
-      avatarUrl: profile.avatarUrl?.trim() || null, // null if empty — field is optional
+      avatarUrl: profile.avatarUrl?.trim() || null, // null if empty  field is optional
       notifyOnReply: profile.notifyOnReply,
       notifyOnMention: profile.notifyOnMention,
     });
@@ -118,7 +118,7 @@ export default function ForumSettingsPage() {
     r.ok ? flash('Profile saved.') : flash(r.error || 'Error saving profile.', false);
   };
 
-  // ── Category helpers ───────────────────────────────────────────────────────
+  //  Category helpers 
   const saveCategory = async (cat: Category) => {
     const r = await apiForum('update_category', { id: cat.id, name: cat.name, description: cat.description, color: cat.color, orderIndex: cat.orderIndex });
     r.ok ? flash('Category updated.') : flash(r.error || 'Error.', false);
@@ -142,18 +142,18 @@ export default function ForumSettingsPage() {
     } else flash(r.error || 'Error.', false);
   };
 
-  // ── Global save ────────────────────────────────────────────────────────────
+  //  Global save 
   const saveGlobal = async () => {
     if (!global) return;
     const r = await apiForum('update_global', global);
     r.ok ? flash('Forum settings saved.') : flash(r.error || 'Error.', false);
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  //  Render 
   if (loading) return (
     <div className="flex items-center justify-center h-[60vh] gap-3 text-black/50 dark:text-[#888888]">
       <Loader2 size={24} className="animate-spin" />
-      <span className="text-[14px] font-mono">Loading forum settings…</span>
+      <span className="text-[14px] font-mono">Loading forum settings</span>
     </div>
   );
 
@@ -185,14 +185,14 @@ export default function ForumSettingsPage() {
 
       {banner && <Banner msg={banner.msg} ok={banner.ok} />}
 
-      {/* ── SECTION 1: IDENTITY ─────────────────────────────────────────── */}
+      {/*  SECTION 1: IDENTITY  */}
       <Section icon={<User size={18} />} title="Identity">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Field label="Display Name">
             <input
               className={inputCls}
               value={profile.displayName ?? ''}
-              placeholder="e.g. SovereignTrader"
+              placeholder="e.g. SystemTrader"
               onChange={e => setProfile(p => p && ({ ...p, displayName: e.target.value }))}
             />
           </Field>
@@ -200,7 +200,7 @@ export default function ForumSettingsPage() {
             <input
               className={inputCls}
               value={profile.avatarUrl ?? ''}
-              placeholder="https://…/avatar.png"
+              placeholder="https:///avatar.png"
               onChange={e => setProfile(p => p && ({ ...p, avatarUrl: e.target.value }))}
             />
           </Field>
@@ -210,7 +210,7 @@ export default function ForumSettingsPage() {
             className={inputCls}
             style={{ resize: 'vertical', minHeight: 90 }}
             value={profile.bio ?? ''}
-            placeholder="Short bio visible on your forum profile…"
+            placeholder="Short bio visible on your forum profile"
             onChange={e => setProfile(p => p && ({ ...p, bio: e.target.value }))}
           />
         </Field>
@@ -219,7 +219,7 @@ export default function ForumSettingsPage() {
             Tier: <strong className="text-black dark:text-white">{profile.tier ?? 'STANDARD'}</strong>
           </span>
           {profile.isPro && (
-            <span className="text-[12px] font-black px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200">⚡ PRO</span>
+            <span className="text-[12px] font-black px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200"> PRO</span>
           )}
         </div>
         <div className="flex justify-end">
@@ -234,7 +234,7 @@ export default function ForumSettingsPage() {
         </div>
       </Section>
 
-      {/* ── SECTION 2: NOTIFICATIONS ────────────────────────────────────── */}
+      {/*  SECTION 2: NOTIFICATIONS  */}
       <Section icon={<Bell size={18} />} title="Notifications">
         <div className="flex flex-col gap-4">
           {[
@@ -267,7 +267,7 @@ export default function ForumSettingsPage() {
         </div>
       </Section>
 
-      {/* ── ADMIN SECTIONS ──────────────────────────────────────────────── */}
+      {/*  ADMIN SECTIONS  */}
       {isAdmin && (
         <>
           {/* SECTION 3: CATEGORIES */}
@@ -292,7 +292,7 @@ export default function ForumSettingsPage() {
                       <input
                         className={inputCls + " text-[12px] opacity-75"}
                         value={cat.description}
-                        placeholder="Short description…"
+                        placeholder="Short description"
                         onChange={e => setCategories(p => p.map(c => c.id === cat.id ? { ...c, description: e.target.value } : c))}
                       />
                     </div>
@@ -329,7 +329,7 @@ export default function ForumSettingsPage() {
                 </Field>
               </div>
               <Field label="Description">
-                <input className={inputCls} value={newCat.description} placeholder="Brief description…" onChange={e => setNewCat(p => ({ ...p, description: e.target.value }))} />
+                <input className={inputCls} value={newCat.description} placeholder="Brief description" onChange={e => setNewCat(p => ({ ...p, description: e.target.value }))} />
               </Field>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
@@ -364,9 +364,9 @@ export default function ForumSettingsPage() {
                     value={global.moderationMode}
                     onChange={e => setGlobal(p => p && ({ ...p, moderationMode: e.target.value }))}
                   >
-                    <option value="OPEN">OPEN — Posts publish instantly</option>
-                    <option value="STRICT">STRICT — All posts require approval</option>
-                    <option value="LOCKED">LOCKED — No new posts allowed</option>
+                    <option value="OPEN">OPEN  Posts publish instantly</option>
+                    <option value="STRICT">STRICT  All posts require approval</option>
+                    <option value="LOCKED">LOCKED  No new posts allowed</option>
                   </select>
                 </Field>
               </div>

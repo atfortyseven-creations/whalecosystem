@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldAlert, BookOpen, Lock, ArrowRight, CheckCircle2 } from "lucide-react";
 
-export function SovereignContractModal() {
+export function SystemContractModal() {
   const [isMounted, setIsMounted] = useState(false);
   const [isSigned, setIsSigned] = useState(true); // Default completely open on server to prevent hydration mismatch, check client
   const [isReadingDocs, setIsReadingDocs] = useState(false);
@@ -12,13 +12,13 @@ export function SovereignContractModal() {
 
   useEffect(() => {
     setIsMounted(true);
-    const signed = localStorage.getItem("sovereign_contract_signed") === "true";
+    const signed = localStorage.getItem("system_contract_signed") === "true";
     setIsSigned(signed);
   }, []);
 
   const handleSign = () => {
     if (!isReadingDocs || !isReadingPrivacy) return;
-    localStorage.setItem("sovereign_contract_signed", "true");
+    localStorage.setItem("system_contract_signed", "true");
     setIsSigned(true);
   };
 
@@ -58,7 +58,7 @@ export function SovereignContractModal() {
           {/* Body */}
           <div className="p-10 flex-col gap-6 flex">
             <p className="text-xs font-bold text-[#444444] leading-relaxed">
-              By accessing the Whale Alert Network, you operate under an elevated state of market intelligence. 
+              By accessing the Whale Alert Network, you operate under an elevated state of market analytics. 
               The infrastructure processes real-time on-chain data, deep mempool mechanics, and accelerated market analytics. 
               You must fully understand the operational guidelines preserving data integrity and privacy.
             </p>

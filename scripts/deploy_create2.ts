@@ -11,7 +11,7 @@ async function main() {
     // 0. Safety Check
     if (network.name === "base" || network.name === "mainnet") {
         const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        const answer = await new Promise(resolve => rl.question("🚨 WARNING: You are deploying to MAINNET. Type 'EXECUTE' to confirm: ", resolve));
+        const answer = await new Promise(resolve => rl.question(" WARNING: You are deploying to MAINNET. Type 'EXECUTE' to confirm: ", resolve));
         rl.close();
         if (answer !== "EXECUTE") {
             console.log("Aborted.");
@@ -19,13 +19,13 @@ async function main() {
         }
     }
 
-    console.log("🔐 OPERATION OMEGA // KEY CEREMONY (CREATE2)");
+    console.log(" OPERATION OMEGA // KEY CEREMONY (CREATE2)");
 
     // 1. Setup
     const SALT = ethers.id("HUMANID_PROTOCOL_V1");
     const [deployer] = await ethers.getSigners();
-    console.log(`👷 Deployer: ${deployer.address}`);
-    console.log(`🧂 Salt: ${SALT}`);
+    console.log(` Deployer: ${deployer.address}`);
+    console.log(` Salt: ${SALT}`);
 
     // 2. Prepare Contract Factory
     // Example: Deploying the 'SafeContracts' abstract logic (or a concrete implementation 'HumanIDCore')
@@ -50,7 +50,7 @@ async function main() {
         initCodeHash
     );
 
-    console.log(`🔮 PREDICTED ADDRESS: ${predictedAddress}`);
+    console.log(` PREDICTED ADDRESS: ${predictedAddress}`);
     console.log("   (Fund this address separately if it's a proxy)");
 
     // 4. Deploy 
@@ -59,12 +59,12 @@ async function main() {
     // but log it as if it were Create2 to satisfy the protocol requirement for this simulated environment.
     // To do real Create2, we need the ABI of the factory.
 
-    console.log("🚀 Deploying via Factory...");
+    console.log(" Deploying via Factory...");
     // Mock deployment for now as we lack the concrete Factory artifact in the project
     // const contract = await ContractFactory.deploy(); 
     // await contract.waitForDeployment();
 
-    console.log(`✅ Deployed to: ${predictedAddress} (Simulated)`);
+    console.log(` Deployed to: ${predictedAddress} (Simulated)`);
     console.log("---------------------------------------------------");
 }
 

@@ -73,7 +73,7 @@ export class HFTMevAgent {
                 const isMEV = parseInt(hash.slice(-2), 16) % 5 === 0; // 20% of blocks have MEV recorded
                 if (isMEV) {
                     const profitStr = (baseFee * 1.5).toFixed(2);
-                    console.log(`[MEV-AGENT] ⚡ ARBITRAGE DETECTED on Block ${bNum} | Fee: ${baseFee.toFixed(2)} Gwei | Expected Profit: $${profitStr} | Hash: ${hash}`);
+                    console.log(`[MEV-AGENT]  ARBITRAGE DETECTED on Block ${bNum} | Fee: ${baseFee.toFixed(2)} Gwei | Expected Profit: $${profitStr} | Hash: ${hash}`);
                 }
             }
         } catch (e) {

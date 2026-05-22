@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   const walletAddress = '0x78831c25c86ea2a78a6127fc2ccb95e612d87b4a';
 
-  console.log(`🚀 Attempting to grant Elite Access to wallet: ${walletAddress}`);
+  console.log(` Attempting to grant Elite Access to wallet: ${walletAddress}`);
 
   // 1. Find user by wallet
   const user = await prisma.user.findUnique({
@@ -13,11 +13,11 @@ async function main() {
   });
 
   if (!user) {
-    console.error(`❌ Error: No user found with wallet ${walletAddress}.`);
+    console.error(` Error: No user found with wallet ${walletAddress}.`);
     process.exit(1);
   }
 
-  console.log(`✅ User found in DB.`);
+  console.log(` User found in DB.`);
 
   // 2. Upsert Subscription
   // Using userId as the unique key for upsert
@@ -35,8 +35,8 @@ async function main() {
     }
   });
 
-  console.log(`✨ SUCCESS: Elite Tier activated for wallet: ${walletAddress}`);
-  console.log(`📊 Subscription ID: ${subscription.id}`);
+  console.log(` SUCCESS: Elite Tier activated for wallet: ${walletAddress}`);
+  console.log(` Subscription ID: ${subscription.id}`);
 }
 
 main()

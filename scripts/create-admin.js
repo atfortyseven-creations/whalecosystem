@@ -21,7 +21,7 @@ const AdminUserSchema = new mongoose.Schema({
 async function createAdmin() {
     try {
         await mongoose.connect(MONGODB_URI);
-        console.log('✅ Connected to MongoDB Atlas');
+        console.log(' Connected to MongoDB Atlas');
 
         const AdminUser = mongoose.model('AdminUser', AdminUserSchema);
 
@@ -30,7 +30,7 @@ async function createAdmin() {
 
         // Delete existing admin users (for clean slate)
         await AdminUser.deleteMany({});
-        console.log('🗑️  Cleared existing admin users');
+        console.log('️  Cleared existing admin users');
 
         // Create new admin
         await AdminUser.create({
@@ -40,12 +40,12 @@ async function createAdmin() {
             createdAt: new Date(),
         });
 
-        console.log('✅ Admin user created successfully!');
-        console.log('⚠️  IMPORTANT: Ensure you set a strong INITIAL_ADMIN_PASSWORD in your environment variables.');
+        console.log(' Admin user created successfully!');
+        console.log('️  IMPORTANT: Ensure you set a strong INITIAL_ADMIN_PASSWORD in your environment variables.');
 
         process.exit(0);
     } catch (error) {
-        console.error('❌ Error:', error);
+        console.error(' Error:', error);
         process.exit(1);
     }
 }

@@ -110,10 +110,10 @@ Wallet: Whale Alert Network Terminal v4.0
                     <div className="flex-1">
                         <h2 className="text-2xl font-black text-black mb-2 uppercase">SECURITY PROTOCOL - CRITICAL</h2>
                         <ul className="space-y-1 text-red-700 font-bold text-sm">
-                            <li>• This phrase is the ONLY way to recover your wallet</li>
-                            <li>• If you lose it, you LOSE YOUR FUNDS forever</li>
-                            <li>• NEVER share it with anyone, not even support</li>
-                            <li>• Write it on paper and keep it in a safe place</li>
+                            <li> This phrase is the ONLY way to recover your wallet</li>
+                            <li> If you lose it, you LOSE YOUR FUNDS forever</li>
+                            <li> NEVER share it with anyone, not even support</li>
+                            <li> Write it on paper and keep it in a safe place</li>
                         </ul>
                     </div>
                 </div>
@@ -285,7 +285,7 @@ function WordCard({ number, word, isRevealed }: { number: number; word: string; 
         <div className="bg-white/80 border-2 border-purple-200 rounded-xl p-3 hover:border-purple-400 transition-colors">
             <div className="text-xs font-mono text-purple-400 mb-1">#{number}</div>
             <div className="text-lg font-black text-purple-900">
-                {isRevealed ? word : '••••••'}
+                {isRevealed ? word : ''}
             </div>
         </div>
     );

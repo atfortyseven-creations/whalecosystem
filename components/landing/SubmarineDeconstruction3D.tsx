@@ -106,7 +106,7 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
 
   return (
     <group ref={groupRef}>
-      {/* Sovereign Scan Ring */}
+      {/* System Scan Ring */}
       <group ref={scanRef} visible={phaseIntro > 0 && phaseOutro < 1}>
         <mesh rotation={[0, Math.PI / 2, 0]}>
           <torusGeometry args={[1.5, 0.015, 16, 100]} />
@@ -235,7 +235,7 @@ function DOMAnnotations({ scrollProgress }: { scrollProgress: number }) {
             </div>
             <h3 className="text-white font-aztec-serif italic text-3xl mb-2">Absolute <span className="text-[var(--aztec-orchid)]">Immersion</span></h3>
             <p className="text-white/50 text-[11px] uppercase font-aztec-mono tracking-widest leading-relaxed">
-              Unveiling the Sovereign Architecture. Scroll to descend into the ultimate institutional data engine.
+              Unveiling the System Architecture. Scroll to descend into the ultimate institutional data engine.
             </p>
           </motion.div>
         )}
@@ -301,13 +301,13 @@ function DOMAnnotations({ scrollProgress }: { scrollProgress: number }) {
                 </h3>
             </div>
             <p className="text-white/70 text-lg font-aztec-serif italic leading-relaxed pl-20">
-              Thousands of sovereign data points dispersing across the global network in real-time. Absolute resilience.
+              Thousands of system data points dispersing across the global network in real-time. Absolute resilience.
             </p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* 5. The Sovereign Vault */}
+      {/* 5. The System Vault */}
       <AnimatePresence>
         {showVault && (
           <motion.div 
@@ -319,7 +319,7 @@ function DOMAnnotations({ scrollProgress }: { scrollProgress: number }) {
               <Lock className="text-white" size={32} />
             </div>
             <h3 className="text-white font-aztec-h1 text-5xl mb-4 tracking-tight drop-shadow-2xl">
-              Sovereign <span className="text-[var(--aztec-orchid)]/80 italic font-light">Permanence</span>
+              System <span className="text-[var(--aztec-orchid)]/80 italic font-light">Permanence</span>
             </h3>
             <p className="text-white/50 text-[11px] uppercase font-aztec-mono tracking-[0.3em] leading-relaxed">
               Your assets descend into absolute cold storage. untouchable by algorithms. Protected by the deep network.
@@ -396,7 +396,7 @@ export default function SubmarineDeconstruction3D() {
 
         {/* Cinematic Watermarks */}
         <div className="absolute top-12 left-12 opacity-10 font-aztec-mono text-[9px] uppercase tracking-[0.6em] text-white pointer-events-none hidden md:block z-0 mix-blend-overlay">
-          Protocol: Sovereign Deep / Phase {Math.floor(scroll * 6)} / Matrix Active
+          Protocol: System Deep / Phase {Math.floor(scroll * 6)} / Grid Active
         </div>
         
         <div className="absolute bottom-12 right-12 text-right opacity-10 font-aztec-serif italic text-white text-[10vw] leading-none select-none pointer-events-none hidden md:block z-0 mix-blend-overlay">

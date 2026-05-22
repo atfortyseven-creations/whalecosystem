@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateApiKey, logApiRequest } from '@/lib/api-guard';
-import { WacIntelligenceService } from '@/lib/intelligence-service';
+import { WacAnalyticsService } from '@/lib/analytics-service';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,15 +30,15 @@ export async function GET(req: NextRequest) {
     const token = searchParams.get('token') || 'ETH';
     
     // 1. Fetch HA Signals
-    const signals = await WacIntelligenceService.getHeikinAshiSignals(token, 20);
+    const signals = await WacAnalyticsService.getHeikinAshiSignals(token, 20);
     
     // 2. Fetch Anomaly Alerts
-    const anomalies = await WacIntelligenceService.getAnomalyAlerts(token);
+    const anomalies = await WacAnalyticsService.getAnomalyAlerts(token);
 
     // 3. Fetch Dark Pool Logic (Elite Only)
     let darkPool = [];
     if (subscription.tier === 'Elite') {
-      darkPool = await WacIntelligenceService.getDarkPoolEvents();
+      darkPool = await WacAnalyticsService.getDarkPoolEvents();
     }
 
     await logApiRequest(req, subscription.id, endpoint, 200);
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
       timestamp: new Date().toISOString(),
       token,
       tier: subscription.tier,
-      intelligence: {
+      analytics: {
         heikin_ashi: signals,
         anomalies: anomalies.map(a => ({
           hash: a.hash,
@@ -60,12 +60,12 @@ export async function GET(req: NextRequest) {
       Elite_exclusive: subscription.tier === 'Elite' ? {
         dark_pool_transfers: darkPool
       } : "Upgrade to Elite for Dark Pool monitoring.",
-      attribution: "Proprietary Intelligence by Whale Alert Corporation."
+      attribution: "Proprietary Analytics by Whale Alert Corporation."
     });
 
   } catch (error: any) {
     console.error('[SIGNALS API] Error:', error);
-    return NextResponse.json({ error: 'Failed to process intelligence signals' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process analytics signals' }, { status: 500 });
   }
 }
 

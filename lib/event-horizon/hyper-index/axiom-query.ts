@@ -14,7 +14,7 @@ export const useHyperIndex = () => {
      * e.g., "Prove that User X had > 0 balance at Block 15,000,000".
      */
     const buildIndexQuery = async (query: AxiomQuery) => {
-        console.log("📖 Hyper-Index: Querying Akasha Records (Blockchain History)...", query);
+        console.log(" Hyper-Index: Querying Akasha Records (Blockchain History)...", query);
 
         // 1. Construct the ZK Circuit inputs
         // Axiom SDK: const q = new Query(); q.append(...)

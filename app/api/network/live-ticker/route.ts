@@ -31,7 +31,7 @@ export async function GET() {
         // Add latest whale movements to the ticker
         if (Array.isArray(whaleMovements)) {
             whaleMovements.forEach(m => {
-                tickerItems.push(`⚠ WHALE: ${m.amount} ${m.token} ON ${m.chain} detected`);
+                tickerItems.push(` WHALE: ${m.amount} ${m.token} ON ${m.chain} detected`);
             });
         }
 
@@ -43,9 +43,9 @@ export async function GET() {
             const eth = data.find((d: any) => d.symbol === 'ETHUSDT');
             const bnb = data.find((d: any) => d.symbol === 'BNBUSDT');
 
-            if (btc) tickerItems.push(`BTC: $${parseFloat(btc.lastPrice).toLocaleString()} ▲${btc.priceChangePercent}%`);
-            if (eth) tickerItems.push(`ETH: $${parseFloat(eth.lastPrice).toLocaleString()} ▼${eth.priceChangePercent}%`);
-            if (bnb) tickerItems.push(`BNB: $${parseFloat(bnb.lastPrice).toLocaleString()} ▲${bnb.priceChangePercent}%`);
+            if (btc) tickerItems.push(`BTC: $${parseFloat(btc.lastPrice).toLocaleString()} ${btc.priceChangePercent}%`);
+            if (eth) tickerItems.push(`ETH: $${parseFloat(eth.lastPrice).toLocaleString()} ${eth.priceChangePercent}%`);
+            if (bnb) tickerItems.push(`BNB: $${parseFloat(bnb.lastPrice).toLocaleString()} ${bnb.priceChangePercent}%`);
         }
 
         return NextResponse.json({ 
@@ -70,7 +70,7 @@ export async function GET() {
             success: false,
             degraded: true,
             ticker: [
-                'NETWORK STATUS: DEGRADED — RECONNECTING...',
+                'NETWORK STATUS: DEGRADED  RECONNECTING...',
                 'DATA FEEDS TEMPORARILY UNAVAILABLE',
             ],
             stats: {

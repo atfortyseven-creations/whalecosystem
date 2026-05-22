@@ -1,19 +1,19 @@
-# Whale Alert Helm Chart — Default Values
+# Whale Alert Helm Chart  Default Values
 # Override any value at install time with --set key=value
 
-# ─── Image ──────────────────────────────────────────────────────────────────
+#  Image 
 image:
   repository: ghcr.io/atfortyseven-creations/whale-alert
   tag:        "3.0.0"
   pullPolicy: Always
 
-# ─── Replicas ────────────────────────────────────────────────────────────────
+#  Replicas 
 replicaCount:
-  app:      2     # App pods (HPA will scale 2–10)
+  app:      2     # App pods (HPA will scale 210)
   scanner:  1     # Always 1 to prevent duplicate detection
   telegram: 1     # Always 1 notifier
 
-# ─── Secrets (inject via --set or external secret store) ─────────────────────
+#  Secrets (inject via --set or external secret store) 
 secrets:
   databaseUrl:      ""     # postgresql://[REDACTED_DB_USER]:[REDACTED_DB_PASS]@host:5432/db
   redisUrl:         ""     # redis://[REDACTED_REDIS_USER]:[REDACTED_REDIS_PASS]@HumanidFi"
@@ -22,7 +22,7 @@ secrets:
   clerkPublishableKey: ""
   clerkSecretKey:   ""
 
-# ─── Config ──────────────────────────────────────────────────────────────────
+#  Config 
 config:
   nodeEnv:            "production"
   whaleThresholdUsd:  "50000"
@@ -30,7 +30,7 @@ config:
   sseKeepAliveMs:     "20000"
   nextauthUrl:        "https://whalealert.network"
 
-# ─── Resources ───────────────────────────────────────────────────────────────
+#  Resources 
 resources:
   app:
     requests: { cpu: 250m, memory: 512Mi }
@@ -42,7 +42,7 @@ resources:
     requests: { cpu: 100m, memory: 256Mi }
     limits:   { cpu: 500m, memory: 512Mi }
 
-# ─── Autoscaling ─────────────────────────────────────────────────────────────
+#  Autoscaling 
 autoscaling:
   enabled:     true
   minReplicas: 2
@@ -50,7 +50,7 @@ autoscaling:
   targetCPUUtilizationPercentage:    70
   targetMemoryUtilizationPercentage: 80
 
-# ─── Ingress ─────────────────────────────────────────────────────────────────
+#  Ingress 
 ingress:
   enabled:          true
   className:        "nginx"
@@ -64,18 +64,18 @@ ingress:
     - secretName: whale-alert-tls
       hosts: [whalealert.network, api.whalealert.network]
 
-# ─── PodDisruptionBudget ─────────────────────────────────────────────────────
+#  PodDisruptionBudget 
 pdb:
   enabled:      true
   minAvailable: 1
 
-# ─── Service ─────────────────────────────────────────────────────────────────
+#  Service 
 service:
   type: ClusterIP
   port: 80
   targetPort: 3000
 
-# ─── Enterprise Edition ──────────────────────────────────────────────────────
+#  Enterprise Edition 
 enterprise:
   enabled: false       # Set true to enable Enterprise API features
   supportEmail: ""

@@ -1,44 +1,44 @@
 /**
- * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║   WHALE FORTRESS WAF — OWASP Core Rule Set v3.3 (Edge Runtime)              ║
- * ║   WhaleFortress v6 — Institutional Anomaly Scoring Engine                   ║
- * ║                                                                              ║
- * ║   Architecture:                                                              ║
- * ║     1. OWASP Anomaly Score accumulates across 6 detection vectors           ║
- * ║     2. Score ≥ BLOCK_THRESHOLD → hard 403                                   ║
- * ║     3. Score ≥ CHALLENGE_THRESHOLD → soft challenge (429 with Retry-After)  ║
- * ║     4. Per-endpoint granular rate limits (hot routes get tightest limits)   ║
- * ║     5. Bot UA fingerprinting                                                 ║
- * ║     6. Path traversal / injection pattern detection                         ║
- * ║     7. Request size limits for POST hot routes                               ║
- * ╚══════════════════════════════════════════════════════════════════════════════╝
+ * 
+ *    WHALE FORTRESS WAF  OWASP Core Rule Set v3.3 (Edge Runtime)              
+ *    WhaleFortress v6  Institutional Anomaly Scoring Engine                   
+ *                                                                               
+ *    Architecture:                                                              
+ *      1. OWASP Anomaly Score accumulates across 6 detection vectors           
+ *      2. Score  BLOCK_THRESHOLD  hard 403                                   
+ *      3. Score  CHALLENGE_THRESHOLD  soft challenge (429 with Retry-After)  
+ *      4. Per-endpoint granular rate limits (hot routes get tightest limits)   
+ *      5. Bot UA fingerprinting                                                 
+ *      6. Path traversal / injection pattern detection                         
+ *      7. Request size limits for POST hot routes                               
+ * 
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
-// ─── THRESHOLDS (OWASP Paranoia Level 2 equivalent) ──────────────────────────
+//  THRESHOLDS (OWASP Paranoia Level 2 equivalent) 
 const BLOCK_THRESHOLD     = 10;
 const CHALLENGE_THRESHOLD = 5;
 
-// ─── BYPASS IPS (Institutional Whitelist) ──────────────────────────────────
+//  BYPASS IPS (Institutional Whitelist) 
 const BYPASS_IPS = ['127.0.0.1', '91.126.42.179'];
 
-// ─── PER-ENDPOINT RATE LIMITS (requests / window in seconds) ─────────────────
+//  PER-ENDPOINT RATE LIMITS (requests / window in seconds) 
 // Tighter limits on write/trade endpoints to prevent automation abuse.
 const ENDPOINT_LIMITS: Record<string, { max: number; windowSec: number }> = {
-  '/api/user/nuke':           { max: 2,    windowSec: 86400 },  // 2 per day — absolute
+  '/api/user/nuke':           { max: 2,    windowSec: 86400 },  // 2 per day  absolute
   '/api/verify-human':        { max: 10,   windowSec: 3600  },  // 10 per hour
   '/api/defi/copy-trading':   { max: 30,   windowSec: 60    },  // 30 per minute
   '/api/defi/deposit':        { max: 20,   windowSec: 60    },
   '/api/polymarket':          { max: 100,  windowSec: 60    },
-  // [ANDROID FIX] Increased from 20→40/min. Android auth flow legitimately makes
-  // 3-4 requests per cycle: verify-session + sovereign-verify + optional nonce + siwe-verify.
+  // [ANDROID FIX] Increased from 2040/min. Android auth flow legitimately makes
+  // 3-4 requests per cycle: verify-session + system-verify + optional nonce + siwe-verify.
   // At 20/min, 5 concurrent users from same corporate NAT IP would hit the limit
   // immediately, causing a cascade of 429s on login. Session cookie compound-key
   // mitigates this for returning users, but first-time auth has no session yet.
   '/api/auth':                { max: 40,   windowSec: 60    },
   // [ANDROID FIX] SIWE endpoints separated from /api/auth for granular control.
-  // The nonce endpoint generates a unique nonce per request — rate limit is tighter
+  // The nonce endpoint generates a unique nonce per request  rate limit is tighter
   // to prevent nonce farming (used in rainbow table attacks against SIWE messages).
   '/api/siwe/nonce':          { max: 15,   windowSec: 60    },  // 15 nonce requests/min (legitimate: ~1 per auth)
   '/api/siwe':                { max: 30,   windowSec: 60    },  // verify = max 1 per auth, but allow retries
@@ -46,8 +46,8 @@ const ENDPOINT_LIMITS: Record<string, { max: number; windowSec: number }> = {
   '/api':                     { max: 1200, windowSec: 60    },  // Increased for high-frequency institutional telemetry
 };
 
-// ─── LEGITIMATE BROWSER UA WHITELIST (bypass scoring entirely) ───────────────
-// iOS Safari UA patterns — must never be flagged as malicious.
+//  LEGITIMATE BROWSER UA WHITELIST (bypass scoring entirely) 
+// iOS Safari UA patterns  must never be flagged as malicious.
 // iOS 15-18 UA: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_x like Mac OS X) ...'
 // iOS Private Mode can send a shorter UA but always contains 'Safari' or 'WebKit'.
 //
@@ -74,17 +74,17 @@ const LEGITIMATE_UA_PATTERNS = [
   /mozilla\/5\.0.*macintosh.*firefox\//i,     // Firefox on macOS
 ];
 
-// ─── KNOWN MALICIOUS BOT SIGNATURES ──────────────────────────────────────────
+//  KNOWN MALICIOUS BOT SIGNATURES 
 const MALICIOUS_UA_PATTERNS = [
   /sqlmap/i, /nikto/i, /nmap/i, /masscan/i, /zgrab/i, /dirbuster/i,
   /gobuster/i, /wfuzz/i, /nuclei/i, /burpsuite/i, /acunetix/i,
   /nessus/i, /openvas/i, /metasploit/i, /hydra/i, /medusa/i,
-  /curl\/7\.[0-4]/i,              // Very old curl — common in ancient exploit scripts
+  /curl\/7\.[0-4]/i,              // Very old curl  common in ancient exploit scripts
   /python-requests\/2\.[0-1]/i,  // Very old requests lib
   /libwww-perl/i, /lwp-request/i, /go-http-client\/1\.0/i,
 ];
 
-// ─── INJECTION / TRAVERSAL DETECTION PATTERNS ────────────────────────────────
+//  INJECTION / TRAVERSAL DETECTION PATTERNS 
 const INJECTION_PATTERNS = [
   /(\.\.[\/\\]){2,}/,                          // Path traversal ../../
   /<script[\s>]/i,                             // XSS
@@ -97,26 +97,26 @@ const INJECTION_PATTERNS = [
   /\beval\b\s*\(/i,                            // Eval injection
 ];
 
-// ─── SUSPICIOUS HEADERS (Nation-State Hardened) ──────────────────────────────
+//  SUSPICIOUS HEADERS (Nation-State Hardened) 
 const SUSPICIOUS_HEADERS = [
-  'x-original-url',           // IIS/nginx URL override — used for auth bypass
+  'x-original-url',           // IIS/nginx URL override  used for auth bypass
   'x-rewrite-url',            // Apache mod_rewrite override
   'x-custom-ip-authorization',// IP spoofing attempt
   'x-forwarded-host',         // Host header injection via proxy headers
   'x-host',                   // Duplicate host injection
-  'x-cluster-client-ip',      // Legacy proxy header — abused in SSRF chains
+  'x-cluster-client-ip',      // Legacy proxy header  abused in SSRF chains
   'x-forwarded-server',       // Server identity spoofing
   'x-original-host',          // CDN origin override
   'x-backend-server',         // Server disclosure / SSRF
 ];
 
-// ─── HTTP REQUEST SMUGGLING INDICATORS ───────────────────────────────────────
+//  HTTP REQUEST SMUGGLING INDICATORS 
 // Detects CL.TE and TE.CL desync attack patterns in raw headers.
 const SMUGGLING_HEADER_COMBINATIONS = [
   ['content-length', 'transfer-encoding'], // Classic CL.TE
 ];
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
+//  HELPERS 
 
 function getIP(req: NextRequest): string {
   return (req.headers.get('x-forwarded-for')?.split(',')[0] ??
@@ -126,7 +126,7 @@ function getIP(req: NextRequest): string {
 }
 
 function buildBlockResponse(anomalyScore: number, reason: string, ip: string): NextResponse {
-  console.error(`[WhaleFortress:WAF] 🚫 BLOCKED score=${anomalyScore} reason="${reason}" ip=${ip}`);
+  console.error(`[WhaleFortress:WAF]  BLOCKED score=${anomalyScore} reason="${reason}" ip=${ip}`);
   return new NextResponse(
     JSON.stringify({ error: 'WAF_BLOCK', code: 403, message: 'Request blocked by Institutional Security Policy.' }),
     { status: 403, headers: { 'Content-Type': 'application/json', 'X-WAF-Block': 'true' } }
@@ -134,14 +134,14 @@ function buildBlockResponse(anomalyScore: number, reason: string, ip: string): N
 }
 
 function buildChallengeResponse(retryAfter: number, ip: string): NextResponse {
-  console.warn(`[WhaleFortress:WAF] ⚠️ RATE_LIMITED ip=${ip} retry=${retryAfter}s`);
+  console.warn(`[WhaleFortress:WAF] ️ RATE_LIMITED ip=${ip} retry=${retryAfter}s`);
   return new NextResponse(
     JSON.stringify({ error: 'RATE_LIMITED', retryAfter, message: `System busy. Retry in ${retryAfter}s.` }),
     { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': String(retryAfter) } }
   );
 }
 
-// ─── IN-MEMORY SLIDING WINDOW (Edge-compatible, falls back gracefully) ────────
+//  IN-MEMORY SLIDING WINDOW (Edge-compatible, falls back gracefully) 
 // For production with high traffic, this is supplemented by the Redis rate limiter.
 // The in-memory window acts as the FIRST line of defense at zero latency.
 
@@ -162,7 +162,7 @@ function inMemoryRateCheck(key: string, max: number, windowSec: number): boolean
   return true;
 }
 
-// ─── OPTIMIZED GC FOR EDGE ───────────────────────────────────────────────────
+//  OPTIMIZED GC FOR EDGE 
 // [BUG-12 FIX] Avoid O(n) synchronous iterations that block the Edge event loop.
 // Instead of full cleanup, we use a size limit (LRU-ish) and passive cleanup.
 function maybeGC() {
@@ -187,11 +187,11 @@ function maybeGC() {
   }
 }
 
-// ─── MAIN WAF FUNCTION ────────────────────────────────────────────────────────
+//  MAIN WAF FUNCTION 
 
-// ─── WAF BYPASS WHITELIST ─────────────────────────────────────────────────────
+//  WAF BYPASS WHITELIST 
 // These paths are ALWAYS allowed through with zero anomaly scoring.
-// Railway/K8s healthchecks use wget/curl with minimal UAs — WAF must never block these.
+// Railway/K8s healthchecks use wget/curl with minimal UAs  WAF must never block these.
 const WAF_BYPASS_PATHS = [
   '/api/health',
   '/api/health-check',
@@ -205,9 +205,9 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
   const ua       = req.headers.get('user-agent') ?? '';
   const method   = req.method;
 
-  // ── BYPASS: Infra / Healthcheck / Authorized IPs ──────────────────────────
+  //  BYPASS: Infra / Healthcheck / Authorized IPs 
   if (WAF_BYPASS_PATHS.some(p => pathname.startsWith(p)) || BYPASS_IPS.includes(ip)) {
-    return null; // unconditional pass-through — no scoring or rate limiting applied
+    return null; // unconditional pass-through  no scoring or rate limiting applied
   }
 
   let anomalyScore = 0;
@@ -215,12 +215,12 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
 
   maybeGC();
 
-  // ── VECTOR 1: Malicious User-Agent Fingerprint ────────────────────────────
+  //  VECTOR 1: Malicious User-Agent Fingerprint 
   // CRITICAL iOS FIX: iOS Safari in Private Mode sends a trimmed UA that may
-  // be unexpectedly short. Only score a completely EMPTY UA — never score
+  // be unexpectedly short. Only score a completely EMPTY UA  never score
   // a UA just because it's short. Legit iOS UAs start with 'Mozilla/5.0'.
   if (!ua || ua.length === 0) {
-    // Completely absent UA — bot-like
+    // Completely absent UA  bot-like
     anomalyScore += 5;
     reasons.push('NO_UA');
   } else {
@@ -238,7 +238,7 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     }
   }
 
-  // ── VECTOR 2: Path Traversal / Injection in URL ────────────────────────────
+  //  VECTOR 2: Path Traversal / Injection in URL 
   const fullUrl = req.url;
   for (const pattern of INJECTION_PATTERNS) {
     if (pattern.test(fullUrl)) {
@@ -248,7 +248,7 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     }
   }
 
-  // ── VECTOR 3: Suspicious Header Injection ─────────────────────────────────
+  //  VECTOR 3: Suspicious Header Injection 
   for (const header of SUSPICIOUS_HEADERS) {
     if (req.headers.has(header)) {
       anomalyScore += 5;
@@ -256,8 +256,8 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     }
   }
 
-  // ── VECTOR 3.5: HTTP Request Smuggling Detection ─────────────────────────
-  // CL.TE / TE.CL desync attacks — one of the most devastating web attack classes.
+  //  VECTOR 3.5: HTTP Request Smuggling Detection 
+  // CL.TE / TE.CL desync attacks  one of the most devastating web attack classes.
   // Responsible for mass authentication bypasses at major institutions (HackerOne reports).
   for (const [h1, h2] of SMUGGLING_HEADER_COMBINATIONS) {
     if (req.headers.has(h1) && req.headers.has(h2)) {
@@ -266,14 +266,14 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     }
   }
 
-  // ── VECTOR 4: HTTP Method Anomaly ─────────────────────────────────────────
+  //  VECTOR 4: HTTP Method Anomaly 
   const allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'];
   if (!allowedMethods.includes(method)) {
     anomalyScore += 10;
     reasons.push(`INVALID_METHOD:${method}`);
   }
 
-  // ── VECTOR 5: Oversized Content-Length on sensitive routes ───────────────
+  //  VECTOR 5: Oversized Content-Length on sensitive routes 
   const contentLength = parseInt(req.headers.get('content-length') ?? '0', 10);
   const HOT_WRITE_ROUTES = ['/api/user/nuke', '/api/defi', '/api/auth', '/api/verify-human'];
   if (HOT_WRITE_ROUTES.some(r => pathname.startsWith(r)) && contentLength > 1_000_000) {
@@ -281,7 +281,7 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     reasons.push(`OVERSIZED_BODY:${contentLength}`);
   }
 
-  // ── VECTOR 6: Host Header Anomaly ────────────────────────────────────────
+  //  VECTOR 6: Host Header Anomaly 
   const host = req.headers.get('host') ?? '';
   const expectedHosts = ['www.humanidfi.com', 'humanidfi.com', 'localhost:3000', 'localhost'];
   // Preview deployment patterns for Railway and Vercel CI/CD pipelines
@@ -294,7 +294,7 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     reasons.push(`HOST_MISMATCH:${host.slice(0, 30)}`);
   }
 
-  // ── VECTOR 6.5: Accept-Encoding Anomaly (scanner fingerprint) ─────────────
+  //  VECTOR 6.5: Accept-Encoding Anomaly (scanner fingerprint) 
   // Legitimate browsers ALWAYS send Accept-Encoding. Scanners/bots often omit it.
   // Combined with short/absent UA = near-certain automated probe.
   const acceptEncoding = req.headers.get('accept-encoding');
@@ -303,7 +303,7 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     reasons.push('MISSING_ACCEPT_ENCODING');
   }
 
-  // ── VECTOR 6.7: Accept-Language Anomaly ──────────────────────────────────
+  //  VECTOR 6.7: Accept-Language Anomaly 
   // All browsers send Accept-Language. No legitimate human browser omits this.
   const acceptLang = req.headers.get('accept-language');
   if (!acceptLang && method === 'GET' && !BYPASS_IPS.includes(ip)) {
@@ -311,7 +311,7 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     reasons.push('MISSING_ACCEPT_LANGUAGE');
   }
 
-  // ── VECTOR 7: Cryptographic Payload Integrity (HMAC Signature) ─────────────
+  //  VECTOR 7: Cryptographic Payload Integrity (HMAC Signature) 
   const FORGE_SECURE_ROUTES = ['/api/user/nuke', '/api/defi/withdrawal'];
   if (FORGE_SECURE_ROUTES.some(r => pathname.startsWith(r)) && method !== 'GET') {
     const signature = req.headers.get('x-forge-signature');
@@ -330,12 +330,12 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     }
   }
 
-  // ── HARD BLOCK CHECK ──────────────────────────────────────────────────────
+  //  HARD BLOCK CHECK 
   if (anomalyScore >= BLOCK_THRESHOLD) {
     return buildBlockResponse(anomalyScore, reasons.join(','), ip);
   }
 
-  // ── PER-ENDPOINT IN-MEMORY RATE LIMIT ────────────────────────────────────
+  //  PER-ENDPOINT IN-MEMORY RATE LIMIT 
   // Find the most specific matching endpoint config
   const endpointConfig = Object.entries(ENDPOINT_LIMITS)
     .sort((a, b) => b[0].length - a[0].length) // longest match wins
@@ -346,7 +346,7 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     
     // [ABYSMALLY COMPLEX OPTIMIZATION]: Defeat NAT overlap (e.g. Apple Private Relay)
     // by composing a compound key using session tokens or user-agent hashes.
-    const sessionCookie = req.cookies.get('whale_session')?.value || req.cookies.get('sovereign_handshake')?.value;
+    const sessionCookie = req.cookies.get('whale_session')?.value || req.cookies.get('system_handshake')?.value;
     const uaHash = ua ? Array.from(ua).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0).toString(16) : 'noua';
     
     // Use session token if available (perfect isolation), otherwise fallback to IP + UA Hash
@@ -364,12 +364,12 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     }
   }
 
-  // ── SOFT CHALLENGE (high anomaly but below hard block) ────────────────────
+  //  SOFT CHALLENGE (high anomaly but below hard block) 
   if (anomalyScore >= CHALLENGE_THRESHOLD) {
     const isOnlyNoUA = reasons.length === 1 && reasons[0] === 'NO_UA';
     const logFn = isOnlyNoUA ? console.log : console.warn;
-    logFn(`[WhaleFortress:WAF] ${isOnlyNoUA ? 'ℹ️' : '⚠️'} HIGH_ANOMALY score=${anomalyScore} ip=${ip} reasons=${reasons.join(',')}`);
-    // Don't block yet — just log. Upgrade to block if count spikes.
+    logFn(`[WhaleFortress:WAF] ${isOnlyNoUA ? '️' : '️'} HIGH_ANOMALY score=${anomalyScore} ip=${ip} reasons=${reasons.join(',')}`);
+    // Don't block yet  just log. Upgrade to block if count spikes.
   }
 
   return null; // pass through

@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import { toast } from 'sonner';
 import { getGbRpc, getGbWss } from '@/lib/blockchain/getblock-registry';
 
-// 100M-User Scalability & Enterprise Matrix Configuration
+// 100M-User Scalability & Enterprise Grid Configuration
 export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche';
 export type ProtocolType = 'RPC' | 'WSS';
 
@@ -102,7 +102,7 @@ export const useWalletStore = create<WalletState>()(
           const newAccount: WalletAccount = {
             address: wallet.address,
             privateKey: wallet.privateKey,
-            label: `Sovereign ${get().accounts.length + 1}`,
+            label: `System ${get().accounts.length + 1}`,
             isCustom: false,
           };
 
@@ -150,7 +150,7 @@ export const useWalletStore = create<WalletState>()(
             toast.success("Identity Unlocked", {
               description: `Active: ${get().accounts[existingIndex].label}`
             });
-            // NOTE: cloudSync intentionally omitted here — this path fires on every
+            // NOTE: cloudSync intentionally omitted here  this path fires on every
             // auth unlock and would cause excess POST requests on mobile.
             return true;
           }
@@ -174,7 +174,7 @@ export const useWalletStore = create<WalletState>()(
             description: `Recovered: ${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
           });
           get().updateBalance();
-          // NOTE: cloudSync intentionally omitted here — only sync explicitly when user
+          // NOTE: cloudSync intentionally omitted here  only sync explicitly when user
           // adds a new account, not on every auth-gate unlock.
           return true;
         } catch (error) {
@@ -388,7 +388,7 @@ export const useWalletStore = create<WalletState>()(
       }
     }),
     {
-      name: 'whale-sovereign-wallet-registry-v2', // Bump version for schema change
+      name: 'whale-system-wallet-registry-v2', // Bump version for schema change
       partialize: (state) => ({ 
         address: state.address, 
         privateKey: null, // SECURITY: Never persist plaintext private keys
@@ -401,7 +401,7 @@ export const useWalletStore = create<WalletState>()(
   )
 );
 
-// ── ATOMIC SELECTORS FOR 240Hz MOBILE RENDERING ──
+//  ATOMIC SELECTORS FOR 240Hz MOBILE RENDERING 
 // Prevents massive React re-renders when only one specific property changes.
 export const useWalletBalance = () => useWalletStore((state) => state.balance);
 export const useWalletAddress = () => useWalletStore((state) => state.address);

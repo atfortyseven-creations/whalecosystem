@@ -17,7 +17,7 @@ export async function GET(
     // Evaluate for this wallet
     const { evaluateFlag } = await import('@/lib/feature-flags/index');
     // Extract tier from session cookie if possible
-    const tier = req.cookies.get('sovereign_tier')?.value ?? 'STARTER';
+    const tier = req.cookies.get('system_tier')?.value ?? 'STARTER';
     const enabled = await evaluateFlag(key, wallet, tier);
 
     return NextResponse.json({ enabled, flagKey: key, rollout: flag.rollout });
@@ -26,7 +26,7 @@ export async function GET(
   }
 }
 
-// POST /api/feature-flags/[key] — Admin only
+// POST /api/feature-flags/[key]  Admin only
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ key: string }> }

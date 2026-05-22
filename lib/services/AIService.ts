@@ -35,7 +35,7 @@ export class AIService {
     }): Promise<ForensicAnalysis> {
         
         if (!process.env.OPENAI_API_KEY) {
-            console.warn('[AIService] ⚠️ OPENAI_API_KEY not configured. Falling back to heuristic baseline.');
+            console.warn('[AIService] ️ OPENAI_API_KEY not configured. Falling back to heuristic baseline.');
             return this.getHeuristicBaseline(address, context);
         }
 
@@ -89,11 +89,11 @@ export class AIService {
             if (error.status === 429 || error.message?.includes('429')) {
                 // Determine if we should log it (only once in a while to not flood)
                 if (!global.__aiQuotaWarned) {
-                    console.warn('[AIService] ⚠️ AI Quota Exceeded (429). Falling back to heuristics. (Will silence further 429 warnings)');
+                    console.warn('[AIService] ️ AI Quota Exceeded (429). Falling back to heuristics. (Will silence further 429 warnings)');
                     global.__aiQuotaWarned = true;
                 }
             } else {
-                console.error('[AIService] 🚨 AI Forensic Analysis failed:', error.message);
+                console.error('[AIService]  AI Forensic Analysis failed:', error.message);
             }
             return this.getHeuristicBaseline(address, context);
         }
@@ -112,7 +112,7 @@ export class AIService {
                 {
                     type: 'neutral',
                     title: 'Deep Sync Active',
-                    description: 'Synchronizing with global forensic matrix...',
+                    description: 'Synchronizing with global forensic grid...',
                     reasoning: 'Telemetry is currently being aggregated from 33+ chains.'
                 }
             ]

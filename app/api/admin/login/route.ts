@@ -7,12 +7,12 @@ import { SignJWT } from "jose";
 const JWT_SECRET_STR = process.env.JWT_SECRET;
 if (!JWT_SECRET_STR) {
     if (process.env.NODE_ENV === 'production') {
-        console.error("[Admin Login] ⚠️ JWT_SECRET not defined. Admin logins disabled.");
+        console.error("[Admin Login] ️ JWT_SECRET not defined. Admin logins disabled.");
     }
 }
 const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STR || 'build-fallback-secret');
 
-// ── Brute-Force Protection: In-memory rate limiter ──────────────────────────
+//  Brute-Force Protection: In-memory rate limiter 
 // Max 5 failed attempts per IP within a 15-minute window.
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
 
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        // Set HTTP-only cookie — strict sameSite to prevent CSRF on admin panel
+        // Set HTTP-only cookie  strict sameSite to prevent CSRF on admin panel
         response.cookies.set("admin_token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",

@@ -132,7 +132,7 @@ function TokenSelector({ assets, onSelect, onClose, currentChainId = null }: any
                                     <TokenLogo symbol={t.symbol} address={t.address} logoURI={t.logoURI} className="w-10 h-10 rounded-full" fallbackClassName="w-10 h-10 rounded-full text-xs" />
                                     <div className="text-left">
                                         <div className="font-black text-black">{t.symbol}</div>
-                                        <div className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{t.name} • {t.network}</div>
+                                        <div className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{t.name}  {t.network}</div>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -277,7 +277,7 @@ function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any)
                     </button>
                 </div>
                 <div className="flex justify-between items-center border-t border-black/5 pt-4">
-                    <span className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{amount && selectedAsset.price ? `≈ $${safeToFixed(parseFloat(amount) * selectedAsset.price, 2)}` : '≈ $0.00'}</span>
+                    <span className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{amount && selectedAsset.price ? ` $${safeToFixed(parseFloat(amount) * selectedAsset.price, 2)}` : ' $0.00'}</span>
                     <button onClick={handleMax} className="text-[10px] text-black/40 font-black uppercase tracking-widest hover:text-black transition-colors flex items-center gap-1">
                         Balance: {safeToFixed(selectedAsset?.balanceNumeric || 0, 4)}
                     </button>
@@ -312,7 +312,7 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
     const { switchChainAsync } = useSwitchChain();
     const allWagmiChains = useChains();
     
-    // ── DYNAMIC CHAIN DERIVATION (No mock data)
+    //  DYNAMIC CHAIN DERIVATION (No mock data)
     const CHAINS = allWagmiChains.map((c: any) => ({
         id: c.id,
         name: c.name,
@@ -332,7 +332,7 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
     const [payAmount, setPayAmount] = useState("");
     const [receiveAmount, setReceiveAmount] = useState("");
     
-    // ── DYNAMIC DEFAULT TOKENS (Derived from chain state)
+    //  DYNAMIC DEFAULT TOKENS (Derived from chain state)
     const DEFAULT_TOKENS = CHAINS.map((c: any) => ({
         symbol: c.id === 137 ? 'MATIC' : 'ETH',
         address: NATIVE_ADDRESS,
@@ -533,7 +533,7 @@ function BuyModule() {
             </div>
             <div className="space-y-3 max-w-[280px]">
                 <h3 className="font-black text-black text-lg uppercase tracking-tight">Direct Deposit</h3>
-                <p className="text-xs text-black/50 font-medium leading-relaxed">Convert fiat to crypto instantly using Apple Pay, Google Pay, or Bank Transfer. Assets are delivered directly to your on-chain sovereign address.</p>
+                <p className="text-xs text-black/50 font-medium leading-relaxed">Convert fiat to crypto instantly using Apple Pay, Google Pay, or Bank Transfer. Assets are delivered directly to your on-chain system address.</p>
             </div>
             <div className="bg-black/5 border border-black/10 p-3 rounded-2xl w-full flex items-center justify-between mt-4">
                 <span className="text-[10px] font-black uppercase tracking-widest text-black/50">Destination Wallet</span>

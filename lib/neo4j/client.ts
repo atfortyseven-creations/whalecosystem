@@ -1,9 +1,9 @@
 import neo4j, { Driver, Session } from 'neo4j-driver';
 
-// ── Sovereign Architecture: Neo4j AuraDB Connector ───────────────────────────
+//  System Architecture: Neo4j AuraDB Connector 
 // This module provides the connection to the graph database used for Mass
-// Transfer Intelligence (3-hop heuristic tracing).
-// ─────────────────────────────────────────────────────────────────────────────
+// Transfer Analytics (3-hop heuristic tracing).
+// 
 
 const uri = process.env.NEO4J_URI || 'neo4j+s://localhost:7687';
 const user = process.env.NEO4J_USER || 'neo4j';

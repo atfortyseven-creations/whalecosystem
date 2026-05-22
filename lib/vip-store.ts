@@ -9,9 +9,9 @@ import { subscribeWithSelector } from 'zustand/middleware';
 export const EMPTY_ARRAY: any[] = [];
 Object.freeze(EMPTY_ARRAY);
 
-// ─────────────────────────────────────────────────────────────
+// 
 // TYPES
-// ─────────────────────────────────────────────────────────────
+// 
 export interface WhaleEvent {
     id: string;
     wallet: string;
@@ -135,7 +135,7 @@ export interface HACandle {
 }
 
 export interface VIPStoreState {
-    // ── Streams ──────────────────────────────────────────────
+    //  Streams 
     whaleEvents: WhaleEvent[];
     whaleActivities: WhaleActivity[]; // Telegram Feed
     tokenFeeds: Record<string, WhaleEvent[]>;
@@ -155,7 +155,7 @@ export interface VIPStoreState {
         entities: { address: string; label: string; balance: string }[];
     } | null;
 
-    // ── Meta ─────────────────────────────────────────────────
+    //  Meta 
     lastWhaleUpdate: number;
     lastActivityUpdate: number;
     lastMempoolUpdate: number;
@@ -167,7 +167,7 @@ export interface VIPStoreState {
     lastNexusUpdate: number;
     lastLeaderboardUpdate: number; // [NEW]
 
-    // ── Actions ──────────────────────────────────────────────
+    //  Actions 
     setWhaleEvents: (events: WhaleEvent[]) => void;
     setWhaleActivities: (activities: WhaleActivity[]) => void;
     mergeWhaleEvents: (events: WhaleEvent[]) => void;
@@ -353,9 +353,9 @@ export const useVIPStore = create<VIPStoreState>()(
     }))
 );
 
-// ─────────────────────────────────────────────────────────────
+// 
 // HELPER: parse raw alpha-events API response into WhaleEvent[]
-// ─────────────────────────────────────────────────────────────
+// 
 export function parseAlphaEvents(rawEvents: any[]): WhaleEvent[] {
     return rawEvents.map(e => {
         // Favor raw numeric usdNum if API provides it, otherwise fallback to parsing string

@@ -1,5 +1,5 @@
 /**
- * 🔥 PULSE MONITOR SERVICE 🔥
+ *  PULSE MONITOR SERVICE 
  * Tracks the "Heartbeat" of major networks (BTC, ETH, BNB, BASE, SOL).
  */
 

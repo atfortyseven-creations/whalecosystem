@@ -7,7 +7,7 @@ import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/navigation';
 
 /**
- * [LEGENDARY] OfflineScreen — branded fullscreen overlay shown when the browser loses network.
+ * [LEGENDARY] OfflineScreen  branded fullscreen overlay shown when the browser loses network.
  * Auto-dismisses when the connection is restored.
  */
 export function OfflineScreen() {

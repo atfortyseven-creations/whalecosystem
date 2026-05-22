@@ -1,6 +1,6 @@
 /**
  * canvas-types.ts
- * ─────────────────────────────────────────────────────────────────────────────
+ * 
  * Shared type definitions for the Canvas topology engine.
  *
  * This file exists to BREAK the circular dependency between CanvasEngine.tsx
@@ -10,7 +10,7 @@
  * values at runtime when module initialisation order is ambiguous.
  *
  * Import from here in ALL canvas sub-components instead of from CanvasEngine.
- * ─────────────────────────────────────────────────────────────────────────────
+ * 
  */
 
 export type NodeType = 'wallet' | 'bot' | 'contract' | 'api';

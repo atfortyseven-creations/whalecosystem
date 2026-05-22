@@ -150,7 +150,7 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                     </div>
                                     <div>
                                         <h2 className="text-slate-950 font-black uppercase tracking-widest text-sm">
-                                            {showChart ? 'Market Intelligence' : 'Scientific Forensics'}
+                                            {showChart ? 'Market Analytics' : 'Scientific Forensics'}
                                         </h2>
                                         <p className="text-slate-400 text-[10px] font-mono tracking-widest truncate max-w-[200px]">{address}</p>
                                     </div>
@@ -178,7 +178,7 @@ export function WhaleProfiler({ address, onClose }: Props) {
 
                                 {isError && (
                                     <div className="flex flex-col items-center justify-center h-48 gap-2 text-slate-400">
-                                        <span className="text-2xl opacity-50">⚠️</span>
+                                        <span className="text-2xl opacity-50">️</span>
                                         <p className="text-[10px] font-black uppercase tracking-widest">Incomplete Telemetry</p>
                                     </div>
                                 )}
@@ -251,7 +251,7 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                                                 <Hash size={12} className="text-slate-400" />
                                                                 <span className="text-slate-400 text-[9px] uppercase tracking-widest font-black">Total Events</span>
                                                             </div>
-                                                            <div className="text-slate-950 font-black font-mono text-lg tracking-tighter">{data.tx_count?.toLocaleString() ?? '—'}</div>
+                                                            <div className="text-slate-950 font-black font-mono text-lg tracking-tighter">{data.tx_count?.toLocaleString() ?? ''}</div>
                                                         </div>
                                                     </motion.div>
 

@@ -20,14 +20,14 @@ import {
   Zap,
   Key,
 } from "lucide-react";
-import { QuantumAuthGate } from "@/components/auth/QuantumAuthGate";
+import { CoreAuthGate } from "@/components/auth/CoreAuthGate";
 
 
-// ── Wave Background using olas-hokusai-4k.png ──────────────────────────────────
+//  Wave Background using olas-hokusai-4k.png 
 function WaveBackground() {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      {/* The legendary wave image — hardware accelerated, zero quality loss */}
+      {/* The legendary wave image  hardware accelerated, zero quality loss */}
       <div
         className="absolute inset-0"
         style={{
@@ -39,7 +39,7 @@ function WaveBackground() {
           willChange: "transform",
         }}
       />
-      {/* Overlay to keep text readable — dark at bottom, transparent at top */}
+      {/* Overlay to keep text readable  dark at bottom, transparent at top */}
       <div
         className="absolute inset-0"
         style={{
@@ -51,7 +51,7 @@ function WaveBackground() {
   );
 }
 
-// ── Instruction Step Card ──────────────────────────────────────────────────────
+//  Instruction Step Card 
 function StepCard({
   step,
   icon,
@@ -97,7 +97,7 @@ function StepCard({
   );
 }
 
-// ── Scroll Indicator ───────────────────────────────────────────────────────────
+//  Scroll Indicator 
 function ScrollHint() {
   return (
     <motion.div
@@ -125,14 +125,14 @@ function ScrollHint() {
   );
 }
 
-// ── Connect Panel (Panel 2) ────────────────────────────────────────────────────
+//  Connect Panel (Panel 2) 
 function ConnectPanel() {
   const { open: openConnectModal } = useAppKit();
   const { isConnected, address } = useAccount();
   const router = useRouter();
   const [showLocalLogin, setShowLocalLogin] = useState(false);
 
-  // When wallet connects → redirect directly to dashboard (no KYC)
+  // When wallet connects  redirect directly to dashboard (no KYC)
   useEffect(() => {
     if (isConnected) {
       setTimeout(() => router.replace("/"), 1200);
@@ -154,7 +154,7 @@ function ConnectPanel() {
                Cerrar
              </button>
              <div className="w-full max-w-[560px] relative z-10 max-h-screen overflow-y-auto">
-                <QuantumAuthGate onComplete={() => router.replace("/")} />
+                <CoreAuthGate onComplete={() => router.replace("/")} />
              </div>
            </motion.div>
         )}
@@ -205,7 +205,7 @@ function ConnectPanel() {
                 Conecta tu Wallet
               </h2>
               <p className="text-white/50 text-[13px] leading-relaxed">
-                Autenticación no custodial. Tu firma criptográfica es tu identidad — sin contraseñas, sin cuentas.
+                Autenticación no custodial. Tu firma criptográfica es tu identidad  sin contraseñas, sin cuentas.
               </p>
             </div>
 
@@ -223,10 +223,10 @@ function ConnectPanel() {
                   ¡Conectado!
                 </p>
                 <p className="font-mono text-white/40 text-[11px]">
-                  {address?.slice(0, 10)}…{address?.slice(-8)}
+                  {address?.slice(0, 10)}{address?.slice(-8)}
                 </p>
                 <p className="font-mono text-[9px] uppercase tracking-widest text-emerald-400/60 animate-pulse">
-                  Accediendo al terminal…
+                  Accediendo al terminal
                 </p>
               </motion.div>
             ) : (
@@ -285,7 +285,7 @@ function ConnectPanel() {
   );
 }
 
-// ── Main Page ──────────────────────────────────────────────────────────────────
+//  Main Page 
 export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -302,7 +302,7 @@ export default function LoginPage() {
     <div className="relative min-h-screen bg-[#020617]">
       <WaveBackground />
 
-      {/* ── PANEL 1: EDUCATIONAL GUIDE ────────────────────────────────── */}
+      {/*  PANEL 1: EDUCATIONAL GUIDE  */}
       <section className="relative z-10 min-h-screen flex flex-col px-6 py-16 max-w-2xl mx-auto">
 
         {/* Header */}
@@ -343,11 +343,11 @@ export default function LoginPage() {
             <span className="text-white/50">tu wallet</span>
           </h1>
           <p className="text-white/50 text-[14px] leading-relaxed max-w-lg">
-            El terminal usa autenticación <span className="text-white/80 font-bold">Web3 pura</span> — sin email, sin contraseñas, sin cuentas. Solo tu wallet y tu firma criptográfica.
+            El terminal usa autenticación <span className="text-white/80 font-bold">Web3 pura</span>  sin email, sin contraseñas, sin cuentas. Solo tu wallet y tu firma criptográfica.
           </p>
         </motion.div>
 
-        {/* ── OPCIÓN A: Chrome Extension ── */}
+        {/*  OPCIÓN A: Chrome Extension  */}
         <div className="mb-8">
           <motion.div
             initial={{ opacity: 0 }}
@@ -382,13 +382,13 @@ export default function LoginPage() {
               step={3}
               icon={<Zap size={18} />}
               title="Haz scroll y pulsa «Conectar Wallet»"
-              description='Desplázate hacia abajo en esta página. Pulsa el botón "Conectar Wallet". Tu extensión mostrará una ventana de confirmación. Aprueba la conexión — eso es todo.'
+              description='Desplázate hacia abajo en esta página. Pulsa el botón "Conectar Wallet". Tu extensión mostrará una ventana de confirmación. Aprueba la conexión  eso es todo.'
               delay={0.55}
             />
           </div>
         </div>
 
-        {/* ── OPCIÓN B: Wallet Móvil ── */}
+        {/*  OPCIÓN B: Wallet Móvil  */}
         <div className="mb-2">
           <motion.div
             initial={{ opacity: 0 }}
@@ -416,13 +416,13 @@ export default function LoginPage() {
               step={2}
               icon={<Wifi size={18} />}
               title="Haz scroll y usa WalletConnect"
-              description='En el panel de conexión (debajo), selecciona "WalletConnect". Se mostrará un código QR. Escanéalo con tu wallet móvil — la sesión se sincronizará automáticamente.'
+              description='En el panel de conexión (debajo), selecciona "WalletConnect". Se mostrará un código QR. Escanéalo con tu wallet móvil  la sesión se sincronizará automáticamente.'
               delay={0.75}
             />
           </div>
         </div>
 
-        {/* ── Security Badge ── */}
+        {/*  Security Badge  */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -444,7 +444,7 @@ export default function LoginPage() {
         <ScrollHint />
       </section>
 
-      {/* ── PANEL 2: CONNECT BUTTON ───────────────────────────────────── */}
+      {/*  PANEL 2: CONNECT BUTTON  */}
       <ConnectPanel />
 
       {/* Footer */}

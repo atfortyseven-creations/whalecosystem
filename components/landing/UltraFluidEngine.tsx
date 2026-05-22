@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 
 /**
- * 🌌 THE LEGENDARY ULTRA-FLUID ENGINE 🌌
+ *  THE LEGENDARY ULTRA-FLUID ENGINE 
  * 
  * Specifically engineered to maintain a mathematical 240Hz lock on both Mobile & PC.
  * Eradicates lag by forcing strict GPU-compositing, bypassing CPU repaints, 

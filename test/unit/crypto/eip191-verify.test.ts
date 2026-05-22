@@ -1,5 +1,5 @@
 /**
- * SOVEREIGN CRYPTOGRAPHIC VERIFICATION — Test Suite
+ * SOVEREIGN CRYPTOGRAPHIC VERIFICATION  Test Suite
  *
  * Tests the formal EIP-191 implementation with all security hardening layers:
  *   - Correct signature verification
@@ -24,7 +24,7 @@ import {
   buildAuthMessage,
 } from '@/lib/crypto/eip191-verify';
 
-// ── Test fixtures ──────────────────────────────────────────────────────────────
+//  Test fixtures 
 
 let wallet: ethers.Wallet;
 let walletAddress: string;
@@ -35,11 +35,11 @@ beforeAll(async () => {
   // Deterministic test wallet (DO NOT use in production)
   wallet = new ethers.Wallet('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80');
   walletAddress = wallet.address;
-  testMessage = 'Sovereign Network Authentication — test message';
+  testMessage = 'System Network Authentication  test message';
   validSignature = await wallet.signMessage(testMessage);
 });
 
-// ── verifyEIP191Signature ──────────────────────────────────────────────────────
+//  verifyEIP191Signature 
 
 describe('verifyEIP191Signature', () => {
   it('accepts a valid EIP-191 signature', () => {
@@ -87,7 +87,7 @@ describe('verifyEIP191Signature', () => {
   });
 });
 
-// ── enforceLoSValue ────────────────────────────────────────────────────────────
+//  enforceLoSValue 
 
 describe('enforceLoSValue (EIP-2 anti-malleability)', () => {
   it('accepts valid signature with low-s', () => {
@@ -113,7 +113,7 @@ describe('enforceLoSValue (EIP-2 anti-malleability)', () => {
   });
 });
 
-// ── safeAddressEqual ───────────────────────────────────────────────────────────
+//  safeAddressEqual 
 
 describe('safeAddressEqual (timing-safe)', () => {
   it('returns true for identical addresses', () => {
@@ -134,7 +134,7 @@ describe('safeAddressEqual (timing-safe)', () => {
   });
 });
 
-// ── validateNonce ──────────────────────────────────────────────────────────────
+//  validateNonce 
 
 describe('validateNonce', () => {
   it('accepts valid 64-char hex nonce (256 bits)', () => {
@@ -156,7 +156,7 @@ describe('validateNonce', () => {
   });
 });
 
-// ── verifySignedPayload ────────────────────────────────────────────────────────
+//  verifySignedPayload 
 
 describe('verifySignedPayload', () => {
   it('accepts valid payload within time window', async () => {
@@ -220,7 +220,7 @@ describe('verifySignedPayload', () => {
   });
 });
 
-// ── buildAuthMessage ───────────────────────────────────────────────────────────
+//  buildAuthMessage 
 
 describe('buildAuthMessage', () => {
   it('produces deterministic, canonical message format', () => {

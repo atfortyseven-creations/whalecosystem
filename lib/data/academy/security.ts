@@ -59,7 +59,7 @@ export const securityModules = [
                 </div>`
         },
         {
-            id: "security-endgame-post-quantum-ai-defense-phd",
+            id: "security-endgame-post-core-ai-defense-phd",
             title: "4. El Endgame de la Seguridad: IA y Criptografía Post-Cuántica",
             description: "La defensa a la velocidad de la luz ante amenazas futuras y agentes autónomos.",
             readTime: 400,
@@ -149,7 +149,7 @@ export const securityModules = [
                 </div>`
         },
         {
-            id: "did-zk-identity-biometric-sovereignty-phd",
+            id: "did-zk-identity-biometric-systemty-phd",
             title: "9. Identidad Descentralizada (DID): Soberanía Biométrica y ZK",
             description: "Tú eres la llave: Integrando la identidad humana en la custodia resistente.",
             readTime: 350,
@@ -288,7 +288,7 @@ export const securityModules = [
 
                     <section class="pro-section">
                         <h2>II. Ataques de Manipulación de Precio por Flash Loans</h2>
-                        <p>Los protocolos poorly-designed usan el precio spot del pool de Uniswap (Oráculo endógeno) como referencia para préstamos. El atacante hace un <strong>Préstamo Flash Inmenso ($100M)</strong> en la misma transacción: 1. Compra agresivamente el Token X en el pool, inflando su spot price allí en un 1000%. 2. Va a la plataforma de préstamos, deposita el mismo Token X y, como la plataforma lee el precio manipulado y sobreinflado, el atacante <em>vacía toda la liquidez del protocolo</em> tomando un "préstamo" enorme de stables. 3. Devuelve el Flash Loan original y se queda el botín real. La regla institucional forense: <strong>Todo oráculo de un solo pool es letal</strong> (siempre deben usarse TWAP — Time-Weighted Average Price — o Chainlink Data-Feeds).</p>
+                        <p>Los protocolos poorly-designed usan el precio spot del pool de Uniswap (Oráculo endógeno) como referencia para préstamos. El atacante hace un <strong>Préstamo Flash Inmenso ($100M)</strong> en la misma transacción: 1. Compra agresivamente el Token X en el pool, inflando su spot price allí en un 1000%. 2. Va a la plataforma de préstamos, deposita el mismo Token X y, como la plataforma lee el precio manipulado y sobreinflado, el atacante <em>vacía toda la liquidez del protocolo</em> tomando un "préstamo" enorme de stables. 3. Devuelve el Flash Loan original y se queda el botín real. La regla institucional forense: <strong>Todo oráculo de un solo pool es letal</strong> (siempre deben usarse TWAP  Time-Weighted Average Price  o Chainlink Data-Feeds).</p>
                     </section>
                 </div>`
         },

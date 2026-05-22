@@ -70,7 +70,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     id: 4,
     title: "Social Recovery",
     category: "Security",
-    description: "Never lose access—trusted contacts can help restore your wallet.",
+    description: "Never lose accesstrusted contacts can help restore your wallet.",
     detailedInfo: "Designate family, friends, or colleagues as recovery guardians. If you lose access, a majority of guardians can collectively restore your account without ever exposing your private keys to any single party.",
     benefits: [
       "No seed phrase storage required",
@@ -91,7 +91,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
       "Privacy-preserving credential verification",
       "Regulatory compliance without KYC exposure",
       "Untraceable transaction paths",
-      "Quantum-resistant cryptography"
+      "Core-resistant cryptography"
     ],
     icon: <Eye />,
     gradient: "from-gray-600 to-slate-800"
@@ -146,7 +146,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Encrypted Backup",
     category: "Security",
     description: "Automated cloud backups with military-grade encryption.",
-    detailedInfo: "Your wallet state is continuously encrypted using AES-256 and backed up to decentralized storage networks. Only you hold the decryption key—not even our servers can access your data.",
+    detailedInfo: "Your wallet state is continuously encrypted using AES-256 and backed up to decentralized storage networks. Only you hold the decryption keynot even our servers can access your data.",
     benefits: [
       "Zero-knowledge cloud architecture",
       "IPFS and Arweave redundancy",
@@ -178,7 +178,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Prediction Markets",
     category: "DeFi",
     description: "Trade on future outcomes with zero-knowledge privacy.",
-    detailedInfo: "Bet on real-world events—from elections to sports to macroeconomic indicators—using decentralized prediction markets. All positions are settled via oracle consensus, ensuring fairness and transparency.",
+    detailedInfo: "Bet on real-world eventsfrom elections to sports to macroeconomic indicatorsusing decentralized prediction markets. All positions are settled via oracle consensus, ensuring fairness and transparency.",
     benefits: [
       "No counterparty risk",
       "Instant global settlements",
@@ -283,7 +283,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Auto-Compounding",
     category: "DeFi",
     description: "Maximize yields with automated reward reinvestment.",
-    detailedInfo: "Harvest and reinvest your staking rewards without manual intervention. Compound interest accelerates exponentially—our vaults handle the complexity so you don't have to.",
+    detailedInfo: "Harvest and reinvest your staking rewards without manual intervention. Compound interest accelerates exponentiallyour vaults handle the complexity so you don't have to.",
     benefits: [
       "Daily compounding frequency",
       "Gas-socialized across all users",
@@ -358,9 +358,9 @@ export const FEATURE_CARDS: FeatureCard[] = [
   {
     id: 23,
     title: "Whale Movement Alerts",
-    category: "Intelligence",
+    category: "Analytics",
     description: "Get notified when whales move large amounts.",
-    detailedInfo: "Track wallets of top holders, VCs, and influencers. Receive instant Telegram/email alerts when they make significant transfers—front-run the market before news goes public.",
+    detailedInfo: "Track wallets of top holders, VCs, and influencers. Receive instant Telegram/email alerts when they make significant transfersfront-run the market before news goes public.",
     benefits: [
       "Custom whale watch lists",
       "Threshold-based alerts",
@@ -390,7 +390,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Transaction History Analysis",
     category: "Analytics",
     description: "Forensic-level insights into your on-chain activity.",
-    detailedInfo: "Visualize your complete transaction history with smart categorization (trades, transfers, staking, airdrops). Export for tax reporting in seconds—supports all major accounting software.",
+    detailedInfo: "Visualize your complete transaction history with smart categorization (trades, transfers, staking, airdrops). Export for tax reporting in secondssupports all major accounting software.",
     benefits: [
       "Tax-ready CSV exports",
       "Cost-basis tracking (FIFO, LIFO, HIFO)",
@@ -403,7 +403,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
   {
     id: 26,
     title: "Risk Scoring",
-    category: "Intelligence",
+    category: "Analytics",
     description: "Assess wallet security and interaction risks.",
     detailedInfo: "Our algorithm scores wallets based on transaction patterns, smart contract interactions, and association with known exploits. Avoid scams by checking risk scores before sending funds.",
     benefits: [
@@ -482,7 +482,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Global Instant Settlements",
     category: "Payments",
     description: "Send money anywhere in seconds, not days.",
-    detailedInfo: "Leverage stablecoin rails for near-instant cross-border payments. No SWIFT delays, no forex fees—just pure, permissionless value transfer at the speed of light.",
+    detailedInfo: "Leverage stablecoin rails for near-instant cross-border payments. No SWIFT delays, no forex feesjust pure, permissionless value transfer at the speed of light.",
     benefits: [
       "24/7/365 availability",
       "Settlement finality in under 30 seconds",
@@ -497,7 +497,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Multi-Chain Messaging",
     category: "Infrastructure",
     description: "Communicate across blockchains seamlessly.",
-    detailedInfo: "Built on LayerZero and Axelar, our messaging protocol enables cross-chain function calls. Trigger actions on Ethereum from Arbitrum, or vice versa—all without manual bridging.",
+    detailedInfo: "Built on LayerZero and Axelar, our messaging protocol enables cross-chain function calls. Trigger actions on Ethereum from Arbitrum, or vice versaall without manual bridging.",
     benefits: [
       "Omnichain smart contract composability",
       "Trustless message verification",
@@ -542,7 +542,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Stablecoin Transfers",
     category: "Payments",
     description: "Send USDC globally with minimal fees.",
-    detailedInfo: "Utilize Circle's CCTP (Cross-Chain Transfer Protocol) to natively burn and mint USDC across chains. No slippage, no liquidity pools—just pure, capital-efficient transfers.",
+    detailedInfo: "Utilize Circle's CCTP (Cross-Chain Transfer Protocol) to natively burn and mint USDC across chains. No slippage, no liquidity poolsjust pure, capital-efficient transfers.",
     benefits: [
       "Native USDC support",
       "Zero slippage",
@@ -649,7 +649,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Referral Programs",
     category: "Social",
     description: "Earn rewards for bringing friends.",
-    detailedInfo: "Share your referral link and earn 10% of your referrals' trading fees for life. Built on-chain with transparent tracking—no hidden clauses or clawbacks.",
+    detailedInfo: "Share your referral link and earn 10% of your referrals' trading fees for life. Built on-chain with transparent trackingno hidden clauses or clawbacks.",
     benefits: [
       "Lifetime revenue share",
       "On-chain tracking",
@@ -664,7 +664,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Governance Voting",
     category: "DAO",
     description: "Vote on protocol upgrades and treasury decisions.",
-    detailedInfo: "Participate in on-chain governance for your favorite protocols. Delegate your voting power or vote directly—your voice shapes the future of DeFi.",
+    detailedInfo: "Participate in on-chain governance for your favorite protocols. Delegate your voting power or vote directlyyour voice shapes the future of DeFi.",
     benefits: [
       "Snapshot and Tally integration",
       "Vote delegation",
@@ -694,7 +694,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Claim Automation",
     category: "Automation",
     description: "Auto-harvest staking rewards and liquidity mining.",
-    detailedInfo: "Set it and forget it—our bots automatically claim and compound your rewards daily. Gas costs are socialized across all users for maximum efficiency.",
+    detailedInfo: "Set it and forget itour bots automatically claim and compound your rewards daily. Gas costs are socialized across all users for maximum efficiency.",
     benefits: [
       "Daily auto-compounding",
       "Gas optimization",

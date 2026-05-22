@@ -1,7 +1,7 @@
 import { moralisService } from '../blockchain/MoralisService';
 
 /**
- * 🔥 TRANSACTION MONITOR - MORALIS EDITION 🔥
+ *  TRANSACTION MONITOR - MORALIS EDITION 
  * Note: Real-time monitoring now leverages Moralis Streams (Backend Configured).
  * This service handles simplified polling logic for active sessions.
  */

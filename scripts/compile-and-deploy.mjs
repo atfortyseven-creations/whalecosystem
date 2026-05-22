@@ -1,14 +1,14 @@
 /**
  * compile-and-deploy.mjs
- * ─────────────────────────────────────────────────────────────────────────────
- * Step 1: Compiles QuantumDots.sol + QuantumLedger.sol using the solc package
+ * 
+ * Step 1: Compiles CoreDots.sol + CoreLedger.sol using the solc package
  *         from node_modules (no Hardhat runtime, no WASM issues).
  * Step 2: Deploys both contracts to Base Mainnet via ethers v6.
  * Step 3: Verifies the genesis allocation on-chain.
  * Step 4: Prints the env vars to set in Railway + .env
  *
  * Usage: node scripts/compile-and-deploy.mjs
- * ─────────────────────────────────────────────────────────────────────────────
+ * 
  */
 
 import { createRequire } from "module";
@@ -21,7 +21,7 @@ const require  = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT     = join(__dirname, "..");
 
-// ── Load .env ────────────────────────────────────────────────────────────────
+//  Load .env 
 function loadEnv() {
   const lines = readFileSync(join(ROOT, ".env"), "utf8").split("\n");
   const env   = {};
@@ -43,7 +43,7 @@ function loadEnv() {
 
 const ENV = loadEnv();
 
-// ── Configuration ─────────────────────────────────────────────────────────────
+//  Configuration 
 const RPC_URL = ENV.BASE_MAINNET_RPC || ENV.BASE_MAINNET_RPC_URL ||
                 ENV.GB_BASE_RPC_1   || "https://mainnet.base.org";
 
@@ -54,11 +54,11 @@ const PRIVATE_KEY = RAW_KEY.startsWith("0x") ? RAW_KEY : `0x${RAW_KEY}`;
 const SOVEREIGN_VAULT = "0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a";
 const EXPECTED_GENESIS = 5_000_000n * 10n ** 18n;
 
-// ── Solidity source paths ────────────────────────────────────────────────────
-const QD_PATH     = join(ROOT, "contracts/quantum/QuantumDots.sol");
-const LEDGER_PATH = join(ROOT, "contracts/quantum/QuantumLedger.sol");
+//  Solidity source paths 
+const QD_PATH     = join(ROOT, "contracts/core/CoreDots.sol");
+const LEDGER_PATH = join(ROOT, "contracts/core/CoreLedger.sol");
 
-// ── Compile using solc (node_modules) ────────────────────────────────────────
+//  Compile using solc (node_modules) 
 function compileSolidity() {
   console.log("\n[1/5] Compiling contracts with solc...");
   const solc = require("solc");
@@ -86,8 +86,8 @@ function compileSolidity() {
   const input = {
     language: "Solidity",
     sources: {
-      "QuantumDots.sol":   { content: qdSrc },
-      "QuantumLedger.sol": { content: ledgerSrc },
+      "CoreDots.sol":   { content: qdSrc },
+      "CoreLedger.sol": { content: ledgerSrc },
     },
     settings: {
       optimizer: { enabled: true, runs: 200 },
@@ -117,8 +117,8 @@ function compileSolidity() {
     console.log(`  ${warnings.length} warning(s) (non-fatal).`);
   }
 
-  const qdOut     = output.contracts["QuantumDots.sol"]["QuantumDots"];
-  const ledgerOut = output.contracts["QuantumLedger.sol"]["QuantumLedger"];
+  const qdOut     = output.contracts["CoreDots.sol"]["CoreDots"];
+  const ledgerOut = output.contracts["CoreLedger.sol"]["CoreLedger"];
 
   if (!qdOut || !ledgerOut) {
     console.error("[ABORT] Compilation did not produce expected contracts.");
@@ -126,8 +126,8 @@ function compileSolidity() {
     process.exit(1);
   }
 
-  console.log("  QuantumDots    compiled ✓");
-  console.log("  QuantumLedger  compiled ✓");
+  console.log("  CoreDots    compiled ");
+  console.log("  CoreLedger  compiled ");
 
   return {
     qd: {
@@ -141,11 +141,11 @@ function compileSolidity() {
   };
 }
 
-// ── Deploy ────────────────────────────────────────────────────────────────────
+//  Deploy 
 async function main() {
-  console.log("\n╔══════════════════════════════════════════════════════════════╗");
-  console.log("║  QuantumDots (210M QDs) + QuantumLedger — Base Mainnet      ║");
-  console.log("╚══════════════════════════════════════════════════════════════╝");
+  console.log("\n");
+  console.log("  CoreDots (210M QDs) + CoreLedger  Base Mainnet      ");
+  console.log("");
 
   // 1. Compile
   const { qd, ledger } = compileSolidity();
@@ -173,8 +173,8 @@ async function main() {
     process.exit(1);
   }
 
-  // 3. Deploy QuantumDots
-  console.log("\n[3/5] Deploying QuantumDots...");
+  // 3. Deploy CoreDots
+  console.log("\n[3/5] Deploying CoreDots...");
   const qdFactory = new ethers.ContractFactory(qd.abi, qd.bytecode, wallet);
   const qdContract = await qdFactory.deploy(wallet.address);
   const qdDeployTx = qdContract.deploymentTransaction();
@@ -182,7 +182,7 @@ async function main() {
   console.log("  Waiting for confirmation...");
   await qdContract.waitForDeployment();
   const QD_ADDRESS = await qdContract.getAddress();
-  console.log(`  Deployed : ${QD_ADDRESS} ✓`);
+  console.log(`  Deployed : ${QD_ADDRESS} `);
 
   // 4. Verify genesis
   console.log("\n[4/5] Verifying genesis allocation...");
@@ -202,10 +202,10 @@ async function main() {
     console.error(`[ABORT] Vault has ${ethers.formatEther(vaultBal)} QDs, expected 5,000,000.`);
     process.exit(1);
   }
-  console.log("  Genesis 5,000,000 QDs confirmed ✓");
+  console.log("  Genesis 5,000,000 QDs confirmed ");
 
-  // 5. Deploy QuantumLedger
-  console.log("\n[5/5] Deploying QuantumLedger v2...");
+  // 5. Deploy CoreLedger
+  console.log("\n[5/5] Deploying CoreLedger v2...");
   const ledgerFactory  = new ethers.ContractFactory(ledger.abi, ledger.bytecode, wallet);
   const ledgerContract = await ledgerFactory.deploy(QD_ADDRESS);
   const ledgerDeployTx = ledgerContract.deploymentTransaction();
@@ -213,9 +213,9 @@ async function main() {
   console.log("  Waiting for confirmation...");
   await ledgerContract.waitForDeployment();
   const LEDGER_ADDRESS = await ledgerContract.getAddress();
-  console.log(`  Deployed : ${LEDGER_ADDRESS} ✓`);
+  console.log(`  Deployed : ${LEDGER_ADDRESS} `);
 
-  // ── Update .env automatically ─────────────────────────────────────────────
+  //  Update .env automatically 
   console.log("\n  Patching .env with contract addresses...");
   let envContent = readFileSync(join(ROOT, ".env"), "utf8");
 
@@ -228,26 +228,26 @@ async function main() {
     .join("\n");
 
   // Append new values
-  envContent += `\n# ── QDs Contract Addresses (auto-generated by deploy-qd-live) ──\n`;
+  envContent += `\n#  QDs Contract Addresses (auto-generated by deploy-qd-live) \n`;
   envContent += `NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=${QD_ADDRESS}\n`;
   envContent += `NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS=${LEDGER_ADDRESS}\n`;
   envContent += `NEXT_PUBLIC_CHAIN_ID=8453\n`;
 
   writeFileSync(join(ROOT, ".env"), envContent, "utf8");
-  console.log("  .env updated ✓");
+  console.log("  .env updated ");
 
-  // ── Summary ───────────────────────────────────────────────────────────────
-  console.log("\n╔══════════════════════════════════════════════════════════════╗");
-  console.log("║  DEPLOYMENT COMPLETE                                         ║");
-  console.log("╠══════════════════════════════════════════════════════════════╣");
-  console.log(`║  QuantumDots   : ${QD_ADDRESS}`);
-  console.log(`║  QuantumLedger : ${LEDGER_ADDRESS}`);
-  console.log("╠══════════════════════════════════════════════════════════════╣");
-  console.log("║  Copy to Railway Dashboard → Variables:                      ║");
-  console.log(`║  NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=${QD_ADDRESS}`);
-  console.log(`║  NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS=${LEDGER_ADDRESS}`);
-  console.log("║  NEXT_PUBLIC_CHAIN_ID=8453                                   ║");
-  console.log("╚══════════════════════════════════════════════════════════════╝\n");
+  //  Summary 
+  console.log("\n");
+  console.log("  DEPLOYMENT COMPLETE                                         ");
+  console.log("");
+  console.log(`  CoreDots   : ${QD_ADDRESS}`);
+  console.log(`  CoreLedger : ${LEDGER_ADDRESS}`);
+  console.log("");
+  console.log("  Copy to Railway Dashboard  Variables:                      ");
+  console.log(`  NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS=${QD_ADDRESS}`);
+  console.log(`  NEXT_PUBLIC_LEDGER_CONTRACT_ADDRESS=${LEDGER_ADDRESS}`);
+  console.log("  NEXT_PUBLIC_CHAIN_ID=8453                                   ");
+  console.log("\n");
   console.log("  BaseScan verification:");
   console.log(`  https://basescan.org/address/${QD_ADDRESS}`);
   console.log(`  https://basescan.org/address/${LEDGER_ADDRESS}\n`);

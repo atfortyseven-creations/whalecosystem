@@ -1,12 +1,12 @@
 # VOSS 2026 SUPREME DIRECTIVE: THE 500 DIMENSIONS OF APEX DOMINANCE
-*Sovereign-grade intelligence output. Direct integration to System Architecture (v4.2.0).*
+*System-grade analytics output. Direct integration to System Architecture (v4.2.0).*
 *Constructed on the principles of Zero-Mock Mandate, Akashic Permanence, and Institutional Ivory.*
 
 
 ## CATEGORÍA 1: ARQUITECTURA Y CÓDIGO CORE
 
-**#001 - Categoría 1: ZK-State Rollup Sovereign Mesh**
-**Descripción:** Mutación del Sovereign Mesh Protocol para asimilar estado global en rollups Groth16. Todo update de Neo4j genera un state root on-chain, extendiendo la arquitectura de Ingestion Sub-15ms.
+**#001 - Categoría 1: ZK-State Rollup System Mesh**
+**Descripción:** Mutación del System Mesh Protocol para asimilar estado global en rollups Groth16. Todo update de Neo4j genera un state root on-chain, extendiendo la arquitectura de Ingestion Sub-15ms.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena sin fallos.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
 **Prioridad:** Crítica
@@ -50,7 +50,7 @@
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#006 - Categoría 1: Sovereign App-Chain L3 87**
+**#006 - Categoría 1: System App-Chain L3 87**
 **Descripción:** Bypass del Query Engine de Prisma en JS para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 20 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -69,7 +69,7 @@
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
 **#008 - Categoría 1: Deterministic Garbage Collection 33**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 10 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 10 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Alta
@@ -77,7 +77,7 @@
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#009 - Categoría 1: ZK-State Rollup Sovereign Mesh 60**
+**#009 - Categoría 1: ZK-State Rollup System Mesh 60**
 **Descripción:** Anclaje del estado del Akashic Ledger a soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 14 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -86,8 +86,8 @@
 **Impacto esperado:** +300% de retención institucional.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#010 - Categoría 1: Non-Custodial Multi-Chain Sovereign Vault 64**
-**Descripción:** Mutación del Sovereign Mesh Protocol para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 6 del README.
+**#010 - Categoría 1: Non-Custodial Multi-Chain System Vault 64**
+**Descripción:** Mutación del System Mesh Protocol para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
 **Prioridad:** Media
@@ -116,13 +116,13 @@
 **#013 - Categoría 1: Inherent MEV Protection Vault 96**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 28 días senior
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#014 - Categoría 1: ZK-State Rollup Sovereign Mesh 57**
+**#014 - Categoría 1: ZK-State Rollup System Mesh 57**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 19 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -152,7 +152,7 @@
 **#017 - Categoría 1: Multi-stage Docker Hyper-optimization 60**
 **Descripción:** Caché anticipada de las rutas Neo4j para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 8 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 9 días senior
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
@@ -176,10 +176,10 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
-**#020 - Categoría 1: Non-Custodial Multi-Chain Sovereign Vault 49**
+**#020 - Categoría 1: Non-Custodial Multi-Chain System Vault 49**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 2 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 2 días senior
 **Impacto esperado:** 0 downtime ante forks de L2s.
@@ -257,8 +257,8 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#029 - Categoría 1: ZK-State Rollup Sovereign Mesh 90**
-**Descripción:** Mutación del Sovereign Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 15 del README.
+**#029 - Categoría 1: ZK-State Rollup System Mesh 90**
+**Descripción:** Mutación del System Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
 **Prioridad:** Media
@@ -266,8 +266,8 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#030 - Categoría 1: Non-Custodial Multi-Chain Sovereign Vault 18**
-**Descripción:** Mutación del Sovereign Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 13 del README.
+**#030 - Categoría 1: Non-Custodial Multi-Chain System Vault 18**
+**Descripción:** Mutación del System Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
 **Prioridad:** Alta
@@ -275,8 +275,8 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#031 - Categoría 1: Non-Custodial Multi-Chain Sovereign Vault 46**
-**Descripción:** Mutación del Sovereign Mesh Protocol para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 6 del README.
+**#031 - Categoría 1: Non-Custodial Multi-Chain System Vault 46**
+**Descripción:** Mutación del System Mesh Protocol para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
 **Prioridad:** Alta
@@ -294,7 +294,7 @@
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
 **#033 - Categoría 1: Biometric Enclave SIWE login 78**
-**Descripción:** Mutación del Sovereign Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 7 del README.
+**Descripción:** Mutación del System Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Crítica
@@ -314,7 +314,7 @@
 **#035 - Categoría 1: Ingestión Solana Geohash Sub-1ms 19**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 10 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
@@ -413,7 +413,7 @@
 **#046 - Categoría 1: Deterministic Engine Polymorphism 61**
 **Descripción:** Caché anticipada de las rutas Neo4j para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 2 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 10 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -428,7 +428,7 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#048 - Categoría 1: Quantum-Resistant Threshold Signatures 78**
+**#048 - Categoría 1: Core-Resistant Threshold Signatures 78**
 **Descripción:** Bóveda nativa multi-cadena controlando la ejecución para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -437,7 +437,7 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#049 - Categoría 1: Non-Custodial Multi-Chain Sovereign Vault 60**
+**#049 - Categoría 1: Non-Custodial Multi-Chain System Vault 60**
 **Descripción:** Anclaje del estado del Akashic Ledger a consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 10 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
@@ -446,8 +446,8 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#050 - Categoría 1: Non-Custodial Multi-Chain Sovereign Vault 1**
-**Descripción:** Mutación del Sovereign Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 5 del README.
+**#050 - Categoría 1: Non-Custodial Multi-Chain System Vault 1**
+**Descripción:** Mutación del System Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 5 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
 **Prioridad:** Crítica
@@ -458,7 +458,7 @@
 
 ## CATEGORÍA 2: NUEVAS FEATURES E INTELIGENCIA AVANZADA
 
-**#051 - Categoría 2: ZK-State Rollup Sovereign Mesh 77**
+**#051 - Categoría 2: ZK-State Rollup System Mesh 77**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -494,7 +494,7 @@
 **Impacto esperado:** +300% de retención institucional.
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
-**#055 - Categoría 2: Sovereign App-Chain L3 27**
+**#055 - Categoría 2: System App-Chain L3 27**
 **Descripción:** Caché anticipada de las rutas Neo4j para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 1 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
@@ -503,7 +503,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#056 - Categoría 2: Sovereign App-Chain L3 81**
+**#056 - Categoría 2: System App-Chain L3 81**
 **Descripción:** Bypass de RPCs tradicionales transmitiendo señales para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 11 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -557,7 +557,7 @@
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#062 - Categoría 2: Groth16 Deadman’s Switch Upgrade 37**
+**#062 - Categoría 2: Groth16 Deadmans Switch Upgrade 37**
 **Descripción:** Bóveda nativa multi-cadena controlando la ejecución para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -620,7 +620,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#069 - Categoría 2: Sovereign App-Chain L3 97**
+**#069 - Categoría 2: System App-Chain L3 97**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 8 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -638,7 +638,7 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#071 - Categoría 2: Sovereign App-Chain L3 16**
+**#071 - Categoría 2: System App-Chain L3 16**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 8 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -647,7 +647,7 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#072 - Categoría 2: Quantum-Resistant Threshold Signatures 4**
+**#072 - Categoría 2: Core-Resistant Threshold Signatures 4**
 **Descripción:** Anclaje del estado del Akashic Ledger a comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -665,7 +665,7 @@
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#074 - Categoría 2: Sovereign App-Chain L3 75**
+**#074 - Categoría 2: System App-Chain L3 75**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 18 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -674,7 +674,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
-**#075 - Categoría 2: ZK-State Rollup Sovereign Mesh 76**
+**#075 - Categoría 2: ZK-State Rollup System Mesh 76**
 **Descripción:** Bypass del Query Engine de Prisma en JS para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 1 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -692,7 +692,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#077 - Categoría 2: Quantum-Resistant Threshold Signatures 93**
+**#077 - Categoría 2: Core-Resistant Threshold Signatures 93**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -711,7 +711,7 @@
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
 **#079 - Categoría 2: World ID Sybil-Resistant Validation 83**
-**Descripción:** Mutación del Sovereign Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 15 del README.
+**Descripción:** Mutación del System Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
 **Prioridad:** Crítica
@@ -749,7 +749,7 @@
 **#083 - Categoría 2: Deterministic Garbage Collection 60**
 **Descripción:** Bypass del Query Engine de Prisma en JS para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 7 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -791,7 +791,7 @@
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#088 - Categoría 2: ZK-State Rollup Sovereign Mesh 3**
+**#088 - Categoría 2: ZK-State Rollup System Mesh 3**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 8 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -830,7 +830,7 @@
 **#092 - Categoría 2: In-Memory EVM Simulation Fork 91**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 11 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 3 días senior
 **Impacto esperado:** 0 downtime ante forks de L2s.
@@ -872,7 +872,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#097 - Categoría 2: Groth16 Deadman’s Switch Upgrade 43**
+**#097 - Categoría 2: Groth16 Deadmans Switch Upgrade 43**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -890,7 +890,7 @@
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
-**#099 - Categoría 2: Groth16 Deadman’s Switch Upgrade 40**
+**#099 - Categoría 2: Groth16 Deadmans Switch Upgrade 40**
 **Descripción:** Anclaje del estado del Akashic Ledger a querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -899,10 +899,10 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#100 - Categoría 2: Quantum-Resistant Threshold Signatures 36**
+**#100 - Categoría 2: Core-Resistant Threshold Signatures 36**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 9 días senior
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
@@ -920,8 +920,8 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#102 - Categoría 3: ZK-State Rollup Sovereign Mesh 45**
-**Descripción:** Mutación del Sovereign Mesh Protocol para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 16 del README.
+**#102 - Categoría 3: ZK-State Rollup System Mesh 45**
+**Descripción:** Mutación del System Mesh Protocol para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
 **Prioridad:** Alta
@@ -950,7 +950,7 @@
 **#105 - Categoría 3: Hardware-Accelerated Graph Renders 47**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 28 días senior
 **Impacto esperado:** +300% de retención institucional.
@@ -992,10 +992,10 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#110 - Categoría 3: Quantum-Resistant Threshold Signatures 77**
+**#110 - Categoría 3: Core-Resistant Threshold Signatures 77**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 5 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 19 días senior
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
@@ -1056,15 +1056,15 @@
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
 **#117 - Categoría 3: In-Memory EVM Simulation Fork 58**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 14 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 14 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 10 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#118 - Categoría 3: Sovereign App-Chain L3 4**
+**#118 - Categoría 3: System App-Chain L3 4**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 1 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
@@ -1091,7 +1091,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#121 - Categoría 3: Non-Custodial Multi-Chain Sovereign Vault 90**
+**#121 - Categoría 3: Non-Custodial Multi-Chain System Vault 90**
 **Descripción:** Bypass del Query Engine de Prisma en JS para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -1166,7 +1166,7 @@
 **#129 - Categoría 3: AI Agentic Execution Sub-system 15**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 21 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
@@ -1190,8 +1190,8 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#132 - Categoría 3: Groth16 Deadman’s Switch Upgrade 25**
-**Descripción:** Mutación del Sovereign Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 6 del README.
+**#132 - Categoría 3: Groth16 Deadmans Switch Upgrade 25**
+**Descripción:** Mutación del System Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
 **Prioridad:** Media
@@ -1226,7 +1226,7 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#136 - Categoría 3: Non-Custodial Multi-Chain Sovereign Vault 23**
+**#136 - Categoría 3: Non-Custodial Multi-Chain System Vault 23**
 **Descripción:** Bypass del Query Engine de Prisma en JS para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 8 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -1235,10 +1235,10 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#137 - Categoría 3: Sovereign App-Chain L3 89**
+**#137 - Categoría 3: System App-Chain L3 89**
 **Descripción:** Anclaje del estado del Akashic Ledger a querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 10 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -1283,7 +1283,7 @@
 **#142 - Categoría 3: ZK-Proof P2P Validation Mesh 82**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 21 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
@@ -1298,7 +1298,7 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
-**#144 - Categoría 3: Groth16 Deadman’s Switch Upgrade 15**
+**#144 - Categoría 3: Groth16 Deadmans Switch Upgrade 15**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 18 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
@@ -1317,7 +1317,7 @@
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
 **#146 - Categoría 3: Neo4j Cypher Neural Generation 87**
-**Descripción:** Mutación del Sovereign Mesh Protocol para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 8 del README.
+**Descripción:** Mutación del System Mesh Protocol para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 8 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Alta
@@ -1344,7 +1344,7 @@
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
 **#149 - Categoría 3: World ID Sybil-Resistant Validation 85**
-**Descripción:** Mutación del Sovereign Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 11 del README.
+**Descripción:** Mutación del System Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 11 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
 **Prioridad:** Alta
@@ -1365,7 +1365,7 @@
 ## CATEGORÍA 4: COMUNIDAD, GOVERNANCE Y RETENCIÓN
 
 **#151 - Categoría 4: Ingestión Solana Geohash Sub-1ms 61**
-**Descripción:** Mutación del Sovereign Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 4 del README.
+**Descripción:** Mutación del System Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
 **Prioridad:** Alta
@@ -1391,7 +1391,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
-**#154 - Categoría 4: ZK-State Rollup Sovereign Mesh 45**
+**#154 - Categoría 4: ZK-State Rollup System Mesh 45**
 **Descripción:** Bóveda nativa multi-cadena controlando la ejecución para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -1410,7 +1410,7 @@
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
 **#156 - Categoría 4: Multi-stage Docker Hyper-optimization 78**
-**Descripción:** Mutación del Sovereign Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 13 del README.
+**Descripción:** Mutación del System Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
 **Prioridad:** Alta
@@ -1427,7 +1427,7 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
-**#158 - Categoría 4: Quantum-Resistant Threshold Signatures 40**
+**#158 - Categoría 4: Core-Resistant Threshold Signatures 40**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 10 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -1466,7 +1466,7 @@
 **#162 - Categoría 4: Prisma Rust Bindings Nativos 50**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 14 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 26 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
@@ -1493,7 +1493,7 @@
 **#165 - Categoría 4: Deterministic Engine Polymorphism 93**
 **Descripción:** Caché anticipada de las rutas Neo4j para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 3 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 31 días senior
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
@@ -1535,7 +1535,7 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#170 - Categoría 4: Non-Custodial Multi-Chain Sovereign Vault 23**
+**#170 - Categoría 4: Non-Custodial Multi-Chain System Vault 23**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
@@ -1545,7 +1545,7 @@
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
 **#171 - Categoría 4: In-Memory EVM Simulation Fork 0**
-**Descripción:** Mutación del Sovereign Mesh Protocol para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 18 del README.
+**Descripción:** Mutación del System Mesh Protocol para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 18 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
 **Prioridad:** Alta
@@ -1553,7 +1553,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#172 - Categoría 4: ZK-State Rollup Sovereign Mesh 85**
+**#172 - Categoría 4: ZK-State Rollup System Mesh 85**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 19 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -1563,7 +1563,7 @@
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
 **#173 - Categoría 4: Zero-Trust Runtime Sandboxing 75**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 13 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
 **Prioridad:** Alta
@@ -1571,7 +1571,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#174 - Categoría 4: ZK-State Rollup Sovereign Mesh 48**
+**#174 - Categoría 4: ZK-State Rollup System Mesh 48**
 **Descripción:** Bypass de RPCs tradicionales transmitiendo señales para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -1589,7 +1589,7 @@
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#176 - Categoría 4: Sovereign App-Chain L3 41**
+**#176 - Categoría 4: System App-Chain L3 41**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -1608,7 +1608,7 @@
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
 **#178 - Categoría 4: On-device ML Heuristics 73**
-**Descripción:** Mutación del Sovereign Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 12 del README.
+**Descripción:** Mutación del System Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
 **Prioridad:** Alta
@@ -1628,7 +1628,7 @@
 **#180 - Categoría 4: Akashic Temporal Sharding 45**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 2 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 2 días senior
 **Impacto esperado:** -80% ancho de banda en servidor central.
@@ -1670,7 +1670,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#185 - Categoría 4: Sovereign App-Chain L3 36**
+**#185 - Categoría 4: System App-Chain L3 36**
 **Descripción:** Bypass del Query Engine de Prisma en JS para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -1679,7 +1679,7 @@
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#186 - Categoría 4: Sovereign App-Chain L3 27**
+**#186 - Categoría 4: System App-Chain L3 27**
 **Descripción:** Bypass del Query Engine de Prisma en JS para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 5 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
@@ -1725,7 +1725,7 @@
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
 **#191 - Categoría 4: Prisma Rust Bindings Nativos 98**
-**Descripción:** Mutación del Sovereign Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 20 del README.
+**Descripción:** Mutación del System Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 20 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
 **Prioridad:** Crítica
@@ -1745,14 +1745,14 @@
 **#193 - Categoría 4: Eigenlayer AVS Data Availability 77**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 14 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 17 días senior
 **Impacto esperado:** +300% de retención institucional.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#194 - Categoría 4: Non-Custodial Multi-Chain Sovereign Vault 74**
-**Descripción:** Mutación del Sovereign Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 16 del README.
+**#194 - Categoría 4: Non-Custodial Multi-Chain System Vault 74**
+**Descripción:** Mutación del System Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Crítica
@@ -1865,13 +1865,13 @@
 **#206 - Categoría 5: Deterministic Garbage Collection 48**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 30 días senior
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#207 - Categoría 5: Groth16 Deadman’s Switch Upgrade 17**
+**#207 - Categoría 5: Groth16 Deadmans Switch Upgrade 17**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
@@ -1880,7 +1880,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#208 - Categoría 5: Sovereign App-Chain L3 11**
+**#208 - Categoría 5: System App-Chain L3 11**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
@@ -1889,7 +1889,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#209 - Categoría 5: Groth16 Deadman’s Switch Upgrade 45**
+**#209 - Categoría 5: Groth16 Deadmans Switch Upgrade 45**
 **Descripción:** Anclaje del estado del Akashic Ledger a descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -1916,7 +1916,7 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#212 - Categoría 5: Groth16 Deadman’s Switch Upgrade 75**
+**#212 - Categoría 5: Groth16 Deadmans Switch Upgrade 75**
 **Descripción:** Bypass de RPCs tradicionales transmitiendo señales para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -1953,7 +1953,7 @@
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
 **#216 - Categoría 5: AI Agentic Execution Sub-system 56**
-**Descripción:** Mutación del Sovereign Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 10 del README.
+**Descripción:** Mutación del System Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 10 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
 **Prioridad:** Alta
@@ -1979,7 +1979,7 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#219 - Categoría 5: Sovereign App-Chain L3 43**
+**#219 - Categoría 5: System App-Chain L3 43**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
@@ -1997,7 +1997,7 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#221 - Categoría 5: Quantum-Resistant Threshold Signatures 77**
+**#221 - Categoría 5: Core-Resistant Threshold Signatures 77**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -2006,7 +2006,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#222 - Categoría 5: Sovereign App-Chain L3 57**
+**#222 - Categoría 5: System App-Chain L3 57**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 11 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -2090,7 +2090,7 @@
 **#231 - Categoría 5: Eigenlayer AVS Data Availability 87**
 **Descripción:** Anclaje del estado del Akashic Ledger a operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 15 días senior
 **Impacto esperado:** -80% ancho de banda en servidor central.
@@ -2099,7 +2099,7 @@
 **#232 - Categoría 5: On-device ML Heuristics 5**
 **Descripción:** Bóveda nativa multi-cadena controlando la ejecución para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 19 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
@@ -2114,7 +2114,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#234 - Categoría 5: ZK-State Rollup Sovereign Mesh 10**
+**#234 - Categoría 5: ZK-State Rollup System Mesh 10**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 19 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
@@ -2123,17 +2123,17 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#235 - Categoría 5: ZK-State Rollup Sovereign Mesh 76**
+**#235 - Categoría 5: ZK-State Rollup System Mesh 76**
 **Descripción:** Bypass del Query Engine de Prisma en JS para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 20 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 17 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
 **#236 - Categoría 5: Akashic Temporal Sharding 41**
-**Descripción:** Mutación del Sovereign Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 15 del README.
+**Descripción:** Mutación del System Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
 **Prioridad:** Crítica
@@ -2171,7 +2171,7 @@
 **#240 - Categoría 5: On-device ML Heuristics 6**
 **Descripción:** Anclaje del estado del Akashic Ledger a asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 11 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 8 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -2187,7 +2187,7 @@
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
 **#242 - Categoría 5: AI Agentic Execution Sub-system 98**
-**Descripción:** Mutación del Sovereign Mesh Protocol para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 10 del README.
+**Descripción:** Mutación del System Mesh Protocol para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 10 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
 **Prioridad:** Alta
@@ -2240,7 +2240,7 @@
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
-**#248 - Categoría 5: ZK-State Rollup Sovereign Mesh 12**
+**#248 - Categoría 5: ZK-State Rollup System Mesh 12**
 **Descripción:** Caché anticipada de las rutas Neo4j para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -2270,7 +2270,7 @@
 
 ## CATEGORÍA 6: MONETIZACIÓN, TOKENOMICS Y SOSTENIBILIDAD ECONÓMICA
 
-**#251 - Categoría 6: Groth16 Deadman’s Switch Upgrade 79**
+**#251 - Categoría 6: Groth16 Deadmans Switch Upgrade 79**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -2291,7 +2291,7 @@
 **#253 - Categoría 6: AI Agentic Execution Sub-system 92**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 3 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -2309,7 +2309,7 @@
 **#255 - Categoría 6: World ID Sybil-Resistant Validation 73**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 6 días senior
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
@@ -2327,14 +2327,14 @@
 **#257 - Categoría 6: Web3-Native PubSub Protocol 35**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 9 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
 **#258 - Categoría 6: Deterministic Garbage Collection 62**
-**Descripción:** Mutación del Sovereign Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 9 del README.
+**Descripción:** Mutación del System Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
 **Prioridad:** Crítica
@@ -2351,7 +2351,7 @@
 **Impacto esperado:** +300% de retención institucional.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#260 - Categoría 6: Groth16 Deadman’s Switch Upgrade 26**
+**#260 - Categoría 6: Groth16 Deadmans Switch Upgrade 26**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
@@ -2378,17 +2378,17 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#263 - Categoría 6: Sovereign App-Chain L3 33**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 4 del README.
+**#263 - Categoría 6: System App-Chain L3 33**
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 30 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
 **#264 - Categoría 6: Prisma Rust Bindings Nativos 5**
-**Descripción:** Mutación del Sovereign Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 19 del README.
+**Descripción:** Mutación del System Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 19 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Alta
@@ -2405,17 +2405,17 @@
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#266 - Categoría 6: Quantum-Resistant Threshold Signatures 15**
+**#266 - Categoría 6: Core-Resistant Threshold Signatures 15**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 5 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 7 días senior
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#267 - Categoría 6: ZK-State Rollup Sovereign Mesh 5**
-**Descripción:** Mutación del Sovereign Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 7 del README.
+**#267 - Categoría 6: ZK-State Rollup System Mesh 5**
+**Descripción:** Mutación del System Mesh Protocol para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
 **Prioridad:** Crítica
@@ -2423,7 +2423,7 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#268 - Categoría 6: Quantum-Resistant Threshold Signatures 95**
+**#268 - Categoría 6: Core-Resistant Threshold Signatures 95**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 1 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -2450,7 +2450,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#271 - Categoría 6: Quantum-Resistant Threshold Signatures 1**
+**#271 - Categoría 6: Core-Resistant Threshold Signatures 1**
 **Descripción:** Caché anticipada de las rutas Neo4j para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 8 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -2471,7 +2471,7 @@
 **#273 - Categoría 6: Eigenlayer AVS Data Availability 90**
 **Descripción:** Bypass de RPCs tradicionales transmitiendo señales para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 8 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 13 días senior
 **Impacto esperado:** -80% ancho de banda en servidor central.
@@ -2495,7 +2495,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#276 - Categoría 6: Quantum-Resistant Threshold Signatures 21**
+**#276 - Categoría 6: Core-Resistant Threshold Signatures 21**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -2534,7 +2534,7 @@
 **#280 - Categoría 6: On-device ML Heuristics 53**
 **Descripción:** Caché anticipada de las rutas Neo4j para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 30 días senior
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
@@ -2579,16 +2579,16 @@
 **#285 - Categoría 6: Web3-Native PubSub Protocol 85**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 5 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 26 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
 **#286 - Categoría 6: Hardware-Accelerated Graph Renders 55**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 2 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 2 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 25 días senior
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
@@ -2597,7 +2597,7 @@
 **#287 - Categoría 6: On-device ML Heuristics 98**
 **Descripción:** Bypass de RPCs tradicionales transmitiendo señales para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 31 días senior
 **Impacto esperado:** +300% de retención institucional.
@@ -2613,7 +2613,7 @@
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
 **#289 - Categoría 6: Akashic Temporal Sharding 70**
-**Descripción:** Mutación del Sovereign Mesh Protocol para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 10 del README.
+**Descripción:** Mutación del System Mesh Protocol para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 10 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
 **Prioridad:** Alta
@@ -2621,7 +2621,7 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#290 - Categoría 6: Sovereign App-Chain L3 54**
+**#290 - Categoría 6: System App-Chain L3 54**
 **Descripción:** Bypass del Query Engine de Prisma en JS para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -2642,7 +2642,7 @@
 **#292 - Categoría 6: Zero-Trust Runtime Sandboxing 66**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 19 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 23 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -2684,7 +2684,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#297 - Categoría 6: Groth16 Deadman’s Switch Upgrade 65**
+**#297 - Categoría 6: Groth16 Deadmans Switch Upgrade 65**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -2693,7 +2693,7 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#298 - Categoría 6: Groth16 Deadman’s Switch Upgrade 67**
+**#298 - Categoría 6: Groth16 Deadmans Switch Upgrade 67**
 **Descripción:** Anclaje del estado del Akashic Ledger a asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 3 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -2723,7 +2723,7 @@
 
 ## CATEGORÍA 7: UI/UX, PRODUCT EXPERIENCE Y DISEÑO CÓSMICO
 
-**#301 - Categoría 7: Non-Custodial Multi-Chain Sovereign Vault 67**
+**#301 - Categoría 7: Non-Custodial Multi-Chain System Vault 67**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -2789,7 +2789,7 @@
 **#308 - Categoría 7: Zero-Mock WebRTC P2P Ingestion 27**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 28 días senior
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
@@ -2798,7 +2798,7 @@
 **#309 - Categoría 7: Ivory Standard Binary Protocol 76**
 **Descripción:** Bóveda nativa multi-cadena controlando la ejecución para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 1 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 14 días senior
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
@@ -2870,7 +2870,7 @@
 **#317 - Categoría 7: Zero-Trust Runtime Sandboxing 16**
 **Descripción:** Bypass de RPCs tradicionales transmitiendo señales para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 3 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 11 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
@@ -2921,7 +2921,7 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#323 - Categoría 7: Groth16 Deadman’s Switch Upgrade 82**
+**#323 - Categoría 7: Groth16 Deadmans Switch Upgrade 82**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 20 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
@@ -2942,7 +2942,7 @@
 **#325 - Categoría 7: Prisma Rust Bindings Nativos 23**
 **Descripción:** Bypass de RPCs tradicionales transmitiendo señales para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 20 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -2958,7 +2958,7 @@
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
 **#327 - Categoría 7: Zero-Mock WebRTC P2P Ingestion 71**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 19 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 19 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
 **Prioridad:** Media
@@ -3011,7 +3011,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#333 - Categoría 7: Non-Custodial Multi-Chain Sovereign Vault 76**
+**#333 - Categoría 7: Non-Custodial Multi-Chain System Vault 76**
 **Descripción:** Bypass del Query Engine de Prisma en JS para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -3020,7 +3020,7 @@
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#334 - Categoría 7: Groth16 Deadman’s Switch Upgrade 74**
+**#334 - Categoría 7: Groth16 Deadmans Switch Upgrade 74**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -3038,7 +3038,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
-**#336 - Categoría 7: Quantum-Resistant Threshold Signatures 25**
+**#336 - Categoría 7: Core-Resistant Threshold Signatures 25**
 **Descripción:** Bypass del Query Engine de Prisma en JS para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 14 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -3047,7 +3047,7 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#337 - Categoría 7: Sovereign App-Chain L3 5**
+**#337 - Categoría 7: System App-Chain L3 5**
 **Descripción:** Anclaje del estado del Akashic Ledger a querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -3077,7 +3077,7 @@
 **#340 - Categoría 7: Inherent MEV Protection Vault 51**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 18 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -3119,7 +3119,7 @@
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#345 - Categoría 7: Non-Custodial Multi-Chain Sovereign Vault 97**
+**#345 - Categoría 7: Non-Custodial Multi-Chain System Vault 97**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 1 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -3137,7 +3137,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#347 - Categoría 7: Groth16 Deadman’s Switch Upgrade 88**
+**#347 - Categoría 7: Groth16 Deadmans Switch Upgrade 88**
 **Descripción:** Caché anticipada de las rutas Neo4j para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -3155,7 +3155,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
-**#349 - Categoría 7: ZK-State Rollup Sovereign Mesh 72**
+**#349 - Categoría 7: ZK-State Rollup System Mesh 72**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -3212,7 +3212,7 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#355 - Categoría 8: Quantum-Resistant Threshold Signatures 84**
+**#355 - Categoría 8: Core-Resistant Threshold Signatures 84**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -3278,16 +3278,16 @@
 **#362 - Categoría 8: Hyper-Graph Pathfinding Predictivo 83**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 2 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 6 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#363 - Categoría 8: Quantum-Resistant Threshold Signatures 85**
+**#363 - Categoría 8: Core-Resistant Threshold Signatures 85**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 14 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 8 días senior
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
@@ -3311,7 +3311,7 @@
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#366 - Categoría 8: Quantum-Resistant Threshold Signatures 74**
+**#366 - Categoría 8: Core-Resistant Threshold Signatures 74**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 3 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
@@ -3330,7 +3330,7 @@
 **Dependencias / Riesgos:** Complejidad en validación AVS.
 
 **#368 - Categoría 8: Deterministic Engine Polymorphism 38**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 7 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
 **Prioridad:** Alta
@@ -3410,7 +3410,7 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#377 - Categoría 8: ZK-State Rollup Sovereign Mesh 97**
+**#377 - Categoría 8: ZK-State Rollup System Mesh 97**
 **Descripción:** Bypass del Query Engine de Prisma en JS para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
@@ -3446,7 +3446,7 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
-**#381 - Categoría 8: Groth16 Deadman’s Switch Upgrade 42**
+**#381 - Categoría 8: Groth16 Deadmans Switch Upgrade 42**
 **Descripción:** Bypass de RPCs tradicionales transmitiendo señales para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Integración de ERC-4337 unida al Next.js 15 App Router.
@@ -3456,7 +3456,7 @@
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
 **#382 - Categoría 8: Hyper-Graph Pathfinding Predictivo 46**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 6 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
 **Prioridad:** Alta
@@ -3545,7 +3545,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
-**#392 - Categoría 8: Non-Custodial Multi-Chain Sovereign Vault 74**
+**#392 - Categoría 8: Non-Custodial Multi-Chain System Vault 74**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -3555,7 +3555,7 @@
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
 **#393 - Categoría 8: Hardware-Accelerated Graph Renders 76**
-**Descripción:** Mutación del Sovereign Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 6 del README.
+**Descripción:** Mutación del System Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Media
@@ -3608,7 +3608,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
-**#399 - Categoría 8: Quantum-Resistant Threshold Signatures 95**
+**#399 - Categoría 8: Core-Resistant Threshold Signatures 95**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -3618,7 +3618,7 @@
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
 **#400 - Categoría 8: Eigenlayer AVS Data Availability 94**
-**Descripción:** Mutación del Sovereign Mesh Protocol para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 2 del README.
+**Descripción:** Mutación del System Mesh Protocol para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 2 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Media
@@ -3647,7 +3647,7 @@
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Overhead de compilación cruzada.
 
-**#403 - Categoría 9: Non-Custodial Multi-Chain Sovereign Vault 73**
+**#403 - Categoría 9: Non-Custodial Multi-Chain System Vault 73**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
@@ -3695,13 +3695,13 @@
 **#408 - Categoría 9: Biometric Enclave SIWE login 95**
 **Descripción:** Caché anticipada de las rutas Neo4j para soporte instantáneo a nuevos OP-stack rollups en PM2. Diseñado estrictamente como extensión de sección 7 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 19 días senior
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#409 - Categoría 9: Quantum-Resistant Threshold Signatures 23**
+**#409 - Categoría 9: Core-Resistant Threshold Signatures 23**
 **Descripción:** Anclaje del estado del Akashic Ledger a comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 19 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -3740,7 +3740,7 @@
 **#413 - Categoría 9: Hardware-Accelerated Graph Renders 3**
 **Descripción:** Bypass del Query Engine de Prisma en JS para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** Ellos re-calculan paths; nosotros tenemos la respuesta lista antes del click.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 7 días senior
 **Impacto esperado:** Respuestas percibidas en 0ms por ballenas.
@@ -3800,7 +3800,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#420 - Categoría 9: ZK-State Rollup Sovereign Mesh 82**
+**#420 - Categoría 9: ZK-State Rollup System Mesh 82**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 18 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -3809,8 +3809,8 @@
 **Impacto esperado:** -80% ancho de banda en servidor central.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#421 - Categoría 9: Sovereign App-Chain L3 98**
-**Descripción:** Mutación del Sovereign Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 5 del README.
+**#421 - Categoría 9: System App-Chain L3 98**
+**Descripción:** Mutación del System Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 5 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
 **Prioridad:** Alta
@@ -3819,7 +3819,7 @@
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
 **#422 - Categoría 9: In-Memory EVM Simulation Fork 29**
-**Descripción:** Mutación del Sovereign Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 18 del README.
+**Descripción:** Mutación del System Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 18 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
 **Prioridad:** Crítica
@@ -3827,8 +3827,8 @@
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
 **Dependencias / Riesgos:** Carga de CPU en worker nodes.
 
-**#423 - Categoría 9: Quantum-Resistant Threshold Signatures 55**
-**Descripción:** Mutación del Sovereign Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 16 del README.
+**#423 - Categoría 9: Core-Resistant Threshold Signatures 55**
+**Descripción:** Mutación del System Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 16 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
 **Prioridad:** Alta
@@ -3891,7 +3891,7 @@
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
 **#430 - Categoría 9: Neo4j Cypher Neural Generation 42**
-**Descripción:** Mutación del Sovereign Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 15 del README.
+**Descripción:** Mutación del System Mesh Protocol para comunicación P2P sub-2ms. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Crítica
@@ -3908,7 +3908,7 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#432 - Categoría 9: Sovereign App-Chain L3 43**
+**#432 - Categoría 9: System App-Chain L3 43**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
@@ -3918,7 +3918,7 @@
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
 **#433 - Categoría 9: Biometric Enclave SIWE login 42**
-**Descripción:** Mutación del Sovereign Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 17 del README.
+**Descripción:** Mutación del System Mesh Protocol para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
 **Prioridad:** Media
@@ -3926,7 +3926,7 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#434 - Categoría 9: Non-Custodial Multi-Chain Sovereign Vault 2**
+**#434 - Categoría 9: Non-Custodial Multi-Chain System Vault 2**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -3962,7 +3962,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
-**#438 - Categoría 9: Groth16 Deadman’s Switch Upgrade 90**
+**#438 - Categoría 9: Groth16 Deadmans Switch Upgrade 90**
 **Descripción:** Caché anticipada de las rutas Neo4j para probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 14 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -4001,13 +4001,13 @@
 **#442 - Categoría 9: Zero-Mock WebRTC P2P Ingestion 46**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar probar inactividad matemáticamente en-cadena. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 2 días senior
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#443 - Categoría 9: ZK-State Rollup Sovereign Mesh 94**
+**#443 - Categoría 9: ZK-State Rollup System Mesh 94**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -4055,7 +4055,7 @@
 **#448 - Categoría 9: Web3-Native PubSub Protocol 16**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 9 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 28 días senior
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
@@ -4064,7 +4064,7 @@
 **#449 - Categoría 9: World ID Sybil-Resistant Validation 10**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 6 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 29 días senior
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
@@ -4091,7 +4091,7 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#452 - Categoría 10: Groth16 Deadman’s Switch Upgrade 1**
+**#452 - Categoría 10: Groth16 Deadmans Switch Upgrade 1**
 **Descripción:** LLM interno traduciendo queries en lenguaje natural para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 5 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Módulos Rust/WASM inyectados en la capa Node.js / BullMQ actual.
@@ -4145,7 +4145,7 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#458 - Categoría 10: Quantum-Resistant Threshold Signatures 31**
+**#458 - Categoría 10: Core-Resistant Threshold Signatures 31**
 **Descripción:** Fragmentación temporal del registro inmutable Akashic para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 12 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -4154,7 +4154,7 @@
 **Impacto esperado:** Queries < 10ms en datasets de 5TB.
 **Dependencias / Riesgos:** Firewalls restrictivos de Wall Street.
 
-**#459 - Categoría 10: Groth16 Deadman’s Switch Upgrade 88**
+**#459 - Categoría 10: Groth16 Deadmans Switch Upgrade 88**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 17 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
 **Implementación paso a paso:** Llama-edge corriendo junto a Neo4j, ingestando Schema.
@@ -4172,10 +4172,10 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#461 - Categoría 10: Sovereign App-Chain L3 84**
+**#461 - Categoría 10: System App-Chain L3 84**
 **Descripción:** Bypass del Query Engine de Prisma en JS para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 3 del README.
 **Por qué derrota a competidores:** No es un tracker; es el ejecutor supremo y soberano sin intermediarios.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 9 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
@@ -4184,14 +4184,14 @@
 **#462 - Categoría 10: Eigenlayer AVS Data Availability 59**
 **Descripción:** Nodos Solana del Ingestion Engine co-localizados para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 2 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 11 días senior
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
 **#463 - Categoría 10: Hyper-Graph Pathfinding Predictivo 11**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 5 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 5 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
 **Implementación paso a paso:** SnarkJS circuits integrando el pipeline Redis Streams -> BullMQ -> Next.js 15.
 **Prioridad:** Alta
@@ -4289,26 +4289,26 @@
 **Impacto esperado:** +$50M TVL flow el primer mes.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#474 - Categoría 10: ZK-State Rollup Sovereign Mesh 37**
+**#474 - Categoría 10: ZK-State Rollup System Mesh 37**
 **Descripción:** Bóveda nativa multi-cadena controlando la ejecución para consultas sub-5ms sobre data histórica masiva. Diseñado estrictamente como extensión de sección 18 del README.
 **Por qué derrota a competidores:** Eliminamos el bottleneck del servidor central; latencia < 2ms global.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 2 días senior
 **Impacto esperado:** 0 downtime ante forks de L2s.
 **Dependencias / Riesgos:** Necesidad de hardware optimizado.
 
-**#475 - Categoría 10: Quantum-Resistant Threshold Signatures 80**
+**#475 - Categoría 10: Core-Resistant Threshold Signatures 80**
 **Descripción:** El Deadman Protocol usa ZK-proofs para encriptar operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 3 días senior
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Alucinaciones de IA; mitigado con ZK.
 
 **#476 - Categoría 10: Deterministic Engine Polymorphism 76**
-**Descripción:** Mutación del Sovereign Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 4 del README.
+**Descripción:** Mutación del System Mesh Protocol para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Next.js negocia conexiones con Simple-Peer, fallback a WebSockets actuales.
 **Prioridad:** Media
@@ -4355,7 +4355,7 @@
 **#481 - Categoría 10: Deterministic Garbage Collection 92**
 **Descripción:** Bypass del Query Engine de Prisma en JS para descubrimiento masivo de entidades. Diseñado estrictamente como extensión de sección 4 del README.
 **Por qué derrota a competidores:** Superamos a cualquier competidor al no requerir redeploys; 0 downtime.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Alta
 **Esfuerzo estimado:** 26 días senior
 **Impacto esperado:** 100% data trustless; 0 latencia añadida.
@@ -4424,8 +4424,8 @@
 **Impacto esperado:** Monopolio del mercado Institutional DeFi.
 **Dependencias / Riesgos:** Migración masiva de BD en live state.
 
-**#489 - Categoría 10: Sovereign App-Chain L3 11**
-**Descripción:** Mutación del Sovereign Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 15 del README.
+**#489 - Categoría 10: System App-Chain L3 11**
+**Descripción:** Mutación del System Mesh Protocol para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 15 del README.
 **Por qué derrota a competidores:** Arkham muere en queries históricos profundos; nosotros paralelizamos el tiempo.
 **Implementación paso a paso:** Particionado de PostgreSQL en hyper-tablas nativas extendiendo Prisma.
 **Prioridad:** Media
@@ -4454,7 +4454,7 @@
 **#492 - Categoría 10: Web3-Native PubSub Protocol 32**
 **Descripción:** Bóveda nativa multi-cadena controlando la ejecución para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 20 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 16 días senior
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
@@ -4505,7 +4505,7 @@
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
 **Dependencias / Riesgos:** Auditoría de smart contracts extrema.
 
-**#498 - Categoría 10: Quantum-Resistant Threshold Signatures 21**
+**#498 - Categoría 10: Core-Resistant Threshold Signatures 21**
 **Descripción:** Todo JSON saliente de Prisma es empaquetado para asimilar estado global en rollups Groth16. Diseñado estrictamente como extensión de sección 13 del README.
 **Por qué derrota a competidores:** UI/UX absoluto para institucionales frente a dashboards inflexibles.
 **Implementación paso a paso:** Cloudflare Workers/Deno DSW arquitecturalmente on-premise.
@@ -4517,7 +4517,7 @@
 **#499 - Categoría 10: Prisma Rust Bindings Nativos 95**
 **Descripción:** El Ingestion Engine ajusta dinámicamente sus parsers para querying on-the-fly sin overhead de interfaz. Diseñado estrictamente como extensión de sección 11 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Crítica
 **Esfuerzo estimado:** 17 días senior
 **Impacto esperado:** Aprobación inmediata por fondos mutuos.
@@ -4526,7 +4526,7 @@
 **#500 - Categoría 10: Hyper-Graph Pathfinding Predictivo 68**
 **Descripción:** Bóveda nativa multi-cadena controlando la ejecución para operar automatizaciones ZK sin trust assumption. Diseñado estrictamente como extensión de sección 19 del README.
 **Por qué derrota a competidores:** Institucionales no confían en AWS; solo confían en matemáticas ZK puras.
-**Implementación paso a paso:** Integración @worldcoin/idkit a nivel Auth/RPC handshake.
+**Implementación paso a paso:** Integración @identity/idkit a nivel Auth/RPC handshake.
 **Prioridad:** Media
 **Esfuerzo estimado:** 6 días senior
 **Impacto esperado:** +300% de retención institucional.
@@ -4534,7 +4534,7 @@
 
 ## PLAN DE EJECUCIÓN MAESTRO (2026-2027)
 **FASE 1 (Días 1-30) - Soberanía Absoluta:**
-Implementación de los elementos 1-125. El foco es la transición de PM2 Node a Rust Bindings (Prisma) y el ZK-Rollup Sovereign Mesh. Se inyecta la liquidez masiva.
+Implementación de los elementos 1-125. El foco es la transición de PM2 Node a Rust Bindings (Prisma) y el ZK-Rollup System Mesh. Se inyecta la liquidez masiva.
 
 **FASE 2 (Días 31-90) - Dominación Institucional:**
 Despliegue de los elementos 126-250. Activación del AI Agentic Vault y Zero-Mock WebRTC P2P Ingestion. Se elimina la infraestructura centralizada; latencia < 2ms global.

@@ -3,11 +3,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { dictionaries, Locale } from './dictionaries';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+//  Types 
 export type { Locale };
 
 export const LOCALES: { code: Locale; label: string; flag: string }[] = [
-  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'en', label: 'English', flag: '' },
 ];
 
 type LanguageContextType = {
@@ -19,7 +19,7 @@ type LanguageContextType = {
   language?: Locale;
 };
 
-// ─── Context ─────────────────────────────────────────────────────────────────
+//  Context 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {

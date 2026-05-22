@@ -91,7 +91,7 @@ export function InstitutionalMarkets() {
     return (
         <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 bg-white dark:bg-[#050505] text-[#050505] dark:text-white font-mono overflow-hidden transition-colors">
             
-            {/* Header section — Search & Filter only */}
+            {/* Header section  Search & Filter only */}
             <div className="max-w-[1400px] mx-auto w-full flex-shrink-0">
                 {/* Search and Filter Row */}
                 <div className="flex flex-col md:flex-row gap-4 mt-2 relative z-20">

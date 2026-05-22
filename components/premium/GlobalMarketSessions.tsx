@@ -197,7 +197,7 @@ export function GlobalMarketSessions() {
                             <div className="p-8 bg-black/5 rounded-[2rem] border border-black/5 flex gap-6 items-start">
                                 <Info size={20} className="text-[var(--aave-purple)] mt-1 flex-shrink-0" />
                                 <p className="text-xs text-slate-500 leading-loose font-medium">
-                                    Note: we only offer the main Xetra continuous trading hours (09:00–17:30 CET). Pre-trading (08:00–09:00 CET) and post-trading (17:30–22:00 CET) mini-auction sessions are not included.
+                                    Note: we only offer the main Xetra continuous trading hours (09:0017:30 CET). Pre-trading (08:0009:00 CET) and post-trading (17:3022:00 CET) mini-auction sessions are not included.
                                 </p>
                             </div>
                             <div className="p-8 bg-[var(--aave-purple)]/5 rounded-[2rem] border border-[var(--aave-purple)]/10 flex gap-6 items-start">

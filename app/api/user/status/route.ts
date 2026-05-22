@@ -45,8 +45,8 @@ export async function GET(req: NextRequest) {
             // CRITICAL SECURITY FIX: Same hardcoded secret removed as in verify-human.
             const rawSecret = process.env.KYC_SECRET;
             if (!rawSecret) {
-                console.error('[UserStatus] ❌ CRITICAL: KYC_SECRET not set. Cannot issue kyc_token.');
-                // Still return user status — just don't issue the cookie
+                console.error('[UserStatus]  CRITICAL: KYC_SECRET not set. Cannot issue kyc_token.');
+                // Still return user status  just don't issue the cookie
                 return response;
             }
 

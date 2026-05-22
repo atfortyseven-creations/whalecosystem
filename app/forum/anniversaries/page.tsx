@@ -58,7 +58,7 @@ export default async function ForumAnniversariesPage() {
         const joined = new Date(u.createdAt);
         const years  = new Date().getFullYear() - joined.getFullYear();
         const addr   = u.walletAddress;
-        const label  = u.displayName || `${addr.slice(0,6)}…${addr.slice(-4)}`;
+        const label  = u.displayName || `${addr.slice(0,6)}${addr.slice(-4)}`;
 
         return (
           <Link

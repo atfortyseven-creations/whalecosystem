@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { UniversalEliteWallpaper } from "@/components/shared/UniversalEliteWallpaper";
 
-// SSR-unsafe — XMTP uses browser WASM
-const SovereignChat = dynamic(
-  () => import("@/components/dashboard/SovereignChat"),
+// SSR-unsafe  XMTP uses browser WASM
+const SystemChat = dynamic(
+  () => import("@/components/dashboard/SystemChat"),
   {
     ssr: false,
     loading: () => (
@@ -16,7 +16,7 @@ const SovereignChat = dynamic(
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-[#9945FF] border-t-transparent animate-spin" />
           <p className="text-[10px] font-mono uppercase tracking-widest text-white/40">
-            Loading Secure Channel…
+            Loading Secure Channel
           </p>
         </div>
       </div>
@@ -46,7 +46,7 @@ export default function MobileChatPage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // ── Body Scroll Lock ───────────────────────────────────────────────────
+    //  Body Scroll Lock 
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
@@ -84,14 +84,14 @@ export default function MobileChatPage() {
     };
   }, [isMobile]);
 
-  // ── Desktop: simple flex-col filling the full viewport ──────────────────
+  //  Desktop: simple flex-col filling the full viewport 
   if (!isMobile) {
     return (
       <>
         <UniversalEliteWallpaper />
         <div className="flex-1 flex flex-col h-screen w-full relative z-10 bg-transparent items-center">
           <div className="w-full flex flex-col h-full bg-black/40 backdrop-blur-3xl shadow-2xl overflow-hidden relative">
-            {/* ── Top Navigation Bar ── */}
+            {/*  Top Navigation Bar  */}
             <header className="shrink-0 h-14 flex items-center justify-between px-8 bg-black/60 backdrop-blur-[60px] border-b border-white/5 relative z-10 w-full">
               <Link
                 href="/dashboard"
@@ -111,9 +111,9 @@ export default function MobileChatPage() {
               </div>
             </header>
 
-            {/* Chat fills the remainder — perfectly centered */}
+            {/* Chat fills the remainder  perfectly centered */}
             <div className="flex-1 min-h-0 w-full overflow-hidden relative bg-transparent">
-              <SovereignChat />
+              <SystemChat />
             </div>
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function MobileChatPage() {
     );
   }
 
-  // ── Mobile: visual-viewport-anchored fixed positioning ──────────────────
+  //  Mobile: visual-viewport-anchored fixed positioning 
   const containerStyle: React.CSSProperties = {
     position: 'fixed',
     top: 0,
@@ -139,7 +139,7 @@ export default function MobileChatPage() {
     <>
       <UniversalEliteWallpaper />
       <div style={containerStyle} className="text-[#050505] dark:text-white">
-        {/* ── Top Navigation Bar ── */}
+        {/*  Top Navigation Bar  */}
         <header className="shrink-0 h-14 flex items-center justify-between px-5 bg-black/60 backdrop-blur-[60px] border-b border-white/5 z-10">
           <Link
             href="/"
@@ -159,9 +159,9 @@ export default function MobileChatPage() {
           </div>
         </header>
 
-        {/* Chat fills the remainder transparently — wallpaper shows through */}
+        {/* Chat fills the remainder transparently  wallpaper shows through */}
         <div className="flex-1 min-h-0 overflow-hidden relative">
-          <SovereignChat />
+          <SystemChat />
         </div>
       </div>
     </>

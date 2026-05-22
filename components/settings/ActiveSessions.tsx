@@ -118,7 +118,7 @@ export function ActiveSessions() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="text-white font-medium text-sm">
-                        {session.device} <span className="text-gray-500 font-normal">• {session.browser}</span>
+                        {session.device} <span className="text-gray-500 font-normal"> {session.browser}</span>
                       </h4>
                       {session.current && (
                         <span className="px-2 py-0.5 bg-[#00f2ea]/20 text-[#00f2ea] text-[10px] font-bold rounded-full border border-[#00f2ea]/30">

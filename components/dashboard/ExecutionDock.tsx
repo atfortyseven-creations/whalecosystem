@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSendTransaction } from 'wagmi';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { parseEther } from 'viem';
 import { ShieldAlert, Zap, Lock, Crosshair, AlertTriangle, Fingerprint, Activity, Ban } from 'lucide-react';
 import { useSniperStore } from '@/store/useSniperStore';
@@ -95,7 +95,7 @@ export default function ExecutionDock() {
   return (
     <div className="flex flex-col gap-6 absolute inset-0 p-4 overflow-y-auto custom-scrollbar bg-[#050505]">
       
-      {/* ── PRICE TICKER ── */}
+      {/*  PRICE TICKER  */}
       <div className="flex flex-col gap-1 items-end z-10">
         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-[var(--aztec-orchid)] animate-pulse" />
@@ -109,7 +109,7 @@ export default function ExecutionDock() {
 
       <div className="flex-1" />
 
-      {/* ── EXECUTION STATS & MEV FEED ── */}
+      {/*  EXECUTION STATS & MEV FEED  */}
       <div className="space-y-3 bg-white/[0.02] border border-white/5 p-4 rounded-xl shadow-sm z-10 relative overflow-hidden backdrop-blur-md hover:border-white/10 transition-colors">
          {/* HFT MEV Anomaly Stream */}
          <div className="border border-[var(--aztec-orchid)]/20 bg-[var(--aztec-orchid)]/5 p-2 rounded-sm mb-4">
@@ -170,7 +170,7 @@ export default function ExecutionDock() {
           </div>
       )}
 
-      {/* ── EXECUTION DEPLOYMENT ZONE ── */}
+      {/*  EXECUTION DEPLOYMENT ZONE  */}
       {!isConnected ? (
         <div className="w-full py-5 bg-white/[0.02] border border-white/5 rounded-[24px] text-center text-white/40 text-[11px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3">
           <ShieldAlert size={16} /> WALLET REQUIRED

@@ -12,9 +12,9 @@ import { randomBytes } from 'crypto';
  * Returns:
  *   { uuid, ekey, expiresAt }
  *
- * uuid  — session identifier embedded in QR URL
- * ekey  — AES-256-GCM encryption key (hex) for E2EE payload from mobile
- * expiresAt — Unix timestamp when this session expires (5 minutes)
+ * uuid   session identifier embedded in QR URL
+ * ekey   AES-256-GCM encryption key (hex) for E2EE payload from mobile
+ * expiresAt  Unix timestamp when this session expires (5 minutes)
  */
 export async function POST(req: NextRequest) {
   try {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       300                           // 5 min TTL
     );
 
-    console.log(`[KYC:Init] New session created: ${uuid.slice(0, 8)}…`);
+    console.log(`[KYC:Init] New session created: ${uuid.slice(0, 8)}`);
 
     return NextResponse.json({
       uuid,

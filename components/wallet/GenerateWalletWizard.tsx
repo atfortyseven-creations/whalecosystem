@@ -219,12 +219,12 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center text-center pt-4 pb-4"
             >
-              {/* 🐳 WHALE — 300% — centered perfectly above address */}
+              {/*  WHALE  300%  centered perfectly above address */}
               <div className="w-full h-56 pointer-events-none mb-0">
                 <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-contain" />
               </div>
               <h2 className="text-2xl font-black uppercase tracking-tight mt-0 mb-2">Wallet Created</h2>
-              {/* Address directly below whale — zero gap = "pegada" */}
+              {/* Address directly below whale  zero gap = "pegada" */}
               <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 px-4 py-2 rounded-2xl border border-black/5 dark:border-white/5 mb-8">
                 <p className="text-[11px] font-mono font-bold text-black/70 dark:text-white/70 break-all">
                   {wallet.address}

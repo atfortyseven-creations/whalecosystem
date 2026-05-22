@@ -1,12 +1,12 @@
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SOVEREIGN AUDIT TRAIL — Immutable Cryptographic Event Log
+// 
+// SOVEREIGN AUDIT TRAIL  Immutable Cryptographic Event Log
 // Every entry is HMAC-signed and chained to the previous entry (hash chain).
-// The PostgreSQL table uses INSERT-ONLY triggers — no UPDATE or DELETE allowed.
+// The PostgreSQL table uses INSERT-ONLY triggers  no UPDATE or DELETE allowed.
 // Compatible with ENISA audit requirements and eIDAS 2.0 non-repudiation.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 export const AUDIT_EVENT_TYPES = [
   // Authentication events
@@ -26,7 +26,7 @@ export const AUDIT_EVENT_TYPES = [
   'SECURITY_WAF_BLOCKED',
   'SECURITY_INVALID_SIGNATURE',
   'SECURITY_TAMPERED_JWT',
-  // Intelligence events
+  // Analytics events
   'WHALE_DETECTED',
   'WHALE_HIGH_CONVICTION',
   'WHALE_MEGA_EVENT',
@@ -85,14 +85,14 @@ function computePayloadHash(
  */
 async function getLastEntryHash(): Promise<string> {
   try {
-    // @ts-ignore — auditLog model added via migration
+    // @ts-ignore  auditLog model added via migration
     const last = await (prisma as any).auditLog.findFirst({
       orderBy: { createdAt: 'desc' },
       select: { payloadHash: true },
     });
     return last?.payloadHash ?? 'GENESIS';
   } catch {
-    // Table may not exist yet — return genesis hash
+    // Table may not exist yet  return genesis hash
     return 'GENESIS';
   }
 }
@@ -132,7 +132,7 @@ export async function appendAuditEntry(
       prev_hash: prevHash,
     };
 
-    // @ts-ignore — auditLog model added via migration
+    // @ts-ignore  auditLog model added via migration
     await (prisma as any).auditLog.create({
       data: {
         timestamp: new Date(timestamp),
@@ -146,7 +146,7 @@ export async function appendAuditEntry(
       },
     });
   } catch (err: any) {
-    // Audit trail must NEVER crash the calling code — log but don't throw
+    // Audit trail must NEVER crash the calling code  log but don't throw
     console.error(`[AUDIT-TRAIL] Failed to append entry (${event}): ${err.message}`);
   }
 }

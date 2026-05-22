@@ -3,12 +3,12 @@
 export function LiquidPrismBackground() {
     return (
         <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-[#000000]">
-            {/* Moving Colors Layer — 400Hz Pure CSS, Zero Network Fetch */}
+            {/* Moving Colors Layer  400Hz Pure CSS, Zero Network Fetch */}
             <div className="absolute inset-0 opacity-100 mix-blend-screen overflow-hidden">
                 <div className="absolute inset-[-100%] bg-gradient-to-tr from-[#2d3080] via-[#8b31ff] to-[#ff176f] animate-[liquid_2s_infinite_linear] opacity-80 blur-[80px]" />
                 <div className="absolute inset-[-100%] bg-gradient-to-bl from-[#00d794] via-[#1a4de6] to-[#af1fb8] animate-[liquid_2.5s_infinite_linear_reverse] opacity-80 blur-[80px] delay-100" />
             </div>
-            {/* Premium CSS Mesh Gradient — replaces jpg for zero-latency rendering */}
+            {/* Premium CSS Mesh Gradient  replaces jpg for zero-latency rendering */}
             <div
                 className="absolute inset-0 animate-prism-shift opacity-70"
                 style={{

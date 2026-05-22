@@ -1,20 +1,20 @@
 /**
- * Sovereign Service Worker — Axioma 452
- * ═══════════════════════════════════════════════════════════
+ * System Service Worker  Axioma 452
+ * 
  * Workbox-compatible service worker with:
  *   - Offline shell caching (stale-while-revalidate for pages)
  *   - Network-first for API routes (never serve stale on-chain data)
  *   - Cache-first for static assets (immutable hashes)
  *   - Ed25519 signed update manifest verification
  *   - Atomic cache update (never partial)
- * ═══════════════════════════════════════════════════════════
+ * 
  */
 
-const CACHE_VERSION = 'sovereign-v1';
+const CACHE_VERSION = 'system-v1';
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`;
 
-// ── Assets to pre-cache on install ──────────────────────────────────────────
+//  Assets to pre-cache on install 
 const PRECACHE_URLS = [
   '/',
   '/connect',
@@ -23,11 +23,11 @@ const PRECACHE_URLS = [
   '/manifest.json',
 ];
 
-// ── Cache strategies ─────────────────────────────────────────────────────────
+//  Cache strategies 
 const API_ROUTES    = ['/api/'];
 const STATIC_EXTS   = ['.js', '.css', '.woff2', '.png', '.jpg', '.svg', '.ico'];
 
-// ── Install: pre-cache shell ─────────────────────────────────────────────────
+//  Install: pre-cache shell 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) =>
@@ -38,7 +38,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// ── Activate: purge stale caches ─────────────────────────────────────────────
+//  Activate: purge stale caches 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -51,7 +51,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// ── Fetch: routing strategy ───────────────────────────────────────────────────
+//  Fetch: routing strategy 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -59,23 +59,23 @@ self.addEventListener('fetch', (event) => {
   // 1. Skip non-GET and cross-origin
   if (request.method !== 'GET' || url.origin !== location.origin) return;
 
-  // 2. API routes → Network-first (never serve stale chain data)
+  // 2. API routes  Network-first (never serve stale chain data)
   if (API_ROUTES.some((prefix) => url.pathname.startsWith(prefix))) {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  // 3. Static assets (hashed filenames) → Cache-first
+  // 3. Static assets (hashed filenames)  Cache-first
   if (STATIC_EXTS.some((ext) => url.pathname.endsWith(ext))) {
     event.respondWith(cacheFirst(request, STATIC_CACHE));
     return;
   }
 
-  // 4. HTML pages → Stale-while-revalidate
+  // 4. HTML pages  Stale-while-revalidate
   event.respondWith(staleWhileRevalidate(request, PAGE_CACHE));
 });
 
-// ── Strategy: Network-first ───────────────────────────────────────────────────
+//  Strategy: Network-first 
 async function networkFirst(request) {
   try {
     const response = await fetch(request);
@@ -86,7 +86,7 @@ async function networkFirst(request) {
   }
 }
 
-// ── Strategy: Cache-first ─────────────────────────────────────────────────────
+//  Strategy: Cache-first 
 async function cacheFirst(request, cacheName) {
   const cached = await caches.match(request);
   if (cached) return cached;
@@ -98,7 +98,7 @@ async function cacheFirst(request, cacheName) {
   return response;
 }
 
-// ── Strategy: Stale-while-revalidate ─────────────────────────────────────────
+//  Strategy: Stale-while-revalidate 
 async function staleWhileRevalidate(request, cacheName) {
   const cache    = await caches.open(cacheName);
   const cached   = await cache.match(request);
@@ -110,11 +110,11 @@ async function staleWhileRevalidate(request, cacheName) {
   return cached ?? fetchPromise ?? offlineFallback();
 }
 
-// ── Offline fallback ──────────────────────────────────────────────────────────
+//  Offline fallback 
 function offlineFallback() {
   return new Response(
     `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-    <title>Sovereign Terminal — Offline</title>
+    <title>System Terminal  Offline</title>
     <style>
       body{margin:0;background:#050505;color:#fff;font-family:monospace;
            display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px;}
@@ -122,16 +122,16 @@ function offlineFallback() {
       p{font-size:11px;opacity:.3;letter-spacing:.1em;text-transform:uppercase;}
     </style>
     </head><body>
-      <h1>Sovereign Terminal</h1>
-      <p>Offline — Reconnect to resume intelligence feed</p>
+      <h1>System Terminal</h1>
+      <p>Offline  Reconnect to resume analytics feed</p>
     </body></html>`,
     { headers: { 'Content-Type': 'text/html' } }
   );
 }
 
-// ── Background sync: queue failed API mutations ───────────────────────────────
+//  Background sync: queue failed API mutations 
 self.addEventListener('sync', (event) => {
-  if (event.tag === 'sovereign-mutation-sync') {
+  if (event.tag === 'system-mutation-sync') {
     event.waitUntil(replaySyncQueue());
   }
 });
@@ -141,7 +141,7 @@ async function replaySyncQueue() {
   console.log('[SW] Background sync: replaying queued mutations');
 }
 
-// ── Push notifications (wallet-tier gated) ────────────────────────────────────
+//  Push notifications (wallet-tier gated) 
 self.addEventListener('push', (event) => {
   if (!event.data) return;
   try {
@@ -152,7 +152,7 @@ self.addEventListener('push', (event) => {
         icon:  icon  ?? '/icons/icon-192x192.png',
         badge: '/icons/icon-96x96.png',
         data,
-        tag:   'sovereign-alert',
+        tag:   'system-alert',
         renotify: true,
         requireInteraction: false,
       })

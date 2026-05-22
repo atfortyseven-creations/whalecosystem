@@ -1,9 +1,9 @@
 /**
  * GET /api/market/signals
  *
- * Sovereign API Marketplace — Institutional Signal Distribution
+ * System API Marketplace  Institutional Signal Distribution
  *
- * Serves on-chain whale intelligence signals to paying subscribers
+ * Serves on-chain whale analytics signals to paying subscribers
  * WITHOUT exposing source wallets, RPC endpoints, or detection methodology.
  *
  * Authentication:
@@ -20,7 +20,7 @@
  *   INSTITUTIONAL: 300 req/min, last 500 events, full filters
  *
  * Response shape: { signals[], tier, quota, remaining, timestamp }
- * Signals omit: walletAddress, fromAddress, toAddress (sovereign source protection)
+ * Signals omit: walletAddress, fromAddress, toAddress (system source protection)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -30,7 +30,7 @@ import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// ─── Tier Configuration ───────────────────────────────────────────────────────
+//  Tier Configuration 
 
 type Tier = 'FREE' | 'PRO' | 'INSTITUTIONAL';
 
@@ -64,7 +64,7 @@ const TIER_CONFIG: Record<Tier, {
     },
 };
 
-// ─── API Key Validation ───────────────────────────────────────────────────────
+//  API Key Validation 
 
 interface ApiKeyRecord { tier: Tier; secret?: string; ownerId: string }
 
@@ -90,12 +90,12 @@ async function resolveApiKey(key: string): Promise<ApiKeyRecord | null> {
         if (!record || !record.isActive) return null;
         return { tier: record.plan as Tier, ownerId: record.userId };
     } catch {
-        // Prisma not available (schema missing ApiKey model) → deny
+        // Prisma not available (schema missing ApiKey model)  deny
         return null;
     }
 }
 
-// ─── HMAC Verification ────────────────────────────────────────────────────────
+//  HMAC Verification 
 
 function verifyHmac(secret: string, timestampHeader: string, body: string, sigHeader: string): boolean {
     const now = Math.floor(Date.now() / 1000);
@@ -112,7 +112,7 @@ function verifyHmac(secret: string, timestampHeader: string, body: string, sigHe
     return timingSafeEqual(expBuf, sigBuf);
 }
 
-// ─── Signal Sanitizer (sovereign source protection) ──────────────────────────
+//  Signal Sanitizer (system source protection) 
 
 function sanitizeSignal(raw: any) {
     return {
@@ -123,15 +123,15 @@ function sanitizeSignal(raw: any) {
         amount:    raw.amount,
         usdValue:  raw.usdValue,
         timestamp: raw.timestamp?.toISOString?.() ?? raw.timestamp,
-        // Partial hash (first 10 chars) — enough for dedup without leaking source
-        txRef:     raw.transactionHash ? raw.transactionHash.slice(0, 12) + '…' : null,
+        // Partial hash (first 10 chars)  enough for dedup without leaking source
+        txRef:     raw.transactionHash ? raw.transactionHash.slice(0, 12) + '' : null,
         // Address privacy: never expose full addresses in the marketplace
-        fromRef:   raw.fromAddress ? raw.fromAddress.slice(0, 6) + '…' : null,
-        toRef:     raw.toAddress   ? raw.toAddress.slice(0, 6)   + '…' : null,
+        fromRef:   raw.fromAddress ? raw.fromAddress.slice(0, 6) + '' : null,
+        toRef:     raw.toAddress   ? raw.toAddress.slice(0, 6)   + '' : null,
     };
 }
 
-// ─── Rate Limiter (Redis-backed, falls back to memory) ───────────────────────
+//  Rate Limiter (Redis-backed, falls back to memory) 
 
 const memoryRateLimiter = new Map<string, { count: number; resetAt: number }>();
 
@@ -162,7 +162,7 @@ async function checkRateLimit(keyId: string, limit: number): Promise<{ allowed: 
     return { allowed: entry.count <= limit, remaining: Math.max(0, limit - entry.count) };
 }
 
-// ─── Main Handler ─────────────────────────────────────────────────────────────
+//  Main Handler 
 
 export async function GET(req: NextRequest) {
     const apiKey    = req.headers.get('x-api-key') ?? req.nextUrl.searchParams.get('apiKey') ?? '';

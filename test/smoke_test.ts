@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("🔥 OPERATION OMEGA // SMOKE TEST", function () {
+describe(" OPERATION OMEGA // SMOKE TEST", function () {
     let mainContract: any;
     let owner: any;
 
@@ -22,27 +22,27 @@ describe("🔥 OPERATION OMEGA // SMOKE TEST", function () {
         [owner] = await ethers.getSigners();
     });
 
-    it("✅ Should NOT be paused", async function () {
+    it(" Should NOT be paused", async function () {
         // Assuming SafeContracts inherits Pausable
         // const isPaused = await mainContract.paused();
         // expect(isPaused).to.be.false;
         console.log("   [PASS] Protocol is Active.");
     });
 
-    it("✅ Should reference correct USDC address", async function () {
+    it(" Should reference correct USDC address", async function () {
         // const usdc = await mainContract.usdcToken();
         // expect(usdc).to.equal(EXPECTED_USDC);
         console.log(`   [PASS] Using USDC: ${EXPECTED_USDC}`);
     });
 
-    it("✅ Should identify Gnosis Safe as Admin", async function () {
+    it(" Should identify Gnosis Safe as Admin", async function () {
         // const DEFAULT_ADMIN = await mainContract.DEFAULT_ADMIN_ROLE();
         // const hasRole = await mainContract.hasRole(DEFAULT_ADMIN, "0xGNOSIS_SAFE...");
         // expect(hasRole).to.be.true;
         console.log("   [PASS] Admin Access Controls Verified.");
     });
 
-    it("✅ Micro-Trade Simulation", async function () {
+    it(" Micro-Trade Simulation", async function () {
         console.log("   [INFO] Attempting 1 USDC Trade...");
         // await mainContract.trade(...)
         console.log("   [PASS] Trade Execution Successful.");

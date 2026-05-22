@@ -5,13 +5,13 @@
  * alert events from the Redis queue to any subscribed browser client.
  *
  * Architecture:
- *   EVM/BTC/SOL Worker → prisma.whaleActivity → Redis List (whale:alert:queue)
- *   → THIS ENDPOINT poll/BLPOP → SSE stream → React Context → UI
+ *   EVM/BTC/SOL Worker  prisma.whaleActivity  Redis List (whale:alert:queue)
+ *    THIS ENDPOINT poll/BLPOP  SSE stream  React Context  UI
  *
  * Why SSE over WebSocket?
  *  - SSE works through HTTP/2 multiplexing on Railway without extra infra
  *  - Automatic browser reconnect on failure (EventSource API)
- *  - Unidirectional (server → client) is exactly what we need
+ *  - Unidirectional (server  client) is exactly what we need
  */
 
 import { NextRequest } from 'next/server';
@@ -24,7 +24,7 @@ export const runtime = 'nodejs';
 let activePodConnections = 0;
 const MAX_CONCURRENT_SSE = 200;
 
-// Redis import is conditional — the worker sets the queue, this endpoint reads it.
+// Redis import is conditional  the worker sets the queue, this endpoint reads it.
 // If Redis is not available (local dev without Docker), we fall back to long-polling
 // against Prisma directly.
 
@@ -67,12 +67,12 @@ export async function GET(req: NextRequest) {
                 try {
                     controller.enqueue(encoder.encode(payload));
                 } catch {
-                    // Client disconnected — stream will be cleaned up by finally block
+                    // Client disconnected  stream will be cleaned up by finally block
                 }
             };
 
             // Initial heartbeat
-            send('connected', { status: 'sovereign', timestamp: new Date().toISOString() });
+            send('connected', { status: 'system', timestamp: new Date().toISOString() });
 
             const prisma = await getPrismaClient();
 
@@ -106,8 +106,8 @@ export async function GET(req: NextRequest) {
             let running = true;
             let isCleanedUp = false;
 
-            // ─── [COSMIC BRIDGE] Redis Mesh Listener ─────────────────────────
-            // We create a dedicated subscriber to the Sovereign Auth Bus
+            //  [COSMIC BRIDGE] Redis Mesh Listener 
+            // We create a dedicated subscriber to the System Auth Bus
             const { redisClient: subClient } = await import('@/lib/redis/client');
             const podSub = (subClient as any).duplicate();
             await podSub.connect().catch(() => {});
@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
                 running = false;
                 activePodConnections--;
                 try { 
-                    await podSub.unsubscribe('sovereign_mesh_auth_bus').catch(() => {});
+                    await podSub.unsubscribe('system_mesh_auth_bus').catch(() => {});
                     await podSub.quit().catch(() => {});
                 } catch {}
                 try { controller.close(); } catch {}
@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
             req.signal.addEventListener('abort', cleanup);
 
             // Listen for Auth Events (QR Handshake Success)
-            podSub.subscribe('sovereign_mesh_auth_bus', (message: string) => {
+            podSub.subscribe('system_mesh_auth_bus', (message: string) => {
                 try {
                     const event = JSON.parse(message);
                     // Standard: The QR token (sent as session param) matches the socket/stream expectation
@@ -141,7 +141,7 @@ export async function GET(req: NextRequest) {
             while (running) {
                 try {
 
-                    // ─── Primary path: Redis Streams ───────────────────────────
+                    //  Primary path: Redis Streams 
                     if (redis) {
                         // XREAD bloqueante por 15s. No elimina el dato de la cola.
                         const result = await (redis as any).xread('BLOCK', 15000, 'STREAMS', 'whale:alert:stream', redisStreamId);
@@ -163,11 +163,11 @@ export async function GET(req: NextRequest) {
                                 }
                             }
                         } else {
-                            // Timeout — send heartbeat
+                            // Timeout  send heartbeat
                             send('heartbeat', { ts: Date.now() });
                         }
                     } else {
-                        // ─── Fallback path: Prisma polling ─────────────────────
+                        //  Fallback path: Prisma polling 
                         const where = lastId ? { id: { gt: lastId } } : {};
                         const rows = await prisma.whaleActivity.findMany({
                             where,
@@ -199,7 +199,7 @@ export async function GET(req: NextRequest) {
                     }
                 } catch (err: any) {
                     if (!running) break;
-                    // Send error event (non-fatal — client will stay connected)
+                    // Send error event (non-fatal  client will stay connected)
                     send('error', { message: err?.message ?? 'Stream error' });
                     await new Promise(r => setTimeout(r, 3000));
                 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, EyeOff, Lock, Network, Zap, Fingerprint, Activity, ChevronRight, RefreshCw, Layers } from 'lucide-react';
 import { useBalance } from 'wagmi';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 // Typings for Etherscan response
 interface EtherscanTx {
@@ -35,7 +35,7 @@ function statusFromConfirmations(conf: string): ShieldedNode['status'] {
 }
 
 export default function AztecPrivacyHub() {
-  const { address, isConnected } = useSovereignAccount();
+  const { address, isConnected } = useSystemAccount();
   const { data: balance } = useBalance({ address });
 
   const [nodes, setNodes] = useState<ShieldedNode[]>([]);
@@ -123,7 +123,7 @@ export default function AztecPrivacyHub() {
         <div className="flex items-center gap-6">
           <div className="text-right">
             <div className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-1">Transaction Count</div>
-            <div className="text-sm font-mono text-purple-400">{anonymitySet !== null ? `${anonymitySet.toLocaleString()} txs` : '—'}</div>
+            <div className="text-sm font-mono text-purple-400">{anonymitySet !== null ? `${anonymitySet.toLocaleString()} txs` : ''}</div>
           </div>
           <button
             onClick={() => { fetchTxs(); handleRoutePrivacy(); }}
@@ -153,7 +153,7 @@ export default function AztecPrivacyHub() {
                 {isConnected ? `${address?.slice(0,12)}...` : 'No wallet detected'}
               </div>
               <div className="text-5xl font-mono font-light tracking-tighter">
-                {balance ? `${parseFloat(balance.formatted).toFixed(4)} ${balance.symbol}` : '—'}
+                {balance ? `${parseFloat(balance.formatted).toFixed(4)} ${balance.symbol}` : ''}
               </div>
             </div>
           </div>

@@ -38,16 +38,16 @@ export default config;
 import { ethers } from "hardhat";
 
 async function main() {
-  console.log("Preparing SovereignValidator Deployment...");
+  console.log("Preparing SystemValidator Deployment...");
   
-  const Validator = await ethers.getContractFactory("SovereignValidator");
+  const Validator = await ethers.getContractFactory("SystemValidator");
   const validator = await Validator.deploy();
 
   await validator.waitForDeployment();
   const address = await validator.getAddress();
 
-  console.log(\`SovereignValidator firmly deployed to L2 at \${address}\`);
-  console.log("Sovereign Authority Context Binded to:", await validator.sovereignAuthority());
+  console.log(\`SystemValidator firmly deployed to L2 at \${address}\`);
+  console.log("System Authority Context Binded to:", await validator.systemAuthority());
 }
 
 main().catch((error) => {

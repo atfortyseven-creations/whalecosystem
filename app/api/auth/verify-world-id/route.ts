@@ -10,7 +10,7 @@ import { SignJWT } from "jose";
 
 export async function POST(request: NextRequest) {
     // Guard: fail fast at request time if the secret is missing.
-    // Never use a known fallback — that would allow anyone with the source code to forge tokens.
+    // Never use a known fallback  that would allow anyone with the source code to forge tokens.
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
         console.error('[FATAL] JWT_SECRET is not set. World ID verification endpoint is misconfigured.');
@@ -32,12 +32,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 2. Verificar la prueba con Worldcoin
+        // 2. Verificar la prueba con Identity
         // IMPORTANTE: Estos deben coincidir EXACTAMENTE con el frontend
-        const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID || process.env.WLD_APP_ID || "app_affe7470221b57a8edee20b3ac30c484";
+        const app_id = process.env.NEXT_PUBLIC_AUTH_APP_ID || process.env.AUTH_APP_ID || "app_affe7470221b57a8edee20b3ac30c484";
         const action = "polymarket-wallet";
 
-        console.log("🛡️ [CORE] Verifying World ID Proof:", { app_id, action });
+        console.log("️ [CORE] Verifying World ID Proof:", { app_id, action });
 
         const verifyRes = await verifyWorldIDProof(
             {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         );
 
         if (!verifyRes.success) {
-            console.error("❌ [CORE] World ID API Rejected Proof:", verifyRes);
+            console.error(" [CORE] World ID API Rejected Proof:", verifyRes);
             return NextResponse.json(
                 { 
                     error: "Prueba de World ID inválida", 
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
                 });
             }
         } catch (dbError: any) {
-            console.error("🚨 [DATABASE-ERROR] Critical failure during World ID persistence:", dbError);
+            console.error(" [DATABASE-ERROR] Critical failure during World ID persistence:", dbError);
             return NextResponse.json({
                 error: "Error de Base de Datos",
                 detail: "La base de datos no está sincronizada. ¿Has ejecutado 'npx prisma db push'?",
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
                 }
             });
         } catch (sessionError) {
-            console.warn("⚠️ [SESSION-WARNING] Could not create DB session, but proceeding with JWT:", sessionError);
+            console.warn("️ [SESSION-WARNING] Could not create DB session, but proceeding with JWT:", sessionError);
         }
 
         const token = await new SignJWT({
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error: any) {
-        console.error("💀 [FATAL-ERROR] World ID Verification Route crashed:", error);
+        console.error(" [FATAL-ERROR] World ID Verification Route crashed:", error);
         return NextResponse.json(
             { error: "Internal Server Error", detail: error.message, verified: false },
             { status: 500 }

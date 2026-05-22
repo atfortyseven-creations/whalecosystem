@@ -1,9 +1,9 @@
 import { neo4jClient } from './client';
 
-// ── Mass Transfer Graph Heuristics ───────────────────────────────────────────
+//  Mass Transfer Graph Heuristics 
 // These functions encode the mathematical models required to map 3-hop capital
 // flows across the Ethereum network, tracking CEX to DeFi movements.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 /**
  * Ingests a raw blockchain transaction into the graph database.

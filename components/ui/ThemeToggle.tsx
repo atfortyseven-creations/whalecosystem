@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
-// GPU-accelerated theme toggle — zero Framer overhead, CSS transform only
+// GPU-accelerated theme toggle  zero Framer overhead, CSS transform only
 // will-change + transform3d forces compositing layer for 60fps flicker-free swap
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);

@@ -6,10 +6,10 @@ import {
     Wallet, TrendingUp, ArrowUpRight, ArrowDownRight, RefreshCw,
     Activity, DollarSign, Zap, Search, Clock, AlertCircle
 } from 'lucide-react';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import useSWR from 'swr';
 import { ScrollFloat } from '@/components/ui/ScrollFloat';
-import { useSovereignENS } from '@/hooks/useSovereignENS';
+import { useSystemENS } from '@/hooks/useSystemENS';
 
 interface WhaleEntity {
     rank: number;
@@ -66,7 +66,7 @@ export function WhalePortfolio() {
     useEffect(() => { setMounted(true); }, []);
 
     const { data: whaleData, isLoading: whaleLoading, mutate: mutateWhales } = useSWR(
-        '/api/intelligence/whales', fetcher,
+        '/api/analytics/whales', fetcher,
         { refreshInterval: 12000, suspense: false }
     );
 
@@ -132,7 +132,7 @@ export function WhalePortfolio() {
 
     return (
         <div className="flex flex-col space-y-8">
-            {/* ── Legendary Title ── */}
+            {/*  Legendary Title  */}
             <div className="px-2">
                 <ScrollFloat 
                     textClassName="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none text-[#050505] dark:text-white"
@@ -147,13 +147,13 @@ export function WhalePortfolio() {
                 </div>
             </div>
 
-            {/* ── Header Stats ── */}
+            {/*  Header Stats  */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Total Whale AUM',   value: whaleLoading ? '…' : fmt(totalAUM), colorClass: 'text-[#050505] dark:text-white', icon: <DollarSign size={16}/> },
-                    { label: 'Whale Txns 30d',    value: whaleLoading ? '…' : totalTxns.toLocaleString(), colorClass: 'text-[#050505] dark:text-white', icon: <Activity size={16}/> },
-                    { label: 'Smart Money Inflow', value: whaleLoading ? '…' : fmt(netFlowsUSD), colorClass: 'text-[#00C076]', icon: <TrendingUp size={16}/> },
-                    { label: 'Avg Alpha Score',   value: whaleLoading ? '…' : avgAlpha.toFixed(1), colorClass: 'text-[#D4AF37]', icon: <Zap size={16}/> },
+                    { label: 'Total Whale AUM',   value: whaleLoading ? '' : fmt(totalAUM), colorClass: 'text-[#050505] dark:text-white', icon: <DollarSign size={16}/> },
+                    { label: 'Whale Txns 30d',    value: whaleLoading ? '' : totalTxns.toLocaleString(), colorClass: 'text-[#050505] dark:text-white', icon: <Activity size={16}/> },
+                    { label: 'Smart Money Inflow', value: whaleLoading ? '' : fmt(netFlowsUSD), colorClass: 'text-[#00C076]', icon: <TrendingUp size={16}/> },
+                    { label: 'Avg Alpha Score',   value: whaleLoading ? '' : avgAlpha.toFixed(1), colorClass: 'text-[#D4AF37]', icon: <Zap size={16}/> },
                 ].map((s, i) => (
                     <div key={i} className="bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center gap-2 mb-3">
@@ -165,7 +165,7 @@ export function WhalePortfolio() {
                 ))}
             </div>
 
-            {/* ── Card ── */}
+            {/*  Card  */}
             <div className="bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-white/10 rounded-3xl overflow-hidden shadow-sm">
                 <div className="px-6 py-4 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] flex items-center gap-4 flex-wrap">
                     <div className="flex bg-[#F0F0F0] dark:bg-[#1A1A1A] p-1 rounded-2xl border border-[#E5E5E5] dark:border-white/10">
@@ -184,7 +184,7 @@ export function WhalePortfolio() {
                     )}
                     <div className="relative flex-1 min-w-[200px] max-w-xs">
                         <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888] dark:text-white/40"/>
-                        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search entity matrix…"
+                        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search entity grid"
                             className="w-full bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-full pl-10 pr-4 py-2 text-[11px] font-mono text-[#050505] dark:text-white outline-none focus:border-[#050505] dark:focus:border-white transition-all"
                         />
                     </div>
@@ -226,7 +226,7 @@ export function WhalePortfolio() {
 
 // -- Subcomponent to resolve ENS independently without breaking hook rules --
 function WhaleRow({ w }: { w: WhaleEntity }) {
-    const { ensName, ensAvatar } = useSovereignENS(w.address as `0x${string}`);
+    const { ensName, ensAvatar } = useSystemENS(w.address as `0x${string}`);
 
     return (
         <tr className="hover:bg-[#FAF9F6] dark:hover:bg-white/5 transition-colors group">

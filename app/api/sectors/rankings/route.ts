@@ -18,7 +18,7 @@ export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
     try {
-        // ── Fast path ─────────────────────────────────────────────────────────
+        //  Fast path 
         const cached = await safeRedisGet(AGGREGATION_KEYS.SECTOR_RANKINGS);
         if (cached && cached !== 'TIMEOUT') {
             const parsed = safeJsonParse(cached, null, 'SECTOR_RANKINGS');
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        // ── Cache miss: direct Prisma query + repopulate ──────────────────────
+        //  Cache miss: direct Prisma query + repopulate 
         const { prisma } = await import('@/lib/prisma');
 
         const sectors = await prisma.sector.findMany({

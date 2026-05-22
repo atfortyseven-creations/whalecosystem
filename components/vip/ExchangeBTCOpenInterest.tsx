@@ -17,17 +17,17 @@ interface OIDataPoint {
 }
 
 const EXCHANGES = [
-  { id: "binance", name: "Binance", color: "#f59e0b", icon: "◉" },
-  { id: "bybit", name: "Bybit", color: "#8b5cf6", icon: "◈" },
-  { id: "okx", name: "OKX", color: "#06b6d4", icon: "✦" },
-  { id: "bitget", name: "Bitget", color: "#10b981", icon: "◆" },
-  { id: "dydx", name: "dYdX", color: "#f97316", icon: "◇" },
+  { id: "binance", name: "Binance", color: "#f59e0b", icon: "" },
+  { id: "bybit", name: "Bybit", color: "#8b5cf6", icon: "" },
+  { id: "okx", name: "OKX", color: "#06b6d4", icon: "" },
+  { id: "bitget", name: "Bitget", color: "#10b981", icon: "" },
+  { id: "dydx", name: "dYdX", color: "#f97316", icon: "" },
 ];
 
 type Currency = "EUR" | "USD";
 
 function formatAxisValue(value: number, currency: Currency): string {
-  const symbol = currency === "EUR" ? "€" : "$";
+  const symbol = currency === "EUR" ? "" : "$";
   if (value >= 1e9) return symbol + (value / 1e9).toFixed(1) + "B";
   if (value >= 1e6) return symbol + (value / 1e6).toFixed(0) + "M";
   return symbol + value.toFixed(0);
@@ -39,7 +39,7 @@ const CustomTooltip = ({
   active?: boolean; payload?: any[]; label?: string; currency: Currency;
 }) => {
   if (!active || !payload?.length) return null;
-  const sym = currency === "EUR" ? "€" : "$";
+  const sym = currency === "EUR" ? "" : "$";
 
   return (
     <div className="bg-[var(--aztec-ink)]/95 backdrop-blur-xl border border-[var(--aztec-parchment)]/10 rounded-2xl p-4 shadow-2xl min-w-[220px]">
@@ -105,7 +105,7 @@ export function ExchangeBTCOpenInterest() {
         openInterest: item.openInterestBinance,
         openInterestBybit: item.openInterestBybit,
         openInterestTotal: item.openInterestTotal,
-        // REAL per-day BTC closing price — not the same value repeated
+        // REAL per-day BTC closing price  not the same value repeated
         btcPrice: item.btcClose,
         openInterestEur: item.openInterestTotal * rate,
         btcPriceEur: item.btcClose * rate,
@@ -122,7 +122,7 @@ export function ExchangeBTCOpenInterest() {
       });
     } catch (e) {
       console.error("[OI Chart] fetch error", e);
-      // No Math.random() fallback — show error state
+      // No Math.random() fallback  show error state
       if (data.length === 0) setError("OI data temporarily unavailable.");
     } finally {
       setLoading(false);
@@ -135,7 +135,7 @@ export function ExchangeBTCOpenInterest() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  const sym = currency === "EUR" ? "€" : "$";
+  const sym = currency === "EUR" ? "" : "$";
   const oiKey = currency === "EUR" ? "openInterestEur" : "openInterest";
   const priceKey = currency === "EUR" ? "btcPriceEur" : "btcPrice";
   const totalOI = currentStats ? (currency === "EUR" ? currentStats.totalOI * eurRate : currentStats.totalOI) : 0;
@@ -219,7 +219,7 @@ export function ExchangeBTCOpenInterest() {
           <div className="h-72 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Loading OI data…</span>
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Loading OI data</span>
             </div>
           </div>
         ) : (
@@ -260,7 +260,7 @@ export function ExchangeBTCOpenInterest() {
               <YAxis
                 yAxisId="price"
                 orientation="right"
-                tickFormatter={(v: number) => (currency === "EUR" ? "€" : "$") + (v / 1000).toFixed(0) + "K"}
+                tickFormatter={(v: number) => (currency === "EUR" ? "" : "$") + (v / 1000).toFixed(0) + "K"}
                 tick={{ fontSize: 9, fill: "#94a3b8", fontFamily: "monospace", fontWeight: 600 }}
                 axisLine={false}
                 tickLine={false}
@@ -302,7 +302,7 @@ export function ExchangeBTCOpenInterest() {
         )}
       </div>
 
-      {/* Exchange Breakdown — Real Binance + Bybit OI */}
+      {/* Exchange Breakdown  Real Binance + Bybit OI */}
       <div className="mx-8 mb-7 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Exchange Breakdown</p>
         {currentStats ? (
@@ -313,7 +313,7 @@ export function ExchangeBTCOpenInterest() {
             ].map(ex => {
               const total = (currency === 'EUR' ? currentStats.totalOI * eurRate : currentStats.totalOI) || 1;
               const pct = Math.round((ex.value / total) * 100);
-              const sym = currency === 'EUR' ? '€' : '$';
+              const sym = currency === 'EUR' ? '' : '$';
               const label = ex.value >= 1e9 ? sym + (ex.value / 1e9).toFixed(2) + 'B' : sym + (ex.value / 1e6).toFixed(0) + 'M';
               return (
                 <div key={ex.name}>

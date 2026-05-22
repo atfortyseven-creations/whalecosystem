@@ -1,5 +1,5 @@
 /**
- * GetBlock WebSocket Whale Engine — Registry-backed
+ * GetBlock WebSocket Whale Engine  Registry-backed
  * Subscribes to all on-chain ERC-20 Transfer events above $WHALE_THRESHOLD_USD
  * Feeds the WhalePortfolio leaderboard and the live whale alert feed.
  * WSS pool: getblock-registry.ts (GB_ETH_WSS_*)
@@ -78,7 +78,7 @@ class WhaleWebSocketEngine {
             backoff = 5000; // Reset on success
             this.startHeartbeat();
             
-            // Subscribe to ALL Transfer logs — we filter by USD value in handler
+            // Subscribe to ALL Transfer logs  we filter by USD value in handler
             this.ws!.send(JSON.stringify({
                 jsonrpc: '2.0', id: 1,
                 method:  'eth_subscribe',
@@ -108,7 +108,7 @@ class WhaleWebSocketEngine {
         });
 
         this.ws.on('close', () => {
-            console.warn('[WhaleEngine] WS disconnected — reconnecting');
+            console.warn('[WhaleEngine] WS disconnected  reconnecting');
             this.stopHeartbeat();
             this.scheduleReconnect();
         });
@@ -155,7 +155,7 @@ class WhaleWebSocketEngine {
         this.stopHeartbeat();
         this.heartbeatTimer = setInterval(() => {
             if (this.isAlive === false) {
-                console.warn('[WhaleEngine] Whale Heartbeat missed — terminating');
+                console.warn('[WhaleEngine] Whale Heartbeat missed  terminating');
                 this.ws?.terminate();
                 return;
             }

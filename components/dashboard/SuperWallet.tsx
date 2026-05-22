@@ -101,7 +101,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
 
     const [isInitialized, setIsInitialized] = useState(false);
 
-    // 🔥 GLOBAL REACTIVE SYNC: Using SWR for watched wallets
+    //  GLOBAL REACTIVE SYNC: Using SWR for watched wallets
     const { data: premiumData, mutate: globalMutate } = useSWR(
         hookAddress ? `/api/premium/watched-wallets?address=${hookAddress}` : null,
         async (url) => {
@@ -230,7 +230,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
             
             const newAccount: WalletAccount = {
                 address: data.address,
-                name: `Sovereign Vault ${accounts.length + 1}`,
+                name: `System Vault ${accounts.length + 1}`,
                 type: 'DERIVED',
                 index: accounts.length,
                 color: getAccountColor(data.address)
@@ -304,7 +304,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
                 const data = await res.json();
                 if (data.id) {
                     watchAccount.id = data.id;
-                    // 🔥 INSTANT GLOBAL SYNC
+                    //  INSTANT GLOBAL SYNC
                     globalMutate();
                 }
             } catch (e) {
@@ -344,7 +344,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
                     }
                 });
                 if (!res.ok) throw new Error("Backend deletion failed");
-                // 🔥 INSTANT GLOBAL SYNC
+                //  INSTANT GLOBAL SYNC
                 globalMutate();
             }
 

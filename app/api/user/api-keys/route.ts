@@ -18,14 +18,14 @@ function generateApiKey() {
   return `${prefix}${randomBytes}`;
 }
 
-/** Resolve wallet address from session — supports both SIWE (address) and legacy email sessions */
+/** Resolve wallet address from session  supports both SIWE (address) and legacy email sessions */
 async function resolveWalletFromSession(session: any): Promise<string | null> {
   const user = session?.user as SessionUser | undefined;
 
   // Primary: SIWE session sets user.address
   if (user?.address) return user.address.toLowerCase();
 
-  // Fallback: legacy next-auth email session — look up by email
+  // Fallback: legacy next-auth email session  look up by email
   if (user?.email) {
     const dbUser = await prisma.user.findUnique({ where: { email: user.email } });
     return dbUser?.walletAddress ?? null;

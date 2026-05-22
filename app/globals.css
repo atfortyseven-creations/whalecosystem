@@ -10,9 +10,9 @@
   }
 }
 
-/* ──────────────────────────────────────────────────────────────────────────
+/* 
    A11Y GLOBAL REDUCED MOTION SUPPORT (Audit A11y & Motion Compliance)
-   ────────────────────────────────────────────────────────────────────────── */
+    */
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -24,16 +24,16 @@
   }
 }
 
-/* ──────────────────────────────────────────────────────────────────────────
+/* 
    IOS 15 / SAFARI WEBKIT UNIVERSAL COMPATIBILITY LAYER
    Resolves blank screen, viewport bugs, and font rendering on iOS 15.x
-   ────────────────────────────────────────────────────────────────────────── */
+    */
 
 /* Fix iOS Safari 100vh blank bottom space bug */
 html {
   /* Let the browser handle global scrolling natively */
   overflow-x: hidden;
-  /* ── HARD BOUNDARY: prevents rubber-band bounce and ghost pages ── */
+  /*  HARD BOUNDARY: prevents rubber-band bounce and ghost pages  */
   overscroll-behavior: none;
 }
 
@@ -48,11 +48,11 @@ body {
   padding-right:  env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* ── LANDING PAGE BOUNDARY SEAL: no empty space or scroll past footer ── */
+  /*  LANDING PAGE BOUNDARY SEAL: no empty space or scroll past footer  */
   overscroll-behavior: none;
 }
 
-/* ── STRICT DESKTOP SCROLL BLEED LOCK ── */
+/*  STRICT DESKTOP SCROLL BLEED LOCK  */
 body.ios-scroll-lock-strict {
   position: fixed !important;
   top: 0;
@@ -64,15 +64,15 @@ body.ios-scroll-lock-strict {
   touch-action: none !important;
 }
 
-/* ── BOUNDED VIEWPORT SEAL ────────────────────────────────────────────────────
+/*  BOUNDED VIEWPORT SEAL 
    When ClientLayout is in "bounded" mode, the root div has h-[100dvh] and the
    main tag is the scroll container. We must ensure nothing inside that tree
    expands the document height beyond the viewport.
-   The `[data-bounded]` attribute is explicitly NOT set anywhere — instead we
+   The `[data-bounded]` attribute is explicitly NOT set anywhere  instead we
    rely on the CSS stacking of h-[100dvh] on the root to create a containing
    block. These rules prevent common child component patterns (min-h-screen,
    min-h-[100dvh]) from leaking outside their scrollable parent.
-   ─────────────────────────────────────────────────────────────────────────── */
+    */
 /* Webkit momentum scrolling for the bounded <main> scroll container */
 main[class*="overflow-y-auto"] {
   -webkit-overflow-scrolling: touch;
@@ -93,11 +93,11 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 }
 
 
-/* ══════════════════════════════════════════════════════════════════════════════
+/* 
    SOVEREIGN LAYOUT SYSTEM
-   ══════════════════════════════════════════════════════════════════════════════
+   
    Tabs are full width to provide maximum visual clarity across the 4K display.
-   ══════════════════════════════════════════════════════════════════════════════ */
+    */
 
 
 /* iOS Safari: Prevent 16px font auto-zoom on input focus
@@ -111,7 +111,7 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 [class*="overflow-scroll"],
 .custom-scrollbar {
   -webkit-overflow-scrolling: touch;
-  /* NOTE: transform:translate3d removed — it forced ALL scroll containers into
+  /* NOTE: transform:translate3d removed  it forced ALL scroll containers into
      separate GPU stacking contexts, which caused the OS native scrollbar to
      misfire scroll events to the wrong target (document root vs inner container). */
 }
@@ -161,10 +161,10 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     --ui-text-scale: 1;
     --stealth-blur: 0px;
 
-    /* ═══════════════════════════════════════════════════════
+    /* 
        MARCA DE AGUA CÓSMICA 4K / MATRIZ INSTITUCIONAL (SVG)
        Reemplazamos el PNG estático por un SVG en Base64 para calidad infinita al hacer zoom
-       ═══════════════════════════════════════════════════════ */
+        */
     --wave-pattern: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%23000' fill-opacity='0.015' fill-rule='evenodd'/%3E%3C/svg%3E");
     --wave-pattern-opacity: 1;
     --olas-hokusai: none;
@@ -195,7 +195,7 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
 
-    /* Prevent horizontal layout overflow — use 100% NOT 100vw.
+    /* Prevent horizontal layout overflow  use 100% NOT 100vw.
        On Windows, 100vw includes the scrollbar width, which creates
        phantom horizontal overflow that cuts the layout at half-screen. */
     overflow-x: hidden;
@@ -215,9 +215,9 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     transition: background-color 0.4s ease, color 0.4s ease;
   }
 
-  /* ═══════════════════════════════════════════════════════
+  /* 
      35% ZOOM EN ZONA PC (IMMULATE 135% ZOOM)
-     ═══════════════════════════════════════════════════════ */
+      */
   @media (min-width: 1024px) {
     html {
       zoom: 1.35;
@@ -229,22 +229,22 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     color: inherit;
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     JAPANESE WAVE PATTERN — Desktop CSS pseudo-element fallback
-     ─────────────────────────────────────────────────────────
+  /* 
+     JAPANESE WAVE PATTERN  Desktop CSS pseudo-element fallback
+     
      WHY pseudo-element + React component both exist:
-     • body::before renders instantly on SSR before JS hydrates
-       → prevents flash of no-pattern on first paint on desktop
-     • WavePatternOverlay (React) takes over on ALL platforms
+      body::before renders instantly on SSR before JS hydrates
+        prevents flash of no-pattern on first paint on desktop
+      WavePatternOverlay (React) takes over on ALL platforms
        and is the authoritative source of truth after hydration
      
      MOBILE OVERRIDE:
      iOS Safari & Android WebView do NOT correctly handle
      `position: fixed` on `body::before` pseudo-elements.
      The pattern disappears/jumps during scroll.
-     We suppress it on touch devices with the media query below —
+     We suppress it on touch devices with the media query below 
      WavePatternOverlay (DOM element) handles mobile correctly.
-     ═══════════════════════════════════════════════════════════ */
+      */
   /* body::before removed to prevent GPU compositing storm with WavePatternOverlay */
 
   /* NOTE: body > * { z-index: 1 } was REMOVED.
@@ -255,13 +255,13 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 
 
   ::selection {
-    /* Institutional neutral — no brand-mismatched magenta */
+    /* Institutional neutral  no brand-mismatched magenta */
     background-color: rgba(0, 0, 0, 0.10);
     color: #050505;
   }
 
    /* input/select/textarea: iOS auto-zoom prevention (16px minimum)
-      Canonical definition here — stub comment above kept for orientation. */
+      Canonical definition here  stub comment above kept for orientation. */
    input, textarea, select {
      font-size: 16px !important;
      touch-action: manipulation;
@@ -273,16 +273,16 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
    /* === GLOBAL GPU LAYER HINTS ===
       Every element participates in the GPU paint system.
       Only `transform` and `opacity` are allowed to animate
-      without triggering layout — enforce that contract here.
+      without triggering layout  enforce that contract here.
    */
    * {
-     /* Do NOT set will-change here — that forces ALL elements onto GPU layers
+     /* Do NOT set will-change here  that forces ALL elements onto GPU layers
         and kills memory. Only set it on animated elements via .transform-gpu utility. */
      -webkit-font-smoothing: antialiased;
      -moz-osx-font-smoothing: grayscale;
      /* PERF: text-rendering:optimizeLegibility removed from universal selector.
         It was blocking EVERY text render on the page. Only apply to headings
-        where visual quality justifies the cost (h1–h4 via element selectors). */
+        where visual quality justifies the cost (h1h4 via element selectors). */
      box-sizing: border-box;
    }
   /* Senior absolute layout correction */
@@ -364,17 +364,17 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 /* ============================================================
    STRATOSPHERIC GPU RENDERING UTILITIES
    Deep compositor layer forcing for animated components.
-   Only apply these to elements that ACTUALLY animate —
+   Only apply these to elements that ACTUALLY animate 
    misuse wastes VRAM and defeats the purpose.
    ============================================================ */
 
-/* Viewport Virtualization — skip layout for off-screen content */
+/* Viewport Virtualization  skip layout for off-screen content */
 .optimize-visibility {
   /* content-visibility: auto; REMOVED AS IT BREAKS IPAD SAFARI */
   contain-intrinsic-size: 0 900px;
 }
 
-/* Full GPU compositor layer — for heavy animated cards/overlays */
+/* Full GPU compositor layer  for heavy animated cards/overlays */
 .transform-gpu {
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -414,8 +414,8 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 html,
 body,
 :root {
-  /* scroll-behavior managed by Lenis — not CSS */
-  /* CRITICAL: height:100% removed — causes iPad Safari blank screen.
+  /* scroll-behavior managed by Lenis  not CSS */
+  /* CRITICAL: height:100% removed  causes iPad Safari blank screen.
      Body/html height is auto by default; min-height:100vh on body handles full-page layout. */
   -webkit-overflow-scrolling: touch;
 }
@@ -428,7 +428,7 @@ body,
   perspective: 1000;
 }
 
-/* GPU scroll container — use on long scrollable lists */
+/* GPU scroll container  use on long scrollable lists */
 .scroll-gpu {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -502,11 +502,11 @@ body,
   .backdrop-blur-md,
   .glass-vault,
   .glass-premium,
-  .glass-sovereign {
+  .glass-system {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
-  /* NOTE: box-shadow intentionally NOT removed — shadows are critical
+  /* NOTE: box-shadow intentionally NOT removed  shadows are critical
      for visual depth on cards, modals and buttons on mobile. */
 }
 
@@ -536,9 +536,9 @@ body.is-mobile-device .mobile-bottom-nav {
 }
 
 /* ============================================================
-   WHALE CHAT — ARTICULATED THEME ENGINE
+   WHALE CHAT  ARTICULATED THEME ENGINE
    Each data-chat-theme value maps directly to a palette.
-   Settings modal → data-chat-theme attribute → CSS variables.
+   Settings modal  data-chat-theme attribute  CSS variables.
    ============================================================ */
 
 .chat-theme-wrapper {
@@ -649,7 +649,7 @@ html.hide-balances [data-balance]:active {
   .min-h-screen { min-height: 100dvh !important; }
   .h-screen { height: 100dvh !important; }
 
-  /* MASTER LAYOUT HEIGHTS — Compensates for the 68px header */
+  /* MASTER LAYOUT HEIGHTS  Compensates for the 68px header */
   .min-h-content { min-height: calc(100dvh - 68px) !important; }
   .h-content { height: calc(100dvh - 68px) !important; }
 
@@ -709,7 +709,7 @@ html.hide-balances [data-balance]:active {
   .glass-pearl {
     background: rgba(255, 255, 255, 0.03);
     /* PERF: Reduced from 45px to 12px. backdrop-filter:blur(45px) caused severe
-       GPU stall on mid-range laptops — it's the single most expensive CSS property.
+       GPU stall on mid-range laptops  it's the single most expensive CSS property.
        12px is visually imperceptible from 45px at opacity 0.03. */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -798,7 +798,7 @@ html.hide-balances [data-balance]:active {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
   }
 
-  /* --- Sovereign Web3 Aesthetics --- */
+  /* --- System Web3 Aesthetics --- */
   .noise-bg {
     position: relative;
     isolation: isolate;
@@ -825,7 +825,7 @@ html.hide-balances [data-balance]:active {
       radial-gradient(at 100% 100%, hsla(339,49%,10%,1) 0, transparent 50%);
   }
 
-  .glass-sovereign {
+  .glass-system {
     background: rgba(255, 255, 255, 0.01);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.03);
@@ -884,7 +884,7 @@ html.forum-light-mode {
 .forum-theme-root {
   background-color: var(--forum-bg);
   color: var(--forum-text);
-  /* Disable transition on initial load to prevent flash — JS adds class later */
+  /* Disable transition on initial load to prevent flash  JS adds class later */
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -897,13 +897,13 @@ html.forum-light-mode {
   transition-duration: 0.2s;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* 
    JAPANESE WAVE SURFACE UTILITIES
    Apply to any white/cream/slate-50 element in any component.
    Uses position:relative + ::before so content stays on top.
-   ═══════════════════════════════════════════════════════════════ */
+    */
 
-/* Standard utility — use on bg-white / bg-slate-50 sections */
+/* Standard utility  use on bg-white / bg-slate-50 sections */
 .wave-surface {
   position: relative;
 }
@@ -930,12 +930,12 @@ html.forum-light-mode {
   z-index: 1;
 }
 
-/* Lighter variant — for cards that already have subtle borders */
+/* Lighter variant  for cards that already have subtle borders */
 .wave-surface-light::before {
   opacity: 0.03;
 }
 
-/* Stronger variant — hero sections */
+/* Stronger variant  hero sections */
 .wave-surface-strong::before {
   opacity: 0.065;
 }
@@ -1012,7 +1012,7 @@ html.forum-light-mode {
 }
 
 /* =============================================
-   LIQUID PRISM BACKGROUND — Static Color Shift
+   LIQUID PRISM BACKGROUND  Static Color Shift
    ============================================= */
 @keyframes prism-shift {
   0%   { filter: hue-rotate(0deg)   saturate(2)   brightness(1.1); }
@@ -1074,21 +1074,21 @@ html.forum-light-mode {
 }
 
 /* ============================================================
-   RESPONSIVE LAYOUT — NO ZOOM HACK
+   RESPONSIVE LAYOUT  NO ZOOM HACK
    All breakpoints use fluid clamp() values and flex/grid.
-   The body never gets CSS zoom — that property breaks stacking
+   The body never gets CSS zoom  that property breaks stacking
    contexts and subpixel rendering entirely.
 
    MOBILE (< 768px)
    - Stack everything vertically (handled by Tailwind sm: prefix)
    - font-size driven by clamp() on html
-   - Touch targets ≥ 48px (WCAG 2.5.5)
+   - Touch targets  48px (WCAG 2.5.5)
 
-   TABLET (768px – 1279px)
+   TABLET (768px  1279px)
    - 2-column grids
    - Slightly smaller padding
 
-   PC (≥ 1280px)
+   PC ( 1280px)
    - Full 3-column grid, sticky headers
 ============================================================ */
 
@@ -1100,7 +1100,7 @@ html.forum-light-mode {
 
 /* Minimum touch target size for buttons on mobile */
 @media (max-width: 1023px) {
-  /* WCAG 2.5.5 minimum touch target — applied only to non-icon buttons/links.
+  /* WCAG 2.5.5 minimum touch target  applied only to non-icon buttons/links.
      Icon-only controls use .icon-btn class and are excluded. */
   button:not(.icon-btn),
   a:not(.icon-link),
@@ -1114,7 +1114,7 @@ html.forum-light-mode {
   .animate-prism-shift {
     filter: blur(30px) saturate(1.8) brightness(1.05) !important;
   }
-  /* Disable content-visibility on mobile — causes layout jumps */
+  /* Disable content-visibility on mobile  causes layout jumps */
   .optimize-visibility {
     content-visibility: visible;
   }
@@ -1179,11 +1179,11 @@ html.forum-light-mode {
 
 
 /* ============================================================
-   MISSING UTILITIES — Sovereign Terminal v4.2
+   MISSING UTILITIES  System Terminal v4.2
    Critical additions for bug-free production rendering.
    ============================================================ */
 
-/* scrollbar-hide — used across dashboard tab containers */
+/* scrollbar-hide  used across dashboard tab containers */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -1192,7 +1192,7 @@ html.forum-light-mode {
   display: none;
 }
 
-/* animate-float — gentle vertical oscillation for WhaleLogo in CTA */
+/* animate-float  gentle vertical oscillation for WhaleLogo in CTA */
 @keyframes float {
   0%,  100% { transform: translate3d(0,  0px, 0); }
   50%        { transform: translate3d(0, -12px, 0); }
@@ -1203,12 +1203,12 @@ html.forum-light-mode {
 }
 
 /* ============================================================
-   SECTION FUSION SYSTEM — 240Hz GPU-composited blend zones
+   SECTION FUSION SYSTEM  240Hz GPU-composited blend zones
    Eliminates hard edges between light and dark landing sections.
    Use on the BOTTOM of a light section or TOP of a dark section.
    ============================================================ */
 
-/* Top of dark section — fades FROM the ivory (#FAF9F6) ABOVE it */
+/* Top of dark section  fades FROM the ivory (#FAF9F6) ABOVE it */
 .section-blend-top {
   position: absolute;
   top: 0;
@@ -1226,7 +1226,7 @@ html.forum-light-mode {
   transform: translateZ(0);
 }
 
-/* Bottom of dark section — fades back TO ivory (#FAF9F6) */
+/* Bottom of dark section  fades back TO ivory (#FAF9F6) */
 .section-blend-bottom {
   position: absolute;
   bottom: 0;
@@ -1280,39 +1280,39 @@ html.forum-light-mode {
   image-rendering: -webkit-optimize-contrast;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════════
-   SOVEREIGN SETTINGS — CSS FUNCTIONAL LAYER
+/* 
+   SOVEREIGN SETTINGS  CSS FUNCTIONAL LAYER
    These classes are applied to <html> by applyDOMClasses() in useSettingsStore.
    Every toggle/selection in Settings has a real visual effect here.
-   ══════════════════════════════════════════════════════════════════════════════ */
+    */
 
-/* ── STEALTH MODE: blur & hide any element tagged [data-balance] ─────────────
+/*  STEALTH MODE: blur & hide any element tagged [data-balance] 
    Usage: add data-balance attribute to any span/div showing wallet balances.
    Example: <span data-balance>${portfolio.total}</span>
-   ─────────────────────────────────────────────────────────────────────────── */
+    */
 html.stealth-active [data-balance] {
   filter: blur(8px);
   user-select: none;
   transition: filter 0.3s ease;
 }
 html.stealth-active [data-balance]:hover {
-  filter: blur(0px); /* Reveal on hover — intentional UX */
+  filter: blur(0px); /* Reveal on hover  intentional UX */
 }
 
-/* ── SHOW BALANCES: when showBalances is OFF, hide [data-balance] fully ──────
+/*  SHOW BALANCES: when showBalances is OFF, hide [data-balance] fully 
    The class hide-balances is applied when showBalances === false.
-   ─────────────────────────────────────────────────────────────────────────── */
+    */
 html.hide-balances [data-balance] {
   visibility: hidden;
   pointer-events: none;
 }
 
-/* ── UI DENSITY — RELAXED (default) ─────────────────────────────────────────*/
+/*  UI DENSITY  RELAXED (default) */
 html:not(.ui-compact):not(.ui-dense) .card-pad   { padding: 1.5rem; }
 html:not(.ui-compact):not(.ui-dense) .row-gap    { gap: 1rem; }
 html:not(.ui-compact):not(.ui-dense) .table-row  { padding-top: 0.75rem; padding-bottom: 0.75rem; }
 
-/* ── UI DENSITY — COMPACT ────────────────────────────────────────────────── */
+/*  UI DENSITY  COMPACT  */
 html.ui-compact .card-pad                        { padding: 0.875rem; }
 html.ui-compact .row-gap                         { gap: 0.5rem; }
 html.ui-compact .table-row                       { padding-top: 0.4rem; padding-bottom: 0.4rem; }
@@ -1325,7 +1325,7 @@ html.ui-compact .gap-6                           { gap: 0.875rem !important; }
 html.ui-compact .mb-4                            { margin-bottom: 0.5rem !important; }
 html.ui-compact .mb-6                            { margin-bottom: 0.75rem !important; }
 
-/* ── UI DENSITY — DENSE ──────────────────────────────────────────────────── */
+/*  UI DENSITY  DENSE  */
 html.ui-dense .card-pad                          { padding: 0.5rem; }
 html.ui-dense .row-gap                           { gap: 0.25rem; }
 html.ui-dense .table-row                         { padding-top: 0.2rem; padding-bottom: 0.2rem; }
@@ -1340,15 +1340,15 @@ html.ui-dense .mb-6                              { margin-bottom: 0.4rem !import
 html.ui-dense .h-16                              { height: 3.25rem !important; }
 html.ui-dense .h-\[52px\]                        { height: 44px !important; }
 
-/* ── HARDWARE ACCELERATION OFF: disable GPU compositing hints ────────────── */
+/*  HARDWARE ACCELERATION OFF: disable GPU compositing hints  */
 html.no-hw-accel * {
   will-change: auto !important;
   transform: none !important;
   backface-visibility: visible !important;
 }
-/* Note: animations still work — we just remove GPU layer hints to save VRAM */
+/* Note: animations still work  we just remove GPU layer hints to save VRAM */
 
-/* ── FORUM LEGACY THEME VARS ────────────────────────────────────────────────── */
+/*  FORUM LEGACY THEME VARS  */
 .forum-theme-root {
   --forum-bg: #FAF9F6;
   --forum-surface: #F0EFEA;
@@ -1372,41 +1372,41 @@ html.no-hw-accel * {
   --forum-accent: #00C076;
 }
 
-/* ──────────────────────────────────────────────────────────────────────────
+/* 
    NOTE: html.hide-balances and html.no-hw-accel rules are defined above
-   (lines ~1141–1185). Duplicate declarations removed here to prevent
+   (lines ~11411185). Duplicate declarations removed here to prevent
    CSS specificity conflicts.
-   ────────────────────────────────────────────────────────────────────────── */
+    */
 
-/* ══════════════════════════════════════════════════════════════════════════════
-   GLOBAL PC SCALE SYSTEM — 40% ZOOM-OUT FOR DESKTOP (zoom: 0.6)
-   ──────────────────────────────────────────────────────────────────────────────
+/* 
+   GLOBAL PC SCALE SYSTEM  40% ZOOM-OUT FOR DESKTOP (zoom: 0.6)
+   
    HOW IT WORKS:
-   • `zoom: 0.6` on <html> scales the entire rendering tree to 60% of original.
-   • This achieves a 40% zoom-out effect — content is closer than 0.5 but still
+    `zoom: 0.6` on <html> scales the entire rendering tree to 60% of original.
+    This achieves a 40% zoom-out effect  content is closer than 0.5 but still
      scaled down for 4K/ultrawide displays.
-   • The browser automatically creates the logical coordinate space.
-   • Mobile (< 1024px physical hardware screen) is completely unaffected.
-   ══════════════════════════════════════════════════════════════════════════════ */
+    The browser automatically creates the logical coordinate space.
+    Mobile (< 1024px physical hardware screen) is completely unaffected.
+    */
 @media screen and (min-width: 1024px) {
   html {
     zoom: 0.6;
   }
 }
 
-/* ══════════════════════════════════════════════════════════════════════════════
-   UNIVERSAL DARK MODE — Glass Surface System
+/* 
+   UNIVERSAL DARK MODE  Glass Surface System
    Applied globally when html.dark is active (default theme = dark).
    Ensures text is ALWAYS readable over the black wallpaper.
-   ══════════════════════════════════════════════════════════════════════════════ */
+    */
 
 /* Force all generic solid-white page shells to transparent in dark mode */
 html.dark [class*="bg-white"]:not([class*="bg-white/"]):not(button):not(a):not(input):not(textarea):not(select):not(img):not(svg):not(span):not(p):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
   background-color: transparent !important;
 }
 
-/* ── UNIVERSAL TEXT CONTRAST — DARK MODE ABSOLUTE ENFORCEMENT ── */
-/* Every text element in dark mode must be white/light — zero exceptions */
+/*  UNIVERSAL TEXT CONTRAST  DARK MODE ABSOLUTE ENFORCEMENT  */
+/* Every text element in dark mode must be white/light  zero exceptions */
 html.dark body,
 html.dark body * {
   color: inherit;
@@ -1443,7 +1443,7 @@ html.dark [class*="text-zinc-900"] {
   color: #F5F5F5 !important;
 }
 
-/* Fix opacity-based dark text — make them light-opacity white instead */
+/* Fix opacity-based dark text  make them light-opacity white instead */
 html.dark [class*="text-black/"] {
   color: rgba(245, 245, 245, 0.85) !important;
 }
@@ -1468,10 +1468,10 @@ html.dark [style*="#FFFDF8"] {
   background-color: transparent !important;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════════
+/* 
    UNIVERSAL NAV / TABS CENTERING SYSTEM
    All navigation headers, tab bars, and pill navs must be perfectly centered.
-   ══════════════════════════════════════════════════════════════════════════════ */
+    */
 
 /* Ensure header inner containers are always max-width centered */
 header > div,
@@ -1494,7 +1494,7 @@ header .absolute.left-\[50\%\] {
   transform: translateX(-50%) !important;
 }
 
-/* ── DOCS LAYOUT: force dark-readable text in the docs panel ── */
+/*  DOCS LAYOUT: force dark-readable text in the docs panel  */
 /* The docs sidebar and content must have white text in dark mode */
 html.dark .doc-content h1,
 html.dark .doc-content h2,
@@ -1521,8 +1521,8 @@ html.dark .doc-content .callout {
   border-left-color: rgba(255,255,255,0.4) !important;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════════
-   SOVEREIGN LIGHT-MODE FIREWALL — Zero Dark Mode. Ever.
+/* 
+   SOVEREIGN LIGHT-MODE FIREWALL  Zero Dark Mode. Ever.
 
    This platform enforces light mode universally: connected, disconnected,
    on wallet reconnect/disconnect cycles, and on AppKit modal open/close.
@@ -1532,7 +1532,7 @@ html.dark .doc-content .callout {
    ensure the visual output is ALWAYS light-mode compliant.
 
    Strategy: override the html.dark cascade back to light-mode values.
-   ══════════════════════════════════════════════════════════════════════════════ */
+    */
 
 /* Force the browser's built-in color scheme to stay light even if .dark exists */
 html,
@@ -1544,10 +1544,10 @@ html.light {
 /* Neutralize the dark-body text inversion */
 html.dark body {
   background-color: transparent !important;
-  color: #1C1917 !important; /* Slate-900 — sovereign light-mode text */
+  color: #1C1917 !important; /* Slate-900  system light-mode text */
 }
 
-/* Neutralize white-text rules — restore dark sovereign text on light bg */
+/* Neutralize white-text rules  restore dark system text on light bg */
 html.dark p,
 html.dark h1,
 html.dark h2,
@@ -1578,7 +1578,7 @@ html.dark [class*="text-black/"] {
   color: unset !important;
 }
 
-/* Restore bg-white containers — do NOT make them transparent */
+/* Restore bg-white containers  do NOT make them transparent */
 html.dark [class*="bg-white"]:not([class*="bg-white/"]):not(button):not(a):not(input):not(textarea):not(select):not(img):not(svg):not(span):not(p):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
   background-color: #ffffff !important;
 }
@@ -1590,7 +1590,7 @@ html.dark [style*="#FFFDF8"] {
   background-color: inherit !important;
 }
 
-/* Docs content: keep dark sovereign text on light surface */
+/* Docs content: keep dark system text on light surface */
 html.dark .doc-content h1,
 html.dark .doc-content h2,
 html.dark .doc-content h3,

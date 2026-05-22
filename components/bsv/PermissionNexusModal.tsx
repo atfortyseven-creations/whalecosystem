@@ -16,7 +16,7 @@ interface PermissionNexusModalProps {
 
 /**
  * PERMISSION NEXUS (Phase 35)
- * The Sovereign Authorization Portal for dApp Protocol Handshakes.
+ * The System Authorization Portal for dApp Protocol Handshakes.
  */
 export const PermissionNexusModal = ({ 
   isOpen, 
@@ -58,7 +58,7 @@ export const PermissionNexusModal = ({
             {/* Context Section */}
             <div className="p-10 space-y-8">
                <div className="space-y-2">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-white/40">Requesting Intelligence</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-white/40">Requesting Analytics</p>
                   <div className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-4">
                      <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center font-black">?</div>
                      <div>

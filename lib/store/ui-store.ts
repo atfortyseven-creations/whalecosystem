@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// ─── Persisted subset: only UI preferences survive reloads ───────────────────
+//  Persisted subset: only UI preferences survive reloads 
 // CRITICAL: isLinked and isConnectModalOpen are intentionally NOT persisted.
-// isLinked is derived fresh on every mount from the live sovereign_handshake cookie
+// isLinked is derived fresh on every mount from the live system_handshake cookie
 // to prevent stale auth state after disconnection.
 interface PersistedUIState {
   isStealthMode: boolean;
@@ -26,17 +26,17 @@ interface UIState extends PersistedUIState {
 export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
-      // ── Persisted preferences ────────────────────────────────────────────
+      //  Persisted preferences 
       isStealthMode: false,
       activePanel: null,
 
-      // ── Runtime-only state (never persisted) ─────────────────────────────
+      //  Runtime-only state (never persisted) 
       // Resets on every page load; correct value is re-derived from cookie in LinkedGate.
       isConnectModalOpen: false,
       isLinked: false,
       isZkVerified: false,
 
-      // ── Actions ──────────────────────────────────────────────────────────
+      //  Actions 
       toggleStealthMode: () => set((state) => ({ isStealthMode: !state.isStealthMode })),
       setStealthMode: (value: boolean) => set({ isStealthMode: value }),
       openConnectModal: () => set({ isConnectModalOpen: true }),

@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
                     type: isBigMove ? 'whale_move' : 'smart_sell',
                     walletLabel: wallet.label,
                     walletAddress: wallet.address,
-                    title: isBigMove ? '🚨 Whale Movement Detected' : '💼 Wallet Activity',
+                    title: isBigMove ? ' Whale Movement Detected' : ' Wallet Activity',
                     description: `Detected ${safeToFixed(tx.value || 0, 4)} ${symbol} transfer from ${wallet.label}`,
                     action: {
                         type: 'TRANSFER',

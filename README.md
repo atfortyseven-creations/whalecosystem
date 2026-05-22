@@ -1,6 +1,6 @@
 # Whale Alert Network Pro
 
-> **Institutional-grade on-chain intelligence.** Real-time forensic surveillance of ERC-20 capital flows, decentralised E2EE messaging, and ZK-proof infrastructure — delivered through a sovereign, zero-trust web terminal.
+> **Institutional-grade on-chain analytics.** Real-time forensic surveillance of ERC-20 capital flows, decentralised E2EE messaging, and ZK-proof infrastructure  delivered through a system, zero-trust web terminal.
 
 [![Build](https://img.shields.io/badge/build-passing-00C076?style=flat-square&logo=railway)](https://railway.app)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-339933?style=flat-square&logo=node.js)](https://nodejs.org)
@@ -12,7 +12,7 @@
 
 ## Overview
 
-Whale Alert Network Pro is a full-stack Web3 intelligence platform that monitors institutional ERC-20 transfer activity across Ethereum and L2 networks. It combines on-chain forensic analysis, cryptographic identity, and decentralised communication into a unified terminal interface.
+Whale Alert Network Pro is a full-stack Web3 analytics platform that monitors institutional ERC-20 transfer activity across Ethereum and L2 networks. It combines on-chain forensic analysis, cryptographic identity, and decentralised communication into a unified terminal interface.
 
 The platform is built for traders, analysts, and institutional desks who require unmediated access to large-capital movement data with sub-second latency and zero reliance on centralised data providers.
 
@@ -22,7 +22,7 @@ The platform is built for traders, analysts, and institutional desks who require
 
 | Module | Description |
 |---|---|
-| **Whale Ledger** | Real-time feed of ERC-20 transfers ≥ $100K. ECDSA-verified, block-confirmed, zero-latency delivery. |
+| **Whale Ledger** | Real-time feed of ERC-20 transfers  $100K. ECDSA-verified, block-confirmed, zero-latency delivery. |
 | **Mass Transfer Intel** | Detection of coordinated multi-wallet token movements. Identifies institutional accumulation and wash trading patterns. |
 | **Entity Graph** | Interactive Neo4j-backed graph of wallet relationships and capital routing across DeFi protocols. |
 | **Mempool Forensics** | AI heuristic engine scanning Ethereum mempools for MEV sandwiches, drainer contracts, and phishing transactions in real time. |
@@ -30,9 +30,9 @@ The platform is built for traders, analysts, and institutional desks who require
 | **DeFi Yields** | Aggregated APY and TVL data across major DeFi protocols. Morpho Blue (Base) integration included. |
 | **Aztec Pipeline** | Live ZK-rollup block sequencer monitoring. Tracks proving, sequencing, and settlement stages on Aztec Network. |
 | **Trading Terminal** | Hyperliquid L1 perpetuals execution layer. Zero-gas institutional trade routing. |
-| **Sovereign Vault** | AES-256 encrypted local storage for private notes and credentials. Unlocked exclusively by wallet signature. |
+| **System Vault** | AES-256 encrypted local storage for private notes and credentials. Unlocked exclusively by wallet signature. |
 | **Reputation SBT** | Soulbound Token passport tracking milestones and on-chain contributions. Non-transferable identity attestation. |
-| **Ticket Mint** | WGT-GENESIS NFT credential portal on Optimism L2. 200 genesis passes — permanent platform access. |
+| **Ticket Mint** | WGT-GENESIS NFT credential portal on Optimism L2. 200 genesis passes  permanent platform access. |
 
 ---
 
@@ -41,27 +41,27 @@ The platform is built for traders, analysts, and institutional desks who require
 The platform operates on a **Zero-Trust, Privacy-by-Void** model. No component assumes trust at any boundary.
 
 ### Authentication
-- **TitaniumGate Middleware** — All protected routes are gated behind a `sovereign_handshake` cryptographic cookie derived from a SIWE (Sign-In with Ethereum) session.
-- **Session Locking** — Inactivity auto-disconnect with configurable timer (15m / 1h / 24h / never). Re-authentication requires on-chain signature verification.
-- **Redis Session Locking** — Upstash Redis enforces single-session constraints per wallet address.
+- **TitaniumGate Middleware**  All protected routes are gated behind a `system_handshake` cryptographic cookie derived from a SIWE (Sign-In with Ethereum) session.
+- **Session Locking**  Inactivity auto-disconnect with configurable timer (15m / 1h / 24h / never). Re-authentication requires on-chain signature verification.
+- **Redis Session Locking**  Upstash Redis enforces single-session constraints per wallet address.
 
 ### Messaging (Whale Chat)
-- **Protocol:** XMTP v5 browser-sdk — peer-to-peer, decentralised message transport.
+- **Protocol:** XMTP v5 browser-sdk  peer-to-peer, decentralised message transport.
 - **Encryption:** Double-ratchet algorithm with ephemeral key derivation (forward secrecy guaranteed).
-- **Identity:** Messaging keys are derived deterministically from the wallet's ECDSA private key via a gasless signature. Keys are stored exclusively in browser IndexedDB — never transmitted.
+- **Identity:** Messaging keys are derived deterministically from the wallet's ECDSA private key via a gasless signature. Keys are stored exclusively in browser IndexedDB  never transmitted.
 - **Server role:** Zero. No message content is routed through, stored by, or accessible to any platform server.
 
 ### Smart Contracts
-- **Audited with Slither** — static analysis enforced in CI via `.github/workflows/security.yml`.
+- **Audited with Slither**  static analysis enforced in CI via `.github/workflows/security.yml`.
 - **Randomness:** All session nonces use `crypto.randomUUID()` and `crypto.getRandomValues()`. `Math.random()` is forbidden.
 - **OpenZeppelin v5** contracts for all token and access-control logic.
 
 ### Infrastructure
-- **Next.js 15** — App Router, async RSC, streaming SSR.
-- **PostgreSQL via Prisma** — typed ORM, schema-enforced migrations.
-- **Redis (Upstash)** — rate limiting, session state, real-time telemetry.
-- **IPFS via Pinata** — immutable asset pinning for NFT metadata.
-- **PM2 + Railway** — zero-downtime process management.
+- **Next.js 15**  App Router, async RSC, streaming SSR.
+- **PostgreSQL via Prisma**  typed ORM, schema-enforced migrations.
+- **Redis (Upstash)**  rate limiting, session state, real-time telemetry.
+- **IPFS via Pinata**  immutable asset pinning for NFT metadata.
+- **PM2 + Railway**  zero-downtime process management.
 
 ---
 
@@ -76,10 +76,10 @@ The WAN API provides programmatic access to all forensic data streams. Authentic
 | **Price** | $14.99 / mo | $49 / mo | $299 / mo | $1,999 / mo |
 | **Requests / day** | 5,000 | 10,000 | 500,000 | Unlimited |
 | **Tokens** | 3 (BTC, ETH, BNB) | 5 | All 24 | All + custom |
-| **Threshold** | ≥ $1M | ≥ $500K | ≥ $100K | ≥ $50K |
+| **Threshold** |  $1M |  $500K |  $100K |  $50K |
 | **Window** | 12h | 24h sliding | 30-day history | 12-month history |
 | **Delivery** | REST | REST | REST + WS + Webhooks | REST + WS + FIX |
-| **SLA** | — | — | — | 99.99% + dedicated infra |
+| **SLA** |  |  |  | 99.99% + dedicated infra |
 
 ### Endpoints (REST)
 
@@ -114,7 +114,7 @@ GET  /api/network/getblock-health     Node health check
 ## Local Development
 
 ```bash
-# Prerequisites: Node ≥ 20, PostgreSQL, Redis
+# Prerequisites: Node  20, PostgreSQL, Redis
 
 git clone <repo-url>
 cd whale-alert-pro
@@ -144,21 +144,21 @@ npm run dev                  # Next.js + scanner worker
 ## Project Structure
 
 ```
-├── app/                  Next.js 15 App Router (routes, API handlers)
-│   ├── api/              Server-side API routes
-│   └── dashboard/        Authenticated terminal shell
-├── components/
-│   ├── dashboard/        All dashboard module panels
-│   ├── landing/          Public marketing pages
-│   └── shared/           Reusable UI primitives
-├── lib/
-│   ├── xmtp/             XMTP v5 E2EE client wrapper
-│   ├── store/            Zustand state management
-│   └── config/           Pricing tiers, feature flags
-├── services/             Background workers (scanner, alerts, mesh)
-├── scripts/              CLI utilities and deployment helpers
-├── contracts/            Solidity smart contracts (Hardhat)
-└── prisma/               Schema and migrations
+ app/                  Next.js 15 App Router (routes, API handlers)
+    api/              Server-side API routes
+    dashboard/        Authenticated terminal shell
+ components/
+    dashboard/        All dashboard module panels
+    landing/          Public marketing pages
+    shared/           Reusable UI primitives
+ lib/
+    xmtp/             XMTP v5 E2EE client wrapper
+    store/            Zustand state management
+    config/           Pricing tiers, feature flags
+ services/             Background workers (scanner, alerts, mesh)
+ scripts/              CLI utilities and deployment helpers
+ contracts/            Solidity smart contracts (Hardhat)
+ prisma/               Schema and migrations
 ```
 
 ---

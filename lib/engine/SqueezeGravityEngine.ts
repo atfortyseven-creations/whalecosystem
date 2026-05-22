@@ -34,7 +34,7 @@ export interface PrecognitiveOutput {
     currentPrice: number;
 }
 
-export class VIPMatrixEngine {
+export class VIPGridEngine {
     
     // Calcula la propensión a un Short/Long squeeze combinando Binance + Hyperliquid
     static async calculatePrecognitiveState(asset: string): Promise<PrecognitiveOutput> {
@@ -93,7 +93,7 @@ export class VIPMatrixEngine {
             };
 
         } catch (error) {
-            console.error(`[Matrix Engine] Gravity Failure on ${asset}`, error);
+            console.error(`[Grid Engine] Gravity Failure on ${asset}`, error);
             return { 
                 gravityScore: 0, direction: 'NEUTRAL', targetPrice: 0, 
                 institutionalVigorValue: 0, institutionalVigorPercent: 50, institutionalIsAccumulation: false,
@@ -129,7 +129,7 @@ export class VIPMatrixEngine {
                markPrice = Number(mexcData.price || 0);
                
                if (markPrice === 0) {
-                   throw new Error(`[Matrix Engine] Asset ${asset} pricing unavailable from primary and secondary oracles.`);
+                   throw new Error(`[Grid Engine] Asset ${asset} pricing unavailable from primary and secondary oracles.`);
                }
             }
 

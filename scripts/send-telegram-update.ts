@@ -19,9 +19,9 @@ async function sendUpdate() {
       disable_web_page_preview: true,
       message_thread_id: TOPIC_ID
     });
-    console.log("✅ Update sent to Telegram:", res.data.ok);
+    console.log(" Update sent to Telegram:", res.data.ok);
   } catch (e: any) {
-    console.error("❌ Error sending to Telegram:", e.response?.data || e.message);
+    console.error(" Error sending to Telegram:", e.response?.data || e.message);
   }
 }
 

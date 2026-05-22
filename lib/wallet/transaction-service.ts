@@ -17,7 +17,7 @@ export class TransactionService {
         asset: string, 
         network: 'ETH' | 'POLYGON' | 'BASE'
     ) {
-        console.log(`[TX] ${amount} ${asset} → ${toAddress} on ${network}`);
+        console.log(`[TX] ${amount} ${asset}  ${toAddress} on ${network}`);
 
         // 1. Get User's Encrypted Key
         const user = await prisma.authUser.findFirst({

@@ -9,7 +9,7 @@ import {
     Activity, Target, Clock, CheckCircle, XCircle, Search, Settings
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { useWhaleStream } from '@/context/WhaleStreamContext';
 
 type AlertType = 'PRICE_ABOVE' | 'PRICE_BELOW' | 'VOLUME_SPIKE' | 'WHALE_MOVE' | 'PERCENT_CHANGE';
@@ -85,7 +85,7 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
                             <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Asset_Pair</label>
                             <select value={form.asset} onChange={e => setForm(f => ({ ...f, asset: e.target.value }))}
                                 className="w-full bg-black/[0.02] border border-black/10 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-emerald-500 transition-all cursor-pointer">
-                                {['BTC','ETH','SOL','USDC','BASE','WLD'].map(a => <option key={a}>{a}</option>)}
+                                {['BTC','ETH','SOL','USDC','BASE','AUTH'].map(a => <option key={a}>{a}</option>)}
                             </select>
                         </div>
                         <div className="space-y-2">
@@ -195,7 +195,7 @@ export function AlertsPanel() {
         <div className="h-full w-full min-h-0 flex flex-col bg-[#FAF9F6] font-mono text-black overflow-hidden">
             {showCreate && <CreateAlertModal onClose={() => setShowCreate(false)} onCreate={handleCreate} />}
 
-            {/* ── HEADER ── */}
+            {/*  HEADER  */}
             <div className="px-8 py-6 border-b border-black/10 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
                     <Bell size={18} className="text-emerald-600" />
@@ -212,7 +212,7 @@ export function AlertsPanel() {
                 </button>
             </div>
 
-            {/* ── LIST ── */}
+            {/*  LIST  */}
             <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
                 <div className="grid grid-cols-1 gap-4">
                     {alerts.length === 0 && !loading && (
@@ -261,7 +261,7 @@ export function AlertsPanel() {
                 </div>
             </div>
 
-            {/* ── FOOTER ── */}
+            {/*  FOOTER  */}
             <div className="px-8 py-3 border-t border-black/10 bg-white flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-4 text-[8px] text-black/40 uppercase tracking-[0.4em]">
                     <div className="flex items-center gap-2">

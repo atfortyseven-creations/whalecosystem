@@ -5,16 +5,16 @@ import axios from "axios";
 import { redisClient } from "../lib/redis/client";
 import { WHALE_QUEUE_NAME, WhaleJobData } from "../lib/queues/whaleQueue";
 import { WebhookDispatcher } from "../lib/webhook-dispatcher";
-import { WacIntelligenceService } from "../lib/intelligence-service";
+import { WacAnalyticsService } from "../lib/analytics-service";
 
 dotenv.config();
 
 const prisma = new PrismaClient();
 
-// ─── Security: NEVER hardcode the bot token. Fail fast if missing. ──────────
+//  Security: NEVER hardcode the bot token. Fail fast if missing. 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 if (!BOT_TOKEN) {
-    console.error("💀 [Telegram Worker] TELEGRAM_BOT_TOKEN env var is not set. Worker cannot start.");
+    console.error(" [Telegram Worker] TELEGRAM_BOT_TOKEN env var is not set. Worker cannot start.");
     process.exit(1);
 }
 
@@ -34,7 +34,7 @@ async function sendTelegram(text: string, chatId: string = TARGET_CHAT_ID, threa
     });
     return res.data.ok;
   } catch (e: any) {
-    console.error(`❌ [Telegram Worker] Error sending to ${chatId}:`, e.response?.data || e.message);
+    console.error(` [Telegram Worker] Error sending to ${chatId}:`, e.response?.data || e.message);
     throw e; // Throw to allow BullMQ to retry
   }
 }
@@ -42,7 +42,7 @@ async function sendTelegram(text: string, chatId: string = TARGET_CHAT_ID, threa
 const formatMoney = (val: number) => {
   const eurVal = val * 0.96;
   const millions = (eurVal / 1_000_000).toFixed(2);
-  return `€${millions} Million Euros`;
+  return `${millions} Million Euros`;
 };
 
 /**
@@ -51,31 +51,31 @@ const formatMoney = (val: number) => {
 const worker = new Worker(WHALE_QUEUE_NAME, async (job: Job<WhaleJobData>) => {
   const { hash, from, to, asset, amount, usdValue, chain, type } = job.data;
   
-  console.log(`👷 [Worker] Processing Whale: ${usdValue.toFixed(2)} USD (${asset})`);
+  console.log(` [Worker] Processing Whale: ${usdValue.toFixed(2)} USD (${asset})`);
 
   // 1. Generate Legendary Tactical Intel
   const shortFrom = `${from.slice(0, 4)}...${from.slice(-4)}`;
   const shortTo = to ? (to === 'Contract' ? 'Contract' : `${to.slice(0, 4)}...${to.slice(-4)}`) : 'Contract';
   const explorer = chain === 'BITCOIN' ? `https://mempool.space/tx/${hash}` : `https://basescan.org/tx/${hash}`;
 
-  const intel = WacIntelligenceService.generateTacticalIntel({ usdValue, from, to, asset, chain, type });
+  const intel = WacAnalyticsService.generateTacticalIntel({ usdValue, from, to, asset, chain, type });
   
-  const sentimentEmoji = intel.sentiment.includes('BULLISH') ? '🐂' : intel.sentiment.includes('BEARISH') ? '🐻' : '⚖️';
-  const mandateHeader = usdValue > 5_000_000 ? '🚨 <b>HIGH CONVICTION MANDATE</b>' : '🐳 <b>WHALE ALERT DETECTED</b>';
+  const sentimentEmoji = intel.sentiment.includes('BULLISH') ? '' : intel.sentiment.includes('BEARISH') ? '' : '️';
+  const mandateHeader = usdValue > 5_000_000 ? ' <b>HIGH CONVICTION MANDATE</b>' : ' <b>WHALE ALERT DETECTED</b>';
 
   const msg = `
 ${mandateHeader} | ${chain}
 ${sentimentEmoji} <b>SENTIMENT:</b> ${intel.sentiment}
 
-🗂️ <b>PROFILE:</b> ${intel.walletProfile}
-💶 <b>${formatMoney(usdValue)}</b> (${amount.toLocaleString()} ${asset})
+️ <b>PROFILE:</b> ${intel.walletProfile}
+ <b>${formatMoney(usdValue)}</b> (${amount.toLocaleString()} ${asset})
 
-👤 <code>${shortFrom}</code> ➡️ <code>${shortTo}</code>
+ <code>${shortFrom}</code> ️ <code>${shortTo}</code>
 
-⚠️ <b>IMPACT:</b> ${intel.marketImpact}
-🎯 <b>MANDATE:</b> ${intel.action}
+️ <b>IMPACT:</b> ${intel.marketImpact}
+ <b>MANDATE:</b> ${intel.action}
 
-🔗 <a href="${explorer}">View Strategic Intercept</a>
+ <a href="${explorer}">View Strategic Intercept</a>
 `.trim();
 
   // 2. Publish to Redis for WebSocket Broadcasting
@@ -108,7 +108,7 @@ ${sentimentEmoji} <b>SENTIMENT:</b> ${intel.sentiment}
       for (const user of usersToNotify) {
         if (user.telegramChatId) {
           await sendTelegram(
-            `🔔 <b>Personal Whale Alert!</b>\n\n${msg}`, 
+            ` <b>Personal Whale Alert!</b>\n\n${msg}`, 
             user.telegramChatId, 
             user.telegramTopicId ? parseInt(user.telegramTopicId) : null
           );
@@ -119,7 +119,7 @@ ${sentimentEmoji} <b>SENTIMENT:</b> ${intel.sentiment}
     console.error("   [Worker] Failed to fetch/send personalized alerts:", err.message);
   }
 
-  // 5. ─── Elite VIGILANTE: WEBHOOKS & ANOMALIES ─────────────────────
+  // 5.  Elite VIGILANTE: WEBHOOKS & ANOMALIES 
   try {
     const activeSubscribers = await (prisma as any).apiSubscription.findMany({
       where: { status: 'active', webhookUrl: { not: null } }
@@ -130,7 +130,7 @@ ${sentimentEmoji} <b>SENTIMENT:</b> ${intel.sentiment}
       
       // Real-time Anomaly Detection (Elite Only)
       // We check if this specific whale event triggered a Z-Score spike
-      const anomalies = await WacIntelligenceService.getAnomalyAlerts(asset);
+      const anomalies = await WacAnalyticsService.getAnomalyAlerts(asset);
       const isAnomaly = anomalies.some(a => a.transactionHash === hash);
 
       for (const sub of activeSubscribers) {
@@ -164,11 +164,11 @@ ${sentimentEmoji} <b>SENTIMENT:</b> ${intel.sentiment}
 });
 
 worker.on('completed', (job) => {
-  console.log(`✅ [Worker] Job ${job.id} completed`);
+  console.log(` [Worker] Job ${job.id} completed`);
 });
 
 worker.on('failed', (job, err) => {
-  console.error(`❌ [Worker] Job ${job?.id} failed:`, err.message);
+  console.error(` [Worker] Job ${job?.id} failed:`, err.message);
 });
 
-console.log("🚀 [Telegram Worker] Listening for whale alerts from Redis Queue...");
+console.log(" [Telegram Worker] Listening for whale alerts from Redis Queue...");

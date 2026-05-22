@@ -29,8 +29,8 @@ export async function GET(req: Request) {
         // Normalize to the schema expected by frontend components
         const formattedEvents = whaleEvents.map(ev => ({
             hash: ev.txHash,
-            wallet: 'Unknown',           // Not stored in this model — placeholder
-            token: 'ETH',               // Not stored in this model — placeholder
+            wallet: 'Unknown',           // Not stored in this model  placeholder
+            token: 'ETH',               // Not stored in this model  placeholder
             amount: String(ev.amountUSD),
             usdValue: Number(ev.amountUSD),
             action: 'TRANSFER',

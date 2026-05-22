@@ -47,7 +47,7 @@ export const GeoBlocker = () => {
                     className="relative z-10"
                 >
                     <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/50 flex items-center justify-center mx-auto mb-6">
-                        <span className="text-3xl">🚫</span>
+                        <span className="text-3xl"></span>
                     </div>
 
                     <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Access Restricted</h2>

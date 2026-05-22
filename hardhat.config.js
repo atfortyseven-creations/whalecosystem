@@ -43,12 +43,12 @@ module.exports = {
              url: process.env.OPTIMISM_MAINNET_RPC || "https://mainnet.optimism.io",
              accounts: (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.length >= 64) ? [process.env.PRIVATE_KEY] : [],
         },
-        // ── Polygon ─────────────────────────────────────────────────────
+        //  Polygon 
         polygonAmoy: {
             url: process.env.POLYGON_AMOY_RPC || "https://rpc-amoy.polygon.technology",
             chainId: 80002,
             accounts: (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.length >= 64) ? [process.env.PRIVATE_KEY] : [],
-            gasPrice: 30_000_000_000, // 30 gwei — Amoy safe default
+            gasPrice: 30_000_000_000, // 30 gwei  Amoy safe default
         },
         polygon: {
             url: process.env.POLYGON_MAINNET_RPC || "https://polygon-rpc.com",

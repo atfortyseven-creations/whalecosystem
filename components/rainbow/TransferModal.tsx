@@ -38,7 +38,7 @@ export function TransferModal({ isOpen, onClose, balances }: TransferModalProps)
           
           if (!res.ok) throw new Error(data.error);
 
-          toast.success("TRANSACTION SENT 🚀", {
+          toast.success("TRANSACTION SENT ", {
               description: "It is now visible on Etherscan.",
               action: {
                   label: "View",

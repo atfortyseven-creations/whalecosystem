@@ -20,7 +20,7 @@ export default function CompliancePage() {
                     </p>
 
                     <div className="bg-blue-600/10 border border-blue-500/30 p-4 rounded-lg">
-                        <h4 className="font-bold text-blue-400 mb-2">🏛️ Regulatory Framework</h4>
+                        <h4 className="font-bold text-blue-400 mb-2">️ Regulatory Framework</h4>
                         <p className="text-sm">We comply with EU-wide regulations (GDPR, MiCA, MiFID II, PSD2) and Spanish national laws (LOPD, Tax Code, Banco de España regulations).</p>
                     </div>
                 </section>
@@ -42,7 +42,7 @@ export default function CompliancePage() {
 
                         <div className="space-y-4">
                             <div>
-                                <h5 className="font-bold mb-2">📋 Transparency Requirements</h5>
+                                <h5 className="font-bold mb-2"> Transparency Requirements</h5>
                                 <ul className="list-disc pl-6 space-y-1 text-sm">
                                     <li>Clear disclosure of risks associated with crypto-assets (see Terms of Service)</li>
                                     <li>Transparent fee structure (no hidden charges)</li>
@@ -52,7 +52,7 @@ export default function CompliancePage() {
                             </div>
 
                             <div>
-                                <h5 className="font-bold mb-2">🛡️ Consumer Protection</h5>
+                                <h5 className="font-bold mb-2">️ Consumer Protection</h5>
                                 <ul className="list-disc pl-6 space-y-1 text-sm">
                                     <li>No misleading marketing or promises of guaranteed returns</li>
                                     <li>Clear distinction between demo and real trading modes</li>
@@ -62,7 +62,7 @@ export default function CompliancePage() {
                             </div>
 
                             <div>
-                                <h5 className="font-bold mb-2">🏦 Operational Requirements</h5>
+                                <h5 className="font-bold mb-2"> Operational Requirements</h5>
                                 <ul className="list-disc pl-6 space-y-1 text-sm">
                                     <li>Segregation of client assets (self-custody model ensures this)</li>
                                     <li>Business continuity plans</li>
@@ -72,7 +72,7 @@ export default function CompliancePage() {
                             </div>
 
                             <div>
-                                <h5 className="font-bold mb-2">⚖️ Market Abuse Prevention</h5>
+                                <h5 className="font-bold mb-2">️ Market Abuse Prevention</h5>
                                 <ul className="list-disc pl-6 space-y-1 text-sm">
                                     <li>Prohibition of insider trading and market manipulation (in our Terms)</li>
                                     <li>Transaction monitoring for suspicious activity</li>
@@ -82,11 +82,11 @@ export default function CompliancePage() {
                         </div>
 
                         <div className="bg-yellow-600/10 border border-yellow-500/30 p-4 rounded-lg mt-4">
-                            <h5 className="font-bold text-yellow-400 mb-2">📅 MiCA Implementation Timeline</h5>
+                            <h5 className="font-bold text-yellow-400 mb-2"> MiCA Implementation Timeline</h5>
                             <ul className="text-xs space-y-1">
-                                <li>• <strong>June 2024:</strong> Market abuse provisions apply</li>
-                                <li>• <strong>December 2024:</strong> Stablecoin (e-money token) rules apply</li>
-                                <li>• <strong>December 2024:</strong> Full MiCA regime for all crypto-asset service providers</li>
+                                <li> <strong>June 2024:</strong> Market abuse provisions apply</li>
+                                <li> <strong>December 2024:</strong> Stablecoin (e-money token) rules apply</li>
+                                <li> <strong>December 2024:</strong> Full MiCA regime for all crypto-asset service providers</li>
                             </ul>
                             <p className="text-xs mt-2">We are preparing for full compliance before mandatory deadlines.</p>
                         </div>
@@ -94,33 +94,33 @@ export default function CompliancePage() {
 
                     <h3 className="text-2xl font-bold mb-3 mt-6">1.2. GDPR (General Data Protection Regulation)</h3>
                     <p className="mb-4">
-                        <strong>Regulation (EU) 2016/679</strong> – See our detailed <a href="/legal/privacy" className="text-blue-400 hover:underline">Privacy Policy</a> for full GDPR compliance measures, including:
+                        <strong>Regulation (EU) 2016/679</strong>  See our detailed <a href="/legal/privacy" className="text-blue-400 hover:underline">Privacy Policy</a> for full GDPR compliance measures, including:
                     </p>
 
                     <div className="grid md:grid-cols-2 gap-3">
                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 text-sm">
-                            ✅ Data Protection Officer (DPO) appointed
+                             Data Protection Officer (DPO) appointed
                         </div>
                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 text-sm">
-                            ✅ Data Processing Impact Assessments (DPIA) completed
+                             Data Processing Impact Assessments (DPIA) completed
                         </div>
                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 text-sm">
-                            ✅ Privacy by design and by default
+                             Privacy by design and by default
                         </div>
                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 text-sm">
-                            ✅ User rights fully implemented (access, erasure, portability, etc.)
+                             User rights fully implemented (access, erasure, portability, etc.)
                         </div>
                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 text-sm">
-                            ✅ Standard Contractual Clauses (SCCs) for international transfers
+                             Standard Contractual Clauses (SCCs) for international transfers
                         </div>
                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 text-sm">
-                            ✅ Breach notification procedures (72-hour window)
+                             Breach notification procedures (72-hour window)
                         </div>
                     </div>
 
                     <h3 className="text-2xl font-bold mb-3 mt-6">1.3. MiFID II (Markets in Financial Instruments Directive)</h3>
                     <p className="mb-4">
-                        <strong>Directive 2014/65/EU</strong> – While cryptocurrencies are not currently classified as financial instruments under MiFID II in most EU jurisdictions, we apply best practices from this framework:
+                        <strong>Directive 2014/65/EU</strong>  While cryptocurrencies are not currently classified as financial instruments under MiFID II in most EU jurisdictions, we apply best practices from this framework:
                     </p>
 
                     <ul className="list-disc pl-6 space-y-2">
@@ -133,7 +133,7 @@ export default function CompliancePage() {
 
                     <h3 className="text-2xl font-bold mb-3 mt-6">1.4. PSD2 (Payment Services Directive)</h3>
                     <p className="mb-4">
-                        <strong>Directive 2015/2366/EU</strong> – Our wallet services implement PSD2-inspired security measures:
+                        <strong>Directive 2015/2366/EU</strong>  Our wallet services implement PSD2-inspired security measures:
                     </p>
 
                     <ul className="list-disc pl-6 space-y-2">
@@ -144,13 +144,13 @@ export default function CompliancePage() {
                     </ul>
 
                     <div className="bg-blue-600/10 border border-blue-500/30 p-4 rounded-lg mt-4">
-                        <h5 className="font-bold text-blue-400 mb-2">ℹ️ Note on Cryptocurrency Classification</h5>
+                        <h5 className="font-bold text-blue-400 mb-2">️ Note on Cryptocurrency Classification</h5>
                         <p className="text-sm">Cryptocurrencies are generally NOT considered "electronic money" under PSD2, so full PSD2 licensing is not required. However, we adopt security standards as best practice.</p>
                     </div>
 
                     <h3 className="text-2xl font-bold mb-3 mt-6">1.5. ePrivacy Directive (Cookie Law)</h3>
                     <p className="mb-4">
-                        <strong>Directive 2002/58/EC</strong> – We comply with consent requirements for cookies and tracking:
+                        <strong>Directive 2002/58/EC</strong>  We comply with consent requirements for cookies and tracking:
                     </p>
 
                     <ul className="list-disc pl-6 space-y-2">
@@ -189,26 +189,26 @@ export default function CompliancePage() {
 
                         <div className="space-y-4">
                             <div>
-                                <h5 className="font-bold mb-2">📝 Modelo 720 (Informative Declaration)</h5>
-                                <p className="text-sm mb-2">Spanish tax residents must declare foreign assets (including crypto wallets) exceeding €50,000.</p>
+                                <h5 className="font-bold mb-2"> Modelo 720 (Informative Declaration)</h5>
+                                <p className="text-sm mb-2">Spanish tax residents must declare foreign assets (including crypto wallets) exceeding 50,000.</p>
                                 <p className="text-sm text-white/70">
                                     <em>Note: This is a USER obligation, not our obligation. We provide transaction history exports to assist with tax filing.</em>
                                 </p>
                             </div>
 
                             <div>
-                                <h5 className="font-bold mb-2">💰 Capital Gains Tax</h5>
+                                <h5 className="font-bold mb-2"> Capital Gains Tax</h5>
                                 <p className="text-sm mb-2">Crypto-to-crypto and crypto-to-fiat trades trigger capital gains tax (19%-26% depending on amount).</p>
                                 <p className="text-sm text-white/70">Users responsible for calculating and paying taxes. We DO NOT withhold taxes.</p>
                             </div>
 
                             <div>
-                                <h5 className="font-bold mb-2">🏦 Wealth Tax (Impuesto sobre el Patrimonio)</h5>
-                                <p className="text-sm">Crypto holdings count toward wealth tax if total assets exceed threshold (varies by region, typically €700k+).</p>
+                                <h5 className="font-bold mb-2"> Wealth Tax (Impuesto sobre el Patrimonio)</h5>
+                                <p className="text-sm">Crypto holdings count toward wealth tax if total assets exceed threshold (varies by region, typically 700k+).</p>
                             </div>
 
                             <div>
-                                <h5 className="font-bold mb-2">📊 Our Support for Tax Compliance</h5>
+                                <h5 className="font-bold mb-2"> Our Support for Tax Compliance</h5>
                                 <ul className="list-disc pl-6 space-y-1 text-sm">
                                     <li>Transaction history export (CSV, PDF)</li>
                                     <li>Realized gains/losses calculator (coming soon)</li>
@@ -219,7 +219,7 @@ export default function CompliancePage() {
                         </div>
 
                         <div className="bg-yellow-600/10 border border-yellow-500/30 p-4 rounded-lg mt-4">
-                            <h5 className="font-bold text-yellow-400 mb-2">⚠️ Disclaimer</h5>
+                            <h5 className="font-bold text-yellow-400 mb-2">️ Disclaimer</h5>
                             <p className="text-sm">We provide tools to help, but you are solely responsible for your tax obligations. Consult a Spanish tax advisor (asesor fiscal) for personalized advice.</p>
                         </div>
                     </div>
@@ -287,7 +287,7 @@ export default function CompliancePage() {
                                 <tr className="bg-white/5">
                                     <td className="border border-white/10 p-3">HUMAN</td>
                                     <td className="border border-white/10 p-3">World ID (proof of personhood, privacy-preserving)</td>
-                                    <td className="border border-white/10 p-3">Full access, {'<'} €10k/month</td>
+                                    <td className="border border-white/10 p-3">Full access, {'<'} 10k/month</td>
                                 </tr>
                                 <tr>
                                     <td className="border border-white/10 p-3">LEGEND</td>
@@ -298,7 +298,7 @@ export default function CompliancePage() {
                         </table>
 
                         <div className="bg-blue-600/10 border border-blue-500/30 p-4 rounded-lg mt-4">
-                            <h5 className="font-bold text-blue-400 mb-2">🌐 World ID: Privacy-Preserving KYC</h5>
+                            <h5 className="font-bold text-blue-400 mb-2"> World ID: Privacy-Preserving KYC</h5>
                             <p className="text-sm">
                                 We use World ID for identity verification, which provides <strong>proof of personhood</strong> without revealing personal information. This balances regulatory compliance with user privacy through zero-knowledge proofs.
                             </p>
@@ -320,7 +320,7 @@ export default function CompliancePage() {
 
                     <div className="bg-white/5 p-4 rounded-lg border border-white/10">
                         <p className="font-bold mb-2">SEPBLAC (Servicio Ejecutivo de la Comisión de Prevención del Blanqueo de Capitales)</p>
-                        <p className="text-sm text-white/70">Spain's Financial Intelligence Unit under the Bank of Spain</p>
+                        <p className="text-sm text-white/70">Spain's Financial Analytics Unit under the Bank of Spain</p>
                     </div>
 
                     <p className="mt-4 text-sm">
@@ -336,7 +336,7 @@ export default function CompliancePage() {
 
                     <h3 className="text-2xl font-bold mb-3 mt-6">3.5. Travel Rule Compliance</h3>
                     <p className="mb-4">
-                        The <strong>FATF Travel Rule</strong> (implemented in EU via 6AMLD) requires sharing of originator and beneficiary information for crypto transfers above €1,000:
+                        The <strong>FATF Travel Rule</strong> (implemented in EU via 6AMLD) requires sharing of originator and beneficiary information for crypto transfers above 1,000:
                     </p>
 
                     <ul className="list-disc pl-6 space-y-2">
@@ -358,22 +358,22 @@ export default function CompliancePage() {
 
                     <div className="grid md:grid-cols-2 gap-4">
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h5 className="font-bold mb-2">📝 Right to Information</h5>
+                            <h5 className="font-bold mb-2"> Right to Information</h5>
                             <p className="text-sm text-white/70">Clear, transparent information before purchasing or using services</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h5 className="font-bold mb-2">↩️ Right to Withdraw</h5>
+                            <h5 className="font-bold mb-2">️ Right to Withdraw</h5>
                             <p className="text-sm text-white/70">14-day cooling-off period for some services (note: executed crypto transactions are irreversible)</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h5 className="font-bold mb-2">⚖️ Unfair Contract Terms</h5>
+                            <h5 className="font-bold mb-2">️ Unfair Contract Terms</h5>
                             <p className="text-sm text-white/70">Protection against unfair terms in our Terms of Service</p>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <h5 className="font-bold mb-2">🛡️ Liability</h5>
+                            <h5 className="font-bold mb-2">️ Liability</h5>
                             <p className="text-sm text-white/70">We cannot exclude liability for death, injury, or fraud</p>
                         </div>
                     </div>
@@ -401,7 +401,7 @@ export default function CompliancePage() {
 
                     <h3 className="text-2xl font-bold mb-3 mt-6">4.3. Investor Protection</h3>
                     <div className="bg-red-600/10 border border-red-500/30 p-6 rounded-lg">
-                        <h5 className="font-bold text-red-400 mb-3">⚠️ CRITICAL: No Investor Compensation Scheme</h5>
+                        <h5 className="font-bold text-red-400 mb-3">️ CRITICAL: No Investor Compensation Scheme</h5>
                         <p className="text-sm mb-2">
                             Unlike traditional financial services, cryptocurrency investments are <strong>NOT protected</strong> by:
                         </p>
@@ -427,11 +427,11 @@ export default function CompliancePage() {
 
                     <h3 className="text-2xl font-bold mb-3">5.1. Sanctioned Countries</h3>
                     <div className="bg-red-600/10 border border-red-500/30 p-4 rounded-lg mb-4">
-                        <h5 className="font-bold text-red-400 mb-2">🚫 Services NOT Available In:</h5>
+                        <h5 className="font-bold text-red-400 mb-2"> Services NOT Available In:</h5>
                         <ul className="text-sm space-y-1">
-                            <li>• <strong>EU Sanctions:</strong> Russia (restricted), Belarus,Syria, Iran, North Korea, Crimea, Donetsk, Luhansk</li>
-                            <li>• <strong>US OFAC Sanctions:</strong> Cuba, Iran, North Korea, Syria, Venezuela (government), Crimea</li>
-                            <li>• <strong>UN Sanctions:</strong> As updated periodically</li>
+                            <li> <strong>EU Sanctions:</strong> Russia (restricted), Belarus,Syria, Iran, North Korea, Crimea, Donetsk, Luhansk</li>
+                            <li> <strong>US OFAC Sanctions:</strong> Cuba, Iran, North Korea, Syria, Venezuela (government), Crimea</li>
+                            <li> <strong>UN Sanctions:</strong> As updated periodically</li>
                         </ul>
                     </div>
 
@@ -472,7 +472,7 @@ export default function CompliancePage() {
                     </ul>
 
                     <div className="bg-blue-600/10 border border-blue-500/30 p-4 rounded-lg mt-4">
-                        <h5 className="font-bold text-blue-400 mb-2">📊 Upcoming: 2026 Transparency Report</h5>
+                        <h5 className="font-bold text-blue-400 mb-2"> Upcoming: 2026 Transparency Report</h5>
                         <p className="text-sm">Our first annual transparency report will be published in Q1 2027, covering calendar year 2026.</p>
                     </div>
                 </section>
@@ -505,16 +505,16 @@ export default function CompliancePage() {
 
                 {/* Summary */}
                 <section className="bg-gradient-to-r from-red-600/20 to-orange-600/20 p-6 rounded-xl border border-white/10">
-                    <h2 className="text-2xl font-bold mb-4">📋 Compliance Summary</h2>
+                    <h2 className="text-2xl font-bold mb-4"> Compliance Summary</h2>
                     <ul className="space-y-2 text-sm">
-                        <li>✅ <strong>EU MiCA:</strong> Proactive compliance with new crypto regulation</li>
-                        <li>✅ <strong>GDPR:</strong> Full data protection compliance with AEPD oversight</li>
-                        <li>✅ <strong>Spanish LOPD:</strong> National data protection law compliance</li>
-                        <li>✅ <strong>AML/CTF:</strong> Risk-based KYC, transaction monitoring, SAR reporting</li>
-                        <li>✅ <strong>Tax Support:</strong> Transaction exports for Spanish tax filing (Modelo 720, capital gains)</li>
-                        <li>✅ <strong>CNMV Registration:</strong> In progress for crypto service provider status</li>
-                        <li>✅ <strong>Sanctions Screening:</strong> Compliance with EU, UN, OFAC sanctions</li>
-                        <li>✅ <strong>Consumer Protection:</strong> Clear complaint handling and EU consumer rights</li>
+                        <li> <strong>EU MiCA:</strong> Proactive compliance with new crypto regulation</li>
+                        <li> <strong>GDPR:</strong> Full data protection compliance with AEPD oversight</li>
+                        <li> <strong>Spanish LOPD:</strong> National data protection law compliance</li>
+                        <li> <strong>AML/CTF:</strong> Risk-based KYC, transaction monitoring, SAR reporting</li>
+                        <li> <strong>Tax Support:</strong> Transaction exports for Spanish tax filing (Modelo 720, capital gains)</li>
+                        <li> <strong>CNMV Registration:</strong> In progress for crypto service provider status</li>
+                        <li> <strong>Sanctions Screening:</strong> Compliance with EU, UN, OFAC sanctions</li>
+                        <li> <strong>Consumer Protection:</strong> Clear complaint handling and EU consumer rights</li>
                     </ul>
                 </section>
             </div>

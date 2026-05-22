@@ -521,7 +521,7 @@ export const genesisModules = [
                                 <path d="M340 80 L450 40" stroke="#fff" marker-end="url(#arrowhead)" />
                                 <path d="M340 120 L450 160" stroke="#fff" marker-end="url(#arrowhead)" />
                                 
-                                <text x="600" y="100" fill="#ff4d4d" text-anchor="middle" style="font-weight: bold;">FORENSIC TRACING 🔍</text>
+                                <text x="600" y="100" fill="#ff4d4d" text-anchor="middle" style="font-weight: bold;">FORENSIC TRACING </text>
                             </svg>
                             <p class="diagram-caption">Figura 18: El nacimiento de la heurística de seguimiento de capital en redes públicas.</p>
                         </div>

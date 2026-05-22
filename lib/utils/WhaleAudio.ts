@@ -161,6 +161,6 @@ class WhaleAudioEngine {
   }
 }
 
-// Singleton – only created client-side
+// Singleton  only created client-side
 export const whaleAudio = typeof window !== 'undefined' ? new WhaleAudioEngine() : null;
 

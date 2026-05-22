@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * 🔥 VISUAL INTELLIGENCE ENGINE (Legendary Level)
+ *  VISUAL INTELLIGENCE ENGINE (Legendary Level)
  * Detects keywords and returns high-fidelity contextual photos.
  * Replaces generic logos (Investing.com, etc.) with professional imagery.
  */

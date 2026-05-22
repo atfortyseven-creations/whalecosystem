@@ -1,15 +1,15 @@
 # COMPREHENSIVE OPERATING CODEX: WHALE ALERT
-## Treatise on System Capabilities, Limitations, and Sovereignty
+## Treatise on System Capabilities, Limitations, and Systemty
 
 **Issue Date:** February 2nd, Year of Our Lord 2026  
 **Classification:** GOVERNING DOCUMENT / OMNISCIENT  
-**Drafted by:** The Architect Intelligence (In the role of Doctor of Letters and Systems Jurisprudence)
+**Drafted by:** The Architect Analytics (In the role of Doctor of Letters and Systems Jurisprudence)
 
 ---
 
 ### PREAMBLE
 
-Let it be known to all present and future operators of this digital architecture, that the system known as **"Whale Alert Wallet"** is not merely an application, but a **Sovereign Financial Organism**. As such, its existence is governed by immutable laws of cryptography, state logic, and human will.
+Let it be known to all present and future operators of this digital architecture, that the system known as **"Whale Alert Wallet"** is not merely an application, but a **System Financial Organism**. As such, its existence is governed by immutable laws of cryptography, state logic, and human will.
 
 This document, drafted with the utmost sumptuousness and semantic rigor, aims to delineate with surgical precision the boundaries of the possible and the impossible within this vast digital domain.
 
@@ -33,7 +33,7 @@ It is imperative to understand that, in its "Titanium Vault" design, there are a
 
 ### BOOK II: OF POWERS AND CAPABILITIES (POSSUMUS)
 
-Having delimited the forbidden, let us now unfold the vast range of powers that this system bestows upon its sovereign users.
+Having delimited the forbidden, let us now unfold the vast range of powers that this system bestows upon its system users.
 
 #### CHAPTER I: FINANCIAL SOVEREIGNTY
 1.  **Absolute Custody:** The user has the power to be their own bank. They can generate, view, and safeguard a 12-word seed phrase that grants them total control over their assets anywhere in the known universe with internet access.
@@ -47,7 +47,7 @@ Having delimited the forbidden, let us now unfold the vast range of powers that 
 
 #### CHAPTER III: GOVERNANCE AND COMMUNITY
 1.  **Voice and Vote:** The user is not a mere client; they are a citizen. They can participate in the protocol's decision-making, casting votes on proposals that define the platform's future.
-2.  **Social Ascension (Gamification):** Through their actions, the user accumulates experience (XP) and rises in the "Leaderboard" rank, moving from a simple "Initiate" to a "Legendary Sovereign," unlocking privileges in the process.
+2.  **Social Ascension (Gamification):** Through their actions, the user accumulates experience (XP) and rises in the "Leaderboard" rank, moving from a simple "Initiate" to a "Legendary System," unlocking privileges in the process.
 
 #### CHAPTER IV: GLOBAL INTERCONNECTION
 1.  **Universal Identity (World ID):** The system allows for proof of humanity without sacrificing privacy, ensuring that every actor in the system is a real and unique human being.

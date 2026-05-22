@@ -22,7 +22,7 @@ export async function GET() {
             timeout: 5000
         });
 
-        // Map CryptoPanic data into our IntelligenceItem format
+        // Map CryptoPanic data into our AnalyticsItem format
         const externalData = cpRes.data?.results || [];
         const signals = externalData.slice(0, 10).map((post: any) => ({
             id: `sig-${post.id}`,

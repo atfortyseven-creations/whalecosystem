@@ -12,7 +12,7 @@ export const useInfiniteArchive = () => {
      * Costs fractions of a cent vs Ethereum storage.
      */
     const archiveHistory = async (historyData: any) => {
-        console.log("📚 Infinite Archive: Dispersing Blob to EigenDA...");
+        console.log(" Infinite Archive: Dispersing Blob to EigenDA...");
 
         const payload = JSON.stringify(historyData);
         const encoded = Buffer.from(payload).toString('base64');
@@ -28,7 +28,7 @@ export const useInfiniteArchive = () => {
                 commitment: "0xKZGCommitment..."
             };
 
-            console.log("✅ Blob Finalized:", blobHeader);
+            console.log(" Blob Finalized:", blobHeader);
             return blobHeader;
         } catch (e) {
             console.error("Archive Failed", e);

@@ -50,20 +50,20 @@ export async function GET(req: NextRequest) {
                     const isPassedFilter = txCount % 10 === 0;
 
                     if (isPassedFilter) {
-                        // Forward 10% of tx hashes as "dust" visualization — value is unknown until fetched
+                        // Forward 10% of tx hashes as "dust" visualization  value is unknown until fetched
                         const payload = {
                             hash: txHash,
                             timestamp: Date.now(),
-                            value: null,    // Real value unknown for dust — don't simulate it
+                            value: null,    // Real value unknown for dust  don't simulate it
                             type: 'dust',
-                            gasPrice: null  // Real gasPrice unknown for dust — don't simulate it
+                            gasPrice: null  // Real gasPrice unknown for dust  don't simulate it
                         };
                         try {
                             controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
                         } catch(e) { }
                     }
 
-                    // Deterministic deep-dive filter: every 5th tx — no Math.random()
+                    // Deterministic deep-dive filter: every 5th tx  no Math.random()
                     if (txCount % 5 === 0) {
                         try {
                             const tx = await provider.getTransaction(txHash);

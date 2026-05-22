@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { formatDistanceToNowStrict, format } from 'date-fns';
 import { BarChart2, PieChart, MessageSquare, Menu } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 export default function TopicPage() {
   const { id } = useParams();
@@ -18,7 +18,7 @@ export default function TopicPage() {
   const [replyDraftSaved, setReplyDraftSaved] = useState(false);
   const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<string | null>(null);
   
-  const { address, isSovereignHandshake } = useSovereignAccount();
+  const { address, isSystemHandshake } = useSystemAccount();
   const sessionAddress = address?.toLowerCase() || null;
 
   // Draft persistence key is scoped per topic so different threads have independent drafts
@@ -58,8 +58,8 @@ export default function TopicPage() {
     setReplyError('');
     setSubmitting(true);
     try {
-      // Cryptographic anchoring (Sign to Post) — OPTIONAL, graceful fallback.
-      // The sovereign_handshake cookie is the primary auth gate on the server.
+      // Cryptographic anchoring (Sign to Post)  OPTIONAL, graceful fallback.
+      // The system_handshake cookie is the primary auth gate on the server.
       // If the user is in Chrome mobile (wagmi not reconnected yet) or rejects
       // the signature request, we post without a signature rather than blocking.
       let finalContent = replyContent;
@@ -304,7 +304,7 @@ function RenderContent({ content }: { content: string }) {
   }
   text = text.replace(docRegex, '').trim();
   
-  // Check for the new token format — hex signature OR session fallback OR legacy strings
+  // Check for the new token format  hex signature OR session fallback OR legacy strings
   const tokenMatch = text.match(/\[SIGNATURE:([^\]]+)\]/i);
   if (tokenMatch) {
     signature = tokenMatch[1];
@@ -378,7 +378,7 @@ function PostRow({
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [imgError, setImgError] = useState(false);
   const addr  = entity.author?.walletAddress || '';
-  const label = entity.author?.displayName || (addr ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : 'ANONYMOUS');
+  const label = entity.author?.displayName || (addr ? `${addr.slice(0, 6)}${addr.slice(-4)}` : 'ANONYMOUS');
   const time  = entity.createdAt ? format(new Date(entity.createdAt), 'MMM d, yyyy') : '';
 
   const isAuthor = sessionAddress && addr.toLowerCase() === sessionAddress;

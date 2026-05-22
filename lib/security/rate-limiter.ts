@@ -261,7 +261,7 @@ export const apiLimiter = new RateLimiter({
 
 export const authLimiter = new RateLimiter({
   windowMs: 15 * 60 * 1000,  // 15 minutes
-  // [ANDROID FIX] Was 3 attempts with 24h block — PARANOIA MODE.
+  // [ANDROID FIX] Was 3 attempts with 24h block  PARANOIA MODE.
   // A normal Android/iOS user with WalletConnect relay instability WILL retry 3 times.
   // Wallet signing errors are user-recoverable (relay timeout, user dismissed, wrong wallet),
   // NOT attack signals. 3 attempts = any mobile user with bad connectivity = 24h lockout.
@@ -287,11 +287,11 @@ export const generalLimiter = new RateLimiter({
 
 export default RateLimiter
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SOVEREIGN DISTRIBUTED RATE LIMITER — Upstash Sliding Window (Edge-compatible)
+// 
+// SOVEREIGN DISTRIBUTED RATE LIMITER  Upstash Sliding Window (Edge-compatible)
 // Used by middleware.ts for cross-instance enforcement across all Edge nodes.
 // The in-memory RateLimiter above handles server-side API routes only.
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -360,7 +360,7 @@ let _upstashWarned = false;
 
 /**
  * Distributed rate limit check (Upstash). 
- * ── INHUMAN OPTIMIZATION: Cascading Fallback ──
+ *  INHUMAN OPTIMIZATION: Cascading Fallback 
  * If Upstash Redis fails or is unconfigured, it seamlessly routes the request
  * through the local memory `generalLimiter` instead of failing open.
  */

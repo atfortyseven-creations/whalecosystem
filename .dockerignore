@@ -1,4 +1,4 @@
-# ─── DOCKER CONTEXT EXCLUSIONS ──────────────────────────────────────────────
+#  DOCKER CONTEXT EXCLUSIONS 
 # Dev build artifacts
 /node_modules
 /.next
@@ -18,7 +18,7 @@
 !.env.example
 
 # Heavy dev-only directories (not needed at runtime)
-# 'scripts' is required for production background workers (sovereign-mesh.ts etc)
+# 'scripts' is required for production background workers (system-mesh.ts etc)
 /k8s
 /contracts
 /typechain-types

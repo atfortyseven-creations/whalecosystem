@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   return NextResponse.json({
-    project: "Sovereign Institutional Vault",
+    project: "System Institutional Vault",
     architecture: {
       type: "Dual-Hybrid Next.js + PWA Webview",
       persistence: ["Prisma (PostgreSQL)", "Neo4j (Institutional Graph)"],
@@ -10,7 +10,7 @@ export async function GET() {
     },
     cryptography: {
       zeroKnowledge: "Aztec L2 / circomlibjs",
-      verification: "Worldcoin ID ZKP + Sumsub On-Chain KYC",
+      verification: "Identity ID ZKP + Sumsub On-Chain KYC",
     },
     telemetry: {
       system: "Mempool Async Workers via Alchemy SDK",

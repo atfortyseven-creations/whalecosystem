@@ -35,14 +35,14 @@ async function sendTo(botToken: string, chatId: string, message: string) {
         });
         const result: any = await response.json();
         if (response.ok) {
-            console.log(`✅ Success: Message sent to ${chatId}`);
+            console.log(` Success: Message sent to ${chatId}`);
             return true;
         } else {
-            console.error(`❌ Failed: ${chatId} ->`, result.description || result);
+            console.error(` Failed: ${chatId} ->`, result.description || result);
             return false;
         }
     } catch (e: any) {
-        console.error(`❌ Critical Error for ${chatId}:`, e.message);
+        console.error(` Critical Error for ${chatId}:`, e.message);
         return false;
     }
 }
@@ -52,24 +52,24 @@ async function broadcastUpdate() {
     const botToken = env['TELEGRAM_BOT_TOKEN'];
 
     if (!botToken) {
-        console.error("❌ TELEGRAM_BOT_TOKEN missing in .env");
+        console.error(" TELEGRAM_BOT_TOKEN missing in .env");
         return;
     }
 
     const message = `
-🚀 *SISTEMA ESTABILIZADO: WHALE ALERT v6.12.0 ONLINE* 🐋⚡
+ *SISTEMA ESTABILIZADO: WHALE ALERT v6.12.0 ONLINE* 
 
-We have completed Elite-grade optimization for our intelligence network.
+We have completed Elite-grade optimization for our analytics network.
 
-✅ *RPC Multiplexer*: Multi-key failover active with 6 redundant GetBlock endpoints.
-✅ *Full Multi-Chain*: Real-time monitoring on *Ethereum*, *BSC*, and *Base*.
-✅ *Sovereign Handshake*: iOS & Android mobile synchronization fully operational.
-✅ *Extreme Resilience*:Blacklist cooldowns optimized for 100% uptime.
+ *RPC Multiplexer*: Multi-key failover active with 6 redundant GetBlock endpoints.
+ *Full Multi-Chain*: Real-time monitoring on *Ethereum*, *BSC*, and *Base*.
+ *System Handshake*: iOS & Android mobile synchronization fully operational.
+ *Extreme Resilience*:Blacklist cooldowns optimized for 100% uptime.
 
-The alert matrix is fully operational and shielded. The legendary monitoring continues. 🏁🛡️
+The alert grid is fully operational and shielded. The legendary monitoring continues. ️
     `.trim();
 
-    console.log("📤 Initiating legendary broadcast...");
+    console.log(" Initiating legendary broadcast...");
 
     const targets = ["@HumanidFi", "7247569356"];
     

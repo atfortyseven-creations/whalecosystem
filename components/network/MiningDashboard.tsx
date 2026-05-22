@@ -49,17 +49,17 @@ export function MiningDashboard() {
     const kpis = [
         {
             label: 'Global Hashrate',
-            value: stats?.hashrate.current ? `${safeToFixed(stats.hashrate.current, 2)} EH/s` : '—',
+            value: stats?.hashrate.current ? `${safeToFixed(stats.hashrate.current, 2)} EH/s` : '',
             icon: Activity,
         },
         {
             label: 'Network Difficulty',
-            value: stats?.difficulty.current ? `${safeToFixed(stats.difficulty.current / 1e12, 2)} T` : '—',
+            value: stats?.difficulty.current ? `${safeToFixed(stats.difficulty.current / 1e12, 2)} T` : '',
             icon: Lock,
         },
         {
             label: 'Average Block Time',
-            value: stats?.avgBlockTimeMin ? `${safeToFixed(stats.avgBlockTimeMin, 2)} min` : '—',
+            value: stats?.avgBlockTimeMin ? `${safeToFixed(stats.avgBlockTimeMin, 2)} min` : '',
             icon: Clock,
         },
     ];

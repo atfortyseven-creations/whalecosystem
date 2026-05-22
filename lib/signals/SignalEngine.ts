@@ -70,7 +70,7 @@ export class SignalEngine {
   /**
    * Generate comprehensive trading signal for an asset
    * 
-   * @param symbol - Trading symbol (e.g., 'WLDUSDT')
+   * @param symbol - Trading symbol (e.g., 'AUTHUSDT')
    * @param candles - Historical candle data (minimum 100 candles)
    * @returns Complete trading signal with all analysis
    */

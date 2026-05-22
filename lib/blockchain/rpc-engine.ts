@@ -2,10 +2,10 @@ import { createPublicClient, http, fallback, PublicClient } from 'viem';
 import { mainnet, bsc, optimism, base, polygon, arbitrum, avalanche } from 'viem/chains';
 import { getGbAllRpc, getGbWss } from './getblock-registry';
 
-// ─── ALCHEMY FALLBACK KEY ───────────────────────────────────────────────────
+//  ALCHEMY FALLBACK KEY 
 const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || 'demo';
 
-// ─── CUSTOM CHAIN DEFS ───────────────────────────────────────────────────────
+//  CUSTOM CHAIN DEFS 
 
 const worldchain = {
   id: 480,
@@ -34,7 +34,7 @@ const berachain = {
   },
 } as const;
 
-// ─── ADVANCED RPC CACHE INTERCEPTOR ───────────────────────────────────────────
+//  ADVANCED RPC CACHE INTERCEPTOR 
 const rpcCache = new Map<string, { data: any; expiry: number }>();
 const CACHE_TTL_MS = 2500;
 
@@ -96,7 +96,7 @@ const memoizedFetch = (url: string) => {
   };
 };
 
-// ─── Helper: construye transport con endpoints en orden ───────────────────────
+//  Helper: construye transport con endpoints en orden 
 const makeTransport = (urls: string[]) =>
   fallback(
     urls.filter(Boolean).map(url =>
@@ -112,9 +112,9 @@ const makeTransport = (urls: string[]) =>
     { rank: false }
   );
 
-// ─── CLIENTES VIEM — GetBlock primero, Alchemy segundo, públicos de emergencia ──
+//  CLIENTES VIEM  GetBlock primero, Alchemy segundo, públicos de emergencia 
 
-/** Ethereum Mainnet — GetBlock Archive (2 nodos) + Alchemy + públicos */
+/** Ethereum Mainnet  GetBlock Archive (2 nodos) + Alchemy + públicos */
 export const mainnetClient = createPublicClient({
   chain: mainnet,
   transport: makeTransport([
@@ -126,7 +126,7 @@ export const mainnetClient = createPublicClient({
   ]),
 });
 
-/** Market Intel — rotación para evitar rate-limit */
+/** Market Intel  rotación para evitar rate-limit */
 export const marketIntelClient = createPublicClient({
   chain: mainnet,
   transport: makeTransport([
@@ -136,7 +136,7 @@ export const marketIntelClient = createPublicClient({
   ]),
 });
 
-/** BNB Chain — GetBlock + públicos */
+/** BNB Chain  GetBlock + públicos */
 export const bscClient = createPublicClient({
   chain: bsc,
   transport: makeTransport([
@@ -149,7 +149,7 @@ export const bscClient = createPublicClient({
   ]),
 });
 
-/** Optimism — GetBlock + Alchemy + públicos */
+/** Optimism  GetBlock + Alchemy + públicos */
 export const optimismClient = createPublicClient({
   chain: optimism,
   transport: makeTransport([
@@ -160,7 +160,7 @@ export const optimismClient = createPublicClient({
   ]),
 });
 
-/** Base — GetBlock Archive + Alchemy + públicos */
+/** Base  GetBlock Archive + Alchemy + públicos */
 export const baseClient = createPublicClient({
   chain: base,
   transport: makeTransport([
@@ -172,7 +172,7 @@ export const baseClient = createPublicClient({
   ]),
 });
 
-/** Polygon — GetBlock Archive + Alchemy + públicos */
+/** Polygon  GetBlock Archive + Alchemy + públicos */
 export const polygonClient = createPublicClient({
   chain: polygon,
   transport: makeTransport([
@@ -184,7 +184,7 @@ export const polygonClient = createPublicClient({
   ]),
 });
 
-/** Arbitrum — GetBlock Archive + Alchemy + públicos */
+/** Arbitrum  GetBlock Archive + Alchemy + públicos */
 export const arbitrumClient = createPublicClient({
   chain: arbitrum,
   transport: makeTransport([
@@ -195,7 +195,7 @@ export const arbitrumClient = createPublicClient({
   ]),
 });
 
-/** Avalanche — GetBlock + Alchemy + públicos */
+/** Avalanche  GetBlock + Alchemy + públicos */
 export const avalancheClient = createPublicClient({
   chain: avalanche,
   transport: makeTransport([
@@ -206,7 +206,7 @@ export const avalancheClient = createPublicClient({
   ]),
 });
 
-/** WorldChain — GetBlock + Alchemy + público */
+/** WorldChain  GetBlock + Alchemy + público */
 export const worldchainClient = createPublicClient({
   //@ts-ignore Custom chain def
   chain: worldchain,
@@ -217,7 +217,7 @@ export const worldchainClient = createPublicClient({
   ]),
 });
 
-/** HyperEVM — GetBlock + público */
+/** HyperEVM  GetBlock + público */
 export const hyperevmClient = createPublicClient({
   //@ts-ignore Custom chain def
   chain: hyperevm,
@@ -227,7 +227,7 @@ export const hyperevmClient = createPublicClient({
   ]),
 });
 
-/** Berachain — GetBlock + público */
+/** Berachain  GetBlock + público */
 export const berachainClient = createPublicClient({
   //@ts-ignore Custom chain def
   chain: berachain,
@@ -237,7 +237,7 @@ export const berachainClient = createPublicClient({
   ]),
 });
 
-// ─── Helper de selección dinámica de chain ────────────────────────────────────
+//  Helper de selección dinámica de chain 
 export const getClientForChain = (chainId: number): PublicClient => {
   switch (chainId) {
     case 1:     return mainnetClient as any;

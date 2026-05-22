@@ -1,6 +1,6 @@
 # Stateful Agents
 
-Stateful Agents are autonomous intelligence units within the Whale Alert Network that maintain persistent memory, execute multi-step analysis tasks, and act on predefined conditions without requiring continuous user interaction.
+Stateful Agents are autonomous analytics units within the Whale Alert Network that maintain persistent memory, execute multi-step analysis tasks, and act on predefined conditions without requiring continuous user interaction.
 
 ---
 
@@ -11,7 +11,7 @@ A Stateful Agent is a process that:
 1. **Maintains state** across multiple execution cycles (not just a single request/response)
 2. **Subscribes to live data streams** (whale events, signals, market data)
 3. **Executes conditional logic** when configured triggers are met
-4. **Takes actions** — sending alerts, executing trades via gasless meta-transactions, updating dashboards
+4. **Takes actions**  sending alerts, executing trades via gasless meta-transactions, updating dashboards
 5. **Persists memory** between sessions via Redis (hot memory) and PostgreSQL (cold memory)
 
 Unlike a webhook (which receives events passively), an agent actively monitors, correlates, and decides.
@@ -21,21 +21,21 @@ Unlike a webhook (which receives events passively), an agent actively monitors, 
 ## Agent Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                         AGENT RUNTIME                            │
-│                                                                  │
-│  ┌─────────────┐    ┌──────────────┐    ┌───────────────────┐   │
-│  │  Data Feed  │───▶│  Condition   │───▶│   Action Engine   │   │
-│  │  (WebSocket)│    │  Evaluator   │    │                   │   │
-│  └─────────────┘    └──────────────┘    │ • Alert dispatch  │   │
-│                            │            │ • Gasless TX       │   │
-│  ┌─────────────┐           │            │ • Webhook POST    │   │
-│  │   Memory    │◀──────────┘            │ • Dashboard upd.  │   │
-│  │   Layer     │                        └───────────────────┘   │
-│  │  Redis (hot)│                                                  │
-│  │  PG (cold)  │                                                  │
-│  └─────────────┘                                                  │
-└──────────────────────────────────────────────────────────────────┘
+
+                         AGENT RUNTIME                            
+                                                                  
+             
+    Data Feed    Condition      Action Engine      
+    (WebSocket)      Evaluator                             
+            Alert dispatch     
+                                          Gasless TX          
+                           Webhook POST       
+     Memory                  Dashboard upd.     
+     Layer                                
+    Redis (hot)                                                  
+    PG (cold)                                                    
+                                                    
+
 ```
 
 ---
@@ -112,7 +112,7 @@ interface AgentConfig {
     signalTypes?: SignalType[];
   };
 
-  // Trigger conditions (all must be true for OR → any one must be true)
+  // Trigger conditions (all must be true for OR  any one must be true)
   triggers: AgentTrigger[];
   triggerLogic: 'AND' | 'OR';  // default: 'OR'
 
@@ -169,7 +169,7 @@ const whaleSurgeAgent: AgentConfig = {
   triggerLogic: 'OR',
   actions: [{
     type: 'telegram',
-    config: { chatId: '-100xxxx', message: '🐋 USDC SURGE DETECTED — {{count}} whales in 30min' }
+    config: { chatId: '-100xxxx', message: ' USDC SURGE DETECTED  {{count}} whales in 30min' }
   }],
   memory: { windowSize: 50, statsPeriodMs: 3_600_000, maxExecutionsPerHour: 5 }
 };
@@ -224,7 +224,7 @@ const liquidationWatcherAgent: AgentConfig = {
   actions: [
     {
       type: 'telegram',
-      config: { chatId: '-100xxxx', message: '⚠️ HIGH ANOMALY SCORE: {{anomalyScore}} on {{token}}' }
+      config: { chatId: '-100xxxx', message: '️ HIGH ANOMALY SCORE: {{anomalyScore}} on {{token}}' }
     },
     {
       type: 'dashboard_alert',
@@ -297,7 +297,7 @@ GET /api/v1/agents/:id/executions?limit=50&page=1
 Agents with the `gasless_trade` action type can execute on-chain transactions on behalf of the user without requiring the user to sign each transaction in real time. This uses **EIP-712 meta-transactions**:
 
 1. At agent creation, the user signs a broad permission (the "permit") using their wallet
-2. The permit is stored encrypted in the sovereign vault
+2. The permit is stored encrypted in the system vault
 3. When the agent triggers, the relayer decrypts the permit and submits the transaction with the user's pre-authorized signature
 4. The gas cost is covered by the relayer (reimbursed from the user's platform balance)
 
@@ -309,8 +309,8 @@ This capability is available exclusively to PRO and ELITE plan holders and requi
 
 | Plan | Max Agents | Max Actions/Hour | Gasless Execution | Memory Window |
 |---|---|---|---|---|
-| FREE | 0 | — | ❌ | — |
-| STANDARD | 0 | — | ❌ | — |
-| STARTER | 2 | 10 | ❌ | 50 events |
-| PRO | 10 | 50 | ✅ | 500 events |
-| ELITE | Unlimited | Unlimited | ✅ | Unlimited |
+| FREE | 0 |  |  |  |
+| STANDARD | 0 |  |  |  |
+| STARTER | 2 | 10 |  | 50 events |
+| PRO | 10 | 50 |  | 500 events |
+| ELITE | Unlimited | Unlimited |  | Unlimited |

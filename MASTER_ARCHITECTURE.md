@@ -1,14 +1,14 @@
-# WHALE ALERT PORTAL: MASTER ARCHITECTURE 👁️⚡️
+# WHALE ALERT PORTAL: MASTER ARCHITECTURE ️️
 "Bringing real-time on-chain data to an elite-grade standard. Optical fiber speed, resilient nodes, and maximum fidelity."
 
 This document serves as the absolute blueprint and master photograph of the Whale Alert Portal architecture, built on an uncompromising "Legendary Level" standard.
 
 ---
 
-## 🏛️ 1. MACRO-ARCHITECTURE OVERVIEW
-The Whale Alert Portal is not merely a wallet; it is a **High-Frequency On-Chain Intelligence Terminal**. It fuses Zero-Knowledge identity verification (WorldID), real-time Ethereum/Base mempool telemetry, predictive markets (Polymarket), and elite-grade portfolio analytics into a single seamless interface.
+## ️ 1. MACRO-ARCHITECTURE OVERVIEW
+The Whale Alert Portal is not merely a wallet; it is a **High-Frequency On-Chain Analytics Terminal**. It fuses Zero-Knowledge identity verification (WorldID), real-time Ethereum/Base mempool telemetry, predictive markets (Polymarket), and elite-grade portfolio analytics into a single seamless interface.
 
-### Topology Matrix
+### Topology Grid
 ```mermaid
 graph TD
     subgraph EVM Base Layer
@@ -16,8 +16,8 @@ graph TD
         Blk[Confirmed Blocks]
     end
 
-    subgraph Sovereign Desktop Vault
-        Daemon[SovereignVault_RUN.bat]
+    subgraph System Desktop Vault
+        Daemon[SystemVault_RUN.bat]
         Wrk[Whale Worker Nodes]
         Prisma[(PostgreSQL State)]
         Neo[(Neo4j Graph)]
@@ -50,21 +50,21 @@ graph TD
     Hnd --> Pwa
 ```
 
-### 🧠 State & Persistence Layer
+###  State & Persistence Layer
 - **PostgreSQL - Prisma ORM**: Primary relational store for user profiles, identity mappings, and transaction metadata.
 - **MongoDB - Mongoose**: Dynamic storage for Polymarket event data and complex market indices.
 - **Redis / Upstash (PubSub & Cache)**:
   - **Zero-Crash Safeguard**: Implements a "Degraded Mode" mock client if `REDIS_URL` is unavailable.
   - **PubSub**: Facilitates real-time event broadcasting from workers to the WebSocket gateway.
-  - **Caching**: 10-minute TTL on heavy Intelligence Reports and portfolio snapshots.
+  - **Caching**: 10-minute TTL on heavy Analytics Reports and portfolio snapshots.
 
-### ⛓️ Blockchain & Protocol Layer
+### ️ Blockchain & Protocol Layer
 - **Base & ETH RPCs**: Leveraging Alchemy, Infura, and official public nodes.
 - **ResilientProvider**: Custom fail-over logic with circuit breakers across 4+ RPC endpoints for 100% uptime.
-- **WorldCoin IDKit**: ZK-SNARK based identity proofs for sybil-resistant human verification.
+- **Identity IDKit**: ZK-SNARK based identity proofs for sybil-resistant human verification.
 - **Moralis Deep Indexing**: High-speed retrieval of historical cross-chain transaction data.
 
-### 🐋 Background Engine / Scanners (The Whale Engine)
+###  Background Engine / Scanners (The Whale Engine)
 - **EVM Whale Scanner**: Dedicated long-running process scanning mempools and new blocks for high-value movement.
 - **BTC Mempool Scanner**: Real-time monitoring of Bitcoin unconfirmed transactions.
 - **Telegram Alert Bot**: Automated notification delivery via dedicated worker.
@@ -72,7 +72,7 @@ graph TD
 
 ---
 
-## ⚡ 2. CELESTIAL GATEWAY (Node.js + WebSockets)
+##  2. CELESTIAL GATEWAY (Node.js + WebSockets)
 **Technology:** Custom Node.js server ([server.ts](file:///c:/Users/admin/.gemini/antigravity/scratch/Wallet%20Human%20Polymarket%20ID/server.ts)) wrapping Next.js 15.
 
 - **Unified Hub:** Handles HTTP requests and WebSocket connections (`Socket.io`) on a single port (3000).
@@ -84,8 +84,8 @@ graph TD
 
 ---
 
-## 🧠 3. THE INTELLIGENCE SERVICE (Deep Analytics)
-**Technology:** [IntelligenceService.ts](file:///c:/Users/admin/.gemini/antigravity/scratch/Wallet%20Human%20Polymarket%20ID/lib/blockchain/IntelligenceService.ts)
+##  3. THE INTELLIGENCE SERVICE (Deep Analytics)
+**Technology:** [AnalyticsService.ts](file:///c:/Users/admin/.gemini/antigravity/scratch/Wallet%20Human%20Polymarket%20ID/lib/blockchain/AnalyticsService.ts)
 
 Generates "Pentagon-level" address profiles by merging Moralis deep-indexing with real-time Ethers.js data.
 
@@ -98,7 +98,7 @@ Generates "Pentagon-level" address profiles by merging Moralis deep-indexing wit
 
 ---
 
-## 🌐 4. CLIENT TERMINAL (Frontend UX/UI)
+##  4. CLIENT TERMINAL (Frontend UX/UI)
 **Technology:** Next.js 15 App Router + Tailwind CSS + Framer Motion.
 
 ### Aesthetics: "Legendary Level" Cyberpunk-Glassmorphism
@@ -108,7 +108,7 @@ Generates "Pentagon-level" address profiles by merging Moralis deep-indexing wit
 
 ---
 
-## 🛡️ 5. THE "LEGENDARY LEVEL" FIXES (Integrity Standard)
+## ️ 5. THE "LEGENDARY LEVEL" FIXES (Integrity Standard)
 The architecture is fortified against critical failure vectors:
 
 1. **OOM Immunity**: Node memory expanded to 8GB (`--max-old-space-size=8192`) for heavy AST parsing.

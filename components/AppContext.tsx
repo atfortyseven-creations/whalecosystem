@@ -14,7 +14,7 @@ interface ExchangeRate {
 
 const exchangeRates: Record<string, ExchangeRate> = {
     USD: { rate: 1, symbol: '$' },
-    EUR: { rate: 0.92, symbol: '€' },
+    EUR: { rate: 0.92, symbol: '' },
     GBP: { rate: 0.79, symbol: '£' },
     JPY: { rate: 148, symbol: '¥' }
 };
@@ -34,11 +34,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
     // Estados iniciales
-    const [theme, setTheme] = useState('light'); // Sovereign First — always light
+    const [theme, setTheme] = useState('light'); // System First  always light
     const [lang, setLang] = useState('en');     // Idioma por defecto
     const [currency, setCurrency] = useState('USD');
 
-    // ── SOVEREIGN LIGHT MODE ENFORCER ──────────────────────────────────────
+    //  SOVEREIGN LIGHT MODE ENFORCER 
     // This platform is light-mode-only. Connected OR disconnected, the html
     // element must ALWAYS carry the 'light' class and NEVER carry 'dark'.
     // We run this on every theme change AND once on mount via an empty deps

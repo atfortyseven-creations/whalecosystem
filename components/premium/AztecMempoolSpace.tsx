@@ -72,7 +72,7 @@ export default function AztecMempoolSpace() {
     const [selectedBlock, setSelectedBlock] = useState<RealBlock | null>(null);
     const [selectedTx, setSelectedTx] = useState<RealTransaction | null>(null);
 
-    // ── Real Data Extraction (L1 Mainnet) ──────────────────────────────
+    //  Real Data Extraction (L1 Mainnet) 
     useEffect(() => {
         if (!publicClient || !blockNumber) return;
 
@@ -284,7 +284,7 @@ export default function AztecMempoolSpace() {
                                         <div className="flex justify-between items-start mb-3 border-b border-[#E5E5E5] dark:border-white/10 border-dashed pb-2">
                                             <div className="flex items-center gap-2">
                                                 <span className="text-[10px] font-mono text-black/30 dark:text-white/30">{tx.time}</span>
-                                                <span className="text-black/20 dark:text-white/20 text-[12px]">→</span>
+                                                <span className="text-black/20 dark:text-white/20 text-[12px]"></span>
                                                 <span className="text-[11px] font-mono text-[#050505] dark:text-white">{tx.hash.slice(0,14)}...</span>
                                             </div>
                                             <span className="text-[10px] font-mono text-[#00C076] font-black">{tx.valueEth.toFixed(2)} ETH</span>

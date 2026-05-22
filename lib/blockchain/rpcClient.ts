@@ -3,10 +3,10 @@ import { mainnet, polygon } from 'viem/chains';
 import { getGbWss } from './getblock-registry';
 
 /**
- * rpcClient — WebSocket Viem Clients
+ * rpcClient  WebSocket Viem Clients
  *
  * WSS primario: GetBlock Registry (GB_ETH_WSS_1, GB_POL_WSS_1)
- * Fallback:     Alchemy → público
+ * Fallback:     Alchemy  público
  *
  * Clientes lazy (se instancian solo cuando se necesitan).
  */
@@ -25,7 +25,7 @@ const POL_WS_URL =
     process.env.POL_WS_URL ||
     (ALCHEMY_KEY ? `wss://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}` : 'wss://polygon-bor-rpc.publicnode.com');
 
-// ── Lazy ETH WebSocket Client ────────────────────────────────────────────────
+//  Lazy ETH WebSocket Client 
 let _ethClient: ReturnType<typeof createPublicClient> | null = null;
 
 export const getEthWsClient = () => {
@@ -38,12 +38,12 @@ export const getEthWsClient = () => {
                 keepAlive: true,
             }),
         });
-        console.log(`🟢 [RpcClient] ETH WSS → ${ETH_WS_URL.replace(/\/([a-f0-9]{20,})/, '/****')}`);
+        console.log(` [RpcClient] ETH WSS  ${ETH_WS_URL.replace(/\/([a-f0-9]{20,})/, '/****')}`);
     }
     return _ethClient;
 };
 
-// ── Lazy Polygon WebSocket Client ────────────────────────────────────────────
+//  Lazy Polygon WebSocket Client 
 let _polClient: ReturnType<typeof createPublicClient> | null = null;
 
 export const getPolWsClient = () => {
@@ -56,7 +56,7 @@ export const getPolWsClient = () => {
                 keepAlive: true,
             }),
         });
-        console.log(`🟢 [RpcClient] POL WSS → ${POL_WS_URL.replace(/\/([a-f0-9]{20,})/, '/****')}`);
+        console.log(` [RpcClient] POL WSS  ${POL_WS_URL.replace(/\/([a-f0-9]{20,})/, '/****')}`);
     }
     return _polClient;
 };
@@ -66,7 +66,7 @@ const ETH_HTTP_URL =
     process.env.NEXT_PUBLIC_ETH_RPC_URL || 
     (ALCHEMY_KEY ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}` : 'https://cloudflare-eth.com');
 
-// ── HTTP client para fetching de bloques/receipts cuando WS pushea un hash ──
+//  HTTP client para fetching de bloques/receipts cuando WS pushea un hash 
 export const ethHttpClient = createPublicClient({
     chain: mainnet,
     transport: http(ETH_HTTP_URL),

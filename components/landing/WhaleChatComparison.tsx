@@ -31,7 +31,7 @@ const CHAT_DATA = [
   },
   {
     feature: "Risk of Censorship or Ban",
-    us: "Impossible. Sovereign Infrastructure.",
+    us: "Impossible. System Infrastructure.",
     common: "Accounts unilaterally deleted",
     usState: "positive",
     commonState: "negative",

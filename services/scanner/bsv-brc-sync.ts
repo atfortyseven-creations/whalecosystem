@@ -1,6 +1,6 @@
 /**
  * BSV BRC Standards Sync Service
- * Stubs the sync operation — actual GitHub-based indexing to be implemented.
+ * Stubs the sync operation  actual GitHub-based indexing to be implemented.
  */
 export async function runBrcSync(): Promise<{ success: boolean; message: string; synced: number }> {
   return {

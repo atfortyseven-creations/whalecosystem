@@ -43,8 +43,8 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
             const checkData = await checkResponse.json();
 
             // All users get a verification code
-            // New users: code → password → access
-            // Existing verified users: code → access (passwordless)
+            // New users: code  password  access
+            // Existing verified users: code  access (passwordless)
             if (checkData.exists && !checkData.requiresVerification) {
                 // Existing verified user - passwordless login
                 setIsSignup(false);
@@ -368,7 +368,7 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
-                                            placeholder="••••••••"
+                                            placeholder=""
                                             autoFocus={!isSignup}
                                         />
                                         <Lock size={18} className="absolute right-4 top-3.5 text-neutral-400 group-focus-within:text-blue-500 transition-colors" />
@@ -386,7 +386,7 @@ export function AuthModal({ onAuthenticated }: AuthModalProps) {
                                                     value={confirmPassword}
                                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                                     className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
-                                                    placeholder="••••••••"
+                                                    placeholder=""
                                                 />
                                                 <Lock size={18} className="absolute right-4 top-3.5 text-neutral-400 group-focus-within:text-blue-500 transition-colors" />
                                             </div>

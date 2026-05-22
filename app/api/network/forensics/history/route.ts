@@ -33,7 +33,7 @@ export async function GET() {
         const zkBaseProofs = 88.2;
 
         for (let i = 30; i >= 0; i--) {
-            // Deterministic entropy derived from day index — no Math.random()
+            // Deterministic entropy derived from day index  no Math.random()
             const deterministicNoise = Math.sin(i * 1.37) * 1.0; // Pseudo-entropy, fully reproducible
             const dayOffset = i * 24 * 60 * 60 * 1000;
             

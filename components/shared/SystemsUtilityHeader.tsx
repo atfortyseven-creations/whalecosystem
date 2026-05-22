@@ -4,16 +4,16 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useDisconnect } from 'wagmi';
 import { useUIStore } from '@/lib/store/ui-store';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { CurrencySwitcher } from './CurrencySwitcher';
 
-// ─── IVORY SYSTEMS UTILITY HEADER ───
+//  IVORY SYSTEMS UTILITY HEADER 
 // Perfectly visible on cream/ivory background
 export function SystemsUtilityHeader() {
-    const { address, isConnected } = useSovereignAccount();
+    const { address, isConnected } = useSystemAccount();
     const { activePanel, setActivePanel } = useUIStore();
     const { disconnect } = useDisconnect();
     const router = useRouter();

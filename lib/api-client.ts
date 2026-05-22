@@ -13,7 +13,7 @@ export const REGISTRY = {
     polymarket:     "/api/polymarket/orders",
   },
   SOVEREIGN_INTEL: {
-    massTransfers:  "/api/intelligence/mass-transfers", // mapped interceptor
+    massTransfers:  "/api/analytics/mass-transfers", // mapped interceptor
     entityMap:      "/api/network/evm/recent", 
     smartSignals:   "/api/whale-stream",
     eventLedger:    "/api/network/mempool/recent",
@@ -36,7 +36,7 @@ export const REGISTRY = {
 // ============================================================================
 // BASE FETCHER WITH TITANIUM SECURITY HEADERS
 // ============================================================================
-const fetchSovereign = async (url: string, requiresAuth: boolean = false) => {
+const fetchSystem = async (url: string, requiresAuth: boolean = false) => {
   if (!url || url.includes('tbd-')) {
      // Suspend fetching intentionally until endpoints are provided by the user
      return new Promise(() => {}); // Infinite suspense / loading state
@@ -58,7 +58,7 @@ const fetchSovereign = async (url: string, requiresAuth: boolean = false) => {
   const res = await fetch(fetchUrl, { headers });
   
   if (!res.ok) {
-    throw new Error(`Sovereign API Error: ${res.status}`);
+    throw new Error(`System API Error: ${res.status}`);
   }
 
   const data = await res.json();
@@ -73,7 +73,7 @@ export function useMarketData(endpointKey: keyof typeof REGISTRY.MARKET_DATA) {
   const query = useQuery({
     queryKey: ['market', endpointKey],
     // Force auth for watchlist since it's sharing the vault endpoint
-    queryFn: () => fetchSovereign(REGISTRY.MARKET_DATA[endpointKey], endpointKey === 'watchlist'),
+    queryFn: () => fetchSystem(REGISTRY.MARKET_DATA[endpointKey], endpointKey === 'watchlist'),
     refetchInterval: 60_000,
     staleTime: 55_000,          // prevents duplicate fetches within 55s
     retry: 2,
@@ -84,11 +84,11 @@ export function useMarketData(endpointKey: keyof typeof REGISTRY.MARKET_DATA) {
   };
 }
 
-// Highly secured intelligence fetches
-export function useSovereignIntel(endpointKey: keyof typeof REGISTRY.SOVEREIGN_INTEL) {
+// Highly secured analytics fetches
+export function useSystemIntel(endpointKey: keyof typeof REGISTRY.SOVEREIGN_INTEL) {
   return useQuery({
     queryKey: ['intel', endpointKey],
-    queryFn: () => fetchSovereign(REGISTRY.SOVEREIGN_INTEL[endpointKey], true),
+    queryFn: () => fetchSystem(REGISTRY.SOVEREIGN_INTEL[endpointKey], true),
     refetchInterval: endpointKey === 'massTransfers' ? 30_000 : 60_000,
     staleTime: endpointKey === 'massTransfers' ? 25_000 : 55_000,
   });
@@ -98,14 +98,14 @@ export function useSovereignIntel(endpointKey: keyof typeof REGISTRY.SOVEREIGN_I
 export function useVaultData(endpointKey: keyof typeof REGISTRY.VAULT_DATA) {
   return useQuery({
     queryKey: ['vault', endpointKey],
-    queryFn: () => fetchSovereign(REGISTRY.VAULT_DATA[endpointKey], true),
+    queryFn: () => fetchSystem(REGISTRY.VAULT_DATA[endpointKey], true),
   });
 }
 
 export function useOmniInfrastructure(endpointKey: keyof typeof REGISTRY.OMNI_INFRA) {
   return useQuery({
     queryKey: ['infra', endpointKey],
-    queryFn: () => fetchSovereign(REGISTRY.OMNI_INFRA[endpointKey], false),
+    queryFn: () => fetchSystem(REGISTRY.OMNI_INFRA[endpointKey], false),
     refetchInterval: endpointKey === 'sessionLogs' ? 10000 : 120000,
   });
 }

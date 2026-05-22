@@ -13,13 +13,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing transaction hex substrate.' }, { status: 400 });
         }
 
-        console.log(`📡 [Arcade] Broadcasting transaction (${hex.length} bytes)...`);
+        console.log(` [Arcade] Broadcasting transaction (${hex.length} bytes)...`);
 
         // Relay to multiple high-fidelity broadcasters for maximum redundancy
         // (Simulating Arcade/Teranode P2P direct broadcast)
         const broadcasters = [
             'https://api.whatsonchain.com/v1/bsv/main/tx/raw',
-            'https://api.taal.com/v1/broadcast' // Placeholder — requires API key
+            'https://api.taal.com/v1/broadcast' // Placeholder  requires API key
         ];
 
         const results = await Promise.allSettled(broadcasters.map(async (url) => {

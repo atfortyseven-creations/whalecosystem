@@ -39,7 +39,7 @@ export function WhalecosystemTweetFeed({
 
   return (
     <div className="flex flex-col w-full h-full font-sans">
-      {/* ── Header ── */}
+      {/*  Header  */}
       {showHeader && (
         <div className="flex items-center justify-between mb-3 px-1">
           <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ export function WhalecosystemTweetFeed({
         </div>
       )}
 
-      {/* ── Widget Container ── */}
+      {/*  Widget Container  */}
       <div
         className={`relative flex-1 rounded-xl overflow-hidden border ${bgClass} ${borderClass} flex flex-col`}
         style={{ height }}

@@ -15,7 +15,7 @@ async function main() {
 
   try {
     // 1. Collect all unique emails and connected wallet addresses that might have emails tied
-    console.log('Scanning Akashic DB for connected Sovereigns...');
+    console.log('Scanning Akashic DB for connected Systems...');
     
     const [subscribers, authUsers] = await Promise.all([
       prisma.emailSubscriber.findMany({ select: { email: true } }),
@@ -64,7 +64,7 @@ CONFIDENTIAL & TIME-SENSITIVE // EXECUTIVE CORRESPONDENCE...
       await resend.emails.send({
         from: 'The Infrastructure Council <council@whalealertnetwork.com>',
         to: batch,
-        subject: 'DECLASSIFIED: Official Genesis of the Whale Alert Network (v6.12.0) — Institutional Intelligence Output',
+        subject: 'DECLASSIFIED: Official Genesis of the Whale Alert Network (v6.12.0)  Institutional Analytics Output',
         text: messagePayload
       });
       */

@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
         const { searchParams } = new URL(req.url);
         const requestedAddress = searchParams.get('address');
 
-        // Enforce strict owner-only access — users cannot view others' PnL
+        // Enforce strict owner-only access  users cannot view others' PnL
         if (!requestedAddress || requestedAddress.toLowerCase() !== validation.userId.toLowerCase()) {
             return NextResponse.json({ error: 'Forbidden: You can only view your own positions.' }, { status: 403 });
         }

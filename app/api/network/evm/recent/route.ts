@@ -84,7 +84,7 @@ function getChains(): ChainConfig[] {
         process.env.BSC_RPC_URL || null,
         // Priority 3: RpcRelayerManager (multi-account rotation)
         RpcRelayerManager.getRpcUrl('BSC', 'RPC') || null,
-        // Priority 4–7: public fallback cascade
+        // Priority 47: public fallback cascade
         'https://bsc.publicnode.com',
         'https://bsc-rpc.publicnode.com',
         'https://bsc-dataseed1.binance.org',
@@ -137,7 +137,7 @@ async function scanChain(chain: ChainConfig): Promise<any[]> {
   }
 
   if (!provider) {
-    console.log(`[EVM Scan] No active RPC for ${chain.label} — degrading gracefully`);
+    console.log(`[EVM Scan] No active RPC for ${chain.label}  degrading gracefully`);
     return [];
   }
 

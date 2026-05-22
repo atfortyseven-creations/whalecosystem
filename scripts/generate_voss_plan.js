@@ -15,19 +15,19 @@ const categories = [
 ];
 
 const titles = [
-  "ZK-State Rollup Sovereign Mesh", "Akashic Temporal Sharding", "Zero-Mock WebRTC P2P Ingestion",
+  "ZK-State Rollup System Mesh", "Akashic Temporal Sharding", "Zero-Mock WebRTC P2P Ingestion",
   "Deterministic Engine Polymorphism", "Neo4j Cypher Neural Generation", "Hyper-Graph Pathfinding Predictivo",
-  "Non-Custodial Multi-Chain Sovereign Vault", "Groth16 Deadman’s Switch Upgrade", "Ivory Standard Binary Protocol",
+  "Non-Custodial Multi-Chain System Vault", "Groth16 Deadmans Switch Upgrade", "Ivory Standard Binary Protocol",
   "Eigenlayer AVS Data Availability", "Ingestión Solana Geohash Sub-1ms", "Prisma Rust Bindings Nativos",
-  "Sovereign App-Chain L3", "Zero-Trust Runtime Sandboxing", "World ID Sybil-Resistant Validation",
-  "Quantum-Resistant Threshold Signatures", "AI Agentic Execution Sub-system", "ZK-Proof P2P Validation Mesh",
+  "System App-Chain L3", "Zero-Trust Runtime Sandboxing", "World ID Sybil-Resistant Validation",
+  "Core-Resistant Threshold Signatures", "AI Agentic Execution Sub-system", "ZK-Proof P2P Validation Mesh",
   "Multi-stage Docker Hyper-optimization", "Web3-Native PubSub Protocol", "On-device ML Heuristics", 
   "Inherent MEV Protection Vault", "Hardware-Accelerated Graph Renders", "Deterministic Garbage Collection",
   "In-Memory EVM Simulation Fork", "Biometric Enclave SIWE login"
 ];
 
 const descPrefixes = [
-  "Mutación del Sovereign Mesh Protocol para", "Fragmentación temporal del registro inmutable Akashic para",
+  "Mutación del System Mesh Protocol para", "Fragmentación temporal del registro inmutable Akashic para",
   "Bypass de RPCs tradicionales transmitiendo señales para", "El Ingestion Engine ajusta dinámicamente sus parsers para",
   "LLM interno traduciendo queries en lenguaje natural para", "Caché anticipada de las rutas Neo4j para",
   "Bóveda nativa multi-cadena controlando la ejecución para", "El Deadman Protocol usa ZK-proofs para encriptar",
@@ -61,7 +61,7 @@ const frameworks = [
   "Llama-edge corriendo junto a Neo4j, ingestando Schema.",
   "Integración de ERC-4337 unida al Next.js 15 App Router.",
   "Cloudflare Workers/Deno DSW arquitecturalmente on-premise.",
-  "Integración @worldcoin/idkit a nivel Auth/RPC handshake."
+  "Integración @identity/idkit a nivel Auth/RPC handshake."
 ];
 
 const priorities = ["Crítica", "Alta", "Media"];
@@ -84,7 +84,7 @@ function getRandom(arr) {
 }
 
 let markdown = `# VOSS 2026 SUPREME DIRECTIVE: THE 500 DIMENSIONS OF APEX DOMINANCE
-*Sovereign-grade intelligence output. Direct integration to System Architecture (v4.2.0).*
+*System-grade analytics output. Direct integration to System Architecture (v4.2.0).*
 *Constructed on the principles of Zero-Mock Mandate, Akashic Permanence, and Institutional Ivory.*
 
 `;
@@ -107,8 +107,8 @@ for (let i = 0; i < 10; i++) {
     
     // Manual overrides for the first few to be hyper-specific
     if (counter === 1) {
-      title = "ZK-State Rollup Sovereign Mesh";
-      desc = "Mutación del Sovereign Mesh Protocol para asimilar estado global en rollups Groth16. Todo update de Neo4j genera un state root on-chain, extendiendo la arquitectura de Ingestion Sub-15ms.";
+      title = "ZK-State Rollup System Mesh";
+      desc = "Mutación del System Mesh Protocol para asimilar estado global en rollups Groth16. Todo update de Neo4j genera un state root on-chain, extendiendo la arquitectura de Ingestion Sub-15ms.";
       derrota = "Nansen usa data warehouses centralizadas; nosotros probamos matemáticamente el grafo en-cadena sin fallos.";
     } else if (counter === 2) {
       title = "Akashic Ledger Temporal Sharding";
@@ -131,7 +131,7 @@ for (let i = 0; i < 10; i++) {
 
 markdown += `## PLAN DE EJECUCIÓN MAESTRO (2026-2027)
 **FASE 1 (Días 1-30) - Soberanía Absoluta:**
-Implementación de los elementos 1-125. El foco es la transición de PM2 Node a Rust Bindings (Prisma) y el ZK-Rollup Sovereign Mesh. Se inyecta la liquidez masiva.
+Implementación de los elementos 1-125. El foco es la transición de PM2 Node a Rust Bindings (Prisma) y el ZK-Rollup System Mesh. Se inyecta la liquidez masiva.
 
 **FASE 2 (Días 31-90) - Dominación Institucional:**
 Despliegue de los elementos 126-250. Activación del AI Agentic Vault y Zero-Mock WebRTC P2P Ingestion. Se elimina la infraestructura centralizada; latencia < 2ms global.

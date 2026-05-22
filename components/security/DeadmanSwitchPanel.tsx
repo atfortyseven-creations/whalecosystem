@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * DeadmanSwitchPanel — Full Institutional-Grade Dashboard Component
+ * DeadmanSwitchPanel  Full Institutional-Grade Dashboard Component
  *
- * Shows live on-chain state from SovereignDeadmanSwitch.sol
+ * Shows live on-chain state from SystemDeadmanSwitch.sol
  * All buttons fire real Polygon transactions via wagmi.
  */
 
@@ -19,11 +19,11 @@ import { useDeadmanSwitch, DEADMAN_CONTRACT_ADDRESS } from "@/hooks/useDeadmanSw
 import { type Address }               from "viem";
 import { polygonAmoy }                from "viem/chains";
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
+//  HELPERS 
 
 function shortAddr(addr?: string) {
-  if (!addr || addr === "0x0000000000000000000000000000000000000000") return "—";
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+  if (!addr || addr === "0x0000000000000000000000000000000000000000") return "";
+  return `${addr.slice(0, 6)}${addr.slice(-4)}`;
 }
 
 function formatDays(secs: bigint) {
@@ -40,7 +40,7 @@ function unixToDate(ts: bigint) {
 
 const AMOY_SCAN = (addr: string) => `https://amoy.polygonscan.com/address/${addr}`;
 
-// ─── RING ARC ─────────────────────────────────────────────────────────────────
+//  RING ARC 
 
 function TimerArc({ percent, danger }: { percent: number; danger: boolean }) {
   const r   = 54;
@@ -62,7 +62,7 @@ function TimerArc({ percent, danger }: { percent: number; danger: boolean }) {
   );
 }
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
+//  MAIN COMPONENT 
 
 export function DeadmanSwitchPanel() {
   const {
@@ -83,11 +83,11 @@ export function DeadmanSwitchPanel() {
     return () => clearInterval(id);
   }, []);
 
-  // ── Action wrapper ─────────────────────────────────────────────────────────
+  //  Action wrapper 
 
   const exec = async (label: string, fn: () => Promise<string>) => {
     setTxPending(label);
-    const toastId = toast.loading(`Broadcasting: ${label}…`);
+    const toastId = toast.loading(`Broadcasting: ${label}`);
     try {
       const hash = await fn();
       toast.success(`${label} confirmed!`, {
@@ -98,7 +98,7 @@ export function DeadmanSwitchPanel() {
             target="_blank" rel="noopener noreferrer"
             className="underline text-indigo-400"
           >
-            View on PolygonScan ↗
+            View on PolygonScan 
           </a>
         ),
       });
@@ -109,12 +109,12 @@ export function DeadmanSwitchPanel() {
     }
   };
 
-  // ─── RENDER ────────────────────────────────────────────────────────────────
+  //  RENDER 
 
   return (
     <div className="bg-[#0d0d1a] rounded-3xl border border-indigo-900/30 p-8 space-y-6 shadow-2xl shadow-indigo-950/50">
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      {/*  Header  */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-indigo-950 border border-indigo-800 flex items-center justify-center shadow-lg shadow-indigo-900/40">
@@ -146,20 +146,20 @@ export function DeadmanSwitchPanel() {
         </div>
       </div>
 
-      {/* ── Contract Address Row ─────────────────────────────────────────── */}
+      {/*  Contract Address Row  */}
       {contractAddress && (
         <div className="flex items-center gap-3 bg-black/30 rounded-2xl px-4 py-3 border border-white/5">
           <Lock size={12} className="text-indigo-500 shrink-0" />
           <span className="font-mono text-indigo-300 text-[11px] truncate">{contractAddress}</span>
-          <span className="ml-auto text-[10px] font-bold text-emerald-500 uppercase tracking-widest shrink-0">Verified ✓</span>
+          <span className="ml-auto text-[10px] font-bold text-emerald-500 uppercase tracking-widest shrink-0">Verified </span>
         </div>
       )}
 
-      {/* ── Loading / Error ─────────────────────────────────────────────── */}
+      {/*  Loading / Error  */}
       {isLoading && !status && (
         <div className="flex items-center justify-center py-16 text-indigo-500">
           <Loader2 className="animate-spin mr-3" size={20} />
-          <span className="text-sm font-bold">Reading on-chain state…</span>
+          <span className="text-sm font-bold">Reading on-chain state</span>
         </div>
       )}
 
@@ -170,7 +170,7 @@ export function DeadmanSwitchPanel() {
         </div>
       )}
 
-      {/* ── Main Status Grid ─────────────────────────────────────────────── */}
+      {/*  Main Status Grid  */}
       {status && !isLoading && (
         <AnimatePresence mode="wait">
           <motion.div
@@ -185,7 +185,7 @@ export function DeadmanSwitchPanel() {
               <div className="bg-red-950/50 border border-red-600/50 rounded-2xl px-5 py-4 flex items-center gap-3 animate-pulse">
                 <ShieldAlert size={20} className="text-red-400 shrink-0" />
                 <div>
-                  <p className="text-red-300 text-sm font-black uppercase tracking-widest">SWITCH ARMED — TIMEOUT ELAPSED</p>
+                  <p className="text-red-300 text-sm font-black uppercase tracking-widest">SWITCH ARMED  TIMEOUT ELAPSED</p>
                   <p className="text-red-500 text-xs mt-0.5">The inheritance can be triggered by any address. Ping immediately to reset.</p>
                 </div>
               </div>
@@ -279,7 +279,7 @@ export function DeadmanSwitchPanel() {
               onClick={() => setShowConfig(v => !v)}
               className="flex items-center gap-2 text-indigo-500 hover:text-indigo-300 transition-colors text-[11px] font-black uppercase tracking-widest"
             >
-              <Settings2 size={14} /> Configuration {showConfig ? "▲" : "▼"}
+              <Settings2 size={14} /> Configuration {showConfig ? "" : ""}
             </button>
 
             <AnimatePresence>
@@ -298,7 +298,7 @@ export function DeadmanSwitchPanel() {
                     <div className="flex gap-3">
                       <input
                         type="text"
-                        placeholder="0x…"
+                        placeholder="0x"
                         value={newBackupInput}
                         onChange={e => setNewBackupInput(e.target.value)}
                         className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs font-mono placeholder-slate-700 outline-none focus:border-indigo-500/60"

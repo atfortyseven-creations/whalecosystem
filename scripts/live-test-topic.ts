@@ -21,7 +21,7 @@ const CHAT_ID = "-1002462382947"; // ID del Grupo (obtenido del link t.me/c/2462
 const TARGET_CHAT_ID = "@HumanidFi"; 
 const TOPIC_ID = 1367;
 
-console.log("🚀 Starting LIVE Topic Test...");
+console.log(" Starting LIVE Topic Test...");
 
 const config = {
   apiKey: ALCHEMY_KEY,
@@ -105,21 +105,21 @@ async function run() {
       const formatMoney = (val: number) => {
       const eurVal = val * 0.96;
       const millions = (eurVal / 1_000_000).toFixed(2);
-      return `€${millions} Millones de euros`;
+      return `${millions} Millones de euros`;
     };
 
     const shortFrom = `${whaleTx.from.slice(0, 4)}...${whaleTx.from.slice(-4)}`;
-    const shortTo = whaleTx.to ? `${whaleTx.to.slice(0, 4)}...${whaleTx.to.slice(-4)}` : 'Contract 📄';
+    const shortTo = whaleTx.to ? `${whaleTx.to.slice(0, 4)}...${whaleTx.to.slice(-4)}` : 'Contract ';
       
     const msg = `
-${'🐋'} <b>ALERTA WHALE (PRUEBA EN VIVO)</b> | Base
+${''} <b>ALERTA WHALE (PRUEBA EN VIVO)</b> | Base
 
-💶 <b>${formatMoney(whaleTx.usdValue)}</b>
+ <b>${formatMoney(whaleTx.usdValue)}</b>
 Transferencia de <b>${parseFloat((whaleTx.value || 0).toFixed(2)).toLocaleString()} ${whaleTx.asset || 'Token'}</b> detectada AHORA MISMO.
 
-👤 <code>${shortFrom}</code> ➡️ <code>${shortTo}</code>
+ <code>${shortFrom}</code> ️ <code>${shortTo}</code>
 
-🔗 <a href="https://basescan.org/tx/${whaleTx.hash}">View Real Transaction</a>
+ <a href="https://basescan.org/tx/${whaleTx.hash}">View Real Transaction</a>
 `.trim();
 
     await sendTelegram(msg);

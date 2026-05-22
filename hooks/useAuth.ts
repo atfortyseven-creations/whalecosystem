@@ -1,37 +1,26 @@
-'use client';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+// hooks/useAUTH.ts
+import { useAccount, useBalance } from 'wagmi'
+import { AUTH_TOKEN_ADDRESS } from '../config/tokens'
 
-const OWNER_ADDRESSES = [
-  // Map to verified wallet addresses for owner privileges
-  // or use OWNER_EMAILS check via /api/subscription/status
-];
+export function useAUTH() {
+    const { address, isConnected, isConnecting } = useAccount()
 
-const OWNER_EMAILS = [
-  'atfortyseven2@gmail.com',
-  'josemanx2000@gmail.com'
-];
+    const { data, isError, isLoading, refetch } = useBalance({
+        address,
+        token: AUTH_TOKEN_ADDRESS, // Aquí es donde ocurre la magia: pedimos AUTH, no ETH
+    })
 
-export function useAuth() {
-  const { address, isConnected, status } = useSovereignAccount();
-  
-  const isLoaded = status !== 'connecting' && status !== 'reconnecting';
-  const isAuthenticated = isConnected && !!address;
-  
-  return {
-    isAuthenticated,
-    user: isAuthenticated ? { id: address, walletAddress: address } : null,
-    isLoading: !isLoaded,
-    isLoaded,
-    isOwner: false, // Validated server-side via /api/subscription/status
-    isPremium: false, // Validated server-side via /api/subscription/status
-    trialViews: 0,
-    viewedAddresses: [] as string[],
-    walletAddress: address || null,
-    authSource: isAuthenticated ? 'siwe' : 'none',
-    login: async () => {
-      if (typeof window !== 'undefined') {
-        window.location.reload();
-      }
+    // Format balance helper
+    const balanceVal = data ? data.formatted : '0.00';
+
+    return {
+        address,
+        balance: balanceVal,
+        symbol: data?.symbol || 'AUTH',
+        status: isConnecting ? 'connecting' : isConnected ? 'connected' : 'disconnected',
+        isError,
+        isLoading,
+        refresh: refetch
     }
-  };
 }
+

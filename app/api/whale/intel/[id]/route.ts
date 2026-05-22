@@ -5,11 +5,11 @@ import { prisma } from '@/lib/prisma';
  * SOVEREIGN INTEL - PREMIUM DATA PAYWALL
  * ------------------------------------
  * High-value whale data is locked behind a BSV micropayment.
- * Verifies transaction proof of payment and releases full intelligence.
+ * Verifies transaction proof of payment and releases full analytics.
  *
  * FIX Bug 21: Removed Math.random() fake whale address.
  * Now queries the real WhaleActivity database using the intelId (walletAddress)
- * to surface actual on-chain intelligence. Returns 404 when no data exists
+ * to surface actual on-chain analytics. Returns 404 when no data exists
  * rather than returning a fabricated Bitcoin address that doesn't exist on-chain.
  */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -25,9 +25,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             }, { status: 402 });
         }
 
-        console.log(`📡 [Intel-Paywall] Verifying payment for intel ${intelId}: ${txid}...`);
+        console.log(` [Intel-Paywall] Verifying payment for intel ${intelId}: ${txid}...`);
 
-        // ── Pull real whale data from DB ────────────────────────────────────────
+        //  Pull real whale data from DB 
         // intelId == walletAddress; surface real aggregated on-chain intel
         const [activities, totalVolume] = await Promise.all([
             prisma.whaleActivity.findMany({
@@ -53,7 +53,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
         if (activities.length === 0) {
             return NextResponse.json({
-                error: 'No intelligence data found for this entity.',
+                error: 'No analytics data found for this entity.',
                 hint: 'This wallet has not been flagged as a whale by our monitoring system.',
             }, { status: 404 });
         }
@@ -80,7 +80,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         return NextResponse.json({
             success: true,
             intel: premiumIntel,
-            message: 'Payment Verified. Sovereign Intel Unlocked.',
+            message: 'Payment Verified. System Intel Unlocked.',
         });
 
     } catch (error: any) {

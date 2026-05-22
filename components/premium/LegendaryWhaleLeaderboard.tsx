@@ -22,7 +22,7 @@ export function LegendaryWhaleLeaderboard() {
     };
 
     const formatEuros = (usdFormat: number) => {
-        return `€${(usdFormat / 1.09 / 1000000).toFixed(2)}M`;
+        return `${(usdFormat / 1.09 / 1000000).toFixed(2)}M`;
     };
 
     const getLatestTxForWallet = (wallet: string) => {

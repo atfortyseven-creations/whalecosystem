@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { companyName, contactName, email, tier, useCase, teamSize, currentStack, preferredCall } = body;
 
-        // ── Validation ──────────────────────────────────────────────────────
+        //  Validation 
         if (!companyName?.trim() || !contactName?.trim() || !email?.trim()) {
             return NextResponse.json(
                 { error: 'companyName, contactName, and email are required.' },
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // ── Persist to DB ────────────────────────────────────────────────────
+        //  Persist to DB 
         const inquiryId = `ENT-${Date.now().toString(36).toUpperCase()}`;
         const { prisma } = await import('@/lib/prisma');
 
@@ -77,27 +77,27 @@ export async function POST(req: NextRequest) {
                 },
             });
         } catch {
-            // Table not yet migrated — log locally, don't block the user
-            console.log(`[Enterprise] New inquiry ${inquiryId}: ${companyName} (${email}) — ${tier}`);
+            // Table not yet migrated  log locally, don't block the user
+            console.log(`[Enterprise] New inquiry ${inquiryId}: ${companyName} (${email})  ${tier}`);
         }
 
-        // ── Notify Admin via Telegram ────────────────────────────────────────
+        //  Notify Admin via Telegram 
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
         const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
 
         if (botToken && adminChatId) {
             const msg = [
-                `🏛️ <b>NEW ENTERPRISE INQUIRY</b>`,
+                `️ <b>NEW ENTERPRISE INQUIRY</b>`,
                 `ID: <code>${inquiryId}</code>`,
                 ``,
-                `🏢 <b>${companyName}</b>`,
-                `👤 ${contactName} — <code>${email}</code>`,
-                `📊 Tier: <b>${tier}</b>`,
-                `👥 Team Size: ${teamSize ?? 'Not specified'}`,
-                `🔧 Current Stack: ${currentStack ?? 'Not specified'}`,
+                ` <b>${companyName}</b>`,
+                ` ${contactName}  <code>${email}</code>`,
+                ` Tier: <b>${tier}</b>`,
+                ` Team Size: ${teamSize ?? 'Not specified'}`,
+                ` Current Stack: ${currentStack ?? 'Not specified'}`,
                 ``,
-                `📋 Use Case: ${useCase.slice(0, 300)}${useCase.length > 300 ? '...' : ''}`,
-                preferredCall ? `📅 Preferred Call: ${preferredCall}` : null,
+                ` Use Case: ${useCase.slice(0, 300)}${useCase.length > 300 ? '...' : ''}`,
+                preferredCall ? ` Preferred Call: ${preferredCall}` : null,
             ].filter(Boolean).join('\n');
 
             try {
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
             success:   true,
             inquiryId,
             tier,
-            message:   `✅ Enterprise inquiry received. Our team will contact you within 24 hours.`,
+            message:   ` Enterprise inquiry received. Our team will contact you within 24 hours.`,
             nextSteps: [
                 `Reference ID <${inquiryId}> in all communications`,
                 'Check your email for confirmation',

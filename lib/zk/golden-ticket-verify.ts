@@ -1,5 +1,5 @@
 /**
- * GOLDEN TICKET — ZK-SNARK Verification Layer
+ * GOLDEN TICKET  ZK-SNARK Verification Layer
  *
  * Implements Groth16-based Zero-Knowledge proof verification for the
  * Golden Ticket NFT claim system. Allows users to prove:
@@ -21,9 +21,9 @@
 
 import crypto from 'crypto';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // TYPE DEFINITIONS
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 export interface ZKProof {
   pi_a: [string, string, string];
@@ -36,7 +36,7 @@ export interface ZKProof {
 export interface GoldenTicketPublicSignals {
   nullifier_hash: string;     // Keccak256(world_id_secret || domain_hash)
   tier_commitment: string;    // Pedersen hash of (serial || tier)
-  domain_hash: string;        // Keccak256('humanity-ledger.sovereign.v1')
+  domain_hash: string;        // Keccak256('humanity-ledger.system.v1')
 }
 
 export interface ZKVerificationResult {
@@ -53,31 +53,31 @@ export interface GoldenTicketClaim {
   timestamp: number;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // DOMAIN CONSTANTS
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
-export const SOVEREIGN_DOMAIN = 'humanity-ledger.sovereign.v1';
+export const SOVEREIGN_DOMAIN = 'humanity-ledger.system.v1';
 export const DOMAIN_HASH = '0x' + crypto
   .createHash('sha256')
   .update(SOVEREIGN_DOMAIN)
   .digest('hex');
 
-// Tier commitment salt — used in Pedersen hash (production: from ceremony)
+// Tier commitment salt  used in Pedersen hash (production: from ceremony)
 // In production this is derived from the Powers of Tau ceremony output
 export const TIER_SALT = process.env.ZK_TIER_SALT ?? 'development-tier-salt-replace-in-production';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NULLIFIER REGISTRY — Prevents double-claim (anti-replay)
+// 
+// NULLIFIER REGISTRY  Prevents double-claim (anti-replay)
 // Production: stored in PostgreSQL with UNIQUE constraint on nullifier_hash
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 const usedNullifiers = new Set<string>(); // In-memory for dev; PostgreSQL in production
 
 export async function isNullifierUsed(nullifierHash: string): Promise<boolean> {
   try {
     const { prisma } = await import('@/lib/prisma');
-    // @ts-ignore — PrivacyDonation reused for ZK nullifier storage (will migrate)
+    // @ts-ignore  PrivacyDonation reused for ZK nullifier storage (will migrate)
     const existing = await (prisma as any).privacyDonation.findUnique({
       where: { nullifier: nullifierHash },
     });
@@ -101,7 +101,7 @@ export async function consumeNullifier(nullifierHash: string, walletAddress: str
     return true;
   } catch (error: any) {
     if (error?.code === 'P2002') {
-      // Prisma unique constraint violation — someone beat us in a race condition
+      // Prisma unique constraint violation  someone beat us in a race condition
       return false;
     }
     // Fallback to in-memory registry during development
@@ -111,10 +111,10 @@ export async function consumeNullifier(nullifierHash: string, walletAddress: str
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // PROOF STRUCTURE VALIDATION
 // Pre-validates proof structure before calling snarkjs (fast-fail path)
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 export function validateProofStructure(proof: ZKProof): { valid: boolean; error?: string } {
   if (proof.protocol !== 'groth16') {
@@ -147,10 +147,10 @@ export function validateProofStructure(proof: ZKProof): { valid: boolean; error?
   return { valid: true };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // DOMAIN HASH VALIDATION
 // Ensures proof was generated for this specific deployment
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 export function validateDomainHash(publicSignals: GoldenTicketPublicSignals): boolean {
   const expectedDomainHash = '0x' + crypto
@@ -168,9 +168,9 @@ export function validateDomainHash(publicSignals: GoldenTicketPublicSignals): bo
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // MAIN VERIFICATION FUNCTION
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 export async function verifyGoldenTicketProof(
   claim: GoldenTicketClaim

@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-    console.log('🌱 Initiating Genesis Operation...')
+    console.log(' Initiating Genesis Operation...')
 
     // 1. Crear el Arquitecto (TU USUARIO)
     // IMPORTANTE: Cambia 'admin_wallet_01' por tu wallet real si quieres ver esto logueado
@@ -17,7 +17,7 @@ async function main() {
             tier: 'SOVEREIGN', // Maximum tier
         },
     })
-    console.log('👤 Usuario Soberano creado.')
+    console.log(' Usuario Soberano creado.')
 
     // Treasury, Market, and Proposals sections removed due to schema changes.
 
@@ -43,15 +43,15 @@ async function main() {
                 { name: 'Technical Support',slug: 'support',       description: 'Smart contract debugging, SDK assistance, and bug reports.',             color: '#E11D48', orderIndex: 4 },
             ]
         });
-        console.log('🗂️  Forum categories initialized.')
+        console.log('️  Forum categories initialized.')
     } else {
-        console.log(`🗂️  Forum categories already exist (${categoryCount}) — skipping.`)
+        console.log(`️  Forum categories already exist (${categoryCount})  skipping.`)
     }
 
     // 7. Seed Humanity Ledger Blocks and Transactions
     const ledgerBlockCount = await prisma.humanityLedgerBlock.count();
     if (ledgerBlockCount === 0) {
-        console.log('🧱 Seeding Humanity Ledger genesis blocks...');
+        console.log(' Seeding Humanity Ledger genesis blocks...');
         const blockId1 = 20392811n;
         const blockId2 = 20392810n;
         const blockId3 = 20392809n;
@@ -152,9 +152,9 @@ async function main() {
                 }
             }
         });
-        console.log('🧱 Humanity Ledger blocks seeded successfully.');
+        console.log(' Humanity Ledger blocks seeded successfully.');
     } else {
-        console.log(`🧱 Humanity Ledger blocks already exist (${ledgerBlockCount}) — skipping.`);
+        console.log(` Humanity Ledger blocks already exist (${ledgerBlockCount})  skipping.`);
     }
 }
 

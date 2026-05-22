@@ -10,9 +10,9 @@ export async function POST(req: Request) {
 
   try {
     const cookieStore = await cookies();
-    const address = cookieStore.get('sovereign_handshake')?.value;
+    const address = cookieStore.get('system_handshake')?.value;
     if (!isAdmin(address)) {
-        return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
+        return NextResponse.json({ error: 'Unauthorized: System Admin Only' }, { status: 403 });
     }
 
     console.log('Resetting forum...');
@@ -51,22 +51,22 @@ export async function POST(req: Request) {
       });
     }
 
-    const welcomeContent = `Welcome to the newly reorganized Sovereign Forum!
+    const welcomeContent = `Welcome to the newly reorganized System Forum!
 
-Here you will find a premium, secure environment for institutional discussion and intelligence sharing.
+Here you will find a premium, secure environment for institutional discussion and analytics sharing.
 
 ### Key Features
-1. **Institutional Matrix**: Deep-dive analysis and structured data.
+1. **Institutional Grid**: Deep-dive analysis and structured data.
 2. **Live Feed**: Real-time discussions and updates.
-3. **Recent Profiles**: Track new sovereign identities joining the network.
-4. **Highest Yield**: The most valuable and upvoted intelligence.
+3. **Recent Profiles**: Track new system identities joining the network.
+4. **Highest Yield**: The most valuable and upvoted analytics.
 
 Please explore the settings panel to configure your preferences, and maintain professionalism at all times.`;
 
     // Create the welcome topic
     await prisma.forumTopic.create({
       data: {
-        title: 'Welcome to the Sovereign Network',
+        title: 'Welcome to the System Network',
         content: welcomeContent,
         authorId: admin.id,
         categoryId: category.id,

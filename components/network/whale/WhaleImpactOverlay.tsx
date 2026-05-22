@@ -39,7 +39,7 @@ export function WhaleImpactOverlay({ active, data, onComplete }: WhaleImpactProp
                 {/* Fixed Background Noise Grain */}
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none noise-bg" />
 
-                {/* Sovereign Ambient Glow */}
+                {/* System Ambient Glow */}
                 <motion.div 
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: [0.8, 1.2, 1.5], opacity: [0, 0.4, 0] }}
@@ -54,9 +54,9 @@ export function WhaleImpactOverlay({ active, data, onComplete }: WhaleImpactProp
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
                     className="relative flex flex-col items-center"
                 >
-                    {/* SVG Filter for Sovereign Glow */}
+                    {/* SVG Filter for System Glow */}
                     <svg className="absolute w-0 h-0">
-                        <filter id="sovereign-glow">
+                        <filter id="system-glow">
                             <feGaussianBlur stdDeviation="12" result="blur" />
                             <feComposite in="SourceGraphic" in2="blur" operator="over" />
                         </filter>
@@ -64,8 +64,8 @@ export function WhaleImpactOverlay({ active, data, onComplete }: WhaleImpactProp
 
                     {/* Impact Card */}
                     <motion.div
-                        className={`glass-sovereign p-10 md:p-14 rounded-[3rem] flex flex-col items-center gap-6 relative overflow-hidden backdrop-blur-3xl border-white/5`}
-                        style={{ filter: 'url(#sovereign-glow)' }}
+                        className={`glass-system p-10 md:p-14 rounded-[3rem] flex flex-col items-center gap-6 relative overflow-hidden backdrop-blur-3xl border-white/5`}
+                        style={{ filter: 'url(#system-glow)' }}
                     >
                         {/* Status Label */}
                         <motion.div 
@@ -137,7 +137,7 @@ export function WhaleImpactOverlay({ active, data, onComplete }: WhaleImpactProp
                     <div className="mt-8 flex gap-12 opacity-30">
                         <div className="flex items-center gap-2">
                             <Cpu size={14} className="text-white" />
-                            <span className="text-[9px] font-mono font-bold tracking-widest text-white uppercase">Sovereign Analysis</span>
+                            <span className="text-[9px] font-mono font-bold tracking-widest text-white uppercase">System Analysis</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <Flame size={14} className="text-white" />

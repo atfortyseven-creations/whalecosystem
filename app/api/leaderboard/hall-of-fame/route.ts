@@ -23,7 +23,7 @@ import { safeJsonParse } from '@/lib/utils/json';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// ─── GET — Fetch Hall of Fame ─────────────────────────────────────────────
+//  GET  Fetch Hall of Fame 
 
 export async function GET(req: NextRequest) {
     const params    = req.nextUrl.searchParams;
@@ -103,10 +103,10 @@ export async function GET(req: NextRequest) {
                     rank:            i + 1,
                     ...entry,
                     totalUsdFormatted: `$${(entry.totalUsdDetected / 1e6).toFixed(2)}M`,
-                    badge:           entry.detectionCount >= 10 ? '🏆 GRAND SENTINEL'
-                        : entry.detectionCount >= 5 ? '🥇 ELITE SENTINEL'
-                        : entry.detectionCount >= 3 ? '🥈 SENTINEL'
-                        : '🥉 WATCHER',
+                    badge:           entry.detectionCount >= 10 ? ' GRAND SENTINEL'
+                        : entry.detectionCount >= 5 ? ' ELITE SENTINEL'
+                        : entry.detectionCount >= 3 ? ' SENTINEL'
+                        : ' WATCHER',
                 }));
 
             const responsePayload = {
@@ -142,7 +142,7 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// ─── POST — Submit Community Detection ────────────────────────────────────
+//  POST  Submit Community Detection 
 
 export async function POST(req: NextRequest) {
     try {
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
 
         if (!verified) {
             return NextResponse.json(
-                { error: 'Transaction not found in sovereign database. Verification failed.' },
+                { error: 'Transaction not found in system database. Verification failed.' },
                 { status: 404 }
             );
         }
@@ -195,8 +195,8 @@ export async function POST(req: NextRequest) {
             txHash,
             chain:     verified.chain,
             usdValue:  verified.usdValue,
-            message:   '✅ Detection verified and recorded to Hall of Fame.',
-            badge:     'You have earned the 🥉 WATCHER badge. Keep detecting!',
+            message:   ' Detection verified and recorded to Hall of Fame.',
+            badge:     'You have earned the  WATCHER badge. Keep detecting!',
         });
 
     } catch (err: any) {

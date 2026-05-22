@@ -22,14 +22,14 @@ import { DepositModal } from '@/components/rainbow/DepositModal';
 import { toast } from 'sonner';
 import { ChainActivityPanel } from '@/components/portfolio/ChainActivityPanel';
 import { PortfolioSecurityPanel } from '@/components/portfolio/PortfolioSecurityPanel';
-import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { SystemFooter } from '@/components/landing/SystemFooter';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
-import { QuantumAuthGate } from '@/components/auth/QuantumAuthGate';
-import QuantumTransfer from '@/components/dashboard/QuantumTransfer';
-import { QuantumDotsPanel } from '@/components/portfolio/QuantumDotsPanel';
+import { CoreAuthGate } from '@/components/auth/CoreAuthGate';
+import CoreTransfer from '@/components/dashboard/CoreTransfer';
+import { CoreDotsPanel } from '@/components/portfolio/CoreDotsPanel';
 import { useQueryClient } from '@tanstack/react-query';
 
-function QuantumEpochCountdown({ onReset }: { onReset: () => void }) {
+function CoreEpochCountdown({ onReset }: { onReset: () => void }) {
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
   useEffect(() => {
@@ -71,14 +71,14 @@ function QuantumEpochCountdown({ onReset }: { onReset: () => void }) {
   );
 }
 
-// ── Palette — Light Mode ─────────────────────────
+//  Palette  Light Mode 
 const BG   = "transparent";
 const INK  = "#050505";         // black text on light bg
 const MUTED = "rgba(5,5,5,0.45)";
 const BORDER = "rgba(5,5,5,0.08)";
 const CARD  = "rgba(255, 255, 255, 0.65)";
 
-// ── Chain color map ──────────────────────────────────────────────────────────
+//  Chain color map 
 const CHAIN_COLORS: Record<string, string> = {
   "Humanity Ledger": "#050505", "Whale Network": "#050505",
   "Ethereum": "#627EEA", "Base": "#0052FF", "Arbitrum One": "#12AAFF", "Arbitrum": "#12AAFF",
@@ -86,14 +86,14 @@ const CHAIN_COLORS: Record<string, string> = {
   "Avalanche": "#E84142", "Solana": "#9945FF", "World Chain": "#000000",
 };
 
-// ── Supported networks for Switch Network ────────────────────────────────────
+//  Supported networks for Switch Network 
 const SUPPORTED_CHAINS = [
   { caipId: "eip155:1",     name: "Ethereum",    color: "#627EEA", symbol: "ETH",  id: 1 },
   { caipId: "eip155:8453",  name: "Base",        color: "#0052FF", symbol: "ETH",  id: 8453 },
   { caipId: "eip155:10",    name: "Optimism",    color: "#FF0420", symbol: "ETH",  id: 10 },
   { caipId: "eip155:42161", name: "Arbitrum",    color: "#12AAFF", symbol: "ETH",  id: 42161 },
   { caipId: "eip155:137",   name: "Polygon",     color: "#8247E5", symbol: "POL",  id: 137 },
-  { caipId: "eip155:480",   name: "World Chain", color: "#000000", symbol: "WLD",  id: 480 },
+  { caipId: "eip155:480",   name: "World Chain", color: "#000000", symbol: "AUTH",  id: 480 },
 ];
 
 /** Fetch EUR/USD rate (cached in module scope so it refreshes every 5 min) */
@@ -110,7 +110,7 @@ async function fetchEURRate() {
 }
 
 function formatEUR(val: number, rate: number) {
-  if (!val || isNaN(val)) return "€0,00";
+  if (!val || isNaN(val)) return "0,00";
   const eur = val * rate;
   return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(eur);
 }
@@ -126,11 +126,11 @@ function useEURRate() {
 }
 
 function formatAddr(addr: string | null | undefined) {
-  if (!addr || typeof addr !== 'string') return "—";
+  if (!addr || typeof addr !== 'string') return "";
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
-// ── Asset Row ────────────────────────────────────────────────────────────────
+//  Asset Row 
 function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hidden: boolean; eurRate: number }) {
   const isQd       = asset.symbol === 'QDs';
   const isPos      = (asset.change24h ?? 0) >= 0;
@@ -161,7 +161,7 @@ function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hi
         <div className="flex items-center gap-1.5 mt-0.5">
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: chainColor }} />
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: chainColor }}>
-            {asset.network ?? "—"}
+            {asset.network ?? ""}
           </span>
           {isQd && (
             <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-black/5 text-black/40">
@@ -174,11 +174,11 @@ function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hi
       {/* Token balance */}
       <div className="text-right hidden sm:block">
         <div className="text-[11px] font-mono font-black" style={{ color: INK }}>
-          {hidden ? "••••" : `${safeToFixed(asset.balance ?? 0, isQd ? 2 : 4)} ${asset.symbol}`}
+          {hidden ? "" : `${safeToFixed(asset.balance ?? 0, isQd ? 2 : 4)} ${asset.symbol}`}
         </div>
       </div>
 
-      {/* 24h change — hidden for QDs (no market price) */}
+      {/* 24h change  hidden for QDs (no market price) */}
       {!isQd ? (
         <div className={`text-right hidden md:block w-20 text-xs font-black ${isPos ? "text-emerald-600" : "text-rose-500"}`}>
           <div className="flex items-center justify-end gap-0.5">
@@ -192,17 +192,17 @@ function AssetRow({ asset, idx, hidden, eurRate }: { asset: any; idx: number; hi
         </div>
       )}
 
-      {/* Value column — EUR for normal tokens, raw QD count for QDs */}
+      {/* Value column  EUR for normal tokens, raw QD count for QDs */}
       <div className="text-right w-28 shrink-0">
         <div className="font-black font-mono text-sm" style={{ color: INK }}>
-          {hidden ? "••••••" : (asset.symbol === 'QDs' ? `${safeToFixed(asset.balance ?? 0, 2)} QDs` : valueEUR)}
+          {hidden ? "" : (asset.symbol === 'QDs' ? `${safeToFixed(asset.balance ?? 0, 2)} QDs` : valueEUR)}
         </div>
       </div>
     </motion.div>
   );
 }
 
-// ── Wallet action button ─────────────────────────────────────────────────────
+//  Wallet action button 
 function WalletAction({
   icon: Icon,
   label,
@@ -230,7 +230,7 @@ function WalletAction({
   );
 }
 
-// ── Main Page ────────────────────────────────────────────────────────────────
+//  Main Page 
 export default function PortfolioPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -287,7 +287,7 @@ export default function PortfolioPage() {
   const handleCreateOnChainAccount = async () => {
     setCreatingAccount(true);
     try {
-      // Open AppKit modal — user picks Coinbase Smart Wallet from the list
+      // Open AppKit modal  user picks Coinbase Smart Wallet from the list
       openAppKit();
       toast.success('Wallet modal opened', { description: 'Select Coinbase Smart Wallet to create your on-chain account.' });
       setAccountCreated(true);
@@ -299,10 +299,10 @@ export default function PortfolioPage() {
   };
 
   let hasKeystore = false;
-  try { hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('sovereign_keystore') : false; } catch(e) {}
-  const isQuantumUnlocked = !!privateKey;
+  try { hasKeystore = typeof window !== 'undefined' ? !!localStorage.getItem('system_keystore') : false; } catch(e) {}
+  const isCoreUnlocked = !!privateKey;
 
-  // ── GATE LOGIC ──────────────────────────────────────────────────────────────
+  //  GATE LOGIC 
   // Wait for client mount to avoid SSR hydration mismatch (wagmi state is client-only)
   if (!mounted) return null;
 
@@ -320,7 +320,7 @@ export default function PortfolioPage() {
   //   - isReconnecting=false (connection is stable, not in-flight)
   // This prevents the ~300ms window of unauthenticated portfolio data fetching on Android.
   const isWagmiStable = wagmiConnected && !isReconnecting;
-  const needsGate = !isQuantumUnlocked && !isWagmiStable && !sessionUnlocked;
+  const needsGate = !isCoreUnlocked && !isWagmiStable && !sessionUnlocked;
 
   if (needsGate) {
     return (
@@ -328,7 +328,7 @@ export default function PortfolioPage() {
         <Link href="/" className="absolute top-6 left-6 z-50 w-10 h-10 rounded-full bg-white/50 backdrop-blur-md border border-black/10 flex items-center justify-center text-black/40 hover:text-black hover:bg-white transition-all shadow-sm" title="Return to Landing Page">
           <ArrowLeft size={20} />
         </Link>
-        <QuantumAuthGate onComplete={() => {
+        <CoreAuthGate onComplete={() => {
           sessionStorage.setItem('portfolio_unlocked', 'true');
           setSessionUnlocked(true);
           refresh();
@@ -341,7 +341,7 @@ export default function PortfolioPage() {
     disconnect();
     clearWallet();
     sessionStorage.removeItem('portfolio_unlocked');
-    sessionStorage.removeItem('sovereign_wallet_addr');
+    sessionStorage.removeItem('system_wallet_addr');
     setSessionUnlocked(false);
     refresh();
   };
@@ -349,7 +349,7 @@ export default function PortfolioPage() {
   return (
     <div className="w-full flex-1 flex flex-col bg-[#FAFAF8] text-[#0A0A0A]">
 
-      {/* ── HEADER ── */}
+      {/*  HEADER  */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b w-full"
         style={{
@@ -372,14 +372,14 @@ export default function PortfolioPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* 🐳 WHALE 300% — floats above address, perfectly centered & pegada */}
+          {/*  WHALE 300%  floats above address, perfectly centered & pegada */}
           <div className="hidden sm:flex flex-col items-center gap-0 relative">
             <div className="w-24 h-24 pointer-events-none -mb-3">
               <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-contain" />
             </div>
-            {/* Address directly below whale — zero gap */}
+            {/* Address directly below whale  zero gap */}
             <div className="flex items-center gap-2 px-3 py-1 border rounded-full" style={{ borderColor: BORDER, background: CARD }}>
-              <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : '—'}</span>
+              <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : ''}</span>
               <button
                 onClick={() => { navigator.clipboard.writeText(userAddress ?? ''); toast.success('Copied!'); }}
                 style={{ color: MUTED }}
@@ -390,7 +390,7 @@ export default function PortfolioPage() {
             </div>
           </div>
 
-          <QuantumEpochCountdown onReset={refresh} />
+          <CoreEpochCountdown onReset={refresh} />
 
           {/* Refresh */}
           <button
@@ -413,7 +413,7 @@ export default function PortfolioPage() {
 
       <div className="w-full px-6 md:px-12 pb-24 pt-8 space-y-6 text-left items-start">
 
-        {/* ── EMPTY STATE / WELCOME HERO (NESTR STYLE) ── */}
+        {/*  EMPTY STATE / WELCOME HERO (NESTR STYLE)  */}
         {!userAddress && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-black/5 shadow-sm p-8 md:p-12 mb-10 flex flex-col lg:flex-row items-center gap-12 overflow-hidden relative">
                 <div className="w-full lg:w-1/2 relative z-10 space-y-6 md:space-y-8">
@@ -434,13 +434,13 @@ export default function PortfolioPage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] dark:from-[#050505] via-transparent to-transparent z-10 hidden lg:block" />
                     <div className="flex flex-col items-center justify-center gap-4 text-[#0a0a0a] dark:text-white opacity-20 relative z-0">
                         <BarChart2 size={64} strokeWidth={1} />
-                        <span className="font-mono text-sm tracking-widest uppercase font-bold">Liquidity Matrix</span>
+                        <span className="font-mono text-sm tracking-widest uppercase font-bold">Liquidity Grid</span>
                     </div>
                 </div>
             </motion.div>
         )}
 
-        {/* ── BALANCE CARD ── */}
+        {/*  BALANCE CARD  */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -464,7 +464,7 @@ export default function PortfolioPage() {
             {/* Big number */}
             <div className="flex items-end gap-5 flex-wrap mb-8">
               <div className="text-6xl md:text-7xl font-black tracking-tighter font-mono" style={{ color: INK }}>
-                {hidden ? <span style={{ color: MUTED }}>••••••••</span> : fmt(Number(totalPnl) ?? 0)}
+                {hidden ? <span style={{ color: MUTED }}></span> : fmt(Number(totalPnl) ?? 0)}
               </div>
 
               {/* 24h pill */}
@@ -474,19 +474,19 @@ export default function PortfolioPage() {
                 }`}
               >
                 {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                {hidden ? "••••" : `${isPositive ? "+" : ""}${fmt(Number(change24hUSD) ?? 0)}`}
+                {hidden ? "" : `${isPositive ? "+" : ""}${fmt(Number(change24hUSD) ?? 0)}`}
                 <span className="opacity-60 text-xs">
-                  ({hidden ? "••" : `${safeToFixed(Number(change24hPercent) ?? 0, 2)}%`})
+                  ({hidden ? "" : `${safeToFixed(Number(change24hPercent) ?? 0, 2)}%`})
                 </span>
                 <span className="text-[9px] font-mono opacity-40 ml-1">24H</span>
               </div>
             </div>
 
-            {/* Stats — no "Status Live" */}
+            {/* Stats  no "Status Live" */}
             <div className="grid grid-cols-2 gap-6 pt-6 border-t" style={{ borderColor: BORDER }}>
               {[
-                { label: "Assets", value: hidden ? "••" : String(assets?.length ?? 0) },
-                { label: "Networks", value: hidden ? "••" : String(new Set(assets?.map((a: any) => a.network)).size ?? 0) },
+                { label: "Assets", value: hidden ? "" : String(assets?.length ?? 0) },
+                { label: "Networks", value: hidden ? "" : String(new Set(assets?.map((a: any) => a.network)).size ?? 0) },
               ].map(({ label, value }) => (
                 <div key={label} className="flex flex-col gap-1">
                   <span className="text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>{label}</span>
@@ -497,7 +497,7 @@ export default function PortfolioPage() {
           </div>
         </motion.div>
 
-        {/* ── WALLET ACTION STRIP ── */}
+        {/*  WALLET ACTION STRIP  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -520,7 +520,7 @@ export default function PortfolioPage() {
           </div>
         </motion.div>
 
-        {/* ── SWITCH NETWORK PANEL ── */}
+        {/*  SWITCH NETWORK PANEL  */}
         <AnimatePresence>
           {showNetworkSwitch && (
             <motion.div
@@ -580,7 +580,7 @@ export default function PortfolioPage() {
           )}
         </AnimatePresence>
 
-        {/* ── CREATE ON-CHAIN ACCOUNT PANEL ── */}
+        {/*  CREATE ON-CHAIN ACCOUNT PANEL  */}
         <AnimatePresence>
           {showCreateAccount && (
             <motion.div
@@ -650,7 +650,7 @@ export default function PortfolioPage() {
           )}
         </AnimatePresence>
 
-        {/* ── HOLDINGS ── */}
+        {/*  HOLDINGS  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -729,7 +729,7 @@ export default function PortfolioPage() {
 
         </motion.div>
 
-        {/* ── ALLOCATION ── */}
+        {/*  ALLOCATION  */}
         {filteredAssets.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -757,7 +757,7 @@ export default function PortfolioPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-mono" style={{ color: MUTED }}>{safeToFixed(pct, 1)}%</span>
-                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "••••" : formatEUR(asset.valueUSD ?? 0, eurRate)}</span>
+                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "" : formatEUR(asset.valueUSD ?? 0, eurRate)}</span>
                       </div>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(5,5,5,0.07)" }}>
@@ -778,7 +778,7 @@ export default function PortfolioPage() {
 
 
 
-        {/* ── CHAIN ACTIVITY (Uniswap-style on-chain history) ── */}
+        {/*  CHAIN ACTIVITY (Uniswap-style on-chain history)  */}
         {userAddress && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -790,7 +790,7 @@ export default function PortfolioPage() {
           </motion.div>
         )}
 
-        {/* ── SECURITY & BACKUP (Account Indexing & Mnemonic Reveal) ── */}
+        {/*  SECURITY & BACKUP (Account Indexing & Mnemonic Reveal)  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -800,18 +800,18 @@ export default function PortfolioPage() {
           <PortfolioSecurityPanel />
         </motion.div>
 
-        {/* ── QUANTUM DOTS — Full Sovereign Panel ── */}
+        {/*  QUANTUM DOTS  Full System Panel  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.28 }}
           className="mt-6"
         >
-          <QuantumDotsPanel />
+          <CoreDotsPanel />
         </motion.div>
       </div>
 
-      {/* ── MODALS ── */}
+      {/*  MODALS  */}
       <LegendaryTransactionModal
         isOpen={isTransferOpen}
         onClose={() => setIsTransferOpen(false)}
@@ -824,12 +824,12 @@ export default function PortfolioPage() {
         onClose={() => setIsDepositOpen(false)}
         address={userAddress ?? ""}
       />
-      <SovereignFooter />
+      <SystemFooter />
       
-      {/* Semantic spacer so SovereignFooter content is not hidden behind the fixed mobile bottom nav */}
+      {/* Semantic spacer so SystemFooter content is not hidden behind the fixed mobile bottom nav */}
       <div className="lg:hidden w-full" style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))' }} />
 
-      {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
+      {/*  Bottom Tab Navigation (Mobile Only)  */}
       <nav className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
            {[
               { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Telemetry' },

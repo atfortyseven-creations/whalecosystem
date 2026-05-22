@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { walletIntelligenceService } from '@/lib/wallet/WalletIntelligenceService';
+import { walletAnalyticsService } from '@/lib/wallet/WalletAnalyticsService';
 
 /**
  * GET /api/premium/wallet-analytics?address=[address]
@@ -14,8 +14,8 @@ export async function GET(req: NextRequest) {
 
     console.log(`[API-ANALYTICS] Processing request for ${address}`);
     
-    // Fetch full intelligence report (cached or fresh)
-    const intel = await walletIntelligenceService.getFullIntelligence(address);
+    // Fetch full analytics report (cached or fresh)
+    const intel = await walletAnalyticsService.getFullAnalytics(address);
 
     // Map to the specific structure expected by WalletAnalyticsPanel
     const analytics: any = {

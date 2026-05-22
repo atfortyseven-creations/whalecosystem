@@ -16,14 +16,14 @@ export interface UseSIWEReturn {
 }
 
 /**
- * useSIWE — Sign-In With Ethereum hook
+ * useSIWE  Sign-In With Ethereum hook
  * 
  * Full SIWE authentication flow:
- * 1. GET /api/siwe/nonce          → cryptographic nonce
- * 2. Build SiweMessage            → domain + address + nonce + chain
- * 3. signMessageAsync             → EIP-191 wallet signature
- * 4. POST /api/siwe/verify        → server verifies + issues JWT session
- * 5. Cookie: human_session, sovereign_handshake, wallet-auth
+ * 1. GET /api/siwe/nonce           cryptographic nonce
+ * 2. Build SiweMessage             domain + address + nonce + chain
+ * 3. signMessageAsync              EIP-191 wallet signature
+ * 4. POST /api/siwe/verify         server verifies + issues JWT session
+ * 5. Cookie: human_session, system_handshake, wallet-auth
  */
 export function useSIWE(): UseSIWEReturn {
   const { address, isConnected } = useAccount();
@@ -46,7 +46,7 @@ export function useSIWE(): UseSIWEReturn {
     }
 
     try {
-      // ── Step 1: Fetch nonce ─────────────────────────────────────────────────
+      //  Step 1: Fetch nonce 
       setStatus("pending-nonce");
       setError(null);
 
@@ -54,7 +54,7 @@ export function useSIWE(): UseSIWEReturn {
       if (!nonceRes.ok) throw new Error("Failed to obtain cryptographic nonce.");
       const nonce = await nonceRes.text();
 
-      // ── Step 2: Build SIWE message ──────────────────────────────────────────
+      //  Step 2: Build SIWE message 
       const domain = window.location.host;
       const origin = window.location.origin;
       const checksummedAddress = (await import('viem')).getAddress(address);
@@ -62,7 +62,7 @@ export function useSIWE(): UseSIWEReturn {
       const message = new SiweMessage({
         domain,
         address: checksummedAddress,
-        statement: "Authenticate into the Whale Alert Sovereign Network. This request will not trigger a blockchain transaction or cost any gas fees.",
+        statement: "Authenticate into the Whale Alert System Network. This request will not trigger a blockchain transaction or cost any gas fees.",
         uri: origin,
         version: "1",
         chainId: chainId || 1,
@@ -73,7 +73,7 @@ export function useSIWE(): UseSIWEReturn {
 
       const preparedMessage = message.prepareMessage();
 
-      // ── Step 3: Request wallet signature ────────────────────────────────────
+      //  Step 3: Request wallet signature 
       setStatus("pending-sign");
       let signature: string;
 
@@ -89,7 +89,7 @@ export function useSIWE(): UseSIWEReturn {
         return false;
       }
 
-      // ── Step 4: Verify on server ────────────────────────────────────────────
+      //  Step 4: Verify on server 
       setStatus("pending-verify");
 
       const verifyRes = await fetch("/api/siwe/verify", {
@@ -112,7 +112,7 @@ export function useSIWE(): UseSIWEReturn {
         throw new Error(result.error || "Authentication rejected by server.");
       }
 
-      // ── Step 5: Session active ──────────────────────────────────────────────
+      //  Step 5: Session active 
       setStatus("authenticated");
       setAuthedAddress(result.address);
       toast.success("SOVEREIGN ACCESS GRANTED", {

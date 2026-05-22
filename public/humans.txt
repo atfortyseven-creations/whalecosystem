@@ -6,5 +6,5 @@ From: Earth
 
 /* SITE */
 Standards: Next.js, React, Web3
-Components: Pristine White UI Infrastructure, Sovereign Network Connectivity
+Components: Pristine White UI Infrastructure, System Network Connectivity
 Software: Vercel, Node.js, Web3 protocols

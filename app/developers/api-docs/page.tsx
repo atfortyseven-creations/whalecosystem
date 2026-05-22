@@ -17,7 +17,7 @@ export default function APIDocsPage() {
                         Build powerful DeFi applications on top of our zero-knowledge identity and multi-chain infrastructure.
                     </p>
                     <div className="bg-yellow-600/10 border border-yellow-500/30 p-4 rounded-lg mt-4">
-                        <p className="text-sm font-bold">⚠️ API Status: COMING SOON (Q2 2026)</p>
+                        <p className="text-sm font-bold">️ API Status: COMING SOON (Q2 2026)</p>
                         <p className="text-sm text-white/70 mt-2">API access will be exclusive to LEGEND tier subscribers. Join the waitlist to be notified when APIs launch.</p>
                     </div>
                 </section>
@@ -33,13 +33,13 @@ export default function APIDocsPage() {
                     <div className="bg-white/5 p-6 rounded-xl border border-white/10 mb-6">
                         <ol className="list-decimal pl-6 space-y-2">
                             <li>Upgrade to <strong>LEGEND tier</strong></li>
-                            <li>Navigate to <code className="bg-black/30 px-2 py-1 rounded">Settings → API Keys</code></li>
+                            <li>Navigate to <code className="bg-black/30 px-2 py-1 rounded">Settings  API Keys</code></li>
                             <li>Click <strong>"Generate New API Key"</strong></li>
                             <li>Securely store your <code>API_KEY</code> and <code>API_SECRET</code></li>
                         </ol>
 
                         <div className="bg-red-600/10 border border-red-500/30 p-4 rounded-lg mt-4">
-                            <h4 className="font-bold text-red-400 mb-2">🔒 Security Warning</h4>
+                            <h4 className="font-bold text-red-400 mb-2"> Security Warning</h4>
                             <p className="text-sm">Treat API keys like passwords. Never commit them to Git, share them publicly, or expose them client-side. Use environment variables.</p>
                         </div>
                     </div>
@@ -362,24 +362,24 @@ ws.onmessage = (event) => {
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
                             <h4 className="font-bold mb-2">JavaScript / TypeScript</h4>
                             <code className="text-xs bg-black/30 px-2 py-1 rounded block mb-2">npm install @WhaleAlert ID/sdk</code>
-                            <a href="https://github.com/WhaleAlert ID-fi/sdk-js" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm">View on GitHub →</a>
+                            <a href="https://github.com/WhaleAlert ID-fi/sdk-js" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm">View on GitHub </a>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
                             <h4 className="font-bold mb-2">Python</h4>
                             <code className="text-xs bg-black/30 px-2 py-1 rounded block mb-2">pip install WhaleAlert ID-sdk</code>
-                            <a href="https://github.com/WhaleAlert ID-fi/sdk-python" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm">View on GitHub →</a>
+                            <a href="https://github.com/WhaleAlert ID-fi/sdk-python" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm">View on GitHub </a>
                         </div>
 
                         <div className="bg-white/5 p-4 rounded-lg border border-white/10">
                             <h4 className="font-bold mb-2">Go</h4>
                             <code className="text-xs bg-black/30 px-2 py-1 rounded block mb-2">go get WhaleAlert ID.fi/sdk</code>
-                            <a href="https://github.com/WhaleAlert ID-fi/sdk-go" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm">View on GitHub →</a>
+                            <a href="https://github.com/WhaleAlert ID-fi/sdk-go" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline text-sm">View on GitHub </a>
                         </div>
                     </div>
 
                     <div className="bg-yellow-600/10 border border-yellow-500/30 p-4 rounded-lg">
-                        <p className="text-sm font-bold">📦 SDKs Coming with API Launch (Q2 2026)</p>
+                        <p className="text-sm font-bold"> SDKs Coming with API Launch (Q2 2026)</p>
                         <p className="text-sm text-white/70 mt-2">We'll provide official SDKs for JavaScript, Python, Go, and Rust. Star our GitHub repos to be notified.</p>
                     </div>
                 </section>
@@ -421,7 +421,7 @@ ws.onmessage = (event) => {
                         Join the waitlist for API access and start building the future of DeFi.
                     </p>
                     <a href="/waitlist?tier=legend" className="inline-block px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-bold hover:scale-105 transition-transform">
-                        Join API Waitlist →
+                        Join API Waitlist 
                     </a>
                 </section>
             </div>

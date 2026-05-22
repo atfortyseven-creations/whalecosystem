@@ -28,7 +28,7 @@ export class WhaleRadarEngine {
      * NO MOCKS. Direct Event-Stream from RPC Pool.
      */
     public static initializeMempoolRadar() {
-        console.log('📡 [Whale Radar] Establishing Cosmic Connection via Premium RPC Pool...');
+        console.log(' [Whale Radar] Establishing Cosmic Connection via Premium RPC Pool...');
         
         // We use the mainnetClient's transport to create an Ethers provider logic
         // For event listening, we ideally need WSS, but we'll use a polling fallback 

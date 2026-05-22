@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// ─── Global LRU JSON Cache ────────────────────────────────────────────────────
+//  Global LRU JSON Cache 
 const JSON_CACHE = new Map<string, any>();
 const JSON_PENDING = new Map<string, Promise<any>>();
 
@@ -172,7 +172,7 @@ export function OptimizedLocalLottie({
       {/* Error state */}
       {status === 'error' && (
         <div className="absolute inset-0 flex items-center justify-center opacity-30 rounded">
-          <span className="text-[10px] text-[#999]">○</span>
+          <span className="text-[10px] text-[#999]"></span>
         </div>
       )}
     </div>

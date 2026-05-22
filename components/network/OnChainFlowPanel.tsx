@@ -91,15 +91,15 @@ export function OnChainFlowPanel() {
         <KPICard
           icon={<Bitcoin size={18} style={{ color: '#f97316' }} />}
           label="Circulating Supply"
-          value={isLoading ? '—' : safeToLocaleString(data?.circulatingSupply ?? 0)}
-          sub={`${supplyPercent ?? '—'}% of 21M cap`}
+          value={isLoading ? '' : safeToLocaleString(data?.circulatingSupply ?? 0)}
+          sub={`${supplyPercent ?? ''}% of 21M cap`}
           color="#f97316"
           delay={0}
         />
         <KPICard
           icon={<Coins size={18} style={{ color: '#eab308' }} />}
           label="Block Reward"
-          value={isLoading ? '—' : `${data?.miningRewardBTC ?? '—'} BTC`}
+          value={isLoading ? '' : `${data?.miningRewardBTC ?? ''} BTC`}
           sub="Post-4th halving (2024)"
           color="#eab308"
           delay={0.05}
@@ -107,7 +107,7 @@ export function OnChainFlowPanel() {
         <KPICard
           icon={<Activity size={18} style={{ color: '#10b981' }} />}
           label="Mempool Txs"
-          value={isLoading ? '—' : safeToLocaleString(data?.mempoolTxCount ?? 0)}
+          value={isLoading ? '' : safeToLocaleString(data?.mempoolTxCount ?? 0)}
           sub="Pending confirmation"
           color="#10b981"
           delay={0.1}
@@ -115,7 +115,7 @@ export function OnChainFlowPanel() {
         <KPICard
           icon={<Database size={18} style={{ color: '#8b5cf6' }} />}
           label="Mempool vSize"
-          value={isLoading ? '—' : `${safeToFixed((data?.mempoolVsize ?? 0) / 1e6, 2)} MB`}
+          value={isLoading ? '' : `${safeToFixed((data?.mempoolVsize ?? 0) / 1e6, 2)} MB`}
           sub="Unconfirmed vbytes"
           color="#8b5cf6"
           delay={0.15}
@@ -123,7 +123,7 @@ export function OnChainFlowPanel() {
         <KPICard
           icon={<TrendingUp size={18} style={{ color: '#06b6d4' }} />}
           label="Mempool Fees"
-          value={isLoading ? '—' : `${safeToFixed((data?.mempoolTotalFees ?? 0) / 1e8, 4)} BTC`}
+          value={isLoading ? '' : `${safeToFixed((data?.mempoolTotalFees ?? 0) / 1e8, 4)} BTC`}
           sub="Pending fee pool"
           color="#06b6d4"
           delay={0.2}
@@ -131,7 +131,7 @@ export function OnChainFlowPanel() {
         <KPICard
           icon={<BarChart2 size={18} style={{ color: '#ec4899' }} />}
           label="Tx Count (30d)"
-          value={isLoading ? '—' : safeToLocaleString(data?.txCountLast30d ?? 0)}
+          value={isLoading ? '' : safeToLocaleString(data?.txCountLast30d ?? 0)}
           sub="Monthly on-chain volume"
           color="#ec4899"
           delay={0.25}
@@ -145,7 +145,7 @@ export function OnChainFlowPanel() {
             <Bitcoin size={12} className="text-orange-400" />
             Bitcoin Supply Issuance
           </div>
-          <span className="text-[10px] font-mono text-orange-400">{supplyPercent ?? '—'}% issued</span>
+          <span className="text-[10px] font-mono text-orange-400">{supplyPercent ?? ''}% issued</span>
         </div>
         <div className="h-3 bg-white/5 rounded-full overflow-hidden">
           <motion.div
@@ -168,7 +168,7 @@ export function OnChainFlowPanel() {
         <Card className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/5 p-6">
           <div className="text-[11px] font-black text-white/40 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
             <Activity size={12} className="text-indigo-400" />
-            Hashrate (3Y Trend) — EH/s
+            Hashrate (3Y Trend)  EH/s
           </div>
           <div className="h-[180px]">
             <ResponsiveContainer width="100%" height="100%">

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert file to buffer then Base64 — immortal, zero filesystem dependency
+    // Convert file to buffer then Base64  immortal, zero filesystem dependency
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -30,13 +30,13 @@ export async function POST(req: NextRequest) {
     // Detect MIME type precisely
     const mimeType = file.type || 'application/octet-stream';
 
-    // Build a data URL — stored and served as inline data, survives all deploys
+    // Build a data URL  stored and served as inline data, survives all deploys
     const base64 = buffer.toString('base64');
     const dataUrl = `data:${mimeType};base64,${base64}`;
 
     return NextResponse.json({
       success: true,
-      url: dataUrl,        // Immortal data URL — no disk reference needed
+      url: dataUrl,        // Immortal data URL  no disk reference needed
       hash,
       fileName: file.name,
       mimeType,

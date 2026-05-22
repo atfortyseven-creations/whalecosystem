@@ -94,7 +94,7 @@ export const WhaleMomentumChart = memo(({
                     </div>
                     {!compact && (
                         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                            Heikin-Ashi 1m • Whale Optimized
+                            Heikin-Ashi 1m  Whale Optimized
                         </span>
                     )}
                 </div>

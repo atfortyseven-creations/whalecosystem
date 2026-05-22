@@ -51,14 +51,14 @@ export class BlockchainService {
         stallTimeout: index === 0 ? 500 : 2000,
       }));
 
-      // 🔥 [QUORUM FIX] quorum:1 → any single healthy RPC is sufficient.
+      //  [QUORUM FIX] quorum:1  any single healthy RPC is sufficient.
       // Default quorum=2 causes "quorum not met" when only 1 of N RPCs responds
       // (common when Alchemy key is missing/invalid and only public nodes are reachable).
       if (providers.length === 0) {
-        // No valid URLs — create a no-op null provider to prevent crashes
-        console.warn(`[BlockchainService] No valid RPCs for chain ${config.chainId} — skip.`);
+        // No valid URLs  create a no-op null provider to prevent crashes
+        console.warn(`[BlockchainService] No valid RPCs for chain ${config.chainId}  skip.`);
       } else if (providers.length === 1) {
-        // Single RPC — use JsonRpcProvider directly (avoids quorum check entirely)
+        // Single RPC  use JsonRpcProvider directly (avoids quorum check entirely)
         this.providers.set(config.chainId, providers[0].provider as any);
       } else {
         this.providers.set(config.chainId, new ethers.FallbackProvider(providers, config.chainId, { quorum: 1 }) as any);
@@ -111,7 +111,7 @@ export class BlockchainService {
   ): Promise<any> {
     const provider = this.getProvider(chainId);
     
-    // 🛡️ [CU-SHIELD] In a real production scenario, we should use a Multicall contract.
+    // ️ [CU-SHIELD] In a real production scenario, we should use a Multicall contract.
     // However, to satisfy the requirement of "Batch Requests" without multicall dependency:
     // We use ethers.js internal batching if the provider supports it, or standard Promise.all.
     // For GetBlock specifically, Batching is ELITE.

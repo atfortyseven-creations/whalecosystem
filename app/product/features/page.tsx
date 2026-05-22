@@ -37,19 +37,19 @@ export default function FeaturesPage() {
                             </p>
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-start gap-2">
-                                    <span className="text-purple-400">✓</span>
+                                    <span className="text-purple-400"></span>
                                     <span><strong>Biometric Verification:</strong> Iris scan proves unique personhood</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-purple-400">✓</span>
+                                    <span className="text-purple-400"></span>
                                     <span><strong>No PII Stored:</strong> Zero personal data on our servers</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-purple-400">✓</span>
+                                    <span className="text-purple-400"></span>
                                     <span><strong>Sybil Resistance:</strong> One identity per human, prevents bots and multi-accounting</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-purple-400">✓</span>
+                                    <span className="text-purple-400"></span>
                                     <span><strong>GDPR Compliant:</strong> Privacy by design</span>
                                 </li>
                             </ul>
@@ -62,23 +62,23 @@ export default function FeaturesPage() {
                                 <h3 className="text-2xl font-bold">Multi-Chain Wallet</h3>
                             </div>
                             <p className="mb-4 text-white/70">
-                                Self-custody wallet supporting 5 major blockchain networks. Your keys, your crypto—always.
+                                Self-custody wallet supporting 5 major blockchain networks. Your keys, your cryptoalways.
                             </p>
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-start gap-2">
-                                    <span className="text-blue-400">✓</span>
+                                    <span className="text-blue-400"></span>
                                     <span><strong>Supported Chains:</strong> Ethereum, Base, Polygon, Arbitrum, Optimism</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-blue-400">✓</span>
+                                    <span className="text-blue-400"></span>
                                     <span><strong>Self-Custody:</strong> Private keys never leave your device</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-blue-400">✓</span>
+                                    <span className="text-blue-400"></span>
                                     <span><strong>WalletConnect:</strong> Compatible with all major dApps</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-blue-400">✓</span>
+                                    <span className="text-blue-400"></span>
                                     <span><strong>Hardware Wallet Support:</strong> Ledger, Trezor integration</span>
                                 </li>
                             </ul>
@@ -95,19 +95,19 @@ export default function FeaturesPage() {
                             </p>
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-start gap-2">
-                                    <span className="text-green-400">✓</span>
+                                    <span className="text-green-400"></span>
                                     <span><strong>30+ Trading Pairs:</strong> BTC, ETH, SOL, and more</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-green-400">✓</span>
+                                    <span className="text-green-400"></span>
                                     <span><strong>Real-Time Charts:</strong> TradingView-style candles with indicators</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-green-400">✓</span>
+                                    <span className="text-green-400"></span>
                                     <span><strong>Order Book:</strong> Live depth visualization</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-green-400">✓</span>
+                                    <span className="text-green-400"></span>
                                     <span><strong>Demo Mode:</strong> Practice with virtual funds (currently active)</span>
                                 </li>
                             </ul>
@@ -124,19 +124,19 @@ export default function FeaturesPage() {
                             </p>
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-start gap-2">
-                                    <span className="text-orange-400">✓</span>
+                                    <span className="text-orange-400"></span>
                                     <span><strong>Whale Detection:</strong> Auto-identify high-value wallets</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-orange-400">✓</span>
+                                    <span className="text-orange-400"></span>
                                     <span><strong>Real-Time Alerts:</strong> Get notified of large transactions</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-orange-400">✓</span>
+                                    <span className="text-orange-400"></span>
                                     <span><strong>Comprehensive Analytics:</strong> Activity score, risk score, P&L</span>
                                 </li>
                                 <li className="flex items-start gap-2">
-                                    <span className="text-orange-400">✓</span>
+                                    <span className="text-orange-400"></span>
                                     <span><strong>Portfolio Insights:</strong> Real blockchain data via Alchemy</span>
                                 </li>
                             </ul>
@@ -157,32 +157,32 @@ export default function FeaturesPage() {
 
                         <div className="grid md:grid-cols-3 gap-4">
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">📤 Send & Receive</h4>
+                                <h4 className="font-bold mb-2"> Send & Receive</h4>
                                 <p className="text-sm text-white/70">Seamless transfers with QR codes, ENS support, and transaction history.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🔄 Token Swaps</h4>
+                                <h4 className="font-bold mb-2"> Token Swaps</h4>
                                 <p className="text-sm text-white/70">Instant DEX swaps with best-price routing across liquidity pools.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🌉 Cross-Chain Bridge</h4>
+                                <h4 className="font-bold mb-2"> Cross-Chain Bridge</h4>
                                 <p className="text-sm text-white/70">Move assets between L1s and L2s with minimal fees.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🖼️ NFT Gallery</h4>
+                                <h4 className="font-bold mb-2">️ NFT Gallery</h4>
                                 <p className="text-sm text-white/70">View, send, and receive NFTs from all supported chains.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">📊 Portfolio Dashboard</h4>
+                                <h4 className="font-bold mb-2"> Portfolio Dashboard</h4>
                                 <p className="text-sm text-white/70">Real-time balance tracking with historical performance charts.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">⚡ Gas Optimization</h4>
+                                <h4 className="font-bold mb-2"> Gas Optimization</h4>
                                 <p className="text-sm text-white/70">Real-time gas estimates with EIP-1559 support for optimal fees.</p>
                             </div>
                         </div>
@@ -197,32 +197,32 @@ export default function FeaturesPage() {
 
                         <div className="grid md:grid-cols-3 gap-4">
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">📈 Advanced Charting</h4>
+                                <h4 className="font-bold mb-2"> Advanced Charting</h4>
                                 <p className="text-sm text-white/70">Multiple timeframes (1m-1M), 50+ indicators, drawing tools.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">📖 Order Book Depth</h4>
+                                <h4 className="font-bold mb-2"> Order Book Depth</h4>
                                 <p className="text-sm text-white/70">Real-time order book with bid/ask spread visualization.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">⏱️ Recent Trades</h4>
+                                <h4 className="font-bold mb-2">️ Recent Trades</h4>
                                 <p className="text-sm text-white/70">Live trade feed showing market activity and price action.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🎯 Limit Orders</h4>
+                                <h4 className="font-bold mb-2"> Limit Orders</h4>
                                 <p className="text-sm text-white/70">Set target prices for automated entry/exit.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">📊 Volume Analysis</h4>
+                                <h4 className="font-bold mb-2"> Volume Analysis</h4>
                                 <p className="text-sm text-white/70">Volume bars, VWAP, and liquidity heatmaps.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🔔 Price Alerts</h4>
+                                <h4 className="font-bold mb-2"> Price Alerts</h4>
                                 <p className="text-sm text-white/70">Browser notifications when your price targets are hit.</p>
                             </div>
                         </div>
@@ -237,32 +237,32 @@ export default function FeaturesPage() {
 
                         <div className="grid md:grid-cols-3 gap-4">
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🔐 Multi-Factor Auth</h4>
+                                <h4 className="font-bold mb-2"> Multi-Factor Auth</h4>
                                 <p className="text-sm text-white/70">Passkeys, 2FA, hardware keys for maximum account security.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🕵️ Zero-Knowledge Proofs</h4>
+                                <h4 className="font-bold mb-2">️ Zero-Knowledge Proofs</h4>
                                 <p className="text-sm text-white/70">Verify identity without revealing personal data.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🔒 End-to-End Encryption</h4>
+                                <h4 className="font-bold mb-2"> End-to-End Encryption</h4>
                                 <p className="text-sm text-white/70">TLS 1.3, AES-256 encryption for all data.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🚨 Fraud Detection</h4>
+                                <h4 className="font-bold mb-2"> Fraud Detection</h4>
                                 <p className="text-sm text-white/70">AI-powered anomaly detection for suspicious activity.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">🔑 Seed Phrase Backup</h4>
+                                <h4 className="font-bold mb-2"> Seed Phrase Backup</h4>
                                 <p className="text-sm text-white/70">Secure 24-word mnemonic with offline storage recommendations.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
-                                <h4 className="font-bold mb-2">📡 Session Management</h4>
+                                <h4 className="font-bold mb-2"> Session Management</h4>
                                 <p className="text-sm text-white/70">Device tracking, auto-logout, and remote session termination.</p>
                             </div>
                         </div>
@@ -286,33 +286,33 @@ export default function FeaturesPage() {
                             <tbody>
                                 <tr>
                                     <td className="border border-white/10 p-3">Account Creation</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                 </tr>
                                 <tr className="bg-white/5">
                                     <td className="border border-white/10 p-3">World ID Verification</td>
-                                    <td className="border border-white/10 p-3 text-center">❌</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                 </tr>
                                 <tr>
                                     <td className="border border-white/10 p-3">Multi-Chain Wallet</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                 </tr>
                                 <tr className="bg-white/5">
                                     <td className="border border-white/10 p-3">Real Wallet Transactions</td>
-                                    <td className="border border-white/10 p-3 text-center">❌</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                 </tr>
                                 <tr>
                                     <td className="border border-white/10 p-3">Demo Trading</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                 </tr>
                                 <tr className="bg-white/5">
                                     <td className="border border-white/10 p-3">Trading Pairs</td>
@@ -322,31 +322,31 @@ export default function FeaturesPage() {
                                 </tr>
                                 <tr>
                                     <td className="border border-white/10 p-3">Advanced Charts</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅ + Custom Indicators</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"> + Custom Indicators</td>
                                 </tr>
                                 <tr className="bg-white/5">
                                     <td className="border border-white/10 p-3">Whale Tracker (Basic)</td>
-                                    <td className="border border-white/10 p-3 text-center">❌</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                 </tr>
                                 <tr>
                                     <td className="border border-white/10 p-3">Whale Tracker (Premium Analytics)</td>
-                                    <td className="border border-white/10 p-3 text-center">❌</td>
-                                    <td className="border border-white/10 p-3 text-center">❌</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                 </tr>
                                 <tr className="bg-white/5">
                                     <td className="border border-white/10 p-3">API Access</td>
-                                    <td className="border border-white/10 p-3 text-center">❌</td>
-                                    <td className="border border-white/10 p-3 text-center">❌</td>
-                                    <td className="border border-white/10 p-3 text-center">✅</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                 </tr>
                                 <tr>
                                     <td className="border border-white/10 p-3">Priority Support</td>
-                                    <td className="border border-white/10 p-3 text-center">❌</td>
+                                    <td className="border border-white/10 p-3 text-center"></td>
                                     <td className="border border-white/10 p-3 text-center">Email</td>
                                     <td className="border border-white/10 p-3 text-center">24/7 Live Chat</td>
                                 </tr>
@@ -364,37 +364,37 @@ export default function FeaturesPage() {
 
                     <div className="grid md:grid-cols-3 gap-4">
                         <div className="bg-gradient-to-br from-yellow-600/10 to-orange-600/10 p-4 rounded-lg border border-yellow-500/30">
-                            <h4 className="font-bold mb-2">🤖 AI Trading Assistant</h4>
+                            <h4 className="font-bold mb-2"> AI Trading Assistant</h4>
                             <p className="text-sm text-white/70">Natural language interface for market analysis and trade execution.</p>
                             <p className="text-xs text-yellow-400 mt-2">Q2 2026</p>
                         </div>
 
                         <div className="bg-gradient-to-br from-green-600/10 to-emerald-600/10 p-4 rounded-lg border border-green-500/30">
-                            <h4 className="font-bold mb-2">📱 Mobile App</h4>
+                            <h4 className="font-bold mb-2"> Mobile App</h4>
                             <p className="text-sm text-white/70">Native iOS and Android apps with full feature parity.</p>
                             <p className="text-xs text-green-400 mt-2">Q3 2026</p>
                         </div>
 
                         <div className="bg-gradient-to-br from-blue-600/10 to-cyan-600/10 p-4 rounded-lg border border-blue-500/30">
-                            <h4 className="font-bold mb-2">🏦 DeFi Yield Aggregator</h4>
+                            <h4 className="font-bold mb-2"> DeFi Yield Aggregator</h4>
                             <p className="text-sm text-white/70">Auto-compound yields across protocols with one click.</p>
                             <p className="text-xs text-blue-400 mt-2">Q4 2026</p>
                         </div>
 
                         <div className="bg-gradient-to-br from-purple-600/10 to-pink-600/10 p-4 rounded-lg border border-purple-500/30">
-                            <h4 className="font-bold mb-2">🔮 Prediction Markets</h4>
+                            <h4 className="font-bold mb-2"> Prediction Markets</h4>
                             <p className="text-sm text-white/70">Bet on real-world events with crypto-native prediction markets.</p>
                             <p className="text-xs text-purple-400 mt-2">Q1 2027</p>
                         </div>
 
                         <div className="bg-gradient-to-br from-red-600/10 to-orange-600/10 p-4 rounded-lg border border-red-500/30">
-                            <h4 className="font-bold mb-2">💸 Fiat On/Off Ramps</h4>
+                            <h4 className="font-bold mb-2"> Fiat On/Off Ramps</h4>
                             <p className="text-sm text-white/70">Buy crypto with credit card, bank transfer, or Apple Pay.</p>
                             <p className="text-xs text-red-400 mt-2">Q2 2027</p>
                         </div>
 
                         <div className="bg-gradient-to-br from-indigo-600/10 to-blue-600/10 p-4 rounded-lg border border-indigo-500/30">
-                            <h4 className="font-bold mb-2">👥 Social Trading</h4>
+                            <h4 className="font-bold mb-2"> Social Trading</h4>
                             <p className="text-sm text-white/70">Copy trades from top performers, share strategies, earn commissions.</p>
                             <p className="text-xs text-indigo-400 mt-2">Q3 2027</p>
                         </div>

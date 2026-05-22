@@ -12,7 +12,7 @@ function serializeData(data: any) {
 }
 export async function GET(request: NextRequest) {
   try {
-    // ── Priority 1: Sovereign JWT session (human_session cookie) ────────────
+    //  Priority 1: System JWT session (human_session cookie) 
     const humanSession = request.cookies.get('human_session')?.value;
     if (humanSession) {
       try {
@@ -44,12 +44,12 @@ export async function GET(request: NextRequest) {
           }));
         }
       } catch {
-        // JWT expired or invalid — fall through
+        // JWT expired or invalid  fall through
       }
     }
 
-    // ── Priority 2: sovereign_handshake cookie (raw wallet address) ─────────
-    const handshake = request.cookies.get('sovereign_handshake')?.value;
+    //  Priority 2: system_handshake cookie (raw wallet address) 
+    const handshake = request.cookies.get('system_handshake')?.value;
     if (handshake && /^0x[a-fA-F0-9]{40}$/.test(handshake)) {
       const user = await prisma.user.findUnique({
         where: { walletAddress: handshake.toLowerCase() },

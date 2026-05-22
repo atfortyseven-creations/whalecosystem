@@ -72,7 +72,7 @@ export function VIPStoreBootstrap() {
         // 3. Periodic Oracle Sync (every 10s) to keep valuations current
         const oracleSyncId = setInterval(fetchOraclePrices, 10000);
 
-        // 4. Poll real alpha events from the Sovereign Data Lake (Zero-Mock L1 EVM blocks)
+        // 4. Poll real alpha events from the System Data Lake (Zero-Mock L1 EVM blocks)
         const pollReal = async () => {
             try {
                 // Poll from the actual on-chain extraction engine (L1 Scanner)

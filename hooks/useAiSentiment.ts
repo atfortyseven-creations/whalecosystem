@@ -51,7 +51,7 @@ export const useAiSentiment = () => {
                 state,
                 keywords: [
                     { tag: 'Blockchain Trends', weight: 0.8 },
-                    { tag: 'Market Intelligence', weight: 0.9 }
+                    { tag: 'Market Analytics', weight: 0.9 }
                 ],
                 analysisCount: headlines.length
             });

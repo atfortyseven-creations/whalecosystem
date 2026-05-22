@@ -27,10 +27,10 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="w-full flex-1 flex flex-col bg-white text-slate-900 font-sans antialiased overflow-y-auto no-scrollbar">
 
-      {/* ── MAIN WRAPPER ── */}
+      {/*  MAIN WRAPPER  */}
       <div className="w-full flex flex-col items-center justify-start p-4 md:p-8 relative min-h-screen">
         
-        {/* ── MAIN PANEL ── */}
+        {/*  MAIN PANEL  */}
         <div className="w-full max-w-[1000px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 lg:p-16 flex flex-col transition-all duration-500 z-10 mt-16 md:mt-24">
           
           {/* Breadcrumb Navigation */}

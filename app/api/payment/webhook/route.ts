@@ -16,7 +16,7 @@ const PLAN_LIMITS: Record<string, { dailyRequests: number; threshold: number; ma
   Elite:   { dailyRequests: -1,      threshold: 50_000,  maxKeys: 10 },
 };
 
-// ─── Generate a cryptographically secure API key ──────────────────────────────
+//  Generate a cryptographically secure API key 
 function generateApiKey(): { raw: string; hash: string } {
   const rawSuffix = randomBytes(40).toString('hex');
   const raw = `wac_live_${rawSuffix}`;
@@ -24,13 +24,13 @@ function generateApiKey(): { raw: string; hash: string } {
   return { raw, hash };
 }
 
-// ─── Auto-submit chargeback evidence to Stripe ────────────────────────────────
+//  Auto-submit chargeback evidence to Stripe 
 async function submitDisputeEvidence(dispute: Stripe.Dispute, subscription: any) {
   try {
     const customer = await stripe.customers.retrieve(dispute.charge as string) as Stripe.Customer;
     const metadata = (await stripe.charges.retrieve(dispute.charge as string)).metadata;
 
-    // Gather API usage logs as evidence from AuditLog (sovereign model)
+    // Gather API usage logs as evidence from AuditLog (system model)
     const usageLogs = await db.auditLog.findMany({
       where: { metadata: { path: ['subscriptionId'], equals: subscription.id } },
       orderBy: { timestamp: 'asc' },
@@ -38,7 +38,7 @@ async function submitDisputeEvidence(dispute: Stripe.Dispute, subscription: any)
     });
 
     const evidenceText = `
-WHALE ALERT CORPORATION — DISPUTE EVIDENCE
+WHALE ALERT CORPORATION  DISPUTE EVIDENCE
 ==========================================
 
 Transaction Details:
@@ -67,7 +67,7 @@ The service was delivered and API keys were provisioned as contracted.
         customer_purchase_ip: metadata?.purchase_ip,
         customer_name: customer.name || undefined,
         customer_email_address: customer.email || undefined,
-        product_description: `Whale Alert Corporation ${subscription.tier} API Subscription — Real-time whale transaction intelligence`,
+        product_description: `Whale Alert Corporation ${subscription.tier} API Subscription  Real-time whale transaction analytics`,
         customer_signature: evidenceText,
         service_date: (subscription.createdAt ?? new Date()).toISOString().split('T')[0],
         service_documentation: `${process.env.NEXT_PUBLIC_APP_URL}/terms`,
@@ -82,7 +82,7 @@ The service was delivered and API keys were provisioned as contracted.
   }
 }
 
-// ─── Prisma `subscription` typed as any for extended API fields ───────────────
+//  Prisma `subscription` typed as any for extended API fields 
 // NOTE: The schema uses `subscription` (not `apiSubscription`). The `(prisma as any)`
 // cast covers extended fields (keyHash, dailyRequestLimit, etc.) until a dedicated
 // ApiSubscription model is added and `prisma generate` is re-run.
@@ -103,9 +103,9 @@ export async function POST(req: NextRequest) {
 
   console.log(`[WAC Webhook] Event received: ${event.type}`);
 
-  // ── HANDLE EVENTS ─────────────────────────────────────────────────────────
+  //  HANDLE EVENTS 
 
-  // 1. Successful payment — provision API key
+  // 1. Successful payment  provision API key
   if (event.type === 'checkout.session.completed') {
     const stripeSession = event.data.object as Stripe.Checkout.Session;
     if (stripeSession.mode !== 'subscription') return NextResponse.json({ ok: true });
@@ -113,21 +113,21 @@ export async function POST(req: NextRequest) {
     const subscriptionId = stripeSession.subscription as string;
     const stripeSub = await stripe.subscriptions.retrieve(subscriptionId);
     const planId = stripeSub.metadata?.plan_id || stripeSession.metadata?.plan_id || 'starter';
-    const sovereignUserId = stripeSub.metadata?.sovereign_user_id || stripeSession.metadata?.sovereign_user_id;
+    const systemUserId = stripeSub.metadata?.system_user_id || stripeSession.metadata?.system_user_id;
     const limits = PLAN_LIMITS[planId] || PLAN_LIMITS.starter;
 
-    // Find user by walletAddress (SIWE sovereign identity)
-    const dbUser = sovereignUserId
-      ? await prisma.user.findFirst({ where: { walletAddress: sovereignUserId } })
+    // Find user by walletAddress (SIWE system identity)
+    const dbUser = systemUserId
+      ? await prisma.user.findFirst({ where: { walletAddress: systemUserId } })
       : null;
 
     // Generate API key
     const { raw: rawKey, hash: keyHash } = generateApiKey();
 
-    // Save subscription + key using the sovereign `subscription` model
+    // Save subscription + key using the system `subscription` model
     const sub = await db.subscription.create({
       data: {
-        userId:               dbUser?.walletAddress || sovereignUserId || 'unknown',
+        userId:               dbUser?.walletAddress || systemUserId || 'unknown',
         tier:                 planId,
         status:               'ACTIVE',
         expiresAt:            new Date((stripeSub as any).current_period_end * 1000),
@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // --- SaaS V4.0 Sovereign Credits Integration ---
+    // --- SaaS V4.0 System Credits Integration ---
     if (dbUser) {
        const creditsToAdd = planId.toLowerCase() === 'elite' ? 30000 : 8000;
        await db.user.update({
@@ -183,7 +183,7 @@ export async function POST(req: NextRequest) {
       await resend.emails.send({
         from: 'Whale Alert Corporation <api@whalealert.corp>',
         to: userEmail,
-        subject: '🐋 Tu API key de Whale Alert Corporation',
+        subject: ' Tu API key de Whale Alert Corporation',
         html: `
           <div style="font-family: monospace; background: #0a0a0a; color: #fff; padding: 32px; border-radius: 12px;">
             <h1 style="color: #a78bfa; font-size: 24px; margin-bottom: 8px;">Whale Alert Corporation</h1>
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
             <code style="color: #60a5fa; font-size: 13px;">X-WAC-API-Key: ${rawKey}</code>
             <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #222;">
               <p style="color: #555; font-size: 11px;">Esta key no se mostrará de nuevo por seguridad.</p>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL}/developers" style="color: #a78bfa;">→ Ver documentación completa</a>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/developers" style="color: #a78bfa;"> Ver documentación completa</a>
             </div>
           </div>
         `,
@@ -206,25 +206,25 @@ export async function POST(req: NextRequest) {
     console.log(`[WAC Webhook] API key provisioned for plan: ${planId}, subscription: ${sub.id}`);
   }
 
-  // 2. Subscription renewed — extend access
+  // 2. Subscription renewed  extend access
   else if (event.type === 'invoice.paid') {
     const invoice = event.data.object as any;
     if (!invoice.subscription) return NextResponse.json({ ok: true });
 
     const stripeSub = await stripe.subscriptions.retrieve(invoice.subscription as string);
-    const sovereignUserId = stripeSub.metadata?.sovereign_user_id || invoice.metadata?.sovereign_user_id;
+    const systemUserId = stripeSub.metadata?.system_user_id || invoice.metadata?.system_user_id;
 
-    if (sovereignUserId) {
+    if (systemUserId) {
       await db.subscription.updateMany({
-        where: { userId: sovereignUserId, status: 'ACTIVE' },
+        where: { userId: systemUserId, status: 'ACTIVE' },
         data: {
           expiresAt:  new Date((stripeSub as any).current_period_end * 1000),
           updatedAt:  new Date(),
         },
       });
 
-      // --- SaaS V4.0 Sovereign Credits Renewal ---
-      const dbUser = await db.user.findFirst({ where: { walletAddress: sovereignUserId } });
+      // --- SaaS V4.0 System Credits Renewal ---
+      const dbUser = await db.user.findFirst({ where: { walletAddress: systemUserId } });
       if (dbUser) {
         const planId = stripeSub.metadata?.plan_id || 'pro';
         const creditsToAdd = planId.toLowerCase() === 'elite' ? 30000 : 8000;
@@ -247,7 +247,7 @@ export async function POST(req: NextRequest) {
     console.log('[WAC Webhook] Subscription renewed:', invoice.subscription);
   }
 
-  // 3. Payment failed — mark as past_due
+  // 3. Payment failed  mark as past_due
   else if (event.type === 'invoice.payment_failed') {
     const invoice = event.data.object as any;
     if (!invoice.subscription) return NextResponse.json({ ok: true });
@@ -265,19 +265,19 @@ export async function POST(req: NextRequest) {
     console.log('[WAC Webhook] Payment failed, logged:', invoice.subscription);
   }
 
-  // 4. Subscription canceled — revoke access
+  // 4. Subscription canceled  revoke access
   else if (event.type === 'customer.subscription.deleted') {
     const stripeSub = event.data.object as Stripe.Subscription;
-    const sovereignId = stripeSub.metadata?.sovereign_user_id;
+    const systemId = stripeSub.metadata?.system_user_id;
 
-    if (sovereignId) {
+    if (systemId) {
       await db.subscription.updateMany({
-        where: { userId: sovereignId },
+        where: { userId: systemId },
         data: { status: 'CANCELLED', updatedAt: new Date() },
       });
 
-      // --- SaaS V4.0 Sovereign Downgrade ---
-      const dbUser = await db.user.findFirst({ where: { walletAddress: sovereignId } });
+      // --- SaaS V4.0 System Downgrade ---
+      const dbUser = await db.user.findFirst({ where: { walletAddress: systemId } });
       if (dbUser) {
         await db.user.update({
           where: { id: dbUser.id },
@@ -287,14 +287,14 @@ export async function POST(req: NextRequest) {
       // -------------------------------------
     }
 
-    console.log('[WAC Webhook] Subscription canceled for:', sovereignId);
+    console.log('[WAC Webhook] Subscription canceled for:', systemId);
   }
 
-  // 5. DISPUTE CREATED — IMMEDIATE LOG + EVIDENCE ─── MILITARY GRADE
+  // 5. DISPUTE CREATED  IMMEDIATE LOG + EVIDENCE  MILITARY GRADE
   else if (event.type === 'charge.dispute.created') {
     const dispute = event.data.object as Stripe.Dispute;
 
-    console.error(`[WAC SECURITY] DISPUTE OPENED: ${dispute.id} — Amount: $${dispute.amount / 100}`);
+    console.error(`[WAC SECURITY] DISPUTE OPENED: ${dispute.id}  Amount: $${dispute.amount / 100}`);
 
     // Log dispute immediately
     await db.auditLog.create({

@@ -25,9 +25,9 @@ export function LightningDashboard() {
     const totalCapacityBtc = stats?.total_capacity ? stats.total_capacity / 1e8 : null;
 
     const metrics = [
-        { label: 'Network Nodes', value: nodeCount ? safeToLocaleString(nodeCount) : '—', icon: Users },
-        { label: 'Active Channels', value: channelCount ? safeToLocaleString(channelCount) : '—', icon: Network },
-        { label: 'Settlement Capacity', value: totalCapacityBtc ? `${safeToFixed(totalCapacityBtc, 2)} BTC` : '—', icon: Zap },
+        { label: 'Network Nodes', value: nodeCount ? safeToLocaleString(nodeCount) : '', icon: Users },
+        { label: 'Active Channels', value: channelCount ? safeToLocaleString(channelCount) : '', icon: Network },
+        { label: 'Settlement Capacity', value: totalCapacityBtc ? `${safeToFixed(totalCapacityBtc, 2)} BTC` : '', icon: Zap },
     ];
 
     return (

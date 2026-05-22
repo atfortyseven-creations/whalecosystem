@@ -9,7 +9,7 @@ const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
 export async function checkDeadManSwitch() {
     try {
-        console.log('[DeadManSwitch] Checking Sovereign Recovery Protocol status...');
+        console.log('[DeadManSwitch] Checking System Recovery Protocol status...');
         const lastHeartbeatStr = await redisClient.get(DEADMAN_KEY);
         
         // If not set yet, we set it now to start the countdown
@@ -23,8 +23,8 @@ export async function checkDeadManSwitch() {
         const now = Date.now();
         
         if (now - lastHeartbeat > THIRTY_DAYS_MS) {
-            console.error('[DeadManSwitch] 🚨 FATAL: Admin heartbeat absent for 30 days. Initiating protocol NUKE.');
-            await executeSovereignPurge();
+            console.error('[DeadManSwitch]  FATAL: Admin heartbeat absent for 30 days. Initiating protocol NUKE.');
+            await executeSystemPurge();
         } else {
             const daysLeft = ((lastHeartbeat + THIRTY_DAYS_MS) - now) / (1000 * 60 * 60 * 24);
             console.log(`[DeadManSwitch] System Nominal. Deadman timer: ${daysLeft.toFixed(2)} days remaining.`);
@@ -34,7 +34,7 @@ export async function checkDeadManSwitch() {
     }
 }
 
-async function executeSovereignPurge() {
+async function executeSystemPurge() {
     console.error('[DeadManSwitch] EXECUTING TIER 1 OBFUSCATION...');
     try {
         // 1. Obfuscate high-tier entities (Zero-Mock but data-protecting)

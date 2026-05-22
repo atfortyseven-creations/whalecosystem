@@ -13,9 +13,9 @@ const PLAN_PRICE_IDS: Record<string, string> = {
 };
 
 const PLAN_NAMES: Record<string, string> = {
-  STARTER: 'Institutional License Lease — STARTER',
-  PRO:     'Institutional License Lease — PRO',
-  ELITE:   'Institutional License Lease — ELITE',
+  STARTER: 'Institutional License Lease  STARTER',
+  PRO:     'Institutional License Lease  PRO',
+  ELITE:   'Institutional License Lease  ELITE',
 };
 
 /**
@@ -27,7 +27,7 @@ export async function createCheckoutSession(planId: string) {
   const siweSession = await getSession();
   const userId = siweSession?.userId;
   if (!userId) {
-    throw new Error('UNAUTHORIZED: ECDSA Sovereign Signature Required.');
+    throw new Error('UNAUTHORIZED: ECDSA System Signature Required.');
   }
 
   const normalizedPlanId = planId.toUpperCase();
@@ -46,15 +46,15 @@ export async function createCheckoutSession(planId: string) {
 
   // 3. Database Customer Reconciliation
   let dbUser = await prisma.user.findUnique({ where: { walletAddress: userId } });
-  if (!dbUser) throw new Error('UNAUTHORIZED: User does not exist in the Sovereign Ledger.');
+  if (!dbUser) throw new Error('UNAUTHORIZED: User does not exist in the System Ledger.');
 
   let customerId = dbUser.stripeCustomerId;
   
   if (!customerId) {
     const customer = await stripe.customers.create({
-      email: dbUser.email || `${userId.slice(0, 8)}@sovereign.node`,
+      email: dbUser.email || `${userId.slice(0, 8)}@system.node`,
       metadata: {
-        sovereign_user_id: userId,
+        system_user_id: userId,
         purchase_ip: ip,
         purchase_country: country,
         purchase_user_agent: userAgent.slice(0, 500),
@@ -79,7 +79,7 @@ export async function createCheckoutSession(planId: string) {
     subscription_data: {
       metadata: {
         plan_id: normalizedPlanId,
-        sovereign_user_id: userId,
+        system_user_id: userId,
         purchase_ip: ip,
         purchase_country: country,
         purchase_timestamp: new Date().toISOString(),
@@ -94,7 +94,7 @@ export async function createCheckoutSession(planId: string) {
     consent_collection: { terms_of_service: 'required' },
     custom_text: {
       terms_of_service_acceptance: {
-        message: '⚠️ Al proceder aceptas que no hay reembolsos. La licencia institucional se activa inmediatamente. En caso de disputa, proporcionaremos evidencia criptográfica y logs inmutables al emisor.',
+        message: '️ Al proceder aceptas que no hay reembolsos. La licencia institucional se activa inmediatamente. En caso de disputa, proporcionaremos evidencia criptográfica y logs inmutables al emisor.',
       },
       submit: { message: 'Adquirir Licencia Institucional' },
     },
@@ -102,7 +102,7 @@ export async function createCheckoutSession(planId: string) {
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://humanidfi.com'}/pricing?canceled=true`,
     metadata: {
       plan_id: normalizedPlanId,
-      sovereign_user_id: userId,
+      system_user_id: userId,
       purchase_ip: ip,
       purchase_country: country,
     },

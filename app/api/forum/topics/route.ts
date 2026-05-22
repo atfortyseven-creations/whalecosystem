@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         }
         const address = validation.userId;
 
-        // Upsert user — create them if they don't exist yet.
+        // Upsert user  create them if they don't exist yet.
         const user = await prisma.user.upsert({
             where: { walletAddress: address },
             update: {},
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
                 });
                 
                 if (!isValidSig) {
-                    console.warn(`[Forum Security] 🚨 Invalid ECDSA signature intercepted for ${address}`);
+                    console.warn(`[Forum Security]  Invalid ECDSA signature intercepted for ${address}`);
                     return NextResponse.json({ error: 'Cryptographic signature verification failed' }, { status: 401 });
                 }
             }
@@ -128,9 +128,9 @@ export async function POST(req: NextRequest) {
                 `ForumPost_${address.slice(0, 6)}_${Date.now()}`
             );
             finalCID = ipfsResult.cid;
-            console.log(`[Zero-Trust] ⚓ Forum post successfully anchored to IPFS: ${finalCID}`);
+            console.log(`[Zero-Trust]  Forum post successfully anchored to IPFS: ${finalCID}`);
         } catch (ipfsErr) {
-            console.warn(`[Zero-Trust] ⚠️ IPFS pinning failed or not configured. Falling back to deterministic pseudo-CID. Error:`, ipfsErr);
+            console.warn(`[Zero-Trust] ️ IPFS pinning failed or not configured. Falling back to deterministic pseudo-CID. Error:`, ipfsErr);
             const contentHash = crypto.createHash('sha256').update(content).digest('hex');
             finalCID = `Qm${contentHash.substring(0, 44)}`;
         }

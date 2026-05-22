@@ -33,7 +33,7 @@ export default function TimeLockVaultModal({ isOpen, onClose }: TimeLockVaultMod
             
             if (!res.ok) throw new Error(data.message || data.error || 'Failed to create vault');
 
-            alert(`🔒 Vault Created! ${amount} ETH locked until ${unlockDate}`);
+            alert(` Vault Created! ${amount} ETH locked until ${unlockDate}`);
             fetchVaults();
             fetchBalance();
             setAmount('');
@@ -69,7 +69,7 @@ export default function TimeLockVaultModal({ isOpen, onClose }: TimeLockVaultMod
                 body: JSON.stringify({ vaultId }),
             });
             const data = await res.json();
-            alert(`✅ Vault unlocked! ${data.amount} ETH returned to your wallet.`);
+            alert(` Vault unlocked! ${data.amount} ETH returned to your wallet.`);
             fetchVaults();
             fetchBalance();
         } catch (e: any) {
@@ -132,7 +132,7 @@ export default function TimeLockVaultModal({ isOpen, onClose }: TimeLockVaultMod
                                     className={`w-full px-4 py-3 bg-white/5 border ${parseFloat(amount) > parseFloat(balance) ? 'border-red-500' : 'border-white/10'} rounded-xl text-white`}
                                 />
                                 {parseFloat(amount) > parseFloat(balance) && (
-                                    <p className="text-red-500 text-[10px] mt-1 font-bold">⚠️ Amount exceeds your current balance</p>
+                                    <p className="text-red-500 text-[10px] mt-1 font-bold">️ Amount exceeds your current balance</p>
                                 )}
                             </div>
 
@@ -178,7 +178,7 @@ export default function TimeLockVaultModal({ isOpen, onClose }: TimeLockVaultMod
                                                 disabled={new Date(vault.unlockDate) > new Date()}
                                                 className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-white/10 disabled:cursor-not-allowed rounded-lg text-sm font-bold text-white"
                                             >
-                                                {new Date(vault.unlockDate) > new Date() ? '🔒 Locked' : '🔓 Unlock'}
+                                                {new Date(vault.unlockDate) > new Date() ? ' Locked' : ' Unlock'}
                                             </button>
                                         </div>
                                     ))}

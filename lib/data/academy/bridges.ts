@@ -108,7 +108,7 @@ export const bridgesModules = [
 
                     <section class="pro-section">
                         <h2>II. Light Clients de Embebimiento Mutuo Criptográfico T-1</h2>
-                        <p>El coloso IBC L1 M2 carece de Oráculos L2 para dictaminar la verdad L1 P2P. Cadena A y Cadena B incorporan mutuamente y nativamente "Light Clients (Clientes Ligeros Cripto P2P)" T-1 en sus respectivos Códigos L1 Core. Cuando Cadena A recibe una Trama L2 M1 de Cadena B, "Autónomamente verifica la firma perimetral (Commitment/Proof M2) contra la cabecera del Bloque M2 en su Propio Light Client Embebido T-1". Si la Matemática L1 cuadra, es Validado Inalienablemente T-1, posibilitando Intercambio Multi-Activo Sovereign O(N) L2 P2P L1 ininterrumpido a Cero Riesgos de Contraparte.</p>
+                        <p>El coloso IBC L1 M2 carece de Oráculos L2 para dictaminar la verdad L1 P2P. Cadena A y Cadena B incorporan mutuamente y nativamente "Light Clients (Clientes Ligeros Cripto P2P)" T-1 en sus respectivos Códigos L1 Core. Cuando Cadena A recibe una Trama L2 M1 de Cadena B, "Autónomamente verifica la firma perimetral (Commitment/Proof M2) contra la cabecera del Bloque M2 en su Propio Light Client Embebido T-1". Si la Matemática L1 cuadra, es Validado Inalienablemente T-1, posibilitando Intercambio Multi-Activo System O(N) L2 P2P L1 ininterrumpido a Cero Riesgos de Contraparte.</p>
                     </section>
                 </div>`
             },

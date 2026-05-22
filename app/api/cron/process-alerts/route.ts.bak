@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
                          await prisma.notification.create({
                             data: {
                                 userId,
-                                title: isBigMove ? '🚨 Whale Alert' : '🔔 Wallet Activity',
+                                title: isBigMove ? ' Whale Alert' : ' Wallet Activity',
                                 message: `${wallet.label} moved ${safeToFixed(tx.value, 2)} ${symbol} ($${safeToFixed(valueUsd, 0)})`,
                                 type: 'market',
                                 metadata: {

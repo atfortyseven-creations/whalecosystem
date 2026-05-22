@@ -1,6 +1,6 @@
 # Etherscan API Key Setup
 
-## 🚨 CRÍTICO: Necesitas un API Key de Etherscan
+##  CRÍTICO: Necesitas un API Key de Etherscan
 
 ### Por qué es necesario:
 - **Sin API Key**: 1 request cada 5 segundos (DEMASIADO LENTO)
@@ -34,12 +34,12 @@
    npm run dev
    ```
 
-## ✅ Verificación
+##  Verificación
 
 Una vez configurado, deberías ver en los logs:
 
 ```
-[ETHERSCAN] ✅ 0xd8da6bf26964af9d7eed9e03e53415d37aa96045: 1234.5678 ETH ($3,086,419.50)
+[ETHERSCAN]  0xd8da6bf26964af9d7eed9e03e53415d37aa96045: 1234.5678 ETH ($3,086,419.50)
 ```
 
 **Con API Key = Balance REAL y RÁPIDO para CUALQUIER cartera**

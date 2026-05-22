@@ -18,7 +18,7 @@ export const useWarpCore = () => {
                 const wasm = await import('../pkg/human_id_warp_core');
                 setModule(wasm);
                 setIsReady(true);
-                console.log("🚀 Warp Core: Online (Rust + WASM)");
+                console.log(" Warp Core: Online (Rust + WASM)");
             } catch (e) {
                 console.warn("Warp Core failed to load, falling back to Impulse Engine (JS).", e);
             }

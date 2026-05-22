@@ -20,14 +20,14 @@ interface CreatorRoyalty {
 }
 
 async function generateWeeklyMerkleTree() {
-    console.log('🌳 Starting Merkle tree generation...');
+    console.log(' Starting Merkle tree generation...');
 
     try {
         // Calculate period (last 7 days)
         const periodEnd = new Date();
         const periodStart = new Date(periodEnd.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-        console.log(`📅 Period: ${periodStart.toISOString()} to ${periodEnd.toISOString()}`);
+        console.log(` Period: ${periodStart.toISOString()} to ${periodEnd.toISOString()}`);
 
         // Get all unclaimed royalties from this period
         const royalties = await prisma.royaltyAccrual.findMany({
@@ -45,11 +45,11 @@ async function generateWeeklyMerkleTree() {
         });
 
         if (royalties.length === 0) {
-            console.log('ℹ️  No unclaimed royalties for this period');
+            console.log('️  No unclaimed royalties for this period');
             return;
         }
 
-        console.log(`💰 Found ${royalties.length} royalty accruals`);
+        console.log(` Found ${royalties.length} royalty accruals`);
 
         // Aggregate by creator address
         const creatorTotals: Record<string, number> = {};
@@ -65,7 +65,7 @@ async function generateWeeklyMerkleTree() {
         }
 
         const creators = Object.keys(creatorTotals);
-        console.log(`👥 ${creators.length} unique creators`);
+        console.log(` ${creators.length} unique creators`);
 
         // Generate Merkle tree leaves
         const leaves = creators.map((address) => {
@@ -82,12 +82,12 @@ async function generateWeeklyMerkleTree() {
         const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
         const root = tree.getHexRoot();
 
-        console.log(`🌲 Merkle root: ${root}`);
+        console.log(` Merkle root: ${root}`);
 
         // Calculate total amount
         const totalAmount = Object.values(creatorTotals).reduce((sum, amt) => sum + amt, 0);
 
-        console.log(`💵 Total distribution: $${totalAmount.toFixed(2)}`);
+        console.log(` Total distribution: $${totalAmount.toFixed(2)}`);
 
         // Store in database
         const distribution = await prisma.merkleDistribution.create({
@@ -107,7 +107,7 @@ async function generateWeeklyMerkleTree() {
             },
         });
 
-        console.log(`✅ Distribution created: ${distribution.id}`);
+        console.log(` Distribution created: ${distribution.id}`);
 
         // Link royalties to this distribution
         await prisma.royaltyAccrual.updateMany({
@@ -121,25 +121,25 @@ async function generateWeeklyMerkleTree() {
             },
         });
 
-        console.log(`🔗 Linked ${royalties.length} royalties to distribution`);
+        console.log(` Linked ${royalties.length} royalties to distribution`);
 
         // TODO: Publish Merkle root to smart contract
         // This would call the MarketGovernance.publishMerkleRoot() function
-        console.log('⚠️  Smart contract integration pending');
+        console.log('️  Smart contract integration pending');
 
         // Print summary
-        console.log('\n📊 Distribution Summary:');
-        console.log('━'.repeat(50));
+        console.log('\n Distribution Summary:');
+        console.log(''.repeat(50));
         creators.forEach((address) => {
             console.log(`${address}: $${creatorTotals[address].toFixed(2)}`);
         });
-        console.log('━'.repeat(50));
+        console.log(''.repeat(50));
         console.log(`Total: $${totalAmount.toFixed(2)}`);
 
-        console.log('\n✨ Merkle tree generation complete!');
+        console.log('\n Merkle tree generation complete!');
 
     } catch (error) {
-        console.error('❌ Error generating Merkle tree:', error);
+        console.error(' Error generating Merkle tree:', error);
         throw error;
     } finally {
         await prisma.$disconnect();

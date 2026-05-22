@@ -271,7 +271,7 @@ export const rwaInstitutionalModules = [
                         <p>Nos Olvidamos Que El 99% Del DeFi O(1) P2P L1 (Aave, Uniswap T-1 L2 M2 O(N)) Reposa Sobre El Activo RWA Más Grande Del Mundo: <strong>Tether (USDT) y Circle (USDC) P2P M1 L1 O(1) T-1 L2 M2.</strong> Son IOUs Fiduciarios L1 O(N) Respaldados Por T-Bills Y Repos En Wall Street M1 L2 T-1 P2P L1 O(1).</p>
                     </section>
                     <section class="pro-section">
-                        <h2>II. Armamento Geopolítico y Contagio Inverso (Sovereign Collateral Sink L1 P2P M1 T-1 L2 M2 O(N))</h2>
+                        <h2>II. Armamento Geopolítico y Contagio Inverso (System Collateral Sink L1 P2P M1 T-1 L2 M2 O(N))</h2>
                         <p>Stablecoins Centralizadas P2P L1 M1 O(1) Son El Mayor Comprador De Deuda Soberana Americana T-1 L2 M2 O(N). En Caso De Que La FED M1 P2P L1 Sancione Una Dirección O(1) (Entity Freezing T-1 M2 L2 O(N) P2P), Destruye El Mito De La Inmutabilidad DeFi L1 M1. Pero Esta Simbiosis Funciona Hacia Arriba P2P M2 T-1 L2: El Dólar Preserva Su Hegemonía Global O(1) P2P L1 M1 T-1 O(N) Exclusivamente L2 M2 Gracias Al Subsidio Tecnológico De Su Despliegue ERC-20 En Redes Sin Fronteras P2P L1 M2 T-1 L2 M1 O(N) O(1).</p>
                     </section>
                 </div>`

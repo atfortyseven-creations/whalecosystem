@@ -61,7 +61,7 @@ export default function GlobalError({
             </h1>
             
             <p className="text-sm font-bold text-black/50 leading-relaxed mb-8 max-w-sm">
-              The Sovereign Terminal encountered a critical root fault in the React mounting tree. The system halted to prevent state corruption.
+              The System Terminal encountered a critical root fault in the React mounting tree. The system halted to prevent state corruption.
             </p>
 
             {error.digest && (

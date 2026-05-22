@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronDown, Save, FileLock2, Plus, ShieldCheck } from 'lucide-react';
 import { useSignMessage, useAccount } from 'wagmi';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 
 const DRAFT_KEY = 'forum_draft_new_topic';
@@ -33,9 +33,9 @@ function NewTopicContent() {
   const [draftSaved, setDraftSaved] = useState(false);
   const [documents, setDocuments]   = useState<{ title: string, url: string }[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
+  const { address, isConnected, isSystemHandshake } = useSystemAccount();
 
-  // ── Restore draft on mount ────────────────────────────────────────────────
+  //  Restore draft on mount 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
@@ -49,7 +49,7 @@ function NewTopicContent() {
     } catch {}
   }, []);
 
-  // ── Auto-save draft on every change ──────────────────────────────────────
+  //  Auto-save draft on every change 
   useEffect(() => {
     if (!title && !content && !tags) return;
     try {
@@ -206,7 +206,7 @@ function NewTopicContent() {
       <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12">
         <div className="max-w-[820px] mx-auto bg-white border border-slate-200 rounded-xl shadow-sm p-8 md:p-12 relative">
 
-      {/* ── Header ── */}
+      {/*  Header  */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-6">
         <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
@@ -236,7 +236,7 @@ function NewTopicContent() {
 
       <div className="flex flex-col gap-8">
 
-        {/* ── Title ── */}
+        {/*  Title  */}
         <div className="flex flex-col gap-2">
           <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Title</label>
           <input
@@ -248,7 +248,7 @@ function NewTopicContent() {
           />
         </div>
 
-        {/* ── Category + Tags ── */}
+        {/*  Category + Tags  */}
         <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-1 relative flex flex-col gap-2">
               <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
@@ -278,7 +278,7 @@ function NewTopicContent() {
           </div>
         </div>
 
-        {/* ── Document Vault ── */}
+        {/*  Document Vault  */}
         <div className="flex flex-col gap-3 bg-black/[0.01] dark:bg-white/[0.01] border border-black/5 dark:border-white/5 p-6 rounded-2xl relative overflow-hidden transition-colors">
             <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-l from-[#00C076]/30 to-transparent" />
             <div className="flex items-center justify-between mb-2">
@@ -316,7 +316,7 @@ function NewTopicContent() {
             ))}
         </div>
 
-        {/* ── Body ── */}
+        {/*  Body  */}
         <div className="flex flex-col gap-2">
           <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Your message</label>
           <textarea
@@ -327,7 +327,7 @@ function NewTopicContent() {
           />
         </div>
 
-        {/* ── Footer ── */}
+        {/*  Footer  */}
         <div className="flex items-center gap-6 mt-6 pt-6 border-t border-black/10 dark:border-white/10 flex-wrap">
             <button
               onClick={submit}

@@ -20,7 +20,7 @@ export const useDigitalTelepathy = () => {
      * @param desire - The high-level outcome the user wants.
      */
     const broadcastDesire = async (desire: string, constraints: any) => {
-        console.log("🔮 Digital Telepathy: Awaiting Anoma Solver Swarm Integration...");
+        console.log(" Digital Telepathy: Awaiting Anoma Solver Swarm Integration...");
 
         throw new Error('AWAITING_GETBLOCK_RPC: The intent mechanism currently lacks connection to the live solver swarm. Synthetic intent execution is disabled.');
     };

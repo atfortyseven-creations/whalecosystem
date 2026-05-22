@@ -23,7 +23,7 @@ export function AlphaToaster() {
     const USD_TO_EUR = 0.93;
 
     useEffect(() => {
-        // [INSTITUTIONAL GUARD] Do not trigger alerts in Genesis mode (Sovereign Isolation)
+        // [INSTITUTIONAL GUARD] Do not trigger alerts in Genesis mode (System Isolation)
         if (!isConnected) {
             if (activeAlert) setActiveAlert(null);
             return;
@@ -43,9 +43,9 @@ export function AlphaToaster() {
 
     const formatEUR = (usd: number) => {
         const eur = usd * USD_TO_EUR;
-        if (eur >= 1_000_000) return `${(eur / 1_000_000).toFixed(2)}M€`;
-        if (eur >= 1000) return `${(eur / 1000).toFixed(1)}K€`;
-        return `${eur.toFixed(2)}€`;
+        if (eur >= 1_000_000) return `${(eur / 1_000_000).toFixed(2)}M`;
+        if (eur >= 1000) return `${(eur / 1000).toFixed(1)}K`;
+        return `${eur.toFixed(2)}`;
     };
 
     const isBuy = (action: string) => 
@@ -66,7 +66,7 @@ export function AlphaToaster() {
                 onClick={() => {
                     setIsMuted(!isMuted);
                     if (!isMuted) setActiveAlert(null);
-                    toast(isMuted ? "Signals Reactive" : "Signals Muted", { icon: isMuted ? "🔔" : "🔕" });
+                    toast(isMuted ? "Signals Reactive" : "Signals Muted", { icon: isMuted ? "" : "" });
                 }}
                 className={`pointer-events-auto p-3 rounded-full border transition-all shadow-xl ${
                     isMuted 
@@ -100,7 +100,7 @@ export function AlphaToaster() {
                                         <span className={`text-[10px] font-black uppercase tracking-[0.3em] mb-1 ${
                                             isBuy(activeAlert.action) ? 'text-emerald-500' : 'text-rose-500'
                                         }`}>
-                                            Sovereign Signal
+                                            System Signal
                                         </span>
                                         <h3 className="text-[17px] font-bold text-black dark:text-white tracking-tight">
                                             {sanitizeLabel(activeAlert.label)}

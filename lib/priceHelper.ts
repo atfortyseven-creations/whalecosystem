@@ -20,7 +20,7 @@ const BINANCE_MAP: Record<string, string> = {
   'ADA': 'ADAUSDT', 'DOGE': 'DOGEUSDT', 'SHIB': 'SHIBUSDT', 'DOT': 'DOTUSDT', 'LINK': 'LINKUSDT',
   'MATIC': 'MATICUSDT', 'POL': 'POLUSDT', 'AVAX': 'AVAXUSDT', 'TRX': 'TRXUSDT', 'UNI': 'UNIUSDT', 
   'PEPE': 'PEPEUSDT', 'FET': 'FETUSDT', 'DAI': 'DAIUSDT', 'APE': 'APEUSDT', 'LDO': 'LDOUSDT', 
-  'ARB': 'ARBUSDT', 'OP': 'OPUSDT', 'STRK': 'STRKUSDT', 'WLD': 'WLDUSDT', 'NEAR': 'NEARUSDT',
+  'ARB': 'ARBUSDT', 'OP': 'OPUSDT', 'STRK': 'STRKUSDT', 'AUTH': 'AUTHUSDT', 'NEAR': 'NEARUSDT',
   'FTM': 'FTMUSDT', 'TAO': 'TAOUSDT', 'INJ': 'INJUSDT', 'RNDR': 'RNDRUSDT', 'RENDER': 'RENDERUSDT', 
   'JUP': 'JUPUSDT', 'SUI': 'SUIUSDT', 'APT': 'APTUSDT', 'TIA': 'TIAUSDT', 'SEI': 'SEIUSDT',
   'ENA': 'ENAUSDT', 'PENDLE': 'PENDLEUSDT', 'AAVE': 'AAVEUSDT', 'MKR': 'MKRUSDT', 'CRV': 'CRVUSDT',
@@ -35,7 +35,7 @@ Object.entries(BINANCE_MAP).forEach(([key, val]) => {
 
 export const STEEL_DOME_FALLBACKS: Record<string, number> = {};
 
-// ── WSS ENGINE — Multi-endpoint with exponential backoff ——————————————————————————
+//  WSS ENGINE  Multi-endpoint with exponential backoff 
 // HTTP 451 = geo-block on stream.binance.com from some Railway regions.
 // We cycle through multiple known endpoints before falling back to REST.
 const WSS_ENDPOINTS = [
@@ -76,7 +76,7 @@ function startRestFallback() {
           }
         });
       }
-    } catch { /* silent — REST may also be rate-limited */ }
+    } catch { /* silent  REST may also be rate-limited */ }
   }, 30_000); // poll every 30 seconds
 }
 
@@ -98,7 +98,7 @@ function connectBinanceWs() {
     wsConnection = ws;
 
     ws.onopen = () => {
-      console.log(`[PriceHelper] WSS Connected — ${endpoint}`);
+      console.log(`[PriceHelper] WSS Connected  ${endpoint}`);
       wsReconnectAttempts = 0; // reset on success
     };
 
@@ -125,7 +125,7 @@ function connectBinanceWs() {
       // 451 = geo-block. Log once per endpoint, then rotate silently.
       const msg = e?.message || String(e);
       if (msg.includes('451') || msg.includes('403')) {
-        console.warn(`[PriceHelper] WSS geo-blocked (${endpoint}). Rotating endpoint…`);
+        console.warn(`[PriceHelper] WSS geo-blocked (${endpoint}). Rotating endpoint`);
         wsEndpointIndex++;
       }
       isWsConnected = false;
@@ -151,7 +151,7 @@ function connectBinanceWs() {
 if (typeof window === 'undefined') {
   setTimeout(connectBinanceWs, 2000);
 }
-// ────────────────
+// 
 
 async function getDexScreenerPrice(symbol: string): Promise<number> {
   try {

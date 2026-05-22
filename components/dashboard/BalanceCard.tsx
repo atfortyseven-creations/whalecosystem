@@ -1,7 +1,7 @@
 "use client";
 
 import { useBalance } from "wagmi";
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { Loader2 } from "lucide-react";
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';

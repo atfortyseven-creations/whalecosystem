@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { SovereignFooter } from '@/components/landing/SovereignFooter';
+import { SystemFooter } from '@/components/landing/SystemFooter';
 import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
 import { OPEN_ROLES, BENEFITS } from './data';
 
@@ -10,13 +10,13 @@ export function CareersPageClient() {
   return (
     <div className="w-full flex-1 flex flex-col bg-white text-slate-900 font-sans antialiased overflow-y-auto no-scrollbar">
 
-      {/* ── MAIN WRAPPER ── */}
+      {/*  MAIN WRAPPER  */}
       <div className="w-full flex flex-col items-center justify-start p-4 md:p-8 relative">
         
-        {/* ── MAIN PANEL ── */}
+        {/*  MAIN PANEL  */}
         <div className="w-full max-w-[1000px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 lg:p-16 flex flex-col transition-all duration-500 z-10">
           
-          {/* ── PAGE HEADER ── */}
+          {/*  PAGE HEADER  */}
           <header className="w-full flex-shrink-0 border-b border-slate-200/60 pb-8 mb-10">
             <div className="flex flex-col gap-4">
                 <div className="inline-flex items-center px-4 py-1.5 bg-slate-50 border border-slate-200/60 rounded-full w-fit">
@@ -26,14 +26,14 @@ export function CareersPageClient() {
                     Join the Platform
                 </h1>
                 <p className="mt-2 text-slate-500 font-medium text-sm md:text-base leading-relaxed max-w-2xl">
-                    We process global market data in real time with high precision. Join our engineering and analytics teams building the systems that provide actionable intelligence to the public.
+                    We process global market data in real time with high precision. Join our engineering and analytics teams building the systems that provide actionable analytics to the public.
                 </p>
             </div>
           </header>
 
           <div className="flex flex-col gap-16">
 
-            {/* ── OPEN POSITIONS ── */}
+            {/*  OPEN POSITIONS  */}
             <section>
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8">
                 <div>
@@ -106,7 +106,7 @@ export function CareersPageClient() {
               </div>
             </section>
 
-            {/* ── CULTURE & BENEFITS ── */}
+            {/*  CULTURE & BENEFITS  */}
             <section>
               <div className="mb-8 border-t border-slate-200/60 pt-10">
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block mb-1">Our Culture</span>
@@ -154,7 +154,7 @@ export function CareersPageClient() {
               </div>
             </section>
 
-            {/* ── SPONTANEOUS APPLICATION ── */}
+            {/*  SPONTANEOUS APPLICATION  */}
             <section className="text-center bg-slate-50 border border-slate-200/60 rounded-2xl p-10 sm:p-16 relative overflow-hidden">
                <div className="relative z-10 flex flex-col items-center">
                 <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 mb-3">Don't see your expertise?</h3>
@@ -176,7 +176,7 @@ export function CareersPageClient() {
       </div>
       
       <WhaleChatLink />
-      <SovereignFooter />
+      <SystemFooter />
     </div>
   );
 }
