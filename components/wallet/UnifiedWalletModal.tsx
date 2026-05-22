@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, ArrowRight, Wallet, AlertCircle, Loader2, CheckCircle2, ChevronDown, Search, ArrowDownUp, Globe, CreditCard, ExternalLink, ShieldCheck, Zap, Info, Network } from "lucide-react";
-import { useSendTransaction, useWriteContract, useReadContract, useAccount, useChainId, useEnsAddress, useEstimateGas, useGasPrice, useSwitchChain } from "wagmi";
+import { useSendTransaction, useWriteContract, useReadContract, useAccount, useChainId, useEnsAddress, useEstimateGas, useGasPrice, useSwitchChain, useChains } from "wagmi";
 import { parseEther, parseUnits, isAddress, formatUnits, maxUint256, formatEther } from "viem";
 import { toast } from "sonner";
 import { mainnet } from "wagmi/chains";
@@ -313,7 +313,7 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
     const allWagmiChains = useChains();
     
     // ── DYNAMIC CHAIN DERIVATION (No mock data)
-    const CHAINS = allWagmiChains.map(c => ({
+    const CHAINS = allWagmiChains.map((c: any) => ({
         id: c.id,
         name: c.name,
         icon: c.id === 1 ? 'https://cryptologos.cc/logos/ethereum-eth-logo.png' : 
@@ -324,8 +324,8 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
               'https://cryptologos.cc/logos/ethereum-eth-logo.png' // Generic fallback
     }));
 
-    const [fromChain, setFromChain] = useState(CHAINS.find(c => c.id === activeChain?.id) || CHAINS[0]);
-    const [toChain, setToChain] = useState(mode === "SWAP" ? fromChain : CHAINS.find(c => c.id !== fromChain.id) || CHAINS[0]);
+    const [fromChain, setFromChain] = useState(CHAINS.find((c: any) => c.id === activeChain?.id) || CHAINS[0]);
+    const [toChain, setToChain] = useState(mode === "SWAP" ? fromChain : CHAINS.find((c: any) => c.id !== fromChain.id) || CHAINS[0]);
 
     const isWrongNetwork = activeChain?.id !== fromChain.id;
 
@@ -333,7 +333,7 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
     const [receiveAmount, setReceiveAmount] = useState("");
     
     // ── DYNAMIC DEFAULT TOKENS (Derived from chain state)
-    const DEFAULT_TOKENS = CHAINS.map(c => ({
+    const DEFAULT_TOKENS = CHAINS.map((c: any) => ({
         symbol: c.id === 137 ? 'MATIC' : 'ETH',
         address: NATIVE_ADDRESS,
         decimals: 18,
@@ -344,7 +344,7 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
 
     const availableFromAssets = userAssets.filter((a: any) => a.chainId === fromChain.id && a.symbol !== 'QDs');
     // Find native token for the selected chain, or default
-    const fallbackNativeToken = DEFAULT_TOKENS.find(t => t.chainId === fromChain.id) || DEFAULT_TOKENS[0];
+    const fallbackNativeToken = DEFAULT_TOKENS.find((t: any) => t.chainId === fromChain.id) || DEFAULT_TOKENS[0];
     
     const [payToken, setPayToken] = useState<any>(availableFromAssets.length > 0 ? availableFromAssets[0] : fallbackNativeToken);
     const [receiveToken, setReceiveToken] = useState<any>(fallbackNativeToken);

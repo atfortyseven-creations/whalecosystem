@@ -296,7 +296,7 @@ function Scene({ vel, progress, isDark, enableScale, isMobile }: any) {
       </Float>
 
       {/* Post-processing: mobile gets Bloom only, desktop gets full suite */}
-      <EffectComposer disableNormalPass multisampling={0} autoClear={false}>
+      <EffectComposer multisampling={0} autoClear={false}>
         <Bloom
           luminanceThreshold={0.45}
           mipmapBlur
