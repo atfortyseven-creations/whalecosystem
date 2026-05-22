@@ -26,6 +26,7 @@ import { SovereignFooter } from '@/components/landing/SovereignFooter';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { QuantumAuthGate } from '@/components/auth/QuantumAuthGate';
 import QuantumTransfer from '@/components/dashboard/QuantumTransfer';
+import { QuantumDotsPanel } from '@/components/portfolio/QuantumDotsPanel';
 import { useQueryClient } from '@tanstack/react-query';
 
 function QuantumEpochCountdown({ onReset }: { onReset: () => void }) {
@@ -799,24 +800,15 @@ export default function PortfolioPage() {
           <PortfolioSecurityPanel />
         </motion.div>
 
-        {/* ── QUANTUM DOTS TOKENOMICS ── */}
-        {userAddress && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.28 }}
-            className="rounded-3xl border overflow-hidden backdrop-blur-3xl p-6 md:p-8 mt-6"
-            style={{ borderColor: BORDER, background: CARD }}
-          >
-            <div className="flex flex-col mb-8 gap-2">
-              <h2 className="font-black uppercase tracking-tight text-xl sm:text-2xl" style={{ color: INK }}>QDs ( Quantum Dots )</h2>
-              <p className="text-sm font-mono" style={{ color: MUTED }}>Execute immutable On-Chain QD transfers paying negligible L2 gas fees.</p>
-            </div>
-            <div className="w-full flex items-center justify-center">
-              <QuantumTransfer />
-            </div>
-          </motion.div>
-        )}
+        {/* ── QUANTUM DOTS — Full Sovereign Panel ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28 }}
+          className="mt-6"
+        >
+          <QuantumDotsPanel />
+        </motion.div>
       </div>
 
       {/* ── MODALS ── */}
