@@ -41,6 +41,12 @@ export default function SwapModal({ isOpen, onClose }: SwapModalProps) {
             return;
         }
 
+        if (payToken.symbol === receiveToken.symbol) {
+            setReceiveAmount(payAmount);
+            setRoute("Identical token selected");
+            return;
+        }
+
         const fetchQuote = async () => {
             try {
                 // LiFi expects amount in base units (e.g., wei)

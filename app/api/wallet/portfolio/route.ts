@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     }
   } else {
     // Check if the platform mandates JWTs now
-    console.warn(`[API-Portfolio] Missing Privy Authorization header for ${address}`);
+    console.debug(`[API-Portfolio] Missing Privy Authorization header for ${address}`);
   }
 
   if (!address) {

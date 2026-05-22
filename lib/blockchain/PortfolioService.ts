@@ -641,9 +641,9 @@ export class PortfolioService {
     // Start new fetch and store promise
     const fetchPromise = (async () => {
         try {
-            // 🔥 [Elite RESILIENCE] 15-second Global Hard-Timeout
+            // 🔥 [Elite RESILIENCE] 25-second Global Hard-Timeout
             const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('GLOBAL_PORTFOLIO_TIMEOUT')), 30000)
+                setTimeout(() => reject(new Error('GLOBAL_PORTFOLIO_TIMEOUT')), 25000)
             );
 
             return await Promise.race([
@@ -745,8 +745,14 @@ export class PortfolioService {
     // This eliminates N redundant calls inside the parallel loop
     console.log(`[Portfolio-SPEED] Pre-fetching global net worth and active chains for ${address}...`);
     const [netWorthData, activeChainsData] = await Promise.all([
-        moralisService.getWalletNetWorth(address).catch(() => null),
-        moralisService.getWalletActiveChains(address).catch(() => ({ active_chains: [] }))
+        Promise.race([
+            moralisService.getWalletNetWorth(address).catch(() => null),
+            new Promise<null>(resolve => setTimeout(() => resolve(null), 5000))
+        ]),
+        Promise.race([
+            moralisService.getWalletActiveChains(address).catch(() => ({ active_chains: [] })),
+            new Promise<{active_chains: any[]}>(resolve => setTimeout(() => resolve({ active_chains: [] }), 5000))
+        ])
     ]);
 
     const activeChainsArray = Array.isArray(activeChainsData?.active_chains) ? activeChainsData.active_chains : [];
@@ -774,7 +780,7 @@ export class PortfolioService {
           };
 
           const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 25000)
+              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 20000)
           );
 
           try {

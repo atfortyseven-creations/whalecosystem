@@ -18,7 +18,7 @@ const ZAP_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_ZAP_GASLESS_CONTRACT_ADDRES
 const domain = {
     name: "ZapContractGasless",
     version: "1",
-    chainId: 84532, // Base Sepolia
+    chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "10"),
     verifyingContract: ZAP_CONTRACT_ADDRESS,
 } as const;
 

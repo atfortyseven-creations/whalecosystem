@@ -17,7 +17,7 @@ const GOVERNANCE_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GOVERNANCE_CONTRACT_
 const domain = {
     name: "PolymarketGovernanceGasless",
     version: "1",
-    chainId: 84532, // Base Sepolia
+    chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "10"),
     verifyingContract: GOVERNANCE_CONTRACT_ADDRESS,
 } as const;
 

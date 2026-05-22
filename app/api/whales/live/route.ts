@@ -38,7 +38,7 @@ export async function GET(req: Request) {
                 // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
             }
         } else {
-            console.warn(`[Whale-Live] Missing Privy Authorization header.`);
+            console.debug(`[Whale-Live] Missing Privy Authorization header.`);
         }
 
         const { searchParams } = new URL(req.url);
