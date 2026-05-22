@@ -202,21 +202,19 @@ function NewTopicContent() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-transparent dark:bg-transparent text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
-      {/* Background Volumetric Lighting */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#00C076]/10 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
-      
-      <div className="max-w-[1000px] mx-auto bg-black/[0.02] dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-xl p-8 md:p-12 relative z-10 transition-colors duration-300">
+    <div className="w-full min-h-screen bg-white text-slate-900 py-10 font-sans">
+      <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[820px] mx-auto bg-white border border-slate-200 rounded-xl shadow-sm p-8 md:p-12 relative">
 
       {/* ── Header ── */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-black/10 dark:border-white/10 pb-6">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-6">
         <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-black tracking-tight text-black dark:text-white flex items-center gap-3 transition-colors">
-              <ShieldCheck className="text-[#00C076]" size={28} />
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+              <ShieldCheck className="text-[#0088cc]" size={24} />
               Start a New Discussion
             </h1>
-            <p className="text-[11px] font-bold text-[#888888] uppercase tracking-[0.2em]">
-                Your post will be signed with your connected wallet
+            <p className="text-sm text-slate-500">
+                Your post will be linked to your connected wallet address.
             </p>
         </div>
         <div className="flex items-center gap-3">
@@ -253,19 +251,19 @@ function NewTopicContent() {
         {/* ── Category + Tags ── */}
         <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-1 relative flex flex-col gap-2">
-              <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-[#FAF9F6] mb-3 transition-colors">Category</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
               <div className="relative">
                 <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
-                className="w-full px-5 py-4 text-[14px] font-sans font-medium rounded-xl outline-none transition-all cursor-pointer appearance-none bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A]"
+                className="w-full px-4 py-3 text-[14px] font-sans rounded-lg outline-none transition-all cursor-pointer appearance-none bg-white border border-slate-200 text-slate-900 focus:border-[#0088cc] focus:ring-1 focus:ring-[#0088cc]/20"
                 >
-              <option value="" disabled className="text-black/40 dark:text-[#555]">Select a category</option>
+              <option value="" disabled className="text-slate-400">Select a category</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id} className="bg-white dark:bg-[#111111] text-black dark:text-white">{cat.name}</option>
+                <option key={cat.id} value={cat.id} className="bg-white text-slate-900">{cat.name}</option>
               ))}
                 </select>
-                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#555555]" size={16} />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" size={16} />
             </div>
           </div>
           <div className="flex-1 flex flex-col gap-2">
@@ -334,7 +332,7 @@ function NewTopicContent() {
             <button
               onClick={submit}
               disabled={submitting}
-              className="w-full h-[54px] bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] rounded-xl text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white dark:hover:text-white active:scale-[0.99] transition-all flex items-center justify-center gap-3 shadow-xl dark:shadow-[0_0_30px_rgba(250,249,246,0.1)] hover:shadow-[0_0_40px_rgba(0,192,118,0.3)] disabled:opacity-50 disabled:hover:bg-[#050505] dark:disabled:hover:bg-[#FAF9F6]"
+              className="w-full h-[48px] bg-[#0088cc] text-white rounded-lg text-[14px] font-bold hover:bg-[#0077b3] active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
             >
               {submitting ? (
                 <>

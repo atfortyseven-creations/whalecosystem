@@ -154,15 +154,15 @@ export default function TopicPage() {
   const isTopicAuthor = sessionAddress && topic.author?.walletAddress?.toLowerCase() === sessionAddress;
 
   return (
-    <div className="w-full min-h-[100dvh] bg-transparent dark:bg-transparent text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
-      {/* Background Volumetric Lighting */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#00C076]/5 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
+    <div className="w-full min-h-[100dvh] bg-white text-slate-900 py-10 font-sans relative">
+      {/* Subtle top accent */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent pointer-events-none" />
       
-      <div className="w-full max-w-[1110px] mx-auto">
+      <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12">
       {/* Topic Header */}
-      <div className="mb-10 pb-6 border-b border-white/10">
+      <div className="mb-10 pb-6 border-b border-slate-200">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-[28px] md:text-[36px] font-black leading-[1.2] tracking-tight mb-4 flex-1 text-black dark:text-white transition-colors">
+          <h1 className="text-[26px] md:text-[32px] font-bold leading-[1.2] tracking-tight mb-4 flex-1 text-slate-900">
             {topic.title}
           </h1>
           {isTopicAuthor && (
@@ -185,9 +185,9 @@ export default function TopicPage() {
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           {topic.category && (
-            <Link href={`/forum/c/${topic.category.slug}`} className="flex items-center gap-2 px-3 py-1 rounded-full transition-colors bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-[#00C076]/30">
+            <Link href={`/forum/c/${topic.category.slug}`} className="flex items-center gap-2 px-3 py-1 rounded-full transition-colors bg-slate-100 border border-slate-200 hover:border-[#0088cc]/30">
               <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: topic.category.color || '#00C076', color: topic.category.color || '#00C076' }} />
-              <span className="text-[11px] font-black tracking-widest uppercase text-black dark:text-white transition-colors">{topic.category.name}</span>
+              <span className="text-[11px] font-bold tracking-widest uppercase text-slate-700">{topic.category.name}</span>
             </Link>
           )}
           {topic.tags?.map((tag: any) => (
@@ -207,38 +207,35 @@ export default function TopicPage() {
             <PostRow key={post.id} entity={post} type="post" onLike={fetchTopic} index={i + 2} sessionAddress={sessionAddress} onDeleted={fetchTopic} />
           ))}
 
-          {/* Reply composer */}
+        {/* Reply composer */}
           <div id="reply-composer" className="mt-12 flex gap-6">
              <div className="w-[60px] shrink-0 hidden sm:block"></div>
              <div className="flex-1">
-                <div className="rounded-2xl overflow-hidden bg-black/[0.02] dark:bg-white/[0.02] border border-black/10 dark:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.05)] dark:shadow-[0_0_30px_rgba(0,0,0,0.5)] focus-within:border-[#00C076]/50 transition-colors">
+                <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-200 focus-within:border-[#0088cc]/50 transition-colors shadow-sm">
                   <textarea
                     value={replyContent}
                     onChange={e => setReplyContent(e.target.value)}
-                    placeholder="Formulate your cryptographic proposal..."
-                    className="w-full px-6 py-5 text-[14px] font-serif bg-transparent text-black dark:text-white focus:outline-none resize-none min-h-[160px] leading-relaxed placeholder:text-black/40 dark:placeholder:text-[#555] custom-scrollbar transition-colors"
+                    placeholder="Write your reply..."
+                    className="w-full px-6 py-5 text-[14px] font-sans bg-transparent text-slate-900 focus:outline-none resize-none min-h-[140px] leading-relaxed placeholder:text-slate-400"
                   />
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 border-t border-black/10 dark:border-white/5 bg-black/5 dark:bg-[#050505] transition-colors gap-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 py-3 border-t border-slate-200 bg-slate-100 gap-3">
                     <div className="flex items-center gap-3 flex-wrap">
                       <button
                         onClick={submitReply}
                         disabled={submitting || !replyContent.trim()}
-                        className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest px-6 py-3 rounded-xl hover:-translate-y-0.5 hover:shadow-[0_5px_20px_rgba(0,192,118,0.2)] transition-all disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-[#00C076] text-black"
+                        className="inline-flex items-center gap-2 text-[13px] font-bold px-5 py-2.5 rounded bg-[#0088cc] text-white hover:bg-[#0077b3] transition-colors disabled:opacity-40"
                       >
-                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                        {submitting ? 'PROCESSING PROPOSAL...' : 'SUBMIT PROPOSAL'}
+                        {submitting ? 'Posting...' : 'Reply'}
                       </button>
                       {replyDraftSaved && (
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#00C076] flex items-center gap-1.5 opacity-60">
+                        <span className="text-[11px] font-medium text-emerald-600 flex items-center gap-1">
                           <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                          Draft Saved
+                          Draft saved
                         </span>
                       )}
                     </div>
                     {replyError && (
-                      <span className="text-[11px] font-black uppercase tracking-widest text-red-500">
-                        {replyError}
-                      </span>
+                      <span className="text-[12px] font-medium text-red-500">{replyError}</span>
                     )}
                   </div>
                 </div>
@@ -248,11 +245,11 @@ export default function TopicPage() {
 
         {/* Timeline Sidebar (Sticky) */}
         <div className="hidden lg:block lg:col-span-3">
-           <div className="sticky top-[120px] border-l border-white/10 pl-8 py-2">
-              <div className="flex flex-col gap-6">
+           <div className="sticky top-[80px] border-l border-slate-200 pl-6 py-2">
+              <div className="flex flex-col gap-5">
                  <div className="flex flex-col gap-1">
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-[#555] transition-colors">Instantiated</span>
-                    <span className="text-[13px] font-bold text-black dark:text-white transition-colors">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Created</span>
+                    <span className="text-[13px] font-medium text-slate-900">
                        {topic.createdAt ? format(new Date(topic.createdAt), 'MMM d, yyyy') : ''}
                     </span>
                  </div>
@@ -271,12 +268,12 @@ export default function TopicPage() {
                     <span className="text-[13px] font-bold text-black dark:text-white transition-colors">{topic.views || 0}</span>
                  </div>
               </div>
-               <div className="mt-10 pt-8 border-t border-white/10 flex gap-2">
+               <div className="mt-8 pt-6 border-t border-slate-200 flex gap-2">
                   <button 
                     onClick={() => document.getElementById('reply-composer')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="flex-1 text-center py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors bg-black/5 dark:bg-white/5 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10"
+                    className="flex-1 text-center py-2.5 rounded text-[13px] font-medium transition-colors bg-[#0088cc] text-white hover:bg-[#0077b3]"
                   >
-                    Submit Proposal
+                    Reply
                   </button>
               </div>
            </div>
@@ -462,13 +459,13 @@ function PostRow({
   const likeCount = entity.likes?.length || 0;
 
   return (
-    <div className="flex gap-6 py-8 border-b border-black/10 dark:border-white/5 transition-colors">
+    <div className="flex gap-6 py-6 border-b border-slate-100 transition-colors">
       
       {/* Left Sidebar (Author) */}
-      <div className="w-[60px] shrink-0 hidden sm:flex flex-col items-center">
+      <div className="w-[56px] shrink-0 hidden sm:flex flex-col items-center">
         <Link href={`/forum/u/${addr}`}>
           <div
-            className="w-[45px] h-[45px] rounded-xl flex items-center justify-center text-[14px] font-black overflow-hidden bg-black/5 dark:bg-white/5 text-black/60 dark:text-[#888888] border border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 transition-colors"
+            className="w-[40px] h-[40px] rounded-full flex items-center justify-center text-[13px] font-bold overflow-hidden bg-slate-200 text-slate-600 border border-slate-300 hover:border-slate-400 transition-colors"
           >
             {!imgError && entity.author?.avatarUrl
               ? <img 
@@ -485,48 +482,40 @@ function PostRow({
 
       {/* Right Content Area */}
       <div className="flex-1 min-w-0 flex flex-col">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <Link href={`/forum/u/${addr}`} className="text-[15px] font-bold hover:text-[#00C076] transition-colors text-black dark:text-white">
-              {label}
-            </Link>
-            {entity.author?.isPro && (
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-gradient-to-r from-[#D4AF37] to-[#F3E5AB] text-black px-2 py-0.5 rounded-sm">PRO</span>
-            )}
-            {type === 'topic' && (
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-[#00C076]/20 text-[#00C076] px-2 py-0.5 rounded-sm border border-[#00C076]/30">ISSUER</span>
-            )}
-            {entity.author?.bio && (
-              <span className="text-[12px] text-black/60 dark:text-[#555] ml-1 transition-colors">
-                 • {entity.author.bio}
-              </span>
-            )}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <Link href={`/forum/u/${addr}`} className="text-[15px] font-medium hover:text-[#0088cc] transition-colors text-slate-900">
+                {label}
+              </Link>
+              {type === 'topic' && (
+                <span className="text-[9px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600 px-2 py-0.5 rounded-sm border border-slate-200">OP</span>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+               <span className="text-[12px] text-slate-500">{time}</span>
+               <span className="text-[11px] text-slate-400">#{index}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-             <span className="text-[11px] font-bold text-black/60 dark:text-[#555] uppercase tracking-widest transition-colors">{time}</span>
-             <span className="text-[11px] font-black text-black/40 dark:text-[#333] transition-colors">#{index}</span>
-          </div>
-        </div>
 
         <div className="mb-6">
           <RenderContent content={entity.content} />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-6 mt-auto border-t border-black/10 dark:border-white/5 pt-4 transition-colors">
+        <div className="flex items-center gap-5 mt-auto border-t border-slate-100 pt-3 transition-colors">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${liked ? 'text-[#00C076]' : 'text-black/60 dark:text-[#555] hover:text-black dark:hover:text-white'}`}
+            className={`flex items-center gap-2 text-[13px] transition-colors ${liked ? 'text-red-500' : 'text-slate-400 hover:text-slate-700'}`}
           >
             <svg className="w-4 h-4" fill={liked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-            {likeCount > 0 && likeCount} ENDORSE
+            {likeCount > 0 && <span>{likeCount}</span>}
           </button>
           <button
             onClick={() => document.getElementById('reply-composer')?.scrollIntoView({ behavior: 'smooth' })}
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors text-black/60 dark:text-[#555] hover:text-black dark:hover:text-white"
+            className="flex items-center gap-2 text-[13px] transition-colors text-slate-400 hover:text-slate-700"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
-            PROPOSE
+            Reply
           </button>
 
           {/* Delete button */}
