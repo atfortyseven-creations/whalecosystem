@@ -1175,43 +1175,42 @@ export function QuantumDotsPanel() {
     return (
         <div className="w-full rounded-3xl border border-black/8 bg-white/70 backdrop-blur-3xl overflow-hidden shadow-sm">
             {/* ── Header ── */}
-            <div className="bg-black px-7 pt-7 pb-6">
+            <div className="bg-[#FAF9F6] px-7 pt-7 pb-6 border-b border-black/5">
                 <div className="flex items-start justify-between mb-5">
                     <div>
-                        <div className="text-[8px] font-mono font-black uppercase tracking-[0.35em] text-white/35 mb-1">
+                        <div className="text-[8px] font-mono font-black uppercase tracking-[0.35em] text-black/35 mb-1">
                             QuantumLedger v2 · {CHAIN_NAME} · {TOKEN_ADDR !== '0x0000000000000000000000000000000000000000' ? fmtAddr(TOKEN_ADDR) : 'Not configured'}
                         </div>
-                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">
+                        <h2 className="text-2xl font-black tracking-tighter text-black uppercase">
                             QDs — Quantum Dots
                         </h2>
                     </div>
                     <div className="flex flex-col items-end gap-1">
                         <div className="flex items-center gap-1.5">
-                            <div className="text-[8px] font-mono uppercase tracking-widest text-white/30">Your Balance</div>
-                            <button onClick={() => setHidden(h => !h)} className="text-white/30 hover:text-white transition-colors">
+                            <div className="text-[8px] font-mono uppercase tracking-widest text-black/30">Your Balance</div>
+                            <button onClick={() => setHidden(h => !h)} className="text-black/30 hover:text-black transition-colors">
                                 {hidden ? <EyeOff size={10} /> : <Eye size={10} />}
                             </button>
                         </div>
-                        <div className="font-mono font-black text-2xl text-white">
+                        <div className="font-mono font-black text-2xl text-black">
                             {hidden ? '••••' : qdBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}
-                            <span className="text-sm ml-1.5 text-white/40">QDs</span>
+                            <span className="text-sm ml-1.5 text-black/40">QDs</span>
                         </div>
-                        <button onClick={() => refetchBalance()} className="text-white/25 hover:text-white/60 transition-colors mt-0.5">
+                        <button onClick={() => refetchBalance()} className="text-black/25 hover:text-black/60 transition-colors mt-0.5">
                             <RefreshCw size={10} />
                         </button>
                     </div>
                 </div>
 
-                {/* Stats strip */}
                 <div className="grid grid-cols-3 gap-3 mb-5">
                     {[
                         { label: 'Total Receipts', value: totalReceipts.toLocaleString() },
                         { label: 'Your Receipts',  value: userCount.toLocaleString()      },
                         { label: 'Chain',          value: CHAIN_NAME                      },
                     ].map(({ label, value }) => (
-                        <div key={label} className="bg-white/[0.07] rounded-xl px-3 py-2">
-                            <div className="text-[7px] font-mono uppercase tracking-widest text-white/30 mb-0.5">{label}</div>
-                            <div className="font-mono font-black text-xs text-white">{value}</div>
+                        <div key={label} className="bg-white border border-black/5 rounded-xl px-3 py-2 shadow-sm">
+                            <div className="text-[7px] font-mono uppercase tracking-widest text-black/30 mb-0.5">{label}</div>
+                            <div className="font-mono font-black text-xs text-black">{value}</div>
                         </div>
                     ))}
                 </div>
@@ -1225,7 +1224,7 @@ export function QuantumDotsPanel() {
                         { icon: <Shield size={8} />,     label: 'Keccak-256'       },
                         { icon: <Infinity size={8} />,   label: 'Immutable Receipt' },
                     ].map(b => (
-                        <div key={b.label} className="flex items-center gap-1 px-2 py-1 rounded-full border border-white/10 text-white/40 text-[7px] font-mono font-black uppercase tracking-widest">
+                        <div key={b.label} className="flex items-center gap-1 px-2 py-1 rounded-full border border-black/10 text-black/40 bg-white text-[7px] font-mono font-black uppercase tracking-widest shadow-sm">
                             {b.icon}{b.label}
                         </div>
                     ))}
