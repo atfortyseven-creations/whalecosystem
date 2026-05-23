@@ -364,8 +364,8 @@ function ConnectedScreen({
           className="w-full flex flex-col items-center justify-center text-center mb-2 px-6"
         >
           <img 
-            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-core-fiction-photo-picture-image_3222092.jpg" 
-            alt="Silver Atom Logo" 
+            src="/official-whale-monochrome.png" 
+            alt="Whale Logo" 
             className="w-full max-w-[85vw] sm:max-w-xs h-auto object-contain mx-auto mb-6 scale-[1.4]"
             style={{ imageRendering: 'high-quality' as any, mixBlendMode: 'multiply' }}
           />

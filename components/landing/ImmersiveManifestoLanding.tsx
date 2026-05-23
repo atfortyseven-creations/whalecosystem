@@ -74,10 +74,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
             )}
 
             {/* Buttons  side by side, centered below atom */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 w-full mt-4">
               <Link
                 href="/portfolio"
-                className="flex items-center justify-center w-full sm:w-auto min-w-[260px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center"
+                className="flex items-center justify-center w-full sm:w-auto min-w-[260px] px-8 py-5 bg-[#050505] text-white hover:bg-[#222] rounded-full font-mono text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-transform active:scale-95 text-center shadow-lg"
               >
                 Don&apos;t have an Account yet?
               </Link>

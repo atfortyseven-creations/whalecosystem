@@ -6,27 +6,27 @@ import { AztecZKMetrics } from "./AztecZKMetrics";
 const SECURITY_PILLARS = [
   {
     index: "01",
-    label: "Aztec Network Substrate",
-    protocol: "PRIVACY-FIRST L2 ZK-ROLLUP",
-    body: "The Humanity Ledger's core cryptographic layer is anchored to the Aztec Network. Rather than relying on transparent EVM execution, our system leverages Aztec's privacy-preserving virtual machine. By executing private functions directly on the user's device and managing encrypted UTXOs, we guarantee that all smart contract logic, capital flows, and state transitions remain strictly confidential before settling securely on Ethereum."
+    label: "Private by Default",
+    protocol: "Zk-Rollup",
+    body: "Our core system is built on the Aztec Network. Instead of public smart contracts, we use private execution on your device to ensure all your actions, funds, and data stay completely confidential before settling on Ethereum."
   },
   {
     index: "02",
     label: "Absolute Privacy",
-    protocol: "ZERO-KNOWLEDGE ARCHITECTURE",
-    body: "The Humanity Ledger ensures that your identity, portfolio, and strategic operations remain secure and private. Our infrastructure guarantees that your interactions remain confidential, operating with complete discretion at all times."
+    protocol: "Zero-Knowledge",
+    body: "Your identity, assets, and activities remain completely secure. Our infrastructure guarantees that your interactions stay private at all times."
   },
   {
     index: "03",
-    label: "Institutional Security",
-    protocol: "CRYPTOGRAPHIC VAULT",
-    body: "Built specifically for demanding funds and quantitative analysts, our platform operates without conventional passwords. We rely on mathematically verified cryptography to secure your session, eliminating the vulnerabilities associated with traditional data breaches."
+    label: "Maximum Security",
+    protocol: "Verified Cryptography",
+    body: "Built for maximum safety, our platform works without traditional passwords. We use advanced cryptography to secure your account, protecting you from data breaches."
   },
   {
     index: "04",
-    label: "Untraceable Operations",
-    protocol: "E2EE ENCRYPTED TUNNELS",
-    body: "Every action you take within the Network, from market queries to direct communications, is routed through secure, end-to-end encrypted tunnels. Your strategy is your edge; we make sure it remains protected."
+    label: "Secure Operations",
+    protocol: "Encrypted Tunnels",
+    body: "Every action you take is routed through secure, end-to-end encrypted connections. Your data and strategies are always protected from third-party viewing."
   }
 ];
 
@@ -41,44 +41,44 @@ const HIGHLIGHTS = [
 
 const AZTEC_EXTENDED_POINTS = [
   {
-    title: "Private Functions",
-    desc: "Client-side execution of proprietary logic guarantees that your operational algorithms and parameter configurations remain entirely confidential before any state generation occurs."
+    title: "Private Actions",
+    desc: "Actions run on your device to keep your logic and parameters completely confidential."
   },
   {
-    title: "Public Functions",
-    desc: "Transparent virtual machine operations reserved exclusively for synchronized liquidity pools where global state visibility is a mandatory regulatory requirement."
+    title: "Public Operations",
+    desc: "Transparent operations are used only when public visibility is required, like in shared liquidity pools."
   },
   {
-    title: "Encrypted UTXOs",
-    desc: "Mathematical representations of assets and strategic data structured as Unspent Transaction Outputs, ensuring that only the entity holding the decryption key can access the underlying variables."
+    title: "Encrypted Assets",
+    desc: "Your assets and data are mathematically encrypted so only you can access them."
   },
   {
-    title: "Public Merkle Trees",
-    desc: "Transparent state maintenance utilized strictly for global consensus and network health verification, carefully isolated to prevent the leakage of any specific institutional entity data."
+    title: "Public Trees",
+    desc: "We maintain network health securely without exposing any of your personal data."
   },
   {
-    title: "Atomic Composability",
-    desc: "Seamless interoperability bridging private UTXO state and public transparent state within a single transaction, allowing complex quantitative strategies to execute without fragmentation."
+    title: "Seamless Flow",
+    desc: "Easily mix private and public actions in a single step without complicated bridging."
   },
   {
-    title: "L1  L2 Messaging",
-    desc: "A secure, trustless message-passing protocol between Ethereum Mainnet and the Humanity Ledger's Rollup, eliminating reliance on vulnerable third-party bridging infrastructure."
+    title: "Secure Messaging",
+    desc: "A direct and safe way to communicate between Ethereum and our network without risky third parties."
   },
   {
-    title: "Client-Side Proving",
-    desc: "The generation of zero-knowledge proofs occurs directly on your local hardware. This architectural decision mathematically guarantees that no unencrypted data is ever transmitted to centralized sequencers."
+    title: "Local Proving",
+    desc: "Security proofs are generated on your own device, ensuring your raw data never leaves your hands."
   },
   {
-    title: "Decentralized Sequencing",
-    desc: "A distributed network of node operators responsible for ordering transactions. Because payloads are encrypted prior to submission, sequencers cannot decipher, front-run, or censor your operations."
+    title: "Decentralized Network",
+    desc: "A globally distributed network processes transactions blindly, meaning they cannot front-run or censor you."
   },
   {
-    title: "Noir Circuit Logic",
-    desc: "Smart contracts are written in Noir, a Rust-based domain-specific language designed for creating provably secure, bug-free cryptographic circuits tailored for high-frequency environments."
+    title: "Safe Smart Contracts",
+    desc: "Built with Noir, a secure programming language designed to prevent bugs and keep operations safe."
   },
   {
-    title: "Anti-Sybil Synergies",
-    desc: "By blending Aztec's cryptographic anonymity with our proprietary Biometric ZK-Liveness checks, the network completely eliminates automated botnets while preserving the absolute privacy of human operators."
+    title: "Bot Prevention",
+    desc: "We stop automated bots completely using biometric liveness checks while keeping real human users fully anonymous."
   }
 ];
 
@@ -94,23 +94,25 @@ export function AztecArchitectureSection() {
 
         {/*  Section Header  */}
         <div className="w-full max-w-[850px] flex flex-col gap-6 text-left">
-          <div className="border-b-[1.5px] border-black pb-3 flex items-end justify-between">
-            <h2 className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-black">
-              Security Infrastructure  Zero-Trust Protocol
-            </h2>
+          <div className="border-b border-slate-200/60 pb-5 flex flex-col items-start justify-start w-full">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-slate-900 leading-none">
+              Security Infrastructure
+            </h1>
+            <span className="mt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              Zero-Trust Protocol
+            </span>
           </div>
 
-          <div className="flex flex-col gap-4 font-serif text-[15px] sm:text-[16px] text-[#222] leading-relaxed text-left">
+          <div className="flex flex-col gap-4 font-sans text-sm text-slate-500 font-medium leading-relaxed max-w-xl text-left">
             <p>
-              In the modern era of on-chain analytics, raw data is only half of the equation. 
-              The true advantage lies in <strong>operational secrecy</strong>. Our infrastructure is built 
-              from the ground up on a foundation of absolute privacy, ensuring that your institutional 
-              movements and analytical queries are never exposed.
+              In the modern era of the internet, your data needs protection. 
+              Our system is built from the ground up on a foundation of absolute privacy, 
+              ensuring that your actions and information are never exposed to the public.
             </p>
             <p>
-              Unlike conventional analytics platforms that track your behavior, 
-              Humanity Ledger separates the act of participating from the act of revealing it. 
-              You gain total visibility over the market while maintaining operational privacy.
+              Unlike conventional platforms that track your every move, 
+              we separate the act of participating from the act of revealing who you are. 
+              You gain total access while maintaining complete personal privacy.
             </p>
           </div>
         </div>

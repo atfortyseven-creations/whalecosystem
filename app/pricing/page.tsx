@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, Check, Lock, Zap, BarChart2, MessageSquare, Briefcase, Users } from 'lucide-react';
+import { Loader2, Check, Lock, Zap, BarChart2, MessageSquare, Briefcase, Users, Shield, Eye, Globe } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { PRICING_TIERS, TIER_RANK, SECTION_FEATURES } from '@/lib/config/pricing-tiers';
 import type { SectionFeatureGroup } from '@/lib/config/pricing-tiers';
@@ -31,7 +31,25 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
   community: <Users size={16} />,
 };
 
-// 
+// Aztec integration trust badges
+const AZTEC_PILLARS = [
+  {
+    icon: <Shield size={20} />,
+    title: 'Private by Default',
+    desc: 'Built on Aztec Network — your data never leaves your device unencrypted.',
+  },
+  {
+    icon: <Eye size={20} />,
+    title: 'No Tracking, Ever',
+    desc: 'We cannot see who you are. Your wallet is your identity — nothing else.',
+  },
+  {
+    icon: <Globe size={20} />,
+    title: 'Decentralized Infrastructure',
+    desc: 'No single server controls your data. The network is global and censorship-resistant.',
+  },
+];
+
 export default function PricingPage() {
   const { isConnected, isSystemHandshake, address } = useSystemAccount();
   const router = useRouter();
@@ -58,12 +76,12 @@ export default function PricingPage() {
 
   const handleSubscribeClick = async (planId: string) => {
     if (currentTierLevel >= (TIER_RANK[planId as keyof typeof TIER_RANK] ?? 0)) {
-      toast.info('Access Level Already Granted');
+      toast.info('You already have this access level');
       router.push('/dashboard');
       return;
     }
     if (!isConnected || !address) {
-      toast.info('Please connect your wallet first');
+      toast.info('Please connect your wallet to continue');
       open({ view: 'Connect' });
       return;
     }
@@ -78,7 +96,7 @@ export default function PricingPage() {
       if (r.ok && data.url) {
         window.location.href = data.url;
       } else {
-        throw new Error(data.error || 'Failed to initialize checkout');
+        throw new Error(data.error || 'Failed to start checkout');
       }
     } catch (err: any) {
       toast.error('Checkout error', { description: err.message });
@@ -88,15 +106,13 @@ export default function PricingPage() {
   };
 
   const activeSectionData = SECTION_FEATURES.find(s => s.section === activeSection)!;
-  const freeTier     = PRICING_TIERS[0];
-  const standardTier = PRICING_TIERS[1];
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-[#FAFAF8] text-black font-sans selection:bg-black/10">
       <div className="relative z-10 w-full flex flex-col items-center">
 
         {/*  HERO  */}
-        <section className="w-full pt-36 pb-20 px-6 border-b border-black/5 relative z-10 flex flex-col justify-center items-center text-center overflow-hidden">
+        <section className="w-full pt-36 pb-24 px-6 border-b border-black/5 relative z-10 flex flex-col justify-center items-center text-center overflow-hidden">
           {/* Subtle grid bg */}
           <div className="pointer-events-none absolute inset-0 opacity-[0.025]"
             style={{
@@ -104,38 +120,39 @@ export default function PricingPage() {
               backgroundSize: '60px 60px',
             }} />
 
-          <div className="w-full max-w-[1200px] mx-auto space-y-8 relative z-10">
+          <div className="w-full max-w-[1200px] mx-auto space-y-10 relative z-10">
             <MotionDiv initial="hidden" animate="visible" variants={FADE_UP} className="flex flex-col items-center gap-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/80 backdrop-blur-sm shadow-sm">
                 <Zap size={12} className="text-black/50" />
                 <span className="font-mono text-[10px] font-black uppercase tracking-[0.25em] text-black/50">
-                  Whale Alert Network  Access Plans
+                  Whale Alert Network — Pricing
                 </span>
               </div>
 
-              <h1 className="text-[56px] md:text-[96px] font-black uppercase tracking-tighter leading-[0.88] text-[#050505]">
-                Unlock Full<br />
-                <span className="text-black/15">Analytics.</span>
+              <h1 className="text-[52px] md:text-[88px] font-black uppercase tracking-tighter leading-[0.88] text-[#050505]">
+                Simple,<br />
+                <span className="text-black/15">Honest Pricing.</span>
               </h1>
 
-              <p className="text-[17px] md:text-[20px] font-serif text-black/50 max-w-2xl leading-relaxed mx-auto">
-                Choose your access level. The <strong className="text-black/70 font-semibold">15/month</strong> plan unlocks
-                institutional-grade features across every section of the platform  Dashboard, Chat, Portfolio and Community.
+              <p className="text-[17px] md:text-[19px] font-serif text-black/55 max-w-2xl leading-relaxed mx-auto">
+                Start for free and track whale movements with no commitment. 
+                Upgrade to <strong className="text-black/80 font-semibold">Pro for $15/month</strong> to unlock every tool 
+                across the entire platform — Dashboard, Chat, Portfolio, and Community.
               </p>
             </MotionDiv>
 
-            {/* Animated stats bar */}
+            {/* Key stats */}
             <MotionDiv
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="flex flex-wrap items-center justify-center gap-8 pt-4"
+              className="flex flex-wrap items-center justify-center gap-10 pt-2"
             >
               {[
-                { value: '', label: 'Whale Movements' },
-                { value: '8+', label: 'Pro Features / Tab' },
-                { value: '4', label: 'System Sections' },
-                { value: '15', label: 'Per Month' },
+                { value: 'Free', label: 'To get started' },
+                { value: '$15', label: 'Per month for Pro' },
+                { value: '4', label: 'Fully unlocked sections' },
+                { value: '∞', label: 'Whale movements tracked' },
               ].map(({ value, label }) => (
                 <div key={label} className="flex flex-col items-center gap-1">
                   <span className="font-mono text-[28px] md:text-[36px] font-black tracking-tighter text-[#050505] leading-none">
@@ -147,11 +164,31 @@ export default function PricingPage() {
                 </div>
               ))}
             </MotionDiv>
+
+            {/* Aztec trust strip */}
+            <MotionDiv
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2"
+            >
+              {AZTEC_PILLARS.map(({ icon, title, desc }) => (
+                <div key={title} className="flex items-start gap-3 max-w-[260px] text-left">
+                  <div className="shrink-0 w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-black/50 mt-0.5">
+                    {icon}
+                  </div>
+                  <div>
+                    <p className="font-mono text-[10px] font-black uppercase tracking-wider text-black/70 mb-0.5">{title}</p>
+                    <p className="font-serif text-[12px] text-black/40 leading-snug">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </MotionDiv>
           </div>
         </section>
 
         {/*  PRICING CARDS  */}
-        <section className="w-full py-20 px-6 relative z-10 flex flex-col items-center">
+        <section className="w-full py-24 px-6 relative z-10 flex flex-col items-center">
           <div className="max-w-[1100px] mx-auto w-full">
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -175,8 +212,8 @@ export default function PricingPage() {
                     {isPro && (
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                         <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black shadow-lg">
-                          <span className="text-[10px]"></span>
-                          <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em]">Most Valuable</span>
+                          <span className="text-[10px]">⭐</span>
+                          <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em]">Most Popular</span>
                         </div>
                       </div>
                     )}
@@ -185,10 +222,10 @@ export default function PricingPage() {
                     <div className="mb-10 pb-10 border-b border-white/10">
                       <div className="flex items-start justify-between gap-4 mb-5">
                         <div>
-                          <h2 className={`text-[28px] md:text-[34px] font-black uppercase tracking-tighter leading-none mb-2 ${isPro ? 'text-white' : 'text-[#050505]'}`}>
+                          <h2 className={`text-[26px] md:text-[32px] font-black uppercase tracking-tighter leading-none mb-2 ${isPro ? 'text-white' : 'text-[#050505]'}`}>
                             {tier.name}
                           </h2>
-                          <p className={`font-mono text-[10px] font-bold uppercase tracking-[0.18em] leading-relaxed max-w-xs ${isPro ? 'text-white/50' : 'text-black/40'}`}>
+                          <p className={`font-serif text-[14px] leading-relaxed max-w-xs ${isPro ? 'text-white/50' : 'text-black/45'}`}>
                             {tier.tagline}
                           </p>
                         </div>
@@ -196,16 +233,18 @@ export default function PricingPage() {
 
                       <div className="flex items-baseline gap-2">
                         <span className={`text-[72px] font-black tracking-tighter leading-none ${isPro ? 'text-white' : 'text-[#050505]'}`}>
-                          {tier.priceMonthly}
+                          {tier.priceMonthly === '0' ? 'Free' : `$${tier.priceMonthly}`}
                         </span>
-                        <span className={`text-[11px] font-black uppercase tracking-widest ${isPro ? 'text-white/30' : 'text-black/25'}`}>
-                          / month
-                        </span>
+                        {tier.priceMonthly !== '0' && (
+                          <span className={`text-[11px] font-black uppercase tracking-widest ${isPro ? 'text-white/30' : 'text-black/25'}`}>
+                            / month
+                          </span>
+                        )}
                       </div>
 
                       {isPro && (
                         <p className="mt-3 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-white/30">
-                          150 / year  save 2 months
+                          Or $150/year — save 2 months
                         </p>
                       )}
                     </div>
@@ -246,24 +285,37 @@ export default function PricingPage() {
                       {isLoading ? (
                         <Loader2 size={16} className="animate-spin" />
                       ) : !isTierLoaded ? (
-                        <div className="flex items-center gap-2"><Loader2 size={13} className="animate-spin" /> Syncing...</div>
+                        <div className="flex items-center gap-2"><Loader2 size={13} className="animate-spin" /> Loading...</div>
                       ) : isGranted ? (
-                        ' Access Level Granted'
+                        '✓ Access Active'
                       ) : tier.id === 'FREE' ? (
-                        isConnected ? 'Current Access Level' : 'Initialize Connection'
+                        isConnected ? 'Go to Dashboard' : 'Get Started Free'
                       ) : (
-                        'Acquire Institutional License'
+                        'Unlock Full Access — $15/mo'
                       )}
                     </button>
                   </MotionDiv>
                 );
               })}
             </div>
+
+            {/* What's included note */}
+            <MotionDiv
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="mt-10 text-center"
+            >
+              <p className="font-serif text-[14px] text-black/40 max-w-xl mx-auto leading-relaxed">
+                Both plans include our Aztec-powered privacy login — no email, no password, no tracking. 
+                Your wallet is your identity. Cancel anytime, no questions asked.
+              </p>
+            </MotionDiv>
           </div>
         </section>
 
-        {/*  SECTION COMPARISON: TABS  */}
-        <section className="w-full py-20 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-white">
+        {/*  WHAT'S DIFFERENT: SECTION TABS  */}
+        <section className="w-full py-24 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-white">
           <div className="max-w-[1100px] mx-auto w-full">
 
             <MotionDiv
@@ -272,12 +324,12 @@ export default function PricingPage() {
               className="text-center mb-14"
             >
               <h2 className="text-[36px] md:text-[64px] font-black uppercase tracking-tighter text-[#050505] leading-none mb-5">
-                What You Unlock<br />
-                <span className="text-black/15">Per Section.</span>
+                What Changes<br />
+                <span className="text-black/15">With Pro.</span>
               </h2>
               <p className="font-serif text-[17px] text-black/45 max-w-xl mx-auto leading-relaxed">
-                Every tab of Whale Alert Network gets a premium upgrade with the 15 plan.
-                Select a section below to see exactly what changes.
+                Every section of Whale Alert Network gets a full upgrade with the $15 plan.
+                Click a section below to see exactly what you unlock.
               </p>
             </MotionDiv>
 
@@ -310,7 +362,7 @@ export default function PricingPage() {
                     {SECTION_ICONS[activeSection]}
                   </div>
                   <div>
-                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30 mb-0.5">Free</p>
+                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30 mb-0.5">Free Plan</p>
                     <p className="font-black text-[15px] uppercase tracking-tight text-black">Whale Alert Network</p>
                   </div>
                 </div>
@@ -327,9 +379,8 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              {/* STANDARD column */}
+              {/* PRO column */}
               <div className="rounded-[2rem] bg-[#050505] p-8 md:p-10 relative overflow-hidden">
-                {/* subtle radial glow */}
                 <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-10"
                   style={{ background: 'radial-gradient(circle, #fff 0%, transparent 70%)' }} />
 
@@ -338,8 +389,8 @@ export default function PricingPage() {
                     {SECTION_ICONS[activeSection]}
                   </div>
                   <div>
-                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5"> Institutional</p>
-                    <p className="font-black text-[15px] uppercase tracking-tight text-white">Whale Alert Network +</p>
+                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">Pro Plan</p>
+                    <p className="font-black text-[15px] uppercase tracking-tight text-white">Whale Alert Network Pro</p>
                   </div>
                 </div>
 
@@ -361,13 +412,13 @@ export default function PricingPage() {
                     disabled={isTierLoaded && currentTierLevel >= 1}
                     className="w-full py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.25em] rounded-[1.2rem] hover:bg-white/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    {isTierLoaded && currentTierLevel >= 1 ? ' Already Unlocked' : 'Unlock This Section  15/mo'}
+                    {isTierLoaded && currentTierLevel >= 1 ? '✓ Already Unlocked' : 'Unlock This Section — $15/mo'}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Section navigator arrows */}
+            {/* Section navigator dots */}
             <div className="flex items-center justify-center gap-3 mt-8">
               {SECTION_FEATURES.map(s => (
                 <button
@@ -383,7 +434,7 @@ export default function PricingPage() {
         </section>
 
         {/*  FULL FEATURE MATRIX  */}
-        <section className="w-full py-20 px-6 border-t border-black/5 relative z-10 flex flex-col items-center">
+        <section className="w-full py-24 px-6 border-t border-black/5 relative z-10 flex flex-col items-center">
           <div className="max-w-[1100px] mx-auto w-full">
 
             <MotionDiv
@@ -392,9 +443,12 @@ export default function PricingPage() {
               className="text-center mb-14"
             >
               <h2 className="text-[36px] md:text-[64px] font-black uppercase tracking-tighter text-[#050505] leading-none mb-5">
-                Full<br />
+                Full Feature<br />
                 <span className="text-black/15">Comparison.</span>
               </h2>
+              <p className="font-serif text-[17px] text-black/45 max-w-xl mx-auto leading-relaxed">
+                Every feature, side by side. No hidden costs, no surprise paywalls.
+              </p>
             </MotionDiv>
 
             <div className="overflow-hidden rounded-[2rem] border border-black/8 bg-white shadow-sm">
@@ -402,7 +456,7 @@ export default function PricingPage() {
               <div className="grid grid-cols-[1fr_140px_140px] border-b border-black/8">
                 <div className="p-6 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30">Feature</div>
                 <div className="p-6 text-center font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30 border-l border-black/5">Free</div>
-                <div className="p-6 text-center font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white bg-[#050505] border-l border-black/5 rounded-tr-[2rem]"> Pro</div>
+                <div className="p-6 text-center font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white bg-[#050505] border-l border-black/5 rounded-tr-[2rem]">Pro</div>
               </div>
 
               {/* Rows */}
@@ -418,7 +472,6 @@ export default function PricingPage() {
                     <div className="border-l border-black/5 bg-[#050505]/[0.02]" />
                   </div>
 
-                  {/* Max rows between free/pro */}
                   {Array.from({ length: Math.max(section.freeFeatures.length, section.proFeatures.length) }).map((_, ri) => {
                     const freeFeat = section.freeFeatures[ri];
                     const proFeat  = section.proFeatures[ri];
@@ -447,7 +500,7 @@ export default function PricingPage() {
               <div className="grid grid-cols-[1fr_140px_140px]">
                 <div className="p-6" />
                 <div className="p-4 border-l border-black/5 flex items-center justify-center">
-                  <span className="font-mono text-[10px] font-black text-black/30">0</span>
+                  <span className="font-mono text-[10px] font-black text-black/30">$0</span>
                 </div>
                 <div className="p-4 border-l border-black/5 bg-[#050505] flex items-center justify-center rounded-br-[2rem]">
                   <button
@@ -456,7 +509,7 @@ export default function PricingPage() {
                     disabled={isTierLoaded && currentTierLevel >= 1}
                     className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-white hover:text-white/70 transition-colors disabled:opacity-40"
                   >
-                    {isTierLoaded && currentTierLevel >= 1 ? ' Active' : '15 / mo '}
+                    {isTierLoaded && currentTierLevel >= 1 ? '✓ Active' : '$15 / mo →'}
                   </button>
                 </div>
               </div>
@@ -464,35 +517,88 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/*  VALUE PROPOSITION CALLOUT  */}
-        <section className="w-full py-20 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-[#050505]">
+        {/*  AZTEC PRIVACY CALLOUT  */}
+        <section className="w-full py-24 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-white">
+          <div className="max-w-[900px] mx-auto w-full">
+            <MotionDiv
+              initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
+              variants={FADE_UP}
+              className="flex flex-col items-center text-center gap-10"
+            >
+              <div>
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-4 block">
+                  How Your Privacy Works
+                </span>
+                <h2 className="text-[36px] md:text-[56px] font-black uppercase tracking-tighter text-[#050505] leading-none mb-6">
+                  No Email.<br />
+                  <span className="text-black/15">No Password. No Tracking.</span>
+                </h2>
+                <p className="font-serif text-[16px] md:text-[18px] text-black/50 max-w-2xl mx-auto leading-relaxed">
+                  We've built our entire login and data system on top of the <strong className="text-black/70">Aztec Network</strong> — 
+                  a privacy-first blockchain layer. When you sign in with your wallet, a 
+                  mathematical proof verifies who you are without revealing any personal information. 
+                  We literally cannot see your name, email, or browsing habits. Your wallet is your account.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                {[
+                  {
+                    title: 'Zero-Knowledge Login',
+                    desc: 'Your wallet signs a cryptographic challenge. We verify the math — not your identity.',
+                    badge: 'Aztec Network',
+                  },
+                  {
+                    title: 'Encrypted by Default',
+                    desc: 'All sensitive operations happen on your device first. Only the proof is ever transmitted.',
+                    badge: 'Client-Side',
+                  },
+                  {
+                    title: 'Censorship Resistant',
+                    desc: 'Your access cannot be revoked by a single server or authority. The network is global.',
+                    badge: 'Decentralized',
+                  },
+                ].map(({ title, desc, badge }) => (
+                  <div key={title} className="flex flex-col gap-3 p-6 rounded-[1.5rem] border border-black/8 bg-[#FAFAF8] text-left">
+                    <span className="inline-block px-2 py-0.5 rounded-full bg-black/5 font-mono text-[8px] font-black uppercase tracking-widest text-black/40 w-fit">{badge}</span>
+                    <p className="font-mono text-[11px] font-black uppercase tracking-tight text-black">{title}</p>
+                    <p className="font-serif text-[13px] text-black/50 leading-relaxed">{desc}</p>
+                  </div>
+                ))}
+              </div>
+            </MotionDiv>
+          </div>
+        </section>
+
+        {/*  FINAL CTA  */}
+        <section className="w-full py-24 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-[#050505]">
           <div className="max-w-[900px] mx-auto w-full text-center">
             <MotionDiv
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
               variants={FADE_UP}
             >
               <p className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6">
-                Institutional Analytics
+                Ready to Start?
               </p>
               <h2 className="text-[40px] md:text-[72px] font-black uppercase tracking-tighter leading-[0.88] text-white mb-8">
-                Every Section.<br />
-                <span className="text-white/20">Fully Unlocked.</span>
+                Track Every Move.<br />
+                <span className="text-white/20">Stay Private.</span>
               </h2>
               <p className="font-serif text-[18px] text-white/45 max-w-2xl mx-auto leading-relaxed mb-12">
-                For the price of a coffee subscription, you get full institutional access to whale
-                analytics across all four pillars of the platform. No paywalls mid-session.
-                No feature locks on the features that matter.
+                For $15 a month — less than a coffee per week — you get unlimited whale tracking, 
+                AI predictions, VIP chat channels, multi-wallet portfolio management, and a verified 
+                community badge. No contracts. Cancel anytime.
               </p>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                 {[
-                  { icon: '', label: 'Dashboard', desc: 'AI predictions + unlimited movements' },
-                  { icon: '', label: 'Whale Chat', desc: 'VIP channels + analyst alpha' },
-                  { icon: '', label: 'Portfolio', desc: 'Multi-wallet + copytrading signals' },
-                  { icon: '', label: 'Community', desc: 'Verified badge + DAO voting' },
+                  { icon: '📊', label: 'Dashboard', desc: 'Unlimited movements + AI predictions' },
+                  { icon: '💬', label: 'Whale Chat', desc: 'VIP channels + analyst signals' },
+                  { icon: '📈', label: 'Portfolio', desc: 'Multi-wallet + copy-trading alerts' },
+                  { icon: '🏅', label: 'Community', desc: 'Verified badge + DAO voting' },
                 ].map(({ icon, label, desc }) => (
                   <div key={label} className="flex flex-col gap-2 p-5 rounded-[1.5rem] border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] transition-colors">
-                    <span className="text-[20px] text-white/40">{icon}</span>
+                    <span className="text-[20px]">{icon}</span>
                     <p className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-white/60">{label}</p>
                     <p className="text-[12px] text-white/30 font-serif leading-snug">{desc}</p>
                   </div>
@@ -508,11 +614,15 @@ export default function PricingPage() {
                 {loadingTier === 'STANDARD' ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : isTierLoaded && currentTierLevel >= 1 ? (
-                  ' Institutional License Active'
+                  '✓ Pro Access Active'
                 ) : (
-                  'Acquire Institutional License  15/mo'
+                  'Unlock Full Access — $15/mo'
                 )}
               </button>
+
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/20 mt-6">
+                Powered by Aztec Network · No personal data stored · Cancel anytime
+              </p>
             </MotionDiv>
           </div>
         </section>

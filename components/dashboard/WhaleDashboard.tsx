@@ -55,7 +55,9 @@ const RouteRenderer = React.memo(({ route, reconciliationKey }: RouteRendererPro
         'inst-ledger': <Registry.InstitutionalLedger />,
         'mass-transfer': <Registry.MassTransferIntel />,
         'logs': <Registry.SessionLogsPanel />,
-        'support': <Registry.WhaleSupport />
+        'support': <Registry.WhaleSupport />,
+        'community': <Registry.WhaleChat />,
+        'privacy': <Registry.SessionLogsPanel />
     };
 
     const targetComponent = ComponentMap[route] || <GoldTicketPanel />;

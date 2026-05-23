@@ -20,21 +20,26 @@ export function AztecZKMetrics() {
   }, []);
 
   return (
-    <div className="w-full flex flex-col gap-4 mt-6">
+    <div className="w-full flex flex-col gap-6 mt-6">
       
+      <div className="flex flex-col items-center justify-center mb-4">
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-black/50 font-bold mb-2">Powered By</span>
+        <span className="font-serif text-5xl md:text-6xl tracking-[0.15em] text-black font-black uppercase">AZTEC</span>
+      </div>
+
       {/* Metrics Row */}
-      <div className="grid grid-cols-3 gap-[1px] bg-black/10 border border-black/10 shadow-sm overflow-hidden rounded-xl">
-        <div className="bg-white p-4 flex flex-col items-center justify-center text-center">
-          <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-1">Avg Proof Time</span>
-          <span className="font-mono text-lg font-black text-[#0088cc]">{lastProofTime.toFixed(2)}s</span>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[1px] bg-black/10 border border-black/10 shadow-sm overflow-hidden rounded-xl">
+        <div className="bg-white p-6 md:p-8 flex flex-col items-center justify-center text-center">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/50 mb-2 font-bold">Avg Proof Time</span>
+          <span className="font-mono text-2xl md:text-3xl font-black text-black">{lastProofTime.toFixed(2)}s</span>
         </div>
-        <div className="bg-white p-4 flex flex-col items-center justify-center text-center">
-          <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-1">Proof Size</span>
-          <span className="font-mono text-lg font-black text-black">~480 B</span>
+        <div className="bg-white p-6 md:p-8 flex flex-col items-center justify-center text-center">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/50 mb-2 font-bold">Proof Size</span>
+          <span className="font-mono text-2xl md:text-3xl font-black text-black">~480 B</span>
         </div>
-        <div className="bg-white p-4 flex flex-col items-center justify-center text-center">
-          <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-1">L1 Gas Saved</span>
-          <span className="font-mono text-lg font-black text-green-600">{gasSaved.toFixed(1)} ETH</span>
+        <div className="bg-white p-6 md:p-8 flex flex-col items-center justify-center text-center">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/50 mb-2 font-bold">L1 Gas Saved</span>
+          <span className="font-mono text-2xl md:text-3xl font-black text-black">{gasSaved.toFixed(1)} ETH</span>
         </div>
       </div>
 
@@ -52,8 +57,8 @@ export function AztecZKMetrics() {
           <text x="190" y="104" textAnchor="middle" fill="#FFF" className="font-mono text-[10px] font-bold">Aztec Rollup</text>
 
           {/* Client Prover */}
-          <rect x="0" y="80" width="100" height="40" rx="4" fill="#FAFAF8" stroke="#0088cc" strokeWidth="1.5" />
-          <text x="50" y="104" textAnchor="middle" fill="#0088cc" className="font-mono text-[10px] font-bold">Noir Prover (Client)</text>
+          <rect x="0" y="80" width="100" height="40" rx="4" fill="#FAFAF8" stroke="#000" strokeWidth="1.5" />
+          <text x="50" y="104" textAnchor="middle" fill="#000" className="font-mono text-[10px] font-bold">Noir Prover (Client)</text>
 
           {/* Lines */}
           <path d="M100 100 L140 100" stroke="#000" strokeWidth="1.5" strokeDasharray="4 2" />
@@ -65,13 +70,13 @@ export function AztecZKMetrics() {
 
           {/* Animated Particles */}
           <motion.circle 
-            r="3" fill="#0088cc"
+            r="3" fill="#000"
             initial={{ cx: 100, cy: 100, opacity: 0 }}
             animate={{ cx: [100, 120, 140], cy: 100, opacity: [0, 1, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           />
           <motion.circle 
-            r="3" fill="#222"
+            r="3" fill="#666"
             initial={{ cx: 240, cy: 100, opacity: 0 }}
             animate={{ cx: [240, 260, 280], cy: 100, opacity: [0, 1, 0] }}
             transition={{ duration: 2, delay: 1, repeat: Infinity, ease: "linear" }}
@@ -80,8 +85,8 @@ export function AztecZKMetrics() {
 
         {/* Live status ping */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
-           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-           <span className="font-mono text-[8px] uppercase tracking-widest text-green-600 font-bold">Proving</span>
+           <div className="w-2 h-2 rounded-full bg-black animate-pulse" />
+           <span className="font-mono text-[8px] uppercase tracking-widest text-black font-bold">Proving</span>
         </div>
       </div>
       

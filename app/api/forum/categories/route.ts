@@ -4,22 +4,25 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 const DEFAULT_CATEGORIES = [
-    { name: 'General',    slug: 'general',    description: 'General discussion, announcements, and community updates.', color: '#00C076', orderIndex: 1 },
-    { name: 'Developer',  slug: 'developer',  description: 'Technical discussions, smart contracts, bugs, and development topics.', color: '#9945FF', orderIndex: 2 },
-    { name: 'Partnering', slug: 'partnering', description: 'Partnership proposals, collaboration opportunities, and integrations.', color: '#D4AF37', orderIndex: 3 },
+    { name: 'Whale Network',  slug: 'whale-network',  description: 'Core discussions about whale movements, large transactions, and on-chain intelligence across all chains.', color: '#050505', orderIndex: 1 },
+    { name: 'General',        slug: 'general',        description: 'General community discussions, announcements, and introductions.', color: '#0088cc', orderIndex: 2 },
+    { name: 'Applications',   slug: 'applications',   description: 'Talk about dApps, DeFi protocols, tools, and ecosystem applications.', color: '#00C076', orderIndex: 3 },
+    { name: 'Testnets',       slug: 'testnets',       description: 'Testing environments, devnet updates, and testnet coordination.', color: '#F59E0B', orderIndex: 4 },
+    { name: 'Noir',           slug: 'noir',           description: 'Zero-knowledge circuit development with Noir, proving systems, and ZK research.', color: '#7C3AED', orderIndex: 5 },
+    { name: 'Site Feedback',  slug: 'site-feedback',  description: 'Report bugs, suggest improvements, and share feedback about Whale Alert Network.', color: '#64748B', orderIndex: 6 },
+    { name: 'QDs Connect',    slug: 'qds-connect',    description: 'QDs ecosystem connectivity, integrations, and cross-platform collaboration.', color: '#EC4899', orderIndex: 7 },
 ];
 
 async function ensureDefaultCategories() {
-    // Upsert canonical categories (safe for existing data)
     for (const cat of DEFAULT_CATEGORIES) {
         await (prisma as any).forumCategory.upsert({
             where: { slug: cat.slug },
-            update: { name: cat.name, description: cat.description, orderIndex: cat.orderIndex },
+            update: { name: cat.name, description: cat.description, orderIndex: cat.orderIndex, color: cat.color },
             create: { ...cat },
         });
     }
 
-    // Cascade-delete topics/posts of non-canonical categories before removing them
+    // Remove any legacy categories not in the new list
     try {
         const legacyCategories = await (prisma as any).forumCategory.findMany({
             where: { slug: { notIn: DEFAULT_CATEGORIES.map(c => c.slug) } },
@@ -27,14 +30,12 @@ async function ensureDefaultCategories() {
         });
         if (legacyCategories.length > 0) {
             const legacyIds = legacyCategories.map((c: any) => c.id);
-            // Find topics in legacy categories
             const legacyTopics = await (prisma as any).forumTopic.findMany({
                 where: { categoryId: { in: legacyIds } },
                 select: { id: true },
             });
             const legacyTopicIds = legacyTopics.map((t: any) => t.id);
             if (legacyTopicIds.length > 0) {
-                // Delete dependent records first (FK order matters)
                 await (prisma as any).forumNotification.deleteMany({ where: { topicId: { in: legacyTopicIds } } });
                 await (prisma as any).forumLike.deleteMany({ where: { topicId: { in: legacyTopicIds } } });
                 await (prisma as any).forumPost.deleteMany({ where: { topicId: { in: legacyTopicIds } } });
@@ -49,7 +50,6 @@ async function ensureDefaultCategories() {
 
 export async function GET() {
     try {
-        // Auto-seed on first access if no categories exist
         await ensureDefaultCategories();
 
         const categories = await (prisma as any).forumCategory.findMany({
