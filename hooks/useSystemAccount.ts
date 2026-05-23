@@ -136,6 +136,7 @@ export function useSystemAccount() {
             connector: undefined,
             isSystemHandshake: false,
             isLocalSystemWallet: true,
+            needsWalletReconnect: false,
             isZkVerified,
             isChecking: false,
         };
@@ -158,6 +159,7 @@ export function useSystemAccount() {
             connector: undefined,
             isSystemHandshake: false,
             isLocalSystemWallet: true,
+            needsWalletReconnect: false,
             isZkVerified,
             isChecking: false,
         };
@@ -177,6 +179,7 @@ export function useSystemAccount() {
             chain: wagmiAccount.chain,
             isSystemHandshake: false,
             isLocalSystemWallet: false,
+            needsWalletReconnect: false,
             isZkVerified,
             isChecking: false,
         };
@@ -196,6 +199,7 @@ export function useSystemAccount() {
             connector: undefined,
             isSystemHandshake: true,
             isLocalSystemWallet: false,
+            needsWalletReconnect: !wagmiAccount.isConnected,
             isZkVerified,
             isChecking: false,
         };
@@ -214,6 +218,7 @@ export function useSystemAccount() {
         chain: wagmiAccount.chain,
         isSystemHandshake: false,
         isLocalSystemWallet: false,
+        needsWalletReconnect: false,
         isZkVerified,
         isChecking,
     };

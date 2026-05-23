@@ -201,6 +201,7 @@
     "lru-cache": "^11.2.5",
     "lucide-react": "^0.563.0",
     "merkletreejs": "^0.6.0",
+    "mermaid": "^11.15.0",
     "mongoose": "^8.9.5",
     "neo4j-driver": "^6.0.1",
     "next": "^15.2.0",

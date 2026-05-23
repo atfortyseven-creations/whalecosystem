@@ -4,6 +4,8 @@ import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ZoomIn, ZoomOut, Maximize, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { FooterPageIntro } from '@/components/landing/FooterPageIntro';
+import { ROADMAP_SECTIONS } from '@/lib/content/footerPagesAztec';
 
 // === DATA ===
 const ROADMAP_DATA = [
@@ -102,8 +104,16 @@ export default function RoadmapPage() {
             <span className="text-[#c4f344] italic">to the Future</span>
           </h1>
           <p className="mt-4 text-xl md:text-2xl text-[#f344d5] max-w-2xl font-medium tracking-tight">
-            Our journey towards a fully decentralized, privacy-preserving Identity & Portfolio Network.
+            How we plan to ship private identity, portfolio tools, and community features—on Aztec, with Noir for policy, and Ethereum for settlement.
           </p>
+          <div className="mt-6 max-w-2xl">
+            <FooterPageIntro
+              title="Roadmap overview"
+              sections={ROADMAP_SECTIONS}
+              defaultOpen={false}
+              dark
+            />
+          </div>
         </div>
 
         {/* CONTROLS */}

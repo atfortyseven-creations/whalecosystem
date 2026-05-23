@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { SystemFooter } from '@/components/landing/SystemFooter';
+import { FooterPageIntro } from '@/components/landing/FooterPageIntro';
+import { COMMUNITY_FORUM_INTRO } from '@/lib/content/footerPagesAztec';
 import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -493,12 +495,22 @@ function ForumHomeContent() {
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 leading-none mb-2">Forum</h1>
-            <p className="text-[14px] text-slate-500 font-medium">A structured space for discussion, ideas, and knowledge sharing.</p>
+            <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 leading-none mb-2">
+              Token Forum
+            </h1>
+            <p className="text-[14px] text-slate-500 font-medium max-w-xl leading-relaxed">
+              Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics—with community guidelines and optional private governance as circuits ship.
+            </p>
           </div>
           <div className="flex flex-col gap-3">
           </div>
         </div>
+
+        <FooterPageIntro
+          title="About this forum"
+          sections={COMMUNITY_FORUM_INTRO}
+          defaultOpen={false}
+        />
 
         {/* ── CATEGORIES VIEW ── */}
         {activeTab === 'categories' && (

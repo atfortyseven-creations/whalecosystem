@@ -19,6 +19,7 @@ import {
   Newspaper, GraduationCap, Briefcase, Activity, TrendingUp
 } from 'lucide-react';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { ATOM_PNGTREE } from '@/lib/constants/systemAssets';
 
 //  Reown AppKit + WagmiAdapter localStorage key patterns 
 // These are ALL the keys that Reown AppKit v1/v2 and its WagmiAdapter write
@@ -363,12 +364,15 @@ function ConnectedScreen({
           style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
           className="w-full flex flex-col items-center justify-center text-center mb-2 px-6"
         >
-          <img 
-            src="/official-whale-monochrome.png" 
-            alt="Whale Logo" 
-            className="w-full max-w-[85vw] sm:max-w-xs h-auto object-contain mx-auto mb-6 scale-[1.4]"
-            style={{ imageRendering: 'high-quality' as any, mixBlendMode: 'multiply' }}
-          />
+          <div className="w-full max-w-[280px] mx-auto mb-6 flex items-center justify-center">
+            <img
+              src={ATOM_PNGTREE}
+              alt="Silver Atom"
+              className="w-full h-auto max-h-[220px] object-contain"
+              style={{ mixBlendMode: 'multiply' }}
+              draggable={false}
+            />
+          </div>
           <p className="text-[64px] sm:text-[72px] font-light tracking-[-0.04em] leading-none tabular-nums text-black">
             {fmtTime(now)}
           </p>
@@ -461,7 +465,16 @@ function ConnectedScreen({
             onClick={onScan}
             className="w-full flex items-center justify-between py-5 px-6 rounded-2xl bg-black text-white font-medium tracking-tight text-[15px] active:scale-[0.98] transition-all group"
           >
-            <span>Open QR Scanner</span>
+            <div className="flex items-center gap-3">
+              <img
+                src={ATOM_PNGTREE}
+                alt=""
+                aria-hidden
+                className="w-9 h-9 object-contain opacity-90 shrink-0"
+                style={{ mixBlendMode: 'screen' }}
+              />
+              <span>Open QR Scanner</span>
+            </div>
             <div className="flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
               <ScanLine size={16} />
               <span className="font-mono text-[10px] uppercase tracking-[0.2em]">Sync Desktop</span>
@@ -877,11 +890,17 @@ export function MobileLanding() {
 
   //  onFocusRecheck  stable useCallback so multiple effects can reference it 
   const onFocusRecheck = useCallback(() => {
-    if (isLinked) return;
+    if (isLinked || signingError) return;
+
+    const tryEstablish = (addr: string) => {
+      if (!addr) return;
+      establishSession(addr);
+    };
+
     // Fast path: wagmi already resolved the address
-    if (wagmiAddressRef.current) { 
-      // establishSession(wagmiAddressRef.current); // DISABLED
-      return; 
+    if (wagmiAddressRef.current) {
+      tryEstablish(wagmiAddressRef.current);
+      return;
     }
     // Cancel any in-flight poll before starting a new one
     if (pollIntervalRef.current) { clearInterval(pollIntervalRef.current); pollIntervalRef.current = null; }
@@ -891,7 +910,7 @@ export function MobileLanding() {
       // Check 1: wagmi ref
       if (wagmiAddressRef.current) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
-        // establishSession(wagmiAddressRef.current); // DISABLED: We no longer auto-handshake to preserve single-signature flow
+        tryEstablish(wagmiAddressRef.current);
         return;
       }
       // Check 2: All cookies (Corrected parsing)
@@ -904,11 +923,11 @@ export function MobileLanding() {
           try { val = decodeURIComponent(val); } catch {}
           if (val) {
             const addr = extractAddressFromAppKit(val);
-            if (addr) { 
+            if (addr && wagmiAddressRef.current) {
               console.log('[System:Sync] Found address in cookies:', addr);
-              clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 
-              // establishSession(addr); // DISABLED: We no longer auto-handshake to preserve single-signature flow
-              return; 
+              clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
+              tryEstablish(wagmiAddressRef.current);
+              return;
             }
           }
         }
@@ -927,14 +946,11 @@ export function MobileLanding() {
             if (addr) { 
               console.log('[System:Sync] Found address in storage key:', key, addr);
               
-              const hasHandshake = document.cookie.includes('system_handshake=');
-              if (!hasHandshake) {
-                console.log('[System:Sync] Missing session cookie, skipping automatic handshake...');
+              clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
+              if (wagmiAddressRef.current) {
+                tryEstablish(wagmiAddressRef.current);
               }
-
-              clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 
-              // establishSession(addr); // DISABLED: We no longer auto-handshake to preserve single-signature flow
-              return; 
+              return;
             }
           }
         }
@@ -949,7 +965,7 @@ export function MobileLanding() {
           const cookieMatch = document.cookie.match(/system_handshake=(0x[0-9a-fA-F]{40,})/i);
           if (cookieMatch?.[1]) {
             console.log('[System:Recovery] Cookie found after poll timeout  using it:', cookieMatch[1]);
-            // establishSession(cookieMatch[1]); // DISABLED: We no longer auto-handshake to preserve single-signature flow
+            tryEstablish(cookieMatch[1]);
             return;
           }
         } catch {}
@@ -963,7 +979,7 @@ export function MobileLanding() {
         } catch {}
       }
     }, 500);
-  }, [isLinked]);
+  }, [isLinked, signingError, establishSession]);
 
   // Wallet state transition tracking to clear __disconnected__ ONLY on new user connection
   const prevConnectedRef = useRef(isConnected);

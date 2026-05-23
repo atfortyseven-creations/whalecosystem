@@ -44,14 +44,13 @@ const NAV_COLUMNS = [
       { label: "Privacy Manifesto",    href: "/manifesto" },
       { label: "QDs Tokenomics",       href: "/tokenomics" },
       { label: "Roadmap",              href: "/roadmap" },
-      { label: "Investors",            href: "/partnership" },
     ]
   },
   {
     label: "Developers",
     links: [
       { label: "Developer Hub",  href: "/developer" },
-      { label: "API Reference",  href: "/api-docs" },
+      { label: "API Reference",  href: "/developers/api-docs" },
       { label: "API Marketplace",href: "/api-marketplace" },
       { label: "Noir Circuits",  href: "https://github.com/hvbr1s/noir-circuits", external: true },
     ]

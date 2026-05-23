@@ -197,7 +197,7 @@ export function SessionLogsPanel() {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
                                 {[
-                                    { label: 'Privacy Policy',       href: '/privacy',            desc: 'How we handle your data and GDPR compliance.' },
+                                    { label: 'Privacy Policy',       href: '/legal/privacy',      desc: 'How we handle your data and GDPR compliance.' },
                                     { label: 'Terms of Service',     href: '/terms',              desc: 'Terms governing access to the Humanity Ledger platform.' },
                                     { label: 'Security Policy',      href: '/security',           desc: 'Vulnerability disclosure and security architecture.' },
                                     { label: 'Audit Reports',        href: '/security',           desc: 'Third-party audit results and formal verification.' },

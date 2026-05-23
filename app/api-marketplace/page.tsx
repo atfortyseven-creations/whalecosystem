@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { WhaleAlertLoader } from "@/components/ui/WhaleAlertLoader";
+import { FooterPageIntro } from "@/components/landing/FooterPageIntro";
+import { API_MARKETPLACE_INTRO } from "@/lib/content/footerPagesAztec";
 
 const PLANS = [
   {
@@ -188,8 +190,16 @@ function ApiMarketplacePageContent() {
             </span>
           </h1>
           <p className="text-white/50 max-w-xl mx-auto text-lg">
-            Choose your plan. Your key will be active in less than 60 seconds after payment.
+            Large-wallet alerts and market-flow data over REST and WebSocket—with HMAC authentication and optional zero-knowledge eligibility on future tiers.
           </p>
+          <div className="mt-8 max-w-2xl mx-auto text-left">
+            <FooterPageIntro
+              title="About the API marketplace"
+              sections={API_MARKETPLACE_INTRO}
+              defaultOpen={false}
+              dark
+            />
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px] gap-8 xl:gap-12">

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Shield, Camera, Upload, Loader2, CheckCircle } from 'lucide-react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
-import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { ATOM_PNGTREE } from '@/lib/constants/systemAssets';
 
 interface QRScannerModalProps {
   isOpen: boolean;
@@ -592,8 +592,14 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           >
             {/* Header */}
             <div className="flex flex-col items-center gap-3 mb-6 relative z-10">
-              <div className="w-12 h-12 mb-2" style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
-                 <RemoteLottie path="block abstract.json" className="w-full h-full object-contain opacity-80" />
+              <div className="w-16 h-16 mb-1 flex items-center justify-center">
+                <img
+                  src={ATOM_PNGTREE}
+                  alt="Silver Atom"
+                  className="w-full h-full object-contain"
+                  style={{ mixBlendMode: 'multiply' }}
+                  draggable={false}
+                />
               </div>
               <h2 className="font-sans text-xl font-black text-[#050505] tracking-tighter uppercase">
                 Link Session
@@ -639,6 +645,20 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                       muted
                     />
                     <canvas ref={canvasRef} className="hidden" />
+
+                    {/* Atom watermark centered in viewfinder */}
+                    <img
+                      src={ATOM_PNGTREE}
+                      alt=""
+                      aria-hidden
+                      className="absolute pointer-events-none z-[5] w-[55%] max-w-[180px] h-auto object-contain opacity-[0.35]"
+                      style={{
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        mixBlendMode: 'screen',
+                      }}
+                    />
 
                     {/* Animated perimeter scan line */}
                     <ScanLine active={status === 'scanning'} />

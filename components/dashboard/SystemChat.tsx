@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useWalletClient, useSignMessage, useDisconnect, useReconnect } from 'wagmi';
+import { useAppKit } from '@reown/appkit/react';
 import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { ethers } from 'ethers';
@@ -153,7 +154,8 @@ function playMessageSound() {
 //  SystemChat (Orchestrator) 
 
 export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => void }) {
-  const { address, isConnected, isLocalSystemWallet, connector, isSystemHandshake } = useAccount();
+  const { address, isConnected, isLocalSystemWallet, connector, isSystemHandshake, needsWalletReconnect } = useAccount();
+  const { open: openAppKit } = useAppKit();
   const { data: walletClient } = useWalletClient();
   const { privateKey: storePrivateKey } = useWalletStore();
   const { disconnect } = useDisconnect();
@@ -357,26 +359,30 @@ export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => 
 
     const hasLocalWallet = isLocalSystemWallet && storePrivateKey;
 
-    // If wagmi walletClient isn't ready yet, wait up to 10s before giving up
-    if (!hasLocalWallet && !walletClient) {
+    if (isSystemHandshake && !connector && !hasLocalWallet) {
       if (isManual) {
-        setXmtpInitializing(true);
-        let waited = 0;
-        const MAX_WAIT = 10000;
-        const INTERVAL = 300;
-        // Read walletClient from wagmi via a live ref to avoid stale closure
-        while (!walletClientRef.current && waited < MAX_WAIT) {
-          await new Promise(r => setTimeout(r, INTERVAL));
-          waited += INTERVAL;
-        }
-        if (!walletClientRef.current) {
-          setXmtpInitializing(false);
-          setXmtpError('Wallet not responding. Please disconnect, reconnect your wallet and try again.');
+        setXmtpError('Connect your wallet in this browser to activate encrypted chat.');
+      }
+      return;
+    }
+
+    // Wait for walletClient (mobile deep-link returns often need 10–15s)
+    if (!hasLocalWallet && !walletClientRef.current) {
+      setXmtpInitializing(true);
+      let waited = 0;
+      const MAX_WAIT = isManual ? 10000 : 15000;
+      const INTERVAL = 300;
+      while (!walletClientRef.current && waited < MAX_WAIT) {
+        await new Promise(r => setTimeout(r, INTERVAL));
+        waited += INTERVAL;
+      }
+      if (!walletClientRef.current) {
+        xmtpInitLock.current = false;
+        setXmtpInitializing(false);
+        setXmtpError('Wallet not responding. Please reconnect your wallet and try again.');
+        if (isManual) {
           toast.error('Wallet Not Ready', { description: 'Disconnect and reconnect your wallet, then try again.' });
-          return;
         }
-      } else {
-        // Non-manual: don't show error, just skip  the walletClient watcher will re-trigger
         return;
       }
     }
@@ -449,21 +455,50 @@ export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => 
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, walletClient, address, isLocalSystemWallet, storePrivateKey, xmtpReady]);
+  }, [isConnected, walletClient, address, isLocalSystemWallet, storePrivateKey, xmtpReady, connector, isSystemHandshake]);
 
   // Auto-init on mount
   useEffect(() => {
+    if (needsWalletReconnect) return;
     initXmtpClient(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, isLocalSystemWallet, storePrivateKey]);
+  }, [isConnected, address, isLocalSystemWallet, storePrivateKey, needsWalletReconnect]);
 
   // Key fix: watch walletClient  when it goes from null  available, auto-trigger init
   useEffect(() => {
+    if (needsWalletReconnect) return;
     if (walletClient && isConnected && !xmtpReady && !xmtpInitLock.current) {
       initXmtpClient(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletClient]);
+  }, [walletClient, needsWalletReconnect]);
+
+  // UI safety: never leave handshake spinner running forever
+  useEffect(() => {
+    if (!xmtpInitializing) return;
+    const timeoutId = setTimeout(() => {
+      if (!xmtpReady) {
+        xmtpInitLock.current = false;
+        setXmtpInitializing(false);
+        setXmtpError((prev) => prev ?? 'Connection timed out. Please reconnect your wallet and retry.');
+      }
+    }, 45000);
+    return () => clearTimeout(timeoutId);
+  }, [xmtpInitializing, xmtpReady]);
+
+  // Retry XMTP init when user returns from wallet app (iOS/Android deep-link)
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState !== 'visible') return;
+      if (needsWalletReconnect || !isConnected || xmtpReady) return;
+      if (walletClientRef.current && !xmtpInitLock.current) {
+        initXmtpClient(false);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, xmtpReady, needsWalletReconnect]);
 
   useEffect(() => {
     if (!xmtpReady || !xmtpClient.current) return;
@@ -867,6 +902,25 @@ export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => 
     );
   }
 
+  if (needsWalletReconnect) {
+    return (
+      <div className="flex flex-1 w-full h-full bg-white items-center justify-center p-6">
+        <div className="max-w-sm w-full flex flex-col items-center gap-5 text-center">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-black/40 leading-relaxed">
+            Connect your wallet in this browser to activate end-to-end encrypted Whale Chat.
+          </p>
+          <button
+            type="button"
+            onClick={() => openAppKit()}
+            className="w-full py-4 rounded-xl bg-[#050505] text-white font-mono text-[11px] font-bold uppercase tracking-widest hover:bg-black/80 transition-all active:scale-[0.98]"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   //  Render 
   return (
     <div className="w-full h-full flex-1 flex text-black overflow-hidden chat-theme-wrapper bg-white relative" data-chat-theme={settings.theme} data-privacy={settings.privacyMode} onClick={() => showPeerMenu && setShowPeerMenu(false)}>
@@ -1158,12 +1212,23 @@ export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => 
                         {!xmtpError && (
                           <p className="text-[10px] font-mono text-black/50 uppercase tracking-widest text-center leading-relaxed max-w-xs">Whale Chat uses end-to-end encryption. Approve the signature in your wallet to activate.</p>
                         )}
-                        <button
-                          onClick={() => { setXmtpError(null); initXmtpClient(true); }}
-                          className="px-6 py-3 bg-[#050505] text-white font-mono text-[11px] font-bold uppercase tracking-widest rounded-[14px] hover:bg-black/80 transition-all shadow-md active:scale-95"
-                        >
-                          {xmtpError ? 'Retry Connection' : 'Activate Secure Chat'}
-                        </button>
+                        <div className="flex flex-col gap-2 w-full max-w-xs">
+                          {(xmtpError?.toLowerCase().includes('wallet') || xmtpError?.toLowerCase().includes('reconnect')) && (
+                            <button
+                              type="button"
+                              onClick={() => openAppKit()}
+                              className="w-full px-6 py-3 bg-white border border-black/15 text-black font-mono text-[11px] font-bold uppercase tracking-widest rounded-[14px] hover:bg-black/[0.03] transition-all active:scale-95"
+                            >
+                              Reconnect Wallet
+                            </button>
+                          )}
+                          <button
+                            onClick={() => { setXmtpError(null); initXmtpClient(true); }}
+                            className="w-full px-6 py-3 bg-[#050505] text-white font-mono text-[11px] font-bold uppercase tracking-widest rounded-[14px] hover:bg-black/80 transition-all shadow-md active:scale-95"
+                          >
+                            {xmtpError ? 'Retry Connection' : 'Activate Secure Chat'}
+                          </button>
+                        </div>
                       </>
                     )}
                   </div>
