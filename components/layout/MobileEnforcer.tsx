@@ -229,6 +229,9 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/academy',
             '/support',
             '/status',
+            '/passport',
+            '/scan',
+            '/studio',
         ];
 
         // [SOVEREIGN-GATE] Always allow dashboard/chat/portfolio so they can reach the ZK-Gate and connect from there

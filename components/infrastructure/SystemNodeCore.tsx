@@ -11,8 +11,7 @@ import CorePrecisionRadar from './CorePrecisionRadar';
 import { HeroCircuitry } from '@/components/landing/HeroCircuitry';
 
 /**
- *  SYSTEM NODE CORE 
- * Hyper-secure, elite blockchain node dashboard.
+ * Infrastructure node dashboard — chain health and telemetry.
  */
 export default function SystemNodeCore() {
     const [telemetry, setTelemetry] = useState<any[]>([]);
@@ -81,7 +80,7 @@ export default function SystemNodeCore() {
                             className="text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-[0.9]"
                         >
                             Internal <br /> 
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/50 to-white/10">Node Core</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/50 to-white/10">infrastructure</span>
                         </motion.h1>
                         
                         <motion.p 
@@ -90,7 +89,7 @@ export default function SystemNodeCore() {
                             transition={{ delay: 0.1 }}
                             className="text-white/40 text-lg font-medium tracking-tight"
                         >
-                            System-wide elite node monitoring with millimetre-precision telemetry and zero-error consensus validation.
+                            Live chain health, block latency, and validator status across supported networks.
                         </motion.p>
                     </div>
 

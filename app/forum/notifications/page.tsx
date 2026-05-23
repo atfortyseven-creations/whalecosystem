@@ -37,7 +37,7 @@ export default function NotificationsPage() {
           Analytics Alerts
         </h1>
         <div className="text-[9px] font-mono uppercase tracking-[0.2em] mt-2" style={{ color: 'var(--forum-button-bg)' }}>
-          SOVEREIGN NOTIFICATION CENTER
+          Mention and reply notifications
         </div>
       </div>
 

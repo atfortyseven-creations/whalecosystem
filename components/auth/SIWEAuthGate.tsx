@@ -36,7 +36,7 @@ const STATUS_LABELS: Record<string, string> = {
   "pending-nonce": "FETCHING NONCE...",
   "pending-sign": "SIGN IN WALLET",
   "pending-verify": "VERIFYING ON-CHAIN...",
-  authenticated: "SOVEREIGN ACCESS",
+  authenticated: "Signed in",
   error: "AUTHENTICATION FAILED",
 };
 

@@ -24,8 +24,8 @@ import {
   MessageSquare,
 } from "lucide-react";
 
-const DynamicQRScannerModal = dynamic(
-  () => import("@/components/wallet/QRScannerModal"),
+const DynamicUniversalScanModal = dynamic(
+  () => import('@/components/scan/UniversalScanModal'),
   { ssr: false }
 );
 
@@ -603,11 +603,12 @@ export default function ConnectPage() {
 
       {/* Mobile QR Scanner */}
       {isMobile && mounted && (
-        <DynamicQRScannerModal
+        <DynamicUniversalScanModal
           isOpen={showMobileScanner}
           onClose={() => setShowMobileScanner(false)}
           address={address ?? ""}
-          onScan={(_result: string) => {
+          mode="session-only"
+          onScan={() => {
             setShowMobileScanner(false);
             toast.success("Session synchronized");
           }}

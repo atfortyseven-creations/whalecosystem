@@ -299,7 +299,7 @@ export function SystemVault() {
 
                 <div className="shrink-0 pt-2 pb-6 border-b border-[#E5E5E5] w-full bg-white flex flex-col gap-0.5 mb-2">
                     <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.1em] text-[#050505]">
-                        SOVEREIGN VAULT
+                        Encrypted vault
                     </h1>
                     <p className="text-[10px] text-[#050505]/40 font-bold uppercase tracking-[0.2em] leading-tight">
                         Cryptographic cold storage and cross-chain liquid reconciliation.
@@ -311,7 +311,7 @@ export function SystemVault() {
                     {/* DEADMAN SWITCH */}
                     <div className="border border-[#E5E5E5] bg-[#FAF9F6] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
-                            <Activity size={20} className={vaultData?.deadman ? "text-[#00C076]" : "text-[#888888]"} />
+                            <Activity size={20} className={vaultData?.deadman ? "text-[#050505]" : "text-[#888888]"} />
                             <h2 className="text-sm font-bold uppercase tracking-widest">DEADMAN CACHE</h2>
                         </div>
                         <p className="text-[10px] text-[#888888] uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
@@ -320,7 +320,7 @@ export function SystemVault() {
                         <div className="flex-1" />
                         {vaultData?.deadman ? (
                             <div className="flex flex-col gap-3 relative z-10">
-                                <div className="text-[10px] font-bold text-[#00C076] border border-[#00C076]/20 bg-[#00C076]/5 px-3 py-2 rounded-lg uppercase">Status: ARMED</div>
+                                <div className="text-[10px] font-bold text-[#050505] border border-black/15 bg-black/5 px-3 py-2 rounded-lg uppercase">Status: Armed</div>
                                 <div className="text-[9px] text-[#888888] font-mono">
                                     Last Heartbeat: {new Date(vaultData.deadman.lastPing).toLocaleString()}
                                 </div>

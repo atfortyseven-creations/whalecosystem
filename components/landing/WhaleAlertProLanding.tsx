@@ -351,7 +351,7 @@ export function WhaleAlertProLanding() {
             transition={{ duration: 1.5, ease: "easeOut" }}
           >
             <h2 className="text-[10vw] font-black tracking-tighter text-white/5 opacity-50 absolute inset-0 flex items-center justify-center select-none pointer-events-none">
-              SOVEREIGN
+              WHALE ALERT
             </h2>
             <div className="max-w-4xl mx-auto relative z-20">
               <h3 className="text-4xl md:text-7xl font-black mb-8 leading-tight tracking-tighter">

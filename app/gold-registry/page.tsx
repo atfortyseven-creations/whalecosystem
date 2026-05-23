@@ -112,7 +112,7 @@ export default function GoldRegistryPage() {
                           rel="noopener noreferrer"
                           className="block w-full text-center py-4 bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 border border-black/5 dark:border-white/5 text-[#050505] dark:text-[#FAF9F6] font-black uppercase text-[11px] tracking-[0.3em] rounded-xl transition-colors"
                         >
-                           ENTER VIA SOVEREIGN BRIDGE 
+                           Open bridge
                         </a>
                      </motion.div>
                    )}

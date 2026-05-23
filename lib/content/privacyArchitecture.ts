@@ -96,7 +96,7 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     id: 'qr-sync',
     title: 'QR code: linking phone and desktop',
     paragraphs: [
-      'When you are on a desktop at /connect, the page generates a QR code containing a one-time session id, an X25519 public key, and an expiry time (about five minutes). Your phone opens the built-in scanner (QRScannerModal) or the connect flow scanner.',
+      'When you are on a desktop at /connect, the page generates a QR code containing a one-time session id, an X25519 public key, and an expiry time (about five minutes). Your phone scans it with the universal scanner (session-only mode on /connect, or the wallet QR scanner elsewhere) or the connect flow scanner.',
       'The phone parses the QR, creates its own ephemeral key pair, and either encrypts an existing JWT with the shared secret or asks the server to mint one (qr-mobile-link). The payload is stored in Redis under the session id. The desktop polls /api/auth/qr-poll once per second until it receives the encrypted bundle or a server JWT.',
       'The desktop decrypts when possible, then calls /api/auth/qr-hydrate to write the same cookie set as a normal login. Optionally, an encrypted XMTP identity seed can sync so chat works on mobile without signing again. A separate qr-sync endpoint supports re-linking with a signed message RE-CONNECT-WHALE-SESSION-{token}.',
     ],
@@ -191,6 +191,48 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     N2["Decrypted XMTP message archive"]
     N3["Your local portfolio vault ciphertext"]
   end`,
+    },
+  },
+  {
+    id: 'product-scan',
+    title: 'Product labels and universal scan',
+    paragraphs: [
+      'On mobile, Scan label opens a universal camera that reads more than desktop session QRs. The same scanner can link your phone to the desktop session, open a wallet address in Whale Chat, show a product passport page, or resolve a GS1 Digital Link when we have a matching record.',
+      'After you connect your wallet on mobile, Try Studio Provenance Beta opens the same Provenance Studio flow as desktop: create a passport, export a QR label, and optionally anchor on chain.',
+      'Product passports are public read records stored in our database. Issuers create them in Provenance Studio (wallet required). Optional on-chain anchoring reuses Core Ledger transferWithReceipt with memo PASSPORT:{slug} and stores the Core Entropy value plus transaction hash on the passport.',
+      'Passport pages work without a wallet—anyone with the link or QR can view published fields (origin, batch, certifications, carbon figures). Private selective disclosure via Aztec is planned for a later phase; today’s passports are explicitly public.',
+    ],
+    diagram: {
+      caption: 'Universal mobile scan router',
+      chart: `flowchart TD
+  cam[Mobile camera or gallery]
+  router[Scan router]
+  session[Desktop session QR]
+  wallet[Wallet address QR]
+  passport[humanidfi.com/passport slug]
+  gs1[GS1 Digital Link]
+  cam --> router
+  router --> session
+  router --> wallet
+  router --> passport
+  router --> gs1
+  session --> link[POST qr-mobile-link]
+  wallet --> chat[Whale Chat peer]
+  passport --> view[Passport page]
+  gs1 --> resolve[GET api passport resolve]
+  resolve --> view`,
+    },
+    bullets: [
+      'Open QR Scanner on the connected mobile screen still prioritises desktop session codes.',
+      'Scan label accepts product URLs, GS1 links, wallet codes, and session QRs in one flow.',
+      'Try Studio Provenance Beta on the connected mobile home screen links to /studio/provenance.',
+      'Unknown codes show a plain error with a link back to this section.',
+    ],
+    callout: {
+      title: 'Create a passport',
+      body: 'Desktop users with a linked wallet can open Provenance Studio to publish a label and export a QR.',
+      href: '/studio/provenance',
+      hrefLabel: 'Provenance Studio',
     },
   },
   {

@@ -46,7 +46,7 @@ const FAQ_DATA: FAQItem[][] = [
         { q: "How is 'Global Intensity' calculated?", a: "It's an aggregate of total USD value moved globally in the last 60 minutes, normalized against a 30-day moving average.", tag: "METRICS" },
         { q: "Can I create custom 'Target Lists'?", a: "Users can define specific wallet clusters to monitor, with custom alert thresholds for each group.", tag: "CUSTOMIZATION" },
         { q: "How do we handle stablecoin de-pegging signals?", a: "The system monitors 3pool and AMM imbalances 24/7, flagging 1\u03c3-3\u03c3 deviations as high-priority systemic risk alerts.", tag: "STABLES" },
-        { q: "What is the 'System Node' requirement?", a: "To access Level 4 analytics, users can run a local light-node that peer-verifies our data feeds for 100% trustlessness.", tag: "NODES" },
+        { q: "What is the optional local verification setup?", a: "For advanced analytics tiers you can run a lightweight verifier that compares our published feeds against chain data—but it is optional, not required for normal use.", tag: "NODES" },
         { q: "Do we provide API access for hedge funds?", a: "Yes, our Institutional API offers raw data streams with 99.99% uptime and <10ms internal processing overhead.", tag: "API" },
         { q: "How does the system identify 'Wash Trading'?", a: "We flag recursive A-B-C-A transaction patterns that artificially inflate volume without changing net asset ownership.", tag: "INTEGRITY" }
     ],
@@ -105,7 +105,7 @@ const FAQ_DATA: FAQItem[][] = [
     // PAGE 8: Privacy vs Forensics
     [
         { q: "Is the Whale Alert Network system compliant with GDPR?", a: "Yes. We analyze public ledger data only and do not associate any PII (Personally Identifiable Information) with wallet addresses.", tag: "PRIVACY" },
-        { q: "How can I keep my own movements private?", a: "We recommend using our 'Stealth Propagation' feature which uses mixers to avoid behavioral fingerprinting by other tools.", tag: "SOVEREIGNTY" },
+        { q: "How can I keep my own movements private?", a: "Use private transfers and wallets that separate public activity from personal flows. Combine that with cautious address reuse and reputable privacy tools.", tag: "PRIVACY" },
         { q: "What is the 'Zero-Knowledge' alert verify?", a: "A feature allowing us to prove the existence of a move without revealing the destination address until it is settled.", tag: "ZK" },
         { q: "How do we manage 'Data Systemty'?", a: "Users own their alert filters; no data is shared with third-party advertising or surveillance firms.", tag: "ETHICS" },
         { q: "Can the system detect identity disclosure attempts?", a: "We flag public social media correlations to warn users when their private wallet may have been compromised by public OSINT.", tag: "SECURITY" },

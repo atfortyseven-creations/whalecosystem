@@ -303,6 +303,17 @@ export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => 
     setMessages([]);
   }, [address]);
 
+  // Open conversation from universal scan (wallet QR)
+  useEffect(() => {
+    if (!address || typeof sessionStorage === 'undefined') return;
+    const peer = sessionStorage.getItem('whale_scan_peer');
+    if (!peer || !/^0x[a-fA-F0-9]{40}$/.test(peer)) return;
+    sessionStorage.removeItem('whale_scan_peer');
+    const displayName = peer.slice(0, 6) + '...' + peer.slice(-4);
+    setActiveConv({ peerAddress: peer, displayName, folder: 'inbox', unread: 0 });
+    toast.success('Wallet scanned — chat opened');
+  }, [address]);
+
   // Save conversations on change
   useEffect(() => {
     if (address && conversations.length > 0) {

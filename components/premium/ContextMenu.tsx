@@ -81,13 +81,13 @@ export default function ContextMenu({ onAction, children }: ContextMenuProps) {
           exit={{ opacity: 0, scale: 0.9, y: 5 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
           style={{ top: position.y, left: position.x }}
-          className="fixed z-[9999] min-w-[240px] rounded-sm bg-[#050505]/95 backdrop-blur-2xl border border-white/10 p-2 shadow-[0_0_40px_rgba(0,0,0,0.9)] focus:outline-none ring-1 ring-[#e0ff00]/10"
+          className="fixed z-[9999] min-w-[240px] rounded-sm bg-[#050505]/95 backdrop-blur-2xl border border-white/10 p-2 shadow-[0_0_40px_rgba(0,0,0,0.9)] focus:outline-none ring-1 ring-white/10"
         >
           {/* Header */}
           <div className="px-3 py-2 mb-1 border-b border-white/10 flex items-center justify-between">
-            <span className="text-[9px] font-black text-[#e0ff00] uppercase tracking-widest flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#e0ff00] animate-pulse" />
-                SOVEREIGN COMMAND
+            <span className="text-[9px] font-black text-white/80 uppercase tracking-widest flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse" />
+                Quick actions
             </span>
             <span className="text-[8px] font-mono text-white/30 tracking-widest">v9.9.9</span>
           </div>

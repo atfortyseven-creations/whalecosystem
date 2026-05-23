@@ -373,7 +373,7 @@ export function ZKProofGrid() {
                                     </div>
                                     <div className="text-[10px] text-white/40 font-mono mt-0.5">
                                         {proofResult === 'success'
-                                            ? `isVerified=1 · nullifier committed · clearance level: SOVEREIGN`
+                                            ? `isVerified=1 · nullifier committed · clearance: verified`
                                             : `isVerified=0 · score ${score} < threshold ${threshold}`
                                         }
                                     </div>

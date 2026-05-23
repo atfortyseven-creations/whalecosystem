@@ -28,11 +28,11 @@ export default function CryptographicID() {
       {/*  ACADEMIC INTRO  */}
       <div className="border border-white/5 bg-white/[0.01] p-6 flex flex-col gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-blue-500/10 border border-blue-500/20 text-blue-500">
+          <div className="p-3 bg-white/5 border border-white/15 text-white/90">
             <Fingerprint size={24} />
           </div>
           <div>
-            <h2 className="text-sm font-black uppercase tracking-[0.4em]">Cryptographic_ID // SOV_IDENTITY</h2>
+            <h2 className="text-sm font-black uppercase tracking-[0.4em]">Cryptographic identity</h2>
             <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Immutable digital identity anchoring on-chain credentials and access levels.</p>
           </div>
         </div>
@@ -47,7 +47,7 @@ export default function CryptographicID() {
             <div className="flex justify-between items-center">
               <span className="text-[9px] text-white/20 uppercase tracking-[0.4em]">Primary_Registry</span>
               {isConnected ? (
-                <div className="flex items-center gap-2 text-[8px] text-emerald-500 border border-emerald-500/20 px-3 py-1 bg-emerald-500/5">
+                <div className="flex items-center gap-2 text-[8px] text-white/80 border border-white/20 px-3 py-1 bg-white/5">
                   <UserCheck size={10} /> AUTHENTICATED
                 </div>
               ) : (
@@ -74,7 +74,7 @@ export default function CryptographicID() {
                </div>
                <div className="space-y-2">
                   <span className="text-[8px] text-white/20 uppercase tracking-widest">Attestation_Status</span>
-                  <div className="text-xs font-black uppercase text-emerald-500">VERIFIED_SOVEREIGN</div>
+                  <div className="text-xs font-black uppercase text-white/90">Verified account</div>
                </div>
             </div>
           </div>

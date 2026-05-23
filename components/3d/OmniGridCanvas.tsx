@@ -222,7 +222,7 @@ export function OmniGridCanvas() {
       //  Live stats HUD & Genesis Status 
       ctx!.font = '9px "Roboto Mono", monospace';
       ctx!.fillStyle = isConnected ? 'rgba(212,175,55,0.45)' : 'rgba(0,195,255,0.45)';
-      const statusText = isConnected ? `SOVEREIGN MESH  ${address?.slice(0,6)}` : 'GENESIS STATE  ISOLATED';
+      const statusText = isConnected ? `Connected ${address?.slice(0,6)}` : 'Not connected';
       ctx!.fillText(`${statusText}  ${events.length} EVT  INT ${(intensity * 100).toFixed(0)}%`, 12, ch - 12);
     }
 

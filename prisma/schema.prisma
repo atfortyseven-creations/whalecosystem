@@ -1271,3 +1271,38 @@ model HumanityLedgerTransaction {
   @@index([to, timestamp(sort: Desc)])
   @@index([timestamp(sort: Desc)])
 }
+
+// 
+// HUMANITY PROVENANCE FRAMEWORK — Product passports (public read, optional on-chain anchor)
+// 
+
+model ProductPassport {
+  id            String   @id @default(cuid())
+  publicSlug    String   @unique
+  title         String
+  category      String?
+  issuerAddress String?
+  payload       Json
+  coreEntropy   String?
+  txHash        String?
+  chainId       Int?
+  gs1Gtin       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  events        ProvenanceEvent[]
+
+  @@index([issuerAddress])
+  @@index([gs1Gtin])
+  @@index([createdAt(sort: Desc)])
+}
+
+model ProvenanceEvent {
+  id         String   @id @default(cuid())
+  passportId String
+  passport   ProductPassport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  eventType  String
+  payload    Json
+  createdAt  DateTime @default(now())
+
+  @@index([passportId, createdAt(sort: Desc)])
+}

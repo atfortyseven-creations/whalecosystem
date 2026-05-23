@@ -27,6 +27,7 @@ import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { CoreAuthGate } from '@/components/auth/CoreAuthGate';
 import CoreTransfer from '@/components/dashboard/CoreTransfer';
 import { CoreDotsPanel } from '@/components/portfolio/CoreDotsPanel';
+import { ProductPassportsPanel } from '@/components/portfolio/ProductPassportsPanel';
 import { useQueryClient } from '@tanstack/react-query';
 
 function CoreEpochCountdown({ onReset }: { onReset: () => void }) {
@@ -809,6 +810,8 @@ export default function PortfolioPage() {
         >
           <CoreDotsPanel />
         </motion.div>
+
+        <ProductPassportsPanel />
       </div>
 
       {/*  MODALS  */}

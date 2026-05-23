@@ -104,7 +104,7 @@ export function PreCognitiveGrid({ symbol }: PreCognitiveGridProps) {
         auraClass = 'shadow-[0_0_20px_5px_rgba(239,68,68,0.9)] border-rose-400';
     }
 
-    // Phase 3: SOVEREIGN SIGNAL ACTIVATION
+    // Phase 3: premium signal overlay
     useEffect(() => {
         if (!state) return;
         const vigorActive = state.institutionalVigorPercent > 80;
@@ -203,7 +203,7 @@ export function PreCognitiveGrid({ symbol }: PreCognitiveGridProps) {
                     <div className="absolute top-5 right-5 flex items-center gap-1.5 z-20">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#00FFAA] animate-[pulse_600ms_ease-in-out_infinite]" />
                         <span className="text-[7px] font-black text-[#00FFAA] uppercase tracking-[0.2em] bg-[#00FFAA]/10 px-1.5 py-0.5 rounded">
-                            {showSystemOverlay ? 'SOVEREIGN MODE ' : 'ON-CHAIN SYNCED'}
+                            {showSystemOverlay ? 'Premium overlay' : 'On-chain synced'}
                         </span>
                     </div>
                 )}

@@ -128,7 +128,7 @@ function ParticleBackground() {
 export function SystemLanding() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { isConnected, connector } = useSystemAccount();
+  const { isConnected, connector, address } = useSystemAccount();
   
   useEffect(() => { setMounted(true); }, []);
 
@@ -296,7 +296,7 @@ export function SystemLanding() {
                    </div>
                    {isConnected ? (
                      <div className="text-[10px] font-mono bg-white/5 p-2 rounded border border-white/10 text-white/70 break-all text-center">
-                       {connector?.id || 'Connected'} / 0xSOVEREIGN...
+                       {connector?.id || 'Connected'} / {address ? `${address.slice(0, 6)}…${address.slice(-4)}` : 'wallet linked'}
                      </div>
                    ) : (
                      <button onClick={() => router.push('/connect')} className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors">

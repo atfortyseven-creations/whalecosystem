@@ -32,7 +32,7 @@ export function ZkKYBVault() {
       
       setStage("MINTING");
       const signature = await signMessageAsync({
-        message: `[SOVEREIGN ZK-KYB]\nMint corporate SBT for ${address}\nDocument Hash: ${verifyData.hash ?? '0x0'}`
+        message: `[ZK business verify]\nMint corporate SBT for ${address}\nDocument hash: ${verifyData.hash ?? '0x0'}`,
       });
 
       // Save seed to prevent double-signing in Whale Chat

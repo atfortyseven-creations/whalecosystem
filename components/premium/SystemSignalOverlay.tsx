@@ -34,15 +34,15 @@ export function SystemSignalOverlay({
     const timeString = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
 
     const copyToClipboard = () => {
-        const text = ` *SOVEREIGN ALPHA DETECTED* 
+        const text = `Premium alert
 Asset: $${symbol}
-Direction: ${direction === 'BULLISH' ? 'LONG SQUEEZE ' : 'SHORT SQUEEZE '}
-Reversal Prob: ${reversalProb.toFixed(1)}%
-Expected Move (15m): ${expectedMove > 0 ? '+' : ''}${expectedMove.toFixed(2)}%
-Vigor Accum: ${vigorPercent.toFixed(0)}% | Tensor: ${gravityScore.toFixed(1)}G
+Direction: ${direction === 'BULLISH' ? 'Long bias' : 'Short bias'}
+Reversal prob: ${reversalProb.toFixed(1)}%
+Expected move (15m): ${expectedMove > 0 ? '+' : ''}${expectedMove.toFixed(2)}%
+Vigor: ${vigorPercent.toFixed(0)}% | Score: ${gravityScore.toFixed(1)}
 Defense: ${icebergDefense || 'None'}
---
-*Intel via HumanIDFi PreCognitive Grid*`;
+—
+HumanIDFi analytics`;
 
         navigator.clipboard.writeText(text);
         setCopied(true);
@@ -64,16 +64,16 @@ Defense: ${icebergDefense || 'None'}
                 onClick={(e) => e.stopPropagation()}
                 className="bg-[#FAF9F6]/90 border border-[#050505] p-8 max-w-sm w-full rounded-2xl shadow-2xl relative overflow-hidden"
             >
-                {/* Tactical Accent */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 via-[#00FFAA] to-orange-400 animate-pulse" />
+                {/* Top accent */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-[#050505]" />
 
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-full bg-[#050505] flex items-center justify-center">
-                        <Target className="text-[#00FFAA]" size={20} />
+                        <Target className="text-white" size={20} />
                     </div>
                     <div>
-                        <h2 className="text-xl font-black text-[#050505] tracking-tighter leading-none">SOVEREIGN SIGNAL</h2>
-                        <span className="text-[10px] font-bold text-[#050505]/50 tracking-[0.2em] uppercase">Absolute Confluence</span>
+                        <h2 className="text-xl font-black text-[#050505] tracking-tighter leading-none">Premium signal</h2>
+                        <span className="text-[10px] font-bold text-[#050505]/50 tracking-[0.2em] uppercase">Confluence readout</span>
                     </div>
                 </div>
 
@@ -84,21 +84,21 @@ Defense: ${icebergDefense || 'None'}
                     </div>
                     <div className="flex justify-between border-b border-[#050505]/10 pb-2">
                         <span className="text-xs font-bold text-[#050505]/60">Reversal Prob</span>
-                        <span className="text-sm font-black text-[#00FFAA] drop-shadow-[0_0_8px_rgba(0,255,170,0.8)] px-2 py-0.5 bg-[#050505] rounded">
+                        <span className="text-sm font-black text-[#050505] border border-black/15 px-2 py-0.5 bg-black/5 rounded">
                             {reversalProb.toFixed(1)}%
                         </span>
                     </div>
                     <div className="flex justify-between border-b border-[#050505]/10 pb-2">
                         <span className="text-xs font-bold text-[#050505]/60">Expected Move</span>
-                        <span className={`text-sm font-black ${expectedMove > 0 ? 'text-cyan-600' : 'text-orange-600'}`}>
+                        <span className={`text-sm font-black ${expectedMove > 0 ? 'text-[#050505]' : 'text-black/50'}`}>
                             {expectedMove > 0 ? '+' : ''}{expectedMove.toFixed(2)}%
                         </span>
                     </div>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 mb-6 text-[#050505]/60">
-                    <Clock size={12} className={timeLeft < 60 ? "text-rose-500 animate-pulse" : ""} />
-                    <span className={`text-[10px] uppercase font-bold tracking-widest ${timeLeft < 60 ? "text-rose-500" : ""}`}>
+                    <Clock size={12} className={timeLeft < 60 ? "text-[#050505] animate-pulse" : ""} />
+                    <span className={`text-[10px] uppercase font-bold tracking-widest ${timeLeft < 60 ? "text-[#050505]" : ""}`}>
                         Signal expires in {timeString}
                     </span>
                 </div>
@@ -107,7 +107,7 @@ Defense: ${icebergDefense || 'None'}
                     onClick={copyToClipboard}
                     className="w-full bg-[#050505] text-white py-3 rounded-lg font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#111] transition-colors"
                 >
-                    {copied ? <CheckCircle size={14} className="text-[#00FFAA]" /> : <Copy size={14} />}
+                    {copied ? <CheckCircle size={14} className="text-white" /> : <Copy size={14} />}
                     {copied ? 'Copied to Clipboard' : 'Copy Alpha Signal'}
                 </button>
             </motion.div>

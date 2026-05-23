@@ -16,6 +16,7 @@ interface QRScannerModalProps {
 
 import jsQR from 'jsqr';
 import { useSecureCamera } from '@/hooks/useSecureCamera';
+import { completeSessionHandshake } from '@/lib/scan/sessionHandshake';
 
 //  File/gallery scanner (fallback for restricted camera environments) 
 async function scanFileForQR(file: File): Promise<string> {
@@ -82,7 +83,7 @@ function ScanLine({ active }: { active: boolean }) {
       <path
         d={path}
         fill="none"
-        stroke="rgba(34,197,94,0.18)"
+        stroke="rgba(255,255,255,0.12)"
         strokeWidth={STROKE}
         strokeLinejoin="round"
       />
@@ -91,7 +92,7 @@ function ScanLine({ active }: { active: boolean }) {
       <path
         d={path}
         fill="none"
-        stroke="#22c55e"
+        stroke="#ffffff"
         strokeWidth={STROKE}
         strokeLinejoin="round"
         strokeLinecap="round"
@@ -116,7 +117,7 @@ function ScanLine({ active }: { active: boolean }) {
           key={i}
           d={d}
           fill="none"
-          stroke="#22c55e"
+          stroke="#faf9f6"
           strokeWidth={STROKE + 0.5}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -157,22 +158,22 @@ function ScannedOverlay() {
             initial={{ scale: 0.6, opacity: 0.6 }}
             animate={{ scale: 1.35, opacity: 0 }}
             transition={{ duration: 0.9, repeat: 1, ease: 'easeOut' }}
-            className="absolute w-20 h-20 rounded-full border-2 border-emerald-400"
+            className="absolute w-20 h-20 rounded-full border-2 border-black/15"
           />
           {/* Check circle */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 500, damping: 25, delay: 0.1 }}
-            className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center"
-            style={{ boxShadow: '0 0 0 6px rgba(34,197,94,0.08)' }}
+            className="w-16 h-16 rounded-full bg-white border border-black/15 flex items-center justify-center"
+            style={{ boxShadow: '0 0 0 6px rgba(5,5,5,0.06)' }}
           >
             {/* SVG checkmark with draw animation */}
             <svg
               viewBox="0 0 24 24"
               className="w-7 h-7"
               fill="none"
-              stroke="#16a34a"
+              stroke="#050505"
               strokeWidth={2.5}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -194,7 +195,7 @@ function ScannedOverlay() {
           transition={{ delay: 0.35 }}
           className="text-center space-y-0.5"
         >
-          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-600">
+          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[#050505]">
             Scanned!
           </p>
           <p className="text-[9px] font-black uppercase tracking-widest text-black/50">
@@ -276,18 +277,17 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     stopCamera();
   }, [stopCamera]);
 
-  //  Successful scan handler 
+  //  Successful scan handler  session QR only  delegates to shared handshake
   const handleSuccess = useCallback(async (decodedText: string) => {
-    // ATOMIC LOCK: first call wins, all subsequent calls from the camera loop are ignored
     if (hasScannedRef.current) return;
     hasScannedRef.current = true;
 
     await destroyScanner();
-    setStatus('success');
 
-    const addr = addressRef.current || extAddrRef.current ||
+    const getAddress = () =>
+      addressRef.current ||
+      extAddrRef.current ||
       (() => {
-        // Cookie fallback  reads system_handshake set after wallet sign
         if (typeof document !== 'undefined') {
           const m = document.cookie.match(/system_handshake=(0x[a-fA-F0-9]{40})/i);
           return m?.[1] ?? null;
@@ -295,175 +295,16 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
         return null;
       })();
 
-    try {
-      //  Step 1: Parse QR  support BOTH URL format (new) and JSON (legacy) 
-      let uuid: string | null = null;
-      let ephemeralPub: string | null = null;
-      let isECDH = false;
+    const result = await completeSessionHandshake(decodedText, getAddress);
 
-      // Try URL format first (new  native camera compatible)
-      try {
-        const url = new URL(decodedText);
-        uuid = url.searchParams.get('uuid');
-        const rawPub = url.searchParams.get('pub');
-        ephemeralPub = rawPub ? decodeURIComponent(rawPub) : null;
-        isECDH = url.searchParams.get('ecdh') === '1';
-
-        // Expiry check
-        const exp = url.searchParams.get('exp');
-        if (exp && Date.now() > parseInt(exp, 10)) {
-          setErrMsg('QR code expired. Refresh it on the desktop terminal.');
-          setStatus('error');
-          hasScannedRef.current = false;
-          return;
-        }
-      } catch {
-        // Not a URL  try legacy JSON format
-        try {
-          const parsed = JSON.parse(decodedText);
-          uuid = parsed.uuid ?? null;
-          ephemeralPub = parsed.ephemeralPub ?? null;
-          isECDH = parsed.isECDH ?? false;
-        } catch {
-          setErrMsg('QR code not recognized. Make sure you scan the Whale Alert Network desktop QR.');
-          setStatus('error');
-          hasScannedRef.current = false;
-          return;
-        }
-      }
-
-      if (!uuid || !ephemeralPub) {
-        setErrMsg('Invalid QR code: missing session data. Please refresh the desktop QR.');
-        setStatus('error');
-        hasScannedRef.current = false;
-        return;
-      }
-
-      //  Step 2: Generate mobile ephemeral keypair 
-      const { generateX25519KeyPair, deriveSharedSecret, encryptAESGCM } = await import('@/lib/web-crypto');
-      const mobilePair = await generateX25519KeyPair();
-
-      //  Step 3: Derive shared secret and get a JWT to encrypt 
-      // The JWT we send to the desktop proves mobile's identity.
-      // We derive sharedSecret = X25519(mobile.priv, desktop.pub)
-      // Desktop will decrypt using X25519(desktop.priv, mobile.pub)  same secret.
-      const shared = await deriveSharedSecret(mobilePair.privateKey, ephemeralPub, isECDH);
-
-      //  Step 3b: Try to get an existing JWT from human_session cookie 
-      // If the mobile already has a session (returning user), we re-use it.
-      // Otherwise, qr-mobile-link will mint a fresh JWT server-side from
-      // the system_handshake cookie (set after wallet connection + sign).
-      let jwt: string | null = null;
-
-      try {
-        const exportRes = await fetch('/api/auth/export-jwt', { credentials: 'include' });
-        if (exportRes.ok) {
-          const exportData = await exportRes.json();
-          jwt = exportData.jwt ?? null;
-        }
-      } catch {
-        // Network error  fall through to server-side mint path
-      }
-
-      //  Step 4: Build the POST payload 
-      // PATH A  Client has JWT: encrypt it with the shared ECDH secret.
-      // PATH B  No JWT yet: send isServerMint=true so the backend mints one
-      //          from system_handshake and stores it as serverJwt in Redis.
-      //          Do NOT send placeholder strings  they corrupt the Redis entry
-      //          and cause the desktop's AES-GCM decryption to throw every time.
-      let postBody: Record<string, unknown>;
-
-      if (jwt) {
-        // PATH A: encrypt JWT client-side
-        const encrypted = await encryptAESGCM(shared, jwt);
-        postBody = {
-          uuid,
-          encryptedPayload: encrypted.encryptedPayload,
-          iv: encrypted.iv,
-          tag: encrypted.tag,
-          mobilePub: mobilePair.publicKey,
-          isServerMint: false,
-        };
-      } else {
-        // PATH B: tell server to mint JWT and store as serverJwt only
-        postBody = {
-          uuid,
-          mobilePub: mobilePair.publicKey,
-          isServerMint: true,
-          // Still send mobilePub so desktop poll can include it in the payload
-          // for future ECDH decryption if server later supports encrypt-at-rest.
-        };
-      }
-
-      //  Step 5: POST to backend to complete the handshake 
-      const res = await fetch('/api/auth/qr-mobile-link', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(postBody),
-        credentials: 'include',
-      });
-
-      if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        const errText = errBody.error || 'Handshake failed';
-
-        if (res.status === 401) {
-          setErrMsg('Wallet not connected. Connect your wallet first, then scan the QR code.');
-        } else {
-          setErrMsg(`${errText}. Refresh the QR on your desktop and try again.`);
-        }
-        setStatus('error');
-        hasScannedRef.current = false;
-        return;
-      }
-
-      // Browser auto-stores human_session cookie from response (credentials:include)
-      setStatus('success');
-
-      //  [EXPERT-SYNC] Receive XMTP Seed from Desktop 
-      // We poll for a few seconds to see if the desktop pushed an identity seed.
-      // If we get it, the user can enter chat without a signature.
-      let seedAttempts = 0;
-      const pollSeed = setInterval(async () => {
-          seedAttempts++;
-          if (seedAttempts > 10) { clearInterval(pollSeed); return; } // Timeout after 10s
-
-          try {
-              const sRes = await fetch(`/api/auth/qr-sync-seed?uuid=${uuid}`);
-              if (sRes.ok) {
-                  const sData = await sRes.json();
-                  if (sData.encryptedSeed && sData.iv) {
-                      clearInterval(pollSeed);
-                      const { decryptAESGCM } = await import('@/lib/web-crypto');
-                       const decryptedRaw = await decryptAESGCM(shared, sData.encryptedSeed, sData.iv);
-                       try {
-                           const payload = JSON.parse(decryptedRaw);
-                           const finalAddr = addr || addressRef.current || extAddrRef.current;
-                           if (finalAddr) {
-                               const normAddr = finalAddr.toLowerCase();
-                               if (payload.seed) localStorage.setItem(`whale_chat_seed_${normAddr}`, payload.seed);
-                               if (payload.vault) localStorage.setItem("system_vault_v1", payload.vault);
-                               console.log("[System:Sync] Full identity synchronized (0-signature active).");
-                           }
-                       } catch (e) {
-                           const finalAddr = addr || addressRef.current || extAddrRef.current;
-                           if (finalAddr) localStorage.setItem(`whale_chat_seed_${finalAddr.toLowerCase()}`, decryptedRaw);
-                       }
-                  }
-              }
-          } catch (e) {
-              console.warn("[System:Sync] Seed sync error:", e);
-          }
-      }, 1000);
-
-    } catch (e: any) {
-      console.error('[QRScanner] Unexpected error:', e);
-      setErrMsg('An unexpected error occurred. Please try again.');
+    if (!result.ok) {
+      setErrMsg(result.message);
       setStatus('error');
       hasScannedRef.current = false;
       return;
     }
 
+    setStatus('success');
     onScanRef.current?.(decodedText);
     setTimeout(() => onCloseRef.current(), 1400);
   }, [destroyScanner]);
@@ -677,7 +518,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                     {addressRef.current && status === 'scanning' && (
                       <div className="absolute bottom-4 left-4 right-4 z-20">
                         <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2.5 flex items-center justify-center gap-3 shadow-2xl">
-                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                           <div className="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
                            <span className="font-mono text-[11px] font-black text-white uppercase tracking-widest">
                              {addressRef.current.slice(0, 8)}...{addressRef.current.slice(-6)}
                            </span>
@@ -750,8 +591,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                         animate={{ opacity: 1, scale: 1 }}
                         className="flex items-center gap-2"
                       >
-                        <CheckCircle size={14} className="text-emerald-500" />
-                        <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600">
+                        <CheckCircle size={14} className="text-[#050505]" />
+                        <p className="text-[11px] font-black uppercase tracking-widest text-[#050505]">
                           ¡ Scanned !
                         </p>
                       </motion.div>

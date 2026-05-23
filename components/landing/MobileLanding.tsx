@@ -16,7 +16,7 @@ import {
   Scan, MessageSquare, LogOut, MessageCircle, ScanLine, 
   Fingerprint, ChevronDown, CheckCircle, Zap, Shield, Menu,
   ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, PieChart,
-  Newspaper, GraduationCap, Briefcase, Activity, TrendingUp
+  Newspaper, GraduationCap, Briefcase, Activity, TrendingUp, Package
 } from 'lucide-react';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { ATOM_PNGTREE } from '@/lib/constants/systemAssets';
@@ -86,9 +86,9 @@ function useLiveClock(intervalMs = 1000): Date {
   return now;
 }
 
-// QR Scanner  iOS-safe dynamic import
-const DynamicQRScannerModal = dynamic(
-  () => import("@/components/wallet/QRScannerModal"),
+// Universal scanner — session QR, wallet, product passport, GS1
+const DynamicUniversalScanModal = dynamic(
+  () => import("@/components/scan/UniversalScanModal"),
   { ssr: false }
 );
 
@@ -262,10 +262,11 @@ function chainName(id?: number): string {
 
 //  Connected Screen 
 function ConnectedScreen({
-  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect, signMessageAsync, initialScanData, setShowKyc
+  address, onScan, onScanLabel, showScanner, onCloseScanner, scanMode, onBack, connectorName, chainId, onDisconnect, signMessageAsync, initialScanData, setShowKyc
 }: {
-  address: string; onScan: () => void;
+  address: string; onScan: () => void; onScanLabel: () => void;
   showScanner: boolean; onCloseScanner: () => void;
+  scanMode: 'universal' | 'session-only';
   onBack?: () => void;
   connectorName?: string;
   chainId?: number;
@@ -482,6 +483,50 @@ function ConnectedScreen({
           </button>
         </motion.div>
 
+        {/*  SCAN LABEL (universal: product, wallet, GS1)  */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.42, duration: 0.5 }}
+          className="w-full mb-3"
+        >
+          <button
+            type="button"
+            onClick={onScanLabel}
+            className="w-full flex items-center justify-between py-4 px-6 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <ScanLine size={16} className="text-black/40" />
+              <span className="text-[14px] font-medium text-black">Scan label</span>
+            </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Product · Wallet</span>
+          </button>
+        </motion.div>
+
+        {/*  PROVENANCE STUDIO BETA  */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.44, duration: 0.5 }}
+          className="w-full mb-3"
+        >
+          <Link
+            href="/studio/provenance"
+            className="w-full flex items-center justify-between py-4 px-6 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <Package size={16} className="text-black/40 shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[14px] font-medium text-black truncate">Try Studio Provenance Beta</span>
+                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/30">Create · QR · Anchor</span>
+              </div>
+            </div>
+            <span className="shrink-0 text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full bg-black/5 text-black/50">
+              Beta
+            </span>
+          </Link>
+        </motion.div>
+
         {/*  SECONDARY ACTIONS  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -644,15 +689,16 @@ function ConnectedScreen({
         </motion.p>
       </main>
 
-      <DynamicQRScannerModal
+      <DynamicUniversalScanModal
         isOpen={showScanner}
         onClose={onCloseScanner}
         address={address}
+        mode={scanMode}
         initialScanData={initialScanData}
         onScan={(_result: string) => {
           const toast = document.createElement('div');
           toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[10px] border border-white/10 font-mono uppercase tracking-[0.3em] px-6 py-5 rounded-2xl shadow-2xl text-center';
-          toast.textContent = 'Session Synchronized';
+          toast.textContent = scanMode === 'session-only' ? 'Session Synchronized' : 'Scan complete';
           document.body.appendChild(toast);
           setTimeout(() => toast.remove(), 3000);
         }}
@@ -687,6 +733,7 @@ export function MobileLanding() {
 
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
+  const [scanMode, setScanMode] = useState<'universal' | 'session-only'>('session-only');
   const [showDebug, setShowDebug]       = useState(false);  // secret debug panel
   const [debugTaps, setDebugTaps]       = useState(0);
   // Always false on SSR. Reads from sessionStorage after mount to survive Chrome
@@ -854,7 +901,7 @@ export function MobileLanding() {
       });
 
       if (!verifyRes.ok) {
-        throw new Error('Verification rejected by System Node');
+        throw new Error('Wallet verification failed. Try again.');
       }
 
       console.log('[Auth] Handshake successful for:', norm);
@@ -1176,9 +1223,11 @@ export function MobileLanding() {
       <div className="w-full min-h-[100dvh] bg-transparent">
         <ConnectedScreen 
            address={effectiveAddress} 
-           onScan={() => setShowScanner(true)} 
+           onScan={() => { setScanMode('session-only'); setShowScanner(true); }} 
+           onScanLabel={() => { setScanMode('universal'); setShowScanner(true); }}
            showScanner={showScanner} 
            onCloseScanner={() => setShowScanner(false)} 
+           scanMode={scanMode}
            connectorName={connector?.name}
            chainId={chainId}
            onDisconnect={handleDisconnect}

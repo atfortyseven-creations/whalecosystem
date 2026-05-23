@@ -96,7 +96,7 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
                     id: ++logCounter,
                     timestamp: timeStr,
                     type: 'error',
-                    message: <span className="text-red-400">SOVEREIGN_DIAGNOSTICS // Tracking local node entropy...</span>
+                    message: <span className="text-black/60">Diagnostics — reconnecting to live feed…</span>
                 }];
             });
         });
