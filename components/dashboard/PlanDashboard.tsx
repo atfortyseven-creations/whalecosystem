@@ -92,17 +92,17 @@ export function PlanDashboard() {
   }
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col items-start justify-start p-4 md:p-8 text-black font-sans overflow-y-auto no-scrollbar relative bg-white">
-      <div className="w-full max-w-[780px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 flex flex-col transition-all duration-500 z-10 ml-0">
+    <div className="w-full h-full min-h-0 flex flex-col items-center justify-start p-4 md:p-8 text-black font-sans overflow-y-auto no-scrollbar relative bg-white">
+      <div className="w-full max-w-[880px] mx-auto bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 flex flex-col transition-all duration-500 z-10">
         
         {/* Header */}
         <div className="w-full flex-shrink-0 border-b border-slate-200/60 pb-5 mb-7">
           <div className="flex flex-col">
             <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-slate-900 leading-none">
-              Billing &amp; Plan
+              Pricing &amp; Plan
             </h1>
             <span className="mt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-              Manage your subscription and payment history
+              Aztec Network · Subscription Management &amp; Billing History
             </span>
           </div>
         </div>

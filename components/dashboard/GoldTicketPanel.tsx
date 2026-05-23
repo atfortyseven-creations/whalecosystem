@@ -475,10 +475,28 @@ export function GoldTicketPanel() {
   };
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col gap-4 overflow-hidden">
-      
+    <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 gap-5 overflow-y-auto no-scrollbar bg-white">
+
+      {/* ── HEADER ── */}
+      <div className="w-full flex-shrink-0 border-b border-slate-200/60 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="flex flex-col">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-slate-900 leading-none">
+              Dashboard
+            </h1>
+            <span className="mt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              Aztec Network · Identity Badge · Public Signature Ledger
+            </span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-black/[0.03] border border-black/8 rounded-full shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+            <span className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40">Optimism L2</span>
+          </div>
+        </div>
+      </div>
+
       {/*  HERO & INTERACTION (BENTO GRID)  */}
-      <div className="grid lg:grid-cols-2 gap-4 shrink-0">
+      <div className="grid lg:grid-cols-2 gap-4 flex-shrink-0">
           
           <div className="bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl flex flex-col justify-center p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
                <div className="shrink-0 pt-2 pb-6 border-b border-black/5 w-full flex flex-col gap-0.5 mb-4">

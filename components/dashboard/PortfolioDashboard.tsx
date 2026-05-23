@@ -167,6 +167,24 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     }
 
     return (
+        <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 bg-white dark:bg-[#050505] overflow-y-auto no-scrollbar gap-6">
+            {/* ── HEADER ── */}
+            <div className="w-full flex-shrink-0 border-b border-slate-200/60 dark:border-white/10 pb-5">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div className="flex flex-col">
+                        <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-slate-900 dark:text-white leading-none">
+                            Portfolio
+                        </h1>
+                        <span className="mt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-black/40 dark:text-white/30">
+                            Aztec Network · Multi-Chain Wallet Intelligence · ZK-Shielded Analytics
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-black/[0.03] dark:bg-white/5 border border-black/8 dark:border-white/10 rounded-full shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40 dark:text-white/30">Live On-Chain</span>
+                    </div>
+                </div>
+            </div>
         <div className="w-full relative space-y-8">
             {/*  DASHBOARD HEADER & ACCOUNT SWITCHER */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-2">
@@ -577,6 +595,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             {/* Modal Integrations */}
             <UnifiedWalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} initialTab={walletModalTab} userAssets={assets} />
             <ReceiveModal isOpen={isReceiveOpen} onClose={() => setIsReceiveOpen(false)} userAssets={assets} />
+        </div>
         </div>
     );
 }

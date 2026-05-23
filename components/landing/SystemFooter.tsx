@@ -75,12 +75,15 @@ const NAV_COLUMNS = [
 ];
 
 const ECOSYSTEM_PARTNERS = [
-  { name: "Aztec Network",  sub: "Privacy Layer",       icon: null,          isAztec: true },
-  { name: "Noir",           sub: "ZK Circuits",         icon: null,          isAztec: false },
-  { name: "Ethereum",       sub: "L1 Settlement",       icon: "https://cdn.simpleicons.org/ethereum/050505",       isAztec: false },
-  { name: "WalletConnect",  sub: "Identity Bridge",     icon: "https://cdn.simpleicons.org/walletconnect/050505",  isAztec: false },
-  { name: "Railway",        sub: "Infrastructure",      icon: "https://cdn.simpleicons.org/railway/050505",        isAztec: false },
-  { name: "Cloudflare",     sub: "Edge Security",       icon: "https://cdn.simpleicons.org/cloudflare/050505",     isAztec: false },
+  { name: "Aztec Network",  sub: "Privacy Layer",       icon: "/system-shots/PARTNERS/Captura de pantalla 2026-05-22 030758.png", isAztec: false },
+  { name: "Noir",           sub: "ZK Circuits",         icon: "/system-shots/PARTNERS/64b5696bf0d1f9bd7b9b0f22_400-400Logo-300x300.png", isAztec: false },
+  { name: "Ethereum",       sub: "L1 Settlement",       icon: "/system-shots/PARTNERS/icon.png", isAztec: false },
+  { name: "MetaMask",       sub: "Identity Bridge",     icon: "/system-shots/PARTNERS/MetaMask_Fox.svg.png", isAztec: false },
+  { name: "Railway",        sub: "Infrastructure",      icon: "/system-shots/PARTNERS/railway.webp", isAztec: false },
+  { name: "Cloudflare",     sub: "Edge Security",       icon: "/system-shots/PARTNERS/cloudflare_logo_icon_170372.png", isAztec: false },
+  { name: "Neo4j",          sub: "Graph DB",            icon: "/system-shots/PARTNERS/neo4j-logo-png-transparent.png", isAztec: false },
+  { name: "Upstash",        sub: "Redis Cache",         icon: "/system-shots/PARTNERS/upstash-icon-white-bg.png", isAztec: false },
+  { name: "Coinbase",       sub: "Exchange Base",       icon: "/system-shots/PARTNERS/coinbase-logo-icon.webp", isAztec: false },
 ];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -125,9 +128,9 @@ export function SystemFooter() {
         {/* ── Row 1: Brand + Social ── */}
         <div className="flex flex-col sm:flex-row items-start justify-between gap-8">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 shrink-0 flex items-center justify-center">
+            <div className="w-10 h-10 shrink-0 flex items-center justify-center">
               <img
-                src="/atom_3d_silver.jpg"
+                src="/system-shots/PARTNERS/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg"
                 alt="Humanity Ledger"
                 className="object-contain w-full h-full mix-blend-multiply"
               />
@@ -199,7 +202,7 @@ export function SystemFooter() {
                     </svg>
                   ) : p.icon ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.icon} alt={p.name} className="w-3.5 h-3.5 object-contain opacity-55 group-hover:opacity-100 transition-opacity" />
+                    <img src={p.icon} alt={p.name} className="w-4 h-4 object-contain opacity-55 group-hover:opacity-100 transition-opacity" />
                   ) : (
                     <div className="w-2 h-2 rounded-sm bg-black/20 group-hover:bg-black/40 transition-colors" />
                   )}
