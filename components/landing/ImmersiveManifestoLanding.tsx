@@ -252,61 +252,35 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
               {/* Two full sets so the loop is seamless */}
               {[0, 1].map((set) => (
                 <React.Fragment key={set}>
-                  {/* Aztec / Screenshot */}
+                  {/* Aztec Network */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
-                    <img
-                      src="/system-shots/Captura de pantalla 2026-05-22 030758.png"
-                      alt="Aztec Network"
-                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
-                    />
+                    <svg viewBox="0 0 24 24" fill="none" className="h-6 w-auto opacity-80">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M12 2.5C12.5 2.5 13 2.7 13.4 3.1L20.9 10.6C21.7 11.4 21.7 12.6 20.9 13.4L13.4 20.9C12.6 21.7 11.4 21.7 10.6 20.9L3.1 13.4C2.3 12.6 2.3 11.4 3.1 10.6L10.6 3.1C11 2.7 11.5 2.5 12 2.5ZM12 8.5C11.6 8.5 11.2 8.7 10.9 8.9L8.9 10.9C8.3 11.5 8.3 12.5 8.9 13.1L10.9 15.1C11.5 15.7 12.5 15.7 13.1 15.1L15.1 13.1C15.7 12.5 15.7 11.5 15.1 10.9L13.1 8.9C12.8 8.7 12.4 8.5 12 8.5Z" fill="#FFFFFF"/>
+                    </svg>
                   </div>
                   {/* Cloudflare */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
-                    <img
-                      src="/system-shots/cloudflare_logo_icon_170372.png"
-                      alt="Cloudflare"
-                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
-                    />
+                    <img src="https://cdn.simpleicons.org/cloudflare/FFFFFF" alt="Cloudflare" className="h-6 w-auto opacity-80" />
                   </div>
                   {/* Coinbase */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
-                    <img
-                      src="/system-shots/coinbase-logo-icon.webp"
-                      alt="Coinbase"
-                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
-                    />
+                    <img src="https://cdn.simpleicons.org/coinbase/FFFFFF" alt="Coinbase" className="h-6 w-auto opacity-80" />
                   </div>
                   {/* Ethereum */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
-                    <img
-                      src="/system-shots/ethereum-eth.svg"
-                      alt="Ethereum"
-                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
-                    />
+                    <img src="https://cdn.simpleicons.org/ethereum/FFFFFF" alt="Ethereum" className="h-6 w-auto opacity-80" />
                   </div>
                   {/* Neo4j */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
-                    <img
-                      src="/system-shots/neo4j-logo-png-transparent.png"
-                      alt="Neo4j"
-                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
-                    />
+                    <img src="https://cdn.simpleicons.org/neo4j/FFFFFF" alt="Neo4j" className="h-6 w-auto opacity-80" />
                   </div>
                   {/* MetaMask */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
-                    <img
-                      src="/system-shots/MetaMask_Fox.svg.png"
-                      alt="MetaMask"
-                      className="h-8 w-auto object-contain opacity-85"
-                    />
+                    <img src="https://cdn.simpleicons.org/metamask/FFFFFF" alt="MetaMask" className="h-6 w-auto opacity-80" />
                   </div>
                   {/* Upstash */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
-                    <img
-                      src="/system-shots/upstash-icon-white-bg.png"
-                      alt="Upstash"
-                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
-                    />
+                    <img src="https://cdn.simpleicons.org/upstash/FFFFFF" alt="Upstash" className="h-6 w-auto opacity-80" />
                   </div>
                   {/* Spacer between sets */}
                   <div className="w-8 shrink-0" />

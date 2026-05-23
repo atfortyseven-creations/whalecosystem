@@ -583,16 +583,12 @@ export default function ConnectPage() {
               </span>
               
               <div className="w-[200px] xl:w-[240px] flex items-center justify-center my-2 opacity-95">
-                <img 
-                  src="/system-shots/Captura de pantalla 2026-05-22 030758.png" 
-                  alt="Made by Aztec Network" 
-                  className="w-full h-auto object-contain mix-blend-multiply drop-shadow-sm"
-                  onError={(e) => { 
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    // Fallback to text if image fails to load
-                    (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-[18px] font-black tracking-tight text-[#0A0A0A]">AZTEC NETWORK</span>';
-                  }}
-                />
+                <div className="flex items-center gap-3">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-10 h-10">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2.5C12.5 2.5 13 2.7 13.4 3.1L20.9 10.6C21.7 11.4 21.7 12.6 20.9 13.4L13.4 20.9C12.6 21.7 11.4 21.7 10.6 20.9L3.1 13.4C2.3 12.6 2.3 11.4 3.1 10.6L10.6 3.1C11 2.7 11.5 2.5 12 2.5ZM12 8.5C11.6 8.5 11.2 8.7 10.9 8.9L8.9 10.9C8.3 11.5 8.3 12.5 8.9 13.1L10.9 15.1C11.5 15.7 12.5 15.7 13.1 15.1L15.1 13.1C15.7 12.5 15.7 11.5 15.1 10.9L13.1 8.9C12.8 8.7 12.4 8.5 12 8.5Z" fill="#0A0A0A"/>
+                  </svg>
+                  <span className="text-[20px] font-black tracking-tighter text-[#0A0A0A]">AZTEC NETWORK</span>
+                </div>
               </div>
               
               <p className="text-[11px] text-[#0A0A0A]/40 leading-relaxed font-serif max-w-[280px] italic">
