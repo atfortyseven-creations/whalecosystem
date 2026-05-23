@@ -1010,21 +1010,7 @@ function TransferTab({
                     )}
                 </AnimatePresence>
 
-                {/* Protocol badge strip */}
-                <div className="flex flex-wrap gap-2">
-                    {[
-                        { icon: <Zap size={8} />,      label: 'ERC-2612 Permit' },
-                        { icon: <Atom size={8} />,      label: '256-bit Entropy' },
-                        { icon: <Lock size={8} />,      label: 'MEV Protected' },
-                        { icon: <Shield size={8} />,    label: 'Keccak-256 Hash' },
-                        { icon: <Infinity size={8} />,  label: 'Immutable Receipt' },
-                        { icon: <Activity size={8} />,  label: `Gas < $0.01` },
-                    ].map(b => (
-                        <div key={b.label} className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-black/8 text-[7px] font-mono font-black uppercase tracking-widest text-black/40">
-                            {b.icon}{b.label}
-                        </div>
-                    ))}
-                </div>
+
 
                 {/* Error display */}
                 <AnimatePresence>
@@ -1084,10 +1070,7 @@ function TransferTab({
                     </button>
                 </div>
 
-                {/* Disclaimer */}
-                <p className="text-[8px] font-mono text-black/25 leading-relaxed uppercase tracking-wider text-center">
-                    This tx injects 256-bit core entropy, ABI-encoded route metadata and generates an immutable Keccak-256 fingerprint stored on-chain in the CoreLedger. ERC-2612 Permit eliminates separate approve(). Fees are negligible L2 costs.
-                </p>
+
             </div>
 
             {/* Success receipt modal */}
@@ -1215,20 +1198,7 @@ export function CoreDotsPanel() {
                     ))}
                 </div>
 
-                {/* Protocol badges */}
-                <div className="flex items-center gap-2 flex-wrap">
-                    {[
-                        { icon: <Zap size={8} />,       label: 'ERC-2612 Permit'  },
-                        { icon: <Atom size={8} />,       label: 'Core Entropy'  },
-                        { icon: <Lock size={8} />,       label: 'MEV Protected'    },
-                        { icon: <Shield size={8} />,     label: 'Keccak-256'       },
-                        { icon: <Infinity size={8} />,   label: 'Immutable Receipt' },
-                    ].map(b => (
-                        <div key={b.label} className="flex items-center gap-1 px-2 py-1 rounded-full border border-black/10 text-black/40 bg-white text-[7px] font-mono font-black uppercase tracking-widest shadow-sm">
-                            {b.icon}{b.label}
-                        </div>
-                    ))}
-                </div>
+
             </div>
 
             {/*  Recent tx toast  */}

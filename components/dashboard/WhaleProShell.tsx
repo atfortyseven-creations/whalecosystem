@@ -42,8 +42,6 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'mass-transfer', label: 'Sync Records',    icon: getModuleIcon('mass-transfer'), requiresZK: true, minTier: 'STANDARD' },
     { id: 'logs',          label: 'Activity Log',    icon: getModuleIcon('logs') },
     { id: 'support',       label: 'Help & Support',  icon: getModuleIcon('support') },
-    { id: 'community',     label: 'Community',       icon: getModuleIcon('community') },
-    { id: 'privacy',       label: 'Privacy',         icon: getModuleIcon('privacy') },
 ];
 
 const RESTRICTED_TABS = [

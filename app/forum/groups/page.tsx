@@ -33,45 +33,48 @@ export default async function ForumGroupsPage() {
   ];
 
   return (
-    <div className="w-full max-w-[1110px] mx-auto py-10 px-4">
+    <div className="flex-1 flex flex-col bg-[#FAFAF9] text-slate-900 w-full min-h-screen">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-10">
 
-      {/* Breadcrumb & Header */}
-      <div className="mb-8 pb-4 border-b border-black/10 dark:border-white/10">
-        <div className="flex items-center gap-2 mb-2 text-[12px] font-sans font-bold text-black/50 dark:text-[#888888]">
-          <Link href="/forum" className="transition-colors hover:opacity-100">Forum</Link>
-          <span>/</span>
-          <span className="text-black dark:text-white">Groups</span>
-        </div>
-        <div className="flex items-center justify-between">
-            <h1 className="text-[28px] font-sans font-black uppercase tracking-tight text-black dark:text-white">
-              Member Groups
-            </h1>
-            <div className="text-[14px] font-sans text-black/50 dark:text-[#888888]">
-              Total: <span className="font-bold text-black dark:text-white">{groupsData.TOTAL} Members</span>
+        {/* Breadcrumb & Header */}
+        <div className="mb-8 pb-4 border-b border-slate-200">
+          <div className="flex items-center gap-2 mb-2 text-[12px] font-sans font-bold text-slate-500">
+            <Link href="/forum" className="transition-colors hover:text-[#0088cc]">Forum</Link>
+            <span>/</span>
+            <span className="text-slate-900">Groups</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 leading-none mb-2">Member Groups</h1>
+              <p className="text-[14px] text-slate-500 font-medium">Access levels and roles across the community.</p>
             </div>
+            <div className="text-[14px] font-sans text-slate-500 hidden sm:block">
+              Total: <span className="font-bold text-slate-900">{groupsData.TOTAL} Members</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-2">
-         {groups.map(g => (
-           <div
-             key={g.id}
-             className="flex items-center py-4 px-4 rounded-xl transition-all duration-200 bg-black/5 dark:bg-[#111111] border border-black/10 dark:border-white/10 hover:border-[#00C076] dark:hover:border-[#00C076]"
-           >
-             <div className="flex-1 min-w-0">
-               <div className="text-[16px] font-sans font-bold transition-colors text-black dark:text-white">
-                 {g.label}
+        <div className="flex flex-col gap-3">
+           {groups.map(g => (
+             <div
+               key={g.id}
+               className="flex items-center py-5 px-6 rounded-xl transition-all duration-200 bg-white border border-slate-200 hover:border-[#0088cc] hover:shadow-sm"
+             >
+               <div className="flex-1 min-w-0">
+                 <div className="text-[16px] font-sans font-bold transition-colors text-slate-900">
+                   {g.label}
+                 </div>
+                 <div className="text-[13px] font-sans mt-1 text-slate-500">{g.sub}</div>
                </div>
-               <div className="text-[13px] font-sans mt-1 text-black/50 dark:text-[#888888]">{g.sub}</div>
-             </div>
-             <div className="w-24 flex items-center justify-end gap-2">
-               <span className="text-[12px] font-sans font-bold uppercase tracking-widest text-black/50 dark:text-[#888888]">Members</span>
-               <div className="text-[18px] font-sans font-black text-black dark:text-white">
-                 {g.count}
+               <div className="w-24 flex items-center justify-end gap-3">
+                 <span className="text-[10px] font-mono font-black uppercase tracking-widest text-slate-400">Members</span>
+                 <div className="text-[18px] font-sans font-black text-slate-900">
+                   {g.count}
+                 </div>
                </div>
              </div>
-           </div>
-         ))}
+           ))}
+        </div>
       </div>
     </div>
   );

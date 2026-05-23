@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function SecurityPage() {
   return (
-    <div className="w-full min-h-screen bg-white text-slate-900 py-16 font-sans">
+    <div className="flex-1 w-full min-h-screen bg-white text-slate-900 py-16 font-sans">
       <div className="w-full max-w-[800px] mx-auto px-6">
         <div className="mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-6">

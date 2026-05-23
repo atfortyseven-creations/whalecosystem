@@ -29,8 +29,8 @@ const FILTER_TABS = [
   { id: 'categories', label: 'Categories',  icon: <Hash size={13} /> },
   { id: 'latest',     label: 'Latest',      icon: <Clock size={13} /> },
   { id: 'new',        label: 'New',         icon: <Star size={13} /> },
+  { id: 'unread',     label: 'Unread',      icon: <Eye size={13} /> },
   { id: 'top',        label: 'Top',         icon: <TrendingUp size={13} /> },
-  { id: 'hot',        label: 'Hot',         icon: <Flame size={13} /> },
 ];
 
 // ─── Search Modal ─────────────────────────────────────────────────────────────
@@ -127,7 +127,7 @@ function SearchModal({ onClose }: { onClose: () => void }) {
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { label: 'Latest Topics', href: '/forum?filter=latest', icon: <Clock size={13} /> },
-                    { label: 'Hot Discussions', href: '/forum?filter=hot', icon: <Flame size={13} /> },
+                    { label: 'Unread Discussions', href: '/forum?filter=unread', icon: <Eye size={13} /> },
                     { label: 'New Posts', href: '/forum?filter=new', icon: <Star size={13} /> },
                     { label: 'Top Topics', href: '/forum?filter=top', icon: <TrendingUp size={13} /> },
                   ].map(link => (
@@ -380,26 +380,6 @@ function TopicRow({ topic, mounted }: { topic: any; mounted: boolean }) {
   );
 }
 
-// ─── Stats Bar ────────────────────────────────────────────────────────────────
-function StatsBar() {
-  const stats = [
-    { value: '12,400+', label: 'Members',     icon: <Users size={14} /> },
-    { value: '3,800+',  label: 'Discussions', icon: <MessageSquare size={14} /> },
-    { value: '98K+',    label: 'Replies',     icon: <BarChart2 size={14} /> },
-  ];
-
-  return (
-    <div className="flex items-center gap-6 flex-wrap">
-      {stats.map(({ value, label, icon }) => (
-        <div key={label} className="flex items-center gap-2">
-          <span className="text-slate-300">{icon}</span>
-          <span className="text-[14px] font-bold text-slate-800">{value}</span>
-          <span className="text-[12px] text-slate-400">{label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 // ─── Main Forum Content ───────────────────────────────────────────────────────
 function ForumHomeContent() {
@@ -517,7 +497,6 @@ function ForumHomeContent() {
             <p className="text-[14px] text-slate-500 font-medium">A structured space for discussion, ideas, and knowledge sharing.</p>
           </div>
           <div className="flex flex-col gap-3">
-            <StatsBar />
           </div>
         </div>
 

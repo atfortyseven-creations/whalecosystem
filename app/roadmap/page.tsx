@@ -76,7 +76,7 @@ export default function RoadmapPage() {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#050e0d] text-white font-sans overflow-hidden flex flex-col relative">
+    <div ref={containerRef} className="flex-1 min-h-screen bg-[#050e0d] text-white font-sans overflow-hidden flex flex-col relative">
       
       {/* HEADER */}
       <header className="p-8 md:p-12 z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative bg-[#020605]">
@@ -87,17 +87,13 @@ export default function RoadmapPage() {
           <div className="flex items-center gap-6 mb-4">
              {/* Aztec Logo */}
              <div className="flex items-center gap-2">
-                 <div className="w-8 h-8 bg-[#c4f344] rounded-sm transform rotate-45 flex items-center justify-center">
-                     <div className="w-4 h-4 bg-[#020605] rounded-sm"></div>
-                 </div>
+                 <img src="/system-shots/PARTNERS/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" alt="Aztec" className="w-8 h-8 rounded-sm object-cover" />
                  <span className="text-xl font-bold tracking-tight text-white">Aztec</span>
              </div>
              <div className="w-[1px] h-8 bg-white/10"></div>
              {/* Whale Alert Logo */}
              <div className="flex items-center gap-2">
-                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/30">
-                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h20"/><path d="M20 12v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/><path d="M12 2v10"/><path d="M8 6l4-4 4 4"/></svg>
-                 </div>
+                 <img src="/system-shots/PARTNERS/Captura de pantalla 2026-05-22 030758.png" alt="Whale Alert" className="w-8 h-8 rounded-sm object-cover bg-white" />
                  <span className="text-xl font-bold tracking-tight text-white">Whale Alert</span>
              </div>
           </div>

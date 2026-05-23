@@ -602,22 +602,7 @@ export default function CoreTransfer() {
                                 </div>
                             </div>
 
-                            {/* Protocol badges */}
-                            <div className="flex items-center gap-2 flex-wrap">
-                                {[
-                                    { icon: <Zap size={9} />, label: 'ERC-2612 Permit' },
-                                    { icon: <Shield size={9} />, label: 'Core Entropy' },
-                                    { icon: <Lock size={9} />, label: 'MEV Protected' },
-                                    { icon: <Activity size={9} />, label: 'Gas < $0.001' },
-                                ].map(b => (
-                                    <div
-                                        key={b.label}
-                                        className="flex items-center gap-1 px-2 py-1 rounded-full border border-white/10 text-white/50 text-[8px] font-mono font-black uppercase tracking-widest"
-                                    >
-                                        {b.icon}{b.label}
-                                    </div>
-                                ))}
-                            </div>
+
                         </div>
 
                         {/*  Form body  */}
@@ -750,12 +735,7 @@ export default function CoreTransfer() {
                                 )}
                             </AnimatePresence>
 
-                            {/* Protocol disclaimer */}
-                            <div className="bg-[#FAFAF8] border border-black/5 rounded-2xl p-4">
-                                <p className="text-[9px] font-mono text-black/40 leading-relaxed uppercase tracking-wider">
-                                    This tx injects 256-bit core entropy, an ABI-encoded payload (platform, network route, ms timestamp) and generates an immutable Keccak-256 fingerprint on the CoreLedger. ERC-2612 Permit eliminates separate approve(). Gas fees are negligible L2 costs.
-                                </p>
-                            </div>
+
 
                             {/* Error */}
                             <AnimatePresence>

@@ -53,7 +53,7 @@ const NAV_COLUMNS = [
       { label: "Developer Hub",  href: "/developer" },
       { label: "API Reference",  href: "/api-docs" },
       { label: "API Marketplace",href: "/api-marketplace" },
-      { label: "Noir Circuits",  href: "https://github.com/atfortyseven-creations/Humanity-Ledger", external: true },
+      { label: "Noir Circuits",  href: "https://github.com/hvbr1s/noir-circuits", external: true },
     ]
   },
   {

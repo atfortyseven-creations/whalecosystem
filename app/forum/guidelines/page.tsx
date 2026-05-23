@@ -109,86 +109,80 @@ const RULES = [
 
 export default function ForumGuidelinesPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans antialiased">
+    <div className="flex-1 flex flex-col bg-[#FAFAF9] text-slate-900 w-full min-h-screen">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-10">
 
-      {/* Top nav breadcrumb */}
-      <div className="w-full border-b border-black/10 dark:border-white/10 bg-white dark:bg-black sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
-          <Link href="/forum" className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
-            <ArrowLeft size={13} />
-            Foro
-          </Link>
-          <span className="text-black/20 dark:text-white/20">/</span>
-          <span className="text-[11px] font-bold uppercase tracking-widest text-black dark:text-white">Normas de la Comunidad</span>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-8 pb-4 border-b border-slate-200">
+          <div className="flex items-center gap-2 text-[12px] font-sans font-bold text-slate-500">
+            <Link href="/forum" className="transition-colors hover:text-[#0088cc]">Forum</Link>
+            <span>/</span>
+            <span className="text-slate-900">Guidelines</span>
+          </div>
         </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-6 pt-16 pb-32">
 
         {/* Hero */}
-        <div className="mb-16">
-          <div className="flex items-center gap-2 mb-5">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">Foro / Normas</span>
-          </div>
-          <h1 className="text-[42px] md:text-[54px] font-black tracking-tighter leading-[0.95] text-black dark:text-white mb-5 uppercase">
-            Normas de la<br />
-            <span>Comunidad</span>
+        <div className="mb-12">
+          <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 leading-none mb-4 uppercase">
+            Normas de la Comunidad
           </h1>
-          <p className="text-[15px] text-black/60 dark:text-white/60 font-medium leading-relaxed max-w-2xl">
+          <p className="text-[14px] text-slate-500 font-medium max-w-2xl leading-relaxed">
             El foro de Whale Alert Network es un espacio de alta calidad para el análisis de blockchain, DeFi e inteligencia financiera. Estas normas existen para proteger la calidad del contenido y asegurar una convivencia sana.
           </p>
         </div>
 
         {/* Quote banner */}
-        <div className="mb-14 p-6 bg-white dark:bg-black border border-black dark:border-white rounded-2xl flex items-start gap-4">
-          <MessageSquare size={18} className="text-black dark:text-white mt-0.5 shrink-0" />
-          <p className="text-[14px] italic text-black dark:text-white leading-relaxed font-medium">
+        <div className="mb-12 p-6 bg-white border border-slate-200 rounded-xl flex items-start gap-4">
+          <MessageSquare size={18} className="text-slate-400 mt-0.5 shrink-0" />
+          <p className="text-[14px] italic text-slate-600 leading-relaxed font-medium">
             "Una comunidad se define por el comportamiento más bajo que está dispuesta a tolerar. Mantenemos el nivel muy alto porque quienes confían en esta información merecen excelencia."
           </p>
         </div>
 
         {/* Rules */}
-        <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {RULES.map(rule => (
-            <div key={rule.n} className="bg-white dark:bg-black rounded-2xl border border-black dark:border-white overflow-hidden">
+            <div key={rule.n} className="bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col">
               
               {/* Rule header */}
-              <div className="flex items-start gap-5 px-8 pt-7 pb-6">
-                <div className="flex items-center gap-4 shrink-0 pt-0.5">
-                  <span className="text-[11px] font-mono font-bold text-black/40 dark:text-white/40">{rule.n}</span>
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center border border-black dark:border-white bg-black/5 dark:bg-white/5">
-                    <rule.icon size={16} className="text-black dark:text-white" />
+              <div className="flex items-start gap-4 px-6 pt-6 pb-5">
+                <div className="flex flex-col items-center gap-2 shrink-0">
+                  <span className="text-[12px] font-mono font-black text-slate-300">{rule.n}</span>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-100 bg-slate-50">
+                    <rule.icon size={16} className="text-slate-500" />
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-[17px] font-black tracking-tight text-black dark:text-white mb-2 uppercase">{rule.title}</h2>
-                  <p className="text-[14px] text-black/60 dark:text-white/60 leading-relaxed font-medium">{rule.body}</p>
+                  <h2 className="text-[15px] font-black tracking-tight text-slate-900 mb-2 uppercase">{rule.title}</h2>
+                  <p className="text-[13px] text-slate-500 leading-relaxed">{rule.body}</p>
                 </div>
               </div>
 
               {/* Do / Don't */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-black dark:bg-white border-t border-black dark:border-white">
-                <div className="bg-white dark:bg-black px-7 py-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-slate-100 border-t border-slate-100 mt-auto">
+                <div className="bg-white px-6 py-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 size={12} className="text-black dark:text-white" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-black dark:text-white">Hacer (Do)</span>
+                    <CheckCircle2 size={12} className="text-[#00C076]" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Do</span>
                   </div>
-                  <ul className="space-y-2">
+                  <ul className="space-y-3">
                     {rule.dos.map((d, i) => (
-                      <li key={i} className="text-[12px] text-black/75 dark:text-white/75 font-medium leading-snug pl-3 border-l-2 border-black dark:border-white">
+                      <li key={i} className="text-[12px] text-slate-600 font-medium leading-snug flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00C076]/30 shrink-0 mt-1.5" />
                         {d}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="bg-white dark:bg-black px-7 py-5">
+                <div className="bg-white px-6 py-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <AlertTriangle size={12} className="text-black dark:text-white" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-black dark:text-white">Evitar (Don't)</span>
+                    <AlertTriangle size={12} className="text-amber-500" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500">Don't</span>
                   </div>
-                  <ul className="space-y-2">
+                  <ul className="space-y-3">
                     {rule.donts.map((d, i) => (
-                      <li key={i} className="text-[12px] text-black/75 dark:text-white/75 font-medium leading-snug pl-3 border-l-2 border-black dark:border-white">
+                      <li key={i} className="text-[12px] text-slate-600 font-medium leading-snug flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500/30 shrink-0 mt-1.5" />
                         {d}
                       </li>
                     ))}
@@ -200,13 +194,13 @@ export default function ForumGuidelinesPage() {
         </div>
 
         {/* Enforcement */}
-        <div className="mt-10 bg-white dark:bg-black rounded-2xl border border-black dark:border-white p-8">
-          <h3 className="text-[16px] font-black tracking-tight text-black dark:text-white mb-3 uppercase">Aplicación de Normas y Apelaciones</h3>
-          <p className="text-[13px] text-black/60 dark:text-white/60 leading-relaxed font-medium mb-5">
-            Las infracciones se tratarán según su gravedad: advertencia inicial para faltas menores, suspensión temporal de 3 a 30 días para reincidencias, y expulsión permanente del foro en casos graves de manipulación de mercado, acoso o exposición de datos privados. Las apelaciones pueden enviarse a <span className="font-bold border-b border-black dark:border-white">moderation@humanidfi.com</span> en un plazo máximo de 14 días. Las decisiones serán resueltas por el equipo en un plazo de 5 días hábiles.
+        <div className="mt-12 bg-slate-900 rounded-xl p-8 text-white">
+          <h3 className="text-[16px] font-black tracking-tight mb-3 uppercase text-white">Aplicación de Normas y Apelaciones</h3>
+          <p className="text-[13px] text-slate-300 leading-relaxed font-medium mb-6 max-w-4xl">
+            Las infracciones se tratarán según su gravedad: advertencia inicial para faltas menores, suspensión temporal de 3 a 30 días para reincidencias, y expulsión permanente del foro en casos graves de manipulación de mercado, acoso o exposición de datos privados. Las apelaciones pueden enviarse a <span className="font-bold border-b border-slate-500">moderation@humanidfi.com</span> en un plazo máximo de 14 días. Las decisiones serán resueltas por el equipo en un plazo de 5 días hábiles.
           </p>
-          <div className="flex items-center gap-2 pt-4 border-t border-black/10 dark:border-white/10">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-black/40 dark:text-white/40">Última actualización  Mayo 2026</span>
+          <div className="flex items-center gap-2 pt-5 border-t border-slate-800">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500">Última actualización: Mayo 2026</span>
           </div>
         </div>
 

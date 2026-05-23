@@ -33,53 +33,62 @@ export default async function ForumAnniversariesPage() {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
+    <div className="flex-1 flex flex-col bg-[#FAFAF9] text-slate-900 w-full min-h-screen">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-10">
 
-      <div className="mb-8 pb-6 border-b border-black/10 dark:border-white/10">
-        <div className="text-[12px] font-sans font-bold mb-2 text-black/50 dark:text-[#888888]">FORUM / NEW MEMBERS</div>
-        <h1 className="text-[28px] font-sans font-black uppercase tracking-tight text-black dark:text-white">
-          {monthNames[currentMonth]}
-        </h1>
-        <div className="text-[14px] font-sans mt-1 text-black/50 dark:text-[#888888]">Joined this month</div>
-      </div>
-
-      {/* Table header */}
-      <div className="flex items-center pb-3 text-[12px] font-sans font-bold uppercase border-b border-black/10 dark:border-white/10 text-black/50 dark:text-[#888888]">
-        <div className="flex-1">MEMBER</div>
-        <div className="w-24 text-right">JOINED</div>
-        <div className="w-16 text-right">SINCE</div>
-      </div>
-
-      {users.length === 0 ? (
-        <div className="py-16 text-center text-[13px] font-sans text-black/50 dark:text-[#888888]">
-          No new members joined in {monthNames[currentMonth]} yet.
+        {/* Breadcrumb & Header */}
+        <div className="mb-8 pb-4 border-b border-slate-200">
+          <div className="flex items-center gap-2 mb-2 text-[12px] font-sans font-bold text-slate-500">
+            <Link href="/forum" className="transition-colors hover:text-[#0088cc]">Forum</Link>
+            <span>/</span>
+            <span className="text-slate-900">Anniversaries</span>
+          </div>
+          <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 leading-none mb-2">
+            {monthNames[currentMonth]}
+          </h1>
+          <p className="text-[14px] text-slate-500 font-medium">New members who joined the community this month.</p>
         </div>
-      ) : users.map((u, i) => {
-        const joined = new Date(u.createdAt);
-        const years  = new Date().getFullYear() - joined.getFullYear();
-        const addr   = u.walletAddress;
-        const label  = u.displayName || `${addr.slice(0,6)}${addr.slice(-4)}`;
 
-        return (
-          <Link
-            key={i}
-            href={`/forum/u/${addr}`}
-            className="flex items-center py-4 transition-colors hover:bg-black/5 dark:hover:bg-[#111111] border-b border-black/10 dark:border-white/10"
-          >
-            <div className="flex-1 min-w-0">
-              <div className="text-[15px] font-sans font-bold truncate text-black dark:text-white">
-                {label}
-              </div>
+        {/* Table header */}
+        <div className="flex items-center pb-3 text-[10px] font-mono font-black uppercase tracking-widest text-slate-400 border-b border-slate-200 mb-4 px-4">
+          <div className="flex-1">Member</div>
+          <div className="w-24 text-right">Joined</div>
+          <div className="w-16 text-right">Since</div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          {users.length === 0 ? (
+            <div className="py-16 text-center text-[13px] font-sans text-slate-400">
+              No new members joined in {monthNames[currentMonth]} yet.
             </div>
-            <div className="w-24 text-right text-[12px] font-sans uppercase text-black/50 dark:text-[#888888]">
-              {monthNames[joined.getMonth()].slice(0,3)} {joined.getFullYear()}
-            </div>
-            <div className="w-16 text-right text-[14px] font-sans font-bold text-black dark:text-white">
-              {years > 0 ? `${years}y` : 'New'}
-            </div>
-          </Link>
-        );
-      })}
+          ) : users.map((u, i) => {
+            const joined = new Date(u.createdAt);
+            const years  = new Date().getFullYear() - joined.getFullYear();
+            const addr   = u.walletAddress;
+            const label  = u.displayName || `${addr.slice(0,6)}...${addr.slice(-4)}`;
+
+            return (
+              <Link
+                key={i}
+                href={`/forum/u/${addr}`}
+                className="flex items-center py-4 px-4 rounded-xl transition-all duration-200 bg-white border border-transparent hover:border-slate-200 hover:shadow-sm"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="text-[15px] font-sans font-bold truncate text-slate-900 group-hover:text-[#0088cc] transition-colors">
+                    {label}
+                  </div>
+                </div>
+                <div className="w-24 text-right text-[12px] font-mono uppercase text-slate-500">
+                  {monthNames[joined.getMonth()].slice(0,3)} {joined.getFullYear()}
+                </div>
+                <div className="w-16 text-right text-[14px] font-sans font-bold text-slate-900">
+                  {years > 0 ? `${years}y` : 'New'}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

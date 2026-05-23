@@ -65,14 +65,16 @@ export default function ForumBadgesPage() {
   };
 
   return (
-    <div className="w-full flex flex-col bg-white text-slate-900 min-h-screen">
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 py-10">
+    <div className="flex-1 flex flex-col bg-[#FAFAF9] text-slate-900 w-full min-h-screen">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-10">
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 mb-8 text-[13px] font-medium text-slate-500">
-          <Link href="/forum" className="transition-colors hover:text-[#0088cc]">Forum</Link>
-          <span>/</span>
-          <span className="text-slate-900">Badges</span>
+        <div className="flex items-center gap-2 mb-8 pb-4 border-b border-slate-200">
+          <div className="flex items-center gap-2 text-[12px] font-sans font-bold text-slate-500">
+            <Link href="/forum" className="transition-colors hover:text-[#0088cc]">Forum</Link>
+            <span>/</span>
+            <span className="text-slate-900">Badges</span>
+          </div>
         </div>
 
         <div className="flex items-end justify-between mb-12">
@@ -86,11 +88,11 @@ export default function ForumBadgesPage() {
 
         {Object.entries(BADGES).map(([category, badges]) => (
           <div key={category} className="mb-12">
-            <h2 className="text-[20px] font-bold text-slate-900 mb-6 border-b border-slate-200 pb-2">
+            <h2 className="text-[14px] font-black uppercase tracking-widest text-slate-400 mb-6 border-b border-slate-200 pb-2">
               {category}
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {badges.map(b => (
                 <div key={b.name} className="flex flex-col p-5 rounded-xl border border-slate-200 bg-white hover:border-[#0088cc] hover:shadow-sm transition-all group">
                   <div className="flex items-start justify-between mb-3">
