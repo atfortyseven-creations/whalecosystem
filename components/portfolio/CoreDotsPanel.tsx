@@ -288,13 +288,13 @@ function TokenomicsTab({
                         key={label}
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-[#FAFAF8] border border-black/8 rounded-2xl px-4 py-4 flex flex-col gap-2"
+                        className="bg-[#FAFAF8] border border-black/8 rounded-2xl px-6 py-6 flex flex-col gap-3"
                     >
                         <div className="flex items-center gap-2 text-black/40">{icon}</div>
                         <div>
-                            <div className="text-[8px] font-black uppercase tracking-widest text-black/30 mb-0.5">{label}</div>
-                            <div className="font-mono font-black text-sm text-black">
-                                {value}{unit ? <span className="text-black/40 font-normal text-[10px] ml-1">{unit}</span> : null}
+                            <div className="text-[10px] font-black uppercase tracking-widest text-black/40 mb-1">{label}</div>
+                            <div className="font-mono font-black text-2xl text-black">
+                                {value}{unit ? <span className="text-black/40 font-normal text-xs ml-1.5">{unit}</span> : null}
                             </div>
                         </div>
                     </motion.div>
@@ -302,25 +302,25 @@ function TokenomicsTab({
             </div>
 
             {/* Contract addresses */}
-            <div className="border border-black/8 rounded-2xl overflow-hidden">
-                <div className="px-5 py-3 border-b border-black/5 bg-[#FAFAF8]">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-black/30">Contract Addresses</span>
+            <div className="border border-black/8 rounded-2xl overflow-hidden mt-6">
+                <div className="px-6 py-4 border-b border-black/5 bg-[#FAFAF8]">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-black/40">Contract Addresses</span>
                 </div>
                 {[
                     { label: 'QDs Token (ERC-20)', addr: TOKEN_ADDR },
                     { label: 'CoreLedger',      addr: LEDGER_ADDR },
                 ].map(({ label, addr }) => (
-                    <div key={label} className="flex items-center gap-3 px-5 py-3.5 border-b border-black/5 last:border-0">
+                    <div key={label} className="flex items-center gap-4 px-6 py-4 border-b border-black/5 last:border-0">
                         <div className="flex-1 min-w-0">
-                            <div className="text-[8px] font-black uppercase tracking-widest text-black/30 mb-0.5">{label}</div>
-                            <div className="font-mono text-[11px] text-black truncate">{addr}</div>
+                            <div className="text-[10px] font-black uppercase tracking-widest text-black/40 mb-1">{label}</div>
+                            <div className="font-mono text-sm text-black truncate">{addr}</div>
                         </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
+                        <div className="flex items-center gap-3 shrink-0">
                             <button onClick={() => copy(addr, label)} className="text-black/30 hover:text-black transition-colors">
-                                {copied === label ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                                {copied === label ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
                             </button>
                             <a href={`${EXPLORER}/address/${addr}`} target="_blank" rel="noopener noreferrer" className="text-black/30 hover:text-black transition-colors">
-                                <ExternalLink size={11} />
+                                <ExternalLink size={14} />
                             </a>
                         </div>
                     </div>
@@ -328,9 +328,9 @@ function TokenomicsTab({
             </div>
 
             {/* Protocol */}
-            <div className="bg-[#FAFAF8] border border-black/8 rounded-2xl p-5 space-y-3">
-                <div className="text-[9px] font-black uppercase tracking-widest text-black/30">Protocol Architecture</div>
-                <div className="space-y-2">
+            <div className="bg-[#FAFAF8] border border-black/8 rounded-2xl p-6 mt-6 space-y-4">
+                <div className="text-[10px] font-black uppercase tracking-widest text-black/40">Protocol Architecture</div>
+                <div className="space-y-3">
                     {[
                         { k: 'Standard',     v: 'ERC-20 + ERC-2612 (Permit)' },
                         { k: 'Entropy',      v: '256-bit CSPRNG, unique per-tx' },
@@ -339,9 +339,9 @@ function TokenomicsTab({
                         { k: 'Gas Model',    v: `L2 (${CHAIN_NAME}), negligible fees` },
                         { k: 'Receipt',      v: 'Immutable on-chain CoreLedger' },
                     ].map(({ k, v }) => (
-                        <div key={k} className="flex items-center justify-between text-xs">
-                            <span className="font-mono text-black/40 uppercase tracking-widest text-[9px]">{k}</span>
-                            <span className="font-mono font-black text-[10px] text-black">{v}</span>
+                        <div key={k} className="flex items-center justify-between text-sm border-b border-black/[0.03] pb-2 last:border-0 last:pb-0">
+                            <span className="font-mono text-black/50 uppercase tracking-widest text-[10px]">{k}</span>
+                            <span className="font-mono font-black text-xs text-black">{v}</span>
                         </div>
                     ))}
                 </div>
