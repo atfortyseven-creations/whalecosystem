@@ -87,27 +87,18 @@ export default function HumanityLedger() {
     // bg logo pushed far right via backgroundPosition so it doesn't compete
     // with the main panel which is pinned to the left side of its container.
     <div className="w-full h-full min-h-0 flex flex-col items-start justify-start p-4 md:p-8 text-black font-sans overflow-y-auto no-scrollbar relative bg-white">
-      {/*  BACKGROUND LOGOS  Centered in the white space on the right, fixed at top  */}
-      <div className="fixed top-0 right-0 bottom-0 left-[780px] hidden lg:flex items-start justify-center pt-12 pointer-events-none z-0">
-        <img 
-          src="/aztec_x_whale_partnership.svg" 
-          alt="Partnership Logos" 
-          className="w-full max-w-[520px] px-8 opacity-90 mix-blend-multiply" 
-        />
-      </div>
-
-      {/*  MAIN PANEL  left-aligned, deliberately narrower  */}
-      <div className="w-full max-w-[780px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 flex flex-col transition-all duration-500 z-10 ml-0">
+      {/*  MAIN PANEL  centered  */}
+      <div className="w-full max-w-[880px] mx-auto bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 flex flex-col transition-all duration-500 z-10">
 
         {/*  HEADER  */}
         <div className="w-full flex-shrink-0 border-b border-slate-200/60 pb-5 mb-7">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex flex-col">
+            <div className="flex flex-col items-center sm:items-start text-center sm:text-left w-full">
               <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-slate-900 leading-none">
                 Humanity Ledger
               </h1>
               <span className="mt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-                Aztec Network × Whale Alert Network  Live Indexer
+                Official Aztec Network Live Indexer
               </span>
             </div>
             <button

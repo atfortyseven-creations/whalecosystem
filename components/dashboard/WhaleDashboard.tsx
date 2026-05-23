@@ -29,7 +29,8 @@ const Registry = {
   PlanDashboard: dynamic(() => import('@/components/dashboard/PlanDashboard').then(m => ({ default: m.PlanDashboard })), { ssr: false, loading: LoadingPanel }),
   HumanityLedger: dynamic(() => import('@/components/dashboard/HumanityLedger'), { ssr: false, loading: LoadingPanel }),
   PortfolioDashboard: dynamic(() => import('@/components/dashboard/PortfolioDashboard'), { ssr: false, loading: LoadingPanel }),
-  InstitutionalMarkets: dynamic(() => import('@/components/dashboard/InstitutionalMarkets').then(m => ({ default: m.InstitutionalMarkets })), { ssr: false, loading: LoadingPanel })
+  InstitutionalMarkets: dynamic(() => import('@/components/dashboard/InstitutionalMarkets').then(m => ({ default: m.InstitutionalMarkets })), { ssr: false, loading: LoadingPanel }),
+  WhaleChat: dynamic(() => import('@/components/dashboard/WhaleChat').then(m => ({ default: m.WhaleChat })), { ssr: false, loading: LoadingPanel })
 } as const;
 
 import "@/app/dashboard/dashboard.css";
@@ -46,6 +47,7 @@ const RouteRenderer = React.memo(({ route, reconciliationKey }: RouteRendererPro
     const ComponentMap: Record<string, JSX.Element> = {
         'zk-identity': <GoldTicketPanel />,
         'gold': <GoldTicketPanel />,
+        'chat': <Registry.WhaleChat />,
         'portfolio': <Registry.PortfolioDashboard />,
         'billing': <Registry.PlanDashboard />,
         'humanity-ledger': <Registry.HumanityLedger />,

@@ -33,31 +33,28 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'gold',          label: 'Create Badge',    icon: getModuleIcon('gold') },
-    { id: 'seed-equity',   label: 'Seed Equity',     icon: getModuleIcon('seed-equity'), externalUrl: '/pitch_deck.html' },
-    { id: 'billing',       label: 'Plans',           icon: getModuleIcon('billing') },
-    { id: 'humanity-ledger', label: 'Humanity Ledger', icon: getModuleIcon('humanity-ledger') },
-    { id: 'markets',       label: 'Tokens',          icon: getModuleIcon('markets'), requiresZK: true },
-    { id: 'inst-ledger',   label: 'Block Explorer',  icon: getModuleIcon('inst-ledger'), requiresZK: true },
-    { id: 'mass-transfer', label: 'Sync Records',    icon: getModuleIcon('mass-transfer'), requiresZK: true, minTier: 'STANDARD' },
-    { id: 'logs',          label: 'Activity Log',    icon: getModuleIcon('logs') },
-    { id: 'support',       label: 'Help & Support',  icon: getModuleIcon('support') },
+    { id: 'gold',          label: 'Dashboard',    icon: getModuleIcon('gold') },
+    { id: 'chat',          label: 'Whale Chat',   icon: getModuleIcon('chat'), requiresZK: true },
+    { id: 'portfolio',     label: 'Portfolio',    icon: getModuleIcon('portfolio'), requiresZK: true },
+    { id: 'support',       label: 'Community',    icon: getModuleIcon('support') },
+    { id: 'billing',       label: 'Pricing',      icon: getModuleIcon('billing') },
+    { id: 'inst-ledger',   label: 'Status',       icon: getModuleIcon('inst-ledger') },
+    { id: 'logs',          label: 'Privacy',      icon: getModuleIcon('logs') },
 ];
 
 const RESTRICTED_TABS = [
-    'mass-transfer'
+    'logs'
 ];
 
 function getModuleIcon(id: string) {
     switch (id) {
-        case 'gold':          return <Zap size={18} />;
+        case 'gold':          return <PieChart size={18} />;
+        case 'chat':          return <MessageSquare size={18} />;
+        case 'portfolio':     return <BarChart2 size={18} />;
+        case 'support':       return <Globe size={18} />;
         case 'billing':       return <Wallet size={18} />;
-        case 'humanity-ledger': return <Database size={18} />;
-        case 'markets':       return <BarChart2 size={18} />;
-        case 'inst-ledger':   return <Globe size={18} />;
-        case 'mass-transfer': return <Cpu size={18} />;
-        case 'logs':          return <Activity size={18} />;
-        case 'support':       return <MessageSquare size={18} />;
+        case 'inst-ledger':   return <Activity size={18} />;
+        case 'logs':          return <Lock size={18} />;
         default:              return <Info size={18} />;
     }
 }
