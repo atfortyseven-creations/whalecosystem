@@ -252,14 +252,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
               {/* Two full sets so the loop is seamless */}
               {[0, 1].map((set) => (
                 <React.Fragment key={set}>
-                  {/* Identity / 64b5... */}
-                  <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
-                    <img
-                      src="/system-shots/64b5696bf0d1f9bd7b9b0f22_400-400Logo-300x300.png"
-                      alt="Identity"
-                      className="h-7 w-auto object-contain brightness-0 invert opacity-80"
-                    />
-                  </div>
                   {/* Aztec / Screenshot */}
                   <div className="flex items-center justify-center h-12 px-6 rounded-xl bg-white/8 backdrop-blur-sm border border-white/10 shrink-0">
                     <img

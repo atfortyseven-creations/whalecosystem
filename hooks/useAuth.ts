@@ -20,7 +20,11 @@ export function useAUTH() {
         status: isConnecting ? 'connecting' : isConnected ? 'connected' : 'disconnected',
         isError,
         isLoading,
-        refresh: refetch
+        refresh: refetch,
+        isAuthenticated: isConnected,
+        isPremium: parseFloat(balanceVal) > 0
     }
 }
+
+export const useAuth = useAUTH;
 

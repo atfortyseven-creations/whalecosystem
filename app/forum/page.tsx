@@ -47,7 +47,7 @@ function ForumHomeContent() {
     <div className="flex-1 flex flex-col bg-white text-slate-900 w-full min-h-screen">
       
       <div className="w-full flex flex-col items-center justify-start relative min-h-screen bg-white pt-24 pb-20">
-        <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12 flex flex-col z-10">
+        <div className="w-full max-w-[1110px] mx-auto px-6 lg:px-12 flex flex-col z-10">
           
           {/* 
               DISCOURSE-STYLE HEADER

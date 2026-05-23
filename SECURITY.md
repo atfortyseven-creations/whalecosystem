@@ -1,55 +1,37 @@
-# System Security Protocols & Threat Mitigation Grid
+# Security Model & Timelock Policy
 
-> [!CAUTION]
-> **RESTRICTED INFORMATION: INSTITUTIONAL CLEARANCE REQUIRED**
-> The contents of this document outline the absolute, unyielding security architecture of the System Terminal. We operate under a strict **Zero-Trust** axiom. Any deviation from these protocols compromises the mathematical integrity of the system and is strictly forbidden.
+## 1. Zero-Trust Architecture
 
-## 1. Threat Modeling & Cryptographic Assurance
+Humanity Ledger is built on the **Aztec Network**, ensuring that privacy is a foundational architectural component, not an optional overlay.
 
-The System Architecture is built upon the premise that all networks are fundamentally compromised. Therefore, security is not perimeter-based; it is mathematically enshrined at the core of every data packet.
+- **Client-Side Proving:** Zero-knowledge proofs (Noir circuits) are generated exclusively on the user's local hardware. No raw, unencrypted state is ever transmitted to the sequencer.
+- **Encrypted UTXOs:** All asset balances (QDs) and reputational scores are maintained as encrypted UTXOs. Sequencers cannot censor or front-run operations because payloads are fully opaque.
+- **Decentralized Sequencer Network:** While transaction ordering is decentralized, the privacy guarantees rely solely on cryptography, not sequencer honesty.
 
-### 1.1 The TitaniumGate Sentinel
-The `TitaniumGate` middleware acts as an omnipotent sentry. It enforces the immutable law that no client-side rendering or API access shall occur without a cryptographically verified Elliptic Curve Digital Signature Algorithm (ECDSA) payload.
-* **Vector Mitigated:** Session Hijacking, Cross-Site Scripting (XSS), and Unauthorized State Injection.
-* **Resolution:** Rejection of all anomalous requests with sub-millisecond latency.
+## 2. Timelock Policy
 
-### 1.2 Non-Custodial Key Systemty
-Under no circumstances does the System Terminal request, transmit, log, or persist private cryptographic keys. All handshakes and verifications utilize `EIP-191` standard message signing.
-* **Vector Mitigated:** Centralized Key Compromise.
-* **Resolution:** Absolute user systemty over cryptographic assets.
+To protect institutional and retail capital against malicious governance upgrades or compromised administrative keys, all protocol smart contracts enforce a strict **Timelock Policy**.
 
-## 2. EVM Thermodynamics & Algorithmic Surveillance
+### Timelock Specifications
+- **Delay Period:** 7 Days (168 hours)
+- **Scope:** All upgrades to the core Token Contract, Ledger Contract, and Circuit Verifiers.
+- **Emergency Pause:** A multisig of 3/5 trusted security council members can pause specific functions (e.g., cross-chain bridging) instantly in the event of an actively exploited CVE, but they **cannot** upgrade logic or move funds without the 7-day timelock.
 
-Our security extends beyond traditional web vulnerabilities into the realm of on-chain threat analytics.
+### Upgrade Process
+1. A transaction proposing an upgrade is submitted to the Timelock contract.
+2. The 7-day delay period begins. The transaction hash and plaintext payload are broadcast via our public `/changelog`.
+3. Users have 7 days to evaluate the new circuits/contracts and, if they disagree, withdraw their liquidity back to Ethereum L1 via the canonical bridge.
+4. After 168 hours, the upgrade can be executed.
 
-### 2.1 Anomaly Detection Engine (Z-Score >= 3.0)
-The backend indexer continuously processes EVM thermodynamics (Gas expenditure). Any sudden deployment of deeply nested or obfuscated smart contracts triggering a thermodynamic anomaly is flagged instantly.
-* **Vector Mitigated:** Stealth MEV Attacks, Flash Loan Exploits, Liquidity Drains.
-* **Resolution:** Real-time generation of `HIGH_CONVICTION` alerts for institutional operators.
+## 3. Web Application Firewall (WAF) & Rate Limiting
 
-### 2.2 Transient Storage (EIP-1153) Auditing
-We aggressively monitor intra-block memory states (`TSTORE`/`TLOAD`) introduced post-Dencun upgrade, neutralizing attack vectors that attempt to hide capital flows within the span of a single block execution.
+The application edge employs a distributed rate limiter (Upstash) and an OWASP-compliant WAF:
+- **Rate Limits:** Enforced per-IP and per-Session via a sliding window algorithm to defeat Layer 7 DDoS attacks.
+- **CSP & Anti-Tampering:** A dynamic, nonce-based Content Security Policy (CSP) restricts `script-src` and `frame-src`. All inline scripts and `eval()` are strictly prohibited.
+- **Replay Protection:** All state-mutating POST requests require a cryptographic nonce and timestamp (`x-system-nonce`, `x-system-timestamp`) enforced within a 60-second validity window.
 
-## 3. Vulnerability Disclosure Protocol (VDP)
+## 4. Bug Bounty
 
-We welcome rigorous auditing from senior cryptographic researchers and security engineers. However, the disclosure must adhere to strict academic professionalism.
+We operate a continuous bug bounty program. Vulnerabilities in our Noir circuits or Aztec integration layers are eligible for bounties up to $250,000 USD, paid in ETH or QDs. 
 
-### 3.1 Reporting Axioms
-If you have discovered a theoretical or practical vulnerability within the System Architecture, you are instructed to comply with the following sequence:
-
-1. Do NOT open a public GitHub issue.
-2. Draft a highly detailed, peer-reviewable technical report detailing the exploit chain.
-3. Encrypt the payload using the System Security PGP Key.
-4. Transmit the encrypted dossier to `security@system-architecture.local`.
-
-### 3.2 Triage and Resolution SLA
-Our core engineering team operates on a 24/7/365 continuous deployment cycle.
-* **Critical Protocol Breaches:** Triage within 15 minutes. Resolution within 4 hours.
-* **Authentication/Bypass Exploits:** Triage within 1 hour. Resolution within 12 hours.
-* **Data Integrity Anomalies:** Triage within 12 hours. Resolution within 48 hours.
-
-## 4. Immutable Incident Logs
-Any verified security breach triggers an automatic, unalterable ledger entry within our PostgreSQL persistence layer, preserving the forensic trail for post-mortem cryptographic analysis.
-
----
-*In a universe governed by entropy, only mathematics provides absolute sanctuary.*
+Please report critical vulnerabilities to `security@humanidfi.com`. Do NOT disclose exploits publicly until they have been patched.

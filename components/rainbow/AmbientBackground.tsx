@@ -52,10 +52,10 @@ function FloatingParticles() {
       dummy.position.set(p.x, p.y, p.z);
       dummy.rotation.set(p.rx, p.ry, 0);
       dummy.scale.setScalar(p.scale);
-      dummy.updateGrid();
-      mesh.current.setGridAt(i, dummy.grid);
+      dummy.updateMatrix();
+      mesh.current.setMatrixAt(i, dummy.matrix);
     }
-    mesh.current.instanceGrid.needsUpdate = true;
+    mesh.current.instanceMatrix.needsUpdate = true;
   });
 
   return (

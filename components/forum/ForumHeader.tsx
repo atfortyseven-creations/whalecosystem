@@ -47,7 +47,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
       {/* Secondary Discourse Sub-Nav */}
       <div className="w-full shadow-sm bg-white border-b border-slate-200 transition-colors duration-300">
-        <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12 flex items-center justify-between h-[54px]">
+        <div className="w-full max-w-[1110px] mx-auto px-6 lg:px-12 flex items-center justify-between h-[54px]">
           
           {/* Left: Breadcrumbs and Nav Links */}
           <div className="flex items-center gap-6 h-full overflow-x-auto custom-scrollbar no-scrollbar">

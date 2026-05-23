@@ -60,6 +60,9 @@ export function ClientRootRouter() {
       {/*  Main Manifesto Landing  */}
       <ImmersiveManifestoLanding />
 
+      {/*  Aztec Architecture & Performance Metrics  */}
+      <AztecArchitectureSection />
+
       {/*  Footer  */}
       <SystemFooter />
     </div>

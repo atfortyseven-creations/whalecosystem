@@ -132,6 +132,39 @@ export default function SettingsPanel() {
         </div>
       </section>
 
+      {/* Privacy & Reputation */}
+      <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
+        <h3 className="text-sm font-bold text-[#1F1F1F]/50 uppercase mb-4 tracking-wider">Privacy & Reputation</h3>
+        
+        <div className="space-y-4">
+          <div className="p-4 bg-white rounded-2xl border border-[#1F1F1F]/5 shadow-sm flex items-center justify-between">
+            <div>
+              <div className="text-xs font-black uppercase tracking-widest text-[#1F1F1F]/50 mb-1">Privacy Score</div>
+              <div className="text-3xl font-black text-green-600 font-mono">98/100</div>
+            </div>
+            <div className="w-16 h-16 rounded-full border-4 border-green-500/20 border-t-green-500 flex items-center justify-center">
+               <ShieldCheck size={24} className="text-green-500" />
+            </div>
+          </div>
+          
+          <div className="space-y-1">
+            <SettingsInfoRow 
+              icon={<Globe size={20} />} 
+              label="What can people see about me?" 
+              value="Only ZK Proofs" 
+              onClick={() => {}} 
+            />
+            <SettingsToggleRow 
+              icon={<Shield size={20} />} 
+              label="Allow ZK Reputation Queries" 
+              sublabel="Used for forum entry"
+              enabled={true} 
+              onToggle={() => {}} 
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Notifications */}
       <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
         <h3 className="text-sm font-bold text-[#1F1F1F]/50 uppercase mb-4 tracking-wider">Notifications</h3>

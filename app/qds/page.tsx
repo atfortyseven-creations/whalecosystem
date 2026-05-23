@@ -3,14 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import dynamic from 'next/dynamic';
-import { useScrollVelocity } from '@/components/shared/QDsAtomRenderer';
 
-// Load the 3D atom only on the client (WebGL needs browser)
-const QDsAtomRenderer = dynamic(
-  () => import('@/components/shared/QDsAtomRenderer').then(m => ({ default: m.QDsAtomRenderer })),
-  { ssr: false, loading: () => null }
-);
 
 //  Page Data 
 
@@ -129,7 +122,6 @@ const SECTIONS = [
 //  Main Page 
 
 export default function QDsPage() {
-  const vel     = useScrollVelocity();
   const heroRef = useRef<HTMLElement>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -156,7 +148,7 @@ export default function QDsPage() {
           <div
             className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-70 mix-blend-multiply"
           >
-            <img src="/system-shots/pngtree-3d-silver-atom-symbol-matter-core-fiction-photo-picture-image_3222092.jpg" alt="Core Atom" className="w-full h-full object-cover" />
+            <img src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" alt="Core Atom" className="w-full h-full object-cover" />
           </div>
         )}
 
@@ -288,7 +280,7 @@ export default function QDsPage() {
       >
         <div className="absolute inset-0 flex items-center justify-center">
           <img 
-            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-core-fiction-photo-picture-image_3222092.jpg" 
+            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" 
             alt="Core Atom" 
             className="w-full h-full object-cover opacity-80 mix-blend-multiply"
           />

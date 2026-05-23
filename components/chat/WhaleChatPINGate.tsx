@@ -334,16 +334,16 @@ function PINDots({ length, filled }: { length: number; filled: number }) {
 // Numeric Keypad
 // 
 
-const PAD_KEYS = ['1','2','3','4','5','6','7','8','9','','0',''] as const;
+const PAD_KEYS = ['1','2','3','4','5','6','7','8','9','spacer','0','del'] as const;
 
 function NumPad({ onPress }: { onPress: (key: string) => void }) {
   return (
     <div className="grid grid-cols-3 gap-3 w-full max-w-[280px] mx-auto">
       {PAD_KEYS.map((key, idx) => {
-        if (key === '') {
+        if (key === 'spacer') {
           return <div key={idx} />;
         }
-        const isDelete = key === '';
+        const isDelete = key === 'del';
         return (
           <motion.button
             key={key}

@@ -18,7 +18,7 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
     const { address } = useAccount();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    const { isAuthenticated, login } = useAuth();
+    const { isAuthenticated } = useAuth();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     // ... world id config ...
@@ -55,7 +55,7 @@ export default function VoidShell({ children }: { children: React.ReactNode }) {
             toast.success("Identity Verified! Governance unlocked ");
 
             // Trigger auth refresh
-            await login();
+            // await login();
 
             // Redirect to wallet
             router.push("/wallet");

@@ -249,11 +249,11 @@ function VisitorMarkers() {
       const z = GLOBE_RADIUS * Math.cos(latR) * Math.sin(lonR);
       dummy.position.set(x * 1.01, y * 1.01, z * 1.01);
       dummy.scale.setScalar(c.scale);
-      dummy.updateGrid();
-      meshRef.current.setGridAt(i, dummy.grid);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(i, dummy.matrix);
     });
     meshRef.current.count = VISITOR_COUNTRIES.length;
-    meshRef.current.instanceGrid.needsUpdate = true;
+    meshRef.current.instanceMatrix.needsUpdate = true;
   }, [dummy]);
 
   useFrame(({ clock }) => {
@@ -268,10 +268,10 @@ function VisitorMarkers() {
       const pulse = 1 + Math.sin(t * 2.5 + i * 0.8) * 0.35;
       dummy.position.set(x * 1.01, y * 1.01, z * 1.01);
       dummy.scale.setScalar(c.scale * pulse);
-      dummy.updateGrid();
-      meshRef.current.setGridAt(i, dummy.grid);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(i, dummy.matrix);
     });
-    meshRef.current.instanceGrid.needsUpdate = true;
+    meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (

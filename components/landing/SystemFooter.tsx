@@ -21,57 +21,34 @@ const MEGA_CLUSTERS = [
   {
     label: "Protocol",
     links: [
-      { label: "Security Architecture", href: "/developer/security-architecture" },
-      { label: "Mempool Analysis", href: "/developer/mempool-analysis" },
-      { label: "Anomaly Detection", href: "/developer/anomaly-detection" },
-      { label: "Edge Computing", href: "/developer/edge-computing" },
-      { label: "Seed Equity", href: "/pitch_deck.html" },
+      { label: "Technical Whitepaper", href: "/whitepaper" },
+      { label: "Privacy Manifesto", href: "/manifesto" },
+      { label: "QDs Tokenomics", href: "/tokenomics" },
+      { label: "Roadmap", href: "/roadmap" },
     ]
   },
   {
-    label: "Identity & Auth",
+    label: "Developers",
     links: [
-      { label: "Mobile Authentication", href: "/developer/mobile-authentication" },
-      { label: "Biometric Verification", href: "/developer/biometric-verification" },
-      { label: "Session Management", href: "/developer/session-management" },
-      { label: "Digital Signatures", href: "/developer/digital-signatures" },
+      { label: "Developer Hub", href: "/developer" },
+      { label: "API Reference", href: "/api-docs" },
+      { label: "Noir Circuits", href: "https://github.com/atfortyseven-creations/Humanity-Ledger" },
     ]
   },
   {
-    label: "Storage & Data",
+    label: "Security",
     links: [
-      { label: "Transaction Routing", href: "/developer/transaction-routing" },
-      { label: "Graph Database", href: "/developer/graph-database" },
-      { label: "Transient Storage", href: "/developer/transient-storage" },
-      { label: "Block Analysis", href: "/developer/block-analysis" },
+      { label: "Security Policy", href: "/security" },
+      { label: "Bug Bounty", href: "/security" },
+      { label: "Audits", href: "/security" },
     ]
   },
   {
-    label: "Network Layer",
+    label: "Community",
     links: [
-      { label: "WebSocket API", href: "/developer/websocket-api" },
-      { label: "Secure Communication", href: "/developer/secure-communication" },
-      { label: "Distributed Caching", href: "/developer/distributed-caching" },
-      { label: "System Fallbacks", href: "/developer/system-fallbacks" },
-    ]
-  },
-  {
-    label: "Integrations",
-    links: [
-      { label: "WorldID Protocol", href: "/developer/worldid-protocol" },
-      { label: "Cloudflare Workers", href: "/developer/cloudflare-workers" },
-      { label: "Railway Hosting", href: "/developer/railway-hosting" },
-      { label: "EVM Compatibility", href: "/developer/evm-compatibility" },
-    ]
-  },
-  {
-    label: "Legal & Ethics",
-    links: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "QDs (Core Dots)", href: "/qds" },
-      { label: "Data Independence", href: "/developer/independence" },
-      { label: "User Rights", href: "/developer/user-rights" },
-      { label: "Terms of Service", href: "/legal" },
+      { label: "Aztec Forum", href: "https://forum.aztec.network/" },
+      { label: "Discord", href: "https://discord.gg/aztec" },
+      { label: "Twitter", href: "https://x.com/aztecnetwork" },
     ]
   }
 ];
@@ -148,14 +125,14 @@ export function SystemFooter() {
             <div className="flex items-center gap-4">
                 <div className="w-8 h-8 flex items-center justify-center shrink-0">
                     <img 
-                        src="/official-whale-monochrome.png" 
-                        alt="Whale Alert Network Logo" 
-                        className="object-contain w-full h-full" 
+                        src="/atom_3d_silver.jpg" 
+                        alt="Humanity Ledger Logo" 
+                        className="object-contain w-full h-full mix-blend-multiply" 
                     />
                 </div>
                 <div className="flex flex-col leading-none text-[#050505] justify-center">
                     <span className="font-mono text-[14px] font-black uppercase tracking-[0.25em] leading-none">
-                        WHALE ALERT NETWORK
+                        HUMANITY LEDGER
                     </span>
                 </div>
             </div>
@@ -210,10 +187,10 @@ export function SystemFooter() {
               <span className="font-mono text-[20px] font-black text-black/15 leading-none select-none">×</span>
             </div>
 
-            {/* Whale Alert Network */}
+            {/* Humanity Ledger */}
             <div className="flex flex-col items-center gap-3 group">
               <div className="w-14 h-14 rounded-2xl border border-black/8 bg-white flex items-center justify-center overflow-hidden group-hover:border-black/20 transition-colors p-2">
-                <img src="/official-whale-monochrome.png" alt="Whale Alert Network" className="w-full h-full object-contain"/>
+                <img src="/atom_3d_silver.jpg" alt="Humanity Ledger" className="w-full h-full object-contain mix-blend-multiply"/>
               </div>
             </div>
           </div>
@@ -231,15 +208,12 @@ export function SystemFooter() {
           </span>
           <div className="w-full flex flex-wrap justify-center items-center gap-x-10 gap-y-6">
             {[
+              { name: "Aztec Network", sub: "Privacy Layer", icon: null },
+              { name: "Noir", sub: "ZK Circuits", icon: null },
               { name: "Ethereum", sub: "L1 Settlement Layer", icon: "https://cdn.simpleicons.org/ethereum/050505" },
               { name: "WalletConnect", sub: "Identity Bridge", icon: "https://cdn.simpleicons.org/walletconnect/050505" },
-              { name: "WorldID", sub: "Human Verification", icon: "https://cdn.simpleicons.org/identity/050505" },
               { name: "Railway", sub: "Infrastructure", icon: "https://cdn.simpleicons.org/railway/050505" },
               { name: "Cloudflare", sub: "Edge Security", icon: "https://cdn.simpleicons.org/cloudflare/050505" },
-              { name: "Neo4j", sub: "Graph Database", icon: "https://cdn.simpleicons.org/neo4j/050505" },
-              { name: "Flashbots", sub: "MEV Protection", icon: null },
-              { name: "Upstash", sub: "Distributed Cache", icon: "https://cdn.simpleicons.org/upstash/050505" },
-              { name: "Resend", sub: "Secure Comms", icon: "https://cdn.simpleicons.org/resend/050505" },
             ].map((partner) => (
               <div key={partner.name} className="flex flex-col items-center gap-2 group cursor-default">
                 <div className="flex items-center gap-2.5 px-4 py-2 border border-black/8 rounded-xl bg-white group-hover:border-black/20 group-hover:bg-black/5 transition-all duration-200">

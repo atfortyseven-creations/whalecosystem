@@ -5,6 +5,14 @@
   - [x] Inyectar cabeceras de máxima paranoia en `middleware.ts`
 - [x] Capa 2: Anti-Tamper del DOM
   - [x] Integrate transparent 3D globe to achieve seamless cream/light-mode blending.
+- [x] #21 `/changelog` — Registro de deploys públicos  
+- [x] #30 `/story` — Historia del proyecto en timeline seamless cream/light-mode blending.
+- [x] #66 ZK Proof indicator en wallet/transacciones
+- [x] #68 "What can people see about me?" en perfil
+- [x] #53 Privacy Score en perfil de usuario
+- [x] #71 Performance metrics en landing
+- [x] #18 Diagrama de arquitectura SVG en landing
+- [x] #70 Animaciones que expliquen ZK en landing
 - [x] 1. Landing Page Alignment (`ClientRootRouter.tsx` / `app/page.tsx`)
 - [x] 2. Connect Page text ("Available now, Whale Chat !")
 - [x] 3. Pricing Section Redesign (impoluto, exact text)
@@ -12,3 +20,5 @@
 - [x] Capa 3: Verificación de Entorno
   - [x] Crear `lib/security/vault-sentinel.ts`
   - [x] Integrar sentinela en `instrumentation.ts`
+- [x] #90 CSP headers + rate limiting en middleware.ts
+- [x] #97 `/open-letter` — Carta abierta al equipo de Aztec (`ClientRootRouter.tsx` / `app/page.tsx`)

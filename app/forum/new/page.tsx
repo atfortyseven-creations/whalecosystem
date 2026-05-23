@@ -203,7 +203,7 @@ function NewTopicContent() {
 
   return (
     <div className="w-full min-h-screen bg-white text-slate-900 py-10 font-sans">
-      <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12">
+      <div className="w-full max-w-[1110px] mx-auto px-6 lg:px-12">
         <div className="max-w-[820px] mx-auto bg-white border border-slate-200 rounded-xl shadow-sm p-8 md:p-12 relative">
 
       {/*  Header  */}
@@ -358,6 +358,7 @@ function NewTopicContent() {
             </span>
           )}
         </div>
+      </div>
       </div>
       </div>
     </div>

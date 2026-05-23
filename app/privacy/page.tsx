@@ -5,99 +5,43 @@ import { motion } from 'framer-motion';
 
 const visionSections = [
   {
-    title: "Introduction to Decentralized Analysis",
+    title: "Programmable Privacy by Default",
     paragraphs: [
-      "The digital landscape stands at the precipice of a foundational transformation. For decades, the asymmetry of information has empowered monolithic entities while systematically disenfranchising the individual. In the realm of decentralized finance, this asymmetry manifests as an invisible architecture where latency, mempool visibility, and cryptographic correlation are monopolized by institutional actors, quantitative hedge funds, and state-level surveillance apparatuses.",
-      "The Whale Alert Network is not merely an analytical interface; it is a declaration of cryptographic independence. By re-engineering the very structure of how on-chain data is ingested, processed, and visualized, we establish a new paradigm of absolute equity. We have dismantled the silos of premium data and decentralized the very core of financial perception.",
-      "Our vision transcends the rudimentary tracking of capital. We are constructing an omniscient, zero-knowledge exoskeleton for the human mind, enabling any individual to perceive the mathematical reality of global liquidity in real-time, without ever surrendering their right to absolute privacy. By flattening the technological playing field, we ensure that the democratization of finance is not a marketing slogan, but a mathematically enforced reality.",
-      "Every user, regardless of their geographical location or capital access, is granted the exact same sub-millisecond telemetry that was previously reserved for entities paying millions in proprietary data feeds. The blockchain is a public ledger, and its truth must be equally and universally accessible to all conscious observers."
+      "The current architecture of decentralized finance enforces radical transparency, forcing users to broadcast their entire financial history to participate in the ecosystem. This fundamentally limits the scope of what can be built on-chain and compromises individual sovereignty.",
+      "We believe that privacy is a fundamental human right, not an optional feature. By integrating Aztec Network's zero-knowledge architecture, we establish a paradigm where programmable privacy is the default state. You maintain absolute control over your transaction graph, balances, and interaction history while retaining the ability to prove compliance selectively.",
+      "Our infrastructure utilizes Noir, the universal zero-knowledge language, to create private smart contract interactions. This ensures that your state transitions are cryptographically verified by the network without ever exposing the underlying data to public observers."
     ]
   },
   {
-    title: "The Zero-Trust Protocol",
+    title: "Client-Side Proving",
     paragraphs: [
-      "To build an infrastructure capable of protecting humanity from surveillance capitalism, we must fundamentally reject the concept of trust. Trust is a vulnerability. It is the attack vector through which data is harvested, sold, and weaponized. The Master Node operates on the uncompromising principle of cryptographic verification.",
-      "Every interaction, every session hydration, and every analytics query is mathematically guaranteed by elliptic curve signatures (ECDSA). The server is inherently blind to the biological identity of the operator. The network is blind to your intentions. Your identity within the protocol is a temporary, ephemeral hash that evaporates into the cryptographic void the moment your session concludes.",
-      "We do not hold your keys. We do not track your coordinates. We do not deploy cookies or persistent tracking pixels. The system extracts reality from the blockchain, not from you. When you query the graph grid for a complex transaction cluster, the edge node process handles the calculation in isolated memory, encrypts the result with your temporary session key, and immediately purges the execution environment.",
-      "By eliminating the persistent database of user activity, we eliminate the honeypot. If our servers are ever seized or compromised by hostile actors, there is nothing to extract. There is only a continuous stream of ephemeral mathematics, untethered from any human identity. This is the absolute realization of privacy by design."
+      "True decentralization requires eliminating trust in intermediaries. Sending raw data to a centralized prover inherently violates privacy. We enforce a client-side proving model where all zero-knowledge proofs are generated locally on your device.",
+      "When you execute a transaction or query a sensitive state, the cryptographic operations occur within your local execution environment. Only the verified proof and the state update commitments are broadcast to the Aztec rollup. The network validates the mathematics without ever gaining visibility into your inputs.",
+      "This architecture guarantees that neither our servers, the rollup sequencers, nor any third-party observers can intercept or reconstruct your financial activity. Your data never leaves your device."
     ]
   },
   {
-    title: "Mobile and Desktop Integration",
+    title: "Encrypted State Architecture",
     paragraphs: [
-      "The physical constraints of human existence demand mobility. We navigate the physical world constantly. Yet, the computational demands of high-frequency on-chain analytics require immense local processing power, typically restricting this level of analysis to massive desktop rigs and server farms. The Protocol resolves this dichotomy through the PWA QR Handshakea seamless, cryptographic bridge between terrestrial hardware and mobile freedom.",
-      "Your desktop operates as the heavy computational node, ingesting thousands of mempool events per second, executing complex Neo4j graph traversals, and calculating multi-dimensional gas vectors. It handles the heavy lifting, maintaining a persistent WebSocket connection to the global mesh.",
-      "Your mobile device, however, acts as the terminal of consciousness. Through a hyper-secure, end-to-end encrypted local tunnel initiated by scanning a high-entropy QR code, your phone interfaces directly with your desktop's computational output. The data flows locally, bypassing our central servers entirely for the visualization layer.",
-      "You carry the omniscient power of an institutional trading desk in your pocket, powered by a localized zero-knowledge bridge. This architecture ensures that even when you are mobile, your data remains localized, your latency remains negligible, and your perception of the market remains absolute."
+      "Unlike traditional EVM networks where all state is public, our protocol utilizes Aztec's hybrid state model, combining public variables with private, encrypted state notes. Private state is represented as an append-only tree of UTXOs (Unspent Transaction Outputs), fully encrypted using your viewing keys.",
+      "When you receive assets or interact with private smart contracts, the resulting state changes are recorded as encrypted commitments on the blockchain. You alone possess the cryptographic keys necessary to decrypt and access these notes.",
+      "This mechanism ensures that your portfolio balance and interaction history remain invisible to the public ledger while remaining mathematically verifiable and securely composable within the broader decentralized ecosystem."
     ]
   },
   {
-    title: "Market Flow Analytics",
+    title: "Decentralized Sequencer Network",
     paragraphs: [
-      "We do not observe static balances; we observe kinetic energy. Traditional analytics are inherently reactive, displaying the aftermath of financial movements. The Ethereum Virtual Machine, however, operates as a thermodynamic engine, and its impending states can be mathematically deduced before they are permanently recorded. By analyzing the execution of specific opcodessuch as the EIP-1153 Transient Storage vectors (TSTORE and TLOAD)we detect the gathering storm of institutional capital before it manifests on public markets.",
-      "Our Z-Score anomaly detectors operate continuously across a rolling 14-block window, measuring the physical density of computational intention. This is not predictive modeling based on historical price action; it is the mathematical observation of reality unfolding at the compiler level.",
-      "When a complex, multi-hop arbitrage or a massive liquidity provision is initiated in the mempool, our algorithms calculate the standard deviation of its gas consumption and execution depth against the global baseline. If the Z-Score breaches a critical threshold, the interface immediately illuminates this kinetic shift.",
-      "Through the interface, you are granted the capability to perceive these energetic shifts in real-time, allowing you to navigate the extreme volatility of global crypto markets with the precision of a high-frequency algorithmic protocol. You are no longer reacting to the market; you are observing its molecular formation."
+      "A privacy network is only as secure as its sequencing layer. Relying on a centralized sequencer creates a single point of failure and introduces censorship risks. Our integration aligns with Aztec's vision for a fully decentralized network of provers and sequencers.",
+      "By participating in a decentralized rollup architecture, we guarantee that no single entity can censor your transactions, reorder your execution for MEV extraction, or deny you access to the network.",
+      "The consensus mechanism ensures that as long as you provide a valid zero-knowledge proof, your state transition will be included and finalized securely on Ethereum Layer 1."
     ]
   },
   {
-    title: "Multi-Hop Network Tracking",
+    title: "Selective Compliance and Disclosure",
     paragraphs: [
-      "Capital actively obfuscates itself through complexity. Institutional actors and adversarial entities distribute value across thousands of intermediary addresses, utilizing mixers, bridges, and cross-chain swaps to conceal their ultimate intentions. To combat this enforced obscurity, we have engineered the Ledgera massive Neo4j graph grid capable of instantaneous, multidimensional multi-hop traversal.",
-      "When a single digital asset shifts from a known accumulation wallet, the graph ripples. Our algorithms do not merely track the direct transfer; they instantly correlate the source, tracing the provenance and destination of capital through up to seven degrees of separation in under 200 milliseconds. The invisible networks of global liquidity, previously hidden within the noise of millions of transactions, are brilliantly illuminated.",
-      "The interface visualizes these complex relationships as a dynamic, interactive web. You can visually identify \"smurfing\" (the division of large sums into smaller, less noticeable transactions) and detect the gravitational pull of major liquidity pools as capital flows toward them through seemingly unrelated intermediary wallets.",
-      "This unprecedented capability is no longer the exclusive domain of state-level forensic actors and quantitative hedge funds. It is now embedded within the local hardware of every single operator on the network, democratizing the power of deep-chain forensics."
-    ]
-  },
-  {
-    title: "Identity and Verification",
-    paragraphs: [
-      "In an era where artificial analytics can flawlessly simulate human behavior, generating millions of autonomous agents capable of overwhelming networks, the verification of unique humanity becomes the bedrock of both democratic consensus and stable financial systems. However, traditional KYC (Know Your Customer) systems require the mass harvesting of highly sensitive biometric and governmental data, creating massive honeypots and violating fundamental privacy rights.",
-      "We integrate directly with zero-knowledge biometric systems, such as the WorldID protocol. However, our implementation ensures that the mathematical proof of your humanity remains entirely decoupled from your terrestrial identity. We verify that you are a unique, living consciousness without ever knowing who you are, what your name is, or where you reside.",
-      "When you authenticate, the biometric hardware generates a localized, zero-knowledge proof. Our servers receive only a cryptographic nullifier hasha string of characters that mathematically proves you have passed the biometric check, but contains absolutely zero information about your physical traits. This hash ensures that one human can only hold one account.",
-      "This cryptographic firewall protects the sanctity of the individual while guaranteeing the absolute integrity of the network against Sybil attacks. It is the perfect synthesis of absolute systemic security and absolute personal anonymity."
-    ]
-  },
-  {
-    title: "Encrypted Communication",
-    paragraphs: [
-      "Freedom of expression is absolute only when it cannot be censored, manipulated, or repudiated. Traditional digital forums rely on centralized databases to store messages, making them vulnerable to algorithmic suppression, administrative censorship, and unauthorized alteration. The Whale Chat Forum replaces these antiquated mechanisms of control with the undeniable reality of ECDSA cryptographic signatures.",
-      "Every transmission, every strategy shared, and every alert broadcasted is signed by your localized, ephemeral private key. The network validates the signature without knowing the biological entity behind it, mathematically ensuring that the message was genuinely authored by a verified human consciousness and has not been tampered with in transit.",
-      "Furthermore, for private coordination, the network utilizes robust end-to-end encryption. The plaintext of the message is encrypted locally on your device using the recipient's public key. The server only routes the ciphertext. We literally do not possess the mathematical capability to read the contents of your private communications.",
-      "This architecture guarantees that speech within the Humanity Ledger is free, authentic, and completely immune to central algorithmic suppression. It is a cryptographic sanctuary for real-time analytics sharing and global coordination, fundamentally unbreakable by any central authority."
-    ]
-  },
-  {
-    title: "Edge Architecture",
-    paragraphs: [
-      "The physical infrastructure of the network is deployed across a globally distributed mesh of Edge runtimes, designed for maximum resilience and minimal latency. By utilizing Vercel's global edge network, Cloudflare's security layer, and heavily isolated Railway worker nodes, we have systematically eliminated any single point of failure.",
-      "Traditional systems rely on monolithic databases located in specific geographic regions, making them highly vulnerable to localized outages, state-level censorship, or targeted Distributed Denial of Service (DDoS) attacks. Our architecture is fluid. Data processing is pushed directly to the edge, running on servers physically located mere miles from the end-user.",
-      "When one node fails, or is subjected to an overwhelming attack, the analytics stream does not collapse; it degrades gracefully. WebSocket connections automatically and seamlessly reconnect to the nearest surviving node using geographic Anycast routing. The global state is maintained in a decentralized memory grid (Redis clusters), ensuring that the flow of data is unbroken.",
-      "This is not merely standard software engineering; it is the deliberate construction of a decentralized digital organism capable of surviving and thriving in the most hostile network environments imaginable. The perception of reality provided by the network remains constant, immune to both physical and digital disruption."
-    ]
-  },
-  {
-    title: "Post-Core Cryptographic Resilience",
-    paragraphs: [
-      "The theoretical timeline for fault-tolerant core computers capable of executing Shors algorithm is collapsing. When this threshold is breached, the Elliptic Curve Cryptography (ECC) that secures the entirety of the current global financial system and traditional blockchain networks will be fundamentally compromised. The Humanity Ledger operates under a \"Store Now, Decrypt Later\" (SNDL) threat model, acknowledging that adversarial state actors are currently harvesting encrypted traffic with the intention of retroactively decrypting it once core supremacy is achieved.",
-      "To future-proof the privacy of our operators, the underlying architecture is aggressively migrating toward hybrid key encapsulation mechanisms (KEMs). By integrating lattice-based cryptography, specifically the NIST-standardized Kyber algorithms, alongside traditional ECDSA, we ensure that the session keys generated during your ephemeral handshake possess forward-secrecy against core decryption.",
-      "This means that your identity, your telemetry queries, and your strategic movements within the graph grid remain mathematically sealed. Even if the encrypted packets of your session are intercepted today by a global surveillance apparatus, they will not possess the mathematical capacity to decouple the zero-knowledge proof from the resulting ciphertext tomorrow. Your privacy is not merely protected against contemporary threats; it is shielded against the inevitable evolution of computation."
-    ]
-  },
-  {
-    title: "Sub-Millisecond Execution Privacy (MEV Shielding)",
-    paragraphs: [
-      "Visibility is a vulnerability in decentralized finance. The moment a transaction is broadcast to the public mempool, it becomes a target for predatory algorithmic bots executing sandwich attacks, generalized front-running, and arbitrage exploitation. This phenomenon, known as Maximal Extractable Value (MEV), is a structural tax on the individual, systematically transferring wealth from the retail operator to the institutional validator.",
-      "The Humanity Ledger eradicates this vulnerability by providing operators with Sub-Millisecond Execution Privacy. When you initiate a transaction or a complex smart contract interaction through the platform, your signed payload is never broadcast to the public P2P network. Instead, it is routed through a localized, encrypted tunnel directly to a consortium of trusted block builders and private RPC relays, such as Flashbots.",
-      "This architecture guarantees that your capital movement bypasses the dark forest of the public mempool entirely. Your transaction remains invisible to predatory algorithms until the exact moment it is cryptographically finalized and permanently embedded within the blockchain state. By shielding your execution intent, we return the tactical advantage of surprise back to the individual operator, ensuring that your strategic alpha cannot be harvested by parasitic network actors."
-    ]
-  },
-  {
-    title: "Decentralized Validator Memory Grid",
-    paragraphs: [
-      "A network is only as secure as its physical topology. Systems that rely on centralized databases or concentrated server clusters, regardless of their cryptographic implementations, are inherently fragile. They can be subpoenaed, targeted by state-level denial of service attacks, or simply suffer catastrophic hardware failure. The Humanity Ledger circumvents this fragility through the deployment of a Decentralized Validator Memory Grid.",
-      "Rather than storing the computational graph state on a central cluster, the mathematical reality of the mempool is fragmented and distributed across a global, fluid mesh of edge nodes. These nodes operate entirely in RAM (Random Access Memory), utilizing high-speed Redis clusters and Kafka streams. They do not persist data to physical hard drives. The state is a continuously flowing river of information, existing simultaneously everywhere and nowhere.",
-      "If an adversarial entity attempts to seize a node to extract user data or analytics vectors, the system reacts instantaneously. The compromised node is mathematically severed from the consensus, and its local RAM is purged as power is disrupted. The global analytics stream simply re-routes around the damage, perfectly preserving the continuity of perception for all connected operators. This is the ultimate expression of anti-fragile engineering, where the attempt to destroy the network only validates its absolute resilience."
+      "Privacy does not mean opacity to regulation; it means having the sovereign right to choose when and with whom to share your data. The platform enables selective disclosure through zero-knowledge compliance proofs.",
+      "If required to prove the origin of funds, verify your identity, or demonstrate solvency to an auditor, you can generate specific cryptographic proofs that validate these facts without exposing your entire transaction history.",
+      "This dual capability—absolute default privacy combined with programmable, verifiable disclosure—provides the necessary infrastructure for institutional adoption while fiercely protecting individual liberty."
     ]
   }
 ];
@@ -111,39 +55,39 @@ export default function PrivacyVisionPage() {
   if (!mounted) return null;
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col md:flex-row bg-white text-black selection:bg-black selection:text-white">
-      {/*  LEFT NAVIGATION (SIDEBAR)  */}
-      <aside className="w-full md:w-[300px] shrink-0 border-b md:border-b-0 md:border-r border-black/10 flex flex-col px-6 pt-8 pb-12 md:h-[100dvh] md:sticky md:top-0 bg-white z-50">
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col md:flex-row bg-[#020605] text-white selection:bg-[#c4f344] selection:text-black">
+      {/* LEFT NAVIGATION */}
+      <aside className="w-full md:w-[300px] shrink-0 border-b md:border-b-0 md:border-r border-white/10 flex flex-col px-6 pt-8 pb-12 md:h-[100dvh] md:sticky md:top-0 bg-[#020605] z-50">
         
-        {/*  TOP BAR (from connect screen)  */}
+        {/* TOP BAR */}
         <div className="w-full flex items-center justify-between mb-10">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 flex items-center justify-center shrink-0">
-              <img src="/official-whale-monochrome.png" alt="Whale" className="w-full h-full object-contain" />
+              <img src="/aztec-logo.svg" alt="Aztec" className="w-full h-full object-contain filter invert" />
             </div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] font-black">
-              Scanner Humanity Ledger
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] font-black text-[#c4f344]">
+              Privacy Architecture
             </span>
           </div>
         </div>
 
-        {/*  DIVIDER  */}
-        <div className="w-full border-t border-black/8 mb-8" />
+        {/* DIVIDER */}
+        <div className="w-full border-t border-white/10 mb-8" />
 
         {/* INDEX */}
-        <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/40 mb-6 shrink-0 pl-2">
-          Temas a explicar
+        <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 mb-6 shrink-0 pl-2">
+          Core Principles
         </div>
         
         <nav className="flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar pb-8">
           {visionSections.map((sec, index) => (
             <a 
               key={index} 
-              href={`#tema-${index + 1}`} 
-              className="group w-full flex items-center gap-4 p-4 rounded-2xl border border-black/5 bg-black/[0.02] hover:bg-black/[0.04] hover:border-black/10 active:scale-[0.97] transition-all duration-200 shadow-sm"
+              href={`#principle-${index + 1}`} 
+              className="group w-full flex items-center gap-4 p-4 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-[#c4f344]/30 active:scale-[0.97] transition-all duration-200 shadow-sm"
             >
               <div className="flex-1 text-left">
-                <p className="text-[12px] font-black uppercase tracking-tight text-[#050505] leading-snug">
+                <p className="text-[12px] font-bold uppercase tracking-tight text-white/80 group-hover:text-[#c4f344] leading-snug transition-colors">
                   {sec.title}
                 </p>
               </div>
@@ -152,7 +96,7 @@ export default function PrivacyVisionPage() {
         </nav>
       </aside>
 
-      {/* MAIN VISION CONTENT */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 px-8 md:px-16 pt-16 md:pt-24 pb-32">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -160,11 +104,11 @@ export default function PrivacyVisionPage() {
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
           className="mb-24"
         >
-          <h1 className="text-[48px] sm:text-[64px] md:text-[72px] font-normal tracking-[-0.04em] leading-[1.05] mb-8 font-sans max-w-[800px]">
-            Achieving Proof of Financial Transparency
+          <h1 className="text-[48px] sm:text-[64px] md:text-[72px] font-normal tracking-[-0.04em] leading-[1.05] mb-8 font-serif italic max-w-[800px]">
+            The Privacy Layer for Web3.
           </h1>
-          <p className="text-[18px] md:text-[21px] leading-[1.6] text-black/70 font-light max-w-[650px]">
-            How to build a zero-knowledge on-chain telemetry network in a way that maximizes individual empowerment and establishes absolute mathematical certainty across both mobile and terrestrial platforms.
+          <p className="text-[18px] md:text-[21px] leading-[1.6] text-white/70 font-light max-w-[650px]">
+            Building the foundation for programmable, default privacy using advanced Zero-Knowledge cryptography and client-side proving architecture.
           </p>
         </motion.div>
 
@@ -172,18 +116,18 @@ export default function PrivacyVisionPage() {
           {visionSections.map((sec, index) => (
             <motion.section
               key={index}
-              id={`tema-${index + 1}`}
+              id={`principle-${index + 1}`}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: '100px' }}
               transition={{ duration: 0.8 }}
             >
-              <h2 className="text-[26px] md:text-[32px] font-normal tracking-tight mb-8">
+              <h2 className="text-[26px] md:text-[32px] font-medium tracking-tight mb-8 text-[#c4f344]">
                 {sec.title}
               </h2>
               <div className="space-y-6">
                 {sec.paragraphs.map((p, j) => (
-                  <p key={j} className="text-[16px] md:text-[18px] leading-[1.8] text-[#111111] font-light text-justify">
+                  <p key={j} className="text-[16px] md:text-[18px] leading-[1.8] text-white/80 font-light text-justify">
                     {p}
                   </p>
                 ))}
@@ -192,9 +136,9 @@ export default function PrivacyVisionPage() {
           ))}
         </div>
 
-        <footer className="mt-48 pt-12 border-t border-black/10 max-w-[800px]">
+        <footer className="mt-48 pt-12 border-t border-white/10 max-w-[800px]">
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-40">
-            © 2026 Humanity Ledger · The Architecture of Reality
+            © 2026 Humanity Ledger · Powered by Aztec Network
           </p>
         </footer>
       </main>

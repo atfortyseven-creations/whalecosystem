@@ -189,7 +189,7 @@ class WalletAnalyticsService {
             });
 
             // If found and fresh (< 5 minutes), return cached
-            if (cached && (Date.now() - new Date(cached.updatedAt).getTime() < 300000)) {
+            if (cached && (Date.now() - new Date(cached.updatedAt || Date.now()).getTime() < 300000)) {
                 console.log(`[INTEL] Returning cached DB record for ${resolvedAddr}`);
                 return this.mapDbToAnalytics(cached);
             }

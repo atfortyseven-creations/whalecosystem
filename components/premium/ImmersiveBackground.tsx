@@ -63,10 +63,10 @@ function BackgroundElements({ isLight }: { isLight: boolean }) {
         const floatY = Math.sin(t * d.speed + d.phase) * 1.5;
         _dummy.position.set(d.x, d.y + floatY, d.z);
         _dummy.scale.setScalar(d.scale);
-        _dummy.updateGrid();
-        partRef.current.setGridAt(i, _dummy.grid);
+        _dummy.updateMatrix();
+        partRef.current.setMatrixAt(i, _dummy.matrix);
       }
-      partRef.current.instanceGrid.needsUpdate = true;
+      partRef.current.instanceMatrix.needsUpdate = true;
     }
   });
 

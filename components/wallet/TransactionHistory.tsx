@@ -321,6 +321,10 @@ const MemoizedTransactionCard = React.memo(
                   <Globe size={10} className="text-[#1F1F1F]/40" />
                   <span className="text-[10px] text-[#1F1F1F]/60 font-black uppercase tracking-widest">{getChainName(transaction.chainId)}</span>
               </div>
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                  <span className="text-[10px] text-green-700 font-black uppercase tracking-widest">ZK PROVEN</span>
+              </div>
             </div>
             <div className="flex items-center gap-2 mt-1">
                 <span className="text-[10px] text-[#1F1F1F]/40 font-bold font-mono">

@@ -1,5 +1,5 @@
 // components/MainVault.tsx
-import { useAUTH } from '../hooks/useAUTH'
+import { useAuth } from '../hooks/useAuth'
 import { useChainId, useAccount, useConnect, useSwitchChain } from 'wagmi';
 
 interface MainVaultProps {
@@ -7,7 +7,7 @@ interface MainVaultProps {
 }
 
 export const MainVault = ({ onConnect }: MainVaultProps) => {
-    const { balance, isLoading } = useAUTH()
+    const { balance, isLoading, isAuthenticated, isPremium } = useAuth()
     const chainId = useChainId();
     const { isConnected, chain } = useAccount();
     const { connect, connectors } = useConnect();

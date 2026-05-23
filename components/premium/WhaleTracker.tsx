@@ -89,7 +89,10 @@ export default function WhaleTracker({
   onTabChange
 }: WhaleTrackerProps) {
   const { address: web3Address } = useSystemAccount();
-  const { isAuthenticated, isOwner, isPremium: authIsPremium, trialViews, viewedAddresses } = useAuth();
+  const { isAuthenticated, isPremium: authIsPremium } = useAuth();
+  const isOwner = false;
+  const trialViews = 3;
+  const viewedAddresses: string[] = [];
   const publicClient = usePublicClient();
 
 

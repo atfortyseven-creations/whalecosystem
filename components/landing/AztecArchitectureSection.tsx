@@ -1,20 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { RemoteLottie } from "@/components/ui/RemoteLottie";
+import { AztecZKMetrics } from "./AztecZKMetrics";
 
 const SECURITY_PILLARS = [
   {
     index: "01",
     label: "Aztec Network Substrate",
     protocol: "PRIVACY-FIRST L2 ZK-ROLLUP",
-    body: "The Whale Alert Network's core cryptographic layer is anchored to the Aztec Network. Rather than relying on transparent EVM execution, our system leverages Aztec's privacy-preserving virtual machine. By executing private functions directly on the user's device and managing encrypted UTXOs, we guarantee that all smart contract logic, capital flows, and state transitions remain strictly confidential before settling securely on Ethereum."
+    body: "The Humanity Ledger's core cryptographic layer is anchored to the Aztec Network. Rather than relying on transparent EVM execution, our system leverages Aztec's privacy-preserving virtual machine. By executing private functions directly on the user's device and managing encrypted UTXOs, we guarantee that all smart contract logic, capital flows, and state transitions remain strictly confidential before settling securely on Ethereum."
   },
   {
     index: "02",
     label: "Absolute Privacy",
     protocol: "ZERO-KNOWLEDGE ARCHITECTURE",
-    body: "Whale Alert Network ensures that your identity, portfolio, and strategic operations remain secure and private. Our infrastructure guarantees that your analytics gathering remains confidential, operating with complete discretion at all times."
+    body: "The Humanity Ledger ensures that your identity, portfolio, and strategic operations remain secure and private. Our infrastructure guarantees that your interactions remain confidential, operating with complete discretion at all times."
   },
   {
     index: "03",
@@ -62,7 +62,7 @@ const AZTEC_EXTENDED_POINTS = [
   },
   {
     title: "L1  L2 Messaging",
-    desc: "A secure, trustless message-passing protocol between Ethereum Mainnet and the Whale Alert Network's Rollup, eliminating reliance on vulnerable third-party bridging infrastructure."
+    desc: "A secure, trustless message-passing protocol between Ethereum Mainnet and the Humanity Ledger's Rollup, eliminating reliance on vulnerable third-party bridging infrastructure."
   },
   {
     title: "Client-Side Proving",
@@ -109,7 +109,7 @@ export function AztecArchitectureSection() {
             </p>
             <p>
               Unlike conventional analytics platforms that track your behavior, 
-              Whale Alert Network separates the act of gathering analytics from the act of revealing it. 
+              Humanity Ledger separates the act of participating from the act of revealing it. 
               You gain total visibility over the market while maintaining operational privacy.
             </p>
           </div>
@@ -194,11 +194,11 @@ export function AztecArchitectureSection() {
               Deep Integration Substrate
             </h3>
             <p className="font-serif text-[15px] text-[#444] leading-relaxed text-left">
-              The fusion of the Whale Alert Network and Aztec Network creates an impenetrable cryptographic shield. This integration relies on specialized primitives operating in perfect synchrony, designed strictly for entities requiring institutional-grade execution without compromising strategic opacity.
+              The fusion of the Humanity Ledger and Aztec Network creates an impenetrable cryptographic shield. This integration relies on specialized primitives operating in perfect synchrony, designed strictly for entities requiring institutional-grade execution without compromising strategic opacity.
             </p>
-            <div className="w-full aspect-square bg-white rounded-[2rem] border border-black/10 shadow-sm flex items-center justify-center p-8 overflow-hidden relative mt-4">
-               <div className="absolute inset-0 bg-gradient-to-b from-[#FAFAF8]/50 to-transparent mix-blend-multiply" />
-               <RemoteLottie path="Isometric data analysis.json" className="scale-[1.15] opacity-95" />
+            <div className="w-full bg-white rounded-[2rem] border border-black/10 shadow-sm flex items-center justify-center p-6 overflow-hidden relative mt-4">
+               <div className="absolute inset-0 bg-gradient-to-b from-[#FAFAF8]/50 to-transparent mix-blend-multiply pointer-events-none" />
+               <AztecZKMetrics />
             </div>
           </div>
 
@@ -223,7 +223,7 @@ export function AztecArchitectureSection() {
           </span>
           <p className="font-serif text-[14px] text-[#444] leading-relaxed text-left">
             Your analytics is only as valuable as your ability to protect it. 
-            Whale Alert Network provides the definitive shield, allowing you to intercept, 
+            The Humanity Ledger provides the definitive shield, allowing you to intercept, 
             analyze, and execute upon the flow of global capital with rigorous security.
           </p>
         </div>
