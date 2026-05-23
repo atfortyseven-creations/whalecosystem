@@ -82,7 +82,6 @@
     "@gnosis.pm/conditional-tokens-market-makers": "^1.8.1",
     "@gnosis.pm/util-contracts": "^3.0.0-alpha.3",
     "@gsap/react": "^2.1.2",
-    "@identity/idkit": "^1.5.0",
     "@libp2p/bootstrap": "^12.0.16",
     "@libp2p/identify": "^4.1.0",
     "@libp2p/kad-dht": "^16.2.0",
