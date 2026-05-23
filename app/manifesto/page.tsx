@@ -1,46 +1,68 @@
-"use client";
-
-import { DownpageLayout } from "@/components/ui/DownpageLayout";
-
-const sections = [
-  {
-    title: "El Fin de la Era de la Vigilancia Financiera",
-    paragraphs: [
-      "Durante más de una década, la tecnología blockchain ha operado bajo una ilusión fundamental: la creencia de que la transparencia radical es un requisito indispensable para la descentralización. Este modelo ha creado el ecosistema de vigilancia financiera más perfecto de la historia humana.",
-      "Cada movimiento, cada inversión, cada estrategia ha quedado expuesta permanentemente en un libro mayor inmutable para que cualquier corporación, fondo de inversión o actor malicioso pueda analizarla, rastrearla y explotarla.",
-      "En Whale Alert Network, declaramos el fin de esta era. La transparencia debe aplicarse a las instituciones y a la infraestructura, no a los individuos. Exigimos privacidad absoluta para el usuario."
-    ]
-  },
-  {
-    title: "Soberanía de Datos como Derecho Fundamental",
-    paragraphs: [
-      "Tu historial de transacciones es un mapa exacto de tu vida, tus ideas y tu patrimonio. Forzar a los usuarios a publicarlo para poder participar en la economía del futuro no es innovación; es coerción.",
-      "Rechazamos los modelos de negocio basados en la venta y monetización de los datos del usuario. Hemos rediseñado toda nuestra infraestructura integrando la criptografía Zero-Knowledge (Conocimiento Cero) de Aztec Network, devolviendo el control absoluto de la identidad y el patrimonio a quien legítimamente le pertenece: a ti."
-    ]
-  },
-  {
-    title: "El Principio de la Invisibilidad Matemática",
-    paragraphs: [
-      "No dependemos de la confianza humana. Las promesas de privacidad de las corporaciones tradicionales son documentos vacíos de 'Términos y Condiciones' que cambian a conveniencia. Nuestra privacidad está respaldada por leyes matemáticas inquebrantables.",
-      "A través de pruebas de validación del lado del cliente y arquitecturas de estado encriptado, garantizamos que tus datos sean verificados por la red sin ser revelados jamás. Ni siquiera nosotros, como creadores de la plataforma, podemos acceder a tu información."
-    ]
-  },
-  {
-    title: "Una Alianza para el Futuro",
-    paragraphs: [
-      "Nuestra integración profunda con Aztec Network no es una simple asociación técnica; es una alineación filosófica. Compartimos la visión de que el futuro de Ethereum y de la web financiera requiere una capa de privacidad nativa, programable y descentralizada.",
-      "Al construir la herramienta analítica de mercados más potente del mundo (el Humanity Ledger) sobre este escudo criptográfico, estamos demostrando que las herramientas de grado institucional ya no requieren que el usuario sacrifique su identidad. Hemos construido el verdadero ecosistema financiero del mañana."
-    ]
-  }
-];
+import React from 'react';
 
 export default function ManifestoPage() {
   return (
-    <DownpageLayout 
-      pageTitle="Manifiesto Soberano"
-      subtitle="Nuestra declaración fundacional sobre la libertad de datos, la criptografía de Conocimiento Cero y el derecho a la privacidad financiera."
-      indexTitle="El Manifiesto"
-      sections={sections}
-    />
+    <div className="w-full min-h-screen bg-white text-slate-900 py-16 font-sans">
+      <div className="w-full max-w-[800px] mx-auto px-6">
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-6">
+            The Financial Privacy Manifesto
+          </h1>
+          <p className="text-lg text-slate-500">
+            A declaration for sovereignty in the programmable web.
+          </p>
+        </div>
+
+        <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-6">
+          <p>
+            Privacy is not secrecy; privacy is the power to selectively reveal oneself to the world.
+          </p>
+
+          <p>
+            In the early days of the blockchain, transparency was a feature required to bootstrap trust in a trustless environment. Every transaction, every balance, every interaction was permanently inscribed on a public ledger for anyone to analyze. While this solved the double-spending problem, it created a surveillance apparatus unprecedented in human history.
+          </p>
+
+          <p>
+            We believe that financial privacy is a fundamental human right.
+          </p>
+
+          <p>
+            When financial data is public by default, users are vulnerable to targeted exploitation, front-running, and systemic profiling. The current architecture of public ledgers treats user privacy as an afterthought, an inconvenience to be solved with complex mixers or centralized custodians.
+          </p>
+
+          <h2 className="text-2xl font-bold text-slate-900 mt-12 mb-4">The Zero-Knowledge Standard</h2>
+          
+          <p>
+            We are building upon the Aztec Network because it represents a paradigm shift. By leveraging zero-knowledge proofs (ZKPs), Aztec allows for programmable privacy at the protocol level.
+          </p>
+
+          <p>
+            The system we are deploying enforces a radical new standard:
+          </p>
+
+          <ul className="list-disc pl-6 space-y-2">
+            <li><strong>Privacy by Default:</strong> Your balances and transaction history are encrypted. They are mathematically provable, yet practically invisible to the public.</li>
+            <li><strong>Programmable Trust:</strong> Identity and reputation can be asserted without revealing the underlying data. You can prove you belong to a community without proving who you are.</li>
+            <li><strong>Local Computation:</strong> Cryptographic proofs are generated client-side. The network verifies the proof, but it never sees the data.</li>
+          </ul>
+
+          <h2 className="text-2xl font-bold text-slate-900 mt-12 mb-4">The Next Layer of the Web</h2>
+
+          <p>
+            The transition from a transparent web to a private web is not merely a technical upgrade; it is a societal necessity. As digital interactions become deeply intertwined with our physical lives, the boundary between public transparency and private sovereignty must be fiercely defended.
+          </p>
+
+          <p>
+            We are not building another ledger. We are building a secure foundation for human interaction on the internet.
+          </p>
+
+          <div className="mt-16 border-t border-slate-200 pt-8">
+            <p className="text-sm text-slate-500 italic">
+              Built on Aztec Network. Secured by cryptography.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

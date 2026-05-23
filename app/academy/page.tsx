@@ -1,44 +1,38 @@
-"use client";
+import React from "react";
+import { WhaleMissionLoader } from '@/components/shared/WhaleMissionLoader';
+import { getAcademyData } from "@/app/actions/academy-actions";
+import { AcademyInteractiveEngine } from "@/components/academy/AcademyInteractiveEngine";
+import { TOPIC_CATEGORIES } from "@/lib/data/academy-curriculum";
+import { SystemFooter } from "@/components/landing/SystemFooter";
+import { WhaleChatLink } from "@/components/shared/WhaleChatLink";
 
-import { DownpageLayout } from "@/components/ui/DownpageLayout";
+export const revalidate = 60;
 
-const sections = [
-  {
-    title: "Módulo 1: La Transparencia como Vector de Ataque",
-    paragraphs: [
-      "Aprende cómo operan las herramientas forenses modernas de análisis on-chain (como Arkham o Nansen) para de-anonimizar a los usuarios.",
-      "Analizaremos casos reales donde la falta de privacidad ha resultado en la pérdida de ventajas competitivas en el mercado, secuestros de estrategias MEV y violaciones de seguridad personal."
-    ]
-  },
-  {
-    title: "Módulo 2: Criptografía Zero-Knowledge (ZK)",
-    paragraphs: [
-      "Desmitificando el 'Conocimiento Cero'. Aprenderás cómo es matemáticamente posible demostrar que tienes fondos suficientes para realizar una transacción, sin revelar cuál es tu saldo total ni a quién le estás enviando el dinero.",
-      "Exploración interactiva del lenguaje Noir y la arquitectura de estado híbrido de Aztec Network."
-    ]
-  },
-  {
-    title: "Módulo 3: El Escáner de Ballenas Híbrido",
-    paragraphs: [
-      "Masterclass técnica sobre cómo funciona Whale Alert Network. Aprende a conectar el flujo masivo de datos públicos y cruzarlo con tus estrategias privadas sin filtrar inteligencia al mercado.",
-      "Configuración de alertas de liquidez, monitorización de puentes inter-cadena (cross-chain bridges) y detección de rug-pulls institucionales."
-    ]
-  },
-  {
-    title: "Módulo 4: Soberanía de Hardware y Sesiones Aisladas",
-    paragraphs: [
-      "Comprende el protocolo de seguridad que ocurre cuando escaneas el código QR para entrar a nuestra plataforma. Aprende por qué aislar tus llaves privadas en un dispositivo móvil (Air-Gapping) es la única defensa efectiva contra el malware de escritorio moderno."
-    ]
-  }
-];
+export default async function AcademyPage() {
+    let dbCourses: any[] = [];
+    try {
+        dbCourses = await getAcademyData();
+    } catch (e) {
+        console.error("LMS DB Connection Missing", e);
+    }
+    
+    const isDatabaseSeeded = dbCourses.length > 0;
 
-export default function AcademyPage() {
-  return (
-    <DownpageLayout 
-      pageTitle="Academia Criptográfica"
-      subtitle="Domina la inteligencia de mercado, la seguridad operacional (OpSec) y los fundamentos de la criptografía de Conocimiento Cero."
-      indexTitle="Academia ZK"
-      sections={sections}
-    />
-  );
+    return (
+        <WhaleMissionLoader>
+            <div className="flex-1 flex flex-col bg-white text-slate-900 w-full min-h-screen">
+              <div className="w-full flex flex-col items-center justify-start p-4 md:p-8 relative min-h-screen">
+                <div className="w-full max-w-[1200px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] flex flex-col transition-all duration-500 z-10 mt-16 md:mt-24 p-8 md:p-16">
+                    <AcademyInteractiveEngine 
+                        dbCourses={dbCourses} 
+                        isSeeded={isDatabaseSeeded}
+                        expectedCategories={TOPIC_CATEGORIES.length} 
+                    />
+                </div>
+              </div>
+              <WhaleChatLink />
+              <SystemFooter />
+            </div>
+        </WhaleMissionLoader>
+    );
 }
