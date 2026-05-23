@@ -148,7 +148,7 @@ export default function QDsPage() {
           <div
             className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-70 mix-blend-multiply"
           >
-            <img src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" alt="Core Atom" className="w-full h-full object-cover" />
+            <img src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" alt="Core Atom" className="w-full h-full object-contain" />
           </div>
         )}
 
@@ -275,19 +275,19 @@ export default function QDsPage() {
 
       {/*  MID-PAGE IMAGE DIVIDER  */}
       <section
-        className="w-full relative border-y border-black/10 bg-[#F8F8F6] overflow-hidden"
+        className="w-full relative border-y border-black/10 bg-white overflow-hidden"
         style={{ height: 'clamp(340px, 45vh, 520px)' }}
       >
         <div className="absolute inset-0 flex items-center justify-center">
           <img 
             src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" 
             alt="Core Atom" 
-            className="w-full h-full object-cover opacity-80 mix-blend-multiply"
+            className="w-full h-full object-contain opacity-80 mix-blend-multiply"
           />
         </div>
         {/* Edge fades */}
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#F8F8F6] to-transparent pointer-events-none z-10" />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#F8F8F6] to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10" />
         <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none bg-white/20 backdrop-blur-[2px]">
           <span className="font-mono text-[10px] font-black uppercase tracking-[0.55em] text-black/40 drop-shadow-sm">
             QDs · Core Dots · 21,000,000 · 2026
@@ -296,7 +296,7 @@ export default function QDsPage() {
       </section>
 
       {/*  FINAL CTA  */}
-      <section className="relative w-full py-32 md:py-48 flex flex-col items-center justify-center overflow-hidden bg-[#FAF9F6] border-b border-black/10">
+      <section className="relative w-full py-32 md:py-48 flex flex-col items-center justify-center overflow-hidden bg-white border-b border-black/10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
