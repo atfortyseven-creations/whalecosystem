@@ -65,7 +65,6 @@ export function InstitutionalHeader() {
       { label: t('NAV_WHALE_CHAT'), href: "/chat" },
       { label: t('NAV_PORTFOLIO'), href: "/portfolio" },
       { label: t('NAV_COMMUNITY'), href: "#", subItems: [{ label: t('NAV_NEWS'), href: "/news" }, { label: t('NAV_ACADEMY'), href: "/academy" }, { label: t('NAV_FORUM'), href: "/forum" }, { label: t('NAV_CAREERS'), href: "/careers" }] },
-      { label: t('NAV_PRICING'), href: "/pricing" },
       { label: t('NAV_STATUS'), href: "/status" },
       { label: t('NAV_PRIVACY'), href: "/privacy" }
     ];

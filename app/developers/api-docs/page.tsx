@@ -37,6 +37,16 @@ function APIDocsPageContent() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [apiUsage, setApiUsage] = useState<{ requests: number; limit: number; reset: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [demoKeyExpiry, setDemoKeyExpiry] = useState<number | null>(null);
+
+  const generateDemoKey = () => {
+    const key = `demo_${address?.slice(0, 8)}_${Date.now()}`;
+    const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+    setApiKey(key);
+    setDemoKeyExpiry(expiry);
+    localStorage.setItem('demo_api_key', key);
+    localStorage.setItem('demo_api_expiry', expiry.toString());
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -52,9 +62,12 @@ function APIDocsPageContent() {
           setUserPlan(data.user?.tier || null);
           setApiKey(data.user?.apiKey || null);
           setApiUsage(data.user?.apiUsage || null);
+        } else {
+          generateDemoKey();
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
+        generateDemoKey();
       } finally {
         setLoading(false);
       }
@@ -62,6 +75,15 @@ function APIDocsPageContent() {
 
     fetchUserData();
   }, [isSignedIn, address]);
+
+  useEffect(() => {
+    if (demoKeyExpiry && Date.now() > demoKeyExpiry) {
+      setApiKey(null);
+      setDemoKeyExpiry(null);
+      localStorage.removeItem('demo_api_key');
+      localStorage.removeItem('demo_api_expiry');
+    }
+  }, [demoKeyExpiry]);
 
   const currentPlan = PLANS.find(p => p.id.toLowerCase() === userPlan?.toLowerCase());
 
@@ -106,16 +128,38 @@ function APIDocsPageContent() {
           <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 md:p-10 mb-12">
             <div className="flex items-center gap-3 mb-6">
               <Key size={20} className="text-slate-600" />
-              <h2 className="text-xl font-black text-slate-900">Upgrade Required</h2>
+              <h2 className="text-xl font-black text-slate-900">Demo API Access</h2>
             </div>
             <p className="text-slate-500 mb-6">
-              You need an active plan to access the API. Choose a plan below to get started.
+              You have a demo API key for testing. This key expires in 10 minutes.
             </p>
-            <Link href="/pricing">
-              <button className="w-full py-4 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-widest text-sm hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
-                <CreditCard size={14} /> View Pricing Plans
-              </button>
-            </Link>
+
+            {/* Demo API Key Display */}
+            <div className="bg-white rounded-2xl p-6 mb-6 border border-slate-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-black text-slate-900">Your Demo API Key</h3>
+                {demoKeyExpiry && (
+                  <span className="text-xs text-slate-400 font-mono">
+                    Expires in {Math.max(0, Math.ceil((demoKeyExpiry - Date.now()) / 60000))} minutes
+                  </span>
+                )}
+              </div>
+              <div className="bg-slate-100 rounded-xl p-4 font-mono text-sm text-slate-700 break-all">
+                {apiKey || 'Loading...'}
+              </div>
+              <div className="mt-4 space-y-2">
+                <SecurityBadge text="Demo key for testing only" />
+                <SecurityBadge text="Expires in 10 minutes" />
+                <SecurityBadge text="Rate limit: 100 requests per day" />
+                <SecurityBadge text="Tokens: 5 supported" />
+              </div>
+            </div>
+
+            <div className="bg-slate-100 rounded-xl p-4 border border-slate-200">
+              <p className="text-xs text-slate-500">
+                This is a demo key for testing purposes. To get full API access with higher limits and permanent keys, contact us at developers@humanidfi.com
+              </p>
+            </div>
           </div>
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 md:p-10 mb-12">
@@ -144,8 +188,8 @@ function APIDocsPageContent() {
               </div>
               <div className="mt-4 space-y-2">
                 <SecurityBadge text="HMAC authentication required" />
-                <SecurityBadge text="Rate limit: " + currentPlan.requests + " per day" />
-                <SecurityBadge text="Tokens: " + currentPlan.tokens + " supported" />
+                <SecurityBadge text={`Rate limit: ${currentPlan.requests} per day`} />
+                <SecurityBadge text={`Tokens: ${currentPlan.tokens} supported`} />
               </div>
             </div>
 
@@ -445,20 +489,6 @@ ws.onmessage = (event) => {
             </div>
           </section>
 
-          {/* Upgrade CTA */}
-          {!currentPlan && (
-            <section className="bg-slate-900 text-white rounded-3xl p-8 md:p-10 text-center">
-              <h2 className="text-3xl font-black mb-4">Ready to Access the API?</h2>
-              <p className="text-slate-300 mb-6 max-w-xl mx-auto">
-                Choose a plan to get your API key and start building with whale alerts and market data.
-              </p>
-              <Link href="/pricing">
-                <button className="inline-flex items-center gap-2 px-8 py-4 bg-white text-slate-900 font-black uppercase tracking-widest text-sm hover:bg-slate-100 transition-colors rounded-2xl">
-                  <CreditCard size={16} /> View Pricing Plans
-                </button>
-              </Link>
-            </section>
-          )}
         </div>
       </div>
     </div>
