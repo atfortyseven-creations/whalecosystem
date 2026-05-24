@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Lock, Wallet } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import WorldIDButton from "./WorldIDButton";
+
 
 // Helper for conditional classes
 function cn(...inputs: ClassValue[]) {
@@ -47,13 +47,6 @@ export default function LoginCard() {
                     Access the future of institutional analytics with your verified identity.
                 </p>
 
-                {/* World ID Integration */}
-                <div className="w-full relative group">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full opacity-20 group-hover:opacity-40 blur transition duration-500"></div>
-                    <div className="relative">
-                        <WorldIDButton />
-                    </div>
-                </div>
             </div>
 
             {/* Footer / Status */}

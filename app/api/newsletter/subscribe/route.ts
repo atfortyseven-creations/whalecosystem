@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { randomBytes } from 'crypto';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy');
 
 // Schema de validación
 const SubscribeSchema = z.object({
@@ -35,13 +38,22 @@ export async function POST(request: NextRequest) {
         email,
         frequency,
         subscribed: true,
-        // FIX Bug 20: Math.random() is a non-cryptographic PRNG.
-        // An attacker can statistically predict the token and unsubscribe
-        // arbitrary users from whale alerts without their consent.
-        // crypto.randomBytes(32) generates 256-bit CSPRNG entropy.
         unsubscribeToken: randomBytes(32).toString('hex'),
       },
     });
+
+    try {
+      await resend.emails.send({
+        from: 'Humanity Ledger <newsletter@humanidfi.com>',
+        to: 'atfortyseven2@humanidfi.es',
+        subject: 'New Newsletter Subscriber',
+        text: `A new user has subscribed to the newsletter!\n\nEmail: ${email}\nFrequency: ${frequency}\n\nPlease add them to the mailing list.`,
+      });
+      console.log(`Successfully routed newsletter subscription for ${email} to atfortyseven2@humanidfi.es`);
+    } catch (emailError) {
+      console.error('Error sending newsletter routing email:', emailError);
+      // We don't fail the request if the email sending fails, just log it.
+    }
 
     return NextResponse.json({
       success: true,
@@ -60,4 +72,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

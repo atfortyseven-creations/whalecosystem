@@ -436,52 +436,7 @@ function ConnectedScreen({
           ))}
         </motion.div>
 
-        {/*  DIVIDER  */}
-        <div className="w-full border-t border-black/8 mb-8" />
 
-        {/*  QR SYNC NOTE  */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.35, duration: 0.6 }}
-          className="w-full flex items-start gap-3 mb-8"
-        >
-          <Scan size={13} className="text-black/30 mt-0.5 shrink-0" />
-          <p className="text-[13px] text-black/50 font-light leading-relaxed">
-            Scan the <span className="font-semibold text-black">QR code</span> shown on the desktop platform to link your session instantly  no additional steps required.
-          </p>
-        </motion.div>
-
-
-
-        {/*  PRIMARY ACTION: OPEN QR SCANNER  */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="w-full mb-3"
-        >
-          <button
-            id="open-qr-scanner-btn"
-            onClick={onScan}
-            className="w-full flex items-center justify-between py-5 px-6 rounded-2xl bg-black text-white font-medium tracking-tight text-[15px] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <img
-                src={ATOM_PNGTREE}
-                alt=""
-                aria-hidden
-                className="w-9 h-9 object-contain opacity-90 shrink-0"
-                style={{ mixBlendMode: 'screen' }}
-              />
-              <span>Open QR Scanner</span>
-            </div>
-            <div className="flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-              <ScanLine size={16} />
-              <span className="font-mono text-[10px] uppercase tracking-[0.2em]">Sync Desktop</span>
-            </div>
-          </button>
-        </motion.div>
 
         {/*  SCAN LABEL (universal: product, wallet, GS1)  */}
         <motion.div
@@ -678,15 +633,7 @@ function ConnectedScreen({
           </motion.button>
         )}
 
-        {/*  FOOTER NOTE  */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/20 text-center mt-4 leading-relaxed px-4"
-        >
-          On the desktop platform, click <span className="text-black/40">Direct QR Handshake</span> then scan the code to link your session.
-        </motion.p>
+
       </main>
 
       <DynamicUniversalScanModal

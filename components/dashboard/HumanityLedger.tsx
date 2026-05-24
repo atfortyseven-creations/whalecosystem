@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { MermaidDiagram } from '@/components/privacy/MermaidDiagram';
 
 // ─── Roadmap Data ─────────────────────────────────────────────────────────────
 
@@ -27,7 +28,7 @@ const NODES: RoadmapNode[] = [
 
   // Q2 2025 - Core Protocol
   { id: 'noir', title: 'Noir Circuit Deployment', status: 'live', quarter: 'Q2 2025', description: 'Core Noir circuits compiled and deployed: private transfer, note commitment, nullifier generation.', x: 380, y: 80 },
-  { id: 'identity', title: 'ZK Identity Layer', status: 'live', quarter: 'Q2 2025', description: 'Biometric liveness proofs and World ID integration. One human, one verified account.', x: 380, y: 220 },
+  { id: 'identity', title: 'ZK Identity Layer', status: 'live', quarter: 'Q2 2025', description: 'Biometric liveness proofs and Identity integration. One human, one verified account.', x: 380, y: 220 },
   { id: 'whale', title: 'Whale Network v1', status: 'live', quarter: 'Q2 2025', description: 'Real-time on-chain capital flow monitoring across 20+ blockchain networks.', x: 380, y: 360 },
 
   // Q3 2025 - Intelligence
@@ -341,7 +342,7 @@ export default function HumanityLedger() {
           <div>
             <h3 className="text-[12px] font-mono font-black uppercase tracking-wider text-black/35 mb-3">Network Integrations</h3>
             <ul className="space-y-1.5">
-              {['Whale Alert Network (real-time flows)', 'World ID (Sybil resistance)', 'XMTP (encrypted messaging)', 'Ethereum L1 (settlement)'].map(i => (
+              {['Whale Alert Network (real-time flows)', 'Zero-Knowledge Identity (Sybil resistance)', 'XMTP (encrypted messaging)', 'Ethereum L1 (settlement)'].map(i => (
                 <li key={i} className="flex gap-2 text-[13px] text-black/60 leading-snug">
                   <span className="mt-[5px] w-1 h-1 rounded-full bg-black/25 shrink-0" />
                   {i}
@@ -349,6 +350,73 @@ export default function HumanityLedger() {
               ))}
             </ul>
           </div>
+        </div>
+
+        {/* Detailed Explanations and Quantum Precision Diagrams */}
+        <div className="mt-16 max-w-[900px] border-t border-black/8 pt-12">
+          <h2 className="text-[22px] font-black tracking-tight text-black mb-4">
+            System Architecture & Deep Dive Explanations
+          </h2>
+          <p className="text-[14px] text-black/60 leading-[1.8] mb-8">
+            The Humanity Ledger is built upon a radically decentralized and privacy-preserving stack. By unifying high-frequency on-chain telemetry (Whale Network) with absolute cryptographic privacy (Aztec Layer 2), we've created an environment where capital flows can be analyzed without exposing the observer's identity. 
+            All analytical computation executes strictly within a zero-knowledge execution environment on the user's localized hardware. There are no SaaS intermediaries. There is no cloud telemetry.
+          </p>
+          
+          <h3 className="text-[16px] font-black tracking-tight text-black mb-4">Core Telemetry & Ingestion Flow</h3>
+          <p className="text-[14px] text-black/60 leading-[1.8] mb-6">
+            Raw block data and mempool streams are ingested via dedicated, failover-resistant RPC nodes. This unindexed data feeds directly into local Worker Nodes which perform Z-Score pattern analysis and EIP-2929 thermodynamics evaluations, mapping capital velocity into a localized Neo4j graph database.
+          </p>
+          
+          <MermaidDiagram 
+            chart={`
+graph TD
+    subgraph "Public Ecosystem"
+        RPC[RPC Node Clusters] -->|Raw Block Data| M[Mempool Streams]
+    end
+    subgraph "Localized Vault Processing"
+        M --> W[Whale Worker Node]
+        W -->|Z-Score Eval| DB1[(Neo4j Graph)]
+        W -->|Tx Vitals| DB2[(Redis/Upstash)]
+        W -->|State| DB3[(Prisma/Postgres)]
+        DB1 --> AG[Analytics Engine]
+        DB2 --> AG
+        DB3 --> AG
+    end
+    subgraph "Secure Client Delivery"
+        AG -->|Encrypted WebSocket| UI[Next.js Client Terminal]
+        UI -->|ZK Circuit| AZ[Aztec Shielded Pool]
+    end
+    style RPC fill:#fafafa,stroke:#333
+    style W fill:#fff,stroke:#000,stroke-width:2px
+    style UI fill:#050505,stroke:#000,color:#fff
+            `} 
+            caption="Thermodynamic Data Ingestion and Local Processing Pipeline" 
+          />
+
+          <h3 className="text-[16px] font-black tracking-tight text-black mt-12 mb-4">Zero-Knowledge Sybil Resistance</h3>
+          <p className="text-[14px] text-black/60 leading-[1.8] mb-6">
+            To prevent network degradation from algorithmic bots and malicious institutional swarms, the network implements a localized biometric liveness verification standard. When a user authenticates, their wallet generates a zk-SNARK proof of personhood. The root address is completely obfuscated through a cryptographic nullifier hash.
+          </p>
+
+          <MermaidDiagram 
+            chart={`
+sequenceDiagram
+    participant User
+    participant LocalClient as Local Client
+    participant ZK as ZK Circuit
+    participant Validator as Network Validator
+    User->>LocalClient: Request Access
+    LocalClient->>User: Request Signature
+    User->>LocalClient: Signed Message (EIP-191)
+    LocalClient->>ZK: Generate Proof (No PII)
+    ZK->>LocalClient: Return ZK-SNARK
+    LocalClient->>Validator: Submit SNARK & Nullifier
+    Validator-->>LocalClient: Accept Proof (True/False)
+    LocalClient-->>User: Grant Encrypted Session
+            `}
+            caption="Zero-Knowledge Authentication and Verification Sequence" 
+          />
+
         </div>
       </div>
     </div>

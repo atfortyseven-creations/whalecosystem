@@ -93,16 +93,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
         <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 bg-white overflow-y-auto no-scrollbar font-sans text-black relative">
             <div className="w-full max-w-[880px] mx-auto bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 flex flex-col transition-all duration-500 z-10">
 
-                {/* Primary Action Row */}
-                <div className="w-full flex justify-end mb-4 flex-shrink-0">
-                    <button 
-                       onClick={() => refetch()}
-                       className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-slate-50 active:scale-95 flex items-center gap-2"
-                    >
-                       <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
-                       SYNC ENTROPY
-                    </button>
-                </div>
+
 
                 {/* Balance Block (Minimalist) */}
                 <div className="w-full border-b border-slate-200/60 pb-8 mb-8">

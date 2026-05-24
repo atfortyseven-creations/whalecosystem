@@ -68,7 +68,7 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
           </div>
         ) : svg ? (
           <div
-            className="p-6 md:p-10 [&_svg]:min-w-[640px] [&_svg]:max-w-none [&_svg]:h-auto [&_svg]:display-block [&_.label]:text-[14px] [&_.node]:text-[14px]"
+            className="p-6 md:p-10 [&_svg]:w-full [&_svg]:max-w-full [&_svg]:h-auto [&_svg]:block [&_.label]:text-[14px] [&_.node]:text-[14px]"
             dangerouslySetInnerHTML={{ __html: svg }}
             aria-hidden={!caption}
           />

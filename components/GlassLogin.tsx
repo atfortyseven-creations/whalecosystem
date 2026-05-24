@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { ShieldCheck, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import WorldIDButton from "./WorldIDButton";
+
 
 export default function GlassLogin() {
     // const [isDiving, setIsDiving] = useState(false);
@@ -102,11 +102,6 @@ export default function GlassLogin() {
                 {/* Subtle Separator */}
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-8" />
 
-                {/* Your World ID Button */}
-                <div className="w-full">
-                    <WorldIDButton />
-                </div>
-
                 {/* Small Footer */}
                 <p className="mt-6 text-[10px] text-gray-500 text-center font-medium">
                     Secured by World ID & Blockchain
@@ -115,4 +110,3 @@ export default function GlassLogin() {
         </motion.div>
     );
 }
-

@@ -307,18 +307,7 @@ function HeroSection() {
       >
         {mounted && (
           <>
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="mb-10 inline-flex items-center gap-2 border border-black/10 px-4 py-1.5 bg-white"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-black" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-black/55">
-                Built on Aztec Network
-              </span>
-            </motion.div>
+
 
             {/* Atom */}
             <motion.div
@@ -424,104 +413,7 @@ function StatStrip() {
 
 // ─── How it works (immersive scroll) ─────────────────────────────────────────
 
-function HowItWorksSection() {
-  const STEPS = [
-    {
-      n: "01",
-      title: "Your device proves it",
-      body: "The Aztec proving environment runs locally on your machine. Private inputs — transaction amounts, wallet addresses, identity data — are never sent anywhere. A succinct proof is generated and submitted instead.",
-    },
-    {
-      n: "02",
-      title: "The network verifies, not reads",
-      body: "The Aztec L2 sequencer receives your proof and verifies its mathematical validity. It confirms the state transition is correct without ever accessing the underlying data. The network learns nothing about you.",
-    },
-    {
-      n: "03",
-      title: "Ethereum settles permanently",
-      body: "Verified state roots are anchored to Ethereum L1, providing finality, censorship resistance, and economic security. Your private activity is backed by the most decentralized settlement network in the world.",
-    },
-    {
-      n: "04",
-      title: "You control disclosure",
-      body: "If you need to prove compliance, you generate a selective viewing key or a cryptographic range proof. Regulators receive verifiable evidence. Nobody else does.",
-    },
-  ];
 
-  return (
-    <section className="w-full bg-white border-t border-black/8 py-28 md:py-40">
-      <div className="w-full max-w-[1100px] mx-auto px-6">
-        <div className="mb-20">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-black/30">
-            How it works
-          </span>
-          <h2 className="mt-4 text-[36px] sm:text-[52px] font-black tracking-tighter leading-[0.93] text-black max-w-[480px]">
-            Zero knowledge.<br />
-            <span className="text-black/22">Zero compromise.</span>
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-[1px] bg-black/8 border border-black/8">
-          {STEPS.map((step) => (
-            <motion.div
-              key={step.n}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white p-10 flex flex-col gap-5 group hover:bg-[#fafafa] transition-colors duration-200"
-            >
-              <span className="font-mono text-[11px] font-black text-black/18">{step.n}</span>
-              <h3 className="text-[20px] font-black tracking-tight text-black leading-tight">
-                {step.title}
-              </h3>
-              <p className="text-[14px] text-black/55 leading-[1.75]">{step.body}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Features grid ────────────────────────────────────────────────────────────
-
-function FeaturesSection() {
-  return (
-    <section className="w-full bg-[#fafafa] border-t border-black/8 py-28 md:py-40">
-      <div className="w-full max-w-[1100px] mx-auto px-6">
-        <div className="mb-16">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-black/30">
-            Capabilities
-          </span>
-          <h2 className="mt-4 text-[36px] sm:text-[52px] font-black tracking-tighter leading-[0.93] text-black max-w-[500px]">
-            Built for what<br />
-            <span className="text-black/22">privacy demands.</span>
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-black/8 border border-black/8">
-          {FEATURES.map((f) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5 }}
-              className="bg-white p-8 flex flex-col gap-4 group hover:bg-[#fafafa] transition-colors duration-200"
-            >
-              <span className="inline-block text-[10px] font-mono font-black uppercase tracking-[0.2em] border border-black/12 px-2.5 py-1 text-black/45 w-fit">
-                {f.tag}
-              </span>
-              <h3 className="text-[17px] font-black tracking-tight text-black">{f.title}</h3>
-              <p className="text-[13.5px] text-black/55 leading-[1.72]">{f.body}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ─── Whale Network callout ────────────────────────────────────────────────────
 
@@ -696,8 +588,6 @@ export function ImmersiveManifestoLanding(_props: ImmersiveManifestoLandingProps
       <LandingNav />
       <HeroSection />
       <StatStrip />
-      <HowItWorksSection />
-      <FeaturesSection />
       <WhaleNetworkSection />
       <DocumentationSection />
       <FinalCTASection />
