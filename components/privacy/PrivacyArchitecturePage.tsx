@@ -90,7 +90,7 @@ export function PrivacyArchitecturePage() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 min-w-0">
+      <main className="flex-1 min-w-0 bg-white">
         <div className="max-w-[800px] mx-auto px-6 py-12 md:py-16 lg:py-20">
           <header className="mb-14 border-b border-black/8 pb-10">
             <div className="flex flex-col sm:flex-row sm:items-start gap-8 mb-8">

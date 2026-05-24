@@ -29,10 +29,10 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
             tertiaryColor: '#ffffff',
             lineColor: '#050505',
             fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-            fontSize: '18px',
+            fontSize: '24px',
           },
-          flowchart: { curve: 'basis', padding: 24, htmlLabels: true },
-          sequence: { actorMargin: 64, messageMargin: 48 },
+          flowchart: { curve: 'basis', padding: 40, htmlLabels: true },
+          sequence: { actorMargin: 80, messageMargin: 64 },
           securityLevel: 'strict',
         });
 
@@ -56,24 +56,24 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
   }, [chart, reactId]);
 
   return (
-    <figure className="my-8 rounded-2xl border border-black/8 bg-white p-6 md:p-8 overflow-x-auto">
+    <figure className="my-12 rounded-2xl border border-black/8 bg-white p-8 md:p-12 overflow-x-auto">
       {error ? (
-        <p className="text-base text-red-600/80 font-mono">{error}</p>
+        <p className="text-lg text-red-600/80 font-mono">{error}</p>
       ) : svg ? (
         <div
-          className="flex justify-center min-w-[600px] md:min-w-[800px] [&_svg]:max-w-full [&_svg]:h-auto"
+          className="flex justify-center min-w-[800px] md:min-w-[1000px] lg:min-w-[1200px] [&_svg]:max-w-full [&_svg]:h-auto"
           dangerouslySetInnerHTML={{ __html: svg }}
           aria-hidden={!caption}
         />
       ) : (
-        <div className="h-32 flex items-center justify-center">
-          <span className="font-mono text-sm uppercase tracking-widest text-[#050505]/30">
+        <div className="h-40 flex items-center justify-center">
+          <span className="font-mono text-base uppercase tracking-widest text-[#050505]/30">
             Loading diagram…
           </span>
         </div>
       )}
       {caption && (
-        <figcaption className="mt-4 font-mono text-sm font-black uppercase tracking-[0.25em] text-[#050505]/45 text-center">
+        <figcaption className="mt-6 font-mono text-base font-black uppercase tracking-[0.25em] text-[#050505]/45 text-center">
           {caption}
         </figcaption>
       )}
