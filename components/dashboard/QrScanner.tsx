@@ -187,7 +187,7 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 startCamera();
             }
         }
-    }, [mode, generateQr]);
+    }, [mode, state]);
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -308,9 +308,6 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                                     className="absolute left-6 right-6 h-0.5 bg-white/20 shadow-[0_0_16px_rgba(255,255,255,0.2)]" />
                             </div>
                         </div>
-                        <p className="font-mono text-[10px] uppercase tracking-widest text-black/30">
-                            Point at the QR code on your PC screen
-                        </p>
                         <div className="w-full space-y-3 pt-2">
                             <label className="w-full py-3 rounded-xl bg-black/5 border border-black/10 text-black font-mono text-[10px] uppercase tracking-widest font-black shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer hover:bg-black/10">
                                 <Camera size={14} /> Upload QR Image

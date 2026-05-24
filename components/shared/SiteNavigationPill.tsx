@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Crown, LayoutDashboard, Globe, HelpCircle, Tag, Atom, Package } from 'lucide-react';
+import { Crown, LayoutDashboard, Globe, HelpCircle, Atom } from 'lucide-react';
 
 export function SiteNavigationPill() {
     const pathname = usePathname();
@@ -13,8 +13,6 @@ export function SiteNavigationPill() {
         { href: '/ledger',    label: 'Ledger',    icon: Globe,         active: pathname.startsWith('/ledger') },
         { href: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, active: pathname.startsWith('/portfolio') },
         { href: '/qds',       label: 'QDs',       icon: Atom,          active: pathname.startsWith('/qds') },
-        { href: '/token',    label: 'Token',     icon: Tag,           active: pathname.startsWith('/token') },
-        { href: '/product-passports', label: 'Studio Provenance Beta', icon: Package, active: pathname.startsWith('/product-passports') },
     ];
 
     return (

@@ -108,8 +108,6 @@ export function WhaleAlertFooter() {
                         <ul className="space-y-2">
                             <li><Link href="/dashboard" className="text-sm text-slate-600 hover:text-slate-900">Dashboard</Link></li>
                             <li><Link href="/portfolio" className="text-sm text-slate-600 hover:text-slate-900">Portfolio</Link></li>
-                            <li><Link href="/token" className="text-sm text-slate-600 hover:text-slate-900">Token</Link></li>
-                            <li><Link href="/product-passports" className="text-sm text-slate-600 hover:text-slate-900">Studio Provenance Beta</Link></li>
                         </ul>
                     </div>
                     <div>
