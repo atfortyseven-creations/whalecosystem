@@ -515,10 +515,10 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {showMobileNav && (
                     <nav className={`mobile-bottom-nav lg:hidden flex fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                          {[
-                            { id: 'gold',        icon: <Zap size={18} />,           label: 'Mint' },
-                            { id: 'markets',     icon: <BarChart2 size={18} />,     label: 'Tokens' },
-                            { id: 'inst-ledger', icon: <Globe size={18} />,          label: 'Ledger' },
-                            { id: 'menu',        icon: <Menu size={18} />,          label: 'Menu' },
+                            { id: 'gold',        icon: Icon.identity, label: 'Identity' },
+                            { id: 'markets',     icon: Icon.markets,  label: 'Markets' },
+                            { id: 'inst-ledger', icon: Icon.explorer, label: 'Explorer' },
+                            { id: 'menu',        icon: <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M2 4h12M2 8h12M2 12h12"/></svg>, label: 'Menu' },
                         ].map(tab => {
                             const isActive = activeTab === tab.id;
                             return (
@@ -596,7 +596,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         </p>
                     </div>
                     <button onClick={() => setShowInfoModal(false)} className="w-8 h-8 rounded-full hover:bg-black/5 flex items-center justify-center transition-colors">
-                        <X size={15} className="text-black/40" />
+                        <span className="text-black/40 text-[17px] leading-none font-light">×</span>
                     </button>
                 </div>
                 <div className="px-6 py-5 border-b border-black/6 bg-black/[0.015]">
@@ -658,7 +658,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                             <p className="text-[12px] text-black/40 dark:text-white/40 mt-0.5">Choose a section</p>
                         </div>
                         <button onClick={() => setIsMenuDrawerOpen(false)} className="w-7 h-7 rounded-full hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition-colors">
-                            <X size={14} className="text-black/50 dark:text-white/50" />
+                            <span className="text-black/50 dark:text-white/50 text-[17px] leading-none font-light">×</span>
                         </button>
                     </div>
 
@@ -686,7 +686,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                 >
                                     <div className="flex items-center gap-3.5">
                                         <div className={isActive ? 'text-white dark:text-black' : 'text-black/50 dark:text-white/50'}>
-                                            {getModuleIcon(item.id)}
+                                            {item.icon}
                                         </div>
                                         <span className="text-[14px] font-medium">{item.label}</span>
                                     </div>
