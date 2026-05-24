@@ -364,12 +364,6 @@ export default function PortfolioPage() {
           <Link href="/" className="p-2 rounded-xl border transition-all hover:bg-black/5" style={{ borderColor: BORDER, background: CARD, color: MUTED }} title="Return to Landing Page">
             <ArrowLeft size={16} />
           </Link>
-          <div className="flex flex-col items-start">
-            <div className="font-black text-sm uppercase tracking-tight" style={{ color: INK }}>Portfolio</div>
-            <div className="w-8 h-8 shrink-0 pointer-events-none -mt-1 -ml-1">
-              <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
-            </div>
-          </div>
         </div>
 
         <div className="flex items-center gap-3">
