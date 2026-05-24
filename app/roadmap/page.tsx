@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ZoomIn, ZoomOut, Maximize, ArrowLeft, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 // === DATA ===
@@ -132,13 +132,13 @@ export default function RoadmapPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Complete':
-        return <CheckCircle2 size={16} className="text-white" />;
+        return null;
       case 'In Progress':
-        return <Clock size={16} className="text-slate-900" />;
+        return null;
       case 'Upcoming':
-        return <AlertCircle size={16} className="text-slate-400" />;
+        return null;
       default:
-        return <AlertCircle size={16} className="text-slate-400" />;
+        return null;
     }
   };
 
@@ -232,17 +232,16 @@ export default function RoadmapPage() {
                         <div className="flex justify-between w-full relative z-10">
                             {lane.nodes.map((node, i) => (
                                 <div key={node.id} className="flex flex-col items-center">
-                                    <div className="mb-3 flex items-center gap-2">
-                                        {getStatusIcon(node.status)}
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{node.status}</span>
+                                    <div className="mb-3">
+                                        <span className="text-sm font-black uppercase tracking-widest text-slate-600">{node.status}</span>
                                     </div>
                                     <div className={`
-                                        px-5 py-4 font-black text-sm text-center w-[180px] min-h-[70px] flex flex-col items-center justify-center shadow-sm rounded-xl transition-all hover:shadow-md
+                                        px-6 py-5 font-black text-base text-center w-[200px] min-h-[80px] flex flex-col items-center justify-center shadow-sm rounded-xl transition-all hover:shadow-md
                                         ${getNodeStyle(node.status)}
                                     `}>
-                                        <span className="mb-1">{node.label}</span>
+                                        <span className="mb-2 text-lg">{node.label}</span>
                                         {node.description && (
-                                          <span className="text-[10px] font-normal opacity-70 leading-tight">{node.description}</span>
+                                          <span className="text-sm font-normal opacity-70 leading-tight">{node.description}</span>
                                         )}
                                     </div>
                                 </div>

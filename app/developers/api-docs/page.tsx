@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
-import { Code, Key, Zap, Shield, CheckCircle2, Lock, CreditCard, Activity, Building2, User, Star, AlertTriangle } from "lucide-react";
+import { Code, Key, Building2, User, Star } from "lucide-react";
 import Link from "next/link";
 import { WhaleAlertLoader } from "@/components/ui/WhaleAlertLoader";
 import { API_MARKETPLACE_PLANS } from "@/lib/api-marketplace-plans";
@@ -12,8 +12,7 @@ const PLANS = API_MARKETPLACE_PLANS;
 
 function SecurityBadge({ text }: { text: string }) {
   return (
-    <div className="flex items-center gap-2 text-xs text-slate-400 font-mono uppercase tracking-widest">
-      <Shield size={11} className="text-slate-600" />
+    <div className="text-sm text-slate-500 font-mono uppercase tracking-widest">
       {text}
     </div>
   );
@@ -110,10 +109,10 @@ function APIDocsPageContent() {
           <Link href="/" className="text-xs font-mono uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors mb-6 inline-block">
              Whale Alert Corporation
           </Link>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 mb-4">
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 mb-4">
             API Documentation
           </h1>
-          <p className="text-slate-500 max-w-xl mx-auto text-lg">
+          <p className="text-slate-500 max-w-xl mx-auto text-xl">
             Large-wallet alerts and market-flow data over REST and WebSocket—with HMAC authentication.
           </p>
         </div>
@@ -121,44 +120,38 @@ function APIDocsPageContent() {
         {/* USER DASHBOARD OR PRICING CTA */}
         {loading ? (
           <div className="w-full py-12 flex items-center justify-center">
-            <Activity size={32} className="animate-spin text-slate-400" />
+            <div className="text-lg font-black text-slate-400">Loading...</div>
           </div>
         ) : !isSignedIn ? (
           <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 md:p-10 mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <Lock size={20} className="text-slate-600" />
-              <h2 className="text-xl font-black text-slate-900">Connect Your Wallet</h2>
-            </div>
-            <p className="text-slate-500 mb-6">
+            <h2 className="text-2xl font-black text-slate-900 mb-6">Connect Your Wallet</h2>
+            <p className="text-base text-slate-500 mb-6">
               Connect your wallet to view your API dashboard and credentials.
             </p>
             <Link href="/login?redirect=/developers/api-docs">
-              <button className="w-full py-4 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-widest text-sm hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
-                <Lock size={14} /> Connect Wallet
+              <button className="w-full py-4 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-widest text-base hover:bg-slate-800 transition-colors">
+                Connect Wallet
               </button>
             </Link>
           </div>
         ) : !currentPlan ? (
           <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 md:p-10 mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <Key size={20} className="text-slate-600" />
-              <h2 className="text-xl font-black text-slate-900">Demo API Access</h2>
-            </div>
-            <p className="text-slate-500 mb-6">
+            <h2 className="text-2xl font-black text-slate-900 mb-6">Demo API Access</h2>
+            <p className="text-base text-slate-500 mb-6">
               You have a demo API key for testing. This key expires in 10 minutes.
             </p>
 
             {/* Demo API Key Display */}
             <div className="bg-white rounded-2xl p-6 mb-6 border border-slate-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-black text-slate-900">Your Demo API Key</h3>
+                <h3 className="text-xl font-black text-slate-900">Your Demo API Key</h3>
                 {demoKeyExpiry && (
-                  <span className="text-xs text-slate-400 font-mono">
+                  <span className="text-sm text-slate-400 font-mono">
                     Expires in {Math.max(0, Math.ceil((demoKeyExpiry - Date.now()) / 60000))} minutes
                   </span>
                 )}
               </div>
-              <div className="bg-slate-100 rounded-xl p-4 font-mono text-sm text-slate-700 break-all">
+              <div className="bg-slate-100 rounded-xl p-4 font-mono text-base text-slate-700 break-all">
                 {apiKey || 'Loading...'}
               </div>
               <div className="mt-4 space-y-2">
@@ -170,7 +163,7 @@ function APIDocsPageContent() {
             </div>
 
             <div className="bg-slate-100 rounded-xl p-4 border border-slate-200">
-              <p className="text-xs text-slate-500">
+              <p className="text-sm text-slate-500">
                 This is a demo key for testing purposes. To get full API access with higher limits and permanent keys, contact us at developers@humanidfi.com
               </p>
             </div>
@@ -178,26 +171,23 @@ function APIDocsPageContent() {
         ) : (
           <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 md:p-10 mb-12">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <Key size={20} className="text-slate-600" />
-                <div>
-                  <h2 className="text-xl font-black text-slate-900">{currentPlan.name} Plan</h2>
-                  <div className="text-xs text-slate-500">Active subscription</div>
-                </div>
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">{currentPlan.name} Plan</h2>
+                <div className="text-sm text-slate-500">Active subscription</div>
               </div>
               <div className="text-right">
                 <span className="text-3xl font-black text-slate-900">${currentPlan.price}</span>
-                <span className="text-slate-400 text-xs font-mono">/mo</span>
+                <span className="text-slate-400 text-sm font-mono">/mo</span>
               </div>
             </div>
 
             {/* API Key Display */}
             <div className="bg-white rounded-2xl p-6 mb-6 border border-slate-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-black text-slate-900">Your API Key</h3>
-                <span className="text-xs text-slate-400 font-mono">Keep this secret</span>
+                <h3 className="text-xl font-black text-slate-900">Your API Key</h3>
+                <span className="text-sm text-slate-400 font-mono">Keep this secret</span>
               </div>
-              <div className="bg-slate-100 rounded-xl p-4 font-mono text-sm text-slate-700 break-all">
+              <div className="bg-slate-100 rounded-xl p-4 font-mono text-base text-slate-700 break-all">
                 {apiKey || 'Loading...'}
               </div>
               <div className="mt-4 space-y-2">
@@ -210,10 +200,10 @@ function APIDocsPageContent() {
             {/* Usage Stats */}
             {apiUsage && (
               <div className="bg-white rounded-2xl p-6 border border-slate-200">
-                <h3 className="font-black text-slate-900 mb-4">API Usage Today</h3>
+                <h3 className="text-xl font-black text-slate-900 mb-4">API Usage Today</h3>
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
-                    <div className="flex justify-between text-sm mb-2">
+                    <div className="flex justify-between text-base mb-2">
                       <span className="text-slate-500">Requests Used</span>
                       <span className="font-black text-slate-900">{apiUsage.requests} / {apiUsage.limit}</span>
                     </div>
@@ -224,7 +214,7 @@ function APIDocsPageContent() {
                       />
                     </div>
                   </div>
-                  <div className="text-xs text-slate-400 font-mono">
+                  <div className="text-sm text-slate-400 font-mono">
                     Resets: {new Date(apiUsage.reset).toLocaleTimeString()}
                   </div>
                 </div>
@@ -237,18 +227,17 @@ function APIDocsPageContent() {
         <div className="space-y-12">
           {/* Getting Started */}
           <section>
-            <h2 className="text-3xl font-black mb-6 flex items-center gap-3">
-              <Zap size={24} className="text-slate-600" />
+            <h2 className="text-4xl font-black mb-6">
               Getting Started
             </h2>
 
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
-              <h3 className="text-xl font-black text-slate-900 mb-4">1. Base URL</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-4">1. Base URL</h3>
               <div className="bg-slate-900 text-white p-4 rounded-xl font-mono text-sm mb-6">
                 https://api.humanidfi.com/v1
               </div>
 
-              <h3 className="text-xl font-black text-slate-900 mb-4">2. Authentication</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-4">2. Authentication</h3>
               <p className="text-slate-500 mb-4">
                 All API requests require HMAC authentication using your API key and secret.
               </p>
@@ -259,7 +248,7 @@ X-API-Signature: hmac_sha256(api_secret, timestamp + method + path + body)
 X-API-Timestamp: unix_timestamp`}</pre>
               </div>
 
-              <h3 className="text-xl font-black text-slate-900 mb-4">3. Rate Limits by Plan</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-4">3. Rate Limits by Plan</h3>
               <div className="overflow-x-auto">
                 <table className="w-full border border-slate-200 text-sm">
                   <thead className="bg-slate-100">
@@ -287,15 +276,14 @@ X-API-Timestamp: unix_timestamp`}</pre>
 
           {/* Core Endpoints */}
           <section>
-            <h2 className="text-3xl font-black mb-6 flex items-center gap-3">
-              <Code size={24} className="text-slate-600" />
+            <h2 className="text-4xl font-black mb-6">
               Core Endpoints
             </h2>
 
             {/* Whale Alerts */}
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-black text-slate-900">Get Whale Alerts</h3>
+                <h3 className="text-2xl font-black text-slate-900">Get Whale Alerts</h3>
                 <span className="bg-slate-900 text-white px-3 py-1 rounded text-xs font-black">GET</span>
               </div>
               <code className="text-sm text-slate-600 bg-slate-200 px-2 py-1 rounded block mb-4">/whale/alerts</code>
@@ -332,7 +320,7 @@ X-API-Timestamp: unix_timestamp`}</pre>
             {/* Wallet Analytics */}
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-black text-slate-900">Get Wallet Analytics</h3>
+                <h3 className="text-2xl font-black text-slate-900">Get Wallet Analytics</h3>
                 <span className="bg-slate-900 text-white px-3 py-1 rounded text-xs font-black">GET</span>
               </div>
               <code className="text-sm text-slate-600 bg-slate-200 px-2 py-1 rounded block mb-4">/analytics/wallet/:address</code>
@@ -370,7 +358,7 @@ X-API-Timestamp: unix_timestamp`}</pre>
             </div>
 
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
-              <h3 className="text-xl font-black text-slate-900 mb-4">Connection Example</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-4">Connection Example</h3>
               <div className="bg-slate-900 text-white p-4 rounded-xl font-mono text-xs overflow-x-auto">
                 <pre>{`const ws = new WebSocket('wss://api.humanidfi.com/v1/ws');
 
@@ -388,7 +376,7 @@ ws.onmessage = (event) => {
 };`}</pre>
               </div>
 
-              <h3 className="text-xl font-black text-slate-900 mb-4 mt-6">Available Channels</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-4 mt-6">Available Channels</h3>
               <div className="overflow-x-auto">
                 <table className="w-full border border-slate-200 text-sm">
                   <thead className="bg-slate-100">
@@ -439,7 +427,7 @@ ws.onmessage = (event) => {
             </div>
 
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
-              <h3 className="text-xl font-black text-slate-900 mb-4">HTTP Status Codes</h3>
+              <h3 className="text-2xl font-black text-slate-900 mb-4">HTTP Status Codes</h3>
               <div className="overflow-x-auto">
                 <table className="w-full border border-slate-200 text-sm">
                   <thead className="bg-slate-100">
@@ -481,8 +469,7 @@ ws.onmessage = (event) => {
 
           {/* Support */}
           <section>
-            <h2 className="text-3xl font-black mb-6 flex items-center gap-3">
-              <Shield size={24} className="text-slate-600" />
+            <h2 className="text-4xl font-black mb-6">
               Developer Support
             </h2>
 
