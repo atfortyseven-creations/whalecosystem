@@ -70,16 +70,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap }: ImmersiveM
                   className="w-full h-full object-contain mix-blend-multiply"
                   draggable={false}
                 />
-                
-                {/* PERFECTLY INCORPORATED LOGOS */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-30 pointer-events-none drop-shadow-2xl">
-                  <div className="flex items-center gap-6 sm:gap-10 bg-white/80 backdrop-blur-md px-10 py-6 rounded-3xl border border-black/10 shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
-                    <img src="/aztec_x_whale_partnership.svg" alt="Aztec x Whale Partnership" className="h-16 sm:h-24 w-auto drop-shadow-md" />
-                  </div>
-                  <h1 className="mt-6 font-mono text-[14px] sm:text-[18px] font-black tracking-[0.4em] text-black uppercase text-center bg-white/70 px-6 py-2 rounded-full backdrop-blur-sm shadow-sm border border-black/5">
-                    Aztec Network <span className="mx-2 text-black/30">x</span> Whale Alert
-                  </h1>
-                </div>
               </div>
             )}
 

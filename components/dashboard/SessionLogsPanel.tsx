@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { Search, Download, AlertCircle, Lock, Shield, Eye, EyeOff, FileText, ExternalLink } from "lucide-react";
+import { Search, Download, AlertCircle, Lock, FileText, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -22,17 +22,17 @@ const PRIVACY_PILLARS = [
         desc: "Your wallet address is your identity. No email, phone, or government ID is ever required to access the Humanity Ledger. All authentication is cryptographic.",
     },
     {
-        icon: <Shield size={18} />,
+        icon: <Lock size={18} />,
         title: "Private Execution via Aztec",
         desc: "Transactions execute inside Aztec Network's private execution environment. Smart contract logic, capital flows, and state transitions are fully shielded from public view on L1.",
     },
     {
-        icon: <Eye size={18} />,
+        icon: <FileText size={18} />,
         title: "No Server-Side Message Storage",
         desc: "Whale Chat uses the XMTP protocol. Messages are encrypted client-side with your wallet keys and transmitted peer-to-peer. No message content ever touches our servers.",
     },
     {
-        icon: <EyeOff size={18} />,
+        icon: <Lock size={18} />,
         title: "IP Anonymity",
         desc: "Your IP address is never persistently logged or associated with your on-chain identity. All API requests are routed through Cloudflare's edge network with no client fingerprinting.",
     },
@@ -57,15 +57,24 @@ export function SessionLogsPanel() {
     const [activeView, setActiveView] = useState<'policy' | 'logs'>('policy');
 
     useEffect(() => {
-        setLogs([
-            { id: "s-1", userId: null, action: "SESSION_INITIALIZED",          ipAddress: "Client",  timestamp: new Date().toISOString() },
-            { id: "s-2", userId: null, action: "DATA_STREAM_CONNECTED",         ipAddress: "Client",  timestamp: new Date().toISOString() },
-            { id: "s-3", userId: null, action: "WALLET_HANDSHAKE_OK",           ipAddress: "Client",  timestamp: new Date(Date.now() - 5000).toISOString() },
-            { id: "s-4", userId: null, action: "ZK_PROOF_VERIFIED",             ipAddress: "Client",  timestamp: new Date(Date.now() - 12000).toISOString() },
-            { id: "s-5", userId: null, action: "AZTEC_IDENTITY_ANCHORED",       ipAddress: "Client",  timestamp: new Date(Date.now() - 18000).toISOString() },
-            { id: "s-6", userId: null, action: "XMTP_ENCRYPTION_INITIALIZED",   ipAddress: "Client",  timestamp: new Date(Date.now() - 25000).toISOString() },
-        ]);
-        setIsLoading(false);
+        const fetchLogs = async () => {
+            setIsLoading(true);
+            try {
+                const res = await fetch('/api/session-logs');
+                if (res.ok) {
+                    const data = await res.json();
+                    setLogs(data.logs || []);
+                } else {
+                    setLogs([]);
+                }
+            } catch (error) {
+                console.error('Error fetching session logs:', error);
+                setLogs([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchLogs();
     }, []);
 
     const filteredLogs = React.useMemo(() => {
@@ -106,16 +115,16 @@ export function SessionLogsPanel() {
     });
 
     const TABS = [
-        { id: 'policy', label: 'Privacy Policy', icon: <Shield size={14} /> },
+        { id: 'policy', label: 'Privacy Policy', icon: <FileText size={14} /> },
         { id: 'logs',   label: 'Audit Log',       icon: <FileText size={14} /> },
     ] as const;
 
     return (
         <div className="w-full h-full min-h-0 flex flex-col items-center justify-start p-4 md:p-8 text-black font-sans overflow-y-auto no-scrollbar relative bg-white">
-            <div className="w-full max-w-[1100px] mx-auto flex flex-col gap-6">
+            <div className="w-full max-w-[880px] mx-auto bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 flex flex-col transition-all duration-500 z-10">
 
                 {/* ── HEADER ── */}
-                <div className="w-full border-b border-slate-200/60 pb-6">
+                <div className="w-full border-b border-slate-200/60 pb-5 mb-7">
                     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                         <div className="flex flex-col">
                             <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-slate-900 leading-none">
@@ -147,7 +156,7 @@ export function SessionLogsPanel() {
                     <motion.div key="policy" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="flex flex-col gap-6">
 
                         {/* Hero Statement */}
-                        <div className="w-full bg-black text-white rounded-2xl p-8 md:p-10 flex flex-col gap-4">
+                        <div className="w-full bg-slate-900 text-white rounded-2xl p-8 md:p-10 flex flex-col gap-4">
                             <div className="flex items-center gap-3 mb-2">
                                 <Lock size={20} className="text-white/60" />
                                 <span className="font-mono text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Privacy Manifesto</span>
@@ -178,12 +187,12 @@ export function SessionLogsPanel() {
                                     transition={{ delay: i * 0.06 }}
                                     className="flex flex-col gap-3 p-6 bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:shadow-md hover:border-black/15 transition-all duration-300"
                                 >
-                                    <div className="w-9 h-9 flex items-center justify-center bg-black/[0.04] border border-black/8 rounded-xl text-black/60">
+                                    <div className="w-9 h-9 flex items-center justify-center bg-slate-100 border border-slate-200 rounded-xl text-slate-600">
                                         {pillar.icon}
                                     </div>
                                     <div className="flex flex-col gap-1.5">
                                         <span className="font-black text-[13px] text-slate-900 tracking-tight">{pillar.title}</span>
-                                        <p className="font-mono text-[10px] text-black/40 leading-relaxed">{pillar.desc}</p>
+                                        <p className="font-mono text-[10px] text-slate-500 leading-relaxed">{pillar.desc}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -192,8 +201,8 @@ export function SessionLogsPanel() {
                         {/* Legal Links */}
                         <div className="w-full bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
                             <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-200/60 bg-slate-50/60">
-                                <FileText size={14} className="text-black/40" />
-                                <span className="font-mono text-[10px] font-black uppercase tracking-widest">Legal Documents</span>
+                                <FileText size={14} className="text-slate-400" />
+                                <span className="font-mono text-[10px] font-black uppercase tracking-widest text-slate-500">Legal Documents</span>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
                                 {[
@@ -205,9 +214,9 @@ export function SessionLogsPanel() {
                                     <Link key={l.label} href={l.href} className="group flex items-center justify-between p-5 hover:bg-slate-50/60 transition-colors">
                                         <div className="flex flex-col gap-0.5">
                                             <span className="font-black text-[13px] text-slate-800 group-hover:text-black transition-colors">{l.label}</span>
-                                            <span className="font-mono text-[10px] text-black/35">{l.desc}</span>
+                                            <span className="font-mono text-[10px] text-slate-400">{l.desc}</span>
                                         </div>
-                                        <ExternalLink size={12} className="text-black/20 group-hover:text-black transition-colors shrink-0 ml-3" />
+                                        <ExternalLink size={12} className="text-slate-300 group-hover:text-slate-600 transition-colors shrink-0 ml-3" />
                                     </Link>
                                 ))}
                             </div>
@@ -221,17 +230,17 @@ export function SessionLogsPanel() {
                         {/* Controls */}
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div className="relative flex-1 group max-w-sm">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-black/30 pointer-events-none" />
-                                <input type="text" className="block w-full pl-11 pr-4 py-3 bg-slate-50/60 border border-slate-200/60 rounded-xl text-[12px] text-slate-800 focus:outline-none focus:ring-1 focus:ring-black/20 focus:border-black/20 transition-all font-mono placeholder:text-black/25" placeholder="Filter action, IP, identity..." value={search} onChange={e => setSearch(e.target.value)} />
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                <input type="text" className="block w-full pl-11 pr-4 py-3 bg-slate-50/60 border border-slate-200/60 rounded-xl text-[12px] text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-all font-mono placeholder:text-slate-400" placeholder="Filter action, IP, identity..." value={search} onChange={e => setSearch(e.target.value)} />
                             </div>
-                            <button onClick={handleExport} disabled={isExporting} className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200/60 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-700 hover:border-black/20 hover:text-black transition-colors disabled:opacity-50 shrink-0">
+                            <button onClick={handleExport} disabled={isExporting} className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200/60 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-700 hover:border-slate-400 hover:text-slate-900 transition-colors disabled:opacity-50 shrink-0">
                                 <Download size={14} />
                                 {isExporting ? "Exporting..." : "Export CSV"}
                             </button>
                         </div>
 
                         <div className="w-full flex-1 flex flex-col border border-slate-200/60 rounded-2xl overflow-hidden bg-white shadow-sm" style={{ minHeight: 300 }}>
-                            <div className="hidden md:grid grid-cols-[1.5fr_2fr_2fr_1.5fr] px-6 py-4 border-b border-slate-200/60 bg-slate-50/60 font-mono text-[9px] font-black text-black/35 uppercase tracking-widest">
+                            <div className="hidden md:grid grid-cols-[1.5fr_2fr_2fr_1.5fr] px-6 py-4 border-b border-slate-200/60 bg-slate-50/60 font-mono text-[9px] font-black text-slate-400 uppercase tracking-widest">
                                 <div>Timestamp</div>
                                 <div>Action</div>
                                 <div>Identity</div>
@@ -239,9 +248,9 @@ export function SessionLogsPanel() {
                             </div>
                             <div ref={tableContainerRef} className="flex-1 overflow-y-auto no-scrollbar" style={{ height: 400 }}>
                                 {isLoading ? (
-                                    <div className="h-full flex items-center justify-center font-mono text-[11px] text-black/30 uppercase tracking-widest animate-pulse">Initializing Audit Stream...</div>
+                                    <div className="h-full flex items-center justify-center font-mono text-[11px] text-slate-400 uppercase tracking-widest animate-pulse">Initializing Audit Stream...</div>
                                 ) : filteredLogs.length === 0 ? (
-                                    <div className="h-full flex flex-col items-center justify-center gap-4 text-black/30">
+                                    <div className="h-full flex flex-col items-center justify-center gap-4 text-slate-400">
                                         <AlertCircle size={28} strokeWidth={1.5} />
                                         <span className="font-mono text-[11px] font-black uppercase tracking-widest">No logs found</span>
                                     </div>
@@ -257,10 +266,10 @@ export function SessionLogsPanel() {
                                                     className="absolute w-full border-b border-slate-100 hover:bg-slate-50/60 transition-colors cursor-pointer flex flex-col md:grid md:grid-cols-[1.5fr_2fr_2fr_1.5fr] md:items-center px-6 py-4 gap-2 md:gap-0"
                                                     style={{ height: `${virtualRow.size}px`, transform: `translateY(${virtualRow.start}px)` }}
                                                 >
-                                                    <div className="font-mono text-[11px] text-black/40 truncate">{new Date(log.timestamp).toLocaleString("en-US", { hour12: false })}</div>
+                                                    <div className="font-mono text-[11px] text-slate-400 truncate">{new Date(log.timestamp).toLocaleString("en-US", { hour12: false })}</div>
                                                     <div><span className="px-2.5 py-1 bg-slate-100 border border-slate-200/60 rounded-md font-mono text-[9px] font-black text-slate-700 uppercase tracking-widest">{log.action}</span></div>
                                                     <div className="font-mono text-[11px] font-bold text-slate-700 truncate">{log.userId || "Anonymous"}</div>
-                                                    <div className="font-mono text-[11px] text-black/35 truncate">{log.ipAddress || "Hidden"}</div>
+                                                    <div className="font-mono text-[11px] text-slate-400 truncate">{log.ipAddress || "Hidden"}</div>
                                                 </div>
                                             );
                                         })}
@@ -269,7 +278,7 @@ export function SessionLogsPanel() {
                             </div>
                         </div>
 
-                        <p className="text-center font-mono text-[9px] text-black/25 uppercase tracking-[0.2em] font-black">
+                        <p className="text-center font-mono text-[9px] text-slate-400 uppercase tracking-[0.2em] font-black">
                             Cryptographic Audit Trail · Client-Side Only · Never Transmitted
                         </p>
                     </motion.div>

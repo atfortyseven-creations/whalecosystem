@@ -23,11 +23,11 @@ const fmtUsd = (n: number) => {
 const fmtApy  = (n: number) => `${n.toFixed(2)}%`;
 
 const RISK: Record<number, { label: string; color: string }> = {
-    1: { label: 'SAFE',        color: 'var(--az-emerald)' },
-    2: { label: 'LOW',         color: 'var(--az-emerald)' },
-    3: { label: 'MODERATE',    color: 'var(--az-amber)' },
-    4: { label: 'HIGH',        color: '#ff7a3c' },
-    5: { label: 'AGGRESSIVE',  color: 'var(--az-rose)' },
+    1: { label: 'SAFE',        color: '#050505' },
+    2: { label: 'LOW',         color: '#050505' },
+    3: { label: 'MODERATE',    color: '#64748b' },
+    4: { label: 'HIGH',        color: '#050505' },
+    5: { label: 'AGGRESSIVE',  color: '#050505' },
 };
 
 const CHAIN_CLS: Record<string, string> = {
@@ -145,48 +145,48 @@ export default function DeFiYieldPanel() {
     };
 
     return (
-        <div className="h-full min-h-0 flex flex-col bg-white rounded border border-[#E5E5E5] shadow-sm overflow-hidden">
+        <div className="h-full min-h-0 flex flex-col bg-white rounded border border-slate-200 shadow-sm overflow-hidden">
             {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, backgroundColor: '#FAF9F6' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, backgroundColor: '#fafafa' }}>
                 {[
-                    { label: 'MAX APY',       value: fmtApy(stats.maxApy),   color: '#16a34a' },
+                    { label: 'MAX APY',       value: fmtApy(stats.maxApy),   color: '#050505' },
                     { label: 'AVG APY',       value: fmtApy(stats.avgApy),   color: '#050505' },
-                    { label: 'STABLE POOLS',  value: stats.stablePools,      color: '#0ea5e9' },
+                    { label: 'STABLE POOLS',  value: stats.stablePools,      color: '#050505' },
                     { label: 'TOTAL TVL',     value: fmtUsd(stats.totalTvl), color: '#050505' },
                 ].map(s => (
-                    <div key={s.label} style={{ padding: '16px 20px', borderRight: '1px solid rgba(5,5,5,0.06)' }} className="last:border-0 hover:bg-black/[0.015] transition-colors">
-                        <div className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/40 mb-1">{s.label}</div>
+                    <div key={s.label} style={{ padding: '16px 20px', borderRight: '1px solid rgba(5,5,5,0.06)' }} className="last:border-0 hover:bg-slate-50 transition-colors">
+                        <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">{s.label}</div>
                         <div className="text-xl font-bold font-mono" style={{ color: s.color }}>{s.value}</div>
                     </div>
                 ))}
             </div>
 
             {/* Filters */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, flexWrap: 'wrap', backgroundColor: '#FAF9F6' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, flexWrap: 'wrap', backgroundColor: '#fafafa' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                     <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={{ accentColor: '#050505' }} />
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/60">STABLE ONLY</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">STABLE ONLY</span>
                 </label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Filter size={10} color="rgba(5,5,5,0.4)" />
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/50">APY MIN:</span>
-                    <select value={minApy} onChange={e => setMinApy(+e.target.value)} className="bg-white border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
+                    <Filter size={10} color="rgba(100,116,139,0.5)" />
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">APY MIN:</span>
+                    <select value={minApy} onChange={e => setMinApy(+e.target.value)} className="bg-white border border-slate-200 rounded px-2 py-1 text-xs text-slate-900 font-mono outline-none">
                         {[3,5,8,10,15,20,30].map(v => <option key={v} value={v}>{v}%</option>)}
                     </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/50">CHAIN:</span>
-                    <select value={chain} onChange={e => setChain(e.target.value)} className="bg-white border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">CHAIN:</span>
+                    <select value={chain} onChange={e => setChain(e.target.value)} className="bg-white border border-slate-200 rounded px-2 py-1 text-xs text-slate-900 font-mono outline-none">
                         {CHAINS.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/50">MAX RISK:</span>
-                    <select value={riskMax} onChange={e => setRiskMax(+e.target.value)} className="bg-white border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">MAX RISK:</span>
+                    <select value={riskMax} onChange={e => setRiskMax(+e.target.value)} className="bg-white border border-slate-200 rounded px-2 py-1 text-xs text-slate-900 font-mono outline-none">
                         {[1,2,3,4,5].map(v => <option key={v} value={v}>{v}  {RISK[v]?.label}</option>)}
                     </select>
                 </div>
-                <button onClick={load} className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded text-[9px] font-bold uppercase tracking-widest text-[#050505]/50 hover:text-[#050505] hover:bg-black/5 transition-all">
+                <button onClick={load} className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
                     <RefreshCw size={11} className={loading ? 'animate-spin' : ''} /> REFRESH
                 </button>
             </div>
@@ -200,7 +200,7 @@ export default function DeFiYieldPanel() {
                         </div>
                     )}
                     {!loading && pools.length > 0 && (
-                        <div className="grid grid-cols-6 gap-8 p-4 border-b border-[#E5E5E5] sticky top-0 bg-[#FAF9F6]/95 backdrop-blur z-10 text-[10px] font-mono tracking-widest text-[#050505]/40 uppercase">
+                        <div className="grid grid-cols-6 gap-8 p-4 border-b border-slate-200 sticky top-0 bg-slate-50/95 backdrop-blur z-10 text-[10px] font-mono tracking-widest text-slate-400 uppercase">
                             <span className="col-span-2">Pool</span>
                             <span style={{ textAlign: 'right' }}>Chain</span>
                             <span style={{ textAlign: 'right' }}>APY</span>
@@ -217,29 +217,29 @@ export default function DeFiYieldPanel() {
                                 <motion.div
                                     key={p.pool}
                                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15, delay: i * 0.008 }}
-                                    className={`grid grid-cols-6 gap-8 p-4 border-b border-[#E5E5E5] cursor-pointer transition-colors ${isActive ? 'bg-[#050505]/[0.02]' : 'hover:bg-[#FAF9F6]'}`}
+                                    className={`grid grid-cols-6 gap-8 p-4 border-b border-slate-200 cursor-pointer transition-colors ${isActive ? 'bg-slate-50' : 'hover:bg-slate-50'}`}
                                     onClick={() => setSelected(isActive ? null : p)}
                                 >
                                     <div className="col-span-2 overflow-hidden flex flex-col gap-1">
-                                        <span className="text-sm font-bold text-[#050505] tracking-tight truncate">{p.symbol}</span>
+                                        <span className="text-sm font-bold text-slate-900 tracking-tight truncate">{p.symbol}</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[10px] uppercase text-[#050505]/40 tracking-wider truncate">{p.project}</span>
-                                            {p.stablecoin && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#FAF9F6] border border-[#E5E5E5] text-[#050505]">STABLE</span>}
+                                            <span className="text-[10px] uppercase text-slate-400 tracking-wider truncate">{p.project}</span>
+                                            {p.stablecoin && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-slate-100 border border-slate-200 text-slate-700">STABLE</span>}
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-white border border-[#E5E5E5] text-[#A0A0A0]">{p.chain}</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-white border border-slate-200 text-slate-500">{p.chain}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-sm font-mono font-bold" style={{ color: p.apy >= 20 ? '#16a34a' : p.apy >= 10 ? '#0ea5e9' : '#050505' }}>
+                                        <span className="text-sm font-mono font-bold text-slate-900">
                                             {fmtApy(p.apy)}
                                         </span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-sm font-mono font-bold text-[#050505]/70">{fmtUsd(p.tvlUsd)}</span>
+                                        <span className="text-sm font-mono font-bold text-slate-600">{fmtUsd(p.tvlUsd)}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-[10px] font-bold tracking-widest px-2 py-1 rounded border border-[#E5E5E5] bg-white text-[#050505]">{risk.label}</span>
+                                        <span className="text-[10px] font-bold tracking-widest px-2 py-1 rounded border border-slate-200 bg-white text-slate-700">{risk.label}</span>
                                     </div>
                                 </motion.div>
                             );
@@ -255,24 +255,24 @@ export default function DeFiYieldPanel() {
                             animate={{ x: 0, opacity: 1 }} 
                             exit={{ x: 400, opacity: 0 }}
                             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                            className="w-[340px] flex-shrink-0 border-l border-[#E5E5E5] bg-[#FFFFFF] flex flex-col overflow-hidden shadow-xl z-20"
+                            className="w-[340px] flex-shrink-0 border-l border-slate-200 bg-white flex flex-col overflow-hidden shadow-xl z-20"
                         >
-                            <div className="p-6 border-b border-[#E5E5E5] bg-[#FAF9F6]">
-                                <div className="text-[10px] font-mono tracking-widest text-[#050505]/50 mb-2 uppercase flex items-center gap-2">
+                            <div className="p-6 border-b border-slate-200 bg-slate-50">
+                                <div className="text-[10px] font-mono tracking-widest text-slate-500 mb-2 uppercase flex items-center gap-2">
                                     <ShieldCheck size={12} /> ON-CHAIN SYNC
                                 </div>
-                                <div className="text-xl font-bold font-mono tracking-tight text-[#050505] mb-1">{selected.symbol}</div>
-                                <div className="text-xs text-[#050505]/40 uppercase font-mono">{selected.project} · {selected.chainFull || selected.chain}</div>
+                                <div className="text-xl font-bold font-mono tracking-tight text-slate-900 mb-1">{selected.symbol}</div>
+                                <div className="text-xs text-slate-400 uppercase font-mono">{selected.project} · {selected.chainFull || selected.chain}</div>
                             </div>
-                            
+
                             <div className="flex-1 p-6 space-y-5 overflow-y-auto custom-scrollbar">
                                 {/* APY Hero */}
-                                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded p-6 text-center">
-                                    <div className="text-[10px] uppercase font-mono tracking-[0.1em] text-[#050505]/40 mb-2">TOTAL NET YIELD</div>
-                                    <div className="text-4xl font-bold font-mono text-[#00C076]">{fmtApy(selected.apy)}</div>
-                                    <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-[#E5E5E5]">
-                                        <div className="flex flex-col"><span className="text-[9px] text-[#050505]/40 uppercase">Base</span> <span className="text-xs font-mono font-bold text-[#050505]">{fmtApy(selected.apyBase)}</span></div>
-                                        <div className="flex flex-col"><span className="text-[9px] text-[#050505]/40 uppercase">Reward</span> <span className="text-xs font-mono font-bold text-[#050505]">{fmtApy(selected.apyReward)}</span></div>
+                                <div className="bg-slate-50 border border-slate-200 rounded p-6 text-center">
+                                    <div className="text-[10px] uppercase font-mono tracking-[0.1em] text-slate-400 mb-2">TOTAL NET YIELD</div>
+                                    <div className="text-4xl font-bold font-mono text-slate-900">{fmtApy(selected.apy)}</div>
+                                    <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-slate-200">
+                                        <div className="flex flex-col"><span className="text-[9px] text-slate-400 uppercase">Base</span> <span className="text-xs font-mono font-bold text-slate-700">{fmtApy(selected.apyBase)}</span></div>
+                                        <div className="flex flex-col"><span className="text-[9px] text-slate-400 uppercase">Reward</span> <span className="text-xs font-mono font-bold text-slate-700">{fmtApy(selected.apyReward)}</span></div>
                                     </div>
                                 </div>
 
@@ -283,33 +283,33 @@ export default function DeFiYieldPanel() {
                                         { l: 'RISK',       v: `${selected.riskScore}/5  ${RISK[selected.riskScore]?.label}` },
                                         { l: 'ASSET TYPE', v: selected.stablecoin ? 'STABLECOIN' : 'VOLATILE' },
                                     ].map(row => (
-                                        <div key={row.l} className="flex justify-between items-center py-2.5 border-b border-[#E5E5E5]">
-                                            <span className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-widest">{row.l}</span>
-                                            <span className="text-sm font-mono font-bold text-[#050505]">{row.v}</span>
+                                        <div key={row.l} className="flex justify-between items-center py-2.5 border-b border-slate-200">
+                                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">{row.l}</span>
+                                            <span className="text-sm font-mono font-bold text-slate-700">{row.v}</span>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="bg-white rounded p-4 border border-[#E5E5E5]">
-                                    <div className="text-[10px] font-mono tracking-widest text-[#050505]/50 mb-2">DEPOSIT AMOUNT (USDC)</div>
-                                    <input 
-                                        type="number" 
-                                        value={depositAmount} 
-                                        onChange={e => setDepositAmount(e.target.value)} 
-                                        className="w-full bg-[#FAF9F6] border border-[#E5E5E5] rounded py-3 px-4 text-[#050505] font-mono text-xl outline-none focus:border-[#050505] transition-colors"
+                                <div className="bg-white rounded p-4 border border-slate-200">
+                                    <div className="text-[10px] font-mono tracking-widest text-slate-500 mb-2">DEPOSIT AMOUNT (USDC)</div>
+                                    <input
+                                        type="number"
+                                        value={depositAmount}
+                                        onChange={e => setDepositAmount(e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded py-3 px-4 text-slate-900 font-mono text-xl outline-none focus:border-slate-400 transition-colors"
                                         placeholder="0.00"
                                     />
-                                    <div className="mt-2 text-[10px] font-mono text-[#050505]/40">
-                                        ESTIMATE: <span className="text-[#00C076] font-bold">+{fmtUsd((Number(depositAmount || 0) * selected.apy) / 100 / 365)} / DAY</span>
+                                    <div className="mt-2 text-[10px] font-mono text-slate-400">
+                                        ESTIMATE: <span className="text-slate-700 font-bold">+{fmtUsd((Number(depositAmount || 0) * selected.apy) / 100 / 365)} / DAY</span>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div className="p-5 border-t border-[#E5E5E5] bg-[#FAF9F6] space-y-3">
-                                <button 
+
+                            <div className="p-5 border-t border-slate-200 bg-slate-50 space-y-3">
+                                <button
                                     onClick={handleOneClickDeposit}
                                     disabled={isDepositing || !depositAmount}
-                                    className="w-full py-4 rounded bg-[#050505] text-white font-bold uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-[#888888] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full py-4 rounded bg-slate-900 text-white font-bold uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isDepositing ? (
                                         <Loader2 size={16} className="animate-spin" />
@@ -319,7 +319,7 @@ export default function DeFiYieldPanel() {
                                         </>
                                     )}
                                 </button>
-                                <p className="text-[9px] font-mono text-[#050505]/30 text-center uppercase tracking-widest">
+                                <p className="text-[9px] font-mono text-slate-400 text-center uppercase tracking-widest">
                                     {isConnected ? 'SMART CONTRACT ROUTING' : 'CONNECT WALLET TO DEPOSIT'}
                                 </p>
                             </div>
@@ -328,7 +328,7 @@ export default function DeFiYieldPanel() {
                 </AnimatePresence>
             </div>
 
-            {ts && <div className="text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-[#050505]/30" style={{ padding: '6px 16px', borderTop: '1px solid rgba(5,5,5,0.06)', flexShrink: 0 }}>DATA: DEFILLAMA API · SYNC: {ts} UTC</div>}
+            {ts && <div className="text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-slate-400" style={{ padding: '6px 16px', borderTop: '1px solid rgba(5,5,5,0.06)', flexShrink: 0 }}>DATA: DEFILLAMA API · SYNC: {ts} UTC</div>}
         </div>
     );
 }

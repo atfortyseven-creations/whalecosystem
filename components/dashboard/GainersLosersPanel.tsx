@@ -23,18 +23,18 @@ const fmtPrice = (n: number) => {
     if (n >= 0.01) return `$${n.toFixed(6)}`;
     return `$${n.toFixed(8)}`;
 };
-const pctColor = (v: number) => (v >= 0 ? '#00C076' : '#FF3B30');
+const pctColor = (v: number) => (v >= 0 ? '#050505' : '#64748b');
 const pctFmt   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
 
 
 const NETWORK_COLORS: Record<string, string> = {
-    bitcoin: '#F7931A', ethereum: '#627EEA', bsc: '#F0B90B',
-    solana: '#9945FF', avalanche: '#E84142', arbitrum: '#12AAFF',
-    polygon: '#8247E5', optimism: '#FF0420', near: '#00C08B',
-    cardano: '#0033AD', polkadot: '#E6007A', aptos: '#00C3A0',
-    injective: '#00F2FE', starknet: '#FF875B', celestia: '#7B2FBE',
-    sui: '#4DA2FF', sei: '#9B5DE5', ton: '#0088CC',
-    xrp: '#00AAE4', default: '#888888',
+    bitcoin: '#050505', ethereum: '#050505', bsc: '#050505',
+    solana: '#050505', avalanche: '#050505', arbitrum: '#050505',
+    polygon: '#050505', optimism: '#050505', near: '#050505',
+    cardano: '#050505', polkadot: '#050505', aptos: '#050505',
+    injective: '#050505', starknet: '#050505', celestia: '#050505',
+    sui: '#050505', sei: '#050505', ton: '#050505',
+    xrp: '#050505', default: '#64748b',
 };
 
 const ALL_NETWORKS = ['all', 'ethereum', 'solana', 'bsc', 'avalanche', 'arbitrum', 'polygon'] as const;
@@ -87,12 +87,12 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
 
     return (
         <div
-            className="grid border-b border-black/[0.03] dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:scale-[1.002] hover:z-10 relative transition-all items-center cursor-pointer bg-transparent"
+            className="grid border-b border-slate-100 hover:bg-slate-50 hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:scale-[1.002] hover:z-10 relative transition-all items-center cursor-pointer bg-transparent"
             style={{ gridTemplateColumns: '40px 2.8fr 1.6fr 1.1fr 1.5fr 1.2fr 1fr' }}
             onClick={onClick}
         >
             {/* Rank */}
-            <div className="px-3 text-[10px] font-black text-[#888888] text-center">{rank}</div>
+            <div className="px-3 text-[10px] font-black text-slate-400 text-center">{rank}</div>
 
             {/* Asset */}
             <div className="px-3 flex items-center gap-3 py-3.5">
@@ -104,7 +104,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
                 </div>
                 <div>
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[13px] font-black text-[#050505] dark:text-white tracking-tight">{ticker}</span>
+                        <span className="text-[13px] font-black text-slate-900 tracking-tight">{ticker}</span>
                         <span
                             className="text-[8px] px-1.5 py-0.5 rounded font-black uppercase border"
                             style={{ color: netColor, borderColor: netColor + '44', background: netColor + '11' }}
@@ -112,20 +112,20 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
                             {meta.network}
                         </span>
                         {(data as any).getblockVerified && (
-                            <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/30 shadow-[0_0_8px_rgba(0,192,118,0.2)]">
+                            <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase bg-slate-100 text-slate-700 border border-slate-200">
                                  VERIFIED
                             </span>
                         )}
                     </div>
-                    <div className="text-[10px] text-[#888888] font-medium mt-0.5 tracking-wide">{meta.name}</div>
+                    <div className="text-[10px] text-slate-400 font-medium mt-0.5 tracking-wide">{meta.name}</div>
                 </div>
             </div>
 
             {/* Price */}
             <div className="px-3 flex flex-col justify-center">
-                <span className="text-[12px] font-black font-mono text-[#050505] dark:text-white">{fmtCurrencyPrice(price)}</span>
+                <span className="text-[12px] font-black font-mono text-slate-900">{fmtCurrencyPrice(price)}</span>
                 {(data as any).onChainPrice && (
-                    <span className="text-[9px] font-mono text-[#888888] mt-0.5">
+                    <span className="text-[9px] font-mono text-slate-400 mt-0.5">
                         Oracle: {fmtCurrencyPrice(parseFloat((data as any).onChainPrice))}
                     </span>
                 )}
@@ -139,16 +139,16 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
             </div>
 
             {/* Volume */}
-            <div className="px-3 text-right text-[11px] font-bold font-mono text-[#050505] dark:text-white">{fmtCurrency(vol)}</div>
+            <div className="px-3 text-right text-[11px] font-bold font-mono text-slate-900">{fmtCurrency(vol)}</div>
 
             {/* Dominance (Calculated Mathematically) */}
-            <div className="px-3 text-right text-[11px] font-bold font-mono text-[#888888]">
+            <div className="px-3 text-right text-[11px] font-bold font-mono text-slate-400">
                 {dominance.toFixed(2)}%
             </div>
 
             {/* Volatility */}
             <div className="px-3 flex justify-center">
-                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded border ${Math.abs(pct) > 10 ? 'bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20' : Math.abs(pct) > 5 ? 'bg-[#F7931A]/10 text-[#F7931A] border-[#F7931A]/20' : 'bg-black/5 text-[#888888] border-black/5'}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded border ${Math.abs(pct) > 10 ? 'bg-slate-100 text-slate-700 border-slate-200' : Math.abs(pct) > 5 ? 'bg-slate-100 text-slate-700 border-slate-200' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
                     {Math.abs(pct) > 10 ? 'HIGH' : Math.abs(pct) > 5 ? 'MED' : 'LOW'}
                 </span>
             </div>
@@ -274,38 +274,38 @@ export function GainersLosersPanel() {
         [...allRows].sort((a, b) => a.pct - b.pct).slice(0, 3), [allRows]);
 
     return (
-        <div className="w-full h-full min-h-0 flex flex-col p-0 space-y-6 overflow-hidden text-[#050505] dark:text-[#FAF9F6] font-sans">
+        <div className="w-full h-full min-h-0 flex flex-col p-0 space-y-6 overflow-hidden text-slate-900 font-sans">
             <ModuleHeader moduleId="markets" />
-            
+
             {/*  Summary Cards  */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
                 {/* Top Gainers */}
-                <div className="bg-white/70 dark:bg-[#111111]/70 backdrop-blur-3xl border border-black/[0.05] dark:border-white/10 rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
-                    <div className="flex items-center justify-between mb-5 pb-3 border-b border-black/[0.04] dark:border-white/10">
-                        <span className="text-[11px] font-black text-[#050505] dark:text-white uppercase tracking-[0.15em] flex items-center gap-2">
+                <div className="bg-white/70 backdrop-blur-3xl border border-slate-200 rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
+                    <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-200">
+                        <span className="text-[11px] font-black text-slate-900 uppercase tracking-[0.15em] flex items-center gap-2">
                             24H GAINERS
                         </span>
                     </div>
                     <div className="space-y-4">
                         {isLoading ? (
-                            <div className="flex flex-col items-center justify-center py-6 text-[#888888]">
+                            <div className="flex flex-col items-center justify-center py-6 text-slate-400">
                                 <Loader2 className="animate-spin mb-3" size={20} />
-                                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-[#050505]/40 dark:text-white/40 animate-pulse">SYNCHRONIZING TELEMETRY</span>
+                                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 animate-pulse">SYNCHRONIZING TELEMETRY</span>
                             </div>
                         ) : topGainers.map((r, i) => (
                             <div key={r.symbol} className="flex items-center justify-between group cursor-default">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-black text-[#050505]/20 dark:text-white/20 w-4 group-hover:text-[#050505]/40 dark:group-hover:text-white/40 transition-colors">{i + 1}</span>
+                                    <span className="text-[10px] font-black text-slate-200 w-4 group-hover:text-slate-400 transition-colors">{i + 1}</span>
                                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm"
                                         style={{ background: NETWORK_COLORS[r.meta.network] || NETWORK_COLORS.default }}>
                                         {stripUSDT(r.symbol)[0]}
                                     </div>
                                     <div className="flex flex-col justify-center">
-                                        <div className="text-[12px] font-black text-[#050505] dark:text-white leading-none mb-1">{stripUSDT(r.symbol)}</div>
-                                        <div className="text-[10px] font-mono text-[#888888] leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
+                                        <div className="text-[12px] font-black text-slate-900 leading-none mb-1">{stripUSDT(r.symbol)}</div>
+                                        <div className="text-[10px] font-mono text-slate-400 leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-[#00C076]/10 px-2 py-1 rounded-md border border-[#00C076]/20" style={{ color: '#00C076' }}>
+                                <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md border border-slate-200" style={{ color: '#050505' }}>
                                     <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
                                 </div>
                             </div>
@@ -314,32 +314,32 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Top Losers */}
-                <div className="bg-white/70 dark:bg-[#111111]/70 backdrop-blur-3xl border border-black/[0.05] dark:border-white/10 rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
-                    <div className="flex items-center justify-between mb-5 pb-3 border-b border-black/[0.04] dark:border-white/10">
-                        <span className="text-[11px] font-black text-[#050505] dark:text-white uppercase tracking-[0.15em] flex items-center gap-2">
+                <div className="bg-white/70 backdrop-blur-3xl border border-slate-200 rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
+                    <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-200">
+                        <span className="text-[11px] font-black text-slate-900 uppercase tracking-[0.15em] flex items-center gap-2">
                             24H LOSERS
                         </span>
                     </div>
                     <div className="space-y-4">
                         {isLoading ? (
-                            <div className="flex flex-col items-center justify-center py-6 text-[#888888]">
+                            <div className="flex flex-col items-center justify-center py-6 text-slate-400">
                                 <Loader2 className="animate-spin mb-3" size={20} />
-                                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-[#050505]/40 dark:text-white/40 animate-pulse">SYNCHRONIZING TELEMETRY</span>
+                                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 animate-pulse">SYNCHRONIZING TELEMETRY</span>
                             </div>
                         ) : topLosers.map((r, i) => (
                             <div key={r.symbol} className="flex items-center justify-between group cursor-default">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-black text-[#050505]/20 dark:text-white/20 w-4 group-hover:text-[#050505]/40 dark:group-hover:text-white/40 transition-colors">{i + 1}</span>
+                                    <span className="text-[10px] font-black text-slate-200 w-4 group-hover:text-slate-400 transition-colors">{i + 1}</span>
                                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm"
                                         style={{ background: NETWORK_COLORS[r.meta.network] || NETWORK_COLORS.default }}>
                                         {stripUSDT(r.symbol)[0]}
                                     </div>
                                     <div className="flex flex-col justify-center">
-                                        <div className="text-[12px] font-black text-[#050505] dark:text-white leading-none mb-1">{stripUSDT(r.symbol)}</div>
-                                        <div className="text-[10px] font-mono text-[#888888] leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
+                                        <div className="text-[12px] font-black text-slate-900 leading-none mb-1">{stripUSDT(r.symbol)}</div>
+                                        <div className="text-[10px] font-mono text-slate-400 leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-[#FF3B30]/10 px-2 py-1 rounded-md border border-[#FF3B30]/20" style={{ color: '#FF3B30' }}>
+                                <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md border border-slate-200" style={{ color: '#64748b' }}>
                                     <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
                                 </div>
                             </div>
@@ -349,18 +349,18 @@ export function GainersLosersPanel() {
             </div>
 
             {/*  Full Ledger Table  */}
-            <div className="flex-1 min-h-0 bg-white/70 dark:bg-[#111111]/70 backdrop-blur-3xl border border-black/[0.05] dark:border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.03)] rounded-2xl overflow-hidden flex flex-col relative">
-                
+            <div className="flex-1 min-h-0 bg-white/70 backdrop-blur-3xl border border-slate-200 shadow-[0_8px_40px_rgba(0,0,0,0.03)] rounded-2xl overflow-hidden flex flex-col relative">
+
                 {/* Background Gradient for Ledger */}
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/40 dark:from-[#111111]/40 to-transparent -z-10" />
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/40 to-transparent -z-10" />
 
                 {/* Toolbar Row 1 */}
-                <div className="shrink-0 px-6 py-4 border-b border-black/[0.04] dark:border-white/10 bg-white/50 dark:bg-[#1A1A1A]/50 backdrop-blur-md flex items-center gap-4 flex-wrap z-10">
+                <div className="shrink-0 px-6 py-4 border-b border-slate-200 bg-white/50 backdrop-blur-md flex items-center gap-4 flex-wrap z-10">
                     {/* View toggle */}
-                    <div className="flex bg-black/[0.03] dark:bg-white/[0.03] p-1 rounded-xl border border-black/[0.05] dark:border-white/10">
+                    <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
                         {(['all', 'gainers', 'losers'] as ViewMode[]).map(v => (
                             <button key={v} onClick={() => setView(v)}
-                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${view === v ? 'bg-white dark:bg-[#0A0A0A] text-[#050505] dark:text-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-black/[0.05] dark:border-white/10 scale-[1.02]' : 'text-[#888888] hover:text-[#050505] dark:hover:text-white'}`}>
+                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${view === v ? 'bg-white text-slate-900 shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-200 scale-[1.02]' : 'text-slate-400 hover:text-slate-900'}`}>
                                 {v === 'gainers' ? 'Gainers' : v === 'losers' ? 'Losers' : 'All Ledger'}
                             </button>
                         ))}
@@ -370,7 +370,7 @@ export function GainersLosersPanel() {
                     <div className="flex gap-1.5">
                         {(['1h', '24h', '7d'] as TimeWindow[]).map(w => (
                             <button key={w} onClick={() => setTimeWindow(w)}
-                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${timeWindow === w ? 'bg-[#050505] dark:bg-white text-white dark:text-[#050505] border-[#050505] dark:border-white' : 'text-[#888888] border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 bg-white/50 dark:bg-black/50'}`}>
+                                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${timeWindow === w ? 'bg-slate-900 text-white border-slate-900' : 'text-slate-400 border-slate-200 hover:border-slate-300 bg-white/50'}`}>
                                 {w}
                             </button>
                         ))}
@@ -378,15 +378,15 @@ export function GainersLosersPanel() {
 
                     {/* Search */}
                     <div className="relative flex-1 min-w-[160px] max-w-sm">
-                        <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A0A0A0]"/>
+                        <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
                         <input value={search} onChange={e => setSearch(e.target.value)}
                             placeholder="SEARCH TICKER OR NAME..."
-                            className="w-full bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 shadow-sm rounded-xl pl-10 pr-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white outline-none focus:border-[#050505] dark:focus:border-white transition-all"/>
+                            className="w-full bg-white border border-slate-200 shadow-sm rounded-xl pl-10 pr-4 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] text-slate-900 outline-none focus:border-slate-400 transition-all"/>
                     </div>
 
                     {/* Currency Toggle */}
                     <div className="flex items-center gap-2 ml-auto">
-                        <div className="flex border border-black/10 dark:border-white/10 rounded-lg overflow-hidden bg-white dark:bg-[#0A0A0A]">
+                        <div className="flex border border-slate-200 rounded-lg overflow-hidden bg-white">
                             {(['USD', 'EUR'] as const).map(c => (
                                 <button
                                     key={c}
@@ -394,7 +394,7 @@ export function GainersLosersPanel() {
                                     className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all"
                                     style={currency === c
                                         ? { background: '#050505', color: '#fff' }
-                                        : { background: 'transparent', color: '#888888' }
+                                        : { background: 'transparent', color: '#64748b' }
                                     }
                                 >
                                     {c === 'USD' ? '$' : ''} {c}
@@ -402,8 +402,8 @@ export function GainersLosersPanel() {
                             ))}
                         </div>
                         {/* Stream status */}
-                        <div className="flex items-center gap-2 border-l border-black/10 dark:border-white/10 pl-3">
-                            <span className="text-[10px] font-mono font-black text-[#A0A0A0] uppercase tracking-widest">
+                        <div className="flex items-center gap-2 border-l border-slate-200 pl-3">
+                            <span className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest">
                                 Data Stream
                             </span>
                         </div>
@@ -411,21 +411,21 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Toolbar Row 2  Network selector */}
-                <div className="shrink-0 px-6 py-2.5 border-b border-black/[0.04] dark:border-white/10 bg-white/30 dark:bg-[#1A1A1A]/30 backdrop-blur-sm flex items-center gap-2.5 flex-wrap z-10">
-                    <span className="text-[9px] font-black text-[#050505]/40 dark:text-white/40 uppercase tracking-[0.2em] mr-2">Topology:</span>
+                <div className="shrink-0 px-6 py-2.5 border-b border-slate-200 bg-slate-50 backdrop-blur-sm flex items-center gap-2.5 flex-wrap z-10">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mr-2">Topology:</span>
                     {ALL_NETWORKS.map(n => (
                         <button key={n} onClick={() => setNetwork(n)}
                             className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all shadow-sm`}
                             style={network === n
                                 ? { background: n === 'all' ? '#050505' : NETWORK_COLORS[n] || '#050505', color: '#fff', borderColor: 'transparent' }
-                                : { color: '#888888', borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(255,255,255,0.8)' }}>
+                                : { color: '#64748b', borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(255,255,255,0.8)' }}>
                             {n === 'all' ? 'All Networks' : n.charAt(0).toUpperCase() + n.slice(1)}
                         </button>
                     ))}
                 </div>
 
                 {/* Column Headers */}
-                <div className="shrink-0 grid bg-black/[0.02] dark:bg-white/[0.02] border-b border-black/[0.04] dark:border-white/10 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] shadow-inner z-10"
+                <div className="shrink-0 grid bg-slate-50 border-b border-slate-200 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] shadow-inner z-10"
                     style={{ gridTemplateColumns: '40px 2.8fr 1.6fr 1.1fr 1.5fr 1.2fr 1fr' }}>
                     {['#', 'Asset Name', 'Oracle Price', '24H %', 'Volume 24H', 'Dominance', 'Volatility'].map((h, i) => (
                         <div key={h} className={`px-3 py-3 ${i >= 3 && i <= 5 ? 'text-right' : i === 0 || i === 6 ? 'text-center' : ''}`}>{h}</div>
@@ -435,22 +435,22 @@ export function GainersLosersPanel() {
                 {/* Rows */}
                 <div className="flex-1 w-full overflow-y-auto no-scrollbar relative z-0" style={{ scrollbarWidth: 'none' }}>
                     {isLoading ? (
-                        <div className="flex-1 flex flex-col items-center justify-center text-[#888888] h-full p-12">
+                        <div className="flex-1 flex flex-col items-center justify-center text-slate-400 h-full p-12">
                             <Loader2 className="animate-spin mb-4" size={36} />
-                            <p className="text-[12px] font-black text-[#050505] dark:text-white uppercase tracking-[0.2em]">INITIALIZING LEDGER MATRIX</p>
+                            <p className="text-[12px] font-black text-slate-900 uppercase tracking-[0.2em]">INITIALIZING LEDGER MATRIX</p>
                             <p className="text-[10px] mt-2 tracking-widest opacity-60">Zero-Mock Protocol Enforced</p>
                         </div>
                     ) : error ? (
                         <div className="h-full flex flex-col items-center justify-center p-12">
-                            <AlertTriangle size={32} className="text-black/20 dark:text-white/20 mb-4" />
-                            <p className="text-[12px] font-black text-[#050505]/40 dark:text-white/40 uppercase tracking-[0.3em]">
+                            <AlertTriangle size={32} className="text-slate-200 mb-4" />
+                            <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em]">
                                 Market Data Unavailable
                             </p>
                         </div>
                     ) : filtered.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-center p-12 text-[#888888]">
+                        <div className="flex flex-col items-center justify-center h-full text-center p-12 text-slate-400">
                             <Search size={32} className="mb-4 opacity-30"/>
-                            <p className="text-[12px] font-black text-[#111] dark:text-white uppercase tracking-[0.2em] mb-2">No analytics found</p>
+                            <p className="text-[12px] font-black text-slate-900 uppercase tracking-[0.2em] mb-2">No analytics found</p>
                             <p className="text-[10px] uppercase tracking-widest opacity-60">Refine parameters</p>
                         </div>
                     ) : (
@@ -473,7 +473,7 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 px-6 py-3 border-t border-black/[0.04] dark:border-white/10 bg-white/50 dark:bg-[#111111]/50 backdrop-blur-md flex items-center justify-between text-[10px] font-black text-[#050505]/40 dark:text-white/40 uppercase tracking-[0.15em] z-10">
+                <div className="shrink-0 px-6 py-3 border-t border-slate-200 bg-white/50 backdrop-blur-md flex items-center justify-between text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] z-10">
                     <span>{filtered.length} VERIFIED ASSETS · {network === 'all' ? 'OMNI-CHAIN' : network.toUpperCase()} · {timeWindow}</span>
                     <span className="font-mono tracking-[0.2em] flex items-center gap-2"> SECURE CONNECTION</span>
                 </div>

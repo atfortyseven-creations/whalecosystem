@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Loader2, Check, Lock, Zap, BarChart2, MessageSquare, Briefcase, Users, Shield, Eye, Globe } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { PRICING_TIERS, TIER_RANK, SECTION_FEATURES } from '@/lib/config/pricing-tiers';
+import { API_MARKETPLACE_PLANS } from '@/lib/api-marketplace-plans';
 import type { SectionFeatureGroup } from '@/lib/config/pricing-tiers';
 import dynamic from 'next/dynamic';
 
@@ -135,10 +136,15 @@ export default function PricingPage() {
               </h1>
 
               <p className="text-[17px] md:text-[19px] font-serif text-black/55 max-w-2xl leading-relaxed mx-auto">
-                Start for free and track whale movements with no commitment. 
-                Upgrade to <strong className="text-black/80 font-semibold">Pro for $15/month</strong> to unlock every tool 
+                Start for free and track whale movements with no commitment.
+                Upgrade to <strong className="text-black/80 font-semibold">Pro for $15/month</strong> to unlock every tool
                 across the entire platform — Dashboard, Chat, Portfolio, and Community.
               </p>
+              <div className="mt-4">
+                <a href="/api-marketplace" className="text-sm text-slate-600 underline hover:text-slate-900">
+                  View API Marketplace plans
+                </a>
+              </div>
             </MotionDiv>
 
             {/* Key stats */}
@@ -307,9 +313,52 @@ export default function PricingPage() {
               className="mt-10 text-center"
             >
               <p className="font-serif text-[14px] text-black/40 max-w-xl mx-auto leading-relaxed">
-                Both plans include our Aztec-powered privacy login — no email, no password, no tracking. 
+                Both plans include our Aztec-powered privacy login — no email, no password, no tracking.
                 Your wallet is your identity. Cancel anytime, no questions asked.
               </p>
+            </MotionDiv>
+
+            {/* Session Quality Benefits */}
+            <MotionDiv
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="mt-12 max-w-3xl mx-auto"
+            >
+              <div className="bg-white border border-black/8 rounded-2xl p-8 md:p-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <Zap size={20} className="text-black/50" />
+                  <h3 className="text-[18px] font-black uppercase tracking-widest text-black">
+                    Session Quality Benefits
+                  </h3>
+                </div>
+                <p className="font-serif text-[14px] text-black/50 mb-6 leading-relaxed">
+                  Upgrading your plan improves your session experience and data quality across all platform features.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {API_MARKETPLACE_PLANS.filter(p => p.id !== 'Elite').map((plan) => (
+                    <div key={plan.id} className="bg-[#FAFAF8] rounded-xl p-5 border border-black/5">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="font-black text-black">{plan.name}</span>
+                        <span className="font-mono text-sm text-black/50">${plan.price}/mo</span>
+                      </div>
+                      <ul className="space-y-2">
+                        {plan.sessionQualityBenefits?.map((benefit, i) => (
+                          <li key={i} className="flex items-start gap-2 text-xs text-black/60">
+                            <Check size={10} className="mt-0.5 shrink-0 text-black/40" />
+                            {benefit}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 text-center">
+                  <a href="/api-marketplace" className="text-sm text-slate-600 underline hover:text-slate-900">
+                    View detailed API Marketplace plans
+                  </a>
+                </div>
+              </div>
             </MotionDiv>
           </div>
         </section>
