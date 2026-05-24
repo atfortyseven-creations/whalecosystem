@@ -1,685 +1,334 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useSystemAccount } from '@/hooks/useSystemAccount';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { Loader2, Check, Lock, Zap, BarChart2, MessageSquare, Briefcase, Users, Shield, Eye, Globe } from 'lucide-react';
-import { useAppKit } from '@reown/appkit/react';
-import { PRICING_TIERS, TIER_RANK, SECTION_FEATURES } from '@/lib/config/pricing-tiers';
-import { API_MARKETPLACE_PLANS } from '@/lib/api-marketplace-plans';
-import type { SectionFeatureGroup } from '@/lib/config/pricing-tiers';
-import dynamic from 'next/dynamic';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { useAccount } from "wagmi";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Shield, CheckCircle2, Lock, Key, Zap, Activity,
+  AlertTriangle, CreditCard, Building2, User, Star
+} from "lucide-react";
+import Link from "next/link";
+import { WhaleAlertLoader } from "@/components/ui/WhaleAlertLoader";
+import { API_MARKETPLACE_PLANS } from "@/lib/api-marketplace-plans";
 
-const SystemFooter = dynamic(
-  () => import('@/components/landing/SystemFooter').then(m => ({ default: m.SystemFooter })),
-  { ssr: false, loading: () => <div className="h-24" /> }
-);
-const MotionDiv = dynamic(
-  () => import('framer-motion').then(m => ({ default: m.motion.div })),
-  { ssr: false, loading: () => <div /> }
-);
+const PLANS = API_MARKETPLACE_PLANS;
 
-const FADE_UP: any = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
-};
-
-const SECTION_ICONS: Record<string, React.ReactNode> = {
-  dashboard: <BarChart2 size={16} />,
-  chat:      <MessageSquare size={16} />,
-  portfolio: <Briefcase size={16} />,
-  community: <Users size={16} />,
-};
-
-// Aztec integration trust badges
-const AZTEC_PILLARS = [
-  {
-    icon: <Shield size={20} />,
-    title: 'Private by Default',
-    desc: 'Built on Aztec Network — your data never leaves your device unencrypted.',
-  },
-  {
-    icon: <Eye size={20} />,
-    title: 'No Tracking, Ever',
-    desc: 'We cannot see who you are. Your wallet is your identity — nothing else.',
-  },
-  {
-    icon: <Globe size={20} />,
-    title: 'Decentralized Infrastructure',
-    desc: 'No single server controls your data. The network is global and censorship-resistant.',
-  },
-];
+function SecurityBadge({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-2 text-xs text-slate-400 font-mono uppercase tracking-widest">
+      <Shield size={11} className="text-slate-600" />
+      {text}
+    </div>
+  );
+}
 
 export default function PricingPage() {
-  const { isConnected, isSystemHandshake, address } = useSystemAccount();
+  return (
+    <React.Suspense fallback={<WhaleAlertLoader bg="#FAFAF8" color="#050505" />}>
+      <PricingPageContent />
+    </React.Suspense>
+  );
+}
+
+function PricingPageContent() {
+  const { address, isConnected, status } = useAccount();
+  const isSignedIn = isConnected;
+  const isLoaded = status !== 'connecting' && status !== 'reconnecting';
   const router = useRouter();
-  const [loadingTier, setLoadingTier]   = useState<string | null>(null);
-  const [currentTier, setCurrentTier]   = useState<string>('FREE');
-  const [isTierLoaded, setIsTierLoaded] = useState<boolean>(false);
-  const [activeSection, setActiveSection] = useState<SectionFeatureGroup['section']>('dashboard');
+  const searchParams = useSearchParams();
+  const initialTier = searchParams.get("tier") || "pro";
 
-  const { open } = useAppKit();
+  const [selectedPlan, setSelectedPlan] = useState(
+    PLANS.find((p) => p.id === initialTier) || PLANS[1]
+  );
+  const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch('/api/auth/session', { cache: 'no-store' })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.user?.tier) {
-          setCurrentTier(data.user.tier.split('_')[0].toUpperCase());
-        }
-      })
-      .catch(() => {})
-      .finally(() => setIsTierLoaded(true));
-  }, [isConnected, isSystemHandshake]);
-
-  const currentTierLevel = TIER_RANK[currentTier as keyof typeof TIER_RANK] ?? 0;
-
-  const handleSubscribeClick = async (planId: string) => {
-    if (currentTierLevel >= (TIER_RANK[planId as keyof typeof TIER_RANK] ?? 0)) {
-      toast.info('You already have this access level');
-      router.push('/dashboard');
+  const handleCheckout = async () => {
+    if (!isSignedIn) {
+      router.push("/login?redirect=/pricing");
       return;
     }
-    if (!isConnected || !address) {
-      toast.info('Please connect your wallet to continue');
-      open({ view: 'Connect' });
+    if (!agreed) {
+      setError("You must accept the terms and the non-refund policy to continue.");
       return;
     }
-    setLoadingTier(planId);
+    setError(null);
+    setLoading(true);
     try {
-      const r = await fetch('/api/payments/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier: planId, isAnnual: false }),
+      const res = await fetch("/api/payment/create-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId: selectedPlan.id,
+          stripePriceId: selectedPlan.stripePriceId,
+          userEmail: address,
+        }),
       });
-      const data = await r.json();
-      if (r.ok && data.url) {
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error creating payment session.");
+
+      if (data.url) {
         window.location.href = data.url;
-      } else {
-        throw new Error(data.error || 'Failed to start checkout');
       }
     } catch (err: any) {
-      toast.error('Checkout error', { description: err.message });
-    } finally {
-      setLoadingTier(null);
+      setError(err.message || "Unexpected error. Try again.");
+      setLoading(false);
     }
   };
 
-  const activeSectionData = SECTION_FEATURES.find(s => s.section === activeSection)!;
-
   return (
-    <div className="w-full min-h-screen flex flex-col bg-[#FAFAF8] text-black font-sans selection:bg-black/10">
-      <div className="relative z-10 w-full flex flex-col items-center">
+    <div className="min-h-screen bg-white text-slate-900 font-sans overflow-x-hidden">
+      <div className="relative z-10 max-w-[1100px] mx-auto px-6 pt-24 pb-24 transform-gpu will-change-transform">
 
-        {/*  HERO  */}
-        <section className="w-full pt-36 pb-24 px-6 border-b border-black/5 relative z-10 flex flex-col justify-center items-center text-center overflow-hidden">
-          {/* Subtle grid bg */}
-          <div className="pointer-events-none absolute inset-0 opacity-[0.025]"
-            style={{
-              backgroundImage: 'linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px)',
-              backgroundSize: '60px 60px',
-            }} />
+        {/*  HEADER  */}
+        <div className="text-center mb-16">
+          <Link href="/" className="text-xs font-mono uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors mb-6 inline-block">
+             Whale Alert Corporation
+          </Link>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 mb-4">
+            Pricing Plans
+          </h1>
+          <p className="text-slate-500 max-w-xl mx-auto text-lg">
+            Large-wallet alerts and market-flow data over REST and WebSocket—with HMAC authentication.
+          </p>
+        </div>
 
-          <div className="w-full max-w-[1200px] mx-auto space-y-10 relative z-10">
-            <MotionDiv initial="hidden" animate="visible" variants={FADE_UP} className="flex flex-col items-center gap-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/80 backdrop-blur-sm shadow-sm">
-                <Zap size={12} className="text-black/50" />
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.25em] text-black/50">
-                  Whale Alert Network — Pricing
-                </span>
-              </div>
+        <div className="grid lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px] gap-8 xl:gap-12">
 
-              <h1 className="text-[52px] md:text-[88px] font-black uppercase tracking-tighter leading-[0.88] text-[#050505]">
-                Simple,<br />
-                <span className="text-black/15">Honest Pricing.</span>
-              </h1>
-
-              <p className="text-[17px] md:text-[19px] font-serif text-black/55 max-w-2xl leading-relaxed mx-auto">
-                Start for free and track whale movements with no commitment.
-                Upgrade to <strong className="text-black/80 font-semibold">Pro for $15/month</strong> to unlock every tool
-                across the entire platform — Dashboard, Chat, Portfolio, and Community.
-              </p>
-              <div className="mt-4">
-                <a href="/api-marketplace" className="text-sm text-slate-600 underline hover:text-slate-900">
-                  View API Marketplace plans
-                </a>
-              </div>
-            </MotionDiv>
-
-            {/* Key stats */}
-            <MotionDiv
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="flex flex-wrap items-center justify-center gap-10 pt-2"
-            >
-              {[
-                { value: 'Free', label: 'To get started' },
-                { value: '$15', label: 'Per month for Pro' },
-                { value: '4', label: 'Fully unlocked sections' },
-                { value: '∞', label: 'Whale movements tracked' },
-              ].map(({ value, label }) => (
-                <div key={label} className="flex flex-col items-center gap-1">
-                  <span className="font-mono text-[28px] md:text-[36px] font-black tracking-tighter text-[#050505] leading-none">
-                    {value}
-                  </span>
-                  <span className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-black/30">
-                    {label}
-                  </span>
-                </div>
-              ))}
-            </MotionDiv>
-
-            {/* Aztec trust strip */}
-            <MotionDiv
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2"
-            >
-              {AZTEC_PILLARS.map(({ icon, title, desc }) => (
-                <div key={title} className="flex items-start gap-3 max-w-[260px] text-left">
-                  <div className="shrink-0 w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-black/50 mt-0.5">
-                    {icon}
-                  </div>
-                  <div>
-                    <p className="font-mono text-[10px] font-black uppercase tracking-wider text-black/70 mb-0.5">{title}</p>
-                    <p className="font-serif text-[12px] text-black/40 leading-snug">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </MotionDiv>
-          </div>
-        </section>
-
-        {/*  PRICING CARDS  */}
-        <section className="w-full py-24 px-6 relative z-10 flex flex-col items-center">
-          <div className="max-w-[1100px] mx-auto w-full">
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {PRICING_TIERS.map((tier, index) => {
-                const isPro      = tier.id === 'STANDARD';
-                const isGranted  = isTierLoaded && currentTierLevel >= (TIER_RANK[tier.id as keyof typeof TIER_RANK] ?? 0);
-                const isLoading  = loadingTier === tier.id;
-
-                return (
-                  <MotionDiv
-                    key={tier.id}
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.12, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className={`relative flex flex-col rounded-[2.5rem] border p-10 md:p-14 transition-all duration-500 hover:-translate-y-1 ${
-                      isPro
-                        ? 'bg-[#050505] border-transparent text-white shadow-2xl'
-                        : 'bg-white border-black/8 text-black shadow-sm hover:border-black/20'
-                    }`}
-                  >
-                    {isPro && (
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                        <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black shadow-lg">
-                          <span className="text-[10px]">⭐</span>
-                          <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em]">Most Popular</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Header */}
-                    <div className="mb-10 pb-10 border-b border-white/10">
-                      <div className="flex items-start justify-between gap-4 mb-5">
-                        <div>
-                          <h2 className={`text-[26px] md:text-[32px] font-black uppercase tracking-tighter leading-none mb-2 ${isPro ? 'text-white' : 'text-[#050505]'}`}>
-                            {tier.name}
-                          </h2>
-                          <p className={`font-serif text-[14px] leading-relaxed max-w-xs ${isPro ? 'text-white/50' : 'text-black/45'}`}>
-                            {tier.tagline}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-baseline gap-2">
-                        <span className={`text-[72px] font-black tracking-tighter leading-none ${isPro ? 'text-white' : 'text-[#050505]'}`}>
-                          {tier.priceMonthly === '0' ? 'Free' : `$${tier.priceMonthly}`}
-                        </span>
-                        {tier.priceMonthly !== '0' && (
-                          <span className={`text-[11px] font-black uppercase tracking-widest ${isPro ? 'text-white/30' : 'text-black/25'}`}>
-                            / month
-                          </span>
-                        )}
-                      </div>
-
-                      {isPro && (
-                        <p className="mt-3 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-white/30">
-                          Or $150/year — save 2 months
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Features list */}
-                    <div className="flex-1 space-y-4 mb-10">
-                      {tier.features.map((f, fi) => (
-                        <div key={fi} className="flex items-start gap-3.5">
-                          <div className={`mt-[3px] shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
-                            isPro
-                              ? f.highlight ? 'bg-white text-black' : 'bg-white/10 text-white/60'
-                              : 'bg-black/5 text-black/40'
-                          }`}>
-                            <Check size={11} strokeWidth={3} />
-                          </div>
-                          <span className={`text-[14px] leading-snug font-medium ${
-                            isPro
-                              ? f.highlight ? 'text-white font-semibold' : 'text-white/60'
-                              : 'text-black/55 font-serif'
-                          }`}>
-                            {f.text}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* CTA Button */}
-                    <button
-                      id={`pricing-btn-${tier.id.toLowerCase()}`}
-                      onClick={() => handleSubscribeClick(tier.id)}
-                      disabled={isLoading || (!isTierLoaded && isConnected) || isGranted}
-                      className={`w-full py-5 text-[11px] font-black uppercase tracking-[0.25em] transition-all duration-300 flex items-center justify-center gap-3 rounded-[1.5rem] ${
-                        isPro
-                          ? 'bg-white text-black hover:bg-white/90 shadow-xl shadow-black/20'
-                          : 'bg-black text-white hover:bg-black/80'
-                      } disabled:opacity-40 disabled:cursor-not-allowed`}
-                    >
-                      {isLoading ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : !isTierLoaded ? (
-                        <div className="flex items-center gap-2"><Loader2 size={13} className="animate-spin" /> Loading...</div>
-                      ) : isGranted ? (
-                        '✓ Access Active'
-                      ) : tier.id === 'FREE' ? (
-                        isConnected ? 'Go to Dashboard' : 'Get Started Free'
-                      ) : (
-                        'Unlock Full Access — $15/mo'
-                      )}
-                    </button>
-                  </MotionDiv>
-                );
-              })}
+          {/*  LEFT: PLAN SELECTOR  */}
+          <div className="space-y-4">
+            <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6">
+              Select your plan
             </div>
 
-            {/* What's included note */}
-            <MotionDiv
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="mt-10 text-center"
-            >
-              <p className="font-serif text-[14px] text-black/40 max-w-xl mx-auto leading-relaxed">
-                Both plans include our Aztec-powered privacy login — no email, no password, no tracking.
-                Your wallet is your identity. Cancel anytime, no questions asked.
-              </p>
-            </MotionDiv>
-
-            {/* Session Quality Benefits */}
-            <MotionDiv
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="mt-12 max-w-3xl mx-auto"
-            >
-              <div className="bg-white border border-black/8 rounded-2xl p-8 md:p-10">
-                <div className="flex items-center gap-3 mb-6">
-                  <Zap size={20} className="text-black/50" />
-                  <h3 className="text-[18px] font-black uppercase tracking-widest text-black">
-                    Session Quality Benefits
-                  </h3>
-                </div>
-                <p className="font-serif text-[14px] text-black/50 mb-6 leading-relaxed">
-                  Upgrading your plan improves your session experience and data quality across all platform features.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {API_MARKETPLACE_PLANS.filter(p => p.id !== 'Elite').map((plan) => (
-                    <div key={plan.id} className="bg-[#FAFAF8] rounded-xl p-5 border border-black/5">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="font-black text-black">{plan.name}</span>
-                        <span className="font-mono text-sm text-black/50">${plan.price}/mo</span>
-                      </div>
-                      <ul className="space-y-2">
-                        {plan.sessionQualityBenefits?.map((benefit, i) => (
-                          <li key={i} className="flex items-start gap-2 text-xs text-black/60">
-                            <Check size={10} className="mt-0.5 shrink-0 text-black/40" />
-                            {benefit}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 text-center">
-                  <a href="/api-marketplace" className="text-sm text-slate-600 underline hover:text-slate-900">
-                    View detailed API Marketplace plans
-                  </a>
-                </div>
-              </div>
-            </MotionDiv>
-          </div>
-        </section>
-
-        {/*  WHAT'S DIFFERENT: SECTION TABS  */}
-        <section className="w-full py-24 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-white">
-          <div className="max-w-[1100px] mx-auto w-full">
-
-            <MotionDiv
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
-              variants={FADE_UP}
-              className="text-center mb-14"
-            >
-              <h2 className="text-[36px] md:text-[64px] font-black uppercase tracking-tighter text-[#050505] leading-none mb-5">
-                What Changes<br />
-                <span className="text-black/15">With Pro.</span>
-              </h2>
-              <p className="font-serif text-[17px] text-black/45 max-w-xl mx-auto leading-relaxed">
-                Every section of Whale Alert Network gets a full upgrade with the $15 plan.
-                Click a section below to see exactly what you unlock.
-              </p>
-            </MotionDiv>
-
-            {/* Tab Switcher */}
-            <div className="flex items-center gap-2 p-1.5 bg-black/5 rounded-[1.5rem] mb-10 flex-wrap justify-center">
-              {SECTION_FEATURES.map(s => (
-                <button
-                  key={s.section}
-                  id={`tab-${s.section}`}
-                  onClick={() => setActiveSection(s.section)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-[1.2rem] font-mono text-[10px] font-black uppercase tracking-[0.18em] transition-all duration-300 ${
-                    activeSection === s.section
-                      ? 'bg-white text-black shadow-sm'
-                      : 'text-black/40 hover:text-black/60'
+            {PLANS.map((plan) => {
+              const selected = selectedPlan.id === plan.id;
+              const PlanIcon = plan.icon === 'Activity' ? Activity : plan.icon === 'User' ? User : plan.icon === 'Star' ? Star : Building2;
+              return (
+                <motion.button
+                  key={plan.id}
+                  onClick={() => setSelectedPlan(plan)}
+                  transition={{
+                    type: "spring",
+                    stiffness: 450,
+                    damping: 30,
+                    mass: 0.8
+                  }}
+                  className={`w-full text-left rounded-3xl border p-5 md:p-6 transition-all duration-200 transform-gpu ${
+                    selected
+                      ? "border-slate-900 bg-slate-50"
+                      : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
+                  style={selected ? { boxShadow: `0 0 30px ${plan.color}15` } : {}}
                 >
-                  <span>{SECTION_ICONS[s.section]}</span>
-                  {s.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Comparison Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              {/* FREE column */}
-              <div className="rounded-[2rem] border border-black/8 bg-[#FAFAF8] p-8 md:p-10">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-8 h-8 rounded-xl bg-black/6 flex items-center justify-center">
-                    {SECTION_ICONS[activeSection]}
-                  </div>
-                  <div>
-                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30 mb-0.5">Free Plan</p>
-                    <p className="font-black text-[15px] uppercase tracking-tight text-black">Whale Alert Network</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {activeSectionData.freeFeatures.map((feat, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="mt-[3px] shrink-0 w-5 h-5 rounded-full bg-black/6 flex items-center justify-center">
-                        <Check size={10} strokeWidth={3} className="text-black/40" />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ background: `${plan.color}08`, border: `1px solid ${plan.color}20` }}
+                      >
+                        <PlanIcon size={18} style={{ color: plan.color }} />
                       </div>
-                      <span className="text-[14px] text-black/55 font-serif leading-snug">{feat}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* PRO column */}
-              <div className="rounded-[2rem] bg-[#050505] p-8 md:p-10 relative overflow-hidden">
-                <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-10"
-                  style={{ background: 'radial-gradient(circle, #fff 0%, transparent 70%)' }} />
-
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-white">
-                    {SECTION_ICONS[activeSection]}
-                  </div>
-                  <div>
-                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">Pro Plan</p>
-                    <p className="font-black text-[15px] uppercase tracking-tight text-white">Whale Alert Network Pro</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {activeSectionData.proFeatures.map((feat, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="mt-[3px] shrink-0 w-5 h-5 rounded-full bg-white/15 flex items-center justify-center">
-                        <Check size={10} strokeWidth={3} className="text-white" />
-                      </div>
-                      <span className="text-[14px] text-white/75 leading-snug font-medium">{feat}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-white/10">
-                  <button
-                    id={`section-cta-${activeSection}`}
-                    onClick={() => handleSubscribeClick('STANDARD')}
-                    disabled={isTierLoaded && currentTierLevel >= 1}
-                    className="w-full py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.25em] rounded-[1.2rem] hover:bg-white/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    {isTierLoaded && currentTierLevel >= 1 ? '✓ Already Unlocked' : 'Unlock This Section — $15/mo'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Section navigator dots */}
-            <div className="flex items-center justify-center gap-3 mt-8">
-              {SECTION_FEATURES.map(s => (
-                <button
-                  key={s.section}
-                  onClick={() => setActiveSection(s.section)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    activeSection === s.section ? 'bg-black w-6' : 'bg-black/20 hover:bg-black/40'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/*  FULL FEATURE MATRIX  */}
-        <section className="w-full py-24 px-6 border-t border-black/5 relative z-10 flex flex-col items-center">
-          <div className="max-w-[1100px] mx-auto w-full">
-
-            <MotionDiv
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
-              variants={FADE_UP}
-              className="text-center mb-14"
-            >
-              <h2 className="text-[36px] md:text-[64px] font-black uppercase tracking-tighter text-[#050505] leading-none mb-5">
-                Full Feature<br />
-                <span className="text-black/15">Comparison.</span>
-              </h2>
-              <p className="font-serif text-[17px] text-black/45 max-w-xl mx-auto leading-relaxed">
-                Every feature, side by side. No hidden costs, no surprise paywalls.
-              </p>
-            </MotionDiv>
-
-            <div className="overflow-hidden rounded-[2rem] border border-black/8 bg-white shadow-sm">
-              {/* Header */}
-              <div className="grid grid-cols-[1fr_140px_140px] border-b border-black/8">
-                <div className="p-6 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30">Feature</div>
-                <div className="p-6 text-center font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/30 border-l border-black/5">Free</div>
-                <div className="p-6 text-center font-mono text-[9px] font-black uppercase tracking-[0.2em] text-white bg-[#050505] border-l border-black/5 rounded-tr-[2rem]">Pro</div>
-              </div>
-
-              {/* Rows */}
-              {SECTION_FEATURES.map((section, si) => (
-                <React.Fragment key={section.section}>
-                  {/* Section header row */}
-                  <div className="grid grid-cols-[1fr_140px_140px] bg-black/[0.025] border-b border-black/5">
-                    <div className="px-6 py-3 flex items-center gap-2">
-                      <span className="text-black/40">{SECTION_ICONS[section.section]}</span>
-                      <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/40">{section.label}</span>
-                    </div>
-                    <div className="border-l border-black/5" />
-                    <div className="border-l border-black/5 bg-[#050505]/[0.02]" />
-                  </div>
-
-                  {Array.from({ length: Math.max(section.freeFeatures.length, section.proFeatures.length) }).map((_, ri) => {
-                    const freeFeat = section.freeFeatures[ri];
-                    const proFeat  = section.proFeatures[ri];
-                    return (
-                      <div key={ri} className={`grid grid-cols-[1fr_140px_140px] border-b border-black/[0.04] ${ri % 2 === 0 ? '' : 'bg-black/[0.01]'}`}>
-                        <div className="px-6 py-4 text-[13px] text-black/60 font-serif leading-snug">
-                          {freeFeat || proFeat}
-                        </div>
-                        <div className="px-4 py-4 flex items-center justify-center border-l border-black/5">
-                          {freeFeat ? (
-                            <Check size={14} strokeWidth={2.5} className="text-black/40" />
-                          ) : (
-                            <Lock size={12} strokeWidth={2} className="text-black/15" />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-black text-slate-900">{plan.name}</span>
+                          {plan.badge && (
+                            <span
+                              className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded"
+                              style={{ color: plan.color, border: `1px solid ${plan.color}30`, background: `${plan.color}08` }}
+                            >
+                              {plan.badge}
+                            </span>
                           )}
                         </div>
-                        <div className="px-4 py-4 flex items-center justify-center border-l border-black/5 bg-black/[0.015]">
-                          <Check size={14} strokeWidth={2.5} className="text-[#050505]" />
-                        </div>
+                        <div className="text-xs text-slate-500 mt-0.5">{plan.description}</div>
                       </div>
-                    );
-                  })}
-                </React.Fragment>
-              ))}
+                    </div>
+                    <div className="text-right">
+                      <span className="text-3xl font-black text-slate-900">${plan.price}</span>
+                      <span className="text-slate-400 text-xs font-mono">/mo</span>
+                    </div>
+                  </div>
 
-              {/* Footer CTA row */}
-              <div className="grid grid-cols-[1fr_140px_140px]">
-                <div className="p-6" />
-                <div className="p-4 border-l border-black/5 flex items-center justify-center">
-                  <span className="font-mono text-[10px] font-black text-black/30">$0</span>
+                  <div className="grid grid-cols-2 xs:grid-cols-3 gap-2 md:gap-3 mb-4">
+                    {[plan.requests, plan.tokens, plan.keys].map((stat, i) => (
+                      <div key={i} className="bg-slate-100 rounded-xl px-2 py-2 md:px-3">
+                        <div className="text-[8px] md:text-[9px] text-slate-400 uppercase tracking-widest mb-0.5 truncate">
+                          {["Requests", "Tokens", "API Keys"][i]}
+                        </div>
+                        <div className="text-[10px] md:text-xs font-bold text-slate-700 truncate">{stat}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <ul className="space-y-1.5">
+                    {plan.features.map((f, i) => (
+                      <li key={i} className="flex items-center gap-2 text-xs text-slate-500">
+                        <CheckCircle2 size={11} style={{ color: plan.color }} className="flex-shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/*  RIGHT: CHECKOUT PANEL  */}
+          <div className="lg:sticky lg:top-24 h-fit transform-gpu">
+            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: `${selectedPlan.color}08`, border: `1px solid ${selectedPlan.color}20` }}
+                >
+                  <Key size={18} style={{ color: selectedPlan.color }} />
                 </div>
-                <div className="p-4 border-l border-black/5 bg-[#050505] flex items-center justify-center rounded-br-[2rem]">
-                  <button
-                    id="grid-cta-btn"
-                    onClick={() => handleSubscribeClick('STANDARD')}
-                    disabled={isTierLoaded && currentTierLevel >= 1}
-                    className="font-mono text-[9px] font-black uppercase tracking-[0.18em] text-white hover:text-white/70 transition-colors disabled:opacity-40"
-                  >
-                    {isTierLoaded && currentTierLevel >= 1 ? '✓ Active' : '$15 / mo →'}
+                <div>
+                  <div className="font-black text-slate-900">{selectedPlan.name}</div>
+                  <div className="text-xs text-slate-500">Selected plan</div>
+                </div>
+              </div>
+
+              {/* Order summary */}
+              <div className="bg-white rounded-2xl p-4 mb-6 space-y-2 border border-slate-200">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">API Plan {selectedPlan.name}</span>
+                  <span className="font-black text-slate-900">${selectedPlan.price}/mo</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>Billed monthly</span>
+                  <span>Cancel anytime</span>
+                </div>
+                <div className="border-t border-slate-200 pt-2 flex justify-between">
+                  <span className="font-black text-slate-900 text-sm">Total today</span>
+                  <span className="font-black text-slate-900 text-xl">${selectedPlan.price}</span>
+                </div>
+              </div>
+
+              {/* Acceptance checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer mb-6 group">
+                <div
+                  className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                    agreed ? "bg-slate-900 border-slate-900" : "border-slate-300 group-hover:border-slate-400"
+                  }`}
+                  onClick={() => setAgreed(!agreed)}
+                >
+                  {agreed && <CheckCircle2 size={12} className="text-white" />}
+                </div>
+                <span className="text-xs text-slate-500 leading-relaxed">
+                  I accept the{" "}
+                  <Link href="/terms" className="text-slate-700 underline hover:text-slate-900">
+                    Terms of Service
+                  </Link>{" "}
+                  and the{" "}
+                  <Link href="/privacy" className="text-slate-700 underline hover:text-slate-900">
+                    Privacy Policy
+                  </Link>
+                  . I understand that{" "}
+                  <strong className="text-slate-700">there are no refunds</strong> and that
+                  the API key is activated immediately after payment.
+                  In case of dispute, my access will be suspended and evidence of
+                  usage will be sent to Stripe.
+                </span>
+              </label>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 text-xs text-red-600 flex items-start gap-2">
+                  <AlertTriangle size={12} className="mt-0.5 flex-shrink-0" />
+                  {error}
+                </div>
+              )}
+
+              {!isLoaded ? (
+                <div className="w-full py-4 rounded-2xl bg-slate-200 animate-pulse" />
+              ) : !isSignedIn ? (
+                <Link href="/login?redirect=/pricing">
+                  <button className="w-full py-4 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-widest text-sm hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                    <Lock size={14} /> Login to continue
                   </button>
-                </div>
+                </Link>
+              ) : (
+                <motion.button
+                  key={`checkout-${selectedPlan.id}`}
+                  transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                  onClick={handleCheckout}
+                  disabled={loading || !agreed}
+                  className="w-full py-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transform-gpu"
+                  style={{
+                    background: agreed
+                      ? selectedPlan.color
+                      : "rgba(0,0,0,0.05)",
+                    border: `1px solid ${selectedPlan.color}30`,
+                    color: agreed ? "white" : "slate-400",
+                  }}
+                >
+                  {loading ? (
+                    <Activity size={16} className="animate-spin" />
+                  ) : (
+                    <>
+                      <CreditCard size={16} />
+                      Pay with Stripe  ${selectedPlan.price}/mo
+                    </>
+                  )}
+                </motion.button>
+              )}
+
+              {/* Security badges */}
+              <div className="mt-6 space-y-2">
+                <SecurityBadge text="Payment processed by Stripe (PCI DSS Level 1)" />
+                <SecurityBadge text="3D Secure 2 mandatory on all cards" />
+                <SecurityBadge text="TLS 1.3 Encryption · data never stored" />
+                <SecurityBadge text="Device fingerprint at time of payment" />
               </div>
             </div>
-          </div>
-        </section>
 
-        {/*  AZTEC PRIVACY CALLOUT  */}
-        <section className="w-full py-24 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-white">
-          <div className="max-w-[900px] mx-auto w-full">
-            <MotionDiv
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
-              variants={FADE_UP}
-              className="flex flex-col items-center text-center gap-10"
-            >
-              <div>
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-4 block">
-                  How Your Privacy Works
-                </span>
-                <h2 className="text-[36px] md:text-[56px] font-black uppercase tracking-tighter text-[#050505] leading-none mb-6">
-                  No Email.<br />
-                  <span className="text-black/15">No Password. No Tracking.</span>
-                </h2>
-                <p className="font-serif text-[16px] md:text-[18px] text-black/50 max-w-2xl mx-auto leading-relaxed">
-                  We've built our entire login and data system on top of the <strong className="text-black/70">Aztec Network</strong> — 
-                  a privacy-first blockchain layer. When you sign in with your wallet, a 
-                  mathematical proof verifies who you are without revealing any personal information. 
-                  We literally cannot see your name, email, or browsing habits. Your wallet is your account.
-                </p>
+            {/* After payment */}
+            <div className="mt-4 bg-slate-50 border border-slate-200 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Zap size={14} className="text-slate-600" />
+                <span className="text-xs font-black uppercase tracking-widest text-slate-600">After payment</span>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+              <ul className="space-y-2">
                 {[
-                  {
-                    title: 'Zero-Knowledge Login',
-                    desc: 'Your wallet signs a cryptographic challenge. We verify the math — not your identity.',
-                    badge: 'Aztec Network',
-                  },
-                  {
-                    title: 'Encrypted by Default',
-                    desc: 'All sensitive operations happen on your device first. Only the proof is ever transmitted.',
-                    badge: 'Client-Side',
-                  },
-                  {
-                    title: 'Censorship Resistant',
-                    desc: 'Your access cannot be revoked by a single server or authority. The network is global.',
-                    badge: 'Decentralized',
-                  },
-                ].map(({ title, desc, badge }) => (
-                  <div key={title} className="flex flex-col gap-3 p-6 rounded-[1.5rem] border border-black/8 bg-[#FAFAF8] text-left">
-                    <span className="inline-block px-2 py-0.5 rounded-full bg-black/5 font-mono text-[8px] font-black uppercase tracking-widest text-black/40 w-fit">{badge}</span>
-                    <p className="font-mono text-[11px] font-black uppercase tracking-tight text-black">{title}</p>
-                    <p className="font-serif text-[13px] text-black/50 leading-relaxed">{desc}</p>
-                  </div>
+                  "API key generated in < 5 seconds",
+                  "Welcome email with credentials",
+                  "Immediate access to documentation",
+                  "First whale event < 12 seconds",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs text-slate-500">
+                    <CheckCircle2 size={10} className="text-slate-600" />
+                    {item}
+                  </li>
                 ))}
+              </ul>
+            </div>
+
+            {/* Session Quality Benefits */}
+            <div className="mt-4 bg-white border border-slate-200 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Zap size={14} className="text-slate-600" />
+                <span className="text-xs font-black uppercase tracking-widest text-slate-600">Session Quality Benefits</span>
               </div>
-            </MotionDiv>
-          </div>
-        </section>
-
-        {/*  FINAL CTA  */}
-        <section className="w-full py-24 px-6 border-t border-black/5 relative z-10 flex flex-col items-center bg-[#050505]">
-          <div className="max-w-[900px] mx-auto w-full text-center">
-            <MotionDiv
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }}
-              variants={FADE_UP}
-            >
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6">
-                Ready to Start?
+              <p className="text-xs text-slate-500 mb-3">
+                Upgrading your plan improves your session experience and data quality:
               </p>
-              <h2 className="text-[40px] md:text-[72px] font-black uppercase tracking-tighter leading-[0.88] text-white mb-8">
-                Track Every Move.<br />
-                <span className="text-white/20">Stay Private.</span>
-              </h2>
-              <p className="font-serif text-[18px] text-white/45 max-w-2xl mx-auto leading-relaxed mb-12">
-                For $15 a month — less than a coffee per week — you get unlimited whale tracking, 
-                AI predictions, VIP chat channels, multi-wallet portfolio management, and a verified 
-                community badge. No contracts. Cancel anytime.
-              </p>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-                {[
-                  { icon: '📊', label: 'Dashboard', desc: 'Unlimited movements + AI predictions' },
-                  { icon: '💬', label: 'Whale Chat', desc: 'VIP channels + analyst signals' },
-                  { icon: '📈', label: 'Portfolio', desc: 'Multi-wallet + copy-trading alerts' },
-                  { icon: '🏅', label: 'Community', desc: 'Verified badge + DAO voting' },
-                ].map(({ icon, label, desc }) => (
-                  <div key={label} className="flex flex-col gap-2 p-5 rounded-[1.5rem] border border-white/8 bg-white/[0.03] hover:bg-white/[0.06] transition-colors">
-                    <span className="text-[20px]">{icon}</span>
-                    <p className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-white/60">{label}</p>
-                    <p className="text-[12px] text-white/30 font-serif leading-snug">{desc}</p>
-                  </div>
+              <ul className="space-y-2">
+                {selectedPlan.sessionQualityBenefits?.map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-xs text-slate-600">
+                    <CheckCircle2 size={10} className="text-slate-600" />
+                    {item}
+                  </li>
                 ))}
-              </div>
-
-              <button
-                id="hero-cta-pro"
-                onClick={() => handleSubscribeClick('STANDARD')}
-                disabled={loadingTier === 'STANDARD' || (isTierLoaded && currentTierLevel >= 1)}
-                className="inline-flex items-center gap-3 px-12 py-5 bg-white text-black text-[11px] font-black uppercase tracking-[0.25em] rounded-[1.5rem] hover:bg-white/90 transition-all shadow-2xl shadow-black/40 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {loadingTier === 'STANDARD' ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : isTierLoaded && currentTierLevel >= 1 ? (
-                  '✓ Pro Access Active'
-                ) : (
-                  'Unlock Full Access — $15/mo'
-                )}
-              </button>
-
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/20 mt-6">
-                Powered by Aztec Network · No personal data stored · Cancel anytime
-              </p>
-            </MotionDiv>
+              </ul>
+            </div>
           </div>
-        </section>
-
+        </div>
       </div>
-
-      <SystemFooter />
-      <div className="h-24 sm:h-0" />
     </div>
   );
 }
