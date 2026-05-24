@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Github, Twitter, Youtube, Instagram, Rss, Send, Loader2, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -99,9 +100,47 @@ export function WhaleAlertFooter() {
     ];
 
     return (
-        <footer className="w-full bg-transparent py-16 opacity-40">
+        <footer className="w-full bg-white py-16 border-t border-black/5">
             <div className="max-w-[2560px] mx-auto px-4 text-left">
-                {/* Purposely empty to maintain clean black aesthetic as requested */}
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+                    <div>
+                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-4">Navigation</h3>
+                        <ul className="space-y-2">
+                            <li><Link href="/dashboard" className="text-sm text-slate-600 hover:text-slate-900">Dashboard</Link></li>
+                            <li><Link href="/portfolio" className="text-sm text-slate-600 hover:text-slate-900">Portfolio</Link></li>
+                            <li><Link href="/token" className="text-sm text-slate-600 hover:text-slate-900">Token</Link></li>
+                            <li><Link href="/product-passports" className="text-sm text-slate-600 hover:text-slate-900">Studio Provenance Beta</Link></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-4">Community</h3>
+                        <ul className="space-y-2">
+                            <li><Link href="/forum" className="text-sm text-slate-600 hover:text-slate-900">Forum</Link></li>
+                            <li><Link href="/chat" className="text-sm text-slate-600 hover:text-slate-900">Chat</Link></li>
+                            <li><Link href="/news" className="text-sm text-slate-600 hover:text-slate-900">News</Link></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-4">Resources</h3>
+                        <ul className="space-y-2">
+                            <li><Link href="/docs" className="text-sm text-slate-600 hover:text-slate-900">Docs</Link></li>
+                            <li><Link href="/privacy" className="text-sm text-slate-600 hover:text-slate-900">Privacy</Link></li>
+                            <li><Link href="/status" className="text-sm text-slate-600 hover:text-slate-900">Status</Link></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-4">Company</h3>
+                        <ul className="space-y-2">
+                            <li><Link href="/careers" className="text-sm text-slate-600 hover:text-slate-900">Careers</Link></li>
+                            <li><Link href="/academy" className="text-sm text-slate-600 hover:text-slate-900">Academy</Link></li>
+                        </ul>
+                    </div>
+                </div>
+                <div className="mt-12 pt-8 border-t border-black/5">
+                    <p className="text-xs text-slate-500">
+                        © {new Date().getFullYear()} Humanity Ledger
+                    </p>
+                </div>
             </div>
         </footer>
     );
