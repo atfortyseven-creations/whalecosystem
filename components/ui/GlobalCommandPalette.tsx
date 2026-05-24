@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search, Command
-} from "lucide-react";
+
+const IconSearch = () => <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className="text-[#050505]/25 dark:text-white/25 shrink-0"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>;
+const IconCommand = () => <svg width="9" height="9" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6H4a2 2 0 1 0 2 2V6zm4 0h2a2 2 0 1 1-2 2V6zm0 4v2a2 2 0 1 0 2-2h-2zm-4 0v2a2 2 0 1 1-2-2h2z"/></svg>;
 
 //  Only the routes that actually exist in SIDEBAR_ITEMS 
 const PAGES = [
@@ -116,7 +116,7 @@ export function GlobalCommandPalette({
             >
               {/* Search Input */}
               <div className="flex items-center px-4 py-3 border-b border-[#F0F0F0] dark:border-white/10 gap-3 shrink-0">
-                <Search size={14} className="text-[#050505]/25 dark:text-white/25 shrink-0" />
+                <IconSearch />
                 <input
                   autoFocus
                   className="flex-1 bg-transparent border-none outline-none text-[#050505] dark:text-white placeholder:text-[#050505]/25 dark:placeholder:text-white/25 text-[13px] font-medium"
@@ -204,7 +204,7 @@ export function GlobalCommandPalette({
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-[#050505]/15 dark:text-white/15">
-                  <Command size={9} />
+                  <IconCommand />
                   <span>K</span>
                 </div>
               </div>
