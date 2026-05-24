@@ -40,7 +40,8 @@ function APIDocsPageContent() {
   const [demoKeyExpiry, setDemoKeyExpiry] = useState<number | null>(null);
 
   const generateDemoKey = () => {
-    const key = `demo_${address?.slice(0, 8)}_${Date.now()}`;
+    if (!address) return;
+    const key = `demo_${address.slice(0, 8)}_${Date.now()}`;
     const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
     setApiKey(key);
     setDemoKeyExpiry(expiry);
@@ -83,6 +84,19 @@ function APIDocsPageContent() {
       localStorage.removeItem('demo_api_key');
       localStorage.removeItem('demo_api_expiry');
     }
+  }, [demoKeyExpiry]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (demoKeyExpiry && Date.now() > demoKeyExpiry) {
+        setApiKey(null);
+        setDemoKeyExpiry(null);
+        localStorage.removeItem('demo_api_key');
+        localStorage.removeItem('demo_api_expiry');
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, [demoKeyExpiry]);
 
   const currentPlan = PLANS.find(p => p.id.toLowerCase() === userPlan?.toLowerCase());
