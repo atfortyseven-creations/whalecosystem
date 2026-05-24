@@ -1,233 +1,242 @@
 export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: string, overview: string, features: { title: string, desc: string }[] }> = {
     'dashboard': {
-        title: 'Encrypted Telemetry',
-        subtitle: 'Node Telemetry Processing',
-        overview: 'Direct integration with full nodes guarantees secure transmission of network state variables. This environment ensures strict data provenance.',
+        title: 'Dashboard',
+        subtitle: 'Network overview',
+        overview: 'A real-time summary of network activity, wallet state, and protocol health. All data is read directly from verified node connections.',
         features: [
-            { title: 'Data Aggregation', desc: 'Secure consolidation of inter-network variations.' },
-            { title: 'Network Health', desc: 'Continuous evaluation of connection stability and node latency.' },
-            { title: 'Metric Normalization', desc: 'Dynamic adjustment of cryptographic metrics to provide clarity.' }
+            { title: 'Live Data', desc: 'Direct node feeds with no third-party intermediary.' },
+            { title: 'Network Health', desc: 'Connection status, latency, and block confirmation monitoring.' },
+            { title: 'Unified View', desc: 'Key metrics across all connected accounts and chains.' },
         ]
     },
     'watchlist': {
-        title: 'Address Classification',
-        subtitle: 'Secure Monitoring System',
-        overview: 'A dedicated tool for monitoring and classifying specific ledger entities. By isolating specific addresses, you receive secure telemetry regarding capital movements.',
+        title: 'Watchlist',
+        subtitle: 'Address monitoring',
+        overview: 'Track specific wallet addresses and receive alerts when they move capital. Configuration is stored locally and never sent to the network.',
         features: [
-            { title: 'Independent Monitoring', desc: 'Continuous tracking of entities using direct ledger integration.' },
-            { title: 'Custom Alert Thresholds', desc: 'Configurable parameters to notify you of key state transitions.' },
-            { title: 'Noise Reduction', desc: 'Proactive filtering of unverified transactions.' }
+            { title: 'Address Tracking', desc: 'Monitor any on-chain address across supported networks.' },
+            { title: 'Custom Alerts', desc: 'Set value thresholds to filter notifications by significance.' },
+            { title: 'Local Storage', desc: 'Watchlist configuration stays on your device only.' },
         ]
     },
     'news': {
-        title: 'Global Analytics',
-        subtitle: 'Macroeconomic Analysis',
-        overview: 'An advanced aggregator that securely streams global financial reporting and macroeconomic events without centralized trackers.',
+        title: 'Analytics Feed',
+        subtitle: 'Market context',
+        overview: 'Aggregated macroeconomic and on-chain reporting delivered without centralized tracking scripts or third-party cookies.',
         features: [
-            { title: 'Event Evaluation', desc: 'Measures the potential market impact of global reports.' },
-            { title: 'Continuous Updates', desc: 'Uninterrupted delivery of breaking analytics.' },
-            { title: 'Relevance Filtering', desc: 'Discards redundant data packets.' }
+            { title: 'Event Coverage', desc: 'Earnings, regulatory announcements, and protocol updates.' },
+            { title: 'Continuous Delivery', desc: 'Feed updates in real time as events occur.' },
+            { title: 'Relevance Filtering', desc: 'Configurable filters to surface what matters to you.' },
         ]
     },
     'gold': {
-        title: 'Identity Provisioning',
-        subtitle: 'Account Level Management',
-        overview: 'The central administration area for your cryptographic access. Here you can view your current authorization parameters, manage your connection, and verify your active permissions.',
+        title: 'Identity',
+        subtitle: 'Account management',
+        overview: 'Manage your cryptographic identity, view your access level, and configure privacy settings for your account.',
         features: [
-            { title: 'Dedicated Infrastructure', desc: 'Priority access to private nodes for stable performance.' },
-            { title: 'Enhanced Privacy', desc: 'Advanced routing to ensure your session remains secure and private.' },
-            { title: 'Unrestricted Access', desc: 'Full permission to deploy secure analytics without standard limitations.' }
+            { title: 'ZK Verification', desc: 'Biometric liveness proof — unique human status, no personal data disclosed.' },
+            { title: 'Access Level', desc: 'View your current permissions and account tier.' },
+            { title: 'Session Control', desc: 'Configure auto-lock timers and session security settings.' },
         ]
     },
     'markets': {
-        title: 'Network State Telemetry',
-        subtitle: 'Real-time Observation',
-        overview: 'Our dedicated secure node infrastructure directly interfaces with the global mempool, allowing for precise tracking of transaction execution pipelines milliseconds after signing.',
+        title: 'Markets',
+        subtitle: 'Real-time prices',
+        overview: 'Live market data sourced directly from major exchanges. Track prices, depth, and capital flows across asset classes.',
         features: [
-            { title: 'Depth Analysis', desc: 'Clear identification of capital barriers.' },
-            { title: 'Capital Flow Metrics', desc: 'Quantitative mapping of net flow across primary channels.' },
-            { title: 'Price Indexing', desc: 'Consolidation of fragmented data into a single verified metric.' }
+            { title: 'Depth View', desc: 'Order book depth for major trading pairs.' },
+            { title: 'Capital Flow', desc: 'Net flow tracking between exchanges and wallets.' },
+            { title: 'Price Index', desc: 'Volume-weighted average across verified sources.' },
         ]
     },
     'newpairs': {
-        title: 'Contract Verifications',
-        subtitle: 'Bytecode Verification',
-        overview: 'A secure monitoring system for newly deployed smart contracts. It evaluates fundamental token metrics and bytecode integrity to assess the structure of emerging assets.',
+        title: 'New Pairs',
+        subtitle: 'Contract deployment monitoring',
+        overview: 'Track newly deployed trading contracts as they appear on-chain. Evaluate basic token metrics before the wider market takes notice.',
         features: [
-            { title: 'Real-Time Detection', desc: 'Immediate identification of new contracts upon deployment.' },
-            { title: 'Structural Diagnostics', desc: 'Automatic review of contract logic and distribution.' },
-            { title: 'Verification', desc: 'Filters assets based on fundamental cryptographic proofs.' }
+            { title: 'Real-Time Detection', desc: 'Identifies new contracts within seconds of deployment.' },
+            { title: 'Structural Review', desc: 'Checks liquidity lock status and supply distribution.' },
+            { title: 'Filtering', desc: 'Hide pairs that fail basic validation criteria.' },
         ]
     },
     'omniexplorer': {
-        title: 'On-Chain Explorer',
-        subtitle: 'Multi-Chain Network Search',
-        overview: 'A clean, unified interface for securely exploring multiple blockchain networks without relying on external tracking entities.',
+        title: 'Explorer',
+        subtitle: 'Multi-chain search',
+        overview: 'Search transactions, addresses, and blocks across multiple blockchain networks from a single interface.',
         features: [
-            { title: 'Multi-Network Support', desc: 'Automatic resolution across different blockchain architectures.' },
-            { title: 'Clear Data Formatting', desc: 'Translation of complex blockchain data into readable formats.' },
-            { title: 'Distraction-Free Interface', desc: 'A minimalist design focused purely on the transaction data.' }
+            { title: 'Multi-Chain', desc: 'Supports Ethereum, Bitcoin, Solana, BNB Chain, and more.' },
+            { title: 'Clean Output', desc: 'Translates raw blockchain data into readable formats.' },
+            { title: 'No Trackers', desc: 'Search activity is not logged or transmitted externally.' },
         ]
     },
     'brc': {
-        title: 'Bitcoin Mainnet',
-        subtitle: 'L1 Operations Tracking',
-        overview: 'A specialized infrastructure for examining the Bitcoin network. It provides clear visibility into ledger activity directly from native Bitcoin Core nodes.',
+        title: 'Bitcoin',
+        subtitle: 'Bitcoin network view',
+        overview: 'Dedicated Bitcoin network monitoring fed directly from Bitcoin Core nodes.',
         features: [
-            { title: 'Native Ledger Integration', desc: 'Direct reading of transactions from Bitcoin Core nodes.' },
-            { title: 'Asset Tracking', desc: 'Clear representation of verified transfers and balances.' },
-            { title: 'Balance Consolidation', desc: 'Simplified views of fragmented holdings.' }
+            { title: 'Native Node', desc: 'Data sourced directly from Bitcoin Core.' },
+            { title: 'UTXO Tracking', desc: 'Monitor unspent outputs and address balances.' },
+            { title: 'Fee Estimation', desc: 'Real-time mempool fee rates for transaction planning.' },
         ]
     },
     'firehose': {
-        title: 'Encrypted Event Stream',
-        subtitle: 'Live Network Monitoring',
-        overview: 'A direct connection to the network mempool, delivering encrypted event streams. Designed for secure monitoring of raw blockchain activity as it occurs.',
+        title: 'Live Feed',
+        subtitle: 'Mempool stream',
+        overview: 'A direct stream from the network mempool. See large transactions as they are broadcast, before confirmation.',
         features: [
-            { title: 'Zero-Delay Indexing', desc: 'Real-time synchronization with the main node.' },
-            { title: 'Dynamic Filtering', desc: 'Systems to eliminate minor movements.' },
-            { title: 'Structured Data Output', desc: 'Automated classification of transfers.' }
+            { title: 'Sub-Second Updates', desc: 'Events delivered as they enter the mempool.' },
+            { title: 'Value Threshold', desc: 'Filter the stream to only show transfers above a set size.' },
+            { title: 'Structured Events', desc: 'Automatic parsing of transfer type, asset, and routing.' },
         ]
     },
     'sov-intel': {
-        title: 'Pattern Recognition',
-        subtitle: 'Advanced Correlation',
-        overview: 'A secure profiling tool that correlates on-chain interactions with network behaviors to trace institutional movement with total privacy.',
+        title: 'Pattern Analysis',
+        subtitle: 'Behavioral correlation',
+        overview: 'Identify recurring on-chain patterns across wallets and time periods. Useful for understanding accumulation behavior and capital routing.',
         features: [
-            { title: 'Behavioral Correlation', desc: 'Identification of entities based on network usage patterns.' },
-            { title: 'Activity Tracking', desc: 'Detection of peer-to-peer transfers.' },
-            { title: 'Accumulation Studies', desc: 'Detailed analysis of asset inflows and outflows.' }
+            { title: 'Behavioral Patterns', desc: 'Groups wallets by on-chain interaction signatures.' },
+            { title: 'Activity History', desc: 'Chronological view of significant movements.' },
+            { title: 'Accumulation Trends', desc: 'Tracks net inflow and outflow over configurable windows.' },
         ]
     },
     'inst-ledger': {
-        title: 'Entity Resolution',
-        subtitle: 'Multi-Hop De-Obfuscation',
-        overview: 'We securely map complex multi-hop interactions and trace transaction outputs in real-time to group fragmented wallets into unified entities.',
+        title: 'Explorer',
+        subtitle: 'Block explorer',
+        overview: 'Browse the Aztec L2 block history, view verified state roots, and look up specific transactions by commitment or nullifier.',
         features: [
-            { title: 'Historical Preservation', desc: 'Reliable access to historical ledger state.' },
-            { title: 'Advanced Search', desc: 'Filtering tools based on secure thresholds.' },
-            { title: 'Clean Export Formats', desc: 'Structured data ready for compliance review.' }
+            { title: 'State Root History', desc: 'Chronological record of Aztec L2 state anchors.' },
+            { title: 'Commitment Search', desc: 'Look up specific note commitments or nullifiers.' },
+            { title: 'Export Ready', desc: 'Data structured for compliance and audit use.' },
         ]
     },
     'mass-transfer': {
-        title: 'Bulk Transfer Logs',
-        subtitle: 'Reserve Migration Tracking',
-        overview: 'A tracking module focused on the redistribution of massive global reserves, maintaining absolute discretion over the queried data.',
+        title: 'Sync',
+        subtitle: 'Record synchronization',
+        overview: 'Synchronize your local private state with the latest Aztec L2 note tree. Recover notes from published transaction data if your local database is out of date.',
         features: [
-            { title: 'Flow Classification', desc: 'Distinguishes between reserve deposits, rotations, and staking.' },
-            { title: 'Reserve Monitoring', desc: 'Notifications regarding sudden contractions in network liquidity.' },
-            { title: 'Clear Visualization', desc: 'A clean layout offering high information density.' }
+            { title: 'Note Recovery', desc: 'Re-derives your private notes from on-chain encrypted data.' },
+            { title: 'Nullifier Check', desc: 'Validates which notes have been spent against the nullifier tree.' },
+            { title: 'Progress Tracking', desc: 'Clear progress indicator during full sync operations.' },
         ]
     },
     'graph': {
-        title: 'Entity Graph',
-        subtitle: 'Relational Network Visualization',
-        overview: 'A visual tool that translates complex transaction histories into interactive, private relational maps.',
+        title: 'Graph',
+        subtitle: 'Relationship visualization',
+        overview: 'Visualize the relationships between wallets and transactions as an interactive node graph.',
         features: [
-            { title: 'Dynamic Mapping', desc: 'Interactive nodes reflecting financial relationships.' },
-            { title: 'Concentration Analysis', desc: 'Highlights key addresses to reveal risk distribution.' },
-            { title: 'Smooth Performance', desc: 'Optimized rendering to ensure stability.' }
+            { title: 'Node Mapping', desc: 'Wallets and contracts represented as interactive nodes.' },
+            { title: 'Concentration View', desc: 'Highlights addresses with the highest interaction counts.' },
+            { title: 'Smooth Rendering', desc: 'Optimized layout engine for large transaction graphs.' },
         ]
     },
     'defi': {
-        title: 'Protocol Liquidity',
-        subtitle: 'Vault Analytics',
-        overview: 'A comprehensive monitor for decentralized protocols. It tracks secure vaults and liquidity pools to evaluate organic network yield.',
+        title: 'Protocols',
+        subtitle: 'DeFi liquidity overview',
+        overview: 'Monitor liquidity pools and vault positions across major DeFi protocols.',
         features: [
-            { title: 'Yield Calculation', desc: 'Clear metrics separating real yields from inflation.' },
-            { title: 'Liquidity Verification', desc: 'Monitoring of total value locked.' },
-            { title: 'Opportunity Highlighting', desc: 'Clear identification of discrepancies.' }
+            { title: 'Yield Metrics', desc: 'Current APR and historical yield data for major pools.' },
+            { title: 'Total Value Locked', desc: 'Protocol-level TVL across supported chains.' },
+            { title: 'Pool Composition', desc: 'Asset breakdown within each monitored pool.' },
         ]
     },
     'polymarket': {
         title: 'Prediction Markets',
-        subtitle: 'Global Event Probabilities',
-        overview: 'An integration of data from major prediction markets. This viewer captures the mathematical probabilities of global socioeconomic events.',
+        subtitle: 'Event probabilities',
+        overview: 'Real-time probability data from major prediction markets. View the collective market estimate of upcoming global events.',
         features: [
-            { title: 'Probability Metrics', desc: 'Clear numerical probabilities derived from market state.' },
-            { title: 'Momentum Tracking', desc: 'Monitoring of rapid shifts in probabilities.' },
-            { title: 'Outcome Analysis', desc: 'Structured tracking of key scenarios.' }
+            { title: 'Probability Display', desc: 'Numerical probabilities derived directly from market state.' },
+            { title: 'Momentum Tracking', desc: 'Shows how probabilities shift over time.' },
+            { title: 'Outcome History', desc: 'Records of resolved markets for reference.' },
         ]
     },
     'forge': {
-        title: 'System Configuration',
-        subtitle: 'Terminal Parameterization',
-        overview: 'The central administration area for configuring your terminal environment, ensuring connection parameters remain fully private.',
+        title: 'Settings',
+        subtitle: 'Application configuration',
+        overview: 'Configure your application environment, connection settings, and privacy preferences.',
         features: [
-            { title: 'Configuration Interface', desc: 'A clean command interface to adjust settings.' },
-            { title: 'Data Integrity Audits', desc: 'Tools to verify that all data is extracted securely.' },
-            { title: 'Extensibility', desc: 'Designed to support future secure integrations.' }
+            { title: 'Connection Settings', desc: 'Configure node endpoints and network preferences.' },
+            { title: 'Privacy Options', desc: 'Set data handling, stealth mode, and session behavior.' },
+            { title: 'Display Preferences', desc: 'Theme, currency display, and layout configuration.' },
         ]
     },
-
     'live-port': {
-        title: 'Quick Portfolio',
-        subtitle: 'Background Balance Monitor',
-        overview: 'A minimalist tool designed to display your key balances without compromising system security or resources.',
+        title: 'Portfolio',
+        subtitle: 'Balance overview',
+        overview: 'A focused view of your current holdings across connected accounts. Balances are read locally — never transmitted.',
         features: [
-            { title: 'Fast Initialization', desc: 'Optimized rendering for immediate response upon authentication.' },
-            { title: 'Focused Visibility', desc: 'Prioritizes your most important assets.' },
-            { title: 'Resource Efficiency', desc: 'Automatically suspends background activity when dormant.' }
+            { title: 'Multi-Account', desc: 'Aggregates balances across all connected wallets.' },
+            { title: 'Local Calculation', desc: 'Portfolio totals computed on your device only.' },
+            { title: 'Asset Breakdown', desc: 'Per-asset view with current market values.' },
         ]
     },
     'whale-port': {
-        title: 'Entity Portfolio Mirroring',
-        subtitle: 'Secure Address Watch',
-        overview: 'An analytical tool that allows you to safely observe public portfolios of dominant market participants without leaving metadata traces.',
+        title: 'Whale Watch',
+        subtitle: 'Large wallet monitoring',
+        overview: 'Observe the public portfolio positions of large on-chain participants. Useful for understanding how major holders are positioned.',
         features: [
-            { title: 'Wallet Mirroring', desc: 'Securely visualizes the holdings of external addresses.' },
-            { title: 'Cost Basis Estimation', desc: 'Calculates the estimated entry prices.' },
-            { title: 'Allocation Comparison', desc: 'Clear visual tools to contrast exposure.' }
+            { title: 'Wallet Observation', desc: 'View public holdings of specified addresses.' },
+            { title: 'Cost Basis Estimate', desc: 'Infers approximate entry prices from transaction history.' },
+            { title: 'Allocation View', desc: 'Visual breakdown of asset distribution.' },
         ]
     },
     'vault': {
-        title: 'System Vault',
-        subtitle: 'Encrypted Credential Storage',
-        overview: 'A secure, isolated memory environment for protecting sensitive settings and API configurations. Data remains private and is never stored centrally.',
+        title: 'Vault',
+        subtitle: 'Local credential storage',
+        overview: 'Securely store API keys and configuration values in local encrypted storage. Nothing is sent to a server.',
         features: [
-            { title: 'In-Memory Security', desc: 'Data is held in volatile memory and is cleared upon disconnection.' },
-            { title: 'Cryptographic Authentication', desc: 'Access is strictly controlled through secure handshake.' },
-            { title: 'Zero-Trust Architecture', desc: 'Eliminates reliance on external databases.' }
+            { title: 'Local Only', desc: 'Credentials stored in browser encrypted storage, never transmitted.' },
+            { title: 'Session Scoped', desc: 'Secrets are cleared when the session ends or the browser closes.' },
+            { title: 'Access Control', desc: 'Vault requires wallet authentication to read or write.' },
         ]
     },
     'zk': {
-        title: 'Cryptographic Integrity',
-        subtitle: 'Zero-Knowledge Architecture',
-        overview: 'The network operates on a strict zero-knowledge architecture. Identity is mathematically verified via elliptic-curve cryptography, ensuring absolute privacy.',
+        title: 'ZK Status',
+        subtitle: 'Proof verification state',
+        overview: 'View the status of your zero-knowledge verification layer and confirm your session is operating within the shielded environment.',
         features: [
-            { title: 'Request Obfuscation', desc: 'Routes queries through nodes to conceal origin.' },
-            { title: 'Tracking Mitigation', desc: 'Filters out known data-collection methods.' },
-            { title: 'Secure Channels', desc: 'Provides End-to-End Encrypted data channels.' }
+            { title: 'PXE Status', desc: 'Confirms the local proving environment is initialized and active.' },
+            { title: 'Proof Queue', desc: 'Shows pending and completed proof submissions.' },
+            { title: 'Note Count', desc: 'Number of verified private notes in your local state.' },
         ]
     },
     'logs': {
-        title: 'Session Logs',
-        subtitle: 'Activity Audit Trail',
-        overview: 'A comprehensive, localized record of your actions during the current session, providing a transparent audit trail stored purely on your device.',
+        title: 'Logs',
+        subtitle: 'Session activity',
+        overview: 'A local record of events from the current session. Useful for reviewing recent actions or diagnosing connection issues.',
         features: [
-            { title: 'Detailed Event Tracking', desc: 'Records significant interactions and queries.' },
-            { title: 'Performance Debugging', desc: 'Helps identify potential connection issues.' },
-            { title: 'Structured Review', desc: 'Presents session data in a clean, immutable format.' }
+            { title: 'Event Log', desc: 'Timestamped record of queries, alerts, and state changes.' },
+            { title: 'Error Reporting', desc: 'Connection and proof errors recorded for debugging.' },
+            { title: 'Local Only', desc: 'Logs are stored in memory only and cleared on disconnect.' },
         ]
     },
     'academy': {
         title: 'Documentation',
-        subtitle: 'Technical Resources',
-        overview: 'A curated library of technical documentation regarding the security, cryptography, and operation of the internal systems.',
+        subtitle: 'Technical reference',
+        overview: 'Technical documentation covering the Humanity Ledger protocol, Aztec integration, Noir circuits, and the Whale Alert Network.',
         features: [
-            { title: 'Technical Guides', desc: 'Structured guides covering network architecture.' },
-            { title: 'Standardized Glossary', desc: 'Clear definitions of security parameters.' },
-            { title: 'Distraction-Free Reading', desc: 'A clean, focused layout optimized for deep reading.' }
+            { title: 'Protocol Guides', desc: 'Architecture overviews and component documentation.' },
+            { title: 'API Reference', desc: 'Complete endpoint specifications with examples.' },
+            { title: 'Circuit Specs', desc: 'Noir circuit descriptions and constraint documentation.' },
         ]
     },
     'support': {
-        title: 'Technical Support',
-        subtitle: 'Encrypted Assistance Channel',
-        overview: 'Your direct, secure line of communication with our technical operators to resolve operational disruptions with total privacy.',
+        title: 'Support',
+        subtitle: 'Technical assistance',
+        overview: 'Contact the technical team for help with connection issues, account access, or protocol questions.',
         features: [
-            { title: 'Direct Escalation', desc: 'Bypasses standard queues to connect you directly with experts.' },
-            { title: 'Secure Context Sharing', desc: 'Allows you to share diagnostic information without exposing identity.' },
-            { title: 'Incident Updates', desc: 'Clear, transparent communication regarding system status.' }
+            { title: 'Direct Contact', desc: 'Open a support request to reach the technical team.' },
+            { title: 'Status Page', desc: 'Current network and API operational status.' },
+            { title: 'Documentation Link', desc: 'Quick access to relevant guides for common issues.' },
         ]
-    }
+    },
+    'humanity-ledger': {
+        title: 'Roadmap',
+        subtitle: 'Protocol development timeline',
+        overview: 'An interactive view of the Humanity Ledger development roadmap. Explore delivered, in-progress, and planned protocol components.',
+        features: [
+            { title: 'Interactive Canvas', desc: 'Drag to pan, scroll to zoom, click nodes for details.' },
+            { title: 'Status Tracking', desc: 'Live, building, and planned states for each component.' },
+            { title: 'Architecture Summary', desc: 'Layer-by-layer breakdown below the roadmap canvas.' },
+        ]
+    },
 };

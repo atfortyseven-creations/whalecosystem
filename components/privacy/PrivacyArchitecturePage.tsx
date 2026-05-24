@@ -62,10 +62,10 @@ export function PrivacyArchitecturePage() {
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                className={`rounded-xl px-3 py-2.5 text-[12px] font-medium leading-snug transition-colors border ${
+                className={`px-3 py-2.5 text-[13px] font-medium leading-snug transition-colors border-l-2 ${
                   activeId === item.id
-                    ? 'bg-[#2a1b4d]/[0.06] border-[#2a1b4d]/20 text-[#050505]'
-                    : 'border-transparent text-[#050505]/55 hover:text-[#050505] hover:bg-black/[0.02]'
+                    ? 'border-black text-black font-semibold'
+                    : 'border-transparent text-[#050505]/50 hover:text-[#050505] hover:border-black/20'
                 }`}
               >
                 {item.label}
@@ -94,7 +94,7 @@ export function PrivacyArchitecturePage() {
         <div className="max-w-[800px] mx-auto px-6 py-12 md:py-16 lg:py-20">
           <header className="mb-14 border-b border-black/8 pb-10">
             <div className="flex flex-col sm:flex-row sm:items-start gap-8 mb-8">
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl border border-black/8 bg-[#faf9f6] overflow-hidden">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 border border-black/10 bg-white overflow-hidden">
                 <Image
                   src={ATOM_PNGTREE}
                   alt=""
@@ -165,8 +165,8 @@ export function PrivacyArchitecturePage() {
                 )}
 
                 {section.callout && (
-                  <div className="mt-8 p-6 md:p-8 rounded-2xl border border-[#2a1b4d]/15 bg-[#2a1b4d]/[0.03]">
-                    <p className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-[#2a1b4d]/70 mb-2">
+                  <div className="mt-8 p-6 md:p-8 border-l-2 border-black bg-[#f9f9f9]">
+                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-black/50 mb-2">
                       {section.callout.title}
                     </p>
                     <p className="text-[14px] text-[#050505]/65 leading-relaxed mb-4">{section.callout.body}</p>

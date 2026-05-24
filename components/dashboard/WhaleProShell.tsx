@@ -4,10 +4,19 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, ChevronRight, Search, ChevronDown,
-    X, ArrowUpRight, Globe, Info, Lock,
-    BarChart2, PlusCircle, Wallet, MessageSquare, Menu, PieChart,
-    Zap, Activity, Cpu, Database
+    ArrowUpRight, Lock
 } from 'lucide-react';
+
+// ─── Custom minimal SVG icons (not Lucide) ─────────────────────────────────
+const Icon = {
+  markets:    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="8" width="2.5" height="7" rx="0.5"/><rect x="5" y="5" width="2.5" height="10" rx="0.5"/><rect x="9" y="2" width="2.5" height="13" rx="0.5"/><rect x="13" y="6" width="2.5" height="9" rx="0.5"/></svg>,
+  explorer:   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 1.5v13M1.5 8h13"/><path d="M3.5 4a11 11 0 0 1 9 0M3.5 12a11 11 0 0 0 9 0"/></svg>,
+  roadmap:    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="4" cy="4" r="1.5"/><circle cx="12" cy="4" r="1.5"/><circle cx="8" cy="12" r="1.5"/><path d="M5.5 4h5M4 5.5v3.8M12 5.5V9a3 3 0 0 1-3 3"/></svg>,
+  sync:       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M2 8A6 6 0 0 1 13.5 5"/><path d="M14 8A6 6 0 0 1 2.5 11"/><path d="M2 5.5L2 8l2.5-1M14 8v2.5l-2.5-1"/></svg>,
+  logs:       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4h12M2 8h8M2 12h10"/></svg>,
+  identity:   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="1.5" y="1.5" width="13" height="13" rx="2"/><circle cx="8" cy="6.5" r="2"/><path d="M4 13.5c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>,
+  support:    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 10.5v.5M8 5.5a2 2 0 0 1 0 4"/></svg>,
+};
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { useRouter } from 'next/navigation';
@@ -38,13 +47,13 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'markets',         label: 'Markets',            icon: getModuleIcon('markets'), requiresZK: true },
-    { id: 'inst-ledger',     label: 'Block Explorer',     icon: getModuleIcon('inst-ledger'), requiresZK: true },
-    { id: 'humanity-ledger', label: 'Protocol Architecture', icon: getModuleIcon('humanity-ledger') },
-    { id: 'mass-transfer',   label: 'Record Sync',        icon: getModuleIcon('mass-transfer'), requiresZK: true },
-    { id: 'logs',            label: 'Session Log',        icon: getModuleIcon('logs') },
-    { id: 'gold',            label: 'Identity Passport',  icon: getModuleIcon('gold') },
-    { id: 'support',         label: 'Support',            icon: getModuleIcon('support') },
+    { id: 'markets',         label: 'Markets',        icon: Icon.markets,  requiresZK: true },
+    { id: 'inst-ledger',     label: 'Explorer',       icon: Icon.explorer, requiresZK: true },
+    { id: 'humanity-ledger', label: 'Roadmap',        icon: Icon.roadmap },
+    { id: 'mass-transfer',   label: 'Sync',           icon: Icon.sync,     requiresZK: true },
+    { id: 'logs',            label: 'Logs',           icon: Icon.logs },
+    { id: 'gold',            label: 'Identity',       icon: Icon.identity },
+    { id: 'support',         label: 'Support',        icon: Icon.support },
 ];
 
 const RESTRICTED_TABS = [
@@ -52,22 +61,6 @@ const RESTRICTED_TABS = [
     'logs',
     'privacy'
 ];
-
-function getModuleIcon(id: string) {
-    switch (id) {
-        case 'gold':          return <Zap size={18} />;
-        case 'billing':       return <Wallet size={18} />;
-        case 'humanity-ledger': return <Database size={18} />;
-        case 'markets':       return <BarChart2 size={18} />;
-        case 'inst-ledger':   return <Globe size={18} />;
-        case 'mass-transfer': return <Cpu size={18} />;
-        case 'logs':          return <Activity size={18} />;
-        case 'support':       return <MessageSquare size={18} />;
-        case 'community':     return <Globe size={18} />;
-        case 'privacy':       return <Lock size={18} />;
-        default:              return <Info size={18} />;
-    }
-}
 
 
 
@@ -378,11 +371,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     })}
 
                     {!isCollapsed && (
-                        <div className="px-4 py-6 mt-4">
-                            <div className="w-full h-px bg-black/10 mb-4" />
-                            <p className="text-[9px] font-serif leading-relaxed text-[#888] text-justify opacity-80">
-                                Documentation on cryptographic mechanisms and data paradigms that secure the global infrastructure.
-                            </p>
+                        <div className="px-4 py-5 mt-2">
+                            <div className="w-full h-px bg-black/8" />
                         </div>
                     )}
                 </div>
@@ -481,9 +471,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     </div>
                 </header>
 
-                <main className="flex-1 flex flex-col min-h-0 transition-colors duration-300 bg-[#FAF9F6] dark:bg-[#0A0A0A] relative">
-                    {/* Background gradient  does NOT create a scroll stacking ctx */}
-                    <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(10,10,10,0.5)_0%,transparent_80%)]" />
+                <main className="flex-1 flex flex-col min-h-0 transition-colors duration-300 bg-white dark:bg-[#0A0A0A] relative">
+                    <div className="absolute inset-0 pointer-events-none -z-10" />
 
                     {/* Scroll container: flex-1 + min-h-0 = bounded by parent, never bleeds to document */}
                     <div
