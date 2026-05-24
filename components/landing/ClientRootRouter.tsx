@@ -2,13 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
-import { AztecArchitectureSection } from "./AztecArchitectureSection";
 import { SystemFooter } from "./SystemFooter";
 import { useSystemAccount } from "@/hooks/useSystemAccount";
-import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-
-
 
 export function ClientRootRouter() {
   const { isConnected } = useSystemAccount();
@@ -31,11 +26,6 @@ export function ClientRootRouter() {
     check();
     
     // [ANDROID PERF FIX] Replace 500ms setInterval with event-driven checks.
-    // A continuous 500ms poll on the landing page consumes unnecessary CPU/battery
-    // on Android Chrome and causes laggy animations. Replace with:
-    // 1. visibilitychange: fires when user returns from wallet app (Android back gesture)
-    // 2. A single 1.5s delayed check to catch the immediate post-auth cookie write
-    // 3. storage event: fires when wagmi writes to localStorage after reconnection
     const onVisibility = () => { if (document.visibilityState === 'visible') check(); };
     const onStorage = () => check();
     
@@ -54,16 +44,7 @@ export function ClientRootRouter() {
 
   return (
     <div className="flex flex-col w-full min-w-full flex-1 bg-white" style={{width:'100%',minWidth:'100%'}}>
-
-      {/* Session Navigation Bar removed  Now handled by the Unified Master InstitutionalHeader */}
-
-      {/*  Main Manifesto Landing  */}
       <ImmersiveManifestoLanding />
-
-      {/*  Aztec Architecture & Performance Metrics  */}
-      <AztecArchitectureSection />
-
-      {/*  Footer  */}
       <SystemFooter />
     </div>
   );

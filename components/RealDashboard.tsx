@@ -1,6 +1,6 @@
 "use client";
 
-import { IDKitWidget, VerificationLevel } from "@identity/idkit";
+import { IDKitWidget, VerificationLevel } from "@worldcoin/idkit";
 import { useWhaleFi } from "@/hooks/useWhaleFi";
 import { useAccount, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";

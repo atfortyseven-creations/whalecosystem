@@ -338,15 +338,15 @@ export function MassTransferIntel() {
 
       {/*  Header  */}
       <div className="flex flex-wrap items-center justify-between px-8 py-6 border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] gap-4 shrink-0">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold uppercase tracking-tighter text-[#050505] dark:text-white">
-              CAPITAL LEDGER
-            </h1>
-          </div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#A0A0A0] ml-9">
-            FLOW TOPOGRAPHY · {'<10ms'} · {events.length} EVENTS
-          </p>
+        <div className="flex-1">
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-slate-50 active:scale-95 disabled:opacity-50 flex items-center gap-2"
+          >
+            <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
+            {syncing ? "SYNCING LEDGER" : "SYNC LEDGER"}
+          </button>
         </div>
 
         {/* Controls */}
@@ -369,15 +369,6 @@ export function MassTransferIntel() {
             ))}
           </div>
 
-          {/* Sync */}
-          <button
-            onClick={handleSync}
-            disabled={syncing}
-            className="px-4 py-2 border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#1A1A1A] hover:bg-[#F0F0F0] dark:hover:bg-[#222] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors disabled:opacity-50"
-          >
-            <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
-            {syncing ? "Syncing" : "Sync"}
-          </button>
 
           {/* Sonar */}
           <button

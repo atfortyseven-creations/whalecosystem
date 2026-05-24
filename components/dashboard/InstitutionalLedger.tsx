@@ -188,22 +188,14 @@ export default function InstitutionalLedger() {
     return (
         <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 bg-white dark:bg-[#050505] text-[#050505] dark:text-white font-mono overflow-y-auto no-scrollbar transition-colors">
             
-            {/* ── HEADER ── */}
-            <div className="max-w-[1400px] mx-auto w-full flex-shrink-0 border-b border-slate-200/60 dark:border-white/10 pb-6 mb-6">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                    <div className="flex flex-col">
-                        <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-slate-900 dark:text-white leading-none">
-                            Status
-                        </h1>
-                        <span className="mt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-black/40 dark:text-white/30">
-                            Aztec Network · L1 Ethereum Block Explorer · Live Telemetry
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-black/[0.03] dark:bg-white/5 border border-black/8 dark:border-white/10 rounded-full shrink-0">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40 dark:text-white/30">Live Streaming</span>
-                    </div>
-                </div>
+            {/* Primary Action Row */}
+            <div className="w-full flex justify-end mb-4 flex-shrink-0 max-w-[1400px] mx-auto">
+                <button 
+                   onClick={() => window.location.reload()}
+                   className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-slate-50 active:scale-95"
+                >
+                   REFRESH TELEMETRY
+                </button>
             </div>
 
             {/* Header section */}

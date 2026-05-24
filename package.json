@@ -155,6 +155,7 @@
     "@walletconnect/core": "^2.17.0",
     "@walletconnect/utils": "^2.17.0",
     "@walletconnect/web3wallet": "^1.15.0",
+    "@worldcoin/idkit": "^1.1.2",
     "@xmtp/browser-sdk": "^5.2.0",
     "alchemy-sdk": "^3.6.5",
     "autoprefixer": "^10.0.1",

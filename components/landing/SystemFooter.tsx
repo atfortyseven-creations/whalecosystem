@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
 import Link from "next/link";
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -18,59 +17,36 @@ function FooterLink({ href, children, external = false }: { href: string; childr
     </Link>
   );
 }
-
-function ClickDot({ x, y, id }: { x: number; y: number; id: number }) {
-  return (
-    <motion.div
-      key={id}
-      style={{ position: 'absolute', left: x - 2, top: y - 2, pointerEvents: 'none', zIndex: 50 }}
-      initial={{ opacity: 1, scale: 0 }}
-      animate={{ opacity: 0, scale: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-    >
-      <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#000000' }} />
-    </motion.div>
-  );
-}
-
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const NAV_COLUMNS = [
   {
-    label: "Protocol",
+    label: "Platform",
     links: [
-      { label: "Technical Whitepaper", href: "/whitepaper" },
-      { label: "Privacy Manifesto",    href: "/manifesto" },
-      { label: "QDs Tokenomics",       href: "/tokenomics" },
-      { label: "Roadmap",              href: "/roadmap" },
-    ]
-  },
-  {
-    label: "Developers",
-    links: [
-      { label: "Developer Hub",  href: "/developer" },
-      { label: "API Reference",  href: "/developers/api-docs" },
-      { label: "API Marketplace",href: "/api-marketplace" },
-      { label: "Noir Circuits",  href: "https://github.com/hvbr1s/noir-circuits", external: true },
-    ]
-  },
-  {
-    label: "Security",
-    links: [
-      { label: "Security Policy", href: "/security" },
-      { label: "Bug Bounty",      href: "/security" },
-      { label: "Audits",          href: "/security" },
+      { label: "Dashboard",            href: "/portfolio" },
+      { label: "Portfolio",            href: "/portfolio" },
+      { label: "Pricing",              href: "/pricing" },
+      { label: "Status",               href: "/status" },
     ]
   },
   {
     label: "Community",
     links: [
-      { label: "Token Forum", href: "/forum" },
-      { label: "Discord",     href: "https://discord.gg/aztec",          external: true },
-      { label: "Twitter",     href: "https://x.com/aztecnetwork",        external: true },
+      { label: "Whale Chat",           href: "/forum" },
+      { label: "Forum",                href: "/forum" },
+      { label: "Academy",              href: "/academy" },
+      { label: "Community",            href: "/community" },
     ]
   },
+  {
+    label: "Company",
+    links: [
+      { label: "About Us",             href: "/company" },
+      { label: "Careers",              href: "/careers" },
+      { label: "Privacy Policy",       href: "/privacy" },
+      { label: "News",                 href: "/news" },
+    ]
+  }
 ];
 
 const ECOSYSTEM_PARTNERS = [
@@ -88,40 +64,10 @@ const ECOSYSTEM_PARTNERS = [
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function SystemFooter() {
-  const containerRef = useRef<HTMLElement>(null);
-  const [dots, setDots] = useState<{ id: number; x: number; y: number }[]>([]);
-  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
-
-  useEffect(() => () => { timeoutsRef.current.forEach(clearTimeout); }, []);
-
-  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const newDots = Array.from({ length: 3 }, (_, i) => ({
-      id: Date.now() + i,
-      x: x + (Math.random() - 0.5) * 20,
-      y: y + (Math.random() - 0.5) * 20,
-    }));
-    setDots(prev => [...prev, ...newDots]);
-    const timer = setTimeout(() => {
-      const ids = new Set(newDots.map(d => d.id));
-      setDots(prev => prev.filter(d => !ids.has(d.id)));
-    }, 500);
-    timeoutsRef.current.push(timer);
-  };
-
   return (
     <footer
-      ref={containerRef}
-      onClick={handleClick}
       className="relative w-full bg-white border-t border-black/5 flex flex-col items-center overflow-hidden selection:bg-black selection:text-white"
     >
-      <AnimatePresence>
-        {dots.map((dot) => <ClickDot key={dot.id} {...dot} />)}
-      </AnimatePresence>
-
       <div className="relative z-20 w-full max-w-[1200px] mx-auto px-8 md:px-16 pt-20 pb-12 flex flex-col gap-14">
 
         {/* ── Row 1: Brand + Social ── */}
@@ -166,54 +112,64 @@ export function SystemFooter() {
 
         <div className="w-full h-px bg-black/5" />
 
-        {/* ── Row 2: Navigation Grid (4 equal columns) ── */}
+        {/* ── Row 2: Letta-style Navigation Grid (3 link columns + 1 newsletter column) ── */}
         <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8">
           {NAV_COLUMNS.map((col) => (
             <div key={col.label} className="flex flex-col gap-5">
-              <span className="font-mono text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]/35 pb-3 border-b border-black/5">
+              <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-[#050505]/40">
                 {col.label}
               </span>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-3">
                 {col.links.map((l) => (
-                  <FooterLink key={l.label} href={l.href} external={'external' in l ? l.external : false}>
+                  <FooterLink key={l.label} href={l.href}>
                     {l.label}
                   </FooterLink>
                 ))}
               </div>
             </div>
           ))}
+
+          {/* Newsletter Column */}
+          <div className="flex flex-col gap-5 col-span-2 md:col-span-1">
+            <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-[#050505]/40">
+              Newsletter
+            </span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center border border-black/20 bg-transparent px-3 py-2 w-full max-w-[240px]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-black/40 mr-2 shrink-0">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  className="bg-transparent border-none outline-none text-[13px] font-sans text-black w-full placeholder:text-black/30"
+                />
+              </div>
+              <button className="w-10 h-[38px] bg-[#111111] hover:bg-black text-white flex items-center justify-center shrink-0 transition-colors">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                  <path d="M7 17L17 7" />
+                  <path d="M7 7h10v10" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="w-full h-px bg-black/5" />
 
-        {/* ── Row 3: Ecosystem Collaborators ── */}
-        <div className="w-full flex flex-col items-center gap-5">
-          <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-black/25 font-bold">
-            Ecosystem Collaborators
+        {/* ── Row 3: Protocol Vision & Introduction ── */}
+        <div className="w-full flex flex-col items-start gap-4">
+          <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] pb-2 border-b border-black/10">
+            HUMANITY LEDGER PROTOCOL & WHALE ALERT NETWORK
           </span>
-          <div className="flex flex-wrap justify-center items-end gap-x-8 gap-y-5">
-            {ECOSYSTEM_PARTNERS.map((p) => (
-              <div key={p.name} className="flex flex-col items-center gap-1.5 group cursor-default">
-                <div className="flex items-center gap-2 px-4 py-2 border border-black/8 rounded-xl bg-white group-hover:border-black/20 group-hover:bg-black/[0.03] transition-all duration-200">
-                  {p.isAztec ? (
-                    <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity">
-                      <path fillRule="evenodd" clipRule="evenodd" d="M12 2.5C12.5 2.5 13 2.7 13.4 3.1L20.9 10.6C21.7 11.4 21.7 12.6 20.9 13.4L13.4 20.9C12.6 21.7 11.4 21.7 10.6 20.9L3.1 13.4C2.3 12.6 2.3 11.4 3.1 10.6L10.6 3.1C11 2.7 11.5 2.5 12 2.5ZM12 8.5C11.6 8.5 11.2 8.7 10.9 8.9L8.9 10.9C8.3 11.5 8.3 12.5 8.9 13.1L10.9 15.1C11.5 15.7 12.5 15.7 13.1 15.1L15.1 13.1C15.7 12.5 15.7 11.5 15.1 10.9L13.1 8.9C12.8 8.7 12.4 8.5 12 8.5Z" fill="#2a1b4d"/>
-                    </svg>
-                  ) : p.icon ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.icon} alt={p.name} className="w-4 h-4 object-contain opacity-55 group-hover:opacity-100 transition-opacity" />
-                  ) : (
-                    <div className="w-2 h-2 rounded-sm bg-black/20 group-hover:bg-black/40 transition-colors" />
-                  )}
-                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.12em] text-black/55 group-hover:text-black transition-colors">
-                    {p.name}
-                  </span>
-                </div>
-                <span className="font-mono text-[7px] uppercase tracking-[0.25em] text-black/22">
-                  {p.sub}
-                </span>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-[#050505]/60 text-xs font-sans leading-relaxed text-justify">
+            <p>
+              Humanity Ledger operates as an advanced cryptographic coordination layer built natively on the Aztec Network. By leveraging zero-knowledge proofs (zkSNARKs) and Noir circuits, the protocol ensures that all financial, identity, and governance state transitions execute with absolute privacy. Unlike transparent public ledgers where surveillance is a default state, Humanity Ledger provides verifiable execution where sensitive user inputs remain permanently shielded on the client device. 
+            </p>
+            <p>
+              Integrated directly with Whale Alert Network, the system provides high-precision market intelligence and forensic analytics without compromising individual user privacy. Whale Alert Network monitors macroeconomic capital flows across Omnichain networks, aggregating data into the Humanity Ledger through private indexing logic. Together, they establish a secure, immutable, and fully decentralized foundation for institutional-grade portfolio management and private decentralized finance.
+            </p>
           </div>
         </div>
 
@@ -222,13 +178,13 @@ export function SystemFooter() {
         {/* ── Row 4: Copyright ── */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-[#050505]/35 text-center sm:text-left">
-            © 2026 Humanity Ledger · The Architecture of Reality
+            © 2026 Humanity Ledger — Built on Aztec Network
           </span>
           <div className="flex items-center gap-8">
-            {["Immutable", "Decentralized", "Absolute"].map((l) => (
+            {["Private", "Verifiable", "Open"].map((l) => (
               <span
                 key={l}
-                className="font-mono text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]/25 cursor-crosshair hover:text-black transition-colors"
+                className="font-mono text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]/25"
               >
                 {l}
               </span>

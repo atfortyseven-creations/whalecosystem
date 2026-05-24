@@ -17,9 +17,14 @@ import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useEthMetrics } from '@/hooks/useEthMetrics';
-import { getTierById, hasAccess } from '@/lib/config/pricing-tiers';
-import { toast } from 'sonner';
 import { useDisconnect } from 'wagmi';
+import { toast } from 'sonner';
+
+// Tier access helper
+const TIER_LEVELS: Record<string, number> = { FREE: 0, STANDARD: 1 };
+function hasAccess(userTier: string, minTier: 'FREE' | 'STANDARD'): boolean {
+    return (TIER_LEVELS[userTier] ?? 0) >= (TIER_LEVELS[minTier] ?? 0);
+}
 
 interface NavItem {
     id: string;
@@ -33,15 +38,13 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'gold',          label: 'Create Badge',    icon: getModuleIcon('gold') },
-    { id: 'seed-equity',   label: 'Seed Equity',     icon: getModuleIcon('seed-equity'), externalUrl: '/pitch_deck.html' },
-    { id: 'billing',       label: 'Plans',           icon: getModuleIcon('billing') },
-    { id: 'humanity-ledger', label: 'Humanity Ledger', icon: getModuleIcon('humanity-ledger') },
-    { id: 'markets',       label: 'Tokens',          icon: getModuleIcon('markets'), requiresZK: true },
-    { id: 'inst-ledger',   label: 'Block Explorer',  icon: getModuleIcon('inst-ledger'), requiresZK: true },
-    { id: 'mass-transfer', label: 'Sync Records',    icon: getModuleIcon('mass-transfer'), requiresZK: true, minTier: 'STANDARD' },
-    { id: 'logs',          label: 'Activity Log',    icon: getModuleIcon('logs') },
-    { id: 'support',       label: 'Help & Support',  icon: getModuleIcon('support') },
+    { id: 'markets',         label: 'Markets',            icon: getModuleIcon('markets'), requiresZK: true },
+    { id: 'inst-ledger',     label: 'Block Explorer',     icon: getModuleIcon('inst-ledger'), requiresZK: true },
+    { id: 'humanity-ledger', label: 'Protocol Architecture', icon: getModuleIcon('humanity-ledger') },
+    { id: 'mass-transfer',   label: 'Record Sync',        icon: getModuleIcon('mass-transfer'), requiresZK: true },
+    { id: 'logs',            label: 'Session Log',        icon: getModuleIcon('logs') },
+    { id: 'gold',            label: 'Identity Passport',  icon: getModuleIcon('gold') },
+    { id: 'support',         label: 'Support',            icon: getModuleIcon('support') },
 ];
 
 const RESTRICTED_TABS = [
@@ -278,24 +281,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             return;
         }
 
-        if (item?.minTier) {
-            const hasClearance = isTierLoaded && tier && hasAccess(tier, item.minTier);
-            if (!hasClearance) {
-                toast.error("Premium Access Required", {
-                    description: `This module requires the ${item.minTier} plan or higher.`,
-                    duration: 4000
-                });
-                router.push('/dashboard?tab=billing');
-                return;
-            }
-        }
-
         if (RESTRICTED_TABS.includes(id)) {
             if (!isWalletConnected) {
-                toast.error("Connection Required", {
-                    description: "You must connect a wallet to access execution and forensic layers.",
-                    duration: 4000
-                });
                 router.push('/connect');
                 return;
             }
@@ -303,25 +290,15 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
         onTabChange(id);
     };
 
-    // Active clearance ejection monitor
+    // Redirect away from restricted tabs when wallet disconnects
     useEffect(() => {
-        const item = SIDEBAR_ITEMS.find(i => i.id === activeTab);
-        if (item?.minTier) {
-             const hasClearance = isTierLoaded && tier && hasAccess(tier, item.minTier);
-             if (!hasClearance) {
-                 onTabChange('gold');
-                 toast.error("Premium Access Required", { description: "You do not have clearance for this module." });
-             }
-        }
-
         if (RESTRICTED_TABS.includes(activeTab)) {
             if (!isWalletConnected) {
-                onTabChange('gold');
-                toast.error("Session Lost", { description: "You have been disconnected." });
+                onTabChange('markets');
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isWalletConnected, activeTab, isTierLoaded, tier]);
+    }, [isWalletConnected, activeTab]);
 
 
 
@@ -359,7 +336,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
 
         </AnimatePresence>
 
-        <div className={`flex fixed inset-0 bg-transparent text-[#050505] dark:text-[#FAF9F6] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''}`}>
+        <div className={`flex fixed inset-0 bg-transparent text-[#050505] dark:text-[#FAF9F6] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''} lg:scale-[1.4] lg:origin-top-left lg:w-[71.428%] lg:h-[71.428%]`}>
 
             
             {/*  Persistent Pro Sidebar (True Desktop Only)  */}
@@ -410,44 +387,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     )}
                 </div>
 
-                {/* UX-17: Tier badge at sidebar bottom */}
-                {!isCollapsed && isTierLoaded && (
-                    <div className="px-3 pb-2 shrink-0">
-                        {(() => {
-                            const tierCfg = getTierById(tier ?? 'FREE');
-                            const isPaid  = tier !== 'FREE' && tier !== null;
-                            return (
-                                <div
-                                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border"
-                                    style={{
-                                        background:   isPaid ? `${tierCfg?.accentColor}10` : 'rgba(0,0,0,0.03)',
-                                        borderColor:  isPaid ? `${tierCfg?.accentColor}30` : 'rgba(0,0,0,0.08)',
-                                    }}
-                                >
-                                    <div className="flex flex-col leading-none">
-                                        <span
-                                            className="text-[8px] font-black uppercase tracking-widest"
-                                            style={{ color: isPaid ? tierCfg?.accentColor : 'rgba(0,0,0,0.3)' }}
-                                        >
-                                            {tierCfg?.name ?? 'Free'}
-                                        </span>
-                                        <span className="text-[7px] text-black/30 font-mono uppercase tracking-widest mt-0.5">
-                                            {isPaid ? 'Active plan' : 'Free tier'}
-                                        </span>
-                                    </div>
-                                    {!isPaid && (
-                                        <button
-                                            onClick={() => router.push('/pricing')}
-                                            className="text-[7px] font-black uppercase tracking-widest px-2 py-1 bg-black text-white rounded-lg hover:bg-black/80 transition-colors"
-                                        >
-                                            Upgrade
-                                        </button>
-                                    )}
-                                </div>
-                            );
-                        })()}
-                    </div>
-                )}
+                {/* No tier badge */}
 
                 <div className="px-2 pb-3 pt-1 shrink-0">
                     <button 

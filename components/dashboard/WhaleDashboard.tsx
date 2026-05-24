@@ -26,7 +26,7 @@ const Registry = {
   InstitutionalLedger: dynamic(() => import('@/components/dashboard/InstitutionalLedger'), { ssr: false, loading: LoadingPanel }),
   MassTransferIntel: dynamic(() => import('@/components/dashboard/MassTransferIntel').then(m => ({ default: m.MassTransferIntel })), { ssr: false, loading: LoadingPanel }),
   SessionLogsPanel: dynamic(() => import('@/components/dashboard/SessionLogsPanel').then(m => ({ default: m.SessionLogsPanel })), { ssr: false, loading: LoadingPanel }),
-  PlanDashboard: dynamic(() => import('@/components/dashboard/PlanDashboard').then(m => ({ default: m.PlanDashboard })), { ssr: false, loading: LoadingPanel }),
+
   HumanityLedger: dynamic(() => import('@/components/dashboard/HumanityLedger'), { ssr: false, loading: LoadingPanel }),
   PortfolioDashboard: dynamic(() => import('@/components/dashboard/PortfolioDashboard'), { ssr: false, loading: LoadingPanel }),
   InstitutionalMarkets: dynamic(() => import('@/components/dashboard/InstitutionalMarkets').then(m => ({ default: m.InstitutionalMarkets })), { ssr: false, loading: LoadingPanel }),
@@ -49,7 +49,7 @@ const RouteRenderer = React.memo(({ route, reconciliationKey }: RouteRendererPro
         'gold': <GoldTicketPanel />,
         'chat': <Registry.WhaleChat />,
         'portfolio': <Registry.PortfolioDashboard />,
-        'billing': <Registry.PlanDashboard />,
+
         'humanity-ledger': <Registry.HumanityLedger />,
         'markets': <Registry.InstitutionalMarkets />,
         'inst-ledger': <Registry.InstitutionalLedger />,
@@ -75,13 +75,13 @@ RouteRenderer.displayName = 'RouteRenderer';
 
 // --- Main Architecture ---
 export default function WhaleDashboard() {
-    const { isCheckingZK } = useSystemAccount();
+    const { isChecking } = useSystemAccount();
     
     const [reconciliationKey, forceReconciliation] = useQuantumSessionVisibility();
     const { activeRoute, mutateRoute } = useAztecStateSync(forceReconciliation);
 
     // ZK Guard Clause
-    if (isCheckingZK) {
+    if (isChecking) {
         return (
             <div className="min-h-screen bg-[#FDFCF8] dark:bg-[#0A0A0A] flex items-center justify-center">
                 <div className="w-6 h-6 border-2 border-[#050505] dark:border-white border-t-transparent rounded-full animate-spin" />

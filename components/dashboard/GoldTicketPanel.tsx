@@ -477,25 +477,17 @@ export function GoldTicketPanel() {
   return (
     <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 gap-5 overflow-y-auto no-scrollbar bg-white">
 
-      {/* ── HEADER ── */}
-      <div className="w-full flex-shrink-0 border-b border-slate-200/60 pb-5">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="flex flex-col">
-            <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase text-slate-900 leading-none">
-              Dashboard
-            </h1>
-            <span className="mt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-              Aztec Network · Identity Badge · Public Signature Ledger
-            </span>
-          </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-black/[0.03] border border-black/8 rounded-full shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-            <span className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40">Optimism L2</span>
-          </div>
-        </div>
+      {/*  HERO & INTERACTION (BENTO GRID)  */}
+      <div className="w-full flex justify-end mb-4 flex-shrink-0">
+          <button 
+             onClick={handleMint}
+             disabled={isMinting || isSigning || hasTicket}
+             className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-slate-50 active:scale-95 disabled:opacity-40"
+          >
+             {hasTicket ? 'ALREADY MINTED' : isMinting ? 'CLAIMING...' : 'MINT YOUR SIGNATURE'}
+          </button>
       </div>
 
-      {/*  HERO & INTERACTION (BENTO GRID)  */}
       <div className="grid lg:grid-cols-2 gap-4 flex-shrink-0">
           
           <div className="bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl flex flex-col justify-center p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">

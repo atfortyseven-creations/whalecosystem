@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { IDKitWidget, ISuccessResult, VerificationLevel } from "@identity/idkit";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

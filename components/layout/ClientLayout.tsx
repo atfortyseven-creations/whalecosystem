@@ -39,7 +39,7 @@ const LinkedGate = dynamic(
 // 
 // Routes that don't need the gate (public / landing)
 // 
-const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/login', '/news', '/careers', '/pricing', '/chat'];
+const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/login', '/news', '/careers', '/chat'];
 
 // 
 // Routes that must NOT get the legacy black Downhead footer
@@ -66,7 +66,7 @@ const BOUNDED_PREFIXES = [
   '/ticket', '/settings', '/docs', '/privacy', '/terms', '/legal',
   '/connect', '/sign-up', '/login', '/admin', '/clearance',
   '/api-marketplace', '/directory', '/company', '/infrastructure',
-  '/forum', '/pricing', '/careers', '/chat',
+  '/forum', '/careers', '/chat',
 ];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -116,7 +116,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       const step = pathname === '/' ? 'LANDING'
         : pathname.startsWith('/connect') ? 'WALLET_CONNECT'
         : pathname.startsWith('/dashboard') ? 'DASHBOARD'
-        : pathname.startsWith('/pricing') ? 'PLAN_VIEW'
+        : pathname.startsWith('/careers') ? 'TEXT_ARTICLE'
         : null;
       if (step) {
         fetch('/api/analytics/funnel', {
@@ -300,7 +300,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const isCenteredPage = ['/connect', '/pricing', '/login', '/sign-up', '/clearance'].some(p => pathname.startsWith(p));
+  const isCenteredPage = ['/connect', '/login', '/sign-up', '/clearance'].some(p => pathname.startsWith(p));
   const isChat = pathname.startsWith('/chat');
 
   // Root container
@@ -332,7 +332,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname === '/academy' ||
     pathname === '/vip' ||
     pathname === '/news' ||
-    pathname === '/pricing' ||
+    pathname === '/careers' ||
     pathname === '/careers' ||
     pathname.startsWith('/forum') ||
     pathname === '/';

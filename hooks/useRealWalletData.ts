@@ -246,7 +246,8 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         change24hPercent: assetsData?.change24hPercent || 0,
         legendaryScore: assetsData?.legendaryScore || 0,
         strategicInsight: assetsData?.strategicInsight || '',
-        backendAccounts: [] // Handled by separate sync if needed
+        backendAccounts: [], // Handled by separate sync if needed
+        refetch: () => {} // Added to fulfill interface requirement
     };
 };
 

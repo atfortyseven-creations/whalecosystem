@@ -222,7 +222,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/legal',
             '/forum',
             '/careers',
-            '/pricing',
+            '/company',
             '/company',
             '/about',
             '/product',

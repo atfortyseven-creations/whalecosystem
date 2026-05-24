@@ -90,11 +90,11 @@ export function PrivacyArchitecturePage() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 min-w-0 bg-white">
+      <main className="flex-1 min-w-0">
         <div className="max-w-[800px] mx-auto px-6 py-12 md:py-16 lg:py-20">
           <header className="mb-14 border-b border-black/8 pb-10">
             <div className="flex flex-col sm:flex-row sm:items-start gap-8 mb-8">
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl border border-black/8 bg-white overflow-hidden">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl border border-black/8 bg-[#faf9f6] overflow-hidden">
                 <Image
                   src={ATOM_PNGTREE}
                   alt=""

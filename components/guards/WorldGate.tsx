@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { VerificationLevel, ISuccessResult } from '@identity/idkit';
+import { VerificationLevel, ISuccessResult } from '@worldcoin/idkit';
 import { useWorld } from '@/src/context/WorldContext';
 import { ScanFace } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { useAccount } from 'wagmi';
 // System SIWE: WorldGate uses wallet address for identity  no Clerk dependency
 
-const IDKitWidget = dynamic(() => import('@identity/idkit').then((mod) => mod.IDKitWidget), {
+const IDKitWidget = dynamic(() => import('@worldcoin/idkit').then((mod) => mod.IDKitWidget), {
     ssr: false,
     loading: () => <div className="w-full h-16 animate-pulse bg-white/10 rounded-full" />
 });

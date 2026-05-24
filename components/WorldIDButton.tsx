@@ -1,6 +1,6 @@
 "use client";
 
-import { IDKitWidget, ISuccessResult, VerificationLevel } from "@identity/idkit";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import { useRouter } from "next/navigation";
 
 export default function VerifyWorldID() {

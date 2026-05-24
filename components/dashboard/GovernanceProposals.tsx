@@ -6,7 +6,7 @@
 // "You're importing a component that needs useState. It only works in a Client Component."
 
 import { useState } from 'react';
-import { IDKitWidget, ISuccessResult, VerificationLevel } from '@identity/idkit';
+import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit';
 import { Vote, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';

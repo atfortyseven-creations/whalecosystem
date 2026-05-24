@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Copy, Menu, User, Loader2, ShieldCheck, AlertCircle, Settings as SettingsIcon, Vote } from "lucide-react";
-import { IDKitWidget, ISuccessResult, VerificationLevel } from "@identity/idkit";
+import { IDKitWidget, ISuccessResult, VerificationLevel } from "@worldcoin/idkit";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

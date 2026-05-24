@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     publicSlug = slugifyTitle(title);
   }
 
-  const payload = (body.payload && typeof body.payload === 'object' ? body.payload : {}) as PassportPayload;
+  const payload = (body.payload && typeof body.payload === 'object' ? body.payload : {}) as any;
 
   const passport = await prisma.productPassport.create({
     data: {
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
         ? {
             create: body.events.map((e) => ({
               eventType: e.eventType || 'note',
-              payload: e.payload || {},
+              payload: (e.payload || {}) as any,
             })),
           }
         : undefined,
