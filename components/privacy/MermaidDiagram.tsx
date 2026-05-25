@@ -25,13 +25,13 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
             primaryColor: '#ffffff',
             primaryTextColor: '#111111',
             primaryBorderColor: 'rgba(0,0,0,0.18)',
-            secondaryColor: '#f8f8f8',
+            secondaryColor: '#ffffff',
             tertiaryColor: '#ffffff',
             lineColor: '#333333',
             fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif',
             fontSize: '13px',
             nodeBorder: '1px solid rgba(0,0,0,0.15)',
-            clusterBkg: '#fafafa',
+            clusterBkg: '#ffffff',
             clusterBorder: 'rgba(0,0,0,0.12)',
             edgeLabelBackground: '#ffffff',
             nodeTextColor: '#111111',
@@ -51,7 +51,9 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
         if (!cancelled) {
           // Patch SVG to be fully responsive: allow natural scaling and scrolling without constrained max-width
           const patched = rendered
-            .replace(/style="max-width:[^"]*"/, 'style="max-width:100%;height:auto;display:block;margin:auto;"');
+            .replace(/style="max-width:[^"]*"/, 'style="width:100%;height:auto;display:block;margin:auto;"')
+            .replace(/height="[^"]*"/, '')
+            .replace(/width="[^"]*"/, '');
           setSvg(patched);
           setError(null);
         }

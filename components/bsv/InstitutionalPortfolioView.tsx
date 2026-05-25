@@ -97,6 +97,7 @@ export function InstitutionalPortfolioView() {
                         entropyIndex={entropyIndex}
                         loading={loading}
                         transactions={transactions}
+                        tokenBalances={tokenBalances}
                         onRefresh={refreshBalance}
                         onSend={() => setView('SEND')}
                         onReceive={() => setView('RECEIVE')}
@@ -120,7 +121,7 @@ export function InstitutionalPortfolioView() {
     );
 }
 
-function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, loading, transactions, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onNetworkClick, onSettingsClick, scannerBase }: any) {
+function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, loading, transactions, tokenBalances, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onNetworkClick, onSettingsClick, scannerBase }: any) {
     const [copied, setCopied] = useState(false);
     const { clearWallet, activeNetwork } = useWalletStore();
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;

@@ -438,25 +438,27 @@ function ConnectedScreen({
 
 
 
-        {/*  SCAN LABEL (universal: product, wallet, GS1)  */}
+        {/*  SCAN QR PC (session sync)  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.42, duration: 0.5 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
           className="w-full mb-3"
         >
           <button
             type="button"
-            onClick={onScanLabel}
-            className="w-full flex items-center justify-between py-4 px-6 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all"
+            onClick={onScan}
+            className="w-full flex items-center justify-between py-4 px-6 rounded-2xl border border-black/10 bg-black text-white hover:bg-black/90 active:scale-[0.98] transition-all"
           >
             <div className="flex items-center gap-3">
-              <ScanLine size={16} className="text-black/40" />
-              <span className="text-[14px] font-medium text-black">Scan label</span>
+              <Scan size={16} className="text-white/70" />
+              <span className="text-[14px] font-medium text-white">Scan QR PC</span>
             </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Product · Wallet</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50">Sync</span>
           </button>
         </motion.div>
+
+
 
         {/*  PROVENANCE STUDIO BETA  */}
         <motion.div
@@ -1265,12 +1267,6 @@ export function MobileLanding() {
         </div>
         
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => { setScanMode('session-only'); setShowScanner(true); }}
-            className="w-8 h-8 rounded-xl bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors text-black"
-          >
-            <Scan size={14} />
-          </button>
           {!showConnectOverlay && (
             <button
               onClick={() => setShowConnectOverlay(true)}

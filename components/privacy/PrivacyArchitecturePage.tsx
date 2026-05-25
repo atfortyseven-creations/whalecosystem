@@ -94,15 +94,27 @@ export function PrivacyArchitecturePage() {
         <div className="max-w-[800px] mx-auto px-6 py-12 md:py-16 lg:py-20">
           <header className="mb-14 border-b border-black/8 pb-10">
             <div className="flex flex-col sm:flex-row sm:items-start gap-8 mb-8">
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 border border-black/10 bg-white overflow-hidden">
-                <Image
-                  src={ATOM_PNGTREE}
-                  alt=""
-                  fill
-                  className="object-cover opacity-90"
-                  sizes="96px"
-                  priority
-                />
+              <div className="flex flex-col gap-4 shrink-0">
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 overflow-hidden">
+                  <Image
+                    src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png"
+                    alt="Atom Logo"
+                    fill
+                    className="object-contain"
+                    sizes="96px"
+                    priority
+                  />
+                </div>
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 overflow-hidden">
+                  <Image
+                    src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png"
+                    alt="Aztec Logo"
+                    fill
+                    className="object-contain"
+                    sizes="128px"
+                    priority
+                  />
+                </div>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-mono text-[10px] font-black uppercase tracking-[0.35em] text-[#2a1b4d]/60 mb-3">
