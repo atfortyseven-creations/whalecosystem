@@ -22,7 +22,7 @@ export const MobileWhaleLanding = () => {
             <img
               src="/atom_3d_silver.jpg"
               alt="Humanity Ledger"
-              className="w-full h-full object-contain mix-blend-multiply"
+              className="w-full h-full object-contain mix-blend-darken contrast-[1.15] brightness-[1.05]"
             />
           </div>
           <span className="text-[11px] font-black tracking-widest uppercase text-black/70">
@@ -52,7 +52,7 @@ export const MobileWhaleLanding = () => {
               <img
                 src="/atom_3d_silver.jpg"
                 alt="Humanity Ledger"
-                className="w-full h-full object-contain mix-blend-multiply"
+                className="w-full h-full object-contain mix-blend-darken contrast-[1.15] brightness-[1.05]"
                 draggable={false}
               />
             </div>

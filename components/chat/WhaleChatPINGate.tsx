@@ -353,7 +353,7 @@ function NumPad({ onPress }: { onPress: (key: string) => void }) {
             className={`h-16 rounded-2xl text-[20px] font-bold flex items-center justify-center transition-all select-none
               ${isDelete
                 ? 'bg-black/5 text-black/40 hover:bg-black/10 hover:text-black/70'
-                : 'bg-[#F5F5F3] text-[#050505] hover:bg-[#EBEBEA] active:bg-black/10 shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-black/5'
+                : 'bg-[#FFFFFF] text-[#050505] hover:bg-black/5 active:bg-black/10 shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-black/5'
               }`}
           >
             {isDelete ? <Delete size={20} /> : key}
@@ -583,7 +583,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
             <img
               src="/atom_3d_silver.jpg"
               alt="Core Atom"
-              className="w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] md:w-[600px] md:h-[600px] max-w-full object-contain mx-auto mix-blend-multiply"
+              className="w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] md:w-[600px] md:h-[600px] max-w-full object-contain mx-auto mix-blend-darken contrast-[1.15] brightness-[1.05]"
               draggable={false}
               style={{
                 maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 45%, transparent 80%)',

@@ -1,291 +1,407 @@
-﻿import DocLayout from '@/components/layout/DocLayout';
+'use client';
 
-export default function PrivacyPolicy() {
-    return (
-        <DocLayout
-            title="Privacy Policy"
-            description="Comprehensive guide on how we collect, use, and safeguard your personal data in strict compliance with GDPR, LOPDGDD, and international standards."
-            lastUpdated="May 25, 2026"
-            category="Legal"
-        >
-            <div className="space-y-12 text-[#050505]">
-                {/* 1. Introduction */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">1. Introduction and Scope</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>
-                            Welcome to Whale Alert Network ("we," "our," "us," or the "Company"). We are unequivocally committed to protecting your privacy, maintaining your trust, and ensuring the absolute security of your personal data. This comprehensive Privacy Policy explains in detail how we collect, use, disclose, transfer, and safeguard your information when you access our decentralized finance platform, mobile applications, APIs, and any related services (collectively, the "Services").
-                        </p>
-                        <p>
-                            This policy has been drafted in strict compliance with the European Union General Data Protection Regulation (GDPR) 2016/679, the Spanish Organic Law 3/2018 on Data Protection and Guarantee of Digital Rights (LOPDGDD), the California Consumer Privacy Act (CCPA), and other applicable global data protection frameworks.
-                        </p>
-                        <p>
-                            By accessing or using our Services, you acknowledge that you have read, understood, and agree to the practices described in this Privacy Policy. If you do not agree with our policies and practices, your choice is not to use our Services.
-                        </p>
-                    </div>
-                </section>
+import LegalDocLayout, { TocItem } from '@/components/layout/LegalDocLayout';
 
-                {/* 2. Data Controller */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">2. Identity of the Data Controller</h2>
-                    <div className="bg-white p-8 rounded-3xl border border-black/10">
-                        <p className="font-bold mb-4 text-[#050505]">For the purposes of the GDPR and other applicable data protection laws, the Data Controller is:</p>
-                        <ul className="space-y-3 text-[#050505]/70">
-                            <li><strong>Legal Entity:</strong> Whale Alert Network, S.L.</li>
-                            <li><strong>Registered Office:</strong> Paseo de la Castellana, Madrid, 28046, Spain</li>
-                            <li><strong>Company Registration Number:</strong> B-12345678</li>
-                            <li><strong>General Email:</strong> contact@whalealert.network</li>
-                            <li><strong>Data Protection Officer (DPO):</strong> dpo@whalealert.network</li>
-                        </ul>
-                        <p className="mt-6 text-sm text-[#050505]/50">
-                            Our DPO is responsible for overseeing questions in relation to this privacy policy. If you have any questions, including any requests to exercise your legal rights, please contact the DPO using the details set out above.
-                        </p>
-                    </div>
-                </section>
+const TOC: TocItem[] = [
+  { id: 'introduction', label: '1. Introduction & Scope' },
+  { id: 'controller', label: '2. Data Controller' },
+  { id: 'data-collected', label: '3. Data We Collect' },
+  { id: 'lawful-basis', label: '4. Lawful Basis for Processing' },
+  { id: 'data-sharing', label: '5. Disclosures & Third-Party Sharing' },
+  { id: 'retention', label: '6. Data Retention & Deletion' },
+  { id: 'rights', label: '7. Your Legal Rights' },
+  { id: 'cookies', label: '8. Cookies & Tracking' },
+  { id: 'transfers', label: '9. International Data Transfers' },
+  { id: 'automated', label: '10. Automated Decision-Making' },
+  { id: 'third-party-links', label: '11. Third-Party Links' },
+  { id: 'changes', label: '12. Changes to This Policy' },
+  { id: 'contact', label: '13. Contact Information' },
+];
 
-                {/* 3. Data We Collect */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">3. Extensive Breakdown of Data We Collect</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>
-                            We adhere strictly to the principle of data minimization. We only collect personal data that is adequate, relevant, and limited to what is necessary in relation to the purposes for which it is processed. We may collect, use, store, and transfer different kinds of personal data about you which we have grouped together as follows:
-                        </p>
-                        
-                        <h3 className="text-2xl font-bold mt-10 mb-4 text-[#050505]">3.1. Identity and Contact Data</h3>
-                        <ul className="list-disc pl-6 space-y-2">
-                            <li><strong>Email address:</strong> Collected via our authentication provider when you create an account.</li>
-                            <li><strong>Public Blockchain Wallet Addresses:</strong> Cryptographic public keys used to interact with decentralized networks.</li>
-                            <li><strong>Zero-Knowledge Proof Identifiers:</strong> We utilize advanced cryptographic zero-knowledge proofs to verify that you are a unique human without ever knowing your real-world identity. This data is purely mathematical and fully anonymized.</li>
-                            <li><strong>Optional Profile Data:</strong> Usernames, display names, or avatars that you explicitly choose to provide.</li>
-                        </ul>
+export default function PrivacyPolicyPage() {
+  return (
+    <LegalDocLayout
+      title="Privacy Policy"
+      subtitle="This policy explains how Whale Alert Network collects, uses, and safeguards your personal data in compliance with GDPR, LOPDGDD, and international data protection standards."
+      lastUpdated="May 25, 2026"
+      category="Legal"
+      toc={TOC}
+      backHref="/"
+      backLabel="Back to Home"
+    >
+      <div className="space-y-14 text-black">
 
-                        <h3 className="text-2xl font-bold mt-10 mb-4 text-[#050505]">3.2. Biometric Authentication Data (Client-Side Only)</h3>
-                        <div className="bg-[#050505] text-white p-6 rounded-2xl">
-                            <p className="mb-2 font-black uppercase tracking-widest text-[11px] text-white/60">Critical Privacy Notice</p>
-                            <p className="leading-relaxed">
-                                When you opt to use biometric authentication (such as Touch ID, Face ID, or Windows Hello), this data is processed <strong>exclusively on your local device</strong> utilizing standard WebAuthn/FIDO2 protocols. <strong>We NEVER receive, store, transmit, or have access to your biometric templates or raw biometric data.</strong> Our servers only receive cryptographic signatures confirming successful local authentication.
-                            </p>
-                        </div>
+        {/* 1 */}
+        <section id="introduction">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            1. Introduction and Scope
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              Welcome to Whale Alert Network ("we," "our," "us," or the "Company"). We are unequivocally committed to protecting your privacy, maintaining your trust, and ensuring the security of your personal data. This comprehensive Privacy Policy explains in detail how we collect, use, disclose, transfer, and safeguard your information when you access our decentralised analytics platform, mobile applications, APIs, and any related services (collectively, the "Services").
+            </p>
+            <p>
+              This policy has been drafted in strict compliance with the European Union General Data Protection Regulation (GDPR) 2016/679, the Spanish Organic Law 3/2018 on Data Protection and Guarantee of Digital Rights (LOPDGDD), the California Consumer Privacy Act (CCPA), and other applicable global data protection frameworks.
+            </p>
+            <p>
+              By accessing or using our Services, you acknowledge that you have read, understood, and agree to the practices described in this Privacy Policy. If you do not agree with our policies and practices, you must not use our Services.
+            </p>
+          </div>
+        </section>
 
-                        <h3 className="text-2xl font-bold mt-10 mb-4 text-[#050505]">3.3. Financial and Transactional Data</h3>
-                        <ul className="list-disc pl-6 space-y-2">
-                            <li><strong>Public Ledger Data:</strong> Wallet balances, transaction history, token transfers, and smart contract interactions fetched from public blockchains (e.g., Ethereum, Base, Polygon). This data is inherently public by the nature of decentralized networks.</li>
-                            <li><strong>Trading Analytics:</strong> Aggregated trading performance metrics, risk preferences, and simulated trading orders within our platform environment.</li>
-                        </ul>
-
-                        <h3 className="text-2xl font-bold mt-10 mb-4 text-[#050505]">3.4. Technical and Device Data</h3>
-                        <ul className="list-disc pl-6 space-y-2">
-                            <li><strong>Network Information:</strong> IP addresses (anonymized where legally required), internet service provider details.</li>
-                            <li><strong>Device Fingerprinting:</strong> Browser type and version, operating system, time zone setting and location (country/city level), browser plug-in types.</li>
-                            <li><strong>Session Data:</strong> Authentication logs, login timestamps, and security tokens.</li>
-                        </ul>
-
-                        <h3 className="text-2xl font-bold mt-10 mb-4 text-[#050505]">3.5. Behavioral and Usage Data</h3>
-                        <ul className="list-disc pl-6 space-y-2">
-                            <li>Information about how you use our website, products, and services.</li>
-                            <li>Pages visited, time spent on pages, clickstream data, and navigation paths.</li>
-                            <li>Error logs, crash reports, and performance diagnostics.</li>
-                        </ul>
-                    </div>
-                </section>
-
-                {/* 4. Lawful Basis */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">4. Lawful Basis for Processing (GDPR Article 6)</h2>
-                    <p className="mb-8 leading-relaxed text-[#050505]/70 text-lg">We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
-                    
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div className="bg-white border border-black/10 p-8 rounded-3xl hover:shadow-lg transition-shadow">
-                            <h4 className="font-bold text-xl mb-4 text-[#050505]">A. Contractual Necessity</h4>
-                            <p className="text-[#050505]/70 leading-relaxed mb-4"><strong>Basis:</strong> Processing is necessary for the performance of a contract to which you are party, or to take steps at your request prior to entering into a contract.</p>
-                            <p className="text-[#050505]/70 leading-relaxed"><strong>Use Case:</strong> Creating your account, providing access to our decentralized trading terminals, rendering portfolio analytics, and providing customer support.</p>
-                        </div>
-
-                        <div className="bg-white border border-black/10 p-8 rounded-3xl hover:shadow-lg transition-shadow">
-                            <h4 className="font-bold text-xl mb-4 text-[#050505]">B. Legitimate Interests</h4>
-                            <p className="text-[#050505]/70 leading-relaxed mb-4"><strong>Basis:</strong> Processing is necessary for the purposes of the legitimate interests pursued by us or a third party, except where such interests are overridden by your fundamental rights.</p>
-                            <p className="text-[#050505]/70 leading-relaxed"><strong>Use Case:</strong> Detecting and preventing fraud, ensuring network and information security, analyzing platform usage to improve our UI/UX, and defending against legal claims.</p>
-                        </div>
-
-                        <div className="bg-white border border-black/10 p-8 rounded-3xl hover:shadow-lg transition-shadow">
-                            <h4 className="font-bold text-xl mb-4 text-[#050505]">C. Legal Obligation</h4>
-                            <p className="text-[#050505]/70 leading-relaxed mb-4"><strong>Basis:</strong> Processing is necessary for compliance with a legal obligation to which the controller is subject.</p>
-                            <p className="text-[#050505]/70 leading-relaxed"><strong>Use Case:</strong> Complying with Anti-Money Laundering (AML) directives, Counter-Terrorism Financing (CTF) laws, tax reporting requirements, and responding to binding court orders.</p>
-                        </div>
-
-                        <div className="bg-white border border-black/10 p-8 rounded-3xl hover:shadow-lg transition-shadow">
-                            <h4 className="font-bold text-xl mb-4 text-[#050505]">D. Explicit Consent</h4>
-                            <p className="text-[#050505]/70 leading-relaxed mb-4"><strong>Basis:</strong> You have given explicit consent to the processing of your personal data for one or more specific purposes.</p>
-                            <p className="text-[#050505]/70 leading-relaxed"><strong>Use Case:</strong> Sending marketing newsletters, utilizing non-essential tracking cookies, and enabling optional beta features.</p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 5. Data Sharing */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">5. Disclosures and Third-Party Sharing</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>
-                            We do not sell, rent, or trade your personal data. We may share your data with strictly vetted third-party service providers who assist us in operating our platform, conducting our business, or serving our users, so long as those parties agree to keep this information confidential and comply with strict GDPR standards.
-                        </p>
-                    </div>
-
-                    <div className="space-y-4 mt-8">
-                        <div className="p-6 border border-black/10 rounded-2xl bg-white hover:border-black/30 transition-colors">
-                            <h4 className="font-bold text-lg mb-2 text-[#050505]">Infrastructure & Hosting Partners</h4>
-                            <p className="text-[#050505]/60 leading-relaxed">Provide secure cloud hosting, edge computing, and database storage. These providers are SOC 2 Type II certified and operate under strict Data Processing Agreements (DPAs).</p>
-                        </div>
-                        <div className="p-6 border border-black/10 rounded-2xl bg-white hover:border-black/30 transition-colors">
-                            <h4 className="font-bold text-lg mb-2 text-[#050505]">Authentication Providers</h4>
-                            <p className="text-[#050505]/60 leading-relaxed">Manage secure user sign-in processes, session management, and multi-factor authentication routing.</p>
-                        </div>
-                        <div className="p-6 border border-black/10 rounded-2xl bg-white hover:border-black/30 transition-colors">
-                            <h4 className="font-bold text-lg mb-2 text-[#050505]">Blockchain RPC Nodes</h4>
-                            <p className="text-[#050505]/60 leading-relaxed">Relay requests to public blockchain networks. We share public wallet addresses with these providers to fetch balances and broadcast signed transactions.</p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 6. Retention */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">6. Data Retention and Deletion Policies</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>
-                            We will only retain your personal data for as long as reasonably necessary to fulfill the purposes we collected it for, including for the purposes of satisfying any legal, regulatory, tax, accounting, or reporting requirements.
-                        </p>
-                        <ul className="list-disc pl-6 space-y-2">
-                            <li><strong>Account Data:</strong> Retained for the lifetime of your account. Upon requesting account deletion, data is hard-deleted from our active databases within 30 days, and purged from secure backups within 90 days.</li>
-                            <li><strong>Security and Access Logs:</strong> Retained for exactly 12 months to facilitate forensic analysis in the event of a security incident, then automatically purged.</li>
-                            <li><strong>Legal Compliance Data:</strong> If required by law (e.g., tax records), certain minimal data may be retained for up to 5-10 years as mandated by relevant legislation.</li>
-                        </ul>
-                    </div>
-                    
-                    <div className="bg-white border border-black/20 p-6 rounded-2xl mt-8">
-                        <p className="font-black uppercase tracking-widest text-[11px] mb-2 text-[#050505]">Blockchain Immutability Disclaimer</p>
-                        <p className="text-[#050505]/70 leading-relaxed">
-                            By the inherent design of decentralized blockchain networks, all transactions and associated public wallet addresses recorded on the blockchain are permanent and immutable. We do not control these networks and <strong>cannot alter or delete data that has been published to a public ledger</strong>. Your exercise of the "Right to Erasure" applies only to data stored on our centralized servers.
-                        </p>
-                    </div>
-                </section>
-
-                {/* 7. Rights */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">7. Your Comprehensive Legal Rights</h2>
-                    <p className="mb-8 leading-relaxed text-lg text-[#050505]/70">Under the GDPR and equivalent data protection laws, you possess powerful rights regarding your personal data:</p>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {[
-                            { title: 'Right to Access', desc: 'Request a comprehensive copy of the personal data we hold about you.' },
-                            { title: 'Right to Rectification', desc: 'Request correction of any incomplete or inaccurate data we hold.' },
-                            { title: 'Right to Erasure', desc: 'Request deletion or removal of personal data where there is no good reason for us continuing to process it.' },
-                            { title: 'Right to Object', desc: 'Object to processing where we are relying on a legitimate interest.' },
-                            { title: 'Right to Restriction', desc: 'Ask us to suspend the processing of your personal data in certain scenarios.' },
-                            { title: 'Right to Portability', desc: 'Request the transfer of your personal data to you or to a third party.' },
-                            { title: 'Right to Withdraw Consent', desc: 'Withdraw consent at any time where we are relying on consent.' },
-                            { title: 'Right to Lodge a Complaint', desc: 'File a formal complaint with your local supervisory authority.' }
-                        ].map((right, idx) => (
-                            <div key={idx} className="p-6 border border-black/5 bg-white rounded-2xl hover:bg-slate-100 transition-colors">
-                                <h4 className="font-bold mb-2 text-[#050505] text-lg">{right.title}</h4>
-                                <p className="text-[#050505]/60 leading-relaxed">{right.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* 9. International Transfers */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">9. International Data Transfers</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>
-                            Given the global nature of decentralized finance and our distributed operations, the personal data that we collect from you may be transferred to, and stored at, a destination outside the European Economic Area ("EEA"). It may also be processed by staff operating outside the EEA who work for us or for one of our suppliers.
-                        </p>
-                        <p>
-                            Whenever we transfer your personal data out of the EEA, we ensure a similar degree of protection is afforded to it by ensuring at least one of the following safeguards is implemented:
-                        </p>
-                        <ul className="list-disc pl-6 space-y-2">
-                            <li>We will only transfer your personal data to countries that have been deemed to provide an adequate level of protection for personal data by the European Commission.</li>
-                            <li>Where we use certain service providers, we may use specific contracts approved by the European Commission which give personal data the same protection it has in Europe (Standard Contractual Clauses).</li>
-                            <li>We implement robust technical measures, such as advanced encryption at rest and in transit, to further protect data transferred across borders.</li>
-                        </ul>
-                    </div>
-                </section>
-
-                {/* 10. Automated Decision-Making */}
-                <section className="bg-white p-10 rounded-3xl border border-black/10">
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">10. Automated Decision-Making and Profiling</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>
-                            We do not use your personal data for automated decision-making or profiling that produces legal effects concerning you or similarly significantly affects you, as defined under Article 22 of the GDPR. Our risk-management algorithms and blockchain analytics tools process transaction data (which is public by nature) and do not rely on your private personal identity to restrict or deny services automatically.
-                        </p>
-                    </div>
-                </section>
-
-                {/* 11. Third-Party Links */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">11. Third-Party Links and Services</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>
-                            Our platform may include links to third-party websites, plug-ins, decentralised applications (dApps), and external APIs. Clicking on those links or enabling those connections may allow third parties to collect or share data about you. We do not control these third-party websites and are not responsible for their privacy statements. When you leave our platform, we strongly encourage you to read the privacy policy of every website or application you visit.
-                        </p>
-                    </div>
-                </section>
-
-                {/* 12. Updates */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">12. Changes to this Privacy Policy</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>
-                            We reserve the right to update or change our Privacy Policy at any time, and you should check this Privacy Policy periodically. Your continued use of the Service after we post any modifications to the Privacy Policy on this page will constitute your acknowledgment of the modifications and your consent to abide and be bound by the modified Privacy Policy.
-                        </p>
-                        <p>
-                            If we make any material changes to this Privacy Policy, we will notify you either through the email address you have provided us, or by placing a prominent notice on our website and decentralized applications prior to the change becoming effective.
-                        </p>
-                    </div>
-                </section>
-
-                {/* Contact */}
-                <section className="bg-[#050505] text-white p-10 md:p-12 rounded-3xl text-center">
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">13. Contact Information</h2>
-                    <p className="mb-8 text-white/70 max-w-2xl mx-auto leading-relaxed">
-                        If you have any questions about this Privacy Policy, our data practices, or if you wish to exercise your legal rights, please contact our Data Protection Officer immediately.
-                    </p>
-                    <div className="inline-flex flex-col gap-4 text-left bg-white/5 p-8 rounded-2xl border border-white/10 w-full max-w-xl mx-auto">
-                        <div className="flex flex-col">
-                            <span className="font-black uppercase tracking-widest text-[10px] text-white/50 mb-1">Email for General Privacy Queries</span>
-                            <a href="mailto:privacy@whalealert.network" className="text-white hover:text-slate-300 transition-colors">privacy@whalealert.network</a>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="font-black uppercase tracking-widest text-[10px] text-white/50 mb-1">Direct to Data Protection Officer</span>
-                            <a href="mailto:dpo@whalealert.network" className="text-white hover:text-slate-300 transition-colors">dpo@whalealert.network</a>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="font-black uppercase tracking-widest text-[10px] text-white/50 mb-1">Physical Address</span>
-                            <span className="text-white">Whale Alert Network, S.L., Paseo de la Castellana, Madrid, 28046, Spain</span>
-                        </div>
-                    </div>
-                </section>
-            
-                {/* Generated Content Expansion */}
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">Data Minimization Protocols</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients.</p><p>Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. The Data Minimization Protocol is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis.</p><p>The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. The Data Minimization Protocol is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients.</p><p>Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. The Data Minimization Protocol is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time.</p><p>In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time.</p><p>High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. The Data Minimization Protocol is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput.</p><p>All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management.</p><p>Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. The Data Minimization Protocol is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers.</p><p>Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. The Data Minimization Protocol is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management.</p><p>The Data Minimization Protocol is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis.</p>
-                    </div>
-                </section>
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">Client-Side Isolation Architecture</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks.</p><p>This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks.</p><p>To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks.</p><p>Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management.</p><p>In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks.</p><p>Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks.</p><p>To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks.</p><p>To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation.</p><p>Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency.</p><p>To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. The Client-Side Isolation Architecture is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience.</p>
-                    </div>
-                </section>
-                <section>
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">Cryptographic Data Erasure</h2>
-                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
-                        <p>All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks.</p><p>The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients.</p><p>By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks.</p><p>Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients.</p><p>The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation.</p><p>High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. High-frequency data streaming ensures that the analytic models receive deterministic inputs required for algorithmic predictive analysis. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience.</p><p>All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput.</p><p>Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers.</p><p>All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. All node deployments are structured utilizing immutable containers that abstract away the underlying infrastructure layers, optimizing DevOps lifecycles. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. The Cryptographic Data Erasure system is designed to provide institutional-grade reliability, ensuring that all operations maintain strict compliance with global regulatory frameworks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. To provide further transparency, cryptographic commitments are posted on-chain periodically, establishing an indisputable audit trail for forensic investigation. The robust access control framework allows administrators to define granular permissions, thereby enforcing the principle of least privilege across all organizational units. To mitigate systemic risks, our platform incorporates automated failover protocols and redundant data availability layers. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients.</p><p>In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Comprehensive telemetry and logging provide deep observability into the system's performance, enabling proactive identification of potential bottlenecks. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. Continuous synchronization with the primary ledger ensures that state transitions are deterministically verified and finalized with sub-second latency. This methodology aligns with industry best practices for Wallet computing and hardware-backed key management. Enterprise integrators can utilize the comprehensive API suite to programmatically manage assets and monitor network health in real-time. Our commitment to security is underscored by regular, independent audits conducted by leading cybersecurity firms, ensuring that all codebase updates meet the highest standards of resilience. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. In addition to performance optimization, the protocol is engineered to natively support cross-chain interoperability, facilitating seamless asset transfers across disparate blockchain networks. Our architecture employs a decoupled execution environment, which isolates transaction processing from consensus mechanisms to maximize throughput. By leveraging advanced cryptographic primitives, the system guarantees that data integrity is preserved across all distributed nodes. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks. Furthermore, the integration of zero-knowledge proofs facilitates privacy-preserving analytics without compromising the auditability required by enterprise clients. All cryptographic operations are executed strictly on the client side, ensuring that sensitive key material is never exposed to external networks.</p>
-                    </div>
-                </section>
+        {/* 2 */}
+        <section id="controller">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            2. Identity of the Data Controller
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>For the purposes of the GDPR and applicable data protection laws, the Data Controller is:</p>
+            <div className="border border-black/10 rounded-xl p-6 space-y-3 mt-2">
+              {[
+                ['Legal Entity', 'Whale Alert Network, S.L.'],
+                ['Registered Office', 'Paseo de la Castellana, Madrid, 28046, Spain'],
+                ['General Email', 'contact@whalecosystem.io'],
+                ['Data Protection Officer (DPO)', 'dpo@whalecosystem.io'],
+              ].map(([label, value]) => (
+                <div key={label}>
+                  <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-0.5">{label}</p>
+                  <p className="text-[15px] text-black">{value}</p>
+                </div>
+              ))}
             </div>
-        </DocLayout>
+            <p>
+              Our DPO is responsible for overseeing questions in relation to this privacy policy. If you have any questions, including requests to exercise your legal rights, please contact the DPO using the details set out above.
+            </p>
+          </div>
+        </section>
 
-    );
+        {/* 3 */}
+        <section id="data-collected">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            3. Data We Collect
+          </h2>
+          <div className="space-y-6 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              We adhere strictly to the principle of data minimisation. We only collect personal data that is adequate, relevant, and limited to what is necessary for the purposes for which it is processed.
+            </p>
+
+            <div>
+              <h3 className="text-[14px] font-bold uppercase tracking-[0.06em] text-black mb-3">3.1 Identity and Contact Data</h3>
+              <ul className="space-y-2 pl-5">
+                {[
+                  ['Email address', 'Collected via our authentication provider when you create an account.'],
+                  ['Public blockchain wallet addresses', 'Cryptographic public keys used to interact with decentralised networks.'],
+                  ['Zero-Knowledge Proof identifiers', 'We utilise advanced cryptographic zero-knowledge proofs to verify that you are a unique human without ever knowing your real-world identity. This data is purely mathematical and fully anonymised.'],
+                  ['Optional profile data', 'Usernames, display names, or avatars that you explicitly choose to provide.'],
+                ].map(([title, desc]) => (
+                  <li key={title as string} className="flex items-start gap-3">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                    <span><strong className="text-black font-semibold">{title}:</strong> {desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-[14px] font-bold uppercase tracking-[0.06em] text-black mb-3">3.2 Biometric Authentication Data (Client-Side Only)</h3>
+              <div className="bg-black text-white rounded-xl p-5">
+                <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-white/50 mb-2">Critical Privacy Notice</p>
+                <p className="text-[14px] leading-relaxed text-white/85">
+                  When you opt to use biometric authentication (Touch ID, Face ID, Windows Hello), this data is processed <strong>exclusively on your local device</strong> utilising WebAuthn/FIDO2 protocols. <strong>We NEVER receive, store, transmit, or have access to your biometric templates or raw biometric data.</strong> Our servers only receive cryptographic signatures confirming successful local authentication.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-[14px] font-bold uppercase tracking-[0.06em] text-black mb-3">3.3 Financial and Transactional Data</h3>
+              <ul className="space-y-2 pl-5">
+                {[
+                  ['Public ledger data', 'Wallet balances, transaction history, token transfers, and smart contract interactions fetched from public blockchains (e.g., Ethereum, Base, Polygon). This data is inherently public by the nature of decentralised networks.'],
+                  ['Trading analytics', 'Aggregated trading performance metrics, risk preferences, and simulated trading orders within our platform.'],
+                ].map(([title, desc]) => (
+                  <li key={title as string} className="flex items-start gap-3">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                    <span><strong className="text-black font-semibold">{title}:</strong> {desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-[14px] font-bold uppercase tracking-[0.06em] text-black mb-3">3.4 Technical and Device Data</h3>
+              <ul className="space-y-2 pl-5">
+                {[
+                  ['Network information', 'IP addresses (anonymised where legally required), internet service provider details.'],
+                  ['Device fingerprinting', 'Browser type and version, operating system, time zone, browser plug-in types.'],
+                  ['Session data', 'Authentication logs, login timestamps, and security tokens.'],
+                ].map(([title, desc]) => (
+                  <li key={title as string} className="flex items-start gap-3">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                    <span><strong className="text-black font-semibold">{title}:</strong> {desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-[14px] font-bold uppercase tracking-[0.06em] text-black mb-3">3.5 Behavioural and Usage Data</h3>
+              <ul className="space-y-2 pl-5">
+                {[
+                  'Information about how you use our website, products, and services.',
+                  'Pages visited, time spent on pages, clickstream data, and navigation paths.',
+                  'Error logs, crash reports, and performance diagnostics.',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* 4 */}
+        <section id="lawful-basis">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            4. Lawful Basis for Processing (GDPR Article 6)
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
+            <div className="grid sm:grid-cols-2 gap-4 mt-2">
+              {[
+                {
+                  title: 'A. Contractual Necessity',
+                  desc: 'Processing necessary to provide our Services, create your account, render portfolio analytics, and provide customer support.',
+                },
+                {
+                  title: 'B. Legitimate Interests',
+                  desc: 'Detecting and preventing fraud, ensuring network security, analysing platform usage to improve UX, and defending against legal claims.',
+                },
+                {
+                  title: 'C. Legal Obligation',
+                  desc: 'Complying with AML directives, CTF laws, tax reporting requirements, and responding to binding court orders.',
+                },
+                {
+                  title: 'D. Explicit Consent',
+                  desc: 'Sending marketing newsletters, utilising non-essential tracking cookies, and enabling optional beta features.',
+                },
+              ].map(({ title, desc }) => (
+                <div key={title} className="border border-black/10 rounded-xl p-5">
+                  <h4 className="font-semibold text-black text-[14px] mb-2">{title}</h4>
+                  <p className="text-[14px] leading-relaxed text-black/60">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 5 */}
+        <section id="data-sharing">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            5. Disclosures and Third-Party Sharing
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              We do not sell, rent, or trade your personal data. We may share your data with strictly vetted third-party service providers who assist us in operating our platform, so long as those parties agree to keep this information confidential and comply with strict GDPR standards.
+            </p>
+            <div className="space-y-3 mt-2">
+              {[
+                {
+                  title: 'Infrastructure & Hosting Partners',
+                  desc: 'Provide secure cloud hosting, edge computing, and database storage. These providers are SOC 2 Type II certified and operate under strict Data Processing Agreements (DPAs).',
+                },
+                {
+                  title: 'Authentication Providers',
+                  desc: 'Manage secure user sign-in processes, session management, and multi-factor authentication routing.',
+                },
+                {
+                  title: 'Blockchain RPC Nodes',
+                  desc: 'Relay requests to public blockchain networks. We share public wallet addresses with these providers solely to fetch balances and broadcast signed transactions.',
+                },
+              ].map(({ title, desc }) => (
+                <div key={title} className="border border-black/8 rounded-xl p-5">
+                  <h4 className="font-semibold text-black text-[14px] mb-1">{title}</h4>
+                  <p className="text-[14px] text-black/60 leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 6 */}
+        <section id="retention">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            6. Data Retention and Deletion Policies
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              We will only retain your personal data for as long as reasonably necessary to fulfil the purposes we collected it for, including for the purposes of satisfying any legal, regulatory, tax, accounting, or reporting requirements.
+            </p>
+            <ul className="space-y-3 pl-5">
+              {[
+                ['Account Data', 'Retained for the lifetime of your account. Upon requesting account deletion, data is hard-deleted from our active databases within 30 days, and purged from secure backups within 90 days.'],
+                ['Security and Access Logs', 'Retained for exactly 12 months to facilitate forensic analysis in the event of a security incident, then automatically purged.'],
+                ['Legal Compliance Data', 'If required by law (e.g., tax records), certain minimal data may be retained for up to 5–10 years as mandated by relevant legislation.'],
+              ].map(([title, desc]) => (
+                <li key={title as string} className="flex items-start gap-3">
+                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                  <span><strong className="text-black font-semibold">{title}:</strong> {desc}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="border border-black/15 rounded-xl p-5 mt-2">
+              <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-2">Blockchain Immutability Disclaimer</p>
+              <p className="text-[14px] text-black/60 leading-relaxed">
+                By the inherent design of decentralised blockchain networks, all transactions and associated public wallet addresses recorded on the blockchain are permanent and immutable. We do not control these networks and <strong className="text-black/80">cannot alter or delete data published to a public ledger</strong>. Your right to erasure applies only to data stored on our centralised servers.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 7 */}
+        <section id="rights">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            7. Your Comprehensive Legal Rights
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>Under the GDPR and equivalent data protection laws, you possess the following rights regarding your personal data:</p>
+            <div className="grid sm:grid-cols-2 gap-3 mt-2">
+              {[
+                ['Right to Access', 'Request a comprehensive copy of the personal data we hold about you.'],
+                ['Right to Rectification', 'Request correction of any incomplete or inaccurate data we hold.'],
+                ['Right to Erasure', 'Request deletion of personal data where there is no good reason for us to continue processing it.'],
+                ['Right to Object', 'Object to processing where we are relying on a legitimate interest.'],
+                ['Right to Restriction', 'Ask us to suspend the processing of your personal data in certain scenarios.'],
+                ['Right to Portability', 'Request the transfer of your personal data to you or to a third party.'],
+                ['Right to Withdraw Consent', 'Withdraw consent at any time where we are relying on consent to process your data.'],
+                ['Right to Lodge a Complaint', 'File a formal complaint with your local supervisory authority.'],
+              ].map(([title, desc]) => (
+                <div key={title as string} className="border border-black/8 rounded-xl p-4">
+                  <h4 className="font-semibold text-black text-[14px] mb-1">{title}</h4>
+                  <p className="text-[13px] text-black/55 leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 8 */}
+        <section id="cookies">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            8. Cookies and Tracking Technologies
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              We use cookies and similar tracking technologies to enhance your experience, understand how our Services are used, and personalise content. Cookies are small text files placed on your device by our website.
+            </p>
+            <ul className="space-y-2 pl-5">
+              {[
+                ['Strictly necessary cookies', 'Required for the website to function. Cannot be disabled.'],
+                ['Performance cookies', 'Help us understand how visitors interact with our website.'],
+                ['Functional cookies', 'Enable personalised features and remember your preferences.'],
+                ['Targeting cookies', 'Used to deliver relevant content. Only enabled with your explicit consent.'],
+              ].map(([title, desc]) => (
+                <li key={title as string} className="flex items-start gap-3">
+                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                  <span><strong className="text-black font-semibold">{title}:</strong> {desc}</span>
+                </li>
+              ))}
+            </ul>
+            <p>
+              You can manage your cookie preferences through our Cookie Consent panel, which appears on your first visit to our platform.
+            </p>
+          </div>
+        </section>
+
+        {/* 9 */}
+        <section id="transfers">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            9. International Data Transfers
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              Given the global nature of decentralised finance, personal data we collect may be transferred to and stored at a destination outside the European Economic Area ("EEA"). Whenever we transfer personal data outside the EEA, we ensure adequate protection through at least one of the following safeguards:
+            </p>
+            <ul className="space-y-2 pl-5">
+              {[
+                'We will only transfer personal data to countries deemed to provide an adequate level of protection by the European Commission.',
+                'Where we use certain service providers, we may use Standard Contractual Clauses approved by the European Commission.',
+                'We implement robust technical measures, including advanced encryption at rest and in transit, to further protect transferred data.',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* 10 */}
+        <section id="automated">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            10. Automated Decision-Making and Profiling
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              We do not use your personal data for automated decision-making or profiling that produces legal effects or similarly significantly affects you, as defined under Article 22 of the GDPR. Our risk-management algorithms and blockchain analytics tools process publicly available transaction data and do not rely on your private personal identity to automatically restrict or deny services.
+            </p>
+          </div>
+        </section>
+
+        {/* 11 */}
+        <section id="third-party-links">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            11. Third-Party Links and Services
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              Our platform may include links to third-party websites, plug-ins, decentralised applications (dApps), and external APIs. Clicking on those links or enabling those connections may allow third parties to collect or share data about you. We do not control these third-party websites and are not responsible for their privacy statements. When you leave our platform, we strongly encourage you to read the privacy policy of every website you visit.
+            </p>
+          </div>
+        </section>
+
+        {/* 12 */}
+        <section id="changes">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            12. Changes to This Privacy Policy
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              We reserve the right to update or change our Privacy Policy at any time, and you should check this policy periodically. Your continued use of the Service after we post modifications to the Privacy Policy constitutes your acknowledgement of the modifications and your consent to abide by the modified policy.
+            </p>
+            <p>
+              If we make any material changes to this Privacy Policy, we will notify you either through the email address you have provided us, or by placing a prominent notice on our website prior to the change becoming effective.
+            </p>
+          </div>
+        </section>
+
+        {/* 13 */}
+        <section id="contact">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            13. Contact Information
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              If you have any questions about this Privacy Policy, our data practices, or wish to exercise your legal rights, please contact our Data Protection Officer:
+            </p>
+            <div className="border border-black/10 rounded-xl p-6 space-y-4 mt-2">
+              {[
+                ['Privacy Queries', 'privacy@whalecosystem.io'],
+                ['Data Protection Officer', 'dpo@whalecosystem.io'],
+                ['Physical Address', 'Whale Alert Network, S.L., Paseo de la Castellana, Madrid, 28046, Spain'],
+              ].map(([label, value]) => (
+                <div key={label as string}>
+                  <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">{label}</p>
+                  <p className="text-[15px] text-black">{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </LegalDocLayout>
+  );
 }

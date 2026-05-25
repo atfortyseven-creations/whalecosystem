@@ -28,6 +28,60 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     },
   },
   {
+    id: 'system-architecture-deep-dive',
+    title: 'System Architecture & Deep Dive Explanations',
+    paragraphs: [
+      'The Humanity Ledger is built upon a radically decentralized and privacy-preserving stack. By unifying high-frequency on-chain telemetry (Whale Network) with absolute cryptographic privacy (Aztec Layer 2), we\'ve created an environment where capital flows can be analyzed without exposing the observer\'s identity. All analytical computation executes strictly within a zero-knowledge execution environment on the user\'s localized hardware. There are no SaaS intermediaries. There is no cloud telemetry.',
+      'Core Telemetry & Ingestion Flow: Raw block data and mempool streams are ingested via dedicated, failover-resistant RPC nodes. This unindexed data feeds directly into local Worker Nodes which perform Z-Score pattern analysis and EIP-2929 thermodynamics evaluations, mapping capital velocity into a localized Neo4j graph database.',
+    ],
+    diagram: {
+      caption: 'Thermodynamic Data Ingestion and Local Processing Pipeline',
+      chart: `graph TD
+  subgraph "Public Ecosystem"
+      RPC[RPC Node Clusters] -->|Raw Block Data| M[Mempool Streams]
+  end
+  subgraph "Localized Vault Processing"
+      M --> W[Whale Worker Node]
+      W -->|Z-Score Eval| DB1[(Neo4j Graph)]
+      W -->|Tx Vitals| DB2[(Redis/Upstash)]
+      W -->|State| DB3[(Prisma/Postgres)]
+      DB1 --> AG[Analytics Engine]
+      DB2 --> AG
+      DB3 --> AG
+  end
+  subgraph "Secure Client Delivery"
+      AG -->|Encrypted WebSocket| UI[Next.js Client Terminal]
+      UI -->|ZK Circuit| AZ[Aztec Shielded Pool]
+  end
+  style RPC fill:#ffffff,stroke:#333
+  style W fill:#ffffff,stroke:#000,stroke-width:2px
+  style UI fill:#050505,stroke:#000,color:#fff`
+    }
+  },
+  {
+    id: 'sybil-resistance',
+    title: 'Zero-Knowledge Sybil Resistance',
+    paragraphs: [
+      'To prevent network degradation from algorithmic bots and malicious institutional swarms, the network implements a localized biometric liveness verification standard. When a user authenticates, their wallet generates a zk-SNARK proof of personhood. The root address is completely obfuscated through a cryptographic nullifier hash.'
+    ],
+    diagram: {
+      caption: 'Zero-Knowledge Authentication and Verification Sequence',
+      chart: `sequenceDiagram
+  participant User
+  participant LocalClient as Local Client
+  participant ZK as ZK Circuit
+  participant Validator as Network Validator
+  User->>LocalClient: Request Access
+  LocalClient->>User: Request Signature
+  User->>LocalClient: Signed Message (EIP-191)
+  LocalClient->>ZK: Generate Proof (No PII)
+  ZK->>LocalClient: Return ZK-SNARK
+  LocalClient->>Validator: Submit SNARK & Nullifier
+  Validator-->>LocalClient: Accept Proof (True/False)
+  LocalClient-->>User: Grant Encrypted Session`
+    }
+  },
+  {
     id: 'wallet-connect',
     title: 'Connecting your wallet',
     paragraphs: [

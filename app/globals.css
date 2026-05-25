@@ -547,7 +547,7 @@ body.is-mobile-device .mobile-bottom-nav {
 
 .chat-theme-wrapper {
   --chat-bg:        #FFFFFF;
-  --chat-sidebar:   #F7F7F7;
+  --chat-sidebar:   #FFFFFF;
   --chat-bubble-me:      #000000;
   --chat-bubble-me-text: #FFFFFF;
   --chat-bubble-peer:    rgba(0,0,0,0.04);

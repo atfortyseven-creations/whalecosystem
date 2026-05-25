@@ -51,7 +51,7 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
         if (!cancelled) {
           // Patch SVG to be fully responsive: allow natural scaling and scrolling without constrained max-width
           const patched = rendered
-            .replace(/style="max-width:[^"]*"/, 'style="width:100%;height:auto;display:block;margin:auto;"')
+            .replace(/style="max-width:[^"]*"/, 'style="width:100%;min-width:1200px;height:auto;display:block;margin:auto;"')
             .replace(/height="[^"]*"/, '')
             .replace(/width="[^"]*"/, '');
           setSvg(patched);

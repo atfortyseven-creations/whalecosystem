@@ -136,7 +136,7 @@ function LandingNav() {
               <img
                 src="/atom_3d_silver.jpg"
                 alt="Humanity Ledger"
-                className="w-full h-full object-contain mix-blend-multiply"
+                className="w-full h-full object-contain mix-blend-darken contrast-[1.15] brightness-[1.05]"
               />
             </div>
             <span className="font-serif text-[17px] font-black tracking-tight text-black leading-none">
@@ -336,7 +336,7 @@ function HeroSection() {
               <img
                 src="/atom_3d_silver.jpg"
                 alt="Humanity Ledger"
-                className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl"
+                className="w-full h-full object-contain mix-blend-darken contrast-[1.15] brightness-[1.05] drop-shadow-2xl"
               />
             </motion.div>
 

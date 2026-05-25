@@ -100,7 +100,7 @@ export function PrivacyArchitecturePage() {
                     src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png"
                     alt="Atom Logo"
                     fill
-                    className="object-contain"
+                    className="object-contain mix-blend-darken contrast-[1.15] brightness-[1.05]"
                     sizes="96px"
                     priority
                   />
@@ -110,7 +110,7 @@ export function PrivacyArchitecturePage() {
                     src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png"
                     alt="Aztec Logo"
                     fill
-                    className="object-contain"
+                    className="object-contain mix-blend-darken contrast-[1.15] brightness-[1.05]"
                     sizes="128px"
                     priority
                   />
