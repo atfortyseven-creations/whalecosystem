@@ -506,7 +506,12 @@ export default function ConnectPage() {
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                     className="flex justify-center mb-5"
                   >
-                    <div className="p-3 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm">
+                    <div className="p-4 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm relative w-[220px]">
+                      <div className="flex items-center justify-center gap-3 w-full mb-1">
+                        <img src="/atom.png" alt="Atom" className="w-8 h-8 object-contain" />
+                        <span className="text-[12px] font-mono text-[#0A0A0A]/30">×</span>
+                        <img src="/aztec_x_whale_partnership.svg" alt="Aztec" className="w-8 h-8 object-contain" />
+                      </div>
                       <QRCodeSVG
                         value={qrData}
                         size={180}
