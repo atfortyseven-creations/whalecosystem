@@ -24,25 +24,37 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
           themeVariables: {
             primaryColor: '#ffffff',
             primaryTextColor: '#111111',
-            primaryBorderColor: 'rgba(0,0,0,0.15)',
-            secondaryColor: '#f4f4f4',
+            primaryBorderColor: 'rgba(0,0,0,0.18)',
+            secondaryColor: '#f8f8f8',
             tertiaryColor: '#ffffff',
             lineColor: '#333333',
             fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif',
-            fontSize: '14px',
+            fontSize: '13px',
             nodeBorder: '1px solid rgba(0,0,0,0.15)',
-            clusterBkg: '#ffffff',
+            clusterBkg: '#fafafa',
             clusterBorder: 'rgba(0,0,0,0.12)',
             edgeLabelBackground: '#ffffff',
+            nodeTextColor: '#111111',
           },
-          flowchart: { curve: 'basis', padding: 20, htmlLabels: false, diagramPadding: 16 },
-          sequence: { actorMargin: 64, messageMargin: 40, boxTextMargin: 8 },
+          flowchart: {
+            curve: 'basis',
+            padding: 24,
+            htmlLabels: true,
+            diagramPadding: 20,
+            useMaxWidth: false,
+          },
+          sequence: { actorMargin: 64, messageMargin: 40, boxTextMargin: 8, useMaxWidth: false },
           securityLevel: 'loose',
         });
 
         const { svg: rendered } = await mermaid.render(`privacy-diagram-${reactId}`, chart.trim());
         if (!cancelled) {
-          setSvg(rendered);
+          // Patch SVG to be fully responsive: remove fixed width/height attrs, keep viewBox
+          const patched = rendered
+            .replace(/\s+width="[^"]*"/, ' width="100%"')
+            .replace(/\s+height="[^"]*"/, ' height="auto"')
+            .replace(/style="max-width:[^"]*"/, 'style="width:100%;height:auto;display:block;"');
+          setSvg(patched);
           setError(null);
         }
       } catch (e) {
@@ -60,21 +72,27 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
   }, [chart, reactId]);
 
   return (
-    <figure className="my-10 border border-black/10 bg-white overflow-hidden">
-      <div className="overflow-x-auto overflow-y-hidden w-full" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <figure className="my-10 border border-black/10 bg-white overflow-hidden rounded-sm">
+      {/* Horizontal scroll container so wide diagrams never clip */}
+      <div
+        className="w-full overflow-x-auto"
+        style={{ WebkitOverflowScrolling: 'touch', minHeight: '120px' }}
+      >
         {error ? (
           <div className="p-6">
             <p className="text-[13px] text-red-600/80 font-mono">{error}</p>
           </div>
         ) : svg ? (
           <div
-            className="p-6 md:p-10 [&_svg]:w-full [&_svg]:max-w-full [&_svg]:h-auto [&_svg]:block [&_.label]:text-[14px] [&_.node]:text-[14px]"
+            /* min-w-max ensures the SVG never collapses narrower than its natural width */
+            className="p-6 md:p-10 min-w-max"
+            style={{ lineHeight: 1 }}
             dangerouslySetInnerHTML={{ __html: svg }}
             aria-hidden={!caption}
           />
         ) : (
           <div className="h-36 flex items-center justify-center">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-[#050505]/30">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-[#050505]/30 animate-pulse">
               Loading diagram…
             </span>
           </div>

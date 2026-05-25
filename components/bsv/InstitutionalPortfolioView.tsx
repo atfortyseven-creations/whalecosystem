@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowUpRight, ArrowDownLeft, Scan, Plus, Copy, Check,
     RefreshCw, X, Box, Key, Lock, Unlock, CreditCard, ExternalLink,
-    Activity, Hash, Database, Fingerprint, GitMerge
+    Activity, Hash, Database, Fingerprint, GitMerge, Globe
 } from 'lucide-react';
 
 import { toast } from 'sonner';

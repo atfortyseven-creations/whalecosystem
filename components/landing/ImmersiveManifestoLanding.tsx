@@ -3,6 +3,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
+
+// Lottie cargado dinámicamente para evitar SSR issues
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 // ─── Nav Data ────────────────────────────────────────────────────────────────
 
@@ -283,7 +287,22 @@ function HeroSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.6], [0, 60]);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [lottieData, setLottieData] = useState<any>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    // Load the dashboard loading Lottie (Browser Loading animation)
+    fetch("/lotties/Browser Loading.json")
+      .then((r) => r.json())
+      .then(setLottieData)
+      .catch(() => {
+        // Fallback to root public
+        fetch("/Browser Loading.json")
+          .then((r) => r.json())
+          .then(setLottieData)
+          .catch(() => null);
+      });
+  }, []);
 
   return (
     <section
@@ -307,21 +326,26 @@ function HeroSection() {
       >
         {mounted && (
           <>
-
-
-            {/* Atom */}
+            {/* Lottie animation replacing the static square */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
-              className="relative w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] lg:w-[380px] lg:h-[380px] mb-10 shrink-0"
+              className="relative w-[180px] h-[180px] sm:w-[240px] sm:h-[240px] lg:w-[300px] lg:h-[300px] mb-8 shrink-0 flex items-center justify-center"
             >
-              <img
-                src="/atom_3d_silver.jpg"
-                alt="Humanity Ledger"
-                className="w-full h-full object-contain mix-blend-multiply"
-                draggable={false}
-              />
+              {lottieData ? (
+                <Lottie
+                  animationData={lottieData}
+                  loop
+                  autoplay
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                /* Elegant fallback while Lottie loads */
+                <div className="w-full h-full rounded-2xl bg-black/5 border border-black/8 flex items-center justify-center">
+                  <div className="w-8 h-8 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                </div>
+              )}
             </motion.div>
 
             {/* Headline */}
@@ -414,10 +438,6 @@ function StatStrip() {
   );
 }
 
-// ─── How it works (immersive scroll) ─────────────────────────────────────────
-
-
-
 // ─── Whale Network callout ────────────────────────────────────────────────────
 
 function WhaleNetworkSection() {
@@ -483,7 +503,7 @@ function WhaleNetworkSection() {
 
 function DocumentationSection() {
   return (
-    <section className="w-full bg-[#fafafa] border-t border-black/8 py-28 md:py-40">
+    <section className="w-full bg-white border-t border-black/8 py-28 md:py-40">
       <div className="w-full max-w-[1100px] mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
           <div>
@@ -508,7 +528,7 @@ function DocumentationSection() {
             <Link
               key={d.label}
               href={d.href}
-              className="bg-white p-8 flex flex-col gap-3 group hover:bg-[#fafafa] transition-colors duration-200"
+              className="bg-white p-8 flex flex-col gap-3 group hover:bg-black/[0.02] transition-colors duration-200"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[15px] font-black tracking-tight text-black group-hover:text-black/80 transition-colors">
@@ -525,12 +545,41 @@ function DocumentationSection() {
   );
 }
 
-// ─── Final CTA ────────────────────────────────────────────────────────────────
+// ─── Final CTA (DownPage) — with video background ─────────────────────────────
 
 function FinalCTASection() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Autoplay blocked by browser policy — silent fail
+      });
+    }
+  }, []);
+
   return (
-    <section className="w-full bg-black py-36 md:py-52">
-      <div className="w-full max-w-[800px] mx-auto px-6 flex flex-col items-center text-center">
+    <section className="w-full relative overflow-hidden" style={{ minHeight: '600px' }}>
+      {/* ── Video background ── */}
+      <video
+        ref={videoRef}
+        className="absolute inset-0 w-full h-full object-cover"
+        src="/system-shots/14683943_3840_2160_30fps.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        style={{ zIndex: 0 }}
+      />
+      {/* Dark overlay for readability */}
+      <div
+        className="absolute inset-0"
+        style={{ background: 'rgba(0,0,0,0.72)', zIndex: 1 }}
+      />
+
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-[800px] mx-auto px-6 py-36 md:py-52 flex flex-col items-center text-center">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -547,13 +596,14 @@ function FinalCTASection() {
             />
           </div>
 
-          <h2 className="text-[44px] sm:text-[68px] font-black tracking-tighter leading-[0.9] text-white">
+          <h2 className="text-[44px] sm:text-[68px] font-black tracking-tighter leading-[0.9] text-white drop-shadow-lg">
             Start building
             <br />
-            <span className="text-white/25">privately.</span>
+            <span className="text-white/35">privately.</span>
           </h2>
 
-          <p className="text-[17px] text-white/40 leading-relaxed max-w-[480px] font-light">
+          {/* Texto más en negrita + mejor contraste */}
+          <p className="text-[18px] text-white/80 leading-relaxed max-w-[520px] font-semibold drop-shadow-md">
             Join the developers and protocols using Humanity Ledger to bring
             verifiable privacy to every interaction on Aztec.
           </p>
@@ -561,13 +611,13 @@ function FinalCTASection() {
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <Link
               href="/portfolio"
-              className="px-9 py-3.5 bg-white text-black text-[13px] font-semibold hover:bg-white/90 transition-colors"
+              className="px-9 py-3.5 bg-white text-black text-[13px] font-black uppercase tracking-wider hover:bg-white/90 transition-colors shadow-lg"
             >
               Open Application
             </Link>
             <Link
               href="/developers/api-docs"
-              className="px-9 py-3.5 border border-white/20 text-white text-[13px] font-semibold hover:border-white/35 transition-colors"
+              className="px-9 py-3.5 border border-white/30 text-white text-[13px] font-black uppercase tracking-wider hover:border-white/60 hover:bg-white/5 transition-all"
             >
               Read the Docs
             </Link>
