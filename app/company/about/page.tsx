@@ -11,8 +11,8 @@ export default function AboutPage() {
         >
             <div className="space-y-16">
                 {/* Hero Section */}
-                <section className="bg-gradient-to-r from-blue-600/10 to-indigo-600/10 p-10 md:p-16 rounded-3xl border border-black/5 dark:border-white/5 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-white/40 dark:bg-black/20 backdrop-blur-sm -z-10" />
+                <section className="bg-white p-10 md:p-16 rounded-3xl border border-black/5 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-white/40 backdrop-blur-sm -z-10" />
                     <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tight text-[#050505] leading-tight">
                         Redefining the Future of Decentralized Finance
                     </h2>
@@ -43,7 +43,7 @@ export default function AboutPage() {
                 {/* Mission & Vision */}
                 <section className="grid md:grid-cols-2 gap-8">
                     <div className="bg-white p-10 rounded-3xl border border-black/5 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-8">
+                        <div className="w-16 h-16 bg-slate-100 text-[#050505] rounded-2xl flex items-center justify-center mb-8">
                             <Target size={32} />
                         </div>
                         <h3 className="text-3xl font-black mb-6 tracking-tight text-[#050505]">Our Mission</h3>
@@ -53,7 +53,7 @@ export default function AboutPage() {
                     </div>
 
                     <div className="bg-white p-10 rounded-3xl border border-black/5 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-8">
+                        <div className="w-16 h-16 bg-slate-100 text-[#050505] rounded-2xl flex items-center justify-center mb-8">
                             <Sparkles size={32} />
                         </div>
                         <h3 className="text-3xl font-black mb-6 tracking-tight text-[#050505]">Our Vision</h3>
@@ -89,13 +89,37 @@ export default function AboutPage() {
 
                 {/* The Team / Leadership section */}
                 <section className="bg-white p-10 md:p-16 rounded-3xl border border-black/5">
-                    <h2 className="text-3xl font-black mb-8 tracking-tight text-[#050505]">Leadership & Culture</h2>
+                    <h2 className="text-3xl font-black mb-8 tracking-tight text-[#050505]">Leadership & Corporate Governance</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <div className="flex flex-col md:flex-row gap-8 items-start">
+                            <div className="w-full md:w-1/3 shrink-0 flex flex-col items-center">
+                                <img src="/system-shots/photo_2026-05-16_19-57-16.jpg" alt="Creator of the Network" className="rounded-2xl border border-black/10 w-full object-cover aspect-square shadow-sm" />
+                                <span className="mt-4 text-sm font-bold text-black">Creator of the Network</span>
+                            </div>
+                            <div className="w-full md:w-2/3 space-y-6">
+                                <p>
+                                    The team behind Whale Alert Network is a diverse, globally distributed group of professionals. Our leadership brings together decades of combined experience from top-tier technology companies, traditional financial institutions, and leading blockchain research organizations. We operate in a flat, meritocratic structure where the best ideas win, regardless of who proposes them.
+                                </p>
+                                <p>
+                                    We foster a culture of radical candor, continuous learning, and intense focus on user experience. We believe that building great software requires empathy for the end-user, rigorous engineering discipline, and an appreciation for beautiful, functional design. Our team is united by a shared passion for decentralization and a profound respect for individual privacy.
+                                </p>
+                                <p>
+                                    Our corporate governance is structured to ensure absolute accountability and transparency. We employ an independent board of advisors composed of legal experts, cybersecurity veterans, and macroeconomists who rigorously audit our strategic direction. This ensures that every technological deployment strictly aligns with our foundational manifesto of user empowerment and ethical financial indexing.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Global Reach and ESG */}
+                <section>
+                    <h2 className="text-3xl font-black mb-8 tracking-tight text-[#050505]">Global Reach & ESG Commitment</h2>
                     <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
                         <p>
-                            The team behind Whale Alert Network is a diverse, globally distributed group of professionals. Our leadership brings together decades of combined experience from top-tier technology companies, traditional financial institutions, and leading blockchain research organizations. We operate in a flat, meritocratic structure where the best ideas win, regardless of who proposes them.
+                            Whale Alert Network is not confined by geopolitical borders. Our infrastructure is deployed across multiple sovereign regions, ensuring low-latency access and uninterrupted service for a truly global user base. We are actively localizing our analytics engine to support multiple international languages and region-specific regulatory frameworks.
                         </p>
                         <p>
-                            We foster a culture of radical candor, continuous learning, and intense focus on user experience. We believe that building great software requires empathy for the end-user, rigorous engineering discipline, and an appreciation for beautiful, functional design. Our team is united by a shared passion for decentralization and a profound respect for individual privacy.
+                            Furthermore, Environmental, Social, and Governance (ESG) principles are embedded deep within our operational DNA. In an industry often criticized for its carbon footprint, we have strategically aligned our node infrastructure with data centers powered entirely by renewable energy sources. We actively subsidize research into energy-efficient cryptographic proofs and aggressively optimize our server-side computational load to minimize our environmental impact.
                         </p>
                     </div>
                 </section>

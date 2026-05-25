@@ -558,11 +558,34 @@ export const ARCHITECTURE_VISION_SECTIONS: AztecDocSection[] = [
 
 export const COMMUNITY_FORUM_INTRO: AztecDocSection[] = [
   {
-    title: 'Welcome to the Community',
+    title: 'Welcome to the Community Governance Architecture',
     paragraphs: [
-      'This is the primary discussion space for the Humanity Ledger community. It is a place for technical discussions about the Aztec Network integration, Noir circuit development, and protocol governance — as well as broader conversations about the future of financial privacy.',
-      'We expect discussions to be substantive, respectful, and conducted in good faith. This is not a space for trading signals, price speculation, or promotional content. Posts that do not contribute to protocol development or community understanding will be removed.',
-      'Protocol governance proposals should be discussed here before formal submission. Community feedback during the discussion phase helps refine proposals and improves the quality of on-chain governance decisions.',
+      'This forum serves as the primary operational and governance hub for the Humanity Ledger community. It is a strictly moderated, professional environment dedicated to technical architecture discussions, Noir circuit peer review, protocol economics, and the formalization of governance proposals. We maintain an institutional standard of discourse to ensure that all protocol developments are vetted rigorously.',
+      'We expect all interactions to be substantive, strictly factual, and conducted with maximum professional courtesy. This is not a venue for price speculation, trading analysis, or promotional content of any kind. Any content that deviates from technical or operational protocol advancement will be immediately archived by our moderation team.',
+      'All formal protocol governance proposals must undergo a mandatory public review period within this forum before they can be submitted for cryptographic voting on-chain. This structural requirement ensures that all proposals are subjected to comprehensive community scrutiny, edge-case analysis, and technical vetting before execution.'
     ],
   },
+  {
+    title: 'Code of Professional Conduct',
+    paragraphs: [
+      'Participation in the Humanity Ledger governance forum requires adherence to our strict Code of Professional Conduct. We operate under a zero-tolerance policy for harassment, discrimination, or unprofessional behavior. This community is built on meritocracy, intellectual rigor, and the shared goal of advancing privacy-preserving financial infrastructure.',
+      'Contributors are expected to provide verifiable data to support their arguments. When debating architectural changes or economic parameters, assumptions must be clearly stated, and models should be provided for peer review. Disagreements are inevitable and encouraged, but they must remain focused on the technical merits of the proposal, never on the individual contributor.',
+      'Moderators are empowered to issue warnings, suspend posting privileges, or permanently revoke forum access for repeated violations of these standards. We prioritize signal over noise, and maintaining a high-quality discussion environment is essential for the long-term success of the protocol.'
+    ],
+  },
+  {
+    title: 'Proposal Lifecycle and Technical Standards',
+    paragraphs: [
+      'The journey from an initial concept to an executed protocol upgrade follows a rigid, standardized lifecycle. Ideas are first introduced as "Draft Proposals," where the community can assess their initial viability. If a draft receives sufficient support, it must be upgraded to a "Formal Request for Comment" (RFC), complete with technical specifications, economic impact assessments, and proposed Noir circuit modifications.',
+      'During the RFC phase, core contributors and community developers will conduct technical audits of the proposed changes. All accompanying code must meet our stringent quality standards, including comprehensive unit testing, documentation, and formal verification where applicable. Proposals lacking this rigor will not proceed.',
+      'Once the RFC phase is successfully concluded, the proposal is finalized and moved to the on-chain voting queue. The forum serves as the permanent archival record of this entire process, ensuring complete transparency into the rationale behind every protocol decision.'
+    ]
+  },
+  {
+    title: 'Security and Responsible Disclosure',
+    paragraphs: [
+      'This forum is public, and as such, it must never be used to report active security vulnerabilities, circuit exploits, or critical infrastructure weaknesses. The publication of zero-day vulnerabilities in a public venue is considered a severe violation of protocol security standards.',
+      'If you discover a potential security flaw, you must utilize our Responsible Disclosure program. All findings should be securely transmitted directly to our security engineering team using the encrypted channels detailed in our Security Architecture documentation. We offer substantial bounties for responsible disclosure, provided the vulnerability has not been publicly exposed.'
+    ]
+  }
 ];

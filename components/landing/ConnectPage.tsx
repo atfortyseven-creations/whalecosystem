@@ -568,34 +568,28 @@ export default function ConnectPage() {
           </div>
         </div>
 
-        {/* CENTER: Atom perfectly adjusted and isolated */}
+        {/* CENTER: New Image 1 */}
         {mounted && (
           <div className="hidden lg:flex flex-1 items-center justify-center z-10 pointer-events-none">
             <div className="w-[400px] h-[400px] xl:w-[500px] xl:h-[500px] flex items-center justify-center opacity-90">
               <img
-                src="/atom_3d_silver.jpg"
-                alt="Silver Atom"
-                className="w-full h-full object-contain mix-blend-multiply"
+                src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png"
+                alt="Generated Image 1"
+                className="w-full h-full object-contain"
                 draggable={false}
               />
             </div>
           </div>
         )}
 
-        {/* RIGHT: Collaborators / Aztec Network */}
+        {/* RIGHT: New Image 2 */}
         <div className="hidden lg:flex w-[380px] xl:w-[420px] flex-shrink-0 flex-col items-center justify-center p-8 z-20">
           <div className="flex flex-col items-center gap-8 w-full">
-            <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
-            
             <div className="flex flex-col items-center text-center gap-4 w-full">
-              
-              <div className="w-[200px] xl:w-[240px] flex items-center justify-center my-2 opacity-95">
-                <img src="/custom-logo-2.png" alt="Collaborator" className="w-full h-auto object-contain rounded-xl shadow-2xl" />
+              <div className="w-[300px] xl:w-[350px] flex items-center justify-center my-2 opacity-95">
+                <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Generated Image 2" className="w-full h-auto object-contain rounded-xl shadow-2xl" />
               </div>
-              
             </div>
-            
-            <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
           </div>
         </div>
       </div>
@@ -614,9 +608,31 @@ export default function ConnectPage() {
         />
       )}
 
-      {/* Footer minimal */}
-      <footer className="relative z-30 px-6 py-5 border-t border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md w-full">
-        <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-white/50">© 2026 Whale Alert Network</span>
+      {/* Footer marquee */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 25s linear infinite;
+        }
+      `}} />
+      <footer className="relative z-30 border-t border-white/10 flex items-center bg-[#2A2A2A]/90 backdrop-blur-md w-full overflow-hidden py-3">
+        <div className="flex w-max animate-marquee space-x-12 px-6 items-center">
+          {[...Array(2)].map((_, i) => (
+            <React.Fragment key={i}>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                <img
+                  key={`set-${i}-img-${num}`}
+                  src={`/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (${num}).png`}
+                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  alt={`Partner ${num}`}
+                />
+              ))}
+            </React.Fragment>
+          ))}
+        </div>
       </footer>
     </div>
   );

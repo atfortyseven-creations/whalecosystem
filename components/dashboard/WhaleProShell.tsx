@@ -50,14 +50,12 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'markets',         label: 'Markets',        icon: Icon.markets,  requiresZK: true },
     { id: 'inst-ledger',     label: 'Explorer',       icon: Icon.explorer, requiresZK: true },
     { id: 'humanity-ledger', label: 'Roadmap',        icon: Icon.roadmap },
-    { id: 'mass-transfer',   label: 'Sync',           icon: Icon.sync,     requiresZK: true },
     { id: 'logs',            label: 'Logs',           icon: Icon.logs },
     { id: 'gold',            label: 'Identity',       icon: Icon.identity },
     { id: 'support',         label: 'Support',        icon: Icon.support },
 ];
 
 const RESTRICTED_TABS = [
-    'mass-transfer',
     'logs',
     'privacy'
 ];

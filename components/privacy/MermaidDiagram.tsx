@@ -31,11 +31,11 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
             fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif',
             fontSize: '14px',
             nodeBorder: '1px solid rgba(0,0,0,0.15)',
-            clusterBkg: '#f9f9f9',
+            clusterBkg: '#ffffff',
             clusterBorder: 'rgba(0,0,0,0.12)',
             edgeLabelBackground: '#ffffff',
           },
-          flowchart: { curve: 'basis', padding: 20, htmlLabels: true, diagramPadding: 16 },
+          flowchart: { curve: 'basis', padding: 20, htmlLabels: false, diagramPadding: 16 },
           sequence: { actorMargin: 64, messageMargin: 40, boxTextMargin: 8 },
           securityLevel: 'loose',
         });

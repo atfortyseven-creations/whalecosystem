@@ -7,21 +7,22 @@ interface DocLayoutProps {
     title: string;
     description?: string;
     lastUpdated?: string;
-    category: 'Product' | 'Developers' | 'Company' | 'Legal';
+    category: 'Product' | 'Developers' | 'Company' | 'Legal' | 'Technical';
 }
 
 export default function DocLayout({ children, title, description, lastUpdated, category }: DocLayoutProps) {
     const categoryColors = {
-        'Product': 'from-[var(--aztec-chartreuse)]/20 to-[var(--aztec-chartreuse)]/40',
-        'Developers': 'from-[var(--aztec-orchid)]/20 to-[var(--aztec-orchid)]/40',
-        'Company': 'from-[var(--aztec-ink)]/10 to-[var(--aztec-ink)]/20',
-        'Legal': 'from-amber-600/10 to-amber-700/20'
+        'Product': 'bg-white',
+        'Developers': 'bg-white',
+        'Company': 'bg-white',
+        'Legal': 'bg-white',
+        'Technical': 'bg-white'
     };
 
     return (
         <div className="min-h-screen bg-transparent text-[var(--aztec-ink)]">
             {/* Header */}
-            <div className={`bg-gradient-to-r ${categoryColors[category]} py-20`}>
+            <div className={`border-b border-black/5 ${categoryColors[category]} py-20`}>
                 <div className="max-w-4xl mx-auto px-6">
                     <Link href="/" className="inline-flex items-center gap-2 text-[var(--aztec-ink)]/60 hover:text-[var(--aztec-ink)] mb-6 transition-colors font-aztec-mono text-[10px] uppercase tracking-widest">
                         <ArrowLeft size={16} />

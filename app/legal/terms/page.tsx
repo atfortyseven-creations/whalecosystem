@@ -104,7 +104,88 @@ export default function TermsOfService() {
                         </p>
                     </div>
                 </section>
-            </div>
+                {/* 6. User Data and Privacy */}
+                <section>
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">6. Interplay with User Data and Privacy Policies</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            We deeply respect your privacy and are committed to protecting it through our compliance with our Privacy Policy. By agreeing to these Terms of Service, you also explicitly acknowledge and agree that your use of the Services is subject to our Privacy Policy, which is incorporated herein by reference. We strongly encourage you to read the Privacy Policy carefully to understand how we collect, use, and disclose information about you.
+                        </p>
+                        <p>
+                            In the event of any conflict between these Terms of Service and the Privacy Policy regarding the processing of personal data, the provisions of the Privacy Policy shall prevail to the extent necessary to resolve the conflict. You acknowledge that any data provided by you or collected by us in connection with your use of the Services shall be used in accordance with the parameters defined within our comprehensive Privacy Policy framework.
+                        </p>
+                    </div>
+                </section>
+
+                {/* 7. Prohibited Activities Detailed */}
+                <section>
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">7. Exhaustive List of Prohibited Activities</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            You may not access or use the Services for any purpose other than that for which we make the Services available. The Services may not be used in connection with any commercial endeavors except those that are specifically endorsed or approved by us in writing. As a user of the Services, you agree not to engage in any of the following activities under any circumstances:
+                        </p>
+                        <ul className="list-none space-y-4 pl-0">
+                            <li className="flex items-start gap-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-black mt-2.5 shrink-0" />
+                                <span>Systematically retrieve data or other content from the Services to create or compile, directly or indirectly, a collection, compilation, database, or directory without written permission from us.</span>
+                            </li>
+                            <li className="flex items-start gap-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-black mt-2.5 shrink-0" />
+                                <span>Trick, defraud, or mislead us and other users, especially in any attempt to learn sensitive account information such as user passwords or cryptographic private keys.</span>
+                            </li>
+                            <li className="flex items-start gap-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-black mt-2.5 shrink-0" />
+                                <span>Circumvent, disable, or otherwise interfere with security-related features of the Services, including features that prevent or restrict the use or copying of any Content or enforce limitations on the use of the Services and the Content contained therein.</span>
+                            </li>
+                            <li className="flex items-start gap-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-black mt-2.5 shrink-0" />
+                                <span>Disparage, tarnish, or otherwise harm, in our opinion, us and the Services, through the propagation of false information or coordinated malicious campaigns.</span>
+                            </li>
+                            <li className="flex items-start gap-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-black mt-2.5 shrink-0" />
+                                <span>Use any information obtained from the Services in order to harass, abuse, or harm another person, or to perform coordinated market manipulation, front-running, or illegal trading practices.</span>
+                            </li>
+                            <li className="flex items-start gap-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-black mt-2.5 shrink-0" />
+                                <span>Upload or transmit (or attempt to upload or to transmit) viruses, Trojan horses, or other material, including excessive use of capital letters and spamming (continuous posting of repetitive text), that interferes with any party uninterrupted use and enjoyment of the Services.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                {/* 8. Governing Law */}
+                <section>
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">8. Governing Law and Dispute Resolution</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            These Terms and your use of the Services are governed by and construed in accordance with the laws of the European Union and the domestic laws of Spain applicable to agreements made and to be entirely performed within Spain, without regard to its conflict of law principles.
+                        </p>
+                        <p>
+                            Any legal action of whatever nature brought by either you or us (collectively, the "Parties" and individually, a "Party") shall be commenced or prosecuted in the state and federal courts located in Madrid, Spain, and the Parties hereby consent to, and waive all defenses of lack of personal jurisdiction and forum non conveniens with respect to venue and jurisdiction in such state and federal courts. Application of the United Nations Convention on Contracts for the International Sale of Goods and the Uniform Computer Information Transaction Act (UCITA) are excluded from these Terms.
+                        </p>
+                    </div>
+                </section>
+
+                {/* 9. Termination */}
+                <section className="bg-white p-10 rounded-3xl border border-black/10">
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">9. Term and Termination</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            These Terms of Service shall remain in full force and effect while you use the Services. Without limiting any other provision of these Terms of Service, we reserve the right to, in our sole discretion and without notice or liability, deny access to and use of the Services (including blocking certain IP addresses), to any person for any reason or for no reason, including without limitation for breach of any representation, warranty, or covenant contained in these Terms of Service or of any applicable law or regulation. We may terminate your use or participation in the Services or delete your account and any content or information that you posted at any time, without warning, in our sole discretion.
+                        </p>
+                    </div>
+                </section>
+
+                {/* 10. Contact */}
+                <section className="bg-[#050505] text-white p-12 rounded-3xl text-center">
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">10. Contact Information</h2>
+                    <p className="mb-8 text-white/70 max-w-2xl mx-auto leading-relaxed">
+                        In order to resolve a complaint regarding the Services or to receive further information regarding the use of the Services, please contact our legal department.
+                    </p>
+                    <a href="mailto:legal@whalealert.network" className="inline-block px-10 py-5 bg-white text-[#050505] font-black uppercase tracking-widest text-[11px] rounded-2xl hover:bg-gray-100 transition-colors shadow-xl">
+                        Contact Legal Department
+                    </a>
+                </section>
         </DocLayout>
     );
 }

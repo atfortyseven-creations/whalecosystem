@@ -23,28 +23,27 @@ const NAV_COLUMNS = [
   {
     label: "Platform",
     links: [
-      { label: "Dashboard",            href: "/portfolio" },
       { label: "Portfolio",            href: "/portfolio" },
-      { label: "Pricing",              href: "/pricing" },
+      { label: "News Analytics",       href: "/news" },
       { label: "Status",               href: "/status" },
-    ]
-  },
-  {
-    label: "Community",
-    links: [
-      { label: "Whale Chat",           href: "/forum" },
-      { label: "Forum",                href: "/forum" },
-      { label: "Academy",              href: "/academy" },
-      { label: "Community",            href: "/community" },
+      { label: "Architecture Guide",   href: "/architecture" },
     ]
   },
   {
     label: "Company",
     links: [
-      { label: "About Us",             href: "/company" },
+      { label: "About Us",             href: "/company/about" },
       { label: "Careers",              href: "/careers" },
-      { label: "Privacy Policy",       href: "/privacy" },
-      { label: "News",                 href: "/news" },
+      { label: "Whale Chat",           href: "/forum" },
+    ]
+  },
+  {
+    label: "Legal & Security",
+    links: [
+      { label: "Terms of Service",     href: "/legal/terms" },
+      { label: "Privacy Policy",       href: "/legal/privacy" },
+      { label: "Security Architecture",href: "/legal/security" },
+      { label: "Regulatory Compliance",href: "/legal/compliance" },
     ]
   }
 ];

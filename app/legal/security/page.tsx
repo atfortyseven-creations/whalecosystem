@@ -75,6 +75,58 @@ export default function SecurityPolicy() {
                     </div>
                 </section>
 
+                {/* Penetration Testing */}
+                <section className="bg-white p-10 md:p-14 rounded-3xl border border-black/5">
+                    <h2 className="text-3xl font-black mb-8 tracking-tight">Continuous Penetration Testing</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            Our infrastructure is subjected to continuous, aggressive penetration testing by specialized red teams mimicking advanced persistent threats (APTs). These simulated cyberattacks target every layer of our technology stack, from our cloud infrastructure and APIs down to individual smart contracts. By proactively hunting for vulnerabilities, we ensure our defensive measures evolve faster than offensive capabilities.
+                        </p>
+                        <p>
+                            All discovered vulnerabilities are immediately patched, and the mitigation strategies are independently verified before any updates are pushed to the production environment. We adhere strictly to the principle of "secure by default" in every architectural decision.
+                        </p>
+                    </div>
+                </section>
+
+                {/* Cryptographic Key Lifecycle */}
+                <section>
+                    <h2 className="text-3xl font-black mb-8 tracking-tight">Cryptographic Key Management Lifecycle</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            The generation, storage, and rotation of cryptographic keys form the backbone of our data protection strategy. We employ Hardware Security Modules (HSMs) with FIPS 140-2 Level 3 certification to manage all root cryptographic material. 
+                        </p>
+                        <p>
+                            Our key rotation protocols are fully automated and trigger strictly on a regular temporal schedule or instantly in the event of suspected compromise. Furthermore, no single employee possesses the clearance or the technical capability to extract private keys from the HSM enclaves, ensuring total mitigation against insider threats.
+                        </p>
+                    </div>
+                </section>
+
+                {/* Employee Clearance */}
+                <section className="bg-white p-10 md:p-14 rounded-3xl border border-black/5">
+                    <h2 className="text-3xl font-black mb-8 tracking-tight">Employee Security Clearances and Training</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            Technology is only as secure as the personnel operating it. Every member of the Whale Alert Network engineering and infrastructure team undergoes a rigorous, multi-stage background check before being granted access to internal systems.
+                        </p>
+                        <p>
+                            Access to critical production databases and deployment pipelines operates on a strict Principle of Least Privilege (PoLP) and requires multi-party computation approvals. Additionally, all employees participate in mandatory, quarterly security awareness training focused on mitigating advanced social engineering and phishing campaigns.
+                        </p>
+                    </div>
+                </section>
+
+                {/* Disaster Recovery */}
+                <section>
+                    <h2 className="text-3xl font-black mb-8 tracking-tight">Disaster Recovery and Business Continuity</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            We operate a highly resilient, globally distributed infrastructure engineered to withstand catastrophic failures, natural disasters, and coordinated regional attacks. Our databases are synchronously replicated across multiple independent geographical zones to ensure zero data loss (RPO = 0) and near-instantaneous failover capabilities (RTO &lt; 60 seconds).
+                        </p>
+                        <p>
+                            Regular failover drills are conducted quarterly to validate our Business Continuity Plan (BCP) in real-world scenarios, ensuring that our analytics platforms and communication networks remain fully operational under any circumstances.
+                        </p>
+                    </div>
+                </section>
+
                 {/* Reporting */}
                 <section className="bg-[#050505] text-white p-10 md:p-12 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="flex-1">

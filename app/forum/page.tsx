@@ -427,7 +427,7 @@ function ForumHomeContent() {
   useEffect(() => { loadData(); }, [loadData]);
 
   return (
-    <div className="flex-1 flex flex-col bg-[#FAFAF9] text-slate-900 w-full min-h-screen">
+    <div className="flex-1 flex flex-col bg-white text-[#050505] w-full min-h-screen">
 
       {/* ── Secondary Sub-nav (Discourse-style) ── */}
       <div className="w-full bg-white border-b border-slate-200 sticky top-0 z-[100] shadow-sm">
@@ -671,7 +671,7 @@ function ForumHomeContent() {
 
 export default function ForumHomePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FAFAF9]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
       <ForumHomeContent />
     </Suspense>
   );

@@ -103,7 +103,7 @@ export const metadata = {
 }
 
 export const viewport = {
-  themeColor: '#FAFAF8',
+  themeColor: '#FFFFFF',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -228,7 +228,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className="bg-[#FAFAF8] text-black antialiased selection:bg-black/10 selection:text-black transition-colors duration-300"
+        className="bg-white text-[#050505] antialiased selection:bg-black/10 selection:text-black transition-colors duration-300"
         suppressHydrationWarning
       >
 

@@ -192,9 +192,60 @@ export default function PrivacyPolicy() {
                     </div>
                 </section>
 
+                {/* 9. International Transfers */}
+                <section>
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">9. International Data Transfers</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            Given the global nature of decentralized finance and our distributed operations, the personal data that we collect from you may be transferred to, and stored at, a destination outside the European Economic Area ("EEA"). It may also be processed by staff operating outside the EEA who work for us or for one of our suppliers.
+                        </p>
+                        <p>
+                            Whenever we transfer your personal data out of the EEA, we ensure a similar degree of protection is afforded to it by ensuring at least one of the following safeguards is implemented:
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2">
+                            <li>We will only transfer your personal data to countries that have been deemed to provide an adequate level of protection for personal data by the European Commission.</li>
+                            <li>Where we use certain service providers, we may use specific contracts approved by the European Commission which give personal data the same protection it has in Europe (Standard Contractual Clauses).</li>
+                            <li>We implement robust technical measures, such as advanced encryption at rest and in transit, to further protect data transferred across borders.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                {/* 10. Automated Decision-Making */}
+                <section className="bg-white p-10 rounded-3xl border border-black/10">
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">10. Automated Decision-Making and Profiling</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            We do not use your personal data for automated decision-making or profiling that produces legal effects concerning you or similarly significantly affects you, as defined under Article 22 of the GDPR. Our risk-management algorithms and blockchain analytics tools process transaction data (which is public by nature) and do not rely on your private personal identity to restrict or deny services automatically.
+                        </p>
+                    </div>
+                </section>
+
+                {/* 11. Third-Party Links */}
+                <section>
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">11. Third-Party Links and Services</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            Our platform may include links to third-party websites, plug-ins, decentralised applications (dApps), and external APIs. Clicking on those links or enabling those connections may allow third parties to collect or share data about you. We do not control these third-party websites and are not responsible for their privacy statements. When you leave our platform, we strongly encourage you to read the privacy policy of every website or application you visit.
+                        </p>
+                    </div>
+                </section>
+
+                {/* 12. Updates */}
+                <section>
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">12. Changes to this Privacy Policy</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            We reserve the right to update or change our Privacy Policy at any time, and you should check this Privacy Policy periodically. Your continued use of the Service after we post any modifications to the Privacy Policy on this page will constitute your acknowledgment of the modifications and your consent to abide and be bound by the modified Privacy Policy.
+                        </p>
+                        <p>
+                            If we make any material changes to this Privacy Policy, we will notify you either through the email address you have provided us, or by placing a prominent notice on our website and decentralized applications prior to the change becoming effective.
+                        </p>
+                    </div>
+                </section>
+
                 {/* Contact */}
                 <section className="bg-[#050505] text-white p-10 md:p-12 rounded-3xl text-center">
-                    <h2 className="text-3xl font-black mb-6 tracking-tight">8. Contact Information</h2>
+                    <h2 className="text-3xl font-black mb-6 tracking-tight">13. Contact Information</h2>
                     <p className="mb-8 text-white/70 max-w-2xl mx-auto leading-relaxed">
                         If you have any questions about this Privacy Policy, our data practices, or if you wish to exercise your legal rights, please contact our Data Protection Officer immediately.
                     </p>

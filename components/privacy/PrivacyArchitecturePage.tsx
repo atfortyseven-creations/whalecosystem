@@ -165,7 +165,7 @@ export function PrivacyArchitecturePage() {
                 )}
 
                 {section.callout && (
-                  <div className="mt-8 p-6 md:p-8 border-l-2 border-black bg-[#f9f9f9]">
+                  <div className="mt-8 p-6 md:p-8 border-l-2 border-black bg-white">
                     <p className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-black/50 mb-2">
                       {section.callout.title}
                     </p>

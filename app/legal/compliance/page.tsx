@@ -75,6 +75,45 @@ export default function CompliancePolicy() {
                     </div>
                 </section>
 
+                {/* Transaction Monitoring */}
+                <section className="bg-white p-10 md:p-14 rounded-3xl border border-black/5">
+                    <h2 className="text-3xl font-black mb-8 tracking-tight">Advanced Transaction Monitoring Framework</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            While preserving user privacy, our platform employs sophisticated, AI-driven heuristic analysis to monitor blockchain ledgers in real-time. This system is designed to identify and flag potential indicators of illicit activity, such as structuring, layering, or interactions with known dark-net marketplaces and mixers.
+                        </p>
+                        <p>
+                            When our automated systems detect patterns consistent with money laundering or terrorist financing, our compliance team reviews the anomaly. While we cannot freeze decentralized assets, we can and will permanently revoke platform access for any user account associated with demonstrably illicit on-chain behavior.
+                        </p>
+                    </div>
+                </section>
+
+                {/* Internal Audits */}
+                <section>
+                    <h2 className="text-3xl font-black mb-8 tracking-tight">Internal Compliance Audits and Training</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            Compliance at Whale Alert Network is an ongoing, dynamic process rather than a static objective. We conduct comprehensive internal compliance audits bi-annually, led by our Chief Compliance Officer (CCO) in coordination with external regulatory counsel. These audits scrutinize our operational procedures, data handling practices, and risk assessment methodologies to ensure unwavering alignment with international standards.
+                        </p>
+                        <p>
+                            Furthermore, every employee, regardless of their department, undergoes mandatory annual compliance training. This specialized curriculum covers the latest developments in AML/KYC regulations, data privacy laws, and the specific compliance obligations pertinent to decentralized financial technologies.
+                        </p>
+                    </div>
+                </section>
+
+                {/* Global Policy Engagement */}
+                <section className="bg-white p-10 md:p-14 rounded-3xl border border-black/5">
+                    <h2 className="text-3xl font-black mb-8 tracking-tight">Constructive Engagement with Policymakers</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            We do not view regulators as adversaries; rather, we see them as essential partners in maturing the Web3 ecosystem. Whale Alert Network actively engages in constructive dialogues with global policymakers, financial regulators, and industry working groups.
+                        </p>
+                        <p>
+                            By participating in open forums and providing technical expertise on blockchain indexation and zero-knowledge cryptography, we aim to assist lawmakers in drafting sensible, technology-neutral regulations that protect consumers without stifling technological innovation.
+                        </p>
+                    </div>
+                </section>
+
                 {/* Contact */}
                 <section className="bg-[#050505] text-white p-10 md:p-12 rounded-3xl text-center">
                     <h2 className="text-2xl md:text-3xl font-black mb-4 tracking-tight">Compliance & Legal Inquiries</h2>

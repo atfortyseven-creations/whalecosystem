@@ -130,6 +130,45 @@ export default function CareersPage() {
           </div>
         </section>
 
+        {/* Extended Corporate Practices */}
+        <section>
+          <h3 className="text-3xl font-black mb-10 text-[#050505] tracking-tight">Performance Evaluation and Compensation Architecture</h3>
+          <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+            <p>
+              At Whale Alert Network, we believe that exceptional talent deserves transparent, highly competitive compensation and a clear trajectory for professional advancement. Our compensation architecture is heavily data-driven, benchmarking against the top 90th percentile of global technology firms. We conduct comprehensive bi-annual market analyses to ensure our salaries remain exceptionally competitive, regardless of macroeconomic volatility.
+            </p>
+            <p>
+              Performance evaluations are conducted quarterly, focusing on objective deliverables, peer feedback, and alignment with our core operating principles. We do not utilize stack ranking. Instead, we evaluate employees against absolute standards of excellence. High performers are rapidly accelerated through our leveling system, with significant adjustments to base compensation and equity grants to reflect their amplified impact on the organizational ecosystem.
+            </p>
+          </div>
+        </section>
+
+        {/* Diversity and Inclusion */}
+        <section className="bg-white p-10 rounded-3xl border border-black/10 mt-10">
+          <h3 className="text-3xl font-black mb-10 text-[#050505] tracking-tight">Diversity, Equity, and Global Inclusion</h3>
+          <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+            <p>
+              As a protocol designed to democratize global finance, our internal workforce must reflect the diverse, international community we serve. We are unequivocally committed to fostering a workplace where differences in background, perspective, and experience are not merely accommodated, but actively sought and celebrated.
+            </p>
+            <p>
+              Our hiring practices are strictly meritocratic and designed to mitigate unconscious bias. All technical evaluations are standardized, and interview panels are deliberately composed of cross-functional members from various geographical regions. We maintain zero tolerance for discrimination or harassment of any kind, enforcing strict codes of conduct across all internal and external communication channels.
+            </p>
+          </div>
+        </section>
+
+        {/* Onboarding */}
+        <section className="mt-10">
+          <h3 className="text-3xl font-black mb-10 text-[#050505] tracking-tight">Executive Onboarding and Mentorship Programs</h3>
+          <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+            <p>
+              Integrating into a high-velocity, fully remote engineering organization requires structured support. Our 90-day executive onboarding program is meticulously designed to accelerate your time-to-impact. Within your first week, you will be assigned a dedicated technical mentor and an organizational buddy to guide you through our internal architecture, proprietary tools, and operational cadence.
+            </p>
+            <p>
+              Beyond the initial onboarding phase, we offer continuous, formalized mentorship programs. Senior engineers and department leads are incentivized to dedicate a percentage of their operational bandwidth to mentoring junior and mid-level team members, fostering a culture of continuous intellectual compounding and knowledge transfer.
+            </p>
+          </div>
+        </section>
+
         {/* Values */}
         <section className="bg-[#050505] text-white p-12 md:p-16 rounded-3xl">
           <h3 className="text-3xl font-black mb-10 tracking-tight">Our Operating Principles</h3>
