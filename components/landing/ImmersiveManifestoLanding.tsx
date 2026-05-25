@@ -326,26 +326,17 @@ function HeroSection() {
       >
         {mounted && (
           <>
-            {/* Lottie animation replacing the static square */}
             <motion.div
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
               className="relative w-[180px] h-[180px] sm:w-[240px] sm:h-[240px] lg:w-[300px] lg:h-[300px] mb-8 shrink-0 flex items-center justify-center"
             >
-              {lottieData ? (
-                <Lottie
-                  animationData={lottieData}
-                  loop
-                  autoplay
-                  style={{ width: "100%", height: "100%" }}
-                />
-              ) : (
-                /* Elegant fallback while Lottie loads */
-                <div className="w-full h-full rounded-2xl bg-black/5 border border-black/8 flex items-center justify-center">
-                  <div className="w-8 h-8 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                </div>
-              )}
+              <img
+                src="/atom_3d_silver.jpg"
+                alt="Humanity Ledger"
+                className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl"
+              />
             </motion.div>
 
             {/* Headline */}
@@ -360,7 +351,7 @@ function HeroSection() {
                 <br />
                 <span className="text-black/30 text-[28px] sm:text-[36px] lg:text-[42px] font-bold">Powered by</span>
               </h1>
-              <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Aztec" className="h-[40px] sm:h-[50px] lg:h-[60px] mt-2 object-contain mix-blend-multiply" />
+              <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Aztec" className="h-[80px] sm:h-[100px] lg:h-[120px] mt-4 object-contain mix-blend-multiply" />
             </motion.div>
 
             {/* Sub */}
@@ -587,12 +578,12 @@ function FinalCTASection() {
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center gap-8"
         >
-          <div className="w-14 h-14">
-            <img
-              src="/atom_3d_silver.jpg"
-              alt="Humanity Ledger"
-              className="w-full h-full object-contain brightness-[8] contrast-50 opacity-75"
-              draggable={false}
+          <div className="w-40 h-40">
+            <Lottie
+              animationData={require('../../public/system-shots/block abstract.json')}
+              loop={true}
+              autoplay={true}
+              style={{ width: '100%', height: '100%', mixBlendMode: 'screen', opacity: 0.9 }}
             />
           </div>
 

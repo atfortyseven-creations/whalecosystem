@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -400,40 +400,22 @@ export default function ConnectPage() {
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col items-center justify-center gap-6 flex-1 py-4 text-center"
+                className="flex flex-col items-center justify-center w-full h-full flex-1 relative min-h-[300px]"
               >
-                <div className="w-32 h-32 flex items-center justify-center -mb-4">
-                  <RemoteLottie path="Transaction Complete.json" loop={false} className="w-full h-full object-contain" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-[300px] h-[300px]">
+                    <RemoteLottie path="Transaction Complete.json" loop={false} className="w-full h-full object-contain scale-[1.2]" />
+                  </div>
                 </div>
 
-                <div>
-                  <h2 className="text-[20px] font-black tracking-tight text-[#0A0A0A] mb-2">
-                    {isLinked ? "Session Verified" : "Wallet Connected"}
-                  </h2>
-                  <p className="text-[12px] text-[#888] leading-relaxed max-w-[240px] mx-auto">
-                    {isLinked
-                      ? "Redirecting to the terminal..."
-                      : "Your wallet is connected. Redirecting to the terminal."}
-                  </p>
+                <div className="absolute bottom-4 flex flex-col items-center gap-2">
+                  <button
+                    onClick={handleTotalDisconnect}
+                    className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] bg-rose-50 text-rose-500 hover:bg-rose-100 hover:text-rose-600 transition-all active:scale-[0.98]"
+                  >
+                    Total Disconnect
+                  </button>
                 </div>
-
-                <div className="flex items-center gap-1.5">
-                  {[0, 1, 2].map((i) => (
-                    <motion.div
-                      key={i}
-                      className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A]/30"
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  onClick={handleTotalDisconnect}
-                  className="mt-4 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] bg-rose-50 text-rose-500 hover:bg-rose-100 hover:text-rose-600 transition-all active:scale-[0.98]"
-                >
-                  Total Disconnect
-                </button>
               </motion.div>
 
             ) : isConnected && !isLinked ? (
@@ -507,10 +489,8 @@ export default function ConnectPage() {
                     className="flex justify-center mb-5"
                   >
                     <div className="p-4 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm relative w-[220px]">
-                      <div className="flex items-center justify-center gap-3 w-full mb-1">
-                        <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Aztec" className="w-24 h-8 object-contain" />
-                        <span className="text-[12px] font-mono text-[#0A0A0A]/30">×</span>
-                        <img src="/atom_3d_silver.jpg" alt="Atom" className="w-8 h-8 object-contain mix-blend-multiply" />
+                      <div className="flex items-center justify-center w-full mb-2 pb-2 border-b border-[#F0F0F0]">
+                        <span className="text-[28px] font-black tracking-tight text-[#0A0A0A]">Login</span>
                       </div>
                       <QRCodeSVG
                         value={qrData}
@@ -563,9 +543,9 @@ export default function ConnectPage() {
                 ))}
                 <button
                   onClick={() => openAppKit({ view: 'Connect' })}
-                  className="w-full flex items-center justify-center gap-3 py-3.5 mt-1 rounded-xl border border-[#F0F0F0] bg-white font-black uppercase tracking-[0.2em] text-[10px] text-[#0A0A0A]/50 hover:bg-[#FFFFFF] hover:text-[#0A0A0A] transition-all"
+                  className="w-full flex items-center justify-center gap-4 py-8 mt-2 rounded-xl border-2 border-[#0A0A0A] bg-white font-black uppercase tracking-[0.2em] text-[20px] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-all shadow-md"
                 >
-                  <ScanLine size={14} />
+                  <ScanLine size={24} />
                   WalletConnect
                 </button>
               </div>
