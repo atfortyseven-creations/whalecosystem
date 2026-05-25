@@ -30,6 +30,11 @@ import { CoreDotsPanel } from '@/components/portfolio/CoreDotsPanel';
 import { ProductPassportsPanel } from '@/components/portfolio/ProductPassportsPanel';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { useSystemAccount } from '@/hooks/useSystemAccount';
+import { useEnsName } from 'wagmi';
+import { PortfolioAdvancedSettings } from '@/components/portfolio/PortfolioAdvancedSettings';
+import { Settings as SettingsIcon } from 'lucide-react';
+
 function CoreEpochCountdown({ onReset }: { onReset: () => void }) {
   const [timeLeft, setTimeLeft] = useState<number>(0);
 
@@ -248,6 +253,7 @@ export default function PortfolioPage() {
   const [accountCreated, setAccountCreated] = useState(false);
   const [sessionUnlocked, setSessionUnlocked] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -259,6 +265,7 @@ export default function PortfolioPage() {
   }, []);
 
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading, isConnected: isLiveConnected, address: userAddress } = useLivePortfolio();
+  const { isConnected: isSystemConnected, isChecking: isSystemChecking } = useSystemAccount();
   const { chain, isConnected: wagmiConnected, isReconnecting } = useAccount();
   const { privateKey, address: storeAddress, clearWallet } = useWalletStore();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
@@ -269,6 +276,8 @@ export default function PortfolioPage() {
     setRefreshKey(k => k + 1);
     queryClient.invalidateQueries();
   }, [queryClient]);
+
+  const { data: ensName } = useEnsName({ address: userAddress as `0x${string}` | undefined });
 
   const isPositive = (change24hUSD ?? 0) >= 0;
 
@@ -288,7 +297,6 @@ export default function PortfolioPage() {
   const handleCreateOnChainAccount = async () => {
     setCreatingAccount(true);
     try {
-      // Open AppKit modal  user picks Coinbase Smart Wallet from the list
       openAppKit();
       toast.success('Wallet modal opened', { description: 'Select Coinbase Smart Wallet to create your on-chain account.' });
       setAccountCreated(true);
@@ -304,24 +312,9 @@ export default function PortfolioPage() {
   const isCoreUnlocked = !!privateKey;
 
   //  GATE LOGIC 
-  // Wait for client mount to avoid SSR hydration mismatch (wagmi state is client-only)
-  if (!mounted) return null;
+  if (!mounted || isSystemChecking) return null;
 
-  // Show the gate when the user has NOT authenticated in this session.
-  // Gate is skipped ONLY when:
-  //   A) privateKey is live in memory (just logged in this tab, not yet reloaded)
-  //   B) wagmi is fully connected AND stable (not just reconnecting from a stale session)
-  //   C) sessionStorage flag set this session (survives soft navigation within the tab)
-  //
-  // [ANDROID RACE FIX] The old condition `!wagmiConnected && !isReconnecting` was inverted:
-  // isReconnecting=true means wagmi is NOT yet confirmed connected. This was passing
-  // `needsGate = false` during the reconnect window, causing the portfolio to render
-  // and fire Alchemy API calls without any address. Now we require both:
-  //   - wagmiConnected=true (actual confirmed connection)
-  //   - isReconnecting=false (connection is stable, not in-flight)
-  // This prevents the ~300ms window of unauthenticated portfolio data fetching on Android.
-  const isWagmiStable = wagmiConnected && !isReconnecting;
-  const needsGate = !isCoreUnlocked && !isWagmiStable && !sessionUnlocked;
+  const needsGate = !isSystemConnected && !sessionUnlocked;
 
   if (needsGate) {
     return (
@@ -380,7 +373,7 @@ export default function PortfolioPage() {
             </div>
             {/* Address directly below whale  zero gap */}
             <div className="flex items-center gap-2 px-3 py-1 border rounded-full" style={{ borderColor: BORDER, background: CARD }}>
-              <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : ''}</span>
+              <span className="font-mono text-[10px]" style={{ color: MUTED }}>{ensName ? ensName : (userAddress ? formatAddr(userAddress) : '')}</span>
               <button
                 onClick={() => { navigator.clipboard.writeText(userAddress ?? ''); toast.success('Copied!'); }}
                 style={{ color: MUTED }}
@@ -516,6 +509,7 @@ export default function PortfolioPage() {
             <WalletAction icon={Globe}          label="Bridge" onClick={() => openMode("bridge")} />
             <WalletAction icon={CreditCard}     label="Buy"    onClick={() => openMode("buy")}    />
             <WalletAction icon={Globe}          label="Network" onClick={() => setShowNetworkSwitch(s => !s)} />
+            <WalletAction icon={SettingsIcon}   label="Settings" onClick={() => setIsSettingsOpen(true)} />
             <WalletAction icon={Plus}           label="New Account" onClick={() => setShowCreateAccount(s => !s)} />
             <WalletAction icon={LogOut}         label="Disconnect" onClick={handleDisconnect} />
           </div>
@@ -811,8 +805,24 @@ export default function PortfolioPage() {
           <CoreDotsPanel />
         </motion.div>
 
-        <ProductPassportsPanel />
+        {/*  PRODUCT PASSPORTS  */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="mt-6 mb-8"
+        >
+          <ProductPassportsPanel />
+        </motion.div>
+
+        <SystemFooter />
       </div>
+
+      <PortfolioAdvancedSettings 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        userAddress={userAddress} 
+      />
 
       {/*  MODALS  */}
       <LegendaryTransactionModal

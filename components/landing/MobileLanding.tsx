@@ -721,9 +721,16 @@ export function MobileLanding() {
   const [autoSyncStarted, setAutoSyncStarted] = useState(false);
 
   useEffect(() => {
-    if (isLinked && effectiveAddress && uuidParam && !autoSyncStarted) {
-      setAutoSyncStarted(true);
-      setShowScanner(true);
+    if (uuidParam && !autoSyncStarted) {
+      if (isLinked && effectiveAddress) {
+        // If they are already linked, immediately show the scanner to complete the handshake
+        setAutoSyncStarted(true);
+        setShowScanner(true);
+      } else {
+        // If they are not linked, show the connect wallet modal so they can connect first
+        setAutoSyncStarted(true);
+        setShowConnectOverlay(true);
+      }
     }
   }, [isLinked, effectiveAddress, uuidParam, autoSyncStarted]);
 
@@ -1233,16 +1240,25 @@ export function MobileLanding() {
           >
             <WhaleLogo className="w-6 h-6" />
           </div>
-          <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
+          <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">Whale Alert</span>
         </div>
-        {!showConnectOverlay && (
+        
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowConnectOverlay(true)}
-            className="px-4 py-2 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+            onClick={() => { setScanMode('session-only'); setShowScanner(true); }}
+            className="w-8 h-8 rounded-xl bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors text-black"
           >
-            Connect Wallet
+            <Scan size={14} />
           </button>
-        )}
+          {!showConnectOverlay && (
+            <button
+              onClick={() => setShowConnectOverlay(true)}
+              className="px-4 py-2 rounded-xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+            >
+              Connect
+            </button>
+          )}
+        </div>
       </motion.header>
 
       {/*  Background Landing Page  */}
@@ -1370,6 +1386,22 @@ export function MobileLanding() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <DynamicUniversalScanModal
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        address={effectiveAddress ?? undefined}
+        mode={scanMode}
+        initialScanData={initialScanData}
+        onScan={(_result: string) => {
+          const toast = document.createElement('div');
+          toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[10px] border border-white/10 font-mono uppercase tracking-[0.3em] px-6 py-5 rounded-2xl shadow-2xl text-center';
+          toast.textContent = scanMode === 'session-only' ? 'Session Handshake Initiated' : 'Scan complete';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 3000);
+          setShowScanner(false);
+        }}
+      />
     </div>
   );
 }

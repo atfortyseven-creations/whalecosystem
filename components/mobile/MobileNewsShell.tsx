@@ -5,34 +5,22 @@ import { motion } from 'framer-motion';
 import { NewsTerminal } from '@/components/news/NewsTerminal';
 import { QrCode, X } from 'lucide-react';
 
-// Inline fallback scanner  MobileQRScanner no longer lives in MobileWhaleLanding
-function MobileQRScannerFallback({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95">
-      <p className="text-white/60 font-mono text-xs mb-6">QR Scanner  open on desktop</p>
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white text-sm"
-      >
-        <X size={14} /> Close
-      </button>
-    </div>
-  );
-}
+import UniversalScanModal from '@/components/scan/UniversalScanModal';
 
-//  MOBILE AUTHENTICATED SHELL 
+// MOBILE AUTHENTICATED SHELL 
 // Shown to mobile users who have completed the QR handshake.
-// Only Whale News is accessible  no other tabs.
+// Only Whale News is accessible no other tabs.
 
 export function MobileNewsShell() {
   const [showScanner, setShowScanner] = useState(false);
 
-  if (showScanner) {
-    return <MobileQRScannerFallback onBack={() => setShowScanner(false)} />;
-  }
-
   return (
     <div className="w-full min-h-safe min-h-screen bg-[#FAF9F6] flex flex-col">
+      <UniversalScanModal 
+        isOpen={showScanner} 
+        onClose={() => setShowScanner(false)} 
+        mode="session-only" 
+      />
       {/*  Minimal Mobile Header  */}
       <header
         className="sticky top-0 z-50 flex items-center justify-between px-5 border-b"

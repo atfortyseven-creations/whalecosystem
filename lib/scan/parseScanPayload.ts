@@ -82,10 +82,10 @@ function isSessionQr(text: string): boolean {
   const trimmed = text.trim();
   try {
     const url = new URL(trimmed);
-    const uuid = url.searchParams.get('uuid');
-    const pub = url.searchParams.get('pub');
+    const uuid = url.searchParams.get('uuid') || url.searchParams.get('session');
+    const pub = url.searchParams.get('pub') || url.searchParams.get('ekey');
     if (uuid && pub) return true;
-    if (url.pathname.includes('/connect') && uuid) return true;
+    if ((url.pathname.includes('/connect') || url.pathname.includes('/mobile-kyc')) && uuid) return true;
   } catch {
     /* fall through */
   }

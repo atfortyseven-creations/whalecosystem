@@ -1,182 +1,278 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { SystemFooter } from '@/components/landing/SystemFooter';
-import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
-import { OPEN_ROLES, BENEFITS } from './data';
+import React, { useState } from 'react';
+import DocLayout from '@/components/layout/DocLayout';
+import { Briefcase, ArrowRight, Code, PenTool, BarChart, Shield, Globe, Users, Heart, Zap, Coffee, MapPin, CheckCircle, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export function CareersPageClient() {
+const JOBS = [
+  {
+    id: 'frontend-engineer',
+    title: 'Senior Frontend Engineer',
+    department: 'Engineering',
+    location: 'Remote (Worldwide)',
+    type: 'Full-time',
+    description: 'We are seeking an exceptionally talented Senior Frontend Engineer to lead the development of our highly interactive web interfaces. In this role, you will be responsible for creating responsive designs that work flawlessly across desktop and mobile devices. You will collaborate closely with our design and backend teams to ensure seamless integration of complex financial data streams into an intuitive user experience. If you are passionate about performance optimization, accessibility, and clean code, this role is for you.',
+    requirements: [
+      '5+ years of professional experience with React and modern web technologies.',
+      'Deep understanding of Next.js, including Server Components and the App Router architecture.',
+      'Exceptional CSS skills, with a strong preference for Tailwind CSS, and extensive experience with animation libraries such as Framer Motion.',
+      'Strong focus on web accessibility standards (WCAG), performance optimization, and creating exceptional user experiences.',
+      'Experience interacting with Web3 libraries (such as viem or wagmi) is a significant advantage.',
+      'Excellent communication skills and the ability to articulate technical decisions to non-technical stakeholders.'
+    ]
+  },
+  {
+    id: 'backend-engineer',
+    title: 'Backend Systems Engineer',
+    department: 'Engineering',
+    location: 'Remote (Worldwide)',
+    type: 'Full-time',
+    description: 'As a Backend Systems Engineer, you will design, build, and maintain the highly scalable infrastructure that powers real-time market data, secure user authentication, and blockchain indexing for our global user base. You will work on solving complex distributed systems problems, ensuring high availability and low latency across all our services. Your work will directly impact the reliability and speed of the platform, forming the backbone of our entire technological ecosystem.',
+    requirements: [
+      'Strong proficiency in Node.js, TypeScript, and advanced API design (REST and GraphQL).',
+      'Extensive experience with relational databases (PostgreSQL), ORMs (Prisma), and caching strategies (Redis).',
+      'Solid knowledge of cloud infrastructure deployment (Vercel, AWS) and containerization technologies (Docker, Kubernetes).',
+      'Deep understanding of security best practices, data protection regulations, and rate limiting mechanisms.',
+      'Familiarity with Ethereum node infrastructure and interacting with RPC providers.',
+      'A proven track record of writing clean, testable, and maintainable backend code.'
+    ]
+  },
+  {
+    id: 'product-designer',
+    title: 'Lead Product Designer',
+    department: 'Design',
+    location: 'Remote (Worldwide)',
+    type: 'Full-time',
+    description: 'We are looking for a Lead Product Designer to shape the visual identity and user experience of Whale Alert Network. You will be tasked with designing intuitive, premium interfaces that make complex financial data easy to understand for everyday users. From wireframing to high-fidelity prototyping, you will own the end-to-end design process, ensuring our product remains visually stunning, accessible, and user-centric.',
+    requirements: [
+      'Extensive portfolio demonstrating high-end digital product design, particularly in complex web applications or financial dashboards.',
+      'Mastery of industry-standard design tools, primarily Figma, including advanced prototyping and the creation of scalable design systems.',
+      'Demonstrated ability to translate complex technical requirements into elegant, simple UI solutions.',
+      'Strong understanding of modern design trends, micro-interactions, and typography.',
+      'Excellent cross-functional collaboration skills, particularly in working closely with frontend engineering teams to ensure design implementation fidelity.'
+    ]
+  },
+  {
+    id: 'community-manager',
+    title: 'Global Community Manager',
+    department: 'Marketing',
+    location: 'Remote (Worldwide)',
+    type: 'Full-time',
+    description: 'The Global Community Manager will be responsible for growing and nurturing our international user base across various social platforms, including Discord and Twitter. You will serve as the primary voice of Whale Alert Network and the chief advocate for our users. This role involves developing engagement strategies, organizing digital events, and acting as the vital link between our user community and our internal product teams.',
+    requirements: [
+      'Proven experience managing large, active online communities, preferably in the technology or finance sectors.',
+      'Exceptional written and verbal communication skills, with a knack for creating engaging, clear, and empathetic content.',
+      'Experience organizing online events, Ask Me Anything (AMA) sessions, and educational campaigns.',
+      'A solid understanding of decentralized finance concepts and a strong empathy for user needs and pain points.',
+      'The ability to gather user feedback systematically and present actionable insights to the product development team.'
+    ]
+  },
+  {
+    id: 'financial-analyst',
+    title: 'Senior Market Data Analyst',
+    department: 'Data',
+    location: 'Remote (Worldwide)',
+    type: 'Full-time',
+    description: 'Join our data division to help interpret complex blockchain transactions and market trends. As a Senior Market Data Analyst, you will build automated reporting tools, define new analytical metrics, and ensure the accuracy of the financial data presented on our platform. Your insights will directly inform the features we build and the information we provide to our users.',
+    requirements: [
+      'Degree in Finance, Economics, Computer Science, Data Science, or a related field.',
+      'Expert proficiency in SQL and Python for data analysis and visualization.',
+      'Deep understanding of traditional financial markets and decentralized finance mechanics.',
+      'Experience working with large datasets and utilizing BI tools (Tableau, Looker, etc.).',
+      'Strong analytical mindset with an obsessive attention to detail and data accuracy.'
+    ]
+  }
+];
+
+export default function CareersPage() {
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+
   return (
-    <div className="w-full flex-1 flex flex-col bg-white text-slate-900 font-sans antialiased overflow-y-auto no-scrollbar">
-
-      {/*  MAIN WRAPPER  */}
-      <div className="w-full flex flex-col items-center justify-start p-4 md:p-8 relative">
+    <DocLayout
+      title="Careers at Whale Alert Network"
+      description="Join our global team and help us build the most accessible, secure, and technologically advanced decentralized finance platform in the world."
+      lastUpdated="May 25, 2026"
+      category="Company"
+    >
+      <div className="space-y-16 pb-16">
         
-        {/*  MAIN PANEL  */}
-        <div className="w-full max-w-[1000px] bg-white/80 backdrop-blur-2xl border border-slate-200/60 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.07)] p-7 md:p-10 lg:p-16 flex flex-col transition-all duration-500 z-10">
-          
-          {/*  PAGE HEADER  */}
-          <header className="w-full flex-shrink-0 border-b border-slate-200/60 pb-8 mb-10">
-            <div className="flex flex-col gap-4">
-                <div className="inline-flex items-center px-4 py-1.5 bg-slate-50 border border-slate-200/60 rounded-full w-fit">
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">Open Positions</span>
+        {/* Intro */}
+        <section className="text-center max-w-4xl mx-auto pt-8">
+          <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tight text-[#050505] leading-tight">
+            Build the Future of Financial Technology
+          </h2>
+          <p className="text-xl text-[#050505]/70 leading-relaxed">
+            We are a rapidly growing, fully remote team of software engineers, product designers, and financial innovators. Our overarching mission is to democratize access to financial technology, and we are actively seeking passionate individuals to join us on this journey. If you value professional excellence, clear communication, and user-centric design, you belong with us.
+          </p>
+        </section>
+
+        {/* Culture & Perks */}
+        <section>
+          <h3 className="text-3xl font-black mb-10 text-[#050505] tracking-tight">Comprehensive Benefits & Culture</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: <Globe />, title: 'Work From Anywhere', desc: 'We are a 100% remote company. Work from the comfort of your home, a local cafe, or while traveling the world. We care entirely about your results and contributions, not your geographical location.' },
+              { icon: <Heart />, title: 'Health & Wellness', desc: 'We offer comprehensive health, dental, and vision insurance for you and your dependents. Additionally, we provide a monthly wellness stipend to cover gym memberships, yoga classes, or mental health applications.' },
+              { icon: <Zap />, title: 'Premium Hardware', desc: 'We provide a generous budget for your home office setup. You can choose the exact laptop, monitor, and ergonomic equipment you need to ensure you can do your best work comfortably.' },
+              { icon: <Briefcase />, title: 'Flexible Time Off', desc: 'We firmly believe in working hard and resting well. Take the time you need to recharge with our highly flexible and untracked paid time off policy.' },
+              { icon: <Users />, title: 'Annual Retreats', desc: 'Once a year, we fly the entire global team to a beautiful destination for a week of in-person team building, strategic planning, and celebration of our milestones.' },
+              { icon: <Code />, title: 'Continuous Learning', desc: 'Continuous professional growth is essential. Enjoy a dedicated annual stipend for online courses, textbooks, industry conferences, and professional certifications.' }
+            ].map((perk, i) => (
+              <div key={i} className="bg-white p-8 rounded-3xl border border-black/5 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center mb-6 text-slate-700 group-hover:scale-110 transition-transform origin-left">
+                  {perk.icon}
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-none">
-                    Join the Platform
-                </h1>
-                <p className="mt-2 text-slate-500 font-medium text-sm md:text-base leading-relaxed max-w-2xl">
-                    We process global market data in real time with high precision. Join our engineering and analytics teams building the systems that provide actionable analytics to the public.
-                </p>
-            </div>
-          </header>
-
-          <div className="flex flex-col gap-16">
-
-            {/*  OPEN POSITIONS  */}
-            <section>
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block mb-1">Active Roles</span>
-                  <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 leading-none">Open Positions</h2>
-                </div>
+                <h4 className="text-xl font-bold mb-3 text-[#050505]">{perk.title}</h4>
+                <p className="text-[#050505]/60 text-sm leading-relaxed">{perk.desc}</p>
               </div>
-
-              <div className="flex flex-col gap-6">
-                {OPEN_ROLES.map(role => (
-                  <Link
-                    key={role.id}
-                    href={`/careers/${role.id}`}
-                    className="block bg-white border border-slate-200/60 rounded-2xl overflow-hidden hover:border-slate-300 hover:shadow-md transition-all duration-300"
-                  >
-                    <div className="p-6 md:p-8">
-                      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-6">
-                        
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-3 mb-4">
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-500">
-                              {role.department}
-                            </span>
-                            {role.badge && (
-                              <span className="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-slate-200 bg-white text-slate-800">
-                                {role.badge}
-                              </span>
-                            )}
-                          </div>
-                          
-                          <h3 className="text-xl md:text-2xl font-black tracking-tight text-slate-900 mb-3 leading-tight">
-                            {role.title}
-                          </h3>
-                          
-                          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-4">
-                            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide">
-                              {role.location}
-                            </div>
-                            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide">
-                              {role.type}
-                            </div>
-                            <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide">
-                              {role.salary}
-                            </div>
-                          </div>
-                          
-                          <p className="text-[14px] text-slate-500 leading-relaxed font-medium max-w-2xl">
-                            {role.description}
-                          </p>
-                        </div>
-
-                        <div className="shrink-0">
-                          <div className="inline-flex items-center justify-center px-6 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-colors">
-                            View Position
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-wrap items-center gap-2 pt-6 border-t border-slate-100">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mr-2">Core Tech:</span>
-                        {role.skills.map(skill => (
-                          <span key={skill} className="text-[9px] font-bold px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-600 uppercase tracking-widest">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-
-            {/*  CULTURE & BENEFITS  */}
-            <section>
-              <div className="mb-8 border-t border-slate-200/60 pt-10">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block mb-1">Our Culture</span>
-                <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 leading-none">Why Join Us</h2>
-              </div>
-
-              <div className="mb-10 bg-slate-50 border border-slate-200/60 rounded-2xl p-8 sm:p-10 relative overflow-hidden">
-                <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-8">
-                  <div className="flex-1 max-w-2xl">
-                    <p className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-tight mb-4">
-                      Your work drives public insight.
-                    </p>
-                    <p className="text-sm text-slate-500 leading-relaxed">
-                      Every system deployed and every interface refined directly influences how users understand the market. We are building the foundational data layer for accessible analytics.
-                    </p>
-                  </div>
-                  <div className="shrink-0 flex items-center px-4 py-2 bg-white border border-slate-200 rounded-full w-fit">
-                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-600">Global Operations</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
-                {BENEFITS.map((b, i) => (
-                  <div key={i} className="bg-white border border-slate-200/60 rounded-2xl p-6 hover:border-slate-300 hover:shadow-sm transition-all duration-300">
-                    <h3 className="text-[15px] font-black tracking-tight text-slate-900 mb-2">{b.title}</h3>
-                    <p className="text-[13px] text-slate-500 leading-relaxed font-medium">{b.body}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden">
-                <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-                  {[
-                    { title: 'Data Integrity', body: 'We build systems where data is verifiable. Our culture reflects transparency and rigorous validation above all else.' },
-                    { title: 'Efficient Execution', body: 'Small, autonomous units. No bureaucratic friction. We deploy professional-grade infrastructure rapidly.' },
-                    { title: 'Global Focus', body: 'Globally distributed by design. Work asynchronously from anywhere. We value clear, documented communication.' },
-                  ].map((p, i) => (
-                    <div key={i} className="p-6 sm:p-8 flex flex-col gap-3 hover:bg-slate-50/50 transition-colors">
-                      <h3 className="text-[15px] font-black tracking-tight text-slate-900">{p.title}</h3>
-                      <p className="text-[13px] text-slate-500 leading-relaxed">{p.body}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/*  SPONTANEOUS APPLICATION  */}
-            <section className="text-center bg-slate-50 border border-slate-200/60 rounded-2xl p-10 sm:p-16 relative overflow-hidden">
-               <div className="relative z-10 flex flex-col items-center">
-                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 mb-3">Don't see your expertise?</h3>
-                <p className="text-sm text-slate-500 max-w-xl mx-auto mb-8 leading-relaxed">
-                  We are constantly expanding our engineering and analytics teams. If you are a specialized professional in data systems or analytics, we want to hear from you.
-                </p>
-                <a
-                  href="mailto:careers@humanidfi.com"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white border border-slate-200 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-50 transition-all shadow-sm"
-                >
-                  Submit Application
-                </a>
-                <p className="mt-5 text-[10px] text-slate-400 font-bold uppercase tracking-widest">careers@humanidfi.com</p>
-              </div>
-            </section>
-
+            ))}
           </div>
-        </div>
+        </section>
+
+        {/* Values */}
+        <section className="bg-[#050505] text-white p-12 md:p-16 rounded-3xl">
+          <h3 className="text-3xl font-black mb-10 tracking-tight">Our Operating Principles</h3>
+          <div className="grid md:grid-cols-2 gap-10">
+            <div>
+              <h4 className="text-xl font-bold mb-4 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0"><CheckCircle size={14}/></div>
+                User-Centric Execution
+              </h4>
+              <p className="text-white/60 leading-relaxed pl-11">
+                Everything we build starts with the user. We do not implement technology simply for the sake of it; we implement it to solve real, tangible problems and provide a delightful, frictionless experience for our global audience.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-xl font-bold mb-4 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0"><Users size={14}/></div>
+                Transparent Communication
+              </h4>
+              <p className="text-white/60 leading-relaxed pl-11">
+                Being a fully remote organization requires exceptional communication. We document everything meticulously, share decisions openly, and encourage constructive feedback across all levels of the company.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-xl font-bold mb-4 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0"><Shield size={14}/></div>
+                Ownership & Autonomy
+              </h4>
+              <p className="text-white/60 leading-relaxed pl-11">
+                We hire intelligent, capable people and trust them to make critical decisions. You will have profound ownership over your projects and the absolute autonomy to execute them in the most effective way possible.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-xl font-bold mb-4 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0"><Zap size={14}/></div>
+                Continuous Shipping
+              </h4>
+              <p className="text-white/60 leading-relaxed pl-11">
+                We heavily value momentum. We break down massive features into manageable, logical updates and ship them frequently. Getting features into users' hands quickly allows us to learn, adapt, and iterate faster.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Open Positions */}
+        <section>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <h3 className="text-3xl font-black text-[#050505] tracking-tight">Open Positions</h3>
+            <span className="bg-slate-100 text-[#050505] border border-black/10 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest self-start sm:self-auto">
+              {JOBS.length} Roles Available
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {JOBS.map(job => (
+              <div key={job.id} className="border border-black/10 rounded-3xl overflow-hidden bg-white shadow-sm transition-all hover:border-black/20">
+                <button 
+                  onClick={() => setSelectedJob(selectedJob === job.id ? null : job.id)}
+                  className="w-full px-8 py-6 flex items-center justify-between bg-white hover:bg-white transition-colors text-left"
+                >
+                  <div className="flex flex-col gap-2">
+                    <h4 className="text-xl font-black text-[#050505]">{job.title}</h4>
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-[#050505]/50 font-medium">
+                      <span className="flex items-center gap-1.5"><Briefcase size={14} /> {job.department}</span>
+                      <span className="flex items-center gap-1.5"><MapPin size={14} /> {job.location}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <span className="hidden md:inline-flex px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black uppercase tracking-widest text-[#050505]">
+                      {job.type}
+                    </span>
+                    <div className={`transform transition-transform duration-300 ${selectedJob === job.id ? 'rotate-90' : ''}`}>
+                      <ArrowRight size={20} className="text-[#050505]/40" />
+                    </div>
+                  </div>
+                </button>
+
+                <AnimatePresence>
+                  {selectedJob === job.id && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="border-t border-black/5"
+                    >
+                      <div className="p-8 md:p-10 bg-white">
+                        <h5 className="font-black text-[#050505] mb-4 text-lg">About the Role</h5>
+                        <p className="text-[#050505]/70 mb-8 leading-relaxed max-w-4xl">
+                          {job.description}
+                        </p>
+                        
+                        <h5 className="font-black text-[#050505] mb-4 text-lg">Key Requirements</h5>
+                        <ul className="space-y-3 mb-10 max-w-4xl">
+                          {job.requirements.map((req, i) => (
+                            <li key={i} className="flex items-start gap-3 text-[#050505]/70 leading-relaxed">
+                              <div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-2 shrink-0"/>
+                              <span>{req}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <button className="px-10 py-4 bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] rounded-2xl hover:bg-black/80 transition-colors shadow-lg active:scale-95">
+                          Apply for this Position
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Application Process */}
+        <section className="bg-white border border-black/10 rounded-3xl p-10 md:p-16">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <h3 className="text-3xl font-black mb-6 text-[#050505] tracking-tight">Our Professional Hiring Process</h3>
+            <p className="text-[#050505]/70 leading-relaxed text-lg">
+              We deeply value your time and effort. Our hiring process is meticulously designed to be efficient, fully transparent, and highly respectful. We aim to complete the entire evaluation process within two to three weeks from the initial contact.
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row items-stretch justify-between gap-6 text-left">
+            <div className="flex-1 bg-white p-8 rounded-3xl border border-black/5 relative">
+              <div className="absolute -top-4 -left-4 w-10 h-10 bg-[#050505] text-white rounded-2xl flex items-center justify-center font-black shadow-lg">1</div>
+              <h4 className="font-bold mb-3 text-[#050505] text-lg">Initial Screening Call</h4>
+              <p className="text-[#050505]/60 leading-relaxed">An introductory 30-minute conversation with our internal recruitment team to discuss your professional background, past experiences, and ensure alignment on expectations.</p>
+            </div>
+            
+            <div className="flex-1 bg-white p-8 rounded-3xl border border-black/5 relative">
+              <div className="absolute -top-4 -left-4 w-10 h-10 bg-[#050505] text-white rounded-2xl flex items-center justify-center font-black shadow-lg">2</div>
+              <h4 className="font-bold mb-3 text-[#050505] text-lg">Technical Evaluation</h4>
+              <p className="text-[#050505]/60 leading-relaxed">A practical, non-whiteboard collaborative session with the engineering or design team to dive deep into your practical skills, architectural decisions, and portfolio projects.</p>
+            </div>
+            
+            <div className="flex-1 bg-white p-8 rounded-3xl border border-black/5 relative">
+              <div className="absolute -top-4 -left-4 w-10 h-10 bg-[#050505] text-white rounded-2xl flex items-center justify-center font-black shadow-lg">3</div>
+              <h4 className="font-bold mb-3 text-[#050505] text-lg">Leadership Conversation</h4>
+              <p className="text-[#050505]/60 leading-relaxed">A final, comprehensive conversation with our executive leadership to ensure mutual cultural fit, align on long-term goals, and answer any remaining questions you may have.</p>
+            </div>
+          </div>
+        </section>
+
       </div>
-      
-      <WhaleChatLink />
-      <SystemFooter />
-    </div>
+    </DocLayout>
   );
 }

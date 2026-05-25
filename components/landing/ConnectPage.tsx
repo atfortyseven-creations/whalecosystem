@@ -359,7 +359,17 @@ export default function ConnectPage() {
   const isVerified = mounted && isLinked;
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center bg-white relative overflow-hidden">
+    <div className="w-full flex-1 flex flex-col items-center bg-black relative overflow-hidden">
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-80"
+      >
+        <source src="/system-shots/8597294-hd_1920_1080_30fps.mp4" type="video/mp4" />
+      </video>
       
       <div className="relative z-10 w-full flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 sm:p-12 lg:gap-12 xl:gap-24 max-w-[1400px] mx-auto min-h-0">
         
@@ -575,28 +585,17 @@ export default function ConnectPage() {
         {/* RIGHT: Collaborators / Aztec Network */}
         <div className="hidden lg:flex w-[380px] xl:w-[420px] flex-shrink-0 flex-col items-center justify-center p-8 z-20">
           <div className="flex flex-col items-center gap-8 w-full">
-            <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-black/10 to-transparent"></div>
+            <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
             
             <div className="flex flex-col items-center text-center gap-4 w-full">
-              <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#0A0A0A]/40 font-medium">
-                Infrastructure Partner
-              </span>
               
               <div className="w-[200px] xl:w-[240px] flex items-center justify-center my-2 opacity-95">
-                <div className="flex items-center gap-3">
-                  <svg viewBox="0 0 24 24" fill="none" className="w-10 h-10">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2.5C12.5 2.5 13 2.7 13.4 3.1L20.9 10.6C21.7 11.4 21.7 12.6 20.9 13.4L13.4 20.9C12.6 21.7 11.4 21.7 10.6 20.9L3.1 13.4C2.3 12.6 2.3 11.4 3.1 10.6L10.6 3.1C11 2.7 11.5 2.5 12 2.5ZM12 8.5C11.6 8.5 11.2 8.7 10.9 8.9L8.9 10.9C8.3 11.5 8.3 12.5 8.9 13.1L10.9 15.1C11.5 15.7 12.5 15.7 13.1 15.1L15.1 13.1C15.7 12.5 15.7 11.5 15.1 10.9L13.1 8.9C12.8 8.7 12.4 8.5 12 8.5Z" fill="#0A0A0A"/>
-                  </svg>
-                  <span className="text-[20px] font-black tracking-tighter text-[#0A0A0A]">AZTEC NETWORK</span>
-                </div>
+                <img src="/custom-logo-2.png" alt="Collaborator" className="w-full h-auto object-contain rounded-xl shadow-2xl" />
               </div>
               
-              <p className="text-[11px] text-[#0A0A0A]/40 leading-relaxed font-serif max-w-[280px] italic">
-                Zero-knowledge programmable privacy preserving infrastructure.
-              </p>
             </div>
             
-            <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-black/10 to-transparent"></div>
+            <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
           </div>
         </div>
       </div>
@@ -616,8 +615,8 @@ export default function ConnectPage() {
       )}
 
       {/* Footer minimal */}
-      <footer className="relative z-30 px-6 py-5 border-t border-[#F0F0F0] flex items-center justify-center bg-white w-full">
-        <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-[#0A0A0A]/30">© 2026 Whale Alert Network</span>
+      <footer className="relative z-30 px-6 py-5 border-t border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md w-full">
+        <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-white/50">© 2026 Whale Alert Network</span>
       </footer>
     </div>
   );

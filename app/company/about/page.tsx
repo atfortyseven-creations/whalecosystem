@@ -1,270 +1,180 @@
 import DocLayout from '@/components/layout/DocLayout';
-import { Heart, Users, Target, Sparkles, Globe, Shield } from 'lucide-react';
+import { Heart, Users, Target, Sparkles, Globe, Shield, Activity, Lock, Cpu, Rocket, Award, Lightbulb, TrendingUp, Handshake, Leaf, BookOpen } from 'lucide-react';
 
 export default function AboutPage() {
     return (
         <DocLayout
-            title="About Us"
-            description="Learn about WhaleAlert ID.fi's mission to democratize DeFi through privacy-preserving identity and professional-grade tools."
-            lastUpdated="February 7, 2026"
+            title="About Whale Alert Network"
+            description="Discover the mission, vision, and people behind Whale Alert Network, a platform committed to making advanced decentralized finance accessible, transparent, and secure for everyone globally."
+            lastUpdated="May 25, 2026"
             category="Company"
         >
-            <div className="space-y-8">
-                {/* Hero */}
-                <section className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 p-8 rounded-xl border border-white/10">
-                    <h2 className="text-4xl font-bold mb-4">The Future of Human-Centric DeFi</h2>
-                    <p className="text-lg text-white/80">
-                        WhaleAlert ID.fi combines zero-knowledge identity verification with Elite-grade trading tools to create a DeFi platform that's powerful, private, and accessible to everyone.
+            <div className="space-y-16">
+                {/* Hero Section */}
+                <section className="bg-gradient-to-r from-blue-600/10 to-indigo-600/10 p-10 md:p-16 rounded-3xl border border-black/5 dark:border-white/5 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-white/40 dark:bg-black/20 backdrop-blur-sm -z-10" />
+                    <h2 className="text-4xl md:text-6xl font-black mb-8 tracking-tight text-[#050505] leading-tight">
+                        Redefining the Future of Decentralized Finance
+                    </h2>
+                    <p className="text-xl md:text-2xl text-[#050505]/70 leading-relaxed max-w-4xl">
+                        At Whale Alert Network, we believe that advanced financial tools should be accessible to everyone, not just institutional investors. We are building a comprehensive ecosystem that combines professional-grade trading insights with an unwavering commitment to user privacy, simplicity, and global security.
                     </p>
                 </section>
 
-                {/* Mission */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
-                        <Target className="text-blue-400" />
-                        Our Mission
-                    </h2>
-
-                    <div className="bg-white/5 p-8 rounded-xl border border-white/10">
-                        <p className="text-lg mb-4">
-                            To democratize access to decentralized finance by proving <strong>humanity</strong> without sacrificing <strong>privacy</strong>.
+                {/* Our Story Extended */}
+                <section className="px-4 md:px-0">
+                    <h2 className="text-3xl font-black mb-8 tracking-tight text-[#050505]">Our Origin Story</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            Whale Alert Network was founded with a simple, profound realization: the technological tools and market analytics used by professional traders and large financial institutions were vastly superior to those available to everyday users. Moreover, the decentralized finance (DeFi) space, while promising absolute transparency and democratization, was becoming increasingly complex, fragmented, and fraught with security risks.
                         </p>
-                        <p className="text-white/70">
-                            We believe everyone deserves access to borderless financial tools, regardless of their location, wealth, or background. By leveraging zero-knowledge proofs and self-custody wallets, we're building a future where you control your identity, your data, and your money.
+                        <p>
+                            A specialized group of passionate software engineers, financial analysts, and user experience designers came together to bridge this growing gap. We set out to build a holistic platform that strips away the daunting complexity of blockchain technology, presenting users with a clean, intuitive, and highly professional interface that rivals the best consumer applications in the world.
                         </p>
-                    </div>
-                </section>
-
-                {/* Vision */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
-                        <Sparkles className="text-yellow-400" />
-                        Our Vision
-                    </h2>
-
-                    <div className="grid md:grid-cols-3 gap-4">
-                        <div className="bg-purple-600/10 border border-purple-500/30 p-6 rounded-xl">
-                            <Shield size={32} className="text-purple-400 mb-3" />
-                            <h3 className="text-xl font-bold mb-2">Privacy First</h3>
-                            <p className="text-sm text-white/70">
-                                Zero-knowledge proofs let you prove you're human without revealing who you are. Your identity, your control.
-                            </p>
-                        </div>
-
-                        <div className="bg-blue-600/10 border border-blue-500/30 p-6 rounded-xl">
-                            <Users size={32} className="text-blue-400 mb-3" />
-                            <h3 className="text-xl font-bold mb-2">Accessible to All</h3>
-                            <p className="text-sm text-white/70">
-                                Professional-grade tools shouldn't require a hedge fund budget. We start free and scale with you.
-                            </p>
-                        </div>
-
-                        <div className="bg-green-600/10 border border-green-500/30 p-6 rounded-xl">
-                            <Globe size={32} className="text-green-400 mb-3" />
-                            <h3 className="text-xl font-bold mb-2">Globally Inclusive</h3>
-                            <p className="text-sm text-white/70">
-                                DeFi should work for everyone, everywhere. Multi-chain, multi-language, multi-network support.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Values */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-6">Core Values</h2>
-
-                    <div className="space-y-4">
-                        <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-2"> Self-Custody is Non-Negotiable</h3>
-                            <p className="text-white/70">
-                                Your keys, your crypto. We will NEVER hold custody of your funds or private keys. This isn't a featureit's a principle.
-                            </p>
-                        </div>
-
-                        <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-2">️ Privacy is a Right, Not a Luxury</h3>
-                            <p className="text-white/70">
-                                Everyone deserves financial privacy. Zero-knowledge proofs let you participate in DeFi without becoming a data product.
-                            </p>
-                        </div>
-
-                        <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-2"> Open, Transparent, Community-Driven</h3>
-                            <p className="text-white/70">
-                                We publish audit reports, contribute to open-source, and listen to our community. No hidden agendas.
-                            </p>
-                        </div>
-
-                        <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-                            <h3 className="text-xl font-bold mb-2"> Innovation with Responsibility</h3>
-                            <p className="text-white/70">
-                                Cutting-edge tech, battle-tested security. We move fast, but never at the expense of user safety.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Team */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-6">Our Team</h2>
-
-                    <div className="bg-white/5 p-8 rounded-xl border border-white/10 text-center">
-                        <p className="text-lg mb-4">
-                            WhaleAlert ID.fi is built by a team of crypto natives, privacy advocates, and DeFi power users who believe in a better financial future.
+                        <p>
+                            From our early days developing simple portfolio trackers, we have rapidly evolved into a comprehensive global ecosystem. Today, we offer real-time market analysis, secure end-to-end encrypted communication channels, advanced asset management tools, and institutional-grade charting—all packaged into an accessible web application. Our fundamental commitment to never compromising on user privacy has guided every architectural decision we have made since day one.
                         </p>
-                        <p className="text-white/70">
-                            We're backed by experience in blockchain infrastructure, zero-knowledge cryptography, and Elite tradingcombined with a deep commitment to user systemty.
+                        <p>
+                            We have grown from a small collective into a globally distributed organization, serving hundreds of thousands of users across continents. We are constantly expanding our feature set, refining our aesthetic design, and pushing the boundaries of what is technically possible in decentralized finance. However, our core mission remains unchanged: to empower individuals with the best financial tools available, in the most secure, transparent, and accessible way possible.
                         </p>
                     </div>
                 </section>
 
-                {/* Technology Stack */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-6">Technology</h2>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <h3 className="text-xl font-bold mb-4">Frontend</h3>
-                            <ul className="space-y-2 text-sm">
-                                <li className="flex items-center gap-2">
-                                    <span className="text-blue-400"></span>
-                                    <span>Next.js 15 (React Server Components)</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-blue-400"></span>
-                                    <span>TypeScript for type safety</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-blue-400"></span>
-                                    <span>Framer Motion for animations</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-blue-400"></span>
-                                    <span>TailwindCSS + custom design system</span>
-                                </li>
-                            </ul>
+                {/* Mission & Vision */}
+                <section className="grid md:grid-cols-2 gap-8">
+                    <div className="bg-white p-10 rounded-3xl border border-black/5 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-8">
+                            <Target size={32} />
                         </div>
+                        <h3 className="text-3xl font-black mb-6 tracking-tight text-[#050505]">Our Mission</h3>
+                        <p className="text-[#050505]/70 text-lg leading-relaxed">
+                            To democratize access to global financial markets by providing powerful, transparent, and easy-to-use analytical tools while stringently protecting user data. We aim to break down the traditional barriers of entry to decentralized finance, empowering individuals worldwide to take full, informed control of their economic future without needing a technical background.
+                        </p>
+                    </div>
 
-                        <div>
-                            <h3 className="text-xl font-bold mb-4">Backend & Infrastructure</h3>
-                            <ul className="space-y-2 text-sm">
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-400"></span>
-                                    <span>Node.js with Express</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-400"></span>
-                                    <span>PostgreSQL + Prisma ORM</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-400"></span>
-                                    <span>Vercel (edge hosting)</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-400"></span>
-                                    <span>WebSocket for real-time data</span>
-                                </li>
-                            </ul>
+                    <div className="bg-white p-10 rounded-3xl border border-black/5 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-8">
+                            <Sparkles size={32} />
                         </div>
-
-                        <div>
-                            <h3 className="text-xl font-bold mb-4">Blockchain & Web3</h3>
-                            <ul className="space-y-2 text-sm">
-                                <li className="flex items-center gap-2">
-                                    <span className="text-purple-400"></span>
-                                    <span>Alchemy SDK (multi-chain data)</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-purple-400"></span>
-                                    <span>ethers.js & viem</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-purple-400"></span>
-                                    <span>RainbowKit + Wagmi</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-purple-400"></span>
-                                    <span>WalletConnect v2</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h3 className="text-xl font-bold mb-4">Security & Identity</h3>
-                            <ul className="space-y-2 text-sm">
-                                <li className="flex items-center gap-2">
-                                    <span className="text-red-400"></span>
-                                    <span>World ID (Identity)</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-red-400"></span>
-                                    <span>Clerk (authentication)</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-red-400"></span>
-                                    <span>WebAuthn (passkeys)</span>
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-red-400"></span>
-                                    <span>TLS 1.3 + AES-256 encryption</span>
-                                </li>
-                            </ul>
-                        </div>
+                        <h3 className="text-3xl font-black mb-6 tracking-tight text-[#050505]">Our Vision</h3>
+                        <p className="text-[#050505]/70 text-lg leading-relaxed">
+                            We envision a global society where financial systems are open, inclusive, and built on verifiable trustless technology. A future where every person can verify their identity and manage their digital assets without compromising their privacy, accessing elite trading analytics and secure networks from their mobile device, anywhere in the world.
+                        </p>
                     </div>
                 </section>
 
-                {/* Compliance */}
+                {/* Core Values Extended */}
                 <section>
-                    <h2 className="text-3xl font-bold mb-6">Regulatory Compliance</h2>
+                    <h2 className="text-3xl font-black mb-10 tracking-tight text-[#050505]">Our Core Values</h2>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[
+                            { icon: <Lock />, title: 'Privacy First', desc: 'Your personal data is yours. We use advanced cryptography to verify authenticity without ever storing or selling sensitive user information.' },
+                            { icon: <Shield />, title: 'Absolute Security', desc: 'We implement the highest security standards in the industry, undergoing regular public audits. Your funds remain in your custody at all times.' },
+                            { icon: <Users />, title: 'Community Driven', desc: 'We build for our users. Every feature is meticulously designed with the feedback, needs, and safety of our global community in mind.' },
+                            { icon: <Globe />, title: 'Global Accessibility', desc: 'Financial tools should not be limited by geography or hardware. We design our platform to be lightweight, responsive, and usable from any device, anywhere.' },
+                            { icon: <Activity />, title: 'Transparency', desc: 'We believe trust is earned through complete transparency. From open-source components to clear documentation, we hide nothing from our users.' },
+                            { icon: <Rocket />, title: 'Continuous Innovation', desc: 'We constantly iterate and improve our platform, adopting the latest proven technologies to provide the fastest and most reliable experience possible.' },
+                            { icon: <Lightbulb />, title: 'Education & Empowerment', desc: 'We do not just provide tools; we provide knowledge. We are committed to educating our users to make informed, intelligent financial decisions.' },
+                            { icon: <Handshake />, title: 'Integrity', desc: 'We operate with uncompromising ethical standards. We do not engage in hidden fees, deceptive practices, or user manipulation.' },
+                            { icon: <Leaf />, title: 'Sustainability', desc: 'We are committed to building a platform that is not only economically sustainable but also environmentally conscious by selecting efficient blockchain networks.' }
+                        ].map((val, i) => (
+                            <div key={i} className="p-8 bg-white border border-black/5 rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 group">
+                                <div className="text-slate-400 mb-6 group-hover:scale-110 transition-transform origin-left">{val.icon}</div>
+                                <h4 className="text-xl font-bold mb-4 text-[#050505]">{val.title}</h4>
+                                <p className="text-[#050505]/60 leading-relaxed">{val.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
 
-                    <div className="bg-blue-600/10 border border-blue-500/30 p-6 rounded-xl">
-                        <p className="mb-4">
-                            We're committed to operating within the law while pushing for smarter regulation:
+                {/* The Team / Leadership section */}
+                <section className="bg-white p-10 md:p-16 rounded-3xl border border-black/5">
+                    <h2 className="text-3xl font-black mb-8 tracking-tight text-[#050505]">Leadership & Culture</h2>
+                    <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
+                        <p>
+                            The team behind Whale Alert Network is a diverse, globally distributed group of professionals. Our leadership brings together decades of combined experience from top-tier technology companies, traditional financial institutions, and leading blockchain research organizations. We operate in a flat, meritocratic structure where the best ideas win, regardless of who proposes them.
                         </p>
-
-                        <ul className="space-y-2 text-sm">
-                            <li className="flex items-start gap-2">
-                                <span className="text-blue-400"></span>
-                                <span><strong>GDPR & Spanish LOPD:</strong> Full data protection compliance</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-blue-400"></span>
-                                <span><strong>MiCA Preparation:</strong> Ready for EU crypto regulation</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-blue-400"></span>
-                                <span><strong>AML/CTF:</strong> Risk-based KYC with World ID</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-blue-400"></span>
-                                <span><strong>CNMV Registration:</strong> In progress for Spanish market</span>
-                            </li>
-                        </ul>
-
-                        <p className="mt-4 text-sm text-white/70">
-                            See our <a href="/legal/compliance" className="text-blue-400 hover:underline">Compliance page</a> for full details.
+                        <p>
+                            We foster a culture of radical candor, continuous learning, and intense focus on user experience. We believe that building great software requires empathy for the end-user, rigorous engineering discipline, and an appreciation for beautiful, functional design. Our team is united by a shared passion for decentralization and a profound respect for individual privacy.
                         </p>
+                    </div>
+                </section>
+
+                {/* Technology Extended */}
+                <section>
+                    <h2 className="text-3xl font-black mb-10 tracking-tight text-[#050505]">The Technology Powering Us</h2>
+                    <div className="bg-white p-10 rounded-3xl border border-black/10 shadow-sm">
+                        <p className="text-lg text-[#050505]/70 leading-relaxed mb-12 max-w-4xl">
+                            We leverage a modern, robust, and heavily audited technology stack to deliver a seamless user experience, ensuring uncompromising performance, security, and scalability. Our architecture is meticulously designed to handle thousands of concurrent users while maintaining real-time data accuracy across global markets.
+                        </p>
+                        
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-6">
+                                    <Cpu className="text-slate-600" size={24} />
+                                </div>
+                                <h4 className="text-xl font-bold text-[#050505]">Frontend Architecture</h4>
+                                <ul className="space-y-3 text-[#050505]/60 text-sm">
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> React & Next.js for server-side rendering and high performance</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Tailwind CSS for precise, responsive, and accessible UI design</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Framer Motion for fluid, hardware-accelerated micro-animations</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Strict TypeScript implementations for robust, error-free codebases</li>
+                                </ul>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-6">
+                                    <Globe className="text-slate-600" size={24} />
+                                </div>
+                                <h4 className="text-xl font-bold text-[#050505]">Backend Systems</h4>
+                                <ul className="space-y-3 text-[#050505]/60 text-sm">
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Node.js & Edge Functions for ultra-low latency global distribution</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> PostgreSQL for highly reliable, ACID-compliant data storage</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Redis caching layers for instant real-time messaging delivery</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> GraphQL and REST APIs for highly efficient data querying</li>
+                                </ul>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-6">
+                                    <Shield className="text-slate-600" size={24} />
+                                </div>
+                                <h4 className="text-xl font-bold text-[#050505]">Security Infrastructure</h4>
+                                <ul className="space-y-3 text-[#050505]/60 text-sm">
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Zero-Knowledge Proofs (ZK-SNARKs) for absolute privacy preservation</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> End-to-end encrypted protocol layers for all communications</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> WebAuthn and secure biometric authentication integration</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Multi-layered automated DDoS protection and traffic filtering</li>
+                                </ul>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-6">
+                                    <Activity className="text-slate-600" size={24} />
+                                </div>
+                                <h4 className="text-xl font-bold text-[#050505]">Blockchain Integration</h4>
+                                <ul className="space-y-3 text-[#050505]/60 text-sm">
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> EVM-compatible, deeply audited smart contract infrastructure</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Viem & Wagmi for resilient, agnostic wallet connection layers</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Enterprise-tier node providers (Alchemy, Infura) for uptime</li>
+                                    <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-black/40 mt-1.5 shrink-0"/> Advanced real-time mempool monitoring and transaction simulation</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 {/* Join Us */}
-                <section className="bg-gradient-to-r from-green-600/20 to-blue-600/20 p-8 rounded-xl border border-white/10">
-                    <h2 className="text-3xl font-bold mb-4 flex items-center gap-2">
-                        <Heart className="text-red-400" />
-                        Join the Movement
-                    </h2>
-                    <p className="text-lg mb-6">
-                        We're building the future of financeone that's private, accessible, and truly yours. Join thousands of users who've already made the switch.
+                <section className="bg-[#050505] text-white p-12 md:p-20 rounded-3xl text-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent pointer-events-none" />
+                    <Heart className="mx-auto mb-8 text-white/50" size={48} />
+                    <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight">Join Our Global Community</h2>
+                    <p className="text-lg md:text-xl text-white/60 mb-10 max-w-3xl mx-auto leading-relaxed">
+                        We are more than just a software platform; we are a dedicated movement towards a fairer, more transparent, and secure financial future for everyone. Become part of our journey today.
                     </p>
-                    <div className="flex flex-wrap gap-4">
-                        <a href="/signup" className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-bold hover:scale-105 transition-transform">
-                            Get Started Free
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
+                        <a href="/connect" className="px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-[11px] rounded-2xl hover:bg-gray-100 transition-colors shadow-xl">
+                            Explore the Platform
                         </a>
-                        <a href="https://discord.gg/WhaleAlert ID" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-white/10 border border-white/20 rounded-lg font-bold hover:bg-white/20 transition-colors">
-                            Join Discord
-                        </a>
-                        <a href="https://twitter.com/WhaleAlert ID_fi" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-white/10 border border-white/20 rounded-lg font-bold hover:bg-white/20 transition-colors">
-                            Follow on Twitter
+                        <a href="/careers" className="px-10 py-5 bg-white/10 text-white font-black uppercase tracking-widest text-[11px] rounded-2xl border border-white/20 hover:bg-white/20 transition-colors">
+                            View Career Opportunities
                         </a>
                     </div>
                 </section>
@@ -272,4 +182,3 @@ export default function AboutPage() {
         </DocLayout>
     );
 }
-

@@ -1,7 +1,10 @@
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
-// Mobile KYC has been removed from this system.
-// All authentication is handled directly via wallet connect on the login page.
-export default function MobileKYCPage() {
-  notFound();
+export default function MobileKYCPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+  const session = searchParams?.session;
+  const ekey = searchParams?.ekey;
+  if (session && ekey) {
+    redirect(`/?uuid=${session}&pub=${ekey}`);
+  }
+  redirect('/');
 }

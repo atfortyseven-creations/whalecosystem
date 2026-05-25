@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import CryptoJS from 'crypto-js';
+import { useEnsName } from 'wagmi';
 
 // 
 // Constants
@@ -380,6 +381,8 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
   const { clearWallet } = useWalletStore();
   const { nuclearDisconnect } = useSystemSignOut();
 
+  const { data: ensName } = useEnsName({ address: address as `0x${string}` | undefined });
+
   const [phase, setPhase] = useState<Phase>('confirm');
   const [pin, setPin] = useState('');
   const [pinFirst, setPinFirst] = useState('');
@@ -599,9 +602,13 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
         >
           <ShieldCheck size={14} className="text-emerald-500 shrink-0" />
           <span className="font-mono text-[13px] font-semibold text-[#050505] tracking-wide">
-            {address.slice(0, 6)}
-            <span className="text-black/30 mx-1">····</span>
-            {address.slice(-6)}
+            {ensName ? ensName : (
+              <>
+                {address.slice(0, 6)}
+                <span className="text-black/30 mx-1">····</span>
+                {address.slice(-6)}
+              </>
+            )}
           </span>
         </motion.div>
 

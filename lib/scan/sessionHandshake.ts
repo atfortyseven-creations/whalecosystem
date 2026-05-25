@@ -16,8 +16,8 @@ export async function completeSessionHandshake(
 
   try {
     const url = new URL(decodedText.trim());
-    uuid = url.searchParams.get('uuid');
-    const rawPub = url.searchParams.get('pub');
+    uuid = url.searchParams.get('uuid') || url.searchParams.get('session');
+    const rawPub = url.searchParams.get('pub') || url.searchParams.get('ekey');
     ephemeralPub = rawPub ? decodeURIComponent(rawPub) : null;
     isECDH = url.searchParams.get('ecdh') === '1';
     const exp = url.searchParams.get('exp');

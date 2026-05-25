@@ -186,10 +186,10 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         address: (process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS || "0x") as `0x${string}`,
         abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
         functionName: 'balanceOf',
-        args: [(effectiveAddress || "0x") as `0x${string}`],
+        args: [(isValidAddress ? effectiveAddress : "0x0000000000000000000000000000000000000000") as `0x${string}`],
         chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "8453"),
         query: {
-            enabled: !!effectiveAddress,
+            enabled: !!isValidAddress,
         }
     });
 

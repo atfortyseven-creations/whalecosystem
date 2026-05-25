@@ -184,7 +184,7 @@ export function TerminalSettingsPanel() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 p-8 md:p-12 lg:p-16 bg-[#FAFAFA] overflow-y-auto h-full custom-scrollbar">
+      <div className="flex-1 p-8 md:p-12 lg:p-16 bg-white overflow-y-auto h-full custom-scrollbar">
          
          <div className="mb-12 max-w-4xl mx-auto">
             <h2 className="text-[20px] font-black uppercase tracking-widest mb-3 text-black">

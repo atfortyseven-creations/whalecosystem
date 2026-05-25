@@ -496,7 +496,7 @@ function ForumHomeContent() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 leading-none mb-2">
-              Token Forum
+              Humanity Ledger Forum
             </h1>
             <p className="text-[14px] text-slate-500 font-medium max-w-xl leading-relaxed">
               Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics—with community guidelines and optional private governance as circuits ship.
