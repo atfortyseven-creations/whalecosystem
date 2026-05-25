@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
@@ -158,7 +158,7 @@ export function ExchangeBTCOpenInterest() {
 
         <div className="flex items-center gap-3">
           {/* Currency Toggle */}
-          <div className="flex items-center gap-1 p-1 bg-slate-50 border border-slate-100 rounded-xl">
+          <div className="flex items-center gap-1 p-1 bg-black/5 border border-slate-100 rounded-xl">
             {(["EUR", "USD"] as Currency[]).map(c => (
               <button
                 key={c}
@@ -205,7 +205,7 @@ export function ExchangeBTCOpenInterest() {
               accent: currentStats.change24h >= 0 ? "text-emerald-600" : "text-rose-600",
             },
           ].map((stat, i) => (
-            <div key={i} className="bg-slate-50 p-4 text-center">
+            <div key={i} className="bg-black/5 p-4 text-center">
               <div className={`text-base font-black font-mono ${stat.accent}`}>{stat.value}</div>
               <div className="text-[9px] font-mono text-slate-400 uppercase tracking-widest mt-0.5">{stat.label}</div>
             </div>
@@ -303,7 +303,7 @@ export function ExchangeBTCOpenInterest() {
       </div>
 
       {/* Exchange Breakdown  Real Binance + Bybit OI */}
-      <div className="mx-8 mb-7 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+      <div className="mx-8 mb-7 p-4 bg-black/5 border border-slate-100 rounded-2xl">
         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Exchange Breakdown</p>
         {currentStats ? (
           <div className="space-y-2">

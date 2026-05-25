@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,7 +24,7 @@ export function CosmicForgePanel() {
         setHiveEnergy(hiveData.energy);
         setEntities(entitiesData.entities || []);
       } catch (e) {
-        console.error("Failed to load Cosmic Forge state", e);
+        console.error("Failed to load Data Studio state", e);
       } finally {
         setLoading(false);
       }
@@ -54,7 +54,7 @@ export function CosmicForgePanel() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-2">
             <h1 className="text-3xl lg:text-4xl font-black uppercase tracking-tighter text-[#050505]">
-              Akashic Cosmic Forge
+              Akashic Data Studio
             </h1>
             <p className="text-[11px] font-mono uppercase tracking-widest text-black/50 max-w-md">
               Living entities spawned by institutional whale volume. Evolution determined by macro market entropy and network activity.

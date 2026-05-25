@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -89,7 +89,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
                     </h1>
                     <button 
                         onClick={copyToClipboard}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 transition-all group w-fit"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-black/5 border border-slate-200 rounded-xl hover:bg-slate-100 transition-all group w-fit"
                     >
                         {copied ? (
                             <Check size={14} className="text-emerald-600" />
@@ -140,7 +140,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-[60px] rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-colors" />
               <div className="mb-0 relative z-10">
-                <div className={`inline-flex p-3 rounded-xl bg-slate-50 border border-slate-100 mb-8 ${stat.color}`}>
+                <div className={`inline-flex p-3 rounded-xl bg-black/5 border border-slate-100 mb-8 ${stat.color}`}>
                    <stat.icon size={20} className="opacity-80" />
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
                     
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-slate-50/50 text-[10px] text-slate-400 uppercase font-black tracking-[0.4em] font-web3">
+                            <thead className="bg-black/5/50 text-[10px] text-slate-400 uppercase font-black tracking-[0.4em] font-web3">
                                 <tr>
                                     <th className="px-12 py-7">Asset</th>
                                     <th className="px-12 py-7">Allocation</th>
@@ -181,7 +181,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
                                 {balances.map((token: any) => {
                                     const share = totalValue > 0 ? (token.valueUsd / totalValue) * 100 : 0;
                                     return (
-                                        <tr key={`${token.symbol}-${token.chainId}`} className="group hover:bg-slate-50/50 transition-all">
+                                        <tr key={`${token.symbol}-${token.chainId}`} className="group hover:bg-black/5/50 transition-all">
                                             <td className="px-12 py-8">
                                                 <div className="flex items-center gap-5">
                                                     <div className="relative">
@@ -258,7 +258,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
                     
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-slate-50 text-[10px] text-slate-400 uppercase font-black tracking-[0.45em] hidden md:table-header-group font-web3">
+                            <thead className="bg-black/5 text-[10px] text-slate-400 uppercase font-black tracking-[0.45em] hidden md:table-header-group font-web3">
                                 <tr>
                                     <th className="px-12 py-7">Transaction Hash</th>
                                     <th className="px-12 py-7">Type</th>
@@ -268,7 +268,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
                             </thead>
                             <tbody className="divide-y divide-slate-100 text-slate-900">
                                 {transactions.map((tx: any) => (
-                                    <tr key={tx.hash} className="group hover:bg-slate-50 transition-colors border-b border-slate-100">
+                                    <tr key={tx.hash} className="group hover:bg-black/5 transition-colors border-b border-slate-100">
                                         <td className="px-12 py-10">
                                             <div className="flex flex-col gap-2">
                                                 <a href={`https://etherscan.io/tx/${tx.hash}`} target="_blank" className="font-web3-mono text-base font-black text-emerald-700 group-hover:text-emerald-500 transition-colors uppercase leading-none tracking-tight">
@@ -285,7 +285,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
                                             <span className={`inline-flex items-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] border font-web3 ${
                                                 tx.type === 'TRANSFER' ? 'bg-emerald-50 text-emerald-700 border-emerald-100 shadow-sm' :
                                                 tx.type === 'ERC20_TRANSFER' ? 'bg-purple-50 text-purple-700 border-purple-100' :
-                                                'bg-slate-50 text-slate-400 border-slate-100'
+                                                'bg-black/5 text-slate-400 border-slate-100'
                                             }`}>
                                                 {tx.type || 'SYNC'}
                                             </span>
@@ -294,11 +294,11 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
                                             <div className="flex flex-col gap-2">
                                                 <div className="text-[11px] font-black uppercase tracking-[0.3em] flex items-center gap-3 font-web3">
                                                     <span className="text-slate-300 w-10">FROM</span> 
-                                                    <span className="text-slate-600 font-web3-mono tracking-tighter bg-slate-50 px-3 py-1 rounded-lg">{tx.from?.slice(0,10)}...</span>
+                                                    <span className="text-slate-600 font-web3-mono tracking-tighter bg-black/5 px-3 py-1 rounded-lg">{tx.from?.slice(0,10)}...</span>
                                                 </div>
                                                 <div className="text-[11px] font-black uppercase tracking-[0.3em] flex items-center gap-3 font-web3">
                                                     <span className="text-slate-300 w-10">TO</span> 
-                                                    <span className="text-slate-600 font-web3-mono tracking-tighter bg-slate-50 px-3 py-1 rounded-lg">{tx.to ? `${tx.to.slice(0,10)}...` : 'CONTRACT'}</span>
+                                                    <span className="text-slate-600 font-web3-mono tracking-tighter bg-black/5 px-3 py-1 rounded-lg">{tx.to ? `${tx.to.slice(0,10)}...` : 'CONTRACT'}</span>
                                                 </div>
                                             </div>
                                         </td>

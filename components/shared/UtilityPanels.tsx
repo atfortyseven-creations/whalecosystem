@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -372,7 +372,7 @@ export function UtilityPanels() {
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="absolute top-24 right-6 w-[420px] bg-[#FAF9F6] backdrop-blur-3xl border border-black/10 rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.15)] p-8 pointer-events-auto overflow-hidden text-[#050505] font-sans"
+                    className="absolute top-24 right-6 w-[420px] bg-[#FFFFFF] backdrop-blur-3xl border border-black/10 rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.15)] p-8 pointer-events-auto overflow-hidden text-[#050505] font-sans"
                 >
                     <div className="absolute top-0 right-0 p-6 z-50">
                         <button 
@@ -458,7 +458,7 @@ export function BillionWhaleNotification() {
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-4">
                                     <div className="bg-black text-white p-2 flex items-center justify-center relative">
-                                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#FAF9F6]" />
+                                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#FFFFFF]" />
                                         <Zap size={16} className="fill-white" />
                                     </div>
                                     <div className="flex flex-col">
@@ -479,7 +479,7 @@ export function BillionWhaleNotification() {
                             </div>
 
                             {/* Core Metrics Block */}
-                            <div className="bg-[#FAF9F6] border border-black/10 p-5 space-y-5">
+                            <div className="bg-[#FFFFFF] border border-black/10 p-5 space-y-5">
                                 <div className="flex flex-col gap-1.5">
                                     <span className="text-[10px] font-aztec-mono text-black/50 uppercase tracking-widest">Global Asset Volume</span>
                                     <div className="flex items-baseline gap-3 flex-wrap">
@@ -514,7 +514,7 @@ export function BillionWhaleNotification() {
                                     </div>
                                     <span className="font-aztec-mono text-[11px] text-[#050505]/70 bg-black/5 py-1 px-2 border border-black/10">{whale.wallet.slice(0, 16)}...</span>
                                 </div>
-                                <button className="px-6 py-2.5 bg-black text-[#FAF9F6] font-aztec-mono text-[10px] font-black uppercase tracking-widest border border-transparent hover:border-black hover:bg-[#FAF9F6] hover:text-black transition-colors leading-tight text-center">
+                                <button className="px-6 py-2.5 bg-black text-[#FFFFFF] font-aztec-mono text-[10px] font-black uppercase tracking-widest border border-transparent hover:border-black hover:bg-[#FFFFFF] hover:text-black transition-colors leading-tight text-center">
                                     EXECUTE <br/> AUDIT
                                 </button>
                             </div>

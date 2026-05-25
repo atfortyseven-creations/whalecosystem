@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CreateConnectorFn, WagmiProvider } from 'wagmi';
 import { AppKitNetwork, mainnet, base, arbitrum, polygon, optimism, bsc } from "@reown/appkit/networks";
@@ -214,7 +214,7 @@ try {
             themeMode: 'light',
             themeVariables: {
                 '--w3m-accent': '#000000',
-                '--w3m-color-mix': '#fafaf8',
+                '--w3m-color-mix': '#FFFFFF',
                 '--w3m-border-radius-master': '2rem',
                 '--w3m-font-family': 'FT Regola Neue, Inter, sans-serif',
                 '--w3m-z-index': 9999,

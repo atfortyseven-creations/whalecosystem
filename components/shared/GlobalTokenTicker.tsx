@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -25,7 +25,7 @@ export function GlobalTokenTicker() {
     const doubledTokens = [...TICKER_TOKENS, ...TICKER_TOKENS];
 
     return (
-        <div className="fixed top-0 left-0 w-full h-8 bg-slate-50/50 backdrop-blur-md border-b border-slate-100 z-40 overflow-hidden flex items-center pointer-events-none select-none">
+        <div className="fixed top-0 left-0 w-full h-8 bg-black/5/50 backdrop-blur-md border-b border-slate-100 z-40 overflow-hidden flex items-center pointer-events-none select-none">
             <motion.div 
                 className="flex items-center gap-16 whitespace-nowrap"
                 animate={{ x: [0, -1500] }}

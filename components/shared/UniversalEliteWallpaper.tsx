@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -26,7 +26,7 @@ export function UniversalEliteWallpaper() {
             aria-hidden="true"
         >
             {/*  Base: light background  */}
-            <div className="absolute inset-0 bg-[#FAFAF8]" />
+            <div className="absolute inset-0 bg-[#FFFFFF]" />
 
 
 

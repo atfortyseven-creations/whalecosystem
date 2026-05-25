@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -53,7 +53,7 @@ export function NetworkDashboard() {
                             </h1>
                         </div>
                         <p className="text-slate-500 text-lg leading-relaxed max-w-xl font-medium">
-                            Real-time auditing of cryptographic state transitions. Precision forensic analysis of block propagation, fee markets, and settlement finality.
+                            Real-time auditing of Account Status transitions. Precision forensic analysis of block propagation, fee markets, and settlement finality.
                         </p>
                     </motion.div>
                     <motion.div
@@ -80,11 +80,11 @@ export function NetworkDashboard() {
 
                     {/* Secondary: live signals */}
                     <div className="flex flex-col gap-8">
-                        <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] p-2">
+                        <div className="bg-black/5 border border-slate-100 rounded-[2.5rem] p-2">
                             <FeeEstimator />
                         </div>
 
-                        <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] overflow-hidden p-8 shadow-sm">
+                        <div className="bg-black/5 border border-slate-100 rounded-[2.5rem] overflow-hidden p-8 shadow-sm">
                             <MempoolVisualizer />
                         </div>
 
@@ -107,7 +107,7 @@ export function NetworkDashboard() {
                                 <Link
                                     key={href}
                                     href={href}
-                                    className="h-14 flex items-center justify-center border border-slate-100 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-950 hover:bg-slate-50 hover:border-slate-200 transition-all"
+                                    className="h-14 flex items-center justify-center border border-slate-100 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-950 hover:bg-black/5 hover:border-slate-200 transition-all"
                                 >
                                     {label}
                                 </Link>

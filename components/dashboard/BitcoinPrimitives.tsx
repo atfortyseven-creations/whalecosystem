@@ -1,4 +1,4 @@
-// components/dashboard/BitcoinPrimitives.tsx
+﻿// components/dashboard/BitcoinPrimitives.tsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -50,7 +50,7 @@ export default function BitcoinPrimitives() {
     <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col p-6 gap-6 bg-[#FFFFFF] text-[#050505] shrink-0 min-h-[600px]">
 
       {/*  HEADER  */}
-      <div className="flex items-center justify-between gap-4 p-5 rounded-2xl bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm">
+      <div className="flex items-center justify-between gap-4 p-5 rounded-2xl bg-[#FFFFFF] border border-[#E5E5E5] shadow-sm">
         <div className="flex items-center gap-4">
           <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#E5E5E5]">
             <Layers size={22} className="text-[#050505]" />
@@ -65,7 +65,7 @@ export default function BitcoinPrimitives() {
         <button
           onClick={handleSync}
           disabled={isSyncing}
-          className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50 shrink-0 text-white bg-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] border border-transparent hover:border-[#E5E5E5]"
+          className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50 shrink-0 text-white bg-[#050505] hover:bg-[#FFFFFF] hover:text-[#050505] border border-transparent hover:border-[#E5E5E5]"
         >
           <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
           {isSyncing ? 'Executing Sync' : 'Re-index Standards'}
@@ -74,7 +74,7 @@ export default function BitcoinPrimitives() {
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4">
         {filtered.map((std) => (
-          <div key={std.id} className="rounded-2xl p-6 group hover:scale-[1.01] transition-all cursor-pointer bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm">
+          <div key={std.id} className="rounded-2xl p-6 group hover:scale-[1.01] transition-all cursor-pointer bg-[#FFFFFF] border border-[#E5E5E5] shadow-sm">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 flex items-center justify-center rounded-xl transition-all bg-[#FFFFFF] border border-[#E5E5E5] group-hover:border-[#050505]">

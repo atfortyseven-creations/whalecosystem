@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -122,7 +122,7 @@ export function MiningDashboard() {
                             transition={{ delay: i * 0.1 }}
                             className="bg-white border border-slate-100 p-10 rounded-[3rem] shadow-[0_24px_80px_rgba(0,0,0,0.03)] hover:shadow-[0_32px_120px_rgba(0,0,0,0.06)] transition-all group"
                         >
-                            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 mb-8 group-hover:bg-orange-500 group-hover:border-orange-500 transition-colors duration-500">
+                            <div className="w-12 h-12 rounded-2xl bg-black/5 flex items-center justify-center border border-slate-100 mb-8 group-hover:bg-orange-500 group-hover:border-orange-500 transition-colors duration-500">
                                 <Icon size={20} className="text-slate-400 group-hover:text-white transition-colors duration-500" />
                             </div>
                             <div className="space-y-1">
@@ -142,7 +142,7 @@ export function MiningDashboard() {
                             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 mb-2">Trailing 30 Days</p>
                             <h2 className="text-3xl font-black text-slate-950 tracking-tight">Hashrate Performance</h2>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-4 py-2 bg-slate-50 rounded-full">Exahash per Second</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-4 py-2 bg-black/5 rounded-full">Exahash per Second</span>
                     </div>
                     <div className="h-[400px]">
                         <ResponsiveContainer width="100%" height="100%">

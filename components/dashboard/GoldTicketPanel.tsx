@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -202,7 +202,7 @@ function SignaturePad({ onSignature, disabled, onMint, mintLabel }: {
 function GlobalLedger({ feed }: { feed: any[] }) {
   return (
       <div className="w-full h-full bg-white flex flex-col">
-         <div className="px-6 py-4 border-b border-black/[0.04] bg-[#FAFAF8] shrink-0 flex items-center justify-between">
+         <div className="px-6 py-4 border-b border-black/[0.04] bg-[#FFFFFF] shrink-0 flex items-center justify-between">
              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">PUBLIC SIGNATURE LEDGER</span>
              <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.3em]">Public Ledger</span>
          </div>
@@ -482,7 +482,7 @@ export function GoldTicketPanel() {
           <button 
              onClick={handleMint}
              disabled={isMinting || isSigning || hasTicket}
-             className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-slate-50 active:scale-95 disabled:opacity-40"
+             className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-black/5 active:scale-95 disabled:opacity-40"
           >
              {hasTicket ? 'ALREADY MINTED' : isMinting ? 'CLAIMING...' : 'MINT YOUR SIGNATURE'}
           </button>
@@ -502,7 +502,7 @@ export function GoldTicketPanel() {
                         Claim your unique public ticket on Optimism and sign the ledger.
                     </p>
                 </div>
-               <div className="bg-[#FAFAF8] border border-black/[0.04] p-6 rounded-2xl space-y-6">
+               <div className="bg-[#FFFFFF] border border-black/[0.04] p-6 rounded-2xl space-y-6">
                   <SupplyBar minted={dbStats?.totalClaimed || 0} max={MAX_SUPPLY} />
                </div>
           </div>

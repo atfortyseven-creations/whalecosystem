@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
 import { GitCommit, Milestone, ShieldAlert, Cpu } from 'lucide-react';
 
@@ -66,7 +66,7 @@ export default function ChangelogPage() {
                 </div>
 
                 {/* Content */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 md:p-8">
+                <div className="bg-black/5 border border-slate-200 rounded-xl p-6 md:p-8">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">{update.title}</h3>
                   <p className="text-slate-600 mb-8">{update.description}</p>
                   

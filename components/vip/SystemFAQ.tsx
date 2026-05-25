@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -153,7 +153,7 @@ export function SystemFAQ() {
         <section className="px-8 pb-32 max-w-[1400px] mx-auto">
             <div className="bg-white rounded-[2rem] overflow-hidden shadow-sm relative border border-black/10">
                 {/* Header: Pagination */}
-                <div className="p-10 border-b border-black/5 flex flex-col items-center gap-10 bg-[#FAFAF8]">
+                <div className="p-10 border-b border-black/5 flex flex-col items-center gap-10 bg-[#FFFFFF]">
                     <div className="flex flex-col items-center gap-4">
                         <h2 className="text-4xl font-black text-[#0A0A0A] uppercase tracking-tighter">
                             Protocol FAQ
@@ -195,7 +195,7 @@ export function SystemFAQ() {
                                 return (
                                     <div 
                                         key={idx} 
-                                        className="bg-white p-10 flex flex-col gap-6 hover:bg-[#FAFAF8] transition-colors duration-500 group relative"
+                                        className="bg-white p-10 flex flex-col gap-6 hover:bg-[#FFFFFF] transition-colors duration-500 group relative"
                                     >
                                         <div className="space-y-4 relative z-10">
                                             <div className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-black/20">
@@ -218,7 +218,7 @@ export function SystemFAQ() {
                 </div>
 
                 {/* Footer */}
-                <div className="p-8 border-t border-black/5 flex items-center justify-between bg-[#FAFAF8]">
+                <div className="p-8 border-t border-black/5 flex items-center justify-between bg-[#FFFFFF]">
                     <button 
                         onClick={prevPage}
                         className="flex items-center gap-3 px-8 py-4 rounded-xl bg-black/5 text-black/40 hover:bg-black/10 hover:text-black transition-all text-[10px] font-black uppercase tracking-widest"

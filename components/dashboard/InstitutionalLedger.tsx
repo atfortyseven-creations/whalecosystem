@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -192,7 +192,7 @@ export default function InstitutionalLedger() {
             <div className="w-full flex justify-end mb-4 flex-shrink-0 max-w-[1400px] mx-auto">
                 <button 
                    onClick={() => window.location.reload()}
-                   className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-slate-50 active:scale-95"
+                   className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-black/5 active:scale-95"
                 >
                    REFRESH TELEMETRY
                 </button>
@@ -217,7 +217,7 @@ export default function InstitutionalLedger() {
                     <button
                         onClick={handleSearch}
                         disabled={isSearching}
-                        className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FAF9F6] dark:hover:bg-[#E5E5E5] text-white dark:text-black px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
+                        className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FFFFFF] dark:hover:bg-[#E5E5E5] text-white dark:text-black px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
                     >
                         {isSearching ? 'INDEXING...' : 'INITIATE'}
                     </button>

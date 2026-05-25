@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -38,7 +38,7 @@ export function InvestmentInstruction() {
                     </p>
                 </div>
 
-                <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                <div className="p-5 bg-black/5 rounded-2xl border border-slate-100 space-y-2">
                     <div className="flex items-center gap-2">
                         <Shield size={12} className="text-cyan-600" />
                         <span className="text-[9px] font-black uppercase text-slate-900 tracking-[0.2em]">Risk Management</span>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from 'framer-motion';
 import { Target, Copy, CheckCircle, Clock } from 'lucide-react';
@@ -62,7 +62,7 @@ HumanIDFi analytics`;
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: -20 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-[#FAF9F6]/90 border border-[#050505] p-8 max-w-sm w-full rounded-2xl shadow-2xl relative overflow-hidden"
+                className="bg-[#FFFFFF]/90 border border-[#050505] p-8 max-w-sm w-full rounded-2xl shadow-2xl relative overflow-hidden"
             >
                 {/* Top accent */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-[#050505]" />

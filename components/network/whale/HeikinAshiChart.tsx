@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo, memo } from 'react';
 import { motion } from 'framer-motion';
@@ -224,7 +224,7 @@ export const HeikinAshiChart = memo(({
             <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-white/80 backdrop-blur-md relative z-10">
                 <span className="text-[12px] font-mono font-black text-slate-500 uppercase tracking-[0.3em]">{symbol} / High-Fidelity Grid</span>
                 <div className="flex items-center gap-3 sm:gap-6 text-[9px] sm:text-[11px] font-black uppercase tracking-widest overflow-hidden">
-                   <div className="hidden sm:flex items-center gap-2 mr-4 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-100 shrink-0">
+                   <div className="hidden sm:flex items-center gap-2 mr-4 px-3 py-1.5 bg-black/5 rounded-lg border border-slate-100 shrink-0">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
                         <span className="text-slate-600 font-mono tracking-tighter">60M WINDOW</span>
                    </div>
@@ -253,7 +253,7 @@ export const HeikinAshiChart = memo(({
                 {/* Metrics & Momentum Section (Expanded) */}
                 <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Volume Profile */}
-                    <div className="h-32 border border-slate-200 bg-slate-50 rounded-3xl flex items-end gap-1 px-8 pb-4 pt-4 shadow-sm relative overflow-hidden">
+                    <div className="h-32 border border-slate-200 bg-black/5 rounded-3xl flex items-end gap-1 px-8 pb-4 pt-4 shadow-sm relative overflow-hidden">
                         <div className="absolute top-4 left-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Volume Profile</div>
                         {candles.map((c, i) => {
                             const maxV = Math.max(...candles.map(x => x.volume), 1);

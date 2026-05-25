@@ -1,11 +1,11 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
 /**
- * SOVEREIGN AUTH UTILITIES
+ * Enterprise AUTH UTILITIES
  */
 
 export function isValidEmail(email: string): boolean {
@@ -37,7 +37,7 @@ export function generateVerificationCode(): string {
 }
 
 /**
- * SOVEREIGN AUTH CONFIGURATION (High Pro 3.1)
+ * Enterprise AUTH CONFIGURATION (High Pro 3.1)
  * 
  * PURGED: Google, Email, and Password providers.
  * Only SIWE and QR Handshake identities are supported to ensure 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -178,7 +178,7 @@ export function CopyTradingArena() {
 
     if (!isConnected) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8 space-y-4">
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FFFFFF] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8 space-y-4">
                 <AlertTriangle size={48} className="text-[#888888] opacity-50" />
                 <h3 className="text-xl font-black text-[#111111] uppercase tracking-tighter">WALLET NOT CONNECTED</h3>
                 <p className="text-sm font-bold text-[#888888] text-center max-w-sm">
@@ -222,7 +222,7 @@ export function CopyTradingArena() {
                 ) : eliteTraders.map((trader) => (
                     <div
                         key={trader.id}
-                        className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all relative overflow-hidden group cursor-pointer"
+                        className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all relative overflow-hidden group cursor-pointer"
                         onClick={() => handleSelectTrader(trader)}
                     >
                         <div className="absolute top-4 right-4">
@@ -278,7 +278,7 @@ export function CopyTradingArena() {
                             initial={{ scale: 0.95, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.95, y: 20 }}
-                            className="bg-[#FAF9F6] border border-[#E5E5E5] w-full max-w-lg rounded-[2rem] p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                            className="bg-[#FFFFFF] border border-[#E5E5E5] w-full max-w-lg rounded-[2rem] p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
                         >
                             {!isCopying && !copyResult && (
                                 <button

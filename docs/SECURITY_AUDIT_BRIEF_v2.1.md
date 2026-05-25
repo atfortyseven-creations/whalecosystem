@@ -1,4 +1,4 @@
-# SOVEREIGN SECURITY AUDIT BRIEF
+﻿# Enterprise SECURITY AUDIT BRIEF
 ## Humanity Ledger  Zero-Trust On-Chain Analytics Platform
 ### Version 2.1 | April 2026 | CONFIDENTIAL
 

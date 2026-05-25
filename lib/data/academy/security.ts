@@ -1,4 +1,4 @@
-export const securityModules = [
+﻿export const securityModules = [
     {
         id: "security",
     title: "VIII. Seguridad y Auto-Custodia: Soberanía Digital Real",
@@ -162,7 +162,7 @@ export const securityModules = [
 
                     <section class="pro-section">
                         <h2>II. Biometría Soberana mediante WebAuthn Inmutable</h2>
-                        <p>El estándar EIP-7212 y Account Abstraction (ERC-4337) habilitan por primera vez la biometría directamente vinculada on-chain. Cuando usas FaceID, el chip <em>Secure Enclave</em> del iPhone genera una firma r1. Un protocolo nativo o un Paymaster valida esa curva elíptica específica on-chain. Esto transforma la carne (retina/huella) en entropía criptográfica: el usuario es, intrínsecamente, su propia wallet. La integración de hardware commodity como validadores HSM personales es el fin definitivo del monopolio del dispositivo Ledger/Trezor para retail avanzado.</p>
+                        <p>El estándar EIP-7212 y Account Abstraction (ERC-4337) habilitan por primera vez la biometría directamente vinculada on-chain. Cuando usas FaceID, el chip <em>Wallet</em> del iPhone genera una firma r1. Un protocolo nativo o un Paymaster valida esa curva elíptica específica on-chain. Esto transforma la carne (retina/huella) en entropía criptográfica: el usuario es, intrínsecamente, su propia wallet. La integración de hardware commodity como validadores HSM personales es el fin definitivo del monopolio del dispositivo Ledger/Trezor para retail avanzado.</p>
                     </section>
                 </div>`
         },

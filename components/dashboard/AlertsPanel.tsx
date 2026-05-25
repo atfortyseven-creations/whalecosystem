@@ -1,4 +1,4 @@
-// components/dashboard/AlertsPanel.tsx
+﻿// components/dashboard/AlertsPanel.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -76,7 +76,7 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
                         <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Identifier</label>
                         <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                             placeholder="SYSTEM_ALERT_01"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-slate-400 transition-all uppercase"
+                            className="w-full bg-black/5 border border-slate-200 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-slate-400 transition-all uppercase"
                         />
                     </div>
 
@@ -84,14 +84,14 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
                         <div className="space-y-2">
                             <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Asset_Pair</label>
                             <select value={form.asset} onChange={e => setForm(f => ({ ...f, asset: e.target.value }))}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-slate-400 transition-all cursor-pointer">
+                                className="w-full bg-black/5 border border-slate-200 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-slate-400 transition-all cursor-pointer">
                                 {['BTC','ETH','SOL','USDC','BASE','AUTH'].map(a => <option key={a}>{a}</option>)}
                             </select>
                         </div>
                         <div className="space-y-2">
                             <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Trigger_Type</label>
                             <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as AlertType }))}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-slate-400 transition-all cursor-pointer">
+                                className="w-full bg-black/5 border border-slate-200 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-slate-400 transition-all cursor-pointer">
                                 {Object.entries(TYPE_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                             </select>
                         </div>
@@ -101,12 +101,12 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
                         <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Threshold_Value</label>
                         <input value={form.threshold} onChange={e => setForm(f => ({ ...f, threshold: e.target.value }))}
                             type="number" placeholder="90000.00"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-slate-400 transition-all font-mono"
+                            className="w-full bg-black/5 border border-slate-200 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-slate-400 transition-all font-mono"
                         />
                     </div>
 
                     <div className="pt-4 flex gap-4">
-                        <button onClick={onClose} className="flex-1 py-3 border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-black hover:bg-slate-50 transition-all">Cancel</button>
+                        <button onClick={onClose} className="flex-1 py-3 border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-black hover:bg-black/5 transition-all">Cancel</button>
                         <button
                             onClick={() => {
                                 if (!form.name || !form.threshold) return toast.error('Incomplete Parameters');
@@ -230,7 +230,7 @@ export function AlertsPanel() {
                             className="rounded-2xl border border-slate-200 bg-white p-6 flex items-center justify-between group hover:border-slate-300 shadow-sm transition-all"
                         >
                             <div className="flex items-center gap-6">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-slate-200 ${alert.status === 'ACTIVE' ? 'text-slate-600 bg-slate-100' : 'text-slate-400 bg-slate-50'}`}>
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-slate-200 ${alert.status === 'ACTIVE' ? 'text-slate-600 bg-slate-100' : 'text-slate-400 bg-black/5'}`}>
                                     {TYPE_CONFIG[alert.type]?.icon || <Bell size={14} />}
                                 </div>
                                 <div>

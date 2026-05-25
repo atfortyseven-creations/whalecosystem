@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -123,7 +123,7 @@ export default function ReceiveModal({ isOpen, onClose, address: propAddress, us
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm" />
 
                     <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none p-4">
-                        <div className="w-full max-w-md bg-[#FAF9F6] border border-black/10 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="w-full max-w-md bg-[#FFFFFF] border border-black/10 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]">
 
                             <div className="flex items-center justify-between p-6 pb-4 border-b border-black/5">
                                 <h2 className="text-xl font-black text-black tracking-tighter uppercase flex items-center gap-2">
@@ -170,7 +170,7 @@ export default function ReceiveModal({ isOpen, onClose, address: propAddress, us
                                     </div>
                                     <div className="mt-6 text-center z-10">
                                          <div className="text-black/40 text-[10px] font-black uppercase tracking-widest mb-3">Scan to resolve on-chain address</div>
-                                         <div className="font-mono text-black font-black text-xs bg-[#FAF9F6] px-5 py-3 rounded-2xl border border-black/10 shadow-sm flex items-center gap-3 cursor-pointer hover:bg-black hover:text-white transition-all group/btn" onClick={handleCopy}>
+                                         <div className="font-mono text-black font-black text-xs bg-[#FFFFFF] px-5 py-3 rounded-2xl border border-black/10 shadow-sm flex items-center gap-3 cursor-pointer hover:bg-black hover:text-white transition-all group/btn" onClick={handleCopy}>
                                             {address ? `${address.slice(0, 8)}...${address.slice(-6)}` : "..."}
                                             {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-black/30 group-hover/btn:text-white/60 transition-colors" />}
                                          </div>

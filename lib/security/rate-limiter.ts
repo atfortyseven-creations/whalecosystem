@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AI-Powered Rate Limiter with Adaptive Thresholds
  * 
  * Features:
@@ -288,7 +288,7 @@ export const generalLimiter = new RateLimiter({
 export default RateLimiter
 
 // 
-// SOVEREIGN DISTRIBUTED RATE LIMITER  Upstash Sliding Window (Edge-compatible)
+// Enterprise DISTRIBUTED RATE LIMITER  Upstash Sliding Window (Edge-compatible)
 // Used by middleware.ts for cross-instance enforcement across all Edge nodes.
 // The in-memory RateLimiter above handles server-side API routes only.
 // 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -94,7 +94,7 @@ export default function UserProfilePage() {
             </div>
           </div>
           
-          <button className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded hover:bg-slate-50 transition-colors text-[13px] font-medium text-slate-700 shadow-sm mt-2">
+          <button className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded hover:bg-black/5 transition-colors text-[13px] font-medium text-slate-700 shadow-sm mt-2">
             <ChevronDown size={14} />
             Expand
           </button>
@@ -128,7 +128,7 @@ export default function UserProfilePage() {
                 className={`flex items-center gap-2 px-5 py-3 text-[13px] font-medium transition-colors border-b-[3px] whitespace-nowrap relative top-[1px] ${
                   rawSub === sub.id 
                     ? 'border-[#0088cc] text-[#0088cc]' 
-                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-black/5'
                 }`}
               >
                 <span className={rawSub === sub.id ? 'opacity-100' : 'opacity-50'}>{sub.icon}</span>

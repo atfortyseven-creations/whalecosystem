@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { ShieldCheck, ShieldAlert, Key, Zap, Building } from 'lucide-react';
@@ -27,7 +27,7 @@ export default function GoldRegistryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-[#050505] dark:text-[#FAF9F6] p-12">
+    <div className="min-h-screen bg-transparent text-[#050505] dark:text-[#FFFFFF] p-12">
       <header className="mb-14">
          <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 text-indigo-600 block mb-3">System Authority Hub</span>
          <h1 className="text-5xl font-black tracking-tighter uppercase italic">System Gold Registry</h1>
@@ -110,7 +110,7 @@ export default function GoldRegistryPage() {
                           href={`https://bridge.system.network/go/${node.id}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="block w-full text-center py-4 bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 border border-black/5 dark:border-white/5 text-[#050505] dark:text-[#FAF9F6] font-black uppercase text-[11px] tracking-[0.3em] rounded-xl transition-colors"
+                          className="block w-full text-center py-4 bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 border border-black/5 dark:border-white/5 text-[#050505] dark:text-[#FFFFFF] font-black uppercase text-[11px] tracking-[0.3em] rounded-xl transition-colors"
                         >
                            Open bridge
                         </a>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -147,7 +147,7 @@ export default function DeFiYieldPanel() {
     return (
         <div className="h-full min-h-0 flex flex-col bg-white rounded border border-[#E5E5E5] shadow-sm overflow-hidden">
             {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, backgroundColor: '#FAF9F6' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, backgroundColor: '#FFFFFF' }}>
                 {[
                     { label: 'MAX APY',       value: fmtApy(stats.maxApy),   color: '#16a34a' },
                     { label: 'AVG APY',       value: fmtApy(stats.avgApy),   color: '#050505' },
@@ -162,7 +162,7 @@ export default function DeFiYieldPanel() {
             </div>
 
             {/* Filters */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, flexWrap: 'wrap', backgroundColor: '#FAF9F6' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, flexWrap: 'wrap', backgroundColor: '#FFFFFF' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                     <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={{ accentColor: '#050505' }} />
                     <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/60">STABLE ONLY</span>
@@ -200,7 +200,7 @@ export default function DeFiYieldPanel() {
                         </div>
                     )}
                     {!loading && pools.length > 0 && (
-                        <div className="grid grid-cols-6 gap-8 p-4 border-b border-[#E5E5E5] sticky top-0 bg-[#FAF9F6]/95 backdrop-blur z-10 text-[10px] font-mono tracking-widest text-[#050505]/40 uppercase">
+                        <div className="grid grid-cols-6 gap-8 p-4 border-b border-[#E5E5E5] sticky top-0 bg-[#FFFFFF]/95 backdrop-blur z-10 text-[10px] font-mono tracking-widest text-[#050505]/40 uppercase">
                             <span className="col-span-2">Pool</span>
                             <span style={{ textAlign: 'right' }}>Chain</span>
                             <span style={{ textAlign: 'right' }}>APY</span>
@@ -217,14 +217,14 @@ export default function DeFiYieldPanel() {
                                 <motion.div
                                     key={p.pool}
                                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15, delay: i * 0.008 }}
-                                    className={`grid grid-cols-6 gap-8 p-4 border-b border-[#E5E5E5] cursor-pointer transition-colors ${isActive ? 'bg-[#050505]/[0.02]' : 'hover:bg-[#FAF9F6]'}`}
+                                    className={`grid grid-cols-6 gap-8 p-4 border-b border-[#E5E5E5] cursor-pointer transition-colors ${isActive ? 'bg-[#050505]/[0.02]' : 'hover:bg-[#FFFFFF]'}`}
                                     onClick={() => setSelected(isActive ? null : p)}
                                 >
                                     <div className="col-span-2 overflow-hidden flex flex-col gap-1">
                                         <span className="text-sm font-bold text-[#050505] tracking-tight truncate">{p.symbol}</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-[10px] uppercase text-[#050505]/40 tracking-wider truncate">{p.project}</span>
-                                            {p.stablecoin && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#FAF9F6] border border-[#E5E5E5] text-[#050505]">STABLE</span>}
+                                            {p.stablecoin && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#FFFFFF] border border-[#E5E5E5] text-[#050505]">STABLE</span>}
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -257,7 +257,7 @@ export default function DeFiYieldPanel() {
                             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                             className="w-[340px] flex-shrink-0 border-l border-[#E5E5E5] bg-[#FFFFFF] flex flex-col overflow-hidden shadow-xl z-20"
                         >
-                            <div className="p-6 border-b border-[#E5E5E5] bg-[#FAF9F6]">
+                            <div className="p-6 border-b border-[#E5E5E5] bg-[#FFFFFF]">
                                 <div className="text-[10px] font-mono tracking-widest text-[#050505]/50 mb-2 uppercase flex items-center gap-2">
                                     <ShieldCheck size={12} /> ON-CHAIN SYNC
                                 </div>
@@ -267,7 +267,7 @@ export default function DeFiYieldPanel() {
                             
                             <div className="flex-1 p-6 space-y-5 overflow-y-auto custom-scrollbar">
                                 {/* APY Hero */}
-                                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded p-6 text-center">
+                                <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded p-6 text-center">
                                     <div className="text-[10px] uppercase font-mono tracking-[0.1em] text-[#050505]/40 mb-2">TOTAL NET YIELD</div>
                                     <div className="text-4xl font-bold font-mono text-[#00C076]">{fmtApy(selected.apy)}</div>
                                     <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-[#E5E5E5]">
@@ -296,7 +296,7 @@ export default function DeFiYieldPanel() {
                                         type="number" 
                                         value={depositAmount} 
                                         onChange={e => setDepositAmount(e.target.value)} 
-                                        className="w-full bg-[#FAF9F6] border border-[#E5E5E5] rounded py-3 px-4 text-[#050505] font-mono text-xl outline-none focus:border-[#050505] transition-colors"
+                                        className="w-full bg-[#FFFFFF] border border-[#E5E5E5] rounded py-3 px-4 text-[#050505] font-mono text-xl outline-none focus:border-[#050505] transition-colors"
                                         placeholder="0.00"
                                     />
                                     <div className="mt-2 text-[10px] font-mono text-[#050505]/40">
@@ -305,7 +305,7 @@ export default function DeFiYieldPanel() {
                                 </div>
                             </div>
                             
-                            <div className="p-5 border-t border-[#E5E5E5] bg-[#FAF9F6] space-y-3">
+                            <div className="p-5 border-t border-[#E5E5E5] bg-[#FFFFFF] space-y-3">
                                 <button 
                                     onClick={handleOneClickDeposit}
                                     disabled={isDepositing || !depositAmount}

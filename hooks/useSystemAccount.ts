@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAccount } from 'wagmi';
 import { useState, useEffect } from 'react';
@@ -6,7 +6,7 @@ import { useWalletStore } from '@/lib/store/wallet-store';
 import { getAddress } from 'viem';
 
 /**
- * [SOVEREIGN HANDSHAKE] Account Bridge
+ * [Enterprise HANDSHAKE] Account Bridge
  *
  * Priority ladder:
  *   1. Local system wallet (privateKey in memory  just unlocked)

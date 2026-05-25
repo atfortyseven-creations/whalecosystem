@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { Shield, Lock, ArrowRight, Globe, Zap } from "lucide-react";
 
 export const MobileWhaleLanding = () => {
   const [mounted, setMounted] = useState(false);
@@ -12,127 +13,117 @@ export const MobileWhaleLanding = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-[#050505] text-[#FAF9F6] overflow-x-hidden selection:bg-[#00F2EA] selection:text-black">
-      
-      {/* 1. LAYER BASE: EL FIRMAMENTO GALÁCTICO ESTÁTICO */}
-      <div 
-        className="fixed inset-0 z-[0] pointer-events-none"
-        style={{
-          backgroundImage: "url('/api/assets?name=peakpx.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-          opacity: 0.95
-        }}
-      />
+    <div className="min-h-screen w-full bg-white text-[#050505] overflow-x-hidden selection:bg-black/10">
 
-      {/* 2. LAYER MEDIO: PARTICULAS Y NIEBLA COSMICA */}
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-t from-[#050505]/95 via-[#050505]/40 to-transparent z-[1]" />
+      {/* Top status bar */}
+      <div className="w-full border-b border-black/8 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4">
+            <img
+              src="/atom_3d_silver.jpg"
+              alt="Humanity Ledger"
+              className="w-full h-full object-contain mix-blend-multiply"
+            />
+          </div>
+          <span className="text-[11px] font-black tracking-widest uppercase text-black/70">
+            Humanity Ledger
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-black" />
+          <span className="text-[9px] font-bold uppercase tracking-widest text-black/40">
+            Secure
+          </span>
+        </div>
+      </div>
 
-      {/* 3. LAYER DINAMICO: LAS OLAS DE HOKUSAI 4K FLOTANTES */}
-      <div 
-        className="fixed inset-0 z-[2] pointer-events-none mix-blend-screen opacity-25"
-        style={{
-          backgroundImage: "url('/olas-hokusai-4k.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "bottom",
-          backgroundRepeat: "no-repeat"
-        }}
-      />
-      <motion.div 
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: [0, 15, 0], opacity: [0.1, 0.3, 0.1] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="fixed inset-0 z-[3] pointer-events-none mix-blend-screen"
-        style={{
-          backgroundImage: "url('/olas-hokusai-4k.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "bottom",
-          backgroundRepeat: "no-repeat"
-        }}
-      />
+      <main className="relative w-full min-h-[calc(100vh-49px)] flex flex-col items-center justify-between px-6 pt-16 pb-10">
 
-      {/* GRADIENTE SUPERIOR OSCURO PARA MAXIMIZAR CONTRASTE DE UI COLD WALLET */}
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-[#050505]/80 via-transparent to-transparent z-[4]" />
+        {/* ── TOP: Logo + Headline ── */}
+        {mounted && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center text-center w-full"
+          >
+            {/* Logo */}
+            <div className="w-24 h-24 mb-10 relative">
+              <img
+                src="/atom_3d_silver.jpg"
+                alt="Humanity Ledger"
+                className="w-full h-full object-contain mix-blend-multiply"
+                draggable={false}
+              />
+            </div>
 
+            {/* Headline */}
+            <h1 className="text-[36px] font-black tracking-tighter leading-[0.92] text-black mb-4">
+              Whale Network
+              <br />
+              <span className="text-black/25 text-[22px] font-bold">
+                Zero-Knowledge Protocol
+              </span>
+            </h1>
 
-      {/* ========================================================================= */}
-      {/* ===================== CONTENIDO SUPERIOR: MAJESTUOSO ==================== */}
-      {/* ========================================================================= */}
-      
-      <main className="relative z-[50] w-full min-h-screen flex flex-col items-center justify-between px-6 pt-12 pb-8">
-        
-        <AnimatePresence>
-          {mounted && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-center w-full"
-            >
-              {/* LOGO INSTITUCIONAL FLOTANTE */}
-              <motion.div 
-                 animate={{ y: [0, -8, 0] }}
-                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                 className="relative w-32 h-32 mb-8 flex justify-center items-center"
-              >
-                  <div className="absolute inset-0 bg-[#00F2EA]/10 blur-3xl rounded-full" />
-                  <img src="/official-whale-monochrome.png" className="w-full h-full object-contain invert opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] relative z-10" alt="Whale Alert Logo" />
-              </motion.div>
+            <p className="text-[14px] text-black/50 leading-relaxed max-w-[300px] font-light mb-12">
+              Private, verifiable transactions on the Aztec Layer 2. Your data stays yours.
+            </p>
 
-              {/* TITULO Y SUBTITULO MAESTRO */}
-              <div className="text-center w-full max-w-sm mb-12">
-                  <h1 className="text-4xl xs:text-5xl font-black uppercase tracking-tighter leading-[0.9] text-white">
-                     System<br/>
-                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2EA] to-white/70">
-                       Terminal
-                     </span>
-                  </h1>
-                  <p className="mt-4 text-[10px] font-mono tracking-[0.3em] uppercase text-white/50 border-t border-white/10 pt-4">
-                     P2P Cryptographic Ledger Protocol
-                  </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ========================================================================= */}
-        {/* ====================== BLOQUE DE ACCIÓN INFERIOR ======================== */}
-        {/* ========================================================================= */}
-
-        <AnimatePresence>
-          {mounted && (
-             <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full max-w-sm flex flex-col gap-5 mt-auto"
-             >
-                {/* STATUS INDICATOR */}
-                <div className="flex items-center justify-center gap-3 bg-black/40 backdrop-blur-md rounded-full py-2 px-4 border border-white/5 mx-auto mb-4">
-                   <div className="w-1.5 h-1.5 rounded-full bg-[#00F2EA] animate-pulse shadow-[0_0_8px_#00F2EA]" />
-                   <span className="text-[9px] font-black tracking-widest text-[#00F2EA] uppercase">Secure Connection</span>
+            {/* Trust badges */}
+            <div className="grid grid-cols-3 gap-3 w-full max-w-[320px] mb-12">
+              {[
+                { icon: Lock, label: "End-to-End\nPrivacy" },
+                { icon: Shield, label: "Aztec\nZK Proofs" },
+                { icon: Globe, label: "20+ Chains\nMonitored" },
+              ].map(({ icon: Icon, label }) => (
+                <div
+                  key={label}
+                  className="flex flex-col items-center gap-2 py-4 px-2 border border-black/8 bg-white"
+                >
+                  <Icon size={16} strokeWidth={1.5} className="text-black/50" />
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-black/50 text-center whitespace-pre-line leading-tight">
+                    {label}
+                  </span>
                 </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
-                {/* BOTON MAESTRO CINETICO CON NEON SUTIL */}
-                <Link href="/connect" className="group relative w-full flex items-center justify-center h-16 rounded-xl overflow-hidden bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#FAF9F6] to-[#E0E0E0]" />
-                    <span className="relative z-10 text-[12px] font-black uppercase tracking-widest text-black">
-                      Autenticar Ingreso
-                    </span>
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-                </Link>
+        {/* ── BOTTOM: Actions ── */}
+        {mounted && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-[360px] flex flex-col gap-3"
+          >
+            {/* Primary CTA */}
+            <Link
+              href="/connect"
+              className="w-full flex items-center justify-between h-14 px-6 bg-black text-white font-semibold text-[13px] tracking-wide hover:bg-black/85 active:scale-[0.98] transition-all duration-200"
+            >
+              <span>Connect Wallet</span>
+              <ArrowRight size={16} strokeWidth={2} />
+            </Link>
 
-                {/* BOTON SECUNDARIO APAGADO Y ELEGANTE */}
-                <button className="w-full h-14 flex items-center justify-center rounded-xl bg-black/30 backdrop-blur-lg border border-white/10 text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white hover:bg-black/50 transition-colors">
-                  Descargar Nodo Local
-                </button>
-             </motion.div>
-          )}
-        </AnimatePresence>
-        
+            {/* Secondary */}
+            <Link
+              href="/developers/api-docs"
+              className="w-full flex items-center justify-center h-12 px-6 border border-black/15 text-black font-medium text-[13px] tracking-wide hover:bg-black/[0.04] active:scale-[0.98] transition-all duration-200"
+            >
+              Read Documentation
+            </Link>
+
+            {/* Fine print */}
+            <p className="text-center text-[10px] text-black/30 font-medium tracking-wide pt-2">
+              Non-custodial · Open source · Aztec L2
+            </p>
+          </motion.div>
+        )}
+
       </main>
-
     </div>
   );
 };

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { TrendingUp, Zap, Activity, BarChart3, Clock, Server } from 'lucide-react';
@@ -32,8 +32,8 @@ export function NetworkStats({ theme = 'default' }: { theme?: 'default' | 'arcti
     : "bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm relative overflow-hidden group hover:border-slate-200 transition-all duration-500";
   
   const iconBoxClass = isArctic
-    ? "p-2.5 bg-slate-50 text-indigo-600 rounded-xl group-hover:bg-slate-950 group-hover:text-white transition-colors duration-500"
-    : "p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-slate-950 group-hover:text-white transition-colors duration-500";
+    ? "p-2.5 bg-black/5 text-indigo-600 rounded-xl group-hover:bg-slate-950 group-hover:text-white transition-colors duration-500"
+    : "p-2.5 bg-black/5 text-slate-400 rounded-xl group-hover:bg-slate-950 group-hover:text-white transition-colors duration-500";
   const { data: prices, isLoading } = useQuery({
     queryKey: ['network', 'prices'],
     queryFn: async () => {
@@ -82,7 +82,7 @@ export function NetworkStats({ theme = 'default' }: { theme?: 'default' | 'arcti
                 <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Peer Value</span>
                 <div className="flex items-baseline gap-2">
                     <h3 className="text-3xl font-black font-mono text-slate-950 tracking-tighter">
-                        {prices?.USD ? `$${safeToLocaleString(prices.USD)}` : <div className="h-8 w-32 bg-slate-50 rounded-xl animate-pulse" />}
+                        {prices?.USD ? `$${safeToLocaleString(prices.USD)}` : <div className="h-8 w-32 bg-black/5 rounded-xl animate-pulse" />}
                     </h3>
                 </div>
             </div>
@@ -105,7 +105,7 @@ export function NetworkStats({ theme = 'default' }: { theme?: 'default' | 'arcti
                 <div className="flex items-end gap-8">
                     <div>
                         <div className="text-3xl font-black font-mono text-slate-950 tracking-tighter">
-                            {fees?.fastestFee ?? <div className="h-8 w-12 bg-slate-50 rounded-xl animate-pulse" />}
+                            {fees?.fastestFee ?? <div className="h-8 w-12 bg-black/5 rounded-xl animate-pulse" />}
                         </div>
                         <div className="text-[8px] font-black text-emerald-600 uppercase tracking-widest mt-1">Immediate Settlement</div>
                     </div>
@@ -130,7 +130,7 @@ export function NetworkStats({ theme = 'default' }: { theme?: 'default' | 'arcti
                 <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Security Equilibrium</span>
                 <div className="flex flex-col">
                     <div className={`text-3xl font-black font-mono tracking-tighter ${difficulty?.difficultyChange && difficulty.difficultyChange > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                         {difficulty?.difficultyChange ? `${difficulty.difficultyChange > 0 ? '+' : ''}${safeToFixed(difficulty.difficultyChange, 2)}%` : <div className="h-8 w-24 bg-slate-50 rounded-xl animate-pulse" />}
+                         {difficulty?.difficultyChange ? `${difficulty.difficultyChange > 0 ? '+' : ''}${safeToFixed(difficulty.difficultyChange, 2)}%` : <div className="h-8 w-24 bg-black/5 rounded-xl animate-pulse" />}
                     </div>
                     <div className="text-[8px] font-black text-slate-300 uppercase tracking-widest mt-1 leading-relaxed">
                         {difficulty?.remainingBlocks} Confirmations until Periodic Recalibration

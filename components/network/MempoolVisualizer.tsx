@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -38,7 +38,7 @@ export function MempoolVisualizer({ hideHeader = false, theme = 'default' }: { h
 
     if (!mempoolBlocks || mempoolBlocks.length === 0) {
         return (
-             <div className="bg-slate-50 backdrop-blur-xl border border-slate-100 rounded-[2.5rem] p-8 h-full flex flex-col items-center justify-center text-slate-500 shadow-sm">
+             <div className="bg-black/5 backdrop-blur-xl border border-slate-100 rounded-[2.5rem] p-8 h-full flex flex-col items-center justify-center text-slate-500 shadow-sm">
                 <Layers size={40} className="mb-4 opacity-50 text-indigo-400" />
                 <p className="text-[10px] uppercase font-black tracking-widest text-slate-500">No backlog detected</p>
             </div>

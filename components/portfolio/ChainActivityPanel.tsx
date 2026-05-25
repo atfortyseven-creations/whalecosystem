@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,7 +9,7 @@ import {
 import { useReadContract } from 'wagmi';
 import { parseAbi, formatEther } from 'viem';
 
-const BG     = "#FAF9F6";
+const BG     = "#FFFFFF";
 const INK    = "#050505";
 const MUTED  = "rgba(5,5,5,0.45)";
 const BORDER = "rgba(5,5,5,0.08)";

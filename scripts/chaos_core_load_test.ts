@@ -1,9 +1,9 @@
-import { ethers } from "hardhat";
+﻿import { ethers } from "hardhat";
 import crypto from "crypto";
 
 async function main() {
   console.log("\n============================================================");
-  console.log(" QUANTUM DOTS & LEDGER  ABYSSAL 2000-TX STRESS TEST ");
+  console.log(" NETWORK SCORE & LEDGER  ABYSSAL 2000-TX STRESS TEST ");
   console.log("============================================================\n");
 
   const signers = await ethers.getSigners();

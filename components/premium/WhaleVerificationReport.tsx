@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -170,7 +170,7 @@ export default function WhaleVerificationReport({
                     </div>
                     <div className="flex items-center gap-1">
                         <CheckCircle2 size={14} className="text-green-500" />
-                        {identityTier === 'SOVEREIGN' || identityTier === 'HUMAN' ? 'World ID Verified' : 'History Scanned'}
+                        {identityTier === 'Enterprise' || identityTier === 'HUMAN' ? 'World ID Verified' : 'History Scanned'}
                     </div>
                 </div>
                 <button 

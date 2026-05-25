@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef } from 'react';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -21,7 +21,7 @@ export function useSystemSessionLock() {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
             timeoutRef.current = setTimeout(() => {
-                console.log(`[SOVEREIGN SECURITY] Inactivity limit reached (${settings.inactivityLockMinutes}m). Locking session.`);
+                console.log(`[Enterprise SECURITY] Inactivity limit reached (${settings.inactivityLockMinutes}m). Locking session.`);
                 
                 // Disconnect external wallet gracefully
                 disconnect();

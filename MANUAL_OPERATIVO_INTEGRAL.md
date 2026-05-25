@@ -1,4 +1,4 @@
-# COMPREHENSIVE OPERATING CODEX: WHALE ALERT
+﻿# COMPREHENSIVE OPERATING CODEX: WHALE ALERT
 ## Treatise on System Capabilities, Limitations, and Systemty
 
 **Issue Date:** February 2nd, Year of Our Lord 2026  
@@ -22,7 +22,7 @@ It is imperative to understand that, in its "Titanium Vault" design, there are a
 #### CHAPTER I: CRYPTOGRAPHIC INVIOLABILITY
 1.  **Impossibility of External Recovery:** It is absolutely forbidden, by the nature of the AES-256-GCM encryption implemented in the core, for any entity (including developers, administrators, or government agencies) to access a user's funds if they lose their master password. The "Seed Phrase" resides encrypted in the database and is only decrypted in the volatile memory of the user's device. **Without the user's key, the data is digital dust.**
 2.  **Irreversibility of Transactions:** Once a transaction has been signed and transmitted to the Polygon (or Ethereum) network, there is no power in this system that can undo it. The blockchain is an immutable history book; what is written, is written.
-3.  **Falsification of Biometric Identity:** it is not possible for a malicious actor to replicate access via "Passkeys" (WebAuthn). The system categorically rejects any authentication attempt that does not originate from the originally registered secure hardware (TPM/Secure Enclave). The "Replay" attack is a technical impossibility.
+3.  **Falsification of Biometric Identity:** it is not possible for a malicious actor to replicate access via "Passkeys" (WebAuthn). The system categorically rejects any authentication attempt that does not originate from the originally registered secure hardware (TPM/Wallet). The "Replay" attack is a technical impossibility.
 
 #### CHAPTER II: BUSINESS LOGIC RESTRICTIONS
 1.  **Guardian Evasion (Titanium Gate):** No user, regardless of their rank, can view sensitive content on the "Dashboard" without having passed the authentication threshold. Routes are protected by edge execution middleware (Edge Runtime).

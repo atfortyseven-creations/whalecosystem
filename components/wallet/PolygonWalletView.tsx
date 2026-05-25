@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import {
@@ -53,7 +53,7 @@ export default function PolygonWalletView() {
             <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
                 <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-black/5 rounded-full border border-slate-100">
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -66,7 +66,7 @@ export default function PolygonWalletView() {
                         {address && (
                             <button
                                 onClick={copyAddress}
-                                className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors px-3 py-1.5 hover:bg-slate-50 rounded-lg"
+                                className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors px-3 py-1.5 hover:bg-black/5 rounded-lg"
                             >
                                 {truncateAddress(address)}
                                 {isCopied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
@@ -90,7 +90,7 @@ export default function PolygonWalletView() {
                     <div className="flex items-center justify-center gap-1">
                         <span className="text-5xl md:text-6xl font-bold tracking-tighter text-slate-950">$2,669.54</span>
                     </div>
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-50 rounded-full text-sm font-medium text-slate-600">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-black/5 rounded-full text-sm font-medium text-slate-600">
                         <Wallet className="w-4 h-4 text-slate-400" />
                         <span>145.20 POL Available for Gas</span>
                     </div>
@@ -115,7 +115,7 @@ export default function PolygonWalletView() {
                         {activeTab === "tokens" ? (
                             <div className="space-y-1">
                                 {ASSETS.map((asset) => (
-                                    <div key={asset.symbol} className="group flex items-center justify-between p-4 hover:bg-slate-50 rounded-xl transition-colors cursor-default">
+                                    <div key={asset.symbol} className="group flex items-center justify-between p-4 hover:bg-black/5 rounded-xl transition-colors cursor-default">
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full text-lg">
                                                 {asset.icon}
@@ -137,7 +137,7 @@ export default function PolygonWalletView() {
                                 {TRANSACTIONS.map((tx, i) => (
                                     <div key={i} className="flex items-center justify-between p-4 border border-slate-100 rounded-xl">
                                         <div className="flex items-center gap-4">
-                                            <div className={`p-2 rounded-full ${tx.type === 'Received' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-600'}`}>
+                                            <div className={`p-2 rounded-full ${tx.type === 'Received' ? 'bg-emerald-50 text-emerald-600' : 'bg-black/5 text-slate-600'}`}>
                                                 {tx.type === 'Received' ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
                                             </div>
                                             <div>
@@ -168,7 +168,7 @@ function ActionButton({ icon, label, highlight }: { icon: React.ReactNode, label
                 w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm
                 ${highlight
                     ? 'bg-slate-900 text-white shadow-lg shadow-slate-200 group-hover:scale-105'
-                    : 'bg-white border border-slate-200 text-slate-900 group-hover:border-slate-300 group-hover:bg-slate-50'
+                    : 'bg-white border border-slate-200 text-slate-900 group-hover:border-slate-300 group-hover:bg-black/5'
                 }
             `}>
                 {icon}

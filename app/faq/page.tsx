@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { ChevronDown, ArrowRight, MessageSquare, Zap, Shield, Cpu, Globe, Lock } from 'lucide-react';
@@ -123,7 +123,7 @@ export default function FAQPage() {
   const activeData = FAQ_CATEGORIES.find(c => c.id === activeCategory)!;
 
   return (
-    <div className="min-h-screen bg-transparent text-[#0a0a0a] dark:text-[#FAF9F6] font-sans antialiased">
+    <div className="min-h-screen bg-transparent text-[#0a0a0a] dark:text-[#FFFFFF] font-sans antialiased">
       
       {/* Hero */}
       <div className="w-full border-b border-black/6 bg-white">
@@ -218,7 +218,7 @@ export default function FAQPage() {
             </Link>
             <Link
               href="/api-marketplace"
-              className="flex items-center gap-3 px-6 py-3.5 bg-slate-50 text-[#0a0a0a] border border-black/8 rounded-xl text-[11px] font-black uppercase tracking-widest hover:border-black/20 transition-all"
+              className="flex items-center gap-3 px-6 py-3.5 bg-black/5 text-[#0a0a0a] border border-black/8 rounded-xl text-[11px] font-black uppercase tracking-widest hover:border-black/20 transition-all"
             >
               View API Plans
               <ArrowRight size={14} />

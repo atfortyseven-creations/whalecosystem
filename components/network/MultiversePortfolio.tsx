@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -62,7 +62,7 @@ export function MultiversePortfolio({ theme = 'default' }: { theme?: 'default' |
                             placeholder="Enter 0x... Address or ENS"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
-                            className={`flex-1 ${isArctic ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-200'} rounded-2xl px-6 h-14 text-slate-900 font-mono text-sm placeholder-slate-400 focus:outline-none ${isArctic ? 'focus:border-indigo-400' : 'focus:border-emerald-400'} transition-colors`}
+                            className={`flex-1 ${isArctic ? 'bg-white border-slate-200' : 'bg-black/5 border-slate-200'} rounded-2xl px-6 h-14 text-slate-900 font-mono text-sm placeholder-slate-400 focus:outline-none ${isArctic ? 'focus:border-indigo-400' : 'focus:border-emerald-400'} transition-colors`}
                         />
                         <button
                             type="submit"
@@ -112,7 +112,7 @@ export function MultiversePortfolio({ theme = 'default' }: { theme?: 'default' |
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className={`${isArctic ? 'bg-white/80 border-slate-100' : 'bg-slate-50 border-slate-100'} border rounded-2xl p-4 flex flex-col justify-between shadow-sm`}
+                                    className={`${isArctic ? 'bg-white/80 border-slate-100' : 'bg-black/5 border-slate-100'} border rounded-2xl p-4 flex flex-col justify-between shadow-sm`}
                                 >
                                     <div className="flex items-center gap-2 mb-3">
                                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: chain.color }} />

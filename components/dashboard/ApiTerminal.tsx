@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -158,7 +158,7 @@ export function ApiTerminal() {
         <div className="flex h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
 
             {/*  Left Sidebar  */}
-            <div className="w-64 border-r border-[#E5E5E5] bg-[#FAF9F6] flex flex-col shrink-0 overflow-y-auto no-scrollbar">
+            <div className="w-64 border-r border-[#E5E5E5] bg-[#FFFFFF] flex flex-col shrink-0 overflow-y-auto no-scrollbar">
                 <div className="px-4 py-3 border-b border-[#E5E5E5]">
                     <span className="text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] flex items-center gap-2">
                         <Database size={11}/> {allEndpoints.length} Endpoints

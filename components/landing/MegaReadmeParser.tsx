@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
@@ -25,10 +25,10 @@ export const MegaReadmeParser = ({ content }: { content: string }) => {
           );
         }
         if (block.startsWith('**') && block.endsWith('**')) {
-           return <div key={idx} className="bg-[#050505] text-[#FAF9F6] p-6 font-bold uppercase tracking-widest my-8 text-center">{block.replace(/\*\*/g, '')}</div>;
+           return <div key={idx} className="bg-[#050505] text-[#FFFFFF] p-6 font-bold uppercase tracking-widest my-8 text-center">{block.replace(/\*\*/g, '')}</div>;
         }
         if (block.match(/^[0-9]+\./)) {
-           return <p key={idx} className="font-bold border border-[#050505]/10 p-4 bg-[#FAF9F6]">{block}</p>;
+           return <p key={idx} className="font-bold border border-[#050505]/10 p-4 bg-[#FFFFFF]">{block}</p>;
         }
         return (
           <p key={idx} className="leading-relaxed text-justify opacity-90 px-4 md:px-0">

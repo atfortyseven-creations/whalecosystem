@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -71,7 +71,7 @@ export function HalvingCountdown() {
                     </div>
 
                     <div className="w-full space-y-4">
-                        <div className="relative h-2 bg-slate-50 rounded-full overflow-hidden border border-slate-100">
+                        <div className="relative h-2 bg-black/5 rounded-full overflow-hidden border border-slate-100">
                             <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${((currentHeight % HALVING_INTERVAL) / HALVING_INTERVAL) * 100}%` }}

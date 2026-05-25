@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -632,7 +632,7 @@ export default function CoreTransfer() {
                                         onChange={e => setRecipient(e.target.value.trim())}
                                         placeholder="0x...   EVM Address"
                                         disabled={isActive}
-                                        className="w-full bg-[#FAFAF8] border rounded-2xl px-5 py-4 text-black font-mono text-sm focus:outline-none transition-colors placeholder:text-black/25 disabled:opacity-50"
+                                        className="w-full bg-[#FFFFFF] border rounded-2xl px-5 py-4 text-black font-mono text-sm focus:outline-none transition-colors placeholder:text-black/25 disabled:opacity-50"
                                         style={{
                                             borderColor: recipientValid === false ? '#ef4444' : recipientValid === true ? '#22c55e' : 'rgba(0,0,0,0.1)',
                                         }}
@@ -672,7 +672,7 @@ export default function CoreTransfer() {
                                         placeholder="0.00"
                                         step="0.000001"
                                         disabled={isActive}
-                                        className="w-full bg-[#FAFAF8] border border-black/10 rounded-2xl px-5 py-4 text-black font-mono text-2xl focus:outline-none transition-colors placeholder:text-black/20 disabled:opacity-50"
+                                        className="w-full bg-[#FFFFFF] border border-black/10 rounded-2xl px-5 py-4 text-black font-mono text-2xl focus:outline-none transition-colors placeholder:text-black/20 disabled:opacity-50"
                                         style={{
                                             borderColor: amount && !amountValid ? '#ef4444' : 'rgba(0,0,0,0.1)',
                                         }}
@@ -700,7 +700,7 @@ export default function CoreTransfer() {
                                     placeholder="Asset purchase, P2P payment..."
                                     maxLength={64}
                                     disabled={isActive}
-                                    className="w-full bg-[#FAFAF8] border border-black/10 rounded-2xl px-5 py-3.5 text-black text-sm focus:outline-none transition-colors placeholder:text-black/20 disabled:opacity-50"
+                                    className="w-full bg-[#FFFFFF] border border-black/10 rounded-2xl px-5 py-3.5 text-black text-sm focus:outline-none transition-colors placeholder:text-black/20 disabled:opacity-50"
                                 />
                             </div>
 
@@ -711,7 +711,7 @@ export default function CoreTransfer() {
                                         initial={{ opacity: 0, y: 6 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0 }}
-                                        className="bg-[#FAFAF8] border border-black/5 rounded-2xl px-5 py-3 divide-y divide-black/5"
+                                        className="bg-[#FFFFFF] border border-black/5 rounded-2xl px-5 py-3 divide-y divide-black/5"
                                     >
                                         <div className="text-[8px] font-black uppercase tracking-widest text-black/30 pb-2">
                                             Estimated Gas (L2)

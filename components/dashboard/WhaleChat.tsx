@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
@@ -1027,7 +1027,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     return (
       <div className="flex flex-col h-full min-h-[500px] bg-white dark:bg-[#0A0A0A] rounded-2xl border border-black/5 dark:border-white/5 shadow-sm overflow-y-auto">
         {/* Minimalist Protocol Header */}
-        <div className="flex items-center justify-between px-8 py-6 border-b border-black/5 dark:border-white/5 bg-[#FAFAF8] dark:bg-[#111111] shrink-0">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-black/5 dark:border-white/5 bg-[#FFFFFF] dark:bg-[#111111] shrink-0">
           <div className="flex items-center gap-3">
           </div>
           <div className="w-4" />
@@ -1077,7 +1077,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         </div>
 
         {/* Action Area */}
-        <div className="bg-[#FAFAF8] dark:bg-[#111111] p-8 md:p-12 border-t border-black/5 dark:border-white/5 flex flex-col items-center">
+        <div className="bg-[#FFFFFF] dark:bg-[#111111] p-8 md:p-12 border-t border-black/5 dark:border-white/5 flex flex-col items-center">
           {initError ? (
             <div className="flex flex-col items-center gap-6 w-full max-w-md">
               <div className="w-full bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-400 text-[12px] font-mono p-5 rounded-xl border border-red-100 dark:border-red-900/50 text-center leading-relaxed">
@@ -1381,7 +1381,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
               {/*  Audio recording indicator  */}
               {isRecording && (
                 <div className="flex items-center gap-2 px-4 pt-3 pb-1">
-                    <div className="flex items-center gap-1.5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 px-2 py-1 rounded-md">
+                    <div className="flex items-center gap-1.5 bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 px-2 py-1 rounded-md">
                         <span className="text-[10px] font-mono text-black dark:text-white uppercase font-black">REC</span>
                         <span className="text-[9px] font-mono text-black/40 dark:text-white/40">{recordingSeconds}s</span>
                     </div>

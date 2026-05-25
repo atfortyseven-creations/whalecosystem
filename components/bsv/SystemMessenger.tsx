@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import useSWR from 'swr';
 
 /**
- * SOVEREIGN MESSENGER (Pillar 3 - Phase 2)
+ * Enterprise MESSENGER (Pillar 3 - Phase 2)
  * -------------------------------------
  * High-performance P2P communication interface.
  * Features signed message substrate and 10000% institutional fidelity.

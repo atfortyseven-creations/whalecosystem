@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { safeStorage } from '@/lib/security/safe-storage';
 
@@ -102,7 +102,7 @@ const applyDOMClasses = (state: Partial<SystemSettings>) => {
         } else {
             html.classList.remove('dark');
             html.setAttribute('data-theme', 'light');
-            html.style.backgroundColor = '#FAF9F6';
+            html.style.backgroundColor = '#FFFFFF';
             html.style.color = '#1C1917';
         }
     }

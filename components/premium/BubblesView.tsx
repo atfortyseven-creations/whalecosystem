@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
@@ -328,7 +328,7 @@ export default function BubblesView({ limit }: { limit?: number }) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#FAFAF8] rounded-[2.5rem] border border-[#E5E5E5] overflow-hidden shadow-sm">
+        <div className="flex flex-col h-full bg-[#FFFFFF] rounded-[2.5rem] border border-[#E5E5E5] overflow-hidden shadow-sm">
             {/* Header / Controls */}
             <div className="p-6 border-b border-[#E5E5E5] flex flex-col md:flex-row gap-4 justify-between items-center z-20">
                 <div className="flex items-center gap-2 bg-[#F0F0F0] p-1.5 rounded-2xl border border-[#E5E5E5]">
@@ -471,7 +471,7 @@ export default function BubblesView({ limit }: { limit?: number }) {
             )}
 
             {/* Footer Stats */}
-            <div className="p-6 bg-[#FAF9F6] border-t border-[#E5E5E5] flex justify-between items-center">
+            <div className="p-6 bg-[#FFFFFF] border-t border-[#E5E5E5] flex justify-between items-center">
                 <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${isSettled ? 'bg-emerald-500' : 'bg-emerald-500'}`} />
                     <span className="text-[10px] font-black uppercase text-black/40 tracking-widest">

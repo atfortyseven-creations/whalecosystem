@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
@@ -103,7 +103,7 @@ export const WalkawayPanel = () => {
                 </Badge>
             </CardHeader>
             <CardContent className="pt-6 space-y-5">
-                <div className="flex flex-col items-center justify-center py-5 border border-[#E5E5E5] rounded-xl bg-[#FAF9F6]">
+                <div className="flex flex-col items-center justify-center py-5 border border-[#E5E5E5] rounded-xl bg-[#FFFFFF]">
                     <p className="text-[9px] uppercase tracking-[0.2em] text-[#888888] mb-1 font-black">Time until Auto-Handover</p>
                     <div className="flex items-baseline gap-1.5">
                         <span className="text-5xl font-black text-[#FF3B30] tracking-tighter">

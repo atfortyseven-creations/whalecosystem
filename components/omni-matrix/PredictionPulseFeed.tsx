@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -41,7 +41,7 @@ export function PredictionPulseFeed() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
                         key={whale.address} 
-                        className="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-indigo-300 transition-colors flex items-center justify-between"
+                        className="p-3 rounded-xl bg-black/5 border border-slate-100 hover:border-indigo-300 transition-colors flex items-center justify-between"
                     >
                         <div className="flex items-center gap-3">
                             <img 

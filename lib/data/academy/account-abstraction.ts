@@ -1,4 +1,4 @@
-export const accountAbstractionModules = [
+﻿export const accountAbstractionModules = [
     {
         id: "account-abstraction-wallets",
         title: "XX. Account Abstraction y el Futuro de las Wallets",
@@ -329,14 +329,14 @@ export const accountAbstractionModules = [
             },
             {
                 id: "secure-enclave-hybrid-wallets",
-                title: "20. Wallets Híbridas y Secure Enclave",
+                title: "20. Wallets Híbridas y Wallet",
                 description: "Seguridad de Hardware en tu Smartphone.",
                 readTime: 50,
                 content: `<div class="academy-article">
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. Falla Gaseosa y el Chip Especializado (Trusted Execution Environments L1 M2 P2P T-1 O(N))</h2>
-                        <p>Una Hardware Wallet L1 P2P M1 O(1) (Ledger, Trezor T-1 L2 M2 O(N)) Tiene Inconvenientes Friccionales P2P L1 M1 T-1 L2 M2. Las <strong>Secure Enclave Wallets P2P L1 M1 O(1) T-1 L2 O(N)</strong> Reclutan El Pequeño Microchip Aislado (TEE M2 P2P L1 M1 O(N) T-1) Que Ya Llevas Dentro De Tu Teléfono L2 M2 P2P L1 O(1), El Cual Fue Diseñado M1 T-1 L2 Originalmente Para Almacenar Datos Dactilares O(N) P2P L1 M1.</p>
+                        <p>Una Hardware Wallet L1 P2P M1 O(1) (Ledger, Trezor T-1 L2 M2 O(N)) Tiene Inconvenientes Friccionales P2P L1 M1 T-1 L2 M2. Las <strong>Wallet Wallets P2P L1 M1 O(1) T-1 L2 O(N)</strong> Reclutan El Pequeño Microchip Aislado (TEE M2 P2P L1 M1 O(N) T-1) Que Ya Llevas Dentro De Tu Teléfono L2 M2 P2P L1 O(1), El Cual Fue Diseñado M1 T-1 L2 Originalmente Para Almacenar Datos Dactilares O(N) P2P L1 M1.</p>
                     </section>
                     <section class="pro-section">
                         <h2>II. Criptografía Híbrida WebAuthn y Smart Contracts L1 P2P M1 T-1 L2 M2 O(N)</h2>

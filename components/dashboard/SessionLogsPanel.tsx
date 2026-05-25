@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -88,7 +88,7 @@ export function SessionLogsPanel() {
                     <button 
                         onClick={handleExport} 
                         disabled={isExporting} 
-                        className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-slate-50 active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                        className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-black/5 active:scale-95 flex items-center gap-2 disabled:opacity-50"
                     >
                         <Download size={12} />
                         {isExporting ? "EXPORTING..." : "EXPORT AUDIT LOG"}
@@ -102,7 +102,7 @@ export function SessionLogsPanel() {
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                             <input 
                                 type="text" 
-                                className="block w-full pl-11 pr-4 py-3 bg-slate-50/60 border border-slate-200/60 rounded-xl text-[12px] text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-all font-mono placeholder:text-slate-400 text-center" 
+                                className="block w-full pl-11 pr-4 py-3 bg-black/5/60 border border-slate-200/60 rounded-xl text-[12px] text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-all font-mono placeholder:text-slate-400 text-center" 
                                 placeholder="Filter action, IP, identity..." 
                                 value={search} 
                                 onChange={e => setSearch(e.target.value)} 
@@ -111,7 +111,7 @@ export function SessionLogsPanel() {
                     </div>
 
                     <div className="w-full flex-1 flex flex-col border border-slate-200/60 rounded-2xl overflow-hidden bg-white shadow-sm" style={{ minHeight: 300 }}>
-                        <div className="hidden md:grid grid-cols-[1.5fr_2fr_2fr_1.5fr] px-6 py-4 border-b border-slate-200/60 bg-slate-50/60 font-mono text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">
+                        <div className="hidden md:grid grid-cols-[1.5fr_2fr_2fr_1.5fr] px-6 py-4 border-b border-slate-200/60 bg-black/5/60 font-mono text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">
                             <div>Timestamp</div>
                             <div>Action</div>
                             <div>Identity</div>
@@ -134,7 +134,7 @@ export function SessionLogsPanel() {
                                             <div
                                                 key={log.id}
                                                 onClick={() => { navigator.clipboard.writeText(JSON.stringify(log, null, 2)); toast.success("Copied"); }}
-                                                className="absolute w-full border-b border-slate-100 hover:bg-slate-50/60 transition-colors cursor-pointer flex flex-col md:grid md:grid-cols-[1.5fr_2fr_2fr_1.5fr] md:items-center px-6 py-4 gap-2 md:gap-0 text-center"
+                                                className="absolute w-full border-b border-slate-100 hover:bg-black/5/60 transition-colors cursor-pointer flex flex-col md:grid md:grid-cols-[1.5fr_2fr_2fr_1.5fr] md:items-center px-6 py-4 gap-2 md:gap-0 text-center"
                                                 style={{ height: `${virtualRow.size}px`, transform: `translateY(${virtualRow.start}px)` }}
                                             >
                                                 <div className="font-mono text-[11px] text-slate-400 truncate">{new Date(log.timestamp).toLocaleString("en-US", { hour12: false })}</div>

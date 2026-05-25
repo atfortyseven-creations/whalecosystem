@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -172,7 +172,7 @@ export const BootSequence = () => {
                     {/* Legal/Technical Footer */}
                     <div className="absolute bottom-8 text-[10px] text-gray-500 font-mono text-center w-full opacity-60">
                         <p>POWERED BY BASE SEPOLIA // ZK-STARK PROTOCOL</p>
-                        <p className="mt-1 text-[8px]">SECURE ENCLAVE ACTIVE</p>
+                        <p className="mt-1 text-[8px]">Wallet ACTIVE</p>
                     </div>
 
                 </motion.div>

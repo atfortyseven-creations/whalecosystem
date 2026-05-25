@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -15,7 +15,7 @@ export function OmniChainGridSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   return (
-    <section ref={containerRef} className="relative py-40 px-6 bg-slate-50 overflow-hidden">
+    <section ref={containerRef} className="relative py-40 px-6 bg-black/5 overflow-hidden">
       <motion.div style={{ opacity }} className="relative z-10 max-w-[2560px] mx-auto text-left">
         <div className="text-center mb-32">
           <div className="text-xs font-black uppercase tracking-[0.5em] text-indigo-600 mb-8">Global Security Grid</div>

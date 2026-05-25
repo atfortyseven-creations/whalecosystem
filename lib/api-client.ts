@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+﻿import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 // ============================================================================
-// SOVEREIGN ENDPOINT REGISTRY
+// Enterprise ENDPOINT REGISTRY
 // ============================================================================
 // The user will inject the production on-chain endpoints here in the next step.
 export const REGISTRY = {
@@ -23,7 +23,7 @@ export const REGISTRY = {
     portfolio:      "/api/wallet/portfolio",
     whaleWallets:   "/api/premium/watched-wallets",
     coldStorage:    "/api/wallet/onchain-balances",
-    zkShield:       "/api/network/forensics",
+    Security Protocol:       "/api/network/forensics",
   },
   OMNI_INFRA: {
     blockExplorer:  "/api/network/evm/recent",

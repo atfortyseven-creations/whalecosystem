@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Phase 6: Enterprise & Kubernetes
 - `feat(k8s)`: Full Kubernetes production manifests  Namespace, ConfigMap, 3 Deployments (app/scanner/telegram), Service, HPA (210 pods, CPU+memory triggers), PodDisruptionBudget (minAvailable:1), ServiceAccount (no auto-token), NGINX Ingress with cert-manager TLS, SSE proxy-buffering disabled
 - `feat(k8s)`: Helm chart for institutional one-command deploy (`helm install whale-alert`) with full values.yaml surface
-- `feat(enterprise)`: `/api/enterprise`  4-tier feature grid (COMMUNITY/PRO/ENTERPRISE/SOVEREIGN) with SLA guarantees and pricing
+- `feat(enterprise)`: `/api/enterprise`  4-tier feature grid (COMMUNITY/PRO/ENTERPRISE/Enterprise) with SLA guarantees and pricing
 - `feat(enterprise)`: `/api/enterprise/contact`  inquiry handler with Telegram admin notification and reference ID generation
 - `docs(enterprise)`: `ENTERPRISE.md`  complete enterprise guide including air-gapped deployment option
 - `chore(semver)`: Bumped version to 3.0.0; added npm scripts for K8s, Helm, and system contract deployment

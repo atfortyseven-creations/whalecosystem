@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -72,7 +72,7 @@ export function BRCExplorerShell() {
         <div className="flex h-[calc(100vh-10px)] bg-[#FFFFFF] text-[#111111] overflow-hidden rounded-tl-3xl shadow-2xl border-l border-[#E5E5E5]">
             
             {/* Sidebar List */}
-            <div className="w-[400px] flex flex-col border-r border-[#E5E5E5] bg-[#FAF9F6] shrink-0 h-full">
+            <div className="w-[400px] flex flex-col border-r border-[#E5E5E5] bg-[#FFFFFF] shrink-0 h-full">
                 <div className="p-6 border-b border-[#E5E5E5] bg-white">
                     <div className="flex justify-between items-center mb-5">
                         <div className="flex items-center gap-2">
@@ -87,7 +87,7 @@ export function BRCExplorerShell() {
                         <button 
                             onClick={triggerSync} 
                             disabled={syncing}
-                            className="p-2 border border-[#E5E5E5] rounded-xl hover:border-[#111] transition-colors bg-[#FAF9F6] text-[#111]"
+                            className="p-2 border border-[#E5E5E5] rounded-xl hover:border-[#111] transition-colors bg-[#FFFFFF] text-[#111]"
                         >
                             <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
                         </button>
@@ -103,7 +103,7 @@ export function BRCExplorerShell() {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto no-scrollbar bg-[#FAF9F6] p-4 space-y-2">
+                <div className="flex-1 overflow-y-auto no-scrollbar bg-[#FFFFFF] p-4 space-y-2">
                     {loading && (
                         <div className="flex flex-col items-center justify-center p-12 text-[#888]">
                             <RefreshCw size={24} className="animate-spin mb-4" />
@@ -136,7 +136,7 @@ export function BRCExplorerShell() {
                     )}
                 </div>
                 
-                <div className="p-4 border-t border-[#E5E5E5] bg-[#FAF9F6] flex justify-between text-[9px] font-black uppercase tracking-widest text-[#888]">
+                <div className="p-4 border-t border-[#E5E5E5] bg-[#FFFFFF] flex justify-between text-[9px] font-black uppercase tracking-widest text-[#888]">
                     <span>Total Index: {standards.length}</span>
                     <span>Github Source Verified</span>
                 </div>
@@ -157,7 +157,7 @@ export function BRCExplorerShell() {
                         key={selected.brcNumber}
                         className="flex-1 flex flex-col h-full bg-white relative z-10"
                     >
-                        <div className="p-10 border-b border-[#E5E5E5] bg-[#FAF9F6]">
+                        <div className="p-10 border-b border-[#E5E5E5] bg-[#FFFFFF]">
                             <div className="flex items-center gap-3 mb-4">
                                 <span className="text-[11px] font-mono bg-[#111] text-white px-3 py-1 rounded font-black">BRC-{selected.brcNumber.toString().padStart(4, '0')}</span>
                                 <span className="text-[10px] font-black uppercase tracking-widest text-[#888]">{selected.type}</span>
@@ -170,7 +170,7 @@ export function BRCExplorerShell() {
                             <h1 className="text-3xl font-black text-[#111] tracking-tighter leading-tight mb-6">{selected.title}</h1>
                             
                             <div className="grid grid-cols-3 gap-6 bg-white p-6 rounded-2xl border border-[#E5E5E5] shadow-sm relative overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#E5E5E5]/10 to-[#FAF9F6] block" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#E5E5E5]/10 to-[#FFFFFF] block" />
                                 <div className="relative z-10">
                                     <p className="text-[9px] font-black uppercase tracking-widest text-[#888] mb-1">Author</p>
                                     <p className="text-[11px] font-mono text-[#111] font-bold">{selected.author}</p>

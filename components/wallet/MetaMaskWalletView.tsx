@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 // No Clerk dependency  wallet identity comes from SIWE wagmi
@@ -140,7 +140,7 @@ export default function MetaMaskWalletView() {
     };
 
     return (
-        <div className="min-h-screen bg-[#FAFAF8] text-[#0A0A0A] font-sans flex justify-center selection:bg-black/10">
+        <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0A] font-sans flex justify-center selection:bg-black/10">
             
             <div className="w-full max-w-md bg-white md:my-8 md:rounded-[40px] md:shadow-sm md:border border-black/5 flex flex-col min-h-[850px] relative overflow-hidden">
                 
@@ -238,7 +238,7 @@ export default function MetaMaskWalletView() {
                 </div>
 
                 {/* Tabs & List Section */}
-                <div className="flex-1 bg-[#FAFAF8] rounded-t-[40px] border-t border-black/5 mt-4 flex flex-col">
+                <div className="flex-1 bg-[#FFFFFF] rounded-t-[40px] border-t border-black/5 mt-4 flex flex-col">
                     <div className="px-6 py-2 flex items-center gap-8 border-b border-black/5">
                         <button
                             onClick={() => setActiveTab("assets")}
@@ -360,7 +360,7 @@ export default function MetaMaskWalletView() {
                                             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                                             className="space-y-6 pt-2"
                                         >
-                                            <div className="p-8 bg-[#FAFAF8] border border-black/10 rounded-[2rem] relative group select-all">
+                                            <div className="p-8 bg-[#FFFFFF] border border-black/10 rounded-[2rem] relative group select-all">
                                                 <p className="text-lg font-mono font-bold text-black text-center leading-relaxed">
                                                     {decryptedMnemonic}
                                                 </p>
@@ -432,7 +432,7 @@ interface AssetRowProps {
 
 function AssetRow({ symbol, name, balance, value, color }: AssetRowProps) {
     return (
-        <div className="p-5 rounded-[1.5rem] bg-white border border-black/5 hover:bg-[#FAFAF8] transition-all flex items-center justify-between group cursor-pointer">
+        <div className="p-5 rounded-[1.5rem] bg-white border border-black/5 hover:bg-[#FFFFFF] transition-all flex items-center justify-between group cursor-pointer">
             <div className="flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center text-black/20 font-black group-hover:scale-105 transition-transform`}>
                     {symbol[0]}

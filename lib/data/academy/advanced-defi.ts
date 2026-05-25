@@ -1,4 +1,4 @@
-export const advancedDefiModules = [
+﻿export const advancedDefiModules = [
     {
         id: "advanced-defi-protocols",
         title: "XV. DeFi Institucional: Restaking, Tasas de Interés y Derivados de Liquidez",
@@ -241,7 +241,7 @@ export const advancedDefiModules = [
             {
                 id: "puffer-slash-protection",
                 title: "14. Puffer Finance: Protección contra Slash",
-                description: "Anti-slashing vía Secure Enclaves.",
+                description: "Anti-slashing vía Wallets.",
                 readTime: 55,
                 content: `<div class="academy-article">
                     <section class="pro-section">
@@ -251,7 +251,7 @@ export const advancedDefiModules = [
                     </section>
 
                     <section class="pro-section">
-                        <h2>II. Intel SGX y Anti-Slashing Determiniıstico (Secure Enclaves P2P L1 T-1 M2)</h2>
+                        <h2>II. Intel SGX y Anti-Slashing Determiniıstico (Wallets P2P L1 T-1 M2)</h2>
                         <p><strong>Puffer Finance M1 L2 P2P O(1)</strong> mitiga la Falla Categórica L1 T-1 M2 incorporando <em>Trusted Execution Environments O(N) L2 M1 P2P</em>. Delegan el Private Key Signing L1 a un Hardware Vault Aislado (Intel SGX T-1 M2 P2P), donde T-1 ni el mismísimo Operador del Nodo M1 L1 O(1) L2 puede extraer ni corromper las claves P2P M2. Adcionalmente T-1 M1 P2P L1 incorporan tecnología Anti-Slashing vía Enclave M2 L2: El Hardware Físico P2P L1 O(N) "Se Niega Asintóticamente T-1 M2" a firmar Bloques Conflictivos M1, reduciendo el Costo de Fianza (Bond L1 P2P M2) a solo 1 ETH T-1 L2, descentralizando el Validating Set M1 L1 M2 Institucional O(N).</p>
                     </section>
                 </div>`

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -29,7 +29,7 @@ export function ChainPulseCard({ chain, metrics, delay = 0, theme = 'default' }:
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay, duration: 0.5 }}
             whileHover={{ y: -5, boxShadow: isArctic ? `0 20px 40px ${chain.color}10` : `0 20px 40px ${chain.color}15` }}
-            className={`relative rounded-3xl p-5 group cursor-pointer transition-all overflow-hidden shadow-sm border ${isArctic ? 'bg-white/40 backdrop-blur-xl border-slate-200 hover:bg-white hover:border-indigo-200' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}
+            className={`relative rounded-3xl p-5 group cursor-pointer transition-all overflow-hidden shadow-sm border ${isArctic ? 'bg-white/40 backdrop-blur-xl border-slate-200 hover:bg-white hover:border-indigo-200' : 'bg-white border-slate-200 hover:bg-black/5 hover:border-slate-300'}`}
         >
             {/* Background Pulse (Authentic) */}
             <motion.div

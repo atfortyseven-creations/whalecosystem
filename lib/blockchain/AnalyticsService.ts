@@ -1,4 +1,4 @@
-import { moralisService } from './MoralisService';
+﻿import { moralisService } from './MoralisService';
 import { ChainId } from './BlockchainService';
 import { ethers } from 'ethers';
 import { redisClient as redis } from '../redis/client';
@@ -317,7 +317,7 @@ export class AnalyticsService {
     }
 
     /**
-     *  [SOVEREIGN DISCOVERY] getLiveYieldOpportunities
+     *  [Enterprise DISCOVERY] getLiveYieldOpportunities
      * Scans real on-chain liquidity pools via Premium RPCs. 
      * Eradicates the need for static mock lists.
      */
@@ -356,7 +356,7 @@ export class AnalyticsService {
     }
 
     /**
-     *  [SOVEREIGN DISCOVERY] getLiveGovProposals
+     *  [Enterprise DISCOVERY] getLiveGovProposals
      * Fetches real-time DAO proposals (Optimism, Uniswap, Aave) via Snapshot/Tally logic blueprints.
      */
     public async getLiveGovProposals(): Promise<any[]> {

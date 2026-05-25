@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Shield, AlertTriangle, CheckCircle2, BookOpen, Users, Zap, Flag, Scale, MessageSquare } from 'lucide-react';
@@ -148,7 +148,7 @@ export default function ForumGuidelinesPage() {
               <div className="flex items-start gap-4 px-6 pt-6 pb-5">
                 <div className="flex flex-col items-center gap-2 shrink-0">
                   <span className="text-[12px] font-mono font-black text-slate-300">{rule.n}</span>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-100 bg-slate-50">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-100 bg-black/5">
                     <rule.icon size={16} className="text-slate-500" />
                   </div>
                 </div>

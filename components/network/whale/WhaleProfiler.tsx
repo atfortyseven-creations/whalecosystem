@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -158,11 +158,11 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                 <div className="flex items-center gap-2">
                                     <button 
                                         onClick={() => setShowChart(!showChart)} 
-                                        className={`p-2 rounded-xl border transition-all ${showChart ? 'bg-slate-950 text-white border-slate-950 shadow-lg scale-105' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
+                                        className={`p-2 rounded-xl border transition-all ${showChart ? 'bg-slate-950 text-white border-slate-950 shadow-lg scale-105' : 'bg-black/5 text-slate-400 border-slate-100'}`}
                                     >
                                         <BarChart3 size={18} />
                                     </button>
-                                    <button onClick={onClose} className="p-2 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 hover:text-slate-950 transition-colors">
+                                    <button onClick={onClose} className="p-2 rounded-xl bg-black/5 border border-slate-100 text-slate-400 hover:text-slate-950 transition-colors">
                                         <X size={18} />
                                     </button>
                                 </div>
@@ -202,7 +202,7 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                                         initial={{ opacity: 0, y: 10 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ delay: 0.3 }}
-                                                        className="p-6 bg-slate-50 border border-slate-100 rounded-[2.5rem]"
+                                                        className="p-6 bg-black/5 border border-slate-100 rounded-[2.5rem]"
                                                     >
                                                         <div className="flex items-center gap-2 mb-3">
                                                             <Activity size={14} className="text-slate-950" />
@@ -225,19 +225,19 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                                     {/* Identity & Stats Grid */}
                                                     <motion.div variants={rowVariant} className="flex flex-wrap items-center gap-2">
                                                         <span className={`px-4 py-2 rounded-full text-[9px] font-black border tracking-widest uppercase ${
-                                                            data.identity_tier === 'SOVEREIGN' ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                                                            data.identity_tier === 'Enterprise' ? 'bg-orange-50 text-orange-600 border-orange-100' :
                                                             data.identity_tier === 'PROTOCOL' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                                            'bg-slate-50 text-slate-600 border-slate-100'
+                                                            'bg-black/5 text-slate-600 border-slate-100'
                                                         }`}>
                                                             {data.identity_tier || 'GHOST ENTITY'}
                                                         </span>
-                                                        <span className="px-4 py-2 rounded-full bg-slate-50 text-slate-400 text-[9px] font-black border border-slate-100 uppercase tracking-widest">
+                                                        <span className="px-4 py-2 rounded-full bg-black/5 text-slate-400 text-[9px] font-black border border-slate-100 uppercase tracking-widest">
                                                             {data.label}
                                                         </span>
                                                     </motion.div>
 
                                                     <motion.div variants={rowVariant} className="grid grid-cols-2 gap-4">
-                                                        <div className="bg-slate-50 border border-slate-100 rounded-[2rem] p-6">
+                                                        <div className="bg-black/5 border border-slate-100 rounded-[2rem] p-6">
                                                             <div className="flex items-center gap-1.5 mb-2">
                                                                 <Database size={12} className="text-slate-400" />
                                                                 <span className="text-slate-400 text-[9px] uppercase tracking-widest font-black">Capital Value</span>
@@ -246,7 +246,7 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                                                 {data.is_evm ? `$${(data.total_value_usd ?? 0).toLocaleString()}` : `${(data.balance_btc ?? 0).toFixed(6)} BTC`}
                                                             </div>
                                                         </div>
-                                                        <div className="bg-slate-50 border border-slate-100 rounded-[2rem] p-6">
+                                                        <div className="bg-black/5 border border-slate-100 rounded-[2rem] p-6">
                                                             <div className="flex items-center gap-1.5 mb-2">
                                                                 <Hash size={12} className="text-slate-400" />
                                                                 <span className="text-slate-400 text-[9px] uppercase tracking-widest font-black">Total Events</span>
@@ -309,7 +309,7 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                                     </motion.div>
 
                                                     {/* Behavior */}
-                                                    <motion.div variants={rowVariant} className="bg-slate-50 border border-slate-100 rounded-[2rem] p-6">
+                                                    <motion.div variants={rowVariant} className="bg-black/5 border border-slate-100 rounded-[2rem] p-6">
                                                         <div className="flex items-center gap-2 mb-4">
                                                             <Activity size={16} className="text-slate-400" />
                                                             <span className="text-slate-950 font-black text-[10px] tracking-widest uppercase">Behavioral Vector</span>
@@ -334,7 +334,7 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                                 href={data.is_evm ? `https://debank.com/profile/${address}` : `https://mempool.space/address/${address}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center justify-center gap-3 w-full py-5 rounded-[2.5rem] bg-slate-50 hover:bg-slate-950 border border-slate-100 text-slate-400 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all duration-500 shadow-sm"
+                                                className="flex items-center justify-center gap-3 w-full py-5 rounded-[2.5rem] bg-black/5 hover:bg-slate-950 border border-slate-100 text-slate-400 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all duration-500 shadow-sm"
                                             >
                                                 <ExternalLink size={14} /> Explorer View
                                             </motion.a>

@@ -1,8 +1,8 @@
-import { defineConfig } from 'vitest/config';
+﻿import { defineConfig } from 'vitest/config';
 import path from 'path';
 
 /**
- * SOVEREIGN TEST CONFIGURATION  Vitest
+ * Enterprise TEST CONFIGURATION  Vitest
  *
  * Covers:
  *   - Unit tests: lib/crypto, lib/audit, lib/resilience, lib/security

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -138,14 +138,14 @@ export function ProvenanceStudioContent({ variant = 'desktop' }: { variant?: 'mo
 
   return (
     <div
-      className={`min-h-[100dvh] bg-[#FAF9F6] text-[#050505] ${
+      className={`min-h-[100dvh] bg-[#FFFFFF] text-[#050505] ${
         isMobile
           ? 'pb-[calc(2rem+env(safe-area-inset-bottom))]'
           : ''
       }`}
     >
       {isMobile && (
-        <header className="sticky top-0 z-20 bg-[#FAF9F6]/95 backdrop-blur-md border-b border-black/8 px-5 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
+        <header className="sticky top-0 z-20 bg-[#FFFFFF]/95 backdrop-blur-md border-b border-black/8 px-5 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
           <button
             type="button"
             onClick={() => router.push('/connect')}

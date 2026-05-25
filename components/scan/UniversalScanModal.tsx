@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -61,7 +61,7 @@ function ScanLine({ active }: { active: boolean }) {
       <path
         d={path}
         fill="none"
-        stroke="#faf9f6"
+        stroke="#FFFFFF"
         strokeWidth={3}
         strokeDasharray={`${PERIMETER * 0.22} ${PERIMETER * 0.78}`}
         style={{ animation: `qr-perimeter-scan 1.8s linear infinite` }}
@@ -327,7 +327,7 @@ export default function UniversalScanModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6] overflow-y-auto py-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]"
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FFFFFF] overflow-y-auto py-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]"
         >
           <button
             type="button"

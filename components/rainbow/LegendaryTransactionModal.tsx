@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,7 +16,7 @@ import { useGaslessSwap } from "@/hooks/useGaslessSwap";
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
 //  Design Tokens (Ivory Model) 
-const BG     = "#FAF9F6";
+const BG     = "#FFFFFF";
 const INK    = "#050505";
 const MUTED  = "rgba(5,5,5,0.45)";
 const BORDER = "rgba(5,5,5,0.08)";
@@ -429,7 +429,7 @@ export function LegendaryTransactionModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-[#FAF9F6]/80 backdrop-blur-md"
+            className="absolute inset-0 bg-[#FFFFFF]/80 backdrop-blur-md"
           />
 
           <motion.div
@@ -464,7 +464,7 @@ export function LegendaryTransactionModal({
                                   setQuote(null);
                                   setErrorMsg(null);
                               }}
-                              className={`flex-1 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest transition-all ${mode === t ? 'bg-[#050505] text-[#FAF9F6] shadow-md' : 'text-black/40 hover:text-black/80'}`}
+                              className={`flex-1 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest transition-all ${mode === t ? 'bg-[#050505] text-[#FFFFFF] shadow-md' : 'text-black/40 hover:text-black/80'}`}
                           >
                               {t}
                           </button>
@@ -508,7 +508,7 @@ export function LegendaryTransactionModal({
                                             <button 
                                                 key={c}
                                                 onClick={() => setSubMode(c)}
-                                                className={`px-3 py-1.5 rounded text-[10px] font-black transition-all ${subMode === c ? 'bg-[#050505] text-[#FAF9F6]' : 'text-black/40 hover:text-[#050505]'}`}
+                                                className={`px-3 py-1.5 rounded text-[10px] font-black transition-all ${subMode === c ? 'bg-[#050505] text-[#FFFFFF]' : 'text-black/40 hover:text-[#050505]'}`}
                                             >
                                                 {c}
                                             </button>

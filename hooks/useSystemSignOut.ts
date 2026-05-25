@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback } from 'react';
 import { useDisconnect } from 'wagmi';
@@ -6,7 +6,7 @@ import { signOut } from 'next-auth/react';
 import { useWalletStore } from '@/lib/store/wallet-store';
 
 /**
- * [SOVEREIGN NUCLEAR DISCONNECT]
+ * [Enterprise NUCLEAR DISCONNECT]
  * Performs a deep-clean of the user session across all persistence layers.
  * 1. Purges authentication cookies (multi-path/domain)
  * 2. Nukes LocalStorage (System + Wagmi + AppKit keys)

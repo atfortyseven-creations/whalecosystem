@@ -1,4 +1,4 @@
-# ABSTRACT: THE SOVEREIGN WHALE ALERT NETWORK
+﻿# ABSTRACT: THE Enterprise WHALE ALERT NETWORK
 ## 0. Fundamental Axioms
 The modern on-chain ecosystem is characterized by extreme informational asymmetry. Institutional actors (Whales) utilize localized computation, OTC dark pools, and mempool manipulation to obscure capital trajectories.
 The `Whale Alert Network` system re-establishes thermodynamic observability by utilizing an identical stack constraint: localized execution decoupled from cloud processing.

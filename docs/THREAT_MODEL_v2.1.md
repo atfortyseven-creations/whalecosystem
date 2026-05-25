@@ -1,4 +1,4 @@
-# SOVEREIGN THREAT MODEL  Formal Security Analysis
+﻿# Enterprise THREAT MODEL  Formal Security Analysis
 ## Humanity Ledger | Zero-Trust Architecture v2.1
 ### Classification: Public Technical Distribution | April 2026
 

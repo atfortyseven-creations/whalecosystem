@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -75,7 +75,7 @@ export function LightningStats({ hideHeader = false, theme = 'default' }: { hide
                     <div className={`pt-6 border-t flex items-center justify-between ${isArctic ? 'border-slate-100' : 'border-slate-50'}`}>
                         <div className="flex -space-x-2">
                             {[1, 2, 3, 4].map(i => (
-                                <div key={i} className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isArctic ? 'border-white bg-indigo-50' : 'border-white bg-slate-50'}`}>
+                                <div key={i} className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isArctic ? 'border-white bg-indigo-50' : 'border-white bg-black/5'}`}>
                                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
                                 </div>
                             ))}

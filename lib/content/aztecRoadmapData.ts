@@ -1,4 +1,4 @@
-export interface AztecRoadmapItem {
+﻿export interface AztecRoadmapItem {
   id: number;
   phase: number;
   phaseTitle: string;
@@ -117,7 +117,7 @@ export const AZTEC_ROADMAP: AztecRoadmapItem[] = [
     id: 12, phase: 2, phaseTitle: "Absolute Privacy for Data, Identity, and Compute",
     title: "Anonymous Zero-Knowledge Biometrics",
     problem: "Institutional identity requires KYC, but biometric storage creates data honeypots.",
-    solution: "Hardware hashes (Secure Enclave) of biometric data validated via local ZK-SNARKs; proving unique human status without transmitting fingerprints or facial data.",
+    solution: "Hardware hashes (Wallet) of biometric data validated via local ZK-SNARKs; proving unique human status without transmitting fingerprints or facial data.",
     contribution: "Human-proof identity primitive without privacy compromise.",
     deliverable: "0% biometric data leakage; validation in < 3 seconds.",
     integrity: "Incorruptible and 100% private identity, fulfilling Sybil requirements without traditional KYC."
@@ -245,7 +245,7 @@ export const AZTEC_ROADMAP: AztecRoadmapItem[] = [
     id: 26, phase: 3, phaseTitle: "Institutional Security and Threat Modeling",
     title: "Anti-Extraction Key Architectures",
     problem: "Physical attackers or malware can extract the user's seed phrase.",
-    solution: "Biometric authentication tied to the device's cryptographic modules (Secure Enclave, TPM); the key is non-extractable and only authorizes local signatures.",
+    solution: "Biometric authentication tied to the device's cryptographic modules (Wallet, TPM); the key is non-extractable and only authorizes local signatures.",
     contribution: "Aztec-compatible wallets that do not depend on the insecure exposure of mnemonic phrases in browsers.",
     deliverable: "Zero attack vectors via mnemonic phrase phishing.",
     integrity: "Protects the human user from their own cybersecurity errors."

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,7 +42,7 @@ export function EliteAnalyticsNews() {
     });
 
     return (
-        <div className="flex flex-col h-full bg-slate-50/30 border border-slate-200/50 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] overflow-hidden rounded-[2rem]">
+        <div className="flex flex-col h-full bg-black/5/30 border border-slate-200/50 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] overflow-hidden rounded-[2rem]">
             {/* Minimalist Header */}
             <div className="flex items-center justify-between px-8 py-6 bg-white border-b border-slate-100">
                 <div className="flex items-center gap-3">
@@ -51,7 +51,7 @@ export function EliteAnalyticsNews() {
                 </div>
                 <button 
                     onClick={() => mutate()}
-                    className="p-2.5 bg-slate-50 border border-slate-200 rounded-full hover:bg-slate-100 transition-all active:scale-95 shadow-sm"
+                    className="p-2.5 bg-black/5 border border-slate-200 rounded-full hover:bg-slate-100 transition-all active:scale-95 shadow-sm"
                 >
                     <RefreshCw size={13} className={`text-slate-500 ${isValidating ? 'animate-spin text-[var(--aave-purple)]' : ''}`} />
                 </button>

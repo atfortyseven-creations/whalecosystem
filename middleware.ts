@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { runWAF } from './lib/security/waf-engine';
 import type { JWTPayload } from 'jose';
 import { checkRateLimit, resolveTier } from './lib/security/rate-limiter';
@@ -82,7 +82,7 @@ const HONEYPOT_PATTERNS = [
 const GEO_RESTRICTED_PATTERNS = ['/api/polymarket(.*)'];
 const RESTRICTED_COUNTRIES = ['US', 'CU', 'IR', 'KP', 'SY'];
 
-// SECURITY MIDDLEWARE  "THE IRON GATE v6 - WHALE FORTRESS SOVEREIGN"
+// SECURITY MIDDLEWARE  "THE IRON GATE v6 - WHALE FORTRESS Enterprise"
 // Absolute protection. Zero Clerk dependency. SIWE-native authentication.
 
 export default async function middleware(request: NextRequest) {

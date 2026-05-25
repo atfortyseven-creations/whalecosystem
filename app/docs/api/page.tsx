@@ -17,7 +17,7 @@ export default function ApiReferencePage() {
                     <p className="text-lg text-black/70 dark:text-white/70 leading-relaxed mb-6">
                         The Whale Alert Network API provides programmatic access to our comprehensive blockchain indexing engine. You can fetch token prices, wallet balances, transaction histories, and real-time alerts across multiple EVM-compatible chains.
                     </p>
-                    <div className="bg-[#FAF9F6] dark:bg-white/5 p-6 rounded-2xl border border-black/5 dark:border-white/10">
+                    <div className="bg-black/[0.03] p-6 border border-black/8">
                         <h4 className="font-bold mb-2">Base URL</h4>
                         <code className="block bg-black/5 dark:bg-black/20 p-3 rounded-lg text-sm font-mono break-all">
                             https://api.whalealert.network/v1
@@ -46,7 +46,7 @@ export default function ApiReferencePage() {
                     <div className="space-y-8">
                         {/* Endpoint 1 */}
                         <div className="border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden">
-                            <div className="bg-slate-50 dark:bg-white/5 p-4 border-b border-black/10 dark:border-white/10 flex items-center gap-4">
+                            <div className="bg-black/[0.03] p-4 border-b border-black/10 flex items-center gap-4">
                                 <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider">GET</span>
                                 <code className="font-mono text-sm font-bold">/v1/wallet/balances</code>
                             </div>
@@ -103,7 +103,7 @@ export default function ApiReferencePage() {
 
                         {/* Endpoint 2 */}
                         <div className="border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden">
-                            <div className="bg-slate-50 dark:bg-white/5 p-4 border-b border-black/10 dark:border-white/10 flex items-center gap-4">
+                            <div className="bg-black/[0.03] p-4 border-b border-black/10 flex items-center gap-4">
                                 <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider">GET</span>
                                 <code className="font-mono text-sm font-bold">/v1/market/tokens</code>
                             </div>

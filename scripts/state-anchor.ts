@@ -1,11 +1,11 @@
-import { ethers } from 'ethers';
+﻿import { ethers } from 'ethers';
 import { prisma } from '../lib/prisma';
 const ADMIN_PRIVATE_KEY = process.env.ADMIN_PRIVATE_KEY || '0x0000000000000000000000000000000000000000000000000000000000000001';
 const RPC_URL = process.env.RPC_URL || 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY';
 
 export async function anchorStateToBlockchain() {
     try {
-        console.log('[StateAnchor] Initiating Cryptographic State Anchoring...');
+        console.log('[StateAnchor] Initiating Account Status Anchoring...');
         
         // 1. Fetch current institutional state (e.g., all elite entities)
         const eliteEntities = await prisma.cosmicEntity.findMany({

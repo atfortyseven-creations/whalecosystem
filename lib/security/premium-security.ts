@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
@@ -18,12 +18,12 @@ export function rateLimit(
 }
 
 // ============================================
-// SECURITY LAYER 2: Subscription Verification  NATIVE SOVEREIGN
+// SECURITY LAYER 2: Subscription Verification  NATIVE Enterprise
 // ============================================
 
 export async function verifyPremiumAccess(userId: string): Promise<{
   valid: boolean;
-  tier: 'FREE' | 'PREMIUM' | 'TRIAL' | 'SOVEREIGN';
+  tier: 'FREE' | 'PREMIUM' | 'TRIAL' | 'Enterprise';
   expiresAt?: Date;
 }> {
   try {
@@ -44,7 +44,7 @@ export async function verifyPremiumAccess(userId: string): Promise<{
 
         if (balance > 0n) {
             console.log(`[Zero-Trust] ️ Validated System NFT holding for ${normalizedUserId}`);
-            return { valid: true, tier: 'SOVEREIGN' };
+            return { valid: true, tier: 'Enterprise' };
         }
     } catch (rpcErr) {
         // Silent fallback to database if RPC fails (Network Resilience)
@@ -63,8 +63,8 @@ export async function verifyPremiumAccess(userId: string): Promise<{
       });
     }
 
-    if (user?.tier === 'SOVEREIGN' || user?.tier === 'HUMAN') {
-       return { valid: true, tier: 'SOVEREIGN' };
+    if (user?.tier === 'Enterprise' || user?.tier === 'HUMAN') {
+       return { valid: true, tier: 'Enterprise' };
     }
 
     // 2. Subscription check from native DB (case insensitive fallback)
@@ -177,7 +177,7 @@ export async function logAuditEvent(log: {
 }
 
 // ============================================
-// SECURITY LAYER 9: Request Validation  SOVEREIGN SIWE
+// SECURITY LAYER 9: Request Validation  Enterprise SIWE
 // ============================================
 
 export async function validateSecureRequest(

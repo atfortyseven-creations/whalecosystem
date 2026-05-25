@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -96,7 +96,7 @@ export function BlocksDashboard() {
                                             
                                             {/* Height & Identification */}
                                             <div className="flex items-center gap-6">
-                                                <div className="h-16 w-16 rounded-[1.5rem] bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-slate-950 group-hover:text-white group-hover:border-slate-950 transition-all duration-500">
+                                                <div className="h-16 w-16 rounded-[1.5rem] bg-black/5 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-slate-950 group-hover:text-white group-hover:border-slate-950 transition-all duration-500">
                                                     <Box size={28} />
                                                 </div>
                                                 <div className="space-y-1">

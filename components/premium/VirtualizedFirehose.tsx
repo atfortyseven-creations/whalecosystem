@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { memo, useRef, useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
@@ -64,7 +64,7 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
         <div style={style} className="px-2 py-1">
             {/* Pure CSS entry animation  zero JS overhead vs motion.div */}
             <div
-                className={`w-full h-full flex flex-col justify-center border-b border-[#E5E5E5] ${bgPulse} hover:bg-[#FAF9F6] bg-white cursor-pointer rounded-sm px-4 firehose-row-enter`}
+                className={`w-full h-full flex flex-col justify-center border-b border-[#E5E5E5] ${bgPulse} hover:bg-[#FFFFFF] bg-white cursor-pointer rounded-sm px-4 firehose-row-enter`}
             >
                 <div className="flex items-center justify-between">
                     {/* LEFT: Time & Token */}
@@ -207,7 +207,7 @@ export function VirtualizedFirehose() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
                             onClick={handleJumpTop}
-                            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 bg-[#050505] text-[#FAF9F6] text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg hover:scale-105 transition-transform active:scale-95 border border-[#E5E5E5]/20"
+                            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 bg-[#050505] text-[#FFFFFF] text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg hover:scale-105 transition-transform active:scale-95 border border-[#E5E5E5]/20"
                         >
                             <ChevronUp size={12} /> Jump to Live Stream
                         </motion.button>
@@ -216,7 +216,7 @@ export function VirtualizedFirehose() {
             </div>
 
             {/* FOOTER */}
-            <div className="shrink-0 p-4 border-t border-[#E5E5E5] bg-[#FAF9F6] rounded-b-xl flex items-center justify-between z-20">
+            <div className="shrink-0 p-4 border-t border-[#E5E5E5] bg-[#FFFFFF] rounded-b-xl flex items-center justify-between z-20">
                 <span className="text-[8px] font-mono text-[#888888] uppercase tracking-[0.3em]">
                     Powered by Zero-Knowledge Nodes
                 </span>

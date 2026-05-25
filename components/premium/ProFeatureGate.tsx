@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { useSettings } from '@/src/context/SettingsContext';
@@ -18,7 +18,7 @@ export function ProFeatureGate({ children, featureName = "Premium Feature" }: Pr
     }
 
     return (
-        <div className="relative group overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50/50 backdrop-blur-sm p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[200px]">
+        <div className="relative group overflow-hidden rounded-[2rem] border border-slate-200 bg-black/5/50 backdrop-blur-sm p-8 flex flex-col items-center justify-center text-center space-y-4 min-h-[200px]">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             
             <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-all duration-500">

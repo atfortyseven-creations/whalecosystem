@@ -1,4 +1,4 @@
-# PLAN DE EMPRESA  HUMANITY LEDGER
+﻿# PLAN DE EMPRESA  HUMANITY LEDGER
 ## Solicitud de Financiación: CDTI NEOTEC + ENISA Jóvenes Emprendedores
 ### Versión 2.1 | Abril 2026 | CONFIDENCIAL
 
@@ -98,7 +98,7 @@ Humanity Ledger integra en una sola plataforma soberana:
 | STANDARD | 500/mes | 50k API calls, 5 wallets vigiladas | DeFi traders, analistas |
 | PRO | 2,000/mes | 500k API calls, 50 wallets, dashboard completo | Fondos pequeños, DAOs |
 | ELITE | 10,000/mes | Ilimitado, API privada, SLA 99.9% | Fondos institucionales, exchanges |
-| SOVEREIGN NODE | 15,000 + 500/mes | Nodo dedicado, datos en infraestructura propia | Bancos, reguladores |
+| Enterprise NODE | 15,000 + 500/mes | Nodo dedicado, datos en infraestructura propia | Bancos, reguladores |
 
 **Ingresos de Licencia (B2B Enterprise):**
 - Licencia API para integradores: 5,000-20,000/año

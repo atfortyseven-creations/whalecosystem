@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { useParams } from 'next/navigation';
@@ -24,7 +24,7 @@ export default function DynamicDocPage({ params }: any) {
       .replace(/^### (.*$)/gim, '<h3 class="font-serif text-lg text-black font-semibold mt-8 mb-4">$1</h3>')
       .replace(/^\* (.*$)/gim, '<li class="font-serif text-[14px] sm:text-[15px] text-[#333] leading-relaxed mb-2 ml-4 list-disc pl-2 marker:text-black/30">$1</li>')
       .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-black">$1</strong>')
-      .replace(/```([a-z]*)\n([\s\S]*?)```/gim, '<div class="my-6"><div class="bg-black/5 border border-black/10 px-3 py-1 font-mono text-[9px] uppercase tracking-widest text-black/50 w-full">$1 code</div><pre class="bg-[#FAFAF8] border border-t-0 border-black/10 p-5 overflow-x-auto text-black/80 font-mono text-xs sm:text-[13px] leading-relaxed"><code>$2</code></pre></div>')
+      .replace(/```([a-z]*)\n([\s\S]*?)```/gim, '<div class="my-6"><div class="bg-black/5 border border-black/10 px-3 py-1 font-mono text-[9px] uppercase tracking-widest text-black/50 w-full">$1 code</div><pre class="bg-[#FFFFFF] border border-t-0 border-black/10 p-5 overflow-x-auto text-black/80 font-mono text-xs sm:text-[13px] leading-relaxed"><code>$2</code></pre></div>')
       .replace(/`(.*?)`/gim, '<code class="bg-black/5 border border-black/10 px-1.5 py-0.5 rounded-sm font-mono text-[11px] text-black">$1</code>')
       .replace(/^(?!<h|<li|<div|<pre)(.+)$/gim, '<p class="font-serif text-[15px] sm:text-[16px] text-[#222] leading-[1.8] mb-6 text-justify">$1</p>')
       .replace(/\n/gim, '');

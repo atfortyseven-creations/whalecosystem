@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from 'react';
 import { Search, Bell, Clock, Eye, Settings, User, Wallet } from 'lucide-react';
@@ -31,7 +31,7 @@ export default function InstitutionalHeader() {
   };
 
   return (
-    <div className="w-full flex flex-col font-sans uppercase tracking-[0.15em] text-[10px] text-[#0A0A0A] bg-[#FAFAF8] border-b border-black/5 relative z-50 selection:bg-black/10">
+    <div className="w-full flex flex-col font-sans uppercase tracking-[0.15em] text-[10px] text-[#0A0A0A] bg-[#FFFFFF] border-b border-black/5 relative z-50 selection:bg-black/10">
       
       {/* Layer 1: Protocol Menu & Connectivity Status */}
       <div className="flex items-center justify-between px-6 py-2 border-b border-black/5 bg-white/50 backdrop-blur-md">
@@ -45,8 +45,8 @@ export default function InstitutionalHeader() {
             </button>
             {activeMenu === 'file' && (
               <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">
-                <button onClick={() => handleMenuAction('file_save')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Commit State</button>
-                <button onClick={() => handleMenuAction('file_export')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Export Ledger</button>
+                <button onClick={() => handleMenuAction('file_save')} className="w-full text-left px-5 py-3 hover:bg-[#FFFFFF] transition-colors text-[9px]">Commit State</button>
+                <button onClick={() => handleMenuAction('file_export')} className="w-full text-left px-5 py-3 hover:bg-[#FFFFFF] transition-colors text-[9px]">Export Ledger</button>
               </div>
             )}
           </div>
@@ -60,7 +60,7 @@ export default function InstitutionalHeader() {
             </button>
             {activeMenu === 'edit' && (
               <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">
-                <button onClick={() => handleMenuAction('edit_preferences')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Preferences</button>
+                <button onClick={() => handleMenuAction('edit_preferences')} className="w-full text-left px-5 py-3 hover:bg-[#FFFFFF] transition-colors text-[9px]">Preferences</button>
               </div>
             )}
           </div>
@@ -74,8 +74,8 @@ export default function InstitutionalHeader() {
              </button>
              {activeMenu === 'view' && (
                <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">
-                 <button onClick={() => handleMenuAction('view_toggle_mode', 'institutional')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Forensic Mode</button>
-                 <button onClick={() => handleMenuAction('view_toggle_mode', 'standard')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Standard Mode</button>
+                 <button onClick={() => handleMenuAction('view_toggle_mode', 'institutional')} className="w-full text-left px-5 py-3 hover:bg-[#FFFFFF] transition-colors text-[9px]">Forensic Mode</button>
+                 <button onClick={() => handleMenuAction('view_toggle_mode', 'standard')} className="w-full text-left px-5 py-3 hover:bg-[#FFFFFF] transition-colors text-[9px]">Standard Mode</button>
                </div>
              )}
           </div>
@@ -89,7 +89,7 @@ export default function InstitutionalHeader() {
              </button>
              {activeMenu === 'analytics' && (
                <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-black/10 shadow-2xl py-2 z-50 rounded-xl overflow-hidden">
-                 <button onClick={() => handleMenuAction('analytics_generate')} className="w-full text-left px-5 py-3 hover:bg-[#FAFAF8] transition-colors text-[9px]">Run Deterministic Scan</button>
+                 <button onClick={() => handleMenuAction('analytics_generate')} className="w-full text-left px-5 py-3 hover:bg-[#FFFFFF] transition-colors text-[9px]">Run Deterministic Scan</button>
                </div>
              )}
           </div>

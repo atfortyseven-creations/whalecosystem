@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Copy, Check, QrCode } from "lucide-react";
 
 //  Design Tokens (Ivory Model) 
-const BG     = "#FAF9F6";
+const BG     = "#FFFFFF";
 const INK    = "#050505";
 const MUTED  = "rgba(5,5,5,0.45)";
 const BORDER = "rgba(5,5,5,0.08)";

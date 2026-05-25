@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -107,7 +107,7 @@ export const WhaleMomentumChart = memo(({
             </div>
 
             {/* Main Canvas */}
-            <div className={`flex-1 relative overflow-hidden ${compact ? 'min-h-[80px]' : 'min-h-[180px] rounded-2xl bg-slate-50/30 border border-slate-100/50 shadow-inner'}`}>
+            <div className={`flex-1 relative overflow-hidden ${compact ? 'min-h-[80px]' : 'min-h-[180px] rounded-2xl bg-black/5/30 border border-slate-100/50 shadow-inner'}`}>
                 {/* Horizontal Grid */}
                 {!compact && (
                     <div className="absolute inset-0 flex flex-col justify-between py-6 pointer-events-none opacity-40">

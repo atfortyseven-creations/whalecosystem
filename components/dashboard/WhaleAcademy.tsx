@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -109,7 +109,7 @@ export function WhaleAcademy() {
                     <h2 className="text-xl font-bold text-[#050505] uppercase tracking-[0.1em] mb-2">{selectedLesson.title}</h2>
                     <p className="text-[11px] text-[#555555] leading-relaxed mb-6">{selectedLesson.description}</p>
 
-                    <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl p-5 mb-6">
+                    <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl p-5 mb-6">
                         <div className="flex items-center gap-2 mb-3">
                             <PlayCircle size={16} className="text-[#050505]" />
                             <span className="text-[10px] font-black uppercase tracking-widest text-[#050505]">Video Lesson</span>
@@ -181,7 +181,7 @@ export function WhaleAcademy() {
                             onClick={() => !lesson.locked && setSelectedLesson(lesson)}
                             className={`bg-white border border-[#E5E5E5] rounded-xl p-4 flex items-center gap-4 transition-all shadow-sm ${lesson.locked ? 'opacity-40 cursor-not-allowed' : 'hover:border-[#050505] hover:shadow-md cursor-pointer'}`}>
                             <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                                style={{ background: lesson.completed ? '#00C076' : '#FAF9F6', border: '1px solid #E5E5E5', color: lesson.completed ? '#fff' : '#888888' }}>
+                                style={{ background: lesson.completed ? '#00C076' : '#FFFFFF', border: '1px solid #E5E5E5', color: lesson.completed ? '#fff' : '#888888' }}>
                                 {lesson.completed ? <CheckCircle size={15} /> : lesson.locked ? <Lock size={13} /> : <PlayCircle size={15} />}
                             </div>
                             <div className="flex-1">
@@ -259,7 +259,7 @@ export function WhaleAcademy() {
                                     <div className="flex items-center gap-2 flex-wrap mb-1">
                                         <h3 className="text-[11px] font-bold text-[#050505] uppercase tracking-tight truncate">{course.title}</h3>
                                         {course.badge && (
-                                            <span className="text-[7px] px-1.5 py-0.5 rounded font-bold uppercase shrink-0 bg-[#FAF9F6] text-[#A0A0A0] border border-[#E5E5E5]">
+                                            <span className="text-[7px] px-1.5 py-0.5 rounded font-bold uppercase shrink-0 bg-[#FFFFFF] text-[#A0A0A0] border border-[#E5E5E5]">
                                                 {course.badge}
                                             </span>
                                         )}
@@ -293,7 +293,7 @@ export function WhaleAcademy() {
                                 })}
                             </div>
                         </div>
-                        <div className="px-5 py-3 flex items-center justify-between border-t border-[#F0F0F0] bg-[#FAF9F6]">
+                        <div className="px-5 py-3 flex items-center justify-between border-t border-[#F0F0F0] bg-[#FFFFFF]">
                             <span className="text-[9px] font-black uppercase tracking-widest text-[#888888]">
                                 {course.lessons.filter(l => l.completed).length}/{course.lessons.length} completed
                             </span>

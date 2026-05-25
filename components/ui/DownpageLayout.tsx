@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -22,9 +22,9 @@ export function DownpageLayout({ pageTitle, subtitle, indexTitle, sections }: Do
   if (!mounted) return null;
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col md:flex-row bg-[#FAFAF8] text-black selection:bg-black selection:text-white">
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col md:flex-row bg-[#FFFFFF] text-black selection:bg-black selection:text-white">
       {/* LEFT NAVIGATION */}
-      <aside className="w-full md:w-[300px] shrink-0 border-b md:border-b-0 md:border-r border-black/10 flex flex-col px-6 pt-8 pb-12 md:h-[100dvh] md:sticky md:top-0 bg-[#FAFAF8] z-50">
+      <aside className="w-full md:w-[300px] shrink-0 border-b md:border-b-0 md:border-r border-black/10 flex flex-col px-6 pt-8 pb-12 md:h-[100dvh] md:sticky md:top-0 bg-[#FFFFFF] z-50">
         
         {/* TOP BAR */}
         <div className="w-full flex items-center justify-between mb-10">

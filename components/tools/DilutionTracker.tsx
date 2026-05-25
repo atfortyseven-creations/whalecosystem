@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -126,11 +126,11 @@ export default function DilutionTracker() {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-stone-50 p-4 rounded-xl border border-stone-100">
+                                    <div className="bg-black/5 p-4 rounded-xl border border-stone-100">
                                         <div className="text-[9px] font-black uppercase text-stone-400 mb-1">Monto</div>
                                         <div className="text-sm font-black text-stone-900">{unlock.amount}</div>
                                     </div>
-                                    <div className="bg-stone-50 p-4 rounded-xl border border-stone-100 text-right">
+                                    <div className="bg-black/5 p-4 rounded-xl border border-stone-100 text-right">
                                         <div className="text-[9px] font-black uppercase text-stone-400 mb-1">Estado</div>
                                         <div className="text-[10px] font-black text-stone-900 uppercase flex items-center justify-end gap-1">
                                             <Bell size={10} className="text-green-500" />
@@ -153,7 +153,7 @@ export default function DilutionTracker() {
                     ))}
                 </div>
 
-                <div className="mt-20 p-8 border border-stone-200 rounded-[2rem] bg-stone-50/50 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="mt-20 p-8 border border-stone-200 rounded-[2rem] bg-black/5/50 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-white border border-stone-200 flex items-center justify-center animate-bounce">
                             <Zap size={20} className="text-yellow-500 fill-yellow-500" />
@@ -203,7 +203,7 @@ export default function DilutionTracker() {
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder="tu@correo.com"
-                                                    className="w-full h-16 bg-stone-50 border border-stone-200 rounded-2xl px-6 font-black text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-900/20 transition-all"
+                                                    className="w-full h-16 bg-black/5 border border-stone-200 rounded-2xl px-6 font-black text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-900/20 transition-all"
                                                 />
                                             </div>
                                             <button 

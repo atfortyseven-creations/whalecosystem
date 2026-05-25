@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -44,7 +44,7 @@ export function TxDetailDashboard({ txid }: TxDetailDashboardProps) {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-12 border-b border-slate-100">
                     <div className="space-y-6 flex-1 min-w-0">
                         <div className="flex items-center gap-4">
-                            <Link href="/ledger" className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all duration-300">
+                            <Link href="/ledger" className="w-12 h-12 rounded-2xl bg-black/5 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-950 hover:text-white hover:border-slate-950 transition-all duration-300">
                                 <ArrowLeft size={20} />
                             </Link>
                             <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-100">
@@ -110,7 +110,7 @@ export function TxDetailDashboard({ txid }: TxDetailDashboardProps) {
                         </div>
                         <div className="space-y-4">
                             {tx.vin.map((input: any, i: number) => (
-                                <div key={i} className="bg-slate-50/50 border border-transparent p-6 rounded-[2rem] hover:bg-white hover:border-slate-100 transition-all duration-300">
+                                <div key={i} className="bg-black/5/50 border border-transparent p-6 rounded-[2rem] hover:bg-white hover:border-slate-100 transition-all duration-300">
                                      <div className="flex justify-between items-center">
                                          <div className="min-w-0 flex-1 mr-4">
                                              <Link href={`/network/address/${input.prevout?.scriptpubkey_address}`} className="text-slate-950 font-black font-mono text-sm hover:text-indigo-600 transition-colors block truncate uppercase tracking-widest">
@@ -139,7 +139,7 @@ export function TxDetailDashboard({ txid }: TxDetailDashboardProps) {
                         </div>
                         <div className="space-y-4">
                             {tx.vout.map((output: any, i: number) => (
-                                <div key={i} className="bg-slate-50/50 border border-transparent p-6 rounded-[2rem] hover:bg-white hover:border-slate-100 transition-all duration-300">
+                                <div key={i} className="bg-black/5/50 border border-transparent p-6 rounded-[2rem] hover:bg-white hover:border-slate-100 transition-all duration-300">
                                      <div className="flex justify-between items-center">
                                          <div className="min-w-0 flex-1 mr-4">
                                              <Link href={`/network/address/${output.scriptpubkey_address}`} className="text-slate-950 font-black font-mono text-sm hover:text-indigo-600 transition-colors block truncate uppercase tracking-widest">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -155,7 +155,7 @@ export default function AztecMempoolSpace() {
     }, [blockNumber, publicClient]);
 
     return (
-        <div className="absolute inset-0 flex flex-col bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#050505] dark:text-[#FAF9F6] font-sans overflow-hidden">
+        <div className="absolute inset-0 flex flex-col bg-[#FFFFFF] dark:bg-[#0A0A0A] text-[#050505] dark:text-[#FFFFFF] font-sans overflow-hidden">
             <div className="shrink-0 pt-4 px-2 bg-white dark:bg-[#111111]">
                 <ModuleHeader moduleId="markets" />
             </div>
@@ -185,7 +185,7 @@ export default function AztecMempoolSpace() {
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-                <div className="w-2/3 p-8 flex flex-col border-r border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#0A0A0A] relative">
+                <div className="w-2/3 p-8 flex flex-col border-r border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#0A0A0A] relative">
                     <div className="flex items-center gap-3 mb-8 shrink-0">
                         <div className="px-4 py-1.5 rounded-lg border border-emerald-500/20 text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10">
                             LIVE: ETHEREUM MAINNET
@@ -324,14 +324,14 @@ export default function AztecMempoolSpace() {
                         >
                             <button 
                                 onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
-                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] hover:text-[#050505] dark:hover:text-white hover:bg-[#FAF9F6] dark:hover:bg-white/5 transition-all"
+                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] hover:text-[#050505] dark:hover:text-white hover:bg-[#FFFFFF] dark:hover:bg-white/5 transition-all"
                             >
                                 X
                             </button>
 
                             <div className="p-8 md:p-10">
                                 <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] dark:border-white/10">
-                                    <div className="w-12 h-12 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded flex items-center justify-center">
+                                    <div className="w-12 h-12 bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded flex items-center justify-center">
                                         <div className="w-5 h-5 bg-black dark:bg-white" />
                                     </div>
                                     <div className="flex flex-col gap-1">

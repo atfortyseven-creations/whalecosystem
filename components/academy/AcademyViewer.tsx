@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
@@ -36,7 +36,7 @@ const ArticleBlock = memo(function ArticleBlock({
 
             <div className="mb-12 space-y-6">
                 <div className="flex flex-wrap items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] font-mono">
-                    <span className="flex items-center gap-2 bg-[#111111] text-[#FAF9F6] px-4 py-1.5 rounded-full shadow-sm">
+                    <span className="flex items-center gap-2 bg-[#111111] text-[#FFFFFF] px-4 py-1.5 rounded-full shadow-sm">
                         <ClockIcon size={12} /> {article.readTime} MIN READ
                     </span>
 
@@ -129,7 +129,7 @@ export function AcademyViewer() {
     }, []);
 
     return (
-        <div className="flex w-full bg-[#FAF9F6] relative z-20 text-[#111111] font-sans antialiased">
+        <div className="flex w-full bg-[#FFFFFF] relative z-20 text-[#111111] font-sans antialiased">
             
             {/* PROGRESS BAR */}
             <div className="fixed top-0 left-0 right-0 h-[3px] bg-[#E5E5E5] z-[100]" style={{ top: '80px' /* adjust if InstitutionalShell header height varies */ }}>
@@ -144,7 +144,7 @@ export function AcademyViewer() {
             <aside className="hidden lg:flex w-[380px] flex-shrink-0 border-r border-[#E5E5E5] bg-white flex-col relative sticky top-[80px] self-start h-[calc(100vh-80px)] overflow-y-auto">
                 <div className="p-8 border-b border-[#E5E5E5] bg-white z-10 sticky top-0">
                     <div className="flex items-center gap-4 mb-2 group cursor-default">
-                        <div className="p-2 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl">
+                        <div className="p-2 bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl">
                             <AcademyLogo />
                         </div>
                         <div>
@@ -159,7 +159,7 @@ export function AcademyViewer() {
                             placeholder="Search archives..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-11 pr-4 py-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-sm font-medium text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#111111] transition-all focus:bg-white shadow-sm"
+                            className="w-full pl-11 pr-4 py-3.5 bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl text-sm font-medium text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#111111] transition-all focus:bg-white shadow-sm"
                         />
                     </div>
                 </div>
@@ -169,7 +169,7 @@ export function AcademyViewer() {
                         <div key={module.id} className="relative pl-5">
                             <div className="absolute left-0 top-1.5 bottom-0 w-px bg-[#E5E5E5]" />
                             <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#888888] mb-4 flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#111111] shadow-[0_0_0_4px_#FAF9F6] z-10 -ml-[23px]" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#111111] shadow-[0_0_0_4px_#FFFFFF] z-10 -ml-[23px]" />
                                 {module.title}
                             </h3>
                             <div className="flex flex-col gap-1.5">
@@ -181,8 +181,8 @@ export function AcademyViewer() {
                                             onClick={() => scrollToSection(article.id)}
                                             className={`text-left px-4 py-3 text-sm transition-all rounded-xl flex items-center justify-between group
                                                 ${isActive
-                                                    ? 'text-[#111111] font-black bg-[#FAF9F6] shadow-sm border border-[#E5E5E5]'
-                                                    : 'text-[#888888] hover:text-[#111111] hover:bg-[#FAF9F6] font-bold border border-transparent'
+                                                    ? 'text-[#111111] font-black bg-[#FFFFFF] shadow-sm border border-[#E5E5E5]'
+                                                    : 'text-[#888888] hover:text-[#111111] hover:bg-[#FFFFFF] font-bold border border-transparent'
                                                 }`}
                                         >
                                             <span className="truncate max-w-[240px] leading-tight">
@@ -199,7 +199,7 @@ export function AcademyViewer() {
                     ))}
                 </div>
 
-                <div className="p-6 border-t border-[#E5E5E5] bg-[#FAF9F6] mt-auto">
+                <div className="p-6 border-t border-[#E5E5E5] bg-[#FFFFFF] mt-auto">
                     <div className="flex items-center justify-between text-[9px] font-mono text-[#111111] uppercase tracking-widest font-black">
                         <span>Status: Online</span>
                         <span className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-[#E5E5E5]">
@@ -225,7 +225,7 @@ export function AcademyViewer() {
 
                     {filteredModules.map((module) => (
                         <section key={module.id} className="mb-48">
-                            <div className="flex flex-col lg:flex-row lg:items-center gap-8 mb-20 sticky top-[80px] z-20 pt-8 bg-[#FAF9F6]/95 backdrop-blur-md -mx-8 px-8 pb-6 border-b border-[#E5E5E5]">
+                            <div className="flex flex-col lg:flex-row lg:items-center gap-8 mb-20 sticky top-[80px] z-20 pt-8 bg-[#FFFFFF]/95 backdrop-blur-md -mx-8 px-8 pb-6 border-b border-[#E5E5E5]">
                                 <div className="flex flex-col flex-1">
                                     <h2 className="font-sans text-4xl md:text-5xl font-black text-[#111111] tracking-tighter">
                                         {module.title}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,7 +19,7 @@ type Priority = 'LOW' | 'MEDIUM' | 'HIGH';
 const FAQ = [
     { q: 'How do I connect my wallet?',          a: 'Navigate to the Dashboard section and use the system handshake flow to link your wallet securely through WalletConnect or MetaMask.' },
     { q: 'What is the Aztec Network integration?', a: 'Humanity Ledger is fully anchored to Aztec Network\'s privacy-preserving L2 rollup. All transactions execute inside Aztec\'s zero-knowledge virtual machine, ensuring your financial activity is never exposed on-chain.' },
-    { q: 'How do QDs tokens work?',              a: 'QDs (Quantum Dots) are the native governance and utility token of the Humanity Ledger ecosystem. They enable voting rights, premium feature access, and staking for network security contributions.' },
+    { q: 'How do QDs tokens work?',              a: 'QDs (Network Score) are the native governance and utility token of the Humanity Ledger ecosystem. They enable voting rights, premium feature access, and staking for network security contributions.' },
     { q: 'Is Whale Chat end-to-end encrypted?',  a: 'Yes. Whale Chat uses the XMTP protocol with full end-to-end encryption. Messages are encrypted client-side using your wallet keys. Not even Humanity Ledger can read your messages.' },
     { q: 'How do I upgrade my plan?',            a: 'Go to the Pricing section in the sidebar to view and upgrade your institutional tier. All payments are processed via Stripe with SEPA and card support.' },
     { q: 'Where does the market data come from?', a: 'Market data is sourced directly from on-chain oracles (Chainlink, GetBlock RPC nodes) and verified exchange APIs in real time with zero interpolation or mock data.' },
@@ -191,14 +191,14 @@ export function WhaleSupport() {
 
                         {/* FAQ */}
                         <div className="w-full bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
-                            <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-slate-50/60">
+                            <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-black/5/60">
                                 <AlertCircle size={14} className="text-black/40" />
                                 <span className="font-mono text-[10px] font-black uppercase tracking-widest">Frequently Asked Questions</span>
                                 <span className="ml-auto font-mono text-[9px] text-black/30 uppercase tracking-widest">{FAQ.length} entries</span>
                             </div>
                             <div className="divide-y divide-slate-100">
                                 {FAQ.map((faq, i) => (
-                                    <div key={i} className="cursor-pointer hover:bg-slate-50/60 transition-colors" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
+                                    <div key={i} className="cursor-pointer hover:bg-black/5/60 transition-colors" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
                                         <div className="px-6 py-4 flex items-center justify-between gap-4">
                                             <span className="text-[13px] font-bold text-slate-800 leading-snug">{faq.q}</span>
                                             <motion.div animate={{ rotate: openFaq === i ? 180 : 0 }} transition={{ duration: 0.2 }} className="shrink-0">
@@ -223,7 +223,7 @@ export function WhaleSupport() {
                 {activeSection === 'docs' && (
                     <motion.div key="docs" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.25 }} className="flex flex-col gap-4">
                         <div className="w-full bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
-                            <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-slate-50/60">
+                            <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-black/5/60">
                                 <BookOpen size={14} className="text-black/40" />
                                 <span className="font-mono text-[10px] font-black uppercase tracking-widest">Protocol Documentation</span>
                                 <span className="ml-auto font-mono text-[9px] text-black/30 uppercase tracking-widest">{DOCS_LINKS.length} resources</span>
@@ -235,7 +235,7 @@ export function WhaleSupport() {
                                         href={doc.href}
                                         target={doc.href.startsWith('http') ? '_blank' : undefined}
                                         rel={doc.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                                        className={`group flex items-start gap-4 p-5 hover:bg-slate-50/60 transition-colors ${i % 2 === 0 && i < DOCS_LINKS.length - 1 ? 'sm:border-b sm:border-slate-100' : ''}`}
+                                        className={`group flex items-start gap-4 p-5 hover:bg-black/5/60 transition-colors ${i % 2 === 0 && i < DOCS_LINKS.length - 1 ? 'sm:border-b sm:border-slate-100' : ''}`}
                                     >
                                         <div className="w-8 h-8 flex items-center justify-center bg-black/[0.03] border border-black/8 rounded-lg text-black/50 shrink-0 group-hover:bg-black group-hover:text-white group-hover:border-black transition-all duration-200 mt-0.5">
                                             {doc.icon}
@@ -260,14 +260,14 @@ export function WhaleSupport() {
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                             {/* Form */}
                             <div className="lg:col-span-3 bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
-                                <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-slate-50/60">
+                                <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-black/5/60">
                                     <Mail size={14} className="text-black/40" />
                                     <span className="font-mono text-[10px] font-black uppercase tracking-widest">Contact Support</span>
                                 </div>
                                 <div className="p-6 flex flex-col gap-5">
                                     <div>
                                         <label className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40 block mb-2">Subject</label>
-                                        <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="What is your issue about?" className="w-full rounded-xl px-4 py-3 text-[13px] bg-slate-50/60 border border-slate-200/60 outline-none focus:border-black/30 transition-all placeholder:text-black/25 text-slate-900 font-sans" />
+                                        <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="What is your issue about?" className="w-full rounded-xl px-4 py-3 text-[13px] bg-black/5/60 border border-slate-200/60 outline-none focus:border-black/30 transition-all placeholder:text-black/25 text-slate-900 font-sans" />
                                     </div>
                                     <div>
                                         <label className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40 block mb-2">Priority</label>
@@ -281,11 +281,11 @@ export function WhaleSupport() {
                                     </div>
                                     <div>
                                         <label className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40 block mb-2">Message</label>
-                                        <textarea value={message} onChange={e => setMessage(e.target.value)} rows={5} placeholder="Describe your issue in detail..." className="w-full rounded-xl px-4 py-3 text-[13px] bg-slate-50/60 border border-slate-200/60 outline-none focus:border-black/30 resize-none transition-all placeholder:text-black/25 text-slate-900 font-sans" />
+                                        <textarea value={message} onChange={e => setMessage(e.target.value)} rows={5} placeholder="Describe your issue in detail..." className="w-full rounded-xl px-4 py-3 text-[13px] bg-black/5/60 border border-slate-200/60 outline-none focus:border-black/30 resize-none transition-all placeholder:text-black/25 text-slate-900 font-sans" />
                                     </div>
                                     <AnimatePresence mode="wait">
                                         {submitted ? (
-                                            <motion.div key="ok" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} className="flex items-center justify-center gap-3 py-4 rounded-xl bg-slate-50/80 border border-slate-200/60 text-slate-700">
+                                            <motion.div key="ok" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} className="flex items-center justify-center gap-3 py-4 rounded-xl bg-black/5/80 border border-slate-200/60 text-slate-700">
                                                 <CheckCircle size={16} />
                                                 <span className="font-mono text-[10px] font-black uppercase tracking-widest">Ticket Submitted</span>
                                             </motion.div>
@@ -303,7 +303,7 @@ export function WhaleSupport() {
                             <div className="lg:col-span-2 flex flex-col gap-6">
                                 {/* Active Tickets */}
                                 <div className="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
-                                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200/60 bg-slate-50/60">
+                                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200/60 bg-black/5/60">
                                         <span className="font-mono text-[10px] font-black uppercase tracking-widest">Your Tickets</span>
                                         <span className="font-mono text-[10px] text-black/30 font-bold">{tickets.length} total</span>
                                     </div>
@@ -311,7 +311,7 @@ export function WhaleSupport() {
                                         {tickets.length === 0 ? (
                                             <div className="py-10 text-center font-mono text-[11px] font-black uppercase tracking-widest text-black/25">No active tickets</div>
                                         ) : tickets.map(t => (
-                                            <div key={t.id} className="px-6 py-4 hover:bg-slate-50/60 transition-colors">
+                                            <div key={t.id} className="px-6 py-4 hover:bg-black/5/60 transition-colors">
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2 mb-1">
@@ -330,7 +330,7 @@ export function WhaleSupport() {
 
                                 {/* Quick Links */}
                                 <div className="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
-                                    <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-200/60 bg-slate-50/60">
+                                    <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-200/60 bg-black/5/60">
                                         <Globe size={14} className="text-black/40" />
                                         <span className="font-mono text-[10px] font-black uppercase tracking-widest">Quick Resources</span>
                                     </div>
@@ -341,7 +341,7 @@ export function WhaleSupport() {
                                             { label: 'Bug Bounty Program',   href: '/security',  external: false },
                                             { label: 'API Marketplace',      href: '/developers', external: false },
                                         ].map(l => (
-                                            <Link key={l.label} href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener noreferrer' : undefined} className="group flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/60 transition-colors">
+                                            <Link key={l.label} href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener noreferrer' : undefined} className="group flex items-center justify-between px-6 py-3.5 hover:bg-black/5/60 transition-colors">
                                                 <span className="text-[12px] font-bold text-slate-700 group-hover:text-black transition-colors">{l.label}</span>
                                                 <ArrowUpRight size={12} className="text-black/25 group-hover:text-black transition-colors" />
                                             </Link>

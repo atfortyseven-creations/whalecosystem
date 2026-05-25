@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -113,7 +113,7 @@ export function MiningPoolDistribution({ hideHeader = false, theme = 'default' }
               </div>
             </div>
             {data && (
-              <div className={`flex items-center gap-3 border px-6 py-3 rounded-2xl ${isArctic ? 'bg-white/80 border-slate-200' : 'bg-slate-50 border-slate-100'}`}>
+              <div className={`flex items-center gap-3 border px-6 py-3 rounded-2xl ${isArctic ? 'bg-white/80 border-slate-200' : 'bg-black/5 border-slate-100'}`}>
                 <Server size={14} className="text-slate-400" />
                 <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
                   {data.totalBlocks?.toLocaleString()} Blocks Audited
@@ -175,7 +175,7 @@ export function MiningPoolDistribution({ hideHeader = false, theme = 'default' }
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.04 }}
-                  className={`group flex items-center gap-4 p-3 pr-6 rounded-[1.25rem] border transition-all cursor-crosshair ${isArctic ? 'bg-white/60 border-slate-100 hover:bg-white hover:border-indigo-200 hover:shadow-lg' : 'bg-slate-50 border-slate-100/50 hover:bg-white hover:border-slate-200 hover:shadow-xl'}`}
+                  className={`group flex items-center gap-4 p-3 pr-6 rounded-[1.25rem] border transition-all cursor-crosshair ${isArctic ? 'bg-white/60 border-slate-100 hover:bg-white hover:border-indigo-200 hover:shadow-lg' : 'bg-black/5 border-slate-100/50 hover:bg-white hover:border-slate-200 hover:shadow-xl'}`}
                 >
                   {/* Number Badge */}
                   <div

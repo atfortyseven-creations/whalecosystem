@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -80,7 +80,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     </button>
                     <button
                         onClick={() => useWalletStore.getState().createWallet()}
-                        className="px-8 py-4 bg-white border border-slate-200 text-black font-black rounded-xl uppercase tracking-[0.2em] text-[10px] hover:bg-slate-50 transition-colors"
+                        className="px-8 py-4 bg-white border border-slate-200 text-black font-black rounded-xl uppercase tracking-[0.2em] text-[10px] hover:bg-black/5 transition-colors"
                     >
                         INITIALIZE VAULT
                     </button>

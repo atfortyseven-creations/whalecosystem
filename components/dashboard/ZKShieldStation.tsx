@@ -1,4 +1,4 @@
-// components/dashboard/ZKShieldStation.tsx
+﻿// components/dashboard/Security ProtocolStation.tsx
 "use client";
 
 import React, { useState } from 'react';
@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Fingerprint, Lock, CheckCircle2, Activity, Cpu, Database, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
-export function ZKShieldStation() {
+export function Security ProtocolStation() {
     const [targetAddress, setTargetAddress] = useState('');
     const [isProving, setIsProving] = useState(false);
     const [lastProof, setLastProof] = useState<any>(null);
@@ -49,7 +49,7 @@ export function ZKShieldStation() {
         <div className="w-full h-full flex-1 min-h-0 bg-[#FFFFFF] text-[#050505] border border-[#E5E5E5] rounded-2xl font-sans flex flex-col overflow-hidden shadow-sm">
             
             {/*  ACADEMIC INTRO  */}
-            <div className="p-8 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between shrink-0">
+            <div className="p-8 border-b border-[#E5E5E5] bg-[#FFFFFF] flex items-center justify-between shrink-0">
                <div className="flex items-center gap-6">
                   <div className="p-3 bg-[#050505] border border-[#050505] text-[#FFFFFF] rounded-xl">
                      <Shield size={20} />
@@ -82,13 +82,13 @@ export function ZKShieldStation() {
                             value={targetAddress}
                             onChange={(e) => setTargetAddress(e.target.value)}
                             placeholder="0x95222290DD9278AA3DDD389CC1E1D165CC4BAFE5"
-                            className="w-full bg-[#FAF9F6] border border-[#E5E5E5] p-5 pl-14 text-xs font-mono text-[#050505] outline-none focus:border-[#050505] transition-all uppercase tracking-widest rounded-2xl shadow-sm placeholder:text-[#888888]"
+                            className="w-full bg-[#FFFFFF] border border-[#E5E5E5] p-5 pl-14 text-xs font-mono text-[#050505] outline-none focus:border-[#050505] transition-all uppercase tracking-widest rounded-2xl shadow-sm placeholder:text-[#888888]"
                          />
                       </div>
                       <button 
                         onClick={handleShield}
                         disabled={isProving}
-                        className="w-full py-5 bg-[#050505] border border-[#050505] text-[#FFFFFF] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[#FAF9F6] hover:text-[#050505] transition-all flex items-center justify-center gap-3 disabled:opacity-50 rounded-xl shadow-sm"
+                        className="w-full py-5 bg-[#050505] border border-[#050505] text-[#FFFFFF] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[#FFFFFF] hover:text-[#050505] transition-all flex items-center justify-center gap-3 disabled:opacity-50 rounded-xl shadow-sm"
                       >
                          {isProving ? <Activity size={14} className="animate-spin" /> : <EyeOff size={14} />}
                          {isProving ? 'SYNTHESIZING PROOF...' : 'EXECUTE ZK SHIELD'}
@@ -102,14 +102,14 @@ export function ZKShieldStation() {
                             animate={{ opacity: 1, y: 0 }}
                             className="border border-[#E5E5E5] bg-[#FFFFFF] overflow-hidden rounded-2xl shadow-sm"
                          >
-                            <div className="px-6 py-5 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between">
+                            <div className="px-6 py-5 border-b border-[#E5E5E5] bg-[#FFFFFF] flex items-center justify-between">
                                <div className="flex items-center gap-3">
                                   <Cpu size={14} className="text-[#050505]" />
                                   <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]">SNARK PROOF BLOB</span>
                                </div>
                                <span className="text-[8px] text-[#888888] uppercase font-mono font-bold">Algorithm: Groth16 // Curve: BN128</span>
                             </div>
-                            <div className="p-6 bg-[#FAF9F6]">
+                            <div className="p-6 bg-[#FFFFFF]">
                                <pre className="text-[10px] text-[#888888] font-mono font-bold leading-relaxed overflow-x-auto selection:bg-[#050505] selection:text-white">
                                   {JSON.stringify(lastProof, null, 2)}
                                </pre>
@@ -130,7 +130,7 @@ export function ZKShieldStation() {
             </div>
 
             {/*  FOOTER  */}
-            <div className="p-4 border-t border-[#E5E5E5] flex justify-between items-center text-[8px] text-[#888888] uppercase tracking-[0.2em] font-bold shrink-0 bg-[#FAF9F6]">
+            <div className="p-4 border-t border-[#E5E5E5] flex justify-between items-center text-[8px] text-[#888888] uppercase tracking-[0.2em] font-bold shrink-0 bg-[#FFFFFF]">
                <span>Aztec Node Alpha v3.1</span>
                <span>Non-Custodian Isolation Engine</span>
             </div>

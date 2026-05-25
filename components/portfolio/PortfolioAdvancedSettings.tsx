@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -164,7 +164,7 @@ export function PortfolioAdvancedSettings({ isOpen, onClose, userAddress }: Port
                     exit={{ scale: 0.95, y: 20 }}
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
                     className="w-full max-w-5xl h-[85vh] sm:h-[80vh] flex flex-col sm:flex-row rounded-[2rem] border overflow-hidden shadow-2xl"
-                    style={{ background: "#FAFAF8", borderColor: BORDER }}
+                    style={{ background: "#FFFFFF", borderColor: BORDER }}
                 >
                     {/* SIDEBAR */}
                     <div className="w-full sm:w-64 shrink-0 flex flex-col border-r bg-white/50" style={{ borderColor: BORDER }}>
@@ -525,7 +525,7 @@ export function PortfolioAdvancedSettings({ isOpen, onClose, userAddress }: Port
                                     </div>
                                     <div className="pt-8 text-center opacity-40">
                                         <Fingerprint size={24} className="mx-auto mb-2" />
-                                        <p className="text-[10px] font-mono uppercase tracking-widest">Built for the Sovereign Web</p>
+                                        <p className="text-[10px] font-mono uppercase tracking-widest">Built for the Enterprise Web</p>
                                     </div>
                                 </div>
                             )}
@@ -560,7 +560,7 @@ function ContactRow({ name, address, onCopy, onRemove }: { name: string; address
     const displayName = ensName || `${address.slice(0, 6)}...${address.slice(-4)}`;
 
     return (
-        <div className="flex items-center justify-between p-4 border rounded-2xl bg-[#FAFAF8] hover:bg-white transition-colors group">
+        <div className="flex items-center justify-between p-4 border rounded-2xl bg-[#FFFFFF] hover:bg-white transition-colors group">
             <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 border flex items-center justify-center font-bold text-xs uppercase shadow-sm">
                     {name.slice(0,2)}

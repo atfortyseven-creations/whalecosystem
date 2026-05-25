@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+﻿import prisma from '@/lib/prisma';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 import { FORGE_ENABLED, TIER_THRESHOLDS } from '../forge';
 import { CosmicSeed, CosmicEntityBase, EntityTier, GeneratorType } from '../forge/types';
@@ -10,7 +10,7 @@ export class ForgeService {
    * Calculate SHA-256 hash to act as the Cosmic Seed
    */
   static generateSeedHash(whaleEventId: string, amountUSD: number, timestamp: number): string {
-    const payload = `${whaleEventId}-${amountUSD}-${timestamp}-SOVEREIGN-FORGE`;
+    const payload = `${whaleEventId}-${amountUSD}-${timestamp}-Enterprise-FORGE`;
     return crypto.createHash('sha256').update(payload).digest('hex');
   }
 

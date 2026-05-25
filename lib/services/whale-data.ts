@@ -1,9 +1,9 @@
-import { ethers } from 'ethers';
+﻿import { ethers } from 'ethers';
 import { safeRedisGet, safeRedisSet } from '../redis/client';
 import { getGbAllRpc } from '@/lib/blockchain/getblock-registry';
 
 /**
- *  WHALE INTELLIGENCE MATRIX V8.0  ZERO SYNTHETIC DATA
+ *  WHALE Analytics Engine V8.0  ZERO SYNTHETIC DATA
  * 100% real on-chain data. No Math.random(). No MATRIX_SYNC padding.
  * No generateSyntheticMovements(). Every event is a verified chain event.
  */

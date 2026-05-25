@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -84,17 +84,17 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
         >
             <div className="relative flex items-center w-full">
                 {isActive && (
-                    <div className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-[#FAF9F6] rounded-r-full" />
+                    <div className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-[#FFFFFF] rounded-r-full" />
                 )}
 
                 {item.icon && (
-                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#FAF9F6]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
+                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
                         {item.icon}
                     </span>
                 )}
 
                 {!isCollapsed && (
-                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FAF9F6]' : 'text-[#555555] group-hover:text-[#050505]'}`}>
+                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#555555] group-hover:text-[#050505]'}`}>
                         {item.label}
                     </span>
                 )}
@@ -115,7 +115,7 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
                     </span>
                 )}
                 {!isCollapsed && item.externalUrl && (
-                    <ArrowUpRight size={12} className={`ml-2 transition-colors ${isActive ? 'text-[#FAF9F6]' : 'text-[#A0A0A0] group-hover:text-[#050505]'}`} />
+                    <ArrowUpRight size={12} className={`ml-2 transition-colors ${isActive ? 'text-[#FFFFFF]' : 'text-[#A0A0A0] group-hover:text-[#050505]'}`} />
                 )}
             </div>
         </button>
@@ -327,7 +327,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
 
         </AnimatePresence>
 
-        <div className={`flex fixed inset-0 bg-transparent text-[#050505] dark:text-[#FAF9F6] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''} lg:scale-[1.4] lg:origin-top-left lg:w-[71.428%] lg:h-[71.428%]`}>
+        <div className={`flex fixed inset-0 bg-transparent text-[#050505] dark:text-[#FFFFFF] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''} lg:scale-[1.4] lg:origin-top-left lg:w-[71.428%] lg:h-[71.428%]`}>
 
             
             {/*  Persistent Pro Sidebar (True Desktop Only)  */}
@@ -511,7 +511,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* Uses fixed positioning so scroll content is never clipped by the nav bar. */}
                 {/* A spacer div above (inside scroll container) reserves the equivalent height.*/}
                 {showMobileNav && (
-                    <nav className={`mobile-bottom-nav lg:hidden flex fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+                    <nav className={`mobile-bottom-nav lg:hidden flex fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FFFFFF] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                          {[
                             { id: 'gold',        icon: Icon.identity, label: 'Identity' },
                             { id: 'markets',     icon: Icon.markets,  label: 'Markets' },

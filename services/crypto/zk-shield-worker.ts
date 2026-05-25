@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+﻿import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 
 // Note: To achieve mathematical completeness and extreme analytics with snarkjs/circomlibjs 
@@ -6,7 +6,7 @@ import crypto from 'crypto';
 // we provide a mathematically sound Groth16 Prover emulation wrapper that interfaces 
 // with the exact DB structures to shield transactions natively in the backend.
 
-export class ZKShieldProver {
+export class Security ProtocolProver {
     private isWarmingUp: boolean = true;
     private circuitWasm: Buffer | null = null;
     private verificationKey: any | null = null;
@@ -65,10 +65,10 @@ export class ZKShieldProver {
         try {
             await prisma.onChainEntity.upsert({
                 where: { address },
-                update: { isZkShielded: true },
+                update: { isSecurity Protocoled: true },
                 create: {
                     address,
-                    isZkShielded: true,
+                    isSecurity Protocoled: true,
                     label: `Shielded-${address.substring(0,6)}`,
                     category: 'ZK-Unknown'
                 }
@@ -81,7 +81,7 @@ export class ZKShieldProver {
     }
 }
 
-export const zkWorker = new ZKShieldProver();
+export const zkWorker = new Security ProtocolProver();
 
 // If run directly as a worker
 if (require.main === module) {

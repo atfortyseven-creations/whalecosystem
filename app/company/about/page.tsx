@@ -1,4 +1,4 @@
-import DocLayout from '@/components/layout/DocLayout';
+﻿import DocLayout from '@/components/layout/DocLayout';
 import { Heart, Users, Target, Sparkles, Globe, Shield, Activity, Lock, Cpu, Rocket, Award, Lightbulb, TrendingUp, Handshake, Leaf, BookOpen } from 'lucide-react';
 
 export default function AboutPage() {
@@ -116,7 +116,7 @@ export default function AboutPage() {
                     <h2 className="text-3xl font-black mb-8 tracking-tight text-[#050505]">Global Reach & ESG Commitment</h2>
                     <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
                         <p>
-                            Whale Alert Network is not confined by geopolitical borders. Our infrastructure is deployed across multiple sovereign regions, ensuring low-latency access and uninterrupted service for a truly global user base. We are actively localizing our analytics engine to support multiple international languages and region-specific regulatory frameworks.
+                            Whale Alert Network is not confined by geopolitical borders. Our infrastructure is deployed across multiple Enterprise regions, ensuring low-latency access and uninterrupted service for a truly global user base. We are actively localizing our analytics engine to support multiple international languages and region-specific regulatory frameworks.
                         </p>
                         <p>
                             Furthermore, Environmental, Social, and Governance (ESG) principles are embedded deep within our operational DNA. In an industry often criticized for its carbon footprint, we have strategically aligned our node infrastructure with data centers powered entirely by renewable energy sources. We actively subsidize research into energy-efficient cryptographic proofs and aggressively optimize our server-side computational load to minimize our environmental impact.

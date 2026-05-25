@@ -1,4 +1,4 @@
-import { portfolioService } from '../blockchain/PortfolioService';
+﻿import { portfolioService } from '../blockchain/PortfolioService';
 import { ChainId } from '../blockchain/BlockchainService';
 import { prisma } from '../prisma';
 import { PriceService } from '../blockchain/PriceService';
@@ -33,7 +33,7 @@ export interface WalletAnalytics {
   historicalBalance?: { date: string; balance: number }[];
   error?: string;
   errorMessage?: string;
-  identityTier?: 'GHOST' | 'INITIATE' | 'HUMAN' | 'SOVEREIGN' | 'PROTOCOL';
+  identityTier?: 'GHOST' | 'INITIATE' | 'HUMAN' | 'Enterprise' | 'PROTOCOL';
   entityInfo?: BlockchainEntity;
   totalFlow30d?: number;
   recentTransfers?: AnalyticsTransfer[];

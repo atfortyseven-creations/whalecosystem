@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -71,7 +71,7 @@ export function ZkKYBVault() {
           </div>
         </div>
 
-        <div className="mb-6 bg-[#FAFAF8] rounded-xl p-4 border border-black/5">
+        <div className="mb-6 bg-[#FFFFFF] rounded-xl p-4 border border-black/5">
             <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-black/60 mb-2">Operation Manual</h4>
             <p className="text-[11px] text-black/50 leading-relaxed">
               1. Drag and drop your official Articles of Incorporation or Proof of Address into the vault.<br/>
@@ -81,7 +81,7 @@ export function ZkKYBVault() {
             </p>
         </div>
 
-        <div className="w-full flex-1 min-h-[250px] rounded-2xl border-2 border-dashed border-black/10 bg-[#FAFAF8] flex flex-col items-center justify-center p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
+        <div className="w-full flex-1 min-h-[250px] rounded-2xl border-2 border-dashed border-black/10 bg-[#FFFFFF] flex flex-col items-center justify-center p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
           
           <AnimatePresence mode="wait">
             {stage === "IDLE" && (

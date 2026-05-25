@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -173,9 +173,9 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
                     <div className="flex flex-col items-center gap-6 mt-4">
                         <Box size={40} className="text-black/20" strokeWidth={1} />
                         <h4 className="text-sm font-bold uppercase tracking-widest">System Uninitialized</h4>
-                        <p className="text-xs text-black/50 max-w-sm leading-relaxed">Cryptographic keys are required to interface with the ledger. Initialize a secure enclave to proceed.</p>
+                        <p className="text-xs text-black/50 max-w-sm leading-relaxed">Cryptographic keys are required to interface with the ledger. Initialize a Wallet to proceed.</p>
                         <button onClick={onCreate} className="bg-black text-white px-8 py-3 text-xs uppercase tracking-widest font-bold hover:bg-black/80 transition-colors">
-                            Initialize Enclave
+                            Create Wallet
                         </button>
                     </div>
                 )}
@@ -196,12 +196,12 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
 
                     {/* Quantum Details */}
                     <div className="lg:col-span-8 space-y-4">
-                        <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-2 mb-4">Cryptographic State</h4>
+                        <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-2 mb-4">Account Status</h4>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                             <div className="border border-black p-6 bg-black text-white relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-1000"><Database size={100} /></div>
-                                <span className="text-[10px] uppercase tracking-widest text-white/50 block mb-2">Quantum Dots (QDs)</span>
+                                <span className="text-[10px] uppercase tracking-widest text-white/50 block mb-2">Network Score (QDs)</span>
                                 <div className="text-3xl font-light tracking-tighter">{qdBalance}<span className="text-lg font-black ml-2 opacity-50 text-white">QDs</span></div>
                                 <div className="mt-4 flex items-center gap-2 text-[9px] uppercase tracking-widest opacity-40">
                                     <Activity size={10} /> Live State Subscribed
@@ -367,7 +367,7 @@ function ReceiveView({ address, onBack }: any) {
 function CreateWalletView({ onBack, onCreated }: any) {
     const { createWallet } = useWalletStore();
     return (
-        <ModalView title="Generate Enclave" icon={<Plus />} onBack={onBack}>
+        <ModalView title="Create Wallet" icon={<Plus />} onBack={onBack}>
             <div className="text-center space-y-6 py-10 border border-black/10">
                 <div className="w-16 h-16 border border-black flex items-center justify-center mx-auto text-black">
                     <Key size={24} />

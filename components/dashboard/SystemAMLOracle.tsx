@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -53,7 +53,7 @@ export function SystemAMLOracle({ address = "0x..." }: { address?: string }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Risk Score */}
-        <div className="bg-[#FAFAF8] rounded-xl p-5 border border-black/5 flex flex-col justify-between">
+        <div className="bg-[#FFFFFF] rounded-xl p-5 border border-black/5 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/40">Entity Health Score</span>
             <ShieldAlert size={14} className="text-black/20" />
@@ -100,7 +100,7 @@ export function SystemAMLOracle({ address = "0x..." }: { address?: string }) {
 
 function CheckItem({ title, status, delay }: { title: string, status: "scanning" | "clear" | "flagged", delay: number }) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-xl bg-[#FAFAF8] border border-black/5 min-w-0 gap-3">
+    <div className="flex items-center justify-between p-4 rounded-xl bg-[#FFFFFF] border border-black/5 min-w-0 gap-3">
       <span className="text-[11px] font-bold uppercase tracking-[0.1em] truncate flex-1 pr-2 text-[#050505]">{title}</span>
       <div className="flex items-center gap-2 shrink-0">
         {status === "scanning" && (

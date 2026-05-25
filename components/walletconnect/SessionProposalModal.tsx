@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useWalletConnectStore } from '@/lib/store/wallet-connect-store';
@@ -51,7 +51,7 @@ export function SessionProposalModal() {
     return (
         <div className="fixed inset-0 z-[99999] bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-black/10 overflow-hidden flex flex-col">
-                <div className="p-6 text-center border-b border-black/5 bg-[#FAFAF8]">
+                <div className="p-6 text-center border-b border-black/5 bg-[#FFFFFF]">
                     <div className="w-16 h-16 mx-auto bg-black/5 rounded-2xl flex items-center justify-center mb-4 border border-black/10 overflow-hidden">
                         {proposer.metadata.icons && proposer.metadata.icons[0] ? (
                             <img src={proposer.metadata.icons[0]} alt={proposer.metadata.name} className="w-full h-full object-cover" />

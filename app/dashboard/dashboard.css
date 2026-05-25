@@ -1,5 +1,5 @@
-/* 
-   AZTEC SOVEREIGN TERMINAL  Ivory & Gold Design System
+﻿/* 
+   AZTEC Enterprise TERMINAL  Ivory & Gold Design System
    v6.0 · Celestial Quality · Minimalist Architecture
     */
 
@@ -771,12 +771,12 @@
 .section-blend-top {
   position: absolute; top: 0; left: 0; right: 0;
   height: 120px; z-index: 2; pointer-events: none;
-  background: linear-gradient(to bottom, #FAF9F6 0%, transparent 100%);
+  background: linear-gradient(to bottom, #FFFFFF 0%, transparent 100%);
 }
 .section-blend-bottom {
   position: absolute; bottom: 0; left: 0; right: 0;
   height: 120px; z-index: 2; pointer-events: none;
-  background: linear-gradient(to top, #FAF9F6 0%, transparent 100%);
+  background: linear-gradient(to top, #FFFFFF 0%, transparent 100%);
 }
 /*  Aztec h1 font shorthand  */
 .font-aztec-h1 {
@@ -792,7 +792,7 @@
     */
 
 [data-dashboard="true"] .bg-white,
-[data-dashboard="true"] .bg-\[\#FAF9F6\],
+[data-dashboard="true"] .bg-\[\#FFFFFF\],
 [data-dashboard="true"] .bg-white\/90 {
   background-color: var(--theme-surface) !important;
   border-color: var(--theme-border) !important;

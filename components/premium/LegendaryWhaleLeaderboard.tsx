@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -31,7 +31,7 @@ export function LegendaryWhaleLeaderboard() {
 
     return (
         <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-xl shadow-slate-200/50 group h-full transition-all duration-500 hover:border-cyan-500/30">
-            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <div className="p-6 border-b border-slate-100 bg-black/5/50 flex justify-between items-center">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Yearly Performance (Real-Time)</span>
             </div>
             
@@ -43,7 +43,7 @@ export function LegendaryWhaleLeaderboard() {
                     const pnlPrefix = pnlDisplay > 0 ? '+' : '';
                     
                     return (
-                        <div key={rank.address} className="p-4 flex items-center gap-6 hover:bg-slate-50 transition-colors group/row">
+                        <div key={rank.address} className="p-4 flex items-center gap-6 hover:bg-black/5 transition-colors group/row">
                             <span className="text-xl font-black text-slate-200 group-hover/row:text-cyan-500/20 transition-colors w-8">
                                 {String(i + 1).padStart(2, '0')}
                             </span>
@@ -94,7 +94,7 @@ export function LegendaryWhaleLeaderboard() {
             )}
 
             {!isExpanded && rankings.length > 0 && (
-                <div className="p-4 bg-slate-50/50 border-t border-slate-100">
+                <div className="p-4 bg-black/5/50 border-t border-slate-100">
                     <button 
                         onClick={() => setIsExpanded(true)}
                         className="w-full py-4 border border-dashed border-slate-200 bg-white rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-cyan-500 hover:text-cyan-600 transition-all flex items-center justify-center gap-2 group/btn"

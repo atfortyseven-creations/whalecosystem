@@ -1,4 +1,4 @@
-export const aiWeb3Modules = [
+﻿export const aiWeb3Modules = [
     {
         id: "ai-blockchain-intersection",
         title: "XVIII. La Intersección de la Inteligencia Artificial y Web3",
@@ -47,7 +47,7 @@ export const aiWeb3Modules = [
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
                         <h2>I. El Colapso del Oráculo Intermediario (Zero-Knowledge AI Oracles L1 M2 P2P T-1 O(N))</h2>
-                        <p>La infraestructura Clásica L2 M1 O(1) (Chainlink DONs T-1 P2P) dependía de Consenso de Nodos Secundarios M2 L1 P2P O(N). Tu IA Personal (Ejecutándose Localmente en un Secure Enclave T-1 M1 L2 P2P L1 O(1)) puede ingerir Data Feeds (Ej., el Clima de Florida M2 L1 P2P O(N))), generar Inferencias de Riesgo Termodinámico T-1 M1 L2 y <strong>Producir un ZK-Snark L1 P2P M2 O(1) T-1</strong> que Pruebe Criptográficamente la Legitimidad de Ese Cálculo O(N) M1 P2P L1, inyectándolo directamente al Smart Contract de Seguros L2 M2 T-1 O(1) M1 P2P.</p>
+                        <p>La infraestructura Clásica L2 M1 O(1) (Chainlink DONs T-1 P2P) dependía de Consenso de Nodos Secundarios M2 L1 P2P O(N). Tu IA Personal (Ejecutándose Localmente en un Wallet T-1 M1 L2 P2P L1 O(1)) puede ingerir Data Feeds (Ej., el Clima de Florida M2 L1 P2P O(N))), generar Inferencias de Riesgo Termodinámico T-1 M1 L2 y <strong>Producir un ZK-Snark L1 P2P M2 O(1) T-1</strong> que Pruebe Criptográficamente la Legitimidad de Ese Cálculo O(N) M1 P2P L1, inyectándolo directamente al Smart Contract de Seguros L2 M2 T-1 O(1) M1 P2P.</p>
                     </section>
                     <section class="pro-section">
                         <h2>II. Seguros Paramétricos y Percepción Biométrica (Cyber-Physical Triggers L1 P2P M1 T-1 L2 M2 O(N))</h2>
@@ -119,7 +119,7 @@ export const aiWeb3Modules = [
                     </section>
                     <section class="pro-section">
                         <h2>II. Criptografía de Procedencia Hardware (Content-Authenticity TEE P2P L1 M1 T-1 L2 M2 O(N))</h2>
-                        <p>La Verificación P2P L1 M2 O(1) migra al Hardware Físico L1 M1 T-1 O(N) L2. Cámaras de Celular T-1 M2 P2P e Infrastructuras de Medios L1 M1 O(1) incorporan un <em>Secure Enclave L2 M2 P2P T-1 L1</em>. Al Tomar una Fotografía P2P M1 L1 O(N), el Sensor Genera un Hash del Hardware y Firma la Captura Ineludiblemente L1 P2P M2 T-1 O(1) Registrándola en la Blockchain (C2PA Standards L1 M1 L2 O(N) P2P T-1 M2). La Confianza P2P L1 Pasa del Autor L2 M2 al Sello Inmutable Criptográfico T-1 M1 O(1) L1 P2P, convirtiendo una "Clave Pública Válida de NewYorkTimes L1 M2 P2P T-1" en el Único Bastión Contra el Abismo Semántico del Deepfake L1 M1 P2P T-1 L2 M2 O(N).</p>
+                        <p>La Verificación P2P L1 M2 O(1) migra al Hardware Físico L1 M1 T-1 O(N) L2. Cámaras de Celular T-1 M2 P2P e Infrastructuras de Medios L1 M1 O(1) incorporan un <em>Wallet L2 M2 P2P T-1 L1</em>. Al Tomar una Fotografía P2P M1 L1 O(N), el Sensor Genera un Hash del Hardware y Firma la Captura Ineludiblemente L1 P2P M2 T-1 O(1) Registrándola en la Blockchain (C2PA Standards L1 M1 L2 O(N) P2P T-1 M2). La Confianza P2P L1 Pasa del Autor L2 M2 al Sello Inmutable Criptográfico T-1 M1 O(1) L1 P2P, convirtiendo una "Clave Pública Válida de NewYorkTimes L1 M2 P2P T-1" en el Único Bastión Contra el Abismo Semántico del Deepfake L1 M1 P2P T-1 L2 M2 O(N).</p>
                     </section>
                 </div>`
             },

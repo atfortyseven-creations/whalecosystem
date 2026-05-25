@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -177,7 +177,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   }, [isLinked, isWalletConnected, isMounted]);
 
   //  Redirect unauthenticated users to /connect 
-  // SOVEREIGN LAW: 400ms debounce prevents false-positive redirects during the
+  // Enterprise LAW: 400ms debounce prevents false-positive redirects during the
   // transient window right after a wallet connects (before the sign step or
   // system_handshake cookie has been written).
   useEffect(() => {

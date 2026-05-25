@@ -1,4 +1,4 @@
-import fs from 'fs';
+﻿import fs from 'fs';
 import path from 'path';
 
 export interface ManifestoSection {
@@ -45,7 +45,7 @@ const FALLBACK_SECTIONS: ManifestoSection[] = [
       '[LIST_ITEM]subscribe to institutional-grade telemetry feeds via sse or webhook',
       '[LIST_ITEM]explore the system vault  a cryptographically sealed archive of historical whale events',
       '[LIST_ITEM]access the entity graph to map wallet relationships and trace capital provenance',
-      '[LIST_ITEM]deploy the zkshield station to verify on-chain claims without exposing position data',
+      '[LIST_ITEM]deploy the Security Protocol station to verify on-chain claims without exposing position data',
       'the system is not a product. it is a protocol. it is designed to be operated by those who understand that asymmetric information is the last remaining structural edge in digital markets.',
     ]
   },

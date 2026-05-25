@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -65,7 +65,7 @@ function WalletButton({ logo, name, badge, onClick, loading = false, delay = 0, 
       disabled={loading}
       className="group relative w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 bg-white border border-[#E8E8E8] shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-[#D0D0D0] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
     >
-      <div className="absolute inset-0 bg-[#FAFAF8] translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
+      <div className="absolute inset-0 bg-[#FFFFFF] translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
       <div className="relative z-10 w-10 h-10 rounded-lg bg-white border border-[#E8E8E8] flex items-center justify-center p-2 shrink-0">
         <img src={logo} alt={name} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
       </div>
@@ -528,7 +528,7 @@ export default function ConnectPage() {
                 ) : syncStatus === "IDLE" || (syncStatus === "AWAITING" && !qrData) ? (
                   <div className="flex justify-center mb-5">
                     <div className="p-3 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm">
-                      <div className="w-[180px] h-[180px] bg-[#FAFAF8] rounded-xl animate-pulse flex items-center justify-center">
+                      <div className="w-[180px] h-[180px] bg-[#FFFFFF] rounded-xl animate-pulse flex items-center justify-center">
                         <Loader2 size={20} className="animate-spin text-black/20" />
                       </div>
                       <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/20 text-center">
@@ -563,7 +563,7 @@ export default function ConnectPage() {
                 ))}
                 <button
                   onClick={() => openAppKit({ view: 'Connect' })}
-                  className="w-full flex items-center justify-center gap-3 py-3.5 mt-1 rounded-xl border border-[#F0F0F0] bg-white font-black uppercase tracking-[0.2em] text-[10px] text-[#0A0A0A]/50 hover:bg-[#FAFAF8] hover:text-[#0A0A0A] transition-all"
+                  className="w-full flex items-center justify-center gap-3 py-3.5 mt-1 rounded-xl border border-[#F0F0F0] bg-white font-black uppercase tracking-[0.2em] text-[10px] text-[#0A0A0A]/50 hover:bg-[#FFFFFF] hover:text-[#0A0A0A] transition-all"
                 >
                   <ScanLine size={14} />
                   WalletConnect

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * CommandPalette  Global Search and Navigation (Cmd+K / Ctrl+K)
@@ -204,7 +204,7 @@ export function CommandPalette({ onNavigate, onBridgeOpen }: CommandPaletteProps
             className="fixed z-[501] left-1/2 top-[15vh] w-full max-w-2xl rounded-3xl overflow-hidden"
             style={{
               transform: "translateX(-50%)",
-              background: "#FAFAF8",
+              background: "#FFFFFF",
               border: "1px solid rgba(0,0,0,0.08)",
               boxShadow: "0 40px 100px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04)",
             }}

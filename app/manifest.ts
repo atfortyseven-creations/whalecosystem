@@ -1,4 +1,4 @@
-import { MetadataRoute } from 'next';
+﻿import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Professional institutional records management and network telemetry.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#FAFAF8',
+    background_color: '#FFFFFF',
     theme_color: '#050505',
     icons: [
       {

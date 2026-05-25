@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,14 +29,14 @@ export function WhaleWatch({ hideHeader = false, theme = 'default' }: { hideHead
 
     const itemClass = isArctic
         ? "bg-white/60 hover:bg-white border border-slate-100 rounded-xl p-4 relative group transition-all shadow-sm hover:shadow-md"
-        : "bg-slate-50 hover:bg-white border border-slate-100 rounded-xl p-4 relative group transition-all";
+        : "bg-black/5 hover:bg-white border border-slate-100 rounded-xl p-4 relative group transition-all";
 
     // Take top 10 for the radar view
     const displayTxs = unifiedWhaleFeed.slice(0, 10);
 
     if (isLoading) {
         return (
-            <Card className={`${isArctic ? 'bg-white/60 backdrop-blur-3xl border-slate-100' : 'bg-slate-50 border-slate-100'} p-8 h-full flex flex-col items-center justify-center rounded-[2.5rem]`}>
+            <Card className={`${isArctic ? 'bg-white/60 backdrop-blur-3xl border-slate-100' : 'bg-black/5 border-slate-100'} p-8 h-full flex flex-col items-center justify-center rounded-[2.5rem]`}>
                  <div className="animate-spin text-indigo-600 mb-4"><Radar size={32} /></div>
                  <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em]">Scanning Multi-Chain Grid...</span>
             </Card>
@@ -110,7 +110,7 @@ export function WhaleWatch({ hideHeader = false, theme = 'default' }: { hideHead
             
             <Link 
                 href="/terminal" 
-                className="mt-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-all border border-slate-200"
+                className="mt-4 py-3 bg-black/5 hover:bg-slate-100 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-all border border-slate-200"
             >
                 Deep Dive Terminal <ArrowRight size={10} className="inline ml-1" />
             </Link>

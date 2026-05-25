@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import Link from 'next/link';
@@ -74,7 +74,7 @@ const FADE_UP: any = {
 
 export default function DocsPage() {
   return (
-    <div className="w-full min-h-screen bg-[#FAFAF8] dark:bg-[#050505] text-black dark:text-white font-sans selection:bg-black/10 dark:selection:bg-white/10">
+    <div className="w-full min-h-screen bg-[#FFFFFF] dark:bg-[#050505] text-black dark:text-white font-sans selection:bg-black/10 dark:selection:bg-white/10">
       <div className="max-w-[1200px] mx-auto py-24 px-6 lg:px-12 flex flex-col items-center">
 
         {/* HERO */}

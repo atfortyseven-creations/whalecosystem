@@ -1,4 +1,4 @@
-// lib/vossAnalyticsEngine.ts
+﻿// lib/vossAnalyticsEngine.ts
 // VOSS 2026 SUPREME DIRECTIVE  500 DIMENSIONS OF APEX DOMINANCE
 // Deterministic generation aligned with README v4.2.0 architecture.
 
@@ -181,7 +181,7 @@ const TITLES: Record<number, string[]> = {
     "Threshold ECDSA Custody", "Schnorr Aggregated Signature", "BLS Signature Aggregator",
     "STARK Proof Verifier", "Halo2 Recursive Proof", "PLONK Circuit Composer",
     "Audit Trail Immutable Log", "Privacy-Preserving Analytics", "Differential Privacy Budget",
-    "Federated Learning System", "Homomorphic Compute Bridge", "Secure Enclave TEE",
+    "Federated Learning System", "Homomorphic Compute Bridge", "Wallet TEE",
     "Formal Verification Engine", "System Red Team Protocol",
   ],
   9: [

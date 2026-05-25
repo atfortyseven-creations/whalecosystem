@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * CoreDotsPanel  Full system QDs interface
@@ -222,7 +222,7 @@ function EntropyTab() {
                 key={entropy.toString().slice(-8)}
                 initial={{ opacity: 0.6 }}
                 animate={{ opacity: 1 }}
-                className="bg-[#FAFAF8] border border-black/8 rounded-2xl p-5"
+                className="bg-[#FFFFFF] border border-black/8 rounded-2xl p-5"
             >
                 <EntropyVisualizer entropy={entropy} />
             </motion.div>
@@ -234,7 +234,7 @@ function EntropyTab() {
                     { label: 'Algorithm', value: 'CSPRNG' },
                     { label: 'Per-Tx Unique', value: 'Yes' },
                 ].map(({ label, value }) => (
-                    <div key={label} className="bg-[#FAFAF8] border border-black/5 rounded-xl px-4 py-3">
+                    <div key={label} className="bg-[#FFFFFF] border border-black/5 rounded-xl px-4 py-3">
                         <div className="text-[8px] font-black uppercase tracking-widest text-black/30 mb-1">{label}</div>
                         <div className="font-mono font-black text-xs text-black">{value}</div>
                     </div>
@@ -288,7 +288,7 @@ function TokenomicsTab({
                         key={label}
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-[#FAFAF8] border border-black/8 rounded-2xl px-6 py-6 flex flex-col gap-3"
+                        className="bg-[#FFFFFF] border border-black/8 rounded-2xl px-6 py-6 flex flex-col gap-3"
                     >
                         <div className="flex items-center gap-2 text-black/40">{icon}</div>
                         <div>
@@ -303,7 +303,7 @@ function TokenomicsTab({
 
             {/* Contract addresses */}
             <div className="border border-black/8 rounded-2xl overflow-hidden mt-6">
-                <div className="px-6 py-4 border-b border-black/5 bg-[#FAFAF8]">
+                <div className="px-6 py-4 border-b border-black/5 bg-[#FFFFFF]">
                     <span className="text-[10px] font-black uppercase tracking-widest text-black/40">Contract Addresses</span>
                 </div>
                 {[
@@ -328,7 +328,7 @@ function TokenomicsTab({
             </div>
 
             {/* Protocol */}
-            <div className="bg-[#FAFAF8] border border-black/8 rounded-2xl p-6 mt-6 space-y-4">
+            <div className="bg-[#FFFFFF] border border-black/8 rounded-2xl p-6 mt-6 space-y-4">
                 <div className="text-[10px] font-black uppercase tracking-widest text-black/40">Protocol Architecture</div>
                 <div className="space-y-3">
                     {[
@@ -902,7 +902,7 @@ function TransferTab({
                             onChange={e => setRecipient(e.target.value.trim())}
                             placeholder="0x EVM address"
                             disabled={isActive}
-                            className="w-full bg-[#FAFAF8] border rounded-2xl px-5 py-4 text-black font-mono text-sm focus:outline-none transition-all placeholder:text-black/25 disabled:opacity-50"
+                            className="w-full bg-[#FFFFFF] border rounded-2xl px-5 py-4 text-black font-mono text-sm focus:outline-none transition-all placeholder:text-black/25 disabled:opacity-50"
                             style={{
                                 borderColor: recipientValid === false ? '#ef4444'
                                             : recipientValid === true  ? '#22c55e'
@@ -953,7 +953,7 @@ function TransferTab({
                             placeholder="0.000000"
                             step="0.000001"
                             disabled={isActive}
-                            className="w-full bg-[#FAFAF8] border rounded-2xl px-5 py-4 text-black font-mono text-2xl font-black focus:outline-none transition-all placeholder:text-black/20 disabled:opacity-50"
+                            className="w-full bg-[#FFFFFF] border rounded-2xl px-5 py-4 text-black font-mono text-2xl font-black focus:outline-none transition-all placeholder:text-black/20 disabled:opacity-50"
                             style={{ borderColor: amount && !amountValid ? '#ef4444' : 'rgba(0,0,0,0.1)' }}
                         />
                         <span className="absolute right-5 top-1/2 -translate-y-1/2 text-black/30 font-mono font-black text-sm">QDs</span>
@@ -977,7 +977,7 @@ function TransferTab({
                         placeholder="P2P payment, asset purchase"
                         maxLength={64}
                         disabled={isActive}
-                        className="w-full bg-[#FAFAF8] border border-black/10 rounded-2xl px-5 py-3.5 text-black text-sm focus:outline-none transition-all placeholder:text-black/20 disabled:opacity-50"
+                        className="w-full bg-[#FFFFFF] border border-black/10 rounded-2xl px-5 py-3.5 text-black text-sm focus:outline-none transition-all placeholder:text-black/20 disabled:opacity-50"
                     />
                     {memo && <p className="text-[8px] font-mono text-black/25 ml-1">{64 - memo.length} chars remaining</p>}
                 </div>
@@ -989,7 +989,7 @@ function TransferTab({
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="bg-[#FAFAF8] border border-black/5 rounded-2xl px-5 py-4"
+                            className="bg-[#FFFFFF] border border-black/5 rounded-2xl px-5 py-4"
                         >
                             <div className="text-[8px] font-black uppercase tracking-widest text-black/30 mb-3">Estimated Gas · L2 ({CHAIN_NAME})</div>
                             <div className="space-y-0 divide-y divide-black/5">
@@ -1158,7 +1158,7 @@ export function CoreDotsPanel() {
     return (
         <div className="w-full rounded-3xl border border-black/8 bg-white/70 backdrop-blur-3xl overflow-hidden shadow-sm">
             {/*  Header  */}
-            <div className="bg-[#FAF9F6] px-7 pt-7 pb-6 border-b border-black/5">
+            <div className="bg-[#FFFFFF] px-7 pt-7 pb-6 border-b border-black/5">
                 <div className="flex items-start justify-between mb-5">
                     <div>
                         <div className="text-[8px] font-mono font-black uppercase tracking-[0.35em] text-black/35 mb-1">

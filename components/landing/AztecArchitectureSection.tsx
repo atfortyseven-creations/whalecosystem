@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { AztecZKMetrics } from "./AztecZKMetrics";
@@ -87,7 +87,7 @@ export function AztecArchitectureSection() {
 
   return (
     <section
-      className="w-full bg-[#FAFAF8] border-t border-black/8"
+      className="w-full bg-[#FFFFFF] border-t border-black/8"
       aria-label="Institutional Security Architecture"
     >
       <div className="w-full max-w-[2560px] mx-auto px-5 sm:px-8 py-24 flex flex-col gap-16 items-center">
@@ -126,10 +126,10 @@ export function AztecArchitectureSection() {
                 <button
                   key={pillar.index}
                   onClick={() => setExpanded(isOpen ? null : pillar.index)}
-                  className="bg-white text-left flex flex-col sm:flex-row items-stretch group overflow-hidden hover:bg-[#FAFAF8] transition-colors duration-200 w-full"
+                  className="bg-white text-left flex flex-col sm:flex-row items-stretch group overflow-hidden hover:bg-[#FFFFFF] transition-colors duration-200 w-full"
                 >
                   {/* Index column */}
-                  <div className="w-full sm:w-[100px] bg-[#FAFAF8] group-hover:bg-[#f2f1eb] border-b sm:border-b-0 sm:border-r border-black/10 flex items-center justify-center p-4 shrink-0 transition-colors duration-200">
+                  <div className="w-full sm:w-[100px] bg-[#FFFFFF] group-hover:bg-[#f2f1eb] border-b sm:border-b-0 sm:border-r border-black/10 flex items-center justify-center p-4 shrink-0 transition-colors duration-200">
                     <span className="font-mono text-[22px] font-black text-black/15 leading-none select-none">
                       {pillar.index}
                     </span>
@@ -173,7 +173,7 @@ export function AztecArchitectureSection() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-[1px] bg-black/10 border border-black/10 border-t-0">
             {HIGHLIGHTS.map((spec) => (
               <div key={spec.key} className="bg-white flex flex-col sm:flex-row items-stretch">
-                <div className="w-full sm:w-[200px] bg-[#FAFAF8] border-b sm:border-b-0 sm:border-r border-black/8 px-4 py-3 flex items-center shrink-0">
+                <div className="w-full sm:w-[200px] bg-[#FFFFFF] border-b sm:border-b-0 sm:border-r border-black/8 px-4 py-3 flex items-center shrink-0">
                   <span className="font-mono text-[9px] uppercase tracking-wider text-black/45 font-bold">
                     {spec.key}
                   </span>
@@ -199,14 +199,14 @@ export function AztecArchitectureSection() {
               The fusion of the Humanity Ledger and Aztec Network creates an impenetrable cryptographic shield. This integration relies on specialized primitives operating in perfect synchrony, designed strictly for entities requiring institutional-grade execution without compromising strategic opacity.
             </p>
             <div className="w-full bg-white rounded-[2rem] border border-black/10 shadow-sm flex items-center justify-center p-6 overflow-hidden relative mt-4">
-               <div className="absolute inset-0 bg-gradient-to-b from-[#FAFAF8]/50 to-transparent mix-blend-multiply pointer-events-none" />
+               <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF]/50 to-transparent mix-blend-multiply pointer-events-none" />
                <AztecZKMetrics />
             </div>
           </div>
 
           <div className="w-full lg:w-[65%] grid grid-cols-1 sm:grid-cols-2 gap-[1px] bg-black/10 border border-black/10 shadow-sm">
             {AZTEC_EXTENDED_POINTS.map((pt, i) => (
-              <div key={i} className="bg-white p-6 sm:p-8 hover:bg-[#FAFAF8] transition-colors duration-300 flex flex-col justify-center">
+              <div key={i} className="bg-white p-6 sm:p-8 hover:bg-[#FFFFFF] transition-colors duration-300 flex flex-col justify-center">
                 <span className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-black mb-3 block">
                   {pt.title}
                 </span>

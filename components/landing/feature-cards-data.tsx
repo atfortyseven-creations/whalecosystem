@@ -1,4 +1,4 @@
-// Feature Cards Data - 40+ Categories
+﻿// Feature Cards Data - 40+ Categories
 import React from 'react';
 import {
   Shield, Key, Users, Heart, Eye, Fingerprint, Clock, Smartphone, Cloud, Lock,
@@ -101,7 +101,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Passkey Authentication",
     category: "Security",
     description: "Passwordless login using WebAuthn and FIDO2 standards.",
-    detailedInfo: "Replace traditional passwords with cryptographic passkeys stored securely in your device's Secure Enclave or TPM. Each login generates a unique cryptographic challenge-response, making phishing mathematically impossible.",
+    detailedInfo: "Replace traditional passwords with cryptographic passkeys stored securely in your device's Wallet or TPM. Each login generates a unique cryptographic challenge-response, making phishing mathematically impossible.",
     benefits: [
       "Phishing-resistant by design",
       "Cross-device synchronization via iCloud/Google",

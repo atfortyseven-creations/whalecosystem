@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Key, Eye, EyeOff, Copy, AlertTriangle, ShieldCheck, Lock } from 'lucide-react';
 import { tryDecryptAny } from '@/lib/wallet-security';
@@ -82,7 +82,7 @@ export function PortfolioSecurityPanel() {
         </div>
       </div>
 
-      <div className="bg-[#FAFAF8] border border-black/5 rounded-2xl p-5 mb-4">
+      <div className="bg-[#FFFFFF] border border-black/5 rounded-2xl p-5 mb-4">
         <div className="flex items-center gap-2 mb-3">
           <AlertTriangle size={16} className="text-amber-500" />
           <span className="text-xs font-black uppercase tracking-widest text-amber-600">Prevención de Pérdida</span>
@@ -103,7 +103,7 @@ export function PortfolioSecurityPanel() {
                 setDecryptedMnemonic(null);
                 setPassword('');
               }}
-              className="w-full bg-[#FAFAF8] border border-black/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-black/30"
+              className="w-full bg-[#FFFFFF] border border-black/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-black/30"
             >
               {accounts.map(acc => (
                 <option key={acc.id} value={acc.id}>
@@ -123,7 +123,7 @@ export function PortfolioSecurityPanel() {
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleReveal()}
                   placeholder="Ingresa tu contraseña"
-                  className="flex-1 bg-[#FAFAF8] border border-black/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-black/30 placeholder:font-medium placeholder:text-black/30"
+                  className="flex-1 bg-[#FFFFFF] border border-black/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-black/30 placeholder:font-medium placeholder:text-black/30"
                 />
                 <button
                   onClick={handleReveal}
@@ -152,7 +152,7 @@ export function PortfolioSecurityPanel() {
 
         <div>
           {decryptedMnemonic ? (
-            <div className="relative border border-black/10 rounded-2xl p-6 bg-[#FAFAF8] h-full flex flex-col items-center justify-center overflow-hidden min-h-[180px]">
+            <div className="relative border border-black/10 rounded-2xl p-6 bg-[#FFFFFF] h-full flex flex-col items-center justify-center overflow-hidden min-h-[180px]">
               {!showMnemonic ? (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm">
                   <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center mb-3">

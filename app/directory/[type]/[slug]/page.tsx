@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { runQuery } from '@/lib/neo4j';
 import { Activity, Landmark, Wallet, Network } from 'lucide-react';
 import { notFound } from 'next/navigation';
@@ -46,7 +46,7 @@ export default async function KnowledgeGraphEntityPage({
   const inEdges = record.get('inEdges').filter((e: any) => e.node);
 
   return (
-    <div className="min-h-screen bg-transparent text-[#050505] dark:text-[#FAF9F6] p-12">
+    <div className="min-h-screen bg-transparent text-[#050505] dark:text-[#FFFFFF] p-12">
       <header className="mb-12 border-b border-black/10 pb-6 flex justify-between items-end">
         <div>
           <span className="text-[10px] font-black uppercase tracking-[0.25em] opacity-40 mb-2 block text-indigo-600">

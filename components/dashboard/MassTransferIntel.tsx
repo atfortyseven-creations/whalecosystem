@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
@@ -62,7 +62,7 @@ function EventRow({ event }: { event: any }) {
   };
 
   return (
-    <div className="flex flex-col border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-colors bg-white dark:bg-[#111111] group p-4">
+    <div className="flex flex-col border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FFFFFF] dark:hover:bg-[#1A1A1A] transition-colors bg-white dark:bg-[#111111] group p-4">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-3 pb-2 border-b border-dashed border-[#F0F0F0] dark:border-white/10">
         <div className="flex items-center gap-3">
@@ -144,7 +144,7 @@ function EventRow({ event }: { event: any }) {
       </div>
 
       {/* TX Hash strip */}
-      <div className="mt-3 pt-3 border-t border-dashed border-[#F0F0F0] dark:border-white/10 flex items-center justify-between text-[9px] font-mono bg-[#FAF9F6] dark:bg-[#1A1A1A] px-3 py-2 rounded-sm border border-[#E5E5E5] dark:border-white/10">
+      <div className="mt-3 pt-3 border-t border-dashed border-[#F0F0F0] dark:border-white/10 flex items-center justify-between text-[9px] font-mono bg-[#FFFFFF] dark:bg-[#1A1A1A] px-3 py-2 rounded-sm border border-[#E5E5E5] dark:border-white/10">
         <div className="flex items-center gap-3">
           <span className="uppercase text-[#888888] font-black tracking-widest flex items-center gap-1.5">
             TX Hash
@@ -334,7 +334,7 @@ export function MassTransferIntel() {
   }, [events, chainFilter, floorPreset, sortBy]);
 
   return (
-    <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] dark:bg-[#0A0A0A] text-[#050505] dark:text-white font-sans">
+    <div className="h-full min-h-0 flex flex-col bg-[#FFFFFF] dark:bg-[#0A0A0A] text-[#050505] dark:text-white font-sans">
 
       {/*  Header  */}
       <div className="flex flex-wrap items-center justify-between px-8 py-6 border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] gap-4 shrink-0">
@@ -342,7 +342,7 @@ export function MassTransferIntel() {
           <button
             onClick={handleSync}
             disabled={syncing}
-            className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-slate-50 active:scale-95 disabled:opacity-50 flex items-center gap-2"
+            className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-black/5 active:scale-95 disabled:opacity-50 flex items-center gap-2"
           >
             <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
             {syncing ? "SYNCING LEDGER" : "SYNC LEDGER"}
@@ -427,7 +427,7 @@ export function MassTransferIntel() {
 
             <div className="bg-white dark:bg-[#111111] border border-[#E0E0E0] dark:border-white/10 rounded flex flex-col shadow-sm">
               {/* Table header */}
-              <div className="px-5 py-3 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#E0E0E0] dark:border-white/10 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[#A0A0A0]">
+              <div className="px-5 py-3 bg-[#FFFFFF] dark:bg-[#1A1A1A] border-b border-[#E0E0E0] dark:border-white/10 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[#A0A0A0]">
                 <span>TRANSMISSIONS ({filtered.length})</span>
                 <div className="flex items-center gap-3">
                   {floorPreset > 0 && (

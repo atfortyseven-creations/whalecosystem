@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -208,7 +208,7 @@ export function NewsTerminal() {
             </div>
 
             {showArchive && archiveDates.length > 0 && (
-              <div className="border-b border-slate-200 bg-slate-50">
+              <div className="border-b border-slate-200 bg-black/5">
                 <p className="px-6 pt-5 pb-3 font-mono text-[9px] uppercase tracking-[0.25em] font-bold text-slate-400">Archive ({archiveDates.length})</p>
                 {archiveDates.map(date => {
                   const count = archive[date]?.length ?? 0;
@@ -236,7 +236,7 @@ export function NewsTerminal() {
                 const isActive = selected?.id === art.id;
                 return (
                   <button key={art.id} onClick={() => setSelected(art)}
-                    className={`text-left w-full px-6 py-6 relative group transition-colors ${isActive ? 'bg-slate-50' : 'bg-transparent hover:bg-slate-50'}`}>
+                    className={`text-left w-full px-6 py-6 relative group transition-colors ${isActive ? 'bg-black/5' : 'bg-transparent hover:bg-black/5'}`}>
                     {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-900" />}
                     {!isActive && <div className="absolute bottom-0 left-6 right-6 h-[1px] bg-slate-100" />}
                     
@@ -305,7 +305,7 @@ export function NewsTerminal() {
                               className="absolute right-0 top-full mt-2 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden min-w-[140px] z-50 flex flex-col"
                             >
                               {LANGUAGES.map(l => (
-                                <button key={l.code} onClick={() => handleTranslate(l.code)} className={`text-left px-4 py-2.5 font-sans text-[12px] font-bold hover:bg-slate-50 transition-colors ${currentLang === l.code ? 'text-slate-900 bg-slate-50/50' : 'text-slate-500'}`}>
+                                <button key={l.code} onClick={() => handleTranslate(l.code)} className={`text-left px-4 py-2.5 font-sans text-[12px] font-bold hover:bg-black/5 transition-colors ${currentLang === l.code ? 'text-slate-900 bg-black/5/50' : 'text-slate-500'}`}>
                                   {l.name}
                                 </button>
                               ))}
@@ -406,11 +406,11 @@ export function NewsTerminal() {
                 <form onSubmit={handleShare} className="p-6">
                   <div className="mb-5">
                     <label className="block font-mono text-[9px] uppercase tracking-widest font-bold text-slate-500 mb-3">Email Address</label>
-                    <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)} className="w-full px-5 py-4 bg-slate-50 border border-slate-200/60 font-sans text-[14px] outline-none focus:border-slate-400 text-slate-900 transition-colors rounded-xl" placeholder="user@example.com" />
+                    <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)} className="w-full px-5 py-4 bg-black/5 border border-slate-200/60 font-sans text-[14px] outline-none focus:border-slate-400 text-slate-900 transition-colors rounded-xl" placeholder="user@example.com" />
                   </div>
                   <div className="mb-8">
                     <label className="block font-mono text-[9px] uppercase tracking-widest font-bold text-slate-500 mb-3">Note (Optional)</label>
-                    <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3} className="w-full px-5 py-4 bg-slate-50 border border-slate-200/60 font-sans text-[14px] outline-none focus:border-slate-400 text-slate-900 transition-colors rounded-xl resize-none" placeholder="Provide context..." />
+                    <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3} className="w-full px-5 py-4 bg-black/5 border border-slate-200/60 font-sans text-[14px] outline-none focus:border-slate-400 text-slate-900 transition-colors rounded-xl resize-none" placeholder="Provide context..." />
                   </div>
                   <button type="submit" disabled={isSending} className="w-full py-4 bg-slate-900 text-white font-sans text-[12px] font-black uppercase tracking-widest hover:bg-slate-800 disabled:opacity-50 transition-colors rounded-xl shadow-md">
                     {isSending ? 'Sending...' : 'Send'}

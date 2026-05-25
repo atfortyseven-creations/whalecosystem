@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -36,7 +36,7 @@ function Skeleton({ count = 6 }) {
     return (
         <div className="flex flex-col gap-3 p-6">
             {Array.from({ length: count }).map((_, i) => (
-                <div key={i} className="flex gap-4 p-5 border border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#1A1A1A] rounded-2xl">
+                <div key={i} className="flex gap-4 p-5 border border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#1A1A1A] rounded-2xl">
                     <div className="w-12 h-12 bg-[#E5E5E5] dark:bg-[#222222] rounded-xl animate-pulse" />
                     <div className="flex-1 space-y-3">
                         <div className="h-5 bg-[#E5E5E5] dark:bg-[#222222] rounded w-3/4 animate-pulse" />
@@ -199,7 +199,7 @@ export default function PolymarketPanel() {
     return (
         <div className="flex flex-col flex-1 h-full min-h-0 bg-[#FFFFFF] dark:bg-[#0A0A0A] text-[#111111] dark:text-white font-sans">
             {/* Controls */}
-            <div className="flex flex-wrap items-center gap-4 p-6 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111]">
+            <div className="flex flex-wrap items-center gap-4 p-6 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111]">
                 <div className="relative flex-1 min-w-[250px] max-w-md">
                     <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888] dark:text-white/40" />
                     <input 
@@ -226,7 +226,7 @@ export default function PolymarketPanel() {
             {/* Markets List */}
             <div className="flex flex-1 overflow-hidden relative">
                 {geoBlocked && (
-                    <div className="absolute inset-0 z-50 flex items-center justify-center p-8 bg-[#FAF9F6]/80 dark:bg-[#000000]/80 backdrop-blur-sm">
+                    <div className="absolute inset-0 z-50 flex items-center justify-center p-8 bg-[#FFFFFF]/80 dark:bg-[#000000]/80 backdrop-blur-sm">
                         <div className="max-w-md w-full p-10 border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 rounded-[2rem] text-center flex flex-col items-center">
                             <ShieldCheck size={64} className="text-red-500 mb-6 opacity-80" />
                             <h3 className="text-2xl font-black text-[#111111] dark:text-white uppercase tracking-tighter mb-3">GEO-RESTRICTED AREA</h3>
@@ -247,9 +247,9 @@ export default function PolymarketPanel() {
                             key={m.id}
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                             onClick={() => setSelected(selected?.id === m.id ? null : m)}
-                            className={`flex gap-5 p-5 rounded-[1.5rem] border cursor-pointer transition-all ${selected?.id === m.id ? 'bg-[#FAF9F6] dark:bg-[#1A1A1A] border-[#111111]/20 dark:border-white/20 shadow-md' : 'bg-[#FFFFFF] dark:bg-[#111111] border-[#E5E5E5] dark:border-white/10 hover:border-[#111111]/10 dark:hover:border-white/20 hover:shadow-sm'}`}
+                            className={`flex gap-5 p-5 rounded-[1.5rem] border cursor-pointer transition-all ${selected?.id === m.id ? 'bg-[#FFFFFF] dark:bg-[#1A1A1A] border-[#111111]/20 dark:border-white/20 shadow-md' : 'bg-[#FFFFFF] dark:bg-[#111111] border-[#E5E5E5] dark:border-white/10 hover:border-[#111111]/10 dark:hover:border-white/20 hover:shadow-sm'}`}
                         >
-                            <div className="w-14 h-14 rounded-xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                            <div className="w-14 h-14 rounded-xl bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                                 {m.image ? <img src={m.image} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.querySelector('svg')?.setAttribute('style', 'display: block'); }} /> : null}
                                 <Banknote size={24} className="text-[#888888] dark:text-white/40 scale-110" style={{ display: m.image ? 'none' : 'block' }} />
                             </div>
@@ -312,10 +312,10 @@ export default function PolymarketPanel() {
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                             className="w-[420px] shrink-0 border-l border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#0A0A0A] flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.03)] h-full z-20"
                         >
-                            <div className="p-8 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111]">
+                            <div className="p-8 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111]">
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 overflow-hidden shrink-0 shadow-sm p-1">
-                                        <div className="w-full h-full rounded-xl overflow-hidden relative bg-[#FAF9F6] dark:bg-[#111111]">
+                                        <div className="w-full h-full rounded-xl overflow-hidden relative bg-[#FFFFFF] dark:bg-[#111111]">
                                             {selected.image ? <img src={selected.image} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.querySelector('svg')?.setAttribute('style', 'display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);'); }} /> : null}
                                             <Banknote size={24} className="text-[#888888] dark:text-white/40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ display: selected.image ? 'none' : 'block' }} />
                                         </div>
@@ -336,7 +336,7 @@ export default function PolymarketPanel() {
                             <div className="flex-1 p-8 space-y-8 overflow-y-auto">
                                 
                                 {/* ODDS IMPLICADAS REPLICA */}
-                                <div className="bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-[2rem] p-6 text-center shadow-sm">
+                                <div className="bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-[2rem] p-6 text-center shadow-sm">
                                     <div className="flex items-center justify-center gap-2 text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] dark:text-white/60 mb-6">
                                         IMPLIED ODDS
                                     </div>
@@ -421,7 +421,7 @@ export default function PolymarketPanel() {
                     )}
                 </AnimatePresence>
             </div>
-            {ts && <div className="text-[9px] font-mono font-black text-[#888888] dark:text-white/60 p-3 border-t border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] text-center uppercase tracking-widest">
+            {ts && <div className="text-[9px] font-mono font-black text-[#888888] dark:text-white/60 p-3 border-t border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] text-center uppercase tracking-widest">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00FFAA] mr-2" />
                 CTF ROUTER SYNC: {ts}
             </div>}

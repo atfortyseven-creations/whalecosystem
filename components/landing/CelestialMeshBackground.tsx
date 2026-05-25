@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 
@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
  * CelestialMeshBackground  System Wallpaper System, v2
  *
  * Layer stack:
- *   L0  Institutional ivory base (#FAF9F6)
+ *   L0  Institutional ivory base (#FFFFFF)
  *   L1  Patron Cosmico 4K  slow parallax drift, opacity 6%, multiply blend
  *   L2  Hokusai 4K  bottom-anchored, full-width, natural aspect ratio
  *   L3  Gradient vignette  top-to-bottom for typography legibility
@@ -24,7 +24,7 @@ interface CelestialMeshBackgroundProps {
 }
 
 export function CelestialMeshBackground({
-    baseColor      = '#FAF9F6',
+    baseColor      = '#FFFFFF',
     waveOpacity    = 0.9,
     patternOpacity = 0.06,
     gradientOpacity = 0.85,

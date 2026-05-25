@@ -1,4 +1,4 @@
-import { Queue } from 'bullmq';
+﻿import { Queue } from 'bullmq';
 import { createRedisClient } from '@/lib/redis/client';
 import { FORGE_ENABLED, TIER_THRESHOLDS } from '../index';
 
@@ -26,7 +26,7 @@ export class WhaleSeedProcessor {
                 removeOnComplete: true,
                 removeOnFail: false
             });
-            console.log(`[WhaleSeedProcessor]  Injected event ${eventId} ($${amountUSD}) into Cosmic Forge`);
+            console.log(`[WhaleSeedProcessor]  Injected event ${eventId} ($${amountUSD}) into Data Studio`);
         } catch (e) {
             console.error('[WhaleSeedProcessor] Failed to inject seed to queue.', e);
         }

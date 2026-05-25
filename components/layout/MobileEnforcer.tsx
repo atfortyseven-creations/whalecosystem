@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState, useRef } from 'react';
 import { MobileLanding as MobileSystemLanding } from '@/components/landing/MobileLanding';
@@ -60,7 +60,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         setMounted(true);
         window.addEventListener('resize', checkMobile);
 
-        //  [SOVEREIGN QR HANDSHAKE] Detect desktop QR URL params 
+        //  [Enterprise QR HANDSHAKE] Detect desktop QR URL params 
         // When the user scans the PC QR code with their native iOS/Android camera,
         // the browser opens /connect?uuid=UUID&pub=BASE64_PUB&ecdh=0|1&exp=TIMESTAMP.
         // We detect these params here and store them for auto-completion after
@@ -234,7 +234,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/studio',
         ];
 
-        // [SOVEREIGN-GATE] Always allow dashboard/chat/portfolio so they can reach the ZK-Gate and connect from there
+        // [Enterprise-GATE] Always allow dashboard/chat/portfolio so they can reach the ZK-Gate and connect from there
         DIRECT_ACCESS_ROUTES.push('/dashboard', '/chat', '/portfolio');
 
         const isDirectAccessRoute = DIRECT_ACCESS_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -218,7 +218,7 @@ export function NewsOfToday() {
                                                     animate={{ height: 'auto', opacity: 1 }} 
                                                     exit={{ height: 0, opacity: 0 }} 
                                                     transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }} 
-                                                    className="overflow-hidden bg-gradient-to-b from-white dark:from-[#111111] to-[#FAF9F6] dark:to-[#0A0A0A] border-t border-black/[0.04] dark:border-white/10"
+                                                    className="overflow-hidden bg-gradient-to-b from-white dark:from-[#111111] to-[#FFFFFF] dark:to-[#0A0A0A] border-t border-black/[0.04] dark:border-white/10"
                                                 >
                                                     <div className="px-6 md:px-8 py-6 md:pl-[224px] pr-6 md:pr-12 flex flex-col space-y-6">
                                                         

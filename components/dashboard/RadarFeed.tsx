@@ -1,4 +1,4 @@
-// components/dashboard/RadarFeed.tsx
+﻿// components/dashboard/RadarFeed.tsx
 "use client";
 
 import React, { useEffect } from 'react';
@@ -51,7 +51,7 @@ export default function RadarFeed() {
   }, [sseEvents, pushAlert]);
 
   return (
-    <div className="flex flex-col h-full bg-[#FAF9F6] font-mono">
+    <div className="flex flex-col h-full bg-[#FFFFFF] font-mono">
       {/*  HEADER  */}
       <div className="grid grid-cols-[100px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[8px] font-black uppercase tracking-[0.3em] text-black/40 border-b border-black/10 shrink-0 items-center">
         <span className="flex items-center gap-2">

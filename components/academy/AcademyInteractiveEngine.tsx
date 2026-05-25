@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
@@ -126,7 +126,7 @@ export function AcademyInteractiveEngine({
                         {isSyncing ? "SYNCING..." : `SYNC ${expectedCategories} CATEGORIES`}
                     </button>
                 ) : (
-                    <div className="px-8 py-4 bg-slate-50 text-slate-500 font-mono text-xs uppercase tracking-widest rounded-xl">
+                    <div className="px-8 py-4 bg-black/5 text-slate-500 font-mono text-xs uppercase tracking-widest rounded-xl">
                         Access Denied: Insufficient Permissions
                     </div>
                 )}
@@ -152,7 +152,7 @@ export function AcademyInteractiveEngine({
                                 <button
                                     key={course.id}
                                     onClick={() => setSelectedCourseSlug(course.slug)}
-                                    className="p-6 border border-slate-200/60 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-left group relative overflow-hidden rounded-2xl"
+                                    className="p-6 border border-slate-200/60 bg-black/5 hover:bg-slate-100 hover:border-slate-300 transition-all text-left group relative overflow-hidden rounded-2xl"
                                 >
                                     <div className="absolute inset-x-0 bottom-0 h-1 bg-slate-200">
                                         <div className="h-full bg-slate-900 transition-all duration-1000" style={{ width: `${progressPct}%` }} />
@@ -188,7 +188,7 @@ export function AcademyInteractiveEngine({
                             const submission = submissions[lesson.id];
 
                             return (
-                                <div key={lesson.id} className={`border rounded-2xl transition-all duration-300 overflow-hidden ${isExpanded ? 'border-slate-300 bg-white shadow-xl' : 'border-slate-200/60 bg-slate-50 hover:bg-slate-100'}`}>
+                                <div key={lesson.id} className={`border rounded-2xl transition-all duration-300 overflow-hidden ${isExpanded ? 'border-slate-300 bg-white shadow-xl' : 'border-slate-200/60 bg-black/5 hover:bg-slate-100'}`}>
                                     <button 
                                         onClick={() => setExpandedLessonId(isExpanded ? null : lesson.id)}
                                         className="w-full text-left p-6 flex justify-between items-center outline-none gap-4"
@@ -210,7 +210,7 @@ export function AcademyInteractiveEngine({
                                         {isExpanded && (
                                             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
                                                 <div className="p-6 md:p-8 pt-0 border-t border-slate-100 flex flex-col items-center justify-center bg-white">
-                                                    <div className="w-full max-w-3xl border border-slate-200/60 bg-slate-50 rounded-xl p-8 relative">
+                                                    <div className="w-full max-w-3xl border border-slate-200/60 bg-black/5 rounded-xl p-8 relative">
                                                         {address?.toLowerCase() === '0x78831c25c86ea2a78a6127fc2ccb95e612d87b4a' ? (
                                                             <div className="flex flex-col gap-4">
                                                                 <h5 className="font-mono text-[12px] uppercase font-bold tracking-widest border-b border-slate-200/60 pb-4 mb-2 text-slate-900 text-center">

@@ -1,4 +1,4 @@
-# HUMANITY LEDGER: SOVEREIGN ARCHITECTURE WHITEPAPER
+﻿# HUMANITY LEDGER: Enterprise ARCHITECTURE WHITEPAPER
 ## The Institutional Standard for Zero-Trust On-Chain Analytics
 **Version:** 3.0.0 (Pre-Seed CDTI/ENISA Draft)
 **Classification:** PUBLIC (RESTRICTED DISTRIBUTION)

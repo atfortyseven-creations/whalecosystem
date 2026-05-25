@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ApplicationForm } from '@/components/careers/ApplicationForm';
@@ -37,7 +37,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ i
           <nav className="mb-10 sm:mb-16">
             <Link 
               href="/careers" 
-              className="inline-flex px-5 py-2.5 bg-slate-50 border border-slate-200/60 rounded-full font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
+              className="inline-flex px-5 py-2.5 bg-black/5 border border-slate-200/60 rounded-full font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
             >
               Return to Positions
             </Link>
@@ -46,7 +46,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ i
           {/* Role Header */}
           <header className="flex flex-col text-left mb-12 sm:mb-16 border-b border-slate-200/60 pb-12">
             <div className="flex flex-wrap items-center gap-3 mb-6">
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-slate-500">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full border border-slate-200 bg-black/5 text-slate-500">
                 {role.department}
               </span>
               {role.badge && (
@@ -119,7 +119,7 @@ export default async function CareerDetailPage({ params }: { params: Promise<{ i
               <h2 className="text-[28px] sm:text-[36px] font-black tracking-tight text-slate-900 mb-3">Apply for this Position</h2>
               <p className="text-[15px] text-slate-500">Submit your application below.</p>
             </div>
-            <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-6 sm:p-10">
+            <div className="bg-black/5 border border-slate-200/60 rounded-3xl p-6 sm:p-10">
               <ApplicationForm role={role.title} />
             </div>
           </section>

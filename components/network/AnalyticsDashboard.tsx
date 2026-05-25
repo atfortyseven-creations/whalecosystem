@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useMotionValue, animate, useSpring } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
@@ -106,7 +106,7 @@ function LivePriceTicker() {
         <div className="flex flex-wrap items-center gap-2">
             {items.map(item => (
                 <motion.div key={item.label}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-100 bg-slate-50"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-100 bg-black/5"
                     whileHover={{ scale: 1.05 }}>
                     <span className="text-indigo-600">{item.icon}</span>
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{item.label}</span>
@@ -197,7 +197,7 @@ export function AnalyticsDashboard() {
                                 Advanced on-chain telemetry and global capital migration. Dynamic monitoring of protocol health, liquidation vectors, and institutional positioning.
                             </p>
                             <div className="flex flex-col md:flex-row md:items-center gap-6">
-                                <div className="flex items-center gap-4 px-6 py-3 rounded-[1.5rem] border border-slate-100 bg-slate-50">
+                                <div className="flex items-center gap-4 px-6 py-3 rounded-[1.5rem] border border-slate-100 bg-black/5">
                                     <div className="w-2.5 h-2.5 rounded-full" style={{ background: statusColor, boxShadow: `0 0 12px ${statusColor}40` }} />
                                     <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: statusColor }}>
                                         State: {networkStatus}

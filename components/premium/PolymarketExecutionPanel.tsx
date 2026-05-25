@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -87,7 +87,7 @@ export function PolymarketExecutionPanel({ symbol, probability, direction, marke
                             initial={{ scale: 0.95, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.95, y: 20 }}
-                            className="bg-[#FAF9F6] border border-[#E5E5E5] w-full max-w-md rounded-[2rem] p-8 shadow-2xl relative"
+                            className="bg-[#FFFFFF] border border-[#E5E5E5] w-full max-w-md rounded-[2rem] p-8 shadow-2xl relative"
                         >
                             <button 
                                 onClick={() => { setIsModalOpen(false); setTxHash(null); }}

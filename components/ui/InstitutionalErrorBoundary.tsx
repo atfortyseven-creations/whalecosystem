@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { ShieldAlert, RefreshCw } from 'lucide-react';
@@ -63,7 +63,7 @@ export class InstitutionalErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="w-full h-full min-h-0 overflow-hidden flex flex-col items-center justify-center p-8 bg-[#FAF9F6] border-2 border-dashed border-black/10 rounded-2xl">
+        <div className="w-full h-full min-h-0 overflow-hidden flex flex-col items-center justify-center p-8 bg-[#FFFFFF] border-2 border-dashed border-black/10 rounded-2xl">
           <div className="relative mb-6">
             <div className="absolute inset-0 bg-[#FF3B30]/10 blur-2xl rounded-full" />
             <div className="relative p-4 bg-white border border-[#FF3B30]/30 rounded-full">

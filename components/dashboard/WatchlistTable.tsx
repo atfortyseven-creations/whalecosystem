@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -140,7 +140,7 @@ export function WatchlistTable() {
         <div className="flex flex-col w-full flex-1 min-h-0 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-2xl border border-[#E5E5E5] dark:border-white/10 shadow-sm overflow-hidden">
 
             {/*  Toolbar  */}
-            <div className="px-4 py-3 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] flex items-center gap-4 flex-wrap">
+            <div className="px-4 py-3 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] flex items-center gap-4 flex-wrap">
                 {/* View toggle */}
                 <div className="flex bg-[#F0F0F0] dark:bg-[#1A1A1A] p-1 rounded-xl border border-[#E5E5E5] dark:border-white/10">
                     {(['TOKENS', 'WALLETS'] as const).map(v => (
@@ -168,7 +168,7 @@ export function WatchlistTable() {
             {view === 'TOKENS' && (
                 <div className="flex-1 overflow-auto flex flex-col min-h-0">
                     <div className="min-w-[1200px] flex flex-col h-full">
-                        <div className="sticky top-0 z-10 grid bg-[#FAF9F6] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.18em]"
+                        <div className="sticky top-0 z-10 grid bg-[#FFFFFF] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.18em]"
                             style={{ gridTemplateColumns: '2.5fr 1.5fr 1fr 1fr 1.2fr 1fr 1fr 1fr 0.8fr' }}>
                             {['Token', 'Current Price', '24h Chg', 'Entry Price', 'ROI', 'MCap', 'Vol 24h', 'Top-10 Hold.', ''].map((h, i) => (
                                 <div key={i} className={`px-3 py-2.5 ${i >= 2 ? 'text-right' : ''}`}>{h}</div>
@@ -207,7 +207,7 @@ export function WatchlistTable() {
 
                                                 return (
                                                     <div style={style} className="border-b border-[#F0F0F0] dark:border-white/5">
-                                                        <div className="grid hover:bg-[#FAF9F6] dark:hover:bg-white/5 transition-colors items-center h-full"
+                                                        <div className="grid hover:bg-[#FFFFFF] dark:hover:bg-white/5 transition-colors items-center h-full"
                                                             style={{ gridTemplateColumns: '2.5fr 1.5fr 1fr 1fr 1.2fr 1fr 1fr 1fr 0.8fr' }}>
                                                             {/* Token */}
                                                             <div className="px-3 flex items-center gap-2.5">
@@ -286,7 +286,7 @@ export function WatchlistTable() {
             {view === 'WALLETS' && (
                 <div className="flex-1 overflow-auto flex flex-col min-h-0">
                     <div className="min-w-[1200px] flex flex-col h-full">
-                        <div className="sticky top-0 z-10 grid bg-[#FAF9F6] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.18em]"
+                        <div className="sticky top-0 z-10 grid bg-[#FFFFFF] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.18em]"
                             style={{ gridTemplateColumns: '2.2fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr 0.8fr' }}>
                             {['Entity', 'Address', 'Net Worth', 'PnL 30d', 'Win Rate', 'DEX Ratio', 'Alpha Score', 'Last Active', ''].map((h, i) => (
                                 <div key={i} className={`px-3 py-2.5 ${i >= 2 ? 'text-right' : ''}`}>{h}</div>
@@ -330,7 +330,7 @@ export function WatchlistTable() {
 
                                                 return (
                                                     <div style={style} className="border-b border-[#F0F0F0] dark:border-white/5">
-                                                        <div className="grid hover:bg-[#FAF9F6] dark:hover:bg-white/5 transition-colors items-center h-full"
+                                                        <div className="grid hover:bg-[#FFFFFF] dark:hover:bg-white/5 transition-colors items-center h-full"
                                                             style={{ gridTemplateColumns: '2.2fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr 0.8fr' }}>
                                                             {/* Entity */}
                                                             <div className="px-3 flex items-center gap-2">
@@ -406,7 +406,7 @@ export function WatchlistTable() {
             )}
 
             {/*  Footer  */}
-            <div className="px-6 py-4 border-t border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] rounded-b-2xl flex items-center justify-between text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-widest">
+            <div className="px-6 py-4 border-t border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] rounded-b-2xl flex items-center justify-between text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-widest">
                 <span>{view === 'TOKENS' ? tokensFiltered.length : walletsFiltered.length} items · Enriched with live on-chain market data</span>
             </div>
         </div>

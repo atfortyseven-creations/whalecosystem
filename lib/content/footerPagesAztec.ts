@@ -1,4 +1,4 @@
-import type { AztecDocSection } from '@/components/landing/AztecDocPage';
+﻿import type { AztecDocSection } from '@/components/landing/AztecDocPage';
 
 // ─── WHITEPAPER ───────────────────────────────────────────────────────────────
 
@@ -343,7 +343,7 @@ export const SECURITY_SECTIONS: AztecDocSection[] = [
     title: 'Key Management',
     paragraphs: [
       'User private keys are generated, stored, and used exclusively on the user device. The protocol does not provide a key custody service. Users are responsible for maintaining secure backups of their key material.',
-      'For devices supporting hardware security modules — including iOS Secure Enclave and Android StrongBox — the Humanity Ledger client uses hardware-backed key storage. In this configuration, the private key is non-extractable: it cannot be read from the device even by the application itself. All signing operations are performed inside the secure hardware element.',
+      'For devices supporting hardware security modules — including iOS Wallet and Android StrongBox — the Humanity Ledger client uses hardware-backed key storage. In this configuration, the private key is non-extractable: it cannot be read from the device even by the application itself. All signing operations are performed inside the secure hardware element.',
       'For institutional users requiring multi-party key management, the protocol supports threshold signatures proven inside a Noir circuit. M-of-N signers are required to authorize a transaction, with the proof confirming that the threshold was met without revealing the total number of signers or their individual identities.',
     ],
   },

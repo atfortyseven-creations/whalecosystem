@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -189,7 +189,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
     });
   };
 
-  const bg     = 'bg-[#FAFAF8]';
+  const bg     = 'bg-[#FFFFFF]';
   const border  = 'border-black/10';
   const tabTextInactive = 'text-black/30 hover:text-black/70';
   const tabTextActive   = 'text-black border-b-2 border-black font-black';

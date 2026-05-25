@@ -1,4 +1,4 @@
-export const ARCHITECTURAL_MANIFESTO = `This document constitutes the complete technical specification, architectural narrative, historical context, and operational manual for the Whale Alert Network  a system-grade, real-time blockchain analytics system designed, engineered, and deployed entirely by one person. Every architectural decision documented herein was made independently, every system component was built from first principles, and every production failure was identified and resolved without external engineering support.
+﻿export const ARCHITECTURAL_MANIFESTO = `This document constitutes the complete technical specification, architectural narrative, historical context, and operational manual for the Whale Alert Network  a system-grade, real-time blockchain analytics system designed, engineered, and deployed entirely by one person. Every architectural decision documented herein was made independently, every system component was built from first principles, and every production failure was identified and resolved without external engineering support.
 
 The work described in this document represents an intellectual undertaking of considerable depth. The developer responsible for its construction operated simultaneously as systems architect, full-stack engineer, blockchain protocol specialist, DevOps operator, security auditor, UX designer, and product strategist. The resulting system is not a prototype or a proof of concept. It is production infrastructure that ingests live blockchain data, processes it through multiple analytical layers, surfaces it through a high-performance web interface, and delivers it to users with sub-15-millisecond latency.
 
@@ -372,7 +372,7 @@ The most sophisticated property of the Whale Alert Network's architecture is its
 
 1. The System Acoustic Terminal (PC/Web) The desktop interface functions as an immaculate, read-only analytics engine. It processes the high-frequency System Mesh data streams  rendering complex Neo4j relationship graphs, performing 60FPS DOM windowing, and executing client-side Z-score mathematical models  strictly within an ephemeral memory layer. Crucially, the PC Terminal is a Zero-Trust Zone: it operates without custody of private key material. It generates unsigned transaction payloads (Requests) and visualizes macroeconomic analytics, offloading all execution risk.
 
-2. The Cryptographic Enclave (Mobile iOS/Android) To execute actions (sign transactions, mint credentials, update profiles), the user must bridge their mobile device using the Reown Relay multiplexing protocol via QR handshake. The mobile device acts as a hardware-secured, network-isolated enclave. When the PC Terminal requires a cryptographic signature, the transmission payload is pushed to the mobile device. The mobile OS's secure enclave prompts biometric authorization (FaceID/TouchID), signs the payload via EIP-712 standard, and returns the signed execution hash to the PC Terminal.
+2. The Cryptographic Enclave (Mobile iOS/Android) To execute actions (sign transactions, mint credentials, update profiles), the user must bridge their mobile device using the Reown Relay multiplexing protocol via QR handshake. The mobile device acts as a hardware-secured, network-isolated enclave. When the PC Terminal requires a cryptographic signature, the transmission payload is pushed to the mobile device. The mobile OS's Wallet prompts biometric authorization (FaceID/TouchID), signs the payload via EIP-712 standard, and returns the signed execution hash to the PC Terminal.
 
 This symbiotic segregation guarantees that even if the PC Terminal DOM were hypothetically compromised by a malicious browser extension, the attacker's execution capability remains exactly zero. It is a paradigm designed not just to emulate institutional security, but to surpass it structurally.
 
@@ -427,7 +427,7 @@ Live data updates use Server-Sent Events rather than WebSocket connections. SSE 
 The visual design system of the Whale Alert Network is governed by a three-colour institutional palette:
 
 Token	Hex Value	Purpose
-Ivory	#FAF9F6	Base background, evokes archival documents and institutional stationery
+Ivory	#FFFFFF	Base background, evokes archival documents and institutional stationery
 Ink	#050505	Primary text and interactive foreground elements
 Teal	#00F2EA	Signal accent for data visualisation and active state indicators
 This palette was selected for its combination of historical gravitas  the ivory and ink pairing evokes financial instruments and institutional documents  and technological precision  the signal teal is distinctive, memorable, and highly legible against both ivory and ink backgrounds.
@@ -440,7 +440,7 @@ Monospace text  used for addresses, hashes, transaction values, and technical me
 20. The Wallpaper System
 The wallpaper system composes four layers rendered behind all page content:
 
-Base layer: Solid colour fill #FAF9F6, which appears anywhere the upper layers are transparent.
+Base layer: Solid colour fill #FFFFFF, which appears anywhere the upper layers are transparent.
 Pattern layer: The patron-cosmico-4k image as a repeating CSS background on a Framer Motion motion.div, animated with a 32-second mirror-loop drift.
 Wave layer: The Hokusai Great Wave PNG anchored to the bottom with position: absolute; bottom: 0; left: 0; width: 100%; height: auto. The height: auto parameter is critical  it allows the image to scale horizontally while preserving the native aspect ratio without distortion.
 Vignette layer: A gradient that fades from the solid base colour through transparent over the top 35 percent and back over the bottom 15 percent, ensuring text contrast at all vertical positions.

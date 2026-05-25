@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -189,7 +189,7 @@ export function SmartMoneyTracker() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="px-8 py-4 hover:bg-stone-50/50 transition-colors"
+                  className="px-8 py-4 hover:bg-black/5/50 transition-colors"
                 >
                   <div className="flex justify-between items-center sm:hidden mb-2">
                     <span className="text-[10px] text-stone-400">{ev.age < 60 ? `Hace ${ev.age}s` : `Hace ${Math.floor(ev.age / 60)}m`}</span>

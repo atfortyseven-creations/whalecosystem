@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -60,7 +60,7 @@ export default function ActivityFeedPanel() {
           { label: "Whale Alert Networks", value: "2,140", color: "#FF3B30" },
           { label: "Avg Tx Size", value: "$462K", color: "#D4AF37" },
         ].map((s, i) => (
-          <div key={i} className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl p-6 flex flex-col items-center justify-center shadow-sm">
+          <div key={i} className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl p-6 flex flex-col items-center justify-center shadow-sm">
             <span className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] mb-1">{s.label}</span>
             <span className="text-2xl font-black font-mono tracking-tighter" style={{ color: s.color }}>{s.value}</span>
           </div>
@@ -68,7 +68,7 @@ export default function ActivityFeedPanel() {
       </div>
 
       {/*  Controls  */}
-      <div className="border border-[#E5E5E5] bg-[#FAF9F6] rounded-xl p-4 flex flex-wrap items-center gap-3 shadow-sm">
+      <div className="border border-[#E5E5E5] bg-[#FFFFFF] rounded-xl p-4 flex flex-wrap items-center gap-3 shadow-sm">
         <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
@@ -91,7 +91,7 @@ export default function ActivityFeedPanel() {
       </div>
 
       {/*  Activity Feed Table  */}
-      <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl shadow-sm overflow-hidden">
         <div className="grid grid-cols-6 gap-4 p-5 border-b border-[#E5E5E5] bg-[#E5E5E5]/30 text-[10px] font-mono font-bold tracking-widest text-[#888888] uppercase">
           <span className="flex items-center gap-1.5"><Clock size={10} /> TIME</span>
           <span>CHAIN</span>

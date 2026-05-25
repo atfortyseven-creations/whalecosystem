@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,7 +66,7 @@ export function GlobalSettingsModal() {
                              </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto relative bg-[#FAF9F6] dark:bg-[#0A0A0A]">
+                        <div className="flex-1 overflow-y-auto relative bg-[#FFFFFF] dark:bg-[#0A0A0A]">
                              {/* Render the full comprehensive Terminal Settings Panel perfectly inside the modal */}
                              <TerminalSettingsPanel />
                         </div>

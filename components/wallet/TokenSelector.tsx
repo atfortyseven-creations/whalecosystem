@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+﻿import { useState, useEffect, useMemo, useRef } from "react";
 import { Search, ChevronDown, Check, Loader2, Shield } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBalance } from "wagmi";
@@ -195,7 +195,7 @@ export function TokenSelector({
                                     placeholder="Search name or paste address..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-[#FAF9F6] border border-black/5 rounded-lg py-2 pl-9 pr-3 text-xs text-[#050505] outline-none focus:border-black/30 transition-all font-medium placeholder:text-black/30"
+                                    className="w-full bg-[#FFFFFF] border border-black/5 rounded-lg py-2 pl-9 pr-3 text-xs text-[#050505] outline-none focus:border-black/30 transition-all font-medium placeholder:text-black/30"
                                 />
                             </div>
                         </div>

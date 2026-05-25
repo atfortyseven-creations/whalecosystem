@@ -1,8 +1,8 @@
-import crypto from 'crypto';
+﻿import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 
 // 
-// SOVEREIGN AUDIT TRAIL  Immutable Cryptographic Event Log
+// Enterprise AUDIT TRAIL  Immutable Cryptographic Event Log
 // Every entry is HMAC-signed and chained to the previous entry (hash chain).
 // The PostgreSQL table uses INSERT-ONLY triggers  no UPDATE or DELETE allowed.
 // Compatible with ENISA audit requirements and eIDAS 2.0 non-repudiation.

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
@@ -64,7 +64,7 @@ function MacroMetricsCard() {
             {loading ? (
                 <div className="space-y-2 animate-pulse">
                     <div className="h-8 bg-[#E5E5E5] rounded w-3/4" />
-                    <div className="h-4 bg-[#FAF9F6] rounded w-1/2" />
+                    <div className="h-4 bg-[#FFFFFF] rounded w-1/2" />
                 </div>
             ) : (
                 <>
@@ -79,7 +79,7 @@ function MacroMetricsCard() {
                             <p className="text-[8px] font-black text-[#555] uppercase tracking-[0.2em] mb-2">Alpha Targets (Top Peers)</p>
                             <div className="flex gap-2 flex-wrap">
                                 {stats.topPairs.slice(0, 3).map((p: any) => (
-                                    <span key={p.symbol} className="text-[9px] font-mono font-bold bg-[#FAF9F6] border border-[#E5E5E5] px-2 py-0.5 rounded text-[#050505]">
+                                    <span key={p.symbol} className="text-[9px] font-mono font-bold bg-[#FFFFFF] border border-[#E5E5E5] px-2 py-0.5 rounded text-[#050505]">
                                         {p.symbol}
                                     </span>
                                 ))}
@@ -131,7 +131,7 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
 
     return (
         <tr 
-            className={`border-b border-[#E5E5E5] bg-white hover:bg-[#FAF9F6] cursor-pointer transition-colors group relative`}
+            className={`border-b border-[#E5E5E5] bg-white hover:bg-[#FFFFFF] cursor-pointer transition-colors group relative`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -139,7 +139,7 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
                 <div className="flex items-center gap-3">
                     <span className="w-1.5 h-1.5 rounded-full" style={{ background: isBull ? '#00C076' : '#FF3B30' }} />
                     <span className="text-sm font-black text-[#050505] tracking-tight group-hover:text-[#888888] transition-colors">{symbol}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FAF9F6] border border-[#E5E5E5] text-[#888888] font-bold uppercase tracking-[0.2em]">PERP</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FFFFFF] border border-[#E5E5E5] text-[#888888] font-bold uppercase tracking-[0.2em]">PERP</span>
                 </div>
             </td>
             <td className="py-5 px-6 font-mono text-sm text-[#050505] font-bold privacy-sensitive">
@@ -159,7 +159,7 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
             </td>
             <td className="py-5 px-6">
                 <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#FAF9F6] border border-[#E5E5E5] ${isBull ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
+                    <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#FFFFFF] border border-[#E5E5E5] ${isBull ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
                         {vigorPercent.toFixed(0)}%
                     </span>
                     <span className="text-[9px] text-[#888888] uppercase tracking-[0.2em]">
@@ -181,7 +181,7 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
                 </div>
             </td>
             <td className="py-5 px-6 text-right">
-                <button className="opacity-0 group-hover:opacity-100 px-5 py-2 rounded-lg bg-[#050505] text-[#FAF9F6] text-[9px] font-black uppercase tracking-[0.2em] transition-all">
+                <button className="opacity-0 group-hover:opacity-100 px-5 py-2 rounded-lg bg-[#050505] text-[#FFFFFF] text-[9px] font-black uppercase tracking-[0.2em] transition-all">
                     Execute
                 </button>
             </td>
@@ -242,7 +242,7 @@ export function PremiumGridStack() {
                         {/*  Card: Live Portfolio  */}
                         {card.id === 'live-portfolio' && (
                             <div className="bg-white border border-[#E5E5E5] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all rounded-xl relative overflow-hidden group h-full">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-[#FAF9F6] to-transparent pointer-events-none opacity-50" />
+                                <div className="absolute inset-0 bg-gradient-to-tr from-[#FFFFFF] to-transparent pointer-events-none opacity-50" />
                                 <div className="flex justify-between items-start mb-4 relative z-10">
                                     <p className="text-[9px] font-black text-[#555] uppercase tracking-[0.2em]">Live Portfolio</p>
                                     {isConnected ? (
@@ -256,7 +256,7 @@ export function PremiumGridStack() {
                                         {settings?.showBalances === false ? '****' : (isConnected && balance ? `${Number(balance.formatted).toFixed(4)} ${balance.symbol}` : '---')}
                                     </h2>
                                     <p className="text-[10px] font-mono text-[#888888] uppercase tracking-widest mt-2 flex items-center gap-2">
-                                        Wallet: <span className="text-[#050505] bg-[#FAF9F6] border border-[#E5E5E5] px-2 py-0.5 rounded font-black privacy-sensitive">{isConnected && address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
+                                        Wallet: <span className="text-[#050505] bg-[#FFFFFF] border border-[#E5E5E5] px-2 py-0.5 rounded font-black privacy-sensitive">{isConnected && address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
                                     </p>
                                 </div>
                             </div>
@@ -293,7 +293,7 @@ export function PremiumGridStack() {
 
             {/*  TERMINAL CONTROLS & TABLE SPLIT  */}
             <div className="flex-1 min-h-0 flex flex-col bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden">
-                <div className="shrink-0 flex items-center justify-between border-b-2 border-[#E5E5E5] p-4 bg-[#FAF9F6]">
+                <div className="shrink-0 flex items-center justify-between border-b-2 border-[#E5E5E5] p-4 bg-[#FFFFFF]">
                 <div className="flex items-center gap-6">
                     <h3 className="text-2xl font-serif font-black tracking-tight text-[#050505] uppercase drop-shadow-sm">
                         Terminal Feed
@@ -301,13 +301,13 @@ export function PremiumGridStack() {
                     <div className="flex gap-2">
                         <button 
                             onClick={() => setSelectedCategory('MAJOR')}
-                            className={`px-5 py-2 text-[9px] font-black uppercase tracking-[0.2em] transition-all rounded-lg ${selectedCategory === 'MAJOR' ? 'bg-[#050505] text-[#FAF9F6] shadow-md' : 'text-[#888888] hover:text-[#050505] hover:bg-black/5'}`}
+                            className={`px-5 py-2 text-[9px] font-black uppercase tracking-[0.2em] transition-all rounded-lg ${selectedCategory === 'MAJOR' ? 'bg-[#050505] text-[#FFFFFF] shadow-md' : 'text-[#888888] hover:text-[#050505] hover:bg-black/5'}`}
                         >
                             Majors
                         </button>
                         <button 
                             onClick={() => setSelectedCategory('ALT')}
-                            className={`px-5 py-2 text-[9px] font-black uppercase tracking-[0.2em] transition-all rounded-lg ${selectedCategory === 'ALT' ? 'bg-[#050505] text-[#FAF9F6] shadow-md' : 'text-[#888888] hover:text-[#050505] hover:bg-black/5'}`}
+                            className={`px-5 py-2 text-[9px] font-black uppercase tracking-[0.2em] transition-all rounded-lg ${selectedCategory === 'ALT' ? 'bg-[#050505] text-[#FFFFFF] shadow-md' : 'text-[#888888] hover:text-[#050505] hover:bg-black/5'}`}
                         >
                             Altcoins
                         </button>
@@ -349,7 +349,7 @@ export function PremiumGridStack() {
                 {/*  MASTER TABLE  */}
                 <div className="flex-1 min-h-0 overflow-y-auto msv-hide-scrollbar">
                     <table className="w-full text-left border-collapse">
-                        <thead className="bg-[#FAF9F6] border-b-2 border-[#E5E5E5] sticky top-0 z-20">
+                        <thead className="bg-[#FFFFFF] border-b-2 border-[#E5E5E5] sticky top-0 z-20">
                             <tr>
                                 <th className="py-4 px-6 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Asset Index</th>
                                 <th className="py-4 px-6 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Last Market Price</th>

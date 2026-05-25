@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'framer-motion';
 import { Dna, Fingerprint, Activity, Code, Music } from 'lucide-react';
 
@@ -29,7 +29,7 @@ export function EntityCard({ entity }: { entity: any }) {
       className="group relative bg-white border border-black/10 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
     >
       {/* Visual Canvas Base */}
-      <div className="relative w-full h-40 bg-[#FAF9F6] overflow-hidden flex items-center justify-center border-b border-black/5">
+      <div className="relative w-full h-40 bg-[#FFFFFF] overflow-hidden flex items-center justify-center border-b border-black/5">
          {isArt && (
             <div className="absolute inset-0 opacity-40 mix-blend-multiply" style={{
                 background: `radial-gradient(circle at center, ${primaryColor} 0%, transparent 70%)`
@@ -78,7 +78,7 @@ export function EntityCard({ entity }: { entity: any }) {
         </div>
 
         {/* Action */}
-        <button className="w-full mt-2 py-3 rounded-xl bg-[#FAF9F6] border border-black/10 text-[10px] font-black uppercase tracking-widest text-[#050505] hover:bg-[#050505] hover:text-white transition-colors group/btn flex items-center justify-center gap-2">
+        <button className="w-full mt-2 py-3 rounded-xl bg-[#FFFFFF] border border-black/10 text-[10px] font-black uppercase tracking-widest text-[#050505] hover:bg-[#050505] hover:text-white transition-colors group/btn flex items-center justify-center gap-2">
            <Activity size={12} className="opacity-50 group-hover/btn:opacity-100" />
            Invoke in Vault
         </button>

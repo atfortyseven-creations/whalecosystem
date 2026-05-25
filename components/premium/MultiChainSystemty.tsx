@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
@@ -6,7 +6,7 @@ import { Network, Activity, ShieldCheck, Zap, Globe, Layers, Cpu } from 'lucide-
 
 interface ChainData {
     name: string;
-    type: 'L1' | 'L2' | 'L3' | 'MODULAR' | 'SOVEREIGN';
+    type: 'L1' | 'L2' | 'L3' | 'MODULAR' | 'Enterprise';
     status: 'OPTIMAL' | 'CONGESTED' | 'MAINTENANCE';
     tps: number;
     gas: string;
@@ -36,15 +36,15 @@ const CHAINS: ChainData[] = [
     { name: 'Fantom', type: 'L1', status: 'OPTIMAL', tps: 22.8, gas: '20 gwei', tvl: '$320M' },
     { name: 'Stellar', type: 'L1', status: 'OPTIMAL', tps: 950, gas: '0.0001 XLM', tvl: '$150M' },
     { name: 'Algorand', type: 'L1', status: 'OPTIMAL', tps: 1200, gas: '0.001 ALGO', tvl: '$180M' },
-    { name: 'Monad', type: 'SOVEREIGN', status: 'OPTIMAL', tps: 10000, gas: 'LOW', tvl: '$0M' },
-    { name: 'Berachain', type: 'SOVEREIGN', status: 'OPTIMAL', tps: 45.2, gas: 'HIGH', tvl: '$0M' },
+    { name: 'Monad', type: 'Enterprise', status: 'OPTIMAL', tps: 10000, gas: 'LOW', tvl: '$0M' },
+    { name: 'Berachain', type: 'Enterprise', status: 'OPTIMAL', tps: 45.2, gas: 'HIGH', tvl: '$0M' },
     { name: 'Linea', type: 'L2', status: 'OPTIMAL', tps: 12.1, gas: '0.4 gwei', tvl: '$450M' },
     { name: 'Scroll', type: 'L2', status: 'OPTIMAL', tps: 8.4, gas: '0.3 gwei', tvl: '$310M' },
     { name: 'Mantle', type: 'L2', status: 'OPTIMAL', tps: 15.6, gas: '0.2 gwei', tvl: '$240M' },
     { name: 'Blast', type: 'L2', status: 'OPTIMAL', tps: 10.2, gas: '0.1 gwei', tvl: '$1.8B' },
     { name: 'Polygon zkEVM', type: 'L2', status: 'OPTIMAL', tps: 5.4, gas: '0.1 gwei', tvl: '$140M' },
-    { name: 'MegaETH', type: 'SOVEREIGN', status: 'OPTIMAL', tps: 100000, gas: 'TRACE', tvl: '$0M' },
-    { name: 'Hyperliquid', type: 'SOVEREIGN', status: 'OPTIMAL', tps: 8500, gas: '0.01 HYPE', tvl: '$450M' },
+    { name: 'MegaETH', type: 'Enterprise', status: 'OPTIMAL', tps: 100000, gas: 'TRACE', tvl: '$0M' },
+    { name: 'Hyperliquid', type: 'Enterprise', status: 'OPTIMAL', tps: 8500, gas: '0.01 HYPE', tvl: '$450M' },
     { name: 'Starknet L3', type: 'L3', status: 'OPTIMAL', tps: 120.4, gas: 'LOW', tvl: '$12M' },
     { name: 'Base L3', type: 'L3', status: 'OPTIMAL', tps: 85.2, gas: 'LOW', tvl: '$8M' },
 ];
@@ -139,7 +139,7 @@ export function MultiChainSystemty() {
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Modular Stack Peak</span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 italic">
+                    <div className="flex items-center gap-2 bg-black/5 px-4 py-2 rounded-xl border border-slate-100 italic">
                         <Cpu size={12} className="text-slate-400" />
                         <span className="text-[10px] font-black text-slate-950 uppercase tracking-tighter">Throughput Optimized: 1.2M e/s</span>
                     </div>

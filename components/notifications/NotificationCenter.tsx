@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -85,7 +85,7 @@ export default function NotificationCenter() {
                             className="absolute right-0 mt-4 w-80 md:w-96 bg-white rounded-3xl shadow-2xl border border-[#1F1F1F]/5 z-50 overflow-hidden"
                         >
                             {/* Header */}
-                            <div className="p-4 border-b border-[#1F1F1F]/5 flex justify-between items-center bg-[#FAFAF8]">
+                            <div className="p-4 border-b border-[#1F1F1F]/5 flex justify-between items-center bg-[#FFFFFF]">
                                 <h3 className="font-bold text-[#1F1F1F]">Notifications</h3>
                                 <div className="text-xs text-[#1F1F1F]/40 font-mono">
                                     {unreadCount} unread
@@ -108,7 +108,7 @@ export default function NotificationCenter() {
                                     notifications.map((n: any) => (
                                         <div 
                                             key={n.id} 
-                                            className={`p-4 border-b border-[#1F1F1F]/5 hover:bg-[#FAF9F6] transition-colors relative group ${!n.read ? 'bg-blue-50/30' : ''}`}
+                                            className={`p-4 border-b border-[#1F1F1F]/5 hover:bg-[#FFFFFF] transition-colors relative group ${!n.read ? 'bg-blue-50/30' : ''}`}
                                         >
                                             <div className="flex gap-3">
                                                 <div className={`mt-1 w-8 h-8 rounded-full bg-white border border-[#1F1F1F]/5 flex items-center justify-center shadow-sm shrink-0`}>
@@ -139,7 +139,7 @@ export default function NotificationCenter() {
                             </div>
 
                             {/* Footer */}
-                            <div className="p-3 bg-[#FAFAF8] border-t border-[#1F1F1F]/5 text-center">
+                            <div className="p-3 bg-[#FFFFFF] border-t border-[#1F1F1F]/5 text-center">
                                 <button 
                                     onClick={markAllRead}
                                     disabled={unreadCount === 0}

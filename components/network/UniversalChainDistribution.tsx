@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -38,7 +38,7 @@ export function UniversalChainDistribution({ theme = 'default' }: { theme?: 'def
             <div className="relative z-10">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                     <div className="flex items-center gap-6">
-                        <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center shadow-sm ${isArctic ? 'bg-indigo-50 border-indigo-100' : 'bg-slate-50 border-slate-100'}`}>
+                        <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center shadow-sm ${isArctic ? 'bg-indigo-50 border-indigo-100' : 'bg-black/5 border-slate-100'}`}>
                             <Globe size={24} className="text-indigo-600" />
                         </div>
                         <div>
@@ -48,7 +48,7 @@ export function UniversalChainDistribution({ theme = 'default' }: { theme?: 'def
                     </div>
                     
                     <div className="flex items-center gap-4">
-                        <div className={`px-5 py-3 rounded-2xl border flex items-center gap-3 ${isArctic ? 'bg-white/80 border-slate-200' : 'bg-slate-50 border-slate-100'}`}>
+                        <div className={`px-5 py-3 rounded-2xl border flex items-center gap-3 ${isArctic ? 'bg-white/80 border-slate-200' : 'bg-black/5 border-slate-100'}`}>
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                             <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">33 Nodes Synchronized</span>
                         </div>
@@ -68,7 +68,7 @@ export function UniversalChainDistribution({ theme = 'default' }: { theme?: 'def
                                 <div className="flex items-center gap-3">
                                     <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: chain.color }} />
                                     <span className="text-[11px] font-black text-slate-950 uppercase tracking-widest">{chain.name}</span>
-                                    <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded border ${isArctic ? 'bg-slate-50 border-slate-100 text-slate-400' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>{chain.type}</span>
+                                    <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded border ${isArctic ? 'bg-black/5 border-slate-100 text-slate-400' : 'bg-black/5 border-slate-100 text-slate-400'}`}>{chain.type}</span>
                                 </div>
                                 <div className="flex items-center gap-6">
                                     <div className="text-right">
@@ -82,7 +82,7 @@ export function UniversalChainDistribution({ theme = 'default' }: { theme?: 'def
                                 </div>
                             </div>
                             
-                            <div className={`h-2.5 w-full rounded-full overflow-hidden border ${isArctic ? 'bg-slate-50 border-slate-100' : 'bg-slate-50 border-slate-100'}`}>
+                            <div className={`h-2.5 w-full rounded-full overflow-hidden border ${isArctic ? 'bg-black/5 border-slate-100' : 'bg-black/5 border-slate-100'}`}>
                                 <motion.div 
                                     initial={{ width: 0 }}
                                     animate={{ width: `${chain.weight}%` }}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -57,7 +57,7 @@ export function TopLightningNodes({ theme = 'default' }: { theme?: 'default' | '
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className={`grid grid-cols-[3rem_1.5fr_1fr_0.8fr_1fr] gap-6 items-center px-6 py-6 transition-all duration-300 group ${isArctic ? 'hover:bg-indigo-50/30' : 'hover:bg-slate-50/50'}`}
+                        className={`grid grid-cols-[3rem_1.5fr_1fr_0.8fr_1fr] gap-6 items-center px-6 py-6 transition-all duration-300 group ${isArctic ? 'hover:bg-indigo-50/30' : 'hover:bg-black/5/50'}`}
                     >
                         <span className="text-[10px] font-black font-mono text-slate-300 group-hover:text-indigo-600 transition-colors">{(i + 1).toString().padStart(2, '0')}</span>
 

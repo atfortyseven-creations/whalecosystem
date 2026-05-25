@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+﻿import dotenv from "dotenv";
 import { startEvmWorker } from "./evm-worker";
 import { startBtcWorker } from "./btc-worker";
 import { startSolanaWorker } from "./sol-worker";
@@ -7,7 +7,7 @@ import { baseResilientProvider, ethereumResilientProvider, bscResilientProvider,
 dotenv.config();
 
 // 
-// SOVEREIGN SCANNER CLUSTER  Multi-chain parallel ingestion engine
+// Enterprise SCANNER CLUSTER  Multi-chain parallel ingestion engine
 // Architecture:
 //   - EVM Mesh: Ethereum, Base, BSC, Polygon (via ResilientProvider multiplexer)
 //   - Bitcoin Sentinel: BTC L1
@@ -68,7 +68,7 @@ async function startHeartbeatLoop() {
 //  System Scanner Main 
 async function main() {
     console.log(" [Scanner Cluster] ");
-    console.log(" [Scanner Cluster] SOVEREIGN MULTI-CHAIN INGESTION ENGINE");
+    console.log(" [Scanner Cluster] Enterprise MULTI-CHAIN INGESTION ENGINE");
     console.log(" [Scanner Cluster] ");
 
     await systemIgnitionCheck();

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,7 +7,7 @@ import { useCWI } from '@/lib/bsv/CWIContext';
 import { toast } from 'sonner';
 
 /**
- * SOVEREIGN INTEL PAYWALL (Pillar 2 - Phase 2)
+ * Enterprise INTEL PAYWALL (Pillar 2 - Phase 2)
  * -----------------------------------------
  * Institutional UI for unlocking premium blockchain analytics.
  * Requires a cryptographically verified micropayment in BSV.

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -24,7 +24,7 @@ export function useQuantumSessionVisibility(): [number, () => void] {
             if (document.hidden) {
                 isSessionHidden = true;
             } else if (isSessionHidden) {
-                // The user has returned. Force a cryptographic state refresh.
+                // The user has returned. Force a Account Status refresh.
                 isSessionHidden = false;
                 forceReconciliation();
             }

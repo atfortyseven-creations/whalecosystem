@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
@@ -121,7 +121,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
             {!embedded && (
                 <motion.header
                     variants={itemVariants}
-                    className="shrink-0 px-6 pt-5 pb-4 mb-4 flex items-center justify-between border border-[#E5E5E5] rounded-2xl bg-[#FAF9F6] shadow-sm"
+                    className="shrink-0 px-6 pt-5 pb-4 mb-4 flex items-center justify-between border border-[#E5E5E5] rounded-2xl bg-[#FFFFFF] shadow-sm"
                 >
                     <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-3 mb-1">
@@ -150,7 +150,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
 
                 {/* B. PORTFOLIO & DYNAMIC MARKETS AREA */}
                 <motion.div variants={itemVariants} className="lg:col-span-8 space-y-6">
-                    <div className="relative p-8 rounded-[28px] bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm overflow-hidden group">
+                    <div className="relative p-8 rounded-[28px] bg-[#FFFFFF] border border-[#E5E5E5] shadow-sm overflow-hidden group">
                         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
                             <Globe className="w-32 h-32 text-[#050505]" />
                         </div>
@@ -177,7 +177,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                 </button>
                                 <button
                                     onClick={() => setIsReceiveOpen(true)}
-                                    className="px-5 py-2.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FAF9F6] border border-[#E5E5E5] flex items-center gap-2 font-black uppercase text-[10px] tracking-widest shadow-sm transition-all hover:scale-105 text-[#050505]"
+                                    className="px-5 py-2.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FFFFFF] border border-[#E5E5E5] flex items-center gap-2 font-black uppercase text-[10px] tracking-widest shadow-sm transition-all hover:scale-105 text-[#050505]"
                                 >
                                     <ArrowDownLeft className="w-4 h-4 text-emerald-600" /> Receive
                                 </button>
@@ -230,7 +230,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                         </h4>
                                         <div className="mt-4 flex items-center justify-between">
                                             <div className="text-[9px] font-mono text-[#050505]/30 uppercase">{market.condition_id.slice(0, 10)}...</div>
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all ${isSelected ? 'border-emerald-300 bg-emerald-50' : 'border-[#E5E5E5] bg-[#FAF9F6] group-hover:border-[#050505]/20'}`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all ${isSelected ? 'border-emerald-300 bg-emerald-50' : 'border-[#E5E5E5] bg-[#FFFFFF] group-hover:border-[#050505]/20'}`}>
                                                 <ArrowUpRight size={14} className={isSelected ? 'text-emerald-600' : 'text-[#050505]/40'} />
                                             </div>
                                         </div>
@@ -250,7 +250,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                 <motion.div variants={itemVariants} className="lg:col-span-4 space-y-4">
 
                     {!isPolygon ? (
-                        <div className="p-8 rounded-[2rem] bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm flex flex-col items-center justify-center text-center space-y-4 min-h-[320px]">
+                        <div className="p-8 rounded-[2rem] bg-[#FFFFFF] border border-[#E5E5E5] shadow-sm flex flex-col items-center justify-center text-center space-y-4 min-h-[320px]">
                             <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
                                 <ActivityIcon className="w-8 h-8 text-rose-500" />
                             </div>
@@ -332,7 +332,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
 
                                 {/* ACTION PANEL */}
                                 <div className="mt-auto">
-                                    <div className="p-1 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] flex mb-6">
+                                    <div className="p-1 rounded-xl bg-[#FFFFFF] border border-[#E5E5E5] flex mb-6">
                                         <button
                                             onClick={() => setSide("YES")}
                                             className={`flex-1 py-3 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${side === "YES" ? "bg-emerald-600 text-white shadow-sm" : "text-[#050505]/40 hover:text-[#050505]"}`}
@@ -356,7 +356,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                                     value={amount}
                                                     onChange={(e) => setAmount(e.target.value)}
                                                     placeholder="0.00"
-                                                    className="w-full bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl py-4 pl-4 pr-12 text-2xl font-black font-mono text-[#050505] focus:outline-none focus:border-[#050505] transition-colors placeholder:text-[#050505]/20"
+                                                    className="w-full bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl py-4 pl-4 pr-12 text-2xl font-black font-mono text-[#050505] focus:outline-none focus:border-[#050505] transition-colors placeholder:text-[#050505]/20"
                                                 />
                                                 <div className="absolute right-4 top-1/2 -translate-y-1/2">
                                                     <span className="text-[10px] font-black tracking-widest text-[#050505]/40">USDC</span>

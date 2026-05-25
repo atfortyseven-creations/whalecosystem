@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -63,7 +63,7 @@ export function WelcomeModal() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-xl bg-[#FAF9F6] border border-black/[0.08] rounded-[2.5rem] p-12 shadow-2xl relative overflow-hidden"
+              className="w-full max-w-xl bg-[#FFFFFF] border border-black/[0.08] rounded-[2.5rem] p-12 shadow-2xl relative overflow-hidden"
             >
               <button 
                 onClick={completeOnboarding}

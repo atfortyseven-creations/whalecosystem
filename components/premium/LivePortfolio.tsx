@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -28,7 +28,7 @@ export function LivePortfolio() {
 
     if (!mounted) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] shadow-sm max-w-4xl mx-auto mt-8 text-center">
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FFFFFF] border border-[#E5E5E5] rounded-[3.5rem] shadow-sm max-w-4xl mx-auto mt-8 text-center">
                 <RefreshCcw size={32} className="text-[#888888] animate-spin mb-4 mx-auto" />
                 <span className="text-sm font-black uppercase text-[#888888] tracking-widest">INITIALIZING VAULT...</span>
             </div>
@@ -37,7 +37,7 @@ export function LivePortfolio() {
 
     if (!isConnected) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] shadow-sm max-w-4xl mx-auto mt-8">
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FFFFFF] border border-[#E5E5E5] rounded-[3.5rem] shadow-sm max-w-4xl mx-auto mt-8">
                 <Wallet size={48} className="text-[#888888] mb-4 opacity-50" />
                 <h3 className="text-xl font-black text-[#050505] uppercase tracking-tighter">WALLET DISCONNECTED</h3>
                 <p className="text-sm font-bold text-[#888888] mt-2">Connect Web3 Wallet to view live on-chain balances</p>
@@ -47,7 +47,7 @@ export function LivePortfolio() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8 text-center">
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FFFFFF] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8 text-center">
                 <RefreshCcw size={32} className="text-[#888888] animate-spin mb-4 mx-auto" />
                 <span className="text-sm font-black uppercase text-[#888888] tracking-widest">PROCESSING ON-CHAIN DATA...</span>
             </div>
@@ -60,7 +60,7 @@ export function LivePortfolio() {
         <div className="w-full h-auto flex flex-col items-center p-4">
         <div className="w-full max-w-4xl mx-auto space-y-6 shrink-0 pb-10">
             
-            <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] p-10 shadow-sm relative overflow-hidden">
+            <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[3.5rem] p-10 shadow-sm relative overflow-hidden">
 
                 <h2 className="text-[11px] font-black text-[#888888] uppercase tracking-[0.2em] mb-3">Institutional Net Worth (USDC + Assets)</h2>
                 <div className="flex items-end gap-6">
@@ -78,7 +78,7 @@ export function LivePortfolio() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* Spot Balances */}
-                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-8 shadow-sm">
+                <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[2rem] p-8 shadow-sm">
                     <h3 className="text-xs font-black text-[#111111] uppercase tracking-widest mb-6 flex items-center gap-2">
                         <Wallet size={16} className="text-[#888888]" />
                         Spot Balances
@@ -106,7 +106,7 @@ export function LivePortfolio() {
                 </div>
 
                 {/* Polymarket Positions */}
-                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-8 shadow-sm">
+                <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[2rem] p-8 shadow-sm">
                     <h3 className="text-xs font-black text-[#111111] uppercase tracking-widest mb-6 flex items-center gap-2">
                         <LayoutGrid size={16} className="text-[#888888]" />
                         Active Prediction Markets

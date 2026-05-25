@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,7 +39,7 @@ export function LatestBlocks({ hideHeader = false, theme = 'default' }: { hideHe
     
     const cardClass = isArctic
         ? "bg-white/60 hover:bg-white border border-slate-100 hover:border-indigo-200 rounded-[2.5rem] p-8 transition-all cursor-default overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-500/20"
-        : "bg-slate-50 hover:bg-white border border-slate-100 hover:border-indigo-200 rounded-[2.5rem] p-8 transition-all cursor-default overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-500/20";
+        : "bg-black/5 hover:bg-white border border-slate-100 hover:border-indigo-200 rounded-[2.5rem] p-8 transition-all cursor-default overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-500/20";
     const { data: blocks, isLoading } = useQuery({
         queryKey: ['network', 'blocks'],
         queryFn: async () => {
@@ -64,7 +64,7 @@ export function LatestBlocks({ hideHeader = false, theme = 'default' }: { hideHe
             {/*  HEADER SECTION  */}
             {!hideHeader && (
                 <div className="flex items-center gap-6">
-                    <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-2xl bg-black/5 border border-slate-100 flex items-center justify-center">
                         <Box className="text-slate-400" size={24} />
                     </div>
                     <div>

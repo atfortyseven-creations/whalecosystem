@@ -1,4 +1,4 @@
-// prisma/seed.ts
+﻿// prisma/seed.ts
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -14,7 +14,7 @@ async function main() {
         create: {
             walletAddress: '0x1234567890abcdef1234567890abcdef12345678',
             email: 'admin@whalealert.network',
-            tier: 'SOVEREIGN', // Maximum tier
+            tier: 'Enterprise', // Maximum tier
         },
     })
     console.log(' Usuario Soberano creado.')

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
@@ -38,7 +38,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [lang, setLang] = useState('en');     // Idioma por defecto
     const [currency, setCurrency] = useState('USD');
 
-    //  SOVEREIGN LIGHT MODE ENFORCER 
+    //  Enterprise LIGHT MODE ENFORCER 
     // This platform is light-mode-only. Connected OR disconnected, the html
     // element must ALWAYS carry the 'light' class and NEVER carry 'dark'.
     // We run this on every theme change AND once on mount via an empty deps

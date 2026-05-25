@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -157,7 +157,7 @@ const FullStack = () => {
 // 3. Tools and Libraries Grid
 const ToolsAndLibraries = () => {
   return (
-    <div className="bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] py-40 px-6 border-y border-black/5 dark:border-white/5">
+    <div className="bg-transparent text-[#0A0A0A] dark:text-[#FFFFFF] py-40 px-6 border-y border-black/5 dark:border-white/5">
        <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-20">
           <div className="lg:w-1/3">
              <div className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold text-[#0044CC] mb-8">Tools and Repositories</div>
@@ -170,7 +170,7 @@ const ToolsAndLibraries = () => {
           </div>
 
           <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
-             <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
+             <div className="bg-[#FFFFFF] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
                 <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">On-Chain Analytics</div>
                 <div className="space-y-6 font-serif text-[22px] font-normal">
                    <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
@@ -181,7 +181,7 @@ const ToolsAndLibraries = () => {
                    </div>
                 </div>
              </div>
-             <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
+             <div className="bg-[#FFFFFF] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
                 <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">Identity Protocols</div>
                 <div className="space-y-6 font-serif text-[22px] font-normal">
                    <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
@@ -192,7 +192,7 @@ const ToolsAndLibraries = () => {
                    </div>
                 </div>
              </div>
-             <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
+             <div className="bg-[#FFFFFF] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm">
                 <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">Regulatory Compliance</div>
                 <div className="space-y-6 font-serif text-[22px] font-normal">
                    <div className="hover:text-[#0044CC] cursor-pointer transition-colors flex items-center justify-between group">
@@ -203,7 +203,7 @@ const ToolsAndLibraries = () => {
                    </div>
                 </div>
              </div>
-             <div className="bg-[#FAF9F6] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm md:row-span-2 flex flex-col justify-between">
+             <div className="bg-[#FFFFFF] p-10 hover:bg-black/[0.02] transition-colors border border-black/5 rounded-sm md:row-span-2 flex flex-col justify-between">
                 <div>
                    <div className="font-mono text-[10px] font-bold tracking-widest uppercase text-black/40 mb-8 border-b border-black/10 pb-4">Development Environment</div>
                    <div className="mb-10">
@@ -226,7 +226,7 @@ const ToolsAndLibraries = () => {
 // 4. Sandbox Callout
 const SandboxSection = () => {
   return (
-    <div className="w-full bg-[#FAF9F6]">
+    <div className="w-full bg-[#FFFFFF]">
        <div className="max-w-[1400px] mx-auto py-40 px-6 flex flex-col md:flex-row items-center gap-20">
           <div className="md:w-1/2">
              <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#0044CC] mb-8">Testing Environment</div>
@@ -249,7 +249,7 @@ const SandboxSection = () => {
              ].map((item, i) => (
                 <div key={i} className="group p-8 bg-white/20 dark:bg-black/20 backdrop-blur-md border border-black/10 dark:border-white/10 flex items-center justify-between cursor-pointer hover:border-[#0044CC]/40 hover:shadow-lg transition-all rounded-sm">
                    <div className="flex items-center gap-8">
-                      <div className="w-14 h-14 bg-[#FAF9F6] border border-black/10 text-[#0A0A0A] rounded-full flex items-center justify-center group-hover:bg-[#0044CC] group-hover:text-white transition-colors">
+                      <div className="w-14 h-14 bg-[#FFFFFF] border border-black/10 text-[#0A0A0A] rounded-full flex items-center justify-center group-hover:bg-[#0044CC] group-hover:text-white transition-colors">
                          <item.icon size={22} strokeWidth={1.5} />
                       </div>
                       <div>
@@ -364,7 +364,7 @@ const TransactionDiagram = () => {
 // 6. Institutional Compliance & Cryptography
 const ResearchSection = () => {
   return (
-    <div className="w-full bg-[#FAF9F6] py-40 px-6 border-y border-black/5">
+    <div className="w-full bg-[#FFFFFF] py-40 px-6 border-y border-black/5">
       <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-20 items-center">
          <div className="lg:w-1/3">
             <h2 className="font-serif text-5xl md:text-[64px] font-normal text-[#0A0A0A] leading-[1.05] tracking-tight mb-12">
@@ -435,7 +435,7 @@ const FAQs = () => {
   ];
 
   return (
-    <div className="w-full bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] py-40 px-6">
+    <div className="w-full bg-transparent text-[#0A0A0A] dark:text-[#FFFFFF] py-40 px-6">
        <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-24">
           <div className="lg:w-1/3">
              <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[#0044CC] mb-8">Documentation</div>
@@ -484,7 +484,7 @@ const FAQs = () => {
 //  MAIN PAGE COMPONENT 
 export default function DevelopersPage() {
   return (
-    <div className="min-h-screen bg-transparent text-[#0A0A0A] dark:text-[#FAF9F6] overflow-x-hidden font-sans selection:bg-black/10 selection:text-[#0A0A0A]">
+    <div className="min-h-screen bg-transparent text-[#0A0A0A] dark:text-[#FFFFFF] overflow-x-hidden font-sans selection:bg-black/10 selection:text-[#0A0A0A]">
       
       {/*  TOP NAV SPACER  */}
       <div className="fixed top-0 left-0 right-0 z-50 px-8 py-6 pointer-events-none flex justify-center backdrop-blur-md bg-white/20 dark:bg-black/20 border-b border-black/5 dark:border-white/5">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -42,7 +42,7 @@ export function FeeEstimator({ hideHeader = false, theme = 'default' }: { hideHe
 
             <div className="grid grid-cols-3 gap-3">
                 {/* Low Priority */}
-                <div className="flex flex-col items-center p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-300 transition-all">
+                <div className="flex flex-col items-center p-4 rounded-xl bg-black/5 border border-slate-100 hover:border-slate-300 transition-all">
                     <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Economic</span>
                     <span className="text-2xl font-black font-mono text-slate-900 tracking-tighter">{fees.hourFee}</span>
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">sat/vB</span>
@@ -65,7 +65,7 @@ export function FeeEstimator({ hideHeader = false, theme = 'default' }: { hideHe
                 </div>
 
                 {/* High Priority */}
-                <div className="flex flex-col items-center p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-300 transition-all">
+                <div className="flex flex-col items-center p-4 rounded-xl bg-black/5 border border-slate-100 hover:border-slate-300 transition-all">
                     <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Priority</span>
                     <span className="text-2xl font-black font-mono text-slate-900 tracking-tighter">{fees.fastestFee}</span>
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">sat/vB</span>

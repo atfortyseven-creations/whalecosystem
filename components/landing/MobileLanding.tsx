@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -96,7 +96,7 @@ import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
 import { WhalecosystemTweetFeed } from "./WhalecosystemTweetFeed";
 
 //  Colour tokens 
-const IVORY = "#FAF9F6";
+const IVORY = "#FFFFFF";
 const INK   = "#050505";
 const FAINT = "rgba(5,5,5,0.08)";
 const MUTED = "rgba(5,5,5,0.50)";

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 
  *    LIQUIDITY DYNAMICS  Capital Velocity Index                        
  *    Whale Alert Network Pro · Infrastructure Suite                             
@@ -276,7 +276,7 @@ export function MempoolCollider() {
     <div className="w-full bg-white border border-slate-100 rounded-[3rem] overflow-hidden relative shadow-sm">
       
       {/* Header */}
-      <div className="p-10 border-b border-slate-50 bg-slate-50/50">
+      <div className="p-10 border-b border-slate-50 bg-black/5/50">
         <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-100">
@@ -361,7 +361,7 @@ export function MempoolCollider() {
               const isUp = delta > 0.05;
               const isDown = delta < -0.05;
               return (
-                <div key={sig.key} className="bg-slate-50 border border-slate-100 rounded-3xl p-6 space-y-4">
+                <div key={sig.key} className="bg-black/5 border border-slate-100 rounded-3xl p-6 space-y-4">
                   <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{sig.label}</p>
                   <div className="flex items-end justify-between">
                     <div className="text-2xl font-black font-mono text-slate-950 tracking-tighter">
@@ -385,7 +385,7 @@ export function MempoolCollider() {
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">Velocity Frequency Map</h3>
             </div>
             
-            <div className="flex-1 min-h-[220px] relative rounded-[2rem] overflow-hidden bg-slate-50/50 border border-slate-100">
+            <div className="flex-1 min-h-[220px] relative rounded-[2rem] overflow-hidden bg-black/5/50 border border-slate-100">
                 <VelocityCanvas history={history} direction={direction} />
             </div>
 

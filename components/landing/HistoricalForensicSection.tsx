@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -60,7 +60,7 @@ export function HistoricalForensicSection() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: i * 0.1 }}
-                        className="group bg-slate-50 border border-slate-100 rounded-[2.5rem] p-8 md:p-12 hover:border-slate-300 hover:bg-slate-100 transition-all relative overflow-hidden shadow-2xl shadow-slate-200/50"
+                        className="group bg-black/5 border border-slate-100 rounded-[2.5rem] p-8 md:p-12 hover:border-slate-300 hover:bg-slate-100 transition-all relative overflow-hidden shadow-2xl shadow-slate-200/50"
                     >
                         {/* Folder Aesthetic Accent */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/5 blur-3xl -z-10" />

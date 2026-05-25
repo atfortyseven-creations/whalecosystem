@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, Suspense, lazy } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +37,7 @@ const SystemIntelTab: React.FC = () => {
     );
 
     return (
-        <div className="w-full h-full min-h-0 flex flex-col p-0 overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A]">
+        <div className="w-full h-full min-h-0 flex flex-col p-0 overflow-hidden bg-[#FFFFFF] dark:bg-[#0A0A0A]">
             {/* Header */}
             <div className="px-6 py-5 border border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0">
                 <div>
@@ -144,11 +144,11 @@ const SystemIntelTab: React.FC = () => {
                                         </div>
                                         
                                         <div className="grid grid-cols-2 gap-3 w-full md:w-auto">
-                                            <div className="p-4 rounded-xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-center">
+                                            <div className="p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-center">
                                                 <p className="text-[9px] text-[#888888] uppercase tracking-widest mb-1 font-bold">Active Peers</p>
                                                 <p className="text-xl font-black text-[#050505] dark:text-white">{nodeMetrics.peers}</p>
                                             </div>
-                                            <div className="p-4 rounded-xl bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-center">
+                                            <div className="p-4 rounded-xl bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-center">
                                                 <p className="text-[9px] text-[#888888] uppercase tracking-widest mb-1 font-bold">Latency</p>
                                                 <p className="text-xl font-black text-[#00C076]">{isNodeActive ? 'Active' : '--'}</p>
                                             </div>
@@ -166,7 +166,7 @@ const SystemIntelTab: React.FC = () => {
 
                         {/* MATRIX DIRECTIVES */}
                         <div className="flex-1 min-h-0 w-full flex flex-col border border-[#E5E5E5] dark:border-white/10 rounded-2xl bg-[#FFFFFF] dark:bg-[#111111] overflow-hidden shadow-sm">
-                            <div className="px-5 py-3 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#1A1A1A] flex items-center justify-between shrink-0">
+                            <div className="px-5 py-3 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#1A1A1A] flex items-center justify-between shrink-0">
                                 <div className="flex items-center gap-2">
                                     <Zap className="text-[#050505] dark:text-white" size={14} />
                                     <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white">
@@ -184,7 +184,7 @@ const SystemIntelTab: React.FC = () => {
                             </div>
                             
                             {/* The list header */}
-                            <div className="grid grid-cols-12 gap-4 px-5 py-2.5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#F0F0F0] dark:border-white/10 text-[9px] font-black text-[#888888] uppercase tracking-[0.18em] shrink-0">
+                            <div className="grid grid-cols-12 gap-4 px-5 py-2.5 bg-[#FFFFFF] dark:bg-[#1A1A1A] border-b border-[#F0F0F0] dark:border-white/10 text-[9px] font-black text-[#888888] uppercase tracking-[0.18em] shrink-0">
                                 <div className="col-span-1">ID</div>
                                 <div className="col-span-3">Directive</div>
                                 <div className="col-span-4">Description</div>
@@ -194,7 +194,7 @@ const SystemIntelTab: React.FC = () => {
 
                             <div className="flex-1 overflow-y-auto custom-scrollbar">
                                 {filteredVoss.map(item => (
-                                    <div key={item.id} className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-[#F0F0F0] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-colors items-start">
+                                    <div key={item.id} className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-[#F0F0F0] dark:border-white/10 hover:bg-[#FFFFFF] dark:hover:bg-[#1A1A1A] transition-colors items-start">
                                         <div className="col-span-1 text-[10px] font-black text-[#888888] pt-0.5">
                                             #{item.id}
                                         </div>

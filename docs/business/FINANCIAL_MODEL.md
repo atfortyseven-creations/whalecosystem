@@ -1,4 +1,4 @@
-# FINANCIAL MODEL & UNIT ECONOMICS
+﻿# FINANCIAL MODEL & UNIT ECONOMICS
 ## Humanity Ledger  System Analytics Platform
 **Prepared for:** CDTI (NEOTEC) & ENISA Applications (Pre-Seed 325k)
 
@@ -12,7 +12,7 @@ Humanity Ledger operates on a tiered B2B SaaS model, targeting institutional inv
 
 | Tier | Target Audience | Pricing | Core Value Proposition |
 |------|-----------------|---------|------------------------|
-| **SOVEREIGN LITE** | Retail Analysts, Researchers | 49 / month | Access to real-time whale alerts, basic Entity Graph queries (up to 50 nodes), and standard market sentiment tools. |
+| **Enterprise LITE** | Retail Analysts, Researchers | 49 / month | Access to real-time whale alerts, basic Entity Graph queries (up to 50 nodes), and standard market sentiment tools. |
 | **PRO TERMINAL** | Day Traders, Boutique Funds | 299 / month | Advanced EVM Thermodynamics (Z-Score filtering), unlimited Graph queries, zero-latency WebSocket feeds, mobile terminal access. |
 | **INSTITUTIONAL API**| Hedge Funds, Quant Desks, VCs| 2,500+ / month | Direct API integration, raw Neo4j graph data dumps, custom alert webhooks, dedicated SLA, and SLA-backed Circuit Breaker guarantees. |
 

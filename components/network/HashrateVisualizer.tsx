@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -25,7 +25,7 @@ export function HashrateVisualizer({ hideHeader = false, theme = 'default' }: { 
     });
 
     if (isLoading || !stats) return (
-        <div className="h-full bg-slate-50 border border-slate-100 rounded-[2.5rem] animate-pulse p-8 flex items-center justify-center">
+        <div className="h-full bg-black/5 border border-slate-100 rounded-[2.5rem] animate-pulse p-8 flex items-center justify-center">
             <Activity className="text-slate-200" />
         </div>
     );
@@ -35,7 +35,7 @@ export function HashrateVisualizer({ hideHeader = false, theme = 'default' }: { 
             {!hideHeader && (
                 <div className="flex justify-between items-center mb-10">
                     <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-xl transition-colors duration-500 ${isArctic ? 'bg-indigo-50/50 text-indigo-600 border border-indigo-100' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-950 group-hover:text-white'}`}>
+                        <div className={`p-2 rounded-xl transition-colors duration-500 ${isArctic ? 'bg-indigo-50/50 text-indigo-600 border border-indigo-100' : 'bg-black/5 text-slate-400 group-hover:bg-slate-950 group-hover:text-white'}`}>
                             <Hash size={14} />
                         </div>
                         <div>

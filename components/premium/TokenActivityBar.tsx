@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
@@ -61,7 +61,7 @@ export function TokenActivityBar({ symbol }: TokenActivityBarProps) {
                         {Math.abs(finalChange).toFixed(2)}%
                     </div>
                 ) : (
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border bg-slate-50 text-slate-400 border-slate-100">
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border bg-black/5 text-slate-400 border-slate-100">
                         <Activity size={10} />
                         
                     </div>
@@ -92,7 +92,7 @@ export function TokenActivityBar({ symbol }: TokenActivityBarProps) {
 
             {/* Activity Data Block */}
             <div className="space-y-3">
-                <div className="bg-slate-50/50 rounded-2xl border border-slate-100 divide-y divide-slate-100 overflow-hidden">
+                <div className="bg-black/5/50 rounded-2xl border border-slate-100 divide-y divide-slate-100 overflow-hidden">
                     <div className="grid grid-cols-3 px-4 py-2 text-[7px] font-black text-slate-400 uppercase tracking-widest bg-slate-100/30">
                         <span>Volume</span>
                         <span className="text-center">Action</span>

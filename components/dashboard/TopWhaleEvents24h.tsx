@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * TopWhaleEvents24h
@@ -79,7 +79,7 @@ export function TopWhaleEvents24h() {
     return (
         <div className="flex flex-col h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-[#E5E5E5] bg-[#FFFFFF] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <TrendingUp size={16} className="text-[#D4AF37]" />
                     <span className="text-xs font-black text-[#050505] uppercase tracking-widest">
@@ -123,7 +123,7 @@ export function TopWhaleEvents24h() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ delay: i * 0.02 }}
-                                className="px-6 py-3.5 hover:bg-[#FAF9F6] transition-colors flex items-center justify-between gap-4"
+                                className="px-6 py-3.5 hover:bg-[#FFFFFF] transition-colors flex items-center justify-between gap-4"
                             >
                                 {/* Rank + Protocol */}
                                 <div className="flex items-center gap-3 min-w-0">
@@ -164,7 +164,7 @@ export function TopWhaleEvents24h() {
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] text-[9px] font-black text-[#888888] uppercase tracking-widest flex justify-between">
+            <div className="px-6 py-2 border-t border-[#E5E5E5] bg-[#FFFFFF] text-[9px] font-black text-[#888888] uppercase tracking-widest flex justify-between">
                 <span>System Intel  Event Ledger</span>
                 {updatedAt && (
                     <span>Updated {fmtTime(updatedAt)}</span>

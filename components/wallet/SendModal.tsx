@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -276,7 +276,7 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
                     >
                         <div className="w-full max-w-md bg-white border border-black/10 rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] pointer-events-auto overflow-hidden">
                             {/* Header */}
-                            <div className="flex items-center justify-between p-6 border-b border-black/5 bg-[#FAFAF8]">
+                            <div className="flex items-center justify-between p-6 border-b border-black/5 bg-[#FFFFFF]">
                                 <h2 className="text-xl font-black text-black tracking-tighter uppercase flex items-center gap-2">
                                     <Send className="w-5 h-5 text-black" />
                                     Send Assets

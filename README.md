@@ -1,4 +1,4 @@
-# Humanity Ledger (Powered by Aztec Network)
+﻿# Humanity Ledger (Powered by Aztec Network)
 
 > The first institutional-grade, fully shielded social and economic ledger built on Aztec Network's zero-knowledge rollup.
 
@@ -8,7 +8,7 @@ Humanity Ledger separates the act of participating from the act of revealing it.
 
 1. **Private Core Dots (QDs):** A natively private token operating on an Aztec Token Contract. Balances are encrypted UTXOs; only the total network supply is public.
 2. **ZK Proof of Reputation:** Users generate recursive proofs of their past positive interactions to access shielded forums without revealing *what* those interactions were or *who* they are.
-3. **Biometric Shielding:** Zero-knowledge liveness proofs prevent sybil attacks without centralizing biometric data. We rejected Worldcoin to build a truly sovereign, trustless alternative.
+3. **Biometric Shielding:** Zero-knowledge liveness proofs prevent sybil attacks without centralizing biometric data. We rejected Worldcoin to build a truly Enterprise, trustless alternative.
 4. **Institutional Tunnels:** E2E encrypted, secure communication channels that run locally on the client's device, ensuring that metadata is never leaked to sequencers.
 
 ## Technology Stack

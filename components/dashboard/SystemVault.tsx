@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo } from 'react';
 import useSWR from 'swr';
@@ -42,7 +42,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
                 <div className="flex items-center gap-3">
                     <Zap size={16} className="text-[#050505]" />
                     <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505]">ON-CHAIN STATUS</h3>
-                    <span className="text-[7px] border border-[#E5E5E5] bg-[#FAF9F6] text-[#A0A0A0] px-2 py-0.5 font-bold uppercase tracking-widest">BASE RPC</span>
+                    <span className="text-[7px] border border-[#E5E5E5] bg-[#FFFFFF] text-[#A0A0A0] px-2 py-0.5 font-bold uppercase tracking-widest">BASE RPC</span>
                 </div>
                 <button
                     onClick={() => mutate()}
@@ -59,7 +59,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* DeadMan Switch on-chain */}
-                <div className="bg-[#FAF9F6] border border-[#E5E5E5] p-4 rounded-xl">
+                <div className="bg-[#FFFFFF] border border-[#E5E5E5] p-4 rounded-xl">
                     <div className="text-[9px] text-[#888888] uppercase tracking-widest mb-3 flex items-center gap-2">
                         <Activity size={10} /> WhaleDeadmanSwitch
                     </div>
@@ -110,7 +110,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
                 </div>
 
                 {/* HumanTimeLock on-chain */}
-                <div className="bg-[#FAF9F6] border border-[#E5E5E5] p-4 rounded-xl">
+                <div className="bg-[#FFFFFF] border border-[#E5E5E5] p-4 rounded-xl">
                     <div className="text-[9px] text-[#888888] uppercase tracking-widest mb-3 flex items-center gap-2">
                         <Lock size={10} /> HumanTimeLock
                     </div>
@@ -309,7 +309,7 @@ export function SystemVault() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
 
                     {/* DEADMAN SWITCH */}
-                    <div className="border border-[#E5E5E5] bg-[#FAF9F6] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
+                    <div className="border border-[#E5E5E5] bg-[#FFFFFF] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
                             <Activity size={20} className={vaultData?.deadman ? "text-[#050505]" : "text-[#888888]"} />
                             <h2 className="text-sm font-bold uppercase tracking-widest">DEADMAN CACHE</h2>
@@ -336,7 +336,7 @@ export function SystemVault() {
                             <button
                                 onClick={handleDeployDeadman}
                                 disabled={!isConnected}
-                                className="w-full bg-[#FAF9F6] border border-[#E5E5E5] text-[#050505] hover:bg-[#050505] hover:text-white py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all relative z-10 disabled:opacity-40"
+                                className="w-full bg-[#FFFFFF] border border-[#E5E5E5] text-[#050505] hover:bg-[#050505] hover:text-white py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all relative z-10 disabled:opacity-40"
                             >
                                 {isConnected ? 'DEPLOY DEADMAN FAILSAFE' : 'CONNECT WALLET'}
                             </button>
@@ -344,7 +344,7 @@ export function SystemVault() {
                     </div>
 
                     {/* TIMELOCK VAULT */}
-                    <div className="border border-[#E5E5E5] bg-[#FAF9F6] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
+                    <div className="border border-[#E5E5E5] bg-[#FFFFFF] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
                             <Lock size={20} className="text-[#050505]" />
                             <h2 className="text-sm font-bold uppercase tracking-widest">LIQUIDITY TIMELOCK</h2>
@@ -356,7 +356,7 @@ export function SystemVault() {
                         <button
                             onClick={handleLock}
                             disabled={isLocking || !isConnected}
-                            className="w-full bg-[#FAF9F6] border border-[#E5E5E5] text-[#050505] hover:bg-[#050505] hover:text-white py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-40 relative z-10"
+                            className="w-full bg-[#FFFFFF] border border-[#E5E5E5] text-[#050505] hover:bg-[#050505] hover:text-white py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-40 relative z-10"
                         >
                             {isLocking ? 'SIGNING...' : isConnected ? 'DEPLOY TIMELOCK (0.001 ETH)' : 'CONNECT WALLET'}
                         </button>
@@ -372,7 +372,7 @@ export function SystemVault() {
                     <div className="flex items-center gap-3 mb-6">
                         <Users size={18} className="text-[#050505]" />
                         <h3 className="text-sm font-black uppercase tracking-widest">Guardian Multi-Sig</h3>
-                        <span className="ml-2 text-[9px] border border-[#E5E5E5] bg-[#FAF9F6] text-[#888888] px-2 py-0.5 font-bold uppercase tracking-widest rounded-md">SECURITY</span>
+                        <span className="ml-2 text-[9px] border border-[#E5E5E5] bg-[#FFFFFF] text-[#888888] px-2 py-0.5 font-bold uppercase tracking-widest rounded-md">SECURITY</span>
                     </div>
                     <p className="text-[10px] text-[#888888] uppercase leading-relaxed mb-6 max-w-xl">
                         Add trusted guardian addresses. If your primary key is compromised, guardians can collectively override the vault. Eliminates single-wallet failure risk.
@@ -389,7 +389,7 @@ export function SystemVault() {
                         <button
                             onClick={handleAddGuardian}
                             disabled={addingGuardian}
-                            className="bg-[#050505] text-white px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-[#FAF9F6] hover:text-[#050505] border border-transparent hover:border-[#E5E5E5] transition-colors disabled:opacity-50 flex items-center gap-2"
+                            className="bg-[#050505] text-white px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-[#FFFFFF] hover:text-[#050505] border border-transparent hover:border-[#E5E5E5] transition-colors disabled:opacity-50 flex items-center gap-2"
                         >
                             <UserPlus size={14} />
                             {addingGuardian ? 'ADDING...' : 'ADD'}
@@ -406,7 +406,7 @@ export function SystemVault() {
                                     </div>
                                     <button
                                         onClick={() => handleRemoveGuardian(g.guardianAddress)}
-                                        className="text-[#888888] hover:text-[#FF3B30] transition-colors p-2 bg-[#FAF9F6] rounded-md border border-[#E5E5E5] hover:border-[#FF3B30]/30"
+                                        className="text-[#888888] hover:text-[#FF3B30] transition-colors p-2 bg-[#FFFFFF] rounded-md border border-[#E5E5E5] hover:border-[#FF3B30]/30"
                                     >
                                         <Trash2 size={12} />
                                     </button>
@@ -414,7 +414,7 @@ export function SystemVault() {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-[10px] text-[#888888] uppercase font-mono bg-[#FAF9F6] p-4 rounded-lg border border-[#E5E5E5] text-center">No guardians configured  vault has single-point-of-failure risk.</div>
+                        <div className="text-[10px] text-[#888888] uppercase font-mono bg-[#FFFFFF] p-4 rounded-lg border border-[#E5E5E5] text-center">No guardians configured  vault has single-point-of-failure risk.</div>
                     )}
                 </div>
 

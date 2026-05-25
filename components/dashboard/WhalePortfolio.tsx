@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -167,7 +167,7 @@ export function WhalePortfolio() {
 
             {/*  Card  */}
             <div className="bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-white/10 rounded-3xl overflow-hidden shadow-sm">
-                <div className="px-6 py-4 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FAF9F6] dark:bg-[#111111] flex items-center gap-4 flex-wrap">
+                <div className="px-6 py-4 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] flex items-center gap-4 flex-wrap">
                     <div className="flex bg-[#F0F0F0] dark:bg-[#1A1A1A] p-1 rounded-2xl border border-[#E5E5E5] dark:border-white/10">
                         {(['leaderboard', 'portfolio'] as const).map(v => (
                             <button key={v} onClick={() => setView(v)}
@@ -197,7 +197,7 @@ export function WhalePortfolio() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.2em] bg-[#FAF9F6] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10">
+                                <tr className="text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.2em] bg-[#FFFFFF] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10">
                                     {['#', 'Entity Profile', 'Net Worth', '24h Change', 'Type', 'Top Alpha Holding', 'Win Rate', 'PnL (30d)'].map((h, i) => (
                                         <th key={h} className={`px-6 py-4 font-black ${i >= 2 ? 'text-right' : ''}`}>{h}</th>
                                     ))}
@@ -229,7 +229,7 @@ function WhaleRow({ w }: { w: WhaleEntity }) {
     const { ensName, ensAvatar } = useSystemENS(w.address as `0x${string}`);
 
     return (
-        <tr className="hover:bg-[#FAF9F6] dark:hover:bg-white/5 transition-colors group">
+        <tr className="hover:bg-[#FFFFFF] dark:hover:bg-white/5 transition-colors group">
             <td className="px-6 py-4 text-[10px] font-black text-[#888888] dark:text-white/60">{w.rank}</td>
             <td className="px-6 py-4">
                 <div className="flex items-center gap-3">

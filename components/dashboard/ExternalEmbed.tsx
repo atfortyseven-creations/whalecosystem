@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -106,7 +106,7 @@ export function ExternalEmbed({
 
     /*  Blocked / fallback state  */
     const BlockedState = () => (
-        <div className="absolute inset-0 bg-[#FAF9F6] flex flex-col items-center justify-center gap-6">
+        <div className="absolute inset-0 bg-[#FFFFFF] flex flex-col items-center justify-center gap-6">
             <div
                 className="w-20 h-20 rounded-3xl flex items-center justify-center text-white shadow-lg"
                 style={{ background: accentColor }}

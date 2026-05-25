@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
@@ -15,7 +15,7 @@ export function ProvenanceSessionGate({ children }: { children: React.ReactNode 
 
   if (!linked) {
     return (
-      <div className="min-h-[100dvh] bg-[#FAF9F6] text-[#050505] flex flex-col px-6 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-[calc(2rem+env(safe-area-inset-bottom))]">
+      <div className="min-h-[100dvh] bg-[#FFFFFF] text-[#050505] flex flex-col px-6 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-[calc(2rem+env(safe-area-inset-bottom))]">
         <Link
           href="/connect"
           className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-black/50 mb-8"

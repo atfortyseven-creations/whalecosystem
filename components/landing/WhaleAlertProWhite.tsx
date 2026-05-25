@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -156,7 +156,7 @@ export default function WhaleAlertProWhite() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#0A0A0A] font-sans overflow-x-hidden selection:bg-[#0044CC]/20">
+    <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0A] font-sans overflow-x-hidden selection:bg-[#0044CC]/20">
       
       {/*  NAVIGATION  */}
       <nav className="fixed top-0 w-full z-[100] px-6 md:px-12 py-6 flex items-center justify-between pointer-events-none">
@@ -172,11 +172,11 @@ export default function WhaleAlertProWhite() {
           </Link>
           
           <div className="hidden lg:flex items-center gap-2 bg-white/90 backdrop-blur-xl border border-slate-200 px-2 py-1.5 rounded-2xl shadow-sm">
-            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 rounded-xl transition-all group">
+            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 hover:bg-black/5 rounded-xl transition-all group">
               <Activity size={16} className="text-[#0044CC]" />
               <span className="text-[11px] font-bold tracking-wide text-slate-600 group-hover:text-slate-950">Terminal</span>
             </Link>
-            <Link href="/portfolio" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 rounded-xl transition-all group">
+            <Link href="/portfolio" className="flex items-center gap-2 px-4 py-2 hover:bg-black/5 rounded-xl transition-all group">
               <Layers size={16} className="text-slate-400 group-hover:text-slate-950" />
               <span className="text-[11px] font-bold tracking-wide text-slate-600 group-hover:text-slate-950">Whale Profile</span>
             </Link>
@@ -230,7 +230,7 @@ export default function WhaleAlertProWhite() {
             >
               Start Tracking Now <ArrowRight size={18} />
             </button>
-            <a href="#capabilities" className="flex items-center justify-center gap-4 px-10 py-5 w-full sm:w-auto bg-white border border-slate-200 text-[#0A0A0A] rounded-2xl text-[14px] font-bold tracking-wide hover:bg-slate-50 transition-colors">
+            <a href="#capabilities" className="flex items-center justify-center gap-4 px-10 py-5 w-full sm:w-auto bg-white border border-slate-200 text-[#0A0A0A] rounded-2xl text-[14px] font-bold tracking-wide hover:bg-black/5 transition-colors">
               How it works
             </a>
           </div>
@@ -333,7 +333,7 @@ export default function WhaleAlertProWhite() {
       </section>
 
       {/*  FAQ SECTION  */}
-      <section id="faq" className="py-32 px-6 lg:px-12 bg-[#FAF9F6] border-t border-slate-100">
+      <section id="faq" className="py-32 px-6 lg:px-12 bg-[#FFFFFF] border-t border-slate-100">
         <div className="max-w-[1000px] mx-auto">
             <div className="text-center mb-20 space-y-6">
                 <h2 className="text-[48px] font-black text-[#0A0A0A] tracking-tight">Frequently Asked Questions</h2>

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
 import { MessageSquare } from 'lucide-react';
 
@@ -7,7 +7,7 @@ export function WhaleChatLink() {
     <div className="w-full max-w-4xl mx-auto px-4 my-12">
       <Link href="/chat" className="group flex flex-col md:flex-row items-center justify-between bg-white border border-[#E5E5E5] rounded-3xl p-6 md:p-8 hover:shadow-lg transition-all duration-300">
         <div className="flex items-center gap-6 mb-4 md:mb-0">
-          <div className="w-14 h-14 bg-[#FAFAF8] border border-[#E5E5E5] rounded-full flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+          <div className="w-14 h-14 bg-[#FFFFFF] border border-[#E5E5E5] rounded-full flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
             <MessageSquare size={24} className="text-[#050505]" />
           </div>
           <div>

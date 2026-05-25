@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 /**
- * PortfolioView  SOVEREIGN TERMINAL v5
+ * PortfolioView  Enterprise TERMINAL v5
  *
  * PERFORMANCE CONTRACT (IPAD / IOS ZERO-LAG):
  * - ZERO blur() CSS filters on animated elements

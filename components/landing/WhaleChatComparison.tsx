@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { motion } from "framer-motion";
@@ -47,7 +47,7 @@ const CHAT_DATA = [
 
 export function WhaleChatComparison() {
   return (
-    <section className="w-full py-32 md:py-48 bg-[#FAFAF8] relative overflow-hidden flex flex-col items-center">
+    <section className="w-full py-32 md:py-48 bg-[#FFFFFF] relative overflow-hidden flex flex-col items-center">
       {/* Cinematic subtle grid background */}
       <div className="absolute inset-0 z-0 bg-[url('/noise.png')] opacity-[0.015] pointer-events-none mix-blend-multiply" />
       <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#00000003_1px,transparent_1px),linear-gradient(to_bottom,#00000003_1px,transparent_1px)] bg-[size:4rem_4rem]" />

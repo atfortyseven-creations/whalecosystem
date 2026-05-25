@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -189,7 +189,7 @@ function SecureStepPanel({ t, onBack, onProceed }: { t: any; onBack: () => void;
         <h2 className="text-4xl font-black text-[#0A0A0A] tracking-tighter uppercase">{t.secure_title}</h2>
         <p className="text-[15px] text-[#0A0A0A]/50 font-medium leading-relaxed">{t.secure_sub}</p>
       </div>
-      <div className="bg-[#FAFAF8] border border-black/5 rounded-[26px] p-7 space-y-5">
+      <div className="bg-[#FFFFFF] border border-black/5 rounded-[26px] p-7 space-y-5">
         <span className="font-black uppercase tracking-widest text-[14px] text-[#050505] block">{t.rules_title}</span>
         <ul className="space-y-4">
           {[t.rule1, t.rule2, t.rule3, t.rule4, t.rule5].map((rule: string, i: number) => (
@@ -407,7 +407,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
     await new Promise(r => setTimeout(r, 60));
 
     try {
-      //  SOVEREIGN UPGRADE: Use fast AES-256-GCM (PBKDF2-SHA256 × 600k)
+      //  Enterprise UPGRADE: Use fast AES-256-GCM (PBKDF2-SHA256 × 600k)
       //    instead of the legacy ethers scrypt which crashes on mobile.
       //    We store the mnemonic phrase so it can be restored from any device.
       const encryptedBlob = await encryptWithPassword(wallet.mnemonic.phrase, password);
@@ -496,7 +496,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
       let addr: string | null = null;
 
       if (!isLegacyVault) {
-        //  SOVEREIGN UPGRADE: tryDecryptAny handles ALL formats atomically:
+        //  Enterprise UPGRADE: tryDecryptAny handles ALL formats atomically:
         //    New AES-GCM blobs (system v1/v2)
         //    Legacy ethers scrypt keystores (V3)
         //    Transparently migrates legacy keystores to AES-GCM on first login
@@ -623,7 +623,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
       // Validate phrase by deriving wallet  throws if any word is invalid
       const restoredWallet = ethers.Wallet.fromPhrase(phrase);
 
-      //  SOVEREIGN UPGRADE: Encrypt with fast AES-GCM (not ethers scrypt)
+      //  Enterprise UPGRADE: Encrypt with fast AES-GCM (not ethers scrypt)
       const encryptedBlob = await encryptWithPassword(phrase, password);
       
       const restoredAccount: SystemAccount = {
@@ -712,7 +712,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
                   className="group w-full flex items-center justify-between p-6 rounded-[24px] bg-white border border-black/10 hover:border-black/20 transition-all shadow-sm active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-5">
-                    <div className="p-3 rounded-full bg-[#FAFAF8] flex items-center justify-center border border-black/5 group-hover:scale-105 transition-transform">
+                    <div className="p-3 rounded-full bg-[#FFFFFF] flex items-center justify-center border border-black/5 group-hover:scale-105 transition-transform">
                       <Lock size={22} className="text-[#050505]" />
                     </div>
                     <div className="text-left">
@@ -747,7 +747,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
         return (
           <div className="space-y-6">
             <div className="text-center space-y-4 mb-10">
-              <div className="w-20 h-20 bg-[#FAFAF8] border border-black/5 shadow-sm rounded-[24px] mx-auto flex items-center justify-center">
+              <div className="w-20 h-20 bg-[#FFFFFF] border border-black/5 shadow-sm rounded-[24px] mx-auto flex items-center justify-center">
                 <Lock size={30} className="text-[#0A0A0A]" strokeWidth={1.5} />
               </div>
               <h1 className="text-4xl font-black text-[#0A0A0A] tracking-tighter uppercase">{t.unlock_title}</h1>
@@ -756,7 +756,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
             
             <div className="space-y-4">
               {accounts.length > 0 && (
-                <div className="w-full bg-[#FAFAF8] border border-black/10 rounded-[20px] p-2 mb-4">
+                <div className="w-full bg-[#FFFFFF] border border-black/10 rounded-[20px] p-2 mb-4">
                   <div className="px-3 pt-2 pb-1 text-[11px] font-black uppercase tracking-widest text-[#0A0A0A]/40">
                     Select Vault ({accounts.length}/5)
                   </div>
@@ -795,7 +795,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
                 onChange={e => setPassword(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleLogin()}
                 placeholder={t.pw_enter}
-                className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
+                className="w-full bg-[#FFFFFF] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
                 autoFocus
               />
               <button 
@@ -868,14 +868,14 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
                 onChange={e => { setMnemonicInput(e.target.value); setMnemonicError(''); }}
                 placeholder="palabra1 palabra2 palabra3 ... palabra12"
                 rows={4}
-                className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[20px] px-5 py-4 text-[#0A0A0A] text-[14px] font-mono font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/20 resize-none"
+                className="w-full bg-[#FFFFFF] border border-black/10 shadow-inner rounded-[20px] px-5 py-4 text-[#0A0A0A] text-[14px] font-mono font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/20 resize-none"
               />
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="Nueva contraseña (mín. 8 caracteres)"
-                className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
+                className="w-full bg-[#FFFFFF] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
               />
               {mnemonicError && (
                 <div className="flex items-center gap-2 text-rose-600 bg-rose-50 rounded-xl px-4 py-3 text-[13px] font-medium">
@@ -907,15 +907,15 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
               <input 
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
                 placeholder={t.pw_placeholder}
-                className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
+                className="w-full bg-[#FFFFFF] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
               />
               <input 
                 type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                 placeholder={t.pw_confirm}
-                className="w-full bg-[#FAFAF8] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
+                className="w-full bg-[#FFFFFF] border border-black/10 shadow-inner rounded-[20px] px-5 py-5 text-[#0A0A0A] text-[16px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
               />
               
-              <label className="flex items-start gap-4 p-5 border border-black/5 bg-[#FAFAF8] rounded-[22px] cursor-pointer hover:border-black/10 transition-colors mt-6 group">
+              <label className="flex items-start gap-4 p-5 border border-black/5 bg-[#FFFFFF] rounded-[22px] cursor-pointer hover:border-black/10 transition-colors mt-6 group">
                 <div className="pt-0.5">
                   <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${termsAccepted ? 'bg-[#050505] border-[#050505]' : 'bg-white border-black/20 group-hover:border-black/40'}`}>
                     {termsAccepted && <Check size={12} className="text-white" strokeWidth={3} />}
@@ -948,7 +948,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
               <p className="text-[15px] text-[#0A0A0A]/50 font-medium leading-relaxed">{t.reveal_sub}</p>
             </div>
 
-            <div className="relative border border-black/5 rounded-[26px] p-7 bg-[#FAFAF8] min-h-[280px] flex items-center justify-center overflow-hidden">
+            <div className="relative border border-black/5 rounded-[26px] p-7 bg-[#FFFFFF] min-h-[280px] flex items-center justify-center overflow-hidden">
               {!revealed ? (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-xl">
                   <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mb-5">
@@ -1017,7 +1017,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
                       newInputs[i] = e.target.value.toLowerCase().trim();
                       setVerifyInputs(newInputs);
                     }}
-                    className="w-full bg-[#FAFAF8] border border-black/5 shadow-inner rounded-[20px] pl-5 pr-24 py-5 text-[#0A0A0A] text-[15px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
+                    className="w-full bg-[#FFFFFF] border border-black/5 shadow-inner rounded-[20px] pl-5 pr-24 py-5 text-[#0A0A0A] text-[15px] font-bold focus:outline-none focus:border-[#0A0A0A] focus:bg-white transition-all placeholder:font-medium placeholder:text-black/30"
                     placeholder="..."
                   />
                 </div>

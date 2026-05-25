@@ -1,4 +1,4 @@
-# STATE OF WHALE INTELLIGENCE 2026
+﻿# STATE OF Market Analytics 2026
 ## Annual On-Chain Capital Flow Report
 ### Whale Alert Network  System Analytics Division
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/docs/Sidebar';
@@ -36,7 +36,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   // be respected so the docs text is white over the black wallpaper background.
   // The docs sidebar and content use dark-mode-aware classes.
 
-  const bg    = 'bg-[#FAFAF8] text-black';
+  const bg    = 'bg-[#FFFFFF] text-black';
   const hdrBg = 'bg-white border-black/10';
 
   return (

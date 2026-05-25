@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -42,7 +42,7 @@ export default function CategoryPage() {
             Categories
           </Link>
           <ChevronRight size={14} className="text-slate-400" />
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 bg-slate-50">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 bg-black/5">
             <span className={`w-2.5 h-2.5 rounded-sm ${CATEGORY_COLORS[0]}`} />
             <span className="font-semibold text-slate-900">{category.name}</span>
           </div>
@@ -59,7 +59,7 @@ export default function CategoryPage() {
 
       {/* Category Description */}
       {category.description && (
-        <div className="mb-6 p-4 rounded-md border border-slate-200 bg-slate-50 border-l-4 border-l-slate-400">
+        <div className="mb-6 p-4 rounded-md border border-slate-200 bg-black/5 border-l-4 border-l-slate-400">
           <p className="text-[14px] text-slate-600">{category.description}</p>
         </div>
       )}
@@ -92,7 +92,7 @@ export default function CategoryPage() {
               <Link
                 key={topic.id}
                 href={`/forum/t/${topic.id}`}
-                className="group flex items-center py-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                className="group flex items-center py-3.5 border-b border-slate-100 hover:bg-black/5 transition-colors"
               >
                 {/* Topic Title */}
                 <div className="flex-1 min-w-0 pr-4 flex items-center gap-3">

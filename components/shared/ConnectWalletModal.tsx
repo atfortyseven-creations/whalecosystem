@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,7 +34,7 @@ export function ConnectWalletModal() {
         }
     }, [isConnectModalOpen]);
 
-    //  [SOVEREIGN MANDATE] QR Handshake Completion Listener 
+    //  [Enterprise MANDATE] QR Handshake Completion Listener 
     // This event is only fired by WalletConnectionBridge when the SSE
     // auth-complete event is received (i.e. a QR scan was completed on
     // a connected mobile device). We close the modal but do NOT force
@@ -141,7 +141,7 @@ export function ConnectWalletModal() {
                     className="relative w-full sm:max-w-[440px] max-h-[92dvh] bg-[#FFFFFF] border border-[#050505]/10 rounded-[24px] overflow-hidden flex flex-col shadow-2xl"
                 >
                     {/* Header Bar */}
-                    <div className="flex items-center justify-between px-6 py-5 border-b border-[#050505]/10 bg-[#FAF9F6]">
+                    <div className="flex items-center justify-between px-6 py-5 border-b border-[#050505]/10 bg-[#FFFFFF]">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full border border-[#050505]/10 flex items-center justify-center bg-white shadow-sm">
                                 <Terminal size={14} className="text-[#050505]" />
@@ -183,7 +183,7 @@ export function ConnectWalletModal() {
                                                 <button 
                                                     key={w.id}
                                                     onClick={w.handler}
-                                                    className="group relative flex flex-col items-center justify-center p-3 sm:p-5 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all shadow-sm shadow-black/5 hover:shadow-md active:scale-[0.96]"
+                                                    className="group relative flex flex-col items-center justify-center p-3 sm:p-5 border border-[#050505]/10 hover:border-[#050505] bg-[#FFFFFF] rounded-xl transition-all shadow-sm shadow-black/5 hover:shadow-md active:scale-[0.96]"
                                                 >
                                                     <div className="w-8 h-8 sm:w-10 sm:h-10 mb-1.5 sm:mb-2.5 relative flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
                                                         <img 
@@ -207,7 +207,7 @@ export function ConnectWalletModal() {
 
                                         {/* WALLET_CONNECT & LEDGER  compact on mobile */}
                                         <div className="space-y-1.5">
-                                            <button onClick={handleAppKitConnect} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
+                                            <button onClick={handleAppKitConnect} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FFFFFF] rounded-xl transition-all">
                                                 <div className="flex items-center gap-2.5">
                                                     <Wallet size={14} className="text-[#050505]" />
                                                     <span className="text-[11px] font-black text-[#050505] uppercase tracking-wide">All Wallets</span>
@@ -226,7 +226,7 @@ export function ConnectWalletModal() {
                                                 <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] shrink-0" />
                                             </button>
 
-                                            <button onClick={handleLedger} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
+                                            <button onClick={handleLedger} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FFFFFF] rounded-xl transition-all">
                                                 <div className="flex items-center gap-2.5">
                                                     <Cpu size={14} className="text-[#050505]" />
                                                     <span className="text-[11px] font-black text-[#050505] uppercase tracking-wide">Hardware Wallet</span>
@@ -263,7 +263,7 @@ export function ConnectWalletModal() {
 
                                     {/* Console Log */}
                                     {isPolling && (
-                                        <div className="w-full bg-[#FAF9F6] border border-[#050505]/10 p-3 rounded-xl text-center">
+                                        <div className="w-full bg-[#FFFFFF] border border-[#050505]/10 p-3 rounded-xl text-center">
                                             <p className="text-[10px] text-[#050505] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-2">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-black"/> AWAITING HANDSHAKE...
                                             </p>
@@ -279,7 +279,7 @@ export function ConnectWalletModal() {
                             {/*  LEDGER VIEW  */}
                             {view === 'ledger' && (
                                 <motion.div key="ledger" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-8 space-y-6 relative z-10">
-                                    <div className="w-20 h-20 rounded-full border border-[#050505]/10 bg-[#FAF9F6] flex items-center justify-center shadow-sm">
+                                    <div className="w-20 h-20 rounded-full border border-[#050505]/10 bg-[#FFFFFF] flex items-center justify-center shadow-sm">
                                         {ledgerLoading ? <Loader2 size={24} className="text-[#050505] animate-spin" /> : <CheckCircle2 size={28} className="text-[#050505]" />}
                                     </div>
 
@@ -289,7 +289,7 @@ export function ConnectWalletModal() {
                                         </h3>
                                     </div>
 
-                                    <div className="w-full bg-[#FAF9F6] border border-[#050505]/10 rounded-2xl p-5 flex flex-col gap-3 text-[11px] font-bold text-black/60">
+                                    <div className="w-full bg-[#FFFFFF] border border-[#050505]/10 rounded-2xl p-5 flex flex-col gap-3 text-[11px] font-bold text-black/60">
                                         <div className="flex items-center gap-3"><Zap size={14} className="text-[#050505]" /><span>Secure Connection Active</span></div>
                                         <div className="flex items-center gap-3"><Lock size={14} className="text-[#050505]" /><span>Hardware Protected Session</span></div>
                                     </div>

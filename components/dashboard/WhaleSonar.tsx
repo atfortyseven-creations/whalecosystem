@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+﻿import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Zap, ShieldAlert, Target, TrendingUp, Flame, Loader2 } from 'lucide-react';
 import { useSystemIntel } from '@/lib/api-client';
@@ -43,7 +43,7 @@ export function WhaleSonar() {
                 />
                 
                 {/* Exposure Radar (Simple CSS Representation) */}
-                <div className="bg-[#FAF9F6] dark:bg-[#1a1a1a] rounded-xl p-4 border border-[#E5E5E5] dark:border-white/5">
+                <div className="bg-[#FFFFFF] dark:bg-[#1a1a1a] rounded-xl p-4 border border-[#E5E5E5] dark:border-white/5">
                     <div className="text-[10px] uppercase font-mono tracking-widest text-[#888888] dark:text-white/40 mb-3 flex items-center justify-between">
                         <span>Exposure Radar</span>
                         <Zap size={10} className="text-[var(--aztec-orchid)]" />
@@ -119,7 +119,7 @@ export function WhaleSonar() {
 
 function MetricBox({ title, value, icon, color }: { title: string, value: string, icon: React.ReactNode, color: string }) {
     return (
-        <div className="bg-[#FAF9F6] dark:bg-[#1a1a1a] p-4 rounded-xl border border-[#E5E5E5] dark:border-white/5 flex items-center justify-between">
+        <div className="bg-[#FFFFFF] dark:bg-[#1a1a1a] p-4 rounded-xl border border-[#E5E5E5] dark:border-white/5 flex items-center justify-between">
             <div>
                 <div className="text-[9px] uppercase font-mono tracking-widest text-[#888888] dark:text-white/40 mb-1">{title}</div>
                 <div className={`text-xl font-aztec-serif font-black ${color}`}>{value}</div>

@@ -1,6 +1,6 @@
-export * from './types';
+﻿export * from './types';
 
-// The Cosmic Forge is activated via an environment variable.
+// The Data Studio is activated via an environment variable.
 // Zero-mock mandate: if false, the Forge UI and core processors degrade gracefully.
 export const FORGE_ENABLED = process.env.ENABLE_COSMIC_FORGE === 'true';
 

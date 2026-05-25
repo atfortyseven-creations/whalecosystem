@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -49,7 +49,7 @@ export function AztecZKMetrics() {
         
         <svg viewBox="0 0 400 200" className="w-full h-auto overflow-visible">
           {/* L1 Ethereum */}
-          <rect x="280" y="80" width="100" height="40" rx="4" fill="#FAFAF8" stroke="#000" strokeWidth="1.5" />
+          <rect x="280" y="80" width="100" height="40" rx="4" fill="#FFFFFF" stroke="#000" strokeWidth="1.5" />
           <text x="330" y="104" textAnchor="middle" className="font-mono text-[10px] font-bold">Ethereum L1</text>
           
           {/* Aztec Sequencer */}
@@ -57,7 +57,7 @@ export function AztecZKMetrics() {
           <text x="190" y="104" textAnchor="middle" fill="#FFF" className="font-mono text-[10px] font-bold">Aztec Rollup</text>
 
           {/* Client Prover */}
-          <rect x="0" y="80" width="100" height="40" rx="4" fill="#FAFAF8" stroke="#000" strokeWidth="1.5" />
+          <rect x="0" y="80" width="100" height="40" rx="4" fill="#FFFFFF" stroke="#000" strokeWidth="1.5" />
           <text x="50" y="104" textAnchor="middle" fill="#000" className="font-mono text-[10px] font-bold">Noir Prover (Client)</text>
 
           {/* Lines */}

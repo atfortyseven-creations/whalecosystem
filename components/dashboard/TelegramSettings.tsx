@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Send, Bell, BellOff, CheckCircle2, AlertCircle, Trash2, ExternalLink, Loader2, RefreshCw } from 'lucide-react';
@@ -114,7 +114,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
       <div className={`flex items-center justify-between px-5 py-4 rounded-2xl border ${
         isActive
           ? 'bg-[#00C076]/5 border-[#00C076]/25'
-          : 'bg-[#FAF9F6] border-[#E5E5E5]'
+          : 'bg-[#FFFFFF] border-[#E5E5E5]'
       }`}>
         <div className="flex items-center gap-3">
           {isActive
@@ -274,7 +274,7 @@ export default function TelegramSettings({ wallet }: { wallet: string }) {
         </div>
 
         {/* What you'll receive */}
-        <div className="bg-[#FAF9F6] border border-[#F0F0F0] rounded-xl px-4 py-3">
+        <div className="bg-[#FFFFFF] border border-[#F0F0F0] rounded-xl px-4 py-3">
           <p className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-2">You'll Receive Alerts For</p>
           <div className="grid grid-cols-2 gap-1.5">
             {[

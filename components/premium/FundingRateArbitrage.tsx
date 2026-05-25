@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface FundingRow {
@@ -108,7 +108,7 @@ export function FundingRateArbitrage() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="bg-stone-50 border border-stone-200/60 p-5 mt-4 text-[12px] text-stone-600 leading-relaxed text-justify space-y-3 shadow-inner">
+              <div className="bg-black/5 border border-stone-200/60 p-5 mt-4 text-[12px] text-stone-600 leading-relaxed text-justify space-y-3 shadow-inner">
                 <p>
                   <strong>What is the Funding Rate?</strong> To keep the price of a perpetual futures contract tied to the actual spot price of the asset, the exchange charges a fee every 8 hours. 
                 </p>
@@ -139,7 +139,7 @@ export function FundingRateArbitrage() {
             data.map(r => {
               const strong = r.arbSignal === "strong";
               return (
-                <div key={r.symbol} className="grid grid-cols-5 px-8 py-4 items-center hover:bg-stone-50/50 transition-colors">
+                <div key={r.symbol} className="grid grid-cols-5 px-8 py-4 items-center hover:bg-black/5/50 transition-colors">
                   <div className="col-span-2">
                     <div className="flex items-center gap-2 mb-1">
                       <span className={`text-[13px] font-medium ${strong ? "text-stone-900" : "text-stone-700"}`}>{r.symbol}</span>

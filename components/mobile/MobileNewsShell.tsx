@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -15,7 +15,7 @@ export function MobileNewsShell() {
   const [showScanner, setShowScanner] = useState(false);
 
   return (
-    <div className="w-full min-h-safe min-h-screen bg-[#FAF9F6] flex flex-col">
+    <div className="w-full min-h-safe min-h-screen bg-[#FFFFFF] flex flex-col">
       <UniversalScanModal 
         isOpen={showScanner} 
         onClose={() => setShowScanner(false)} 

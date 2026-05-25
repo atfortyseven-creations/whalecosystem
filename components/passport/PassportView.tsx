@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { ExternalLink, Package, Leaf, MapPin, ShieldCheck, Hash } from 'lucide-react';
@@ -23,7 +23,7 @@ export function PassportView({ passport }: { passport: ProductPassportPublic }) 
   const txUrl = explorerUrl(passport.chainId, passport.txHash);
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#050505] pb-16">
+    <div className="min-h-screen bg-[#FFFFFF] text-[#050505] pb-16">
       <header className="px-5 pt-[calc(1.25rem+env(safe-area-inset-top))] pb-6 border-b border-black/8 bg-white">
         <div className="max-w-lg mx-auto flex flex-col items-center gap-3 text-center">
           <div className="w-20 h-20">

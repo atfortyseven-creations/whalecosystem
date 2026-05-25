@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -75,7 +75,7 @@ export function WhaleFlowMap({ data, onClick, theme = 'arctic' }: FlowMapProps) 
             className={`relative w-full h-full flex flex-col ${isArctic ? 'bg-white/60 backdrop-blur-3xl' : 'bg-white'} overflow-hidden group/flow transition-all cursor-crosshair rounded-[2.5rem] shadow-inner border ${isArctic ? 'border-slate-100' : 'border-slate-200'}`}
         >
             {/* Formal Data Table Header */}
-            <div className="grid grid-cols-4 gap-4 px-6 py-4 border-b border-slate-100 bg-slate-50 mb-2">
+            <div className="grid grid-cols-4 gap-4 px-6 py-4 border-b border-slate-100 bg-black/5 mb-2">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Network Node</span>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Activity (TPS)</span>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Volume (24H)</span>
@@ -94,7 +94,7 @@ export function WhaleFlowMap({ data, onClick, theme = 'arctic' }: FlowMapProps) 
                             key={node.id}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="grid grid-cols-4 gap-4 px-4 py-4 rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50/50 transition-all group/row"
+                            className="grid grid-cols-4 gap-4 px-4 py-4 rounded-xl border border-transparent hover:border-slate-200 hover:bg-black/5/50 transition-all group/row"
                         >
                             {/* Asset Info */}
                             <div className="flex items-center gap-4">

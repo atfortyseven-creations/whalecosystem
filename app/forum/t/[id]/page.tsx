@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -140,13 +140,13 @@ export default function TopicPage() {
   };
 
   if (!topic) return (
-    <div className="py-20 text-center text-[13px] font-sans animate-pulse min-h-screen bg-[#FFFDF8] dark:bg-[#050505] text-black/60 dark:text-[#555] transition-colors duration-300">
+    <div className="py-20 text-center text-[13px] font-sans animate-pulse min-h-screen bg-[#FFFFFF] dark:bg-[#050505] text-black/60 dark:text-[#555] transition-colors duration-300">
       Decrypting Institutional Mandate...
     </div>
   );
 
   if (topic.error) return (
-    <div className="py-20 text-center text-[13px] font-sans text-red-500 min-h-screen bg-[#FFFDF8] dark:bg-[#050505] transition-colors duration-300">
+    <div className="py-20 text-center text-[13px] font-sans text-red-500 min-h-screen bg-[#FFFFFF] dark:bg-[#050505] transition-colors duration-300">
       Mandate / Profile not found or restricted.
     </div>
   );
@@ -211,7 +211,7 @@ export default function TopicPage() {
           <div id="reply-composer" className="mt-12 flex gap-6">
              <div className="w-[60px] shrink-0 hidden sm:block"></div>
              <div className="flex-1">
-                <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-200 focus-within:border-[#0088cc]/50 transition-colors shadow-sm">
+                <div className="rounded-xl overflow-hidden bg-black/5 border border-slate-200 focus-within:border-[#0088cc]/50 transition-colors shadow-sm">
                   <textarea
                     value={replyContent}
                     onChange={e => setReplyContent(e.target.value)}

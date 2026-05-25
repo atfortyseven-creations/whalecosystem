@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
@@ -158,7 +158,7 @@ export function NewPairsTable() {
             <div className="flex-1 w-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm flex flex-col min-h-0">
 
             {/*  Toolbar  */}
-            <div className="shrink-0 px-4 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
+            <div className="shrink-0 px-4 py-3 border-b border-[#E5E5E5] bg-[#FFFFFF] flex items-center gap-3 flex-wrap">
                 {/* Search */}
                 <div className="relative flex-1 min-w-[180px] max-w-xs">
                     <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]" />
@@ -258,7 +258,7 @@ export function NewPairsTable() {
                                     const score = security.score ?? 50;
                                     return (
                                         <div key={p.id || index} className="border-b border-[#F0F0F0]">
-                                            <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer min-h-[78px]"
+                                            <div className="grid hover:bg-[#FFFFFF] transition-colors items-center cursor-pointer min-h-[78px]"
                                                 style={{ gridTemplateColumns: '2.4fr 1.4fr 0.7fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 1fr 1fr 1.4fr' }}
                                             >
                                                 {/* Token / Dex */}
@@ -372,7 +372,7 @@ export function NewPairsTable() {
             </div>
 
             {/*  Status Footer  */}
-            <div className="shrink-0 px-5 py-2.5 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em]">
+            <div className="shrink-0 px-5 py-2.5 border-t border-[#E5E5E5] bg-[#FFFFFF] flex items-center justify-between text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em]">
                 <span>{filtered.length} PAIRS · ON-CHAIN VERIFIED</span>
                 <span className="font-mono text-[#050505]/40 tracking-widest">WAN SECURITY ENGINE</span>
             </div>

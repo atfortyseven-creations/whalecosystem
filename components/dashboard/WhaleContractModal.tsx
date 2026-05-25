@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,7 +32,7 @@ export function SystemContractModal() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] bg-[#FAF9F6]/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
+        className="fixed inset-0 z-[9999] bg-[#FFFFFF]/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
       >
         <motion.div
           initial={{ y: 20, opacity: 0, scale: 0.95 }}
@@ -41,7 +41,7 @@ export function SystemContractModal() {
           className="bg-white border border-[#E5E5E5] w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col"
         >
           {/* Header */}
-          <div className="px-10 pt-10 pb-6 border-b border-[#E5E5E5]/60 flex items-start gap-5 bg-[#FAF9F6]">
+          <div className="px-10 pt-10 pb-6 border-b border-[#E5E5E5]/60 flex items-start gap-5 bg-[#FFFFFF]">
             <div className="p-3 bg-white rounded-xl shadow-sm border border-[#E5E5E5]">
               <ShieldAlert className="text-[#050505]" size={28} />
             </div>
@@ -71,7 +71,7 @@ export function SystemContractModal() {
                 rel="noopener noreferrer"
                 onClick={() => setIsReadingDocs(true)}
                 className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:shadow-sm ${
-                  isReadingDocs ? "bg-[#FAF9F6] border-[#00C076] text-[#00C076]" : "bg-white border-[#E5E5E5] text-[#050505] hover:border-[#050505]"
+                  isReadingDocs ? "bg-[#FFFFFF] border-[#00C076] text-[#00C076]" : "bg-white border-[#E5E5E5] text-[#050505] hover:border-[#050505]"
                 }`}
               >
                 <div className="flex items-center gap-4">
@@ -93,7 +93,7 @@ export function SystemContractModal() {
                 rel="noopener noreferrer"
                 onClick={() => setIsReadingPrivacy(true)}
                 className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:shadow-sm ${
-                  isReadingPrivacy ? "bg-[#FAF9F6] border-[#00C076] text-[#00C076]" : "bg-white border-[#E5E5E5] text-[#050505] hover:border-[#050505]"
+                  isReadingPrivacy ? "bg-[#FFFFFF] border-[#00C076] text-[#00C076]" : "bg-white border-[#E5E5E5] text-[#050505] hover:border-[#050505]"
                 }`}
               >
                 <div className="flex items-center gap-4">
@@ -111,7 +111,7 @@ export function SystemContractModal() {
           </div>
 
           {/* Footer Action */}
-          <div className="p-8 border-t border-[#E5E5E5]/60 bg-[#FAF9F6] flex justify-end">
+          <div className="p-8 border-t border-[#E5E5E5]/60 bg-[#FFFFFF] flex justify-end">
             <button
               onClick={handleSign}
               disabled={!canSign}

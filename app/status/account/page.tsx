@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { useSession, signOut } from 'next-auth/react';
@@ -47,7 +47,7 @@ export default function AccountPage() {
           <div>
             <button 
               onClick={() => signOut({ callbackUrl: '/status' })}
-              className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold px-5 py-2.5 rounded-md text-sm transition-colors shadow-sm"
+              className="bg-black/5 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold px-5 py-2.5 rounded-md text-sm transition-colors shadow-sm"
             >
               Log out
             </button>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -41,7 +41,7 @@ export function MigrationHologram() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.15 }}
                         key={mig.id} 
-                        className="group flex flex-col gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-cyan-300 transition-all"
+                        className="group flex flex-col gap-2 p-3 rounded-xl bg-black/5 border border-slate-100 hover:border-cyan-300 transition-all"
                     >
                         <div className="flex justify-between items-center w-full">
                            <div className="flex items-center gap-2">

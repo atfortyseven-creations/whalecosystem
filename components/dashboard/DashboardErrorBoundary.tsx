@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { AlertOctagon, RotateCcw, Wifi } from "lucide-react";
@@ -88,7 +88,7 @@ export class DashboardErrorBoundary extends Component<Props, State> {
 
     if (!online && !hasError) {
       return (
-        <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem]">
+        <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-[#FFFFFF] border border-[#E5E5E5] rounded-[2rem]">
           <div className="flex bg-[#F7931A]/10 p-4 rounded-full mb-4">
             <Wifi size={32} className="text-[#F7931A]" />
           </div>
@@ -102,7 +102,7 @@ export class DashboardErrorBoundary extends Component<Props, State> {
 
     if (hasError) {
       return (
-        <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem]">
+        <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-[#FFFFFF] border border-[#E5E5E5] rounded-[2rem]">
           <div className="flex bg-[#FF3B30]/10 p-4 rounded-full mb-4">
             <AlertOctagon size={32} className="text-[#FF3B30]" />
           </div>

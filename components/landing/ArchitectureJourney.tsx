@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
@@ -129,7 +129,7 @@ function ArchitectureStep({ node, index }: { node: typeof ARCHITECTURE_NODES[0],
           whileHover={{ scale: 1.1, rotate: 5 }}
           className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white border border-slate-100 flex items-center justify-center relative overflow-hidden group/icon shadow-xl shadow-slate-200/50"
         >
-          <div className="absolute inset-0 bg-slate-50 group-hover/icon:bg-indigo-50 transition-colors" />
+          <div className="absolute inset-0 bg-black/5 group-hover/icon:bg-indigo-50 transition-colors" />
           <node.icon size={28} className="text-slate-900 group-hover/icon:text-indigo-600 transition-colors relative z-10" />
           
           {/* Animated rings around node when in view */}

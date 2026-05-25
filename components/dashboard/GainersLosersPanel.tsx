@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { RefreshCw, Search, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
@@ -87,7 +87,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
 
     return (
         <div
-            className="grid border-b border-slate-100 hover:bg-slate-50 hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:scale-[1.002] hover:z-10 relative transition-all items-center cursor-pointer bg-transparent"
+            className="grid border-b border-slate-100 hover:bg-black/5 hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:scale-[1.002] hover:z-10 relative transition-all items-center cursor-pointer bg-transparent"
             style={{ gridTemplateColumns: '40px 2.8fr 1.6fr 1.1fr 1.5fr 1.2fr 1fr' }}
             onClick={onClick}
         >
@@ -148,7 +148,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
 
             {/* Volatility */}
             <div className="px-3 flex justify-center">
-                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded border ${Math.abs(pct) > 10 ? 'bg-slate-100 text-slate-700 border-slate-200' : Math.abs(pct) > 5 ? 'bg-slate-100 text-slate-700 border-slate-200' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded border ${Math.abs(pct) > 10 ? 'bg-slate-100 text-slate-700 border-slate-200' : Math.abs(pct) > 5 ? 'bg-slate-100 text-slate-700 border-slate-200' : 'bg-black/5 text-slate-400 border-slate-200'}`}>
                     {Math.abs(pct) > 10 ? 'HIGH' : Math.abs(pct) > 5 ? 'MED' : 'LOW'}
                 </span>
             </div>
@@ -411,7 +411,7 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Toolbar Row 2  Network selector */}
-                <div className="shrink-0 px-6 py-2.5 border-b border-slate-200 bg-slate-50 backdrop-blur-sm flex items-center gap-2.5 flex-wrap z-10">
+                <div className="shrink-0 px-6 py-2.5 border-b border-slate-200 bg-black/5 backdrop-blur-sm flex items-center gap-2.5 flex-wrap z-10">
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mr-2">Topology:</span>
                     {ALL_NETWORKS.map(n => (
                         <button key={n} onClick={() => setNetwork(n)}
@@ -425,7 +425,7 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Column Headers */}
-                <div className="shrink-0 grid bg-slate-50 border-b border-slate-200 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] shadow-inner z-10"
+                <div className="shrink-0 grid bg-black/5 border-b border-slate-200 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] shadow-inner z-10"
                     style={{ gridTemplateColumns: '40px 2.8fr 1.6fr 1.1fr 1.5fr 1.2fr 1fr' }}>
                     {['#', 'Asset Name', 'Oracle Price', '24H %', 'Volume 24H', 'Dominance', 'Volatility'].map((h, i) => (
                         <div key={h} className={`px-3 py-3 ${i >= 3 && i <= 5 ? 'text-right' : i === 0 || i === 6 ? 'text-center' : ''}`}>{h}</div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -190,7 +190,7 @@ export function TokenUnlockCalendar() {
               className={`px-4 py-1.5 text-[10px] uppercase font-semibold tracking-widest border transition-colors shadow-sm ${
                 filter === f
                   ? "border-stone-400/80 bg-stone-900 text-white"
-                  : "border-stone-200 bg-white text-stone-500 hover:bg-stone-50"
+                  : "border-stone-200 bg-white text-stone-500 hover:bg-black/5"
               }`}
             >
               {f === "all" ? "All Events" : f === "high" ? "High or Critical Impact" : "Critical Only"}
@@ -220,7 +220,7 @@ export function TokenUnlockCalendar() {
           const daysOut = Math.ceil((u.date.getTime() - Date.now()) / 86_400_000);
 
           return (
-            <div key={u.id} className={u.sellPressure === "critical" ? "bg-stone-50/50" : ""}>
+            <div key={u.id} className={u.sellPressure === "critical" ? "bg-black/5/50" : ""}>
               <button
                 onClick={() => setExpanded(isExpanded ? null : u.id)}
                 className="w-full grid grid-cols-12 px-8 py-5 hover:bg-stone-100/50 transition-colors items-center text-left"

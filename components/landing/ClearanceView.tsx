@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -141,7 +141,7 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
         style={{ color: "#050505" }}
       >
         {/* HEADER */}
-        <div className="flex justify-between items-center bg-[#FAF9F6] px-8 py-5 border-b border-black/[0.04]">
+        <div className="flex justify-between items-center bg-[#FFFFFF] px-8 py-5 border-b border-black/[0.04]">
           <div className="flex items-center gap-3 text-black/80">
             <Terminal size={14} strokeWidth={1.5} />
             <span className="font-mono text-[10px] uppercase tracking-[0.35em] font-bold text-black/60">
@@ -223,7 +223,7 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
           </div>
 
           {/* TARGET RECP */}
-          <div className="bg-[#FAF9F6] p-6 border border-black/[0.04] rounded-2xl flex justify-between items-center group transition-colors hover:border-black/[0.1]">
+          <div className="bg-[#FFFFFF] p-6 border border-black/[0.04] rounded-2xl flex justify-between items-center group transition-colors hover:border-black/[0.1]">
             <div className="space-y-2">
               <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-black/40 font-black">
                 Destino Asegurado

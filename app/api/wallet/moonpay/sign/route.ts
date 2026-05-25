@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       baseCurrencyCode: (baseCurrencyCode || 'usd').toLowerCase(),
       baseCurrencyAmount: baseCurrencyAmount.toString(),
       walletAddress,
-      colorCode: '#FAF9F6', // Institutional Ivory match
+      colorCode: '#FFFFFF', // Institutional Ivory match
       theme: 'light'
     });
 

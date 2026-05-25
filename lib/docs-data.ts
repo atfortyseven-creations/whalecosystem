@@ -1,4 +1,4 @@
-export interface DocSection {
+﻿export interface DocSection {
   title: string;
   category: string;
   content: string[];
@@ -49,7 +49,7 @@ export const docsData: Record<string, DocSection> = {
     category: "Identity & Auth",
     content: [
       "We provide a seamless and secure mobile authentication flow designed to eliminate the vulnerabilities associated with traditional passwords. Utilizing standard protocols such as OAuth 2.0 and OpenID Connect, our mobile authentication module allows users to verify their identity using their personal mobile devices as hardware authenticators.",
-      "The process typically involves a QR code handshake. When a user attempts to access the platform on a desktop device, a unique, time-sensitive QR code is generated. The user scans this code using our secure mobile application, which signs a challenge cryptographically using keys stored in the device's secure enclave. This out-of-band authentication method is highly resistant to phishing and credential stuffing attacks.",
+      "The process typically involves a QR code handshake. When a user attempts to access the platform on a desktop device, a unique, time-sensitive QR code is generated. The user scans this code using our secure mobile application, which signs a challenge cryptographically using keys stored in the device's Wallet. This out-of-band authentication method is highly resistant to phishing and credential stuffing attacks.",
       "Once the challenge is successfully signed and verified by our servers, a secure session is established. This session is bound to both the specific device and the geographical location, providing an additional layer of contextual security. Developers can easily integrate this flow using our provided SDKs, significantly reducing the friction of onboarding while maximizing security."
     ]
   },

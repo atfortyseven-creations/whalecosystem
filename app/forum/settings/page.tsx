@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, User, Bell, Tag, Settings, Plus, Trash2, Save, Loader2, Check, AlertTriangle } from 'lucide-react';
@@ -63,7 +63,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-const inputCls = "w-full px-3 py-2 rounded-lg text-[14px] font-mono outline-none transition-all focus:ring-1 bg-[#FAF9F6] dark:bg-[#111111] border border-black/10 dark:border-white/10 text-[#050505] dark:text-[#FAF9F6]";
+const inputCls = "w-full px-3 py-2 rounded-lg text-[14px] font-mono outline-none transition-all focus:ring-1 bg-[#FFFFFF] dark:bg-[#111111] border border-black/10 dark:border-white/10 text-[#050505] dark:text-[#FFFFFF]";
 
 // 
 export default function ForumSettingsPage() {
@@ -226,7 +226,7 @@ export default function ForumSettingsPage() {
           <button
             onClick={saveProfile}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             Save Identity
@@ -259,7 +259,7 @@ export default function ForumSettingsPage() {
           <button
             onClick={saveProfile}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             Save Notifications
@@ -342,7 +342,7 @@ export default function ForumSettingsPage() {
                 <button
                   onClick={createCategory}
                   disabled={addingCat}
-                  className="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
+                  className="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
                 >
                   {addingCat ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                   Add Category
@@ -404,7 +404,7 @@ export default function ForumSettingsPage() {
               <div className="flex justify-end">
                 <button
                   onClick={saveGlobal}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all bg-[#050505] dark:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
                 >
                   <Save size={14} /> Save Forum Config
                 </button>

@@ -1,4 +1,4 @@
-import db from '@/lib/db';
+﻿import db from '@/lib/db';
 
 export class IdentityService {
     /**
@@ -23,7 +23,7 @@ export class IdentityService {
 
     /**
      * Critical logic: Verify World ID
-     * This elevates the user Tier to SOVEREIGN
+     * This elevates the user Tier to Enterprise
      */
     static async verifyWorldID(walletAddress: string, proof: any) {
         // Real ZK proof cryptographic validation would go here
@@ -33,7 +33,7 @@ export class IdentityService {
             return await db.user.update({
                 where: { walletAddress },
                 data: {
-                    tier: 'SOVEREIGN',
+                    tier: 'Enterprise',
                     humanityScore: { increment: 50 } // Reputation boost
                 }
             });

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -24,7 +24,7 @@ export default function UptimeBar({ serviceName, uptimePercentage, days }: Uptim
     <div className="w-full bg-white border border-slate-200 rounded-lg overflow-hidden transition-all duration-300 shadow-sm mb-4">
       {/* Header Row */}
       <div 
-        className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
+        className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-black/5 transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
@@ -35,7 +35,7 @@ export default function UptimeBar({ serviceName, uptimePercentage, days }: Uptim
       </div>
 
       {/* Bar Row */}
-      <div className="px-6 pb-5 pt-1 border-t border-slate-50 bg-slate-50/30">
+      <div className="px-6 pb-5 pt-1 border-t border-slate-50 bg-black/5/30">
         <div className="flex justify-between items-center text-[10px] uppercase font-bold text-slate-400 mb-2">
           <span>90 days ago</span>
           <span>Today</span>

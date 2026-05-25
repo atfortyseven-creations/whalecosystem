@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -113,7 +113,7 @@ export function UnifiedExplorerTerminal() {
 
                 </main>
 
-                <footer className="py-12 px-8 border-t border-slate-100 bg-slate-50/50 backdrop-blur-md">
+                <footer className="py-12 px-8 border-t border-slate-100 bg-black/5/50 backdrop-blur-md">
                     <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                         <div className="flex items-center gap-6">
                             <Link href="/" className="flex items-center gap-2">

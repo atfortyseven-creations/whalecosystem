@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -170,7 +170,7 @@ export function PreCognitiveGrid({ symbol }: PreCognitiveGridProps) {
 
     if (!state) {
         return (
-            <div className="bg-[#FAF9F6] border border-[#050505]/10 rounded-2xl p-6 h-40 flex items-center justify-center animate-pulse">
+            <div className="bg-[#FFFFFF] border border-[#050505]/10 rounded-2xl p-6 h-40 flex items-center justify-center animate-pulse">
                 <span className="text-[10px] font-black uppercase text-[#050505]/30 tracking-widest">Warming Grid Engine...</span>
             </div>
         );
@@ -194,7 +194,7 @@ export function PreCognitiveGrid({ symbol }: PreCognitiveGridProps) {
             </AnimatePresence>
 
             <div 
-                className="group relative bg-[#FAF9F6] border border-[#050505]/10 rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-[#050505]/30 cursor-crosshair min-h-[160px]"
+                className="group relative bg-[#FFFFFF] border border-[#050505]/10 rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-[#050505]/30 cursor-crosshair min-h-[160px]"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >

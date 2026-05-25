@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -117,7 +117,7 @@ function ScanLine({ active }: { active: boolean }) {
           key={i}
           d={d}
           fill="none"
-          stroke="#faf9f6"
+          stroke="#FFFFFF"
           strokeWidth={STROKE + 0.5}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -413,7 +413,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6] overflow-y-auto py-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]"
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FFFFFF] overflow-y-auto py-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]"
         >
           {/* Close button */}
           <button

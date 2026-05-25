@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -53,7 +53,7 @@ export function ConcentratedLiquidityMap() {
                             <span className="text-xs font-mono text-slate-600">${node.priceAsset0}</span>
                         </div>
                         
-                        <div className="flex-1 h-6 bg-slate-50 rounded-r-sm overflow-hidden border-l border-slate-200 relative flex items-center">
+                        <div className="flex-1 h-6 bg-black/5 rounded-r-sm overflow-hidden border-l border-slate-200 relative flex items-center">
                             <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${Math.min(100, node.concentration * 2)}%` }}

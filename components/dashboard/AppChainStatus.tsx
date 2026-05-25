@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -27,7 +27,7 @@ export default function AppChainStatus() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#FAF9F6] border border-black/5 rounded-3xl p-6 space-y-4">
+                <div className="bg-[#FFFFFF] border border-black/5 rounded-3xl p-6 space-y-4">
                     <div className="flex items-center gap-2 opacity-40">
                         <Shield size={14} className="text-black" />
                         <span className="text-[9px] font-black uppercase tracking-widest text-black">Consensus</span>
@@ -38,7 +38,7 @@ export default function AppChainStatus() {
                     </div>
                 </div>
 
-                <div className="bg-[#FAF9F6] border border-black/5 rounded-3xl p-6 space-y-4">
+                <div className="bg-[#FFFFFF] border border-black/5 rounded-3xl p-6 space-y-4">
                     <div className="flex items-center gap-2 opacity-40">
                         <Zap size={14} className="text-black" />
                         <span className="text-[9px] font-black uppercase tracking-widest text-black">Execution Layer</span>
@@ -79,7 +79,7 @@ export default function AppChainStatus() {
 
 function SignalEntry({ timestamp, type, status, desc }: { timestamp: string, type: string, status: string, desc: string }) {
     return (
-        <div className="flex items-center justify-between p-3 hover:bg-[#FAF9F6] rounded-2xl transition-colors group border border-transparent hover:border-black/5">
+        <div className="flex items-center justify-between p-3 hover:bg-[#FFFFFF] rounded-2xl transition-colors group border border-transparent hover:border-black/5">
             <div className="flex items-center gap-3">
                 <div className="text-[10px] font-bold text-black/10 font-mono w-12">{timestamp}</div>
                 <div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useId, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -142,7 +142,7 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
             style={{ color: '#050505' }}
           >
             {/* HEADER */}
-            <div className="flex justify-between items-center bg-[#FAF9F6] px-6 py-4 border-b border-[#E5E5E5]">
+            <div className="flex justify-between items-center bg-[#FFFFFF] px-6 py-4 border-b border-[#E5E5E5]">
               <div className="flex items-center gap-3 text-[#050505]/80">
                 <Terminal size={16} />
                 {/* FIX: Replaced Date.now().toString().slice(-6) with stable useId()
@@ -211,7 +211,7 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
               </div>
 
               {/* TARGET RECP */}
-              <div className="bg-[#FAF9F6] p-5 border border-[#E5E5E5] rounded-xl text-left flex justify-between items-center shadow-inner">
+              <div className="bg-[#FFFFFF] p-5 border border-[#E5E5E5] rounded-xl text-left flex justify-between items-center shadow-inner">
                 <div className="space-y-1">
                     <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#888888] font-black">Destino Asegurado</span>
                     <p className="font-mono text-[10px] uppercase tracking-widest text-[#050505] font-black">

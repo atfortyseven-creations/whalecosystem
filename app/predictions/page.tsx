@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,7 +15,7 @@ export default function PredictionGridTab() {
   const [activeFilter, setActiveFilter] = useState('All');
 
   return (
-    <div className="w-full bg-transparent text-[#050505] dark:text-[#FAF9F6] p-12 min-h-screen">
+    <div className="w-full bg-transparent text-[#050505] dark:text-[#FFFFFF] p-12 min-h-screen">
       <header className="mb-14 border-b border-black/10 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <div className="flex items-center gap-3 mb-3">
@@ -78,7 +78,7 @@ export default function PredictionGridTab() {
                   href={`https://bridge.system.network/predict/${market.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full bg-white/20 dark:bg-black/20 backdrop-blur-md text-[#050505] dark:text-[#FAF9F6] p-3 rounded-xl flex items-center justify-center gap-2 font-black uppercase text-[10px] tracking-widest hover:bg-white/40 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5"
+                  className="w-full bg-white/20 dark:bg-black/20 backdrop-blur-md text-[#050505] dark:text-[#FFFFFF] p-3 rounded-xl flex items-center justify-center gap-2 font-black uppercase text-[10px] tracking-widest hover:bg-white/40 dark:hover:bg-white/10 transition-colors border border-black/5 dark:border-white/5"
                 >
                   Direct Capital Routing <ChevronRight size={14} />
                 </a>

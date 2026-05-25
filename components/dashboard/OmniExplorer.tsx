@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { 
@@ -128,7 +128,7 @@ export function OmniExplorer() {
     };
 
     return (
-        <div className="relative h-full w-full min-h-0 font-sans p-0 flex flex-col selection:bg-[#050505]/20 dark:selection:bg-white/20 selection:text-[#050505] dark:selection:text-white overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A]">
+        <div className="relative h-full w-full min-h-0 font-sans p-0 flex flex-col selection:bg-[#050505]/20 dark:selection:bg-white/20 selection:text-[#050505] dark:selection:text-white overflow-hidden bg-[#FFFFFF] dark:bg-[#0A0A0A]">
             
             <div className="relative z-10 w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col gap-12">
                 {/* Header / Search Area */}
@@ -159,7 +159,7 @@ export function OmniExplorer() {
                         <button
                             onClick={handleSearch}
                             disabled={isSearching}
-                            className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] hover:text-[#050505] dark:hover:text-white hover:border-[#050505] dark:hover:border-white/10 border border-transparent text-white dark:text-black px-8 font-semibold text-[13px] transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded"
+                            className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FFFFFF] dark:hover:bg-[#1A1A1A] hover:text-[#050505] dark:hover:text-white hover:border-[#050505] dark:hover:border-white/10 border border-transparent text-white dark:text-black px-8 font-semibold text-[13px] transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded"
                         >
                             {isSearching ? 'Searching...' : 'Search'}
                         </button>
@@ -175,7 +175,7 @@ export function OmniExplorer() {
 
                     {searchResults !== null && (
                         <div className="w-full border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] rounded overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
-                            <div className="flex items-center justify-between p-5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
+                            <div className="flex items-center justify-between p-5 bg-[#FFFFFF] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
                                 <div className="flex items-center gap-3">
                                     <Zap size={14} className="text-[#050505] dark:text-white" />
                                     <h2 className="text-[13px] font-semibold">Search Results</h2>
@@ -195,7 +195,7 @@ export function OmniExplorer() {
                                         const label = result.label || entity._labels?.[0] || 'Entity';
                                         const name = entity.name || entity.address || entity.symbol || entity.id || 'Unknown';
                                         return (
-                                            <div key={i} className="flex items-center justify-between p-5 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
+                                            <div key={i} className="flex items-center justify-between p-5 hover:bg-[#FFFFFF] dark:hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
                                                 <div className="flex flex-col gap-1">
                                                     <span className="text-[13px] text-[#050505] dark:text-white font-mono font-bold group-hover:text-[#888888] dark:group-hover:text-white/60 transition-colors">{name}</span>
                                                     {entity.description && (
@@ -203,7 +203,7 @@ export function OmniExplorer() {
                                                     )}
                                                 </div>
                                                 <div className="flex items-center gap-4">
-                                                    <span className="px-2.5 py-1 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-[#AAAAAA] rounded-md uppercase tracking-widest">{label}</span>
+                                                    <span className="px-2.5 py-1 bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-[#AAAAAA] rounded-md uppercase tracking-widest">{label}</span>
                                                     <ChevronRight size={14} className="text-[#888888] group-hover:translate-x-1 transition-all" />
                                                 </div>
                                             </div>
@@ -220,7 +220,7 @@ export function OmniExplorer() {
                     
                     {/* BLOCKS PANEL */}
                     <div className="border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] rounded overflow-hidden shadow-sm">
-                        <div className="flex items-center justify-between p-6 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
+                        <div className="flex items-center justify-between p-6 bg-[#FFFFFF] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
                             <div className="flex items-center gap-3">
                                 <Box size={14} className="text-[#050505] dark:text-white" />
                                 <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">BLOCK TELEMETRY</h2>
@@ -241,7 +241,7 @@ export function OmniExplorer() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.8 }}
                                         onClick={() => setSelectedBlock(block)}
-                                        className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-all gap-4 group relative overflow-hidden"
+                                        className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FFFFFF] dark:hover:bg-[#1A1A1A] transition-all gap-4 group relative overflow-hidden"
                                     >
                                         {/* Animation: Mined pulse effect on mount */}
                                         <motion.div
@@ -252,7 +252,7 @@ export function OmniExplorer() {
                                         />
 
                                         <div className="flex items-center gap-4 relative z-10">
-                                            <div className="w-12 h-12 bg-[#FAF9F6] dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:bg-[#050505] dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black transition-all">
+                                            <div className="w-12 h-12 bg-[#FFFFFF] dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:bg-[#050505] dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black transition-all">
                                                 <Box size={16} />
                                             </div>
                                             <div className="flex flex-col gap-1 text-left">
@@ -282,7 +282,7 @@ export function OmniExplorer() {
 
                     {/* TRANSACTIONS PANEL */}
                     <div className="border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] rounded overflow-hidden shadow-sm">
-                        <div className="flex items-center justify-between p-6 bg-[#FAF9F6] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
+                        <div className="flex items-center justify-between p-6 bg-[#FFFFFF] dark:bg-[#1A1A1A] border-b border-[#E5E5E5] dark:border-white/10">
                             <div className="flex items-center gap-3">
                                 <Activity size={14} className="text-[#050505] dark:text-white" />
                                 <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">TRANSACTION FLOWS</h2>
@@ -298,10 +298,10 @@ export function OmniExplorer() {
                                 <button 
                                     key={i} 
                                     onClick={() => setSelectedTx(tx)}
-                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-all gap-4 group"
+                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FFFFFF] dark:hover:bg-[#1A1A1A] transition-all gap-4 group"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-[#FAF9F6] dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:border-[#050505] dark:group-hover:border-white transition-all">
+                                        <div className="w-12 h-12 bg-[#FFFFFF] dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:border-[#050505] dark:group-hover:border-white transition-all">
                                             <AlignLeft size={16} className="text-[#888888] dark:text-[#AAAAAA] group-hover:text-[#050505] dark:group-hover:text-white" />
                                         </div>
                                         <div className="flex flex-col gap-1 text-left min-w-0">
@@ -319,7 +319,7 @@ export function OmniExplorer() {
                                             <span className="text-[#050505] dark:text-white">{tx.to}</span>
                                         </div>
                                         <div className="flex items-center sm:justify-end gap-3">
-                                            <span className="px-2 py-0.5 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-[8px] font-black text-[#888888] dark:text-[#AAAAAA] rounded-md uppercase tracking-widest">{tx.type}</span>
+                                            <span className="px-2 py-0.5 bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 text-[8px] font-black text-[#888888] dark:text-[#AAAAAA] rounded-md uppercase tracking-widest">{tx.type}</span>
                                             <span className="text-sm font-mono font-black text-[#050505] dark:text-white tracking-tighter">{tx.value}</span>
                                         </div>
                                     </div>
@@ -335,14 +335,14 @@ export function OmniExplorer() {
                         <div className="w-full max-w-2xl bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded shadow-xl overflow-hidden relative">
                             <button 
                                 onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
-                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] dark:text-[#AAAAAA] hover:text-[#050505] dark:hover:text-white hover:bg-[#FAF9F6] dark:hover:bg-[#1A1A1A] transition-all"
+                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] dark:text-[#AAAAAA] hover:text-[#050505] dark:hover:text-white hover:bg-[#FFFFFF] dark:hover:bg-[#1A1A1A] transition-all"
                             >
                                 <X size={18} />
                             </button>
 
                             <div className="p-8 md:p-10">
                                 <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] dark:border-white/10">
-                                    <div className="w-12 h-12 bg-[#FAF9F6] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded flex items-center justify-center">
+                                    <div className="w-12 h-12 bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded flex items-center justify-center">
                                         {selectedBlock ? <Box size={20} className="text-[#050505] dark:text-white" /> : <Activity size={20} className="text-[#050505] dark:text-white" />}
                                     </div>
                                     <div className="flex flex-col gap-1">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -229,7 +229,7 @@ Wallet: Whale Alert Network Terminal v4.0
 
             {/* Verification Section */}
             {!isVerified && (
-                <div className="bg-[#FAFAF8] border border-black/10 rounded-3xl p-8">
+                <div className="bg-[#FFFFFF] border border-black/10 rounded-3xl p-8">
                     <h3 className="text-2xl font-black text-black mb-4">Verification</h3>
                     <p className="text-black/60 mb-6">
                         Confirm sequence stability by entering the following words:

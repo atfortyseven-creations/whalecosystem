@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback } from "react";
 import { SiweMessage } from "siwe";
@@ -115,7 +115,7 @@ export function useSIWE(): UseSIWEReturn {
       //  Step 5: Session active 
       setStatus("authenticated");
       setAuthedAddress(result.address);
-      toast.success("SOVEREIGN ACCESS GRANTED", {
+      toast.success("Enterprise ACCESS GRANTED", {
         description: `Identity verified: ${result.address.slice(0, 6)}...${result.address.slice(-4)}`,
       });
 

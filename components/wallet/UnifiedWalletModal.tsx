@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -60,7 +60,7 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm" />
 
                     <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none p-4">
-                        <div className="w-full max-w-md bg-[#FAF9F6] border border-black/5 rounded-[32px] shadow-2xl pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="w-full max-w-md bg-[#FFFFFF] border border-black/5 rounded-[32px] shadow-2xl pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]">
                             <div className="flex items-center justify-between p-6 pb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 border border-black/10 rounded-2xl bg-white shadow-sm">
@@ -111,7 +111,7 @@ function TokenSelector({ assets, onSelect, onClose, currentChainId = null }: any
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-[#FAF9F6] rounded-[32px] shadow-2xl border border-black/10 w-full max-w-sm relative z-10 overflow-hidden flex flex-col max-h-[80vh]">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-[#FFFFFF] rounded-[32px] shadow-2xl border border-black/10 w-full max-w-sm relative z-10 overflow-hidden flex flex-col max-h-[80vh]">
                 <div className="p-6 border-b border-black/5 flex flex-col gap-4">
                     <div className="flex justify-between items-center">
                         <span className="font-black text-black uppercase tracking-tight">Select Token</span>

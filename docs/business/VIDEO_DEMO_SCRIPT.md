@@ -1,4 +1,4 @@
-# PRODUCT VALIDATION: INSTITUTIONAL VIDEO DEMO
+﻿# PRODUCT VALIDATION: INSTITUTIONAL VIDEO DEMO
 ## System Network Architecture | Humanity Ledger
 ### Duration: 5-7 Minutes | Audience: ENISA, CDTI Evaluators, Seed Investors
 
@@ -15,7 +15,7 @@
 
 ---
 
-## ACTO 1: TITANIUMGATE & THE SOVEREIGN HANDSHAKE (1:00 - 2:30)
+## ACTO 1: TITANIUMGATE & THE Enterprise HANDSHAKE (1:00 - 2:30)
 **VISUAL:** Grabación de pantalla del flujo de conexión. El usuario escanea el código QR desde su teléfono. La terminal de escritorio reacciona instantáneamente sin recargar la página.
 **AUDIO:**
 "Observen el protocolo System Handshake. No usamos contraseñas ni dependemos de servidores de terceros. El usuario firma criptográficamente un desafío EIP-191."
