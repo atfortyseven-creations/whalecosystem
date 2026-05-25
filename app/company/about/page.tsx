@@ -1,4 +1,4 @@
-﻿import DocLayout from '@/components/layout/DocLayout';
+import DocLayout from '@/components/layout/DocLayout';
 import { Heart, Users, Target, Sparkles, Globe, Shield, Activity, Lock, Cpu, Rocket, Award, Lightbulb, TrendingUp, Handshake, Leaf, BookOpen } from 'lucide-react';
 
 export default function AboutPage() {
@@ -92,9 +92,10 @@ export default function AboutPage() {
                     <h2 className="text-3xl font-black mb-8 tracking-tight text-[#050505]">Leadership & Corporate Governance</h2>
                     <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
                         <div className="flex flex-col md:flex-row gap-8 items-start">
-                            <div className="w-full md:w-1/3 shrink-0 flex flex-col items-center">
+                            <div className="w-full md:w-1/3 shrink-0 flex flex-col items-center text-center">
                                 <img src="/system-shots/photo_2026-05-16_19-57-16.jpg" alt="Creator of the Network" className="rounded-2xl border border-black/10 w-full object-cover aspect-square shadow-sm" />
-                                <span className="mt-4 text-sm font-bold text-black">Creator of the Network</span>
+                                <span className="mt-4 text-base font-black text-[#050505]">CEO - Stefan Antonio Cirisanu</span>
+                                <span className="mt-1 text-sm font-medium text-[#050505]/60">Creator of the Network</span>
                             </div>
                             <div className="w-full md:w-2/3 space-y-6">
                                 <p>

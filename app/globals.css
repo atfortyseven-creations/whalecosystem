@@ -1,4 +1,4 @@
-﻿@import "tailwindcss/base";
+@import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
@@ -141,6 +141,10 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     --border-main: rgba(0, 0, 0, 0.08);
     --glass-bg: rgba(255, 255, 255, 0.45);
     --glass-border: rgba(0, 0, 0, 0.05);
+    
+    /* Institutional Absolute Contrast */
+    --aztec-parchment: #FFFFFF;
+    --aztec-ink: #050505;
     
     /* Institutional Accents */
     --accent-primary: #00F2EA; /* Pure Cyan */
@@ -354,9 +358,9 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
 
     /* PURE WEB3 FLOATING NAV REFINEMENTS */
     .capsule-nav-glass {
-        background: rgba(250, 249, 246, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(0, 0, 0, 0.06);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
     }

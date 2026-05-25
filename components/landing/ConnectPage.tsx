@@ -371,7 +371,7 @@ export default function ConnectPage() {
         <source src="/system-shots/8597294-hd_1920_1080_30fps.mp4" type="video/mp4" />
       </video>
       
-      <div className="relative z-10 w-full flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 sm:p-12 max-w-[1400px] mx-auto min-h-0">
+      <div className="relative z-10 w-full flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 sm:p-12 max-w-[1400px] mx-auto min-h-0 pt-16">
         
         {/* CENTER: Connection panel (Login Zone) */}
         <div className="w-full max-w-[420px] mx-auto flex-shrink-0 flex flex-col bg-white rounded-[24px] border border-[#F0F0F0] shadow-[0_8px_40px_rgba(0,0,0,0.03)] p-6 sm:p-8 xl:p-10 z-20">
@@ -555,6 +555,48 @@ export default function ConnectPage() {
 
       </div>
 
+      {/* TOP BAR: Aztec only */}
+      <div className="absolute top-0 left-0 right-0 z-40 border-b border-white/10 bg-[#0A0A0A]/80 backdrop-blur-md overflow-hidden h-16 flex items-center">
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes marquee-aztec {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-marquee-aztec {
+            animation: marquee-aztec 10s linear infinite;
+          }
+          @keyframes marquee-bottom {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-marquee-bottom {
+            animation: marquee-bottom 12s linear infinite;
+          }
+        `}} />
+        <div className="flex w-max animate-marquee-aztec items-center">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-8">
+              <img
+                src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png"
+                className="h-10 w-auto object-contain opacity-70"
+                alt="Aztec"
+              />
+              <span className="text-white/30 text-[8px] font-mono uppercase tracking-[0.3em] whitespace-nowrap">Powered by Aztec</span>
+            </div>
+          ))}
+          {[...Array(20)].map((_, i) => (
+            <div key={`b-${i}`} className="flex items-center gap-3 px-8">
+              <img
+                src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png"
+                className="h-10 w-auto object-contain opacity-70"
+                alt="Aztec"
+              />
+              <span className="text-white/30 text-[8px] font-mono uppercase tracking-[0.3em] whitespace-nowrap">Powered by Aztec</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Mobile QR Scanner */}
       {isMobile && mounted && (
         <DynamicUniversalScanModal
@@ -569,25 +611,28 @@ export default function ConnectPage() {
         />
       )}
 
-      {/* Footer marquee */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes marquee {
-          0% { transform: translateX(0%); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 25s linear infinite;
-        }
-      `}} />
-      <footer className="relative z-30 border-t border-white/10 flex items-center bg-[#2A2A2A]/90 backdrop-blur-md w-full overflow-hidden py-3">
-        <div className="flex w-max animate-marquee space-x-12 px-6 items-center">
-          {[...Array(2)].map((_, i) => (
-            <React.Fragment key={i}>
+      {/* BOTTOM BAR: All logos, full-width, faster */}
+      <footer className="relative z-30 border-t border-white/10 flex items-center bg-[#111]/90 backdrop-blur-md w-full overflow-hidden h-16">
+        <div className="flex w-max animate-marquee-bottom items-center">
+          {[...Array(4)].map((_, rep) => (
+            <React.Fragment key={rep}>
               {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
                 <img
-                  key={`set-${i}-img-${num}`}
+                  key={`rep-${rep}-img-${num}`}
                   src={`/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (${num}).png`}
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                  className="h-10 w-auto object-contain opacity-75 hover:opacity-100 transition-opacity mx-6 shrink-0"
+                  alt={`Partner ${num}`}
+                />
+              ))}
+            </React.Fragment>
+          ))}
+          {[...Array(4)].map((_, rep) => (
+            <React.Fragment key={`dup-${rep}`}>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
+                <img
+                  key={`dup-rep-${rep}-img-${num}`}
+                  src={`/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (${num}).png`}
+                  className="h-10 w-auto object-contain opacity-75 hover:opacity-100 transition-opacity mx-6 shrink-0"
                   alt={`Partner ${num}`}
                 />
               ))}

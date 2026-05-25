@@ -49,11 +49,9 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
 
         const { svg: rendered } = await mermaid.render(`privacy-diagram-${reactId}`, chart.trim());
         if (!cancelled) {
-          // Patch SVG to be fully responsive: remove fixed width/height attrs, keep viewBox
+          // Patch SVG to be fully responsive: allow natural scaling and scrolling without constrained max-width
           const patched = rendered
-            .replace(/\s+width="[^"]*"/, ' width="100%"')
-            .replace(/\s+height="[^"]*"/, ' height="auto"')
-            .replace(/style="max-width:[^"]*"/, 'style="width:100%;height:auto;display:block;"');
+            .replace(/style="max-width:[^"]*"/, 'style="max-width:100%;height:auto;display:block;margin:auto;"');
           setSvg(patched);
           setError(null);
         }
@@ -84,8 +82,8 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
           </div>
         ) : svg ? (
           <div
-            /* min-w-max ensures the SVG never collapses narrower than its natural width */
-            className="p-6 md:p-10 min-w-max"
+            /* Removed min-w-max to prevent cutting off SVG contents */
+            className="p-6 md:p-10 w-full"
             style={{ lineHeight: 1 }}
             dangerouslySetInnerHTML={{ __html: svg }}
             aria-hidden={!caption}

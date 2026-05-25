@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 // Lottie cargado dinámicamente para evitar SSR issues
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
@@ -579,11 +580,11 @@ function FinalCTASection() {
           className="flex flex-col items-center gap-8"
         >
           <div className="w-40 h-40">
-            <Lottie
-              animationData={require('../../public/system-shots/block abstract.json')}
+            <RemoteLottie
+              path="/system-shots/block abstract.json"
               loop={true}
-              autoplay={true}
-              style={{ width: '100%', height: '100%', mixBlendMode: 'screen', opacity: 0.9 }}
+              className="w-full h-full"
+              style={{ mixBlendMode: 'screen', opacity: 0.9 }}
             />
           </div>
 

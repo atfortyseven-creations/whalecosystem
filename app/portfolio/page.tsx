@@ -1,9 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from 'react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { CoreAuthGate } from '@/components/auth/CoreAuthGate';
 import { InstitutionalPortfolioView } from '@/components/bsv/InstitutionalPortfolioView';
+import { UnlockVaultScreen } from '@/components/security/UnlockVaultScreen';
+import { useWalletStore } from '@/lib/store/wallet-store';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
@@ -11,6 +13,7 @@ export default function PortfolioPage() {
   const [sessionUnlocked, setSessionUnlocked] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { isConnected: isSystemConnected, isChecking: isSystemChecking } = useSystemAccount();
+  const { isLocked, passwordHash } = useWalletStore();
 
   useEffect(() => {
     setMounted(true);
@@ -22,6 +25,10 @@ export default function PortfolioPage() {
   }, []);
 
   if (!mounted || isSystemChecking) return null;
+
+  if (isLocked && passwordHash) {
+      return <UnlockVaultScreen />;
+  }
 
   const needsGate = !isSystemConnected && !sessionUnlocked;
 

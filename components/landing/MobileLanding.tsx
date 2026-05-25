@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -1413,7 +1413,7 @@ export function MobileLanding() {
         onClose={() => setShowScanner(false)}
         address={effectiveAddress ?? undefined}
         mode={scanMode}
-        initialScanData={initialScanData}
+        initialScanData={(autoSyncStarted && uuidParam) ? window.location.href : null}
         onScan={(_result: string) => {
           const toast = document.createElement('div');
           toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-black text-white text-[10px] border border-white/10 font-mono uppercase tracking-[0.3em] px-6 py-5 rounded-2xl shadow-2xl text-center';

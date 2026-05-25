@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
 import { getGbRpc, getGbWss } from '@/lib/blockchain/getblock-registry';
+import CryptoJS from 'crypto-js';
 
 // 100M-User Scalability & Enterprise Grid Configuration
 export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche';
@@ -44,19 +45,49 @@ export const NETWORKS: Record<NetworkId, { name: string; currency: string; rpc: 
 interface WalletAccount {
   address: string;
   privateKey: string | null;
+  mnemonic?: string | null;
   label: string;
   isCustom: boolean;
+}
+
+// In-memory strictly local encryption key. Never leaves JS context.
+let sessionEncryptionKey: string | null = null;
+
+interface Contact {
+  name: string;
+  address: string;
+}
+
+interface CustomToken {
+  address: string;
+  symbol: string;
+  decimals: number;
+}
+
+interface TokenBalance extends CustomToken {
+  balance: string;
 }
 
 interface WalletState {
   address: string | null;
   privateKey: string | null;
+  mnemonic: string | null;
   accounts: WalletAccount[];
   balance: string;
   isCustom: boolean;
   activeNetwork: NetworkId;
   activeProtocol: ProtocolType;
   isUpdatingBalance: boolean;
+  transactions: any[];
+  contacts: Contact[];
+  customRpcUrl: string | null;
+  customTokens: CustomToken[];
+  tokenBalances: TokenBalance[];
+
+  // Vault Security
+  isLocked: boolean;
+  passwordHash: string | null;
+  encryptedVault: string | null;
   
   createWallet: () => void;
   importWallet: (privateKey: string, label?: string) => boolean;
@@ -64,12 +95,22 @@ interface WalletState {
   removeAccount: (address: string) => void;
   clearWallet: () => void; // Purges all accounts
   updateBalance: () => Promise<void>;
-  sendTransaction: (to: string, amount: string) => Promise<string | null>;
+  sendTransaction: (to: string, amount: string, gasPriority?: 'low'|'medium'|'high') => Promise<string | null>;
   setNetwork: (network: NetworkId) => void;
   setProtocol: (protocol: ProtocolType) => void;
+  setCustomRpcUrl: (url: string | null) => void;
+  addContact: (name: string, address: string) => void;
+  removeContact: (address: string) => void;
+  addCustomToken: (address: string, symbol: string, decimals: number) => void;
   syncAddress: (address: string | null) => void;
   cloudSync: () => Promise<void>;
   restoreFromCloud: () => Promise<void>;
+
+  // Security Operations
+  setupPassword: (password: string) => void;
+  unlockVault: (password: string) => boolean;
+  lockVault: () => void;
+  _encryptAndSave: () => void;
 }
 
 export const useWalletStore = create<WalletState>()(
@@ -77,12 +118,92 @@ export const useWalletStore = create<WalletState>()(
     (set, get) => ({
       address: null,
       privateKey: null,
+      mnemonic: null,
       accounts: [],
       balance: "0.0",
       isCustom: false,
       activeNetwork: 'polygon',
       activeProtocol: 'RPC',
       isUpdatingBalance: false,
+      transactions: [],
+      contacts: [],
+      customRpcUrl: null,
+      customTokens: [],
+      tokenBalances: [],
+
+      isLocked: false, // Initially false, but set to true on hydrate if passwordHash exists
+      passwordHash: null,
+      encryptedVault: null,
+
+      setupPassword: (password: string) => {
+          const hash = CryptoJS.SHA256(password).toString();
+          sessionEncryptionKey = password;
+          set({ passwordHash: hash, isLocked: false });
+          get()._encryptAndSave();
+          toast.success("Security Vault Initialized");
+      },
+
+      unlockVault: (password: string) => {
+          const { passwordHash, encryptedVault } = get();
+          if (!passwordHash) return true;
+          const hash = CryptoJS.SHA256(password).toString();
+          if (hash !== passwordHash) {
+              toast.error("Decryption Failed", { description: "Invalid password provided." });
+              return false;
+          }
+          sessionEncryptionKey = password;
+          
+          if (encryptedVault) {
+              try {
+                  const bytes = CryptoJS.AES.decrypt(encryptedVault, sessionEncryptionKey);
+                  const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+                  set({
+                      accounts: decrypted.accounts || [],
+                      address: decrypted.address || null,
+                      privateKey: decrypted.privateKey || null,
+                      mnemonic: decrypted.mnemonic || null,
+                      isLocked: false,
+                  });
+                  get().updateBalance();
+                  toast.success("Vault Unlocked");
+                  return true;
+              } catch (e) {
+                  toast.error("Vault Corrupted", { description: "Could not decrypt vault data." });
+                  return false;
+              }
+          }
+          set({ isLocked: false });
+          return true;
+      },
+
+      lockVault: () => {
+          const { passwordHash } = get();
+          if (passwordHash) {
+              sessionEncryptionKey = null;
+              set({
+                  isLocked: true,
+                  privateKey: null,
+                  mnemonic: null,
+                  // We mask the private keys in the accounts array in memory when locked
+                  accounts: get().accounts.map(a => ({ ...a, privateKey: null, mnemonic: null }))
+              });
+              toast.info("Vault Locked", { description: "Cryptographic memory wiped." });
+          }
+      },
+
+      _encryptAndSave: () => {
+          const state = get();
+          if (state.passwordHash && sessionEncryptionKey) {
+              const payload = {
+                  accounts: state.accounts,
+                  address: state.address,
+                  privateKey: state.privateKey,
+                  mnemonic: state.mnemonic
+              };
+              const encrypted = CryptoJS.AES.encrypt(JSON.stringify(payload), sessionEncryptionKey).toString();
+              set({ encryptedVault: encrypted });
+          }
+      },
 
       setNetwork: (network: NetworkId) => {
         set({ activeNetwork: network, balance: "0.0" });
@@ -96,12 +217,48 @@ export const useWalletStore = create<WalletState>()(
         get().updateBalance();
       },
 
+      setCustomRpcUrl: (url: string | null) => {
+        set({ customRpcUrl: url });
+        if (url) {
+           toast.info("Custom RPC Connected");
+        } else {
+           toast.info("Reset to Default RPC");
+        }
+        get().updateBalance();
+      },
+
+      addContact: (name: string, address: string) => {
+        set(state => ({
+           contacts: [...state.contacts.filter(c => c.address !== address), { name, address }]
+        }));
+        toast.success("Contact Saved");
+        get()._encryptAndSave();
+      },
+
+      removeContact: (address: string) => {
+        set(state => ({
+           contacts: state.contacts.filter(c => c.address !== address)
+        }));
+        toast.info("Contact Removed");
+        get()._encryptAndSave();
+      },
+
+      addCustomToken: (address: string, symbol: string, decimals: number) => {
+        set(state => ({
+          customTokens: [...state.customTokens.filter(t => t.address !== address), { address, symbol, decimals }]
+        }));
+        toast.success(`Token ${symbol} Tracked`);
+        get()._encryptAndSave();
+        get().updateBalance();
+      },
+
       createWallet: () => {
         try {
           const wallet = ethers.Wallet.createRandom();
           const newAccount: WalletAccount = {
             address: wallet.address,
             privateKey: wallet.privateKey,
+            mnemonic: wallet.mnemonic?.phrase || null,
             label: `System ${get().accounts.length + 1}`,
             isCustom: false,
           };
@@ -110,6 +267,7 @@ export const useWalletStore = create<WalletState>()(
             accounts: [...state.accounts, newAccount],
             address: wallet.address,
             privateKey: wallet.privateKey,
+            mnemonic: wallet.mnemonic?.phrase || null,
             balance: "0.0",
             isCustom: false,
           }));
@@ -117,6 +275,7 @@ export const useWalletStore = create<WalletState>()(
           toast.success("Secure Wallet Generated", {
             description: `Address: ${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
           });
+          get()._encryptAndSave();
           get().updateBalance();
           get().cloudSync();
         } catch (error) {
@@ -142,22 +301,23 @@ export const useWalletStore = create<WalletState>()(
                 accounts: updatedAccounts,
                 address: wallet.address,
                 privateKey: wallet.privateKey,
+                mnemonic: null,
                 isCustom: updatedAccounts[existingIndex].isCustom,
                 balance: "0.0"
               };
             });
+            get()._encryptAndSave();
             get().updateBalance();
             toast.success("Identity Unlocked", {
               description: `Active: ${get().accounts[existingIndex].label}`
             });
-            // NOTE: cloudSync intentionally omitted here  this path fires on every
-            // auth unlock and would cause excess POST requests on mobile.
             return true;
           }
 
           const newAccount: WalletAccount = {
             address: wallet.address,
             privateKey: wallet.privateKey,
+            mnemonic: null,
             label: label || `Imported ${get().accounts.length + 1}`,
             isCustom: true,
           };
@@ -166,6 +326,7 @@ export const useWalletStore = create<WalletState>()(
             accounts: [...state.accounts, newAccount],
             address: wallet.address,
             privateKey: wallet.privateKey,
+            mnemonic: null,
             balance: "0.0",
             isCustom: true,
           }));
@@ -173,9 +334,8 @@ export const useWalletStore = create<WalletState>()(
           toast.success("Identity Imported", {
             description: `Recovered: ${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
           });
+          get()._encryptAndSave();
           get().updateBalance();
-          // NOTE: cloudSync intentionally omitted here  only sync explicitly when user
-          // adds a new account, not on every auth-gate unlock.
           return true;
         } catch (error) {
           console.error("Invalid private key during import:", error);
@@ -190,9 +350,11 @@ export const useWalletStore = create<WalletState>()(
           set({
             address: account.address,
             privateKey: account.privateKey,
+            mnemonic: account.mnemonic || null,
             isCustom: account.isCustom,
             balance: "0.0"
           });
+          get()._encryptAndSave();
           get().updateBalance();
           toast.success("Identity Switched", { description: `Active: ${account.label}` });
         }
@@ -207,17 +369,20 @@ export const useWalletStore = create<WalletState>()(
             const nextAccount = newAccounts[0] || null;
             nextState.address = nextAccount?.address || null;
             nextState.privateKey = nextAccount?.privateKey || null;
+            nextState.mnemonic = nextAccount?.mnemonic || null;
             nextState.isCustom = nextAccount?.isCustom || false;
             nextState.balance = "0.0";
           }
           
           return nextState as WalletState;
         });
+        get()._encryptAndSave();
         toast.info("Account Removed");
       },
 
       clearWallet: () => {
-        set({ address: null, privateKey: null, accounts: [], balance: "0.0", isCustom: false });
+        set({ address: null, privateKey: null, mnemonic: null, accounts: [], balance: "0.0", isCustom: false, encryptedVault: null, passwordHash: null, isLocked: false });
+        sessionEncryptionKey = null;
         toast.info("Registry Purged", { description: "All secure keys removed from local memory." });
       },
 
@@ -229,14 +394,9 @@ export const useWalletStore = create<WalletState>()(
 
         try {
           const networkData = NETWORKS[activeNetwork];
-          // [INSTITUTIONAL OPTIMIZATION]
-          // Never use WebSockets for one-off stateless requests like getBalance.
-          // WSS Handshakes are extremely heavy. We force JsonRpcProvider for all state-reads
-          // to ensure instantaneous UI rendering and zero connection drops.
           const provider = new ethers.JsonRpcProvider(networkData.rpc);
 
           let rawBalance = await provider.getBalance(address);
-
           const oldBalanceValue = parseFloat(get().balance || "0");
           let numericBalance = parseFloat(ethers.formatEther(rawBalance));
           
@@ -249,7 +409,25 @@ export const useWalletStore = create<WalletState>()(
           }
           
           const displayBalance = numericBalance === 0 ? "0.0" : numericBalance < 0.0001 ? "<0.0001" : numericBalance.toFixed(4);
-          set({ balance: displayBalance });
+          
+          // Fetch ERC20 balances
+          const currentTokens = get().customTokens;
+          const updatedTokenBalances: TokenBalance[] = [];
+          
+          for (const token of currentTokens) {
+             try {
+                const contract = new ethers.Contract(token.address, [
+                   "function balanceOf(address owner) view returns (uint256)"
+                ], provider);
+                const bal = await contract.balanceOf(address);
+                const formatted = ethers.formatUnits(bal, token.decimals);
+                updatedTokenBalances.push({ ...token, balance: parseFloat(formatted).toFixed(4) });
+             } catch (e) {
+                updatedTokenBalances.push({ ...token, balance: "0.0" });
+             }
+          }
+
+          set({ balance: displayBalance, tokenBalances: updatedTokenBalances });
 
         } catch (error) {
           console.error("Failed to sync balance:", error);
@@ -258,18 +436,20 @@ export const useWalletStore = create<WalletState>()(
         }
       },
 
-      sendTransaction: async (to: string, amount: string) => {
-        const { privateKey, activeNetwork, activeProtocol } = get();
-        if (!privateKey) {
-          toast.error("No Secure Key", { description: "Select an internal wallet for this operation." });
+      sendTransaction: async (to: string, amount: string, gasPriority: 'low'|'medium'|'high' = 'medium') => {
+        const { privateKey, activeNetwork, activeProtocol, isLocked } = get();
+        if (isLocked || !privateKey) {
+          toast.error("Vault Locked", { description: "Please unlock your vault to sign transactions." });
           return null;
         }
 
         try {
           const networkData = NETWORKS[activeNetwork];
+          let rpcUrl = get().customRpcUrl || networkData.rpc;
+          
           const provider = activeProtocol === 'WSS' 
             ? new ethers.WebSocketProvider(networkData.wss)
-            : new ethers.JsonRpcProvider(networkData.rpc);
+            : new ethers.JsonRpcProvider(rpcUrl);
 
           const wallet = new ethers.Wallet(privateKey, provider);
           if (!ethers.isAddress(to)) {
@@ -281,11 +461,38 @@ export const useWalletStore = create<WalletState>()(
           const currentBalance = await provider.getBalance(wallet.address);
           
           let gasCost = 0n;
+          let txParams: ethers.TransactionRequest = { to, value };
+
           try {
              const feeData = await provider.getFeeData();
              const gasEstimate = await wallet.estimateGas({ to, value });
-             gasCost = gasEstimate * (feeData.maxFeePerGas || feeData.gasPrice || 1n);
+             
+             // EIP-1559 Calculation
+             if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+                 const priorityMultiplier = gasPriority === 'high' ? 2.0 : gasPriority === 'low' ? 0.8 : 1.2;
+                 const maxPriorityFeePerGas = BigInt(Math.floor(Number(feeData.maxPriorityFeePerGas) * priorityMultiplier));
+                 
+                 // If base fee is null, try to derive it or use fallback
+                 let maxFeePerGas = feeData.maxFeePerGas;
+                 if (gasPriority === 'high') {
+                     maxFeePerGas = feeData.maxFeePerGas * 3n / 2n; // 50% increase max
+                 }
+
+                 txParams.maxPriorityFeePerGas = maxPriorityFeePerGas;
+                 txParams.maxFeePerGas = maxFeePerGas;
+                 txParams.type = 2; // EIP-1559
+                 
+                 gasCost = gasEstimate * maxFeePerGas;
+             } else {
+                 // Legacy fallback
+                 const gasPrice = feeData.gasPrice || 1n;
+                 txParams.gasPrice = gasPriority === 'high' ? gasPrice * 120n / 100n : gasPrice;
+                 gasCost = gasEstimate * txParams.gasPrice;
+             }
+             
+             txParams.gasLimit = gasEstimate * 110n / 100n; // 10% buffer
           } catch (gasError) {
+             console.error("Gas Error:", gasError);
              toast.error("Execution Unviable", { description: "Simulation failed. Check funds or network rules." });
              return null;
           }
@@ -296,7 +503,7 @@ export const useWalletStore = create<WalletState>()(
           }
 
           toast.loading("Broadcasting Transaction...", { id: "tx-broadcast" });
-          const tx = await wallet.sendTransaction({ to, value });
+          const tx = await wallet.sendTransaction(txParams);
 
           toast.success("Broadcast Successful", { 
             id: "tx-broadcast",
@@ -319,23 +526,21 @@ export const useWalletStore = create<WalletState>()(
         const { address, accounts } = get();
         if (address === addr) return;
         
-        // Check if this address is already in our managed registry
         if (addr) {
           const existing = accounts.find(a => a.address.toLowerCase() === addr.toLowerCase());
           if (existing) {
             set({
               address: existing.address,
               privateKey: existing.privateKey,
+              mnemonic: existing.mnemonic || null,
               isCustom: existing.isCustom,
               balance: "0.0"
             });
           } else {
-            // It's an external web3 address being broadcasted via Handshake/AppKit
-            set({ address: addr, privateKey: null, balance: "0.0", isCustom: false });
+            set({ address: addr, privateKey: null, mnemonic: null, balance: "0.0", isCustom: false });
           }
           get().updateBalance();
         } else {
-          // If clearing, we don't necessarily clear our registries, just the 'active' pointer if it was external
           if (!get().privateKey) {
             set({ address: null, balance: "0.0" });
           }
@@ -370,7 +575,7 @@ export const useWalletStore = create<WalletState>()(
                   if (!newAccounts.find(a => a.address.toLowerCase() === w.address.toLowerCase())) {
                       newAccounts.push({
                           address: w.address,
-                          privateKey: null, // We can't restore PK from cloud for security
+                          privateKey: null, 
                           label: w.label || 'Recovered',
                           isCustom: false
                       });
@@ -388,24 +593,47 @@ export const useWalletStore = create<WalletState>()(
       }
     }),
     {
-      name: 'whale-system-wallet-registry-v2', // Bump version for schema change
-      partialize: (state) => ({ 
-        address: state.address, 
-        privateKey: state.privateKey, // Allowed for demo functionality
-        accounts: state.accounts,
-        isCustom: state.isCustom,
-        activeNetwork: state.activeNetwork,
-        activeProtocol: state.activeProtocol
-      }),
+      name: 'whale-system-wallet-registry-v3', // Bumped for encryption
+      partialize: (state) => {
+        // EXTREMELY CRITICAL: Never serialize privateKey, mnemonic, or plaintext accounts!
+        // If passwordHash exists, we ONLY save the encryptedVault.
+        if (state.passwordHash) {
+             return {
+                 address: state.address, // Public address is safe
+                 isCustom: state.isCustom,
+                 activeNetwork: state.activeNetwork,
+                 activeProtocol: state.activeProtocol,
+                 passwordHash: state.passwordHash,
+                 encryptedVault: state.encryptedVault,
+                 // We store masked accounts so the UI knows they exist, but without keys
+                 accounts: state.accounts.map(a => ({ ...a, privateKey: null, mnemonic: null }))
+             } as Partial<WalletState>;
+        }
+        // Legacy fallback if no password is set yet
+        return { 
+          address: state.address, 
+          privateKey: state.privateKey, 
+          mnemonic: state.mnemonic,
+          accounts: state.accounts,
+          isCustom: state.isCustom,
+          activeNetwork: state.activeNetwork,
+          activeProtocol: state.activeProtocol
+        } as Partial<WalletState>;
+      },
+      onRehydrateStorage: () => (state) => {
+          if (state && state.passwordHash) {
+              // Lock immediately on rehydration so the app requires unlock
+              state.isLocked = true;
+              state.privateKey = null;
+              state.mnemonic = null;
+          }
+      }
     }
   )
 );
 
-//  ATOMIC SELECTORS FOR 240Hz MOBILE RENDERING 
-// Prevents massive React re-renders when only one specific property changes.
 export const useWalletBalance = () => useWalletStore((state) => state.balance);
 export const useWalletAddress = () => useWalletStore((state) => state.address);
 export const useWalletNetwork = () => useWalletStore((state) => state.activeNetwork);
 export const useWalletIsUpdating = () => useWalletStore((state) => state.isUpdatingBalance);
 export const useWalletAccounts = () => useWalletStore((state) => state.accounts);
-

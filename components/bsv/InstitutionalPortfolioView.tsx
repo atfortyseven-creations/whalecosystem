@@ -1,18 +1,19 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowUpRight, ArrowDownLeft, Scan, Plus, Copy, Check,
     RefreshCw, X, Box, Key, Lock, Unlock, CreditCard, ExternalLink,
-    Activity, Hash, Database, Fingerprint, GitMerge, Globe
+    Activity, Hash, Database, Fingerprint, GitMerge, Globe, Settings
 } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 import { useVIPStore } from '@/lib/vip-store';
+import { SettingsView } from '@/components/settings/SettingsView';
 
-type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK';
+type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK' | 'SETTINGS';
 
 const truncate = (str: string, len: number) => {
     if (!str) return '';
@@ -24,7 +25,7 @@ const truncate = (str: string, len: number) => {
 };
 
 export function InstitutionalPortfolioView() {
-    const { address, balance, updateBalance, activeNetwork, restoreFromCloud } = useWalletStore();
+    const { address, balance, updateBalance, activeNetwork, restoreFromCloud, tokenBalances } = useWalletStore();
     const [view, setView] = useState<View>('HOME');
     const [prefilledAddress, setPrefilledAddress] = useState('');
     const [loading, setLoading] = useState(false);
@@ -45,9 +46,9 @@ export function InstitutionalPortfolioView() {
                 const data = await res.json();
                 setTransactions(Array.isArray(data) ? data : []);
             }
-            // Generate deterministic QD and Entropy values
-            setQdBalance((Math.random() * 10000).toFixed(0));
-            setEntropyIndex((Math.random() * 100).toFixed(4));
+            // Strict On-Chain execution. No random simulations allowed.
+            setQdBalance("0");
+            setEntropyIndex("0.000");
         } catch (e) {
             console.error("[PORTFOLIO] Sync failure:", e);
         } finally { setLoading(false); }
@@ -103,10 +104,12 @@ export function InstitutionalPortfolioView() {
                         onCreate={() => setView('CREATE')}
                         onBuy={() => setView('BUY')}
                         onNetworkClick={() => setView('NETWORK')}
+                        onSettingsClick={() => setView('SETTINGS')}
                         scannerBase={scannerBase}
                     />
                 )}
                 {view === 'NETWORK' && <NetworkView key="network" onBack={() => setView('HOME')} />}
+                {view === 'SETTINGS' && <SettingsView key="settings" onBack={() => setView('HOME')} />}
                 {view === 'SEND' && <SendView key="send" prefilledAddress={prefilledAddress} onBack={() => { setView('HOME'); setPrefilledAddress(''); }} />}
                 {view === 'BUY' && <BuyView key="buy" address={address} onBack={() => setView('HOME')} />}
                 {view === 'RECEIVE' && <ReceiveView key="receive" address={address} onBack={() => setView('HOME')} />}
@@ -117,7 +120,7 @@ export function InstitutionalPortfolioView() {
     );
 }
 
-function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, loading, transactions, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onNetworkClick, scannerBase }: any) {
+function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, loading, transactions, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onNetworkClick, onSettingsClick, scannerBase }: any) {
     const [copied, setCopied] = useState(false);
     const { clearWallet, activeNetwork } = useWalletStore();
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
@@ -145,6 +148,9 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
                         <button onClick={onRefresh} disabled={loading} className="text-black/40 hover:text-black transition-colors">
                             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
                         </button>
+                        <button onClick={onSettingsClick} className="text-black/40 hover:text-black transition-colors">
+                            <Settings size={14} />
+                        </button>
                         <button onClick={clearWallet} className="text-black/40 hover:text-black uppercase text-[10px] font-bold tracking-widest">
                             Disconnect
                         </button>
@@ -153,10 +159,12 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
             </header>
 
             <section className="px-8 pt-16 pb-12 flex flex-col items-center text-center">
-                <h1 className="font-light tracking-tighter text-black mb-2 flex items-baseline justify-center" style={{ fontSize: 'clamp(3rem, 10vw, 6rem)' }}>
-                    {balance}
-                    <span className="text-2xl ml-4 font-black uppercase tracking-widest text-black/30">{networkInfo.currency}</span>
-                </h1>
+                <div className="relative inline-flex items-baseline justify-center mb-2">
+                    <h1 className="font-light tracking-tighter text-black" style={{ fontSize: 'clamp(3rem, 10vw, 6rem)' }}>
+                        {balance}
+                    </h1>
+                    <span className="absolute left-full text-2xl ml-4 font-black uppercase tracking-widest text-black/30 bottom-6">{networkInfo.currency}</span>
+                </div>
                 <p className="text-black/50 text-xs tracking-[0.2em] uppercase mb-12 border border-black/10 px-4 py-1.5 rounded-sm">{balanceFiat} USD EQUIVALENT</p>
 
                 {address ? (
@@ -207,11 +215,24 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
                                     <Activity size={10} /> Live State Subscribed
                                 </div>
                             </div>
-                            <div className="border border-black/10 p-6 bg-white relative overflow-hidden">
-                                <span className="text-[10px] uppercase tracking-widest text-black/50 block mb-2">System Entropy</span>
-                                <div className="text-3xl font-light tracking-tighter">{entropyIndex}<span className="text-lg font-black ml-2 opacity-30 text-black">IDX</span></div>
-                                <div className="mt-4 flex items-center gap-2 text-[9px] uppercase tracking-widest opacity-40">
-                                    <Fingerprint size={10} /> Deterministic Matrix
+                            
+                            <div className="border border-black/10 bg-white relative flex flex-col">
+                                <div className="p-4 border-b border-black/10 flex justify-between items-center bg-black/5">
+                                    <span className="text-[10px] uppercase tracking-widest font-bold">Verified ERC-20 Assets</span>
+                                </div>
+                                <div className="p-4 flex-1 flex flex-col gap-3 overflow-y-auto max-h-[150px]">
+                                    {tokenBalances && tokenBalances.length > 0 ? (
+                                        tokenBalances.map((tb: any) => (
+                                            <div key={tb.address} className="flex justify-between items-center text-sm font-mono border-b border-black/5 pb-2 last:border-0">
+                                                <span>{tb.symbol}</span>
+                                                <span className="font-bold">{tb.balance}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-xs text-black/40 text-center uppercase tracking-widest mt-4">
+                                            No tracked tokens
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -308,13 +329,30 @@ function SendView({ prefilledAddress, onBack }: any) {
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
     const [toAddress, setToAddress] = useState(prefilledAddress || '');
     const [amount, setAmount] = useState('');
+    const [gasPriority, setGasPriority] = useState<'low'|'medium'|'high'>('medium');
     const [isSigning, setIsSigning] = useState(false);
 
     const handleSend = async () => {
         if (!toAddress || !amount) return;
         setIsSigning(true);
         try {
-            const txHash = await sendTransaction(toAddress, amount);
+            let finalAddress = toAddress;
+            // ENS Resolution Simulation/Actual On-Chain
+            if (toAddress.endsWith('.eth')) {
+                toast.loading(`Resolving ${toAddress}...`, { id: 'ens-resolve' });
+                const mainnetProvider = new ethers.JsonRpcProvider(NETWORKS.ethereum.rpc);
+                const resolved = await mainnetProvider.resolveName(toAddress);
+                if (resolved) {
+                    finalAddress = resolved;
+                    toast.success(`Resolved to ${resolved.slice(0,8)}...`, { id: 'ens-resolve' });
+                } else {
+                    toast.error(`Could not resolve ${toAddress}`, { id: 'ens-resolve' });
+                    setIsSigning(false);
+                    return;
+                }
+            }
+
+            const txHash = await sendTransaction(finalAddress, amount, gasPriority);
             if (txHash) {
                 onBack();
             }
@@ -324,13 +362,31 @@ function SendView({ prefilledAddress, onBack }: any) {
     return (
         <ModalView title="Transmit Value" icon={<ArrowUpRight />} onBack={onBack}>
             <div className="space-y-6">
-                <FormField label={`Destination Target (${networkInfo.name})`}>
-                    <input type="text" value={toAddress} onChange={e => setToAddress(e.target.value)} placeholder="0x..." className="w-full bg-transparent border border-black/10 p-4 text-sm outline-none placeholder:text-black/20 focus:border-black transition-colors" />
+                <FormField label={`Destination Target (0x... or .eth)`}>
+                    <input type="text" value={toAddress} onChange={e => setToAddress(e.target.value)} placeholder="0x... or vitalik.eth" className="w-full bg-transparent border border-black/10 p-4 text-sm outline-none placeholder:text-black/20 focus:border-black transition-colors" />
                 </FormField>
                 <FormField label="Cryptographic Amount">
                     <div className="relative border border-black/10 focus-within:border-black transition-colors">
                         <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-transparent border-none p-6 text-2xl font-light outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                         <span className="absolute right-6 top-1/2 -translate-y-1/2 text-sm font-bold text-black/40 uppercase">{networkInfo.currency}</span>
+                    </div>
+                </FormField>
+                
+                <FormField label="EIP-1559 Fee Market Priority">
+                    <div className="grid grid-cols-3 gap-2">
+                        {(['low', 'medium', 'high'] as const).map(p => (
+                            <button
+                                key={p}
+                                onClick={() => setGasPriority(p)}
+                                className={`py-3 text-[10px] uppercase font-bold tracking-widest border transition-all ${
+                                    gasPriority === p 
+                                        ? 'border-black bg-black text-white' 
+                                        : 'border-black/10 text-black/40 hover:border-black/30'
+                                }`}
+                            >
+                                {p}
+                            </button>
+                        ))}
                     </div>
                 </FormField>
                 <button onClick={handleSend} disabled={isSigning || !toAddress || !amount} className="w-full py-5 bg-black text-white font-bold text-[10px] uppercase tracking-[0.2em] transition-opacity hover:opacity-90 disabled:opacity-30 flex items-center justify-center gap-3 mt-4">
