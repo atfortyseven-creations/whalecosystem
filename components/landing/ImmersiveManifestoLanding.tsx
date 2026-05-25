@@ -325,16 +325,19 @@ function HeroSection() {
             </motion.div>
 
             {/* Headline */}
-            <motion.h1
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              className="text-[42px] sm:text-[60px] lg:text-[80px] font-black tracking-tighter leading-[0.9] text-black mb-5"
+              className="flex flex-col items-center gap-2 mb-5"
             >
-              Private by
-              <br />
-              <span className="text-black/22">Default.</span>
-            </motion.h1>
+              <h1 className="text-[42px] sm:text-[60px] lg:text-[80px] font-black tracking-tighter leading-[0.9] text-black text-center">
+                Whale Network™
+                <br />
+                <span className="text-black/30 text-[28px] sm:text-[36px] lg:text-[42px] font-bold">Powered by</span>
+              </h1>
+              <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Aztec" className="h-[40px] sm:h-[50px] lg:h-[60px] mt-2 object-contain mix-blend-multiply" />
+            </motion.div>
 
             {/* Sub */}
             <motion.p

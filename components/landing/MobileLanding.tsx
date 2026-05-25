@@ -723,12 +723,33 @@ export function MobileLanding() {
   useEffect(() => {
     if (uuidParam && !autoSyncStarted) {
       if (isLinked && effectiveAddress) {
-        // If they are already linked, immediately show the scanner to complete the handshake
         setAutoSyncStarted(true);
-        setShowScanner(true);
+        
+        // Execute the session handshake directly using the URL
+        const runHandshake = async () => {
+          try {
+            const { completeSessionHandshake } = await import('@/lib/scan/sessionHandshake');
+            const result = await completeSessionHandshake(window.location.href, () => effectiveAddress);
+            
+            const toast = document.createElement('div');
+            toast.className = `fixed top-6 left-4 right-4 z-[99999] text-white text-[10px] border border-white/10 font-mono uppercase tracking-[0.3em] px-6 py-5 rounded-2xl shadow-2xl text-center ${result.ok ? 'bg-black' : 'bg-red-600'}`;
+            toast.textContent = result.ok ? 'Session Synchronized' : result.message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+            
+            if (result.ok) {
+              // Clean up the URL to prevent re-triggering
+              window.history.replaceState({}, '', '/connect');
+            }
+          } catch (e) {
+            console.error('Handshake error', e);
+          }
+        };
+        runHandshake();
+        
       } else {
-        // If they are not linked, show the connect wallet modal so they can connect first
-        setAutoSyncStarted(true);
+        // If they are not linked, we wait until they connect. The useEffect will re-run
+        // once isLinked and effectiveAddress become true.
         setShowConnectOverlay(true);
       }
     }

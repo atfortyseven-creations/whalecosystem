@@ -371,10 +371,10 @@ export default function ConnectPage() {
         <source src="/system-shots/8597294-hd_1920_1080_30fps.mp4" type="video/mp4" />
       </video>
       
-      <div className="relative z-10 w-full flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 sm:p-12 lg:gap-12 xl:gap-24 max-w-[1400px] mx-auto min-h-0">
+      <div className="relative z-10 w-full flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 sm:p-12 max-w-[1400px] mx-auto min-h-0">
         
-        {/* LEFT: Connection panel (Login Zone) */}
-        <div className="w-full lg:w-[380px] xl:w-[420px] flex-shrink-0 flex flex-col bg-white rounded-[24px] border border-[#F0F0F0] shadow-[0_8px_40px_rgba(0,0,0,0.03)] p-6 sm:p-8 xl:p-10 z-20">
+        {/* CENTER: Connection panel (Login Zone) */}
+        <div className="w-full max-w-[420px] mx-auto flex-shrink-0 flex flex-col bg-white rounded-[24px] border border-[#F0F0F0] shadow-[0_8px_40px_rgba(0,0,0,0.03)] p-6 sm:p-8 xl:p-10 z-20">
           
           <div className="flex items-center gap-3 mb-8 pb-5 border-b border-black/5">
             <Lock size={16} strokeWidth={1.2} className="text-[#0A0A0A]" />
@@ -508,9 +508,9 @@ export default function ConnectPage() {
                   >
                     <div className="p-4 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm relative w-[220px]">
                       <div className="flex items-center justify-center gap-3 w-full mb-1">
-                        <img src="/atom.png" alt="Atom" className="w-8 h-8 object-contain" />
+                        <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Aztec" className="w-24 h-8 object-contain" />
                         <span className="text-[12px] font-mono text-[#0A0A0A]/30">×</span>
-                        <img src="/aztec_x_whale_partnership.svg" alt="Aztec" className="w-8 h-8 object-contain" />
+                        <img src="/atom_3d_silver.jpg" alt="Atom" className="w-8 h-8 object-contain mix-blend-multiply" />
                       </div>
                       <QRCodeSVG
                         value={qrData}
@@ -573,30 +573,6 @@ export default function ConnectPage() {
           </div>
         </div>
 
-        {/* CENTER: New Image 1 */}
-        {mounted && (
-          <div className="hidden lg:flex flex-1 items-center justify-center z-10 pointer-events-none">
-            <div className="w-[400px] h-[400px] xl:w-[500px] xl:h-[500px] flex items-center justify-center opacity-90">
-              <img
-                src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png"
-                alt="Generated Image 1"
-                className="w-full h-full object-contain"
-                draggable={false}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* RIGHT: New Image 2 */}
-        <div className="hidden lg:flex w-[380px] xl:w-[420px] flex-shrink-0 flex-col items-center justify-center p-8 z-20">
-          <div className="flex flex-col items-center gap-8 w-full">
-            <div className="flex flex-col items-center text-center gap-4 w-full">
-              <div className="w-[300px] xl:w-[350px] flex items-center justify-center my-2 opacity-95">
-                <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Generated Image 2" className="w-full h-auto object-contain rounded-xl shadow-2xl" />
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Mobile QR Scanner */}

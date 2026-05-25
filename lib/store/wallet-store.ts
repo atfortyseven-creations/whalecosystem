@@ -397,9 +397,6 @@ export const useWalletStore = create<WalletState>()(
         activeNetwork: state.activeNetwork,
         activeProtocol: state.activeProtocol
       }),
-        activeNetwork: state.activeNetwork,
-        activeProtocol: state.activeProtocol
-      }),
     }
   )
 );

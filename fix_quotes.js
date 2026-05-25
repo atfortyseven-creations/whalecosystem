@@ -1,10 +1,20 @@
 const fs = require('fs');
-['app/legal/terms/page.tsx', 'app/legal/privacy/page.tsx', 'app/legal/security/page.tsx', 'app/legal/compliance/page.tsx'].forEach(file => {
-    let content = fs.readFileSync(file, 'utf8');
-    content = content.replace(/system's/g, 'system&apos;s');
-    content = content.replace(/'/g, '&apos;'); // Ensure ALL single quotes are escaped in JSX text, but wait, this might break imports and attributes!
-    // Let's only replace system's and other specific ones we generated.
-    // The only one with a quote in our generator was "system's"
-    fs.writeFileSync(file, content);
+const path = require('path');
+
+const dirs = [
+  'app/legal/terms',
+  'app/legal/privacy',
+  'app/legal/security',
+  'app/legal/compliance'
+];
+
+dirs.forEach(d => {
+  const f = path.join(__dirname, d, 'page.tsx');
+  if (fs.existsSync(f)) {
+    let content = fs.readFileSync(f, 'utf8');
+    // Replace all instances of &apos; with a single quote
+    content = content.replace(/&apos;/g, "'");
+    fs.writeFileSync(f, content);
+    console.log('Fixed', f);
+  }
 });
-console.log('Quotes fixed!');
