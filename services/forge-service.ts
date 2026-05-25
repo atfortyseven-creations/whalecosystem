@@ -1,8 +1,8 @@
 import prisma from '@/lib/prisma';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
-import { FORGE_ENABLED, TIER_THRESHOLDS } from '@/forge';
-import { CosmicSeed, CosmicEntityBase, EntityTier, GeneratorType } from '@/forge/types';
-import * as Generators from '@/forge/generators';
+import { FORGE_ENABLED, TIER_THRESHOLDS } from '../forge';
+import { CosmicSeed, CosmicEntityBase, EntityTier, GeneratorType } from '../forge/types';
+import * as Generators from '../forge/generators';
 import crypto from 'crypto';
 
 export class ForgeService {

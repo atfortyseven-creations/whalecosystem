@@ -1,6 +1,6 @@
 import { Queue } from 'bullmq';
 import { createRedisClient } from '@/lib/redis/client';
-import { FORGE_ENABLED, TIER_THRESHOLDS } from '@/forge';
+import { FORGE_ENABLED, TIER_THRESHOLDS } from '../index';
 
 const connection = createRedisClient({ name: 'CosmicForgeQueue' });
 const forgeQueue = new Queue('forge-seed', { connection });
