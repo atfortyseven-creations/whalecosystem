@@ -186,6 +186,7 @@ export default function TermsOfService() {
                         Contact Legal Department
                     </a>
                 </section>
+            </div>
         </DocLayout>
     );
 }
