@@ -121,7 +121,7 @@ export function CareersPageClient() {
       backHref="/"
       backLabel="Back to Home"
     >
-      <div className="space-y-14 text-black">
+      <div className="space-y-10 sm:space-y-14 text-black">
 
         {/* Intro */}
         <section id="intro">

@@ -54,7 +54,7 @@ export default function AboutPage() {
       backHref="/"
       backLabel="Back to Home"
     >
-      <div className="space-y-14 text-black">
+      <div className="space-y-10 sm:space-y-14 text-black">
 
         {/* Origin */}
         <section id="origin">
@@ -182,7 +182,7 @@ export default function AboutPage() {
               We leverage a modern, robust, and heavily audited technology stack to deliver a seamless user experience, ensuring uncompromising performance, security, and scalability across global markets.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {STACK.map(({ title, items }) => (
               <div key={title} className="border border-black/8 rounded-xl p-5">
                 <h3 className="font-semibold text-black text-[14px] mb-3">{title}</h3>

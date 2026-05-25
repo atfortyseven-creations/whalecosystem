@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
       backHref="/"
       backLabel="Back to Home"
     >
-      <div className="space-y-14 text-black">
+      <div className="space-y-10 sm:space-y-14 text-black">
 
         {/* 1 */}
         <section id="introduction">
@@ -386,17 +386,25 @@ export default function PrivacyPolicyPage() {
             <p>
               If you have any questions about this Privacy Policy, our data practices, or wish to exercise your legal rights, please contact our Data Protection Officer:
             </p>
-            <div className="border border-black/10 rounded-xl p-6 space-y-4 mt-2">
-              {[
-                ['Privacy Queries', 'privacy@whalecosystem.io'],
-                ['Data Protection Officer', 'dpo@whalecosystem.io'],
-                ['Physical Address', 'Whale Alert Network, S.L., Paseo de la Castellana, Madrid, 28046, Spain'],
-              ].map(([label, value]) => (
-                <div key={label as string}>
-                  <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">{label}</p>
-                  <p className="text-[15px] text-black">{value}</p>
-                </div>
-              ))}
+            <div className="border border-black/10 rounded-xl p-5 sm:p-6 space-y-4 mt-2">
+              <div>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Email</p>
+                <a href="mailto:atfortyseven2@gmail.com" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors break-all">
+                  atfortyseven2@gmail.com
+                </a>
+              </div>
+              <div>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Telegram</p>
+                <a href="https://t.me/atfortyseven2" target="_blank" rel="noopener noreferrer" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors">
+                  @atfortyseven2
+                </a>
+              </div>
+              <div>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">LinkedIn — Founder</p>
+                <a href="https://www.linkedin.com/in/stefan-antonio-cirisanu-40116140b/" target="_blank" rel="noopener noreferrer" className="text-black text-[14px] underline underline-offset-2 hover:text-black/60 transition-colors break-all">
+                  Stefan Antonio Cirisanu
+                </a>
+              </div>
             </div>
           </div>
         </section>

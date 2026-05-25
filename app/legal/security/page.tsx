@@ -26,7 +26,7 @@ export default function SecurityArchitecturePage() {
       backHref="/"
       backLabel="Back to Home"
     >
-      <div className="space-y-14 text-black">
+      <div className="space-y-10 sm:space-y-14 text-black">
 
         {/* 1 */}
         <section id="overview">
@@ -218,10 +218,14 @@ export default function SecurityArchitecturePage() {
             <p>
               If you are a security researcher and believe you have discovered a vulnerability in our platform, API, or smart contracts, we strongly encourage responsible disclosure. Please contact our security team before any public disclosure to allow us to investigate and remediate the issue.
             </p>
-            <div className="border border-black/10 rounded-xl p-6 space-y-3 mt-2">
+            <div className="border border-black/10 rounded-xl p-5 sm:p-6 space-y-4 mt-2">
               <div>
-                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Security Team</p>
-                <a href="mailto:security@whalecosystem.io" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors">security@whalecosystem.io</a>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Email</p>
+                <a href="mailto:atfortyseven2@gmail.com" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors break-all">atfortyseven2@gmail.com</a>
+              </div>
+              <div>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Telegram</p>
+                <a href="https://t.me/atfortyseven2" target="_blank" rel="noopener noreferrer" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors">@atfortyseven2</a>
               </div>
               <div>
                 <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Expected Response Time</p>

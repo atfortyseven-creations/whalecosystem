@@ -30,7 +30,7 @@ export default function TermsOfServicePage() {
       backHref="/"
       backLabel="Back to Home"
     >
-      <div className="space-y-14 text-black">
+      <div className="space-y-10 sm:space-y-14 text-black">
 
         {/* 1 */}
         <section id="general">
@@ -286,14 +286,18 @@ export default function TermsOfServicePage() {
             <p>
               If you have any questions about the Website or these Terms, please contact us:
             </p>
-            <div className="border border-black/10 rounded-xl p-6 space-y-3 mt-4">
+            <div className="border border-black/10 rounded-xl p-5 sm:p-6 space-y-4 mt-4">
               <div>
-                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">General Legal Inquiries</p>
-                <a href="mailto:legal@whalecosystem.io" className="text-black text-[15px] hover:text-black/60 transition-colors underline underline-offset-2">legal@whalecosystem.io</a>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Email</p>
+                <a href="mailto:atfortyseven2@gmail.com" className="text-black text-[15px] hover:text-black/60 transition-colors underline underline-offset-2 break-all">atfortyseven2@gmail.com</a>
               </div>
               <div>
-                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Platform</p>
-                <a href="https://whalecosystem.io" className="text-black text-[15px] hover:text-black/60 transition-colors underline underline-offset-2">whalecosystem.io</a>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Telegram</p>
+                <a href="https://t.me/atfortyseven2" target="_blank" rel="noopener noreferrer" className="text-black text-[15px] hover:text-black/60 transition-colors underline underline-offset-2">@atfortyseven2</a>
+              </div>
+              <div>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">LinkedIn — Founder</p>
+                <a href="https://www.linkedin.com/in/stefan-antonio-cirisanu-40116140b/" target="_blank" rel="noopener noreferrer" className="text-black text-[14px] hover:text-black/60 transition-colors underline underline-offset-2 break-all">Stefan Antonio Cirisanu</a>
               </div>
             </div>
           </div>
