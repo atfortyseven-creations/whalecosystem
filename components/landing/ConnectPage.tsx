@@ -390,16 +390,12 @@ export default function ConnectPage() {
 
   return (
     <div className="w-full flex-1 flex flex-col items-center bg-black relative overflow-hidden">
-      {/* Background Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-80"
-      >
-        <source src="/system-shots/8597294-hd_1920_1080_30fps.mp4" type="video/mp4" />
-      </video>
+      {/* Background Image */}
+      <img
+        src="/system-shots/monochrome-illustration-science-fiction-arch-pixel-art-Devine-Lu-Linvega-2268380-wallhere.com (1).jpg"
+        alt="Architecture Background"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-60"
+      />
       
       <div className="relative z-10 w-full flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 sm:p-12 max-w-[1400px] mx-auto min-h-0 pt-16">
         

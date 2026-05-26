@@ -48,27 +48,14 @@ export const MobileWhaleLanding = () => {
             className="flex flex-col items-center text-center w-full"
           >
             {/* Logo */}
-            <div className="w-24 h-24 mb-10 relative">
+            <div className="w-full aspect-video mb-10 relative overflow-hidden rounded-xl border border-black/10">
               <img
-                src="/atom_3d_silver.jpg"
-                alt="Humanity Ledger"
-                className="w-full h-full object-contain mix-blend-darken contrast-[1.15] brightness-[1.05]"
+                src="/system-shots/monochrome-illustration-science-fiction-arch-pixel-art-Devine-Lu-Linvega-2268380-wallhere.com (1).jpg"
+                alt="Humanity Ledger Architecture"
+                className="w-full h-full object-cover mix-blend-darken contrast-[1.15] brightness-[1.05]"
                 draggable={false}
               />
             </div>
-
-            {/* Headline */}
-            <h1 className="text-[36px] font-black tracking-tighter leading-[0.92] text-black mb-4">
-              Whale Network
-              <br />
-              <span className="text-black/25 text-[22px] font-bold">
-                Zero-Knowledge Protocol
-              </span>
-            </h1>
-
-            <p className="text-[14px] text-black/50 leading-relaxed max-w-[300px] font-light mb-12">
-              Private, verifiable transactions on the Aztec Layer 2. Your data stays yours.
-            </p>
 
             {/* Trust badges */}
             <div className="grid grid-cols-3 gap-3 w-full max-w-[320px] mb-12">

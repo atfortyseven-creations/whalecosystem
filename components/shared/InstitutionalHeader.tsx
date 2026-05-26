@@ -65,8 +65,8 @@ export function InstitutionalHeader() {
       { label: t('NAV_WHALE_CHAT') || 'WHALE CHAT', href: "/chat" },
       { label: t('NAV_PORTFOLIO') || 'PORTFOLIO', href: "/portfolio" },
       { label: t('NAV_COMMUNITY') || 'COMMUNITY', href: "#", subItems: [{ label: t('NAV_NEWS') || 'NEWS', href: "/news" }, { label: t('NAV_ACADEMY') || 'ACADEMY', href: "/academy" }, { label: t('NAV_FORUM') || 'FORUM', href: "/forum" }, { label: t('NAV_CAREERS') || 'CAREERS', href: "/careers" }] },
-      { label: 'DEVELOPERS', href: "#", subItems: [{ label: 'DOCUMENTATION', href: '/docs' }, { label: 'API MARKETPLACE', href: '/api-marketplace' }, { label: 'INFRASTRUCTURE', href: '/infrastructure' }] },
-      { label: 'RESOURCES', href: "#", subItems: [{ label: 'SUPPORT', href: '/support' }, { label: 'FAQ', href: '/faq' }, { label: 'STATUS', href: '/status' }, { label: 'PRIVACY', href: '/privacy' }, { label: 'TERMS', href: '/terms' }] }
+      { label: 'STATUS', href: '/status' },
+      { label: 'PRIVACY', href: '/privacy' }
     ];
 
     return (

@@ -331,40 +331,17 @@ function HeroSection() {
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
-              className="relative w-[180px] h-[180px] sm:w-[240px] sm:h-[240px] lg:w-[300px] lg:h-[300px] mb-8 shrink-0 flex items-center justify-center"
+              className="relative w-full max-w-[500px] lg:max-w-[700px] aspect-video mb-8 shrink-0 flex items-center justify-center overflow-hidden rounded-xl border border-black/10"
             >
               <img
-                src="/atom_3d_silver.jpg"
-                alt="Humanity Ledger"
-                className="w-full h-full object-contain mix-blend-multiply"
+                src="/system-shots/monochrome-illustration-science-fiction-arch-pixel-art-Devine-Lu-Linvega-2268380-wallhere.com (1).jpg"
+                alt="Humanity Ledger Architecture"
+                className="w-full h-full object-cover mix-blend-darken"
               />
             </motion.div>
 
             {/* Headline */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              className="flex flex-col items-center gap-2 mb-5"
-            >
-              <h1 className="text-[42px] sm:text-[60px] lg:text-[80px] font-black tracking-tighter leading-[0.9] text-black text-center">
-                Whale Network™
-                <br />
-                <span className="text-black/30 text-[28px] sm:text-[36px] lg:text-[42px] font-bold">Powered by</span>
-              </h1>
-              <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Aztec" className="h-[80px] sm:h-[100px] lg:h-[120px] mt-4 object-contain mix-blend-multiply" />
-            </motion.div>
-
-            {/* Sub */}
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.32 }}
-              className="text-[16px] sm:text-[18px] text-black/50 leading-relaxed max-w-[560px] mb-10 font-light"
-            >
-              A zero-knowledge network built on Aztec. Every transaction, record, and identity proof
-              is cryptographically private — not opt-in, not optional. Private by design.
-            </motion.p>
+            {/* No headline/subtext as requested */}
 
             {/* CTAs */}
             <motion.div
