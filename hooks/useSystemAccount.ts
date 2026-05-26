@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useAccount } from 'wagmi';
 import { useState, useEffect } from 'react';
@@ -80,7 +80,28 @@ export function useSystemAccount() {
 
     //  Mount effect: read all client-only storage once 
     useEffect(() => {
-        // 1. Read sessionStorage (safe  client only)
+        // 0. AUTO-RESTORE from system_session_v2 (Humanity Ledger EIP-712 sign-up)
+        //    This makes sign-up users identical to MetaMask users on every page load.
+        //    sessionStorage is per-tab, so we restore it from the durable localStorage token.
+        if (typeof window !== 'undefined') {
+            try {
+                const raw = localStorage.getItem('system_session_v2');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed?.exp > Date.now() && parsed?.wallet) {
+                        const addr: string = parsed.wallet;
+                        if (addr.startsWith('0x') && addr.length === 42) {
+                            try {
+                                sessionStorage.setItem('system_wallet_addr', addr.toLowerCase());
+                                sessionStorage.setItem('portfolio_unlocked', 'true');
+                            } catch {}
+                        }
+                    }
+                }
+            } catch {}
+        }
+
+        // 1. Read sessionStorage (safe  client only) — now includes auto-restored values above
         const sessAddr = safeSessionGet('system_wallet_addr');
         if (sessAddr && sessAddr.startsWith('0x') && sessAddr.length === 42) {
             setSessionAddress(sessAddr);
@@ -107,9 +128,11 @@ export function useSystemAccount() {
         // 5. Cookie poll interval  only when:
         //    - not connected via wagmi (MetaMask etc.)
         //    - AND no system wallet already in memory
+        //    - AND no session already restored from system_session_v2
         //    This avoids a 1s tick hammering while already authenticated.
         let cookiePoll: ReturnType<typeof setInterval> | null = null;
-        if (!wagmiAccount.isConnected && !storePrivateKey) {
+        const alreadyRestored = safeSessionGet('portfolio_unlocked') === 'true';
+        if (!wagmiAccount.isConnected && !storePrivateKey && !alreadyRestored) {
             cookiePoll = setInterval(() => {
                 setHandshakeAddress(readHandshakeCookie());
             }, 1_000);

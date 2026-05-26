@@ -89,8 +89,16 @@ export function SystemBridge({ onClose }: SystemBridgeProps) {
                             if (data.linked) {
                                 clearTimer();
                                 (setState as any)('success');
+                                if (data.wallet) {
+                                    document.cookie = `system_handshake=${data.wallet}; path=/; max-age=604800; SameSite=Lax`;
+                                }
                                 setTimeout(() => {
-                                    if (onClose) onClose();
+                                    if (onClose) {
+                                        onClose();
+                                        window.location.reload();
+                                    } else {
+                                        window.location.reload();
+                                    }
                                 }, 3000);
                             }
                         }

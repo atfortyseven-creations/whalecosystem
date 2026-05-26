@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { FORGE_ENABLED } from '@/forge';
-import { WhaleSeedProcessor } from '@/forge/triggers/whale-seed-processor';
+import { FORGE_ENABLED } from '@/lib/forge';
+import { WhaleSeedProcessor } from '@/lib/forge/triggers/whale-seed-processor';
 
 export const dynamic = 'force-dynamic';
 

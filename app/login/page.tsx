@@ -132,12 +132,26 @@ function ConnectPanel() {
   const router = useRouter();
   const [showLocalLogin, setShowLocalLogin] = useState(false);
 
+  const handleRedirect = useCallback(() => {
+     const urlParams = new URLSearchParams(window.location.search);
+     const returnUrl = urlParams.get('returnUrl') || urlParams.get('redirect_url');
+     if (returnUrl) {
+         if (returnUrl.startsWith('http')) {
+             window.location.href = returnUrl;
+         } else {
+             router.replace(returnUrl);
+         }
+     } else {
+         router.replace("/");
+     }
+  }, [router]);
+
   // When wallet connects  redirect directly to dashboard (no KYC)
   useEffect(() => {
     if (isConnected) {
-      setTimeout(() => router.replace("/"), 1200);
+      setTimeout(() => handleRedirect(), 1200);
     }
-  }, [isConnected, router]);
+  }, [isConnected, handleRedirect]);
 
   return (
     <>
@@ -154,7 +168,7 @@ function ConnectPanel() {
                Cerrar
              </button>
              <div className="w-full max-w-[560px] relative z-10 max-h-screen overflow-y-auto">
-                <CoreAuthGate onComplete={() => router.replace("/")} />
+                <CoreAuthGate onComplete={handleRedirect} />
              </div>
            </motion.div>
         )}

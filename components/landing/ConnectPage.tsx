@@ -286,7 +286,17 @@ export default function ConnectPage() {
           if (data.authenticated) {
             setLinked(true);
             redirectingRef.current = true;
-            window.location.replace("/dashboard");
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnUrl = urlParams.get('returnUrl') || urlParams.get('redirect_url');
+            if (returnUrl) {
+                if (returnUrl.startsWith('http')) {
+                    window.location.href = returnUrl;
+                } else {
+                    window.location.replace(returnUrl);
+                }
+            } else {
+                window.location.replace("/dashboard");
+            }
             return;
           }
         }
@@ -315,7 +325,17 @@ export default function ConnectPage() {
 
         setLinked(true);
         redirectingRef.current = true;
-        window.location.replace("/dashboard");
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrl = urlParams.get('returnUrl') || urlParams.get('redirect_url');
+        if (returnUrl) {
+            if (returnUrl.startsWith('http')) {
+                window.location.href = returnUrl;
+            } else {
+                window.location.replace(returnUrl);
+            }
+        } else {
+            window.location.replace("/dashboard");
+        }
       } catch (err: any) {
         const msg = err?.message || '';
         // User rejected signing  don't show an error, just reset

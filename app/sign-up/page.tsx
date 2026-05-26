@@ -102,7 +102,17 @@ export default function SignUpPage() {
             
             // Redirection as requested
             setTimeout(() => {
-                router.replace('/dashboard');
+                const urlParams = new URLSearchParams(window.location.search);
+                const returnUrl = urlParams.get('returnUrl') || urlParams.get('redirect_url');
+                if (returnUrl) {
+                    if (returnUrl.startsWith('http')) {
+                        window.location.href = returnUrl;
+                    } else {
+                        router.replace(returnUrl);
+                    }
+                } else {
+                    router.replace('/dashboard');
+                }
             }, 2000);
         } catch (error: any) {
             console.error("Cryptographic Anchor Failed:", error);

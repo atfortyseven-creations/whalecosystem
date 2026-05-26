@@ -78,7 +78,20 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
         await stopCamera();
         
         try {
-            const res = await fetch(`/api/bridge/generate?token=${encodeURIComponent(extractedText)}`);
+            let walletParam = '';
+            try {
+                const raw = localStorage.getItem('system_session_v2');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed?.wallet) walletParam = `&wallet=${parsed.wallet}`;
+                }
+                if (!walletParam) {
+                    const sess = sessionStorage.getItem('system_wallet_addr');
+                    if (sess) walletParam = `&wallet=${sess}`;
+                }
+            } catch {}
+
+            const res = await fetch(`/api/bridge/generate?token=${encodeURIComponent(extractedText)}${walletParam}`);
             const data = await res.json();
             
             if (data.valid) {
@@ -113,16 +126,14 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                 scannerRef.current = scanner;
 
                 const config = {
-                    fps: 20,
+                    fps: 10,
                     qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
                         const min = Math.min(viewfinderWidth, viewfinderHeight);
                         const size = Math.floor(min * 0.75);
                         return { width: size, height: size };
                     },
                     aspectRatio: 1.0,
-                    experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
-                    }
+                    disableFlip: false
                 };
 
                 let started = false;

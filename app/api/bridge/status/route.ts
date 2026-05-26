@@ -6,10 +6,27 @@ export async function GET(request: NextRequest) {
         const token = request.nextUrl.searchParams.get('token');
         if (!token) return NextResponse.json({ error: 'Token required' }, { status: 400 });
 
-        const status = await safeRedisGet(`bridge:status:${token}`);
+        const statusData = await safeRedisGet(`bridge:status:${token}`);
         
+        let isLinked = false;
+        let wallet = '';
+        if (statusData) {
+            if (statusData === 'linked') {
+                isLinked = true;
+            } else {
+                try {
+                    const parsed = JSON.parse(statusData);
+                    isLinked = parsed.status === 'linked';
+                    wallet = parsed.wallet || '';
+                } catch {
+                    isLinked = statusData === 'linked';
+                }
+            }
+        }
+
         return NextResponse.json({
-            linked: status === 'linked'
+            linked: isLinked,
+            wallet
         });
     } catch (err) {
         console.error('[Bridge/Status]', err);

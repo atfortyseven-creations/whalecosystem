@@ -1,8 +1,8 @@
 import { Worker, Job } from 'bullmq';
 import { createRedisClient } from '../lib/redis/client';
 import { ForgeService } from '../services/forge-service';
-import { CosmicSeed } from '../forge/types';
-import { FORGE_ENABLED } from '../forge';
+import { CosmicSeed } from '@/lib/forge/types';
+import { FORGE_ENABLED } from '@/lib/forge';
 
 // Singleton Redis connections for the worker
 const connection = createRedisClient({ name: 'CosmicForgeWorker' });

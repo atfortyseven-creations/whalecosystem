@@ -22,7 +22,20 @@ export default function BridgePage() {
 
     const consumeToken = async () => {
       try {
-        const res = await fetch(`/api/bridge/generate?token=${encodeURIComponent(token)}`);
+        let walletParam = '';
+        try {
+            const raw = localStorage.getItem('system_session_v2');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed?.wallet) walletParam = `&wallet=${parsed.wallet}`;
+            }
+            if (!walletParam) {
+                const sess = sessionStorage.getItem('system_wallet_addr');
+                if (sess) walletParam = `&wallet=${sess}`;
+            }
+        } catch {}
+
+        const res = await fetch(`/api/bridge/generate?token=${encodeURIComponent(token)}${walletParam}`);
         const data = await res.json();
 
         if (data.valid) {

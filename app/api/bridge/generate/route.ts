@@ -55,9 +55,20 @@ export async function GET(request: NextRequest) {
         // to allow for re-scans if mobile page reloads, rather than strict one-time use
         // which can be brittle on spotty mobile connections.
 
+        // Get mobile session wallet
+        let mobileWallet = request.nextUrl.searchParams.get('wallet') || '';
+        if (!mobileWallet) {
+            try {
+                const session = await getSession();
+                mobileWallet = session?.walletAddress || request.cookies.get('system_handshake')?.value || '';
+            } catch {
+                mobileWallet = request.cookies.get('system_handshake')?.value || '';
+            }
+        }
+
         // Update Redis to indicate the bridge was successfully linked
         // PC will poll this status via /api/bridge/status
-        await safeRedisSet(`bridge:status:${token}`, 'linked', 'EX', TOKEN_EXPIRY_S);
+        await safeRedisSet(`bridge:status:${token}`, JSON.stringify({ status: 'linked', wallet: mobileWallet }), 'EX', TOKEN_EXPIRY_S);
 
         return NextResponse.json({
             valid: true,
