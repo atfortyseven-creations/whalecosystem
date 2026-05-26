@@ -28,7 +28,7 @@ export default function WhaleAlertLanding({
   return (
     <div
       style={{
-        backgroundColor: "#FDFCF8",
+        backgroundColor: "#FFFFFF",
         color: "#1a1a1a",
         fontFamily:
           '"Georgia", "Times New Roman", serif',

@@ -391,10 +391,8 @@ function ForumHomeContent() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen]     = useState(false);
   const [isMounted, setIsMounted]   = useState(false);
-  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab]   = useState('categories');
   const router = useRouter();
-  const rawFilter = searchParams.get('filter');
-  const activeTab = rawFilter || 'categories';
 
   useEffect(() => {
     setIsMounted(true);
@@ -427,82 +425,69 @@ function ForumHomeContent() {
   useEffect(() => { loadData(); }, [loadData]);
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#1f1f1f] text-[#050505] dark:text-white w-full min-h-screen transition-colors duration-300">
-
-      {/* ── Secondary Sub-nav (Discourse-style) ── */}
-      <div className="w-full bg-white dark:bg-[#2b2b2b] border-b border-slate-200 dark:border-white/10 sticky top-0 z-[100] shadow-sm transition-colors duration-300">
-        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between h-[52px]">
-
-          {/* Left: Filter tabs */}
-          <div className="flex items-center gap-0 h-full overflow-x-auto no-scrollbar">
-            {FILTER_TABS.map(tab => {
-              const isActive = activeTab === tab.id || (tab.id === 'categories' && !rawFilter);
-              return (
-                <Link
-                  key={tab.id}
-                  href={tab.id === 'categories' ? '/forum' : `/forum?filter=${tab.id}`}
-                  className={`flex items-center gap-1.5 h-full px-4 text-[13px] font-medium whitespace-nowrap border-b-2 transition-colors ${
-                    isActive
-                      ? 'border-[#0088cc] text-[#0088cc]'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <span className="hidden sm:block opacity-70">{tab.icon}</span>
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Right: Action icons */}
-          <div className="flex items-center gap-3 shrink-0 ml-4">
-            {/* Search */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors text-slate-500 hover:text-slate-700"
-              title="Search (⌘K)"
-            >
-              <Search size={14} />
-              <span className="hidden sm:block text-[12px] font-mono text-slate-400">⌘K</span>
-            </button>
-
-            {/* New Topic */}
-            <Link
-              href="/forum/new"
-              className="hidden sm:flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#0088cc] text-white text-[12px] font-bold hover:bg-[#0077b3] transition-colors shadow-sm"
-            >
-              <Plus size={13} />
-              New Topic
-            </Link>
-
-            {/* Hamburger */}
-            <button
-              onClick={() => setMenuOpen(v => !v)}
-              className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${menuOpen ? 'bg-slate-200 text-slate-700' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-700'}`}
-              title="Menu"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="flex-1 flex flex-col bg-white text-[#050505] w-full overflow-y-auto">
 
       {/* ── Page Content ── */}
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-10 flex flex-col gap-10">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-8 flex flex-col gap-8">
 
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 dark:text-white leading-none mb-2">
-              Humanity Ledger Forum
-            </h1>
-            <p className="text-[14px] text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
-              Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics—with community guidelines and optional private governance as circuits ship.
-            </p>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div>
+              <h1 className="text-[24px] md:text-[32px] font-black tracking-tight text-slate-900 leading-none mb-1">
+                Humanity Ledger Forum
+              </h1>
+              <p className="text-[13px] text-slate-500 font-medium max-w-xl leading-relaxed">
+                Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-black/10 bg-white hover:bg-black/5 transition-colors text-slate-500 hover:text-slate-700 text-[12px] font-medium"
+                title="Search (⌘K)"
+              >
+                <Search size={13} />
+                <span className="hidden sm:block">⌘K Search</span>
+              </button>
+              <button
+                onClick={() => setMenuOpen(v => !v)}
+                className={`flex items-center justify-center w-9 h-9 rounded-xl border border-black/10 transition-colors ${menuOpen ? 'bg-black text-white' : 'bg-white hover:bg-black/5 text-slate-500'}`}
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <div className="flex flex-col gap-3">
+
+          {/* Inline filter tab bar */}
+          <div className="flex items-center gap-1 border-b border-black/8 pb-0">
+            {FILTER_TABS.map(tab => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold whitespace-nowrap border-b-2 -mb-px transition-colors ${
+                    isActive
+                      ? 'border-[#050505] text-[#050505]'
+                      : 'border-transparent text-slate-400 hover:text-slate-700 hover:border-slate-300'
+                  }`}
+                >
+                  <span className="opacity-80">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              );
+            })}
+            <div className="flex-1" />
+            <Link
+              href="/forum/new"
+              className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#050505] text-white text-[11px] font-bold hover:bg-black/80 transition-colors mb-1"
+            >
+              <Plus size={12} />
+              New Topic
+            </Link>
           </div>
         </div>
 
@@ -543,9 +528,9 @@ function ForumHomeContent() {
                   <h2 className="text-[13px] font-bold text-[#0088cc] uppercase tracking-wide flex items-center gap-2">
                     <Clock size={13} /> Latest
                   </h2>
-                  <Link href="/forum?filter=latest" className="text-[11px] text-slate-400 hover:text-slate-600 transition-colors">
+                  <button onClick={() => setActiveTab('latest')} className="text-[11px] text-slate-400 hover:text-slate-600 transition-colors">
                     See all →
-                  </Link>
+                  </button>
                 </div>
                 <div className="bg-white dark:bg-[#2b2b2b] rounded-2xl border border-slate-200 dark:border-white/10 divide-y divide-slate-100 dark:divide-white/5 overflow-hidden">
                   {loading ? (
@@ -659,12 +644,8 @@ function ForumHomeContent() {
         )}
       </div>
 
-      {/* Modals */}
       {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
       {menuOpen && <HamburgerMenu categories={categories} onClose={() => setMenuOpen(false)} />}
-
-      <WhaleChatLink />
-      <SystemFooter />
     </div>
   );
 }

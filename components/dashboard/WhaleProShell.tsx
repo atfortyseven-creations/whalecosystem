@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +16,7 @@ const Icon = {
   logs:       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4h12M2 8h8M2 12h10"/></svg>,
   identity:   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="1.5" y="1.5" width="13" height="13" rx="2"/><circle cx="8" cy="6.5" r="2"/><path d="M4 13.5c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>,
   support:    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 10.5v.5M8 5.5a2 2 0 0 1 0 4"/></svg>,
+  forum:      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 4h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4.5L2.5 14v-2h-1a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></svg>,
 };
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -50,6 +51,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'markets',         label: 'Markets',        icon: Icon.markets,  requiresZK: true },
     { id: 'inst-ledger',     label: 'Explorer',       icon: Icon.explorer, requiresZK: true },
     { id: 'humanity-ledger', label: 'Roadmap',        icon: Icon.roadmap },
+    { id: 'forum',           label: 'Forum',          icon: Icon.forum },
     { id: 'logs',            label: 'Logs',           icon: Icon.logs },
     { id: 'gold',            label: 'Identity',       icon: Icon.identity },
     { id: 'support',         label: 'Support',        icon: Icon.support },

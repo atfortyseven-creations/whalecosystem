@@ -340,11 +340,7 @@ export default function UniversalScanModal({
 
           <div className="w-full max-w-sm flex flex-col items-center px-6">
             <div className="flex flex-col items-center gap-3 mb-6">
-              <div className="flex items-center justify-center gap-3 w-full mb-1">
-                <img src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png" alt="Aztec" className="w-24 h-8 object-contain" />
-                <span className="text-[12px] font-mono text-[#0A0A0A]/30">×</span>
-                <img src="/atom_3d_silver.jpg" alt="Atom" className="w-8 h-8 object-contain mix-blend-multiply" />
-              </div>
+
               <h2 className="text-xl font-black uppercase tracking-tighter">{title}</h2>
             </div>
 

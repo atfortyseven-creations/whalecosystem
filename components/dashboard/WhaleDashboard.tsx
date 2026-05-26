@@ -30,7 +30,8 @@ const Registry = {
   HumanityLedger: dynamic(() => import('@/components/dashboard/HumanityLedger'), { ssr: false, loading: LoadingPanel }),
   PortfolioDashboard: dynamic(() => import('@/components/dashboard/PortfolioDashboard'), { ssr: false, loading: LoadingPanel }),
   InstitutionalMarkets: dynamic(() => import('@/components/dashboard/InstitutionalMarkets').then(m => ({ default: m.InstitutionalMarkets })), { ssr: false, loading: LoadingPanel }),
-  WhaleChat: dynamic(() => import('@/components/dashboard/WhaleChat').then(m => ({ default: m.WhaleChat })), { ssr: false, loading: LoadingPanel })
+  WhaleChat: dynamic(() => import('@/components/dashboard/WhaleChat').then(m => ({ default: m.WhaleChat })), { ssr: false, loading: LoadingPanel }),
+  SystemForum: dynamic(() => import('@/components/dashboard/SystemForum'), { ssr: false, loading: LoadingPanel })
 } as const;
 
 import "@/app/dashboard/dashboard.css";
@@ -57,6 +58,7 @@ const RouteRenderer = React.memo(({ route, reconciliationKey }: RouteRendererPro
         'logs': <Registry.SessionLogsPanel />,
         'support': <Registry.WhaleSupport />,
         'community': <Registry.WhaleChat />,
+        'forum': <Registry.SystemForum />,
         'privacy': <Registry.SessionLogsPanel />
     };
 
@@ -83,7 +85,7 @@ export default function WhaleDashboard() {
     // ZK Guard Clause
     if (isChecking) {
         return (
-            <div className="min-h-screen bg-[#FDFCF8] dark:bg-[#0A0A0A] flex items-center justify-center">
+            <div className="min-h-screen bg-[#FFFFFF] dark:bg-[#0A0A0A] flex items-center justify-center">
                 <div className="w-6 h-6 border-2 border-[#050505] dark:border-white border-t-transparent rounded-full animate-spin" />
             </div>
         );

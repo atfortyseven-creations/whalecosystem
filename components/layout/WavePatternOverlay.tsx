@@ -50,66 +50,6 @@ export function WavePatternOverlay() {
   const hokusaiOpacity = 0.12;
 
   return (
-    <>
-      {/*  Layer 1: Patron Cosmico  DPI-aware seamless tile  */}
-      <div
-        aria-hidden="true"
-        style={{
-          position:           "fixed",
-          inset:              0,
-          zIndex:             0,
-          pointerEvents:      "none",
-          transform:          "translateZ(0)",
-          WebkitTransform:    "translateZ(0)",
-          backfaceVisibility: "hidden",
-          // 4K source at small tile  crisp at any DPI, never blurry
-          backgroundImage:    "url('/patron-cosmico-4k.png')",
-          backgroundRepeat:   "repeat",
-          backgroundSize:     `${tileSize}px auto`,
-          backgroundAttachment: "scroll",
-          opacity:            cosmicoOpacity,
-          mixBlendMode:       "multiply",
-          // `crisp-edges` preserves texture sharpness; `auto` allows
-          // browser upscaling  use `auto` here since source is 4K
-          imageRendering:     "auto",
-        }}
-      />
-
-      {/*  Layer 2: Olas Hokusai  bottom-anchored, DPI-corrected  */}
-      <div
-        aria-hidden="true"
-        className="hokusai-strip"
-        style={{
-          position:        "fixed",
-          left:            0,
-          right:           0,
-          bottom:          0,
-          zIndex:          0,
-          pointerEvents:   "none",
-          transform:       "translateZ(0)",
-          WebkitTransform: "translateZ(0)",
-          backfaceVisibility: "hidden",
-          // Height: tall enough to see the full crest on desktop,
-          // smaller on mobile to avoid the "zoomed in" vertical crop.
-          // clamp(min, preferred, max)
-          height:          "clamp(80px, 18vh, 240px)",
-          backgroundImage: "url('/olas-hokusai-4k.png')",
-          backgroundRepeat:   "no-repeat",
-          backgroundPosition: "bottom center",
-          // KEY FIX: `cover` instead of `100% auto`
-          // `100% auto` on a tall strip forces the image to scale vertically,
-          // which zooms into the wave crest and loses the full Hokusai silhouette.
-          // `cover` scales the image so its SHORTER dimension fits, preserving
-          // the correct aspect ratio and showing the complete wave on all screens.
-          backgroundSize:   "cover",
-          backgroundAttachment: "scroll",
-          opacity:          hokusaiOpacity,
-          mixBlendMode:     "multiply",
-          // Fade from solid at bottom to transparent at top
-          maskImage:        "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0) 100%)",
-          WebkitMaskImage:  "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0) 100%)",
-        }}
-      />
-    </>
+    null
   );
 }

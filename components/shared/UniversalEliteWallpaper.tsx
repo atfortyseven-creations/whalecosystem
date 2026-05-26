@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from 'react';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -33,8 +33,7 @@ export function UniversalEliteWallpaper() {
             {/*  Light mode: translucent overlay  */}
             {!isDark && (
                 <div
-                    className="absolute inset-0 transition-opacity duration-700"
-                    style={{ background: 'rgba(250, 250, 248, 0.92)' }}
+                    className="absolute inset-0 transition-opacity duration-700 bg-white"
                 />
             )}
 

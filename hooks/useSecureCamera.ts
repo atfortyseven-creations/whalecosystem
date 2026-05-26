@@ -41,7 +41,7 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
         try {
           // Fallback 1: less strict width/height constraints
           stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode },
+            video: { facingMode: { ideal: facingMode } },
             audio: false,
           });
         } catch (err2) {

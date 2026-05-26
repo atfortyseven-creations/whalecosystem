@@ -34,7 +34,7 @@ export function SystemProfileModal({
            initial={{ y: 20, opacity: 0, scale: 0.98 }} 
            animate={{ y: 0, opacity: 1, scale: 1 }}
            exit={{ y: 20, opacity: 0, scale: 0.98 }}
-           className="bg-[#FDFCF8] w-full max-w-4xl shadow-2xl overflow-hidden border border-black/20 flex flex-col h-[85vh] max-h-[800px]"
+           className="bg-[#FFFFFF] w-full max-w-4xl shadow-2xl overflow-hidden border border-black/20 flex flex-col h-[85vh] max-h-[800px]"
         >
           {/* Header */}
           <div className="bg-black text-white p-5 flex justify-between items-center">
@@ -43,8 +43,8 @@ export function SystemProfileModal({
                    <Shield size={18}/>
                 </div>
                 <div>
-                   <h2 className="font-serif font-bold text-lg uppercase tracking-widest text-[#FDFCF8]">System Grid Profile</h2>
-                   <span className="font-mono text-[9px] text-[#FDFCF8]/50 break-all">{walletAddress || "OFFLINE_MODE"}</span>
+                   <h2 className="font-serif font-bold text-lg uppercase tracking-widest text-[#FFFFFF]">System Grid Profile</h2>
+                   <span className="font-mono text-[9px] text-[#FFFFFF]/50 break-all">{walletAddress || "OFFLINE_MODE"}</span>
                 </div>
              </div>
              <button onClick={onClose} className="p-2 hover:bg-white/10 transition-colors text-white/50 hover:text-white">
@@ -58,7 +58,7 @@ export function SystemProfileModal({
                 <button 
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-4 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors ${activeTab === tab ? 'bg-[#FDFCF8] text-black border-b-2 border-black' : 'text-black/40 hover:text-black/80 hover:bg-black/5'}`}
+                  className={`flex-1 py-4 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors ${activeTab === tab ? 'bg-[#FFFFFF] text-black border-b-2 border-black' : 'text-black/40 hover:text-black/80 hover:bg-black/5'}`}
                 >
                   {tab === "IDENTITY" && <GraduationCap size={14} className="inline mr-2"/>}
                   {tab === "PRIVACY_LOGS" && <Activity size={14} className="inline mr-2"/>}
@@ -69,7 +69,7 @@ export function SystemProfileModal({
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-[#FDFCF8]">
+          <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-[#FFFFFF]">
              
              {activeTab === "IDENTITY" && (
                 <div className="space-y-8 animate-in fade-in">
