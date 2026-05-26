@@ -61,12 +61,12 @@ export function InstitutionalHeader() {
     const { t } = useSystemTranslation();
 
     const MENU_ITEMS = [
-      { label: t('NAV_DASHBOARD'), href: "/dashboard" },
-      { label: t('NAV_WHALE_CHAT'), href: "/chat" },
-      { label: t('NAV_PORTFOLIO'), href: "/portfolio" },
-      { label: t('NAV_COMMUNITY'), href: "#", subItems: [{ label: t('NAV_NEWS'), href: "/news" }, { label: t('NAV_ACADEMY'), href: "/academy" }, { label: t('NAV_FORUM'), href: "/forum" }, { label: t('NAV_CAREERS'), href: "/careers" }] },
-      { label: t('NAV_STATUS'), href: "/status" },
-      { label: t('NAV_PRIVACY'), href: "/privacy" }
+      { label: t('NAV_DASHBOARD') || 'DASHBOARD', href: "/dashboard" },
+      { label: t('NAV_WHALE_CHAT') || 'WHALE CHAT', href: "/chat" },
+      { label: t('NAV_PORTFOLIO') || 'PORTFOLIO', href: "/portfolio" },
+      { label: t('NAV_COMMUNITY') || 'COMMUNITY', href: "#", subItems: [{ label: t('NAV_NEWS') || 'NEWS', href: "/news" }, { label: t('NAV_ACADEMY') || 'ACADEMY', href: "/academy" }, { label: t('NAV_FORUM') || 'FORUM', href: "/forum" }, { label: t('NAV_CAREERS') || 'CAREERS', href: "/careers" }] },
+      { label: 'DEVELOPERS', href: "#", subItems: [{ label: 'DOCUMENTATION', href: '/docs' }, { label: 'API MARKETPLACE', href: '/api-marketplace' }, { label: 'INFRASTRUCTURE', href: '/infrastructure' }] },
+      { label: 'RESOURCES', href: "#", subItems: [{ label: 'SUPPORT', href: '/support' }, { label: 'FAQ', href: '/faq' }, { label: 'STATUS', href: '/status' }, { label: 'PRIVACY', href: '/privacy' }, { label: 'TERMS', href: '/terms' }] }
     ];
 
     return (
@@ -137,22 +137,43 @@ export function InstitutionalHeader() {
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -8 }}
+                        initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 right-0 z-[90] p-4 shadow-lg bg-white border-b border-[#EBEBEB]"
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute top-full left-0 right-0 z-[90] shadow-2xl bg-white border-b border-[#EBEBEB] overflow-hidden"
                     >
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 p-4 max-h-[75vh] overflow-y-auto overscroll-contain">
                             {MENU_ITEMS.map((item, index) => (
-                                <Link 
-                                    key={index} 
-                                    href={item.href} 
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="font-mono text-[11px] font-black uppercase tracking-[0.2em] py-3 px-4 text-[#0A0A0A] hover:bg-[#F8F8F8] rounded-lg transition-colors"
-                                >
-                                    {item.label}
-                                </Link>
+                                <div key={index} className="flex flex-col">
+                                    {item.subItems ? (
+                                        <div className="py-2 px-4">
+                                            <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-2 block">
+                                                {item.label}
+                                            </span>
+                                            <div className="flex flex-col gap-1 pl-2 border-l border-black/10">
+                                                {item.subItems.map((sub: any, subIdx: number) => (
+                                                    <Link 
+                                                        key={subIdx} 
+                                                        href={sub.href} 
+                                                        onClick={() => setIsMenuOpen(false)}
+                                                        className="font-mono text-[11px] font-bold uppercase tracking-[0.15em] py-2.5 px-3 text-[#0A0A0A] hover:bg-black/5 rounded-lg transition-colors"
+                                                    >
+                                                        {sub.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <Link 
+                                            href={item.href} 
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className="font-mono text-[11px] font-black uppercase tracking-[0.2em] py-3 px-4 text-[#0A0A0A] hover:bg-black/5 rounded-lg transition-colors"
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </motion.div>
