@@ -22,24 +22,24 @@ interface RoadmapEdge {
 }
 
 const NODES: RoadmapNode[] = [
-  // Milestone 1
-  { id: 'm1-circuit', title: 'Aztec Testnet Integration', status: 'live', quarter: 'Milestone 1', description: 'Develop and deploy Noir circuits for Whale Chat messaging logic and private state management.', x: 100, y: 140 },
-  { id: 'm1-sandbox', title: 'Sandbox Integration', status: 'live', quarter: 'Milestone 1', description: 'Integrate Aztec Sandbox for local testing of private state transitions. Deliverable: Functional integration of the Whale Network dashboard with the Aztec testnet.', x: 100, y: 300 },
+  // January 2026
+  { id: 'm1-ledger', title: 'Humanity Ledger Expansion', status: 'live', quarter: 'January 2026', description: 'Specialized backend development and RPC node infrastructure for complex, private indexing of Aztec network data.', x: 100, y: 140 },
+  { id: 'm1-circuit', title: 'Aztec Testnet Integration', status: 'live', quarter: 'January 2026', description: 'Develop Noir circuits for Whale Chat messaging logic and private state management.', x: 100, y: 300 },
   
-  // Milestone 2
-  { id: 'm2-audit', title: 'Security Audits', status: 'building', quarter: 'Milestone 2', description: 'Conduct independent security audits of our frontend infrastructure, smart contracts, and newly developed Noir circuits.', x: 450, y: 140 },
-  { id: 'm2-beta', title: 'Testnet Beta Launch', status: 'building', quarter: 'Milestone 2', description: 'Deliverable: A fully functional, testnet-ready dashboard and wallet interface deployed for public beta testing, strictly meeting timeline requirement.', x: 450, y: 300 },
+  // May 2026
+  { id: 'm2-audit', title: 'Security Audits', status: 'building', quarter: 'May 2026', description: 'Independent professional audits for our Noir circuits and account contracts.', x: 450, y: 140 },
+  { id: 'm2-beta', title: 'Testnet Beta Launch', status: 'building', quarter: 'May 2026', description: 'Fully functional, testnet-ready dashboard and wallet interface deployed for public beta testing.', x: 450, y: 300 },
 
-  // Milestone 3
-  { id: 'm3-mobile', title: 'Mobile Synchronization', status: 'planned', quarter: 'Milestone 3', description: 'Complete native iOS/Android applications. Implement and stress-test the ZK-secured QR code session sync.', x: 800, y: 140 },
-  { id: 'm3-crosschain', title: 'Cross-Chain Expansion', status: 'planned', quarter: 'Milestone 3', description: 'Deliverable: Seamless, privacy-preserving cross-device wallet experience within the Aztec environment.', x: 800, y: 300 },
+  // Jan 2027
+  { id: 'm3-mobile', title: 'Mobile Finalization', status: 'planned', quarter: '01/01/2027', description: 'Native iOS/Android apps finalization. ZK-secured QR synchronization flawlessly across devices.', x: 800, y: 140 },
+  { id: 'm3-mainnet', title: 'Final Mainnet Launch', status: 'planned', quarter: '01/01/2027', description: 'Seamless, privacy-preserving cross-device wallet experience deployed to Aztec mainnet.', x: 800, y: 300 },
 ];
 
 const EDGES: RoadmapEdge[] = [
-  { from: 'm1-circuit', to: 'm2-audit' },
-  { from: 'm1-sandbox', to: 'm2-beta' },
+  { from: 'm1-ledger', to: 'm2-audit' },
+  { from: 'm1-circuit', to: 'm2-beta' },
   { from: 'm2-audit', to: 'm3-mobile' },
-  { from: 'm2-beta', to: 'm3-crosschain' },
+  { from: 'm2-beta', to: 'm3-mainnet' },
 ];
 
 const STATUS_CONFIG = {
@@ -123,22 +123,22 @@ function RoadmapCanvas() {
   }, []);
 
   return (
-    <div className="relative w-full h-full flex flex-col gap-0 min-h-[500px]">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/8 bg-white shrink-0">
-        <div className="flex items-center gap-5">
+    <div className="absolute inset-0 w-full h-full flex flex-col overflow-hidden bg-white">
+      {/* Toolbar - floating absolute so it doesn't block dragging in the main area */}
+      <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto z-20 flex items-center justify-between sm:justify-center px-4 py-3 border border-black/10 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg">
+        <div className="flex items-center gap-4 sm:gap-5">
           {Object.entries(STATUS_CONFIG).map(([k, v]) => (
-            <div key={k} className="flex items-center gap-2">
+            <div key={k} className="flex items-center gap-1.5 sm:gap-2">
               <span className={`w-2 h-2 rounded-full ${v.dot}`} />
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-black/45 hidden sm:inline">{v.label}</span>
+              <span className="text-[9px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-black/50">{v.label}</span>
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-black/30 mr-2 hidden sm:inline">Drag to pan · Scroll to zoom</span>
-          <button onClick={zoomOut} className="w-8 h-8 flex items-center justify-center border border-black/12 hover:bg-black/[0.03] transition-colors text-black/60 font-bold text-lg leading-none">−</button>
-          <button onClick={zoomIn}  className="w-8 h-8 flex items-center justify-center border border-black/12 hover:bg-black/[0.03] transition-colors text-black/60 font-bold text-lg leading-none">+</button>
-          <button onClick={reset}   className="px-3 h-8 flex items-center justify-center border border-black/12 hover:bg-black/[0.03] transition-colors text-[11px] font-mono font-bold uppercase tracking-wider text-black/50">Reset</button>
+        <div className="w-[1px] h-4 bg-black/10 mx-2 sm:mx-4 hidden sm:block"></div>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <button onClick={zoomOut} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-black/5 transition-colors text-black/60 font-bold text-lg leading-none">−</button>
+          <button onClick={zoomIn}  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-black/5 transition-colors text-black/60 font-bold text-lg leading-none">+</button>
+          <button onClick={reset}   className="px-2 sm:px-3 h-8 flex items-center justify-center rounded-lg hover:bg-black/5 transition-colors text-[9px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-black/50">Reset</button>
         </div>
       </div>
 
@@ -178,9 +178,9 @@ function RoadmapCanvas() {
         >
           {/* Quarter labels */}
           {[
-            { label: 'Milestone 1', x: 100 },
-            { label: 'Milestone 2', x: 450 },
-            { label: 'Milestone 3', x: 800 },
+            { label: 'January 2026', x: 100 },
+            { label: 'May 2026', x: 450 },
+            { label: '01/01/2027', x: 800 },
           ].map(q => (
 
             <div
@@ -287,25 +287,22 @@ function RoadmapCanvas() {
 
 export default function HumanityLedger() {
   return (
-    <div className="w-full h-full min-h-0 flex flex-col bg-white overflow-y-auto">
-      {/* Header */}
-      <div className="px-6 py-8 border-b border-black/8">
+    <div className="relative w-full h-full min-h-0 bg-white overflow-hidden">
+      {/* Header overlaid with pointer-events-none to let drag pass through */}
+      <div className="absolute top-0 left-0 right-0 px-6 py-6 sm:py-8 z-10 pointer-events-none bg-gradient-to-b from-white via-white/80 to-transparent">
         <div className="max-w-[900px]">
-          <h1 className="text-[22px] font-black tracking-tight text-black mb-2">
+          <h1 className="text-[22px] font-black tracking-tight text-black mb-2 pointer-events-auto">
             Protocol Roadmap
           </h1>
-          <p className="text-[13.5px] text-black/50 leading-relaxed">
-            The development timeline for Humanity Ledger on Aztec Network. Drag the canvas to explore,
+          <p className="text-[12px] sm:text-[13.5px] text-black/50 leading-relaxed pointer-events-auto max-w-xl">
+            The development timeline for Whale Network on Aztec Network. Drag the canvas to explore,
             scroll to zoom, and click any node for details.
           </p>
         </div>
       </div>
 
-      {/* Roadmap Canvas */}
-      <div className="flex-1 min-h-0">
-        <RoadmapCanvas />
-      </div>
-
+      {/* Fullscreen Roadmap Canvas */}
+      <RoadmapCanvas />
     </div>
   );
 }

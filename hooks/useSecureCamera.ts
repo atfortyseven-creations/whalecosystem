@@ -27,14 +27,31 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
         throw new Error('WebRTC API not supported in this browser.');
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      });
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+      } catch (err1) {
+        try {
+          // Fallback 1: less strict width/height constraints
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode },
+            audio: false,
+          });
+        } catch (err2) {
+          // Fallback 2: Any available video device
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
+        }
+      }
 
       if (activeRequestRef.current !== activeRequestId) {
         stream.getTracks().forEach(track => track.stop());
@@ -46,8 +63,13 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute('playsinline', 'true'); // Critical for iOS PWA/Safari
+        videoRef.current.setAttribute('muted', 'true');
         videoRef.current.play().catch(e => {
           console.error("Video play error:", e);
+          setTimeout(() => {
+            videoRef.current?.play().catch(() => {});
+          }, 300);
         });
       }
     } catch (err: any) {
