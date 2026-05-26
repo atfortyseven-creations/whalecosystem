@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useId, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 
 type MermaidDiagramProps = {
   chart: string;
@@ -11,6 +11,7 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
   const reactId = useId().replace(/:/g, '');
   const [svg, setSvg] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,35 +26,52 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
             primaryColor: '#ffffff',
             primaryTextColor: '#111111',
             primaryBorderColor: 'rgba(0,0,0,0.18)',
-            secondaryColor: '#ffffff',
-            tertiaryColor: '#ffffff',
-            lineColor: '#333333',
-            fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif',
-            fontSize: '13px',
-            nodeBorder: '1px solid rgba(0,0,0,0.15)',
-            clusterBkg: '#ffffff',
+            secondaryColor: '#f5f5f5',
+            tertiaryColor: '#f9f9f9',
+            lineColor: '#555555',
+            fontFamily: '"Inter", ui-sans-serif, system-ui, -apple-system, sans-serif',
+            fontSize: '12px',
+            nodeBorder: '1px solid rgba(0,0,0,0.2)',
+            clusterBkg: '#fafafa',
             clusterBorder: 'rgba(0,0,0,0.12)',
             edgeLabelBackground: '#ffffff',
             nodeTextColor: '#111111',
+            labelTextColor: '#111111',
           },
           flowchart: {
             curve: 'basis',
-            padding: 24,
+            padding: 20,
             htmlLabels: true,
-            diagramPadding: 20,
-            useMaxWidth: false,
+            diagramPadding: 16,
+            useMaxWidth: true,
+            rankSpacing: 60,
+            nodeSpacing: 40,
           },
-          sequence: { actorMargin: 64, messageMargin: 40, boxTextMargin: 8, useMaxWidth: false },
+          sequence: {
+            actorMargin: 50,
+            messageMargin: 35,
+            boxTextMargin: 6,
+            useMaxWidth: true,
+            mirrorActors: false,
+            showSequenceNumbers: false,
+          },
           securityLevel: 'loose',
+          maxEdges: 500,
         });
 
-        const { svg: rendered } = await mermaid.render(`privacy-diagram-${reactId}`, chart.trim());
+        const diagramId = `mermaid-${reactId}-${Math.random().toString(36).slice(2, 7)}`;
+        const { svg: rendered } = await mermaid.render(diagramId, chart.trim());
+
         if (!cancelled) {
-          // Patch SVG to be fully responsive: allow natural scaling and scrolling without constrained max-width
+          // Fully responsive patch:
+          // 1. Strip any inline max-width / width / height style that forces overflow
+          // 2. Set explicit width=100% so SVG fills the container
+          // 3. Preserve viewBox so browsers can scale proportionally
           const patched = rendered
-            .replace(/style="max-width:[^"]*"/, 'style="width:100%;min-width:1200px;height:auto;display:block;margin:auto;"')
-            .replace(/height="[^"]*"/, '')
-            .replace(/width="[^"]*"/, '');
+            .replace(/\sstyle="[^"]*max-width[^"]*"/g, '')
+            .replace(/\sheight="[^"]*"/g, '')
+            .replace(/\swidth="[^"]*"/g, ' width="100%"');
+
           setSvg(patched);
           setError(null);
         }
@@ -72,34 +90,43 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
   }, [chart, reactId]);
 
   return (
-    <figure className="my-10 border border-black/10 bg-white overflow-hidden rounded-sm">
-      {/* Horizontal scroll container so wide diagrams never clip */}
+    <figure className="my-10 border border-black/10 bg-white overflow-hidden" style={{ borderRadius: 2 }}>
+      {/* Scroll horizontally on mobile so nothing is clipped. On desktop the SVG scales to 100% width naturally. */}
       <div
+        ref={containerRef}
         className="w-full overflow-x-auto"
-        style={{ WebkitOverflowScrolling: 'touch', minHeight: '120px' }}
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehaviorX: 'contain',
+          minHeight: '120px',
+        }}
       >
         {error ? (
-          <div className="p-6">
-            <p className="text-[13px] text-red-600/80 font-mono">{error}</p>
+          <div className="p-6 flex items-start gap-3">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-red-500/80 mt-0.5">ERR</span>
+            <p className="text-[12px] text-red-600/70 font-mono leading-relaxed">{error}</p>
           </div>
         ) : svg ? (
           <div
-            /* Removed min-w-max to prevent cutting off SVG contents */
-            className="p-6 md:p-10 w-full"
-            style={{ lineHeight: 1 }}
+            className="p-4 md:p-8 w-full"
+            style={{
+              lineHeight: 1,
+              minWidth: 0,
+            }}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: Mermaid SVG output
             dangerouslySetInnerHTML={{ __html: svg }}
             aria-hidden={!caption}
           />
         ) : (
           <div className="h-36 flex items-center justify-center">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-[#050505]/30 animate-pulse">
-              Loading diagram…
+            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#050505]/25 animate-pulse">
+              Rendering diagram…
             </span>
           </div>
         )}
       </div>
       {caption && (
-        <figcaption className="px-6 py-3 border-t border-black/8 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#050505]/40">
+        <figcaption className="px-5 py-3 border-t border-black/8 font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-[#050505]/35">
           {caption}
         </figcaption>
       )}

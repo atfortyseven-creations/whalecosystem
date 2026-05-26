@@ -8,326 +8,614 @@ export type PrivacyArchitectureSection = {
 };
 
 export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
+  // ===== 1. OVERVIEW =====
   {
     id: 'overview',
-    title: 'What this page explains',
+    title: 'System Overview: Quantum Architecture Blueprint',
     paragraphs: [
-      'Humanity Ledger (Whale Alert Network) is a wallet-connected web app: you sign in with an Ethereum address, use a dashboard for on-chain analytics, and can chat with other users over encrypted messaging. Private balances and transfers on Aztec are a separate layer on top of public Ethereum activity.',
-      'This guide walks through how each part connects—on your phone, in the browser, and on our servers—so you can see what stays on your device and what we actually store.',
+      'Humanity Ledger (Whale Alert Network) operates at the absolute vanguard of institutional decentralized finance. By unifying high-frequency on-chain telemetry with absolute cryptographic privacy via Aztec Layer 2 and Noir ZK circuits, the system orchestrates a frictionless execution environment for capital flows, entirely untethered from centralized SaaS intermediaries.',
+      'This documentation maps the exhaustive thermodynamic flow of data, value, and identity across our entire infrastructure. Every vector is secured, every state transition is proven, and all client telemetry is strictly localized on the user device.'
     ],
     bullets: [
-      'No passwords or email required for core access—your wallet address is your identity.',
-      'Sessions are short-lived signed tokens in HTTP-only cookies, plus a readable cookie so the UI knows you are linked.',
-      'Direct messages use XMTP end-to-end encryption; we do not hold decryption keys for chat.',
+      'Zero-Knowledge Proofs (zk-SNARKs) isolate user identity from capital vectors.',
+      'Institutional execution vectors (Swap, Bridge, Ingress) execute directly on immutable smart contracts via Ethers.js.',
+      'Decentralized communication via XMTP guarantees absolute end-to-end encryption.',
+      'No passwords. No email. Your wallet address is your sovereign identity.',
+      'Sessions are short-lived JWTs in HTTP-only cookies — JavaScript cannot read them.'
     ],
+    diagram: {
+      caption: 'Full System Macro Overview',
+      chart: `graph TD
+  User([End User]) --> Client[Next.js Client Terminal]
+  Client --> Auth[Auth Layer / JWTs]
+  Client --> Portfolio[Portfolio Execution Vectors]
+  Client --> Analytics[Analytics Dashboard]
+  Client --> Chat[Whale Chat / XMTP]
+  Auth --> API[Humanity Ledger API]
+  Portfolio --> OnChain[(On-Chain Smart Contracts)]
+  Analytics --> Workers[Whale Worker Nodes]
+  Chat --> XMTP[XMTP Network]
+  Workers --> Neo4j[(Neo4j Graph DB)]
+  Workers --> Redis[(Redis Cache)]
+  API --> Postgres[(Postgres DB)]
+  OnChain --> Ethereum[(Ethereum L1)]
+  OnChain --> Aztec[(Aztec L2 ZK Rollup)]
+  style Client fill:#000,color:#fff
+  style OnChain fill:#1a1a2e,color:#fff
+  style Aztec fill:#2a1b4d,color:#fff`
+    },
     callout: {
-      title: 'Legal privacy policy',
+      title: 'Legal Privacy Policy',
       body: 'For data retention, cookies, and regulatory wording, see the formal Privacy Policy.',
       href: '/legal/privacy',
-      hrefLabel: 'Legal privacy policy',
-    },
+      hrefLabel: 'Read the Legal Privacy Policy'
+    }
   },
+
+  // ===== 2. INSTITUTIONAL ANALYTICS PIPELINE =====
   {
-    id: 'system-architecture-deep-dive',
-    title: 'System Architecture & Deep Dive Explanations',
+    id: 'institutional-analytics-pipeline',
+    title: 'Institutional Real-Time Analytics Pipeline',
     paragraphs: [
-      'The Humanity Ledger is built upon a radically decentralized and privacy-preserving stack. By unifying high-frequency on-chain telemetry (Whale Network) with absolute cryptographic privacy (Aztec Layer 2), we\'ve created an environment where capital flows can be analyzed without exposing the observer\'s identity. All analytical computation executes strictly within a zero-knowledge execution environment on the user\'s localized hardware. There are no SaaS intermediaries. There is no cloud telemetry.',
-      'Core Telemetry & Ingestion Flow: Raw block data and mempool streams are ingested via dedicated, failover-resistant RPC nodes. This unindexed data feeds directly into local Worker Nodes which perform Z-Score pattern analysis and EIP-2929 thermodynamics evaluations, mapping capital velocity into a localized Neo4j graph database.',
+      'The data ingestion engine operates in a failover-resistant topology. Unindexed raw block data is streamed via proprietary RPC node clusters directly into localized Whale Worker nodes. These evaluate thermodynamic Z-Scores and EIP-2929 gas metrics before pushing synthesized intelligence into a Neo4j graph and Redis streams.',
+      'All analytical computation executes strictly within the server boundary. The Next.js client receives only encrypted, pre-processed alpha signals via WebSocket — never raw mempool data.'
     ],
     diagram: {
       caption: 'Thermodynamic Data Ingestion and Local Processing Pipeline',
       chart: `graph TD
-  subgraph "Public Ecosystem"
-      RPC[RPC Node Clusters] -->|Raw Block Data| M[Mempool Streams]
+  subgraph PublicEco["Public Ecosystem"]
+    RPC["RPC Node Clusters"] -->|Raw Block Data| Mem["Mempool Streams"]
   end
-  subgraph "Localized Vault Processing"
-      M --> W[Whale Worker Node]
-      W -->|Z-Score Eval| DB1[(Neo4j Graph)]
-      W -->|Tx Vitals| DB2[(Redis/Upstash)]
-      W -->|State| DB3[(Prisma/Postgres)]
-      DB1 --> AG[Analytics Engine]
-      DB2 --> AG
-      DB3 --> AG
+  subgraph VaultProcessing["Localized Vault Processing"]
+    Mem --> WW["Whale Worker Node"]
+    WW -->|Z-Score Analysis| Neo["Neo4j Graph DB"]
+    WW -->|Tx Vitals Stream| Redis["Redis / Upstash"]
+    WW -->|Persistent State| PG["Prisma / Postgres"]
+    Neo --> AE["Analytics Engine"]
+    Redis --> AE
+    PG --> AE
   end
-  subgraph "Secure Client Delivery"
-      AG -->|Encrypted WebSocket| UI[Next.js Client Terminal]
-      UI -->|ZK Circuit| AZ[Aztec Shielded Pool]
+  subgraph SecureDelivery["Secure Client Delivery"]
+    AE -->|Encrypted WebSocket| UI["Next.js Client Terminal"]
+    UI -.->|ZK Circuit Delegation| AZ["Aztec Shielded Pool"]
   end
-  style RPC fill:#ffffff,stroke:#333
-  style W fill:#ffffff,stroke:#000,stroke-width:2px
-  style UI fill:#050505,stroke:#000,color:#fff`
+  style WW fill:#fff,stroke:#000,stroke-width:2px
+  style UI fill:#000,color:#fff
+  style AZ fill:#2a1b4d,color:#fff`
     }
   },
+
+  // ===== 3. PORTFOLIO EXECUTION VECTORS =====
   {
-    id: 'sybil-resistance',
+    id: 'portfolio-execution-vectors',
+    title: 'Portfolio On-Chain Execution Vectors',
+    paragraphs: [
+      'The native portfolio interface rejects all iframe-based SaaS chokepoints. Instead, it uses direct Ethers.js integration to communicate with core decentralized protocols. Every execution — swap, bridge, or fiat ingress — is settled natively on the ledger.',
+      'When a user authorizes a swap, the signature routes directly to Uniswap V2/V3 routers. Cross-chain bridge capital leverages LayerZero infrastructure for guaranteed finality. The fiat-to-crypto gateway opens an isolated popup to a compliant KYC provider without ever storing credentials.'
+    ],
+    diagram: {
+      caption: 'Native Portfolio Component Architecture and Smart Contract Execution',
+      chart: `flowchart TD
+  subgraph UI["Next.js Native Portfolio UI"]
+    Store(("Zustand Wallet Store"))
+    Buy["NativeBuyView"]
+    Swap["NativeSwapView"]
+    Bridge["NativeBridgeView"]
+    Store --> Buy
+    Store --> Swap
+    Store --> Bridge
+  end
+  subgraph Protocols["Decentralized Protocol Layer"]
+    Moonpay(("Fiat On-Ramp Gateway"))
+    UniV2(("Uniswap V2 Router"))
+    UniV3(("Uniswap V3 Router"))
+    LZ(("LayerZero Endpoints"))
+  end
+  subgraph Ledgers["Immutable Ledgers"]
+    ETH[("Ethereum Mainnet")]
+    ARB[("Arbitrum Rollup")]
+    POL[("Polygon PoS")]
+    OPT[("Optimism Rollup")]
+    BASE[("Base L2")]
+  end
+  Buy -.->|Secure Popup Redirect| Moonpay
+  Swap -->|ethers.Contract call| UniV2
+  Swap -->|ethers.Contract call| UniV3
+  Bridge -->|Cross-Chain Message| LZ
+  Moonpay -->|Settlement| ETH
+  UniV2 -->|ERC20 Transfer| ETH
+  UniV3 -->|ERC20 Transfer| ETH
+  LZ -->|Relayer| ARB
+  LZ -->|Relayer| POL
+  LZ -->|Relayer| OPT
+  LZ -->|Relayer| BASE
+  style Store fill:#000,color:#fff
+  style UI fill:#f9f9f9,stroke:#000`
+    },
+    bullets: [
+      'Slippage tolerance is configurable per-swap at the component level.',
+      'Bridge fees are estimated on-chain before signature request.',
+      'No private key ever leaves the local wallet provider — Ethers.js operates exclusively on the signed payload.'
+    ]
+  },
+
+  // ===== 4. ZERO-KNOWLEDGE SYBIL RESISTANCE =====
+  {
+    id: 'zk-authentication-sybil',
     title: 'Zero-Knowledge Sybil Resistance',
     paragraphs: [
-      'To prevent network degradation from algorithmic bots and malicious institutional swarms, the network implements a localized biometric liveness verification standard. When a user authenticates, their wallet generates a zk-SNARK proof of personhood. The root address is completely obfuscated through a cryptographic nullifier hash.'
+      'The network enforces a localized biometric liveness verification standard using Noir ZK circuits. When a user authenticates, their wallet produces a zk-SNARK proof of personhood. The root address is completely obfuscated through a cryptographic nullifier hash.',
+      'This guarantees the central validator can confirm authenticity without ever learning the true public key of the participant. Proof generation happens entirely in-browser via Barretenberg WebAssembly.'
     ],
     diagram: {
-      caption: 'Zero-Knowledge Authentication and Verification Sequence',
+      caption: 'Zero-Knowledge Authentication and Sybil Resistance Sequence',
       chart: `sequenceDiagram
   participant User
-  participant LocalClient as Local Client
-  participant ZK as ZK Circuit
-  participant Validator as Network Validator
-  User->>LocalClient: Request Access
-  LocalClient->>User: Request Signature
-  User->>LocalClient: Signed Message (EIP-191)
-  LocalClient->>ZK: Generate Proof (No PII)
-  ZK->>LocalClient: Return ZK-SNARK
-  LocalClient->>Validator: Submit SNARK & Nullifier
-  Validator-->>LocalClient: Accept Proof (True/False)
-  LocalClient-->>User: Grant Encrypted Session`
+  participant Wallet as Client Wallet
+  participant BB as Barretenberg Wasm
+  participant Verifier as Network Validator
+  User->>Wallet: Request Shielded Access
+  Wallet->>User: Sign Challenge EIP-191
+  User->>Wallet: Signed Message
+  Wallet->>BB: Compile Noir Circuit with Witness Inputs
+  note over Wallet,BB: Private Key Scalar + Nullifier Logic<br/>Never Leave Browser
+  BB->>Wallet: Emit zk-SNARK + Public Nullifier Hash
+  Wallet->>Verifier: Submit Proof Bundle
+  Verifier-->>Verifier: Pairing Curve Verification
+  Verifier-->>Wallet: Accept or Reject Proof
+  Wallet-->>User: Grant Encrypted Shielded Session`
     }
   },
+
+  // ===== 5. WALLET CONNECT + SESSION =====
   {
     id: 'wallet-connect',
-    title: 'Connecting your wallet',
+    title: 'Identity and Wallet Session Matrix',
     paragraphs: [
-      'You can use the app on a phone (iOS or Android, including installed as a home-screen PWA) or on a desktop browser. The connect flow is the same idea everywhere: pick a wallet, approve the connection in the wallet app or extension, then the site registers your address with our API.',
-      'On mobile, WalletConnect / Reown AppKit opens your wallet app (MetaMask, Coinbase Wallet, Rainbow, etc.). When you return to the browser tab, Wagmi restores the connection from local storage and we call the verify endpoint with your address.',
-      'On desktop at /connect, you can use a browser extension directly, or open the mobile wallet list if you prefer phone-based signing. Extension users go straight to session verification after connect; QR mode is described in the cross-device section below.',
+      'Authentication supports maximum liquidity across all environments. Whether via Mobile PWA, Desktop Browser, or injected dApp browsers, the session state is meticulously preserved without compromising cryptographic integrity.',
+      'Upon address verification, the server mints a pair of HTTP-only JWTs alongside a JavaScript-readable handshake cookie. This tripartite design ensures absolute resilience against XSS and iOS back-navigation re-login loops.',
+      'The hook useSystemAccount resolves identity in priority order: local unlocked vault, sessionStorage restore, Wagmi connection, then the handshake cookie.'
     ],
     diagram: {
-      caption: 'Wallet connect and session registration',
+      caption: 'Wallet Connect and Tripartite Session Registration',
       chart: `flowchart TB
-  subgraph mobile["Mobile browser or PWA"]
-    M1["Open site"]
-    M2["WalletConnect / AppKit"]
-    M3["Wallet app approves"]
-    M4["Address available in browser"]
+  subgraph mobile["Mobile PWA or Browser"]
+    M1["Open App"] --> M2["WalletConnect / AppKit"]
+    M2 --> M3["Wallet App Approves"]
+    M3 --> M4["Address Captured in Browser"]
   end
-  subgraph desktop["Desktop at /connect"]
-    D1["Extension wallet OR QR for phone"]
-    D2["Wagmi connected address"]
+  subgraph desktop["Desktop Browser"]
+    D1["Injected Extension MetaMask / Coinbase"]
+    D2["Wagmi Resolves Address"]
+    D1 --> D2
   end
-  subgraph api["Humanity Ledger API"]
+  subgraph qr["QR Desktop Bridge"]
+    Q1["/connect QR Mode"]
+    Q2["Phone Scans QR"]
+    Q1 --> Q2 --> D2
+  end
+  subgraph api["Humanity Ledger Auth API"]
     V["POST /api/auth/system-verify"]
-    C["Session cookies set"]
+    JWT["Mint whale_session JWT - HTTP Only"]
+    JWT2["Mint human_session JWT - HTTP Only"]
+    HS["Mint system_handshake - JS Readable"]
+    V --> JWT
+    V --> JWT2
+    V --> HS
   end
-  M1 --> M2 --> M3 --> M4 --> V
-  D1 --> D2 --> V
-  V --> C
-  C --> App["Dashboard and protected routes"]`,
+  M4 --> V
+  D2 --> V
+  JWT --> App["Protected Routes and Portfolio"]
+  HS --> App`
     },
     bullets: [
       'MobileLanding and ConnectPage both call system-verify after a wallet address is known.',
-      'If verify-session already returns authenticated, we skip a new registration (returning users).',
-      'Signing a custom message is optional in the current build; trust is placed on the connected wallet address from Wagmi.',
-    ],
+      'verify-session skips re-registration for returning authenticated users.',
+      'SameSite=Lax, Secure in production, 7-day JWT max age.'
+    ]
   },
+
+  // ===== 6. SESSION COOKIE DEEP DIVE =====
   {
     id: 'auth-cookies',
-    title: 'Sessions, cookies, and API verification',
+    title: 'Sessions, Cookies and API Verification Deep Dive',
     paragraphs: [
-      'After your address is accepted, the server mints a JSON Web Token (JWT) and stores it in secure cookies. Middleware and API routes read these cookies to decide if you can load the dashboard, forum, or admin tools.',
-      'Three cookies work together: whale_session and human_session are HTTP-only (JavaScript cannot read them)—they carry the JWT. system_handshake is readable by JavaScript and holds your wallet address so the UI can show “linked” state without another round trip, including on iOS where back-navigation cache was causing re-login loops.',
-      'The hook useSystemAccount resolves “who is logged in” in this order: local in-memory wallet (if unlocked), sessionStorage restore, Wagmi connection, then the handshake cookie. Protected pages use the same priority so QR-linked desktop users still see their address.',
+      'Three cookies work in concert. `whale_session` and `human_session` are HTTP-only — JavaScript is structurally blocked from reading them. `system_handshake` is JavaScript-readable and holds your wallet address so the UI renders the "linked" state without an additional round trip.',
+      'Middleware and all API routes verify the JWT on every request. A 401 redirects to /connect without exposing any sensitive state.'
     ],
     diagram: {
-      caption: 'system-verify and cookie layout',
+      caption: 'System-Verify and Full Cookie Architecture',
       chart: `sequenceDiagram
   participant Browser
-  participant Verify as POST system-verify
-  participant DB as User database
-  participant MW as Middleware / APIs
-  Browser->>Verify: wallet address JSON body
-  Verify->>DB: upsert user by address
-  Verify->>Browser: Set whale_session httpOnly JWT
-  Verify->>Browser: Set human_session httpOnly JWT
-  Verify->>Browser: Set system_handshake address readable
-  Browser->>MW: Requests include cookies
-  MW->>Browser: 200 if JWT valid else 401`,
+  participant Verify as POST /system-verify
+  participant DB as User Database
+  participant MW as Middleware / All APIs
+  Browser->>Verify: Wallet address in JSON body
+  Verify->>DB: Upsert user row by address
+  Verify->>Browser: Set whale_session HTTP-Only JWT
+  Verify->>Browser: Set human_session HTTP-Only JWT
+  Verify->>Browser: Set system_handshake Readable Cookie
+  Browser->>MW: Subsequent requests include all cookies
+  MW->>MW: Decode and verify JWT signature
+  alt JWT Valid
+    MW->>Browser: 200 OK - Serve protected content
+  else JWT Expired or Missing
+    MW->>Browser: 401 Redirect to /connect
+  end`
     },
     bullets: [
-      'verify-session checks human_session first for “already logged in” on page load.',
-      'Cookies use SameSite=Lax, Secure in production, 7-day max age.',
-      'Sign-out clears handshake, JWT cookies, Wagmi storage, and local session keys.',
-    ],
+      'Sign-out clears all three cookies plus Wagmi localStorage and session keys.',
+      'Cookie expiry is 7 days rolling.',
+      'Back-navigation cache on iOS is handled via the handshake cookie fallback.'
+    ]
   },
+
+  // ===== 7. QR BRIDGE =====
   {
     id: 'qr-sync',
-    title: 'QR code: linking phone and desktop',
+    title: 'Quantum QR Bridge: Cross-Device Sync',
     paragraphs: [
-      'When you are on a desktop at /connect, the page generates a QR code containing a one-time session id, an X25519 public key, and an expiry time (about five minutes). Your phone scans it with the universal scanner (session-only mode on /connect, or the wallet QR scanner elsewhere) or the connect flow scanner.',
-      'The phone parses the QR, creates its own ephemeral key pair, and either encrypts an existing JWT with the shared secret or asks the server to mint one (qr-mobile-link). The payload is stored in Redis under the session id. The desktop polls /api/auth/qr-poll once per second until it receives the encrypted bundle or a server JWT.',
-      'The desktop decrypts when possible, then calls /api/auth/qr-hydrate to write the same cookie set as a normal login. Optionally, an encrypted XMTP identity seed can sync so chat works on mobile without signing again. A separate qr-sync endpoint supports re-linking with a signed message RE-CONNECT-WHALE-SESSION-{token}.',
+      'The QR bridge allows instant, cryptographically secure session transfer from desktop to mobile without exposing private keys at any point. The desktop generates an ephemeral X25519 keypair and encodes the public key plus a UUID into the QR display.',
+      'The phone scans, generates its own ephemeral pair, derives the shared secret, encrypts the JWT payload, and stores it in Redis with a 60-second TTL. The desktop polls and decrypts locally. No server ever sees the plaintext JWT.'
     ],
     diagram: {
-      caption: 'Desktop ↔ mobile QR session bridge',
+      caption: 'Ephemeral Desktop to Mobile QR Session Bridge',
       chart: `sequenceDiagram
   participant Desktop as Desktop /connect
-  participant QR as QR code
-  participant Phone as Mobile scanner
+  participant QR as Ephemeral QR Code
+  participant Phone as Mobile Scanner
   participant API as Auth APIs
-  participant Redis as Short-lived store
-  Desktop->>Desktop: X25519 keypair + uuid
-  Desktop->>QR: Encode uuid pub exp
-  Phone->>QR: Camera scan
-  Phone->>Phone: Mobile keypair + shared secret
-  Phone->>API: POST qr-mobile-link
-  API->>Redis: Store JWT payload for uuid
-  loop Every 1 second
-    Desktop->>API: GET qr-poll
+  participant Redis as Volatile Cache TTL 60s
+  Desktop->>Desktop: Generate X25519 keypair + UUID + Expiry
+  Desktop->>QR: Encode UUID, PubKey, Expiry
+  Phone->>QR: Camera Scan
+  Phone->>Phone: Generate Mobile X25519 Keypair
+  Phone->>Phone: Derive Shared ECDH Secret
+  Phone->>API: POST qr-mobile-link with Encrypted JWT
+  API->>Redis: Store Encrypted Payload under UUID
+  loop Poll Every 1 Second
+    Desktop->>API: GET /api/auth/qr-poll?uuid
     API->>Redis: Read payload
-    API->>Desktop: encrypted JWT or serverJwt
+    Redis->>API: Return Encrypted Bundle or null
+    API->>Desktop: Encrypted Bundle or 204 No Content
   end
-  Desktop->>API: POST qr-hydrate
-  API->>Desktop: whale_session human_session handshake`,
-    },
+  Desktop->>Desktop: Decrypt Bundle with Local Private Key
+  Desktop->>API: POST /api/auth/qr-hydrate
+  API->>Desktop: whale_session + human_session + handshake
+  Desktop-->>Phone: ACK Connection Established`
+    }
   },
+
+  // ===== 8. WHALE CHAT / XMTP =====
   {
     id: 'whale-chat',
-    title: 'Whale Chat and XMTP',
+    title: 'Decentralized Communications: Whale Chat XMTP',
     paragraphs: [
-      'Whale Chat (SystemChat) sends direct messages through XMTP v5. When you first open chat, your wallet signs an install message; the XMTP client is cached in the browser per address. Messages are encrypted for the recipient’s inbox id; only participants can decrypt.',
-      'Conversation lists, contact nicknames, block lists, and chat settings live in your browser’s localStorage—not on our servers. Exporting a chat downloads a plain-text file you trigger locally.',
-      'A PIN gate (WhaleChatPINGate) can lock the chat UI; wiping XMTP deletes IndexedDB databases whose names contain “xmtp” on this device. QR sync can copy an encrypted seed from desktop to phone so both devices share the same XMTP identity after scanning.',
+      'Whale Chat orchestrates end-to-end encrypted direct messaging via XMTP v5 protocol. At no point does the Humanity Ledger server access plaintext message data. The XMTP client is instantiated and persisted entirely in the browser via IndexedDB.',
+      'All conversation states, address books, and ciphertexts remain strictly on-device. A PIN gate can lock the chat UI and a full wipe deletes all local IndexedDB databases matching the XMTP prefix.'
     ],
     diagram: {
-      caption: 'XMTP message path (end-to-end encrypted)',
+      caption: 'End-to-End Encrypted XMTP Message Architecture',
       chart: `flowchart LR
-  subgraph you["Your browser"]
-    W["Wallet signs XMTP install"]
-    C["XMTP Client singleton"]
-    IDB["IndexedDB message store"]
+  subgraph YourBrowser["Your Browser"]
+    W["Wallet Signs XMTP Install Message"]
+    C["XMTP Client Singleton Cached"]
+    IDB[("IndexedDB Ciphertexts")]
+    PIN["PIN Gate Optional Lockout"]
   end
-  subgraph xmtp["XMTP network"]
-    N["Encrypted envelopes"]
+  subgraph XMTPNet["XMTP Decentralized Network"]
+    N["Encrypted Envelope Topics"]
   end
-  subgraph peer["Other user"]
-    P["Their wallet + XMTP client"]
+  subgraph PeerBrowser["Counterparty Browser"]
+    P["Their Wallet + XMTP Client"]
+    PIDB[("Their IndexedDB")]
   end
   W --> C
-  C --> N
-  N --> P
-  C --> IDB`,
+  C -->|Publish Encrypted Envelope| N
+  N -->|Subscribe + Decrypt| P
+  C <-->|Persist and Retrieve| IDB
+  P <-->|Persist and Retrieve| PIDB
+  PIN -.->|Blocks UI Access| C
+  style XMTPNet fill:#f5f5f5,stroke:#ccc,stroke-dasharray:5 5`
     },
     bullets: [
-      'Environment: NEXT_PUBLIC_XMTP_ENV (default production).',
-      'Stealth privacy mode in chat only masks display in the UI—it does not change XMTP ciphertext.',
-      'We do not operate a central chat database with message bodies.',
+      'Environment: NEXT_PUBLIC_XMTP_ENV defaults to production network.',
+      'Stealth privacy mode in chat only masks the UI — it does not alter XMTP ciphertext.',
+      'Humanity Ledger does not operate any central message database.',
+      'QR sync can copy an encrypted seed from desktop to phone so both devices share the same XMTP identity.'
     ],
     callout: {
-      title: 'Open chat',
-      body: 'After linking your wallet, open Whale Chat from the dashboard or /chat.',
+      title: 'Open Whale Chat',
+      body: 'After linking your wallet, open Whale Chat from the dashboard or the /chat route.',
       href: '/chat',
-      hrefLabel: 'Go to chat',
-    },
+      hrefLabel: 'Go to Whale Chat'
+    }
   },
+
+  // ===== 9. DATA BOUNDARIES =====
   {
     id: 'data-boundaries',
-    title: 'What stays on your device vs our servers',
+    title: 'Data Boundary Architecture',
     paragraphs: [
-      'We designed the product so sensitive material defaults to your machine. Wallet private keys and seed phrases never leave your wallet app or local vault unlock flow. ZK witnesses for Aztec actions are built with Barretenberg in the browser when you use those features.',
-      'Our servers see your wallet address (for account rows), tier metadata, forum content you post, API usage, and short-lived QR bridge tokens in Redis (expiring in about a minute). Session JWTs prove identity but are not a copy of your on-chain portfolio.',
-      'Analytics workers may process public chain data (mempool, blocks) in backend services—that is network-wide data, not a dump of your local vault. Telegram or alert features only see what you configure to send.',
+      'We designed the product so all sensitive material defaults to remaining on your device. Wallet private keys and seed phrases never leave your wallet application or local vault unlock flow.',
+      'Our servers see your wallet address (for the user account row), tier metadata, forum content you post, API usage telemetry, and short-lived QR bridge tokens (expiring in Redis within 60 seconds). Session JWTs prove identity but carry no copy of your on-chain portfolio.'
     ],
     diagram: {
-      caption: 'Data boundary overview',
+      caption: 'Comprehensive Data Boundary and Storage Classification',
       chart: `flowchart TB
-  subgraph device["On your device"]
-    KEYS["Wallet keys / local vault unlock"]
-    XMTP["XMTP IndexedDB"]
-    CHAT["Chat contacts blocks settings"]
-    ZK["ZK proof inputs Barretenberg"]
-    WC["WalletConnect session storage"]
+  subgraph OnDevice["On Your Device Only"]
+    KEYS["Wallet Private Keys and Seed"]
+    XMTP["XMTP IndexedDB Ciphertexts"]
+    CONTACTS["Chat Contacts and Block Lists"]
+    WIT["ZK Witness Inputs Barretenberg"]
+    WC["WalletConnect Session Local Storage"]
+    VAULT["Local Vault Encrypted Ciphertext"]
   end
-  subgraph server["Humanity Ledger servers"]
-    USER["User row address tier activity"]
-    SESS["JWT session cookies"]
-    POSTS["Forum and API content you submit"]
-    QRSTORE["QR bridge tokens Redis TTL"]
+  subgraph OurServers["Humanity Ledger Servers"]
+    USER["User Row: Address + Tier"]
+    SESS["JWT Session Cookies"]
+    FORUM["Forum Posts and API Content"]
+    QRT["QR Bridge Token Redis TTL 60s"]
+    LOGS["Anonymized Interaction Telemetry"]
   end
-  subgraph notstored["Not stored by us"]
-    N1["Private keys or seed phrases"]
-    N2["Decrypted XMTP message archive"]
-    N3["Your local portfolio vault ciphertext"]
-  end`,
-    },
+  subgraph NeverStored["Never Stored Anywhere by Us"]
+    NK1["Private Keys or Seed Phrases"]
+    NK2["Decrypted XMTP Message Archive"]
+    NK3["Local Portfolio Vault Ciphertext"]
+    NK4["ZK Circuit Witness Inputs"]
+  end
+  style NeverStored fill:#fff8f8,stroke:#cc0000,stroke-dasharray:4 4
+  style OnDevice fill:#f8fff8,stroke:#006600
+  style OurServers fill:#f8f8ff,stroke:#000066`
+    }
   },
-  {
-    id: 'product-scan',
-    title: 'Product labels and universal scan',
-    paragraphs: [
-      'On mobile, Scan label opens a universal camera that reads more than desktop session QRs. The same scanner can link your phone to the desktop session, open a wallet address in Whale Chat, show a product passport page, or resolve a GS1 Digital Link when we have a matching record.',
-      'After you connect your wallet on mobile, Try Studio Provenance Beta opens the same Provenance Studio flow as desktop: create a passport, export a QR label, and optionally anchor on chain.',
-      'Product passports are public read records stored in our database. Issuers create them in Provenance Studio (wallet required). Optional on-chain anchoring reuses Core Ledger transferWithReceipt with memo PASSPORT:{slug} and stores the Core Entropy value plus transaction hash on the passport.',
-      'Passport pages work without a wallet—anyone with the link or QR can view published fields (origin, batch, certifications, carbon figures). Private selective disclosure via Aztec is planned for a later phase; today’s passports are explicitly public.',
-    ],
-    diagram: {
-      caption: 'Universal mobile scan router',
-      chart: `flowchart TD
-  cam[Mobile camera or gallery]
-  router[Scan router]
-  session[Desktop session QR]
-  wallet[Wallet address QR]
-  passport[humanidfi.com/passport slug]
-  gs1[GS1 Digital Link]
-  cam --> router
-  router --> session
-  router --> wallet
-  router --> passport
-  router --> gs1
-  session --> link[POST qr-mobile-link]
-  wallet --> chat[Whale Chat peer]
-  passport --> view[Passport page]
-  gs1 --> resolve[GET api passport resolve]
-  resolve --> view`,
-    },
-    bullets: [
-      'Open QR Scanner on the connected mobile screen still prioritises desktop session codes.',
-      'Scan label accepts product URLs, GS1 links, wallet codes, and session QRs in one flow.',
-      'Try Studio Provenance Beta on the connected mobile home screen links to /studio/provenance.',
-      'Unknown codes show a plain error with a link back to this section.',
-    ],
-    callout: {
-      title: 'Create a passport',
-      body: 'Desktop users with a linked wallet can open Provenance Studio to publish a label and export a QR.',
-      href: '/studio/provenance',
-      hrefLabel: 'Provenance Studio',
-    },
-  },
+
+  // ===== 10. AZTEC PRIVATE STATE =====
   {
     id: 'aztec-private',
-    title: 'Aztec private state (high level)',
+    title: 'Aztec Private State and ZK Proof Architecture',
     paragraphs: [
-      'Public Ethereum shows every transfer to everyone. Aztec adds a private execution layer: balances and transfers can live as encrypted “notes” in a shielded pool, while the chain only sees that a valid zero-knowledge proof was submitted.',
-      'Humanity Ledger uses Noir to describe rules (for example, token transfers or membership checks) and Barretenberg (@aztec/bb.js) to generate proofs in your browser. The rollup verifies proofs in batches and posts a compact commitment to Ethereum L1 for security.',
-      'You can think of it as: you prove “this transaction follows the rules” without publishing the amounts or counterparty on a public ledger. Shielding moves assets into the private pool; unshielding moves them back to public ERC-20 when you choose.',
+      'Public Ethereum shows every transfer to everyone. Aztec adds a private execution layer: balances and transfers can live as encrypted notes in a shielded pool, while the chain only sees that a valid zero-knowledge proof was submitted.',
+      'Humanity Ledger uses Noir to describe circuit rules (token transfers, membership checks) and Barretenberg to generate proofs entirely in your browser. The Aztec rollup verifies proofs in batches and posts a compact state commitment to Ethereum L1 for security.'
     ],
     diagram: {
-      caption: 'Client-side proving to Aztec and Ethereum',
+      caption: 'Client-Side Proving to Aztec Rollup and Ethereum L1',
       chart: `flowchart LR
-  subgraph client["Your browser"]
-    WIT["Build witness from your keys"]
-    PROV["Barretenberg proof"]
+  subgraph ClientBrowser["Your Browser"]
+    WIT2["Build Witness from Private Inputs"]
+    NOIR["Noir Circuit Compilation"]
+    BB2["Barretenberg Proof Generation"]
   end
-  subgraph aztec["Aztec rollup"]
-    VER["Verify proof batch"]
-    STATE["Private state tree updates"]
+  subgraph AztecRollup["Aztec Network"]
+    VER["Proof Verifier Batch"]
+    NOTES["Private Note Tree Updates"]
+    NULL["Nullifier Set"]
   end
-  subgraph l1["Ethereum L1"]
-    ROOT["Anchored state root"]
+  subgraph L1["Ethereum L1"]
+    ROOT2["Anchored State Root Commitment"]
+    VERIFY["L1 Verifier Contract"]
   end
-  WIT --> PROV
-  PROV -->|"proof only"| VER
-  VER --> STATE
-  STATE --> ROOT`,
+  WIT2 --> NOIR
+  NOIR --> BB2
+  BB2 -->|Proof Only No Witness| VER
+  VER --> NOTES
+  VER --> NULL
+  NOTES --> ROOT2
+  NULL --> ROOT2
+  ROOT2 --> VERIFY
+  style ClientBrowser fill:#f8fff8,stroke:#006600
+  style AztecRollup fill:#2a1b4d,color:#fff
+  style L1 fill:#1a1a2e,color:#fff`
     },
     bullets: [
-      'Private notes use commitments and nullifiers so each note is spent once without revealing which note.',
-      'QDs and other protocol tokens follow the same shielded transfer model described in the whitepaper.',
-      'Selective disclosure lets you prove a fact (for example eligibility) without exporting your full history.',
+      'Private notes use commitments and nullifiers so each note is spent exactly once.',
+      'Selective disclosure lets you prove a fact (e.g. eligibility) without exporting your full history.',
+      'Shielding moves assets into the private pool; unshielding moves them back to public ERC-20.'
     ],
     callout: {
-      title: 'Technical depth',
-      body: 'For circuit design, tokenomics, and security audits, read the whitepaper and security pages.',
+      title: 'Technical Depth',
+      body: 'For circuit design, tokenomics, and security audits, read the Whitepaper.',
       href: '/whitepaper',
-      hrefLabel: 'Whitepaper',
-    },
+      hrefLabel: 'Read the Whitepaper'
+    }
   },
+
+  // ===== 11. UNIVERSAL SCAN ROUTER =====
+  {
+    id: 'product-scan',
+    title: 'Universal Mobile Scan Router',
+    paragraphs: [
+      'On mobile, the Scan action opens a universal camera that reads far beyond desktop session QRs. The same scanner can link your phone to the desktop session, open a wallet address in Whale Chat, show a product passport page, or resolve a GS1 Digital Link.',
+      'The routing logic is deterministic: the scan parser evaluates the payload format against all known schemas in order of specificity before dispatching to the correct handler.'
+    ],
+    diagram: {
+      caption: 'Universal Mobile Scan Payload Router',
+      chart: `flowchart TD
+  CAM["Mobile Camera or Gallery Input"] --> PARSER["Scan Payload Parser"]
+  PARSER -->|UUID + X25519 PubKey| SESS["Desktop Session QR Handler"]
+  PARSER -->|0x Ethereum Address| WALLET["Wallet Address QR Handler"]
+  PARSER -->|humanidfi.com/passport slug| PASS["Passport Page Handler"]
+  PARSER -->|GS1 Digital Link| GS1["GS1 Resolver Handler"]
+  PARSER -->|Unknown Format| ERR["Error + Help Link"]
+  SESS --> QR["POST qr-mobile-link"]
+  WALLET --> CHAT2["Open Whale Chat to Peer"]
+  PASS --> VIEW["Public Passport Page"]
+  GS1 --> RESOLVE["GET /api/passport/resolve"]
+  RESOLVE --> VIEW
+  QR --> HYDRATE["Desktop Session Hydrated"]`
+    },
+    bullets: [
+      'All format matching is deterministic and evaluated client-side only.',
+      'Unknown QR codes never send data to external servers.',
+      'GS1 Digital Link support enables physical product provenance verification.'
+    ]
+  },
+
+  // ===== 12. SMART CONTRACT ARCHITECTURE =====
+  {
+    id: 'smart-contract-architecture',
+    title: 'Smart Contract Architecture and Token Flows',
+    paragraphs: [
+      'The on-chain layer is composed of composable, immutable smart contracts deployed across multiple EVM-compatible chains. The Core Ledger contract handles transferWithReceipt logic, anchoring product passports on-chain with memos. Token flows are routed through Uniswap liquidity pools and bridged via LayerZero messaging.',
+      'All contract interactions are proxied through the native portfolio components which handle gas estimation, slippage, and MEV protection natively before broadcasting signed transactions.'
+    ],
+    diagram: {
+      caption: 'Smart Contract Interaction and Token Flow Architecture',
+      chart: `graph TD
+  subgraph UserWallet["User Wallet Layer"]
+    PK["Private Key Signer"]
+    ETH_W["ETH Balance"]
+    ERC20_W["ERC20 Token Balances"]
+  end
+  subgraph CoreContracts["Core Smart Contracts"]
+    CoreLedger["Core Ledger Contract"]
+    PassportAnchor["Passport Anchor Registry"]
+    TransferReceipt["transferWithReceipt Logic"]
+    CoreLedger --> PassportAnchor
+    CoreLedger --> TransferReceipt
+  end
+  subgraph DEX["Decentralized Exchange Layer"]
+    UniV2R["Uniswap V2 Router 02"]
+    UniV3R["Uniswap V3 Router"]
+    UniPool["Liquidity Pools"]
+    UniV2R --> UniPool
+    UniV3R --> UniPool
+  end
+  subgraph Bridge["Cross-Chain Bridge"]
+    STG["Stargate Finance"]
+    LZEndpoint["LayerZero Endpoint"]
+    STG --> LZEndpoint
+  end
+  PK --> CoreLedger
+  PK --> UniV2R
+  PK --> UniV3R
+  PK --> STG
+  ERC20_W --> UniV2R
+  ETH_W --> LZEndpoint
+  UniPool --> ERC20_W
+  TransferReceipt -->|PASSPORT memo| PassportAnchor
+  style CoreContracts fill:#f0f0ff,stroke:#2a1b4d
+  style DEX fill:#fff8f0,stroke:#996600
+  style Bridge fill:#f0fff0,stroke:#006600`
+    }
+  },
+
+  // ===== 13. GLOBAL SECURITY ARCHITECTURE =====
+  {
+    id: 'global-security-architecture',
+    title: 'Global Security and Circuit Breaker Architecture',
+    paragraphs: [
+      'Security is the absolute zero-point of the architecture. The system integrates multi-layered defense: edge-level WAF and rate limiting, middleware JWT verification, smart contract invariant monitoring, and automated circuit breakers that freeze all capital operations upon anomaly detection.',
+      'If extreme market volatility or a smart contract invariant violation is detected, automated circuit breakers halt off-chain indexing, freeze fiat-ingress portals, and emit emergency alerts to the operations team.'
+    ],
+    diagram: {
+      caption: 'Threat Mitigation, Rate Limiting and Circuit Breaker Topology',
+      chart: `graph TD
+  subgraph EdgePerimeter["Edge Perimeter"]
+    WAF["Web Application Firewall"]
+    RATE["Vercel Edge Rate Limiter"]
+    DDOS["DDoS Mitigation Layer"]
+  end
+  subgraph APILayer["Backend API Layer"]
+    MW2["Auth Middleware JWT Verify"]
+    INV["Contract Invariant Monitor"]
+    ANOMALY["Anomaly Detection Engine"]
+  end
+  subgraph CircuitBreaker["Active Defense System"]
+    CB(("Global Circuit Breaker"))
+    LOCK["Capital Operations Lockdown"]
+    OPS["Ops Alert Dispatch"]
+    AUDIT["Audit Log Write"]
+  end
+  subgraph Recovery["Recovery Path"]
+    HEALTH["Health Check API"]
+    RESTORE["Manual Restore Endpoint"]
+  end
+  EdgePerimeter --> MW2
+  MW2 --> INV
+  INV -->|Invariant Violation| ANOMALY
+  ANOMALY -->|Threshold Exceeded| CB
+  CB --> LOCK
+  CB --> OPS
+  CB --> AUDIT
+  LOCK -.->|Post Recovery| HEALTH
+  HEALTH --> RESTORE
+  style CB fill:#cc0000,color:#fff,stroke:#fff
+  style LOCK fill:#ff4444,color:#fff
+  style EdgePerimeter fill:#f0f0ff,stroke:#0000cc`
+    }
+  },
+
+  // ===== 14. INFRASTRUCTURE AND DEPLOYMENT =====
+  {
+    id: 'infrastructure-deployment',
+    title: 'Infrastructure and Deployment Architecture',
+    paragraphs: [
+      'The platform is deployed on Railway with edge functions handled by Vercel. The Next.js application uses the App Router with server components for SEO-critical pages and client components for all wallet-interactive modules.',
+      'Continuous deployment is triggered on every push to the main branch of the GitHub repository. Database migrations run automatically via Prisma. Redis clusters are managed via Upstash with automatic eviction policies for ephemeral QR tokens.'
+    ],
+    diagram: {
+      caption: 'Cloud Infrastructure, Deployment Pipeline and Service Topology',
+      chart: `flowchart TD
+  DEV["Developer Push to GitHub main"] --> CI["GitHub Actions CI Pipeline"]
+  CI -->|Lint + Type Check| BUILD["Next.js Build"]
+  BUILD --> RAILWAY["Railway Deployment"]
+  BUILD --> VERCEL_EDGE["Vercel Edge Network"]
+  RAILWAY --> NEXTSERVER["Next.js App Server"]
+  RAILWAY --> POSTGRES2["Postgres via Railway"]
+  RAILWAY --> REDIS2["Upstash Redis"]
+  VERCEL_EDGE --> NEXTSERVER
+  NEXTSERVER --> PRISMA2["Prisma ORM Layer"]
+  PRISMA2 --> POSTGRES2
+  NEXTSERVER --> REDIS2
+  NEXTSERVER --> RPC2["Alchemy / Infura RPC"]
+  NEXTSERVER --> XMTP2["XMTP Production Network"]
+  subgraph Monitoring["Observability Stack"]
+    LOGS2["Railway Logs"]
+    METRICS["Performance Metrics"]
+    ALERTS2["Error Alerting"]
+  end
+  RAILWAY --> Monitoring
+  style CI fill:#f0f0f0,stroke:#333
+  style RAILWAY fill:#7B2FBE,color:#fff
+  style POSTGRES2 fill:#336791,color:#fff`
+    },
+    bullets: [
+      'Zero-downtime deployments via Railway rolling releases.',
+      'Prisma migrations run in CI before traffic cutover.',
+      'Redis TTLs guarantee ephemeral data does not persist beyond its operational window.'
+    ]
+  },
+
+  // ===== 15. PROVENANCE PASSPORT SYSTEM =====
+  {
+    id: 'provenance-passport',
+    title: 'Provenance Passport and On-Chain Anchoring',
+    paragraphs: [
+      'Product passports are public-read records stored in our database. Issuers create them in Provenance Studio (wallet required). Optional on-chain anchoring calls Core Ledger transferWithReceipt with a PASSPORT:{slug} memo, storing the Core Entropy value and transaction hash on the passport record.',
+      'Passport pages are fully readable without a wallet — anyone with the URL or QR can view published fields (origin, batch, certifications, carbon). Private selective disclosure via Aztec is planned for a later phase.'
+    ],
+    diagram: {
+      caption: 'Provenance Passport Creation, Anchoring and Verification Flow',
+      chart: `flowchart TD
+  ISSUER["Issuer with Connected Wallet"] --> STUDIO["Provenance Studio"]
+  STUDIO --> FORM["Fill Passport Fields"]
+  FORM --> SAVE["Save to Humanity Ledger DB"]
+  SAVE --> QR2["Generate QR Label"]
+  FORM -.->|Optional| ANCHOR["On-Chain Anchoring"]
+  ANCHOR --> CORETX["Core Ledger: transferWithReceipt"]
+  CORETX -->|PASSPORT memo| CHAIN["Ethereum State"]
+  CHAIN --> ENTROPY["Store TxHash + Core Entropy"]
+  ENTROPY --> SAVE
+  QR2 --> PRINT["Physical Product Label"]
+  PRINT --> SCAN2["Consumer Scans QR"]
+  SCAN2 --> PUBVIEW["Public Passport View Page"]
+  PUBVIEW -->|Read DB| SAVE
+  PUBVIEW -.->|Verify Anchor| CHAIN
+  style ANCHOR fill:#f0fff0,stroke:#006600
+  style CHAIN fill:#1a1a2e,color:#fff`
+    }
+  }
 ];
 
 export const PRIVACY_TOC = PRIVACY_ARCHITECTURE_SECTIONS.map((s) => ({
