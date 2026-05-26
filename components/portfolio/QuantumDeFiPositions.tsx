@@ -15,7 +15,7 @@ import { motion } from 'framer-motion';
 export function QuantumDeFiPositions({ address, activeNetwork }: { address: string, activeNetwork: string }) {
 
     const contracts = useMemo(() => {
-        if (!address || activeNetwork !== 'ethereum') return [];
+        if (!address || activeNetwork !== 'ethereum') return undefined;
         return [
             {
                 address: PROTOCOL_ADDRESSES.AAVE_V3_POOL as `0x${string}`,
@@ -39,8 +39,8 @@ export function QuantumDeFiPositions({ address, activeNetwork }: { address: stri
     }, [address, activeNetwork]);
 
     const { data, isLoading, refetch } = useReadContracts({
-        contracts,
-        query: { enabled: contracts.length > 0 }
+        contracts: contracts as any,
+        query: { enabled: !!contracts }
     });
 
     const positions = useMemo(() => {

@@ -389,18 +389,19 @@ export default function ConnectPage() {
   const isVerified = mounted && isLinked;
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center bg-black relative overflow-hidden">
-      {/* Background Image */}
+    <div className="w-full min-h-screen flex flex-col items-center bg-black relative overflow-hidden">
+      {/* Background Image — no zoom, object-contain so the full image is visible */}
       <img
         src="/system-shots/monochrome-illustration-science-fiction-arch-pixel-art-Devine-Lu-Linvega-2268380-wallhere.com (1).jpg"
         alt="Architecture Background"
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-60"
+        className="absolute inset-0 w-full h-full z-0"
+        style={{ objectFit: 'contain', objectPosition: 'center', opacity: 1 }}
       />
       
-      <div className="relative z-10 w-full flex-1 flex flex-col lg:flex-row items-center justify-center px-4 py-8 sm:p-12 max-w-[1400px] mx-auto min-h-0 pt-16">
+      <div className="relative z-10 w-full flex-1 flex flex-col items-end justify-start px-4 pt-24 pr-8 sm:pr-16 max-w-[1400px] mx-auto min-h-0" style={{ pointerEvents: 'none' }}>
         
-        {/* CENTER: Connection panel (Login Zone) */}
-        <div className="w-full max-w-[420px] mx-auto flex-shrink-0 flex flex-col bg-white rounded-[24px] border border-[#F0F0F0] shadow-[0_8px_40px_rgba(0,0,0,0.03)] p-6 sm:p-8 xl:p-10 z-20">
+        {/* Login Panel — positioned right-center just below AZTEC logo */}
+        <div className="w-full max-w-[340px] flex-shrink-0 flex flex-col bg-white rounded-[20px] border border-[#F0F0F0] shadow-[0_8px_40px_rgba(0,0,0,0.12)] p-5 z-20" style={{ pointerEvents: 'all', marginTop: '8vh' }}>
           
           <div className="flex items-center gap-3 mb-8 pb-5 border-b border-black/5">
             <Lock size={16} strokeWidth={1.2} className="text-[#0A0A0A]" />
@@ -637,35 +638,7 @@ export default function ConnectPage() {
         />
       )}
 
-      {/* BOTTOM BAR: All logos, full-width, faster */}
-      <footer className="relative z-30 border-t border-white/10 flex items-center bg-[#111]/90 backdrop-blur-md w-full overflow-hidden h-16">
-        <div className="flex w-max animate-marquee-bottom items-center">
-          {[...Array(4)].map((_, rep) => (
-            <React.Fragment key={rep}>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                <img
-                  key={`rep-${rep}-img-${num}`}
-                  src={`/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (${num}).png`}
-                  className="h-10 w-auto object-contain opacity-75 hover:opacity-100 transition-opacity mx-6 shrink-0"
-                  alt={`Partner ${num}`}
-                />
-              ))}
-            </React.Fragment>
-          ))}
-          {[...Array(4)].map((_, rep) => (
-            <React.Fragment key={`dup-${rep}`}>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                <img
-                  key={`dup-rep-${rep}-img-${num}`}
-                  src={`/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (${num}).png`}
-                  className="h-10 w-auto object-contain opacity-75 hover:opacity-100 transition-opacity mx-6 shrink-0"
-                  alt={`Partner ${num}`}
-                />
-              ))}
-            </React.Fragment>
-          ))}
-        </div>
-      </footer>
+      {/* Bottom bar removed — image must show fully including Humanity Ledger text */}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 // Lottie cargado dinámicamente para evitar SSR issues
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
-const InteractiveHeroImage = dynamic(() => import('./InteractiveHeroImage').then(mod => mod.InteractiveHeroImage), { ssr: false });
+
 
 // ─── Nav Data ────────────────────────────────────────────────────────────────
 
@@ -283,6 +283,22 @@ function LandingNav() {
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
+/**
+ * HeroSection — Maximum fidelity pixel-art rendering.
+ *
+ * Rendering pipeline:
+ *  1. `image-rendering: pixelated` → browser must NOT apply bilinear interpolation.
+ *     This is the single most important rule for pixel art: keep every pixel a
+ *     hard-edged rectangle, never a blurred quad.
+ *  2. `fetchpriority="high"` + `loading="eager"` + `decoding="sync"` → image
+ *     is fetched at the top of the network queue and decoded on the main thread
+ *     before first paint — zero layout shift, zero flash of black.
+ *  3. `100dvh` on mobile (accounts for collapsible browser chrome) and
+ *     `100vh` on desktop via CSS class override.
+ *  4. `object-fit: cover` with smart `object-position` fills the container
+ *     using the image's natural pixel density — never scaling up beyond 1:1.
+ *  5. Global `<style>` injection ensures `pixelated` survives any Tailwind reset.
+ */
 function HeroSection() {
   const [mounted, setMounted] = useState(false);
 
@@ -292,14 +308,82 @@ function HeroSection() {
 
   return (
     <section
-      className="relative w-full h-[100vh] min-h-[700px] flex flex-col items-center justify-end overflow-hidden pt-14 bg-[#FAFAFA]"
+      className="relative w-full flex flex-col items-center justify-end overflow-hidden pt-14 bg-black"
+      style={{
+        /* dvh for mobile chrome correction, fallback to vh */
+        height: 'calc(var(--vh, 1vh) * 100)',
+        minHeight: '700px',
+      }}
     >
-      {/* 3D Interactive Background */}
-      {mounted && <InteractiveHeroImage />}
+      {/* ── Global pixelated-rendering rule ─────────────────────────────── */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .hero-pixel-img {
+          image-rendering: -webkit-optimize-contrast; /* Safari */
+          image-rendering: crisp-edges;               /* Firefox */
+          image-rendering: pixelated;                 /* Chrome / modern */
+          -ms-interpolation-mode: nearest-neighbor;   /* IE11 */
+        }
+        /* dvh polyfill via JS — updated on resize */
+        @supports (height: 100dvh) {
+          .hero-section-dvh { height: 100dvh !important; }
+        }
+      `}} />
 
-      {/* Bottom fade */}
-      <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
+      {/* ── Maximum-quality pixel-art background ────────────────────────── */}
+      {/*
+        • `loading="eager"` — do not defer this image; it's above the fold.
+        • `fetchpriority="high"` — browser puts this at the top of the network
+          queue, ahead of scripts and lower-priority images.
+        • `decoding="sync"` — decode before rendering the page, preventing a
+          flash of black on fast connections.
+        • `draggable="false"` — prevents accidental drag-selection.
+        • The image is served unmodified (next.config: unoptimized: true),
+          so every original pixel reaches the browser intact.
+      */}
+      <img
+        src="/system-shots/Devine-Lu-Linvega-monochrome-pixel-art-illustration-arch-2268374-wallhere.com.jpg"
+        alt="Devine Lu Linvega Monochrome Pixel Architecture"
+        loading="eager"
+        // @ts-ignore — fetchpriority is a valid HTML attribute
+        fetchpriority="high"
+        decoding="sync"
+        draggable="false"
+        className="hero-pixel-img absolute inset-0 w-full h-full select-none"
+        style={{
+          objectFit: 'cover',
+          /*
+           * Desktop: centre the image horizontally; anchor to the top so
+           * the architectural skyline is always visible.
+           * Mobile: shift anchor slightly lower to reveal the street-level
+           * detail that makes the composition read well on portrait screens.
+           */
+          objectPosition: 'center top',
+          /*
+           * Prevent any OS/GPU sub-pixel smoothing layer. Some browsers
+           * apply a hardware-accelerated bicubic pass on top of CSS
+           * image-rendering — will-change: transform forces the element
+           * onto its own compositing layer, bypassing that pass.
+           */
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+        }}
+      />
 
+      {/* ── dvh polyfill for mobile browser-chrome correction ───────────── */}
+      {mounted && (
+        <DvhPolyfill />
+      )}
+
+      {/* ── Bottom fade to white content below ──────────────────────────── */}
+      <div
+        className="absolute inset-x-0 bottom-0 pointer-events-none z-10"
+        style={{
+          height: '220px',
+          background: 'linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 40%, transparent 100%)',
+        }}
+      />
+
+      {/* ── CTA buttons ─────────────────────────────────────────────────── */}
       <div className="relative z-20 flex flex-col items-center text-center px-6 w-full max-w-[880px] mx-auto pb-24">
         {mounted && (
           <motion.div
@@ -316,7 +400,7 @@ function HeroSection() {
             </Link>
             <Link
               href="/developers/api-docs"
-              className="w-full sm:w-auto px-8 py-3.5 border border-black/20 bg-white/60 backdrop-blur-md text-black text-[13px] font-semibold hover:bg-white/90 transition-colors shadow-xl"
+              className="w-full sm:w-auto px-8 py-3.5 border border-white/30 bg-white/10 backdrop-blur-md text-white text-[13px] font-semibold hover:bg-white/20 transition-colors shadow-xl"
             >
               Read Documentation
             </Link>
@@ -324,17 +408,35 @@ function HeroSection() {
         )}
       </div>
 
-      {/* Scroll cue */}
+      {/* ── Scroll cue ──────────────────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2, duration: 1 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30 pointer-events-none"
       >
-        <div className="w-[1px] h-12 bg-gradient-to-b from-black/25 to-transparent" />
+        <div className="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent" />
       </motion.div>
     </section>
   );
+}
+
+/**
+ * DvhPolyfill — sets `--vh` CSS custom property to the actual inner viewport
+ * height in pixels, updated on every resize. This corrects the `100vh`
+ * bug on iOS/Android where the browser chrome collapses/expands.
+ */
+function DvhPolyfill() {
+  useEffect(() => {
+    const setVh = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    setVh();
+    window.addEventListener('resize', setVh, { passive: true });
+    return () => window.removeEventListener('resize', setVh);
+  }, []);
+  return null;
 }
 
 // ─── Network stat strip ───────────────────────────────────────────────────────

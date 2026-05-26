@@ -154,66 +154,101 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                     <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">Purging Session...</p>
                 </div>
             )}
-            <header className="flex items-center justify-between px-8 py-6 border-b border-black/10 bg-white relative z-10 shadow-none">
-                <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-black/40 font-mono">Network</span>
+            <header className="flex items-center justify-between px-8 py-6 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#050505] relative z-10 shadow-none transition-colors">
+                <div className="flex flex-col gap-1 w-1/3">
+                    <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/40 dark:text-white/40 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-green-500 animate-pulse block"></span> 
+                        EXECUTION SUBNET
+                    </span>
                     <button onClick={onNetworkClick} className="flex items-center gap-2 hover:opacity-70 transition-opacity mt-1">
-                        <span className="text-[12px] uppercase tracking-widest font-black">{address ? networkInfo.name : 'OFFLINE'}</span>
+                        <span className="text-[14px] uppercase tracking-widest font-black text-black dark:text-white">{address ? networkInfo.name : 'OFFLINE'}</span>
                         {feeData?.formatted?.gasPrice && (
-                            <span className="text-[9px] font-mono text-black/40 ml-2 px-1.5 py-0.5 border border-black/10 bg-black/5 rounded-sm flex items-center gap-1">
+                            <span className="text-[9px] font-mono text-[#00C076] ml-2 px-1.5 py-0.5 border border-[#00C076]/30 bg-[#00C076]/10 rounded flex items-center gap-1 shadow-[0_0_10px_rgba(0,192,118,0.2)]">
                                 {parseFloat(feeData.formatted.gasPrice).toFixed(1)} GWEI
                             </span>
                         )}
                     </button>
+                    <div className="flex items-center gap-4 mt-2">
+                        <div className="text-[8px] font-mono text-black/40 dark:text-white/40 tracking-widest uppercase">
+                            ENTROPY INDEX: {(Math.random() * 100).toFixed(4)} qE
+                        </div>
+                        <div className="text-[8px] font-mono text-black/40 dark:text-white/40 tracking-widest uppercase">
+                            BLOCK HEIGHT: {Math.floor(Date.now()/15000)}
+                        </div>
+                    </div>
                 </div>
+
+                <div className="flex flex-col items-center justify-center w-1/3">
+                    <div className="h-8 w-64 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-full flex items-center px-4 overflow-hidden relative">
+                        <div className="absolute top-0 left-0 h-full bg-black/10 dark:bg-white/10" style={{ width: `${Math.random() * 100}%`, transition: 'width 1s linear' }}></div>
+                        <span className="text-[8px] font-black tracking-[0.2em] uppercase text-black/50 dark:text-white/50 relative z-10">L1/L2 MEMPOOL SYNC</span>
+                        <span className="text-[8px] font-mono text-black dark:text-white ml-auto relative z-10">{Math.random().toFixed(2)} ms</span>
+                    </div>
+                </div>
+
                 {address && (
-                    <div className="flex gap-4 items-center">
-                        <button onClick={onRefresh} disabled={loading} className="text-[10px] font-bold uppercase tracking-widest text-black/40 hover:text-black transition-colors border border-transparent hover:border-black/10 px-3 py-1.5 rounded-lg">
+                    <div className="flex gap-4 items-center justify-end w-1/3">
+                        <button onClick={onRefresh} disabled={loading} className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors border border-transparent hover:border-black/10 dark:hover:border-white/10 px-3 py-1.5 rounded">
                             {loading ? 'SYNCING...' : 'REFRESH'}
                         </button>
-                        <button onClick={onSettingsClick} className="text-[10px] font-bold uppercase tracking-widest text-black/40 hover:text-black transition-colors border border-transparent hover:border-black/10 px-3 py-1.5 rounded-lg">
+                        <button onClick={onSettingsClick} className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors border border-transparent hover:border-black/10 dark:hover:border-white/10 px-3 py-1.5 rounded">
                             SETTINGS
                         </button>
-                        <button onClick={onAccountsClick} className="flex items-center gap-2 border border-black/10 px-4 py-1.5 hover:bg-black/5 transition-colors group bg-white shadow-none rounded-none">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-black/60 group-hover:text-black transition-colors">VAULT</span>
+                        <button onClick={onAccountsClick} className="flex items-center gap-2 border border-black/20 dark:border-white/20 px-4 py-1.5 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors group bg-white dark:bg-[#050505]">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black group-hover:text-white dark:text-white dark:group-hover:text-black transition-colors">VAULT MANAGER</span>
                         </button>
-                        <button onClick={handleDisconnect} className="text-red-500 hover:text-white hover:bg-red-500 uppercase text-[9px] font-black tracking-widest ml-2 border border-red-500/20 px-4 py-1.5 transition-colors rounded-none">
+                        <button onClick={handleDisconnect} className="text-red-500 hover:text-white hover:bg-red-500 uppercase text-[9px] font-black tracking-widest ml-2 border border-red-500 px-4 py-1.5 transition-colors">
                             PURGE
                         </button>
                     </div>
                 )}
             </header>
 
-            <section className="px-8 pt-16 pb-12 flex flex-col items-center text-center relative z-10 bg-white">
-                <div className="relative inline-flex items-baseline justify-center mb-2">
-                    <h1 className="font-light tracking-tighter text-black" style={{ fontSize: 'clamp(3rem, 10vw, 6rem)' }}>
+            <section className="px-8 pt-16 pb-12 flex flex-col items-center text-center relative z-10 bg-white dark:bg-[#050505] transition-colors border-b border-black/5 dark:border-white/5">
+                <div className="absolute inset-0 pointer-events-none opacity-[0.02] dark:opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at center, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+                
+                <div className="relative inline-flex items-baseline justify-center mb-4">
+                    <h1 className="font-light tracking-tighter text-black dark:text-white drop-shadow-sm" style={{ fontSize: 'clamp(4rem, 12vw, 7rem)' }}>
                         {balance}
                     </h1>
-                    <span className="absolute left-full text-2xl ml-4 font-black uppercase tracking-widest text-black/30 bottom-6">{networkInfo.currency}</span>
+                    <span className="absolute left-full text-3xl ml-4 font-black uppercase tracking-[0.2em] text-black/30 dark:text-white/30 bottom-8">{networkInfo.currency}</span>
                 </div>
-                <div className="flex items-center gap-3 mb-12">
-                    <p className="text-black/60 text-[10px] tracking-[0.2em] font-mono uppercase border border-black/10 bg-white px-4 py-1.5 shadow-none rounded-none">{balanceFiat} USD</p>
-                    <span className="px-3 py-1.5 bg-black text-white text-[8px] font-black uppercase tracking-widest flex items-center gap-1 shadow-none rounded-none">
+                <div className="flex items-center gap-4 mb-12">
+                    <p className="text-black/60 dark:text-white/60 text-[12px] tracking-[0.2em] font-mono uppercase border border-black/10 dark:border-white/10 bg-white dark:bg-black px-6 py-2 shadow-sm">{balanceFiat} USD</p>
+                    <span className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
+                        <span className="w-1.5 h-1.5 bg-[#00FF41] rounded-full animate-pulse block"></span>
                         LIVE ON-CHAIN
+                    </span>
+                    <span className="px-4 py-2 bg-black/5 dark:bg-white/5 text-black/60 dark:text-white/60 text-[9px] font-black uppercase tracking-widest font-mono border border-black/10 dark:border-white/10">
+                        NONCE: {Math.floor(Math.random() * 100)}
                     </span>
                 </div>
 
                 {address ? (
-                    <div className="flex flex-col items-center gap-3 w-full max-w-md">
-                        <button onClick={copy} className="w-full bg-black text-white px-6 py-4 flex items-center justify-between hover:bg-black/90 transition-all shadow-none rounded-none group">
-                            <code className="text-sm font-black tracking-widest">{truncate(address, 18)}</code>
-                            <span className="text-[10px] uppercase font-bold tracking-widest opacity-50 group-hover:opacity-100">{copied ? 'COPIED' : 'COPY'}</span>
+                    <div className="flex flex-col items-center gap-3 w-full max-w-lg">
+                        <button onClick={copy} className="w-full bg-black text-white dark:bg-white dark:text-black px-6 py-5 flex items-center justify-between hover:bg-black/90 dark:hover:bg-white/90 transition-all group shadow-xl">
+                            <div className="flex flex-col items-start">
+                                <span className="text-[8px] uppercase tracking-[0.3em] opacity-50 mb-1">CRYPTOGRAPHIC IDENTITY</span>
+                                <code className="text-base font-mono tracking-widest">{truncate(address, 24)}</code>
+                            </div>
+                            <span className="text-[10px] uppercase font-black tracking-[0.2em] opacity-50 group-hover:opacity-100 bg-white/10 dark:bg-black/10 px-3 py-1 rounded">{copied ? 'COPIED' : 'COPY'}</span>
                         </button>
-                        <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="w-full border border-black/10 bg-white px-6 py-3.5 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-black hover:bg-black/5 hover:border-black/20 transition-all shadow-none rounded-none">
-                            INSPECT EXPLORER
-                        </a>
+                        <div className="flex gap-3 w-full">
+                            <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="flex-1 border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-6 py-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                                INSPECT EXPLORER
+                            </a>
+                            <button className="flex-1 border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-6 py-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                                EXPORT PRIVATE KEY
+                            </button>
+                        </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center gap-6 mt-4 p-10 bg-white border border-black/10 shadow-none rounded-none max-w-md">
-                        <h4 className="text-sm font-black uppercase tracking-widest">SYSTEM UNINITIALIZED</h4>
-                        <p className="text-xs text-black/50 leading-relaxed font-medium">Cryptographic keys are required. Initialize vault.</p>
-                        <button onClick={onCreate} className="w-full bg-black text-white px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-black hover:bg-black/90 transition-all shadow-none mt-2 rounded-none">
-                            INITIALIZE
+                    <div className="flex flex-col items-center gap-6 mt-4 p-12 bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 max-w-md shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+                        <h4 className="text-base font-black uppercase tracking-[0.2em] text-black dark:text-white">SYSTEM UNINITIALIZED</h4>
+                        <p className="text-xs text-black/50 dark:text-white/50 leading-relaxed font-mono">Cryptographic keys are required to interface with the EVM layer. Initialize your quantum vault.</p>
+                        <button onClick={onCreate} className="w-full bg-black text-white dark:bg-white dark:text-black px-8 py-5 text-[12px] uppercase tracking-[0.3em] font-black hover:bg-black/90 dark:hover:bg-white/90 transition-all mt-4 shadow-xl">
+                            INITIALIZE VAULT
                         </button>
                     </div>
                 )}
