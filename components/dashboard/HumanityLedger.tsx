@@ -22,52 +22,24 @@ interface RoadmapEdge {
 }
 
 const NODES: RoadmapNode[] = [
-  // Q1 2025 - Foundation
-  { id: 'pxe', title: 'Private Execution Environment', status: 'live', quarter: 'Q1 2025', description: 'Local Aztec PXE initialized and integrated. All state transitions proven client-side.', x: 100, y: 140 },
-  { id: 'wallet', title: 'Wallet Connection', status: 'live', quarter: 'Q1 2025', description: 'MetaMask and EIP-1193 compatible wallet bridge. Supports Ethereum and Aztec accounts.', x: 100, y: 300 },
+  // Milestone 1
+  { id: 'm1-circuit', title: 'Aztec Testnet Integration', status: 'live', quarter: 'Milestone 1', description: 'Develop and deploy Noir circuits for Whale Chat messaging logic and private state management.', x: 100, y: 140 },
+  { id: 'm1-sandbox', title: 'Sandbox Integration', status: 'live', quarter: 'Milestone 1', description: 'Integrate Aztec Sandbox for local testing of private state transitions. Deliverable: Functional integration of the Whale Network dashboard with the Aztec testnet.', x: 100, y: 300 },
+  
+  // Milestone 2
+  { id: 'm2-audit', title: 'Security Audits', status: 'building', quarter: 'Milestone 2', description: 'Conduct independent security audits of our frontend infrastructure, smart contracts, and newly developed Noir circuits.', x: 450, y: 140 },
+  { id: 'm2-beta', title: 'Testnet Beta Launch', status: 'building', quarter: 'Milestone 2', description: 'Deliverable: A fully functional, testnet-ready dashboard and wallet interface deployed for public beta testing, strictly meeting timeline requirement.', x: 450, y: 300 },
 
-  // Q2 2025 - Core Protocol
-  { id: 'noir', title: 'Noir Circuit Deployment', status: 'live', quarter: 'Q2 2025', description: 'Core Noir circuits compiled and deployed: private transfer, note commitment, nullifier generation.', x: 380, y: 80 },
-  { id: 'identity', title: 'ZK Identity Layer', status: 'live', quarter: 'Q2 2025', description: 'Biometric liveness proofs and Identity integration. One human, one verified account.', x: 380, y: 220 },
-  { id: 'whale', title: 'Whale Network v1', status: 'live', quarter: 'Q2 2025', description: 'Real-time on-chain capital flow monitoring across 20+ blockchain networks.', x: 380, y: 360 },
-
-  // Q3 2025 - Intelligence
-  { id: 'alerts', title: 'Alert Engine', status: 'live', quarter: 'Q3 2025', description: 'Configurable alert conditions on large transfers, exchange flows, and wallet activations.', x: 660, y: 140 },
-  { id: 'portfolio', title: 'Portfolio Dashboard', status: 'live', quarter: 'Q3 2025', description: 'Aggregated private portfolio view. Balances remain shielded; position data never leaves the device.', x: 660, y: 280 },
-  { id: 'ledger', title: 'Block Explorer', status: 'live', quarter: 'Q3 2025', description: 'Privacy-respecting block explorer for Aztec L2 state. Verifiable commitments, no data exposure.', x: 660, y: 420 },
-
-  // Q4 2025 - Compliance & Security
-  { id: 'disclosure', title: 'Selective Disclosure SDK', status: 'building', quarter: 'Q4 2025', description: 'Viewing key generation and ZK range proofs for regulatory and audit compliance.', x: 940, y: 80 },
-  { id: 'multisig', title: 'Threshold Multi-Signature', status: 'building', quarter: 'Q4 2025', description: 'M-of-N signing proven inside a ZK circuit. Signer identities remain hidden from public observers.', x: 940, y: 240 },
-  { id: 'bridge', title: 'Cross-Chain Bridge', status: 'building', quarter: 'Q4 2025', description: 'Encrypted asset transfers between Aztec L2 and Ethereum L1. Capital flows invisible to analysis.', x: 940, y: 400 },
-
-  // Q1 2026 - Scale
-  { id: 'rwa', title: 'Real World Asset Integration', status: 'planned', quarter: 'Q1 2026', description: 'Tokenization of real-world assets on Aztec under smart contract custody.', x: 1220, y: 140 },
-  { id: 'darkpool', title: 'Dark Pool Liquidity', status: 'planned', quarter: 'Q1 2026', description: 'Blind order matching via ZK proofs and multi-party computation. MEV extraction made impossible.', x: 1220, y: 300 },
-  { id: 'governance', title: 'Decentralized Governance', status: 'planned', quarter: 'Q1 2026', description: 'Cryptographic voting with full voter anonymity on L2. Protocol upgrades governed by verified participants.', x: 1220, y: 460 },
-
-  // Q2 2026 - Ecosystem
-  { id: 'sdk', title: 'Developer SDK', status: 'planned', quarter: 'Q2 2026', description: 'Embeddable SDK for browsers and mobile. PXE initialization, proving, and submission abstracted completely.', x: 1500, y: 200 },
-  { id: 'sandbox', title: 'Developer Sandbox', status: 'planned', quarter: 'Q2 2026', description: 'Local CLI and GUI environment simulating L1/L2. Full note, nullifier, and witness visualization.', x: 1500, y: 380 },
+  // Milestone 3
+  { id: 'm3-mobile', title: 'Mobile Synchronization', status: 'planned', quarter: 'Milestone 3', description: 'Complete native iOS/Android applications. Implement and stress-test the ZK-secured QR code session sync.', x: 800, y: 140 },
+  { id: 'm3-crosschain', title: 'Cross-Chain Expansion', status: 'planned', quarter: 'Milestone 3', description: 'Deliverable: Seamless, privacy-preserving cross-device wallet experience within the Aztec environment.', x: 800, y: 300 },
 ];
 
 const EDGES: RoadmapEdge[] = [
-  { from: 'pxe', to: 'noir' },
-  { from: 'wallet', to: 'identity' },
-  { from: 'wallet', to: 'whale' },
-  { from: 'noir', to: 'alerts' },
-  { from: 'identity', to: 'portfolio' },
-  { from: 'whale', to: 'portfolio' },
-  { from: 'whale', to: 'ledger' },
-  { from: 'alerts', to: 'disclosure' },
-  { from: 'portfolio', to: 'multisig' },
-  { from: 'ledger', to: 'bridge' },
-  { from: 'disclosure', to: 'rwa' },
-  { from: 'multisig', to: 'darkpool' },
-  { from: 'bridge', to: 'governance' },
-  { from: 'rwa', to: 'sdk' },
-  { from: 'darkpool', to: 'sdk' },
-  { from: 'governance', to: 'sandbox' },
+  { from: 'm1-circuit', to: 'm2-audit' },
+  { from: 'm1-sandbox', to: 'm2-beta' },
+  { from: 'm2-audit', to: 'm3-mobile' },
+  { from: 'm2-beta', to: 'm3-crosschain' },
 ];
 
 const STATUS_CONFIG = {
@@ -132,20 +104,38 @@ function RoadmapCanvas() {
     return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
   }
 
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if ((e.target as HTMLElement).closest('[data-node]')) return;
+    setDragging(true);
+    dragStart.current = { mx: e.touches[0].clientX, my: e.touches[0].clientY, tx: transform.x, ty: transform.y };
+  }, [transform]);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragging || !dragStart.current) return;
+    const dx = e.touches[0].clientX - dragStart.current.mx;
+    const dy = e.touches[0].clientY - dragStart.current.my;
+    setTransform(t => ({ ...t, x: dragStart.current!.tx + dx, y: dragStart.current!.ty + dy }));
+  }, [dragging]);
+
+  const onTouchEnd = useCallback(() => {
+    setDragging(false);
+    dragStart.current = null;
+  }, []);
+
   return (
-    <div className="relative w-full flex flex-col gap-0">
+    <div className="relative w-full h-full flex flex-col gap-0 min-h-[500px]">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/8 bg-white">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-black/8 bg-white shrink-0">
         <div className="flex items-center gap-5">
           {Object.entries(STATUS_CONFIG).map(([k, v]) => (
             <div key={k} className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${v.dot}`} />
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-black/45">{v.label}</span>
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-black/45 hidden sm:inline">{v.label}</span>
             </div>
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-black/30 mr-2">Drag to pan · Scroll to zoom</span>
+          <span className="text-[11px] font-mono text-black/30 mr-2 hidden sm:inline">Drag to pan · Scroll to zoom</span>
           <button onClick={zoomOut} className="w-8 h-8 flex items-center justify-center border border-black/12 hover:bg-black/[0.03] transition-colors text-black/60 font-bold text-lg leading-none">−</button>
           <button onClick={zoomIn}  className="w-8 h-8 flex items-center justify-center border border-black/12 hover:bg-black/[0.03] transition-colors text-black/60 font-bold text-lg leading-none">+</button>
           <button onClick={reset}   className="px-3 h-8 flex items-center justify-center border border-black/12 hover:bg-black/[0.03] transition-colors text-[11px] font-mono font-bold uppercase tracking-wider text-black/50">Reset</button>
@@ -155,12 +145,16 @@ function RoadmapCanvas() {
       {/* Canvas */}
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden bg-white"
-        style={{ height: 540, cursor: dragging ? 'grabbing' : 'grab' }}
+        className="relative w-full flex-1 overflow-hidden bg-white"
+        style={{ cursor: dragging ? 'grabbing' : 'grab', touchAction: 'none' }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
         onWheel={onWheel}
       >
         {/* Dot grid background */}
@@ -184,13 +178,11 @@ function RoadmapCanvas() {
         >
           {/* Quarter labels */}
           {[
-            { label: 'Q1 2025', x: 100 },
-            { label: 'Q2 2025', x: 380 },
-            { label: 'Q3 2025', x: 660 },
-            { label: 'Q4 2025', x: 940 },
-            { label: 'Q1 2026', x: 1220 },
-            { label: 'Q2 2026', x: 1500 },
+            { label: 'Milestone 1', x: 100 },
+            { label: 'Milestone 2', x: 450 },
+            { label: 'Milestone 3', x: 800 },
           ].map(q => (
+
             <div
               key={q.label}
               style={{ position: 'absolute', left: q.x, top: 0, width: NODE_W }}

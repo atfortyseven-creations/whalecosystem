@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,7 +6,7 @@ import {
     X, Settings as SettingsIcon, Globe, Shield, Activity, 
     Network, FlaskConical, Info, Check, Copy, Trash2, 
     Search, Download, Users, Lock, Eye, EyeOff, Bell,
-    Fingerprint, HardDrive, Smartphone, Zap, FileJson, AlertTriangle
+    Fingerprint, HardDrive, Smartphone, Zap, FileJson, AlertTriangle, ArrowRight, ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEnsName } from 'wagmi';

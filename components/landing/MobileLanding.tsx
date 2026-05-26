@@ -352,9 +352,13 @@ function ConnectedScreen({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
           style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
-          className="w-full flex items-center justify-center mb-10"
+          className="w-full flex items-center justify-center mb-10 bg-white"
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] font-black">Whale Alert Network</span>
+          <img
+            src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png"
+            className="h-8 w-auto object-contain mix-blend-multiply"
+            alt="Powered by Aztec"
+          />
         </motion.div>
 
         {/*  ATOM LOGO & GIANT CLOCK  */}

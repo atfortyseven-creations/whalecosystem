@@ -1,5 +1,6 @@
 import { TelemetryTracker } from '@/components/forum/TelemetryTracker';
 import { MobileBottomNav } from '@/components/forum/MobileBottomNav';
+import { ForumHeader } from '@/components/forum/ForumHeader';
 
 export default async function ForumLayout({
   children,
@@ -7,8 +8,9 @@ export default async function ForumLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#1a1a1a] text-slate-900 dark:text-white transition-colors duration-300">
       <TelemetryTracker />
+      <ForumHeader />
 
       <main className="flex-1 w-full overflow-x-hidden">
         {children}

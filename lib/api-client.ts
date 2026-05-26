@@ -1,4 +1,4 @@
-﻿import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 // ============================================================================
@@ -23,7 +23,7 @@ export const REGISTRY = {
     portfolio:      "/api/wallet/portfolio",
     whaleWallets:   "/api/premium/watched-wallets",
     coldStorage:    "/api/wallet/onchain-balances",
-    Security Protocol:       "/api/network/forensics",
+    zkShield:       "/api/network/forensics",
   },
   OMNI_INFRA: {
     blockExplorer:  "/api/network/evm/recent",

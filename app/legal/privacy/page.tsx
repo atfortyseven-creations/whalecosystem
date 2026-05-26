@@ -60,8 +60,8 @@ export default function PrivacyPolicyPage() {
               {[
                 ['Legal Entity', 'Whale Alert Network, S.L.'],
                 ['Registered Office', 'Paseo de la Castellana, Madrid, 28046, Spain'],
-                ['General Email', 'contact@whalecosystem.io'],
-                ['Data Protection Officer (DPO)', 'dpo@whalecosystem.io'],
+                ['General Email', 'atfortyseven2@humanidfi.es'],
+                ['Data Protection Officer (DPO)', 'atfortyseven2@humanidfi.es'],
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-0.5">{label}</p>

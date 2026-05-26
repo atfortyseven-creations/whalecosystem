@@ -556,7 +556,7 @@ export default function ConnectPage() {
       </div>
 
       {/* TOP BAR: Aztec only */}
-      <div className="absolute top-0 left-0 right-0 z-40 border-b border-white/10 bg-[#0A0A0A]/80 backdrop-blur-md overflow-hidden h-16 flex items-center">
+      <div className="absolute top-0 left-0 right-0 z-40 border-b border-black/10 bg-white backdrop-blur-md overflow-hidden h-16 flex items-center">
         <style dangerouslySetInnerHTML={{ __html: `
           @keyframes marquee-aztec {
             0% { transform: translateX(0%); }
@@ -578,20 +578,20 @@ export default function ConnectPage() {
             <div key={i} className="flex items-center gap-3 px-8">
               <img
                 src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png"
-                className="h-10 w-auto object-contain opacity-70"
+                className="h-10 w-auto object-contain"
                 alt="Aztec"
               />
-              <span className="text-white/30 text-[8px] font-mono uppercase tracking-[0.3em] whitespace-nowrap">Powered by Aztec</span>
+              <span className="text-black/50 text-[8px] font-mono uppercase tracking-[0.3em] whitespace-nowrap">Powered by Aztec</span>
             </div>
           ))}
           {[...Array(20)].map((_, i) => (
             <div key={`b-${i}`} className="flex items-center gap-3 px-8">
               <img
                 src="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (2).png"
-                className="h-10 w-auto object-contain opacity-70"
+                className="h-10 w-auto object-contain"
                 alt="Aztec"
               />
-              <span className="text-white/30 text-[8px] font-mono uppercase tracking-[0.3em] whitespace-nowrap">Powered by Aztec</span>
+              <span className="text-black/50 text-[8px] font-mono uppercase tracking-[0.3em] whitespace-nowrap">Powered by Aztec</span>
             </div>
           ))}
         </div>

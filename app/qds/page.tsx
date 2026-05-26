@@ -21,8 +21,8 @@ const SECTIONS = [
     num: '01',
     title: 'What QDs is',
     paragraphs: [
-      'QDs (Core Dots) is a digital asset designed to act as the foundational unit of economic exchange within the Whale Alert network. It is not a governance token, a reward coupon, or a speculative vehicle with hidden unlock schedules. It is a base layer of exchange: finite, minable, and enforced entirely by the deployed contract code.',
-      'The name derives from the concept of core dots  the smallest indivisible unit of verifiable computational work. Just as physical matter cannot be reduced below the atomic scale, QDs cannot be created beyond its defined ceiling or subdivided beyond its defined precision. This physical analogy represents the strict mathematical boundaries established by the protocol layer.',
+      'QDs (Quantum Dots, also known as Core Dots) is a digital asset designed to act as the foundational unit of economic exchange within the network. It is a base layer of exchange: finite, minable, and enforced entirely by the deployed contract code.',
+      'The name derives from the concept of Quantum Dots—representing the smallest indivisible unit of verifiable computational work (Core Dots). Just as physical matter cannot be reduced below the atomic scale, QDs cannot be created beyond its defined ceiling or subdivided beyond its defined precision. This physical analogy represents the strict mathematical boundaries established by the protocol layer.',
       'Every design decision for QDs was measured against one test: does this reduce complexity, or add it? Any structure that added complexity without adding a mathematical guarantee was removed. What remains is a token defined by absolute clarity. The codebase has been stripped of any redundant logic, administrative backdoors, or upgradeable proxy patterns that could introduce centralized risk.',
       'The full technical specification of QDs is publicly auditable from day one. There are no hidden parameters, no admin keys, and no emergency override functions. The rules encoded at genesis govern QDs until the final token is mined. Enterprise integrators can rely on this stability to build deterministic financial models and automated settlement infrastructure without the counterparty risk associated with human intervention.'
     ],
@@ -42,7 +42,7 @@ const SECTIONS = [
     title: 'Mining: earned, not issued',
     paragraphs: [
       'QDs is distributed exclusively through mining. There are no pre-mines, no team allocations, no investor reserves, and no foundation treasury. From the first block, every token enters circulation through computational work performed by open, permissionless participants. This mechanism guarantees that the initial distribution of the asset is tied directly to energy expenditure and infrastructural commitment.',
-      'The mining process follows a deterministic emission schedule. As more computational power joins the network, the difficulty of finding a valid block increases proportionally, keeping the rate of new token issuance stable and predictable regardless of participation levels. The difficulty adjustment algorithm operates independently of human oversight, recalculating target thresholds strictly based on recent block times.',
+      'The mining process follows a deterministic emission schedule. As more people participate and mine on the network, the difficulty of finding a valid block increases proportionally. Consequently, it becomes harder to mine, and the relative reward per unit of compute decreases over time. The difficulty adjustment algorithm operates independently of human oversight, recalculating target thresholds strictly based on recent block times.',
       'Block rewards halve at fixed intervals following a geometric decay schedule. Each halving reduces the new tokens issued per block by fifty percent, extending the mining timeline while preserving the overall supply ceiling. The final QDs will be issued through fractional issuance as the block reward approaches its lower bound, transitioning the network seamlessly from an inflationary bootstrapping phase to a pure fee-driven economic model.',
       'Anyone with compatible hardware and a network connection can begin mining immediately after mainnet launch. There is no whitelist, no minimum stake requirement, and no registration process. The protocol is permissionless at every level of participation, ensuring that the network topology remains decentralized and resistant to localized regulatory pressures.'
     ],
@@ -91,7 +91,7 @@ const SECTIONS = [
     num: '08',
     title: 'Technical specification',
     paragraphs: [
-      'QDs is implemented as an ERC-20 compatible token on the Ethereum Virtual Machine. The contract inherits the standard interface to ensure compatibility with existing wallets, exchanges, and DeFi infrastructure without requiring custom integration work from third parties. This strategic decision prioritizes immediate interoperability over esoteric technical novelty.',
+      'Following the established project milestones, QDs will be deployed as an ERC-20 token on the Ethereum L1 mainnet. The contract inherits the standard interface to ensure compatibility with existing wallets, exchanges, and DeFi infrastructure without requiring custom integration work from third parties. This strategic decision prioritizes immediate interoperability over esoteric technical novelty.',
       'The contract includes a single additional function beyond the ERC-20 standard: the mine() function, which allows eligible participants to claim block rewards during the mining period. No other non-standard functions exist. The attack surface of the contract is minimal by design, reducing the vector footprint to an absolute minimum.',
       'Gas consumption for QDs transactions is comparable to any standard ERC-20 transfer. No exotic opcodes, delegatecall patterns, or proxy architectures are used. The contract is static  what is deployed at genesis is what runs for the lifetime of the token. Code is law, and the code is remarkably brief.',
       'Security audits of the QDs contract will be published before mainnet launch. Multiple independent audit firms will review the contract. All findings, including any that are remediated before launch, will be disclosed in full in the public audit documentation. Transparency regarding the security perimeter is non-negotiable.'
@@ -190,9 +190,9 @@ export default function QDsPage() {
               className="font-serif text-black/50 max-w-[560px] leading-relaxed"
               style={{ fontSize: 'clamp(16px, 2vw, 22px)' }}
             >
-              Core Dots. 21,000,000 units. Mined, not issued.
+              Quantum Dots. 21,000,000 units. Mined, not issued.
               <br className="hidden md:block" />
-              Launching before 2027.
+              Ethereum L1 ERC-20 token.
             </motion.p>
 
             {/* Scroll cue */}
@@ -290,7 +290,7 @@ export default function QDsPage() {
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10" />
         <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none bg-white/20 backdrop-blur-[2px]">
           <span className="font-mono text-[10px] font-black uppercase tracking-[0.55em] text-black/40 drop-shadow-sm">
-            QDs · Core Dots · 21,000,000 · 2026
+            QDs · Quantum Dots · 21,000,000 · ERC-20
           </span>
         </div>
       </section>

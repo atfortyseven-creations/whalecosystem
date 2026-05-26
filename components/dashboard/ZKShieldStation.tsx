@@ -1,4 +1,4 @@
-﻿// components/dashboard/Security ProtocolStation.tsx
+// components/dashboard/Security ProtocolStation.tsx
 "use client";
 
 import React, { useState } from 'react';
@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Fingerprint, Lock, CheckCircle2, Activity, Cpu, Database, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
-export function Security ProtocolStation() {
+export function ZKShieldStation() {
     const [targetAddress, setTargetAddress] = useState('');
     const [isProving, setIsProving] = useState(false);
     const [lastProof, setLastProof] = useState<any>(null);

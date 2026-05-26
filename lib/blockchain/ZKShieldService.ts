@@ -1,14 +1,14 @@
-﻿// @ts-ignore
+// @ts-ignore
 import { buildPoseidon } from 'circomlibjs';
 import * as snarkjs from 'snarkjs';
 import { type Address, type Hex } from 'viem';
 
 /**
- * Security ProtocolService
+ * ZKShieldService
  * Orchestrates Zero-Knowledge assets shielding and unshielding.
  * Uses Poseidon hashing and Groth16 proofs for state masking.
  */
-export class Security ProtocolService {
+export class ZKShieldService {
     private poseidon: any = null;
 
     private async init() {
@@ -81,4 +81,4 @@ export class Security ProtocolService {
     }
 }
 
-export const Security ProtocolService = new Security ProtocolService();
+export const ZKShieldServiceInstance = new ZKShieldService();

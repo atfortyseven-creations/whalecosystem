@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -268,7 +268,7 @@ function ChainRow({ chain, address }: { chain: typeof CHAINS[0]; address: string
         <div className="flex-1 min-w-0">
           <div className="font-black text-sm" style={{ color: INK }}>{chain.name}</div>
           <div className="text-[10px] font-mono mt-0.5" style={{ color: MUTED }}>
-            {chain.isQd ? "Core Dots · Base L2" : `Chain ID: ${chain.id}`}
+            {chain.isQd ? "Quantum Dots · Ethereum L1" : `Chain ID: ${chain.id}`}
           </div>
         </div>
 

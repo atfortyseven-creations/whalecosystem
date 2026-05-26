@@ -7,7 +7,7 @@ export default function ApiReferencePage() {
             title="API Reference"
             description="Complete documentation for the Whale Alert Network REST and WebSocket APIs. Integrate real-time wallet data, token transfers, and portfolio analytics."
             lastUpdated="May 25, 2026"
-            category="Developer"
+            category="Developers"
         >
             <div className="space-y-12">
                 

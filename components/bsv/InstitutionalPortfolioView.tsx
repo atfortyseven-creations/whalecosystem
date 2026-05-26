@@ -11,7 +11,9 @@ import {
 import { toast } from 'sonner';
 import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 import { useVIPStore } from '@/lib/vip-store';
+import { formatEther } from 'viem';
 import { SettingsView } from '@/components/settings/SettingsView';
+import { ethers } from 'ethers';
 
 type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK' | 'SETTINGS';
 
@@ -212,9 +214,7 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-1000"><Database size={100} /></div>
                                 <span className="text-[10px] uppercase tracking-widest text-white/50 block mb-2">Network Score (QDs)</span>
                                 <div className="text-3xl font-light tracking-tighter">{qdBalance}<span className="text-lg font-black ml-2 opacity-50 text-white">QDs</span></div>
-                                <div className="mt-4 flex items-center gap-2 text-[9px] uppercase tracking-widest opacity-40">
-                                    <Activity size={10} /> Live State Subscribed
-                                </div>
+
                             </div>
                             
                             <div className="border border-black/10 bg-white relative flex flex-col">

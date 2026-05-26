@@ -9,11 +9,15 @@
 - [x] #30 `/story` — Historia del proyecto en timeline seamless cream/light-mode blending.
 - [x] #66 ZK Proof indicator en wallet/transacciones
 - [x] #68 "What can people see about me?" en perfil
+- [x] Legal/Privacy Emails: Change to `atfortyseven2@humanidfi.es` in privacy and security pages.
 - [x] #53 Privacy Score en perfil de usuario
 - [x] #71 Performance metrics en landing
 - [x] #18 Diagrama de arquitectura SVG en landing
 - [x] #70 Animaciones que expliquen ZK en landing
-- [x] 1. Landing Page Alignment (`ClientRootRouter.tsx` / `app/page.tsx`)
+- [x] Top Band (Aztec Logo): Make it white, use the high-quality Aztec logo.
+- [x] Atom Logo on Landing Page: Remove borders and blend with white background.
+- [x] Session Logs UI: Fix the session logs display so that local wallet session history is shown correctly instead of "NO SESSION LOGS" (`UtilityPanels.tsx`).
+- [x] Mobile QR Scanner: Fix camera permissions and autoPlay for iOS/Android (`UniversalScanModal.tsx`, `useSecureCamera.ts`).
 - [x] 2. Connect Page text ("Available now, Whale Chat !")
 - [x] 3. Pricing Section Redesign (impoluto, exact text)
 - [x] 4. Forum Normalization (`ForumHeader.tsx`, `page.tsx`)

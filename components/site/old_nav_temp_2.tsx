@@ -151,8 +151,13 @@ export function DropdownNav() {
                                             )}
                                             <span className="text-xs font-bold text-[#1F1F1F] dark:text-white">Alertas</span>
                                         </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
+            </div>
         </>
     );
 }
-
-

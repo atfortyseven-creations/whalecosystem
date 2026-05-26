@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,11 +45,52 @@ export function UtilityPanels() {
         fetch(`/api/session-logs?userId=${address}`)
             .then(r => r.json())
             .then(data => {
-                if (Array.isArray(data)) setSessions(data);
-                else if (data.logs) setSessions(data.logs);
-                else setSessions([]);
+                let apiSessions = [];
+                if (Array.isArray(data)) apiSessions = data;
+                else if (data.logs) apiSessions = data.logs;
+                
+                const localKey = `system_history_${address}`;
+                let localSessions = [];
+                try {
+                    const stored = localStorage.getItem(localKey);
+                    if (stored) {
+                        localSessions = JSON.parse(stored).map((s: any, i: number) => {
+                            const parsedTime = new Date(`${s.date} ${s.time}`).getTime();
+                            return {
+                                id: `local-${i}-${Date.now()}`,
+                                action: `LOGIN (${s.provider})`,
+                                timestamp: isNaN(parsedTime) ? Date.now() : parsedTime,
+                                userId: address,
+                                ipAddress: s.os || 'Unknown Device'
+                            };
+                        });
+                    }
+                } catch (e) {}
+
+                const merged = [...apiSessions, ...localSessions].sort((a, b) => b.timestamp - a.timestamp);
+                setSessions(merged);
             })
-            .catch(console.error)
+            .catch((err) => {
+                console.error(err);
+                const localKey = `system_history_${address}`;
+                let localSessions = [];
+                try {
+                    const stored = localStorage.getItem(localKey);
+                    if (stored) {
+                        localSessions = JSON.parse(stored).map((s: any, i: number) => {
+                            const parsedTime = new Date(`${s.date} ${s.time}`).getTime();
+                            return {
+                                id: `local-${i}-${Date.now()}`,
+                                action: `LOGIN (${s.provider})`,
+                                timestamp: isNaN(parsedTime) ? Date.now() : parsedTime,
+                                userId: address,
+                                ipAddress: s.os || 'Unknown Device'
+                            };
+                        });
+                    }
+                } catch (e) {}
+                setSessions(localSessions);
+            })
             .finally(() => setSessionsLoading(false));
     }, [address]);
 

@@ -29,7 +29,7 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode,
+          facingMode: { ideal: facingMode },
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },

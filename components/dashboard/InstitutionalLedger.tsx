@@ -1,11 +1,12 @@
-﻿"use client";
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePublicClient, useBlockNumber } from 'wagmi';
 import { formatEther } from 'viem';
-import { Search, Loader2, AlertCircle, Zap, ChevronRight, Box, Activity, Clock, ShieldCheck, AlignLeft, X } from 'lucide-react';
+import { Search, Loader2, AlertCircle, Zap, ChevronRight, Box, Clock, ShieldCheck, AlignLeft, X } from 'lucide-react';
 import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 interface RealTransaction {
     id: string;
@@ -81,7 +82,7 @@ export default function InstitutionalLedger() {
     const [selectedBlock, setSelectedBlock] = useState<RealBlock | null>(null);
     const [selectedTx, setSelectedTx] = useState<RealTransaction | null>(null);
 
-    const handleSearch = async () => {
+    const handleSearch = useCallback(async () => {
         const q = searchQuery.trim();
         if (!q || q.length < 2) return;
         setIsSearching(true);
@@ -93,14 +94,14 @@ export default function InstitutionalLedger() {
             if (data.ok) {
                 setSearchResults(data.data ?? []);
             } else {
-                setSearchError(data.error || 'No results found');
+                setSearchError(data.error || 'No results found.');
             }
         } catch {
-            setSearchError('Network error  could not reach the graph index.');
+            setSearchError('Network error — unable to reach the index.');
         } finally {
             setIsSearching(false);
         }
-    };
+    }, [searchQuery]);
 
     // Main Polling Effect
     useEffect(() => {
@@ -194,7 +195,7 @@ export default function InstitutionalLedger() {
                    onClick={() => window.location.reload()}
                    className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-black/5 active:scale-95"
                 >
-                   REFRESH TELEMETRY
+                   REFRESH BLOCK EXPLORER
                 </button>
             </div>
 
@@ -212,7 +213,7 @@ export default function InstitutionalLedger() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                         className="w-full bg-[#F9F9F9] dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 focus:border-[#050505] dark:focus:border-white text-[#050505] dark:text-white p-5 pl-14 outline-none transition-all text-[11px] font-mono uppercase tracking-[0.1em] placeholder:text-[#A0A0A0] dark:placeholder:text-white/40 rounded-xl shadow-sm"
-                        placeholder="INPUT ADDRESS / TX HASH / ENS"
+                        placeholder="ADDRESS / TX HASH / ENS"
                     />
                     <button
                         onClick={handleSearch}
@@ -301,7 +302,7 @@ export default function InstitutionalLedger() {
                 <div className="border border-[#E5E5E5] dark:border-white/10 bg-[#F9F9F9] dark:bg-[#111111] rounded-2xl overflow-hidden shadow-sm">
                     <div className="flex items-center justify-between p-6 bg-[#E5E5E5]/50 dark:bg-white/5 border-b border-[#E5E5E5] dark:border-white/10">
                         <div className="flex items-center gap-3">
-                            <Box size={14} className="text-[#050505] dark:text-white" />
+                            <div className="w-5 h-5 overflow-hidden flex items-center justify-center dark:invert"><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
                             <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">BLOCK TELEMETRY</h2>
                         </div>
                         <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">LIVE STREAMING</span>
@@ -353,7 +354,7 @@ export default function InstitutionalLedger() {
                 <div className="border border-[#E5E5E5] dark:border-white/10 bg-[#F9F9F9] dark:bg-[#111111] rounded-2xl overflow-hidden shadow-sm">
                     <div className="flex items-center justify-between p-6 bg-[#E5E5E5]/50 dark:bg-white/5 border-b border-[#E5E5E5] dark:border-white/10">
                         <div className="flex items-center gap-3">
-                            <Activity size={14} className="text-[#050505] dark:text-white" />
+                            <div className="w-5 h-5 overflow-hidden flex items-center justify-center dark:invert"><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
                             <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">TRANSACTION FLOWS</h2>
                         </div>
                         <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">MEMPOOL MONITOR</span>
@@ -420,7 +421,7 @@ export default function InstitutionalLedger() {
                             <div className="p-8 md:p-10">
                                 <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] dark:border-white/10">
                                     <div className="w-12 h-12 bg-white dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-xl flex items-center justify-center shadow-sm">
-                                        {selectedBlock ? <Box size={20} className="text-[#050505] dark:text-white" /> : <Activity size={20} className="text-[#050505] dark:text-white" />}
+                                        <div className="w-6 h-6 overflow-hidden flex items-center justify-center dark:invert"><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">
@@ -471,13 +472,19 @@ export default function InstitutionalLedger() {
     );
 }
 
-function DetailRow({ label, value, bold }: any) {
+interface DetailRowProps {
+    label: string;
+    value: string | number | undefined | null;
+    bold?: boolean;
+}
+
+function DetailRow({ label, value, bold }: DetailRowProps) {
     return (
         <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5] dark:border-white/10">
             <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888] dark:text-[#AAAAAA]">{label}</span>
             <div className="flex items-center gap-3">
                 <span className={`text-[12px] font-mono text-[#050505] dark:text-white ${bold ? 'font-bold' : ''}`}>
-                    {value}
+                    {value ?? '—'}
                 </span>
             </div>
         </div>

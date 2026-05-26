@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState, useCallback, Suspense, useRef } from 'react';
 import Link from 'next/link';
@@ -273,7 +273,7 @@ function CategoryCard({ cat, index }: { cat: any; index: number }) {
       transition={{ delay: index * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
     >
       <Link href={`/forum/c/${cat.slug}`}
-        className="group flex flex-col h-full bg-white border border-slate-200 rounded-2xl p-6 hover:border-slate-300 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+        className="group flex flex-col h-full bg-white dark:bg-[#2b2b2b] border border-slate-200 dark:border-white/10 rounded-2xl p-6 hover:border-slate-300 dark:hover:border-white/30 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -427,10 +427,10 @@ function ForumHomeContent() {
   useEffect(() => { loadData(); }, [loadData]);
 
   return (
-    <div className="flex-1 flex flex-col bg-white text-[#050505] w-full min-h-screen">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#1f1f1f] text-[#050505] dark:text-white w-full min-h-screen transition-colors duration-300">
 
       {/* ── Secondary Sub-nav (Discourse-style) ── */}
-      <div className="w-full bg-white border-b border-slate-200 sticky top-0 z-[100] shadow-sm">
+      <div className="w-full bg-white dark:bg-[#2b2b2b] border-b border-slate-200 dark:border-white/10 sticky top-0 z-[100] shadow-sm transition-colors duration-300">
         <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between h-[52px]">
 
           {/* Left: Filter tabs */}
@@ -495,10 +495,10 @@ function ForumHomeContent() {
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 leading-none mb-2">
+            <h1 className="text-[28px] md:text-[36px] font-black tracking-tight text-slate-900 dark:text-white leading-none mb-2">
               Humanity Ledger Forum
             </h1>
-            <p className="text-[14px] text-slate-500 font-medium max-w-xl leading-relaxed">
+            <p className="text-[14px] text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
               Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics—with community guidelines and optional private governance as circuits ship.
             </p>
           </div>
@@ -547,7 +547,7 @@ function ForumHomeContent() {
                     See all →
                   </Link>
                 </div>
-                <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+                <div className="bg-white dark:bg-[#2b2b2b] rounded-2xl border border-slate-200 dark:border-white/10 divide-y divide-slate-100 dark:divide-white/5 overflow-hidden">
                   {loading ? (
                     Array.from({ length: 6 }).map((_, i) => (
                       <div key={i} className="h-14 animate-pulse bg-black/5" />
@@ -598,7 +598,7 @@ function ForumHomeContent() {
                 </Link>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 px-4 py-2 divide-y divide-slate-100">
+              <div className="bg-white dark:bg-[#2b2b2b] rounded-2xl border border-slate-200 dark:border-white/10 px-4 py-2 divide-y divide-slate-100 dark:divide-white/5">
                 {/* Column headers */}
                 <div className="grid grid-cols-[1fr_auto] gap-4 py-2 text-[10px] font-mono font-black uppercase tracking-widest text-slate-300">
                   <span>Topic</span>
@@ -633,15 +633,15 @@ function ForumHomeContent() {
             <div className="w-full lg:w-[280px] shrink-0">
               <div className="sticky top-[72px]">
                 <h2 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 mb-4">Categories</h2>
-                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div className="bg-white dark:bg-[#2b2b2b] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
                   {categories.map((cat, i) => {
                     const meta = CATEGORY_META[cat.slug] || { color: '#64748B', icon: <Hash size={13} /> };
                     return (
                       <Link key={cat.id} href={`/forum/c/${cat.slug}`}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-black/5 transition-colors border-b border-slate-100 last:border-0 group">
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-white/5 last:border-0 group">
                         <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: meta.color }} />
-                        <span className="flex-1 text-[13px] font-medium text-slate-700 group-hover:text-slate-900 transition-colors">{cat.name}</span>
-                        <span className="text-[12px] font-mono text-slate-300">{cat._count?.topics ?? 0}</span>
+                        <span className="flex-1 text-[13px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{cat.name}</span>
+                        <span className="text-[12px] font-mono text-slate-300 dark:text-slate-500">{cat._count?.topics ?? 0}</span>
                       </Link>
                     );
                   })}
