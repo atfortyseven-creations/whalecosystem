@@ -4,17 +4,22 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowUpRight, ArrowDownLeft, Scan, Plus, Copy, Check,
-    RefreshCw, X, Box, Key, Lock, Unlock, CreditCard, ExternalLink,
-    Activity, Hash, Database, Fingerprint, GitMerge, Globe, Settings, ChevronRight
+    RefreshCw, X, Box, Key, CreditCard, ExternalLink,
+    Activity, Database, GitMerge, Globe, Settings, ChevronRight, Zap, TerminalSquare, Landmark
 } from 'lucide-react';
-
 import { toast } from 'sonner';
 import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 import { useVIPStore } from '@/lib/vip-store';
-import { formatEther } from 'viem';
 import { SettingsView } from '@/components/settings/SettingsView';
 import { ethers } from 'ethers';
 import { useSystemSignOut } from '@/hooks/useSystemSignOut';
+import { useFeeData } from 'wagmi';
+
+// Quantum Components
+import { QuantumHoldingsEngine } from '@/components/portfolio/QuantumHoldingsEngine';
+import { TransactionHistory } from '@/components/portfolio/TransactionHistory';
+import { QuantumDeFiPositions } from '@/components/portfolio/QuantumDeFiPositions';
+import { QuantumEntropyVisualizer } from '@/components/portfolio/QuantumEntropyVisualizer';
 
 type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK' | 'SETTINGS' | 'SWAP' | 'BRIDGE' | 'ACCOUNTS';
 
@@ -28,11 +33,10 @@ const truncate = (str: string, len: number) => {
 };
 
 export function InstitutionalPortfolioView() {
-    const { address, balance, updateBalance, activeNetwork, restoreFromCloud, tokenBalances } = useWalletStore();
+    const { address, balance, updateBalance, activeNetwork, restoreFromCloud } = useWalletStore();
     const [view, setView] = useState<View>('HOME');
     const [prefilledAddress, setPrefilledAddress] = useState('');
     const [loading, setLoading] = useState(false);
-    const [transactions, setTransactions] = useState<any[]>([]);
     const [isHydrated, setIsHydrated] = useState(false);
 
     // Complex Abysmal Entropy & QD Data State
@@ -44,12 +48,6 @@ export function InstitutionalPortfolioView() {
         setLoading(true);
         try {
             await updateBalance();
-            const res = await fetch(`/api/transactions?userId=${address}`);
-            if (res.ok) {
-                const data = await res.json();
-                setTransactions(Array.isArray(data) ? data : []);
-            }
-            // Strict On-Chain execution. No random simulations allowed.
             setQdBalance("0");
             setEntropyIndex("0.000");
         } catch (e) {
@@ -85,7 +83,7 @@ export function InstitutionalPortfolioView() {
     const balanceFiat = `$${(parseFloat(balance || "0") * priceOracle).toFixed(2)}`;
 
     return (
-        <div className="flex flex-col relative text-black selection:bg-black/10 min-h-[85vh] bg-white font-mono">
+        <div className="flex flex-col relative text-black selection:bg-black/10 min-h-[85vh] bg-[#F9F9F9] font-sans">
             <AnimatePresence mode="wait">
                 {view === 'HOME' && (
                     <HomeView key="home"
@@ -95,8 +93,7 @@ export function InstitutionalPortfolioView() {
                         qdBalance={qdBalance}
                         entropyIndex={entropyIndex}
                         loading={loading}
-                        transactions={transactions}
-                        tokenBalances={tokenBalances}
+                        activeNetwork={activeNetwork}
                         onRefresh={refreshBalance}
                         onSend={() => setView('SEND')}
                         onReceive={() => setView('RECEIVE')}
@@ -126,13 +123,15 @@ export function InstitutionalPortfolioView() {
     );
 }
 
-function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, loading, transactions, tokenBalances, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onSwap, onBridge, onNetworkClick, onSettingsClick, onAccountsClick, scannerBase }: any) {
+function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onSwap, onBridge, onNetworkClick, onSettingsClick, onAccountsClick, scannerBase }: any) {
     const [copied, setCopied] = useState(false);
     const [isDisconnecting, setIsDisconnecting] = useState(false);
-    const [activeTab, setActiveTab] = useState<'TOKENS'|'NFTS'|'ACTIVITY'>('TOKENS');
-    const { clearWallet, activeNetwork } = useWalletStore();
-    const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
+    const [activeTab, setActiveTab] = useState<'TOKENS'|'DEFI'|'ACTIVITY'>('TOKENS');
     const { nuclearDisconnect } = useSystemSignOut();
+    const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
+
+    // Fetch live gas prices via wagmi
+    const { data: feeData } = useFeeData({ chainId: activeNetwork === 'ethereum' ? 1 : 137 });
     
     const handleDisconnect = async () => {
         setIsDisconnecting(true);
@@ -148,183 +147,131 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
     };
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col relative z-20 pb-20">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col relative z-20 pb-20 w-full min-h-[100dvh]">
+            <QuantumEntropyVisualizer active={!!address} />
+            
             {isDisconnecting && (
                 <div className="fixed inset-0 z-[9999] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-4"></div>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">Purging Session...</p>
                 </div>
             )}
-            <header className="flex items-center justify-between px-8 py-6 border-b border-black/10">
+            <header className="flex items-center justify-between px-8 py-6 border-b border-black/10 bg-white relative z-10 shadow-sm">
                 <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-black/40">Network Status</span>
+                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-black/40 font-mono">Network Interface</span>
                     <button onClick={onNetworkClick} className="flex items-center gap-2 hover:opacity-70 transition-opacity mt-1">
-                        <div className="w-1.5 h-1.5 bg-black animate-pulse" />
-                        <span className="text-xs uppercase tracking-widest font-black">{address ? networkInfo.name : 'OFFLINE'}</span>
+                        <div className="w-1.5 h-1.5 bg-[#00C076] animate-pulse rounded-full shadow-[0_0_8px_#00C076]" />
+                        <span className="text-[12px] uppercase tracking-widest font-black">{address ? networkInfo.name : 'OFFLINE'}</span>
+                        {feeData?.formatted?.gasPrice && (
+                            <span className="text-[9px] font-mono text-black/40 ml-2 px-1.5 py-0.5 border border-black/10 bg-black/5 rounded-sm flex items-center gap-1">
+                                <Zap size={8} /> {parseFloat(feeData.formatted.gasPrice).toFixed(1)} gwei
+                            </span>
+                        )}
                     </button>
                 </div>
                 {address && (
                     <div className="flex gap-4 items-center">
-                        <button onClick={onRefresh} disabled={loading} className="text-black/40 hover:text-black transition-colors">
+                        <button onClick={onRefresh} disabled={loading} className="text-black/40 hover:text-black transition-colors border border-transparent hover:border-black/10 p-1.5 rounded-lg">
                             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
                         </button>
-                        <button onClick={onSettingsClick} className="text-black/40 hover:text-black transition-colors" title="Settings">
+                        <button onClick={onSettingsClick} className="text-black/40 hover:text-black transition-colors border border-transparent hover:border-black/10 p-1.5 rounded-lg" title="Settings">
                             <Settings size={14} />
                         </button>
-                        <button onClick={onAccountsClick} className="flex items-center gap-2 border border-black/10 px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors group">
-                            <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-black to-gray-400" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-black/60 group-hover:text-black">Account 1</span>
+                        <button onClick={onAccountsClick} className="flex items-center gap-2 border border-black/10 px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors group bg-white shadow-sm">
+                            <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-black to-gray-600 shadow-inner" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black/60 group-hover:text-black transition-colors">Quantum Vault</span>
                             <ChevronRight size={12} className="text-black/40 rotate-90" />
                         </button>
-                        <button onClick={handleDisconnect} className="text-black/40 hover:text-black uppercase text-[10px] font-bold tracking-widest ml-2">
-                            Disconnect
+                        <button onClick={handleDisconnect} className="text-red-500 hover:text-white hover:bg-red-500 uppercase text-[9px] font-black tracking-widest ml-2 border border-red-500/20 px-3 py-1.5 rounded-full transition-colors">
+                            Purge
                         </button>
                     </div>
                 )}
             </header>
 
-            <section className="px-8 pt-16 pb-12 flex flex-col items-center text-center">
+            <section className="px-8 pt-16 pb-12 flex flex-col items-center text-center relative z-10 bg-gradient-to-b from-white to-transparent">
                 <div className="relative inline-flex items-baseline justify-center mb-2">
                     <h1 className="font-light tracking-tighter text-black" style={{ fontSize: 'clamp(3rem, 10vw, 6rem)' }}>
                         {balance}
                     </h1>
                     <span className="absolute left-full text-2xl ml-4 font-black uppercase tracking-widest text-black/30 bottom-6">{networkInfo.currency}</span>
                 </div>
-                <p className="text-black/50 text-xs tracking-[0.2em] uppercase mb-12 border border-black/10 px-4 py-1.5 rounded-sm">{balanceFiat} USD EQUIVALENT</p>
+                <div className="flex items-center gap-3 mb-12">
+                    <p className="text-black/60 text-[10px] tracking-[0.2em] font-mono uppercase border border-black/10 bg-white/50 backdrop-blur-md px-4 py-1.5 rounded-full shadow-sm">{balanceFiat} USD EQUIVALENT</p>
+                    <span className="px-2 py-1 bg-black text-white text-[8px] font-black uppercase tracking-widest rounded-sm flex items-center gap-1 shadow-md">
+                        <TerminalSquare size={10} /> LIVE ON-CHAIN
+                    </span>
+                </div>
 
                 {address ? (
-                    <div className="flex flex-col items-center gap-3 w-full max-w-sm">
-                        <button onClick={copy} className="w-full bg-black text-white px-6 py-4 rounded-none flex items-center justify-between hover:bg-black/90 transition-colors group">
-                            <code className="text-xs font-bold">{truncate(address, 16)}</code>
-                            {copied ? <Check size={14} /> : <Copy size={14} className="opacity-50 group-hover:opacity-100" />}
+                    <div className="flex flex-col items-center gap-3 w-full max-w-md">
+                        <button onClick={copy} className="w-full bg-black text-white px-6 py-4 rounded-2xl flex items-center justify-between hover:bg-black/90 hover:scale-[1.02] transition-all shadow-xl group">
+                            <code className="text-sm font-black tracking-widest">{truncate(address, 18)}</code>
+                            {copied ? <Check size={16} className="text-[#00C076]" /> : <Copy size={16} className="opacity-50 group-hover:opacity-100" />}
                         </button>
-                        <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="w-full border border-black/10 px-6 py-3 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-black hover:bg-black/5 transition-colors">
-                            Verify Block Explorer <ExternalLink size={10} />
+                        <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="w-full border border-black/10 bg-white px-6 py-3.5 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-black hover:bg-black/5 hover:border-black/20 transition-all shadow-sm">
+                            Inspect Full Cryptographic State <ExternalLink size={12} />
                         </a>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center gap-6 mt-4">
-                        <Box size={40} className="text-black/20" strokeWidth={1} />
-                        <h4 className="text-sm font-bold uppercase tracking-widest">System Uninitialized</h4>
-                        <p className="text-xs text-black/50 max-w-sm leading-relaxed">Cryptographic keys are required to interface with the ledger. Initialize a Wallet to proceed.</p>
-                        <button onClick={onCreate} className="bg-black text-white px-8 py-3 text-xs uppercase tracking-widest font-bold hover:bg-black/80 transition-colors">
-                            Create Wallet
+                    <div className="flex flex-col items-center gap-6 mt-4 p-10 bg-white border border-black/10 rounded-3xl shadow-2xl max-w-md">
+                        <div className="w-20 h-20 rounded-full bg-black/5 flex items-center justify-center mb-2 shadow-inner">
+                            <Box size={32} className="text-black/40" strokeWidth={1.5} />
+                        </div>
+                        <h4 className="text-sm font-black uppercase tracking-widest">System Uninitialized</h4>
+                        <p className="text-xs text-black/50 leading-relaxed font-medium">Cryptographic keys are required to interface with the global ledger. Initialize a Quantum Vault to proceed.</p>
+                        <button onClick={onCreate} className="w-full bg-black text-white px-8 py-4 rounded-xl text-[11px] uppercase tracking-[0.2em] font-black hover:bg-black/90 hover:scale-[1.02] transition-all shadow-lg mt-2">
+                            Initialize Architecture
                         </button>
                     </div>
                 )}
             </section>
 
             {address && (
-                <section className="px-8 max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Actions Panel */}
-                    <div className="lg:col-span-4 space-y-4">
-                        <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-2 mb-4">Operations</h4>
-                        <div className="grid grid-cols-3 gap-2">
-                            <ActionBtn icon={CreditCard} label="Deposit" onClick={onBuy} />
-                            <ActionBtn icon={RefreshCw} label="Swap" onClick={onSwap} />
-                            <ActionBtn icon={GitMerge} label="Bridge" onClick={onBridge} />
-                            <ActionBtn icon={ArrowUpRight} label="Send" onClick={onSend} />
-                            <ActionBtn icon={ArrowDownLeft} label="Receive" onClick={onReceive} />
-                            <ActionBtn icon={Scan} label="Scan" onClick={onScan} />
+                <section className="px-8 max-w-[1400px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+                    {/* Action Palette */}
+                    <div className="lg:col-span-3 space-y-4">
+                        <div className="bg-white rounded-2xl border border-black/10 p-5 shadow-sm">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-3 mb-4 flex items-center gap-2">
+                                <Zap size={12} /> Execution Vectors
+                            </h4>
+                            <div className="grid grid-cols-2 gap-3">
+                                <ActionBtn icon={CreditCard} label="Deposit" onClick={onBuy} />
+                                <ActionBtn icon={RefreshCw} label="Swap" onClick={onSwap} />
+                                <ActionBtn icon={GitMerge} label="Bridge" onClick={onBridge} />
+                                <ActionBtn icon={ArrowUpRight} label="Send" onClick={onSend} />
+                                <ActionBtn icon={ArrowDownLeft} label="Receive" onClick={onReceive} />
+                                <ActionBtn icon={Scan} label="Scan" onClick={onScan} />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Quantum Details */}
-                    <div className="lg:col-span-8 space-y-4">
-                        <div className="flex items-center gap-4 border-b border-black/10">
-                            {['TOKENS', 'NFTS', 'ACTIVITY'].map(t => (
-                                <button 
-                                    key={t}
-                                    onClick={() => setActiveTab(t as any)}
-                                    className={`pb-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${activeTab === t ? 'text-black border-b-2 border-black' : 'text-black/40 hover:text-black/70'}`}
-                                >
-                                    {t}
-                                </button>
-                            ))}
+                    {/* Deep Data Inspector */}
+                    <div className="lg:col-span-9 space-y-4">
+                        <div className="bg-white rounded-2xl border border-black/10 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
+                            {/* Tab Bar */}
+                            <div className="flex items-center border-b border-black/10 bg-black/5 px-2 pt-2 gap-2 overflow-x-auto">
+                                {['TOKENS', 'DEFI', 'ACTIVITY'].map(t => (
+                                    <button 
+                                        key={t}
+                                        onClick={() => setActiveTab(t as any)}
+                                        className={`px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all rounded-t-lg flex items-center gap-2 ${activeTab === t ? 'bg-white text-black shadow-[0_-2px_10px_rgba(0,0,0,0.05)] border-t border-x border-black/10' : 'text-black/40 hover:text-black/70 hover:bg-black/5 border border-transparent'}`}
+                                    >
+                                        {t === 'TOKENS' && <Database size={12} />}
+                                        {t === 'DEFI' && <Landmark size={12} />}
+                                        {t === 'ACTIVITY' && <Activity size={12} />}
+                                        {t}
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            {/* Content Body */}
+                            <div className="flex-1 bg-white relative flex flex-col">
+                                {activeTab === 'TOKENS' && <QuantumHoldingsEngine address={address} activeNetwork={activeNetwork} scannerBase={scannerBase} />}
+                                {activeTab === 'DEFI' && <QuantumDeFiPositions address={address} activeNetwork={activeNetwork} />}
+                                {activeTab === 'ACTIVITY' && <TransactionHistory address={address} scannerBase={scannerBase} />}
+                            </div>
                         </div>
-                        
-                        {activeTab === 'TOKENS' && (
-                            <div className="border border-black/10 bg-white flex flex-col min-h-[300px]">
-                                <div className="p-4 flex-1 flex flex-col gap-3 overflow-y-auto">
-                                    {tokenBalances && tokenBalances.length > 0 ? (
-                                        tokenBalances.map((tb: any) => (
-                                            <div key={tb.address} className="flex justify-between items-center text-sm font-mono border-b border-black/5 pb-3 pt-1 last:border-0 hover:bg-black/5 px-2 transition-colors cursor-pointer">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">{tb.symbol[0]}</div>
-                                                    <span className="font-bold">{tb.symbol}</span>
-                                                </div>
-                                                <span className="font-bold">{tb.balance}</span>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                                            <Database size={24} className="text-black/20 mb-4" />
-                                            <p className="text-xs text-black/40 uppercase tracking-widest font-bold mb-2">No Tokens Found</p>
-                                            <p className="text-[10px] text-black/30">Your ERC-20 assets will appear here.</p>
-                                        </div>
-                                    )}
-                                </div>
-                                <button onClick={onSettingsClick} className="w-full mt-auto border-t border-black/10 py-4 text-[10px] font-bold uppercase tracking-widest text-black/60 hover:bg-black hover:text-white transition-colors">
-                                    + Import Tokens
-                                </button>
-                            </div>
-                        )}
-
-                        {activeTab === 'NFTS' && (
-                            <div className="border border-black/10 bg-white flex flex-col min-h-[300px] items-center justify-center p-8 text-center">
-                                <Box size={32} className="text-black/20 mb-4" />
-                                <p className="text-xs text-black/40 uppercase tracking-widest font-bold mb-2">No NFTs Found</p>
-                                <p className="text-[10px] text-black/30 mb-6">Learn more about non-fungible tokens and how to acquire them.</p>
-                                <button className="border border-black text-black px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-colors">
-                                    Import NFT
-                                </button>
-                            </div>
-                        )}
-
-                        {activeTab === 'ACTIVITY' && (
-                            <div className="border border-black/10 bg-white min-h-[300px]">
-                                <div className="divide-y divide-black/10">
-                                    {transactions.length > 0 ? (
-                                        transactions.map((tx: any) => (
-                                            <a 
-                                                key={tx.hash} 
-                                                href={`${scannerBase}/tx/${tx.hash}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center justify-between p-4 hover:bg-black/5 transition-colors group"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-full border border-black flex items-center justify-center text-black bg-white">
-                                                        {tx.type === 'SEND' ? <ArrowUpRight size={14} /> : <ArrowDownLeft size={14} />}
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-[10px] font-bold uppercase tracking-widest block mb-1">{tx.type}</span>
-                                                        <span className={`text-[9px] font-bold uppercase tracking-widest ${tx.status === 'SUCCESS' ? 'text-green-600' : 'text-red-600'}`}>
-                                                            {tx.status === 'SUCCESS' ? 'Confirmed' : 'Failed'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <span className="text-xs font-bold block mb-1">
-                                                        {tx.type === 'SEND' ? '-' : '+'}{tx.fromAmount} {tx.fromToken}
-                                                    </span>
-                                                    <div className="flex items-center justify-end gap-1 text-black/40">
-                                                        <span className="text-[10px]">{truncate(tx.hash, 12)}</span>
-                                                        <ExternalLink size={10} />
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        ))
-                                    ) : (
-                                        <div className="p-16 text-center flex flex-col items-center">
-                                            <Activity size={24} className="text-black/20 mb-4" />
-                                            <p className="text-xs text-black/40 uppercase tracking-widest font-bold mb-2">No Transactions</p>
-                                            <p className="text-[10px] text-black/40 max-w-[200px]">Your activity will appear here when you interact with the network.</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </section>
             )}

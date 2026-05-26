@@ -456,9 +456,9 @@ function ConnectedScreen({
           >
             <div className="flex items-center gap-3">
               <Scan size={16} className="text-white/70" />
-              <span className="text-[14px] font-medium text-white">Scan QR PC</span>
+              <span className="text-[14px] font-medium text-white">Link New PC Session</span>
             </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50">Sync</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50">Multi-Sync</span>
           </button>
         </motion.div>
 
@@ -745,7 +745,7 @@ export function MobileLanding() {
             
             if (result.ok) {
               // Clean up the URL to prevent re-triggering
-              window.history.replaceState({}, '', '/connect');
+              window.history.replaceState({}, '', window.location.pathname);
             }
           } catch (e) {
             console.error('Handshake error', e);
@@ -886,6 +886,7 @@ export function MobileLanding() {
       }
 
       console.log('[Auth] Handshake successful for:', norm);
+      document.cookie = `system_handshake=${norm}; path=/; max-age=31536000; SameSite=Lax`;
       setLinkedAddress(norm);
       setIsLinked(true);
       setConnecting(null);

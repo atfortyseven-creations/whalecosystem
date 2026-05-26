@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, User, Bell, Tag, Settings, Plus, Trash2, Save, Loader2, Check, AlertTriangle } from 'lucide-react';
@@ -192,7 +192,7 @@ export default function ForumSettingsPage() {
             <input
               className={inputCls}
               value={profile.displayName ?? ''}
-              placeholder="e.g. SystemTrader"
+              placeholder="e.g. NetworkParticipant"
               onChange={e => setProfile(p => p && ({ ...p, displayName: e.target.value }))}
             />
           </Field>
